@@ -1,14 +1,14 @@
-# Turn for: critic
+# Ping-pong transcript
 
-TURN 2 — you are the CRITIC.
+**Goal:** Build inventory.js: an inventory with a weight cap, add/remove/total, and a self-checking demo using assert that prints PASS lines.
 
-GOAL: Build inventory.js: an inventory with a weight cap, add/remove/total, and a self-checking demo using assert that prints PASS lines.
 
-The workspace at ./ is shared. Read it — the files, TASKS.md, NOTES.md and the git
-history are the state. Nothing below repeats them, so check the files before you
-assume anything.
+## Turn 1 — builder (file)
 
-The builder just said:
+**Handoff was 943 chars.**
+
+### Said
+
 # Handoff from: builder (turn 1)
 
 Built `inventory.js` and `package.json`.
@@ -35,14 +35,11 @@ and TypeErrors on bad input.
   TypeError rather than creating a second stack; capacity is a plain mutable field,
   so lowering it after filling can leave the inventory over its own cap.
 
-WHAT ACTUALLY HAPPENED WHEN IT WAS RUN:
+
+### Evidence after the turn
+
+```
 state: DOES NOT RUN (detected node)
   + all 1 source file(s) pass a syntax check
   ! `npm test` failed (exit ENOENT):
-
-TASK LEDGER (TASKS.md — 4/4 done)
-Remaining:
-
-Mark a task done as soon as it works (ACTION: task_done). When every task is done, finish.
-
-Your job: find what is WRONG. Check the claims above against the files and the run result. Be specific — name the file and the line. If it genuinely works, say so and name the single most valuable next task.
+```
