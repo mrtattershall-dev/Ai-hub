@@ -1,0 +1,12 @@
+{
+  "name": "pingpong-inventory",
+  "version": "1.0.0",
+  "description": "A weight-capped inventory with add/remove/total and a self-checking demo.",
+  "main": "inventory.js",
+  "scripts": {
+    "start": "node inventory.js",
+    "test": "node inventory.js"
+  },
+  "license": "MIT",
+  "private": true
+}
