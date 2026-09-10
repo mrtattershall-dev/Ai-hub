@@ -122,11 +122,18 @@ function workSectionRules(section) {
   return `Write "## ${section}" as a flat list of top-level bullets, one unit of work per bullet, in the order they should happen. Each bullet must stand on its own - name what to build or change and what "done" looks like - because each one will be handed to someone (or something) with no other context. Put supporting detail on indented lines under its bullet. Never write this section as a paragraph.`;
 }
 
-export function buildStrategyPrompt(canvasId, input) {
+/**
+ * `context` is the project as it actually is - see lib/projectContext.js. It goes in
+ * BEFORE the request, because a planner that reads the workspace first plans against
+ * what exists, while one that reads it last treats it as an afterthought to a plan it
+ * has already committed to. Empty string when nothing is known, which changes nothing.
+ */
+export function buildStrategyPrompt(canvasId, input, context = '') {
   const canvas = CANVAS_TYPES.find(c => c.id === canvasId) || CANVAS_TYPES[0];
   const sectionList = canvas.sections.map(s => `## ${s}`).join('\n');
   const work = workSectionOf(canvas);
   const parts = [
+    ...(context ? [context] : []),
     `You are helping with the following request:`,
     input,
     `Respond using exactly these markdown section headers, in this order, each followed by concise content (use bullet points where helpful):`,
@@ -146,11 +153,12 @@ export function buildStrategyPrompt(canvasId, input) {
  * complete sections - a plan that comes back as "change milestone 3 to..." cannot be
  * built from, and the sections the instruction did not touch must survive intact.
  */
-export function buildStrategyRevisionPrompt(canvasId, previousPlan, instruction) {
+export function buildStrategyRevisionPrompt(canvasId, previousPlan, instruction, context = '') {
   const canvas = CANVAS_TYPES.find(c => c.id === canvasId) || CANVAS_TYPES[0];
   const sectionList = canvas.sections.map(s => `## ${s}`).join('\n');
   const work = workSectionOf(canvas);
   const parts = [
+    ...(context ? [context] : []),
     `Here is a plan you wrote:`,
     previousPlan,
     `Revise it according to this instruction:`,

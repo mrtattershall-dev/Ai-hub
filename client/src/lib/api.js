@@ -5,8 +5,36 @@ const BASE = '/api';
 // localhost-only and tells the client what to send, so the token is picked up once
 // at startup and attached to every request and to the terminal WebSocket.
 let hubToken = null;
+const TOKEN_KEY = 'hub_token';
 export function getHubToken() { return hubToken; }
+
+/**
+ * Where the token comes from, in order.
+ *
+ * A REMOTE browser can never use /auth/hint: that route is localhost-only on purpose,
+ * and once HUB_TOKEN is set the server no longer exempts loopback callers (a tunnel
+ * terminates locally, so "it came from 127.0.0.1" proves nothing). So a tunnelled
+ * client needs another way in, or token-gated remote access is simply unusable:
+ *
+ *   1. ?token=... in the page URL - how you open the hub through a tunnel. It is
+ *      stored and then stripped from the address bar so it does not linger in
+ *      screenshots, browser history or a shared link.
+ *   2. whatever was stored last, so a reload does not need the query string again.
+ *   3. /auth/hint - the zero-setup path when you are sitting at the machine.
+ */
 export async function loadHubToken() {
+  try {
+    const fromUrl = new URLSearchParams(location.search).get('token');
+    if (fromUrl) {
+      hubToken = fromUrl;
+      try { localStorage.setItem(TOKEN_KEY, fromUrl); } catch {}
+      try { history.replaceState(null, '', location.pathname + location.hash); } catch {}
+      return hubToken;
+    }
+    const saved = localStorage.getItem(TOKEN_KEY);
+    if (saved) { hubToken = saved; return hubToken; }
+  } catch { /* no URL/localStorage in this context - fall through to the hint */ }
+
   try {
     const res = await fetch(BASE + '/auth/hint');
     if (res.ok) hubToken = (await res.json()).token || null;

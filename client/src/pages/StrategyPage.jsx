@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Send, Compass, Wand2, Loader2 } from 'lucide-react';
+import { Send, Compass, Wand2, Loader2, FolderTree } from 'lucide-react';
 import { useStore } from '../store/useStore.js';
 import ChipGroup from '../components/ChipGroup.jsx';
 import OutputBlock from '../components/OutputBlock.jsx';
 import { CANVAS_TYPES } from '../lib/constants.js';
 import { buildStrategyPrompt, buildStrategyRevisionPrompt } from '../lib/prompts.js';
 import { chatStream } from '../lib/api.js';
+import { gatherProjectContext } from '../lib/projectContext.js';
 
 const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -46,6 +47,12 @@ function RefineBox({ onRefine, busy }) {
 export default function StrategyPage() {
   const [input, setInput] = useState('');
   const [temperature, setTemperature] = useState(0.4);
+  // On by default. A plan written blind is the expensive failure now that plans become
+  // unattended chains, so the burden is on turning context OFF, not on remembering it.
+  const [useContext, setUseContext] = useState(true);
+  // What the last send actually attached, so the toggle can report fact rather than
+  // intent - "on" and "the workspace listing timed out" must not look the same.
+  const [attached, setAttached] = useState(null);
 
   const activeCanvas = useStore(s => s.activeCanvas);
   const setActiveCanvas = useStore(s => s.setActiveCanvas);
@@ -119,21 +126,43 @@ export default function StrategyPage() {
     );
   };
 
-  const handleSend = () => {
-    if (!input.trim() || isStreaming || !providerReady()) return;
-    runCanvas(buildStrategyPrompt(activeCanvas, input), { rev: 1 });
+  /** The project block for this send, and the record of what it contained. */
+  const contextForSend = async () => {
+    if (!useContext) { setAttached(null); return ''; }
+    const { text, available } = await gatherProjectContext();
+    setAttached(available);
+    return text;
   };
 
-  const handleRefine = (source, instruction) => {
+  const handleSend = async () => {
+    if (!input.trim() || isStreaming || !providerReady()) return;
+    const context = await contextForSend();
+    runCanvas(buildStrategyPrompt(activeCanvas, input, context), { rev: 1 });
+  };
+
+  const handleRefine = async (source, instruction) => {
     if (isStreaming || !providerReady()) return;
     const canvasId = source.canvasId || activeCanvas;
-    const prompt = buildStrategyRevisionPrompt(canvasId, source.response, instruction);
+    const context = await contextForSend();
+    const prompt = buildStrategyRevisionPrompt(canvasId, source.response, instruction, context);
     runCanvas(prompt, {
       canvasId,
       rev: (source.rev || 1) + 1,
       revisionOf: source.id,
       revisionNote: instruction,
     });
+  };
+
+  // What the toggle says under itself: the last send's real contents, or the intent
+  // before any send has happened.
+  const contextLabel = () => {
+    if (!useContext) return 'Planning blind — the model sees only your description.';
+    if (!attached) return 'The workspace, TASKS.md and the agent queue, read at send time.';
+    const bits = [];
+    bits.push(attached.files ? `${attached.files} workspace file(s)` : 'no workspace files');
+    if (attached.tasks) bits.push('TASKS.md');
+    if (attached.queued) bits.push(`${attached.queued} queued goal(s)`);
+    return `Last send included: ${bits.join(', ')}.`;
   };
 
   const handleKeyDown = (e) => {
@@ -162,6 +191,15 @@ export default function StrategyPage() {
             onKeyDown={handleKeyDown}
           />
         </div>
+        <div className="field-group">
+          <label className="context-toggle">
+            <input type="checkbox" checked={useContext} onChange={(e) => setUseContext(e.target.checked)} />
+            <FolderTree size={13} />
+            Plan against the current project
+          </label>
+          <p className="hint" style={{ marginTop: 2 }}>{contextLabel()}</p>
+        </div>
+
         <div className="send-row">
           <div className="temp-control">
             <label>Temperature</label>

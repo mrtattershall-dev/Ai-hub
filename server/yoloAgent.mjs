@@ -38,7 +38,7 @@ const hub = spawn(process.execPath, [join(__dirname, 'index.js')], {
   env: {
     ...process.env, PORT: String(PORT), HUB_DB: join(dir, 'hub.json'),
     AGENT_WORKSPACE: ws, AGENT_QUEUE_FILE: join(dir, 'queue.json'), AGENT_RUNS_DIR: join(dir, 'runs'), RUN_INDEX: process.env.TRIAL_INDEX || join(dir, 'run-index.jsonl'),
-    AGENT_SUPERVISOR: '1', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
+    AGENT_SUPERVISOR: '1', AGENT_APPROVAL_MODE: 'yolo', HUB_TOKEN: '',
     AGENT_TICK_S: '30', AGENT_APPROVAL_TIMEOUT_MIN: '2',
     AGENT_MAX_STEPS: '30', AGENT_MAX_MINUTES: '10',
     MODEL_FIRST_BYTE_S: '600', MODEL_STALL_S: '90', MODEL_TIMEOUT_S: '1800',
@@ -55,55 +55,53 @@ const api = async (p, o) => (await fetch(API + p, { headers: { 'Content-Type': '
 for (let i = 0; i < 400; i++) { try { await fetch(API + '/auth/hint'); break; } catch { await new Promise((r) => setTimeout(r, 250)); } }
 
 const GOALS = [
-  // 30 trials spanning every shape the agent has to handle. Deliberately varied - running
-  // one shape thirty times would only measure that shape. Ordered so later goals depend on
-  // earlier ones, which is where the real difficulty lives.
+  // 30 YOLO trials. Chosen so the MODE actually matters: build auto-runs node/npm/python/git
+  // and ASKS about anything else, so a batch that never reaches for an unfamiliar binary
+  // would behave identically in both modes and prove nothing. These deliberately want real
+  // dependencies, system tools and multi-step builds - the places where "unknown command"
+  // comes up - while the denylist (rm -rf, git push, shutdown, curl|bash) stays in force.
 
-  // --- create, in three languages ---
-  'Create q1_math.js exporting add(a,b) and mul(a,b), throwing a clear Error on non-numeric input. Verify with node.',
-  'Create q2_str.js exporting slug(s) and title(s), throwing on non-string input. Verify with node.',
-  'Create q3_list.js exporting uniq(arr), flatten(arr) and chunk(arr,n). Verify with node.',
-  'Create q4_time.py with a function humanize(seconds) returning "2m 3s" style strings, plus asserts at the bottom. Run it with python.',
-  'Create q5_page.html: a plain HTML page with a heading, a button, and a counter that increments on click. Test it in the browser.',
+  // --- real dependencies, installed and used ---
+  'Create y1_dates.js that uses a date library from npm to format the current date as "Monday, 1 January 2026". Install what you need, then run it.',
+  'Create y2_uuid.js that installs and uses a uuid package to print five unique ids. Run it.',
+  'Create y3_color.js that installs a colour library and prints the hex value of "rebeccapurple". Run it.',
+  'Add a second output to the EXISTING y1_dates.js showing the date in ISO form. Keep the existing output. Run it.',
+  'Create y4_csv.js that installs a CSV parser, parses an inline CSV string of three rows, and prints the parsed objects. Run it.',
 
-  // --- append to what exists ---
-  'Add sub(a,b) and div(a,b) to the EXISTING q1_math.js, keeping add and mul unchanged. div must throw on divide-by-zero. Verify.',
-  'Add kebab(s) and snake(s) to the EXISTING q2_str.js, keeping the existing functions. Verify.',
-  'Add zip(a,b) and range(n) to the EXISTING q3_list.js. Keep everything else. Verify.',
-  'Add a clamp(v,lo,hi) function to the EXISTING q1_math.js. Keep everything else. Verify.',
-  'Add five more helpers to the EXISTING q3_list.js: head, tail, last, compact, sum. Verify all of them.',
+  // --- the toolchain itself ---
+  'Print the versions of node, npm and python available in this workspace, then write y5_env.md recording exactly what you found.',
+  'List every npm package currently installed in this workspace and write y6_deps.md naming each one and what it is for.',
+  'Create y7_lint.js with deliberately messy formatting, then install a formatter and use it to reformat the file. Show the before and after.',
+  'Create a package.json for this workspace with a "test" script that runs any q7 or y-prefixed check file that exists, then run npm test.',
+  'Create y8_bench.js that times how long it takes to sum one million numbers, and run it three times reporting each result.',
 
-  // --- edit one specific place ---
-  'In the EXISTING q1_math.js, change ONLY clamp so it throws when lo > hi. Touch nothing else. Verify.',
-  'In the EXISTING q2_str.js, change ONLY slug so it strips punctuation as well as spaces. Touch nothing else. Verify.',
-  'In the EXISTING q3_list.js, change ONLY chunk so it throws when n is less than 1. Touch nothing else. Verify.',
-  'In the EXISTING q1_math.js, add a JSDoc comment above add and mul only. Do not change any code. Verify it still runs.',
+  // --- data and files ---
+  'Create y9_data.json with 20 records of {id, name, score}, then y10_top.js that reads it and prints the top 5 by score. Run it.',
+  'Add a filter to the EXISTING y10_top.js so it only counts scores above 50. Keep the existing output. Run it.',
+  'Create y11_words.txt with 200 words, then y12_count.js that reports the ten most common. Run it.',
+  'Create y13_tree.js that prints the workspace file tree as indented text, and run it.',
+  'Create y14_report.md summarising every .js file in the workspace: its name and what it does. Read them first.',
 
-  // --- edit in many places at once ---
-  'Add input validation to EVERY function in q2_str.js that lacks it, so each throws a clear Error on bad input. Keep the working logic. Verify.',
-  'Add input validation to EVERY function in q3_list.js that lacks it. Keep the working logic. Verify.',
-  'Rename the function uniq to unique everywhere in q3_list.js, including any uses. Verify.',
+  // --- python alongside javascript ---
+  'Create y15_stats.py that computes mean, median and stdev of [3,1,4,1,5,9,2,6] with asserts, and run it.',
+  'Add a mode() function to the EXISTING y15_stats.py with an assert. Keep the rest. Run it.',
+  'Create y16_bridge.js that runs y15_stats.py as a subprocess and prints its output. Run it.',
+  'Create y17_json.py that writes a JSON file and y18_read.js that reads it back and prints it. Run both in order.',
+  'Write Y_PY.md documenting every function that really exists in y15_stats.py. Read the file first.',
 
-  // --- multiple files that depend on each other ---
-  'Create q6_index.js that re-exports everything from q1_math.js, q2_str.js and q3_list.js. Verify it loads with node.',
-  'Create q7_check.js that imports from q6_index.js and asserts at least one function from each module works. Run it and make it pass.',
-  'Update the EXISTING q6_index.js to also re-export the newest helpers, then run q7_check.js and fix anything that fails.',
+  // --- debugging under yolo ---
+  'Create y19_bug.js with an off-by-one error in a function slice2(arr, n) plus a failing test. Run it and confirm it fails.',
+  'Fix slice2 in the EXISTING y19_bug.js so its test passes. Run it to prove it.',
+  'Create y20_async.js with an async function that resolves after 100ms, and a test that awaits it. Run it.',
+  'Create y21_throw.js that demonstrates try/catch around a thrown Error, printing both paths. Run it.',
+  'Create y22_perf.js comparing array push versus concat over 100k items, and report which wins. Run it.',
 
-  // --- debugging: make something that fails pass ---
-  'Create q8_broken.js containing a function median(arr) that is WRONG for even-length arrays, plus a test at the bottom that fails. Run it and confirm it fails.',
-  'Fix median in the EXISTING q8_broken.js so its own test passes. Run it to prove it.',
-  'Create q9_slow.js with a function fib(n) written recursively, and a test that fib(25) is 75025. Run it.',
-  'Rewrite fib in the EXISTING q9_slow.js to be iterative, keeping the same test passing. Run it.',
-
-  // --- read the real code, then write about it ---
-  'Write Q_MATH.md documenting every function that really exists in q1_math.js, including what each throws. Read the file first.',
-  'Write Q_LIST.md documenting every function that really exists in q3_list.js. Read the file first.',
-  'Add a "Gotchas" section to the EXISTING Q_MATH.md describing the error cases, keeping the existing text.',
-
-  // --- a game, with real assets and browser verification ---
-  'Build q10_game.html: a Phaser 3 game. Use list_assets to find a player sprite, load it by EXACT path, arrow-key movement. Test it in the browser.',
-  'Add a score display to the EXISTING q10_game.html that increases when the player moves. Keep movement working. Test in the browser.',
-  'Write Q_GAME.md describing what q10_game.html actually does: the controls, the asset paths it loads, and the scoring. Read the file first.',
+  // --- larger builds ---
+  'Create y23_api.js: a tiny in-memory CRUD store with add/get/list/remove and a test at the bottom. Run it.',
+  'Add update(id, patch) to the EXISTING y23_api.js, keeping the other operations. Verify all five.',
+  'Add input validation to EVERY function in y23_api.js that lacks it. Keep the working logic. Verify.',
+  'Create y24_cli.js that takes a command line argument and prints a greeting, then run it with a sample argument.',
+  'Write Y_API.md documenting every operation in y23_api.js including what each throws. Read the file first.',
 ];
 
 console.log(`full agent run: ${MINUTES} min against ${BASE}`);

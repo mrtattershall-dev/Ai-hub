@@ -55,7 +55,7 @@ const hub = spawn(process.execPath, [join(__dirname, 'index.js')], {
     ...process.env,
     PORT: String(PORT), HUB_DB: dbPath,
     AGENT_WORKSPACE: ws, AGENT_QUEUE_FILE: join(dir, 'queue.json'),
-    AGENT_RUNS_DIR: join(dir, 'runs'),        // keep this out of the live run history
+    AGENT_RUNS_DIR: join(dir, 'runs'), RUN_INDEX: join(dir, 'run-index.jsonl'),        // keep this out of the live run history
     AGENT_SUPERVISOR: '1', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
     AGENT_MAX_STEPS: '30', AGENT_MAX_MINUTES: '12',
     MODEL_FIRST_BYTE_S: '600', MODEL_STALL_S: '90', MODEL_TIMEOUT_S: '1800',
@@ -103,7 +103,7 @@ await test('the supervisor drives the whole game chain unattended', async () => 
   let q = null;
   while (Date.now() < deadline) {
     q = await api('/agent/queue');
-    const open = (q.items || []).filter((i) => !['done', 'failed', 'cancelled'].includes(i.status));
+    const open = (q.items || []).filter((i) => !['done', 'failed', 'cancelled', 'stopped'].includes(i.status));
     if (!open.length) break;
     await new Promise((r) => setTimeout(r, 5000));
   }

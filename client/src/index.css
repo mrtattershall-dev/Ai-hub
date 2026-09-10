@@ -692,3 +692,11 @@ body.ws-dragging iframe, body.ws-dragging .xterm { pointer-events: none; }
   border-top: 0.5px solid var(--border);
 }
 .refine-note + .refine-row { border-top: 0; }
+
+/* The "plan against the current project" switch. Sits with the canvas controls rather
+   than in settings, because whether a plan was written blind is part of the plan. */
+.context-toggle {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; cursor: pointer; user-select: none;
+}
+.context-toggle input[type="checkbox"] { width: auto; margin: 0; }

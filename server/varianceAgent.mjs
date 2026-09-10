@@ -55,55 +55,42 @@ const api = async (p, o) => (await fetch(API + p, { headers: { 'Content-Type': '
 for (let i = 0; i < 400; i++) { try { await fetch(API + '/auth/hint'); break; } catch { await new Promise((r) => setTimeout(r, 250)); } }
 
 const GOALS = [
-  // 30 trials spanning every shape the agent has to handle. Deliberately varied - running
-  // one shape thirty times would only measure that shape. Ordered so later goals depend on
-  // earlier ones, which is where the real difficulty lives.
-
-  // --- create, in three languages ---
-  'Create q1_math.js exporting add(a,b) and mul(a,b), throwing a clear Error on non-numeric input. Verify with node.',
-  'Create q2_str.js exporting slug(s) and title(s), throwing on non-string input. Verify with node.',
-  'Create q3_list.js exporting uniq(arr), flatten(arr) and chunk(arr,n). Verify with node.',
-  'Create q4_time.py with a function humanize(seconds) returning "2m 3s" style strings, plus asserts at the bottom. Run it with python.',
-  'Create q5_page.html: a plain HTML page with a heading, a button, and a counter that increments on click. Test it in the browser.',
-
-  // --- append to what exists ---
-  'Add sub(a,b) and div(a,b) to the EXISTING q1_math.js, keeping add and mul unchanged. div must throw on divide-by-zero. Verify.',
-  'Add kebab(s) and snake(s) to the EXISTING q2_str.js, keeping the existing functions. Verify.',
-  'Add zip(a,b) and range(n) to the EXISTING q3_list.js. Keep everything else. Verify.',
-  'Add a clamp(v,lo,hi) function to the EXISTING q1_math.js. Keep everything else. Verify.',
-  'Add five more helpers to the EXISTING q3_list.js: head, tail, last, compact, sum. Verify all of them.',
-
-  // --- edit one specific place ---
-  'In the EXISTING q1_math.js, change ONLY clamp so it throws when lo > hi. Touch nothing else. Verify.',
-  'In the EXISTING q2_str.js, change ONLY slug so it strips punctuation as well as spaces. Touch nothing else. Verify.',
-  'In the EXISTING q3_list.js, change ONLY chunk so it throws when n is less than 1. Touch nothing else. Verify.',
-  'In the EXISTING q1_math.js, add a JSDoc comment above add and mul only. Do not change any code. Verify it still runs.',
-
-  // --- edit in many places at once ---
-  'Add input validation to EVERY function in q2_str.js that lacks it, so each throws a clear Error on bad input. Keep the working logic. Verify.',
-  'Add input validation to EVERY function in q3_list.js that lacks it. Keep the working logic. Verify.',
-  'Rename the function uniq to unique everywhere in q3_list.js, including any uses. Verify.',
-
-  // --- multiple files that depend on each other ---
-  'Create q6_index.js that re-exports everything from q1_math.js, q2_str.js and q3_list.js. Verify it loads with node.',
-  'Create q7_check.js that imports from q6_index.js and asserts at least one function from each module works. Run it and make it pass.',
-  'Update the EXISTING q6_index.js to also re-export the newest helpers, then run q7_check.js and fix anything that fails.',
-
-  // --- debugging: make something that fails pass ---
-  'Create q8_broken.js containing a function median(arr) that is WRONG for even-length arrays, plus a test at the bottom that fails. Run it and confirm it fails.',
-  'Fix median in the EXISTING q8_broken.js so its own test passes. Run it to prove it.',
-  'Create q9_slow.js with a function fib(n) written recursively, and a test that fib(25) is 75025. Run it.',
-  'Rewrite fib in the EXISTING q9_slow.js to be iterative, keeping the same test passing. Run it.',
-
-  // --- read the real code, then write about it ---
-  'Write Q_MATH.md documenting every function that really exists in q1_math.js, including what each throws. Read the file first.',
-  'Write Q_LIST.md documenting every function that really exists in q3_list.js. Read the file first.',
-  'Add a "Gotchas" section to the EXISTING Q_MATH.md describing the error cases, keeping the existing text.',
-
-  // --- a game, with real assets and browser verification ---
-  'Build q10_game.html: a Phaser 3 game. Use list_assets to find a player sprite, load it by EXACT path, arrow-key movement. Test it in the browser.',
-  'Add a score display to the EXISTING q10_game.html that increases when the player moves. Keep movement working. Test in the browser.',
-  'Write Q_GAME.md describing what q10_game.html actually does: the controls, the asset paths it loads, and the scoring. Read the file first.',
+  // THE SAME SIX SHAPES, FIVE TIMES EACH, with independent file prefixes.
+  // Everything measured so far is n=1 per goal: we know the agent CAN do each shape,
+  // not how OFTEN. For anything meant to run unattended that is the number that
+  // matters - 100% and 60% look identical in a single successful demo.
+  // Prefixes keep the repeats independent; repeating into the same files would
+  // measure 'editing a bigger file' instead of consistency.
+  'Create v1_calc.js exporting add(a,b), sub(a,b) and div(a,b). div throws on divide-by-zero. Include self-checks. Verify with node.',
+  'Create v1_base.js exporting greet(name) that throws on non-string input, then ADD a farewell(name) function to that SAME file keeping greet unchanged. Verify both.',
+  'Create v1_edit.js exporting scale(v, f) with no validation, then change ONLY scale so it throws when f is zero. Touch nothing else. Verify.',
+  'Create v1_multi.js with three functions a(x), b(x), c(x) that each double their input, then add input validation to EVERY one of them. Keep the maths. Verify.',
+  'Create v1_lib.js exporting one function, v1_use.js that imports and calls it, then run v1_use.js and make it pass.',
+  'Create v1_docs.js exporting three named functions with distinct behaviour, then write v1_DOCS.md describing every function that really exists in it. Read the file first.',
+  'Create v2_calc.js exporting add(a,b), sub(a,b) and div(a,b). div throws on divide-by-zero. Include self-checks. Verify with node.',
+  'Create v2_base.js exporting greet(name) that throws on non-string input, then ADD a farewell(name) function to that SAME file keeping greet unchanged. Verify both.',
+  'Create v2_edit.js exporting scale(v, f) with no validation, then change ONLY scale so it throws when f is zero. Touch nothing else. Verify.',
+  'Create v2_multi.js with three functions a(x), b(x), c(x) that each double their input, then add input validation to EVERY one of them. Keep the maths. Verify.',
+  'Create v2_lib.js exporting one function, v2_use.js that imports and calls it, then run v2_use.js and make it pass.',
+  'Create v2_docs.js exporting three named functions with distinct behaviour, then write v2_DOCS.md describing every function that really exists in it. Read the file first.',
+  'Create v3_calc.js exporting add(a,b), sub(a,b) and div(a,b). div throws on divide-by-zero. Include self-checks. Verify with node.',
+  'Create v3_base.js exporting greet(name) that throws on non-string input, then ADD a farewell(name) function to that SAME file keeping greet unchanged. Verify both.',
+  'Create v3_edit.js exporting scale(v, f) with no validation, then change ONLY scale so it throws when f is zero. Touch nothing else. Verify.',
+  'Create v3_multi.js with three functions a(x), b(x), c(x) that each double their input, then add input validation to EVERY one of them. Keep the maths. Verify.',
+  'Create v3_lib.js exporting one function, v3_use.js that imports and calls it, then run v3_use.js and make it pass.',
+  'Create v3_docs.js exporting three named functions with distinct behaviour, then write v3_DOCS.md describing every function that really exists in it. Read the file first.',
+  'Create v4_calc.js exporting add(a,b), sub(a,b) and div(a,b). div throws on divide-by-zero. Include self-checks. Verify with node.',
+  'Create v4_base.js exporting greet(name) that throws on non-string input, then ADD a farewell(name) function to that SAME file keeping greet unchanged. Verify both.',
+  'Create v4_edit.js exporting scale(v, f) with no validation, then change ONLY scale so it throws when f is zero. Touch nothing else. Verify.',
+  'Create v4_multi.js with three functions a(x), b(x), c(x) that each double their input, then add input validation to EVERY one of them. Keep the maths. Verify.',
+  'Create v4_lib.js exporting one function, v4_use.js that imports and calls it, then run v4_use.js and make it pass.',
+  'Create v4_docs.js exporting three named functions with distinct behaviour, then write v4_DOCS.md describing every function that really exists in it. Read the file first.',
+  'Create v5_calc.js exporting add(a,b), sub(a,b) and div(a,b). div throws on divide-by-zero. Include self-checks. Verify with node.',
+  'Create v5_base.js exporting greet(name) that throws on non-string input, then ADD a farewell(name) function to that SAME file keeping greet unchanged. Verify both.',
+  'Create v5_edit.js exporting scale(v, f) with no validation, then change ONLY scale so it throws when f is zero. Touch nothing else. Verify.',
+  'Create v5_multi.js with three functions a(x), b(x), c(x) that each double their input, then add input validation to EVERY one of them. Keep the maths. Verify.',
+  'Create v5_lib.js exporting one function, v5_use.js that imports and calls it, then run v5_use.js and make it pass.',
+  'Create v5_docs.js exporting three named functions with distinct behaviour, then write v5_DOCS.md describing every function that really exists in it. Read the file first.',
 ];
 
 console.log(`full agent run: ${MINUTES} min against ${BASE}`);

@@ -113,7 +113,7 @@ await test('the supervisor drives all three to completion with NO human input', 
     // 'taken' means the supervisor has DEQUEUED it and a run is in flight. Excluding it
     // made this loop stop watching while goal 3 was still working - and then the hub was
     // killed out from under it, which looked like the chain breaking. It had not.
-    const open = items.filter((i) => !['done', 'failed', 'cancelled'].includes(i.status));
+    const open = items.filter((i) => !['done', 'failed', 'cancelled', 'stopped'].includes(i.status));
     if (!open.length) break;
     await new Promise((r) => setTimeout(r, 4000));
   }
