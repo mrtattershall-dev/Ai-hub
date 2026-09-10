@@ -67,6 +67,11 @@ export const __toolPolicyTest = {
   // the model might emit is callable - without constructing a router, which would run
   // requeueOrphans() against the live work queue.
   hasTool: (name) => typeof tools[name] === 'function',
+  // The boundary-marker guard. A PURE function, so a test can pin it without constructing
+  // a router or touching a workspace. Exported because the failure it prevents was silent:
+  // the marker became a 22-byte stub and every later run measured a workspace whose module
+  // system did not match what the system prompt told the model it was.
+  markerRefusal: (path, tool) => markerRefusal(path, tool),
   // The single-run-at-a-time lock, exercisable without a model. `autoStart` is the only
   // path the agent may start work on its own, and it had no test at all until it was
   // pointed out that a guard nobody has watched fail is not a guard.
@@ -237,7 +242,11 @@ function buildOutline(lines) {
 // the advisory-vs-mechanical lesson one level down. Only a guard can hold it.
 const MARKER = 'package.json';
 function markerRefusal(path, tool) {
-  const rel = String(path || '').split(/[\/]+/).filter(Boolean).join('/');
+  // No regex here on purpose: an escaped backslash class kept getting mangled in transit,
+  // and a guard that silently stops matching is worse than no guard. Split on both
+  // separators, drop '.' segments, so './package.json' and '.\package.json' both
+  // normalise to 'package.json'. The test caught './' slipping through.
+  const rel = String(path || '').split(String.fromCharCode(92)).join('/').split('/').filter((x) => x && x !== '.').join('/');
   if (rel !== MARKER) return null;
   return `ERROR: ${MARKER} is the workspace boundary marker and ${tool} may not change it.
 `
