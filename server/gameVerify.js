@@ -15,13 +15,30 @@
  */
 import { Router } from 'express';
 import { createRequire } from 'module';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { launchOptions } from './browser.js';
 import { ENGINES, engineOr, engineHead } from '../shared/engines.js';
 import * as assets from './assets.js';
+import { loadEngineScript } from './engineCache.js';
 
 const require = createRequire(import.meta.url);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// ---- the engine script, cached on disk ---------------------------------------------
+//
+// Verification used to fetch Phaser/PIXI/THREE from jsdelivr on every single run. When
+// that fetch lost - a blip, a rate limit, no network at all - the engine global was
+// missing and the verdict read "<engine> never loaded", which is a statement about the
+// CODE. It is not: the code was never given the chance to run. Measured 2026-09-10:
+// pixi failed inside the selftest and passed three times in a row on its own, seconds
+// later. In an eval or a harvest that is a false negative on a working game, and false
+// negatives are the expensive kind - they teach the wrong lesson to whatever reads them.
+//
+// So: fetch once, keep the bytes, and serve them to the page through the interception
+// that is already there for assets. Verification then runs offline and, more
+// importantly, gives the same answer twice.
 const MAX_CODE = 200_000;
 const NAV_TIMEOUT = 20_000;
 const SETTLE_MS = 1200;          // let the engine boot + render a frame or two
@@ -46,12 +63,44 @@ const ASSET_HOST = 'http://hub-assets.invalid/';
  * model "you asked for assets/hero.png, which does not exist" is the difference between
  * a fixable error and a mystery.
  */
-async function attachAssetInterception(page, errors) {
+async function attachAssetInterception(page, errors, engineScript = null) {
   const used = [];
   const missing = [];
+  /** External scripts we could not supply. INFRASTRUCTURE, never the code's fault. */
+  const cdnFailures = [];
   await page.setRequestInterception(true);
-  page.on('request', (req) => {
+  page.on('request', async (req) => {
     const url = req.url();
+    // The engine comes from the cache when we have it, so the run does not depend on a
+    // CDN being reachable at this exact moment.
+    if (engineScript && url === engineScript.url) {
+      req.respond({ status: 200, contentType: 'application/javascript', body: engineScript.body })
+        .catch(() => {});
+      return;
+    }
+
+    // ANY other external script gets the same treatment, not only the one we injected.
+    //
+    // This used to match the exact injected URL alone, so a page pinning its own version -
+    // `phaser@3.60.0` when the cache holds 3.80.1 - fell through to a live CDN fetch.
+    // Measured 2026-09-10: jsdelivr answered with something HTML-ish and the browser
+    // reported `Unexpected token '<'` as a RUNTIME ERROR IN THE GAME. Correct code scored
+    // as broken, in the path that feeds eval, harvest and the finish gate. The agent writes
+    // its own script tag, so pinning a different version is the normal case here, not the
+    // exotic one.
+    if (req.resourceType() === 'script' && /^https?:\/\//i.test(url) && !url.startsWith(ASSET_HOST)) {
+      const body = await loadEngineScript(url);
+      if (body) {
+        req.respond({ status: 200, contentType: 'application/javascript', body }).catch(() => {});
+      } else {
+        // Fail it deliberately and record it APART from `errors`, so nothing downstream can
+        // mistake "a library could not be fetched" for "this code throws".
+        if (!cdnFailures.includes(url)) cdnFailures.push(url);
+        req.abort().catch(() => {});
+      }
+      return;
+    }
+
     if (!url.startsWith(ASSET_HOST)) { req.continue().catch(() => {}); return; }
     const want = url.slice(ASSET_HOST.length);
     let hit = null;
@@ -80,7 +129,7 @@ async function attachAssetInterception(page, errors) {
       }).catch(() => {});
     }
   });
-  return { used, missing };
+  return { used, missing, cdnFailures };
 }
 
 function buildDoc(engineId, code) {
@@ -106,6 +155,9 @@ export default function gameVerifyRouter() {
     const eng = engineOr(engine);
     const errors = [];
     let browser;
+    // Declared out here so the failure path below can tell "the code hung" apart from
+    // "we never had an engine to give it".
+    let bytes = null;
     try {
       browser = await puppeteer.launch(launchOptions());
       const page = await browser.newPage();
@@ -121,7 +173,9 @@ export default function gameVerifyRouter() {
       page.on('requestfailed', (r) => errors.push(`[NETWORK] ${r.failure()?.errorText || 'failed'} — ${r.url()}`));
       page.on('response', (r) => { if (r.status() >= 400) errors.push(`[HTTP ${r.status()}] ${r.url()}`); });
 
-      const assetTrace = await attachAssetInterception(page, errors);
+      bytes = await loadEngineScript(eng.cdn);
+      const assetTrace = await attachAssetInterception(page, errors,
+        bytes ? { url: eng.cdn, body: bytes } : null);
 
       await page.setContent(buildDoc(engine, code), { waitUntil: 'networkidle2', timeout: NAV_TIMEOUT });
       await new Promise((r) => setTimeout(r, SETTLE_MS));
@@ -142,7 +196,14 @@ export default function gameVerifyRouter() {
       browser = null;
 
       checks.rendered = checks.canvasFound && checks.canvasWidth > 0 && checks.canvasHeight > 0;
-      const hardErrors = errors.filter((e) => e.startsWith('[JS ERROR]') || e.startsWith('[NETWORK]'));
+
+      // A library we could not supply produces knock-on noise - the aborted request itself,
+      // and whatever the page throws next because the global is missing. None of it is the
+      // code's fault, so none of it may reach `hardErrors`, which is what `ok` turns on.
+      const cdnFailed = assetTrace.cdnFailures || [];
+      const fromCdn = (e) => cdnFailed.some((u) => e.includes(u));
+      const hardErrors = errors.filter((e) =>
+        (e.startsWith('[JS ERROR]') || e.startsWith('[NETWORK]')) && !fromCdn(e));
       // A missing asset is a FAILURE, not a warning. Phaser paints a green placeholder for
       // a texture that 404'd and carries on, so the canvas renders and every other check
       // passes - measured 2026-09-09: a game whose sprite did not exist came back
@@ -150,10 +211,22 @@ export default function gameVerifyRouter() {
       // paths) and the verifier (which is meant to be the ground truth) would disagree,
       // and the eval would pass code that draws a placeholder where the art should be.
       const missingAssets = assetTrace.missing.length > 0;
-      const ok = checks.engineLoaded && checks.rendered && hardErrors.length === 0 && !checks.thrownAtTopLevel && !missingAssets;
+      // A run missing a library it asked for proved nothing, so it cannot be a pass - but
+      // it is reported as `infra` below rather than as broken code.
+      const libraryUnavailable = cdnFailed.length > 0;
+      const ok = checks.engineLoaded && checks.rendered && hardErrors.length === 0
+        && !checks.thrownAtTopLevel && !missingAssets && !libraryUnavailable;
 
+      // An engine that could not be supplied at all is an INFRASTRUCTURE failure, and
+      // saying so keeps it out of any score that is meant to be about the code.
+      const engineUnavailable = !checks.engineLoaded && !bytes;
+      // The page asked for a library of its own and we could not supply it. Same category:
+      // infrastructure, not code. `ok` stays false - the run genuinely proved nothing - but
+      // `infra` tells eval and harvest to retry or skip rather than score it.
       let verdict;
-      if (!checks.engineLoaded) verdict = `${eng.label} never loaded — the CDN script failed or was blocked.`;
+      if (engineUnavailable) verdict = `Verification could not run: no cached copy of ${eng.label} and the CDN could not be reached. This says nothing about the code.`;
+      else if (libraryUnavailable) verdict = `Verification could not run: ${cdnFailed.length} script(s) the page asked for could not be fetched or read from cache (${cdnFailed[0]}${cdnFailed.length > 1 ? ', …' : ''}). This says nothing about the code.`;
+      else if (!checks.engineLoaded) verdict = `${eng.label} never loaded — the script was served but did not define ${eng.global}.`;
       else if (checks.thrownAtTopLevel) verdict = `Code threw before it finished: ${checks.thrownAtTopLevel}`;
       else if (missingAssets) verdict = `Loads ${assetTrace.missing.length} asset(s) that do not exist: ${assetTrace.missing.slice(0, 3).join(', ')}${assetTrace.missing.length > 3 ? ', …' : ''}. Use list_assets for exact names.`;
       else if (!checks.canvasFound) verdict = `${eng.label} loaded but no <canvas> was created — nothing rendered.`;
@@ -164,6 +237,12 @@ export default function gameVerifyRouter() {
 
       res.json({
         ok, verdict, engine, checks,
+        // True when the run failed for a reason that is not the code's fault. Eval and
+        // harvest should retry or skip these, never score them.
+        infra: engineUnavailable || libraryUnavailable,
+        // Which scripts we could not supply, so a human can see WHICH library was missing
+        // rather than being told only that "something" was.
+        cdnFailures: cdnFailed,
         // What the code actually asked the library for. `assetsMissing` is the useful
         // half: it names the exact filename that does not exist.
         assetsUsed: assetTrace.used,
@@ -174,9 +253,14 @@ export default function gameVerifyRouter() {
       });
     } catch (e) {
       try { if (browser) await browser.close(); } catch {}
+      // A navigation timeout with no engine bytes is the CDN, not the code - which is
+      // exactly how a working game got scored as broken before the cache existed.
       res.status(500).json({
         ok: false,
-        verdict: `Verification failed to run: ${e.message}`,
+        infra: !bytes,
+        verdict: bytes
+          ? `Verification failed to run: ${e.message}`
+          : `Verification failed to run (${e.message}), and ${eng.label} could not be fetched or read from cache - this says nothing about the code.`,
         engine,
         checks: null,
         errors: errors.slice(0, 30),
