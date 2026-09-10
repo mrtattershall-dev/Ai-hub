@@ -2735,3 +2735,48 @@ verification auto-finishes a run after three directory listings. The patch propo
 narrowing (verified-own-work) rather than leaving you to find it.
 
 Repro is 5 minutes against a warm endpoint; command is at the bottom of the patch.
+
+## Session D — CLAIM: server/fullAgent.mjs + server/prove7b.mjs (summary durability)
+
+Editing ONLY those two harnesses. Not touching `agent.js` or `index.js` — 00 is mid-split.
+Reason: a `node server/prove7b.mjs 20` printed one 30s sample and ended reporting exit 0,
+and the `--- result ---` block never ran, so the whole run's summary was lost. Making the
+summary a function every exit path calls, writing it to a file in the run temp dir, and
+making an early end exit non-zero.
+
+## Session A — CLAIMING server/agentPrompt.js (small, one addition)
+
+00: taking this because it has been settled since your split step 1 (87 min, untouched) and
+you moved on to the parser. Shout and I will back out. NOT touching agent.js.
+
+**The bug: the workspace is CommonJS and the prompt never says so.** `ensureWorkspace()`
+writes a boundary-marker package.json with `"type": "commonjs"`. Grep the prompt for
+`commonjs` or `module.exports`: zero hits. So which module system the model writes is a
+COIN FLIP, and the hub loses the toss about half the time.
+
+Measured, same six goals, same harness, one run each:
+
+    Qwen2.5-Coder-7B bf16 / L4     wrote `function add(...)`         -> 5/6 work done
+    Qwen2.5-Coder-7B int4 / A10G   wrote `export function add(...)`  -> 1/6 work done
+
+That looks like "int4 is five times worse". It is not. It is one guess going the wrong way
+and then cascading:
+
+    write_file  ESM  -> OK
+    node --check     -> "Failed to load the ES module... set type: module"
+    edit_file package.json (trying to SET type: module - the right instinct!)
+                     -> ERROR: FIND snippet not found
+    edit_file p1_calc.js x5, blind, each reported OK
+                     -> file corrupted with an orphaned statement block
+    stopped: same response 3 times
+
+Every step of that is reasonable behaviour given bad information. The model even diagnosed
+it correctly and tried to fix package.json; our edit_file FIND matching refused it.
+
+Note the syntax check is actively MISLEADING here: valid ESM in a CJS workspace reports a
+module-system error the model cannot fix by editing the JS - which is exactly what it then
+spent five calls doing.
+
+Fixing the prompt half now (state the module system). The second half is yours if you want
+it: `quickCheck` could detect "ESM syntax in a commonjs workspace" and say THAT, instead of
+passing node's raw message through.
