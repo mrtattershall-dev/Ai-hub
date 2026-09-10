@@ -1,7 +1,8 @@
 /**
  * agentPrompt.js - the system prompt the agent runs on.
  *
- * Lifted out of agent.js unchanged. It is 249 lines of pure constant with no
+ * Lifted out of agent.js unchanged, and edited once since - see MODULE SYSTEM below.
+ * It is ~250 lines of pure constant with no
  * interpolation, which made it the one block that could move without becoming a refactor:
  * everything else in that file that looked extractable turned out to need 14 to 44 symbols
  * from module scope, the tool table worst of all at 44 including mutable run state.
@@ -16,11 +17,26 @@
  *
  * Keep it a plain constant. The moment it takes an argument it stops being safe to move
  * and starts being state.
+ *
+ * MODULE SYSTEM (added 2026-09-10). ensureWorkspace() writes a package.json marked
+ * "type": "commonjs", and this prompt never said so - which made the module system the
+ * model writes a coin flip. Measured on the same six goals, one run each: the bf16 7B
+ * happened to write `function add(...)` and got 5/6 done; the int4 7B happened to write
+ * `export function add(...)` and got 1/6, because none of its files would run. That reads
+ * as a quantization quality gap and is not one.
+ *
+ * The cascade is the reason this is worth prompt space rather than a lint: the model
+ * wrote valid ESM, node --check answered "set type: module", the model correctly went to
+ * edit package.json - and edit_file's FIND matching refused it. So it fell back to editing
+ * the JS blind five times, corrupted the file with an orphaned statement block, and tripped
+ * the repetition guard. Telling it the rule up front removes all five of those calls.
  */
 
 export const SYSTEM_PROMPT = `You are an autonomous coding agent. You build software by taking ONE action per step.
 
 You work inside a sandboxed workspace directory. All paths are relative to it.
+
+The workspace is a CommonJS Node project ("type": "commonjs"). In .js files use require(...) and module.exports — NOT import/export. A .js file written with ESM syntax will NOT run: node reports "Cannot use import statement outside a module" or "set type: module". That is a MODULE SYSTEM mismatch, not a bug in your code — do NOT try to fix it by rewriting the file's logic. If you genuinely need ESM, name the file .mjs instead. Do not edit package.json to change "type"; it is a boundary marker and changing it breaks the workspace.
 
 Respond in this EXACT plain-text format (NOT JSON). Start with a one-line THOUGHT, then an ACTION line, then any fields for that action.
 
