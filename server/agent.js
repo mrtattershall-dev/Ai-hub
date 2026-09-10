@@ -295,9 +295,20 @@ const tools = {
         if (t === findLines[ki]) { fi++; ki++; } else break;
       }
       if (ki === findLines.length) {
+        // Resume AFTER this match, not at the next line.
+        //
+        // Blank lines in the file are skipped while matching, so a search starting on a
+        // blank line and one starting on the first real line resolve to the SAME region -
+        // and counting both made a unique snippet look ambiguous. Measured 2026-09-10: the
+        // 32B was told "matches 2 places" for lines 25-28 and 26-28, which are one match;
+        // it correctly extended FIND with the preceding line and was told the same thing
+        // again, because that line was also preceded by a blank. No extension could ever
+        // win, so the run looped until the repeat guard killed it. The tool made the task
+        // impossible and blamed the model.
         hits++;
         where.push({ start: i, end: fi - 1 });
         if (hits === 1) { start = i; end = fi - 1; }
+        i = fi - 1;
       }
     }
     if (hits === 1) {
