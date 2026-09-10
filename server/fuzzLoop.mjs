@@ -86,7 +86,17 @@ async function iteration(seed) {
   live.add(hub);
   const log = []; hub.stdout.on('data', (d) => log.push(d.toString())); hub.stderr.on('data', (d) => log.push(d.toString()));
   const API = `http://127.0.0.1:${hubPort}/api`;
-  const api = async (p, o) => (await fetch(API + p, { headers: { 'Content-Type': 'application/json' }, ...o, signal: AbortSignal.timeout(60000) })).json();
+  // Read the body as TEXT first. A route that throws gets Express's default error handler,
+  // which answers with an HTML page holding the stack trace - and `.json()` on that throws
+  // "Unexpected token '<'", discarding the one thing that says what went wrong. Seed 39 hit
+  // exactly that on the 4th /agent/start of an iteration, and all the report could say was
+  // that the reply was not JSON.
+  const api = async (p, o) => {
+    const res = await fetch(API + p, { headers: { 'Content-Type': 'application/json' }, ...o, signal: AbortSignal.timeout(60000) });
+    const body = await res.text();
+    try { return JSON.parse(body); }
+    catch { throw new Error(`HTTP ${res.status} non-JSON from ${p}: ${body.replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#?\w+;/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 400)}`); }
+  };
   for (let i = 0; i < 240; i++) { try { await fetch(API + '/auth/hint'); break; } catch { await new Promise((ok) => setTimeout(ok, 250)); } }
 
   const v = [];                       // violations
