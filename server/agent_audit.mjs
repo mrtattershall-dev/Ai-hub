@@ -455,7 +455,7 @@ console.log('\n--- asset library (live) ---');
   // The agent.
   check('list_assets is a tool', /async list_assets\(\{ filter/.test(src));
   check('list_assets needs no approval', /'list_assets'\]\);/.test(src));
-  check('list_assets is documented to the model', /ACTION: list_assets\nFILTER:/.test(src));
+  check('list_assets is documented to the model', /ACTION: list_assets\r?\nFILTER:/.test(src));
   check('list_assets is dispatched with its FILTER', /tool === 'list_assets'/.test(src) && /FILTER:\\s\*/.test(src));
   check('the library summary is injected on every call, beside the ledger',
     /assetLib\.contextBlock\(\)/.test(src) && /extra\.push\(\{ role: 'user', content: canon \? /.test(src));

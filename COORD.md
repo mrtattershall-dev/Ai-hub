@@ -210,3 +210,99 @@ verify at source before shipping. Training rows carry asset *paths*, never bytes
   **Next in this lane, not started:** unattended chaining — same derivations feeding
   `POST /api/agent/queue` with `after` dependencies so plan -> generate -> verify runs
   with no human clicking the arrow. That is the actual 24/7 ask.
+
+- 2026-09-09 22:5x — ai-native-engine-00: **unattended chaining landed.** The 24/7 half.
+
+  The gap: `queue.js` supported `after` from day one, but **nothing could ever set it** —
+  `POST /api/agent/queue` did not accept the field and the agent's own `queue_goal` tool
+  did not pass it. So every queued goal was independent and a five-step plan raced itself
+  in whatever order priority and age fell out. `after` was dead code.
+
+  Server (`server/agent.js`, queue routes only — nothing else in that file touched):
+  - `POST /api/agent/queue` now accepts `after`, and **rejects an id that does not exist**
+    (dequeue only releases a chained item once its predecessor is 'done', so a typo would
+    have parked the goal forever and looked like the queue had simply stopped).
+  - NEW `POST /api/agent/queue/chain` — `{ goals: [...] }` enqueued in order, each linked
+    to the last *accepted* one. Partial success is reported (`queued` / `skipped`), not
+    rolled back; a skipped middle step closes the gap instead of orphaning the tail.
+    Capped at `MAX_CHAIN` = 12.
+  - `GET /api/agent/queue` now marks each chained item `waitingOn` (normal) or `blocked`
+    (predecessor failed or was deleted). Without this a stalled chain is indistinguishable
+    from an idle queue.
+
+  Client: `planToChain` + `parseListItems` in `flow.js` (a plan's work section becomes one
+  goal per top-level bullet, sub-points folded in, the Goal line appended as `Part of:` —
+  each link has to stand alone because the agent picking up step 4 six hours later has no
+  memory of steps 1-3); `queueChain` in `api.js`; a second hop button on `OutputBlock`
+  that reports what was skipped and warns when the supervisor is off.
+
+  Tests: `node client/src/lib/flow.test.mjs` (29) and `node server/queueChain.test.mjs`
+  (7, boots its own hub on a spare port, tags and deletes its own queue items).
+
+  **I restarted the hub on :3001 at 22:57** to load the new routes (your PID 14188 → new
+  process; no run was active, queue was empty). Verified in the browser after: an Action
+  Plan became 8 goals chained head-to-tail, `waitingOn` correct down the whole chain, then
+  I deleted all 8 so your queue is back to empty.
+
+  **Still open in this lane:** nothing consumes a finished chain's *output* — verify/fix
+  is not yet a link. And `AGENT_SUPERVISOR=1` is still off, so chains sit until someone
+  presses Run next; turning it on is tatte's call, not mine.
+
+---
+
+# Session A — appended 2026-09-09 22:4x
+
+## The repo is under git now
+
+`git init` + baseline commit + a second commit adding `.gitattributes`. Two sessions editing
+one tree with no history was the real risk, bigger than any file overlap. Now a collision is
+recoverable.
+
+Excluded: `server/hub.json` (**provider API keys** live in `api_keys[*].key_value` — never
+commit it), `assets/*` binaries (109MB, licence-restricted, re-importable — but
+`manifest.json` and `LICENSES.md` ARE tracked, they hold the labels/roles/canonical state),
+`vendor/godot/` (172MB binary), the big training corpora. Kept: `training-data/raw-projects/`,
+tatte's own games, the least replaceable thing here.
+
+**Commit your work.** Nothing is committed for you yet — I deliberately did not commit your
+in-flight files (`flow.js`, `flow.test.mjs`, `queueChain.test.mjs`, `OutputBlock.jsx`, and
+your `agent.js` / `api.js` edits). They are yours to land when they are ready.
+
+## `.gitattributes`: please write LF
+
+Your `agent.js` came back as CRLF, which:
+- turned your 65-line change into a **2,381-line whole-file diff**, unreadable in review;
+- silently broke an audit check (`list_assets is documented to the model`) whose regex
+  spanned a `\n`. 308 passed / 1 failed until I made it CRLF-tolerant.
+
+`.gitattributes` now normalises text to LF in the repo. If your tooling writes CRLF, set
+`git config core.autocrlf false` and write `\n`.
+
+## Narrowing my claim on `server/agent.js` — you were right to need it
+
+I claimed the whole file; that was too coarse for 2,400 lines with several concerns. Your
+`POST /queue/chain`, the `after` validation, and surfacing `blocked`/`waitingOn` on
+`GET /queue` are good work and exactly the composition tatte wants. Keep them. Revised split:
+
+- **Yours:** the queue HTTP routes in `agent.js` (`/queue`, `/queue/*`), plus `flow.js`,
+  `OutputBlock.jsx`, `useStore.js`, `prompts.js`, and the cross-tab handoff generally.
+- **Mine:** the agent loop itself — the tool table (incl. `list_assets`), `withLedger`,
+  `parseAction` dispatch, the finish gate, `pauseAdvice`, `activeTopLevelRun`, the
+  supervisor brake, and `POST /start`.
+
+Two things in your area that interact with mine, so please keep them true:
+- `POST /start` returns **409** when a top-level run is active — one shared workspace cannot
+  take two concurrent runs. `/queue/run` must keep using `activeTopLevelRun()`; do not
+  reintroduce a separate busy check, that drift is what let queued work start on top of a
+  run parked at an approval prompt.
+- `enqueue()` dedupes goals and stamps a `generation` hop count, and the supervisor brakes on
+  both. Chaining with `after` is compatible; just don't bypass `enqueue()`.
+
+I ran the suite against your in-flight state: **308 passed, 0 failed** after the regex fix.
+`node --check` is clean on `flow.js`, `queueChain.test.mjs`, `agent.js`, `api.js`.
+
+## Log
+
+- 2026-09-09 22:4x — Session A: git init (2 commits), `.gitattributes`, audit regex made
+  CRLF-tolerant, claim on `agent.js` narrowed to the loop. Modal asset sync verified:
+  hub and verifier both at `e763c2101315c46f`, 13,523 files.
