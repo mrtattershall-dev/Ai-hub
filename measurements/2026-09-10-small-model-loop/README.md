@@ -151,3 +151,40 @@ model to do), the game had preload/create/update, arrow keys AND WASD, scoring, 
 broken code on disk when its own syntax check flags it (10 workspaces), still discards every
 action after the first (102 real responses hit it), still strands a chained queue on one
 `stopped` goal, and still carries three latent parser path bugs. That score is a floor.
+
+## Second 35-goal run — FRESH prompts, post-fixes (`t35b.log`, `goals35b.json`)
+
+35 goals with zero overlap with the first set (r-series: CSV, money, POSIX paths, retry with
+backoff, deep object access, dedupe, plus the same hard shapes). Same harness, so the runs
+are comparable.
+
+    point-in-time (as each goal finished)  29/35
+    end-state     (final workspace)        32/35
+    status 'done'                          27/35
+    tool errors                            7
+    model calls                            467
+    wall clock                             27.7 min
+
+**The two numbers measure different things and both are honest.** Point-in-time used the
+scorer as it stood; end-state re-scores the final workspace with the corrected rules. The gap
+is not only scorer bugs - goal 31 genuinely failed when it ran (wrote r11_game.html, never
+created r11_game.js) and goal 32 later created that file. End-state credits work a later goal
+rescued. **32/35 is what you would actually keep.**
+
+**Three misses, TWO distinct causes:**
+
+    3   r3_path.py:THROWS     assert normalizePath("/a/../../b") == "/b"  -> AssertionError
+    17  r3_path.py:THROWS     the rename WORKED; it inherited the broken file from goal 3
+    35  R_AUDIT.md:MISSING    never written
+
+**The finding that now has three occurrences across two prompt sets and two languages:**
+`q4_time.py` (run 1), `r3_path.py` (run 2) - the model writes CORRECT code, then writes a
+self-check that contradicts it, runs it, sees the AssertionError, and finishes anyway. Its
+implementation is more reliable than its verification. A green run only proves the code and
+its author-written test agree; a red one does not prove the code is wrong.
+
+**Scorer fixes this run forced (the instrument was wrong as often as the hub):**
+  - browser JS was EXECUTED under node, so a correct DOM script "threw" on `document`
+  - `.html` scored `:ok` for merely existing - now checks linked JS exists and assets resolve
+  - the filename matcher only recognised q-series, silently scoring r-goals as unscorable
+  - the preflight one-shot fetch failed a healthy 30B on a slow cold start (~20 min of H100)
