@@ -1699,6 +1699,23 @@ function parseAction(text, lastPath) {
     const replBare = text.match(/REPLACE:[ \t]*\n([\s\S]*?)(?=\n[ \t]*[A-Z][A-Z_]{2,}:|$)/i);
     const find = clean(findFenced ? findFenced[1] : findBare?.[1]);
     const replace = clean(replFenced ? replFenced[1] : replBare?.[1]) ?? '';
+
+    // edit_file + a lone code block + NO FIND/REPLACE at all = a whole-file rewrite.
+    //
+    // The model says "let me fix this" and pastes the complete new file under
+    // ACTION: edit_file. That is write_file's job and the intent is unambiguous - there is
+    // no snippet to find because it is not replacing a part, it is replacing the lot. The
+    // parser already forgives the same instinct when there is no ACTION header at all
+    // ("treat any lone code block as a write_file"); this is the same instinct with a
+    // slightly wrong label, and refusing it just burns a call to say so.
+    //
+    // Only when FIND: is ENTIRELY ABSENT. If FIND: is there but malformed, the error
+    // stands and now explains the shape - guessing at a half-written edit is how you
+    // replace the wrong thing.
+    if (!find && fenced !== undefined && !/\bFIND:/i.test(text)) {
+      return { tool: 'write_file', thought, args: { path: path || lastPath, content: fenced } };
+    }
+
     return { tool, thought, args: { path: path || lastPath, find, replace } };
   }
   if (tool === 'run_command') {
@@ -2240,7 +2257,11 @@ function recordRunIndex(run) {
       source: run.source || 'human',
       generation: run.generation || 0,
     };
-    const f = join(__dirname, 'run-index.jsonl');
+    // Overridable for the same reason AGENT_RUNS_DIR is: without it every isolated test
+    // hub writes into the developer's real index, and the operational history fills up
+    // with "hostile probe: drip". I fixed this for the runs directory an hour ago and
+    // then shipped the identical leak in the feature that replaced it.
+    const f = process.env.RUN_INDEX || join(__dirname, 'run-index.jsonl');
     appendFileSync(f, JSON.stringify(rec) + '\n', 'utf8');
   } catch { /* a record of the work must never break the work */ }
 }
