@@ -24,7 +24,7 @@ const TARGET = args.find((a) => !a.startsWith('--'));
 const EMIT = flag('emit', null);
 const MIN = Number(flag('min', 200));
 const MAX = Number(flag('max', 6000));
-if (!TARGET) { console.error('usage: node factory/extract_units.mjs <dir-or-file> [--emit out.jsonl]'); process.exit(1); }
+const CLI = !!TARGET;
 
 const DATA_URI = /data:[a-z]+\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi;
 
@@ -196,80 +196,109 @@ function matchBracket(src, open) {
   return -1;
 }
 
-const targets = [];
-try {
-  if (statSync(TARGET).isDirectory()) {
-    for (const f of readdirSync(TARGET)) if (/\.html?$/i.test(f)) targets.push(join(TARGET, f));
-  } else targets.push(TARGET);
-} catch (e) { console.error(e.message); process.exit(1); }
+/**
+ * Extract units with their dependencies resolved, from one source string.
+ * Shared with harvest_pipeline.mjs so repo files and local games go through identical
+ * logic - two copies of a heuristic this fiddly would drift within a day.
+ */
+export function extractUnits(src, { min = 200, max = 6000, ctxMax = 8000 } = {}) {
+  const decls = declarations(src);
+  const out = [];
+  for (const u of units(src)) {
+    if (u.code.length < min || u.code.length > max) continue;
+    const free = freeIdentifiers(u.code);
+    const context = [];
+    let unresolved = 0;
+    for (const id of free) {
+      const d = decls.get(id);
+      if (!d || d === u.code) { unresolved++; continue; }
+      context.push(d);
+    }
+    if (unresolved) continue;
+    if (context.reduce((a, c) => a + c.length, 0) > ctxMax) continue;
+    out.push({ kind: u.kind, name: u.name, code: u.code, context });
+  }
+  return out;
+}
 
-const CTX_MAX = Number(flag('ctxmax', 8000));
-const rows = [];
-const seen = new Set();
-const declMap = new Map();
-const stats = { files: 0, raw: 0, tooSmall: 0, tooBig: 0, free: 0, ctxTooBig: 0, dupe: 0, kept: 0 };
-const freeHist = new Map();
+// Only scan and report when run directly; harvest_pipeline.mjs imports extractUnits.
+if (CLI) {
+  const targets = [];
+  try {
+    if (statSync(TARGET).isDirectory()) {
+      for (const f of readdirSync(TARGET)) if (/\.html?$/i.test(f)) targets.push(join(TARGET, f));
+    } else targets.push(TARGET);
+  } catch (e) { console.error(e.message); process.exit(1); }
 
-for (const t of targets) {
-  let html = '';
-  try { html = readFileSync(t, 'utf8'); } catch { continue; }
-  stats.files++;
-  const src = html.replace(DATA_URI, 'DATAURI');
-  declMap.set(t, declarations(src));
-  for (const body of scriptBodies(src)) {
-    for (const u of units(body)) {
-      stats.raw++;
-      if (u.code.length < MIN) { stats.tooSmall++; continue; }
-      if (u.code.length > MAX) { stats.tooBig++; continue; }
-      const key = u.code.replace(/\s+/g, ' ');
-      if (seen.has(key)) { stats.dupe++; continue; }
-      seen.add(key);
-      const free = freeIdentifiers(u.code);
-      freeHist.set(free.length, (freeHist.get(free.length) || 0) + 1);
+  const CTX_MAX = Number(flag('ctxmax', 8000));
+  const rows = [];
+  const seen = new Set();
+  const declMap = new Map();
+  const stats = { files: 0, raw: 0, tooSmall: 0, tooBig: 0, free: 0, ctxTooBig: 0, dupe: 0, kept: 0 };
+  const freeHist = new Map();
 
-      // Resolve what it depends on, one hop, from the same file.
-      const decls = declMap.get(t);
-      const context = [];
-      let unresolved = 0;
-      for (const id of free) {
-        const d = decls.get(id);
-        if (!d || d === u.code) { unresolved++; continue; }
-        context.push(d);
+  for (const t of targets) {
+    let html = '';
+    try { html = readFileSync(t, 'utf8'); } catch { continue; }
+    stats.files++;
+    const src = html.replace(DATA_URI, 'DATAURI');
+    declMap.set(t, declarations(src));
+    for (const body of scriptBodies(src)) {
+      for (const u of units(body)) {
+        stats.raw++;
+        if (u.code.length < MIN) { stats.tooSmall++; continue; }
+        if (u.code.length > MAX) { stats.tooBig++; continue; }
+        const key = u.code.replace(/\s+/g, ' ');
+        if (seen.has(key)) { stats.dupe++; continue; }
+        seen.add(key);
+        const free = freeIdentifiers(u.code);
+        freeHist.set(free.length, (freeHist.get(free.length) || 0) + 1);
+
+        // Resolve what it depends on, one hop, from the same file.
+        const decls = declMap.get(t);
+        const context = [];
+        let unresolved = 0;
+        for (const id of free) {
+          const d = decls.get(id);
+          if (!d || d === u.code) { unresolved++; continue; }
+          context.push(d);
+        }
+        const ctxChars = context.reduce((a, c) => a + c.length, 0);
+        if (unresolved) { stats.free++; continue; }
+        if (ctxChars > CTX_MAX) { stats.ctxTooBig++; continue; }
+
+        stats.kept++;
+        rows.push({
+          game: basename(t), kind: u.kind, name: u.name,
+          chars: u.code.length, ctxChars, deps: free.length,
+          context, code: u.code,
+        });
       }
-      const ctxChars = context.reduce((a, c) => a + c.length, 0);
-      if (unresolved) { stats.free++; continue; }
-      if (ctxChars > CTX_MAX) { stats.ctxTooBig++; continue; }
-
-      stats.kept++;
-      rows.push({
-        game: basename(t), kind: u.kind, name: u.name,
-        chars: u.code.length, ctxChars, deps: free.length,
-        context, code: u.code,
-      });
     }
   }
-}
 
-console.log(`\nscanned ${stats.files} file(s)`);
-console.log(`  ${stats.raw} top-level unit(s) found`);
-console.log(`  -${stats.tooSmall} under ${MIN} chars`);
-console.log(`  -${stats.tooBig} over ${MAX} chars`);
-console.log(`  -${stats.dupe} identical to one already taken (version chains repeat a lot)`);
-console.log(`  -${stats.free} depend on something not declared anywhere in the file`);
-console.log(`  -${stats.ctxTooBig} need more than ${CTX_MAX} chars of context`);
-console.log(`  =${stats.kept} unit(s) with RESOLVED context\n`);
-const byName = new Map();
-for (const r of rows) byName.set(r.name, (byName.get(r.name) || 0) + 1);
-console.log(`  distinct names: ${byName.size}`);
-console.log(`  avg size: ${Math.round(rows.reduce((a, r) => a + r.chars, 0) / (rows.length || 1))} chars`);
-console.log('  free-identifier distribution (0 = self-contained):');
-for (const [n, c] of [...freeHist.entries()].sort((a, b) => a[0] - b[0]).slice(0, 8)) {
-  console.log(`    ${String(n).padStart(3)} free -> ${c}`);
-}
-console.log('\n  sample kept:');
-for (const r of rows.slice(0, 8)) console.log(`    ${r.kind.padEnd(8)} ${r.name.padEnd(28)} ${String(r.chars).padStart(5)}ch  ${r.game.slice(0, 30)}`);
+  console.log(`\nscanned ${stats.files} file(s)`);
+  console.log(`  ${stats.raw} top-level unit(s) found`);
+  console.log(`  -${stats.tooSmall} under ${MIN} chars`);
+  console.log(`  -${stats.tooBig} over ${MAX} chars`);
+  console.log(`  -${stats.dupe} identical to one already taken (version chains repeat a lot)`);
+  console.log(`  -${stats.free} depend on something not declared anywhere in the file`);
+  console.log(`  -${stats.ctxTooBig} need more than ${CTX_MAX} chars of context`);
+  console.log(`  =${stats.kept} unit(s) with RESOLVED context\n`);
+  const byName = new Map();
+  for (const r of rows) byName.set(r.name, (byName.get(r.name) || 0) + 1);
+  console.log(`  distinct names: ${byName.size}`);
+  console.log(`  avg size: ${Math.round(rows.reduce((a, r) => a + r.chars, 0) / (rows.length || 1))} chars`);
+  console.log('  free-identifier distribution (0 = self-contained):');
+  for (const [n, c] of [...freeHist.entries()].sort((a, b) => a[0] - b[0]).slice(0, 8)) {
+    console.log(`    ${String(n).padStart(3)} free -> ${c}`);
+  }
+  console.log('\n  sample kept:');
+  for (const r of rows.slice(0, 8)) console.log(`    ${r.kind.padEnd(8)} ${r.name.padEnd(28)} ${String(r.chars).padStart(5)}ch  ${r.game.slice(0, 30)}`);
 
-if (EMIT) {
-  writeFileSync(EMIT, rows.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
-  console.log(`\n  -> ${EMIT} (${rows.length} units, not yet prompted or verified)`);
+  if (EMIT) {
+    writeFileSync(EMIT, rows.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
+    console.log(`\n  -> ${EMIT} (${rows.length} units, not yet prompted or verified)`);
+  }
+
 }

@@ -194,6 +194,10 @@ for (const r of permissive.sort((a, b) => b.stars - a.stars).slice(0, 15)) {
 }
 
 if (OUT) {
-  writeFileSync(OUT, JSON.stringify({ permissive, totals, scanned: all.length }, null, 2), 'utf8');
+  // Persist EVERY repo, not just the permissive ones. Saving only the survivors meant the
+  // 3,164 repos discarded on a null licence field were gone from disk, so licence recovery
+  // could not be run over them without repeating the whole search. Throwing away the
+  // rejects also throws away the ability to question the rejection.
+  writeFileSync(OUT, JSON.stringify({ permissive, all, totals, scanned: all.length }, null, 2), 'utf8');
   console.log(`\n  -> ${OUT}`);
 }
