@@ -75,6 +75,32 @@ html, body, #root { height: 100%; font-family: var(--font); background: var(--bg
 .nav-icon { width: 15px; height: 15px; flex-shrink: 0; opacity: .65; }
 .nav-item.active .nav-icon { opacity: 1; color: var(--accent); }
 
+/* The flow group is drawn as a tree, because the flow branches: one plan, then either
+   Code -> Game/Godot by hand or Agent unattended. Each node carries its own connector
+   (see FlowBranch in Sidebar.jsx) - CSS cannot tell "last sibling" here, since a node is
+   followed by its own children rather than by the next sibling. */
+.nav-flow { position: relative; }
+.nav-node { display: flex; align-items: stretch; }
+.nav-node > .nav-item { flex: 1; min-width: 0; }
+.nav-elbow { position: relative; flex: 0 0 14px; }
+/* the trunk: full height for a node with siblings below, half for the last one */
+.nav-elbow::before { content: ''; position: absolute; left: 0; top: 0; width: 1.5px; height: 100%; background: var(--border-mid); }
+.nav-elbow.last::before { height: 50%; }
+/* the branch out to the item */
+.nav-elbow::after { content: ''; position: absolute; left: 0; top: 50%; width: 9px; height: 1.5px; background: var(--border-mid); }
+/* the root has nothing above it, so it gets a node dot instead of a connector */
+.nav-elbow.root::before { display: none; }
+.nav-elbow.root::after {
+  left: 2px; top: 50%; transform: translateY(-50%); width: 7px; height: 7px;
+  border-radius: 50%; background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--border-mid);
+}
+.nav-node:has(.nav-item.active) .nav-elbow::after { background: var(--accent); box-shadow: none; }
+.nav-node:has(.nav-item.active) .nav-elbow.root::after { background: var(--accent); }
+.nav-children { position: relative; padding-left: 14px; }
+.nav-children.through::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1.5px; background: var(--border-mid); }
+.nav-step { margin-left: auto; font-size: 10px; color: var(--text-tertiary); letter-spacing: .04em; flex-shrink: 0; }
+.nav-item.active .nav-step { color: var(--accent); }
+
 /* Tab switcher */
 .tab-switch { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 0.5px solid var(--border); }
 .tab-btn { padding: 10px 0; font-size: 12px; font-weight: 500; text-align: center; cursor: pointer; border: none; background: transparent; color: var(--text-tertiary); display: flex; align-items: center; justify-content: center; gap: 5px; transition: color .1s; }
@@ -234,6 +260,11 @@ label { font-size: 11.5px; color: var(--text-secondary); font-weight: 500; displ
   .sidebar { width: 48px; }
   .sidebar .nav-item span, .sidebar .sidebar-label, .sidebar .provider-item span:not(.provider-dot), .sidebar .p-status, .tab-btn span, .sidebar .app-brand span { display: none; }
   .nav-item { justify-content: center; padding: 8px; }
+  /* Collapsed to icons there is no room for connectors beside them, and the indent would
+     throw the icons off centre. The order still carries the flow. */
+  .nav-elbow { display: none; }
+  .nav-children { padding-left: 0; }
+  .nav-children.through::before { display: none; }
   .provider-item { justify-content: center; }
   .tab-btn { font-size: 0; }
   .fields-grid { grid-template-columns: 1fr; }
@@ -640,3 +671,24 @@ body.ws-dragging iframe, body.ws-dragging .xterm { pointer-events: none; }
   background: var(--bg-primary, #0c0d11); padding: 8px; border-radius: 5px;
   white-space: pre-wrap; margin: 0;
 }
+
+/* ---- Strategy: refining a plan, and hops that cannot fire ---------------- */
+
+/* A blocked hop stays clickable on purpose - the click is how the reason gets read -
+   so it is dimmed rather than disabled, and carries a small marker to say it is not
+   the ordinary button next to it. */
+.btn-icon.hop-blocked { position: relative; opacity: .45; border-style: dashed; }
+.btn-icon.hop-blocked:hover { opacity: .85; color: var(--danger, #f85149); }
+.hop-blocked-badge { position: absolute; right: -1px; bottom: -1px; color: var(--danger, #f85149); }
+
+.refine-row {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 10px; border-top: 0.5px solid var(--border);
+  color: var(--text-tertiary);
+}
+.refine-row input[type="text"] { flex: 1; font-size: 12.5px; padding: 5px 8px; }
+.refine-note {
+  padding: 6px 10px 0; font-size: 11.5px; color: var(--text-tertiary);
+  border-top: 0.5px solid var(--border);
+}
+.refine-note + .refine-row { border-top: 0; }

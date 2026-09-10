@@ -113,6 +113,10 @@ export const queueList    = ()                   => req('/agent/queue');
 export const queueAdd     = (goal, priority = 0, force = false) => req('/agent/queue', { method: 'POST', body: JSON.stringify({ goal, priority, force }) });
 export const queueRemove  = (id)                 => req(`/agent/queue/${id}`, { method: 'DELETE' });
 export const queueRunNext = ()                   => req('/agent/queue/run', { method: 'POST' });
+// Queue an ordered chain - each goal runs only after the previous one finished. Resolves
+// to { queued, skipped, ... }: a chain can be partly accepted, so callers must read
+// `skipped` rather than assume every goal landed.
+export const queueChain   = (goals, priority = 0, force = false) => req('/agent/queue/chain', { method: 'POST', body: JSON.stringify({ goals, priority, force }) });
 
 // Asset library. Files themselves are served at /assets/<name> (outside /api, so game code
 // and <img> tags load them without a token - the same path the agent writes into games).
@@ -123,6 +127,21 @@ export const assetsReindex = ()      => req('/assets/reindex', { method: 'POST' 
 export const ASSET_URL     = (name)  => `/assets/${encodeURIComponent(name)}`;
 // The canonical vocabulary: names guaranteed to resolve (placeholders until real art lands).
 export const assetsCanonical = (force = false) => req('/assets/canonical', { method: 'POST', body: JSON.stringify({ force }) });
+
+// Unattended operation. Persisted server-side, so it survives a restart and does not
+// depend on remembering an environment variable at launch.
+export const supervisorGet = ()   => req('/agent/supervisor');
+export const supervisorSet = (on) => req('/agent/supervisor', { method: 'POST', body: JSON.stringify({ on }) });
+
+// Google account. `status` is the only shape the client ever sees: the signed-in identity,
+// which services were actually granted, and how long the access token has left. Never the
+// tokens themselves and never the client secret - see server/googleAuth.js.
+export const googleStatus      = ()        => req('/google/status');
+export const googleSaveConfig  = (body)    => req('/google/config', { method: 'POST', body: JSON.stringify(body) });
+export const googleSetServices = (enabled) => req('/google/services', { method: 'POST', body: JSON.stringify({ enabled }) });
+export const googleAuthorize   = (enabled) => req('/google/authorize', { method: 'POST', body: JSON.stringify({ enabled }) });
+export const googleDisconnect  = ()        => req('/google/disconnect', { method: 'POST' });
+export const googleProbe       = ()        => req('/google/probe', { method: 'POST' });
 
 // History
 export const getHistory        = (params = {}) => req('/history?' + new URLSearchParams(params));

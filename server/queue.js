@@ -66,7 +66,7 @@ function norm(goal) {
  * Pass `force` for the human case: re-running something deliberately is legitimate, and a
  * person typing it again is an explicit instruction, not a runaway loop.
  */
-export function enqueue(goal, { priority = 0, source = 'human', after = null, force = false, generation = 0 } = {}) {
+export function enqueue(goal, { priority = 0, source = 'human', after = null, force = false, generation = 0, repairOf = null } = {}) {
   const g = String(goal || '').trim();
   if (!g) return { ok: false, error: 'goal is required' };
   const s = load();
@@ -91,6 +91,11 @@ export function enqueue(goal, { priority = 0, source = 'human', after = null, fo
     // to auto-start past a cap, which bounds chains of DIFFERENT goals that dedup
     // cannot see.
     generation: Math.max(0, Number(generation) || 0),
+    // The item this one is a second attempt at, or null. Load-bearing for termination:
+    // a repair is never itself repaired, so one failed goal can produce at most one extra
+    // run no matter what it fails with. Dedup cannot do that job here - the second
+    // failure usually carries a different error string, so the goals differ.
+    repairOf,
     createdAt: Date.now(),
     status: 'queued',
   };
@@ -140,6 +145,23 @@ export function release(id) {
   const it = s.items.find((i) => i.id === id);
   if (it && it.status === 'taken') { it.status = 'queued'; delete it.takenAt; it.heldAt = Date.now(); save(s); }
   return it || null;
+}
+
+/**
+ * Move everything waiting on `fromId` to wait on `toId` instead. Returns the ids moved.
+ *
+ * Used when a chain step fails and a repair is spliced in: the rest of the chain was
+ * waiting on a goal that will now never reach 'done', so without this the tail is stranded
+ * even if the repair succeeds. Re-pointing keeps the order the plan asked for.
+ */
+export function repoint(fromId, toId) {
+  const s = load();
+  const moved = [];
+  for (const i of s.items) {
+    if (i.after === fromId && i.status === 'queued') { i.after = toId; moved.push(i.id); }
+  }
+  if (moved.length) save(s);
+  return moved;
 }
 
 export function remove(id) {

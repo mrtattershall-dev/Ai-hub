@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, RotateCcw, Download, Trash2, Gamepad2, ShieldCheck, Loader2 } from 'lucide-react';
+import { Play, RotateCcw, Download, Trash2, Gamepad2, ShieldCheck, Loader2, Wrench } from 'lucide-react';
 import { verifyGame } from '../lib/api.js';
 import { useStore } from '../store/useStore.js';
 import { extractCodeBlocks } from '../lib/markdown.js';
+import { verdictToFix } from '../lib/flow.js';
 import { ENGINES as ENGINE_CDN, engineHead } from '@shared/engines.js';
 import { PHASER_STARTER, PIXI_STARTER, THREE_STARTER } from '../lib/gameTemplate.js';
 import ChipGroup from '../components/ChipGroup.jsx';
@@ -51,6 +52,7 @@ export default function GamePage() {
   const chatThreads = useStore(s => s.chatThreads);
   const activeThreadId = useStore(s => s.activeThreadId);
   const addToast = useStore(s => s.addToast);
+  const sendHandoff = useStore(s => s.sendHandoff);
 
   // Read/write the stored code for a given engine.
   const codeByEngine = { phaser: phaserCode, pixi: pixiCode, three: threeCode };
@@ -138,7 +140,9 @@ export default function GamePage() {
     saveFor(gameEngine, code);
     try {
       const r = await verifyGame({ engine: gameEngine, code });
-      setVerdict(r);
+      // Keep the exact source that produced this verdict. The editor is still live, so by
+      // the time "Fix in Code" is pressed the buffer may no longer be what failed.
+      setVerdict({ ...r, code });
       addToast(r.ok ? 'Verified: runs clean in Chromium.' : 'Verification found problems.', r.ok ? 'success' : 'error');
     } catch (err) {
       setVerdict({ ok: false, verdict: `Could not reach the verifier: ${err.message}`, errors: [], shot: null });
@@ -198,6 +202,21 @@ export default function GamePage() {
                 <ShieldCheck size={13} />
                 <span>{verdict.ok ? 'Chromium: PASS' : 'Chromium: FAIL'}</span>
                 <span style={{ flex: 1 }} />
+                {/* A failure used to end here, leaving you to retype it into Code. The
+                    brief carries the checks, the distinct errors and the missing assets
+                    with it - the detail that gets dropped when a human transcribes it. */}
+                {!verdict.ok && (
+                  <button
+                    className="btn btn-sm"
+                    onClick={() => {
+                      const payload = verdictToFix(verdict, { code: verdict.code || code, engine: gameEngine });
+                      if (payload) sendHandoff('code', payload);
+                    }}
+                    title="Send the failure and the code to the Code tab"
+                  >
+                    <Wrench size={12} /> Fix in Code
+                  </button>
+                )}
                 <button className="btn-icon" onClick={() => setVerdict(null)} title="Dismiss">
                   <Trash2 size={12} />
                 </button>

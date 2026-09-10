@@ -1,0 +1,6 @@
+{
+  "//": "shared/ is ESM. This file exists so that stays true no matter what the repo root's package.json says. Node resolves a .js file's module type from the NEAREST package.json, and shared/ had none - so it inherited the root's, and on 2026-09-10 a root `npm install` appended \"type\": \"commonjs\" there. That instantly made every `export` in this directory a syntax error, and the server stopped booting: gameVerify.js imports ENGINES from here. The running hub survived only because it had already loaded the module. Declaring the type locally makes this directory immune to root churn.",
+  "name": "hub-shared",
+  "private": true,
+  "type": "module"
+}

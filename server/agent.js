@@ -28,6 +28,46 @@ import { escalate, estimateTokens, tokenBudgetExceeded } from './escalate.js';
 import * as workQueue from './queue.js';
 import * as assetLib from './assets.js';
 import { canonicalSummary } from './canonicalAssets.mjs';
+import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
+
+/**
+ * The database handle the Google tools use, filled in by agentRouter.
+ *
+ * The tools themselves are registered at module load (below), NOT inside the router. They
+ * were registered in the router at first, which meant `tools.gmail_search` did not exist
+ * until an HTTP router had been constructed - so the only way to check the wiring was to
+ * construct one, and constructing one runs requeueOrphans() against the shared work queue.
+ * A test should not have to disturb live state to ask "is this tool registered?".
+ */
+const googleDb = { loadDb: () => ({}), saveDb: () => {}, withDb: (fn) => fn() };
+
+// True once an account is connected. Reads through googleDb, so connecting an account
+// takes effect without a restart, and returns false until the router binds a real db.
+const googleReady = () => {
+  try { return !!googleDb.loadDb().google?.tokens?.refresh_token; } catch { return false; }
+};
+
+/**
+ * Exposed so a test can assert the read/write split for real, rather than trusting the
+ * comment next to it. AUTO_TOOLS is the difference between "the agent read your calendar"
+ * and "the agent mailed your contacts at 3am"; it deserves an assertion.
+ */
+export const __toolPolicyTest = {
+  autoTools: () => new Set(AUTO_TOOLS),
+  writeReason: (tool, args) => googleWriteReason(tool, args),
+  // The lookup the run loop actually does (`tools[tool]`), so a test can ask whether a tool
+  // the model might emit is callable - without constructing a router, which would run
+  // requeueOrphans() against the live work queue.
+  hasTool: (name) => typeof tools[name] === 'function',
+};
+
+/** What an approval prompt for a Google write should say, in terms of the real effect. */
+function googleWriteReason(tool, args = {}) {
+  if (tool === 'gmail_send') return `sends mail AS YOU to ${args.to || '(no recipient given)'} — subject "${(args.subject || '').slice(0, 60)}"`;
+  if (tool === 'drive_upload') return `uploads ${args.path || '(no file)'} from the workspace to your Google Drive`;
+  if (tool === 'calendar_add') return `creates "${(args.title || '(untitled)').slice(0, 60)}" in your calendar at ${args.start || '(no time)'}`;
+  return `${tool} changes your Google account`;
+}
 
 export const WORKSPACE = join(__dirname, '..', 'workspace');
 const PORT = process.env.PORT || 3001;
@@ -671,6 +711,17 @@ const tools = {
   },
 };
 
+// The Google tools join the same table, at load time. safePath confines drive_upload to the
+// workspace by exactly the check that confines write_file - without it, PATH: ../../.ssh/id_rsa
+// is a one-line exfiltration that the approval prompt would ask about in a form nobody reads
+// carefully at 3am.
+Object.assign(tools, googleTools({
+  loadDb: () => googleDb.loadDb(),
+  saveDb: (db) => googleDb.saveDb(db),
+  withDb: (fn) => googleDb.withDb(fn),
+  safePath,
+}));
+
 // Tools that run WITHOUT human approval.
 //
 // The line is "can this reach outside the sandbox, or spend/destroy something
@@ -695,6 +746,13 @@ const AUTO_TOOLS = new Set(['list_dir', 'read_file', 'search_file', 'outline_fil
   'remember', 'recall',
   // The ledger is bookkeeping about work, not the work itself.
   'task_list', 'task_add', 'task_done',
+  // Reading a connected Google account changes nothing in it. The WRITE half
+  // (gmail_send, drive_upload, calendar_add) is deliberately NOT here: those act on a real
+  // account belonging to a person, and with the supervisor on this agent works while
+  // nobody is watching. Leaving them out routes each one through the human gate below.
+  ...GOOGLE_READ_TOOLS,
+  // (the read/write split above is asserted in googleTools.test.mjs via __toolPolicyTest —
+  //  a safety boundary that only a comment defends is one that quietly stops holding)
   // Looking at and verifying its own output. Both only READ - see_screen loads a local
   // page in a headless browser, verify_project runs the project's own entry point.
   // (verify_project executes workspace code, which is exactly what it is for: a claim
@@ -1201,6 +1259,10 @@ function parseAction(text, lastPath) {
     const filter = (text.match(/FILTER:\s*(.+)/i)?.[1] || '').trim().replace(/[`"']/g, '');
     return { tool, thought, args: { filter } };
   }
+  // Google tools parse their own fields (see googleTools.js) - each has a different shape
+  // and gmail_send's BODY is multi-line, which the generic PATH handler would truncate to
+  // its first line and send anyway.
+  if (GOOGLE_TOOLS.includes(tool)) return { tool, thought, args: parseGoogleArgs(tool, text, fenced) };
   if (tool === 'test_web') return { tool, thought, args: { path: path || 'index.html' } };
   if (tool === 'search_file') {
     const query = (text.match(/QUERY:\s*(.+)/i)?.[1] || '').trim().replace(/[`"']/g, '');
@@ -1366,6 +1428,10 @@ function pruneHistory(run) {
  */
 function withLedger(history) {
   const extra = [];
+  // Google tool docs ride along only while an account is actually connected. Documenting
+  // gmail_send to a model that has no token spends context teaching it a tool whose every
+  // call returns "not connected", and invites it to plan a run around one.
+  if (googleReady()) extra.push({ role: 'user', content: `GOOGLE ACCOUNT TOOLS (an account is connected):\n${GOOGLE_TOOL_DOCS}` });
   let block;
   try { block = ledger.contextBlock(WORKSPACE); } catch { block = null; }
   if (block) extra.push({ role: 'user', content: block });
@@ -1776,6 +1842,10 @@ async function drive(loadDb, run) {
       if (!AUTO_TOOLS.has(tool)) {
         const verdict = tool === 'run_command' ? classifyCommand(args.cmd)
           : tool === 'run_python' ? classifyPython()
+          // Name what is about to happen to a real account, in the words of the thing it
+          // affects. "gmail_send always needs a human" is not what you want to read at 3am;
+          // "sends mail as you, to someone@example.com" is.
+          : GOOGLE_WRITE_TOOLS.includes(tool) ? { decision: 'ask', reason: googleWriteReason(tool, args) }
           : { decision: 'ask', reason: `${tool} always needs a human` };
 
         if (verdict.decision === 'deny') {
@@ -1897,6 +1967,16 @@ async function drive(loadDb, run) {
         : run.status === 'interrupted' ? 'tunnel' : 'error';
       await escalate(WORKSPACE, { runId: run.id, goal: run.goal, status: run.status, reason, detail: text })
         .catch(() => {});
+
+      // ── Don't leave the chain stranded ────────────────────────────────────────
+      // The queue item was only ever completed on a clean finish, so a failed step
+      // stayed 'taken' for good: invisible to dequeue, and re-queued on the next restart
+      // by requeueOrphans as if nothing had happened. Everything behind it waited on an
+      // id that could never reach 'done'. Record the failure, then splice in ONE repair
+      // attempt and move the tail behind it, so the plan's order survives the stumble.
+      if (!run.depth && run.queueItemId) {
+        try { failQueueItem(loadDb, run, reason, text); } catch { /* never take a run down with the queue */ }
+      }
     }
 
     // ── Take the next ticket ────────────────────────────────────────────────────
@@ -1904,9 +1984,10 @@ async function drive(loadDb, run) {
     // autonomous within one goal and then idle. A finished run now pulls the next
     // queued item by itself.
     //
-    // Only on a CLEAN finish, and never from inside a sub-task: chaining more work
-    // onto a run that just failed compounds the failure instead of surfacing it.
-    if (SUPERVISOR && run.status === 'done' && !run.depth) {
+    // Only on a CLEAN finish, and never from inside a sub-task: moving on to the NEXT
+    // goal after a failure compounds it instead of surfacing it. A failure takes the
+    // other path above - one retry of the same goal, then it stops and waits for a human.
+    if (supervisorEnabled && run.status === 'done' && !run.depth) {
       try {
         if (run.queueItemId) workQueue.complete(run.queueItemId, { status: 'done', runId: run.id });
         const next = workQueue.dequeue({ completedIds: completedQueueIds() });
@@ -1929,7 +2010,31 @@ async function drive(loadDb, run) {
   }
 }
 
-const SUPERVISOR = process.env.AGENT_SUPERVISOR === '1';
+/**
+ * Whether a finished run pulls the next queued goal by itself.
+ *
+ * This was an env var only, which made it unreachable in practice: start-hub.bat never set
+ * it, so the queue, the chains and the retry path were all correct code that had executed
+ * zero times. It is a persisted setting now, so turning 24/7 on is a decision you can make
+ * from Settings instead of an environment variable you have to remember at launch.
+ *
+ * AGENT_SUPERVISOR=1 still forces it on at boot and cannot be switched off from the UI:
+ * a headless deployment that was started with it should not be silently disarmed by a
+ * browser tab someone left open.
+ */
+const SUPERVISOR_FORCED = process.env.AGENT_SUPERVISOR === '1';
+let supervisorEnabled = SUPERVISOR_FORCED;
+export const supervisorOn = () => supervisorEnabled;
+
+/** The ceilings that bound unattended work, reported wherever it is switched on. */
+const supervisorLimits = () => ({
+  maxGenerations: MAX_GENERATIONS,
+  maxAutoStartsPerHour: MAX_AUTO_STARTS_PER_HOUR,
+  autoStartsLastHour: autoStarts.filter((t) => t > Date.now() - 3600_000).length,
+});
+// How many goals one POST /queue/chain may add. A plan with forty milestones is a plan
+// that wants splitting, not forty unattended runs kicked off by one click.
+const MAX_CHAIN = 12;
 
 // How far a chain of machine-queued work may extend before a human has to look at it,
 // and how many runs the supervisor may start per hour no matter what.
@@ -1960,6 +2065,10 @@ export const __supervisorTest = {
   record: () => autoStarts.push(Date.now()),
   reset: () => { autoStarts.length = 0; },
   caps: () => ({ generations: MAX_GENERATIONS, perHour: MAX_AUTO_STARTS_PER_HOUR }),
+  // The whole failure path, callable without a model that fails on cue. With the
+  // supervisor off (the default, and what tests run under) it stops before starting
+  // anything, so what is left to observe is exactly what it did to the queue.
+  failItem: (run, reason, detail) => failQueueItem(null, run, reason, detail),
 };
 
 function supervisorBrake(item) {
@@ -1991,6 +2100,96 @@ function activeTopLevelRun() {
 
 function completedQueueIds() {
   return workQueue.list().filter((i) => i.status === 'done').map((i) => i.id);
+}
+
+/**
+ * The goal text for a second attempt at a failed chain step, or null when there must not
+ * be one.
+ *
+ * Null when the failed item was ITSELF a repair. That single rule is what makes this
+ * terminate: one original goal can produce at most one extra run, whatever it fails with.
+ * Dedup cannot do that job - a second failure usually carries a different error string, so
+ * the two repair goals are different text and dedup waves them both through.
+ *
+ * The goal says the workspace may be half-finished, because it usually is: a run that died
+ * at step 7 of 10 leaves files on disk, and a retry that assumes an empty workspace either
+ * duplicates that work or trips over it.
+ */
+export function repairGoalFor(item, { reason = 'error', detail = '' } = {}) {
+  if (!item || item.repairOf) return null;
+  const why = { budget: 'it ran out of budget', loop: 'it repeated itself and got stuck',
+    parse: 'its reply could not be parsed', same_error: 'the same error kept coming back',
+    tunnel: 'its connection dropped' }[reason] || 'it errored';
+  const snippet = String(detail || '').trim().slice(0, 400);
+  return [
+    `A previous attempt at this goal stopped part-way (${why}), so workspace/ may be half-finished.`,
+    'Read what is already there before changing anything, then finish the goal.',
+    '',
+    `Goal: ${item.goal}`,
+    snippet ? `\nIt stopped with:\n${snippet}` : '',
+  ].join('\n').trim();
+}
+
+/**
+ * Record that a queued step failed, and splice in its one retry.
+ *
+ * The retry outranks the rest of the backlog (priority + 1) because the tail of this chain
+ * is already queued behind it - letting unrelated work overtake would run the plan's later
+ * steps' dependency last.
+ */
+function failQueueItem(loadDb, run, reason, detail) {
+  const item = workQueue.list().find((i) => i.id === run.queueItemId);
+  workQueue.complete(run.queueItemId, {
+    status: run.status === 'done' ? 'done' : run.status || 'error',
+    runId: run.id, summary: `${reason}: ${String(detail || '').slice(0, 200)}`,
+  });
+
+  // Only a genuine error earns an automatic retry.
+  //
+  // 'stopped' is a person pressing Stop. Re-queueing what someone just cancelled, at 4am,
+  // is the single most obnoxious thing an unattended agent could do. 'interrupted' is a
+  // dropped connection, and those runs are resumable with their history intact - retrying
+  // from scratch throws that away and redoes work the run had already done. Both still get
+  // recorded above, so the chain shows why it is not moving instead of looking idle.
+  if (run.status && run.status !== 'error') {
+    pushStep(run, { type: 'note', text: `Queue: ${run.queueItemId} marked '${run.status}'. No automatic retry — `
+      + (run.status === 'stopped' ? 'you stopped this one.' : 'resume it rather than starting over.') });
+    return;
+  }
+
+  const goal = repairGoalFor(item, { reason, detail });
+  if (!goal) {
+    pushStep(run, { type: 'note', text: item?.repairOf
+      ? `Queue: this was already the retry of ${item.repairOf}, so the chain stops here and waits for you.`
+      : `Queue: marked ${run.queueItemId} failed.` });
+    return;
+  }
+
+  const r = workQueue.enqueue(goal, {
+    source: 'repair', generation: (item.generation || 0) + 1,
+    priority: (item.priority || 0) + 1, repairOf: item.id,
+  });
+  if (!r.ok) {
+    pushStep(run, { type: 'note', text: `Queue: ${item.id} failed (${reason}); no retry queued — ${r.error}` });
+    return;
+  }
+  const moved = workQueue.repoint(item.id, r.item.id);
+  pushStep(run, { type: 'note', text: `Queue: ${item.id} failed (${reason}). Retrying once as ${r.item.id}`
+    + (moved.length ? `, with ${moved.length} waiting goal(s) moved behind it.` : '.') });
+
+  // Start it under exactly the brakes any other auto-start gets - generation cap and the
+  // runs-per-hour ceiling. A retry storm is the failure mode those caps exist for.
+  if (!supervisorEnabled) return;
+  const stop = supervisorBrake(r.item);
+  if (stop) {
+    pushStep(run, { type: 'note', text: `Supervisor held the retry: ${stop} It stays queued.` });
+    return;
+  }
+  autoStarts.push(Date.now());
+  setTimeout(() => {
+    try { startRun(loadDb, r.item.goal, { queueItemId: r.item.id, source: 'queue', generation: r.item.generation }); }
+    catch { /* the retry is best-effort; the queue still records the failure */ }
+  }, 250);
 }
 
 /**
@@ -2032,7 +2231,7 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
 }
 
 // ── Router ────────────────────────────────────────────────────────────────────
-export default function agentRouter({ loadDb }) {
+export default function agentRouter({ loadDb, saveDb, withDb }) {
   const router = express.Router();
   loadRuns();   // restore checkpointed runs after a server restart (mid-flight ones become 'interrupted')
   // A crash mid-run leaves its queue item marked 'taken' and it would never be picked
@@ -2041,7 +2240,52 @@ export default function agentRouter({ loadDb }) {
   if (orphans) console.log(`[agent] re-queued ${orphans} orphaned work item(s) after restart`);
   workQueue.prune();
   console.log(`[agent] approval mode: ${describeMode()}`);
-  if (SUPERVISOR) console.log(`[agent] supervisor ON — finished runs will pull the next queued goal (${workQueue.depth()} waiting)`);
+
+  // Hand the already-registered Google tools a real database. Until this runs they exist
+  // but report "not connected", which is also what they should do.
+  googleDb.loadDb = loadDb;
+  googleDb.saveDb = saveDb;
+  googleDb.withDb = withDb;
+  if (googleReady()) console.log(`[agent] Google account connected — ${GOOGLE_READ_TOOLS.length} read tools auto-run, ${GOOGLE_WRITE_TOOLS.length} write tools need approval`);
+
+  // Restore the persisted choice, unless the environment already forced it on at boot.
+  if (!SUPERVISOR_FORCED) {
+    try { supervisorEnabled = !!loadDb().settings?.agentSupervisor; } catch { supervisorEnabled = false; }
+  }
+  if (supervisorEnabled) console.log(`[agent] supervisor ON — finished runs will pull the next queued goal (${workQueue.depth()} waiting)`);
+
+  /**
+   * Turn unattended pickup on or off, and remember the choice.
+   *
+   * Reports the brakes back with it, because "the agent will now start work on its own
+   * while you are asleep" is not a setting anyone should switch on without being told, in
+   * the same breath, what stops it: the approval mode, the per-hour ceiling and the
+   * generation cap.
+   */
+  router.post('/supervisor', (req, res) => withDb(async () => {
+    const on = !!req.body?.on;
+    if (SUPERVISOR_FORCED && !on) {
+      return res.status(409).json({
+        error: 'AGENT_SUPERVISOR=1 is set in the environment, so this cannot be switched off from the UI.',
+        supervisor: true, forced: true,
+      });
+    }
+    const db = loadDb();
+    db.settings = { ...(db.settings || {}), agentSupervisor: on };
+    saveDb(db);
+    supervisorEnabled = on;
+    console.log(`[agent] supervisor ${on ? 'ON' : 'OFF'} (set from Settings)`);
+    res.json({ supervisor: supervisorEnabled, forced: SUPERVISOR_FORCED, ...supervisorLimits() });
+  }));
+
+  router.get('/supervisor', (_req, res) => res.json({
+    supervisor: supervisorEnabled,
+    forced: SUPERVISOR_FORCED,
+    approvalMode: APPROVAL_MODE,
+    approvalModeDescription: describeMode(),
+    queued: workQueue.depth(),
+    ...supervisorLimits(),
+  }));
 
   // Start a new run; returns immediately, loop runs in the background.
   router.post('/start', (req, res) => {
@@ -2086,21 +2330,76 @@ export default function agentRouter({ loadDb }) {
 
   // ── Work queue ───────────────────────────────────────────────────────────────
   // The backlog the supervisor pulls from, and that the agent can add to itself.
-  router.get('/queue', (req, res) => res.json({
-    supervisor: SUPERVISOR,
-    approvalMode: APPROVAL_MODE,
-    items: workQueue.list(),
-  }));
+  router.get('/queue', (req, res) => {
+    const items = workQueue.list();
+    // A chained item is only dequeued once its `after` reaches 'done'. If that
+    // predecessor failed or was deleted, the item is not "queued" in any useful sense -
+    // it will sit there forever and nothing says why. Say why.
+    const byId = new Map(items.map((i) => [i.id, i]));
+    res.json({
+      supervisor: supervisorEnabled,
+      approvalMode: APPROVAL_MODE,
+      items: items.map((i) => {
+        if (i.status !== 'queued' || !i.after) return i;
+        const dep = byId.get(i.after);
+        if (!dep) return { ...i, blocked: `waits on ${i.after}, which no longer exists` };
+        if (dep.status === 'done') return i;
+        if (dep.status === 'queued' || dep.status === 'taken') return { ...i, waitingOn: i.after };
+        return { ...i, blocked: `waits on ${i.after}, which ended as '${dep.status}'` };
+      }),
+    });
+  });
 
   router.post('/queue', (req, res) => {
-    const { goal, priority, force } = req.body || {};
+    const { goal, priority, force, after } = req.body || {};
+    // `after` must name an item that exists. An unknown id is not a no-op: dequeue only
+    // releases a chained item once its predecessor is 'done', so a typo would park the
+    // goal forever and look like the queue had simply stopped.
+    if (after != null && !workQueue.list().some((i) => i.id === after)) {
+      return res.status(400).json({ error: `no queued item with id ${after} to run after` });
+    }
     // A person adding the same goal twice is a deliberate re-run, not a runaway chain,
     // so the dedup guard is overridable here - but only from this route, and only when
     // asked for explicitly.
-    const r = workQueue.enqueue(goal, { priority, source: 'human', force: !!force });
+    const r = workQueue.enqueue(goal, { priority, source: 'human', force: !!force, after: after || null });
     if (r.duplicate) return res.status(409).json({ error: r.error, duplicate: true, item: r.item });
     if (!r.ok) return res.status(400).json({ error: r.error });
     res.json(r);
+  });
+
+  /**
+   * Queue an ordered chain: each goal runs only after the one before it finished.
+   *
+   * This is what a plan becomes when nobody is going to be sitting there clicking. The
+   * pieces already existed - `after` in the queue, the supervisor pulling the next item
+   * when a run ends - but nothing could set `after`, so every queued goal was independent
+   * and a five-step plan raced itself in whatever order the priorities fell out.
+   *
+   * Partial success is reported, not rolled back. If step 3 of 5 is a duplicate of work
+   * already done, steps 1, 2, 4 and 5 are still the work you asked for; throwing them
+   * away because one link was redundant would be worse than a shorter chain. Each
+   * accepted goal links to the last ACCEPTED one, so a skipped middle step closes the gap
+   * rather than orphaning everything after it.
+   */
+  router.post('/queue/chain', (req, res) => {
+    const { goals, priority, force } = req.body || {};
+    if (!Array.isArray(goals) || goals.length === 0) {
+      return res.status(400).json({ error: 'goals must be a non-empty array' });
+    }
+    if (goals.length > MAX_CHAIN) {
+      return res.status(400).json({ error: `a chain is capped at ${MAX_CHAIN} goals (got ${goals.length})` });
+    }
+
+    const queued = [], skipped = [];
+    let previousId = null;
+    for (const goal of goals) {
+      const r = workQueue.enqueue(goal, {
+        priority, source: 'human', force: !!force, after: previousId,
+      });
+      if (r.ok) { queued.push(r.item); previousId = r.item.id; }
+      else skipped.push({ goal: String(goal || '').slice(0, 120), reason: r.error, duplicate: !!r.duplicate });
+    }
+    res.json({ ok: queued.length > 0, queued, skipped, depth: workQueue.depth(), supervisor: supervisorEnabled });
   });
 
   router.delete('/queue/:id', (req, res) => res.json(workQueue.remove(req.params.id)));

@@ -1,4 +1,5 @@
 import { CANVAS_TYPES } from './constants.js';
+import { workSectionOf } from './flow.js';
 
 // Task instructions are the system frame for each Code-tab action. They're written
 // for a local ~14B model, which follows explicit structure and firm constraints far
@@ -109,10 +110,55 @@ export function buildCodeSystem(taskId, modeId, engine) {
     `This is an ongoing conversation — read the previous turns and build on them. When the user points out a problem or requests a change, modify the code you already produced rather than starting from scratch; show the full updated file when the change is large, or just the changed section (in full, no placeholders) when it is small. Keep names and structure consistent with the existing code.`;
 }
 
+/**
+ * The rule that makes a plan executable rather than merely readable.
+ *
+ * Each top-level bullet in the work section becomes one queued goal, picked up by an agent
+ * hours later with no memory of the plan around it. "Then wire it up" is worthless to that
+ * agent, so the bullets are asked for as self-contained units of work here, at the only
+ * point where it is cheap to ask.
+ */
+function workSectionRules(section) {
+  return `Write "## ${section}" as a flat list of top-level bullets, one unit of work per bullet, in the order they should happen. Each bullet must stand on its own - name what to build or change and what "done" looks like - because each one will be handed to someone (or something) with no other context. Put supporting detail on indented lines under its bullet. Never write this section as a paragraph.`;
+}
+
 export function buildStrategyPrompt(canvasId, input) {
   const canvas = CANVAS_TYPES.find(c => c.id === canvasId) || CANVAS_TYPES[0];
   const sectionList = canvas.sections.map(s => `## ${s}`).join('\n');
-  return `You are helping with the following request:\n\n${input}\n\n` +
-    `Respond using exactly these markdown section headers, in this order, each followed by concise content (use bullet points where helpful):\n\n${sectionList}\n\n` +
-    `Do not add any extra top-level headers or preamble text before the first header.`;
+  const work = workSectionOf(canvas);
+  const parts = [
+    `You are helping with the following request:`,
+    input,
+    `Respond using exactly these markdown section headers, in this order, each followed by concise content (use bullet points where helpful):`,
+    sectionList,
+  ];
+  if (work) parts.push(workSectionRules(work));
+  parts.push(`Do not add any extra top-level headers or preamble text before the first header.`);
+  return parts.join('\n\n');
+}
+
+/**
+ * A plan plus an instruction -> the same plan, revised.
+ *
+ * Planning is not one-shot: the first pass is a draft you argue with. The whole previous
+ * plan is sent back rather than a summary of it, and the whole revised plan is asked for
+ * rather than a diff, because everything downstream (the build brief, the chain) reads
+ * complete sections - a plan that comes back as "change milestone 3 to..." cannot be
+ * built from, and the sections the instruction did not touch must survive intact.
+ */
+export function buildStrategyRevisionPrompt(canvasId, previousPlan, instruction) {
+  const canvas = CANVAS_TYPES.find(c => c.id === canvasId) || CANVAS_TYPES[0];
+  const sectionList = canvas.sections.map(s => `## ${s}`).join('\n');
+  const work = workSectionOf(canvas);
+  const parts = [
+    `Here is a plan you wrote:`,
+    previousPlan,
+    `Revise it according to this instruction:`,
+    instruction,
+    `Return the COMPLETE revised plan, not a diff and not a description of what you changed. Keep every part the instruction does not touch exactly as it was. Use exactly these markdown section headers, in this order:`,
+    sectionList,
+  ];
+  if (work) parts.push(workSectionRules(work));
+  parts.push(`Do not add any extra top-level headers or preamble text before the first header.`);
+  return parts.join('\n\n');
 }

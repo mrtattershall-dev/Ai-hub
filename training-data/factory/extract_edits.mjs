@@ -67,12 +67,14 @@ const VERSION_WORDS = new Set(['demo', 'playable', 'fixed', 'final', 'new', 'old
 
 /**
  * Parse a filename into { family, series, version, copy }.
- *   dust-harvest-v34_5.html        -> family dust-harvest, series v,     version 34, copy 0
- *   cursebound_s13(2).html         -> family cursebound,   series s,     version 13, copy 2
- *   index(7).html                  -> family index,        series -,     version null, copy 7
- *   dust-harvest-fixed2(1).html    -> family dust-harvest, series fixed, version 2, copy 1
+ *   dust-harvest-v34_5.html        -> family dust-harvest, series v,     version 34, sub 5,    copy 0
+ *   cursebound_s13(2).html         -> family cursebound,   series s,     version 13, sub null, copy 2
+ *   index(7).html                  -> family index,        series -,     version null,         copy 7
+ *   dust-harvest-fixed2(1).html    -> family dust-harvest, series fixed, version 2,  sub null, copy 1
  * Family = tokens before the first version-like token, minus VERSION_WORDS. Words after
  * the version token (multiplayer, jungle, stable) describe the version, not a new game.
+ * `sub` is used for ordering only when every file at that main version carries one
+ * (cursebound_v2_0/1/3/4); mixed groups (v34.html + v34_1..19) fall back to mtime.
  */
 function parseName(file) {
   let base = file.replace(/\.html?$/i, '');
@@ -80,23 +82,30 @@ function parseName(file) {
   base = base.replace(/\((\d+)\)/g, (_, n) => { copy = Math.max(copy, +n); return ''; });
   const tokens = base.split(/[-_ .()]+/).filter(Boolean);
   const family = [];
-  let version = null, series = '-';
+  let version = null, series = '-', sub = null, prevWasVersion = false;
   for (const t of tokens) {
     const tl = t.toLowerCase();
     const m = /^([a-z]*)(\d+)([a-z]?)$/i.exec(t);
     if (m) {
-      if (version !== null) continue;
+      if (version !== null) {
+        // a bare number right after the version token is a sub-version (v2_3, v34_5)
+        if (prevWasVersion && !m[1] && !m[3]) sub = +m[2];
+        prevWasVersion = false;
+        continue;
+      }
+      prevWasVersion = true;
       const word = m[1].toLowerCase();
       version = +m[2];
       series = word || '-';
       if (word && !/^[vs]$/.test(word) && !VERSION_WORDS.has(word)) family.push(word);
       continue;
     }
+    prevWasVersion = false;
     if (version !== null) continue;
     if (VERSION_WORDS.has(tl)) continue;
     family.push(tl);
   }
-  return { file, family: family.join('-') || base.toLowerCase(), series, version, copy };
+  return { file, family: family.join('-') || base.toLowerCase(), series, version, sub, copy };
 }
 
 /**
@@ -115,7 +124,11 @@ function orderFamily(entries) {
     .sort((p, q) => Math.min(...p.map((e) => e.mtime)) - Math.min(...q.map((e) => e.mtime)));
   const ordered = [];
   for (const block of trusted) {
-    block.sort((a, b) => a.version - b.version || a.mtime - b.mtime);
+    const allSub = new Map();
+    for (const e of block) allSub.set(e.version, (allSub.get(e.version) ?? true) && e.sub !== null);
+    block.sort((a, b) => a.version - b.version
+      || (allSub.get(a.version) ? a.sub - b.sub : 0)
+      || a.mtime - b.mtime);
     ordered.push(...block);
   }
   const rest = entries.filter((e) => !ordered.includes(e)).sort((a, b) => a.mtime - b.mtime);
@@ -229,9 +242,11 @@ async function unitsOf(entry) {
     for (const u of inner) strictKey.set(u.name + '\0' + normWS(u.code), u);
   }
   const last = new Map();
+  const lastAny = new Map(); // every size, for diagnosing pairs whose only edits are oversize
   const redefs = [];
   let inWindow = 0;
   for (const u of units) {
+    lastAny.set(u.name, u.code);
     if (u.code.length < MIN || u.code.length > MAX) continue;
     inWindow++;
     const s = strictKey.get(u.name + '\0' + normWS(u.code));
@@ -241,7 +256,7 @@ async function unitsOf(entry) {
     last.set(u.name, unit);
   }
   const rawFns = (src.match(/^[ \t]*(?:async\s+)?function\s+[A-Za-z_$][\w$]*\s*\(/gm) || []).length;
-  const info = { last, redefs, srcHash: hash(normWS(src)), srcLen: src.length, allCount: units.length, inWindow, strictCount: strict.length, rawFns, unwrapped, hasError };
+  const info = { last, lastAny, redefs, srcHash: hash(normWS(src)), srcLen: src.length, allCount: units.length, inWindow, strictCount: strict.length, rawFns, unwrapped, hasError };
   fileCache.set(entry.file, info);
   return info;
 }
@@ -327,6 +342,12 @@ const multi = famList.filter(([, v]) => v.length > 1);
 
 // extract every chained file up front so the ordering table can show sizes/unit counts
 for (const [, list] of multi) for (const e of list) await unitsOf(e);
+// A version that does not parse (the author saved a broken file) loses every declaration
+// after the error, which would show up as hundreds of fake removals then fake additions.
+// Such files are shown in the ordering but skipped when forming pairs.
+const brokenFiles = [];
+for (const [fam, list] of multi) for (const e of list) if (fileCache.get(e.file).hasError) brokenFiles.push(e.file);
+const chains = multi.map(([fam, list]) => [fam, list.filter((e) => !fileCache.get(e.file).hasError)]).filter(([, l]) => l.length > 1);
 
 console.log(`files: ${[...fams.values()].reduce((a, v) => a + v.length, 0)}   families: ${fams.size}   multi-version families: ${multi.length}   files in chains: ${multi.reduce((a, [, v]) => a + v.length, 0)}`);
 console.log('\n== ordering of the 5 biggest families (version | mtime | script chars | units | file) ==');
@@ -341,8 +362,8 @@ for (const [fam, list] of famList.slice(0, 5)) {
     const shrink = prevInfo && info.srcLen < prevInfo.srcLen;
     if (inv) inversions++;
     if (shrink) shrinks++;
-    const key = (e.series === '-' ? '' : e.series) + (e.version === null ? '?' : e.version) + (e.copy ? `(${e.copy})` : '');
-    console.log(`  ${String(i + 1).padStart(3)}. ${key.padEnd(10)} ${fmtT(e.mtime)}  ${String(info.srcLen).padStart(8)}  ${String(info.last.size).padStart(4)}  ${e.file}${inv ? '  <- mtime earlier than previous' : ''}${shrink ? '  <- smaller than previous' : ''}`);
+    const key = (e.series === '-' ? '' : e.series) + (e.version === null ? '?' : e.version) + (e.sub !== null ? '.' + e.sub : '') + (e.copy ? `(${e.copy})` : '');
+    console.log(`  ${String(i + 1).padStart(3)}. ${key.padEnd(10)} ${fmtT(e.mtime)}  ${String(info.srcLen).padStart(8)}  ${String(info.last.size).padStart(4)}  ${e.file}${inv ? '  <- mtime earlier than previous' : ''}${shrink ? '  <- smaller than previous' : ''}${info.hasError ? '  <- PARSE ERROR, skipped from pairs' : ''}`);
   }
   console.log(`  mtime inversions vs chosen order: ${inversions}; versions smaller than their predecessor: ${shrinks}`);
 }
@@ -351,7 +372,7 @@ for (const [fam, list] of famList.slice(5)) if (list.length > 1) console.log(`  
 console.log(`  singles (${famList.filter(([, v]) => v.length === 1).length}): ${famList.filter(([, v]) => v.length === 1).map(([k]) => k).join(', ')}`);
 
 const stats = {
-  pairs: 0, pairsIdenticalSource: 0, pairsNoUnitChange: 0, pairsAllDeduped: 0,
+  pairs: 0, pairsIdenticalSource: 0, pairsNoUnitChange: 0, pairsOversizeOnly: 0, pairsAllDeduped: 0,
   modified: 0, added: 0, redefined: 0, removed: 0, skippedCommentOnly: 0, skippedOversize: 0, skippedNonStrict: 0, dedupDropped: 0,
   perFamily: new Map(),
 };
@@ -370,7 +391,9 @@ function emit(row, famCounter) {
   return true;
 }
 
-for (const [fam, list] of multi) {
+console.log(`\nparse-error files skipped from pairs (${brokenFiles.length}): ${brokenFiles.join(', ') || '-'}`);
+
+for (const [fam, list] of chains) {
   // within-file redefinitions (each file once)
   for (const e of list) {
     const info = fileCache.get(e.file);
@@ -404,7 +427,13 @@ for (const [fam, list] of multi) {
       if (emit(row, fam)) emitted++;
     }
     for (const name of ua.last.keys()) if (!ub.last.has(name)) stats.removed++;
-    if (changes === 0) { stats.pairsNoUnitChange++; zeroPairs.push({ a: A.file, b: B.file, identical: ua.srcHash === ub.srcHash, srcDelta: ub.srcLen - ua.srcLen, why: 'no unit changed' }); }
+    if (changes === 0) {
+      stats.pairsNoUnitChange++;
+      let oversize = 0;
+      for (const [name, code] of ub.lastAny) { const p = ua.lastAny.get(name); if (code.length > MAX && (!p || normWS(p) !== normWS(code))) oversize++; }
+      if (oversize) stats.pairsOversizeOnly++;
+      zeroPairs.push({ a: A.file, b: B.file, identical: ua.srcHash === ub.srcHash, srcDelta: ub.srcLen - ua.srcLen, why: oversize ? `only ${oversize} unit(s) > ${MAX} chars changed` : 'no top-level unit changed (edits in data/top-level statements)' });
+    }
     else if (emitted === 0) { stats.pairsAllDeduped++; zeroPairs.push({ a: A.file, b: B.file, identical: false, srcDelta: ub.srcLen - ua.srcLen, why: `${changes} change(s), all seen in another chain` }); }
   }
 }
@@ -423,7 +452,7 @@ for (const info of fileCache.values()) { allUnitsN += info.allCount; inWindowN +
 
 console.log('\n== results ==');
 console.log(`version pairs compared:        ${stats.pairs}`);
-console.log(`  no unit-level change:        ${stats.pairsNoUnitChange}  (of which script byte-identical after data-URI strip: ${stats.pairsIdenticalSource})`);
+console.log(`  no unit-level change:        ${stats.pairsNoUnitChange}  (script byte-identical after data-URI strip: ${stats.pairsIdenticalSource}; edits only in functions > ${MAX} chars: ${stats.pairsOversizeOnly})`);
 console.log(`  changes all deduped away:    ${stats.pairsAllDeduped}  (same edits already emitted from another chain)`);
 console.log(`units (chained files):         top-level decls ${allUnitsN}; in ${MIN}..${MAX} window ${inWindowN}; accepted by strict extractUnits ${strictN}; regex-visible function decls ${rawN}`);
 console.log(`files IIFE-unwrapped: ${unwrappedN}; files with parse errors: ${errN}`);

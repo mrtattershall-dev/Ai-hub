@@ -135,7 +135,7 @@ function pathWords(path) {
     .map(wordsOf).filter(Boolean);
   return { dirs, leaf };
 }
-const an = (phrase) => (/^[aeiou]/i.test(phrase) ? 'an ' : 'a ') + phrase;
+const an = (phrase) => (/^[aeiou]/i.test(phrase) && !/^(u[st]|uni|use|usu|euro|one)/i.test(phrase) ? 'an ' : 'a ') + phrase;
 function pathDescription(path) {
   const { dirs, leaf: rawLeaf } = pathWords(path);
   const leaf = rawLeaf.replace(/^\d+\s*/, '');                         // "6831 normal map rotation"
@@ -244,6 +244,14 @@ const PROGRAM_CODE = [
 ];
 // `tail` is a clause that reads after "<kind>": "that spawns the damage number", or
 // 'described in the code as "..."', or null when nothing honest can be said about intent.
+const PROGRAM_REPO_FILE = [
+  (d, fw) => `Write ${d}${fw}, complete.`,
+  (d, fw) => `Write ${d} as one complete file${fw}.`,
+  (d, fw) => `Give me the full source of ${d}${fw}, as a complete program.`,
+  (d, fw) => `Reproduce ${d} in full${fw}.`,
+  (d, fw) => `I need ${d} written out completely, ready to run${fw}.`,
+  (d, fw) => `Write out ${d}${fw}, complete and runnable.`,
+];
 const UNIT_ASK = [
   (n, k, t) => (t ? `Write the \`${n}\` ${k} ${t}.` : `Write the \`${n}\` ${k}.`),
   (n, k, t) => (t ? `Implement \`${n}\`, a ${k} ${t}.` : `Implement the \`${n}\` ${k}.`),
@@ -276,10 +284,15 @@ const GENERIC_CLASS = /^(Example|Demo|Demo[A-Z]?|Scene[A-Z]?|GameScene|Preloader
 const GENERIC_FN = /^(create|preload|update|init|constructor|render|destroy|shutdown)$/;
 
 function buildProgram(h) {
-  const desc = leadingComment(h.code) || (h.repo && !isExamplesRepo(h.repo) ? repoFileDescription(h) : pathDescription(h.path));
+  const comment = leadingComment(h.code);
+  const repoFile = !comment && h.repo && !isExamplesRepo(h.repo);
+  const desc = comment || (repoFile ? repoFileDescription(h) : pathDescription(h.path));
   const d = desc.replace(/^[A-Z]/, (c) => c.toLowerCase());
-  const tpl = pick(h.axis === 'phaser' ? PROGRAM_PHASER : PROGRAM_CODE, h.path + '|' + h.repo);
-  return row(h.axis === 'phaser' ? SYS_PHASER : SYS_CODE, tpl(d), fence(h.code));
+  const key = h.path + '|' + h.repo;
+  const user = repoFile
+    ? pick(PROGRAM_REPO_FILE, key)(d, h.axis === 'phaser' ? ', in Phaser 3' : ', in vanilla JavaScript')
+    : pick(h.axis === 'phaser' ? PROGRAM_PHASER : PROGRAM_CODE, key)(d);
+  return row(h.axis === 'phaser' ? SYS_PHASER : SYS_CODE, user, fence(h.code));
 }
 
 const repoShort = (repo) => String(repo || '').split('/').pop();
@@ -288,9 +301,10 @@ const isExamplesRepo = (repo) => /phaserjs\/examples/i.test(String(repo || ''));
 function repoFileDescription(h) {
   const base = String(h.path || '').split('/').pop();
   const { leaf } = pathWords(h.path);
+  const what = leaf === 'script' ? 'script' : `${leaf} script`;
   return /\.(m?js)$/i.test(base)
-    ? `the ${leaf} script (${base}) of the ${repoShort(h.repo)} project`
-    : `the ${leaf} script of the ${repoShort(h.repo)} project`;
+    ? `the ${what} (${base}) of the ${repoShort(h.repo)} project`
+    : `the ${what} of the ${repoShort(h.repo)} project`;
 }
 
 function buildUnit(h) {
@@ -428,6 +442,14 @@ function harvestFile(name, src) {
 }
 harvestFile('harvest_examples.jsonl', 'phaserjs/examples');
 harvestFile('harvest_js.jsonl', 'harvest_js');
+// The Modal fan-out over 1,976 repos. Landed after the first assembly run, so it is added
+// here rather than replacing harvest_js - the dedupe pass below removes the overlap
+// (harvest_js's 373 repos are a subset of these 1,976).
+// The FILTERED wide harvest. The raw 50,710 was 80.3% generic JavaScript that merely lived
+// in a repo tagged as a game - the same composition as run5's correctness slice, which took
+// the code axis from 7/9 to 5/9 and then 3/9. filter_games.mjs keeps the 8,042 rows with
+// actual evidence of game code in them.
+harvestFile('harvest_wide_games.jsonl', 'harvest_wide');
 
 {
   const rows = readJsonl(join(IN_DIR, 'own_units.jsonl'));

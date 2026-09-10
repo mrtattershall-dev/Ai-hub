@@ -160,8 +160,20 @@ check('a sub-task never waits on approval (it reports back instead)',
   /needs approval/.test(src) && /Do that step yourself in the parent run/.test(src));
 check('terminal states escalate to a human',
   /escalate\(WORKSPACE/.test(src) && /'error', 'stopped', 'interrupted'/.test(src));
-check('the supervisor is behind a flag and only chains CLEAN finishes',
-  /SUPERVISOR && run\.status === 'done' && !run\.depth/.test(src));
+// Updated 2026-09-10 by ai-native-engine-00 (flagged in COORD.md). The supervisor moved
+// from a module const to a persisted, runtime-toggleable setting, so the old regex on
+// `SUPERVISOR` stopped matching. The invariant it guarded is unchanged; it is asserted in
+// three halves now, because a FAILED run gained a behaviour it did not have back then.
+check('the NEXT queued goal is only pulled after a CLEAN finish',
+  /supervisorEnabled && run\.status === 'done' && !run\.depth/.test(src));
+check('a failed step retries at most once, and never one a human stopped',
+  /if \(!item \|\| item\.repairOf\) return null;/.test(src)
+  && /if \(run\.status && run\.status !== 'error'\)/.test(src));
+check('unattended pickup stays off unless it was explicitly turned on',
+  /let supervisorEnabled = SUPERVISOR_FORCED;/.test(src)
+  && /settings\?\.agentSupervisor/.test(src));
+check('Google WRITE tools are absent from AUTO_TOOLS',
+  /\.\.\.GOOGLE_READ_TOOLS,/.test(src) && !/\.\.\.GOOGLE_WRITE_TOOLS/.test(src));
 check('token spend is accounted per run',
   /run\.tokens = \(run\.tokens \|\| 0\) \+ estimateTokens/.test(src));
 check('orphaned queue items are recovered after a restart',

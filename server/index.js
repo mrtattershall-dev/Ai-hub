@@ -12,6 +12,7 @@ import assetsRouter from './assetsRouter.js';
 import { ASSETS_DIR, mimeFor } from './assets.js';
 import { attachTerminal, sessionCount, viewerCount, writeToNewestSession, writeToSession } from './terminal.js';
 import { requireAuth, allowed, isLocal, HUB_TOKEN } from './auth.js';
+import { googleRouter, googleCallbackRouter } from './googleAuth.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -362,10 +363,21 @@ app.get('/api/providers', (req, res) => res.json(PROVIDER_DEFAULTS));
 
 
 // ── Autonomous agent routes ───────────────────────────────────────────────────
-app.use('/api/agent', agentRouter({ loadDb }));
+app.use('/api/agent', agentRouter({ loadDb, saveDb, withDb }));
 app.use('/api/game', gameVerifyRouter());
 app.use('/api/godot', godotVerifyRouter());
 app.use('/api/assets', assetsRouter());
+
+// ── Google account ────────────────────────────────────────────────────────────
+// The redirect target must match a URI registered on the OAuth client character for
+// character, so it is derived from PORT in one place and reported by /api/google/status
+// for pasting into the Cloud console rather than being written down twice.
+const GOOGLE_REDIRECT = process.env.GOOGLE_REDIRECT_URI || `http://localhost:${PORT}/oauth/google/callback`;
+const APP_URL = process.env.HUB_APP_URL || 'http://localhost:5173';
+app.use('/api/google', googleRouter({ loadDb, saveDb, withDb, redirectUri: GOOGLE_REDIRECT }));
+// Outside the /api gate on purpose: Google's redirect is a plain browser navigation with
+// no hub token. It is protected by the single-use `state` this server issued instead.
+app.use('/oauth/google', googleCallbackRouter({ loadDb, saveDb, withDb, redirectUri: GOOGLE_REDIRECT, appUrl: APP_URL }));
 app.get('/api/terminal/status', (_req, res) => res.json({ sessions: sessionCount(), viewers: viewerCount() }));
 // Push text into a shell - powers "Send to Terminal" from other tabs. Targets the
 // session the client says is active; falls back to the newest only if none given.

@@ -8,7 +8,11 @@
  * the next tab the wrong text.
  */
 import assert from 'node:assert/strict';
-import { planToCodeBrief, codeToGame, hopsFor, FLOW } from './flow.js';
+import {
+  planToCodeBrief, codeToGame, hopsFor, planToChain, parseListItems, verdictToFix,
+  chainBlockReason, historyToPlan,
+  FLOW, MAX_CHAIN, MAX_FIX_ERRORS, MAX_FIX_CODE,
+} from './flow.js';
 
 let passed = 0;
 const test = (name, fn) => {
@@ -103,16 +107,50 @@ test('no code block at all yields null', () => {
 });
 
 // ---- hopsFor ----------------------------------------------------------------------
-test('a strategy output offers exactly the Code hop', () => {
+test('a strategy output offers the Code hop and the queue-chain hop', () => {
   const hops = hopsFor(plan(ACTION_PLAN));
-  assert.equal(hops.length, 1);
-  assert.equal(hops[0].to, 'code');
+  assert.deepEqual(hops.map(h => h.to), ['code', 'agent']);
   assert.equal(hops[0].label, 'Build this in Code');
   assert.match(hops[0].payload.input, /Ship a playable Pong/);
+  assert.equal(hops[1].action, 'queueChain');
+  assert.equal(hops[1].payload.goals.length, 3);
 });
 
 test('an empty strategy output offers no hop, so no dead button renders', () => {
   assert.deepEqual(hopsFor(plan('')), []);
+});
+
+test('a plan with no work section still offers Code, and blocks the chain with a reason', () => {
+  const hops = hopsFor(plan('## Goal\nShip it.\n\n## Risks\nprose, no bullets'));
+  assert.deepEqual(hops.map(h => h.to), ['code', 'agent']);
+
+  const chain = hops.find(h => h.to === 'agent');
+  assert.equal(chain.payload, null);
+  // The reason has to name the fix, not the rule it broke: this text is the entire
+  // explanation the user gets for why unattended execution is unavailable.
+  assert.match(chain.blocked, /the "## Tasks" section/);
+  assert.match(chain.blocked, /Refine it/);
+});
+
+test('a work section written as prose blocks the chain and asks for bullets', () => {
+  const chain = hopsFor(plan('## Goal\nShip it.\n\n## Tasks\nFirst the paddle, then the ball.'))
+    .find(h => h.to === 'agent');
+  assert.equal(chain.payload, null);
+  assert.match(chain.blocked, /"Tasks" is written as prose/);
+  assert.match(chain.blocked, /bulleted list/);
+});
+
+test('a chainable plan reports no block', () => {
+  const chain = hopsFor(plan(ACTION_PLAN)).find(h => h.to === 'agent');
+  assert.equal(chain.blocked, null);
+  assert.equal(chain.payload.goals.length, 3);
+  // null from the reason and goals from the derivation are two answers to one question;
+  // if they ever disagree, a hop silently vanishes again.
+  assert.equal(chainBlockReason(plan(ACTION_PLAN)), null);
+});
+
+test('an empty plan has no block reason, so an empty output block stays button-free', () => {
+  assert.equal(chainBlockReason(plan('')), null);
 });
 
 test('kinds with no flow, and junk, yield no hops', () => {
@@ -121,11 +159,41 @@ test('kinds with no flow, and junk, yield no hops', () => {
   assert.deepEqual(hopsFor(null), []);
 });
 
-test('a throwing derivation is swallowed rather than blanking the output block', () => {
+test('a throwing derivation drops its own hop and leaves the others alone', () => {
   const original = FLOW.strategy[0].derive;
   FLOW.strategy[0].derive = () => { throw new Error('boom'); };
-  try { assert.deepEqual(hopsFor(plan('x')), []); }
-  finally { FLOW.strategy[0].derive = original; }
+  try {
+    // 'x' has no work section, so the chain hop is blocked-with-a-reason rather than
+    // absent. What matters here is that the throwing hop is gone and nothing propagated.
+    assert.deepEqual(hopsFor(plan('x')).map(h => h.to), ['agent']);
+  } finally {
+    FLOW.strategy[0].derive = original;
+  }
+});
+
+// ---- historyToPlan ----------------------------------------------------------------
+test('a saved row becomes a plan the hops can act on again', () => {
+  const revived = historyToPlan({
+    tab: 'strategy', task: 'plan', provider: 'claude', response: ACTION_PLAN,
+    prompt: 'build pong', tokens_used: 812, created_at: 1789000000,
+  });
+  assert.equal(revived.kind, 'strategy');
+  assert.equal(revived.canvasId, 'plan');
+  assert.equal(revived.label, 'Action Plan');
+  assert.equal(revived.createdAt, 1789000000 * 1000);   // seconds in the DB, ms in the client
+  assert.equal(revived.fromHistory, true);
+  assert.deepEqual(hopsFor({ ...revived, streaming: false }).map(h => h.to), ['code', 'agent']);
+});
+
+test('a row with an unknown task still revives, under a neutral label', () => {
+  const revived = historyToPlan({ task: 'not-a-canvas', response: ACTION_PLAN });
+  assert.equal(revived.canvasId, null);
+  assert.equal(revived.label, 'Saved plan');
+});
+
+test('an empty row revives to nothing', () => {
+  assert.equal(historyToPlan({ response: '   ' }), null);
+  assert.equal(historyToPlan(null), null);
 });
 
 // every FLOW hop must name a real destination, or sendHandoff parks a payload nobody claims
@@ -134,6 +202,141 @@ test('every declared hop targets a known view', () => {
   for (const [from, hops] of Object.entries(FLOW)) {
     for (const h of hops) assert.ok(VIEWS.includes(h.to), `${from} -> unknown view "${h.to}"`);
   }
+});
+
+// ---- parseListItems ---------------------------------------------------------------
+test('one item per top-level bullet, whatever the marker', () => {
+  assert.deepEqual(parseListItems('- a\n* b\n+ c\n1. d\n2) e'), ['a', 'b', 'c', 'd', 'e']);
+});
+
+test('indented lines fold into the item above, not into new items', () => {
+  const items = parseListItems('- Set up Phaser\n  * init game\n  * set size\n- Add paddles');
+  assert.equal(items.length, 2);
+  assert.equal(items[0], 'Set up Phaser\ninit game\nset size');
+  assert.equal(items[1], 'Add paddles');
+});
+
+test('a tab counts as indentation, same as spaces', () => {
+  assert.deepEqual(parseListItems('- top\n\tnested'), ['top\nnested']);
+});
+
+test('prose before the first bullet is dropped, not turned into an item', () => {
+  assert.deepEqual(parseListItems('Here is the plan:\n- do it'), ['do it']);
+});
+
+test('a section with no bullets yields nothing', () => {
+  assert.deepEqual(parseListItems('just a paragraph of prose'), []);
+  assert.deepEqual(parseListItems(''), []);
+  assert.deepEqual(parseListItems(undefined), []);
+});
+
+// ---- planToChain ------------------------------------------------------------------
+test('each milestone becomes its own goal, carrying the plan for context', () => {
+  const out = planToChain(plan(ACTION_PLAN));
+  assert.equal(out.goals.length, 3);
+  assert.match(out.goals[0], /^Paddle input/);
+  for (const g of out.goals) assert.match(g, /Part of: Ship a playable Pong in the hub\./);
+});
+
+test('a goal stands alone: sub-points travel with it', () => {
+  const out = planToChain(plan('## Goal\nG\n\n## Tasks\n- Big step\n  - detail one\n  - detail two'));
+  assert.match(out.goals[0], /Big step\ndetail one\ndetail two/);
+});
+
+test('risks never become goals', () => {
+  const out = planToChain(plan(ACTION_PLAN));
+  for (const g of out.goals) assert.doesNotMatch(g, /farm schema/);
+});
+
+test('a long plan is capped and says how much it dropped', () => {
+  const many = Array.from({ length: MAX_CHAIN + 5 }, (_, i) => `- step ${i}`).join('\n');
+  const out = planToChain(plan(`## Goal\nG\n\n## Tasks\n${many}`));
+  assert.equal(out.goals.length, MAX_CHAIN);
+  assert.equal(out.dropped, 5);
+});
+
+test('no work section, no bullets, or no plan at all: no chain', () => {
+  assert.equal(planToChain(plan('## Goal\nonly a goal')), null);
+  assert.equal(planToChain(plan('## Tasks\nprose with no bullets')), null);
+  assert.equal(planToChain(plan('')), null);
+  assert.equal(planToChain(undefined), null);
+});
+
+test('a plan without a Goal section still chains, just without the context line', () => {
+  const out = planToChain(plan('## Tasks\n- alpha\n- beta'));
+  assert.deepEqual(out.goals, ['alpha', 'beta']);
+});
+
+// ---- verdictToFix -----------------------------------------------------------------
+const FAIL = {
+  ok: false,
+  verdict: 'Nothing was drawn to the canvas.',
+  checks: { engineLoaded: true, rendered: false, canvasWidth: 0, canvasHeight: 0 },
+  errors: ['TypeError: x is not a function'],
+};
+
+test('a passing verdict offers no repair', () => {
+  assert.equal(verdictToFix({ ok: true, verdict: 'clean' }, { code: 'x' }), null);
+  assert.equal(verdictToFix(null), null);
+});
+
+test('the brief names the verdict, the failed check and the errors', () => {
+  const out = verdictToFix(FAIL, { code: 'run()', engine: 'phaser' });
+  assert.equal(out.task, 'debug');
+  assert.equal(out.from, 'game');
+  assert.match(out.input, /^This phaser code failed verification/);
+  assert.match(out.input, /Nothing was drawn to the canvas\./);
+  assert.match(out.input, /nothing rendered \(canvas 0x0\)/);
+  assert.match(out.input, /- TypeError: x is not a function/);
+});
+
+test('a check that passed is not reported as a failure', () => {
+  const out = verdictToFix(FAIL, { code: 'run()' });
+  assert.doesNotMatch(out.input, /engine never loaded/);
+});
+
+test('the same error repeated every frame is reported once', () => {
+  const spam = { ...FAIL, errors: Array.from({ length: 60 }, () => 'Boom') };
+  const out = verdictToFix(spam, { code: 'run()' });
+  assert.equal(out.input.match(/- Boom/g).length, 1);
+  assert.doesNotMatch(out.input, /further distinct errors/);
+});
+
+test('more distinct errors than the cap are trimmed, and the trim is admitted', () => {
+  const many = { ...FAIL, errors: Array.from({ length: MAX_FIX_ERRORS + 3 }, (_, i) => `err ${i}`) };
+  const out = verdictToFix(many, { code: 'run()' });
+  assert.equal(out.input.match(/^- err /gm).length, MAX_FIX_ERRORS);
+  assert.match(out.input, /3 further distinct errors omitted/);
+});
+
+test('errors arriving as objects are unwrapped, not stringified as [object Object]', () => {
+  const out = verdictToFix({ ...FAIL, errors: [{ message: 'real message' }] }, { code: 'x' });
+  assert.match(out.input, /- real message/);
+  assert.doesNotMatch(out.input, /\[object Object\]/);
+});
+
+test('missing assets are named, with the canonical rule attached', () => {
+  const out = verdictToFix({ ...FAIL, assetsMissing: ['hero.png', 'jump.wav'] }, { code: 'x' });
+  assert.match(out.input, /hero\.png, jump\.wav/);
+  assert.match(out.input, /canonical asset names only/);
+});
+
+test('the failing code travels with the brief, asking for a whole file back', () => {
+  const out = verdictToFix(FAIL, { code: 'const a = 1;' });
+  assert.match(out.input, /Return the corrected file in full, not a diff/);
+  assert.match(out.input, /```js\nconst a = 1;\n```/);
+});
+
+test('an oversized file is truncated and says so, rather than being sent whole', () => {
+  const out = verdictToFix(FAIL, { code: 'z'.repeat(MAX_FIX_CODE + 500) });
+  assert.match(out.input, /truncated/);
+  assert.ok(out.input.length < MAX_FIX_CODE + 2000, 'the cap must actually bound the brief');
+});
+
+test('no code still produces a usable brief rather than nothing', () => {
+  const out = verdictToFix(FAIL, {});
+  assert.ok(out.input.length > 0);
+  assert.doesNotMatch(out.input, /```/);
 });
 
 console.log(`flow: ${passed} passed${process.exitCode ? ' (with failures above)' : ''}`);

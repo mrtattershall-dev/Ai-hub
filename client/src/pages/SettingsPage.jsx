@@ -3,6 +3,8 @@ import { Save, Trash2, KeyRound } from 'lucide-react';
 import { useStore } from '../store/useStore.js';
 import { PROVIDERS } from '../lib/constants.js';
 import { getKeys, saveKey, deleteKey, getProviders } from '../lib/api.js';
+import GoogleAccount from '../components/GoogleAccount.jsx';
+import UnattendedCard from '../components/UnattendedCard.jsx';
 
 export default function SettingsPage() {
   const connectedProviders = useStore(s => s.connectedProviders);
@@ -96,6 +98,25 @@ export default function SettingsPage() {
   return (
     <div className="output-area" style={{ paddingTop: 14, maxWidth: 720 }}>
       <div className="settings-section" style={{ padding: 0, border: 'none' }}>
+        <h3>Accounts</h3>
+        <p className="hint">
+          Services the hub acts on your behalf in. Sign-in happens in a Google window - the hub
+          never sees your password, and stores only the tokens Google issues.
+        </p>
+      </div>
+
+      <GoogleAccount />
+
+      <div className="settings-section" style={{ padding: 0, border: 'none', marginTop: 22 }}>
+        <h3>Running on its own</h3>
+        <p className="hint">
+          Whether the agent picks up queued work without being asked, and what stops it if it goes wrong.
+        </p>
+      </div>
+
+      <UnattendedCard />
+
+      <div className="settings-section" style={{ padding: 0, border: 'none', marginTop: 22 }}>
         <h3>API providers</h3>
         <p className="hint">
           Keys are stored locally in the server's SQLite database and are never sent to the browser after saving.

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { History as HistoryIcon, Trash2, ChevronDown, ChevronRight, RotateCcw } from 'lucide-react';
+import { History as HistoryIcon, Trash2, ChevronDown, ChevronRight, RotateCcw, ArrowRight } from 'lucide-react';
 import { useStore } from '../store/useStore.js';
 import { PROVIDER_MAP, PROVIDERS } from '../lib/constants.js';
 import Markdown from '../components/Markdown.jsx';
 import { getHistory, deleteHistoryItem, clearHistory } from '../lib/api.js';
+import { historyToPlan } from '../lib/flow.js';
 
 function formatDate(unixSeconds) {
   const d = new Date(unixSeconds * 1000);
@@ -19,6 +20,8 @@ export default function HistoryPage() {
   const [expandedId, setExpandedId] = useState(null);
 
   const addToast = useStore(s => s.addToast);
+  const sendHandoff = useStore(s => s.sendHandoff);
+  const setActiveTab = useStore(s => s.setActiveTab);
 
   const load = async () => {
     setLoading(true);
@@ -37,6 +40,23 @@ export default function HistoryPage() {
   };
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [tabFilter, providerFilter]);
+
+  /**
+   * Put a saved plan back in front of the flow.
+   *
+   * History is where every plan already lives, but as a transcript: readable, and dead.
+   * Handing the row back to Strategy as an output restores the only thing that was
+   * missing - the hops - so a plan written last night can still become a build brief or
+   * an unattended chain this morning, without regenerating it and paying for a different
+   * plan that happens to answer the same question.
+   */
+  const handleReopen = (row, e) => {
+    e.stopPropagation();
+    const plan = historyToPlan(row);
+    if (!plan) { addToast('That entry has no plan text to reopen', 'error'); return; }
+    sendHandoff('strategy', { plan });
+    setActiveTab('strategy');
+  };
 
   const handleDelete = async (id, e) => {
     e.stopPropagation();
@@ -120,7 +140,16 @@ export default function HistoryPage() {
                     <div className="out-header">Response</div>
                     <div className="out-body"><Markdown text={row.response} /></div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+                    {row.tab === 'strategy' && (
+                      <button
+                        className="btn btn-sm"
+                        onClick={(e) => handleReopen(row, e)}
+                        title="Put this plan back in the Strategy tab, with its handoffs"
+                      >
+                        <ArrowRight size={12} /> Open in Strategy
+                      </button>
+                    )}
                     <button className="btn btn-sm btn-danger" onClick={(e) => handleDelete(row.id, e)}>
                       <Trash2 size={12} /> Delete entry
                     </button>

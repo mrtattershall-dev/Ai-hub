@@ -11,17 +11,29 @@ function saveLocal(key, val) {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
 }
 
+// Finished plans only, and a bounded number of them: a plan is a few KB of markdown and
+// localStorage is a handful of MB, so the cap is about not letting a year of planning
+// crowd out the buffers the Game and Godot tabs keep in the same store.
+const MAX_SAVED_PLANS = 30;
+function persistOutputs(outputs) {
+  saveLocal('strategyOutputs', outputs.filter(o => !o.streaming && !o.error).slice(0, MAX_SAVED_PLANS));
+}
+
 // The pane layout persists, so reopening the hub restores your workspace. Ids are
 // reseeded above the highest saved id so a restored tree cannot collide with new panes.
+// A fresh hub opens on the first step of the flow rather than the second. A saved layout
+// always wins over this - reordering the sidebar is not a reason to move someone's panes.
+const FIRST_VIEW = 'strategy';
+
 function loadPaneTree() {
   try {
     const raw = JSON.parse(localStorage.getItem('paneTree'));
-    if (!raw || !raw.type) return leaf('code');
+    if (!raw || !raw.type) return leaf(FIRST_VIEW);
     let max = 0;
     (function walk(n) { if (!n) return; if (n.type === 'leaf') max = Math.max(max, n.id); else { walk(n.a); walk(n.b); } })(raw);
     while (nextPaneId() <= max) { /* advance the sequence past restored ids */ }
     return raw;
-  } catch { return leaf('code'); }
+  } catch { return leaf(FIRST_VIEW); }
 }
 function savePaneTree(tree) {
   try { localStorage.setItem('paneTree', JSON.stringify(tree)); } catch {}
@@ -29,7 +41,7 @@ function savePaneTree(tree) {
 
 export const useStore = create((set, get) => ({
   // UI state
-  activeTab: 'code',
+  activeTab: FIRST_VIEW,
   // One pending tab-to-tab handoff, or null. Deliberately not persisted and deliberately
   // singular - see lib/flow.js for why a queue here would be the wrong shape.
   handoff: null,
@@ -58,7 +70,12 @@ export const useStore = create((set, get) => ({
   theme: (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) || 'dark',
 
   connectedProviders: {},
-  outputs: [],
+  // Plans survive a reload. They are the only thing in the hub you write BEFORE the work
+  // and then act on afterwards, and a dev-server reload in the middle of planning used to
+  // empty the tab - the plan itself was still in History, but the buttons that turn it
+  // into a build or a chain were not. Only finished plans are stored, so a half-streamed
+  // response never comes back as a plan that looks complete.
+  outputs: loadLocal('strategyOutputs', []),
   isStreaming: false,
   toasts: [],
 
@@ -686,7 +703,7 @@ export const useStore = create((set, get) => ({
     savePaneTree(t);
   },
   closePane: (id) => {
-    const t = closeNode(get().paneTree, id) || leaf('code');
+    const t = closeNode(get().paneTree, id) || leaf(FIRST_VIEW);
     const still = findLeaf(t, get().activePaneId);
     set({ paneTree: t, activePaneId: still ? get().activePaneId : (firstLeaf(t) || {}).id });
     savePaneTree(t);
@@ -741,12 +758,28 @@ export const useStore = create((set, get) => ({
   setConnectedProviders: (p) => set({ connectedProviders: p }),
   setIsStreaming: (v) => set({ isStreaming: v }),
 
-  addOutput: (output) => set(s => ({ outputs: [output, ...s.outputs].slice(0, 100) })),
+  addOutput: (output) => set(s => {
+    const outputs = [output, ...s.outputs].slice(0, 100);
+    persistOutputs(outputs);
+    return { outputs };
+  }),
   updateOutput: (id, patch) => set(s => ({
-    outputs: s.outputs.map(o => (o.id === id ? { ...o, ...(typeof patch === 'function' ? patch(o) : patch) } : o)),
+    outputs: (() => {
+      const outputs = s.outputs.map(o => (o.id === id ? { ...o, ...(typeof patch === 'function' ? patch(o) : patch) } : o));
+      // Writing on every streamed delta would hammer localStorage for no gain, so the
+      // save waits for the output to stop streaming - which is also the first moment the
+      // plan is worth keeping.
+      const touched = outputs.find(o => o.id === id);
+      if (touched && !touched.streaming) persistOutputs(outputs);
+      return outputs;
+    })(),
   })),
-  clearOutputs: () => set({ outputs: [] }),
-  removeOutput: (id) => set(s => ({ outputs: s.outputs.filter(o => o.id !== id) })),
+  clearOutputs: () => { persistOutputs([]); set({ outputs: [] }); },
+  removeOutput: (id) => set(s => {
+    const outputs = s.outputs.filter(o => o.id !== id);
+    persistOutputs(outputs);
+    return { outputs };
+  }),
 
   // ── Chat thread actions ───────────────────────────────────────────────────
   getActiveThread(tab) {
