@@ -39,6 +39,15 @@ import modal
 BASE = os.environ.get("EVAL_BASE", "unsloth/Qwen2.5-Coder-14B-Instruct-bnb-4bit")
 GPU = os.environ.get("EVAL_GPU", "A10G")
 
+# Same guard as modal_train.py, for the same reason: a 32B in 4-bit is ~19GB before the KV
+# cache, and generating 3072 tokens on a 24GB A10G OOMs AFTER the model has loaded - so the
+# load is billed and nothing is produced. Refuse here, where it costs nothing.
+if "32B" in BASE.upper() and GPU in ("A10", "A10G", "L4", "T4", "A100"):
+    raise SystemExit(
+        f"refusing to start: EVAL_BASE is {BASE} but EVAL_GPU={GPU}. "
+        f"Generating from a 32B needs 80GB - set EVAL_GPU=H100 (or A100-80GB)."
+    )
+
 # ── The five system prompts, verbatim from the training set ───────────────────
 SYS_CODE = ("You are a senior engineer who writes complete, self-contained, runnable code. "
             "Every identifier you reference must be declared or imported, declarations must "
@@ -165,13 +174,13 @@ image = (
     .apt_install("git")
     .pip_install("unsloth", "trl", "peft", "transformers", "datasets",
                  "accelerate", "bitsandbytes", "huggingface_hub", "hf_transfer")
-    .env({"HF_HUB_ENABLE_HF_TRANSFER": "1", "EVAL_BASE": BASE})
+    .env({"HF_HUB_ENABLE_HF_TRANSFER": "1", "EVAL_BASE": BASE, "EVAL_GPU": GPU})
 )
 
 app = modal.App("qwen-evalset")
 
 
-@app.function(image=image, gpu=GPU, timeout=60 * 90,
+@app.function(image=image, gpu=GPU, retries=0, timeout=60 * 90,
               volumes={"/root/.cache/huggingface": hf_cache, "/adapters": adapters, "/output": gen_output})
 def generate(ref: str, out_name: str):
     import json
@@ -241,7 +250,7 @@ hf_image = (
 )
 
 
-@app.function(image=hf_image, gpu=HF_GPU, timeout=60 * 60,
+@app.function(image=hf_image, gpu=HF_GPU, retries=0, timeout=60 * 60,
               volumes={"/root/.cache/huggingface": hf_cache, "/output": gen_output})
 def generate_hf(ref: str, out_name: str, max_new: int = 3072):
     # MUST match the unsloth path's 3072. It was 2048, and Qwen3-Coder-30B is verbose
