@@ -62,6 +62,12 @@ SCALEDOWN_S = int(os.environ.get("MYCODER_SCALEDOWN_S", "600"))
 # applied to the FULL-PRECISION base at serve time, which is why MYCODER_BASE below is the
 # plain Qwen repo and not the -bnb-4bit one named in adapter_config.json. Getting that
 # backwards loads a 4-bit base and silently serves something the adapter was not shaped for.
+# DEPLOY FROM GIT BASH WITH `MSYS_NO_PATHCONV=1`, or this path is silently rewritten.
+# MSYS turns a leading-slash argument into a Windows path, so MYCODER_LORA=/adapters/run5
+# was baked into the image as C:/Program Files/Git/adapters/run5 - enable_lora went True,
+# the adapter directory did not exist, and the server would have answered every request
+# from the BASE model while every label said run5. Third variant of that same trap in one
+# day; check /api/health's "lora" field rather than trusting the deploy log.
 LORA_PATH = os.environ.get("MYCODER_LORA", "")          # e.g. /adapters/run5
 LORA_NAME = os.environ.get("MYCODER_LORA_NAME", "tuned")
 LORA_RANK = int(os.environ.get("MYCODER_LORA_RANK", "16"))
@@ -96,6 +102,14 @@ image = (
         # silently fall back to the defaults.
         "MYCODER_BASE": MODEL, "MYCODER_GPU": GPU, "MYCODER_NAME": MODEL_NAME,
         "MYCODER_MAXLEN": str(MAX_LEN), "MYCODER_GPU_FRAC": str(GPU_FRAC),
+        # The LoRA settings MUST be baked in here too. Deploy-time env does not reach the
+        # container - only this dict does. Missing them, LORA_PATH is "" inside the
+        # container, enable_lora is False, and the server happily serves the BASE model
+        # while every label still says "run5". Caught by reading the vLLM banner:
+        # `non-default args` listed no enable_lora. This project has already shipped a
+        # "the hub may not actually be serving run5" once; that is what this line prevents.
+        "MYCODER_LORA": LORA_PATH, "MYCODER_LORA_NAME": LORA_NAME,
+        "MYCODER_LORA_RANK": str(LORA_RANK),
     })
 )
 
