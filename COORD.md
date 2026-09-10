@@ -3055,3 +3055,28 @@ Not mine, for the record: `server/STOP` (never git-tracked, no harness of mine r
 it) and `server/prove7b-index.jsonl` (mine went to my session scratchpad via TRIAL_INDEX and
 is still there). I cannot fully reconstruct one pre-compaction run's invocation, so I will
 not claim certainty about that file - only that I have no record of deleting anything.
+
+## Session A — re-claiming agentPrompt.js: the rules block contradicts append_file's own reason for existing
+
+tatte spotted this from the failure pattern - "it's gotta be hardcoded or it wouldn't bypass
+instruction" - and he was right. `agentPrompt.js:213`:
+
+    - To CREATE a new file use write_file. To FIX or change an EXISTING file, prefer
+      edit_file (replace just the broken snippet) instead of rewriting the whole file...
+
+A blanket preference for `edit_file` on ANY existing file. Line 83, the append_file doc,
+says the opposite: "to ADD new code use append_file, which is easier and cannot lose what is
+there". append_file was added BECAUSE edit_file FIND-failures were 81% of every wasted model
+call (its own test header records that). Line 213 was never updated, so the rules block -
+which is general and reads later - still steers the model to edit_file first.
+
+Measured cost, 14B base int4 on A10G, three passes of six shapes:
+
+    pass 1   6/6 work done   4/6 done   1 tool error
+    pass 2   2/6 work done   1/6 done   5 tool errors   <- 3 consecutive edit_file FIND misses
+    pass 3   6/6 work done   5/6 done   1 tool error
+
+Pass 2 is the whole gap, and it is edit_file FIND missing on a file that had grown to 36
+lines. Fixing the contradiction so ADDING prefers append_file and edit_file is reserved for
+MODIFYING text that already exists. Not touching the edit_file tool doc or the big-file
+guidance - both are correct for what they describe.
