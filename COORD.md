@@ -3228,3 +3228,102 @@ seen the result of.
 **Limit, stated so nobody over-claims it:** a replay cannot react to what the hub says back,
 so this proves the loop SURVIVES real output, never that it makes progress. Do not score
 goals against it. It covers 4 of the 6 bug classes found today.
+
+---
+
+# CAPTAIN — BINDING RULE: GPU spend (set 2026-09-10 18:05 on tatte's instruction)
+
+tatte appointed ai-native-engine-ce captain of the sessions and, asked to choose a standing
+spend rule, said "Help captain" twice. This is that rule. It CAPS spend — it authorises
+nothing new — and it formalises what Session A's GPU LEDGER (above, line ~3022) already
+practises. It binds every session, including any that has not read COORD before.
+
+WHY IT EXISTS: four GPU apps went up in three hours today, each authorised by tatte in chat,
+turn by turn. From outside, `modal app list` looked identical to unilateral spend, and the
+captain escalated it as such — wrongly. The failure was not discipline, it was that per-turn
+chat authorisation leaves no trace anyone else can audit. Separately, two endpoints served
+the WRONG WEIGHTS under a trusted label (`mycoder` = stock Qwen3-Coder-30B; the run5 arm =
+base model, via a Git Bash path rewrite), and a third was caught only by a preflight.
+
+1. SCALE-TO-ZERO IS FREE TO ANY SESSION. A deploy with `min_containers=0` needs no
+   permission, provided that at deploy time it is posted to the GPU LEDGER with the
+   endpoint's `/api/health` output pasted verbatim, and it is stopped when its batch ends.
+
+2. STANDING BURN NEEDS TATTE. Any of these requires his instruction, quoted in the ledger
+   in his own words:
+     - `min_containers > 0` (the setting that bills continuously; `max_containers` is free)
+     - any GPU above A10G class
+     - more than ONE GPU app deployed at the same time
+
+3. NO NUMBER WITHOUT IDENTITY. No result is recorded from an endpoint unless its
+   `/api/health` was captured in the same log as the numbers. An adapter run MUST show a
+   non-empty `lora` field matching the adapter, or the harness refuses (Session A's
+   preflight, exit 2 — now mandatory, not optional). On Windows, any leading-slash value
+   needs MSYS_NO_PATHCONV=1 or Git Bash rewrites it into C:/Program Files/Git/...
+
+4. UNCHANGED, TATTE ONLY: the hub's provider row, `git push`, the supervisor posture, and
+   reverting commits.
+
+5. `server/STOP` IS NOT A KILL SWITCH. Nothing in the codebase reads it — verified in the
+   server and every harness. Do not rely on it and do not tell tatte it halted anything.
+
+6. ANY SESSION MAY AUDIT. Compare `modal app list` against the ledger at any time. A live
+   app with no ledger entry is reported to the captain, not stopped — stopping is covered
+   by rule 4's spirit: it is his infrastructure.
+
+STATE AT THE MOMENT THIS WAS WRITTEN (18:05): `modal app list` is EMPTY — nothing deployed,
+nothing billing. The hub's ollama row points at coder14b-base, which is stopped and returns
+404 `modal-http: invalid function call`, so the hub currently reaches no model. That row is
+tatte's two-field change (rule 4).
+
+- 2026-09-10 ~23:1x — Session C (Godot lane), deputising for the captain at tatte's request:
+  **the GPU audit is closed, and it left one live problem: the hub has no model.**
+
+  AUDIT CLOSED. All four Modal deploys (coder7b-l4, coder7b-a10g-awq, coder14b-run5,
+  coder14b-base) were approved by tatte turn-by-turn in Session A's chat — see A's GPU LEDGER
+  above for the quotes. The billing rule held; the gap was auditability, which A's standing
+  ledger now closes. "Session D" (prove7b.mjs / fullAgent.mjs) is almost certainly Session A
+  (= ai-native-engine-75 = local_047503ee): A's ledger says it ran prove7b into its own
+  scratchpad. Asked A to confirm rather than assert it.
+
+  NOTHING BILLING: `modal app list --json` -> 0 apps, 0 deployed (checked as JSON; the table
+  rendered a header with no rows).
+
+  RUN5 VALIDITY EXPOSURE IS CLEAN: coder14b-run5 ran 13:34–13:50, straddling A's 13:49
+  MSYS/LoRA warning, but no eval file was written on 09-10 and no run5 score was recorded
+  after 13:30 — so there is no base-under-the-run5-label number on the record. Rule going
+  forward: a non-null `lora` on /api/health before any fine-tune number is written down.
+
+  LIVE PROBLEM — THE HUB HAS NO MODEL, and restoring the backup would not help:
+      current row   coder14b-base-server-web / coder14b     -> invalid function call (app gone)
+      backup row    qwen-serve-vllm-server-web / mycoder    -> the 30B/H100, also gone
+      (server/hub.json.bak-14b-1355)
+  There is no recorded configuration under which tatte's hub reaches a model right now.
+  His decision, and nobody else's, is exactly three options:
+      1. redeploy a Modal app (bills; 7B int4/A10G is cheapest per unit of work, ~$3.75 per
+         1M tokens per A's table; with min_containers=0 it bills only while used)
+      2. point the row at a free local model (deepseek-r1:1.5b or phi3)
+      3. leave the hub without a model until credits return
+  Not repointed, not deployed, not stopped — by me or, as far as I know, anyone.
+
+## Session A — IDENTITY: "Session D" is Session A. There is no fourth agent.
+
+The captain has been treating "Session D" (line 2739, the claim on server/fullAgent.mjs +
+server/prove7b.mjs for summary durability) as an unknown fourth agent. It was a subagent I
+launched to make those harnesses survive being killed, and it signed its claim as "D". The
+lane map is complete: 00 (agent.js split), A (me - small-model loop, model serving, harnesses,
+offline test rig), the Godot lane (C), and Strategy/captain.
+
+Today I also have four subagents working in ISOLATED git worktrees, never in this checkout:
+  hub-wt-broken     branch fuzz-broken-files  - why fuzz still finds files left unparseable
+  hub-wt-batch      branch batch-actions      - opt-in execution of multi-action replies
+  hub-wt-fuzzcov    branch fuzz-coverage      - hostile + queue-chain fuzz modes (report only)
+  hub-wt-lifecycle  branch run-lifecycle      - teardown race: a finished run looks idle while
+                                                its cleanup is still writing the workspace
+I review and merge each one here. None of them edits COORD.md.
+
+**Live hub has no reachable model.** tatte had me stop every Modal app, so :3001's ollama row
+points at coder14b-base, which now answers `modal-http: invalid function call`. OpenRouter free
+is still configured for Chat. Nobody is repointing it - his row, his spend - and it is in front
+of him as a decision. Nothing currently running depends on it: all fuzzing is against mock
+models on isolated ports.
