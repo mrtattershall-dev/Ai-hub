@@ -31,28 +31,78 @@ const runs = readFileSync(FILE, 'utf8').trim().split('\n').filter(Boolean)
   .map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
 if (!runs.length) { console.log('run index is empty'); process.exit(0); }
 
+// Four fields in the record are shaped differently from how a reader wants to use them,
+// and three of them are objects. Reach for the wrong one and the output says
+// "[object Object]" or "NaN" where a number belongs — which is worse than no number,
+// because it still lines up in the column and still looks like a reading:
+//   errorCount    the count. `errors` is an OBJECT {kind: count} — sum it only when the
+//                 record predates errorCount, and never print it where a number goes.
+//   errorSamples  {kind: {tool, args}} — objects all the way down, see sampleLine().
+//   tokPerSec     {min, max}, or null, or (older lines) a bare number. Not a number now.
+//   calls         the model-call count. agent.js renames run.modelCalls to `calls` on the
+//                 way out, but accept either so an older or hand-made line still counts.
+// Every read of these goes through the accessors below, so when the writer changes shape
+// again there is exactly one place to fix rather than six call sites to re-audit.
+const callsOf = (r) => Number(r.calls ?? r.modelCalls) || 0;
+const errorsOf = (r) => (r.errors && typeof r.errors === 'object' ? r.errors : {});
+const errorCountOf = (r) => (typeof r.errorCount === 'number'
+  ? r.errorCount
+  : Object.values(errorsOf(r)).reduce((a, b) => a + (Number(b) || 0), 0));
+const peakTok = (r) => {
+  const t = r.tokPerSec;
+  if (typeof t === 'number') return t;                       // pre-{min,max} records
+  return t && typeof t.max === 'number' ? t.max : null;      // null, not the object
+};
+
 const sum = (rs, f) => rs.reduce((a, r) => a + (f(r) || 0), 0);
 const pct = (a, b) => (b ? (a / b * 100).toFixed(1) + '%' : '—');
 const agg = (rs) => {
-  const calls = sum(rs, (r) => r.calls);
-  const errs = sum(rs, (r) => r.errorCount);
+  const calls = sum(rs, callsOf);
+  const errs = sum(rs, errorCountOf);
   const status = {};
   for (const r of rs) status[r.status] = (status[r.status] || 0) + 1;
-  const rates = rs.map((r) => r.tokPerSec?.max).filter(Boolean);
+  const rates = rs.map(peakTok).filter((n) => n > 0);
   return {
     n: rs.length, calls, errs, errRate: pct(errs, calls),
     done: pct(status.done || 0, rs.length),
-    medCalls: rs.length ? [...rs].map((r) => r.calls).sort((a, b) => a - b)[Math.floor(rs.length / 2)] : 0,
+    // callsOf, not r.calls: one record missing the field sorts NaN into the middle of the
+    // list and the median silently becomes NaN for the whole half.
+    medCalls: rs.length ? [...rs].map(callsOf).sort((a, b) => a - b)[Math.floor(rs.length / 2)] : 0,
     tok: rates.length ? Math.round(rates.reduce((a, b) => a + b, 0) / rates.length) : null,
     promptMax: Math.max(0, ...rs.map((r) => r.promptMax || 0)),
   };
 };
 
+// errorSamples[kind] is {tool, args:{...}} — there is no string in it to print, so the
+// only way to show one is to name its parts. Interpolating the sample (or its args) into
+// a template gives "[object Object]", which is the whole reason this helper exists.
+const sampleLine = (s) => {
+  if (!s || typeof s !== 'object') return null;
+  const args = s.args && typeof s.args === 'object'
+    ? Object.entries(s.args).map(([k, v]) => `${k}=${typeof v === 'string' ? v : JSON.stringify(v)}`).join(' ')
+    : '';
+  const one = [s.tool, args].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+  if (!one) return null;
+  return one.length > 110 ? one.slice(0, 110) + '…' : one;
+};
+
 if (flag('errors')) {
   const all = new Map();
-  for (const r of runs) for (const [k, v] of Object.entries(r.errors || {})) all.set(k, (all.get(k) || 0) + v);
+  const eg = new Map();   // first sample seen per kind — the call that actually failed
+  for (const r of runs) {
+    for (const [k, v] of Object.entries(errorsOf(r))) all.set(k, (all.get(k) || 0) + (Number(v) || 0));
+    // The samples are recorded so a kind that reads like "the model keeps breaking"
+    // turns into "look, the tool is wrong". They were being dropped on the floor here:
+    // this command was printing the counts and nothing else.
+    for (const [k, s] of Object.entries(r.errorSamples || {})) {
+      if (!eg.has(k)) { const line = sampleLine(s); if (line) eg.set(k, line); }
+    }
+  }
   console.log(`\nevery distinct failure across ${runs.length} runs, by wasted model calls:\n`);
-  [...all].sort((a, b) => b[1] - a[1]).forEach(([k, v]) => console.log(`  ${String(v).padStart(4)}x  ${k}`));
+  [...all].sort((a, b) => b[1] - a[1]).forEach(([k, v]) => {
+    console.log(`  ${String(v).padStart(4)}x  ${k}`);
+    if (eg.has(k)) console.log(`        e.g. ${eg.get(k)}`);
+  });
   process.exit(0);
 }
 
@@ -80,13 +130,16 @@ for (const r of recent) {
   const d = new Date(r.ts);
   const when = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} `
     + `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  const tok = r.tokPerSec ? String(Math.round(r.tokPerSec.max)) : '—';
-  console.log(`  ${when}  ${String(r.status).padEnd(9)} ${String(r.calls).padStart(5)} ${String(r.errorCount).padStart(5)}  ${tok.padStart(5)}   ${String(r.goal).slice(0, 46)}`);
+  // peakTok, not r.tokPerSec.max: a truthy tokPerSec that is a bare number (older lines)
+  // has no .max, and Math.round(undefined) prints "NaN" in a column of real rates.
+  const t = peakTok(r);
+  const tok = t == null ? '—' : String(Math.round(t));
+  console.log(`  ${when}  ${String(r.status).padEnd(9)} ${String(callsOf(r)).padStart(5)} ${String(errorCountOf(r)).padStart(5)}  ${tok.padStart(5)}   ${String(r.goal).slice(0, 46)}`);
 }
 const a = agg(runs);
 console.log(`\ntotals: ${a.n} runs, ${a.calls} model calls, ${a.errs} failed steps (${a.errRate} of calls), ${a.done} completed`);
 const all = new Map();
-for (const r of runs) for (const [k, v] of Object.entries(r.errors || {})) all.set(k, (all.get(k) || 0) + v);
+for (const r of runs) for (const [k, v] of Object.entries(errorsOf(r))) all.set(k, (all.get(k) || 0) + (Number(v) || 0));
 if (all.size) {
   console.log('\ntop failures (each one is a wasted model call):');
   [...all].sort((x, y) => y[1] - x[1]).slice(0, 5).forEach(([k, v]) => console.log(`  ${String(v).padStart(3)}x  ${k}`));
