@@ -40,7 +40,11 @@ const AUTHOR = ['-c', 'user.name=hub-agent', '-c', 'user.email=agent@localhost']
  * can find workspace/.git and nothing beyond it. This is the mechanical guarantee;
  * ensureRepo() below is the one that makes sure workspace/.git actually exists.
  */
-function git(cwd, args, timeout = GIT_TIMEOUT_MS) {
+// `raw` keeps stdout byte-exact. Trimming is right for log/diff/rev-parse and WRONG for
+// file contents: `git show HEAD:file` came back without its trailing newline, so restoring
+// a file from HEAD silently rewrote it. Caught by syntaxRollback.test.mjs, which is the
+// only reason it is not shipping.
+function git(cwd, args, timeout = GIT_TIMEOUT_MS, { raw = false } = {}) {
   const ceiling = dirname(resolve(cwd));
   return new Promise((res) => {
     execFile('git', ['-C', cwd, ...AUTHOR, ...args], {
@@ -49,7 +53,7 @@ function git(cwd, args, timeout = GIT_TIMEOUT_MS) {
     },
       (err, stdout, stderr) => res({
         ok: !err,
-        out: (stdout || '').trim(),
+        out: raw ? (stdout || '') : (stdout || '').trim(),
         err: (stderr || '').trim() || (err ? err.message : ''),
       }));
   });
@@ -127,6 +131,23 @@ export async function diff(workspace, ref = 'HEAD~1', maxChars = 12_000) {
     summary: stat.out || '(no changes)',
     patch: body + (patch.out.length > maxChars ? '\n… (diff truncated)' : ''),
   };
+}
+
+/**
+ * One file's contents at a ref, or null if it is not there.
+ *
+ * Added for the syntax rollback. The agent checkpoints BEFORE every mutating write, so when
+ * a write leaves a file that will not parse, the last version that DID parse is already
+ * committed - it was simply never read back. Audited 67 run workspaces: 10 ended holding
+ * .js that does not parse, every one flagged by our own syntax check at the time and left
+ * there anyway.
+ */
+export async function showFile(workspace, ref, relPath) {
+  await ensureRepo(workspace);
+  const clean = String(relPath || '').split('\\').join('/').replace(/^\.\//, '');
+  if (!clean || clean.startsWith('..')) return null;
+  const r = await git(workspace, ['show', `${ref}:${clean}`], undefined, { raw: true });
+  return r.ok ? r.out : null;
 }
 
 /** Recent history, newest first. */

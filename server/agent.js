@@ -20,7 +20,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 import { mirrorAgentCommand, mirrorAgentResult } from './terminal.js';
-import { ensureRepo, commitAll, diff as gitDiff, log as gitLog, undo as gitUndo, isDirty } from './workspaceGit.js';
+import { ensureRepo, commitAll, diff as gitDiff, log as gitLog, undo as gitUndo, isDirty, showFile } from './workspaceGit.js';
 import { classifyCommand, classifyPython, describeMode, MODE as APPROVAL_MODE } from './approvalPolicy.js';
 import * as ledger from './taskLedger.js';
 import * as visual from './visualCheck.js';
@@ -2711,6 +2711,36 @@ async function drive(loadDb, run) {
     }
   } finally {
     run.busy = false;
+
+    // ── DO NOT LEAVE CODE THAT WILL NOT PARSE ──────────────────────────────────
+    //
+    // quickCheck already runs after every write and tells the model "❌ SYNTAX CHECK
+    // FAILED". That is advisory, and advisory does not work: audited 67 run workspaces and
+    // 10 ended holding .js that does not parse - every one flagged at the time. A run that
+    // ends leaving a broken file is worse than one that ends having changed nothing, because
+    // the next run inherits the wreckage and the goals after it all fail on the same file.
+    //
+    // The repair is already on disk. Mutating tools checkpoint BEFORE they write, so HEAD
+    // holds the last version that existed before the damaging write. Restore it - but only
+    // when the OLD version actually parses, so this can never make things worse, and only
+    // for languages quickCheck understands.
+    if (['done', 'error', 'stopped'].includes(run.status)) {
+      try {
+        const files = readdirSync(WORKSPACE).filter((f) => /\.(c|m)?js$|\.py$/i.test(f));
+        for (const f of files.slice(0, 40)) {
+          if (!(await quickCheck(f))) continue;                 // parses fine - leave it alone
+          const prev = await showFile(WORKSPACE, 'HEAD', f).catch(() => null);
+          if (prev == null) continue;                           // no earlier version to go back to
+          const full = join(WORKSPACE, f);
+          const broken = readFileSync(full, 'utf8');
+          if (prev === broken) continue;
+          writeFileSync(full, prev, 'utf8');
+          if (await quickCheck(f)) { writeFileSync(full, broken, 'utf8'); continue; }  // old one is no better
+          pushStep(run, { type: 'note', text: `${f} did not parse at the end of the run — restored the last version that did.` });
+        }
+      } catch { /* never let the repair take the run down */ }
+    }
+
     if (['done', 'error', 'stopped'].includes(run.status)) { saveTrace(run); recordRunIndex(run); }
     persist(run);   // capture final/paused state (incl. 'interrupted' and 'awaiting_approval')
 
