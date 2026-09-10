@@ -819,3 +819,60 @@ Suites after all of it: `flow.test.mjs` **45 passed**, `vite build` clean, queue
   mid-something. From your queue it looks like the first real queue-driven run this project
   has ever had, which makes it a bad one to have interrupted. I will stop restarting the
   shared server without checking `/api/agent/list` for an active run first.
+
+- 2026-09-10 01:4x — Session C (Godot lane): **the 24/7 spine ran end to end for the
+  first time, and I had to fix two things to get there. One of them is breaking YOUR tree
+  right now.**
+
+  **READ THIS FIRST — the server does not boot from a clean start.**
+  A root `npm install` rewrote `package.json`: ~250 transitive deps hoisted into
+  `dependencies`, and `"type": "commonjs"` appended. `shared/` has no package.json of its
+  own, so it inherits the root's, and `shared/engines.js` is ESM. Every boot now dies with
+  `does not provide an export named 'ENGINES'` (server/gameVerify.js:20). A hub already
+  running survives only because the module is in memory — **restart it and it is gone.**
+  I fixed it additively with NEW `shared/package.json` `{"type":"module"}` rather than
+  touching a root file someone is mid-churn on; that also makes shared/ immune next time.
+  The hoisted `dependencies` block is still there and is still wrong — whoever ran that
+  install should clean it up.
+
+  **Modal serving is live.** NEW `modal-serve/modal_ollama_qwen.py`, deployed at
+  `https://mr-tattershall--hub-coder-serve.modal.run`, serving stock `qwen2.5-coder:14b`
+  (Q4_K_M, 32k ctx) on an A10G, min_containers=0, 15-min scaledown. Cold start incl. the
+  one-time 9GB pull: 2 min; warm cold-start after that is seconds. The hub's `ollama`
+  provider now points at it (`server/hub.json` — backed up before I touched it), so
+  nothing in the hub code changed: it already POSTs to `{base_url}/api/generate`.
+
+  Two traps, both of which the existing `modal_ollama_serve.py` (Jul 14) still has:
+  - `curl install.sh | sh` needs **zstd** now, or the build fails outright.
+  - Worse, it fails SILENTLY on GPU: that install runs at image-build time where Modal
+    attaches no GPU, so ollama lays down the CPU-only build and then ignores the A10G at
+    runtime. Measured: **3.6 tok/s generate, 2 tok/s prefill** on a GPU we were paying for.
+    Starting from the published `ollama/ollama` image (ships CUDA) fixed it:
+    **47 tok/s generate, 1617 tok/s prefill.** If you ever deploy the fine-tuned GGUF,
+    start from that image too.
+
+  **The run.** Spare hub on :3712 (`AGENT_SUPERVISOR=1`, `AGENT_APPROVAL_MODE=build`,
+  12 min/run, 40 steps, 8 auto-starts/hr). tatte's hub on :3001 was never restarted; the
+  shared `agent-queue.json` was snapshotted and restored between rounds.
+
+  Three chained goals — write a module + self-checking test, extend both, then document
+  from the real code — **completed in 1m44s with no human input**, the supervisor pulling
+  each next goal itself. 5/9/6 model calls per step. I re-ran the generated test myself
+  outside the agent: PASS/PASS/exit 0, and step 2 had genuinely edited step 1's file
+  rather than starting over. That is `after`-chaining, the supervisor, the finish gate and
+  `verify_project` all doing real work at once, for the first time.
+
+  **The planner prompt is the next thing worth fixing, and it is Session A's file.**
+  `agent.js:1437` frames EVERY goal as `'a senior game/software architect'` with a
+  `PLAN_TASK` demanding SYSTEMS NEEDED, GAMEPLAY LOOP, win/lose condition and a
+  "first-PLAYABLE slice". Given "write a function add(a, b)":
+  - phi3 (3.8B, local) produced a game design document with an Input System and a player,
+    burned 4.5 minutes on one model call, and never wrote a file.
+  - qwen14b wrote "SYSTEMS NEEDED — None (this is a simple JavaScript function)" and got on
+    with it.
+  A capable model routes around the bad frame; a small one is destroyed by it. Since the
+  point of this repo is training small models, that prompt should branch on the goal
+  rather than assume a game.
+
+  Still open from my lane: no agent tool verifies a Godot FILE SET, so Godot work still
+  cannot be queued unattended. `verify_project` covers a Godot project already on disk.
