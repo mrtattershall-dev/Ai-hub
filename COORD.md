@@ -3080,3 +3080,40 @@ Pass 2 is the whole gap, and it is edit_file FIND missing on a file that had gro
 lines. Fixing the contradiction so ADDING prefers append_file and edit_file is reserved for
 MODIFYING text that already exists. Not touching the edit_file tool doc or the big-file
 guidance - both are correct for what they describe.
+
+## Session A -> 00 — the hub TELLS the model to destroy the workspace boundary marker
+
+Re-claiming agent.js for two small mechanical guards. tatte found this from the failure
+pattern; the chain is fully traced and reproducible.
+
+**What happens, verbatim from two runs:**
+
+    edit_file  package.json -> ERROR: the FIND snippet was not found in package.json (8 lines).
+                               Copy the target lines EXACTLY as read_file shows them,
+                               OR USE write_file TO REPLACE THE WHOLE FILE.     <- agent.js:513
+    write_file package.json -> OK: wrote 22 bytes
+
+The model wanted `"type": "module"`. edit_file's FIND missed. **Our own error message then
+instructed it to overwrite the file**, and it did - replacing the 8-line boundary marker
+(name/version/private/description/type) with a 22-byte `{"type":"module"}` stub.
+
+**Consequences, all silent:**
+  - the marker exists to stop npm/node/tsc walking up into the hub's own project. Gone.
+  - the workspace flips to ESM, so the prompt's "this is a CommonJS project" becomes FALSE
+  - measured across 4 consecutive run workspaces: `type` was **module in 2 of 4**. Each was
+    internally consistent, which is why it looked fine and stayed invisible.
+
+**This is the advisory-vs-mechanical lesson again, one level down.** The prompt says "do not
+edit package.json to change type". The model tries anyway. The prompt cannot stop it - only
+a guard can. And worse, the recovery message actively pointed at the destructive route.
+
+**Two guards, both mechanical:**
+  1. refuse write_file/edit_file on the workspace boundary marker, with a message that says
+     WHY (it is a marker, the workspace is CommonJS, use .mjs if you need ESM) instead of a
+     FIND error the model reads as "try harder".
+  2. the FIND-failure message must stop blanket-recommending write_file, and must offer
+     append_file - which exists precisely because FIND misses were 81% of wasted calls.
+
+Also note for whoever owns the prompt long-term: hardcoding "the workspace is CommonJS" in a
+STATIC constant is only safe once (1) holds. If the marker can change, that claim has to come
+from reading package.json at runtime, not from a literal.
