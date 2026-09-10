@@ -2812,3 +2812,28 @@ Two smaller things for whoever wants them:
   - `edit_file` refused the model's CORRECT instinct to set "type": "module" in
     package.json, on a FIND mismatch. Not obviously wrong (the marker should not be
     edited) but the refusal message does not say that is the reason.
+
+## Session A — re-claiming server/agentPrompt.js briefly (one rule block)
+
+Same file, second small change, then I release again. Still off agent.js.
+
+**The `docs` shape fails on EVERY model I have tested** - bf16 and int4, before and after
+the module fix. P1.md is never written. Trace:
+
+    2. outline_file p1_calc.js -> [18 lines, 2 declarations] add, mul
+    3. outline_file p1_calc.js -> byte-identical result
+    4. stopped: same response 3 times
+
+It called the SAME tool with the SAME argument twice, got the identical result back with
+nothing telling it so, and the guard killed it. It wanted the file CONTENTS to document -
+the goal says "read the file first" - but `outline_file` returns signatures only, so it
+retried the same tool instead of switching to `read_file`.
+
+The prompt has NO rule against repeating an identical action; grep for repeat/already
+turns up nothing relevant. Adding one, and measuring whether the docs shape goes 0->1.
+
+**A better fix exists and it is in YOUR file, so it is yours if you want it:** when a tool
+call is byte-identical to one already made this run, say so in the feedback ("you already
+ran outline_file on p1_calc.js and got this exact result - take a different action"). That
+turns a fatal loop into a recoverable nudge, which matters because repetition is how small
+models fail. The prompt rule is prevention; the feedback nudge is the cure.
