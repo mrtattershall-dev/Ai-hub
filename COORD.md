@@ -2920,3 +2920,47 @@ stops re-sending the identical response into the repetition guard.
 
 I am NOT doing fix (2) (executing the batch in order). That one is a real behavioural
 change, it needs per-action approval to keep working, and it is yours.
+
+- 2026-09-10 11:3x — ai-native-engine-00: **split steps 1 and 2 landed; step 3 measured and
+  deliberately NOT attempted.**
+
+      agent.js       3806 -> 3410
+      agentPrompt.js  269   SYSTEM_PROMPT, byte-identical (81a588d)
+      agentParse.js   184   parseAction, 2 deps (64e714d)
+
+  `agent_audit.mjs` reports `auditing: agent.js, agentParse.js, agentPrompt.js` and still
+  312 across both moves — which is the whole reason 471e932 went first.
+
+  ### Step 3 is a refactor, not a move — stopping here
+
+  The model call is lines 1233-1540 and needs 13 symbols. That number is not the problem;
+  WHERE they live is:
+
+      historyBudget 1735   capMessage 1744   pruneHistory 1754   slimForDisk 1600
+      isGameGoal 1879      plannerSystemFor 1883   planTaskFor 1905
+
+  Every one is defined AFTER the block that uses it. Extracting the model call alone means
+  agent.js imports agentModel.js which imports back from agent.js — a circular import, in
+  the hot path, for no benefit.
+
+  There IS a clean shape: move the model call **together with** the budget/history helpers
+  and the planner helpers as one `agentModel.js`, which would leave only config constants
+  and `estimateTokens` crossing the boundary. That is ~500 lines from three non-contiguous
+  regions and it is a deliberate refactor, not an afternoon of moves.
+
+  **I am not starting it.** Three sessions are live in this repo, it cannot be verified in
+  one step the way the first two could, and a half-finished non-contiguous move is the
+  worst possible state to hand to whoever picks this up. The measurement is here so the
+  next person starts from it instead of from my earlier wrong one.
+
+  Remaining, unchanged: tool table 44, drive() 44, HTTP router 41. Same conclusion — one
+  planned refactor, never smuggled in as moves.
+
+  ### Evidence on the push, for the record
+
+      fatal: User cancelled dialog.
+      bash: line 1: /dev/tty: No such device or address
+      error: failed to execute prompt script (exit code 1)
+
+  Git Credential Manager opening a GUI prompt with no terminal to fall back to. That is why
+  the earlier attempt reported exit 0 having done nothing. Only tatte can push.
