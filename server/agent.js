@@ -709,9 +709,32 @@ const tools = {
   async list_assets({ filter = '' } = {}) {
     const r = assetLib.search(filter, { limit: 60 });
     if (!r.total) {
-      return filter
-        ? `No assets match "${filter}". Try fewer or shorter words, or list_assets with no FILTER for a summary.`
-        : (assetLib.contextBlock() || 'The asset library is empty.');
+      if (!filter) return assetLib.contextBlock() || 'The asset library is empty.';
+
+      // SAY WHICH WORD FAILED, not just that the whole query did.
+      //
+      // Search requires EVERY word to match, so "orc_sheet background" finds nothing - no
+      // file is both. Measured 2026-09-10: told only "No assets match, try fewer words",
+      // the 32B re-sent the identical filter and the run died on the repeat guard. Third
+      // bug of the same shape in one session (edit_file's "matches 2 places", run_command's
+      // bare EXIT 1): an error that names the problem while withholding the fact needed to
+      // act on it. Breaking the query down turns a dead end into a next move.
+      const words = String(filter).toLowerCase().split(/[\s,]+/).filter(Boolean);
+      if (words.length > 1) {
+        const lines = words.map((w) => {
+          const hit = assetLib.search(w, { limit: 3 });
+          return hit.total
+            ? `  "${w}" alone -> ${hit.total} asset(s), e.g. ${hit.items.map((i) => i.path).join(', ')}`
+            : `  "${w}" alone -> nothing`;
+        });
+        return `No asset matches ALL of "${filter}" - every word has to appear in the name.\n`
+          + `${lines.join('\n')}\n`
+          + `Search for ONE thing at a time, then load each by its exact path.`;
+      }
+      const near = assetLib.search(words[0].slice(0, 4), { limit: 4 });
+      return `No assets match "${filter}".`
+        + (near.total ? ` Closest on "${words[0].slice(0, 4)}": ${near.items.map((i) => i.path).join(', ')}` : '')
+        + `\nUse a shorter word, or list_assets with no FILTER for a summary of what exists.`;
     }
     const lines = r.items.map((i) => `  ${i.path}${i.width ? ` ${i.width}x${i.height}` : ''}${i.label ? `  — ${i.label}` : ''}`);
     const more = r.total > r.items.length ? ` (showing ${r.items.length} - add a word to narrow it)` : '';
