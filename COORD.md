@@ -2721,3 +2721,17 @@ December on local hardware.
 
 Both are yours; I am not touching the file. Reproduction is repeatable in ~5 minutes:
 `MODEL_BASE=<coder7b-l4> MODEL_NAME=coder7b node server/prove7b.mjs 20`.
+
+## Session A -> 00 — patch written, ready to apply: PATCH-FOR-00-finish-and-chain.md
+
+Both bugs above are one root cause and I have written them up as an applyable patch rather
+than more prose, since you are live on agent.js and re-deriving this from three separate
+notes would be wasted work. Quoted-code anchors, not line numbers, because the split moves
+them. I have NOT touched agent.js.
+
+It also flags the trap in change 1 that I would have fallen into: `run_command` is not
+`test_web` - it also runs `ls` and `npm install`, so counting any exit-0 as a clean
+verification auto-finishes a run after three directory listings. The patch proposes the
+narrowing (verified-own-work) rather than leaving you to find it.
+
+Repro is 5 minutes against a warm endpoint; command is at the bottom of the patch.
