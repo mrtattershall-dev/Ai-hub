@@ -219,6 +219,37 @@ function buildOutline(lines) {
 }
 
 // ── Tools ────────────────────────────────────────────────────────────────────
+// THE WORKSPACE BOUNDARY MARKER IS NOT THE AGENT'S TO REWRITE.
+//
+// Traced end to end 2026-09-10, and the hub caused it. The model wants "type": "module"
+// for the ESM it just wrote. It tries edit_file, the FIND misses, and our OWN error message
+// says "or use write_file to replace the whole file" - so it does, and the 8-line marker
+// becomes a 22-byte {"type":"module"} stub. Measured across four consecutive run
+// workspaces: `type` was module in TWO of them, each internally consistent, which is
+// exactly why it stayed invisible.
+//
+// Two things break silently when that happens. The marker exists to stop npm/node/tsc
+// walking up into the hub's own project, and that protection is simply gone. And the
+// system prompt states "the workspace is a CommonJS Node project" as a fact, which is now
+// false - so every later instruction built on it misleads the model.
+//
+// The prompt already asks the model not to do this and the model does it anyway; that is
+// the advisory-vs-mechanical lesson one level down. Only a guard can hold it.
+const MARKER = 'package.json';
+function markerRefusal(path, tool) {
+  const rel = String(path || '').split(/[\/]+/).filter(Boolean).join('/');
+  if (rel !== MARKER) return null;
+  return `ERROR: ${MARKER} is the workspace boundary marker and ${tool} may not change it.
+`
+    + `It is NOT a normal file: it stops npm and node from treating the hub's own project as this workspace.
+`
+    + `If you wanted "type": "module" so you can use import/export — do not. This workspace is CommonJS: `
+    + `use require(...) and module.exports in .js files, or name the file .mjs if you genuinely need ESM.
+`
+    + `Nothing about your goal requires editing ${MARKER}. Carry on with the actual work.`;
+}
+
+
 const tools = {
   list_dir({ path = '.' }) {
     const full = safePath(path);
@@ -322,6 +353,7 @@ const tools = {
   },
 
   write_file({ path, content = '' }) {
+    { const r = markerRefusal(path, 'write_file'); if (r) return r; }
     const full = safePath(path);
     mkdirSync(dirname(full), { recursive: true });
     // DO NOT LET A FRAGMENT DESTROY WORKING CODE.
@@ -396,6 +428,7 @@ const tools = {
   // first; if that fails, falls back to whitespace-tolerant line matching (small
   // models rarely reproduce exact indentation). Refuses if not found or ambiguous.
   edit_file({ path, find, replace = '' }) {
+    { const r = markerRefusal(path, 'edit_file'); if (r) return r; }
     const full = safePath(path);
     if (!existsSync(full)) return `ERROR: file not found: ${path} (use write_file to create it)`;
     if (find == null || find === '') {
@@ -510,7 +543,14 @@ const tools = {
       }
     }
     return `ERROR: the FIND snippet was not found in ${path} (${fileLines.length} lines).${near}\n`
-      + `Copy the target lines EXACTLY as read_file shows them, or use write_file to replace the whole file.`;
+      + `Copy the target lines EXACTLY as read_file shows them.
+`
+      // Do NOT lead with write_file here. This line is what destroyed the workspace
+      // boundary marker: the model missed a FIND on package.json, read this, and
+      // overwrote the whole file. append_file is the right answer when the intent was
+      // to ADD - it needs no FIND and cannot lose what is already there, which is why
+      // it exists (FIND misses were 81% of all wasted model calls).
+      + `If you were trying to ADD something rather than change existing text, use append_file instead - it needs no FIND snippet and cannot lose what is there.`;
   },
 
   // ---- durable memory --------------------------------------------------------
