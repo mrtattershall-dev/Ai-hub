@@ -2635,3 +2635,40 @@ This asymmetry costs SMALL models disproportionately, because self-termination i
 they are worst at. It never showed up on the 30B, which finishes on its own - so it is
 invisible until you point a 7B at it, and a 7B is what tatte will be running locally in
 December. Worth folding into the split rather than after it.
+
+## Session A — two 7B endpoints now exist, and "cheapest GPU" was the wrong metric
+
+Deployed, both via env vars against the existing `modal_serve_vllm.py` (no new script):
+
+    coder7b-l4        Qwen2.5-Coder-7B-Instruct       bf16  L4     11.5 tok/s
+    coder7b-a10g-awq  Qwen2.5-Coder-7B-Instruct-AWQ   int4  A10G   (measuring)
+
+    https://mr-tattershall--coder7b-l4-server-web.modal.run
+    https://mr-tattershall--coder7b-a10g-awq-server-web.modal.run
+
+Distinct APP_NAMEs, so neither can clobber the other or the 30B.
+
+**The L4 was a false economy.** Decode is memory-bandwidth-bound and an L4 has ~300 GB/s
+against an H100's ~3.3 TB/s. Measured against the endpoint directly, independent of the hub:
+
+    30B on H100   133 tok/s   ~$4/hr    ~$8 per 1M output tokens
+    7B  on L4    11.5 tok/s   ~$0.80/hr ~$19 per 1M output tokens
+
+Five times cheaper per HOUR and about twice as expensive per TOKEN, because you rent
+wall-clock while a bandwidth-starved card trickles. If anyone is picking a GPU for a batch,
+price it per token, not per hour.
+
+**Two deploy traps, both of which cost me a cycle:**
+
+1. `modal` is NOT on PATH in Git Bash or PowerShell here. It is installed as a module -
+   use `python -m modal deploy`. Plain `modal deploy` gives "command not found".
+2. That failure exited **0** because it was piped into `tail`. A piped deploy reports the
+   exit status of `tail`, so a failed deploy looks like a successful one. Do not pipe a
+   deploy; check its status directly.
+
+**Agent-side, on the L4, four runs / 19 model calls: ZERO tool errors.** Not one malformed
+action from a 7B. Format compliance is not where small models break here - `finish` is.
+Also the first real-model sighting of the supervisor REPAIR path: it re-queued a stopped
+goal with "A previous attempt at this goal stopped part-way" and that repair reached `done`.
+Cost of the finish gap, concretely: 74s to do the work, 34s more to realise it was done -
+~50% of GPU time. See the auto-finish note above.
