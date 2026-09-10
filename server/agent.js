@@ -262,6 +262,36 @@ const tools = {
   write_file({ path, content = '' }) {
     const full = safePath(path);
     mkdirSync(dirname(full), { recursive: true });
+    // DO NOT LET A FRAGMENT DESTROY WORKING CODE.
+    //
+    // Measured 2026-09-10: mid-build, the 32B wrote 158 bytes of English prose about a
+    // "User class" over a working 1,040-byte Phaser page - hallucinated content, unrelated
+    // to the goal, and the game was gone. The run then lost the thread entirely. An
+    // unattended agent that can silently delete its own work is not safe to leave running.
+    //
+    // The test is deliberately narrow, because a legitimate rewrite may well shrink a file:
+    // it only fires when the replacement is BOTH much smaller AND does not look like code
+    // for that extension. Prose replacing a program is the case being caught, not editing.
+    if (existsSync(full)) {
+      const before = readFileSync(full, 'utf8');
+      const shrank = content.length < before.length * 0.4 && before.length > 400;
+      const ext = (path.match(/\.([a-z0-9]+)$/i) || [, ''])[1].toLowerCase();
+      const CODEISH = {
+        html: /<\/?[a-z!][\s\S]*>/i,
+        js: /[;{}]|=>|\bfunction\b|\bconst\b|\blet\b|\bvar\b|\bclass\b/,
+        mjs: /[;{}]|=>|\bfunction\b|\bconst\b/,
+        css: /[{}:;]/,
+        json: /^[\s]*[[{]/,
+      }[ext];
+      const looksLikeCode = !CODEISH || CODEISH.test(content);
+      if (shrank && !looksLikeCode) {
+        return `ERROR: refusing to overwrite ${path} - this would replace ${before.length} bytes of `
+          + `working code with ${content.length} bytes that do not look like ${ext || 'code'} at all.\n`
+          + `What you sent starts: ${JSON.stringify(content.slice(0, 90))}\n`
+          + `If you meant to change part of the file, use edit_file. If you really do want to replace `
+          + `the whole file, send the COMPLETE new ${ext || 'source'} - not a description of it.`;
+      }
+    }
     writeFileSync(full, content, 'utf8');
     return `OK: wrote ${Buffer.byteLength(content)} bytes to ${path}`;
   },

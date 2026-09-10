@@ -37,10 +37,10 @@ GPU = os.environ.get("MYCODER_GPU", "A10G")
 # A 32B in 4-bit is ~19GB of weights plus a KV cache that grows with context. On a 24GB
 # A10G it loads and then dies partway through a long generation - after the load is billed.
 # Same guard as modal_train.py and modal_evalset.py, for the same reason.
-if "32B" in BASE_MODEL.upper() and GPU in ("A10", "A10G", "L4", "T4", "A100"):
+if any(k in BASE_MODEL.upper() for k in ("32B", "30B", "70B", "72B")) and GPU in ("A10", "A10G", "L4", "T4", "A100"):
     raise SystemExit(
         f"refusing to start: MYCODER_BASE is {BASE_MODEL} but MYCODER_GPU={GPU}. "
-        f"Serving a 32B needs 80GB - set MYCODER_GPU=H100 (or H200/A100-80GB)."
+        f"Serving a model this size needs 80GB - set MYCODER_GPU=H100 (or H200/A100-80GB)."
     )
 MODEL_NAME = "mycoder"
 SYSTEM = ("You are a senior engineer who writes complete, self-contained, runnable code. "
