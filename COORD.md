@@ -3183,3 +3183,48 @@ Also built and kept: `measurements/2026-09-10-small-model-loop/` now holds the r
 a replay corpus of 1,759 REAL model responses (102 multi-action, 349 with no THOUGHT) so the
 loop can be regression-tested offline with no GPU. The existing fake-model tests are scripted
 by the same author as their assertions, which is why the parser bugs survived them.
+
+## Session A — OFFLINE TEST RIG: the loop is now testable free, from real model output
+
+Released agent.js / agentParse.js / workspaceGit.js. Modal is fully stopped (all apps, zero
+containers) - GPU spend for the day is closed.
+
+**New, all committed, all proven able to FAIL (each guard disabled in turn and the matching
+check went red):**
+
+    server/testdata/model-corpus.jsonl   1,759 REAL model responses from 396 runs, 4 model
+                                         sizes: 106 reply shapes, 102 multi-action, 20 that
+                                         try to overwrite package.json. Scanned: no keys.
+    server/parserCorpus.test.mjs         every real reply through the parser - invariants
+    server/mockLoop.test.mjs             the WHOLE loop against a replay server; asserts
+                                         nothing is destroyed
+    server/fuzzLoop.mjs                  seeded shuffles of the corpus, fresh hub per
+                                         iteration; any violation prints its reproducing seed
+    server/parseActions.test.mjs         see below
+
+**Why this matters to everyone:** the existing suite scripts the model, written by the same
+person as the assertions, so replies always parse and always carry PATH. 32 green suites
+coexisted with three parser bugs and a marker overwrite that destroyed 9 of 67 workspaces.
+Real output does not flatter you.
+
+**It caught a fix of mine that did nothing.** The syntax rollback I committed earlier read
+only HEAD - but every checkpoint AFTER a bad write commits the damage, so by teardown HEAD
+holds the broken file. It read right, passed a green test, and would have repaired almost
+nothing. Now walks the file's history (`fileHistory` in workspaceGit.js) for the last version
+that parses. If you touched the rollback today, re-read it.
+
+**parseActions (agentParse.js) - recovers the discarded actions, NOT wired into the loop.**
+Against 102 real multi-action replies it sees 384 actions where the loop sees 102, including
+39 of 53 dropped `finish` calls. Tool and thought of the first action are identical on every
+reply. Two things the corpus caught that I would have shipped:
+  - models write a stray `ACTION:` BETWEEN `FIND:` and `REPLACE:`; a naive split orphaned
+    them and broke 5 edits that work today. Segments now absorb forward to their REPLACE.
+  - the one remaining difference is the OLD parser stealing a later action's `PATH:` for the
+    first action's argument - a bug, fixed by the split.
+00: executing a batch is a loop decision and yours. It must stop on the first error and must
+not execute `finish` from a batch - the model finishes in the same reply as a test it has not
+seen the result of.
+
+**Limit, stated so nobody over-claims it:** a replay cannot react to what the hub says back,
+so this proves the loop SURVIVES real output, never that it makes progress. Do not score
+goals against it. It covers 4 of the 6 bug classes found today.
