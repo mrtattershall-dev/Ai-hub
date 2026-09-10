@@ -1,0 +1,14 @@
+function update() {
+  pollGamepad();
+  G.stateTimer++;
+  G.frame++;
+
+  switch (G.state) {
+    case STATE.TITLE:   titleScreen.update();        break;
+    case STATE.PLAYING: playingPlaceholder.update(); break;
+    case STATE.PAUSED:  pauseScreen.update();        break;
+    case STATE.DEAD:    deadScreen.update();         break;
+    case STATE.WIN:     winScreen.update();          break;
+  }
+  /* inputFlush moved to gameLoop — called once per rAF, not per logic step */
+}

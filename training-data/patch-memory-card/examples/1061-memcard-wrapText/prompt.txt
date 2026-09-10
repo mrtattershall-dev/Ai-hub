@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+wrapText (from js/scenes/worldscene.js)

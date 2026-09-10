@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+Player (from js/entities/player.js)

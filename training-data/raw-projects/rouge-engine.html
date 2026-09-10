@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROUGE-ENGINE</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0d0d10; color:#f8f9fa; font-family:'Courier New',monospace; overflow:hidden; user-select:none; }
+#gameCanvas { display:block; cursor:crosshair; }
+
+#rougeBar {
+  position:fixed; left:16px; top:50%; transform:translateY(-50%);
+  width:18px; height:220px; background:#111116; border:1px solid #3a0a0f; border-radius:2px; overflow:hidden;
+}
+#rougeFill {
+  position:absolute; bottom:0; width:100%;
+  background:linear-gradient(to top,#8a0215,#ff3333);
+  border-radius:0 0 2px 2px;
+}
+#rougeFill.pulse { animation:rougePulse 0.35s ease-in-out infinite; }
+@keyframes rougePulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+#rougeLabel { position:fixed; left:7px; top:50%; transform:translateY(-130px); font-size:7px; color:#ba041c; letter-spacing:2px; writing-mode:vertical-rl; }
+#drainRate { position:fixed; left:5px; top:calc(50% + 120px); font-size:9px; color:#5a1a1a; text-align:center; width:28px; }
+
+#graftDisplay { position:fixed; right:14px; top:50%; transform:translateY(-50%); width:62px; }
+.graftSlot {
+  width:62px; height:62px; border:1px solid #2a0a0f;
+  background:#0d0d10; border-radius:2px; margin-bottom:8px;
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  position:relative; overflow:hidden; transition:border-color 0.3s;
+}
+.graftSlot.empty { opacity:0.25; }
+.graftSlot .gIcon { font-size:20px; line-height:1; }
+.graftSlot .gName { font-size:6px; color:#ba041c; text-align:center; margin-top:3px; letter-spacing:1px; }
+.decayBar { position:absolute; bottom:0; left:0; height:3px; background:#ba041c; transition:width 0.2s, background 0.3s; }
+
+#floorIndicator { position:fixed; top:14px; left:50%; transform:translateX(-50%); font-size:10px; color:#3a3a50; letter-spacing:4px; }
+#killCount { position:fixed; top:30px; left:50%; transform:translateX(-50%); font-size:9px; color:#2a2a35; letter-spacing:2px; }
+
+#vignette { position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.65) 100%); transition:background 0.5s; }
+#vignette.warn  { background:radial-gradient(ellipse at center,transparent 40%,rgba(100,0,20,0.3) 100%); }
+#vignette.crit  { background:radial-gradient(ellipse at center,transparent 25%,rgba(186,4,28,0.5) 100%); }
+
+#deathScreen {
+  position:fixed; inset:0; background:#ba041c; display:none; flex-direction:column;
+  align-items:center; justify-content:center; animation:dFlood 0.6s ease-out; pointer-events:all; z-index:300;
+}
+@keyframes dFlood { from{opacity:0} to{opacity:1} }
+#deathScreen h1 { font-size:44px; letter-spacing:8px; color:#0d0d10; margin-bottom:12px; font-weight:normal; }
+#deathScreen .dstats { font-size:12px; color:rgba(13,13,16,0.65); margin-bottom:28px; letter-spacing:2px; line-height:2; text-align:center; }
+#deathScreen button { background:#0d0d10; color:#ba041c; border:none; padding:12px 36px; font-family:'Courier New',monospace; font-size:13px; letter-spacing:4px; cursor:pointer; }
+#deathScreen button:hover { background:#1a1a22; }
+
+#titleScreen {
+  position:fixed; inset:0; background:#0d0d10; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; pointer-events:all; z-index:200;
+}
+#titleScreen h1 { font-size:58px; letter-spacing:10px; color:#ba041c; font-weight:normal; margin-bottom:6px; }
+#titleScreen .tsub { font-size:10px; color:#2a2a35; letter-spacing:6px; margin-bottom:40px; }
+#titleScreen .tdesc { font-size:11px; color:#3a3a4a; max-width:380px; text-align:center; line-height:2; margin-bottom:6px; }
+#titleScreen .tquote { font-size:10px; color:#ba041c; margin:16px 0 32px; opacity:0.8; }
+#titleScreen button { background:#ba041c; color:#f8f9fa; border:none; padding:13px 44px; font-family:'Courier New',monospace; font-size:12px; letter-spacing:5px; cursor:pointer; }
+#titleScreen button:hover { background:#d40620; }
+.tkey { color:#ba041c; }
+
+#controls { position:fixed; bottom:12px; left:50%; transform:translateX(-50%); font-size:8px; color:#1e1e28; letter-spacing:2px; white-space:nowrap; }
+
+#pickupHint { position:fixed; display:none; background:#0d0d10; border:1px solid #ba041c; padding:5px 10px; font-size:9px; color:#ba041c; border-radius:2px; pointer-events:none; z-index:100; letter-spacing:1px; }
+#rougeNum { position:fixed; left:4px; top:calc(50% - 135px); font-size:8px; color:#ba041c; width:28px; text-align:center; }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<div id="ui">
+  <div id="rougeNum">100</div>
+  <div id="rougeLabel">ROUGE</div>
+  <div id="rougeBar"><div id="rougeFill" style="height:100%"></div></div>
+  <div id="drainRate">5/s</div>
+  <div id="floorIndicator">FLOOR 01</div>
+  <div id="killCount">0 KILLS</div>
+  <div id="graftDisplay">
+    <div class="graftSlot empty" id="slot0">
+      <div class="gIcon">⬡</div><div class="gName">PRIMARY</div>
+      <div class="decayBar" style="width:0%"></div>
+    </div>
+    <div class="graftSlot empty" id="slot1">
+      <div class="gIcon">⬡</div><div class="gName">SECONDARY</div>
+      <div class="decayBar" style="width:0%"></div>
+    </div>
+  </div>
+  <div id="vignette"></div>
+  <div id="controls">WASD — MOVE &nbsp;|&nbsp; CLICK — ATTACK &nbsp;|&nbsp; WALK OVER ORGAN DROPS — GRAFT &nbsp;|&nbsp; WALK OVER CORPSES — SIPHON ROUGE</div>
+  <div id="pickupHint"></div>
+</div>
+
+<div id="titleScreen">
+  <h1>ROUGE-ENGINE</h1>
+  <div class="tsub">TATTERSHALL STUDIOS</div>
+  <div class="tdesc">Your mech bleeds every second. Every kill refuels you.<br>Every drop of Rouge reshapes the world.<br>Every organ grafted makes you powerful — and accelerates your death.</div>
+  <div class="tquote">"You cannot play it safe. Aggression is survival. Hesitation is death."</div>
+  <button onclick="startGame()">INITIATE SEQUENCE</button>
+  <div class="tdesc" style="margin-top:24px;font-size:9px;color:#2a2a35">
+    <span class="tkey">WASD</span> move &nbsp;|&nbsp; <span class="tkey">CLICK</span> attack &nbsp;|&nbsp; walk over glowing drops to graft &nbsp;|&nbsp; walk over corpses to siphon rouge
+  </div>
+</div>
+
+<div id="deathScreen">
+  <h1>CORE FLATLINE</h1>
+  <div class="dstats" id="dstats"></div>
+  <button onclick="restartGame()">[ RESTART ]</button>
+</div>
+
+<script>
+// ============================================================
+// ROUGE-ENGINE — Phase 1+2  (all timing in SECONDS)
+// dt is always in seconds throughout this codebase
+// ============================================================
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const TILE = 40, COLS = 25, ROWS = 18;
+const W = COLS*TILE, H = ROWS*TILE;
+const T = { FLOOR:0, WALL:1, CHASM:2, BIODOOR:3, EXIT:4 };
+
+const C = {
+  void:'#0d0d10', iron:'#3a3d54', floor:'#1e2128',
+  rouge:'#ba041c', bright:'#ff3333', gold:'#ffb703',
+  white:'#f0f0f8', necro:'#4f121a', dark:'#0d0e15',
+};
+
+// ORGANS — decay in seconds, drainMult applied to base drain
+const ORGANS = {
+  'ORG-01':{ name:'Gatling-Lung',   icon:'⊕', col:'#ff6b35', drainMult:2.5, decay:8,  type:'ranged', dmg:8,  cd:0.1,  desc:'Rapid-fire' },
+  'ORG-02':{ name:'Blade-Scapula',  icon:'⊗', col:'#cc1122', drainMult:1.5, decay:12, type:'melee',  dmg:30, cd:0.6,  desc:'Heavy swing' },
+  'ORG-03':{ name:'Ventricle-Pump', icon:'♡', col:'#ff4455', drainMult:0.8, decay:10, type:'utility',dmg:8,  cd:0.5,  desc:'Drain -20%' },
+  'ORG-06':{ name:'Myoblast-Jaw',   icon:'⊙', col:'#8b0000', drainMult:3.0, decay:7,  type:'melee',  dmg:22, cd:0.55, desc:'Bite heals rouge' },
+  'ORG-07':{ name:'Capillary-Eye',  icon:'◎', col:'#4a90d9', drainMult:1.2, decay:14, type:'utility',dmg:15, cd:0.45, desc:'+40% crit' },
+  'ORG-10':{ name:'Hemorrhage-Fist',icon:'✦', col:'#cc0022', drainMult:2.2, decay:10, type:'melee',  dmg:55, cd:1.3,  desc:'Massive explosion' },
+};
+
+const ETYPES = {
+  husk:   { name:'HUSK',    hp:40,  spd:55,  col:'#5a5a78', sz:10, rv:20, org:'ORG-02', dmg:6,   melee:true  },
+  spitter:{ name:'SPITTER', hp:30,  spd:45,  col:'#5a7a3a', sz:9,  rv:20, org:'ORG-07', dmg:8,   ranged:true },
+  charger:{ name:'CHARGER', hp:60,  spd:130, col:'#7a4a2a', sz:12, rv:25, org:'ORG-03', dmg:12,  charger:true},
+  brute:  { name:'BRUTE',   hp:120, spd:35,  col:'#5a3a6a', sz:16, rv:35, org:'ORG-06', dmg:15,  melee:true  },
+  crawler:{ name:'CRAWLER', hp:25,  spd:80,  col:'#3a5a2a', sz:7,  rv:15, org:'ORG-07', dmg:4,   melee:true  },
+};
+
+let G = {};
+let audioCtx = null;
+
+function initState() {
+  G = {
+    running:false,
+    rouge:100, maxRouge:100,
+    baseDrain:5,           // per second
+    grafts:['',''],        // [primary, secondary]
+    graftDecay:[0,0],      // seconds remaining
+    attackCd:0,            // seconds
+    px:200, py:200,        // player world pos (pixels)
+    pspeed:110,            // pixels/sec
+    psize:11,
+    enemies:[], particles:[], projectiles:[], corpses:[], organDrops:[],
+    keys:{}, mx:W/2, my:H/2,
+    floor:1, kills:0, graftsEquipped:0, tilesTransformed:0,
+    ticks:0, time:0,       // total seconds elapsed
+    hbTimer:0,             // heartbeat timer
+    map:[], sat:[], chasmed:{}, doored:{},
+    rooms:[],
+    shakeMag:0,
+  };
+}
+
+// ============================================================
+// MAP
+// ============================================================
+function rng(min,max){ return min+Math.random()*(max-min); }
+function irng(min,max){ return Math.floor(rng(min,max+1)); }
+
+function generateMap() {
+  G.map=[]; G.sat=[]; G.chasmed={}; G.doored={};
+  for(let r=0;r<ROWS;r++){ G.map.push(new Uint8Array(COLS).fill(T.WALL)); G.sat.push(new Float32Array(COLS)); }
+
+  const rooms=[];
+  for(let i=0;i<40&&rooms.length<7;i++){
+    const rw=irng(4,7), rh=irng(3,5);
+    const rx=irng(1,COLS-rw-2), ry=irng(1,ROWS-rh-2);
+    let ok=true;
+    for(const rm of rooms) if(rx<rm.x+rm.w+2&&rx+rw>rm.x-2&&ry<rm.y+rm.h+2&&ry+rh>rm.y-2){ok=false;break;}
+    if(ok){ rooms.push({x:rx,y:ry,w:rw,h:rh}); for(let r=ry;r<ry+rh;r++)for(let c=rx;c<rx+rw;c++)G.map[r][c]=T.FLOOR; }
+  }
+  // connect rooms with corridors
+  for(let i=1;i<rooms.length;i++){
+    const a=rooms[i-1],b=rooms[i];
+    let cx=Math.floor(a.x+a.w/2), cy=Math.floor(a.y+a.h/2);
+    const tx=Math.floor(b.x+b.w/2), ty=Math.floor(b.y+b.h/2);
+    while(cx!==tx){G.map[cy][cx]=T.FLOOR;cx+=(tx>cx?1:-1);}
+    while(cy!==ty){G.map[cy][cx]=T.FLOOR;cy+=(ty>cy?1:-1);}
+  }
+  // place a chasm between rooms 1 and 2
+  if(rooms.length>=3){
+    const r=rooms[2], cx=r.x-1;
+    for(let row=r.y;row<r.y+r.h&&row<ROWS-1;row++) if(cx>0&&G.map[row][cx]===T.FLOOR) G.map[row][cx]=T.CHASM;
+  }
+  // bio-door before room 3
+  if(rooms.length>=4){
+    const r=rooms[3], dc=Math.floor(r.x+r.w/2), dr=r.y-1;
+    if(dr>0) G.map[dr][dc]=T.BIODOOR;
+  }
+  // exit in last room
+  const lr=rooms[rooms.length-1];
+  G.map[lr.y+lr.h-2][lr.x+lr.w-2]=T.EXIT;
+
+  G.rooms=rooms;
+  const sr=rooms[0];
+  G.px=(sr.x+Math.floor(sr.w/2))*TILE+TILE/2;
+  G.py=(sr.y+Math.floor(sr.h/2))*TILE+TILE/2;
+}
+
+function tile(px,py){ const c=Math.floor(px/TILE),r=Math.floor(py/TILE); if(r<0||r>=ROWS||c<0||c>=COLS)return T.WALL; return G.map[r][c]; }
+function key(r,c){ return r*1000+c; }
+function passable(px,py){
+  const t=tile(px,py), c=Math.floor(px/TILE), r=Math.floor(py/TILE);
+  if(t===T.WALL)return false;
+  if(t===T.CHASM)return !!G.chasmed[key(r,c)];
+  if(t===T.BIODOOR)return !!G.doored[key(r,c)];
+  return true;
+}
+function canMove(nx,ny,size){
+  const hs=size*0.85;
+  return passable(nx,ny)&&passable(nx+hs,ny)&&passable(nx-hs,ny)&&passable(nx,ny+hs)&&passable(nx,ny-hs);
+}
+
+function addSat(px,py,amt){
+  const c=Math.floor(px/TILE),r=Math.floor(py/TILE);
+  if(r<0||r>=ROWS||c<0||c>=COLS)return;
+  const prev=G.sat[r][c];
+  G.sat[r][c]=Math.min(100,prev+amt);
+  const s=G.sat[r][c], t=G.map[r][c];
+  if(t===T.WALL&&s>=80&&prev<80){ G.map[r][c]=T.FLOOR; G.tilesTransformed++; boom(c*TILE+20,r*TILE+20,8,C.iron); }
+  if(t===T.CHASM&&s>=80&&!G.chasmed[key(r,c)]){ G.chasmed[key(r,c)]=true; G.tilesTransformed++; }
+  if(t===T.BIODOOR&&s>=60){ G.doored[key(r,c)]=true; G.tilesTransformed++; }
+  // check bio-doors adjacent
+  for(const[dr,dc]of[[-1,0],[1,0],[0,-1],[0,1]]){
+    const nr=r+dr,nc=c+dc;
+    if(nr<0||nr>=ROWS||nc<0||nc>=COLS)continue;
+    if(G.map[nr][nc]===T.BIODOOR){
+      let tot=0,cnt=0;
+      for(const[dr2,dc2]of[[-1,0],[1,0],[0,-1],[0,1]]){ const nr2=nr+dr2,nc2=nc+dc2; if(nr2>=0&&nr2<ROWS&&nc2>=0&&nc2<COLS){tot+=G.sat[nr2][nc2];cnt++;} }
+      if(cnt&&tot/cnt>=60) G.doored[key(nr,nc)]=true;
+    }
+  }
+}
+
+// ============================================================
+// PARTICLES
+// ============================================================
+function boom(x,y,n,col,opts={}){
+  for(let i=0;i<n&&G.particles.length<500;i++){
+    const a=Math.random()*Math.PI*2, spd=opts.spd||rng(40,160);
+    G.particles.push({ x,y, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd-(opts.up?40:0),
+      col:col||C.rouge, life:1, decay:rng(0.8,2.5), sz:opts.sz||rng(1.2,3), settles:opts.settles!==false });
+  }
+}
+
+function updateParticles(dt){
+  for(let i=G.particles.length-1;i>=0;i--){
+    const p=G.particles[i];
+    p.vy+=200*dt; // gravity px/s^2
+    p.vx*=Math.pow(0.85,60*dt); p.vy*=Math.pow(0.88,60*dt);
+    p.x+=p.vx*dt; p.y+=p.vy*dt;
+    p.life-=p.decay*dt;
+    if(p.life<=0){
+      if(p.settles&&(p.col===C.rouge||p.col===C.bright)) addSat(p.x,p.y,1);
+      G.particles.splice(i,1);
+    }
+  }
+}
+
+// ============================================================
+// PROJECTILES
+// ============================================================
+function spawnProj(x,y,tx,ty,dmg,fromPlayer,col){
+  const dx=tx-x,dy=ty-y,d=Math.hypot(dx,dy)||1;
+  G.projectiles.push({x,y,vx:(dx/d)*380,vy:(dy/d)*380,dmg,fromPlayer,col,life:1.5,px:x,py:y});
+}
+
+function updateProjectiles(dt){
+  for(let i=G.projectiles.length-1;i>=0;i--){
+    const p=G.projectiles[i];
+    p.x+=p.vx*dt; p.y+=p.vy*dt; p.life-=dt;
+    const t=tile(p.x,p.y);
+    if(t===T.WALL||t===T.CHASM||p.life<=0){
+      if(t===T.WALL) addSat(p.x,p.y,4);
+      boom(p.x,p.y,4,p.col,{spd:60,settles:true});
+      G.projectiles.splice(i,1); continue;
+    }
+    if(p.fromPlayer){
+      for(let j=G.enemies.length-1;j>=0;j--){
+        const e=G.enemies[j];
+        if(Math.hypot(p.x-e.x,p.y-e.y)<e.sz+5){ hitEnemy(j,p.dmg); boom(p.x,p.y,10,C.rouge,{settles:true}); G.projectiles.splice(i,1); break; }
+      }
+    } else {
+      if(Math.hypot(p.x-G.px,p.y-G.py)<G.psize+4){ G.rouge=Math.max(0,G.rouge-p.dmg); boom(p.x,p.y,5,C.rouge); G.shakeMag=4; G.projectiles.splice(i,1); }
+    }
+  }
+}
+
+// ============================================================
+// COMBAT
+// ============================================================
+function hitEnemy(idx,dmg){
+  const e=G.enemies[idx];
+  const hasCrit=(G.grafts[0]==='ORG-07'||G.grafts[1]==='ORG-07');
+  let d=dmg;
+  if(hasCrit&&Math.random()<0.4){ d*=2; boom(e.x,e.y,18,C.bright,{settles:true}); }
+  e.hp-=d;
+  boom(e.x,e.y,12,C.rouge,{settles:true});
+  G.shakeMag=2;
+  if(e.hp<=0) killEnemy(idx);
+}
+
+function killEnemy(idx){
+  const e=G.enemies[idx];
+  G.enemies.splice(idx,1);
+  boom(e.x,e.y,35,C.rouge,{spd:150,settles:true});
+  boom(e.x,e.y,12,C.bright,{spd:200,settles:true});
+  G.organDrops.push({x:e.x,y:e.y,org:e.org,timer:4.0}); // 4 seconds to claim
+  G.corpses.push({x:e.x,y:e.y,rv:e.rv,siphoned:false});
+  G.kills++;
+  // Hemorrhage-Fist kill explosion
+  if(G.grafts[0]==='ORG-10'){
+    for(let a=0;a<20;a++){ const ang=(a/20)*Math.PI*2; addSat(e.x+Math.cos(ang)*40,e.y+Math.sin(ang)*40,6); boom(e.x,e.y,3,C.rouge,{settles:true}); }
+  }
+  playSound('kill');
+}
+
+function playerAttack(){
+  if(G.attackCd>0) return;
+  const org=ORGANS[G.grafts[0]];
+  G.rouge=Math.max(0,G.rouge-3); // 3 rouge per attack
+  if(!org){
+    // default melee pulse
+    const closest=nearestEnemy(90);
+    if(closest>=0) hitEnemy(closest,15);
+    boom(G.px,G.py,6,C.rouge,{settles:false,up:true});
+    G.attackCd=0.45;
+    return;
+  }
+  G.attackCd=org.cd;
+  if(org.type==='ranged'){
+    spawnProj(G.px,G.py,G.mx,G.my,org.dmg,true,C.bright);
+    if(G.grafts[0]==='ORG-01'){
+      const a=Math.atan2(G.my-G.py,G.mx-G.px);
+      spawnProj(G.px,G.py,G.px+Math.cos(a+0.3)*200,G.py+Math.sin(a+0.3)*200,org.dmg*0.7,true,C.bright);
+    }
+  } else {
+    const range=G.grafts[0]==='ORG-10'?110:90;
+    const closest=nearestEnemy(range);
+    if(closest>=0){
+      hitEnemy(closest,org.dmg);
+      if(G.grafts[0]==='ORG-06') G.rouge=Math.min(G.maxRouge,G.rouge+15);
+    }
+    boom(G.px,G.py,14,C.rouge,{settles:true,spd:120});
+  }
+  playSound('attack');
+}
+
+function nearestEnemy(range){
+  let best=-1,bd=range;
+  for(let i=0;i<G.enemies.length;i++){ const d=Math.hypot(G.px-G.enemies[i].x,G.py-G.enemies[i].y); if(d<bd){bd=d;best=i;} }
+  return best;
+}
+
+// ============================================================
+// GRAFTING — walk-over auto-graft
+// ============================================================
+function checkGraftPickup(){
+  for(let i=G.organDrops.length-1;i>=0;i--){
+    const d=G.organDrops[i];
+    if(Math.hypot(G.px-d.x,G.py-d.y)<28){
+      equipOrgan(d.org);
+      G.organDrops.splice(i,1);
+      G.graftsEquipped++;
+      playSound('graft');
+      return;
+    }
+  }
+}
+
+function equipOrgan(id){
+  const o=ORGANS[id]; if(!o)return;
+  if(!G.grafts[0]){ G.grafts[0]=id; G.graftDecay[0]=o.decay; }
+  else if(!G.grafts[1]&&id!==G.grafts[0]){ G.grafts[1]=id; G.graftDecay[1]=o.decay; }
+  else { G.grafts[0]=id; G.graftDecay[0]=o.decay; }
+  boom(G.px,G.py,22,o.col||C.rouge,{settles:false,spd:180});
+}
+
+// ============================================================
+// PLAYER UPDATE
+// ============================================================
+function updatePlayer(dt){
+  const k=G.keys;
+  let dx=0,dy=0;
+  if(k['w']||k['ArrowUp'])    dy=-1;
+  if(k['s']||k['ArrowDown'])  dy= 1;
+  if(k['a']||k['ArrowLeft'])  dx=-1;
+  if(k['d']||k['ArrowRight']) dx= 1;
+  if(dx&&dy){dx*=0.707;dy*=0.707;}
+
+  // Speed lane bonus
+  const pc=Math.floor(G.px/TILE),pr=Math.floor(G.py/TILE);
+  const onLane=pr>=0&&pr<ROWS&&pc>=0&&pc<COLS&&G.map[pr][pc]===T.FLOOR&&G.sat[pr][pc]>20;
+  const spd=G.pspeed*(onLane?1.75:1)*(G.grafts[0]==='ORG-09'?1.1:1);
+
+  const nx=G.px+dx*spd*dt, ny=G.py+dy*spd*dt;
+  if(canMove(nx,G.py,G.psize)) G.px=Math.max(5,Math.min(W-5,nx));
+  if(canMove(G.px,ny,G.psize)) G.py=Math.max(5,Math.min(H-5,ny));
+
+  // Siphon corpses (walk over)
+  for(let i=G.corpses.length-1;i>=0;i--){
+    const corp=G.corpses[i];
+    if(!corp.siphoned&&Math.hypot(G.px-corp.x,G.py-corp.y)<30){
+      corp.siphoned=true;
+      G.rouge=Math.min(G.maxRouge,G.rouge+corp.rv);
+      boom(corp.x,corp.y,16,C.rouge,{settles:false,up:true,spd:100});
+      G.corpses.splice(i,1);
+    }
+  }
+
+  // Passive healing on saturated floor
+  if(pr>=0&&pr<ROWS&&pc>=0&&pc<COLS&&G.sat[pr][pc]>90&&G.map[pr][pc]===T.FLOOR)
+    G.rouge=Math.min(G.maxRouge,G.rouge+2*dt);
+
+  // Organ pickup
+  checkGraftPickup();
+
+  // Attack cd
+  if(G.attackCd>0) G.attackCd-=dt;
+
+  // Check exit
+  if(tile(G.px,G.py)===T.EXIT) nextFloor();
+}
+
+// ============================================================
+// ENEMY UPDATE
+// ============================================================
+function updateEnemies(dt){
+  const px=G.px,py=G.py;
+  for(let i=G.enemies.length-1;i>=0;i--){
+    const e=G.enemies[i];
+    const dx=px-e.x,dy=py-e.y,dist=Math.hypot(dx,dy)||1;
+
+    if(e.type==='charger'){
+      if(!e.charging){
+        e.chargeWait=(e.chargeWait||0)-dt;
+        if(dist<220&&e.chargeWait<=0){ e.charging=true; e.cdx=dx/dist; e.cdy=dy/dist; e.chargeT=0.5; }
+      }
+      if(e.charging){
+        const nx=e.x+e.cdx*e.spd*dt*2.2, ny=e.y+e.cdy*e.spd*dt*2.2;
+        if(canMove(nx,ny,e.sz)){e.x=nx;e.y=ny;} else {e.charging=false;e.chargeWait=1.5;}
+        addSat(e.x,e.y,1.5*dt*60);
+        e.chargeT-=dt;
+        if(e.chargeT<=0){e.charging=false;e.chargeWait=1.5;}
+      }
+    } else if(e.type==='spitter'){
+      if(dist<90){e.x-=(dx/dist)*e.spd*dt;e.y-=(dy/dist)*e.spd*dt;}
+      else if(dist>160){e.x+=(dx/dist)*e.spd*0.5*dt;e.y+=(dy/dist)*e.spd*0.5*dt;}
+      e.shotT=(e.shotT||0)-dt;
+      if(e.shotT<=0&&dist<280){ spawnProj(e.x,e.y,px,py,e.dmg,false,'#6aaa44'); addSat(px,py,4); e.shotT=rng(1.5,3); }
+    } else {
+      // chase with simple obstacle nudge
+      if(dist>5){
+        const nx=e.x+(dx/dist)*e.spd*dt, ny=e.y+(dy/dist)*e.spd*dt;
+        if(canMove(nx,ny,e.sz)){e.x=nx;e.y=ny;}
+        else if(canMove(nx,e.y,e.sz))e.x=nx;
+        else if(canMove(e.x,ny,e.sz))e.y=ny;
+        else{ e.x+=rng(-30,30)*dt; e.y+=rng(-30,30)*dt; } // unstuck jitter
+      }
+    }
+
+    // Melee contact damage — apply per second, gated so it doesn't stack every frame
+    if(e.melee&&dist<e.sz+G.psize){
+      G.rouge=Math.max(0,G.rouge-e.dmg*dt);
+      G.shakeMag=Math.max(G.shakeMag,3);
+    }
+  }
+}
+
+// ============================================================
+// DRAIN — per second rates
+// ============================================================
+function updateDrain(dt){
+  // base 5/sec, modified by grafts
+  let drain=G.baseDrain*(1+(G.floor-1)*0.08);
+  const o0=ORGANS[G.grafts[0]],o1=ORGANS[G.grafts[1]];
+  if(o0) drain*=o0.drainMult;
+  if(o1) drain*=o1.drainMult;
+
+  G.rouge=Math.max(0,G.rouge-drain*dt);
+
+  // Decay grafts
+  for(let i=0;i<2;i++){
+    if(!G.grafts[i]) continue;
+    G.graftDecay[i]-=dt;
+    if(G.graftDecay[i]<=0){
+      boom(G.px,G.py,18,C.necro,{spd:150});
+      G.grafts[i]=''; G.graftDecay[i]=0;
+      playSound('decay');
+    }
+  }
+  return drain;
+}
+
+// ============================================================
+// SPAWN
+// ============================================================
+function spawnEnemies(){
+  G.enemies=[];
+  const pool=Object.keys(ETYPES);
+  const count=Math.min(4+G.floor*2,20);
+  for(let i=0;i<count;i++){
+    const type=pool[Math.min(Math.floor(Math.random()*Math.ceil(pool.length*(0.3+G.floor*0.1))),pool.length-1)];
+    const def=ETYPES[type];
+    // Spawn in rooms 1+ (not starting room)
+    const room=G.rooms[1+Math.floor(Math.random()*(G.rooms.length-1))];
+    G.enemies.push({
+      type,...def, sz:def.sz,
+      x:room.x*TILE+rng(TILE,room.w*TILE-TILE),
+      y:room.y*TILE+rng(TILE,room.h*TILE-TILE),
+      hp:def.hp, maxHp:def.hp, charging:false, chargeWait:0, chargeT:0, cdx:0, cdy:0, shotT:rng(1,3),
+    });
+  }
+}
+
+// ============================================================
+// NEXT FLOOR
+// ============================================================
+function nextFloor(){
+  G.floor++;
+  G.rouge=Math.min(G.maxRouge,G.rouge+40);
+  generateMap(); spawnEnemies();
+  G.particles=[]; G.projectiles=[]; G.corpses=[]; G.organDrops=[];
+  document.getElementById('floorIndicator').textContent='FLOOR '+String(G.floor).padStart(2,'0');
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderTiles(){
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const t=G.map[r][c], s=G.sat[r][c];
+      const x=c*TILE, y=r*TILE;
+      if(t===T.WALL){
+        ctx.fillStyle=C.iron; ctx.fillRect(x,y,TILE,TILE);
+        if(s>0){ ctx.fillStyle=`rgba(186,4,28,${Math.min(s/160,0.6)})`; ctx.fillRect(x,y,TILE,TILE); }
+        if(s>60){ ctx.strokeStyle=`rgba(255,51,51,${(s-60)/80})`; ctx.lineWidth=0.5; ctx.strokeRect(x+1,y+1,TILE-2,TILE-2); }
+      } else if(t===T.FLOOR){
+        ctx.fillStyle=C.floor; ctx.fillRect(x,y,TILE,TILE);
+        if(s>0){ ctx.fillStyle=`rgba(186,4,28,${Math.min(s/120,0.65)})`; ctx.fillRect(x,y,TILE,TILE); }
+        if(s>20){ ctx.fillStyle='rgba(255,80,80,0.07)'; ctx.fillRect(x,y+TILE-3,TILE,3); } // speed lane
+      } else if(t===T.CHASM){
+        const bridged=G.chasmed[r*1000+c];
+        ctx.fillStyle=bridged?'#1a0810':C.dark; ctx.fillRect(x,y,TILE,TILE);
+        if(bridged){ ctx.fillStyle='rgba(186,4,28,0.35)'; ctx.fillRect(x,y,TILE,TILE); }
+        else if(s>20){ ctx.fillStyle=`rgba(186,4,28,${s/500})`; ctx.fillRect(x,y,TILE,TILE); }
+      } else if(t===T.BIODOOR){
+        const open=G.doored[r*1000+c];
+        if(open){ ctx.fillStyle=C.floor; ctx.fillRect(x,y,TILE,TILE); }
+        else {
+          ctx.fillStyle='#141200'; ctx.fillRect(x,y,TILE,TILE);
+          ctx.fillStyle=C.gold; ctx.fillRect(x+5,y+5,TILE-10,TILE-10);
+          ctx.fillStyle='#141200'; ctx.fillRect(x+11,y+11,TILE-22,TILE-22);
+          if(s>30){ ctx.fillStyle=`rgba(255,183,3,${(s-30)/80})`; ctx.fillRect(x,y,TILE,TILE); }
+        }
+      } else if(t===T.EXIT){
+        ctx.fillStyle=C.floor; ctx.fillRect(x,y,TILE,TILE);
+        const pulse=0.5+0.5*Math.sin(G.time*4);
+        ctx.fillStyle=C.gold; ctx.globalAlpha=0.4+pulse*0.5; ctx.fillRect(x+6,y+6,TILE-12,TILE-12); ctx.globalAlpha=1;
+        ctx.fillStyle='rgba(0,0,0,0.7)'; ctx.font='8px Courier New'; ctx.textAlign='center';
+        ctx.fillText('EXIT',x+TILE/2,y+TILE/2+3);
+      }
+    }
+  }
+}
+
+function renderEnemies(){
+  for(const e of G.enemies){
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.ellipse(e.x,e.y+e.sz-2,e.sz*0.8,e.sz*0.3,0,0,Math.PI*2); ctx.fill();
+    // Body
+    ctx.fillStyle=e.col; ctx.beginPath(); ctx.arc(e.x,e.y,e.sz,0,Math.PI*2); ctx.fill();
+    // HP bar
+    const hf=e.hp/e.maxHp;
+    ctx.fillStyle='#111'; ctx.fillRect(e.x-e.sz,e.y-e.sz-7,e.sz*2,4);
+    ctx.fillStyle=hf>0.5?'#3a7a3a':'#ba041c'; ctx.fillRect(e.x-e.sz,e.y-e.sz-7,e.sz*2*hf,4);
+    // Type label
+    ctx.fillStyle='rgba(200,200,220,0.45)'; ctx.font='6px Courier New'; ctx.textAlign='center';
+    ctx.fillText(e.name,e.x,e.y+e.sz+9);
+  }
+}
+
+function renderPlayer(){
+  const px=G.px,py=G.py;
+  const rf=G.rouge/G.maxRouge;
+
+  // Primary graft extension
+  if(G.grafts[0]){
+    const o=ORGANS[G.grafts[0]];
+    const df=G.graftDecay[0]/o.decay;
+    const gc=df>0.35?o.col:(df>0.15?C.necro:'#1a0808');
+    const angle=Math.atan2(G.my-py,G.mx-px);
+    ctx.save(); ctx.translate(px,py); ctx.rotate(angle);
+    if(df<0.35&&G.ticks%8<4) ctx.globalAlpha=0.45;
+    ctx.fillStyle=gc; ctx.fillRect(10,-4,20,8);
+    // tip
+    ctx.fillStyle=df>0.35?C.bright:C.necro; ctx.fillRect(28,-2,5,4);
+    ctx.globalAlpha=1; ctx.restore();
+  }
+  // Secondary graft (small back extension)
+  if(G.grafts[1]){
+    const o=ORGANS[G.grafts[1]];
+    const df=G.graftDecay[1]/o.decay;
+    const gc=df>0.35?o.col:C.necro;
+    ctx.fillStyle=gc; ctx.beginPath(); ctx.arc(px-9,py,5,0,Math.PI*2); ctx.fill();
+  }
+
+  // Mech body
+  const mc=rf>0.6?C.white:rf>0.3?'#b0b0c8':'#707085';
+  ctx.fillStyle=mc; ctx.beginPath(); ctx.arc(px,py,G.psize,0,Math.PI*2); ctx.fill();
+
+  // Rouge ring
+  ctx.strokeStyle=rf>0.6?C.rouge:rf>0.3?'#ff5555':C.bright;
+  ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.arc(px,py,G.psize+3,-Math.PI/2,-Math.PI/2+rf*Math.PI*2); ctx.stroke();
+
+  // Cracks
+  if(rf<0.6){
+    ctx.strokeStyle=`rgba(186,4,28,${0.9-rf})`;
+    ctx.lineWidth=0.5;
+    for(let k=0;k<4;k++){
+      const a=(k/4)*Math.PI*2+G.time;
+      ctx.beginPath(); ctx.moveTo(px+Math.cos(a)*4,py+Math.sin(a)*4); ctx.lineTo(px+Math.cos(a)*G.psize,py+Math.sin(a)*G.psize); ctx.stroke();
+    }
+  }
+  // Critical flash ring
+  if(rf<0.15&&G.ticks%10<5){
+    ctx.strokeStyle=C.bright; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(px,py,G.psize+7,0,Math.PI*2); ctx.stroke();
+  }
+}
+
+function renderOrganDrops(){
+  for(const d of G.organDrops){
+    const o=ORGANS[d.org], pulse=0.5+0.5*Math.sin(G.time*8);
+    ctx.fillStyle=o?o.col:C.gold; ctx.globalAlpha=0.6+pulse*0.4;
+    ctx.beginPath(); ctx.arc(d.x,d.y,9,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+    ctx.fillStyle=C.white; ctx.font='11px serif'; ctx.textAlign='center';
+    ctx.fillText(o?o.icon:'?',d.x,d.y+4);
+    // Decay ring
+    const frac=d.timer/4.0;
+    ctx.strokeStyle=C.gold; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(d.x,d.y,13,-Math.PI/2,-Math.PI/2+frac*Math.PI*2); ctx.stroke();
+    // label
+    ctx.fillStyle='rgba(255,183,3,0.7)'; ctx.font='7px Courier New';
+    ctx.fillText(o?o.name.split('-')[0]:'ORG',d.x,d.y-16);
+  }
+}
+
+function renderParticles(){
+  for(const p of G.particles){
+    ctx.fillStyle=p.col; ctx.globalAlpha=Math.max(0,p.life);
+    ctx.fillRect(p.x-p.sz/2,p.y-p.sz/2,p.sz,p.sz);
+  }
+  ctx.globalAlpha=1;
+}
+
+function renderProjectiles(){
+  for(const p of G.projectiles){
+    ctx.fillStyle=p.col; ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=p.col; ctx.globalAlpha=0.25;
+    ctx.beginPath(); ctx.arc(p.x-p.vx*0.025,p.y-p.vy*0.025,2,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+}
+
+function render(){
+  // Screen shake
+  let sx=0,sy=0;
+  if(G.shakeMag>0){ sx=(Math.random()-0.5)*G.shakeMag*2; sy=(Math.random()-0.5)*G.shakeMag*2; G.shakeMag*=0.7; if(G.shakeMag<0.2)G.shakeMag=0; }
+  ctx.save(); ctx.translate(sx,sy);
+  ctx.fillStyle=C.void; ctx.fillRect(-4,-4,W+8,H+8);
+  renderTiles();
+  renderParticles();
+  renderProjectiles();
+  renderOrganDrops();
+  renderEnemies();
+  renderPlayer();
+  ctx.restore();
+}
+
+// ============================================================
+// HUD
+// ============================================================
+function updateHUD(drain){
+  const rf=G.rouge/G.maxRouge;
+  document.getElementById('rougeFill').style.height=(rf*100)+'%';
+  document.getElementById('rougeNum').textContent=Math.ceil(G.rouge);
+  document.getElementById('rougeFill').className=rf<0.3?'pulse':'';
+  document.getElementById('drainRate').textContent=drain.toFixed(1)+'/s';
+  const v=document.getElementById('vignette');
+  v.className=rf<0.15?'crit':rf<0.3?'warn':'';
+  document.getElementById('killCount').textContent=G.kills+' KILLS';
+
+  // Graft slots
+  for(let i=0;i<2;i++){
+    const el=document.getElementById('slot'+i);
+    const id=G.grafts[i], o=id?ORGANS[id]:null;
+    if(!o){
+      el.className='graftSlot empty';
+      el.querySelector('.gIcon').textContent='⬡';
+      el.querySelector('.gName').textContent=i===0?'PRIMARY':'SECONDARY';
+      el.querySelector('.decayBar').style.width='0%';
+      el.style.borderColor=''; el.style.opacity='';
+    } else {
+      const df=G.graftDecay[i]/o.decay;
+      el.className='graftSlot';
+      el.querySelector('.gIcon').textContent=o.icon;
+      el.querySelector('.gName').textContent=o.name.split('-')[0];
+      const db=el.querySelector('.decayBar');
+      db.style.width=(df*100)+'%';
+      db.style.background=df>0.35?'#ba041c':df>0.15?'#4f121a':'#1a0808';
+      el.style.borderColor=df>0.35?'#ba041c':df>0.15?'#3a0808':'#1a0505';
+      el.style.opacity=df<0.35&&G.ticks%8<4?'0.55':'1';
+    }
+  }
+
+  // Pickup hint
+  const hint=document.getElementById('pickupHint');
+  let nearest=null,nd=40;
+  for(const d of G.organDrops){ const dist=Math.hypot(G.px-d.x,G.py-d.y); if(dist<nd){nd=dist;nearest=d;} }
+  if(nearest){
+    const o=ORGANS[nearest.org];
+    hint.style.display='block';
+    hint.style.left=(G.px/W*100)+'%'; hint.style.top=(G.py/H*100-8)+'%';
+    hint.textContent='WALK OVER — GRAFT '+( o?o.name:'ORG');
+  } else { hint.style.display='none'; }
+}
+
+// ============================================================
+// AUDIO
+// ============================================================
+function initAudio(){ try{ audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+function playSound(type){
+  if(!audioCtx)return;
+  try{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    const t=audioCtx.currentTime;
+    if(type==='kill'){ o.type='sawtooth'; o.frequency.setValueAtTime(220,t); o.frequency.exponentialRampToValueAtTime(40,t+0.18); g.gain.setValueAtTime(0.35,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18); o.start(t);o.stop(t+0.18); }
+    else if(type==='attack'){ o.type='square'; o.frequency.setValueAtTime(380,t); o.frequency.exponentialRampToValueAtTime(180,t+0.06); g.gain.setValueAtTime(0.12,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.06); o.start(t);o.stop(t+0.06); }
+    else if(type==='graft'){ o.type='sine'; o.frequency.setValueAtTime(80,t); o.frequency.linearRampToValueAtTime(500,t+0.25); g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.35); o.start(t);o.stop(t+0.35); }
+    else if(type==='decay'){ o.type='sawtooth'; o.frequency.setValueAtTime(350,t); o.frequency.exponentialRampToValueAtTime(20,t+0.5); g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.5); o.start(t);o.stop(t+0.5); }
+    else if(type==='hb'){ o.type='sine'; o.frequency.setValueAtTime(55,t); o.frequency.exponentialRampToValueAtTime(25,t+0.12); g.gain.setValueAtTime(0.45,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.16); o.start(t);o.stop(t+0.16); }
+  }catch(e){}
+}
+
+// ============================================================
+// GAME LOOP
+// ============================================================
+let lastTs=0;
+function loop(ts){
+  if(!G.running)return;
+  const dt=Math.min((ts-lastTs)/1000,0.05); // seconds, capped at 50ms
+  lastTs=ts;
+  G.time+=dt; G.ticks++;
+
+  updatePlayer(dt);
+  updateEnemies(dt);
+  updateParticles(dt);
+  updateProjectiles(dt);
+
+  // Organ drop timers
+  for(let i=G.organDrops.length-1;i>=0;i--){ G.organDrops[i].timer-=dt; if(G.organDrops[i].timer<=0) G.organDrops.splice(i,1); }
+
+  const drain=updateDrain(dt);
+
+  // Heartbeat
+  G.hbTimer-=dt;
+  if(G.hbTimer<=0){ const rf=G.rouge/G.maxRouge; G.hbTimer=rf<0.15?0.4:rf<0.3?0.7:1.8; if(rf<0.3) playSound('hb'); }
+
+  render();
+  updateHUD(drain);
+
+  if(G.rouge<=0){ G.running=false; document.getElementById('deathScreen').style.display='flex'; document.getElementById('dstats').innerHTML=`FLOOR ${G.floor}<br>${G.kills} ENEMIES KILLED<br>${G.graftsEquipped} ORGANS GRAFTED<br>${G.tilesTransformed} TILES TRANSFORMED`; return; }
+  requestAnimationFrame(loop);
+}
+
+// ============================================================
+// INPUT
+// ============================================================
+function setupInput(){
+  window.onkeydown=e=>{ G.keys[e.key]=true; if(['w','s','a','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault(); };
+  window.onkeyup=e=>{ G.keys[e.key]=false; };
+
+  canvas.onmousemove=e=>{
+    const r=canvas.getBoundingClientRect();
+    G.mx=(e.clientX-r.left)*(W/r.width);
+    G.my=(e.clientY-r.top)*(H/r.height);
+  };
+  canvas.onclick=e=>{
+    if(!G.running)return;
+    const r=canvas.getBoundingClientRect();
+    G.mx=(e.clientX-r.left)*(W/r.width);
+    G.my=(e.clientY-r.top)*(H/r.height);
+    playerAttack();
+  };
+  canvas.oncontextmenu=e=>{ e.preventDefault(); if(G.running) playerAttack(); };
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+function resize(){
+  const sw=window.innerWidth,sh=window.innerHeight,sc=Math.min(sw/W,sh/H);
+  canvas.width=W; canvas.height=H;
+  canvas.style.width=(W*sc)+'px'; canvas.style.height=(H*sc)+'px';
+  canvas.style.position='fixed'; canvas.style.left=((sw-W*sc)/2)+'px'; canvas.style.top=((sh-H*sc)/2)+'px';
+}
+window.onresize=resize; resize();
+
+function startGame(){ document.getElementById('titleScreen').style.display='none'; initAudio(); launch(); }
+function restartGame(){ document.getElementById('deathScreen').style.display='none'; launch(); }
+function launch(){ initState(); generateMap(); spawnEnemies(); setupInput(); G.running=true; lastTs=performance.now(); requestAnimationFrame(loop); }
+</script>
+</body>
+</html>

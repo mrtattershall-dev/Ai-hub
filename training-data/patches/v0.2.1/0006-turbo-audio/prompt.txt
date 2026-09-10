@@ -1,0 +1,3 @@
+[REVIEW - replace with a real instruction]
+Module: audio.js
+Header hint: AUDIO MODULE  –  WebAudio synthesized sounds

@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+STATES (from js/entities/player.js)

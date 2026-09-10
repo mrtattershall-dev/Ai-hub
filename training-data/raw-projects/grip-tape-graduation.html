@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grip Tape & Graduation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0f; overflow: hidden; font-family: 'Courier New', monospace; }
+  #canvas { display: block; width: 100vw; height: 100vh; }
+
+  #hud {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 10;
+  }
+
+  /* Top-left: Life Balance Triangle */
+  #stats {
+    position: absolute; top: 20px; left: 20px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .stat-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .stat-label {
+    color: #aaa; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    width: 80px;
+  }
+  .stat-bar {
+    width: 120px; height: 4px; background: rgba(255,255,255,0.1);
+    border-radius: 2px; overflow: hidden;
+  }
+  .stat-fill {
+    height: 100%; border-radius: 2px; transition: width 0.3s ease;
+  }
+  .stat-val {
+    color: #fff; font-size: 11px; width: 28px; text-align: right;
+  }
+  #stat-academics .stat-fill { background: #4fc3f7; }
+  #stat-clout .stat-fill { background: #f06292; }
+  #stat-skate .stat-fill { background: #aed581; }
+
+  /* Top-right: Flow State */
+  #flow-section {
+    position: absolute; top: 20px; right: 20px;
+    text-align: right;
+  }
+  #flow-label {
+    color: #aaa; font-size: 11px; letter-spacing: 3px; margin-bottom: 6px;
+  }
+  #flow-bar-wrap {
+    width: 160px; height: 6px; background: rgba(255,255,255,0.1);
+    border-radius: 3px; overflow: hidden; margin-left: auto;
+  }
+  #flow-fill {
+    height: 100%; width: 0%; background: linear-gradient(90deg, #ff6d00, #ffd600);
+    border-radius: 3px; transition: width 0.2s ease;
+  }
+  #flow-state-text {
+    color: #ffd600; font-size: 13px; font-weight: bold;
+    letter-spacing: 2px; margin-top: 6px;
+    opacity: 0; transition: opacity 0.3s;
+  }
+
+  /* Bottom-center: Speed + trick display */
+  #bottom-hud {
+    position: absolute; bottom: 30px; left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  #trick-display {
+    color: #fff; font-size: 22px; font-weight: bold;
+    letter-spacing: 3px; text-shadow: 0 0 20px #ffd600;
+    min-height: 32px; margin-bottom: 8px;
+    opacity: 0; transition: opacity 0.4s;
+  }
+  #combo-score {
+    color: #ffd600; font-size: 15px; letter-spacing: 2px;
+    min-height: 22px;
+  }
+  #speed-display {
+    color: #888; font-size: 11px; letter-spacing: 2px; margin-top: 6px;
+  }
+
+  /* Bruise meter */
+  #bruise-section {
+    position: absolute; bottom: 30px; left: 20px;
+  }
+  #bruise-label {
+    color: #aaa; font-size: 10px; letter-spacing: 2px; margin-bottom: 5px;
+  }
+  #bruise-bar {
+    width: 100px; height: 4px; background: rgba(255,255,255,0.1);
+    border-radius: 2px; overflow: hidden;
+  }
+  #bruise-fill {
+    height: 100%; width: 0%; background: #ef5350;
+    border-radius: 2px; transition: width 0.4s ease;
+  }
+
+  /* Controls hint */
+  #controls {
+    position: absolute; bottom: 30px; right: 20px;
+    color: #444; font-size: 10px; letter-spacing: 1px;
+    line-height: 1.9;
+    text-align: right;
+  }
+
+  /* Location tag */
+  #location {
+    position: absolute; top: 20px; left: 50%;
+    transform: translateX(-50%);
+    color: #555; font-size: 11px; letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  /* Bail flash */
+  #bail-flash {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(239,83,80,0.35);
+    pointer-events: none; opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 20;
+  }
+
+  /* Flow state vignette */
+  #flow-vignette {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; opacity: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(255,214,0,0.08) 100%);
+    transition: opacity 0.5s;
+    z-index: 9;
+  }
+
+  /* Intro overlay */
+  #intro {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #0a0a0f;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    transition: opacity 1s ease;
+  }
+  #intro h1 {
+    color: #fff; font-size: 42px; font-weight: 900;
+    letter-spacing: 6px; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  #intro h1 span { color: #ffd600; }
+  #intro p {
+    color: #555; font-size: 13px; letter-spacing: 3px;
+    margin-bottom: 40px;
+  }
+  #intro-btn {
+    background: none; border: 1px solid #333; color: #aaa;
+    padding: 12px 32px; font-family: 'Courier New', monospace;
+    font-size: 12px; letter-spacing: 3px; cursor: pointer;
+    transition: all 0.2s;
+    pointer-events: all;
+  }
+  #intro-btn:hover {
+    border-color: #ffd600; color: #ffd600;
+  }
+  #faction-select {
+    display: flex; gap: 16px; margin-bottom: 40px;
+  }
+  .faction-btn {
+    background: none; border: 1px solid #333; color: #555;
+    padding: 10px 20px; font-family: 'Courier New', monospace;
+    font-size: 11px; letter-spacing: 2px; cursor: pointer;
+    transition: all 0.2s; pointer-events: all;
+  }
+  .faction-btn.selected { border-color: #ffd600; color: #ffd600; }
+  .faction-btn:hover { border-color: #888; color: #aaa; }
+
+  /* Mini-map placeholder */
+  #minimap {
+    position: absolute; bottom: 80px; right: 20px;
+    width: 100px; height: 100px;
+    border: 1px solid #222; border-radius: 50%;
+    overflow: hidden; background: rgba(0,0,0,0.6);
+    opacity: 0.7;
+  }
+  #minimap canvas { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div id="bail-flash"></div>
+<div id="flow-vignette"></div>
+
+<div id="intro">
+  <h1>GRIP TAPE <span>&</span> GRADUATION</h1>
+  <p>OAKHAVEN CITY — JUNIOR YEAR</p>
+  <div id="faction-select">
+    <button class="faction-btn selected" data-faction="gutter">GUTTER PUNKS</button>
+    <button class="faction-btn" data-faction="syndicate">THE SYNDICATE</button>
+    <button class="faction-btn" data-faction="vertigo">VERTIGO CREW</button>
+  </div>
+  <button id="intro-btn">DROP IN →</button>
+</div>
+
+<div id="hud">
+  <div id="location">Westbridge High — Plaza</div>
+
+  <div id="stats">
+    <div class="stat-row" id="stat-academics">
+      <span class="stat-label">Academics</span>
+      <div class="stat-bar"><div class="stat-fill" id="fill-academics" style="width:65%"></div></div>
+      <span class="stat-val" id="val-academics">65</span>
+    </div>
+    <div class="stat-row" id="stat-clout">
+      <span class="stat-label">Clout</span>
+      <div class="stat-bar"><div class="stat-fill" id="fill-clout" style="width:30%"></div></div>
+      <span class="stat-val" id="val-clout">30</span>
+    </div>
+    <div class="stat-row" id="stat-skate">
+      <span class="stat-label">Skate</span>
+      <div class="stat-bar"><div class="stat-fill" id="fill-skate" style="width:20%"></div></div>
+      <span class="stat-val" id="val-skate">20</span>
+    </div>
+  </div>
+
+  <div id="flow-section">
+    <div id="flow-label">FLOW STATE</div>
+    <div id="flow-bar-wrap"><div id="flow-fill"></div></div>
+    <div id="flow-state-text">IN THE ZONE</div>
+  </div>
+
+  <div id="bottom-hud">
+    <div id="trick-display"></div>
+    <div id="combo-score"></div>
+    <div id="speed-display">SPEED: 0 MPH</div>
+  </div>
+
+  <div id="bruise-section">
+    <div id="bruise-label">BRUISE</div>
+    <div id="bruise-bar"><div id="bruise-fill"></div></div>
+  </div>
+
+  <div id="controls">
+    WASD / ARROWS — PUSH<br>
+    SPACE — OLLIE<br>
+    Z — KICKFLIP<br>
+    X — HEELFLIP<br>
+    C — 180<br>
+    SHIFT — GRIND<br>
+    MOUSE — CAMERA<br>
+  </div>
+
+  <div id="minimap"><canvas id="minimap-canvas" width="100" height="100"></canvas></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function() {
+
+// ─── SCENE SETUP ──────────────────────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.9;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d1117);
+scene.fog = new THREE.FogExp2(0x0d1117, 0.018);
+
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500);
+camera.position.set(0, 5, 12);
+
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
+
+// ─── LIGHTING ─────────────────────────────────────────────────────────────────
+const ambient = new THREE.AmbientLight(0x1a1a2e, 1.2);
+scene.add(ambient);
+
+const sun = new THREE.DirectionalLight(0xfff5e6, 1.8);
+sun.position.set(30, 60, 20);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 200;
+sun.shadow.camera.left = -80;
+sun.shadow.camera.right = 80;
+sun.shadow.camera.top = 80;
+sun.shadow.camera.bottom = -80;
+sun.shadow.bias = -0.001;
+scene.add(sun);
+
+const fill = new THREE.DirectionalLight(0x4fc3f7, 0.4);
+fill.position.set(-20, 10, -10);
+scene.add(fill);
+
+const streetLampColor = 0xffc947;
+
+// ─── MATERIALS ────────────────────────────────────────────────────────────────
+function mat(color, rough=0.8, metal=0) {
+  return new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
+}
+
+const mats = {
+  concrete:    mat(0x2a2d35, 0.95, 0),
+  concreteLight: mat(0x3a3d45, 0.9, 0),
+  asphalt:     mat(0x1a1c22, 1, 0),
+  marble:      mat(0xd4cfc8, 0.3, 0),
+  steel:       mat(0x5a6070, 0.4, 0.8),
+  glass:       new THREE.MeshStandardMaterial({ color: 0x4fc3f7, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.25 }),
+  board:       mat(0xd4a85a, 0.6, 0),
+  wheel:       mat(0xf5f5f5, 0.9, 0),
+  truck:       mat(0x888ea0, 0.3, 0.9),
+  schoolbrick: mat(0x8b4513, 0.9, 0),
+  grass:       mat(0x1a3a0a, 1, 0),
+  railing:     mat(0x888888, 0.4, 0.7),
+  yellow:      mat(0xffd600, 0.7, 0),
+};
+
+// ─── GEOMETRY HELPERS ─────────────────────────────────────────────────────────
+function box(w, h, d, material, x=0, y=0, z=0, rx=0, ry=0, rz=0) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  m.position.set(x, y, z);
+  m.rotation.set(rx, ry, rz);
+  m.castShadow = true;
+  m.receiveShadow = true;
+  scene.add(m);
+  return m;
+}
+
+function cyl(rt, rb, h, seg, material, x=0, y=0, z=0) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), material);
+  m.position.set(x, y, z);
+  m.castShadow = true;
+  m.receiveShadow = true;
+  scene.add(m);
+  return m;
+}
+
+// ─── WORLD: WESTBRIDGE HIGH PLAZA ─────────────────────────────────────────────
+// Ground
+const ground = box(200, 0.4, 200, mats.asphalt, 0, -0.2, 0);
+ground.receiveShadow = true;
+
+// Main plaza slab — height 0.5, center Y=0.25, top at Y=0.5
+box(60, 0.5, 50, mats.concrete, 0, 0.25, 0);
+
+// Grass patches
+box(15, 0.4, 10, mats.grass, -25, 0.2, 5);
+box(15, 0.4, 10, mats.grass, 25, 0.2, 5);
+box(20, 0.4, 8, mats.grass, 0, 0.2, -30);
+
+// School building (background)
+box(60, 20, 8, mats.schoolbrick, 0, 10, -35);
+box(62, 0.6, 9, mats.concrete, 0, 20.3, -35); // roof overhang
+
+// Windows on school
+for (let i = -4; i <= 4; i++) {
+  for (let j = 0; j < 3; j++) {
+    const wm = new THREE.Mesh(
+      new THREE.BoxGeometry(3.5, 3, 0.1),
+      i % 2 === 0 && j === 1 ? mats.glass : new THREE.MeshStandardMaterial({ color: 0x1a2a3a, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.7 })
+    );
+    wm.position.set(i * 6.2, 4 + j * 5.5, -31.1);
+    wm.castShadow = false;
+    scene.add(wm);
+  }
+}
+
+// Stair sets (left side) — 4 steps
+for (let i = 0; i < 5; i++) {
+  box(12, 0.4, 0.8, mats.concreteLight, -20, 0.2 + i * 0.4, -8 + i * 1.2);
+}
+
+// Stair sets (right side) — 6 steps
+for (let i = 0; i < 7; i++) {
+  box(10, 0.4, 0.8, mats.concreteLight, 18, 0.2 + i * 0.4, -6 + i * 1.0);
+}
+
+// Handrails on left stairs
+const railMat = mats.railing;
+{
+  const rg = new THREE.CylinderGeometry(0.05, 0.05, 8, 8);
+  const r1 = new THREE.Mesh(rg, railMat);
+  r1.position.set(-15, 1.4, -5);
+  r1.rotation.set(-0.28, 0, 0);
+  scene.add(r1);
+  const r2 = new THREE.Mesh(rg, railMat);
+  r2.position.set(-25, 1.4, -5);
+  r2.rotation.set(-0.28, 0, 0);
+  scene.add(r2);
+  // Posts
+  for (let i = 0; i < 5; i++) {
+    const post1 = cyl(0.04, 0.04, 1.2 + i * 0.3, 6, railMat, -15, 0.6 + i * 0.4, -8 + i * 1.2);
+    const post2 = cyl(0.04, 0.04, 1.2 + i * 0.3, 6, railMat, -25, 0.6 + i * 0.4, -8 + i * 1.2);
+  }
+}
+
+// Marble ledges (skate spots)
+box(14, 0.6, 1.2, mats.marble, 5, 0.8, 10);
+box(14, 0.6, 1.2, mats.marble, 5, 0.8, 13);
+box(8, 0.6, 1.2, mats.marble, -10, 0.8, 10);
+
+// Sculpture / architectural obstacle
+const sculptureGeo = new THREE.Mesh(new THREE.OctahedronGeometry(2, 1), mats.steel);
+sculptureGeo.position.set(-5, 2, -5);
+sculptureGeo.castShadow = true;
+scene.add(sculptureGeo);
+
+// Benches
+function bench(x, z, ry=0) {
+  const g = new THREE.Group();
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(3, 0.12, 0.8), mats.concreteLight);
+  seat.position.y = 0.6;
+  g.add(seat);
+  [-1.2, 1.2].forEach(dx => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.6, 0.8), mats.steel);
+    leg.position.set(dx, 0.3, 0);
+    g.add(leg);
+  });
+  g.position.set(x, 0.5, z);
+  g.rotation.y = ry;
+  g.traverse(c => { c.castShadow = true; c.receiveShadow = true; });
+  scene.add(g);
+}
+bench(-5, 15); bench(10, 15, 0.3); bench(-12, -2, -0.2);
+
+// Street lamps
+function lamp(x, z) {
+  const pole = cyl(0.06, 0.06, 8, 6, mats.steel, x, 4, z);
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 1.5), mats.steel);
+  arm.position.set(x, 7.8, z - 0.7);
+  scene.add(arm);
+  const bulb = cyl(0.3, 0.3, 0.2, 8, new THREE.MeshStandardMaterial({ color: streetLampColor, emissive: streetLampColor, emissiveIntensity: 2 }), x, 7.6, z - 1.3);
+  const light = new THREE.PointLight(streetLampColor, 1.5, 18);
+  light.position.set(x, 7.2, z - 1.3);
+  scene.add(light);
+}
+lamp(-22, 2); lamp(22, 2); lamp(-22, -20); lamp(22, -20); lamp(0, -20);
+
+// Distant city buildings
+const buildingColors = [0x1a1f2e, 0x0f1419, 0x1e2533, 0x161b26];
+const bPositions = [
+  [-50, 25, -60], [50, 35, -60], [-70, 18, -50], [70, 40, -55],
+  [-35, 20, -80], [35, 28, -80], [0, 45, -90], [-80, 15, -70], [80, 22, -70]
+];
+bPositions.forEach(([x, h, z]) => {
+  const bm = mat(buildingColors[Math.floor(Math.random()*4)], 0.9, 0.1);
+  const b = box(Math.random()*8+6, h, Math.random()*8+6, bm, x, h/2, z);
+  // Windows — glowing dots
+  for (let i = 0; i < 15; i++) {
+    const won = Math.random() > 0.5;
+    const wm = new THREE.Mesh(
+      new THREE.BoxGeometry(0.4, 0.6, 0.05),
+      new THREE.MeshStandardMaterial({
+        color: won ? 0xffd600 : 0x1a2a4a,
+        emissive: won ? 0xffaa00 : 0x000000,
+        emissiveIntensity: won ? 0.8 : 0
+      })
+    );
+    wm.position.set(
+      x + (Math.random()-0.5)*6,
+      Math.random()*h*0.8 + 2,
+      z + Math.random()*0.5 - (Math.random()*0.5)
+    );
+    scene.add(wm);
+  }
+});
+
+// ─── SKATER (Player) ──────────────────────────────────────────────────────────
+// Layout built bottom-up:
+//   wheel radius     = 0.12
+//   wheel center Y   = 0.12        (wheels rest on Y=0 ground)
+//   truck center Y   = 0.12 + 0.04 = 0.16
+//   board bottom Y   = 0.16 + 0.035 = 0.195
+//   board center Y   = 0.195 + 0.05 = 0.245
+//   skaterGroup Y    = 0           (origin IS the ground contact point)
+// GROUND_Y is set to 0 — group origin sits on the ground plane.
+
+const skaterGroup = new THREE.Group();
+scene.add(skaterGroup);
+skaterGroup.position.set(0, 0.5, 8);
+
+// Board  (height 0.10 → center at 0.245)
+const boardMesh = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.10, 2.4), mats.board);
+boardMesh.position.y = 0.245;
+boardMesh.castShadow = true;
+skaterGroup.add(boardMesh);
+
+// Trucks + Wheels
+[-0.75, 0.75].forEach(z => {
+  const truck = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.07, 0.22), mats.truck);
+  truck.position.set(0, 0.16, z);
+  skaterGroup.add(truck);
+  [-0.33, 0.33].forEach(x => {
+    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.10, 12), mats.wheel);
+    wheel.rotation.z = Math.PI / 2;
+    wheel.position.set(x, 0.12, z);   // center at wheel-radius height
+    skaterGroup.add(wheel);
+  });
+});
+
+// Legs  (bottom of legs = board top ≈ 0.30, leg height 0.38)
+[-0.10, 0.10].forEach(x => {
+  const leg = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.38, 0.14), mat(0x1a237e, 0.9));
+  leg.position.set(x, 0.30 + 0.19, -0.05);  // center = 0.49
+  leg.castShadow = true;
+  skaterGroup.add(leg);
+});
+
+// Body  (sits above legs, height 0.65 → center ≈ 0.49 + 0.19 + 0.325 = 1.0)
+const body = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.65, 0.28), mat(0x2c3e50, 0.9));
+body.position.set(0, 1.0, -0.08);
+body.castShadow = true;
+skaterGroup.add(body);
+
+// Arms
+[[-0.26, 1.0, -0.05], [0.26, 1.0, -0.05]].forEach(([x, y, z]) => {
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.40, 0.13), mat(0x2c3e50, 0.9));
+  arm.position.set(x, y, z);
+  arm.castShadow = true;
+  skaterGroup.add(arm);
+});
+
+// Head  (above body top: 1.0 + 0.325 + 0.14 = 1.465)
+const head = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.28, 0.28), mat(0xd4a574, 0.8));
+head.position.set(0, 1.47, -0.08);
+head.castShadow = true;
+skaterGroup.add(head);
+
+// Cap
+const cap = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.08, 0.32), mat(0x1a1a1a, 0.9));
+cap.position.set(0, 1.63, -0.08);
+skaterGroup.add(cap);
+
+// ─── PHYSICS STATE ────────────────────────────────────────────────────────────
+const player = {
+  pos: new THREE.Vector3(0, 0.5, 8),
+  vel: new THREE.Vector3(),
+  onGround: true,
+  grinding: false,
+  speed: 0,
+  facing: 0, // radians
+  boardTilt: 0,
+  ollieTime: 0,
+  isOllying: false,
+  trickAir: null,
+  trickAngle: 0,
+  bruise: 0,
+  flow: 0,
+  lastTricks: [],
+  comboScore: 0,
+  airTime: 0,
+
+  // Life stats
+  academics: 65,
+  clout: 30,
+  skate: 20,
+};
+
+const GRAVITY = -18;
+const GROUND_Y = 0;
+const PUSH_FORCE = 28;
+const FRICTION = 0.97;
+const TURN_SPEED = 2.2;
+const MAX_SPEED = 40;
+
+// Obstacle collision boxes (simple AABB)
+const obstacles = [
+  // ledges
+  { minX: -2, maxX: 12, minZ: 9.4, maxZ: 10.6, topY: 1.1 },
+  { minX: -2, maxX: 12, minZ: 12.4, maxZ: 13.6, topY: 1.1 },
+  { minX: -14, maxX: -6, minZ: 9.4, maxZ: 10.6, topY: 1.1 },
+  // plaza slab top
+  { minX: -30, maxX: 30, minZ: -25.5, maxZ: 25.5, topY: 0.5 },
+];
+
+// ─── INPUT ────────────────────────────────────────────────────────────────────
+const keys = {};
+document.addEventListener('keydown', e => { keys[e.code] = true; e.preventDefault?.(); });
+document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+// Mouse camera
+let camYaw = 0, camPitch = 0.28;
+let mouseDown = false;
+canvas.addEventListener('mousedown', () => { mouseDown = true; canvas.requestPointerLock?.(); });
+document.addEventListener('mouseup', () => mouseDown = false);
+document.addEventListener('mousemove', e => {
+  if (document.pointerLockElement === canvas) {
+    camYaw -= e.movementX * 0.003;
+    camPitch = Math.max(0.05, Math.min(0.8, camPitch + e.movementY * 0.002));
+  }
+});
+
+// ─── TRICK SYSTEM ─────────────────────────────────────────────────────────────
+const tricks = {
+  kickflip: { name: 'KICKFLIP', score: 100, key: 'KeyZ', axis: 'z', dir: 1 },
+  heelflip: { name: 'HEELFLIP', score: 100, key: 'KeyX', axis: 'z', dir: -1 },
+  bs180:    { name: 'BACKSIDE 180', score: 150, key: 'KeyC', axis: 'y', dir: 1 },
+};
+
+let pendingTrick = null;
+let boardRotation = new THREE.Euler();
+let trickDisplay = document.getElementById('trick-display');
+let trickTimeout = null;
+
+function doTrick(name) {
+  if (!player.isOllying || player.trickAir) return;
+  player.trickAir = name;
+  player.trickAngle = 0;
+}
+
+document.addEventListener('keydown', e => {
+  for (const [k, t] of Object.entries(tricks)) {
+    if (e.code === t.key && player.isOllying && !player.trickAir) {
+      doTrick(k);
+    }
+  }
+  if (e.code === 'ShiftLeft' && player.onGround && player.speed > 2) {
+    player.grinding = true;
+  }
+});
+document.addEventListener('keyup', e => {
+  if (e.code === 'ShiftLeft') player.grinding = false;
+});
+
+// ─── GAME STATE ────────────────────────────────────────────────────────────────
+let gameRunning = false;
+let faction = 'gutter';
+const clock = new THREE.Clock();
+
+// ─── HUD HELPERS ──────────────────────────────────────────────────────────────
+function updateStat(id, val) {
+  document.getElementById('fill-' + id).style.width = val + '%';
+  document.getElementById('val-' + id).textContent = Math.round(val);
+}
+
+function showTrick(name, pts) {
+  trickDisplay.textContent = name;
+  trickDisplay.style.opacity = '1';
+  clearTimeout(trickTimeout);
+  trickTimeout = setTimeout(() => { trickDisplay.style.opacity = '0'; }, 1500);
+
+  player.skate = Math.min(100, player.skate + 0.5);
+  player.clout = Math.min(100, player.clout + 0.2);
+  player.comboScore += pts;
+  document.getElementById('combo-score').textContent = '+' + player.comboScore + ' PTS';
+
+  // Flow state
+  player.flow = Math.min(100, player.flow + 12);
+  updateFlow();
+
+  // Track last tricks (spam prevention)
+  player.lastTricks.push(name);
+  if (player.lastTricks.length > 3) player.lastTricks.shift();
+  if (player.lastTricks.length === 3 &&
+      player.lastTricks[0] === player.lastTricks[1] &&
+      player.lastTricks[1] === player.lastTricks[2]) {
+    player.flow = 0;
+    player.lastTricks = [];
+    updateFlow();
+    trickDisplay.textContent = 'TRICK SPAM!';
+    trickDisplay.style.textShadow = '0 0 20px #ef5350';
+    setTimeout(() => { trickDisplay.style.textShadow = '0 0 20px #ffd600'; }, 1000);
+  }
+}
+
+function updateFlow() {
+  const f = player.flow;
+  document.getElementById('flow-fill').style.width = f + '%';
+  const inZone = f >= 80;
+  document.getElementById('flow-state-text').style.opacity = inZone ? '1' : '0';
+  document.getElementById('flow-vignette').style.opacity = inZone ? '1' : '0';
+}
+
+function bail() {
+  document.getElementById('bail-flash').style.opacity = '1';
+  setTimeout(() => document.getElementById('bail-flash').style.opacity = '0', 200);
+  player.bruise = Math.min(100, player.bruise + 15);
+  player.flow = Math.max(0, player.flow - 30);
+  player.comboScore = 0;
+  player.lastTricks = [];
+  document.getElementById('bruise-fill').style.width = player.bruise + '%';
+  document.getElementById('combo-score').textContent = '';
+  updateFlow();
+  trickDisplay.textContent = 'BAILED!';
+  trickDisplay.style.opacity = '1';
+  clearTimeout(trickTimeout);
+  trickTimeout = setTimeout(() => { trickDisplay.style.opacity = '0'; }, 1200);
+}
+
+// ─── MINIMAP ──────────────────────────────────────────────────────────────────
+const mmCtx = document.getElementById('minimap-canvas').getContext('2d');
+function drawMinimap() {
+  mmCtx.clearRect(0, 0, 100, 100);
+  const cx = 50, cy = 50, scale = 0.6;
+  // buildings
+  mmCtx.fillStyle = 'rgba(255,255,255,0.07)';
+  mmCtx.fillRect(0, 0, 100, 100);
+  // plaza
+  mmCtx.fillStyle = 'rgba(255,255,255,0.12)';
+  mmCtx.fillRect(cx - 18*scale, cy - 15*scale, 36*scale, 30*scale);
+  // player dot
+  const px = cx + player.pos.x * scale;
+  const pz = cy + player.pos.z * scale;
+  mmCtx.beginPath();
+  mmCtx.arc(px, pz, 3, 0, Math.PI*2);
+  mmCtx.fillStyle = '#ffd600';
+  mmCtx.fill();
+  // facing arrow
+  mmCtx.beginPath();
+  mmCtx.moveTo(px, pz);
+  mmCtx.lineTo(px + Math.sin(player.facing)*8, pz + Math.cos(player.facing)*8);
+  mmCtx.strokeStyle = '#ffd600';
+  mmCtx.lineWidth = 1;
+  mmCtx.stroke();
+}
+
+// ─── UPDATE LOOP ──────────────────────────────────────────────────────────────
+function update(dt) {
+  if (!gameRunning) return;
+
+  const inFlow = player.flow >= 80;
+  const popBoost = inFlow ? 1.1 : 1.0;
+  const maxSpd = MAX_SPEED * (1 - player.bruise * 0.003);
+
+  // Movement — ground only for push, air gives minimal directional nudge
+  let pushing = false;
+  if (keys['ArrowUp'] || keys['KeyW']) {
+    if (player.onGround) {
+      const fx = -Math.sin(player.facing) * PUSH_FORCE * dt;
+      const fz = -Math.cos(player.facing) * PUSH_FORCE * dt;
+      player.vel.x += fx;
+      player.vel.z += fz;
+      pushing = true;
+    }
+    // tiny air nudge — no acceleration, just steer
+  }
+  if (keys['ArrowDown'] || keys['KeyS']) {
+    if (player.onGround) {
+      player.vel.x *= 0.90;
+      player.vel.z *= 0.90;
+    }
+  }
+  if (keys['ArrowLeft'] || keys['KeyA']) {
+    player.facing += TURN_SPEED * dt * (player.onGround ? 1 : 0.3);
+  }
+  if (keys['ArrowRight'] || keys['KeyD']) {
+    player.facing -= TURN_SPEED * dt * (player.onGround ? 1 : 0.3);
+  }
+
+  // Clamp speed
+  const hspd = Math.sqrt(player.vel.x**2 + player.vel.z**2);
+  if (hspd > maxSpd) {
+    player.vel.x = (player.vel.x / hspd) * maxSpd;
+    player.vel.z = (player.vel.z / hspd) * maxSpd;
+  }
+
+  // Ollie
+  if (keys['Space'] && player.onGround && player.ollieTime <= 0) {
+    player.vel.y = 7 * popBoost;
+    player.onGround = false;
+    player.isOllying = true;
+    player.airTime = 0;
+    player.ollieTime = 0.5;
+    player.comboScore = 0;
+    player.lastTricks = [];
+  }
+  if (player.ollieTime > 0) player.ollieTime -= dt;
+
+  // Gravity
+  if (!player.onGround) {
+    player.vel.y += GRAVITY * dt;
+    player.airTime += dt;
+  }
+
+  // Ground check
+  let groundY = 0;
+  for (const ob of obstacles) {
+    const nx = player.pos.x, nz = player.pos.z + player.vel.z * dt;
+    if (nx > ob.minX && nx < ob.maxX && nz > ob.minZ && nz < ob.maxZ) {
+      groundY = Math.max(groundY, ob.topY);
+    }
+  }
+  groundY = Math.max(groundY, GROUND_Y);
+
+  // Friction — frame-rate independent rolling resistance
+  if (player.onGround) {
+    const frictionDt = Math.pow(FRICTION, dt * 60);
+    player.vel.x *= frictionDt;
+    player.vel.z *= frictionDt;
+  }
+
+  // Move
+  player.pos.x += player.vel.x * dt;
+  player.pos.z += player.vel.z * dt;
+  player.pos.y += player.vel.y * dt;
+
+  // Land
+  if (player.pos.y <= groundY && !player.onGround) {
+    player.pos.y = groundY;
+    const impact = Math.abs(player.vel.y);
+    player.vel.y = 0;
+    player.onGround = true;
+
+    // Bail check
+    if (player.trickAir && player.trickAngle < Math.PI * 1.8) {
+      bail();
+    } else if (player.trickAir) {
+      const t = tricks[player.trickAir];
+      showTrick(t.name, t.score);
+      player.skate = Math.min(100, player.skate + 1.5);
+    }
+
+    // Hard landing
+    if (impact > 10 && !player.trickAir) bail();
+
+    player.trickAir = null;
+    player.trickAngle = 0;
+    player.isOllying = false;
+    player.airTime = 0;
+
+    // Flow decay when landing
+    player.flow = Math.max(0, player.flow - 3);
+    updateFlow();
+  }
+
+  // Boundary clamp
+  player.pos.x = Math.max(-90, Math.min(90, player.pos.x));
+  player.pos.z = Math.max(-90, Math.min(90, player.pos.z));
+
+  // Update skater mesh
+  skaterGroup.position.copy(player.pos);
+  skaterGroup.rotation.y = player.facing;
+
+  // Board tilt (lean)
+  const leanX = player.vel.x * 0.03;
+  const leanZ = player.vel.z * 0.03;
+  boardMesh.rotation.z = leanX * 0.3;
+
+  // Trick animation
+  if (player.trickAir && !player.onGround) {
+    const t = tricks[player.trickAir];
+    player.trickAngle += dt * 8;
+    if (t.axis === 'z') boardMesh.rotation.z = player.trickAngle * t.dir;
+    if (t.axis === 'y') skaterGroup.rotation.y = player.facing + player.trickAngle * t.dir;
+  } else if (player.onGround) {
+    boardMesh.rotation.z *= 0.85;
+  }
+
+  // Wheel spin
+  skaterGroup.children.forEach(c => {
+    if (c.geometry && c.geometry.type === 'CylinderGeometry' && c.position.y < -0.3) {
+      c.rotation.y += hspd * dt * 0.8;
+    }
+  });
+
+  // Board pump animation when pushing
+  if (pushing && player.onGround) {
+    boardMesh.position.y = 0.245 + Math.sin(Date.now() * 0.012) * 0.012;
+  } else if (player.onGround) {
+    boardMesh.position.y = 0.245;
+  }
+
+  // Flow slow decay
+  if (player.onGround && !pushing) {
+    player.flow = Math.max(0, player.flow - dt * 4);
+    updateFlow();
+  }
+
+  // Speed display
+  player.speed = Math.sqrt(player.vel.x**2 + player.vel.z**2);
+  document.getElementById('speed-display').textContent =
+    'SPEED: ' + Math.round(player.speed * 2.2) + ' MPH';
+
+  // Camera follow
+  const camDist = 10;
+  const camHeight = 5 + player.airTime * 0.5;
+  const targetCamX = player.pos.x + Math.sin(camYaw) * camDist;
+  const targetCamZ = player.pos.z + Math.cos(camYaw) * camDist;
+  camera.position.x += (targetCamX - camera.position.x) * 0.08;
+  camera.position.z += (targetCamZ - camera.position.z) * 0.08;
+  camera.position.y += ((player.pos.y + camHeight) - camera.position.y) * 0.08;
+  camera.lookAt(player.pos.x, player.pos.y + 0.8, player.pos.z);
+
+  // HUD stats
+  updateStat('academics', player.academics);
+  updateStat('clout', player.clout);
+  updateStat('skate', player.skate);
+
+  drawMinimap();
+
+  // Sculpture spin
+  sculptureGeo.rotation.y += dt * 0.3;
+  sculptureGeo.rotation.x += dt * 0.15;
+}
+
+// ─── RENDER LOOP ──────────────────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  update(dt);
+  renderer.render(scene, camera);
+}
+animate();
+
+// ─── INTRO LOGIC ──────────────────────────────────────────────────────────────
+document.querySelectorAll('.faction-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.faction-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    faction = btn.dataset.faction;
+  });
+});
+
+document.getElementById('intro-btn').addEventListener('click', () => {
+  const intro = document.getElementById('intro');
+  intro.style.opacity = '0';
+  setTimeout(() => { intro.style.display = 'none'; }, 1000);
+  gameRunning = true;
+  clock.start();
+  if (faction === 'syndicate') {
+    document.body.style.setProperty('--accent', '#00ffff');
+  }
+});
+
+})();
+</script>
+</body>
+</html>

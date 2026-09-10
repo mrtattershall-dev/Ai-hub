@@ -1,0 +1,2140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROUGE-ENGINE</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0d0d10; color:#f8f9fa; font-family:'Courier New',monospace; overflow:hidden; user-select:none; }
+#gameCanvas { display:block; cursor:crosshair; }
+
+#rougeBar {
+  position:fixed; left:16px; top:50%; transform:translateY(-50%);
+  width:18px; height:220px; background:#111116; border:1px solid #3a0a0f; border-radius:2px; overflow:hidden;
+}
+#rougeFill {
+  position:absolute; bottom:0; width:100%;
+  background:linear-gradient(to top,#8a0215,#ff3333);
+  border-radius:0 0 2px 2px; transition:height 0.08s;
+}
+#rougeFill.pulse { animation:rougePulse 0.35s ease-in-out infinite; }
+@keyframes rougePulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+#rougeLabel { position:fixed; left:7px; top:50%; transform:translateY(-130px); font-size:7px; color:#ba041c; letter-spacing:2px; writing-mode:vertical-rl; }
+#drainRate  { position:fixed; left:5px; top:calc(50% + 122px); font-size:9px; color:#5a1a1a; text-align:center; width:28px; }
+#rougeNum   { position:fixed; left:4px; top:calc(50% - 138px); font-size:8px; color:#ba041c; width:28px; text-align:center; }
+
+#graftDisplay { position:fixed; right:14px; top:50%; transform:translateY(-50%); width:64px; }
+.graftSlot {
+  width:64px; height:64px; border:1px solid #2a0a0f;
+  background:#0d0d10; border-radius:2px; margin-bottom:8px;
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  position:relative; overflow:hidden; transition:border-color 0.3s, opacity 0.1s;
+}
+.graftSlot.empty { opacity:0.22; }
+.graftSlot .gIcon { font-size:20px; line-height:1; }
+.graftSlot .gName { font-size:6px; color:#ba041c; text-align:center; margin-top:3px; letter-spacing:1px; }
+.graftSlot .gDesc { font-size:5px; color:#3a1a1a; text-align:center; margin-top:1px; }
+.decayBar { position:absolute; bottom:0; left:0; height:3px; background:#ba041c; }
+
+#floorIndicator { position:fixed; top:14px; left:50%; transform:translateX(-50%); font-size:10px; color:#3a3a50; letter-spacing:4px; }
+#killCount      { position:fixed; top:30px; left:50%; transform:translateX(-50%); font-size:9px; color:#242430; letter-spacing:2px; }
+
+#vignette { position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.65) 100%); }
+#vignette.warn { background:radial-gradient(ellipse at center,transparent 40%,rgba(80,0,15,0.35) 100%); }
+#vignette.crit { background:radial-gradient(ellipse at center,transparent 22%,rgba(186,4,28,0.55) 100%); }
+
+/* iframes can flash -- keep transition off vignette for snappy crit */
+
+#deathScreen {
+  position:fixed; inset:0; background:#ba041c; display:none; flex-direction:column;
+  align-items:center; justify-content:center; animation:dFlood 0.55s ease-out; pointer-events:all; z-index:300;
+}
+@keyframes dFlood { from{opacity:0} to{opacity:1} }
+#deathScreen h1   { font-size:44px; letter-spacing:8px; color:#0d0d10; margin-bottom:10px; font-weight:normal; }
+#deathScreen .ds  { font-size:12px; color:rgba(13,13,16,0.6); margin-bottom:28px; letter-spacing:2px; line-height:2.2; text-align:center; }
+#deathScreen button { background:#0d0d10; color:#ba041c; border:none; padding:12px 36px; font-family:'Courier New',monospace; font-size:13px; letter-spacing:4px; cursor:pointer; }
+#deathScreen button:hover { background:#1a1a22; }
+
+#winScreen {
+  position:fixed; inset:0; background:#0d0d10; display:none; flex-direction:column;
+  align-items:center; justify-content:center; pointer-events:all; z-index:300;
+  animation:dFlood 1.2s ease-out;
+}
+#winScreen h1 { font-size:38px; letter-spacing:8px; color:#ba041c; font-weight:normal; margin-bottom:6px; }
+#winScreen .ws { font-size:11px; color:#3a3a50; letter-spacing:3px; margin-bottom:6px; }
+#winScreen .wq { font-size:10px; color:#ba041c; opacity:0.6; font-style:italic; margin-bottom:24px; max-width:420px; text-align:center; line-height:1.9; }
+#winScreen .wstats { font-size:11px; color:#4a4e69; letter-spacing:2px; line-height:2.4; text-align:center; margin-bottom:24px; }
+#winScreen .wstats span { color:#ba041c; }
+#winScreen .wbest { font-size:9px; color:#252530; letter-spacing:2px; margin-bottom:22px; text-align:center; line-height:2; }
+#winScreen button { background:#ba041c; color:#f8f9fa; border:none; padding:12px 36px; font-family:'Courier New',monospace; font-size:12px; letter-spacing:4px; cursor:pointer; margin:4px; }
+#winScreen button:hover { background:#d40622; }
+
+#bossBar {
+  position:fixed; top:14px; left:50%; transform:translateX(-50%);
+  width:340px; display:none; flex-direction:column; align-items:center; z-index:50;
+}
+#bossName { font-size:9px; color:#ba041c; letter-spacing:4px; margin-bottom:4px; }
+#bossHpTrack { width:100%; height:6px; background:#1a0a0a; border:1px solid #3a0a0f; }
+#bossHpFill  { height:100%; background:linear-gradient(to right,#8a0215,#ff3333); transition:width 0.1s; }
+#bossPhase   { font-size:7px; color:#4a1a1a; letter-spacing:3px; margin-top:3px; }
+
+#titleScreen {
+  position:fixed; inset:0; background:#0d0d10; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; pointer-events:all; z-index:200;
+}
+#titleScreen h1   { font-size:56px; letter-spacing:10px; color:#ba041c; font-weight:normal; margin-bottom:5px; }
+#titleScreen .ts  { font-size:10px; color:#252530; letter-spacing:6px; margin-bottom:38px; }
+#titleScreen .td  { font-size:11px; color:#383848; max-width:380px; text-align:center; line-height:2; margin-bottom:4px; }
+#titleScreen .tq  { font-size:10px; color:#ba041c; margin:14px 0 30px; opacity:0.75; font-style:italic; }
+#titleScreen button { background:#ba041c; color:#f8f9fa; border:none; padding:13px 44px; font-family:'Courier New',monospace; font-size:12px; letter-spacing:5px; cursor:pointer; }
+#titleScreen button:hover { background:#d40622; }
+#titleScreen .tk  { font-size:9px; color:#252530; margin-top:20px; letter-spacing:2px; line-height:2; text-align:center; }
+#titleScreen .tk span { color:#ba041c; }
+
+#synergyDisplay {
+  position:fixed; right:14px; bottom:14px; width:64px;
+  text-align:center; pointer-events:none;
+}
+#synergyDisplay .sLabel { font-size:6px; color:#ba041c; letter-spacing:1px; line-height:1.6; }
+#synergyDisplay .sBadge {
+  font-size:5px; color:#ffb703; letter-spacing:0.5px; line-height:1.4;
+  border:1px solid #3a2a00; padding:2px 3px; margin-top:2px;
+  background:rgba(13,13,16,0.85); display:none;
+}
+
+
+#pickupHint { position:fixed; display:none; background:#0d0d10; border:1px solid #ffb703; padding:4px 9px; font-size:8px; color:#ffb703; border-radius:2px; pointer-events:none; z-index:100; letter-spacing:1px; transform:translateX(-50%); }
+
+#iframes { position:fixed; top:14px; right:14px; font-size:8px; color:#1e1e28; letter-spacing:1px; }
+
+#minimap {
+  position:fixed; bottom:14px; left:50%; transform:translateX(-50%);
+  border:1px solid #2a0a10; background:#0d0d10; image-rendering:pixelated;
+  opacity:0.82; width:150px; height:108px;
+}
+#minimapLabel {
+  position:fixed; bottom:136px; left:50%; transform:translateX(-50%);
+  font-size:6px; color:#2a1a1a; letter-spacing:3px; text-align:center; pointer-events:none;
+  width:120px;
+}
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<div id="ui">
+  <div id="rougeNum">100</div>
+  <div id="rougeLabel">ROUGE</div>
+  <div id="rougeBar"><div id="rougeFill" style="height:100%"></div></div>
+  <div id="drainRate">5/s</div>
+  <div id="floorIndicator">FLOOR 01</div>
+  <div id="killCount">0 KILLS</div>
+  <div id="graftDisplay">
+    <div class="graftSlot empty" id="slot0">
+      <div class="gIcon">⬡</div><div class="gName">PRIMARY</div><div class="gDesc"></div>
+      <div class="decayBar" style="width:0%"></div>
+    </div>
+    <div class="graftSlot empty" id="slot1">
+      <div class="gIcon">⬡</div><div class="gName">SECONDARY</div><div class="gDesc"></div>
+      <div class="decayBar" style="width:0%"></div>
+    </div>
+  </div>
+  <div id="vignette"></div>
+  <div id="iframes"></div>
+  <canvas id="minimap"></canvas>
+  <div id="minimapLabel">SECTOR MAP</div>
+  <div id="synergyDisplay">
+    <div class="sLabel">SYNERGY</div>
+    <div class="sBadge" id="sBadge"></div>
+  </div>
+  <div id="controls">WASD — MOVE &nbsp;|&nbsp; CLICK — ATTACK &nbsp;|&nbsp; WALK OVER DROPS — GRAFT &nbsp;|&nbsp; WALK OVER CORPSES — SIPHON</div>
+  <div id="pickupHint"></div>
+</div>
+
+<div id="titleScreen">
+  <h1>ROUGE-ENGINE</h1>
+  <div class="ts">TATTERSHALL STUDIOS</div>
+  <div class="td">Your mech bleeds every second. Every kill refuels you.<br>Every drop of Rouge reshapes the world.<br>Every organ you rip from the dead makes you powerful —<br>and accelerates your death.</div>
+  <div class="tq">"You cannot play it safe. Aggression is survival. Hesitation is death."</div>
+  <button onclick="startGame()">INITIATE SEQUENCE</button>
+  <div class="tk">
+    <span>WASD</span> move &nbsp;|&nbsp; <span>CLICK</span> attack toward cursor<br>
+    walk over corpses → siphon rouge &nbsp;|&nbsp; walk over glowing drops → graft organ
+  </div>
+</div>
+
+<div id="deathScreen">
+  <h1>CORE FLATLINE</h1>
+  <div class="ds" id="dstats"></div>
+  <button onclick="restartGame()">[ RESTART ]</button>
+</div>
+
+<div id="winScreen">
+  <h1>RUN COMPLETE</h1>
+  <div class="ws">THE SOVEREIGN CORE HAS FALLEN</div>
+  <div class="wq">"The Sovereign didn't malfunction. It evolved. It just forgot that evolution requires something worth becoming."</div>
+  <div class="wstats" id="wstats"></div>
+  <div class="wbest" id="wbest"></div>
+  <button onclick="restartGame()">[ RUN AGAIN ]</button>
+</div>
+
+<div id="bossBar">
+  <div id="bossName">—</div>
+  <div id="bossHpTrack"><div id="bossHpFill" style="width:100%"></div></div>
+  <div id="bossPhase"></div>
+</div>
+
+<script>
+// ============================================================
+// ROUGE-ENGINE — Pillar 1 Solid Build
+// ALL timing in SECONDS. dt = seconds elapsed since last frame.
+// ============================================================
+
+const canvas = document.getElementById('gameCanvas');
+const ctx    = canvas.getContext('2d');
+
+const TILE = 40, COLS = 25, ROWS = 18, W = COLS*TILE, H = ROWS*TILE;
+
+// ── MINIMAP SETUP ─────────────────────────────────────────────
+const MM_TILE = 3;
+const mmCanvas = document.getElementById('minimap');
+mmCanvas.width  = COLS * MM_TILE;
+mmCanvas.height = ROWS * MM_TILE;
+const T = { FLOOR:0, WALL:1, CHASM:2, BIODOOR:3, EXIT:4, BIO_GEN:5, CORPSE_PIT:6, SPORE_VENT:7 };
+const C = {
+  void:'#0d0d10', iron:'#3a3d54', floor:'#1e2128',
+  rouge:'#ba041c', bright:'#ff3333', gold:'#ffb703',
+  white:'#f0f0f8', necro:'#4f121a', dark:'#0d0e15',
+};
+
+// ── ORGANS ───────────────────────────────────────────────────
+// decay: seconds | drainMult: multiplier on base drain
+// cd: attack cooldown in seconds
+const ORGANS = {
+  'ORG-01':{ name:'Gatling-Lung',    icon:'⊕', col:'#ff6b35', drainMult:2.5, decay:8,  type:'ranged',  dmg:8,  cd:0.1,  desc:'rapid-fire x2' },
+  'ORG-02':{ name:'Blade-Scapula',   icon:'⊗', col:'#cc1122', drainMult:1.5, decay:12, type:'melee',   dmg:30, cd:0.6,  desc:'heavy swing' },
+  'ORG-03':{ name:'Ventricle-Pump',  icon:'♡', col:'#ff4455', drainMult:0.8, decay:10, type:'utility', dmg:8,  cd:0.5,  desc:'drain -20%' },
+  'ORG-06':{ name:'Myoblast-Jaw',    icon:'⊙', col:'#aa0010', drainMult:3.0, decay:7,  type:'melee',   dmg:22, cd:0.55, desc:'bite heals +15' },
+  'ORG-07':{ name:'Capillary-Eye',   icon:'◎', col:'#4a90d9', drainMult:1.2, decay:14, type:'utility', dmg:15, cd:0.45, desc:'+40% crit chance' },
+  'ORG-10':{ name:'Hemorrhage-Fist', icon:'✦', col:'#cc0022', drainMult:2.2, decay:10, type:'melee',   dmg:55, cd:1.3,  desc:'explosion on kill' },
+  'ORG-04':{ name:'Acidic-Kidney',   icon:'⊛', col:'#aacc22', drainMult:1.4, decay:11, type:'utility', dmg:10, cd:0.5,  desc:'wall corrosion x3' },
+  'ORG-05':{ name:'Tendril-Aorta',   icon:'⟳', col:'#cc44aa', drainMult:2.0, decay:9,  type:'ranged',  dmg:12, cd:0.55, desc:'pull + +25% dmg' },
+  'ORG-08':{ name:'Tumor-Chassis',   icon:'⬟', col:'#7a2a8a', drainMult:4.0, decay:8,  type:'defense', dmg:5,  cd:0.3,  desc:'armor 10 + reflect 5' },
+  'ORG-09':{ name:'Neuron-Spine',    icon:'⊡', col:'#2aaacc', drainMult:1.6, decay:14, type:'utility', dmg:8,  cd:0.4,  desc:'reveal all + spd+10%' },
+};
+
+// ── ORGAN SYNERGIES ──────────────────────────────────────────
+// Each entry: [primary, secondary] → { id, label, desc, apply(ctx) }
+// apply is called once on equip; effects read G.synergy in hot paths
+const SYNERGIES = [
+  { id:'crit_gatling',   p:'ORG-07', s:'ORG-01', label:'CRYSTALLINE BARRAGE', desc:'crits fire triple burst' },
+  { id:'jaw_pump',       p:'ORG-06', s:'ORG-03', label:'VITAL OVERFLOW',      desc:'bite restores 25 rouge' },
+  { id:'acid_fist',      p:'ORG-04', s:'ORG-10', label:'CAUSTIC DETONATION',  desc:'punches leave acid pools' },
+  { id:'tendril_blade',  p:'ORG-05', s:'ORG-02', label:'IMPALE PROTOCOL',     desc:'pulled enemies auto-struck' },
+  { id:'tumor_jaw',      p:'ORG-08', s:'ORG-06', label:'REGENERATIVE ARMOR',  desc:'reflect damage heals you' },
+];
+
+function resolveSynergy(){
+  const p=G.grafts[0], s=G.grafts[1];
+  G.synergy=null;
+  if(!p||!s) return;
+  for(const syn of SYNERGIES){
+    if(syn.p===p && syn.s===s){ G.synergy=syn.id; return; }
+    // also allow reverse secondary slot
+    if(syn.p===s && syn.s===p){ G.synergy=syn.id; return; }
+  }
+}
+
+function activeSynLabel(){
+  if(!G.synergy) return null;
+  return SYNERGIES.find(s=>s.id===G.synergy);
+}
+
+
+// spd: px/sec | rv: rouge value on siphon | dmg: per-second contact dmg
+// iframes given to player on each hit to prevent stacking
+const ETYPES = {
+  husk:   { name:'HUSK',    hp:40,  spd:58,  col:'#5a5a78', sz:10, rv:20, org:'ORG-02', dmg:10, contactDmg:true },
+  spitter:{ name:'SPITTER', hp:30,  spd:48,  col:'#4a7a30', sz:9,  rv:20, org:'ORG-07', dmg:0,  contactDmg:false, ranged:true },
+  charger:{ name:'CHARGER', hp:60,  spd:130, col:'#8a4a20', sz:12, rv:25, org:'ORG-03', dmg:18, contactDmg:true, charger:true },
+  crawler:{ name:'CRAWLER', hp:25,  spd:85,  col:'#3a5a2a', sz:7,  rv:15, org:'ORG-04', dmg:6,  contactDmg:true },
+  leech:  { name:'LEECH',   hp:45,  spd:72,  col:'#4a1a3a', sz:9,  rv:30, org:'ORG-05', dmg:0,  contactDmg:false, leech:true },
+  brute:  { name:'BRUTE',   hp:120, spd:36,  col:'#5a3a6a', sz:16, rv:35, org:'ORG-08', dmg:14, contactDmg:true },
+  // ── ELITES (2.5× HP, 1.5× dmg, elite:true flag) ──────────────
+  revenant:{ name:'REVENANT', hp:100, spd:60, col:'#8a0a5a', sz:11, rv:35, org:'ORG-06', dmg:18, contactDmg:true, elite:true, teleport:true, teleWait:2, teleT:0 },
+  architect:{ name:'ARCHITECT', hp:75, spd:44, col:'#2a5a8a', sz:10, rv:35, org:'ORG-01', dmg:10, contactDmg:false, elite:true, ranged:true, builder:true, buildT:3 },
+};
+
+// ── GAME STATE ────────────────────────────────────────────────
+let G = {};
+let audioCtx = null;
+let inputBound = false;
+
+function initState() {
+  G = {
+    running:   false,
+    rouge:     100, maxRouge: 100,
+    baseDrain: 5,              // rouge/sec with no grafts
+    grafts:    ['',''],        // [primary, secondary] organ IDs
+    graftDecay:[0, 0],         // seconds remaining on each graft
+    attackCd:  0,              // seconds until next attack
+    iframes:   0,              // player invincibility seconds (prevents damage stacking)
+    px: 200, py: 200,          // player world position (pixels)
+    pspeed: 112,               // pixels/sec base
+    psize:  11,
+    floorTransitioning: false, // guard against exit firing every frame
+    enemies: [], particles: [], projectiles: [], corpses: [], organDrops: [],
+    keys: {}, mx: W/2, my: H/2,
+    floor: 1, kills: 0, graftsEquipped: 0, tilesTransformed: 0,
+    ticks: 0, time: 0,
+    hbTimer: 0,
+    map: [], sat: [], chasmed: {}, doored: {}, genAwake: {}, ventActive: {},
+    rooms: [],
+    shakeMag: 0,
+    synergy: null,   // active synergy ID string or null
+    theme: 'lab',
+    secretRoom: null,
+    secretDropSpawned: false,
+    boss: null,       // active boss entity or null
+    bossPhase: 0,     // 0=none, 1/2/3 for sovereign phases
+  };
+}
+
+// ── MAP GENERATION ────────────────────────────────────────────
+function rng(a,b){ return a+Math.random()*(b-a); }
+function irng(a,b){ return Math.floor(a+Math.random()*(b-a+1)); }
+
+function generateMap() {
+  G.map=[]; G.sat=[]; G.chasmed={}; G.doored={}; G.genAwake={}; G.ventActive={};
+  for(let r=0;r<ROWS;r++){
+    G.map.push(new Uint8Array(COLS).fill(T.WALL));
+    G.sat.push(new Float32Array(COLS));
+  }
+
+  // Place rooms (no overlap, padding 2)
+  const rooms=[];
+  for(let attempt=0; attempt<60 && rooms.length<7; attempt++){
+    const rw=irng(4,7), rh=irng(3,5);
+    const rx=irng(1,COLS-rw-2), ry=irng(1,ROWS-rh-2);
+    let ok=true;
+    for(const rm of rooms)
+      if(rx<rm.x+rm.w+2&&rx+rw>rm.x-2&&ry<rm.y+rm.h+2&&ry+rh>rm.y-2){ ok=false; break; }
+    if(ok){
+      rooms.push({x:rx,y:ry,w:rw,h:rh});
+      for(let r=ry;r<ry+rh;r++)
+        for(let c=rx;c<rx+rw;c++)
+          G.map[r][c]=T.FLOOR;
+    }
+  }
+
+  // Fallback: guarantee at least 3 rooms
+  if(rooms.length<3){
+    rooms.length=0;
+    const r1={x:2,y:2,w:5,h:4}, r2={x:11,y:3,w:5,h:4}, r3={x:18,y:8,w:5,h:4};
+    for(const rm of[r1,r2,r3]){
+      rooms.push(rm);
+      for(let r=rm.y;r<rm.y+rm.h;r++) for(let c=rm.x;c<rm.x+rm.w;c++) G.map[r][c]=T.FLOOR;
+    }
+  }
+
+  // Connect rooms with L-corridors (2 tiles wide for easier navigation)
+  for(let i=1;i<rooms.length;i++){
+    const a=rooms[i-1], b=rooms[i];
+    let cx=Math.floor(a.x+a.w/2), cy=Math.floor(a.y+a.h/2);
+    const tx=Math.floor(b.x+b.w/2), ty=Math.floor(b.y+b.h/2);
+    while(cx!==tx){
+      G.map[cy][cx]=T.FLOOR;
+      if(cy+1<ROWS) G.map[cy+1][cx]=T.FLOOR; // wide corridor
+      cx+=(tx>cx?1:-1);
+    }
+    while(cy!==ty){
+      G.map[cy][cx]=T.FLOOR;
+      if(cx+1<COLS) G.map[cy][cx+1]=T.FLOOR;
+      cy+=(ty>cy?1:-1);
+    }
+  }
+
+  // Optional chasm before room 2 (only if there's room)
+  if(rooms.length>=3){
+    const rm=rooms[2];
+    const cx=rm.x-1;
+    if(cx>0){
+      for(let row=rm.y;row<rm.y+rm.h&&row<ROWS-1;row++)
+        if(G.map[row][cx]===T.FLOOR) G.map[row][cx]=T.CHASM;
+    }
+  }
+
+  // Optional bio-door corridor entry for room 3
+  if(rooms.length>=4){
+    const rm=rooms[3];
+    const dc=Math.floor(rm.x+rm.w/2), dr=rm.y-1;
+    if(dr>0 && G.map[dr][dc]===T.FLOOR) G.map[dr][dc]=T.BIODOOR;
+  }
+
+  // Exit tile — guaranteed in last room, not in a corner the player spawns at
+  const lr=rooms[rooms.length-1];
+  const exitR=Math.max(lr.y, Math.min(lr.y+lr.h-2, lr.y+Math.floor(lr.h/2)));
+  const exitC=Math.max(lr.x, Math.min(lr.x+lr.w-2, lr.x+lr.w-2));
+  G.map[exitR][exitC]=T.EXIT;
+
+  // ── PILLAR 2 SPECIAL TILES ────────────────────────────────────
+  // Bio-Generator: awakens when adjacent saturation reaches 70 → spawns enemies
+  if(rooms.length>=2){
+    const rm=rooms[1];
+    const gc=Math.floor(rm.x+rm.w*0.75), gr=Math.floor(rm.y+rm.h*0.5);
+    if(gr>=0&&gr<ROWS&&gc>=0&&gc<COLS && G.map[gr][gc]===T.FLOOR)
+      G.map[gr][gc]=T.BIO_GEN;
+  }
+
+  // Corpse Pit: passive rouge regen when standing on it
+  if(rooms.length>=3){
+    const rm=rooms[Math.floor(rooms.length/2)];
+    const pc2=Math.floor(rm.x+rm.w*0.3), pr2=Math.floor(rm.y+rm.h*0.5);
+    if(pr2>=0&&pr2<ROWS&&pc2>=0&&pc2<COLS && G.map[pr2][pc2]===T.FLOOR)
+      G.map[pr2][pc2]=T.CORPSE_PIT;
+  }
+
+  // Spore Vent: activates at sat>=50, deals AOE drain-tick to nearby enemies
+  if(rooms.length>=4){
+    const rm=rooms[rooms.length>=5 ? rooms.length-2 : rooms.length-1];
+    const sc2=Math.floor(rm.x+rm.w*0.5), sr2=Math.floor(rm.y+rm.h*0.25);
+    if(sr2>=0&&sr2<ROWS&&sc2>=0&&sc2<COLS && G.map[sr2][sc2]===T.FLOOR)
+      G.map[sr2][sc2]=T.SPORE_VENT;
+  }
+
+  G.rooms=rooms;
+
+  // ── FLOOR THEME ────────────────────────────────────────────────
+  // Floors 1-3: Sterile Lab | 4-6: Organic Corridors | 7-9: Deep Core | 10: Singularity
+  G.theme = G.floor<=3 ? 'lab' : G.floor<=6 ? 'organic' : G.floor<=9 ? 'core' : 'singularity';
+
+  // ── SECRET ROOM (30% chance, floors 2+) ────────────────────────
+  G.secretRoom=null;
+  if(G.floor>=2 && Math.random()<0.30 && rooms.length>=3){
+    // Pick a random interior wall tile adjacent to a floor tile — carve a 3×3 room behind it
+    const attempts=40;
+    for(let a=0;a<attempts;a++){
+      const sc=irng(2,COLS-5), sr=irng(2,ROWS-5);
+      if(G.map[sr][sc]!==T.WALL) continue;
+      // Must have at least one adjacent floor tile (the "secret" wall)
+      let adjFloor=false;
+      for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]])
+        if(G.map[sr+dr]&&G.map[sr+dr][sc+dc]===T.FLOOR){ adjFloor=true; break; }
+      if(!adjFloor) continue;
+      // Carve the 3×3 room into walls
+      let ok=true;
+      for(let rr=sr-1;rr<=sr+3&&ok;rr++)
+        for(let cc=sc;cc<=sc+3&&ok;cc++)
+          if(rr<0||rr>=ROWS||cc<0||cc>=COLS) ok=false;
+      if(!ok) continue;
+      for(let rr=sr;rr<sr+3;rr++)
+        for(let cc=sc+1;cc<sc+4;cc++)
+          G.map[rr][cc]=T.FLOOR;
+      // Place a rouge pool and an elite organ drop marker
+      G.map[sr+1][sc+2]=T.CORPSE_PIT;
+      G.secretRoom={ x:sc, y:sr, w:3, h:3, entryC:sc, entryR:sr+1 };
+      // The entry tile stays WALL — player must saturate it to dissolve in
+      G.sat[sr+1][sc]=0; // ensure entry wall starts fresh
+      break;
+    }
+  }
+
+  // Player spawn: centre of room 0
+  const sr=rooms[0];
+  G.px=(sr.x+Math.floor(sr.w/2))*TILE+TILE/2;
+  G.py=(sr.y+Math.floor(sr.h/2))*TILE+TILE/2;
+  G.floorTransitioning=false;
+}
+
+// ── TILE UTILS ────────────────────────────────────────────────
+function tileAt(px,py){
+  const c=Math.floor(px/TILE), r=Math.floor(py/TILE);
+  if(r<0||r>=ROWS||c<0||c>=COLS) return T.WALL;
+  return G.map[r][c];
+}
+function passable(px,py){
+  const t=tileAt(px,py), c=Math.floor(px/TILE), r=Math.floor(py/TILE), k=r*1000+c;
+  if(t===T.WALL)    return false;
+  if(t===T.CHASM)   return !!G.chasmed[k];
+  if(t===T.BIODOOR) return !!G.doored[k];
+  // BIO_GEN, CORPSE_PIT, SPORE_VENT are all passable floor tiles
+  return true;
+}
+function canMove(nx,ny,size){
+  const hs=size*0.85;
+  return passable(nx,ny)&&passable(nx+hs,ny)&&passable(nx-hs,ny)&&passable(nx,ny+hs)&&passable(nx,ny-hs);
+}
+
+// ── SATURATION / ROUGE-SHIFT ──────────────────────────────────
+function addSat(px,py,amt){
+  const c=Math.floor(px/TILE), r=Math.floor(py/TILE);
+  if(r<0||r>=ROWS||c<0||c>=COLS) return;
+  // Acidic-Kidney: triple saturation gain on wall tiles
+  const hasAcid=(G.grafts&&(G.grafts[0]==='ORG-04'||G.grafts[1]==='ORG-04'));
+  const t0=G.map[r][c];
+  if(hasAcid && t0===T.WALL) amt*=3;
+  const prev=G.sat[r][c];
+  G.sat[r][c]=Math.min(100,prev+amt);
+  const s=G.sat[r][c], t=G.map[r][c];
+  // Wall dissolves at 80
+  if(t===T.WALL && s>=80 && prev<80){
+    G.map[r][c]=T.FLOOR; G.tilesTransformed++;
+    boom(c*TILE+20,r*TILE+20,10,C.iron,{spd:80,settles:false});
+  }
+  // Chasm bridges at 80
+  if(t===T.CHASM && s>=80 && !G.chasmed[r*1000+c]){
+    G.chasmed[r*1000+c]=true; G.tilesTransformed++;
+  }
+  // Bio-door tile itself at 60
+  if(t===T.BIODOOR && s>=60){ G.doored[r*1000+c]=true; G.tilesTransformed++; }
+  // Bio-door unlocks from adjacent saturation avg
+  for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]){
+    const nr=r+dr, nc=c+dc;
+    if(nr<0||nr>=ROWS||nc<0||nc>=COLS) continue;
+    if(G.map[nr][nc]!==T.BIODOOR) continue;
+    let tot=0,cnt=0;
+    for(const [dr2,dc2] of [[-1,0],[1,0],[0,-1],[0,1]]){
+      const nr2=nr+dr2,nc2=nc+dc2;
+      if(nr2>=0&&nr2<ROWS&&nc2>=0&&nc2<COLS){ tot+=G.sat[nr2][nc2]; cnt++; }
+    }
+    if(cnt && tot/cnt>=60) G.doored[nr*1000+nc]=true;
+  }
+
+  // Bio-Generator awakens at sat>=70 — triggers enemy wave
+  if(t===T.BIO_GEN && s>=70 && !G.genAwake[r*1000+c]){
+    G.genAwake[r*1000+c]=true;
+    G.tilesTransformed++;
+    triggerBioGenWave(c*TILE+TILE/2, r*TILE+TILE/2);
+  }
+
+  // Spore Vent activates at sat>=50
+  if(t===T.SPORE_VENT && s>=50 && !G.ventActive[r*1000+c]){
+    G.ventActive[r*1000+c]=true;
+    G.tilesTransformed++;
+    playSound('spore');
+  }
+}
+
+// Bio-Generator enemy wave — spawns 2-3 husks near the generator position
+function triggerBioGenWave(wx, wy){
+  boom(wx, wy, 30, C.gold, {spd:140, settles:false});
+  const count = 2 + Math.floor(G.floor/3);
+  for(let i=0; i<count; i++){
+    const ang = (i/count)*Math.PI*2;
+    const def = ETYPES.husk;
+    G.enemies.push({
+      ...def, type:'husk',
+      x: wx+Math.cos(ang)*TILE*1.5,
+      y: wy+Math.sin(ang)*TILE*1.5,
+      hp: def.hp*(1+(G.floor-1)*0.1),
+      maxHp: def.hp*(1+(G.floor-1)*0.1),
+      charging:false, chargeWait:rng(0.5,1.5), chargeT:0, cdx:0, cdy:0,
+      shotT:rng(1,2.5),
+    });
+  }
+}
+
+// ── PARTICLES ─────────────────────────────────────────────────
+// decay: life-loss per second (so life=1 / decay=0.6 → ~1.67s lifetime)
+function boom(x,y,n,col,opts={}){
+  const cap=500;
+  for(let i=0;i<n&&G.particles.length<cap;i++){
+    const a=Math.random()*Math.PI*2;
+    const spd=opts.spd||rng(60,180);
+    G.particles.push({
+      x, y,
+      vx: Math.cos(a)*spd,
+      vy: Math.sin(a)*spd - (opts.up?50:0),
+      col: col||C.rouge,
+      life: 1,
+      decay: rng(0.4, 1.1),   // life lost per second → 0.9–2.5s lifetime
+      sz: opts.sz||rng(1.2,3),
+      settles: opts.settles!==false,
+    });
+  }
+}
+
+function updateParticles(dt){
+  for(let i=G.particles.length-1;i>=0;i--){
+    const p=G.particles[i];
+    p.vy += 220*dt;            // gravity
+    p.vx *= Math.pow(0.82,60*dt);
+    p.vy *= Math.pow(0.86,60*dt);
+    p.x  += p.vx*dt;
+    p.y  += p.vy*dt;
+    p.life -= p.decay*dt;
+    if(p.life<=0){
+      if(p.settles && (p.col===C.rouge||p.col===C.bright)) addSat(p.x,p.y,1);
+      G.particles.splice(i,1);
+    }
+  }
+}
+
+// ── PROJECTILES ───────────────────────────────────────────────
+function spawnProj(x,y,tx,ty,dmg,fromPlayer,col){
+  const dx=tx-x, dy=ty-y, d=Math.hypot(dx,dy)||1;
+  G.projectiles.push({ x,y, vx:(dx/d)*400, vy:(dy/d)*400, dmg, fromPlayer, col, life:1.4 });
+}
+
+function updateProjectiles(dt){
+  for(let i=G.projectiles.length-1;i>=0;i--){
+    const p=G.projectiles[i];
+    p.x+=p.vx*dt; p.y+=p.vy*dt; p.life-=dt;
+    const t=tileAt(p.x,p.y);
+    // Hit solid tiles
+    if(t===T.WALL || (t===T.CHASM && !G.chasmed[Math.floor(p.y/TILE)*1000+Math.floor(p.x/TILE)]) || p.life<=0){
+      if(t===T.WALL) addSat(p.x,p.y,5);
+      boom(p.x,p.y,5,p.col,{spd:70,settles:true});
+      G.projectiles.splice(i,1); continue;
+    }
+    let removed=false;
+    if(p.fromPlayer){
+      // Check boss first
+      if(G.boss && Math.hypot(p.x-G.boss.x,p.y-G.boss.y)<G.boss.sz+5){
+        hitBoss(p.dmg);
+        boom(p.x,p.y,12,C.rouge,{settles:true});
+        G.projectiles.splice(i,1); removed=true;
+      }
+      if(!removed) for(let j=G.enemies.length-1;j>=0;j--){
+        const e=G.enemies[j];
+        if(Math.hypot(p.x-e.x,p.y-e.y)<e.sz+5){
+          hitEnemy(j,p.dmg);
+          boom(p.x,p.y,12,C.rouge,{settles:true});
+          G.projectiles.splice(i,1); removed=true; break;
+        }
+      }
+    } else {
+      // Enemy projectile hits player (iframes apply here too)
+      if(G.iframes<=0 && Math.hypot(p.x-G.px,p.y-G.py)<G.psize+5){
+        G.rouge=Math.max(0,G.rouge-p.dmg);
+        G.iframes=0.25; // brief iframes so one shot doesn't chain
+        G.shakeMag=4;
+        boom(p.x,p.y,6,C.rouge,{settles:false});
+        G.projectiles.splice(i,1); removed=true;
+      }
+    }
+    if(!removed && G.projectiles[i]===undefined) continue; // already spliced
+  }
+}
+
+// ── COMBAT ────────────────────────────────────────────────────
+function hitEnemy(idx,dmg){
+  if(idx<0||idx>=G.enemies.length) return;
+  const e=G.enemies[idx];
+  const hasCrit=(G.grafts[0]==='ORG-07'||G.grafts[1]==='ORG-07');
+  let d=dmg;
+  if(hasCrit&&Math.random()<0.4){
+    d*=2;
+    boom(e.x,e.y,20,C.bright,{settles:true,spd:200});
+    // SYNERGY: crit_gatling — fire two extra projectiles outward on crit
+    if(G.synergy==='crit_gatling'){
+      const a=Math.atan2(e.y-G.py, e.x-G.px);
+      spawnProj(G.px,G.py,e.x+Math.cos(a+0.6)*200,e.y+Math.sin(a+0.6)*200,ORGANS['ORG-01'].dmg,true,C.bright);
+      spawnProj(G.px,G.py,e.x+Math.cos(a-0.6)*200,e.y+Math.sin(a-0.6)*200,ORGANS['ORG-01'].dmg,true,C.bright);
+    }
+  }
+  e.hp-=d;
+  boom(e.x,e.y,12,C.rouge,{settles:true});
+  G.shakeMag=Math.max(G.shakeMag,2);
+  if(e.hp<=0) killEnemy(idx);
+}
+
+function killEnemy(idx){
+  const e=G.enemies[idx];
+  G.enemies.splice(idx,1);
+  boom(e.x,e.y,40,C.rouge,{spd:160,settles:true});
+  boom(e.x,e.y,15,C.bright,{spd:220,settles:true});
+  // Organ drop (separate from corpse siphon — both exist simultaneously)
+  G.organDrops.push({ x:e.x, y:e.y, org:e.org, timer:4.0, maxTimer:4.0, id:Math.random() });
+  // Corpse for rouge siphon — offset slightly so player can grab organ first
+  G.corpses.push({ x:e.x, y:e.y, rv:e.rv, siphoned:false });
+  G.kills++;
+  // Myoblast-Jaw passive kill heal
+  if(G.grafts[0]==='ORG-06'||G.grafts[1]==='ORG-06')
+    G.rouge=Math.min(G.maxRouge,G.rouge+30);
+  // Hemorrhage-Fist kill explosion
+  if(G.grafts[0]==='ORG-10'){
+    for(let a=0;a<24;a++){
+      const ang=(a/24)*Math.PI*2;
+      addSat(e.x+Math.cos(ang)*50, e.y+Math.sin(ang)*50, 8);
+      boom(e.x,e.y,2,C.rouge,{settles:true,spd:200});
+    }
+  }
+  // SYNERGY: acid_fist — kill leaves a permanent acid pool (boosts saturation ring)
+  if(G.synergy==='acid_fist'){
+    for(let a=0;a<16;a++){
+      const ang=(a/16)*Math.PI*2;
+      addSat(e.x+Math.cos(ang)*38, e.y+Math.sin(ang)*38, 12);
+    }
+    boom(e.x,e.y,18,'#aacc22',{settles:true,spd:140});
+  }
+  playSound('kill');
+}
+
+function playerAttack(){
+  if(G.attackCd>0) return;
+  const orgId=G.grafts[0];
+  const org=ORGANS[orgId];
+
+  // Only cost rouge if there are enemies nearby or we fire a projectile
+  const hasPrimary=!!org;
+  const attackRange = hasPrimary && org.type==='melee' ? (orgId==='ORG-10'?115:95) : 95;
+
+  if(!hasPrimary){
+    // Default pulse: instant melee in 95px radius
+    const cl=nearestEnemy(attackRange);
+    if(cl>=0){ G.rouge=Math.max(0,G.rouge-3); hitEnemy(cl,15); }
+    else { tryHitBoss(attackRange,15); G.rouge=Math.max(0,G.rouge-3); }
+    boom(G.px,G.py,8,C.rouge,{settles:true,spd:100,up:true});
+    G.attackCd=0.42;
+    playSound('attack');
+    return;
+  }
+
+  G.rouge=Math.max(0,G.rouge-3);
+  G.attackCd=org.cd;
+
+  // Neuron-Spine: +10% movement speed (handled in updatePlayer)
+  // Tumor-Chassis: armor block (handled in contact damage)
+
+  if(org.type==='ranged'){
+    // ORG-05: Tendril-Aorta — pull nearest enemy or boss toward player
+    if(orgId==='ORG-05'){
+      const cl=nearestEnemy(280);
+      if(cl>=0){
+        const en=G.enemies[cl];
+        const dx=G.px-en.x, dy=G.py-en.y, dist=Math.hypot(dx,dy)||1;
+        const pullSpd=320;
+        en.x+=dx/dist*pullSpd*org.cd;
+        en.y+=dy/dist*pullSpd*org.cd;
+        boom(en.x,en.y,14,'#cc44aa',{settles:false,spd:120});
+        hitEnemy(cl, org.dmg);
+        if(G.synergy==='tendril_blade' && (G.grafts[0]==='ORG-02'||G.grafts[1]==='ORG-02'))
+          hitEnemy(cl, ORGANS['ORG-02'].dmg);
+      } else if(G.boss){
+        // Pull boss (partial)
+        const bx=G.boss.x-G.px, by=G.boss.y-G.py, bd=Math.hypot(bx,by)||1;
+        G.boss.x-=bx/bd*80; G.boss.y-=by/bd*80;
+        hitBoss(org.dmg);
+        boom(G.boss.x,G.boss.y,14,'#cc44aa',{settles:false,spd:120});
+      }
+    } else {
+      spawnProj(G.px,G.py,G.mx,G.my,org.dmg,true,C.bright);
+      if(orgId==='ORG-01'){
+        const a=Math.atan2(G.my-G.py,G.mx-G.px);
+        spawnProj(G.px,G.py, G.px+Math.cos(a+0.28)*200, G.py+Math.sin(a+0.28)*200, org.dmg*0.75, true, C.bright);
+        spawnProj(G.px,G.py, G.px+Math.cos(a-0.28)*200, G.py+Math.sin(a-0.28)*200, org.dmg*0.75, true, C.bright);
+      }
+    }
+  } else {
+    // Melee: hit nearest enemy in range, fall back to boss
+    const cl=nearestEnemy(attackRange);
+    if(cl>=0){
+      hitEnemy(cl,org.dmg);
+      if(orgId==='ORG-06'){
+        const healAmt = G.synergy==='jaw_pump' ? 25 : 15;
+        G.rouge=Math.min(G.maxRouge,G.rouge+healAmt);
+      }
+    } else {
+      tryHitBoss(attackRange, org.dmg);
+    }
+    boom(G.px,G.py,16,C.rouge,{settles:true,spd:130});
+  }
+  playSound('attack');
+}
+
+function nearestEnemy(range){
+  let best=-1, bd=range;
+  for(let i=0;i<G.enemies.length;i++){
+    const d=Math.hypot(G.px-G.enemies[i].x, G.py-G.enemies[i].y);
+    if(d<bd){ bd=d; best=i; }
+  }
+  return best;
+}
+
+// Returns true if boss was the nearest target and got hit
+function tryHitBoss(range, dmg){
+  if(!G.boss) return false;
+  const d=Math.hypot(G.px-G.boss.x, G.py-G.boss.y);
+  if(d<range+(G.boss.sz||22)){
+    hitBoss(dmg);
+    return true;
+  }
+  return false;
+}
+
+// ── GRAFTING ─────────────────────────────────────────────────
+// Walk-over pickup with a clear 2-second cooldown after grafting
+// so player doesn't accidentally chain-graft two drops at once
+let graftCooldown=0;
+
+function checkGraftPickup(){
+  if(graftCooldown>0) return;
+  for(let i=G.organDrops.length-1;i>=0;i--){
+    const d=G.organDrops[i];
+    if(Math.hypot(G.px-d.x,G.py-d.y)<26){
+      equipOrgan(d.org);
+      G.organDrops.splice(i,1);
+      G.graftsEquipped++;
+      graftCooldown=0.8; // 0.8s before next auto-pickup
+      playSound('graft');
+      return;
+    }
+  }
+}
+
+function equipOrgan(id){
+  const o=ORGANS[id]; if(!o) return;
+  // Fill empty slot first; if both full replace primary
+  if(!G.grafts[0]){
+    G.grafts[0]=id; G.graftDecay[0]=o.decay;
+  } else if(!G.grafts[1]){
+    G.grafts[1]=id; G.graftDecay[1]=o.decay;
+  } else {
+    // Both full — replace whichever has LESS time left
+    const replaceIdx = G.graftDecay[0]<=G.graftDecay[1] ? 0 : 1;
+    G.grafts[replaceIdx]=id; G.graftDecay[replaceIdx]=o.decay;
+  }
+  boom(G.px,G.py,25,o.col||C.rouge,{settles:false,spd:200});
+  resolveSynergy();
+  updateSynergyHUD();
+}
+
+// ── PLAYER UPDATE ─────────────────────────────────────────────
+function updatePlayer(dt){
+  const k=G.keys;
+  let dx=0, dy=0;
+  if(k['w']||k['ArrowUp'])    dy=-1;
+  if(k['s']||k['ArrowDown'])  dy= 1;
+  if(k['a']||k['ArrowLeft'])  dx=-1;
+  if(k['d']||k['ArrowRight']) dx= 1;
+  if(dx&&dy){ dx*=0.707; dy*=0.707; }
+
+  // Speed lane: saturated floor tiles give 1.75x speed
+  const pc=Math.floor(G.px/TILE), pr=Math.floor(G.py/TILE);
+  const satHere = (pr>=0&&pr<ROWS&&pc>=0&&pc<COLS) ? G.sat[pr][pc] : 0;
+  const onLane = G.map[pr]&&G.map[pr][pc]===T.FLOOR && satHere>20;
+  const hasNeuron=(G.grafts[0]==='ORG-09'||G.grafts[1]==='ORG-09');
+  const spd = G.pspeed * (onLane?1.75:1) * (hasNeuron?1.1:1);
+
+  const nx=G.px+dx*spd*dt, ny=G.py+dy*spd*dt;
+  if(canMove(nx, G.py, G.psize)) G.px=Math.max(5,Math.min(W-5,nx));
+  if(canMove(G.px, ny, G.psize)) G.py=Math.max(5,Math.min(H-5,ny));
+
+  // Corpse siphon — walk over, instant +rouge
+  for(let i=G.corpses.length-1;i>=0;i--){
+    const corp=G.corpses[i];
+    if(!corp.siphoned && Math.hypot(G.px-corp.x,G.py-corp.y)<32){
+      corp.siphoned=true;
+      G.rouge=Math.min(G.maxRouge,G.rouge+corp.rv);
+      boom(corp.x,corp.y,18,C.rouge,{settles:false,up:true,spd:110});
+      G.corpses.splice(i,1);
+    }
+  }
+
+  // Secret room: drop an elite organ when player first enters
+  if(G.secretRoom && !G.secretDropSpawned){
+    const sr=G.secretRoom;
+    const inRoom=(G.px>sr.x*TILE && G.px<(sr.x+sr.w+3)*TILE && G.py>sr.y*TILE && G.py<(sr.y+sr.h+3)*TILE);
+    if(inRoom){
+      G.secretDropSpawned=true;
+      const eliteOrgs=['ORG-01','ORG-06','ORG-10','ORG-08','ORG-05','ORG-09'];
+      const drop=eliteOrgs[Math.floor(Math.random()*eliteOrgs.length)];
+      G.organDrops.push({ x:(sr.x+2)*TILE+TILE/2, y:(sr.y+1)*TILE+TILE/2, org:drop, timer:12.0, maxTimer:12.0, id:Math.random() });
+      boom((sr.x+2)*TILE+TILE/2,(sr.y+1)*TILE+TILE/2,20,C.gold,{settles:false,spd:140,up:true});
+    }
+  }
+
+  // Passive healing on hyper-saturated floor (>90 sat)
+  if(pr>=0&&pr<ROWS&&pc>=0&&pc<COLS && G.map[pr][pc]===T.FLOOR && satHere>90)
+    G.rouge=Math.min(G.maxRouge,G.rouge+2*dt);
+
+  // Corpse Pit: stand on it for strong rouge regen (+8/sec)
+  if(pr>=0&&pr<ROWS&&pc>=0&&pc<COLS && G.map[pr][pc]===T.CORPSE_PIT){
+    G.rouge=Math.min(G.maxRouge, G.rouge+8*dt);
+    // Emit small blood particles upward to signal the regen
+    if(G.ticks%18===0) boom(G.px,G.py,3,C.rouge,{settles:false,up:true,spd:60,sz:1.5});
+  }
+
+  // Organ pickup
+  if(graftCooldown>0) graftCooldown-=dt;
+  checkGraftPickup();
+
+  // Attack cooldown
+  if(G.attackCd>0)  G.attackCd-=dt;
+  if(G.iframes>0)   G.iframes-=dt;
+
+  // Floor exit — guard against firing every frame; block while boss alive
+  if(!G.floorTransitioning && !G.boss && tileAt(G.px,G.py)===T.EXIT){
+    G.floorTransitioning=true;
+    nextFloor();
+  }
+}
+
+// ── ENEMY UPDATE ─────────────────────────────────────────────
+function updateEnemies(dt){
+  const px=G.px, py=G.py;
+  for(let i=G.enemies.length-1;i>=0;i--){
+    const e=G.enemies[i];
+    const dx=px-e.x, dy=py-e.y, dist=Math.hypot(dx,dy)||1;
+
+    // ── Charger ──
+    if(e.type==='charger'){
+      if(!e.charging){
+        e.chargeWait-=dt;
+        if(dist<230 && e.chargeWait<=0){
+          e.charging=true;
+          e.cdx=dx/dist; e.cdy=dy/dist;
+          e.chargeT=0.6;
+          boom(e.x,e.y,8,C.gold,{spd:80,settles:false}); // wind-up flash
+        }
+      } else {
+        const nx=e.x+e.cdx*e.spd*2.4*dt, ny=e.y+e.cdy*e.spd*2.4*dt;
+        if(canMove(nx,ny,e.sz)){ e.x=nx; e.y=ny; }
+        else { e.charging=false; e.chargeWait=rng(1.2,2.0); }
+        addSat(e.x,e.y,2*dt*60); // leaves rouge trail
+        e.chargeT-=dt;
+        if(e.chargeT<=0){ e.charging=false; e.chargeWait=rng(1.2,2.0); }
+      }
+    }
+    // ── Revenant (elite): teleports to player ──
+    else if(e.type==='revenant'){
+      e.teleWait=(e.teleWait||rng(1.5,3))-dt;
+      if(e.teleWait<=0 && dist<350){
+        // Wind-up: flash
+        e.teleT=(e.teleT||0)+dt;
+        if(e.teleT<0.3){
+          if(G.ticks%5<3) boom(e.x,e.y,4,'#8a0a5a',{settles:false,spd:80});
+        } else {
+          // Teleport — rouge explosion at origin, land near player
+          boom(e.x,e.y,30,C.rouge,{settles:true,spd:180});
+          addSat(e.x,e.y,15);
+          const ang=Math.random()*Math.PI*2;
+          e.x=G.px+Math.cos(ang)*(G.psize+e.sz+12);
+          e.y=G.py+Math.sin(ang)*(G.psize+e.sz+12);
+          boom(e.x,e.y,12,'#8a0a5a',{settles:false,spd:100});
+          e.teleWait=rng(2.5,4); e.teleT=0;
+        }
+      } else {
+        e.teleT=0;
+        // Drift toward player between teleports
+        if(dist>30){
+          const nx=e.x+(dx/dist)*e.spd*dt, ny=e.y+(dy/dist)*e.spd*dt;
+          if(canMove(nx,ny,e.sz)){ e.x=nx; e.y=ny; }
+        }
+      }
+    }
+    // ── Architect (elite): builds temp walls, fires ranged ──
+    else if(e.type==='architect'){
+      // Ranged attack
+      e.shotT=(e.shotT||rng(1,2))-dt;
+      if(e.shotT<=0 && dist<320){
+        spawnProj(e.x,e.y,px,py,e.dmg,false,'#2a5a8a');
+        e.shotT=rng(1.8,3.5);
+      }
+      // Build temp wall
+      e.buildT=(e.buildT||rng(2,4))-dt;
+      if(e.buildT<=0){
+        const mx2=Math.floor((e.x/2+G.px/2)/TILE), my2=Math.floor((e.y/2+G.py/2)/TILE);
+        // Don't block start room (rooms[0])
+        const sr0=G.rooms[0];
+        const inStart=sr0&&mx2>=sr0.x-1&&mx2<=sr0.x+sr0.w&&my2>=sr0.y-1&&my2<=sr0.y+sr0.h;
+        if(!inStart && mx2>0&&mx2<COLS-1&&my2>0&&my2<ROWS-1 && G.map[my2][mx2]===T.FLOOR){
+          G.map[my2][mx2]=T.WALL;
+          G.sat[my2][mx2]=0;
+          boom(mx2*TILE+TILE/2,my2*TILE+TILE/2,10,C.iron,{settles:false,spd:70});
+        }
+        e.buildT=rng(3,5);
+      }
+      // Drift away from player
+      if(dist<160){ e.x-=(dx/dist)*e.spd*dt; e.y-=(dy/dist)*e.spd*dt; }
+      else if(dist>280){ e.x+=(dx/dist)*e.spd*0.5*dt; e.y+=(dy/dist)*e.spd*0.5*dt; }
+    }
+    // ── Spitter ──
+    else if(e.type==='spitter'){
+      // Keep distance
+      if(dist<100){ e.x-=(dx/dist)*e.spd*dt; e.y-=(dy/dist)*e.spd*dt; }
+      else if(dist>200){ e.x+=(dx/dist)*e.spd*0.5*dt; e.y+=(dy/dist)*e.spd*0.5*dt; }
+      e.shotT=(e.shotT||rng(1,2))-dt;
+      if(e.shotT<=0&&dist<300){
+        spawnProj(e.x,e.y,px,py,e.dmg||8,false,'#6aaa44');
+        addSat(px,py,4); // spitter inadvertently paints tiles
+        e.shotT=rng(1.5,3.0);
+      }
+    }
+    // ── All other types: chase ──
+    else {
+      if(dist>6){
+        const nx=e.x+(dx/dist)*e.spd*dt, ny=e.y+(dy/dist)*e.spd*dt;
+        if(canMove(nx,ny,e.sz)){       e.x=nx; e.y=ny; }
+        else if(canMove(nx,e.y,e.sz)){ e.x=nx; }
+        else if(canMove(e.x,ny,e.sz)){ e.y=ny; }
+        else { // unstuck: random push
+          e.x+=rng(-40,40)*dt;
+          e.y+=rng(-40,40)*dt;
+        }
+      }
+    }
+
+    // ── Contact damage (ALL enemy types including charger) ──
+    // Uses iframes so multiple enemies can't all hit simultaneously
+    if(e.contactDmg && dist < e.sz+G.psize+2){
+      if(G.iframes<=0){
+        let hit=Math.min(e.dmg, e.dmg*0.5);
+        // Tumor-Chassis: absorb 10 damage per hit
+        if(G.grafts[0]==='ORG-08'||G.grafts[1]==='ORG-08'){
+          hit=Math.max(0,hit-10);
+          boom(G.px,G.py,6,'#7a2a8a',{settles:false,spd:60});
+          // SYNERGY: tumor_jaw — reflect heals player
+          if(G.synergy==='tumor_jaw') G.rouge=Math.min(G.maxRouge,G.rouge+5);
+          // Reflect 5 dmg to attacker
+          e.hp-=5;
+          if(e.hp<=0){ killEnemy(i); continue; }
+        }
+        G.rouge=Math.max(0,G.rouge-hit);
+        G.iframes=0.4;
+        G.shakeMag=Math.max(G.shakeMag,5);
+        boom(G.px,G.py,8,C.rouge,{settles:false,spd:80,up:true});
+      }
+    }
+
+    // ── Leech: latches and drains rouge directly ──
+    if(e.leech && dist < e.sz+G.psize+4){
+      if(G.iframes<=0){
+        G.rouge=Math.max(0,G.rouge-18*dt);
+        G.iframes=0.12; // short iframe window — leech is punishing but not instant-kill
+        if(G.ticks%20===0) boom(G.px,G.py,4,'#4a1a3a',{settles:false,spd:50,up:true});
+      }
+    }
+  }
+
+  // ── Spore Vent AOE: active vents damage all enemies within 80px ──
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      if(G.map[r][c]===T.SPORE_VENT && G.ventActive[r*1000+c]){
+        const vx=c*TILE+TILE/2, vy=r*TILE+TILE/2;
+        // Tick every ~0.5s using ticks modulo (roughly 30 frames at 60fps)
+        if(G.ticks%30===0){
+          for(let i=G.enemies.length-1;i>=0;i--){
+            const e=G.enemies[i];
+            if(Math.hypot(e.x-vx,e.y-vy)<80){
+              hitEnemy(i,8);
+              boom(e.x,e.y,5,'#6aaa44',{settles:false,spd:70});
+            }
+          }
+          // Visual spore burst from vent
+          boom(vx,vy,8,'#6aaa44',{settles:false,spd:90,up:true});
+        }
+      }
+    }
+  }
+}
+
+// ── ROUGE DRAIN ───────────────────────────────────────────────
+// All in seconds. base 5/sec. Grafts multiply it.
+function updateDrain(dt){
+  let drain=G.baseDrain * (1+(G.floor-1)*0.08);
+  const o0=ORGANS[G.grafts[0]], o1=ORGANS[G.grafts[1]];
+  if(o0) drain*=o0.drainMult;
+  if(o1) drain*=o1.drainMult;
+
+  G.rouge=Math.max(0,G.rouge-drain*dt);
+
+  // Graft decay — count down in seconds
+  for(let i=0;i<2;i++){
+    if(!G.grafts[i]) continue;
+    G.graftDecay[i]-=dt;
+    if(G.graftDecay[i]<=0){
+      boom(G.px,G.py,20,C.necro,{spd:160,settles:false});
+      G.grafts[i]=''; G.graftDecay[i]=0;
+      playSound('decay');
+      resolveSynergy();
+      updateSynergyHUD();
+    }
+  }
+  return drain;
+}
+
+// ── ENEMY SPAWN ───────────────────────────────────────────────
+function spawnEnemies(){
+  G.enemies=[];
+  G.boss=null; G.bossPhase=0;
+
+  // ── Floor 10: Sovereign Core boss ───────────────────────────
+  if(G.floor===10){
+    spawnSovereignCore();
+    updateBossHUD();
+    return;
+  }
+
+  const stdPool=['husk','spitter','charger','crawler','leech','brute'];
+  const elitePool=['revenant','architect'];
+  const count=Math.min(4+G.floor*2,20);
+  const typePool= G.floor===1 ? ['husk','husk','husk','spitter'] : stdPool;
+
+  for(let i=0;i<count;i++){
+    const type=typePool[Math.floor(Math.random()*typePool.length)];
+    const def=ETYPES[type];
+    const roomIdx=1+Math.floor(Math.random()*(G.rooms.length-1));
+    const room=G.rooms[Math.min(roomIdx,G.rooms.length-1)];
+    const ex=room.x*TILE+rng(TILE*0.5,room.w*TILE-TILE*0.5);
+    const ey=room.y*TILE+rng(TILE*0.5,room.h*TILE-TILE*0.5);
+    G.enemies.push({
+      ...def, type,
+      x:ex, y:ey,
+      hp:def.hp*(1+(G.floor-1)*0.1),
+      maxHp:def.hp*(1+(G.floor-1)*0.1),
+      charging:false, chargeWait:rng(0.5,2), chargeT:0, cdx:0, cdy:0,
+      shotT:rng(1,2.5), teleWait:rng(1.5,3), teleT:0, buildT:rng(2,4),
+    });
+  }
+
+  const eliteCount = G.floor>=6 ? 2 : G.floor>=3 ? 1 : 0;
+  for(let e=0;e<eliteCount;e++){
+    const type=elitePool[e%elitePool.length];
+    const def=ETYPES[type];
+    const room=G.rooms[G.rooms.length-1];
+    const ex=room.x*TILE+rng(TILE,room.w*TILE-TILE);
+    const ey=room.y*TILE+rng(TILE,room.h*TILE-TILE);
+    G.enemies.push({
+      ...def, type,
+      x:ex, y:ey,
+      hp:def.hp*2.5*(1+(G.floor-1)*0.1),
+      maxHp:def.hp*2.5*(1+(G.floor-1)*0.1),
+      charging:false, chargeWait:rng(0.5,2), chargeT:0, cdx:0, cdy:0,
+      shotT:rng(1,2), teleWait:rng(1.5,3), teleT:0, buildT:rng(2,4),
+    });
+  }
+
+  // ── Floor 5: The Amalgam mini-boss (alongside standard enemies) ──
+  if(G.floor===5){
+    spawnAmalgam();
+    updateBossHUD();
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// BOSS SYSTEM
+// ════════════════════════════════════════════════════════════
+
+// ── THE AMALGAM (Floor 5 Mini-Boss) ─────────────────────────
+function spawnAmalgam(){
+  const room=G.rooms[G.rooms.length-1];
+  G.boss={
+    type:'amalgam',
+    name:'THE AMALGAM',
+    x:(room.x+Math.floor(room.w/2))*TILE, y:(room.y+Math.floor(room.h/2))*TILE,
+    hp:400, maxHp:400,
+    phase:1,           // 1: tendril pulls | 2: shed organs as projectiles
+    sz:22, spd:52,
+    pullT:0, shedT:0,
+    // Amalgam-specific visuals
+    tentacles: Array.from({length:6},(_,i)=>({ ang:(i/6)*Math.PI*2, len:rng(18,30), pulse:rng(0,Math.PI*2) })),
+  };
+  G.bossPhase=1;
+}
+
+function updateAmalgam(dt){
+  const b=G.boss;
+  if(!b||b.type!=='amalgam') return;
+  const dx=G.px-b.x, dy=G.py-b.y, dist=Math.hypot(dx,dy)||1;
+
+  // Chase
+  if(dist>20){
+    const nx=b.x+(dx/dist)*b.spd*dt, ny=b.y+(dy/dist)*b.spd*dt;
+    if(canMove(nx,ny,b.sz)){ b.x=nx; b.y=ny; }
+    else if(canMove(nx,b.y,b.sz)){ b.x=nx; }
+    else if(canMove(b.x,ny,b.sz)){ b.y=ny; }
+  }
+  // Leave massive rouge trails
+  if(G.ticks%4===0) addSat(b.x+rng(-b.sz,b.sz),b.y+rng(-b.sz,b.sz),3);
+
+  // Phase transition
+  if(b.phase===1 && b.hp<=200){
+    b.phase=2; G.bossPhase=2;
+    boom(b.x,b.y,50,C.rouge,{spd:200,settles:true});
+    playSound('decay');
+  }
+
+  // Phase 1: tendril pull attack
+  if(b.phase===1){
+    b.pullT-=dt;
+    if(b.pullT<=0 && dist<350){
+      // Pull player toward Amalgam
+      const pullF=260;
+      G.px+=(dx/dist)*-pullF*0.12; // nudge player toward boss
+      G.py+=(dy/dist)*-pullF*0.12;
+      boom(b.x,b.y,20,C.rouge,{settles:true,spd:180});
+      boom(G.px,G.py,8,C.rouge,{settles:false,spd:80,up:true});
+      if(G.iframes<=0){ G.rouge=Math.max(0,G.rouge-8); G.iframes=0.5; G.shakeMag=6; }
+      b.pullT=rng(2.5,4);
+    }
+  }
+
+  // Phase 2: shed organs as homing projectiles + faster trails
+  if(b.phase===2){
+    b.shedT-=dt;
+    if(b.shedT<=0){
+      // Fire a tendril projectile toward player
+      const orgIds=Object.keys(ORGANS);
+      const randOrg=orgIds[Math.floor(Math.random()*orgIds.length)];
+      spawnProj(b.x,b.y,G.px,G.py,14,false,ORGANS[randOrg]?.col||C.rouge);
+      addSat(b.x,b.y,8);
+      boom(b.x,b.y,12,C.necro,{spd:150,settles:true});
+      b.shedT=rng(0.8,1.8);
+    }
+    // In phase 2 the organ sheds ALSO drop graftable pickups occasionally
+    if(G.ticks%90===0){
+      const orgIds=Object.keys(ORGANS);
+      const randOrg=orgIds[Math.floor(Math.random()*orgIds.length)];
+      G.organDrops.push({ x:b.x+rng(-60,60), y:b.y+rng(-60,60), org:randOrg, timer:2.0, maxTimer:2.0, id:Math.random() });
+    }
+  }
+
+  // Contact damage
+  if(dist < b.sz+G.psize+2 && G.iframes<=0){
+    let hit=20;
+    if(G.grafts[0]==='ORG-08'||G.grafts[1]==='ORG-08'){ hit=Math.max(0,hit-10); if(G.synergy==='tumor_jaw') G.rouge=Math.min(G.maxRouge,G.rouge+5); }
+    G.rouge=Math.max(0,G.rouge-hit); G.iframes=0.5; G.shakeMag=10;
+  }
+
+  // Death
+  if(b.hp<=0){
+    boom(b.x,b.y,80,C.rouge,{spd:220,settles:true});
+    boom(b.x,b.y,40,C.bright,{spd:280,settles:true});
+    for(let a=0;a<20;a++) addSat(b.x+Math.cos(a/20*Math.PI*2)*80, b.y+Math.sin(a/20*Math.PI*2)*80, 15);
+    G.rouge=Math.min(G.maxRouge,G.rouge+60); // boss kill reward
+    G.kills++;
+    // Drop a random elite organ
+    const eliteOrgs=['ORG-01','ORG-06','ORG-10','ORG-08','ORG-05'];
+    const drop=eliteOrgs[Math.floor(Math.random()*eliteOrgs.length)];
+    G.organDrops.push({ x:b.x, y:b.y, org:drop, timer:8.0, maxTimer:8.0, id:Math.random() });
+    G.boss=null; G.bossPhase=0;
+    playSound('kill');
+    updateBossHUD();
+  }
+}
+
+// ── THE SOVEREIGN CORE (Floor 10 Final Boss) ─────────────────
+function spawnSovereignCore(){
+  G.boss={
+    type:'sovereign',
+    name:'THE SOVEREIGN CORE',
+    x:(COLS-6)*TILE, y:Math.floor(ROWS/2)*TILE,
+    hp:1200, maxHp:1200,
+    phase:1, sz:28, spd:44,
+    // Per-phase timers
+    summonT:0,    // phase 1: summon husks
+    shiftT:0,     // phase 2: rouge-shift attacks
+    stolenOrgs:[], // phase 3: organs it stole
+    stealT:0,
+    // Visual
+    armAngs: Array.from({length:4},(_,i)=>i/4*Math.PI*2),
+    rotSpd: 1.2,
+    chargeT:0, charging:false, cdx:0, cdy:0,
+  };
+  G.bossPhase=1;
+}
+
+function updateSovereignCore(dt){
+  const b=G.boss;
+  if(!b||b.type!=='sovereign') return;
+  const dx=G.px-b.x, dy=G.py-b.y, dist=Math.hypot(dx,dy)||1;
+
+  // Rotate arms
+  b.armAngs=b.armAngs.map(a=>a+b.rotSpd*dt);
+
+  // Phase transitions
+  if(b.phase===1 && b.hp<=840){ b.phase=2; G.bossPhase=2; boom(b.x,b.y,60,C.rouge,{spd:240,settles:true}); playSound('decay'); }
+  if(b.phase===2 && b.hp<=480){ b.phase=3; G.bossPhase=3; boom(b.x,b.y,80,C.bright,{spd:280,settles:true}); playSound('decay'); b.rotSpd=2.4; }
+
+  // Chase (all phases)
+  if(!b.charging && dist>30){
+    const nx=b.x+(dx/dist)*b.spd*dt, ny=b.y+(dy/dist)*b.spd*dt;
+    if(canMove(nx,ny,b.sz)){ b.x=nx; b.y=ny; }
+    else if(canMove(nx,b.y,b.sz)){ b.x=nx; }
+    else if(canMove(b.x,ny,b.sz)){ b.y=ny; }
+  }
+
+  // ── Phase 1: continuously summons Husks ──────────────────────
+  if(b.phase===1){
+    b.summonT-=dt;
+    if(b.summonT<=0){
+      const count=2+Math.floor(b.hp/400);
+      for(let i=0;i<count;i++){
+        const ang=Math.random()*Math.PI*2;
+        G.enemies.push({ ...ETYPES.husk, type:'husk', x:b.x+Math.cos(ang)*100, y:b.y+Math.sin(ang)*100,
+          hp:40, maxHp:40, charging:false,chargeWait:1,chargeT:0,cdx:0,cdy:0,shotT:2,teleWait:2,teleT:0,buildT:3 });
+      }
+      boom(b.x,b.y,20,C.iron,{spd:120,settles:false});
+      b.summonT=rng(3,5);
+    }
+    // Ranged projectile burst
+    if(G.ticks%90===0){
+      for(let i=0;i<4;i++){
+        const a=Math.atan2(dy,dx)+(i-1.5)*0.35;
+        spawnProj(b.x,b.y, b.x+Math.cos(a)*200, b.y+Math.sin(a)*200, 18, false, C.bright);
+      }
+    }
+  }
+
+  // ── Phase 2: rouge-shift attacks — saturates tiles to create hazards ─
+  if(b.phase===2){
+    b.shiftT-=dt;
+    if(b.shiftT<=0){
+      // Saturate a ring of tiles around player to create speed lanes for itself
+      for(let i=0;i<12;i++){
+        const a=(i/12)*Math.PI*2;
+        addSat(G.px+Math.cos(a)*TILE*3, G.py+Math.sin(a)*TILE*3, 25);
+      }
+      // Fire 8-way projectile burst
+      for(let i=0;i<8;i++){
+        const a=(i/8)*Math.PI*2;
+        spawnProj(b.x,b.y, b.x+Math.cos(a)*200, b.y+Math.sin(a)*200, 20, false, '#8a0a5a');
+      }
+      boom(b.x,b.y,30,'#8a0a5a',{spd:200,settles:true});
+      b.shiftT=rng(2.5,4);
+    }
+    // Continues summoning, less frequently
+    b.summonT-=dt;
+    if(b.summonT<=0){
+      const ang=Math.random()*Math.PI*2;
+      G.enemies.push({ ...ETYPES.husk, type:'husk', x:b.x+Math.cos(ang)*80, y:b.y+Math.sin(ang)*80,
+        hp:40,maxHp:40,charging:false,chargeWait:1,chargeT:0,cdx:0,cdy:0,shotT:2,teleWait:2,teleT:0,buildT:3 });
+      b.summonT=rng(5,8);
+    }
+  }
+
+  // ── Phase 3: steals organs, gains their abilities ────────────
+  if(b.phase===3){
+    b.stealT-=dt;
+    if(b.stealT<=0 && b.stolenOrgs.length<3){
+      // Rip organ from player if they have one
+      const graftIdx=G.grafts[0]?0:G.grafts[1]?1:-1;
+      if(graftIdx>=0 && dist<220){
+        const stolen=G.grafts[graftIdx];
+        b.stolenOrgs.push(stolen);
+        G.grafts[graftIdx]=''; G.graftDecay[graftIdx]=0;
+        resolveSynergy(); updateSynergyHUD();
+        boom(b.x,b.y,30,ORGANS[stolen]?.col||C.rouge,{spd:180,settles:false});
+        boom(G.px,G.py,20,C.necro,{spd:120,settles:false,up:true});
+        playSound('decay');
+        G.shakeMag=12;
+      }
+      b.stealT=rng(4,7);
+    }
+    // For each stolen organ: boss gains an attack based on it
+    if(G.ticks%45===0){
+      for(const org of b.stolenOrgs){
+        const o=ORGANS[org];
+        if(!o) continue;
+        if(o.type==='ranged'){
+          spawnProj(b.x,b.y,G.px,G.py,o.dmg*1.2,false,o.col||C.bright);
+        } else if(o.type==='melee' && dist<120){
+          if(G.iframes<=0){ G.rouge=Math.max(0,G.rouge-o.dmg); G.iframes=0.35; G.shakeMag=8; boom(b.x,b.y,15,o.col||C.rouge,{settles:true,spd:150}); }
+        }
+      }
+    }
+    // Phase 3 charge attack
+    if(!b.charging){ b.chargeT=(b.chargeT||0)-dt; }
+    if(!b.charging && (b.chargeT||0)<=0 && dist<300){
+      b.charging=true; b.cdx=dx/dist; b.cdy=dy/dist; b.chargeT=0.7; b.spd=160;
+      boom(b.x,b.y,10,C.bright,{spd:100,settles:false});
+    }
+    if(b.charging){
+      const nx=b.x+b.cdx*b.spd*dt, ny=b.y+b.cdy*b.spd*dt;
+      if(canMove(nx,ny,b.sz)){ b.x=nx; b.y=ny; }
+      else { b.charging=false; b.spd=44; b.chargeT=rng(3,5); }
+      b.chargeT-=dt;
+      if(b.chargeT<=0){ b.charging=false; b.spd=44; b.chargeT=rng(3,5); }
+    }
+  }
+
+  // Contact damage
+  if(dist < b.sz+G.psize+2 && G.iframes<=0){
+    let hit=25;
+    if(G.grafts[0]==='ORG-08'||G.grafts[1]==='ORG-08'){ hit=Math.max(0,hit-10); if(G.synergy==='tumor_jaw') G.rouge=Math.min(G.maxRouge,G.rouge+5); }
+    G.rouge=Math.max(0,G.rouge-hit); G.iframes=0.6; G.shakeMag=14;
+    boom(G.px,G.py,12,C.rouge,{settles:false,spd:100,up:true});
+  }
+
+  // Death — massive rouge flood, win state
+  if(b.hp<=0){
+    G.running=false;
+    // Flood every tile
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) G.sat[r][c]=100;
+    render(); // one last frame showing the flood
+    boom(b.x,b.y,120,C.rouge,{spd:280,settles:true});
+    boom(b.x,b.y,60,C.bright,{spd:340,settles:true});
+    G.kills++;
+    G.boss=null; G.bossPhase=0;
+    setTimeout(()=>showWinScreen(), 1400);
+    return;
+  }
+
+  // Boss bar update
+  updateBossHUD();
+}
+
+function hitBoss(dmg){
+  const b=G.boss; if(!b) return;
+  b.hp-=dmg;
+  boom(b.x,b.y,18,C.bright,{settles:true,spd:180});
+  G.shakeMag=Math.max(G.shakeMag,4);
+}
+
+// ── BOSS HUD ──────────────────────────────────────────────────
+function updateBossHUD(){
+  const bar=document.getElementById('bossBar');
+  const fill=document.getElementById('bossHpFill');
+  const name=document.getElementById('bossName');
+  const phase=document.getElementById('bossPhase');
+  if(!G.boss){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  name.textContent=G.boss.name;
+  fill.style.width=(Math.max(0,G.boss.hp/G.boss.maxHp)*100)+'%';
+  const labels=['','PHASE I — SUMMONS','PHASE II — ROUGE-SHIFT','PHASE III — ORGAN THEFT'];
+  phase.textContent=labels[G.bossPhase]||'';
+}
+
+// ── WIN SCREEN ────────────────────────────────────────────────
+function showWinScreen(){
+  const ws=document.getElementById('winScreen');
+  ws.style.display='flex';
+  // Stats
+  const s=document.getElementById('wstats');
+  s.innerHTML=`<span>${G.kills}</span> ENEMIES KILLED<br><span>${G.graftsEquipped}</span> ORGANS GRAFTED<br><span>${G.tilesTransformed}</span> TILES TRANSFORMED<br><span>10</span> FLOORS CLEARED`;
+  // localStorage persistence
+  try {
+    const prev={
+      bestFloor: parseInt(localStorage.getItem('re_bestFloor')||'0'),
+      lifeOrgans: parseInt(localStorage.getItem('re_lifeOrgans')||'0'),
+      lifeTiles:  parseInt(localStorage.getItem('re_lifeTiles')||'0'),
+      runs:       parseInt(localStorage.getItem('re_runs')||'0'),
+    };
+    const newBestFloor=Math.max(prev.bestFloor,G.floor);
+    localStorage.setItem('re_bestFloor',  newBestFloor);
+    localStorage.setItem('re_lifeOrgans', prev.lifeOrgans+G.graftsEquipped);
+    localStorage.setItem('re_lifeTiles',  prev.lifeTiles+G.tilesTransformed);
+    localStorage.setItem('re_runs',       prev.runs+1);
+    const b=document.getElementById('wbest');
+    b.innerHTML=`LIFETIME — ${prev.runs+1} runs | ${prev.lifeOrgans+G.graftsEquipped} organs | ${prev.lifeTiles+G.tilesTransformed} tiles`;
+  } catch(e){}
+}
+
+
+function nextFloor(){
+  G.floor++;
+  if(G.floor>10) return; // run ends at boss kill, not here
+  G.rouge=Math.min(G.maxRouge,G.rouge+45);
+  if(G.floor===10){
+    generateBossArena();
+  } else {
+    generateMap();
+  }
+  spawnEnemies();
+  G.particles=[]; G.projectiles=[]; G.corpses=[]; G.organDrops=[];
+  G.boss=null; G.bossPhase=0;
+  G.secretDropSpawned=false;
+  graftCooldown=0;
+  const label=G.floor===5?'FLOOR 05 — THE AMALGAM':G.floor===10?'FLOOR 10 — SINGULARITY':'FLOOR '+String(G.floor).padStart(2,'0');
+  document.getElementById('floorIndicator').textContent=label;
+  updateBossHUD();
+}
+
+// ── BOSS ARENA (Floor 10 — The Singularity Chamber) ───────────
+function generateBossArena(){
+  G.map=[]; G.sat=[]; G.chasmed={}; G.doored={}; G.genAwake={}; G.ventActive={};
+  for(let r=0;r<ROWS;r++){
+    G.map.push(new Uint8Array(COLS).fill(T.WALL));
+    G.sat.push(new Float32Array(COLS));
+  }
+  // Large open arena with 4-tile border wall
+  for(let r=3;r<ROWS-3;r++)
+    for(let c=3;c<COLS-3;c++)
+      G.map[r][c]=T.FLOOR;
+  // Corner pillars
+  for(const [pr,pc] of [[4,4],[4,COLS-5],[ROWS-5,4],[ROWS-5,COLS-5]]){
+    for(let dr=0;dr<2;dr++) for(let dc=0;dc<2;dc++) G.map[pr+dr][pc+dc]=T.WALL;
+  }
+  G.theme='singularity';
+  G.rooms=[{x:3,y:3,w:COLS-6,h:ROWS-6}];
+  G.secretRoom=null;
+  // Player spawns left-centre; boss will spawn right-centre
+  G.px=5*TILE+TILE/2; G.py=Math.floor(ROWS/2)*TILE;
+  G.floorTransitioning=false;
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+// Theme palettes
+const THEMES = {
+  lab:        { wall:'#3a3d54', floor:'#1e2128', accent:'#4a4e69' },
+  organic:    { wall:'#3a1a1a', floor:'#1a1010', accent:'#6a2a2a' },
+  core:       { wall:'#0e0e1a', floor:'#0a0a12', accent:'#1a1a3a' },
+  singularity:{ wall:'#1a1a1a', floor:'#0d0d10', accent:'#f8f9fa' },
+};
+
+function renderTiles(){
+  const th=THEMES[G.theme]||THEMES.lab;
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const t=G.map[r][c], s=G.sat[r][c];
+      const x=c*TILE, y=r*TILE;
+      ctx.textAlign='center';
+      if(t===T.WALL){
+        // Secret room entry wall: faint gold shimmer to hint at hidden room
+        const isSecretWall = G.secretRoom && c===G.secretRoom.entryC && r===G.secretRoom.entryR;
+        ctx.fillStyle=isSecretWall ? '#1a1500' : th.wall; ctx.fillRect(x,y,TILE,TILE);
+        if(isSecretWall&&s<80){ ctx.fillStyle=`rgba(255,183,3,${0.06+0.08*Math.sin(G.time*2+c)})`; ctx.fillRect(x,y,TILE,TILE); }
+        if(s>0){  ctx.fillStyle=`rgba(186,4,28,${Math.min(s/160,0.6)})`; ctx.fillRect(x,y,TILE,TILE); }
+        if(s>60){ ctx.strokeStyle=`rgba(255,51,51,${(s-60)/80})`; ctx.lineWidth=0.5; ctx.strokeRect(x+1,y+1,TILE-2,TILE-2); }
+        // Singularity: white grid lines on walls
+        if(G.theme==='singularity'){ ctx.strokeStyle='rgba(248,249,250,0.08)'; ctx.lineWidth=0.5; ctx.strokeRect(x,y,TILE,TILE); }
+      } else if(t===T.FLOOR){
+        ctx.fillStyle=th.floor; ctx.fillRect(x,y,TILE,TILE);
+        // Organic: faint living-wall texture pulse
+        if(G.theme==='organic'){ ctx.fillStyle=`rgba(80,10,10,${0.06+0.04*Math.sin(G.time*0.8+r+c)})`; ctx.fillRect(x,y,TILE,TILE); }
+        // Core: glowing red vein lines
+        if(G.theme==='core' && (r+c)%7===0){ ctx.fillStyle='rgba(186,4,28,0.07)'; ctx.fillRect(x,y,TILE,TILE); }
+        // Singularity: white grid
+        if(G.theme==='singularity'){ ctx.strokeStyle='rgba(248,249,250,0.06)'; ctx.lineWidth=0.5; ctx.strokeRect(x,y,TILE,TILE); }
+        if(s>0){  ctx.fillStyle=`rgba(186,4,28,${Math.min(s/120,0.65)})`; ctx.fillRect(x,y,TILE,TILE); }
+        if(s>20){ ctx.fillStyle='rgba(255,80,80,0.09)'; ctx.fillRect(x,y+TILE-3,TILE,3); }
+      } else if(t===T.CHASM){
+        const bridged=G.chasmed[r*1000+c];
+        ctx.fillStyle=bridged?'#240818':C.dark; ctx.fillRect(x,y,TILE,TILE);
+        if(bridged){ ctx.fillStyle='rgba(186,4,28,0.38)'; ctx.fillRect(x,y,TILE,TILE); }
+        else if(s>20){ ctx.fillStyle=`rgba(186,4,28,${s/600})`; ctx.fillRect(x,y,TILE,TILE); }
+        // Chasm inner shadow
+        if(!bridged){ ctx.strokeStyle='rgba(0,0,0,0.5)'; ctx.lineWidth=2; ctx.strokeRect(x+2,y+2,TILE-4,TILE-4); }
+      } else if(t===T.BIODOOR){
+        const open=G.doored[r*1000+c];
+        if(open){ ctx.fillStyle=C.floor; ctx.fillRect(x,y,TILE,TILE); }
+        else{
+          ctx.fillStyle='#100e00'; ctx.fillRect(x,y,TILE,TILE);
+          ctx.fillStyle=C.gold;    ctx.fillRect(x+4,y+4,TILE-8,TILE-8);
+          ctx.fillStyle='#100e00'; ctx.fillRect(x+10,y+10,TILE-20,TILE-20);
+          if(s>25){ ctx.fillStyle=`rgba(255,183,3,${(s-25)/90})`; ctx.fillRect(x,y,TILE,TILE); }
+        }
+      } else if(t===T.EXIT){
+        ctx.fillStyle=C.floor; ctx.fillRect(x,y,TILE,TILE);
+        const pulse=0.45+0.55*Math.sin(G.time*3.5);
+        // Dim exit if boss is alive
+        const exitBlocked = !!G.boss;
+        ctx.fillStyle=exitBlocked?'#2a2a00':C.gold;
+        ctx.globalAlpha=exitBlocked?0.2:(0.35+pulse*0.55);
+        ctx.fillRect(x+5,y+5,TILE-10,TILE-10);
+        ctx.globalAlpha=1;
+        ctx.fillStyle=exitBlocked?'rgba(100,100,0,0.5)':'rgba(0,0,0,0.75)';
+        ctx.font='6px Courier New';
+        ctx.fillText(exitBlocked?'LOCKED':'EXIT',x+TILE/2,y+TILE/2+3);
+
+      } else if(t===T.BIO_GEN){
+        const awake=G.genAwake[r*1000+c];
+        ctx.fillStyle=C.floor; ctx.fillRect(x,y,TILE,TILE);
+        // Pulsing ring — gold when dormant, red when awake
+        const gp=0.4+0.6*Math.sin(G.time*(awake?6:2));
+        ctx.strokeStyle=awake?C.rouge:C.gold;
+        ctx.lineWidth=2; ctx.globalAlpha=0.4+gp*0.5;
+        ctx.beginPath(); ctx.arc(x+TILE/2,y+TILE/2,11,0,Math.PI*2); ctx.stroke();
+        ctx.globalAlpha=1;
+        // Core dot
+        ctx.fillStyle=awake?C.bright:C.gold;
+        ctx.beginPath(); ctx.arc(x+TILE/2,y+TILE/2,4,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(0,0,0,0.8)'; ctx.font='6px Courier New';
+        ctx.fillText(awake?'SPENT':'GEN',x+TILE/2,y+TILE-5);
+
+      } else if(t===T.CORPSE_PIT){
+        ctx.fillStyle='#1a0d0d'; ctx.fillRect(x,y,TILE,TILE);
+        // Dark pool with slow rouge shimmer
+        const cp=0.3+0.2*Math.sin(G.time*1.2+c+r);
+        ctx.fillStyle=`rgba(186,4,28,${cp})`; ctx.fillRect(x+3,y+3,TILE-6,TILE-6);
+        ctx.strokeStyle='#3a0a10'; ctx.lineWidth=1;
+        ctx.strokeRect(x+1,y+1,TILE-2,TILE-2);
+        ctx.fillStyle='rgba(255,51,51,0.3)'; ctx.font='7px Courier New';
+        ctx.fillText('POOL',x+TILE/2,y+TILE/2+3);
+
+      } else if(t===T.SPORE_VENT){
+        const active=G.ventActive[r*1000+c];
+        ctx.fillStyle=C.floor; ctx.fillRect(x,y,TILE,TILE);
+        // Vent grate
+        ctx.strokeStyle=active?'#6aaa44':'#2a3a2a'; ctx.lineWidth=1;
+        for(let gi=1;gi<4;gi++){
+          ctx.beginPath(); ctx.moveTo(x+gi*10,y+2); ctx.lineTo(x+gi*10,y+TILE-2); ctx.stroke();
+        }
+        // Spore puff when active
+        if(active){
+          const sp=0.3+0.3*Math.sin(G.time*4+c);
+          ctx.fillStyle=`rgba(106,170,68,${sp})`; ctx.globalAlpha=0.7;
+          ctx.beginPath(); ctx.arc(x+TILE/2,y+TILE/2,8+sp*4,0,Math.PI*2); ctx.fill();
+          ctx.globalAlpha=1;
+        }
+        ctx.fillStyle=active?'#6aaa44':'#2a3a2a'; ctx.font='6px Courier New';
+        ctx.fillText('VENT',x+TILE/2,y+TILE-5);
+      }
+    }
+  }
+}
+
+function renderEnemies(){
+  for(const e of G.enemies){
+    // Drop shadow
+    ctx.fillStyle='rgba(0,0,0,0.28)';
+    ctx.beginPath(); ctx.ellipse(e.x,e.y+e.sz,e.sz*0.9,e.sz*0.28,0,0,Math.PI*2); ctx.fill();
+    // Body
+    ctx.fillStyle=e.col; ctx.beginPath(); ctx.arc(e.x,e.y,e.sz,0,Math.PI*2); ctx.fill();
+    // Elite: gold pulsing ring
+    if(e.elite){
+      const ep=0.5+0.5*Math.sin(G.time*4+e.x);
+      ctx.strokeStyle=C.gold; ctx.lineWidth=1.5; ctx.globalAlpha=0.4+ep*0.5;
+      ctx.beginPath(); ctx.arc(e.x,e.y,e.sz+4,0,Math.PI*2); ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+    // Revenant teleport wind-up
+    if(e.type==='revenant'&&e.teleT>0){
+      ctx.strokeStyle='#8a0a5a'; ctx.lineWidth=2; ctx.globalAlpha=e.teleT/0.3;
+      ctx.beginPath(); ctx.arc(e.x,e.y,e.sz+8,0,Math.PI*2); ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+    // Leech latch indicator when on player
+    if(e.leech&&Math.hypot(e.x-G.px,e.y-G.py)<e.sz+G.psize+4){
+      ctx.strokeStyle='#4a1a3a'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(e.x,e.y); ctx.lineTo(G.px,G.py); ctx.stroke();
+    }
+    // Charger wind-up pulse
+    if(e.type==='charger'&&!e.charging&&e.chargeWait<=0.5){
+      ctx.strokeStyle=C.gold; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(e.x,e.y,e.sz+3,0,Math.PI*2); ctx.stroke();
+    }
+    // HP bar
+    const hf=e.hp/e.maxHp;
+    ctx.fillStyle='#0d0d10';  ctx.fillRect(e.x-e.sz,e.y-e.sz-8,e.sz*2,3);
+    ctx.fillStyle=hf>0.5?'#2a6a2a':'#ba041c'; ctx.fillRect(e.x-e.sz,e.y-e.sz-8,e.sz*2*hf,3);
+    // Name
+    ctx.fillStyle='rgba(180,180,200,0.4)'; ctx.font='6px Courier New'; ctx.textAlign='center';
+    ctx.fillText(e.name,e.x,e.y+e.sz+10);
+  }
+}
+
+function renderPlayer(){
+  const px=G.px, py=G.py, rf=G.rouge/G.maxRouge;
+
+  // Primary graft arm extension
+  if(G.grafts[0]){
+    const o=ORGANS[G.grafts[0]];
+    const df=Math.max(0,G.graftDecay[0]/o.decay);
+    const gc=df>0.35?o.col : df>0.15?C.necro : '#1a0606';
+    const angle=Math.atan2(G.my-py,G.mx-px);
+    ctx.save(); ctx.translate(px,py); ctx.rotate(angle);
+    if(df<0.35&&G.ticks%8<4) ctx.globalAlpha=0.4;
+    ctx.fillStyle=gc;
+    ctx.fillRect(10,-4,22,8);
+    ctx.fillStyle=df>0.35?C.bright : C.necro;
+    ctx.fillRect(30,-2,6,4);
+    ctx.globalAlpha=1; ctx.restore();
+  }
+  // Secondary graft (back bulge)
+  if(G.grafts[1]){
+    const o=ORGANS[G.grafts[1]];
+    const df=Math.max(0,G.graftDecay[1]/o.decay);
+    ctx.fillStyle=df>0.35?o.col : C.necro;
+    if(df<0.35&&G.ticks%8<4) ctx.globalAlpha=0.4;
+    ctx.beginPath(); ctx.arc(px-10,py,5,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+
+  // Mech body
+  const mc=rf>0.6?C.white : rf>0.3?'#b0b0c8' : '#707085';
+  ctx.fillStyle=mc; ctx.beginPath(); ctx.arc(px,py,G.psize,0,Math.PI*2); ctx.fill();
+
+  // Rouge ring arc
+  ctx.strokeStyle=rf>0.6?C.rouge : rf>0.3?'#ff5555' : C.bright;
+  ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.arc(px,py,G.psize+3,-Math.PI/2,-Math.PI/2+rf*Math.PI*2); ctx.stroke();
+
+  // Chassis cracks at low rouge
+  if(rf<0.6){
+    ctx.strokeStyle=`rgba(186,4,28,${Math.min(0.9,(0.9-rf)*1.5)})`;
+    ctx.lineWidth=0.5;
+    for(let k=0;k<4;k++){
+      const a=(k/4)*Math.PI*2+G.time*0.5;
+      ctx.beginPath();
+      ctx.moveTo(px+Math.cos(a)*4,py+Math.sin(a)*4);
+      ctx.lineTo(px+Math.cos(a)*G.psize,py+Math.sin(a)*G.psize);
+      ctx.stroke();
+    }
+  }
+  // Critical strobe ring
+  if(rf<0.15&&G.ticks%10<5){
+    ctx.strokeStyle=C.bright; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(px,py,G.psize+7,0,Math.PI*2); ctx.stroke();
+  }
+  // iframes flash (visual feedback that you're invincible)
+  if(G.iframes>0&&G.ticks%6<3){
+    ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(px,py,G.psize+4,0,Math.PI*2); ctx.stroke();
+  }
+}
+
+function renderOrganDrops(){
+  for(const d of G.organDrops){
+    const o=ORGANS[d.org];
+    const pulse=0.5+0.5*Math.sin(G.time*8+d.id*10);
+    // Glow base
+    ctx.fillStyle=o?o.col:C.gold; ctx.globalAlpha=0.55+pulse*0.4;
+    ctx.beginPath(); ctx.arc(d.x,d.y,9,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+    // Icon
+    ctx.fillStyle=C.white; ctx.font='12px serif'; ctx.textAlign='center';
+    ctx.fillText(o?o.icon:'?',d.x,d.y+4);
+    // Countdown ring
+    const frac=d.timer/(d.maxTimer||4.0);
+    ctx.strokeStyle=frac>0.5?C.gold:'#ff9900'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(d.x,d.y,13,-Math.PI/2,-Math.PI/2+frac*Math.PI*2); ctx.stroke();
+    // Name label above
+    ctx.fillStyle=`rgba(255,183,3,${0.6+pulse*0.3})`; ctx.font='7px Courier New';
+    ctx.fillText(o?o.name.split('-')[0].toUpperCase():'ORG',d.x,d.y-16);
+  }
+}
+
+function renderParticles(){
+  for(const p of G.particles){
+    ctx.fillStyle=p.col;
+    ctx.globalAlpha=Math.max(0,p.life);
+    ctx.fillRect(p.x-p.sz/2,p.y-p.sz/2,p.sz,p.sz);
+  }
+  ctx.globalAlpha=1;
+}
+
+function renderProjectiles(){
+  for(const p of G.projectiles){
+    ctx.fillStyle=p.col; ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=p.col; ctx.globalAlpha=0.22;
+    ctx.beginPath(); ctx.arc(p.x-p.vx*0.02,p.y-p.vy*0.02,2,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+}
+
+// ── MINIMAP RENDERER ─────────────────────────────────────────
+const mmCtx = mmCanvas.getContext('2d');
+
+function renderMinimap(){
+  if(!G.map||!G.map.length) return;
+  mmCtx.clearRect(0,0,mmCanvas.width,mmCanvas.height);
+
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const t=G.map[r][c], s=G.sat[r][c];
+      const x=c*MM_TILE, y=r*MM_TILE;
+      const k=r*1000+c;
+
+      // Base tile colour
+      if(t===T.WALL){
+        // Walls lighten as saturation builds — foreshadowing dissolution
+        const wb=Math.floor(58+s*0.4);
+        mmCtx.fillStyle=`rgb(${wb},${Math.floor(wb*0.95)},${Math.floor(wb*1.05)})`;
+      } else if(t===T.FLOOR){
+        mmCtx.fillStyle='#2a2d35';
+      } else if(t===T.CHASM){
+        mmCtx.fillStyle=G.chasmed[k]?'#3a1020':'#0a0a0e';
+      } else if(t===T.BIODOOR){
+        mmCtx.fillStyle=G.doored[k]?'#2a2d35':'#3a3000';
+      } else if(t===T.EXIT){
+        mmCtx.fillStyle=G.boss?'#1a1a00':'#5a4800';
+      } else if(t===T.BIO_GEN){
+        mmCtx.fillStyle=G.genAwake[k]?'#3a0a0a':'#3a3000';
+      } else if(t===T.CORPSE_PIT){
+        mmCtx.fillStyle='#3a0d10';
+      } else if(t===T.SPORE_VENT){
+        mmCtx.fillStyle=G.ventActive[k]?'#1a2a10':'#161e10';
+      } else {
+        mmCtx.fillStyle='#111116';
+      }
+      mmCtx.fillRect(x,y,MM_TILE,MM_TILE);
+
+      // Saturation rouge overlay on passable tiles
+      if(t!==T.WALL && s>5){
+        mmCtx.fillStyle=`rgba(186,4,28,${Math.min(s/100,0.75)})`;
+        mmCtx.fillRect(x,y,MM_TILE,MM_TILE);
+      }
+
+      // Special tile accent pixels (1px dot in corner)
+      if(t===T.EXIT){
+        const pulse=G.ticks%20<10;
+        mmCtx.fillStyle=pulse?'#ffb703':'#7a6000';
+        mmCtx.fillRect(x+1,y+1,1,1);
+      } else if(t===T.BIO_GEN && !G.genAwake[k]){
+        mmCtx.fillStyle='#ffb703';
+        mmCtx.fillRect(x+1,y+1,1,1);
+      } else if(t===T.SPORE_VENT && G.ventActive[k]){
+        mmCtx.fillStyle='#6aaa44';
+        mmCtx.fillRect(x+1,y+1,1,1);
+      } else if(t===T.CORPSE_PIT){
+        mmCtx.fillStyle='#ff3333';
+        mmCtx.fillRect(x+1,y+1,1,1);
+      }
+    }
+  }
+
+  // Enemy dots — gold for elites, red for standard
+  const hasNeuronMM=(G.grafts&&(G.grafts[0]==='ORG-09'||G.grafts[1]==='ORG-09'));
+  for(const e of G.enemies){
+    const ex=Math.floor(e.x/TILE)*MM_TILE+1;
+    const ey=Math.floor(e.y/TILE)*MM_TILE+1;
+    mmCtx.fillStyle=e.elite?C.gold:'rgba(186,4,28,0.7)';
+    mmCtx.fillRect(ex,ey,e.elite?2:1,e.elite?2:1);
+  }
+
+  // Player dot — white, blinks at critical rouge
+  const rf=G.rouge/G.maxRouge;
+  const playerVisible = rf>0.15 || G.ticks%10<7;
+  if(playerVisible){
+    const ppx=Math.floor(G.px/TILE)*MM_TILE;
+    const ppy=Math.floor(G.py/TILE)*MM_TILE;
+    mmCtx.fillStyle=rf>0.3?'#f0f0f8':'#ff3333';
+    mmCtx.fillRect(ppx,ppy,MM_TILE,MM_TILE);
+  }
+}
+
+function renderBoss(){
+  const b=G.boss; if(!b) return;
+  const hf=b.hp/b.maxHp;
+  // Drop shadow
+  ctx.fillStyle='rgba(0,0,0,0.35)';
+  ctx.beginPath(); ctx.ellipse(b.x,b.y+b.sz,b.sz*1.1,b.sz*0.3,0,0,Math.PI*2); ctx.fill();
+
+  if(b.type==='amalgam'){
+    // Tentacles
+    for(const t of b.tentacles){
+      t.ang+=0.6*(G.ticks%2===0?1:-1)*0.016;
+      t.pulse+=2.2*0.016;
+      const tl=t.len*(0.85+0.15*Math.sin(t.pulse));
+      ctx.strokeStyle=hf>0.5?'#8a1a1a':'#3a0a0a'; ctx.lineWidth=3+2*Math.sin(t.pulse);
+      ctx.beginPath();
+      ctx.moveTo(b.x,b.y);
+      ctx.quadraticCurveTo(
+        b.x+Math.cos(t.ang+0.5)*tl*0.6, b.y+Math.sin(t.ang+0.5)*tl*0.6,
+        b.x+Math.cos(t.ang)*tl,          b.y+Math.sin(t.ang)*tl
+      );
+      ctx.stroke();
+    }
+    // Core body — pulsing mass
+    const pulse=0.9+0.1*Math.sin(G.time*4);
+    ctx.fillStyle=hf>0.5?'#6a1a1a':'#3a0505';
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.sz*pulse,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=hf>0.5?C.rouge:C.necro; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.sz*pulse+3,0,Math.PI*2); ctx.stroke();
+    // Phase 2: shedding particles
+    if(b.phase===2 && G.ticks%8<4){
+      ctx.strokeStyle=C.bright; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.arc(b.x,b.y,b.sz+10,0,Math.PI*2); ctx.stroke();
+    }
+
+  } else if(b.type==='sovereign'){
+    // Rotating arm extensions
+    for(let i=0;i<b.armAngs.length;i++){
+      const a=b.armAngs[i];
+      const al=b.sz+18+(b.phase-1)*8;
+      ctx.save(); ctx.translate(b.x,b.y); ctx.rotate(a);
+      // Arm rod
+      ctx.strokeStyle=hf>0.7?C.iron:hf>0.4?'#6a0a0a':C.rouge;
+      ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(al,0); ctx.stroke();
+      // Stolen organ icon at arm tip in phase 3
+      if(b.phase===3 && b.stolenOrgs[i]){
+        const so=ORGANS[b.stolenOrgs[i]];
+        ctx.fillStyle=so?.col||C.rouge;
+        ctx.beginPath(); ctx.arc(al,0,5,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=C.white; ctx.font='8px serif'; ctx.textAlign='center';
+        ctx.fillText(so?.icon||'?',al,3);
+      } else {
+        ctx.fillStyle=hf>0.4?C.iron:C.rouge;
+        ctx.beginPath(); ctx.arc(al,0,4,0,Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+    }
+    // Core body — angular, mechanical
+    const phase3Glow=b.phase===3&&G.ticks%6<3;
+    ctx.fillStyle=phase3Glow?'#3a0000':hf>0.7?'#2a2a3a':hf>0.4?'#3a1a1a':'#1a0000';
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.sz,0,Math.PI*2); ctx.fill();
+    // Outer ring
+    ctx.strokeStyle=b.phase===3?C.bright:b.phase===2?'#8a0a5a':C.iron;
+    ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.sz+5,0,Math.PI*2); ctx.stroke();
+    // Inner eye
+    ctx.fillStyle=b.phase===3?C.bright:C.rouge;
+    ctx.beginPath(); ctx.arc(b.x,b.y,8,0,Math.PI*2); ctx.fill();
+  }
+
+  // HP bar above boss
+  const bw=b.sz*3;
+  ctx.fillStyle='#0d0d10'; ctx.fillRect(b.x-bw,b.y-b.sz-16,bw*2,5);
+  ctx.fillStyle=hf>0.5?C.rouge:hf>0.25?'#ff5500':C.bright;
+  ctx.fillRect(b.x-bw,b.y-b.sz-16,bw*2*hf,5);
+  ctx.fillStyle='rgba(180,180,200,0.5)'; ctx.font='7px Courier New'; ctx.textAlign='center';
+  ctx.fillText(b.name,b.x,b.y-b.sz-20);
+}
+
+
+function render(){
+  // Screen shake
+  let sx=0, sy=0;
+  if(G.shakeMag>0){
+    sx=(Math.random()-0.5)*G.shakeMag*2.5;
+    sy=(Math.random()-0.5)*G.shakeMag*2.5;
+    G.shakeMag*=0.72;
+    if(G.shakeMag<0.2) G.shakeMag=0;
+  }
+  ctx.save(); ctx.translate(sx,sy);
+  ctx.fillStyle=C.void; ctx.fillRect(-8,-8,W+16,H+16);
+  renderTiles();
+  renderParticles();
+  renderProjectiles();
+  renderOrganDrops();
+  renderEnemies();
+  if(G.boss) renderBoss();
+  renderPlayer();
+  ctx.restore();
+  renderMinimap();
+}
+
+// ── HUD ───────────────────────────────────────────────────────
+function updateHUD(drain){
+  const rf=G.rouge/G.maxRouge;
+  document.getElementById('rougeFill').style.height=(rf*100)+'%';
+  document.getElementById('rougeNum').textContent=Math.ceil(G.rouge);
+  document.getElementById('rougeFill').className=rf<0.3?'pulse':'';
+  document.getElementById('drainRate').textContent=drain.toFixed(1)+'/s';
+  document.getElementById('killCount').textContent=G.kills+' KILLS';
+
+  const v=document.getElementById('vignette');
+  v.className=rf<0.15?'crit':rf<0.3?'warn':'';
+
+  // Boss bar — update every frame for smooth HP
+  updateBossHUD();
+
+  // Graft slots
+  for(let i=0;i<2;i++){
+    const el=document.getElementById('slot'+i);
+    const id=G.grafts[i], o=id?ORGANS[id]:null;
+    if(!o){
+      el.className='graftSlot empty';
+      el.querySelector('.gIcon').textContent='⬡';
+      el.querySelector('.gName').textContent=i===0?'PRIMARY':'SECONDARY';
+      el.querySelector('.gDesc').textContent='';
+      el.querySelector('.decayBar').style.width='0%';
+      el.style.borderColor='';
+    } else {
+      const df=Math.max(0,G.graftDecay[i]/o.decay);
+      el.className='graftSlot';
+      el.querySelector('.gIcon').textContent=o.icon;
+      el.querySelector('.gName').textContent=o.name.split('-')[0].toUpperCase();
+      el.querySelector('.gDesc').textContent=o.desc;
+      const db=el.querySelector('.decayBar');
+      db.style.width=(df*100)+'%';
+      db.style.background=df>0.35?'#ba041c':df>0.15?'#4f121a':'#1a0606';
+      el.style.borderColor=df>0.35?'#ba041c':df>0.15?'#3a0606':'#1a0404';
+      // Flicker at low decay
+      el.style.opacity=df<0.35&&G.ticks%8<4?'0.5':'1';
+    }
+  }
+
+  // Pickup hint — show above player when near an organ drop
+  const hint=document.getElementById('pickupHint');
+  let nearest=null, nd=50;
+  for(const d of G.organDrops){
+    const dist=Math.hypot(G.px-d.x,G.py-d.y);
+    if(dist<nd){ nd=dist; nearest=d; }
+  }
+  if(nearest&&graftCooldown<=0){
+    const o=ORGANS[nearest.org];
+    const canvasRect=canvas.getBoundingClientRect();
+    const scaleX=canvasRect.width/W, scaleY=canvasRect.height/H;
+    hint.style.display='block';
+    hint.style.left=(canvasRect.left+G.px*scaleX)+'px';
+    hint.style.top=(canvasRect.top+G.py*scaleY-40)+'px';
+    hint.textContent=(o?o.name:'ORG')+' — WALK OVER';
+  } else {
+    hint.style.display='none';
+  }
+
+  // Debug iframes
+  document.getElementById('iframes').textContent=G.iframes>0?`I-FRAMES ${G.iframes.toFixed(2)}s`:'';
+}
+
+// ── SYNERGY HUD ───────────────────────────────────────────────
+function updateSynergyHUD(){
+  const badge=document.getElementById('sBadge');
+  if(!badge) return;
+  const syn=activeSynLabel();
+  if(syn){
+    badge.style.display='block';
+    badge.textContent=syn.label+'\n'+syn.desc;
+    badge.style.whiteSpace='pre';
+  } else {
+    badge.style.display='none';
+  }
+}
+
+
+function initAudio(){ try{ audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+
+function playSound(type){
+  if(!audioCtx) return;
+  try{
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    const t=audioCtx.currentTime;
+    if(type==='kill'){
+      o.type='sawtooth';
+      o.frequency.setValueAtTime(240,t); o.frequency.exponentialRampToValueAtTime(35,t+0.2);
+      g.gain.setValueAtTime(0.35,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+      o.start(t); o.stop(t+0.2);
+    } else if(type==='attack'){
+      o.type='square';
+      o.frequency.setValueAtTime(400,t); o.frequency.exponentialRampToValueAtTime(160,t+0.07);
+      g.gain.setValueAtTime(0.1,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+      o.start(t); o.stop(t+0.07);
+    } else if(type==='graft'){
+      // Wet organic slam
+      o.type='sine';
+      o.frequency.setValueAtTime(60,t); o.frequency.linearRampToValueAtTime(520,t+0.18);
+      g.gain.setValueAtTime(0.55,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.32);
+      o.start(t); o.stop(t+0.32);
+    } else if(type==='decay'){
+      o.type='sawtooth';
+      o.frequency.setValueAtTime(380,t); o.frequency.exponentialRampToValueAtTime(18,t+0.55);
+      g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.55);
+      o.start(t); o.stop(t+0.55);
+    } else if(type==='hb'){
+      o.type='sine';
+      o.frequency.setValueAtTime(58,t); o.frequency.exponentialRampToValueAtTime(22,t+0.14);
+      g.gain.setValueAtTime(0.48,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+      o.start(t); o.stop(t+0.18);
+    } else if(type==='spore'){
+      o.type='sine';
+      o.frequency.setValueAtTime(180,t); o.frequency.exponentialRampToValueAtTime(60,t+0.3);
+      g.gain.setValueAtTime(0.18,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+      o.start(t); o.stop(t+0.3);
+    }
+  }catch(e){}
+}
+
+// ── GAME LOOP ─────────────────────────────────────────────────
+let lastTs=0;
+function loop(ts){
+  if(!G.running) return;
+  // dt in SECONDS, capped at 50ms to prevent spiral-of-death on tab switch
+  const dt=Math.min((ts-lastTs)/1000, 0.05);
+  lastTs=ts;
+  G.time+=dt; G.ticks++;
+
+  updatePlayer(dt);
+  updateEnemies(dt);
+  updateParticles(dt);
+  updateProjectiles(dt);
+  if(G.boss){ if(G.boss.type==='amalgam') updateAmalgam(dt); else updateSovereignCore(dt); }
+
+  // Organ drop timer
+  for(let i=G.organDrops.length-1;i>=0;i--){
+    G.organDrops[i].timer-=dt;
+    if(G.organDrops[i].timer<=0) G.organDrops.splice(i,1);
+  }
+
+  const drain=updateDrain(dt);
+
+  // Heartbeat audio
+  G.hbTimer-=dt;
+  if(G.hbTimer<=0){
+    const rf=G.rouge/G.maxRouge;
+    G.hbTimer=rf<0.15?0.35 : rf<0.3?0.65 : 2.0;
+    if(rf<0.3) playSound('hb');
+  }
+
+  render();
+  updateHUD(drain);
+
+  // Death
+  if(G.rouge<=0){
+    G.running=false;
+    // Save persistent stats on death
+    try {
+      const prev={ bestFloor:parseInt(localStorage.getItem('re_bestFloor')||'0'), lifeOrgans:parseInt(localStorage.getItem('re_lifeOrgans')||'0'), lifeTiles:parseInt(localStorage.getItem('re_lifeTiles')||'0'), runs:parseInt(localStorage.getItem('re_runs')||'0') };
+      localStorage.setItem('re_bestFloor', Math.max(prev.bestFloor,G.floor));
+      localStorage.setItem('re_lifeOrgans',prev.lifeOrgans+G.graftsEquipped);
+      localStorage.setItem('re_lifeTiles', prev.lifeTiles+G.tilesTransformed);
+      localStorage.setItem('re_runs',      prev.runs+1);
+    } catch(e){}
+    document.getElementById('deathScreen').style.display='flex';
+    document.getElementById('dstats').innerHTML=
+      `FLOOR ${G.floor}<br>${G.kills} ENEMIES KILLED<br>`+
+      `${G.graftsEquipped} ORGANS GRAFTED<br>${G.tilesTransformed} TILES TRANSFORMED`;
+    return;
+  }
+  requestAnimationFrame(loop);
+}
+
+// ── INPUT ─────────────────────────────────────────────────────
+function setupInput(){
+  if(inputBound) return; // prevent stacking on restart
+  inputBound=true;
+
+  window.addEventListener('keydown',e=>{
+    G.keys[e.key]=true;
+    if(['w','s','a','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))
+      e.preventDefault();
+  });
+  window.addEventListener('keyup',e=>{ G.keys[e.key]=false; });
+
+  canvas.addEventListener('mousemove',e=>{
+    const r=canvas.getBoundingClientRect();
+    G.mx=(e.clientX-r.left)*(W/r.width);
+    G.my=(e.clientY-r.top)*(H/r.height);
+  });
+  canvas.addEventListener('click',e=>{
+    if(!G.running) return;
+    const r=canvas.getBoundingClientRect();
+    G.mx=(e.clientX-r.left)*(W/r.width);
+    G.my=(e.clientY-r.top)*(H/r.height);
+    playerAttack();
+  });
+  canvas.addEventListener('contextmenu',e=>{ e.preventDefault(); if(G.running) playerAttack(); });
+}
+
+// ── RESIZE ────────────────────────────────────────────────────
+function resize(){
+  const sw=window.innerWidth, sh=window.innerHeight;
+  const sc=Math.min(sw/W, sh/H);
+  canvas.width=W; canvas.height=H;
+  canvas.style.width=(W*sc)+'px'; canvas.style.height=(H*sc)+'px';
+  canvas.style.position='fixed';
+  canvas.style.left=((sw-W*sc)/2)+'px';
+  canvas.style.top=((sh-H*sc)/2)+'px';
+}
+window.addEventListener('resize',resize); resize();
+
+// ── BOOT ──────────────────────────────────────────────────────
+function startGame(){
+  document.getElementById('titleScreen').style.display='none';
+  initAudio();
+  launch();
+}
+function restartGame(){
+  document.getElementById('deathScreen').style.display='none';
+  document.getElementById('winScreen').style.display='none';
+  launch();
+}
+function launch(){
+  initState();
+  generateMap();
+  spawnEnemies();
+  setupInput();
+  updateSynergyHUD();
+  updateBossHUD();
+  const label=G.floor===5?'FLOOR 05 — THE AMALGAM':G.floor===10?'FLOOR 10 — SINGULARITY':'FLOOR '+String(G.floor).padStart(2,'0');
+  document.getElementById('floorIndicator').textContent=label;
+  G.running=true;
+  lastTs=performance.now();
+  requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>

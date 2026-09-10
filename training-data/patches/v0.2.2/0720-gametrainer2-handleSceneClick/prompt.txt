@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+Module/function: handleSceneClick  (from gametrainer2)

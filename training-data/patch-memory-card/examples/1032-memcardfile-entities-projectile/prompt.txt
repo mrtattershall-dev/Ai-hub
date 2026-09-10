@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/entities/projectile.js: * projectile.js — lightweight bullets for the player's burst and turret fire.

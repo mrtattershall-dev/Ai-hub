@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+makeHitbox (from js/systems/combat.js)

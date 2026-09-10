@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grip Tape & Graduation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0f; overflow: hidden; font-family: 'Courier New', monospace; }
+  #canvas { display: block; width: 100vw; height: 100vh; }
+
+  #hud { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+
+  #stats { position: absolute; top: 20px; left: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .stat-row { display: flex; align-items: center; gap: 8px; }
+  .stat-label { color: #aaa; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; width: 80px; }
+  .stat-bar { width: 120px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .stat-fill { height: 100%; border-radius: 2px; transition: width 0.3s ease; }
+  .stat-val { color: #fff; font-size: 11px; width: 28px; text-align: right; }
+  #stat-academics .stat-fill { background: #4fc3f7; }
+  #stat-clout .stat-fill { background: #f06292; }
+  #stat-skate .stat-fill { background: #aed581; }
+
+  #flow-section { position: absolute; top: 20px; right: 20px; text-align: right; }
+  #flow-label { color: #aaa; font-size: 11px; letter-spacing: 3px; margin-bottom: 6px; }
+  #flow-bar-wrap { width: 160px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin-left: auto; }
+  #flow-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #ff6d00, #ffd600); border-radius: 3px; transition: width 0.2s ease; }
+  #flow-state-text { color: #ffd600; font-size: 13px; font-weight: bold; letter-spacing: 2px; margin-top: 6px; opacity: 0; transition: opacity 0.3s; }
+
+  #bottom-hud { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); text-align: center; min-width: 300px; }
+  #trick-display { color: #fff; font-size: 24px; font-weight: bold; letter-spacing: 3px; text-shadow: 0 0 20px #ffd600; min-height: 34px; margin-bottom: 6px; opacity: 0; transition: opacity 0.4s; }
+  #combo-score { color: #ffd600; font-size: 15px; letter-spacing: 2px; min-height: 22px; }
+  #speed-display { color: #555; font-size: 11px; letter-spacing: 2px; margin-top: 6px; }
+
+  #bruise-section { position: absolute; bottom: 30px; left: 20px; }
+  #bruise-label { color: #aaa; font-size: 10px; letter-spacing: 2px; margin-bottom: 5px; }
+  #bruise-bar { width: 100px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  #bruise-fill { height: 100%; width: 0%; background: #ef5350; border-radius: 2px; transition: width 0.4s ease; }
+
+  /* Grind indicator */
+  #grind-indicator { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); color: #ff9800; font-size: 13px; letter-spacing: 3px; opacity: 0; transition: opacity 0.2s; }
+
+  /* Bell / clock */
+  #clock-section { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); text-align: center; }
+  #period-label { color: #555; font-size: 10px; letter-spacing: 3px; margin-bottom: 3px; }
+  #clock-display { color: #888; font-size: 18px; letter-spacing: 4px; }
+  #bell-flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,200,0,0.18); pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 19; }
+  #bell-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #ffd600; font-size: 28px; font-weight: bold; letter-spacing: 4px; opacity: 0; transition: opacity 0.4s; pointer-events: none; text-shadow: 0 0 30px #ffd600; text-align: center; }
+
+  /* Guard alert */
+  #guard-alert { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); color: #ef5350; font-size: 13px; letter-spacing: 3px; opacity: 0; transition: opacity 0.3s; }
+
+  /* SkateGram panel */
+  #skategram-panel {
+    position: absolute; bottom: 30px; right: 20px;
+    width: 200px; background: rgba(10,10,15,0.92);
+    border: 1px solid #222; border-radius: 4px; overflow: hidden;
+    pointer-events: all;
+  }
+  #sg-header { background: #111; padding: 8px 12px; font-size: 10px; letter-spacing: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; }
+  #sg-header span { color: #f06292; }
+  #sg-feed { padding: 8px; max-height: 120px; overflow: hidden; }
+  .sg-post { font-size: 10px; color: #444; line-height: 1.6; padding: 3px 0; border-bottom: 1px solid #1a1a1a; }
+  .sg-post.new { color: #aaa; animation: sgfade 3s forwards; }
+  @keyframes sgfade { 0%{color:#fff} 100%{color:#555} }
+  #sg-upload-btn { width: 100%; background: none; border: none; border-top: 1px solid #1a1a1a; color: #444; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; padding: 8px; cursor: pointer; transition: color 0.2s; }
+  #sg-upload-btn:hover { color: #f06292; }
+  #sg-upload-btn:disabled { color: #222; cursor: default; }
+
+  #controls { position: absolute; bottom: 180px; right: 20px; color: #333; font-size: 10px; letter-spacing: 1px; line-height: 2.0; text-align: right; }
+
+  #location { position: absolute; top: 58px; left: 50%; transform: translateX(-50%); color: #333; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; }
+
+  #bail-flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(239,83,80,0.35); pointer-events: none; opacity: 0; transition: opacity 0.1s; z-index: 20; }
+  #flow-vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at center, transparent 60%, rgba(255,214,0,0.08) 100%); transition: opacity 0.5s; z-index: 9; }
+
+  #minimap { position: absolute; bottom: 200px; left: 20px; width: 90px; height: 90px; border: 1px solid #1a1a1a; border-radius: 50%; overflow: hidden; background: rgba(0,0,0,0.6); opacity: 0.8; }
+  #minimap canvas { width: 100%; height: 100%; }
+
+  /* Notification toasts */
+  #toast-stack { position: absolute; top: 120px; left: 20px; display: flex; flex-direction: column; gap: 6px; }
+  .toast { background: rgba(10,10,15,0.9); border-left: 2px solid #ffd600; padding: 6px 10px; font-size: 10px; letter-spacing: 1px; color: #888; animation: toastin 0.3s ease, toastout 0.4s ease 2.6s forwards; max-width: 200px; }
+  .toast.danger { border-left-color: #ef5350; }
+  .toast.success { border-left-color: #aed581; }
+  @keyframes toastin { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes toastout { from{opacity:1} to{opacity:0} }
+
+  /* Intro */
+  #intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0f; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 1s ease; }
+  #intro h1 { color: #fff; font-size: 42px; font-weight: 900; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 8px; }
+  #intro h1 span { color: #ffd600; }
+  #intro p { color: #555; font-size: 13px; letter-spacing: 3px; margin-bottom: 40px; }
+  #faction-select { display: flex; gap: 16px; margin-bottom: 40px; }
+  .faction-btn { background: none; border: 1px solid #333; color: #555; padding: 10px 20px; font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; pointer-events: all; }
+  .faction-btn.selected { border-color: #ffd600; color: #ffd600; }
+  .faction-btn:hover { border-color: #888; color: #aaa; }
+  #intro-btn { background: none; border: 1px solid #333; color: #aaa; padding: 12px 32px; font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 3px; cursor: pointer; transition: all 0.2s; pointer-events: all; }
+  #intro-btn:hover { border-color: #ffd600; color: #ffd600; }
+  .faction-desc { color: #333; font-size: 10px; letter-spacing: 1px; margin-bottom: 20px; text-align: center; max-width: 360px; line-height: 1.8; }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="bail-flash"></div>
+<div id="bell-flash"></div>
+<div id="flow-vignette"></div>
+
+<div id="intro">
+  <h1>GRIP TAPE <span>&</span> GRADUATION</h1>
+  <p>OAKHAVEN CITY — JUNIOR YEAR</p>
+  <div id="faction-select">
+    <button class="faction-btn selected" data-faction="gutter">GUTTER PUNKS</button>
+    <button class="faction-btn" data-faction="syndicate">THE SYNDICATE</button>
+    <button class="faction-btn" data-faction="vertigo">VERTIGO CREW</button>
+  </div>
+  <div class="faction-desc" id="faction-desc">DIY purists. Anti-establishment. Hidden spots, custom grip, real respect.</div>
+  <button id="intro-btn">DROP IN →</button>
+</div>
+
+<div id="hud">
+  <div id="clock-section">
+    <div id="period-label">PERIOD 3 — FREE PERIOD</div>
+    <div id="clock-display">12:00</div>
+  </div>
+  <div id="bell-msg"></div>
+  <div id="location">Westbridge High — Plaza</div>
+
+  <div id="stats">
+    <div class="stat-row" id="stat-academics">
+      <span class="stat-label">Academics</span>
+      <div class="stat-bar"><div class="stat-fill" id="fill-academics" style="width:65%"></div></div>
+      <span class="stat-val" id="val-academics">65</span>
+    </div>
+    <div class="stat-row" id="stat-clout">
+      <span class="stat-label">Clout</span>
+      <div class="stat-bar"><div class="stat-fill" id="fill-clout" style="width:30%"></div></div>
+      <span class="stat-val" id="val-clout">30</span>
+    </div>
+    <div class="stat-row" id="stat-skate">
+      <span class="stat-label">Skate</span>
+      <div class="stat-bar"><div class="stat-fill" id="fill-skate" style="width:20%"></div></div>
+      <span class="stat-val" id="val-skate">20</span>
+    </div>
+  </div>
+
+  <div id="flow-section">
+    <div id="flow-label">FLOW STATE</div>
+    <div id="flow-bar-wrap"><div id="flow-fill"></div></div>
+    <div id="flow-state-text">IN THE ZONE</div>
+  </div>
+
+  <div id="bottom-hud">
+    <div id="trick-display"></div>
+    <div id="grind-indicator">⬛ GRINDING</div>
+    <div id="combo-score"></div>
+    <div id="speed-display">SPEED: 0 MPH</div>
+  </div>
+
+  <div id="bruise-section">
+    <div id="bruise-label">BRUISE</div>
+    <div id="bruise-bar"><div id="bruise-fill"></div></div>
+  </div>
+
+  <div id="guard-alert">⚠ GUARD SPOTTED YOU</div>
+
+  <div id="skategram-panel">
+    <div id="sg-header"><span>SkateGram</span> <span id="sg-followers">30 followers</span></div>
+    <div id="sg-feed"></div>
+    <button id="sg-upload-btn" disabled>[ UPLOAD CLIP — SKATE FIRST ]</button>
+  </div>
+
+  <div id="controls">
+    W/↑ — PUSH<br>
+    S/↓ — BRAKE<br>
+    A/D — TURN<br>
+    SPACE — OLLIE<br>
+    Z — KICKFLIP<br>
+    X — HEELFLIP<br>
+    C — 180<br>
+    V — VARIAL<br>
+    B — HARDFLIP<br>
+    SHIFT — GRIND<br>
+    G — UPLOAD CLIP<br>
+    MOUSE — CAMERA<br>
+  </div>
+
+  <div id="minimap"><canvas id="minimap-canvas" width="90" height="90"></canvas></div>
+  <div id="toast-stack"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function() {
+
+// ─── RENDERER ─────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.9;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d1117);
+scene.fog = new THREE.FogExp2(0x0d1117, 0.018);
+
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500);
+camera.position.set(0, 6, 14);
+
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
+
+// ─── LIGHTING ─────────────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0x1a1a2e, 1.4));
+const sun = new THREE.DirectionalLight(0xfff5e6, 1.8);
+sun.position.set(30, 60, 20);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near = 1; sun.shadow.camera.far = 200;
+sun.shadow.camera.left = -80; sun.shadow.camera.right = 80;
+sun.shadow.camera.top = 80; sun.shadow.camera.bottom = -80;
+sun.shadow.bias = -0.001;
+scene.add(sun);
+scene.add(new THREE.DirectionalLight(0x4fc3f7, 0.4)).position.set(-20, 10, -10);
+
+// ─── MATERIAL FACTORY ─────────────────────────────────────────────────────────
+const M = (color, rough=0.8, metal=0) => new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
+const mats = {
+  concrete:   M(0x2a2d35, 0.95),
+  concreteL:  M(0x3a3d45, 0.9),
+  asphalt:    M(0x1a1c22, 1),
+  marble:     M(0xd4cfc8, 0.25),
+  steel:      M(0x5a6070, 0.4, 0.8),
+  glass:      new THREE.MeshStandardMaterial({ color: 0x4fc3f7, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.25 }),
+  board:      M(0xd4a85a, 0.6),
+  wheel:      M(0xf5f5f5, 0.9),
+  truck:      M(0x888ea0, 0.3, 0.9),
+  brick:      M(0x6b3a2a, 0.9),
+  grass:      M(0x1a3a0a, 1),
+  rail:       M(0x999999, 0.35, 0.8),
+  yellow:     M(0xffd600, 0.7),
+  guard:      M(0x1a3a6a, 0.8),
+  guardFace:  M(0xd4a574, 0.8),
+  npcShirt:   M(0x2a2a2a, 0.9),
+};
+
+// ─── MESH HELPERS ─────────────────────────────────────────────────────────────
+function box(w, h, d, mat, x=0, y=0, z=0, rx=0, ry=0) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+  m.position.set(x, y, z);
+  m.rotation.set(rx, ry, 0);
+  m.castShadow = true; m.receiveShadow = true;
+  scene.add(m); return m;
+}
+function cyl(rt, rb, h, seg, mat, x=0, y=0, z=0, rx=0, rz=0) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), mat);
+  m.position.set(x, y, z);
+  m.rotation.x = rx; m.rotation.z = rz;
+  m.castShadow = true; m.receiveShadow = true;
+  scene.add(m); return m;
+}
+function lamp(x, z) {
+  cyl(0.06, 0.06, 8, 6, mats.steel, x, 4, z);
+  const bulbMat = new THREE.MeshStandardMaterial({ color: 0xffc947, emissive: 0xffc947, emissiveIntensity: 2 });
+  cyl(0.3, 0.3, 0.2, 8, bulbMat, x, 7.6, z - 1.2);
+  const pl = new THREE.PointLight(0xffc947, 1.5, 18);
+  pl.position.set(x, 7.2, z - 1.2);
+  scene.add(pl);
+}
+
+// ─── WORLD BUILD ──────────────────────────────────────────────────────────────
+// Ground
+box(200, 0.4, 200, mats.asphalt, 0, -0.2, 0);
+
+// Plaza slab — top at Y=0.5
+box(60, 0.5, 50, mats.concrete, 0, 0.25, 0);
+
+// Grass
+box(15, 0.4, 10, mats.grass, -25, 0.2, 5);
+box(15, 0.4, 10, mats.grass, 25, 0.2, 5);
+box(20, 0.4, 8, mats.grass, 0, 0.2, -30);
+
+// School building
+box(60, 20, 8, mats.brick, 0, 10, -35);
+box(62, 0.6, 9, mats.concreteL, 0, 20.3, -35);
+for (let i = -4; i <= 4; i++) {
+  for (let j = 0; j < 3; j++) {
+    const on = i % 2 === 0 && j === 1;
+    const wm = new THREE.MeshStandardMaterial({ color: on ? 0x4fc3f7 : 0x1a2a3a, roughness: 0.1, transparent: true, opacity: on ? 0.5 : 0.7, emissive: on ? 0x4fc3f7 : 0x000000, emissiveIntensity: on ? 0.3 : 0 });
+    const w = new THREE.Mesh(new THREE.BoxGeometry(3.5, 3, 0.1), wm);
+    w.position.set(i * 6.2, 4 + j * 5.5, -31.1);
+    scene.add(w);
+  }
+}
+
+// Left stairs — 5 steps
+for (let i = 0; i < 5; i++) box(12, 0.4, 0.8, mats.concreteL, -20, 0.5 + i * 0.4, -8 + i * 1.2);
+// Right stairs — 7 steps
+for (let i = 0; i < 7; i++) box(10, 0.4, 0.8, mats.concreteL, 18, 0.5 + i * 0.4, -6 + i * 1.0);
+
+// Handrails
+function handrail(x1, y1, z1, x2, y2, z2) {
+  const dx = x2-x1, dy = y2-y1, dz = z2-z1;
+  const len = Math.sqrt(dx*dx+dy*dy+dz*dz);
+  const mid = new THREE.Vector3((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
+  const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,len,8), mats.rail);
+  rail.position.copy(mid);
+  rail.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), new THREE.Vector3(dx,dy,dz).normalize());
+  scene.add(rail);
+}
+handrail(-15,0.7,-8, -15,2.5,-2);
+handrail(-25,0.7,-8, -25,2.5,-2);
+handrail(14,0.7,-6, 14,3.2,1);
+handrail(22,0.7,-6, 22,3.2,1);
+
+// Marble ledges — grindable (stored for collision)
+const ledgeObstacles = [];
+function makeLedge(x, z, w=14) {
+  const m = box(w, 0.6, 1.2, mats.marble, x, 0.8, z);
+  ledgeObstacles.push({ mesh: m, minX: x-w/2, maxX: x+w/2, minZ: z-0.6, maxZ: z+0.6, topY: 1.1, type: 'ledge' });
+}
+makeLedge(5, 10); makeLedge(5, 13); makeLedge(-10, 10, 8);
+// Extra ledge near school
+makeLedge(0, -18, 16);
+
+// Hubba ledge (angled concrete block)
+const hubba = box(8, 1.5, 1.0, mats.concreteL, 12, 1.0, 5, 0, 0.2);
+ledgeObstacles.push({ mesh: hubba, minX: 8, maxX: 16, minZ: 4.5, maxZ: 5.5, topY: 1.5, type: 'ledge' });
+
+// Steel rail (standalone grind rail)
+const railObstacles = [];
+function makeRail(x, z, len, ry=0) {
+  const r = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,len,8), mats.rail);
+  r.position.set(x, 1.0, z);
+  r.rotation.y = ry;
+  r.castShadow = true;
+  scene.add(r);
+  railObstacles.push({ x, z, len, ry, topY: 1.0, type: 'rail' });
+}
+makeRail(-5, 17, 10); makeRail(15, -5, 8, 0.4);
+
+// Benches
+function bench(x, z, ry=0) {
+  const g = new THREE.Group();
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(3,0.12,0.8), mats.concreteL);
+  seat.position.y = 0.6; g.add(seat);
+  [-1.2,1.2].forEach(dx => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.6,0.8), mats.steel);
+    leg.position.set(dx,0.3,0); g.add(leg);
+  });
+  g.position.set(x,0.5,z); g.rotation.y = ry;
+  g.traverse(c => { c.castShadow = true; c.receiveShadow = true; });
+  scene.add(g);
+}
+bench(-5,15); bench(10,15,0.3); bench(-12,-2,-0.2); bench(8,-12);
+
+// Lamps
+lamp(-22,2); lamp(22,2); lamp(-22,-20); lamp(22,-20); lamp(0,-20);
+
+// Sculpture
+const sculpt = new THREE.Mesh(new THREE.OctahedronGeometry(2,1), mats.steel);
+sculpt.position.set(-5,2,-5); sculpt.castShadow = true; scene.add(sculpt);
+
+// Distant city
+const bColors = [0x1a1f2e,0x0f1419,0x1e2533,0x161b26];
+[[-50,25,-60],[50,35,-60],[-70,18,-50],[70,40,-55],[-35,20,-80],[35,28,-80],[0,45,-90],[-80,15,-70],[80,22,-70]].forEach(([x,h,z]) => {
+  box(Math.random()*8+6, h, Math.random()*8+6, M(bColors[Math.floor(Math.random()*4)],0.9,0.1), x, h/2, z);
+  for (let i=0;i<15;i++) {
+    const on = Math.random()>0.5;
+    const wm = new THREE.Mesh(new THREE.BoxGeometry(0.4,0.6,0.05),
+      new THREE.MeshStandardMaterial({color:on?0xffd600:0x1a2a4a,emissive:on?0xffaa00:0,emissiveIntensity:on?0.8:0}));
+    wm.position.set(x+(Math.random()-0.5)*6, Math.random()*h*0.8+2, z+Math.random()*0.3);
+    scene.add(wm);
+  }
+});
+
+// Collision obstacle list (plaza + ledges + ground)
+const staticObstacles = [
+  { minX:-30, maxX:30, minZ:-25.5, maxZ:25.5, topY:0.5, type:'ground' },
+  ...ledgeObstacles
+];
+
+// ─── SKATER ───────────────────────────────────────────────────────────────────
+const skaterGroup = new THREE.Group();
+scene.add(skaterGroup);
+skaterGroup.position.set(0, 0.5, 8);
+
+const boardMesh = new THREE.Mesh(new THREE.BoxGeometry(0.8,0.10,2.4), mats.board);
+boardMesh.position.y = 0.245; boardMesh.castShadow = true;
+skaterGroup.add(boardMesh);
+
+const wheelRefs = [];
+[-0.75,0.75].forEach(z => {
+  const truck = new THREE.Mesh(new THREE.BoxGeometry(0.75,0.07,0.22), mats.truck);
+  truck.position.set(0,0.16,z); skaterGroup.add(truck);
+  [-0.33,0.33].forEach(x => {
+    const w = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.10,12), mats.wheel);
+    w.rotation.z = Math.PI/2; w.position.set(x,0.12,z);
+    skaterGroup.add(w); wheelRefs.push(w);
+  });
+});
+
+[-0.10,0.10].forEach(x => {
+  const leg = new THREE.Mesh(new THREE.BoxGeometry(0.13,0.38,0.14), M(0x1a237e,0.9));
+  leg.position.set(x,0.49,-0.05); leg.castShadow=true; skaterGroup.add(leg);
+});
+const bodyM = new THREE.Mesh(new THREE.BoxGeometry(0.35,0.65,0.28), M(0x2c3e50,0.9));
+bodyM.position.set(0,1.0,-0.08); bodyM.castShadow=true; skaterGroup.add(bodyM);
+[[-0.26,1.0],[0.26,1.0]].forEach(([x,y]) => {
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.40,0.13), M(0x2c3e50,0.9));
+  arm.position.set(x,y,-0.05); arm.castShadow=true; skaterGroup.add(arm);
+});
+const headM = new THREE.Mesh(new THREE.BoxGeometry(0.28,0.28,0.28), M(0xd4a574,0.8));
+headM.position.set(0,1.47,-0.08); headM.castShadow=true; skaterGroup.add(headM);
+const capM = new THREE.Mesh(new THREE.BoxGeometry(0.32,0.08,0.32), M(0x1a1a1a,0.9));
+capM.position.set(0,1.63,-0.08); skaterGroup.add(capM);
+
+// ─── NPC GUARDS ───────────────────────────────────────────────────────────────
+const guards = [];
+function makeGuard(x, z, patrolA, patrolB) {
+  const g = new THREE.Group();
+  // Body
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.35,0.55,0.28), mats.guard);
+  torso.position.y = 1.0; torso.castShadow=true; g.add(torso);
+  // Head
+  const hd = new THREE.Mesh(new THREE.BoxGeometry(0.26,0.26,0.26), mats.guardFace);
+  hd.position.y = 1.42; hd.castShadow=true; g.add(hd);
+  // Cap
+  const cap2 = new THREE.Mesh(new THREE.BoxGeometry(0.30,0.07,0.30), M(0x0a1a3a,0.9));
+  cap2.position.y = 1.58; g.add(cap2);
+  // Legs
+  [-0.10,0.10].forEach(lx => {
+    const leg2 = new THREE.Mesh(new THREE.BoxGeometry(0.13,0.38,0.14), M(0x0a1a3a,0.9));
+    leg2.position.set(lx,0.49,-0.05); leg2.castShadow=true; g.add(leg2);
+  });
+  // Alert cone (detection visualizer)
+  const coneMat = new THREE.MeshBasicMaterial({ color: 0xef5350, transparent: true, opacity: 0.0, side: THREE.DoubleSide });
+  const coneGeo = new THREE.ConeGeometry(4, 8, 8, 1, true);
+  const coneMesh = new THREE.Mesh(coneGeo, coneMat);
+  coneMesh.position.set(0, 0.8, -4);
+  coneMesh.rotation.x = Math.PI / 2;
+  g.add(coneMesh);
+
+  g.position.set(x, 0.5, z);
+  scene.add(g);
+  guards.push({ group: g, patrolA: new THREE.Vector3(patrolA[0],0.5,patrolA[1]), patrolB: new THREE.Vector3(patrolB[0],0.5,patrolB[1]), target: 0, speed: 2.2 + Math.random()*0.5, alertLevel: 0, cone: coneMesh, coneMat });
+}
+makeGuard(-18, -5,  [-18,-5], [-18,12]);
+makeGuard(16,  -8,  [16,-8],  [0,-8]);
+makeGuard(3,  -22,  [-10,-22],[10,-22]);
+
+// ─── PHYSICS CONSTANTS ────────────────────────────────────────────────────────
+const GRAVITY    = -18;
+const GROUND_Y   = 0;
+const PUSH_FORCE = 28;
+const FRICTION   = 0.97;
+const TURN_SPEED = 2.2;
+const MAX_SPEED  = 40;
+
+// ─── PLAYER STATE ─────────────────────────────────────────────────────────────
+const player = {
+  pos: new THREE.Vector3(0, 0.5, 8),
+  vel: new THREE.Vector3(),
+  onGround: true,
+  grinding: false, grindRail: null, grindProgress: 0, grindTime: 0,
+  speed: 0,
+  facing: 0,
+  ollieTime: 0, isOllying: false,
+  trickAir: null, trickAngle: 0,
+  bruise: 0, flow: 0,
+  lastTricks: [], comboScore: 0, airTime: 0,
+  // Life stats
+  academics: 65, clout: 30, skate: 20,
+  // Session clip data
+  clipScore: 0, pendingUpload: false,
+  // Guard state
+  busted: false, bustedTimer: 0,
+};
+
+// ─── INPUT ────────────────────────────────────────────────────────────────────
+const keys = {};
+document.addEventListener('keydown', e => { keys[e.code] = true; });
+document.addEventListener('keyup',   e => { keys[e.code] = false; });
+
+let camYaw = 0, camPitch = 0.28;
+canvas.addEventListener('mousedown', () => canvas.requestPointerLock?.());
+document.addEventListener('mousemove', e => {
+  if (document.pointerLockElement === canvas) {
+    camYaw   -= e.movementX * 0.003;
+    camPitch  = Math.max(0.05, Math.min(0.8, camPitch + e.movementY * 0.002));
+  }
+});
+
+// ─── TRICK LIBRARY ────────────────────────────────────────────────────────────
+const tricks = {
+  kickflip: { name: 'KICKFLIP',      score: 100, key: 'KeyZ', axis: 'boardZ', dir:  1, speed: 9 },
+  heelflip: { name: 'HEELFLIP',      score: 100, key: 'KeyX', axis: 'boardZ', dir: -1, speed: 9 },
+  bs180:    { name: 'BACKSIDE 180',  score: 150, key: 'KeyC', axis: 'bodyY',  dir:  1, speed: 4 },
+  varial:   { name: 'VARIAL FLIP',   score: 200, key: 'KeyV', axis: 'both',   dir:  1, speed: 10 },
+  hardflip: { name: 'HARDFLIP',      score: 250, key: 'KeyB', axis: 'both',   dir: -1, speed: 10 },
+};
+
+let trickTimeout = null;
+const trickDisplay = document.getElementById('trick-display');
+
+function doTrick(key) {
+  if (!player.isOllying || player.trickAir || player.grinding) return;
+  for (const [k,t] of Object.entries(tricks)) {
+    if (t.key === key) { player.trickAir = k; player.trickAngle = 0; return; }
+  }
+}
+
+document.addEventListener('keydown', e => {
+  for (const t of Object.values(tricks)) doTrick(e.code);
+  // G = upload clip
+  if (e.code === 'KeyG' && player.pendingUpload) uploadClip();
+  // Grind attempt on SHIFT
+  if (e.code === 'ShiftLeft') player.grinding = true;
+});
+document.addEventListener('keyup', e => {
+  if (e.code === 'ShiftLeft') { player.grinding = false; player.grindRail = null; }
+});
+
+// ─── SCHOOL BELL SYSTEM ───────────────────────────────────────────────────────
+const periods = [
+  { name: 'PERIOD 1', duration: 180, skate: false },
+  { name: 'PASSING',  duration: 30,  skate: true  },
+  { name: 'PERIOD 2', duration: 180, skate: false },
+  { name: 'PASSING',  duration: 30,  skate: true  },
+  { name: 'FREE PER', duration: 120, skate: true  },
+  { name: 'PERIOD 3', duration: 180, skate: false },
+  { name: 'LUNCH',    duration: 90,  skate: true  },
+  { name: 'PERIOD 4', duration: 180, skate: false },
+];
+let periodIdx = 4; // start on Free Period
+let periodTimer = 120;
+let guardActive = true;
+
+function updateClock() {
+  const p = periods[periodIdx];
+  const mins = Math.floor(periodTimer / 60);
+  const secs = Math.floor(periodTimer % 60);
+  document.getElementById('period-label').textContent = p.name;
+  document.getElementById('clock-display').textContent =
+    String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+}
+
+function ringBell() {
+  const bf = document.getElementById('bell-flash');
+  bf.style.opacity = '1';
+  setTimeout(() => bf.style.opacity = '0', 300);
+  const bm = document.getElementById('bell-msg');
+  const p = periods[periodIdx];
+  bm.textContent = p.skate ? '🛹 ' + p.name + ' — SKATE!' : '🔔 ' + p.name + ' — GET TO CLASS!';
+  bm.style.opacity = '1';
+  setTimeout(() => bm.style.opacity = '0', 2500);
+  // Guards get aggressive during class periods
+  guardActive = true;
+  if (p.skate) {
+    toast('Free time — skate!', 'success');
+    // Guards relax a bit during free periods
+    guards.forEach(g => g.speed = 1.5 + Math.random() * 0.5);
+  } else {
+    toast('Bell rang — guards on patrol!', 'danger');
+    guards.forEach(g => g.speed = 3.0 + Math.random() * 0.8);
+    player.academics = Math.max(0, player.academics - 8);
+  }
+}
+
+// ─── SKATEGRAM ────────────────────────────────────────────────────────────────
+let followers = 30;
+const sgFeed = document.getElementById('sg-feed');
+const sgBtn  = document.getElementById('sg-upload-btn');
+const sgFollEl = document.getElementById('sg-followers');
+
+const clipComments = {
+  gutter:    ['🔥 raw as hell', 'keep it street', 'no pads respect', 'locals only 🤙', 'grimy. love it'],
+  syndicate: ['🔥 viral material', 'brand collab incoming', 'go off king', '💰 sponsor this', 'mad views'],
+  vertigo:   ['clean pop 🎯', 'textbook execution', 'competition ready', 'that form tho 🤌', 'podium material'],
+};
+
+function uploadClip() {
+  if (!player.pendingUpload) return;
+  player.pendingUpload = false;
+  sgBtn.disabled = true;
+  sgBtn.textContent = '[ UPLOADING... ]';
+
+  const gain = Math.floor(player.clipScore / 30);
+  const comments = clipComments[faction] || clipComments.gutter;
+  followers += gain;
+  player.clout = Math.min(100, player.clout + gain * 0.5);
+  sgFollEl.textContent = followers + ' followers';
+
+  const post = document.createElement('div');
+  post.className = 'sg-post new';
+  post.textContent = '+' + gain + ' followers — "' + comments[Math.floor(Math.random()*comments.length)] + '"';
+  sgFeed.prepend(post);
+  if (sgFeed.children.length > 4) sgFeed.removeChild(sgFeed.lastChild);
+
+  player.clipScore = 0;
+  toast('+' + gain + ' followers on SkateGram', 'success');
+
+  setTimeout(() => {
+    sgBtn.textContent = '[ UPLOAD CLIP — SKATE FIRST ]';
+  }, 2000);
+}
+
+document.getElementById('sg-upload-btn').addEventListener('click', uploadClip);
+
+function markClipReady(score) {
+  player.clipScore += score;
+  player.pendingUpload = true;
+  sgBtn.disabled = false;
+  sgBtn.textContent = '[ G — UPLOAD CLIP +' + player.clipScore + 'pts ]';
+}
+
+// ─── TOAST NOTIFICATIONS ──────────────────────────────────────────────────────
+function toast(msg, type='') {
+  const stack = document.getElementById('toast-stack');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  stack.appendChild(el);
+  setTimeout(() => el.remove(), 3100);
+}
+
+// ─── HUD HELPERS ──────────────────────────────────────────────────────────────
+function updateStat(id, val) {
+  document.getElementById('fill-'+id).style.width = val + '%';
+  document.getElementById('val-'+id).textContent = Math.round(val);
+}
+function updateFlow() {
+  const f = player.flow;
+  document.getElementById('flow-fill').style.width = f + '%';
+  const inZone = f >= 80;
+  document.getElementById('flow-state-text').style.opacity = inZone ? '1' : '0';
+  document.getElementById('flow-vignette').style.opacity = inZone ? '1' : '0';
+}
+function showTrick(name, pts) {
+  trickDisplay.textContent = name;
+  trickDisplay.style.opacity = '1';
+  clearTimeout(trickTimeout);
+  trickTimeout = setTimeout(() => trickDisplay.style.opacity = '0', 1600);
+  player.skate = Math.min(100, player.skate + 0.8);
+  player.comboScore += pts;
+  document.getElementById('combo-score').textContent = '+' + player.comboScore + ' PTS';
+  player.flow = Math.min(100, player.flow + 14);
+  updateFlow();
+  markClipReady(pts);
+  // spam check
+  player.lastTricks.push(name);
+  if (player.lastTricks.length > 3) player.lastTricks.shift();
+  if (player.lastTricks.length===3 && player.lastTricks.every(t=>t===player.lastTricks[0])) {
+    player.flow = 0; player.lastTricks = []; updateFlow();
+    trickDisplay.textContent = 'TRICK SPAM!';
+    trickDisplay.style.textShadow = '0 0 20px #ef5350';
+    setTimeout(() => trickDisplay.style.textShadow = '0 0 20px #ffd600', 1000);
+  }
+}
+function bail() {
+  document.getElementById('bail-flash').style.opacity = '1';
+  setTimeout(() => document.getElementById('bail-flash').style.opacity = '0', 200);
+  player.bruise = Math.min(100, player.bruise + 15);
+  player.flow = Math.max(0, player.flow - 30);
+  player.comboScore = 0; player.lastTricks = [];
+  document.getElementById('bruise-fill').style.width = player.bruise + '%';
+  document.getElementById('combo-score').textContent = '';
+  updateFlow();
+  trickDisplay.textContent = 'BAILED!';
+  trickDisplay.style.opacity = '1';
+  clearTimeout(trickTimeout);
+  trickTimeout = setTimeout(() => trickDisplay.style.opacity = '0', 1200);
+  player.vel.x *= 0.3; player.vel.z *= 0.3;
+}
+function getBusted() {
+  if (player.busted) return;
+  player.busted = true; player.bustedTimer = 3;
+  player.vel.set(0,0,0);
+  trickDisplay.textContent = '🚫 BUSTED!';
+  trickDisplay.style.opacity = '1';
+  clearTimeout(trickTimeout);
+  trickTimeout = setTimeout(() => trickDisplay.style.opacity = '0', 2500);
+  player.academics = Math.max(0, player.academics - 15);
+  toast('Confiscated! Academics -15', 'danger');
+  player.flow = 0; updateFlow();
+}
+
+// ─── GRIND DETECTION ──────────────────────────────────────────────────────────
+function checkGrindLedge() {
+  if (!player.grinding || !player.isOllying) return null;
+  for (const ob of ledgeObstacles) {
+    if (player.pos.x > ob.minX-0.5 && player.pos.x < ob.maxX+0.5 &&
+        player.pos.z > ob.minZ-0.5 && player.pos.z < ob.maxZ+0.5 &&
+        Math.abs(player.pos.y - ob.topY) < 0.5) {
+      return ob;
+    }
+  }
+  return null;
+}
+
+// ─── MINIMAP ──────────────────────────────────────────────────────────────────
+const mmCtx = document.getElementById('minimap-canvas').getContext('2d');
+function drawMinimap() {
+  mmCtx.clearRect(0,0,90,90);
+  const cx=45, cy=45, scale=0.55;
+  mmCtx.fillStyle='rgba(255,255,255,0.05)'; mmCtx.fillRect(0,0,90,90);
+  mmCtx.fillStyle='rgba(255,255,255,0.1)';
+  mmCtx.fillRect(cx-18*scale, cy-15*scale, 36*scale, 30*scale);
+  // guards
+  guards.forEach(g => {
+    const gx = cx + g.group.position.x*scale;
+    const gz = cy + g.group.position.z*scale;
+    mmCtx.beginPath(); mmCtx.arc(gx,gz,3,0,Math.PI*2);
+    mmCtx.fillStyle = g.alertLevel > 0.5 ? '#ef5350' : '#1a3a6a'; mmCtx.fill();
+  });
+  // player
+  const px = cx+player.pos.x*scale, pz = cy+player.pos.z*scale;
+  mmCtx.beginPath(); mmCtx.arc(px,pz,3,0,Math.PI*2);
+  mmCtx.fillStyle='#ffd600'; mmCtx.fill();
+  mmCtx.beginPath(); mmCtx.moveTo(px,pz);
+  mmCtx.lineTo(px+Math.sin(player.facing)*7, pz+Math.cos(player.facing)*7);
+  mmCtx.strokeStyle='#ffd600'; mmCtx.lineWidth=1.5; mmCtx.stroke();
+}
+
+// ─── UPDATE ───────────────────────────────────────────────────────────────────
+let gameRunning = false;
+let faction = 'gutter';
+const clock = new THREE.Clock();
+let periodAccum = 0;
+
+function update(dt) {
+  if (!gameRunning) return;
+
+  // ── School Bell Timer ──
+  periodAccum += dt;
+  periodTimer -= dt;
+  if (periodTimer <= 0) {
+    periodIdx = (periodIdx + 1) % periods.length;
+    periodTimer = periods[periodIdx].duration;
+    ringBell();
+  }
+  updateClock();
+
+  // ── Busted recovery ──
+  if (player.busted) {
+    player.bustedTimer -= dt;
+    if (player.bustedTimer <= 0) {
+      player.busted = false;
+      player.pos.set(0, 0.5, 8); player.vel.set(0,0,0);
+    }
+    skaterGroup.position.copy(player.pos);
+    return;
+  }
+
+  const inFlow = player.flow >= 80;
+  const popBoost = inFlow ? 1.1 : 1.0;
+  const maxSpd = MAX_SPEED * (1 - player.bruise * 0.003);
+
+  // ── Movement ──
+  let pushing = false;
+  if (keys['ArrowUp'] || keys['KeyW']) {
+    if (player.onGround && !player.grinding) {
+      player.vel.x += -Math.sin(player.facing) * PUSH_FORCE * dt;
+      player.vel.z += -Math.cos(player.facing) * PUSH_FORCE * dt;
+      pushing = true;
+    }
+  }
+  if ((keys['ArrowDown'] || keys['KeyS']) && player.onGround) {
+    player.vel.x *= 0.90; player.vel.z *= 0.90;
+  }
+  if (keys['ArrowLeft'] || keys['KeyA']) player.facing += TURN_SPEED * dt * (player.onGround ? 1 : 0.25);
+  if (keys['ArrowRight'] || keys['KeyD']) player.facing -= TURN_SPEED * dt * (player.onGround ? 1 : 0.25);
+
+  const hspd = Math.sqrt(player.vel.x**2 + player.vel.z**2);
+  if (hspd > maxSpd) { player.vel.x = player.vel.x/hspd*maxSpd; player.vel.z = player.vel.z/hspd*maxSpd; }
+
+  // ── Ollie ──
+  if (keys['Space'] && player.onGround && !player.grinding && player.ollieTime <= 0) {
+    player.vel.y = 7 * popBoost;
+    player.onGround = false; player.isOllying = true;
+    player.airTime = 0; player.ollieTime = 0.5;
+    player.comboScore = 0; player.lastTricks = [];
+  }
+  if (player.ollieTime > 0) player.ollieTime -= dt;
+
+  // ── Grind detection ──
+  const grindHit = checkGrindLedge();
+  if (grindHit && !player.grinding) player.grindRail = null;
+  if (grindHit && player.grinding && player.grindRail !== grindHit) {
+    player.grindRail = grindHit;
+    player.onGround = true;
+    player.isOllying = false;
+    player.vel.y = 0;
+    player.pos.y = grindHit.topY;
+    player.grindTime = 0;
+    document.getElementById('grind-indicator').style.opacity = '1';
+    player.flow = Math.min(100, player.flow + 8);
+    updateFlow();
+  }
+  if (player.grindRail) {
+    player.grindTime += dt;
+    // keep player on rail surface, slide along it
+    player.pos.y = player.grindRail.topY;
+    player.vel.y = 0;
+    player.onGround = true;
+    const grindScore = Math.floor(player.grindTime * 10) * 5;
+    document.getElementById('combo-score').textContent = 'GRIND +' + grindScore;
+    markClipReady(1);
+    player.flow = Math.min(100, player.flow + dt * 6);
+    updateFlow();
+    // Exit grind if no longer holding shift or out of bounds
+    if (!player.grinding || !grindHit) {
+      player.flow = Math.min(100, player.flow + 10);
+      showTrick('BOARDSLIDE', Math.floor(player.grindTime*50+50));
+      player.grindRail = null; player.grindTime = 0;
+      document.getElementById('grind-indicator').style.opacity = '0';
+    }
+  } else {
+    document.getElementById('grind-indicator').style.opacity = '0';
+  }
+
+  // ── Gravity ──
+  if (!player.onGround) { player.vel.y += GRAVITY * dt; player.airTime += dt; }
+
+  // ── Ground collision ──
+  let groundY = GROUND_Y;
+  for (const ob of staticObstacles) {
+    if (player.pos.x > ob.minX && player.pos.x < ob.maxX &&
+        player.pos.z > ob.minZ && player.pos.z < ob.maxZ) {
+      groundY = Math.max(groundY, ob.topY);
+    }
+  }
+
+  // ── Friction ──
+  if (player.onGround) {
+    const fd = Math.pow(FRICTION, dt * 60);
+    player.vel.x *= fd; player.vel.z *= fd;
+  }
+
+  // ── Integrate ──
+  player.pos.x += player.vel.x * dt;
+  player.pos.z += player.vel.z * dt;
+  player.pos.y += player.vel.y * dt;
+
+  // ── Land ──
+  if (player.pos.y <= groundY && !player.onGround) {
+    player.pos.y = groundY;
+    const impact = Math.abs(player.vel.y);
+    player.vel.y = 0; player.onGround = true;
+    if (player.trickAir && player.trickAngle < Math.PI * 1.7) {
+      bail();
+    } else if (player.trickAir) {
+      showTrick(tricks[player.trickAir].name, tricks[player.trickAir].score);
+    }
+    if (impact > 12 && !player.trickAir) bail();
+    player.trickAir = null; player.trickAngle = 0;
+    player.isOllying = false; player.airTime = 0;
+    player.flow = Math.max(0, player.flow - 2);
+    updateFlow();
+  }
+
+  // ── Bounds ──
+  player.pos.x = Math.max(-90, Math.min(90, player.pos.x));
+  player.pos.z = Math.max(-90, Math.min(90, player.pos.z));
+
+  // ── Skater mesh ──
+  skaterGroup.position.copy(player.pos);
+  skaterGroup.rotation.y = player.facing;
+
+  // Board tilt from lean
+  const spdFraction = hspd / MAX_SPEED;
+  boardMesh.rotation.z = (player.vel.x * Math.cos(player.facing) - player.vel.z * Math.sin(player.facing)) * 0.02;
+
+  // Trick animation
+  if (player.trickAir && !player.onGround) {
+    const t = tricks[player.trickAir];
+    player.trickAngle += dt * t.speed;
+    if (t.axis === 'boardZ') boardMesh.rotation.z = player.trickAngle * t.dir;
+    if (t.axis === 'bodyY')  skaterGroup.rotation.y = player.facing + player.trickAngle * t.dir;
+    if (t.axis === 'both')   { boardMesh.rotation.z = player.trickAngle * t.dir; skaterGroup.rotation.y = player.facing + player.trickAngle * 0.5 * t.dir; }
+  } else if (player.onGround && !player.grindRail) {
+    boardMesh.rotation.z *= 0.8;
+  }
+
+  // Wheel spin
+  wheelRefs.forEach(w => { w.rotation.y += hspd * dt * 1.2; });
+
+  // Pump anim
+  if (pushing && player.onGround) {
+    boardMesh.position.y = 0.245 + Math.sin(Date.now()*0.012)*0.010;
+  } else if (player.onGround) {
+    boardMesh.position.y = 0.245;
+  }
+
+  // Flow decay
+  if (player.onGround && !pushing && !player.grindRail) {
+    player.flow = Math.max(0, player.flow - dt * 3);
+    updateFlow();
+  }
+
+  // ── Guard AI ──
+  let guardAlerted = false;
+  guards.forEach(guard => {
+    const g = guard.group;
+    // Patrol between A and B
+    const tgt = guard.target === 0 ? guard.patrolA : guard.patrolB;
+    const dx = tgt.x - g.position.x, dz = tgt.z - g.position.z;
+    const dist = Math.sqrt(dx*dx+dz*dz);
+    if (dist < 0.5) { guard.target = 1 - guard.target; }
+    else {
+      g.position.x += (dx/dist)*guard.speed*dt;
+      g.position.z += (dz/dist)*guard.speed*dt;
+      g.rotation.y = Math.atan2(dx, dz);
+    }
+
+    // Detection: cone in front of guard, range 8 units, 60deg FOV
+    const toPlayer = new THREE.Vector3(player.pos.x - g.position.x, 0, player.pos.z - g.position.z);
+    const toPlayerDist = toPlayer.length();
+    const guardFwd = new THREE.Vector3(Math.sin(g.rotation.y), 0, Math.cos(g.rotation.y));
+    const dot = toPlayerDist > 0 ? toPlayer.normalize().dot(guardFwd) : 0;
+    const inCone = dot > 0.75 && toPlayerDist < 8;
+    const inClose = toPlayerDist < 2.5;
+
+    if ((inCone || inClose) && hspd > 0.5) {
+      guard.alertLevel = Math.min(1, guard.alertLevel + dt * 1.2);
+    } else {
+      guard.alertLevel = Math.max(0, guard.alertLevel - dt * 0.5);
+    }
+
+    // Visual cone alert
+    guard.coneMat.opacity = guard.alertLevel * 0.25;
+    guard.coneMat.color.setHex(guard.alertLevel > 0.7 ? 0xef5350 : 0xff9800);
+
+    if (guard.alertLevel >= 1.0 && !player.busted) {
+      getBusted();
+    }
+    if (guard.alertLevel > 0.3) guardAlerted = true;
+  });
+
+  // Guard alert HUD
+  const alertEl = document.getElementById('guard-alert');
+  alertEl.style.opacity = guardAlerted ? '1' : '0';
+
+  // ── Speed & HUD ──
+  player.speed = hspd;
+  document.getElementById('speed-display').textContent = 'SPEED: ' + Math.round(hspd * 2.2) + ' MPH';
+  updateStat('academics', player.academics);
+  updateStat('clout', player.clout);
+  updateStat('skate', player.skate);
+
+  // ── Camera ──
+  const camDist = 10;
+  const camHeight = 5 + player.airTime * 0.4;
+  const tcx = player.pos.x + Math.sin(camYaw)*camDist;
+  const tcz = player.pos.z + Math.cos(camYaw)*camDist;
+  camera.position.x += (tcx - camera.position.x)*0.08;
+  camera.position.z += (tcz - camera.position.z)*0.08;
+  camera.position.y += ((player.pos.y + camHeight) - camera.position.y)*0.08;
+  camera.lookAt(player.pos.x, player.pos.y+0.8, player.pos.z);
+
+  // ── Misc scene ──
+  sculpt.rotation.y += dt*0.3; sculpt.rotation.x += dt*0.15;
+  drawMinimap();
+}
+
+// ─── RENDER LOOP ──────────────────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  update(dt);
+  renderer.render(scene, camera);
+}
+animate();
+
+// ─── INTRO ────────────────────────────────────────────────────────────────────
+const factionDescs = {
+  gutter:    'DIY purists. Anti-establishment. Hidden spots, custom grip, real respect.',
+  syndicate: 'Hyper-commercialized. Energy drinks and social clout. High cash, private parks.',
+  vertigo:   'Competition-focused. Athletic perfection. Olympic hopefuls with technical boards.',
+};
+document.querySelectorAll('.faction-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.faction-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    faction = btn.dataset.faction;
+    document.getElementById('faction-desc').textContent = factionDescs[faction];
+  });
+});
+document.getElementById('intro-btn').addEventListener('click', () => {
+  const intro = document.getElementById('intro');
+  intro.style.opacity = '0';
+  setTimeout(() => intro.style.display = 'none', 1000);
+  gameRunning = true; clock.start();
+  toast('Drop in! Push to gain speed.', '');
+  setTimeout(() => toast('SHIFT near a ledge to grind', ''), 3000);
+  setTimeout(() => toast('G to upload your best clip to SkateGram', ''), 6000);
+});
+
+})();
+</script>
+</body>
+</html>

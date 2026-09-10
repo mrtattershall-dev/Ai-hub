@@ -1,0 +1,736 @@
+<!--
+  ═══════════════════════════════════════════════════════════
+  DUST & HARVEST — MULTIPLAYER ADDON  (append before </body>)
+  ═══════════════════════════════════════════════════════════
+  Drop this entire block just before </body></html> in your
+  dust-harvest-v35.html file. Nothing above this line is
+  modified — the game runs identically in singleplayer if
+  no server is reachable.
+
+  SETUP:
+    1. npm install   (inside the server/ folder)
+    2. node server.js
+    3. Open the game, click [🌐 MULTI] (top-right)
+    4. Host: click HOST, share your IP + room code
+    5. Guest: enter host's IP + code, click JOIN
+  ═══════════════════════════════════════════════════════════
+-->
+
+<style id="dhMpStyle">
+/* ── MULTI BUTTON ─────────────────────────────────────────── */
+#dhMpBtn {
+  position: fixed; top: 7px; right: 10px; z-index: 50;
+  background: rgba(14,10,6,.92);
+  border: 1px solid rgba(72,112,160,.48); border-top: 2px solid #4870a0;
+  padding: 4px 10px;
+  font-family: 'Special Elite','Courier New',serif; font-size: 10px;
+  color: #6898c0; cursor: pointer; letter-spacing: .06em;
+  transition: all .12s;
+}
+#dhMpBtn:hover { background: rgba(20,40,70,.96); color: #90b8e0; }
+#dhMpBtn.active { border-top-color: #60d060; color: #60d060; }
+
+/* ── PANEL ────────────────────────────────────────────────── */
+#dhMpPanel {
+  position: fixed; top: 40px; right: 10px; width: 285px;
+  background: rgba(14,10,6,.98);
+  border: 1px solid rgba(110,85,45,.55); border-top: 3px solid #4870a0;
+  padding: 14px; z-index: 50; display: none;
+  font-family: 'Special Elite','Courier New',serif;
+}
+
+/* ── BADGE (in-game HUD) ──────────────────────────────────── */
+#dhMpBadge {
+  position: fixed; bottom: 95px; left: 10px; z-index: 20;
+  background: rgba(14,10,6,.92);
+  border: 1px solid rgba(72,112,160,.38); border-left: 3px solid #4870a0;
+  padding: 4px 10px; font-size: 9px; color: #6898c0; display: none;
+  font-family: 'Special Elite','Courier New',serif; letter-spacing: .04em;
+}
+
+/* ── CHAT INPUT ───────────────────────────────────────────── */
+#dhMpChatBox {
+  position: fixed; bottom: 148px; left: 50%; transform: translateX(-50%);
+  background: rgba(14,10,6,.97);
+  border: 1px solid rgba(72,112,160,.55); border-top: 2px solid #4870a0;
+  padding: 7px 12px; display: none; align-items: center; gap: 8px;
+  z-index: 100; font-family: 'Special Elite','Courier New',serif;
+}
+#dhMpChatIn {
+  background: rgba(255,255,255,.06); border: none;
+  border-bottom: 1px solid rgba(72,112,160,.6); outline: none;
+  color: #c8d8e8; font-family: 'Special Elite','Courier New',serif;
+  font-size: 11px; width: 200px; padding: 2px 4px;
+}
+
+/* ── PANEL WIDGETS ────────────────────────────────────────── */
+.dhmp-section {
+  font-size: 8px; color: rgba(110,85,45,.7); letter-spacing: .1em;
+  text-transform: uppercase; border-bottom: 1px solid rgba(110,85,45,.22);
+  padding-bottom: 5px; margin-bottom: 10px;
+}
+.dhmp-label {
+  font-size: 8px; color: rgba(72,112,160,.7); letter-spacing: .08em;
+  margin-bottom: 4px; text-transform: uppercase;
+}
+.dhmp-inp {
+  width: 100%; box-sizing: border-box;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(72,112,160,.38);
+  padding: 5px 8px; font-family: 'Special Elite','Courier New',serif;
+  font-size: 10px; color: #c8d8e8; margin-bottom: 6px; outline: none;
+}
+.dhmp-inp:focus { border-color: rgba(72,112,160,.75); }
+.dhmp-btn {
+  width: 100%; padding: 7px; font-family: 'Special Elite','Courier New',serif;
+  font-size: 10px; cursor: pointer;
+  border: 1px solid rgba(72,112,160,.5); background: rgba(72,112,160,.12);
+  color: #90b8e0; letter-spacing: .06em; margin-bottom: 5px; transition: all .1s;
+}
+.dhmp-btn:hover  { background: rgba(72,112,160,.25); color: #c0d8f0; }
+.dhmp-btn.danger { border-color: rgba(180,60,40,.5); background: rgba(180,60,40,.1); color: #e08060; }
+.dhmp-btn.danger:hover { background: rgba(180,60,40,.22); }
+.dhmp-btn.dim    { opacity: .4; cursor: not-allowed; }
+.dhmp-code {
+  font-size: 26px; color: #4870a0; letter-spacing: .35em; text-align: center;
+  padding: 8px 4px; background: rgba(72,112,160,.07);
+  border: 1px solid rgba(72,112,160,.28); margin-bottom: 8px;
+  font-family: 'Rye','Special Elite',serif;
+}
+.dhmp-status {
+  font-size: 9px; color: rgba(150,170,190,.72); line-height: 1.7;
+  margin-bottom: 10px;
+}
+.dhmp-status b  { color: #a0c8ff; }
+.dhmp-status em { color: #c8a060; font-style: normal; }
+.dhmp-hr { border: none; border-top: 1px solid rgba(110,85,45,.2); margin: 8px 0; }
+</style>
+
+<!-- Multiplayer panel DOM -->
+<div id="dhMpPanel"></div>
+<div id="dhMpBadge">🌐 CO-OP</div>
+<div id="dhMpChatBox">
+  <span style="color:#4870a0;font-size:10px">💬 SAY:</span>
+  <input id="dhMpChatIn" type="text" maxlength="80" placeholder="Type message…">
+  <span style="color:rgba(72,112,160,.6);font-size:9px">[Enter]·[Esc]</span>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ════════════════════════════════════════════════════════════
+   DH_MP — Dust & Harvest Multiplayer Addon
+   Designed to be appended to the game without modifying it.
+   Uses global variables: player, gameState, economy, plots,
+   animals, inventory, ctx, canvas, ZOOM, T, showMsg, render,
+   useTool, refreshMarketUI, marketOpen, drawCharacter
+   ════════════════════════════════════════════════════════════ */
+
+/* ── STATE ─────────────────────────────────────────────────── */
+const mp = {
+  ws:          null,
+  role:        null,     // 'host' | 'guest' | null
+  code:        null,     // 4-char room code
+  partnerReady: false,   // true when both players are in the room
+  partnerPos:  null,     // latest position snapshot from partner
+  chatOpen:    false,
+
+  isHost()    { return this.role === 'host'; },
+  isGuest()   { return this.role === 'guest'; },
+  isActive()  { return this.partnerReady; },
+
+  send(data) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      try { this.ws.send(JSON.stringify(data)); } catch (_) {}
+    }
+  },
+};
+
+/* ── TIMERS (setInterval — no game-loop hooking needed) ─────── */
+let _posInterval   = null;
+let _worldInterval = null;
+
+const POS_MS   = 80;    // position broadcast rate
+const WORLD_MS = 2000;  // world-state broadcast rate (host→guest)
+
+function startIntervals() {
+  stopIntervals();
+  _posInterval = setInterval(broadcastPos, POS_MS);
+  if (mp.isHost()) {
+    _worldInterval = setInterval(broadcastWorldState, WORLD_MS);
+  }
+}
+
+function stopIntervals() {
+  clearInterval(_posInterval);
+  clearInterval(_worldInterval);
+  _posInterval = _worldInterval = null;
+}
+
+/* ── CONNECTION ─────────────────────────────────────────────── */
+function connectAs(role, addr, code) {
+  if (mp.ws) { try { mp.ws.close(); } catch (_) {} }
+
+  // Build ws:// URL from plain IP input
+  const url = /^wss?:\/\//.test(addr) ? addr : `ws://${addr}:8765`;
+
+  const ws = new WebSocket(url);
+  mp.ws   = ws;
+  mp.role = null;
+  mp.partnerReady = false;
+  mp.partnerPos   = null;
+
+  ws.onopen = () => {
+    if (role === 'host') {
+      mp.send({ type: 'host' });
+    } else {
+      mp.send({ type: 'join', code: (code || '').toUpperCase() });
+    }
+  };
+
+  ws.onmessage = (ev) => {
+    let msg;
+    try { msg = JSON.parse(ev.data); } catch { return; }
+    handleMessage(msg);
+  };
+
+  ws.onclose = () => {
+    stopIntervals();
+    const wasActive = mp.partnerReady;
+    mp.role = null;
+    mp.partnerReady = false;
+    mp.partnerPos   = null;
+    if (wasActive) showMsg('🌐 Multiplayer session ended.');
+    updateBadge();
+    renderPanel();
+  };
+
+  ws.onerror = () => {
+    if (mp.role === null) {          // never got through
+      showMsg('⚠️ Could not reach server. Is it running? Check the IP address.');
+    }
+  };
+}
+
+function disconnect() {
+  stopIntervals();
+  if (mp.ws) { try { mp.ws.close(); } catch (_) {} mp.ws = null; }
+  mp.role = null;
+  mp.code = null;
+  mp.partnerReady = false;
+  mp.partnerPos   = null;
+  updateBadge();
+  renderPanel();
+  showMsg('🌐 Multiplayer disconnected.');
+}
+
+/* ── MESSAGE HANDLER ────────────────────────────────────────── */
+function handleMessage(msg) {
+  switch (msg.type) {
+
+    case 'joined':
+      mp.role = msg.role;
+      mp.code = msg.code;
+      if (msg.role === 'guest') {
+        // Guest is ready immediately when server confirms the join
+        mp.partnerReady = true;
+        startIntervals();
+        showMsg(`🌐 Joined room ${msg.code}! Waiting for world sync…`);
+        updateBadge();
+      }
+      // Host waits for partner_joined before activating
+      renderPanel();
+      break;
+
+    case 'partner_joined':
+      mp.partnerReady = true;
+      startIntervals();
+      showMsg('🌐 Partner connected — co-op active! [T] to chat.');
+      updateBadge();
+      renderPanel();
+      break;
+
+    case 'partner_left':
+      stopIntervals();
+      mp.partnerReady = false;
+      mp.partnerPos   = null;
+      showMsg(`🌐 ${msg.reason || 'Partner disconnected.'}`);
+      updateBadge();
+      renderPanel();
+      // Host stays connected and can accept a new guest
+      if (mp.isHost()) startIntervals(); // keep world interval paused (no guest), but rerender is fine
+      break;
+
+    // Relay messages from partner
+    case 'pos':
+    case 'world_state':
+    case 'guest_action':
+    case 'chat':
+      handleRelay(msg);
+      break;
+
+    // Server wrapped relay
+    default:
+      if (msg._from) handleRelay(msg);
+      break;
+
+    case 'error':
+      showMsg(`⚠️ Multiplayer: ${msg.msg}`);
+      renderPanel();
+      break;
+  }
+}
+
+function handleRelay(msg) {
+  switch (msg.type) {
+
+    case 'pos':
+      mp.partnerPos = msg;
+      break;
+
+    case 'world_state':
+      if (mp.isGuest()) applyWorldState(msg);
+      break;
+
+    case 'guest_action':
+      if (mp.isHost()) applyGuestAction(msg);
+      break;
+
+    case 'chat': {
+      const who  = msg.senderName || 'Partner';
+      const text = (msg.text || '').slice(0, 120);
+      if (text) showMsg(`💬 ${who}: ${text}`, 4000);
+      break;
+    }
+  }
+}
+
+/* ── POSITION BROADCAST ─────────────────────────────────────── */
+function broadcastPos() {
+  if (!mp.partnerReady) return;
+  mp.send({
+    type:       'pos',
+    x:          player.x,
+    y:          player.y,
+    facing:     player.facing,
+    walkFrame:  player.walkFrame  || 0,
+    tool:       player.tool,
+    name:       player.name       || 'Partner',
+    gender:     player.gender,
+    skinTone:   player.skinTone,
+    hairStyle:  player.hairStyle,
+    hairColor:  player.hairColor,
+    shirtStyle: player.shirtStyle,
+    shirtColor: player.shirtColor,
+    pantsColor: player.pantsColor,
+    hatColor:   player.hatColor,
+    // Zone so we only draw if both on same map
+    zone:       (gameState.inMine      ? 'mine'
+                :gameState.inBadlands  ? 'badlands'
+                :gameState.inHoboCamp  ? 'hobo'
+                :gameState.inOcean     ? 'ocean'
+                :'overworld'),
+  });
+}
+
+/* ── WORLD STATE ────────────────────────────────────────────── */
+function broadcastWorldState() {
+  if (!mp.partnerReady) return;
+
+  // Compact plots: only serialize the fields the guest needs
+  const plotsCompact = {};
+  for (const [k, p] of Object.entries(plots)) {
+    plotsCompact[k] = {
+      crop: p.crop, stage: p.stage, growTimer: p.growTimer,
+      watered: p.watered, wilted: p.wilted, harvestReady: p.harvestReady,
+      tilled: p.tilled, wateredToday: p.wateredToday,
+    };
+  }
+
+  mp.send({
+    type:             'world_state',
+    plots:            JSON.stringify(plotsCompact),
+    econPrices:       JSON.stringify(economy.prices),
+    econSeedPrices:   JSON.stringify(economy.seedPrices),
+    econEvent:        economy.event ? JSON.stringify(economy.event) : null,
+    econEvDaysLeft:   economy.evDaysLeft,
+    day:              gameState.day,
+    timeOfDay:        gameState.timeOfDay,
+    season:           gameState.season,
+    isNight:          gameState.isNight,
+    animals:          JSON.stringify(
+      animals
+        .filter(a => a.hp > 0)
+        .map(a => ({ type: a.type, x: a.x, y: a.y, hp: a.hp }))
+    ),
+  });
+}
+
+function applyWorldState(msg) {
+  // ── Plots ────────────────────────────────────────────────
+  try {
+    const incoming = JSON.parse(msg.plots);
+    // Remove plots that host no longer has
+    for (const k of Object.keys(plots)) {
+      if (!incoming[k]) delete plots[k];
+    }
+    // Merge / overwrite
+    for (const [k, v] of Object.entries(incoming)) {
+      if (!plots[k]) plots[k] = {};
+      Object.assign(plots[k], v);
+    }
+    // Sync tile types so they visually match host
+    for (const [k, p] of Object.entries(plots)) {
+      const [tx, ty] = k.split(',').map(Number);
+      if (!isNaN(tx) && !isNaN(ty) && typeof setT === 'function' && typeof TL !== 'undefined') {
+        const tile = p.watered ? TL.FARM_WATERED : p.tilled ? TL.FARM_TILLED : TL.FARM_DRY;
+        setT(tx, ty, tile);
+      }
+    }
+  } catch (_) {}
+
+  // ── Economy ──────────────────────────────────────────────
+  try { Object.assign(economy.prices,     JSON.parse(msg.econPrices));     } catch (_) {}
+  try { Object.assign(economy.seedPrices, JSON.parse(msg.econSeedPrices)); } catch (_) {}
+  try {
+    economy.event      = msg.econEvent ? JSON.parse(msg.econEvent) : null;
+    economy.evDaysLeft = msg.econEvDaysLeft;
+  } catch (_) {}
+
+  // ── Time / Season ────────────────────────────────────────
+  gameState.day       = msg.day;
+  gameState.timeOfDay = msg.timeOfDay;
+  gameState.season    = msg.season;
+  gameState.isNight   = msg.isNight;
+
+  // Refresh open panels
+  try { if (typeof refreshMarketUI === 'function' && window.marketOpen) refreshMarketUI(); } catch (_) {}
+  try { if (typeof updateFarmPanelPrices === 'function') updateFarmPanelPrices(); } catch (_) {}
+}
+
+/* ── GUEST FARM ACTIONS → relayed to host ───────────────────── */
+// When guest uses a farm tool, relay the action to the host.
+// Host applies it to the authoritative world, guest sees it on next world sync.
+const FARM_TOOLS = new Set(['till', 'water', 'plant', 'harvest']);
+
+const _origUseTool = window.useTool;
+window.useTool = function (wx, wy) {
+  if (mp.isGuest() && mp.isActive() && FARM_TOOLS.has(player.tool)) {
+    // Relay to host — don't apply locally (host is authoritative for plots)
+    mp.send({
+      type:         'guest_action',
+      actionType:   'use_tool',
+      wx, wy,
+      tool:         player.tool,
+      seed:         player.selectedSeed,
+      facing:       player.facing,
+    });
+    return; // skip local execution
+  }
+  _origUseTool(wx, wy);
+};
+
+function applyGuestAction(msg) {
+  if (msg.actionType !== 'use_tool') return;
+
+  // Temporarily override the global player context so useTool()
+  // operates on the guest's position and tool choice.
+  const savedTool    = player.tool;
+  const savedSeed    = player.selectedSeed;
+  const savedFacing  = player.facing;
+
+  player.tool           = msg.tool   || savedTool;
+  player.selectedSeed   = msg.seed   || savedSeed;
+  player.facing         = msg.facing || savedFacing;
+
+  try { _origUseTool(msg.wx, msg.wy); } catch (_) {}
+
+  player.tool         = savedTool;
+  player.selectedSeed = savedSeed;
+  player.facing       = savedFacing;
+}
+
+/* ── RENDER HOOK — draw remote player ───────────────────────── */
+const _origRender = window.render;
+window.render = function () {
+  _origRender();
+  if (mp.partnerPos) drawRemotePlayer();
+};
+
+function getLocalZone() {
+  if (gameState.inMine)     return 'mine';
+  if (gameState.inBadlands) return 'badlands';
+  if (gameState.inHoboCamp) return 'hobo';
+  if (gameState.inOcean)    return 'ocean';
+  return 'overworld';
+}
+
+function drawRemotePlayer() {
+  const p   = mp.partnerPos;
+  // Only draw if both players are on the same map layer
+  if ((p.zone || 'overworld') !== getLocalZone()) return;
+
+  const cam = gameState.camera;
+  const sx  = Math.round(p.x - cam.x);
+  const sy  = Math.round(p.y - cam.y);
+
+  // Cull if off-screen
+  const vw = canvas.width  / ZOOM;
+  const vh = canvas.height / ZOOM;
+  if (sx < -60 || sx > vw + 60 || sy < -80 || sy > vh + 20) return;
+
+  ctx.save();
+  ctx.scale(ZOOM, ZOOM);
+
+  // Shadow
+  ctx.save();
+  ctx.globalAlpha = 0.28;
+  ctx.fillStyle   = '#000';
+  ctx.beginPath();
+  ctx.ellipse(sx, sy + 2, 10, 4, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Character — reuse the game's drawCharacter if available
+  const cfg = {
+    gender:     p.gender     ?? 'male',
+    skinTone:   p.skinTone   ?? 0,
+    hairStyle:  p.hairStyle  ?? 0,
+    hairColor:  p.hairColor  ?? 0,
+    shirtStyle: p.shirtStyle ?? 0,
+    shirtColor: p.shirtColor ?? 2,  // slightly different default to stand out
+    pantsColor: p.pantsColor ?? 1,
+    hatColor:   p.hatColor   ?? 2,
+  };
+
+  if (typeof drawCharacter === 'function') {
+    drawCharacter(ctx, sx, sy, p.facing || 'down', p.walkFrame || 0, false, cfg);
+  } else {
+    // Fallback silhouette
+    ctx.fillStyle = '#3060a0'; ctx.fillRect(sx - 9, sy - 20, 18, 22);
+    ctx.fillStyle = '#c09870'; ctx.fillRect(sx - 5, sy - 31, 10, 12);
+  }
+
+  // Tool icon above player
+  const toolIcons = { till:'⛏', water:'💧', plant:'🌱', harvest:'🌾' };
+  const icon = toolIcons[p.tool] || '';
+  if (icon) {
+    ctx.font = '13px serif'; ctx.textAlign = 'center';
+    ctx.fillText(icon, sx, sy - 44);
+  }
+
+  // Name tag
+  const name = (p.name || 'Partner').slice(0, 16);
+  const nw   = name.length * 4.5 + 14;
+  ctx.fillStyle = 'rgba(10,25,50,.82)';
+  ctx.fillRect(sx - nw / 2, sy - 54, nw, 13);
+  // Blue top border for the name tag
+  ctx.fillStyle = '#4870a0';
+  ctx.fillRect(sx - nw / 2, sy - 54, nw, 2);
+  ctx.fillStyle = '#a8ccff';
+  ctx.font      = '9px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(name, sx, sy - 45);
+
+  ctx.restore();
+}
+
+/* ── CHAT ────────────────────────────────────────────────────── */
+const chatBox = document.getElementById('dhMpChatBox');
+const chatIn  = document.getElementById('dhMpChatIn');
+
+function openChat() {
+  if (mp.chatOpen || !mp.isActive()) return;
+  mp.chatOpen = true;
+  chatBox.style.display = 'flex';
+  chatIn.value = '';
+  setTimeout(() => chatIn.focus(), 30);
+}
+
+function closeChat() {
+  mp.chatOpen = false;
+  chatBox.style.display = 'none';
+  chatIn.blur();
+}
+
+chatIn.addEventListener('keydown', (e) => {
+  if (e.code === 'Escape') { e.preventDefault(); closeChat(); return; }
+  if (e.code === 'Enter') {
+    e.preventDefault();
+    const text = chatIn.value.trim();
+    if (text) {
+      mp.send({ type: 'chat', senderName: player.name || 'Partner', text });
+      showMsg(`💬 You: ${text}`, 3500);
+    }
+    closeChat();
+  }
+});
+
+// [T] to open chat; block game keydown when chat is open
+document.addEventListener('keydown', (e) => {
+  if (mp.chatOpen) {
+    // Eat all keys except those handled by chatIn's own listener
+    if (e.code !== 'Enter' && e.code !== 'Escape') e.stopPropagation();
+    return;
+  }
+  if (e.code === 'KeyT' && mp.isActive()
+      && !window.invOpen && !window.marketOpen
+      && !window.settingsOpen && !window.pauseOpen) {
+    e.preventDefault();
+    openChat();
+  }
+}, true); // capture phase so it fires before game listeners
+
+/* ── PANEL UI ────────────────────────────────────────────────── */
+const mpPanel = document.getElementById('dhMpPanel');
+const mpBadge = document.getElementById('dhMpBadge');
+let   panelVisible = false;
+
+function togglePanel() {
+  panelVisible = !panelVisible;
+  mpPanel.style.display = panelVisible ? 'block' : 'none';
+  if (panelVisible) renderPanel();
+}
+
+function renderPanel() {
+  if (!panelVisible) return;
+
+  // ── No connection yet ────────────────────────────────────
+  if (!mp.role && !mp.ws) {
+    mpPanel.innerHTML = `
+      <div class="dhmp-section">🌐 CO-OP MULTIPLAYER</div>
+      <div class="dhmp-status">
+        Play with a partner over WiFi or LAN.<br>
+        One player hosts, the other joins.
+      </div>
+
+      <div class="dhmp-label">YOUR LOCAL IP (the host enters this)</div>
+      <input class="dhmp-inp" id="dhMpAddr"
+        placeholder="192.168.1.x"
+        value="${localStorage.getItem('dhMpLastAddr') || ''}">
+
+      <button class="dhmp-btn" onclick="window._dhMpDoHost()">⚑ HOST A GAME</button>
+      <hr class="dhmp-hr">
+      <div class="dhmp-label">JOIN — HOST'S IP + ROOM CODE</div>
+      <input class="dhmp-inp" id="dhMpJoinIP"
+        placeholder="192.168.1.x (host's IP)"
+        value="${localStorage.getItem('dhMpLastAddr') || ''}">
+      <input class="dhmp-inp" id="dhMpJoinCode"
+        placeholder="ROOM CODE" maxlength="4"
+        style="text-transform:uppercase;letter-spacing:.2em;font-size:14px">
+      <button class="dhmp-btn" onclick="window._dhMpDoJoin()">↳ JOIN GAME</button>
+      <hr class="dhmp-hr">
+      <button class="dhmp-btn" onclick="togglePanel()" style="opacity:.55">✕ CLOSE</button>
+    `;
+    return;
+  }
+
+  // ── Connecting / error ───────────────────────────────────
+  if (mp.ws && !mp.role) {
+    mpPanel.innerHTML = `
+      <div class="dhmp-section">🌐 CONNECTING…</div>
+      <div class="dhmp-status">Reaching the server…</div>
+      <button class="dhmp-btn danger" onclick="window._dhMpDoDisconnect()">✕ CANCEL</button>
+    `;
+    return;
+  }
+
+  // ── Host, waiting for partner ────────────────────────────
+  if (mp.isHost() && !mp.partnerReady) {
+    mpPanel.innerHTML = `
+      <div class="dhmp-section">🌐 HOSTING — WAITING</div>
+      <div class="dhmp-label">ROOM CODE — share with your partner:</div>
+      <div class="dhmp-code">${mp.code || '…'}</div>
+      <div class="dhmp-status">
+        Give your partner:<br>
+        &nbsp;&nbsp;• Your local IP address<br>
+        &nbsp;&nbsp;• This code: <b>${mp.code}</b><br><br>
+        <em>⏳ Waiting for partner to join…</em>
+      </div>
+      <button class="dhmp-btn danger" onclick="window._dhMpDoDisconnect()">✕ CANCEL</button>
+    `;
+    return;
+  }
+
+  // ── Active session ───────────────────────────────────────
+  const roleName    = mp.isHost() ? '⚑ HOST' : '↳ GUEST';
+  const partnerName = mp.partnerPos?.name || 'Partner';
+  const guestNote   = mp.isGuest()
+    ? `<br><span style="color:rgba(160,140,80,.7);font-size:8px">Farm actions relay to host (~2s delay).<br>Your gold &amp; inventory are local.</span>`
+    : '';
+
+  mpPanel.innerHTML = `
+    <div class="dhmp-section">🌐 CO-OP ACTIVE — ${roleName}</div>
+    <div class="dhmp-status">
+      Room: <b>${mp.code}</b> &nbsp;·&nbsp; Partner: <b>${partnerName}</b><br>
+      Press <b style="color:#c8d8e8">[T]</b> to chat.
+      ${guestNote}
+    </div>
+    <div style="font-size:8px;color:rgba(110,85,45,.55);margin-bottom:8px;line-height:1.6">
+      Shared: farm plots · market prices · time / season<br>
+      Separate: gold · inventory · health · stats
+    </div>
+    <button class="dhmp-btn" onclick="togglePanel()">← CLOSE PANEL</button>
+    <button class="dhmp-btn danger" onclick="window._dhMpDoDisconnect()">✕ DISCONNECT</button>
+  `;
+}
+
+/* ── BADGE ────────────────────────────────────────────────────── */
+function updateBadge() {
+  if (mp.isActive()) {
+    const partner = mp.partnerPos?.name || 'Partner';
+    const role    = mp.isHost() ? '⚑' : '↳';
+    mpBadge.textContent  = `🌐 ${role} ${partner}`;
+    mpBadge.style.display = 'block';
+    document.getElementById('dhMpBtn').classList.add('active');
+    document.getElementById('dhMpBtn').textContent = '🌐 CO-OP ●';
+  } else {
+    mpBadge.style.display = 'none';
+    document.getElementById('dhMpBtn').classList.remove('active');
+    document.getElementById('dhMpBtn').textContent = '🌐 MULTI';
+  }
+}
+
+/* ── BUTTON ──────────────────────────────────────────────────── */
+// Inject the toggle button
+(function injectBtn() {
+  const btn = document.createElement('button');
+  btn.id        = 'dhMpBtn';
+  btn.textContent = '🌐 MULTI';
+  btn.onclick   = togglePanel;
+  document.body.appendChild(btn);
+})();
+
+/* ── GLOBAL WRAPPERS (called from inline onclick) ─────────────── */
+window._dhMpDoHost = function () {
+  const addr = (document.getElementById('dhMpAddr')?.value || '').trim();
+  if (!addr) { showMsg('⚠️ Enter your local IP address first.'); return; }
+  localStorage.setItem('dhMpLastAddr', addr);
+  connectAs('host', addr);
+  // Re-render after a moment so we show the "connecting" state
+  setTimeout(renderPanel, 250);
+  setTimeout(renderPanel, 1800); // again once server confirms
+};
+
+window._dhMpDoJoin = function () {
+  const ip   = (document.getElementById('dhMpJoinIP')?.value   || '').trim();
+  const code = (document.getElementById('dhMpJoinCode')?.value || '').trim().toUpperCase();
+  if (!ip)   { showMsg('⚠️ Enter the host\'s IP address.'); return; }
+  if (!code) { showMsg('⚠️ Enter the room code.'); return; }
+  localStorage.setItem('dhMpLastAddr', ip);
+  connectAs('guest', ip, code);
+  setTimeout(renderPanel, 250);
+};
+
+window._dhMpDoDisconnect = function () {
+  disconnect();
+};
+
+// Also expose togglePanel globally so panel's close button works
+window.togglePanel = togglePanel; // eslint-disable-line no-global-assign
+
+/* ── EXPOSE FOR CONSOLE DEBUGGING ────────────────────────────── */
+window.dhMp = mp;
+
+})();
+</script>

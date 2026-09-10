@@ -1,0 +1,10 @@
+Write an input module for a browser game using the IIFE revealing-module pattern (const Input = (() => { ... })()).
+
+Requirements:
+- Track keyboard state via keydown/keyup listeners on window.
+- Expose isDown(code) for held keys and justDown(code) that is true only on the first frame a key is pressed.
+- Keep a "previous frame" snapshot and provide update() (call once per frame) to refresh it, plus clear() to reset all keys.
+- Prevent Space from scrolling/activating focused buttons.
+- Add a pause toggle on KeyP or Escape that calls Game.togglePause() only while the game state is 'racing'.
+- Add a layer of semantic input helpers on top of the raw key state.
+- Use section-header comments to organize the file.

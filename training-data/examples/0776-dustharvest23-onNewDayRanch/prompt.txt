@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+Module/function: onNewDayRanch  (from dustharvest23)

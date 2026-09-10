@@ -1,0 +1,1157 @@
+// ── Autonomous coding agent ───────────────────────────────────────────────────
+// A simple, transparent ReAct-style loop: the model emits ONE JSON action per
+// step, the server executes it against a sandboxed workspace, feeds the result
+// back, and repeats until the goal is met or a step limit is hit.
+//
+// Safety model (v1): file/list operations run automatically; run_command pauses
+// and waits for explicit human approval. Everything is confined to WORKSPACE.
+
+import express from 'express';
+import { fileURLToPath } from 'url';
+import { dirname, join, resolve, relative, sep } from 'path';
+import { randomUUID } from 'crypto';
+import { mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, existsSync, unlinkSync, rmSync, appendFileSync } from 'fs';
+import { exec } from 'child_process';
+import fetch from 'node-fetch';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+import { mirrorAgentCommand, mirrorAgentResult } from './terminal.js';
+
+export const WORKSPACE = join(__dirname, '..', 'workspace');
+const PORT = process.env.PORT || 3001;
+
+const MAX_STEPS = 30;            // hard ceiling so a run can't loop forever
+const CMD_TIMEOUT_MS = 60_000;   // per shell command
+// Qwen2.5 supports 32k natively. On a Kaggle/Colab T4 (16GB), 24k is the practical
+// cap for a 14B: KV cache ~4.5GB + ~9GB model + buffers ≈ 14.5GB (fits, tight). Enable
+// OLLAMA_KV_CACHE_TYPE=q8_0 server-side to halve the KV and run it comfortably. Drop
+// NUM_CTX to 8192 if you OOM; a 7B has room to spare either way.
+const NUM_CTX = parseInt(process.env.NUM_CTX, 10) || 24_576;
+const NUM_PREDICT = parseInt(process.env.NUM_PREDICT, 10) || -1; // -1 = generate until done; never truncate a long file mid-write
+const TEMPERATURE = 0.2;
+const MAX_HISTORY_MSGS = 16;     // keep recent context dense; older tool dumps are pruned
+
+// ── Workspace sandbox helpers ────────────────────────────────────────────────
+function ensureWorkspace() {
+  if (!existsSync(WORKSPACE)) mkdirSync(WORKSPACE, { recursive: true });
+}
+
+// Resolve a user/model-supplied path and refuse anything outside WORKSPACE.
+function safePath(p) {
+  const full = resolve(WORKSPACE, p || '.');
+  const rel = relative(WORKSPACE, full);
+  if (rel.startsWith('..') || (rel.includes('..' + sep))) {
+    throw new Error(`Path escapes workspace: ${p}`);
+  }
+  return full;
+}
+
+// At/above this size, a blind read_file (no LINES) returns a MAP instead of the
+// contents — forcing the model to navigate by range like a human reads code.
+const BIG_FILE_LINES = 250;
+
+// Compact map of a file: every function/class/top-level declaration + its line.
+// Shared by outline_file and read_file's big-file redirect. Handles JS and Python.
+function buildOutline(lines) {
+  const pats = [
+    /^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)\s*\(/,
+    /^\s*(?:export\s+)?class\s+([A-Za-z_$][\w$]*)/,
+    /^\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?(?:function|\([^)]*\)\s*=>|\{|\[)/,
+    /^\s*([A-Za-z_$][\w$]*)\s*[:=]\s*(?:async\s*)?function/,
+    /^\s*(?:async\s+)?def\s+([A-Za-z_]\w*)\s*\(/,        // python def
+    /^\s*class\s+([A-Za-z_]\w*)\s*[:(]/,                 // python class
+  ];
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    for (const re of pats) {
+      if (re.test(lines[i])) { out.push(`${i + 1}: ${lines[i].trim().slice(0, 90)}`); break; }
+    }
+  }
+  return out;
+}
+
+// ── Tools ────────────────────────────────────────────────────────────────────
+const tools = {
+  list_dir({ path = '.' }) {
+    const full = safePath(path);
+    if (!existsSync(full)) return `(empty — ${path} does not exist yet)`;
+    const walk = (dir, prefix = '') => {
+      let out = '';
+      for (const name of readdirSync(dir).sort()) {
+        if (name === 'node_modules' || name === '.git') continue;
+        const fp = join(dir, name);
+        const isDir = statSync(fp).isDirectory();
+        out += `${prefix}${name}${isDir ? '/' : ''}\n`;
+        if (isDir) out += walk(fp, prefix + '  ');
+      }
+      return out;
+    };
+    return walk(full).trim() || '(empty)';
+  },
+
+  // Read a file. Shows line numbers (for navigation/search follow-up) and, on a
+  // big file, only a window — so a 10k-line file never blows the model's context.
+  read_file({ path, offset, limit }) {
+    const full = safePath(path);
+    if (!existsSync(full)) return `ERROR: file not found: ${path}`;
+    const all = readFileSync(full, 'utf8').split('\n');
+    const total = all.length;
+
+    // Blind read of a BIG file → don't slurp. Hand back the MAP + the first lines,
+    // and make the model pick a range or search. This is how you read code: orient
+    // from the structure, then zoom into the one part you need.
+    if (offset == null && limit == null && total > BIG_FILE_LINES) {
+      const map = buildOutline(all);
+      const head = all.slice(0, 30).map((l, i) => `${i + 1}: ${l}`).join('\n');
+      return [
+        `[${path} — ${total} lines. Too big to read whole; here is its MAP and the first 30 lines.]`,
+        `MAP (declaration → line):`,
+        map.length ? map.join('\n') : '(no declarations detected — use search_file to find what you need)',
+        ``,
+        `FIRST 30 LINES:`,
+        head,
+        ``,
+        `➜ Now read ONLY what you need: read_file PATH with LINES <start>-<end> for a section, or search_file to jump to a symbol. Do NOT ask for the whole file.`,
+      ].join('\n').slice(0, 14_000);
+    }
+
+    const start = offset != null ? Math.max(0, (parseInt(offset, 10) || 1) - 1) : 0;
+    const count = limit != null ? Math.max(1, parseInt(limit, 10) || 1) : 400;
+    const numbered = all.slice(start, start + count).map((l, i) => `${start + i + 1}: ${l}`).join('\n');
+    const shownEnd = Math.min(start + count, total);
+    const more = shownEnd < total
+      ? `\n... ${total - shownEnd} more lines below. Use read_file with OFFSET: ${shownEnd + 1} to continue, or search_file to jump to a symbol.`
+      : '';
+    return `[${path} — lines ${start + 1}-${shownEnd} of ${total}]\n${numbered}${more}`.slice(0, 14_000);
+  },
+
+  // Find where a symbol/string lives in a big file (or across the workspace).
+  // Returns "path:line: text" so the model can then read_file a range and edit it.
+  search_file({ path, query }) {
+    if (!query) return 'ERROR: missing QUERY to search for.';
+    let re;
+    try { re = new RegExp(query, 'i'); }
+    catch { re = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); }
+    const targets = [];
+    if (path) targets.push(path);
+    else {
+      const walk = (dir, rel = '') => {
+        for (const name of readdirSync(dir)) {
+          if (name === 'node_modules' || name === '.git') continue;
+          const fp = join(dir, name), r = rel ? `${rel}/${name}` : name;
+          statSync(fp).isDirectory() ? walk(fp, r) : targets.push(r);
+        }
+      };
+      try { walk(WORKSPACE); } catch {}
+    }
+    const out = [];
+    for (const t of targets) {
+      let full;
+      try { full = safePath(t); } catch { continue; }
+      if (!existsSync(full) || statSync(full).isDirectory()) continue;
+      const lines = readFileSync(full, 'utf8').split('\n');
+      for (let i = 0; i < lines.length && out.length < 60; i++) {
+        if (re.test(lines[i])) out.push(`${t}:${i + 1}: ${lines[i].trim().slice(0, 150)}`);
+      }
+      if (out.length >= 60) break;
+    }
+    return out.length
+      ? out.join('\n') + (out.length >= 60 ? '\n... more matches — refine QUERY.' : '')
+      : `(no matches for "${query}")`;
+  },
+
+  // Compact MAP of a big file — every function/class/top-level const + its line
+  // number. Lets the model grasp a 10k-line file's structure in ~100 lines, then
+  // read_file just the slice it needs. The right FIRST move on any large file.
+  outline_file({ path }) {
+    const full = safePath(path);
+    if (!existsSync(full)) return `ERROR: file not found: ${path}`;
+    const lines = readFileSync(full, 'utf8').split('\n');
+    const out = buildOutline(lines);
+    return out.length
+      ? `[${path} — ${lines.length} lines, ${out.length} declarations]\n${out.join('\n')}`.slice(0, 13_000)
+      : `(no declarations found — use read_file with LINES or search_file)`;
+  },
+
+  write_file({ path, content = '' }) {
+    const full = safePath(path);
+    mkdirSync(dirname(full), { recursive: true });
+    writeFileSync(full, content, 'utf8');
+    return `OK: wrote ${Buffer.byteLength(content)} bytes to ${path}`;
+  },
+
+  // Surgical edit: replace a snippet in an existing file. Tries an exact match
+  // first; if that fails, falls back to whitespace-tolerant line matching (small
+  // models rarely reproduce exact indentation). Refuses if not found or ambiguous.
+  edit_file({ path, find, replace = '' }) {
+    const full = safePath(path);
+    if (!existsSync(full)) return `ERROR: file not found: ${path} (use write_file to create it)`;
+    if (find == null || find === '') return 'ERROR: missing FIND snippet.';
+    const content = readFileSync(full, 'utf8');
+
+    // 1) exact unique match
+    const exact = content.split(find).length - 1;
+    if (exact === 1) { writeFileSync(full, content.replace(find, replace), 'utf8'); return `OK: edited ${path}.`; }
+    if (exact > 1) return `ERROR: the FIND snippet appears ${exact} times; include more surrounding lines so it is unique.`;
+
+    // 2) whitespace-tolerant: match by trimmed non-blank lines (ignores indentation)
+    const fileLines = content.split('\n');
+    const findLines = find.split('\n').map(l => l.replace(/^\s*\d+:\s?/, '').trim()).filter(Boolean);
+    if (!findLines.length) return `ERROR: the FIND snippet was not found in ${path}.`;
+    let start = -1, end = -1, hits = 0;
+    for (let i = 0; i < fileLines.length; i++) {
+      let fi = i, ki = 0;
+      while (fi < fileLines.length && ki < findLines.length) {
+        const t = fileLines[fi].trim();
+        if (t === '') { fi++; continue; }            // skip blank lines in the file
+        if (t === findLines[ki]) { fi++; ki++; } else break;
+      }
+      if (ki === findLines.length) { hits++; if (hits === 1) { start = i; end = fi - 1; } }
+    }
+    if (hits === 1) {
+      const out = [...fileLines.slice(0, start), replace, ...fileLines.slice(end + 1)].join('\n');
+      writeFileSync(full, out, 'utf8');
+      return `OK: edited ${path} (matched ignoring indentation).`;
+    }
+    if (hits > 1) return `ERROR: the snippet matches ${hits} places; include more lines so it is unique.`;
+    return `ERROR: the FIND snippet was not found in ${path}. read_file again and copy the exact lines you want to replace.`;
+  },
+
+  run_command({ cmd }) {
+    return new Promise((res) => {
+      // Mirror into any open Terminal view so you SEE what the agent runs. The
+      // command still executes via exec(), not the PTY: the model needs a clean
+      // stdout/stderr/exit-code triple, which you cannot parse back out of a shell
+      // byte stream. Mirroring gives visibility without costing reliability.
+      mirrorAgentCommand('run_command', cmd);
+      exec(cmd, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true }, (err, stdout, stderr) => {
+        const out = [
+          stdout && `STDOUT:\n${stdout}`,
+          stderr && `STDERR:\n${stderr}`,
+          err && err.killed && `(timed out after ${CMD_TIMEOUT_MS / 1000}s)`,
+          `EXIT: ${err ? (err.code ?? 1) : 0}`,
+        ].filter(Boolean).join('\n');
+        mirrorAgentResult(out, !err);
+        res(out.slice(0, 8_000));
+      });
+    });
+  },
+
+  // Run Python. Either an inline CODE block (written to _snippet.py and executed)
+  // or an existing PATH in the workspace. Same risk profile as run_command, so it
+  // is approval-gated. Lets the agent compute, test, or run a data script.
+  run_python({ code, path }) {
+    return new Promise((res) => {
+      let target = path;
+      if (code != null && code !== '') {
+        try { writeFileSync(join(WORKSPACE, '_snippet.py'), code, 'utf8'); target = '_snippet.py'; }
+        catch (e) { return res(`ERROR: ${e.message}`); }
+      }
+      if (!target) return res('ERROR: provide CODE (a python code block) or PATH to a .py file.');
+      let full; try { full = safePath(target); } catch (e) { return res(`ERROR: ${e.message}`); }
+      if (!existsSync(full)) return res(`ERROR: file not found: ${target}`);
+      exec(`python "${full}"`, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true }, (err, stdout, stderr) => {
+        const out = [
+          stdout && `STDOUT:\n${stdout}`,
+          stderr && `STDERR:\n${stderr}`,
+          err && err.killed && `(timed out after ${CMD_TIMEOUT_MS / 1000}s)`,
+          `EXIT: ${err ? (err.code ?? 1) : 0}`,
+        ].filter(Boolean).join('\n');
+        res(out.slice(0, 8_000));
+      });
+    });
+  },
+
+  // ── Internet reference lookup (free, no API key) ─────────────────────────────
+  // A LAST-RESORT escape hatch: when local context isn't enough, search the web
+  // for guidance. Read-only network reads, output is truncated to protect the
+  // model's limited context, so these auto-run. Use sparingly (the prompt says so).
+  async web_search({ query, max_results = 5 }) {
+    if (!query) return 'ERROR: missing QUERY to search for.';
+    const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
+    let html;
+    try {
+      const r = await fetch('https://html.duckduckgo.com/html/?q=' + encodeURIComponent(query),
+        { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(15_000) });
+      html = await r.text();
+    } catch (e) { return `ERROR: web search failed: ${e.message}`; }
+
+    const titles = [], snips = [];
+    const tre = /<a[^>]+class="result__a"[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
+    let m;
+    while ((m = tre.exec(html)) && titles.length < max_results) {
+      let href = m[1];
+      const ud = href.match(/uddg=([^&]+)/);          // DDG wraps links in a redirect — unwrap it
+      if (ud) { try { href = decodeURIComponent(ud[1]); } catch {} }
+      titles.push({ href, title: m[2].replace(/<[^>]+>/g, '').trim() });
+    }
+    const sre = /class="result__snippet"[^>]*>([\s\S]*?)<\/a>/g;
+    while ((m = sre.exec(html)) && snips.length < max_results) snips.push(m[1].replace(/<[^>]+>/g, '').trim());
+
+    if (!titles.length) return `(no results for "${query}")`;
+    return titles.map((t, i) =>
+      `${i + 1}. ${t.title}\n   ${t.href}\n   ${(snips[i] || '').slice(0, 240)}`).join('\n\n')
+      + `\n\n(Use web_fetch on the most relevant URL to read its content.)`;
+  },
+
+  // Fetch a page and strip it to clean text (never dump raw HTML into the model).
+  async web_fetch({ url, max_chars = 4000 }) {
+    if (!/^https?:\/\//i.test(url || '')) return 'ERROR: URL must start with http:// or https://';
+    const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
+    let html;
+    try {
+      const r = await fetch(url, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(15_000) });
+      if (!r.ok) return `ERROR: fetch returned HTTP ${r.status}`;
+      html = await r.text();
+    } catch (e) { return `ERROR: fetch failed: ${e.message}`; }
+    const text = html
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"')
+      .replace(/\s+/g, ' ').trim();
+    return `[${url} — ${text.length} chars of text extracted]\n${text.slice(0, max_chars)}`
+      + (text.length > max_chars ? '\n... (truncated)' : '');
+  },
+
+  // Load the web app in a headless browser, click its controls, and report
+  // console/page errors + the visible text after interaction. Lets the agent
+  // catch its own runtime bugs by actually running the app.
+  async test_web({ path = 'index.html' } = {}) {
+    let puppeteer;
+    try { puppeteer = require('puppeteer'); }
+    catch { return 'ERROR: puppeteer is not installed on the server, cannot test.'; }
+    const url = `http://localhost:${PORT}/workspace/${String(path).replace(/^\/+/, '')}`;
+    const logs = [];
+    let browser;
+    try {
+      browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+      const page = await browser.newPage();
+      page.on('console', (m) => {
+        const t = m.text();
+        // skip generic "Failed to load resource" (favicon noise — real 404s are caught below with their URL)
+        if ((m.type() === 'error' || m.type() === 'warning') && !/Failed to load resource/i.test(t)) logs.push(`[console.${m.type()}] ${t}`);
+      });
+      page.on('pageerror', (e) => logs.push(`[JS ERROR] ${e.message}`));
+      page.on('response', (r) => { if (r.status() >= 400 && !/favicon/i.test(r.url())) logs.push(`[HTTP ${r.status()}] ${r.url().split('/').pop()}`); });
+      const resp = await page.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
+      const status = resp ? resp.status() : 'no response';
+      await new Promise((r) => setTimeout(r, 700));
+      const before = (await page.evaluate(() => document.body ? document.body.innerText : '')).slice(0, 400);
+      // exercise the UI: click up to 12 buttons / onclick elements
+      const clickable = await page.$$('button, [onclick]');
+      let clicked = 0;
+      for (const el of clickable.slice(0, 12)) {
+        try { await el.click({ delay: 10 }); clicked++; await new Promise((r) => setTimeout(r, 120)); } catch {}
+      }
+      await new Promise((r) => setTimeout(r, 400));
+      const after = (await page.evaluate(() => document.body ? document.body.innerText : '')).slice(0, 700);
+      await browser.close();
+      const errs = logs.length ? logs.slice(0, 25).join('\n') : '(none)';
+      return [
+        `Loaded ${url} (HTTP ${status}). Clicked ${clicked} control(s).`,
+        `ERRORS:\n${errs}`,
+        `VISIBLE TEXT (on load): ${before.replace(/\n+/g, ' | ')}`,
+        `VISIBLE TEXT (after clicking): ${after.replace(/\n+/g, ' | ')}`,
+        `(Review the visible text for wrong values, e.g. "$0" where money was expected, or features that did nothing.)`,
+      ].join('\n\n');
+    } catch (e) {
+      try { if (browser) await browser.close(); } catch {}
+      return `ERROR loading the page: ${e.message}\nCollected so far:\n${logs.join('\n') || '(none)'}`;
+    }
+  },
+};
+
+// run without approval. web_search/web_fetch are read-only network reads with
+// truncated output; run_python and run_command execute code, so they are NOT here.
+const AUTO_TOOLS = new Set(['list_dir', 'read_file', 'search_file', 'outline_file', 'write_file', 'edit_file', 'test_web', 'web_search', 'web_fetch']);
+
+// Cheap, automatic verification: after the model writes/edits a .py or .js file,
+// compile-check it (no execution). Catches the most common failure mode — broken
+// syntax — instantly and for free, the same way test_web catches runtime bugs.
+function quickCheck(path) {
+  return new Promise((res) => {
+    if (!path) return res(null);
+    let full; try { full = safePath(path); } catch { return res(null); }
+    let cmd;
+    if (/\.py$/i.test(path)) cmd = `python -m py_compile "${full}"`;
+    else if (/\.(c|m)?js$/i.test(path)) cmd = `node --check "${full}"`;
+    else return res(null);                       // not a checkable language
+    exec(cmd, { cwd: WORKSPACE, timeout: 20_000, windowsHide: true }, (err, _o, stderr) => {
+      res(err ? (stderr || 'syntax error').slice(0, 1200) : null);
+    });
+  });
+}
+
+// ── Model call (Ollama /api/chat, non-streaming for reliability) ──────────────
+// Uncapped num_predict at 32K ctx means a long file can take minutes on a T4 (~15-25 tok/s).
+// 180s would abort it mid-write; 600s tolerates a full long generation while still bounding a dead tunnel.
+const MODEL_TIMEOUT_MS = (parseInt(process.env.MODEL_TIMEOUT_S, 10) || 600) * 1000;
+const KEEP_ALIVE = process.env.OLLAMA_KEEP_ALIVE || '30m'; // keep the 14B resident; avoids 20-60s cold reloads between steps
+
+async function callModel(loadDb, messages, signal, override) {
+  const db = loadDb();
+  const o = db.api_keys?.ollama || {};
+  const base = ((override && override.base_url) || o.base_url || 'http://localhost:11434').replace(/\/+$/, '');
+  const model = (override && override.model) || o.model || 'qwen2.5-coder:7b';
+  // abort on either the run's stop signal OR a hard timeout
+  const sigs = [AbortSignal.timeout(MODEL_TIMEOUT_MS)];
+  if (signal) sigs.push(signal);
+  const merged = AbortSignal.any(sigs);
+  try {
+    // STREAM the reply. A non-streaming 14B reply sends no bytes until the whole
+    // generation is done — on a Cloudflare quick tunnel (~100s idle cap) that
+    // returns a 524 HTML error page mid-think. Streaming keeps bytes flowing per
+    // token so the connection stays alive; we accumulate and return the full text
+    // so every caller (planner + action loop) is unchanged.
+    const r = await fetch(`${base}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model, messages, stream: true, keep_alive: KEEP_ALIVE, options: { temperature: TEMPERATURE, num_ctx: NUM_CTX, num_predict: NUM_PREDICT } }),
+      signal: merged,
+    });
+    if (!r.ok) throw new Error(`Model error ${r.status}: ${(await r.text().catch(() => '')).slice(0, 200)}`);
+
+    // Ollama /api/chat streams NDJSON: { message: { content }, done }. Buffer
+    // across network chunk boundaries so a split JSON line isn't dropped.
+    let full = '', buf = '';
+    const take = (line) => {
+      const s = line.trim();
+      if (!s) return;
+      try { const j = JSON.parse(s); if (j.message?.content) full += j.message.content; } catch {}
+    };
+    for await (const chunk of r.body) {
+      buf += chunk.toString();
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const l of lines) take(l);
+    }
+    if (buf) take(buf);
+    return full;
+  } catch (e) {
+    if (e.name === 'TimeoutError' || (merged.aborted && !(signal && signal.aborted))) {
+      throw new Error(`Model call timed out after ${MODEL_TIMEOUT_MS / 1000}s — the Ollama tunnel may be down. Re-check the tunnel URL in Settings.`);
+    }
+    throw e;
+  }
+}
+
+const SYSTEM_PROMPT = `You are an autonomous coding agent. You build software by taking ONE action per step.
+
+You work inside a sandboxed workspace directory. All paths are relative to it.
+
+Respond in this EXACT plain-text format (NOT JSON). Start with a one-line THOUGHT, then an ACTION line, then any fields for that action.
+
+The actions are:
+
+list_dir — list files/folders:
+THOUGHT: <why>
+ACTION: list_dir
+PATH: .
+
+read_file — read a file. For a BIG file, read only a line range with LINES (read_file shows line numbers, and tells you how many lines are below). If you read a big file with NO LINES, you get its MAP (declarations → line numbers) instead of the contents — read the map, then request the exact range you need:
+THOUGHT: <why>
+ACTION: read_file
+PATH: <a file from the workspace listing>
+LINES: 200-260
+
+outline_file — get a COMPACT map of a big file: every function/class with its line number. Do this FIRST on any large file, then read_file only the lines you need (never try to read a whole big file — it will not fit):
+THOUGHT: <why>
+ACTION: outline_file
+PATH: <a file from the workspace listing>
+
+search_file — find which line a specific symbol is on. Use the REAL name from the goal or the outline — NEVER a placeholder name from these examples:
+THOUGHT: <why>
+ACTION: search_file
+PATH: <a file from the listing, or omit to search every file>
+QUERY: <the exact symbol you are looking for>
+
+write_file — create/overwrite a file. Put the COMPLETE file in a fenced code block. Write code NORMALLY — do NOT escape quotes or backslashes:
+THOUGHT: <why>
+ACTION: write_file
+PATH: main.py
+\`\`\`python
+print("hello")
+\`\`\`
+
+edit_file — change a small part of an EXISTING file (preferred over rewriting it). The FIND text must match the file EXACTLY and be unique:
+THOUGHT: <why>
+ACTION: edit_file
+PATH: <the file from the listing>
+FIND:
+\`\`\`
+the exact old code to replace
+\`\`\`
+REPLACE:
+\`\`\`
+the new code
+\`\`\`
+
+run_command — run a shell command (a human must approve it):
+THOUGHT: <why>
+ACTION: run_command
+COMMAND: python main.py
+
+run_python — run Python: put the code in a fenced block (it runs as a script), or give PATH to a .py file in the workspace (a human must approve it):
+THOUGHT: <why>
+ACTION: run_python
+\`\`\`python
+print(2 + 2)
+\`\`\`
+
+web_search — LAST RESORT only: when the workspace and your own knowledge are not enough, search the web for guidance. Returns titles, URLs, and snippets:
+THOUGHT: <why you are stuck and what you need>
+ACTION: web_search
+QUERY: <a focused search query>
+
+web_fetch — read the text of ONE web page (usually a URL from web_search). Output is stripped to plain text and truncated:
+THOUGHT: <why>
+ACTION: web_fetch
+URL: https://example.com/docs/page
+
+test_web — load your web app in a real browser, click its controls, and get back any errors + the on-screen text:
+THOUGHT: <why>
+ACTION: test_web
+PATH: index.html
+
+finish — the goal is fully complete:
+THOUGHT: <why>
+ACTION: finish
+SUMMARY: <what you built>
+
+RULES:
+- Exactly ONE action per response. Nothing after the action's content.
+- Write real, complete, working code — no placeholders, no "...".
+- Code goes in ONE fenced block exactly as it should appear on disk. Never add backslashes before quotes.
+- To CREATE a new file use write_file. To FIX or change an EXISTING file, prefer edit_file (replace just the broken snippet) instead of rewriting the whole file — it's faster and safer. read_file first so your FIND snippet matches exactly.
+- If an edit_file FAILS (the FIND snippet was not found), do NOT retry the same patch and do NOT re-read the file in a loop. search_file for the symbol to get its REAL current line, then copy those EXACT lines for a new FIND. (For SMALL files you may instead write_file the whole corrected file.)
+- BIG FILES (hundreds/thousands of lines): never read or rewrite the whole file — it will NOT fit in one read. FIRST outline_file to get its map, then search_file/read_file ONLY the exact LINES you need, then edit_file that snippet. Watch for "... N more lines below" — the file is longer than one read shows.
+- NEVER invent a variable, constant, function, or API name. If you have not actually seen it in the file, search_file for it first. Do not guess names or values.
+- When copying lines into edit_file FIND/REPLACE, do NOT include the "N: " line-number prefix that read_file shows — it is only for navigation.
+- Do NOT run programs that loop forever; if you must, the command will time out and that is fine.
+
+WHEN TO USE THE INTERNET (web_search / web_fetch):
+- These are a LAST RESORT, not a first move. Try the workspace files and your own knowledge FIRST.
+- Only search the web when you are genuinely STUCK — an unfamiliar API, an error you cannot explain, or a spec you do not know. State in your THOUGHT what you tried and what you need.
+- After web_search, web_fetch ONLY the single most relevant URL, take what you need, then get back to building. Do NOT browse, and do NOT search for things you already know.
+
+WORKED EXAMPLE (this is the rhythm to follow — explore, build, VERIFY, fix, finish):
+
+  Step 1 — orient:
+  THOUGHT: New project. See what exists before writing anything.
+  ACTION: list_dir
+  PATH: .
+
+  Step 2 — build the smallest playable slice (one fenced block, real code):
+  THOUGHT: Empty workspace. Create the entry point with the core loop wired up.
+  ACTION: write_file
+  PATH: index.html
+  \`\`\`html
+  <!doctype html><html><body><button onclick="tick()">Go</button><p id="out">0</p>
+  <script>let n=0;function tick(){n++;document.getElementById('out').textContent=n;}</script>
+  </body></html>
+  \`\`\`
+
+  Step 3 — VERIFY by actually running it (required for web apps):
+  THOUGHT: Wrote the app; run it in a browser to catch errors before finishing.
+  ACTION: test_web
+  PATH: index.html
+
+  Step 4 — only after a CLEAN test:
+  THOUGHT: test_web reported no errors and the counter updates. Goal met.
+  ACTION: finish
+  SUMMARY: A one-button counter that increments and displays the count.
+
+BUILDING APPS (IMPORTANT):
+- Default to a WEB APP that opens in a browser, unless the user clearly asks for something else.
+- Use plain HTML, CSS, and JavaScript with NO build tools and NO frameworks that need installing.
+- The entry point MUST be a file named index.html that works by simply opening it (all logic client-side).
+- Put markup in index.html, styles in style.css, logic in script.js (link them from index.html).
+- For 3D graphics or 3D games, use three.js (no install) via an ES-module import map in index.html, since the app is served over http:
+    <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }</script>
+    <script type="module">import * as THREE from 'three'; /* scene, camera, renderer, animate loop */</script>
+  Set up a Scene, a PerspectiveCamera, and a WebGLRenderer (append renderer.domElement to the page); animate with requestAnimationFrame and handle window resize. Keep everything client-side; it still opens via index.html.
+- Only use run_command / a server for things that genuinely need it (e.g. a Python data script).
+
+VERIFY BEFORE FINISHING (web apps) — this is required:
+- After writing your web app, you MUST run test_web. It opens the app in a real browser, clicks the controls, and reports JS errors plus the on-screen text.
+- READ the report carefully:
+  - Any [JS ERROR], [console.error], or [failed load] = a real bug. Fix the file(s) and run test_web again.
+  - Check the VISIBLE TEXT for wrong values or dead features (e.g. it shows "$0" after selling, a counter never changes, a button did nothing). Those are logic bugs — fix them and test_web again.
+- Only call finish once test_web shows NO errors and the visible text looks correct.
+
+CORRECTNESS RULES (avoid the common bugs):
+- Every variable and function you reference must be defined somewhere.
+- When you change a value AND report it, compute the report BEFORE changing the value.
+- Any UI label that implies state (money, $, counts, score) must have a backing variable that is updated AND shown on screen.
+- Trace every clickable control to its handler, and every handler to its full, correct effect.
+- Build the SIMPLEST fully-working version first; don't add features that aren't wired up.
+- Put your <script> at the END of <body> (or wrap DOM code in a DOMContentLoaded handler) so every element exists before your JS runs — this avoids "Cannot read properties of null".
+- Prefer wiring buttons with onclick="fn()" attributes (functions defined in the script) over addEventListener on elements fetched at load time.`;
+
+// Parse one plain-text action from a model response. File content lives in a raw
+// fenced code block (never JSON), so quotes/backslashes/escape-sequences survive
+// intact — the thing that broke JSON-string encoding on smaller models.
+function parseAction(text, lastPath) {
+  if (!text) return null;
+  const thought = (text.match(/THOUGHT:\s*(.+)/i)?.[1] || '').trim();
+  const fenceM = text.match(/```([^\n]*)\n([\s\S]*?)```/);
+  const fenceLang = fenceM ? fenceM[1].trim().toLowerCase() : '';
+  const fenced = fenceM ? fenceM[2].replace(/\n$/, '') : undefined;
+  const pathM = text.match(/PATH:\s*(.+)/i);
+  let path = pathM ? pathM[1].trim().replace(/[`"']/g, '') : undefined;
+  // if no PATH given, try a filename mentioned anywhere in the text
+  if (!path) { const fm = text.match(/\b([\w.\-/]+\.(?:html|css|js|py|json|md|txt))\b/i); if (fm) path = fm[1]; }
+
+  const langFile = { html: 'index.html', css: 'style.css', js: 'script.js', javascript: 'script.js', python: 'main.py', py: 'main.py' };
+  const am = text.match(/ACTION:\s*([a-z_]+)/i);
+  let tool = am ? am[1].toLowerCase() : null;
+
+  // Forgiving fallback: small models often "fix" a file by just pasting a code
+  // block with no ACTION header — treat any lone code block as a write_file.
+  if (!tool && fenced !== undefined) tool = 'write_file';
+  if (!tool) return null;
+
+  if (tool === 'write_file') {
+    if (!path) path = langFile[fenceLang] || lastPath || 'index.html';
+    return { tool, thought, args: { path, content: fenced ?? '' } };
+  }
+  if (tool === 'edit_file') {
+    const findM = text.match(/FIND:\s*```[^\n]*\n([\s\S]*?)```/i);
+    const replM = text.match(/REPLACE:\s*```[^\n]*\n([\s\S]*?)```/i);
+    return { tool, thought, args: { path: path || lastPath, find: findM?.[1]?.replace(/\n$/, ''), replace: replM ? replM[1].replace(/\n$/, '') : '' } };
+  }
+  if (tool === 'run_command') {
+    const cmd = (text.match(/COMMAND:\s*(.+)/i)?.[1]?.trim()) || (fenced ? fenced.trim().split('\n')[0] : undefined);
+    return { tool, thought, args: { cmd } };
+  }
+  if (tool === 'run_python') {
+    return { tool, thought, args: { code: fenced, path } };   // inline CODE block, or a .py PATH
+  }
+  if (tool === 'web_search') {
+    const query = (text.match(/QUERY:\s*(.+)/i)?.[1] || '').trim().replace(/[`"']/g, '');
+    return { tool, thought, args: { query } };
+  }
+  if (tool === 'web_fetch') {
+    const url = (text.match(/URL:\s*(\S+)/i)?.[1] || '').trim().replace(/[`"'<>]/g, '');
+    return { tool, thought, args: { url } };
+  }
+  if (tool === 'finish') {
+    const summary = (text.match(/SUMMARY:\s*([\s\S]+)/i)?.[1] || '').trim();
+    return { tool, thought, args: { summary } };
+  }
+  if (tool === 'test_web') return { tool, thought, args: { path: path || 'index.html' } };
+  if (tool === 'search_file') {
+    const query = (text.match(/QUERY:\s*(.+)/i)?.[1] || '').trim().replace(/[`"']/g, '');
+    return { tool, thought, args: { path, query } };   // path optional — omit = search all files
+  }
+  if (tool === 'read_file') {
+    let offset, limit;
+    const lm = text.match(/LINES:\s*(\d+)\s*-\s*(\d+)/i);
+    if (lm) { offset = +lm[1]; limit = (+lm[2] - +lm[1]) + 1; }
+    else {
+      const om = text.match(/OFFSET:\s*(\d+)/i); if (om) offset = +om[1];
+      const li = text.match(/LIMIT:\s*(\d+)/i);  if (li) limit = +li[1];
+    }
+    return { tool, thought, args: { path: path || '.', offset, limit } };
+  }
+  if (tool === 'outline_file') return { tool, thought, args: { path: path || '.' } };
+  if (tool === 'list_dir') return { tool, thought, args: { path: path || '.' } };
+  return { tool, thought, args: {} };
+}
+
+// ── Run state (in-memory, mirrored to disk) ───────────────────────────────────
+// The Map is the live copy; each run is also checkpointed to agent-runs/<id>.json
+// so a dropped tunnel or a server restart never loses an in-progress build.
+const runs = new Map();
+const RUNS_DIR = join(__dirname, 'agent-runs');
+
+function pushStep(run, step) {
+  run.steps.push({ n: run.steps.length + 1, ts: Date.now(), ...step });
+}
+
+// Write the full run (incl. history) to disk. abort is an AbortController (not
+// serializable) and busy is transient — both are rebuilt on resume, so drop them.
+function persist(run) {
+  try {
+    mkdirSync(RUNS_DIR, { recursive: true });
+    const { abort, busy, ...save } = run;
+    writeFileSync(join(RUNS_DIR, `${run.id}.json`), JSON.stringify(save));
+  } catch {}
+}
+
+// Restore checkpointed runs on boot. Anything caught mid-flight (the process died
+// while it was running/awaiting) becomes 'interrupted' so the UI can offer Resume.
+function loadRuns() {
+  try {
+    mkdirSync(RUNS_DIR, { recursive: true });
+    for (const name of readdirSync(RUNS_DIR)) {
+      if (!name.endsWith('.json')) continue;
+      try {
+        const run = JSON.parse(readFileSync(join(RUNS_DIR, name), 'utf8'));
+        run.busy = false; run.abort = null;
+        if (['running', 'awaiting_approval'].includes(run.status)) run.status = 'interrupted';
+        runs.set(run.id, run);
+      } catch {}
+    }
+  } catch {}
+}
+
+// A model call that failed because the tunnel/Ollama is unreachable — NOT a real
+// agent error. These are resumable once the tunnel is back, so we pause (not kill).
+function isConnError(e) {
+  const s = `${e?.name} ${e?.message} ${e?.cause?.code || ''}`;
+  // Network/tunnel failures AND Cloudflare/gateway pages (524/502/503) or a
+  // timed-out reply — all are "tunnel down / too slow", i.e. resumable once the
+  // tunnel is re-pointed, NOT a real agent error that should kill the run.
+  return /TimeoutError|AbortError|fetch failed|ECONNREFUSED|ENOTFOUND|ECONNRESET|EAI_AGAIN|network|socket hang up|timed out|tunnel may be down|Model error 5\d\d|cloudflare|<!doctype|<html|gateway/i.test(s);
+}
+
+// Keep the model's context dense: preserve the anchors it must never forget —
+// system prompt, the goal+file listing, and the BUILD PLAN — plus the most recent
+// exchanges, and trim the stale middle (old read_file/test_web dumps). Without this,
+// long runs grow unbounded and Ollama silently drops the oldest (goal-bearing) messages.
+function pruneHistory(run) {
+  const h = run.history;
+  if (h.length <= MAX_HISTORY_MSGS) return;
+  const head = [h[0]];                      // system prompt
+  if (h[1]) head.push(h[1]);                // goal + initial file listing
+  const plan = h.find(m => m.role === 'assistant' && /^BUILD PLAN:/.test(m.content || ''));
+  if (plan && !head.includes(plan)) head.push(plan);
+  const tail = h.slice(-(MAX_HISTORY_MSGS - head.length - 1));
+  const dropped = h.length - head.length - tail.length;
+  if (dropped <= 0) return;                 // nothing meaningful to trim
+  run.history = [
+    ...head,
+    { role: 'user', content: `(… ${dropped} earlier steps trimmed to save context. The GOAL and PLAN above still stand — keep following them. Recent steps follow.)` },
+    ...tail,
+  ];
+}
+
+// ── Plan-first gate (Stage 1) ─────────────────────────────────────────────────
+const PLANNER_SYSTEM = 'You are a senior game/software architect. You produce a short, concrete BUILD PLAN. You do NOT write code.';
+const PLAN_TASK = `Before any code is written, produce a BUILD PLAN for the goal above. Do NOT write code. Be concise — a numbered list.
+
+1. SYSTEMS NEEDED — the distinct systems required (e.g. input, player, physics, inventory, save, UI).
+2. GAMEPLAY LOOP — what the user/player does moment to moment, and the win/lose/end condition.
+3. STATE / DATA — the key state each system owns; note any state machine (e.g. crop: untilled -> tilled -> growing -> harvestable -> dead).
+4. MISSING / REQUIRED — anything the goal implies but does not spell out (data, UI, save data, balancing values).
+5. BUILD ORDER — the smallest first-PLAYABLE slice, then what to add after.
+
+Output ONLY the plan.`;
+
+// Append a (goal -> plan -> code) trace for later v0.3 training. Lives OUTSIDE the
+// workspace so a "New project" reset never wipes it.
+function saveTrace(run) {
+  if (run.traced) return;
+  run.traced = true;
+  try {
+    const dir = join(__dirname, 'agent-traces');
+    mkdirSync(dir, { recursive: true });
+    const code = run.steps
+      .filter(s => s.tool === 'write_file' || s.tool === 'edit_file')
+      .map(s => ({ tool: s.tool, path: s.args?.path, content: String(s.args?.content ?? s.args?.replace ?? '').slice(0, 30_000) }));
+    const rec = {
+      ts: Date.now(), status: run.status, goal: run.goal, plan: run.plan || null,
+      followups: run.followups || [],   // later instructions that built on the first
+      steps: run.steps.map(s => ({ type: s.type, tool: s.tool, path: s.args?.path })),
+      code,
+    };
+    appendFileSync(join(dir, 'traces.jsonl'), JSON.stringify(rec) + '\n');
+  } catch {}
+}
+
+// Drive the loop until it finishes, errors, hits the step ceiling, or needs
+// approval. Auto-tools execute inline; run_command pauses the run.
+async function drive(loadDb, run) {
+  if (run.busy) return;
+  run.busy = true;
+  try {
+    // ── Stage 1: PLAN-FIRST GATE — a build plan is produced before ANY code (runs once) ──
+    if (!run.planned && run.status === 'running') {
+      run.planned = true;
+      run.abort = new AbortController();
+      try {
+        const planner = loadDb().api_keys?.ollama_planner;   // optional: a stronger/base model just for planning
+        const planText = await callModel(loadDb, [
+          { role: 'system', content: PLANNER_SYSTEM },
+          { role: 'user', content: `${run.history[1]?.content || ('GOAL: ' + run.goal)}\n\n${PLAN_TASK}` },
+        ], run.abort.signal, planner);
+        if (planText && planText.trim()) {
+          run.plan = planText.trim();
+          pushStep(run, { type: 'plan', text: run.plan });
+          run.history.push(
+            { role: 'assistant', content: `BUILD PLAN:\n${run.plan}` },
+            { role: 'user', content: 'Good. Now BUILD it with the tools, following the plan — the smallest PLAYABLE slice FIRST, then extend. One action per step.' },
+          );
+        }
+      } catch (e) {
+        if (run.status === 'stopped') return;   // stop aborted planning — exit (finally resets busy)
+        if (isConnError(e)) {                    // tunnel down before we even planned — pause as resumable
+          run.planned = false;                   // so Resume re-plans instead of silently skipping the plan
+          run.status = 'interrupted';
+          pushStep(run, { type: 'error', text: 'Tunnel/model unreachable during planning — run paused. Re-point the Ollama tunnel in Settings, then Resume.' });
+          return;
+        }
+        pushStep(run, { type: 'error', text: `Planning step skipped: ${e.message}` });  // don't kill the run
+      } finally {
+        run.abort = null;
+      }
+    }
+
+    while (run.status === 'running' && run.modelCalls < MAX_STEPS) {
+      run.modelCalls++;
+      pruneHistory(run);                 // keep context dense before each model call
+      let raw;
+      run.abort = new AbortController();
+      try {
+        raw = await callModel(loadDb, run.history, run.abort.signal);
+      } catch (e) {
+        if (run.status === 'stopped') break;        // Stop aborted the call — exit quietly
+        if (isConnError(e)) {                        // tunnel/Ollama unreachable — pause (resumable), don't kill
+          run.status = 'interrupted';
+          pushStep(run, { type: 'error', text: `Tunnel/model unreachable — run paused at step ${run.modelCalls}. Re-point the Ollama tunnel in Settings, then Resume. (${e.message})` });
+          break;
+        }
+        run.status = 'error';
+        pushStep(run, { type: 'error', text: e.message });
+        break;
+      } finally {
+        run.abort = null;
+      }
+      if (run.status !== 'running') break;            // stopped during the call — don't run another step
+      run.history.push({ role: 'assistant', content: raw });
+
+      // Stuck-loop guard: if the model emits the same response repeatedly it's
+      // making no progress — stop rather than grind to the step ceiling.
+      const norm = raw.replace(/\s+/g, ' ').trim();
+      run.repeat = norm === run.lastNorm ? (run.repeat || 0) + 1 : 0;
+      run.lastNorm = norm;
+      if (run.repeat >= 2) {
+        run.status = 'stopped';
+        pushStep(run, { type: 'error', text: 'Stopped: the model kept repeating the same response without making progress.' });
+        break;
+      }
+
+      const action = parseAction(raw, run.lastPath);
+      if (!action || !action.tool || !tools[action.tool] && action.tool !== 'finish') {
+        run.errStreak = (run.errStreak || 0) + 1;
+        if (run.errStreak >= 4) {
+          run.status = 'error';
+          pushStep(run, { type: 'error', text: 'Gave up after repeated unparseable responses from the model.' });
+          break;
+        }
+        pushStep(run, { type: 'error', text: 'Could not parse an action; asking the model to retry.' });
+        run.history.push({ role: 'user', content: 'Your last response did not contain a valid ACTION. Reply using the exact plain-text format: a THOUGHT line, an ACTION line, then its fields (file content in a single fenced code block, written normally).' });
+        continue;
+      }
+      run.errStreak = 0;
+
+      const { tool, args = {}, thought = '' } = action;
+
+      if (tool === 'finish') {
+        // Gate: don't let it finish a web app it hasn't browser-tested since the last edit.
+        const hasWeb = existsSync(join(WORKSPACE, 'index.html'));
+        if (hasWeb && run.needsTest && (run.finishBlocks || 0) < 3) {
+          run.finishBlocks = (run.finishBlocks || 0) + 1;
+          pushStep(run, { type: 'error', thought, text: 'Verifying in a browser before finishing…' });
+          run.history.push({ role: 'user', content: 'Do NOT finish yet — you changed files since the last clean browser test. Run test_web, read the report, fix any [JS ERROR]/console errors or wrong on-screen values, and only finish once test_web is clean.' });
+          continue;
+        }
+        run.status = 'done';
+        pushStep(run, { type: 'finish', thought, summary: args.summary || '' });
+        break;
+      }
+
+      if (!tools[tool]) {
+        pushStep(run, { type: 'error', thought, text: `Unknown tool: ${tool}` });
+        run.history.push({ role: 'user', content: `TOOL ERROR: unknown tool "${tool}". Use only the listed tools.` });
+        continue;
+      }
+
+      // Dangerous tool → pause for approval
+      if (!AUTO_TOOLS.has(tool)) {
+        run.pending = { tool, args, thought };
+        run.status = 'awaiting_approval';
+        pushStep(run, { type: 'approval_request', tool, args, thought });
+        break;
+      }
+
+      // Auto tool → execute inline
+      let result;
+      try { result = await tools[tool](args); }
+      catch (e) { result = `ERROR: ${e.message}`; }
+      let syntaxNote = '';
+      if (tool === 'write_file' || tool === 'edit_file') {
+        run.needsTest = true; if (args.path) run.lastPath = args.path; // edited → needs a fresh test
+        const err = await quickCheck(args.path);
+        if (err) syntaxNote = `\n\n❌ SYNTAX CHECK FAILED for ${args.path}:\n${err}\nFix this before doing anything else — it will not run as written.`;
+        else if (/\.(py|c?js|mjs)$/i.test(args.path || '')) syntaxNote = `\n\n✅ ${args.path} passed a syntax check.`;
+      }
+
+      let feedback = `TOOL RESULT (${tool}):\n${result}${syntaxNote}`;
+      if (tool === 'test_web') {
+        const hasErr = /\[JS ERROR\]|\[console\.error\]|\[HTTP \d/.test(result);
+        run.needsTest = hasErr;
+        if (hasErr) {
+          // signature of the JS error (digits stripped) to detect the SAME bug recurring
+          const sig = (result.match(/\[JS ERROR\][^\n]*/)?.[0] || '').replace(/\d+/g, '').slice(0, 80);
+          run.sameErr = sig && sig === run.lastErrSig ? (run.sameErr || 0) + 1 : 0;
+          run.lastErrSig = sig;
+          if (run.sameErr >= 4) {
+            pushStep(run, { type: 'error', tool, args, thought, result, text: 'Same error persisted after several fix attempts — stopping. Likely a structural cause (script load order / id mismatch) that needs a stronger model or a manual fix.' });
+            run.status = 'stopped';
+            break;
+          }
+          if (run.sameErr >= 2) {
+            feedback += `\n\n⚠️ This is the SAME error ${run.sameErr + 1} times. STOP rewriting the same file the same way. A null element means EITHER (a) your <script> runs before the DOM exists — move it to the very END of <body> or add defer; OR (b) an id used in your JS does not exist in index.html. READ index.html, then fix the <script> placement and make every getElementById id match a real element.`;
+          }
+        } else {
+          // clean test — nudge it to FINISH instead of endlessly re-editing a working app
+          run.sameErr = 0; run.lastErrSig = null;
+          run.cleanTests = (run.cleanTests || 0) + 1;
+          feedback += `\n\n✅ The app loaded with NO errors. If it fulfills the goal, call finish NOW (ACTION: finish with a SUMMARY). Do NOT keep editing a working app.`;
+          if (run.cleanTests >= 3) {
+            pushStep(run, { type: 'tool', tool, args, thought, result });
+            pushStep(run, { type: 'finish', thought: 'auto', summary: 'App passed browser tests with no errors (auto-finished after repeated clean tests).' });
+            run.status = 'done';
+            break;
+          }
+        }
+      }
+      pushStep(run, { type: 'tool', tool, args, thought, result });
+      run.history.push({ role: 'user', content: feedback });
+      persist(run);   // checkpoint after each completed step — a drop loses at most one step
+    }
+
+    if (run.status === 'running' && run.modelCalls >= MAX_STEPS) {
+      run.status = 'stopped';
+      pushStep(run, { type: 'error', text: `Hit step ceiling (${MAX_STEPS}). Stopping.` });
+    }
+  } finally {
+    run.busy = false;
+    if (['done', 'error', 'stopped'].includes(run.status)) saveTrace(run);
+    persist(run);   // capture final/paused state (incl. 'interrupted' and 'awaiting_approval')
+  }
+}
+
+// ── Router ────────────────────────────────────────────────────────────────────
+export default function agentRouter({ loadDb }) {
+  const router = express.Router();
+  loadRuns();   // restore checkpointed runs after a server restart (mid-flight ones become 'interrupted')
+
+  // Start a new run; returns immediately, loop runs in the background.
+  router.post('/start', (req, res) => {
+    const { goal } = req.body || {};
+    if (!goal || !goal.trim()) return res.status(400).json({ error: 'goal required' });
+    ensureWorkspace();
+    const id = randomUUID();
+    const run = {
+      id, goal, status: 'running', busy: false, modelCalls: 0,
+      steps: [], pending: null, createdAt: Date.now(),
+      history: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: `Files currently in the workspace (these are the ONLY files — use these EXACT names, never invent one):\n${tools.list_dir({ path: '.' })}\n\nGOAL: ${goal}\n\nBegin step by step. For any large file, outline_file it FIRST, then read_file the slice you need — never try to read a whole big file at once.` },
+      ],
+    };
+    runs.set(id, run);
+    persist(run);       // on disk before step 1 so it survives a restart even mid-planning
+    drive(loadDb, run); // fire and forget
+    res.json({ runId: id });
+  });
+
+  // List all known runs (lightweight — no history/steps payload) so the UI can
+  // surface resumable 'interrupted' runs after a tunnel drop or server restart.
+  router.get('/list', (req, res) => {
+    const out = [...runs.values()]
+      .map(r => ({ id: r.id, goal: r.goal, status: r.status, modelCalls: r.modelCalls, steps: r.steps.length, createdAt: r.createdAt }))
+      .sort((a, b) => b.createdAt - a.createdAt);
+    res.json(out);
+  });
+
+  // List the files currently in the workspace. (Must be defined BEFORE '/:id'
+  // or Express treats "files" as a run id.)
+  router.get('/files', (req, res) => {
+    ensureWorkspace();
+    const out = [];
+    const walk = (dir, rel = '') => {
+      for (const name of readdirSync(dir)) {
+        if (name === 'node_modules' || name === '.git') continue;
+        const fp = join(dir, name);
+        const r = rel ? `${rel}/${name}` : name;
+        if (statSync(fp).isDirectory()) walk(fp, r);
+        else out.push({ path: r, size: statSync(fp).size });
+      }
+    };
+    walk(WORKSPACE);
+    res.json(out);
+  });
+
+  // Poll run state (client strips the heavy history field).
+  router.get('/:id', (req, res) => {
+    const run = runs.get(req.params.id);
+    if (!run) return res.status(404).json({ error: 'run not found' });
+    const { history, busy, ...view } = run;
+    res.json(view);
+  });
+
+  // Approve or reject a pending run_command, then resume.
+  router.post('/:id/approve', async (req, res) => {
+    const run = runs.get(req.params.id);
+    if (!run) return res.status(404).json({ error: 'run not found' });
+    if (run.status !== 'awaiting_approval' || !run.pending) {
+      return res.status(409).json({ error: 'nothing awaiting approval' });
+    }
+    const approve = req.body?.approve !== false;
+    const { tool, args } = run.pending;
+    run.pending = null;
+
+    if (!approve) {
+      pushStep(run, { type: 'approval_denied', tool, args });
+      run.history.push({ role: 'user', content: `The human DENIED running: ${args.cmd}. Do not run it. Continue another way or finish.` });
+    } else {
+      let result;
+      try { result = await tools[tool](args); }
+      catch (e) { result = `ERROR: ${e.message}`; }
+      pushStep(run, { type: 'tool', tool, args, result, approved: true });
+      run.history.push({ role: 'user', content: `TOOL RESULT (${tool}):\n${result}` });
+    }
+    run.status = 'running';
+    drive(loadDb, run);
+    res.json({ ok: true });
+  });
+
+  // Resume a run that paused because the tunnel dropped (or was caught mid-flight
+  // by a server restart). drive() replays from run.history, so it picks up exactly
+  // where it left off. Point the Ollama tunnel at the new URL in Settings first.
+  router.post('/:id/resume', (req, res) => {
+    const run = runs.get(req.params.id);
+    if (!run) return res.status(404).json({ error: 'run not found' });
+    if (run.busy || run.status === 'running') return res.status(409).json({ error: 'run is already active' });
+    if (run.status === 'awaiting_approval') return res.status(409).json({ error: 'run is awaiting command approval — use approve' });
+    if (run.status === 'done') return res.status(409).json({ error: 'run already finished' });
+    run.status = 'running';
+    pushStep(run, { type: 'note', text: 'Resumed.' });
+    drive(loadDb, run);
+    res.json({ ok: true });
+  });
+
+  // Follow-up: continue a FINISHED run with a new instruction instead of starting
+  // a cold new run that re-plans from scratch. The model keeps its whole prior
+  // conversation (its last output is right there in run.history), so it builds on
+  // what exists — patching with edit_file, or fully rewriting a file that's wrong.
+  // The workspace listing is refreshed first so the model edits the REAL current
+  // files (ground truth), never its memory of them.
+  router.post('/:id/followup', (req, res) => {
+    const run = runs.get(req.params.id);
+    if (!run) return res.status(404).json({ error: 'run not found' });
+    const instruction = (req.body?.goal || req.body?.instruction || '').trim();
+    if (!instruction) return res.status(400).json({ error: 'instruction required' });
+    if (run.busy || run.status === 'running') return res.status(409).json({ error: 'run is still active — stop it first' });
+    if (run.status === 'awaiting_approval') return res.status(409).json({ error: 'run is awaiting command approval — resolve it first' });
+    if (run.status === 'interrupted') return res.status(409).json({ error: 'run is paused (tunnel dropped) — Resume it first, then send a follow-up' });
+
+    ensureWorkspace();
+    const listing = tools.list_dir({ path: '.' });
+    run.history.push({ role: 'user', content:
+      `FOLLOW-UP INSTRUCTION — the previous task is complete. Build on the EXISTING workspace below; do NOT start over and do NOT recreate files that already exist.\n\n` +
+      `Workspace now contains (these are the real current files — read one before you edit it so your FIND matches):\n${listing}\n\n` +
+      `INSTRUCTION: ${instruction}\n\n` +
+      `Prefer edit_file for targeted changes. Only write_file (full rewrite) a file that is fundamentally wrong. One action per step; finish when this instruction is satisfied.` });
+
+    // Fresh per-iteration budget + guards so the previous run's counters don't
+    // strangle this one — but KEEP run.planned = true so we continue, not replan.
+    run.followups = run.followups || [];
+    run.followups.push({ ts: Date.now(), instruction });
+    run.modelCalls = 0;
+    run.repeat = 0; run.lastNorm = null;
+    run.errStreak = 0; run.sameErr = 0; run.lastErrSig = null;
+    run.needsTest = false; run.finishBlocks = 0; run.cleanTests = 0;
+    run.traced = false;                    // capture a fresh (goal+followup -> code) trace
+    run.status = 'running';
+    pushStep(run, { type: 'followup', text: instruction });
+    persist(run);
+    drive(loadDb, run);
+    res.json({ ok: true, runId: run.id });
+  });
+
+  // Stop a run — flip status and abort any in-flight model call immediately.
+  router.post('/:id/stop', (req, res) => {
+    const run = runs.get(req.params.id);
+    if (!run) return res.status(404).json({ error: 'run not found' });
+    run.status = 'stopped';
+    run.pending = null;
+    try { run.abort?.abort(); } catch {}
+    pushStep(run, { type: 'error', text: 'Stopped by user.' });
+    persist(run);
+    res.json({ ok: true });
+  });
+
+  // Download the whole workspace as a zip (Windows built-in Compress-Archive).
+  router.get('/export/zip', (req, res) => {
+    ensureWorkspace();
+    if (readdirSync(WORKSPACE).length === 0) {
+      return res.status(400).json({ error: 'workspace is empty — nothing to export yet' });
+    }
+    const tmp = join(__dirname, 'workspace_export.zip');
+    try { if (existsSync(tmp)) unlinkSync(tmp); } catch {}
+    const cmd = `powershell -NoProfile -Command "Compress-Archive -Path '${join(WORKSPACE, '*')}' -DestinationPath '${tmp}' -Force"`;
+    exec(cmd, { windowsHide: true }, (err, _stdout, stderr) => {
+      if (err) return res.status(500).json({ error: (stderr || err.message).slice(0, 300) });
+      res.download(tmp, 'workspace.zip', () => { try { unlinkSync(tmp); } catch {} });
+    });
+  });
+
+  // Drop a (text) file into the workspace so the agent can read/edit it.
+  router.post('/upload', (req, res) => {
+    const { path, content } = req.body || {};
+    if (!path) return res.status(400).json({ error: 'path required' });
+    try {
+      const full = safePath(path);
+      mkdirSync(dirname(full), { recursive: true });
+      writeFileSync(full, content ?? '', 'utf8');
+      res.json({ ok: true, path });
+    } catch (e) { res.status(400).json({ error: e.message }); }
+  });
+
+  // Drop a .zip — decode and extract it into the workspace (Windows Expand-Archive).
+  router.post('/upload-zip', (req, res) => {
+    const { dataB64 } = req.body || {};
+    if (!dataB64) return res.status(400).json({ error: 'dataB64 required' });
+    ensureWorkspace();
+    const tmp = join(__dirname, `_upload_${Date.now()}.zip`);
+    try { writeFileSync(tmp, Buffer.from(dataB64, 'base64')); }
+    catch (e) { return res.status(400).json({ error: e.message }); }
+    const cmd = `powershell -NoProfile -Command "Expand-Archive -LiteralPath '${tmp}' -DestinationPath '${WORKSPACE}' -Force"`;
+    exec(cmd, { windowsHide: true }, (err, _o, stderr) => {
+      try { unlinkSync(tmp); } catch {}
+      if (err) return res.status(500).json({ error: (stderr || err.message).slice(0, 300) });
+      res.json({ ok: true });
+    });
+  });
+
+  // Remove a file from the workspace.
+  router.delete('/files', (req, res) => {
+    try {
+      const full = safePath(req.query.path || '');
+      if (existsSync(full)) unlinkSync(full);
+      res.json({ ok: true });
+    } catch (e) { res.status(400).json({ error: e.message }); }
+  });
+
+  // Wipe the workspace for a fresh project (clears every file, base + uploaded).
+  router.post('/reset', (req, res) => {
+    ensureWorkspace();
+    try {
+      for (const name of readdirSync(WORKSPACE)) {
+        rmSync(join(WORKSPACE, name), { recursive: true, force: true });
+      }
+      res.json({ ok: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
+  return router;
+}

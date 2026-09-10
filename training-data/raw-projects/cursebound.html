@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CURSEBOUND</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#000;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  min-height:100vh; overflow:hidden;
+}
+#wrapper {
+  position:relative;
+  width:768px; height:672px;
+  image-rendering:pixelated;
+}
+canvas {
+  position:absolute; top:0; left:0;
+  width:768px; height:672px;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+}
+#gc { z-index:1; }
+#lc { z-index:2; }
+#uc { z-index:3; }
+#sl {
+  position:absolute; top:0; left:0;
+  width:100%; height:100%; z-index:10;
+  pointer-events:none;
+  background:repeating-linear-gradient(to bottom,
+    transparent 0px, transparent 2px,
+    rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+}
+#vi {
+  position:absolute; top:0; left:0;
+  width:100%; height:100%; z-index:9;
+  pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,0.9) 100%);
+}
+#kb {
+  color:#2a2a3a; font:10px monospace;
+  margin-top:6px; letter-spacing:2px; text-align:center;
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+  <canvas id="gc" width="256" height="224"></canvas>
+  <canvas id="lc" width="256" height="224"></canvas>
+  <canvas id="uc" width="256" height="224"></canvas>
+  <div id="sl"></div>
+  <div id="vi"></div>
+</div>
+<div id="kb">ARROWS/WASD · Z=ATTACK · X=LANTERN · ENTER=TALK/CONFIRM · ESC=PAUSE</div>
+<script>
+// ================================================================
+// CURSEBOUND  —  NES JAM 2026
+// ================================================================
+const GC=document.getElementById('gc').getContext('2d');
+const LC=document.getElementById('lc').getContext('2d');
+const UC=document.getElementById('uc').getContext('2d');
+const W=256,H=224,TW=16,HH=16; // HH = HUD height
+const MROW=(H-HH)/TW; // 13 visible tile rows
+
+// ================================================================
+// AUDIO ENGINE — Web Audio procedural chiptune
+// ================================================================
+let ACtx=null;
+const SFX={};
+
+function initAudio(){
+  if(ACtx) return;
+  ACtx=new(window.AudioContext||window.webkitAudioContext)();
+}
+
+function note(freq,dur,type='square',vol=0.15,delay=0){
+  if(!ACtx) return;
+  const o=ACtx.createOscillator();
+  const g=ACtx.createGain();
+  const now=ACtx.currentTime+delay;
+  o.connect(g); g.connect(ACtx.destination);
+  o.type=type; o.frequency.setValueAtTime(freq,now);
+  g.gain.setValueAtTime(0,now);
+  g.gain.linearRampToValueAtTime(vol,now+0.01);
+  g.gain.exponentialRampToValueAtTime(0.001,now+dur);
+  o.start(now); o.stop(now+dur+0.05);
+}
+
+function chord(freqs,dur,type='square',vol=0.1){
+  freqs.forEach(f=>note(f,dur,type,vol));
+}
+
+function playHit(){   note(220,0.05,'square',0.2); note(110,0.08,'sawtooth',0.1,0.03); }
+function playDie(){   [220,180,140,100].forEach((f,i)=>note(f,0.12,'square',0.18,i*0.06)); }
+function playAtk(){   note(440,0.04,'square',0.12); note(330,0.03,'square',0.08,0.03); }
+function playItem(){  [523,659,784].forEach((f,i)=>note(f,0.15,'square',0.12,i*0.07)); }
+function playBell(){
+  const freqs=[523,659,523];
+  freqs.forEach((f,i)=>{note(f,0.8,'sine',0.25,i*0.3); note(f*2,0.4,'sine',0.08,i*0.3+0.05);});
+}
+function playBellDie(){
+  [523,494,466,440,415,392].forEach((f,i)=>note(f,0.3,'sine',0.2,i*0.15));
+}
+function playDoor(){  note(330,0.05,'square',0.1); note(440,0.05,'square',0.1,0.06); }
+function playCurse(){ note(55,0.5,'sawtooth',0.08); note(73,0.4,'sawtooth',0.06,0.1); }
+
+// Music — simple looping arpeggio
+let musicTimer=0,musicOn=true,musicPhase=0;
+const MUSIC={
+  chapel:[[131,165,196,220,196,165],[110,138,165,196,165,138]],
+  graveyard:[[98,123,147,174,147,123],[82,103,123,147,123,103]],
+  village:[[196,247,294,370,294,247],[165,208,247,311,247,208]],
+  woods:[[87,110,131,155,131,110],[73,92,110,131,110,92]],
+  night:[[55,69,82,98,82,69],[46,58,69,82,69,58]],
+  boss:[[196,0,196,220,0,196,174,0],[147,0,147,165,0,147,131,0]],
+};
+let curMusicKey='chapel',musicSeq=0,musicRow=0;
+
+function tickMusic(){
+  if(!ACtx||!musicOn) return;
+  musicTimer++;
+  if(musicTimer%18!==0) return;
+  const track=MUSIC[curMusicKey]||MUSIC.chapel;
+  const row=track[musicSeq%track.length];
+  const f=row[musicRow%row.length];
+  if(f>0) note(f,0.28,'square',0.06);
+  // bass
+  if(musicRow%2===0) note(f/2,0.35,'triangle',0.05);
+  musicRow++;
+  if(musicRow>=row.length){ musicRow=0; musicSeq++; }
+}
+
+// ================================================================
+// INPUT
+// ================================================================
+const K={},JP={};
+window.addEventListener('keydown',e=>{
+  if(!K[e.code]) JP[e.code]=true;
+  K[e.code]=true; e.preventDefault();
+  initAudio();
+});
+window.addEventListener('keyup',e=>{ K[e.code]=false; });
+const dn=k=>!!K[k];
+const jp=k=>!!JP[k];
+function clearJP(){ Object.keys(JP).forEach(k=>delete JP[k]); }
+
+// ================================================================
+// NES PALETTE
+// ================================================================
+const C={
+  BLK:'#000000', NAVY:'#08103a', DKBLU:'#0b0d2e', MIDBLU:'#2844c8',
+  BLOOD:'#7a0000', DKRED:'#3d0000', MIDRED:'#b01010', RUST:'#6b3000',
+  BRN:'#5c2a00', DKGRN:'#003d00', MIDGRN:'#006b00', SICKGRN:'#4a6b00',
+  DKGRY:'#1a1a1a', MIDGRY:'#3a3a3a', LTGRY:'#7a7a7a', SILV:'#bcbcbc',
+  WHT:'#f8f8f8', YLW:'#d8b000', GOLD:'#b88000', PURP:'#2d004a',
+  DKPUR:'#180028', FLAME:'#e05000', AMBRE:'#d87800', TAN:'#c09860',
+  SKIN:'#d89060', BONE:'#c8b078', FOGBLU:'#182858', TEAL:'#006868',
+};
+
+// ================================================================
+// TILE IDs
+// ================================================================
+const T={
+  FLOOR:0,WALL:1,BRICK:2,DOOR:3,ALTAR:4,GRAVE:5,TREE:6,
+  WATER:7,BELL:9,PILLAR:10,TORCH:11,STAIR_D:12,STAIR_U:13,
+  RUBBLE:14,FENCE:15,CRACK:16,CHEST:17,SIGN:18,WELL:19,FORGE:20,
+};
+const SOLID_TILES=new Set([T.WALL,T.BRICK,T.TREE,T.PILLAR,T.FENCE,T.STAIR_D,T.FORGE]);
+
+// ================================================================
+// PIXEL FONT  (3×5 glyphs, 4px advance)
+// ================================================================
+const FONT={
+  A:[[0,1,0],[1,0,1],[1,1,1],[1,0,1],[1,0,1]],
+  B:[[1,1,0],[1,0,1],[1,1,0],[1,0,1],[1,1,0]],
+  C:[[0,1,1],[1,0,0],[1,0,0],[1,0,0],[0,1,1]],
+  D:[[1,1,0],[1,0,1],[1,0,1],[1,0,1],[1,1,0]],
+  E:[[1,1,1],[1,0,0],[1,1,0],[1,0,0],[1,1,1]],
+  F:[[1,1,1],[1,0,0],[1,1,0],[1,0,0],[1,0,0]],
+  G:[[0,1,1],[1,0,0],[1,0,1],[1,0,1],[0,1,1]],
+  H:[[1,0,1],[1,0,1],[1,1,1],[1,0,1],[1,0,1]],
+  I:[[1,1,1],[0,1,0],[0,1,0],[0,1,0],[1,1,1]],
+  J:[[0,1,1],[0,0,1],[0,0,1],[1,0,1],[0,1,1]],
+  K:[[1,0,1],[1,1,0],[1,0,0],[1,1,0],[1,0,1]],
+  L:[[1,0,0],[1,0,0],[1,0,0],[1,0,0],[1,1,1]],
+  M:[[1,0,1],[1,1,1],[1,0,1],[1,0,1],[1,0,1]],
+  N:[[1,0,1],[1,1,1],[1,1,1],[1,1,1],[1,0,1]],
+  O:[[0,1,0],[1,0,1],[1,0,1],[1,0,1],[0,1,0]],
+  P:[[1,1,0],[1,0,1],[1,1,0],[1,0,0],[1,0,0]],
+  Q:[[0,1,0],[1,0,1],[1,0,1],[1,1,1],[0,1,1]],
+  R:[[1,1,0],[1,0,1],[1,1,0],[1,0,1],[1,0,1]],
+  S:[[0,1,1],[1,0,0],[0,1,0],[0,0,1],[1,1,0]],
+  T:[[1,1,1],[0,1,0],[0,1,0],[0,1,0],[0,1,0]],
+  U:[[1,0,1],[1,0,1],[1,0,1],[1,0,1],[0,1,1]],
+  V:[[1,0,1],[1,0,1],[1,0,1],[1,0,1],[0,1,0]],
+  W:[[1,0,1],[1,0,1],[1,1,1],[1,1,1],[1,0,1]],
+  X:[[1,0,1],[1,0,1],[0,1,0],[1,0,1],[1,0,1]],
+  Y:[[1,0,1],[1,0,1],[0,1,0],[0,1,0],[0,1,0]],
+  Z:[[1,1,1],[0,0,1],[0,1,0],[1,0,0],[1,1,1]],
+  '0':[[0,1,0],[1,0,1],[1,0,1],[1,0,1],[0,1,0]],
+  '1':[[0,1,0],[1,1,0],[0,1,0],[0,1,0],[1,1,1]],
+  '2':[[1,1,0],[0,0,1],[0,1,0],[1,0,0],[1,1,1]],
+  '3':[[1,1,0],[0,0,1],[0,1,0],[0,0,1],[1,1,0]],
+  '4':[[1,0,1],[1,0,1],[1,1,1],[0,0,1],[0,0,1]],
+  '5':[[1,1,1],[1,0,0],[1,1,0],[0,0,1],[1,1,0]],
+  '6':[[0,1,0],[1,0,0],[1,1,0],[1,0,1],[0,1,0]],
+  '7':[[1,1,1],[0,0,1],[0,1,0],[0,1,0],[0,1,0]],
+  '8':[[0,1,0],[1,0,1],[0,1,0],[1,0,1],[0,1,0]],
+  '9':[[0,1,0],[1,0,1],[0,1,1],[0,0,1],[0,1,0]],
+  '!':[[0,1,0],[0,1,0],[0,1,0],[0,0,0],[0,1,0]],
+  '.':[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,1,0]],
+  ',':[[0,0,0],[0,0,0],[0,1,0],[0,1,0],[1,0,0]],
+  "'":[[0,1,0],[1,0,0],[0,0,0],[0,0,0],[0,0,0]],
+  '-':[[0,0,0],[0,0,0],[1,1,1],[0,0,0],[0,0,0]],
+  ' ':[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]],
+  ':':[[0,1,0],[0,0,0],[0,0,0],[0,0,0],[0,1,0]],
+  '?':[[1,1,0],[0,0,1],[0,1,0],[0,0,0],[0,1,0]],
+  '/':[[0,0,1],[0,0,1],[0,1,0],[1,0,0],[1,0,0]],
+  '*':[[0,0,0],[1,0,1],[0,1,0],[1,0,1],[0,0,0]],
+};
+function ptext(ctx,str,x,y,col,sc=1){
+  ctx.fillStyle=col;
+  let cx=x;
+  for(const ch of str.toUpperCase()){
+    const g=FONT[ch];
+    if(!g){cx+=4*sc;continue;}
+    for(let r=0;r<5;r++) for(let c=0;c<3;c++)
+      if(g[r][c]) ctx.fillRect(cx+c*sc,y+r*sc,sc,sc);
+    cx+=4*sc;
+  }
+}
+function ptw(str){ return str.length*4; }
+
+// ================================================================
+// MAP BUILDER HELPERS
+// ================================================================
+function mkMap(w,h){ return new Uint8Array(w*h); }
+function setR(m,w,x,y,rw,rh,t){ for(let row=y;row<y+rh;row++) for(let col=x;col<x+rw;col++) if(col<w&&row<h(m,w)) m[row*w+col]=t; }
+function h(m,w){ return m.length/w; }
+function setT(m,w,x,y,t){ m[y*w+x]=t; }
+function getT(m,w,mh,x,y){ if(x<0||y<0||x>=w||y>=mh) return T.WALL; return m[y*w+x]; }
+
+// ================================================================
+// GAME STATE
+// ================================================================
+const SC={TITLE:0,INTRO:1,GAME:2,DIALOG:3,PAUSE:4,TRANSITION:5,GAMEOVER:6,BOSS:7,ENDING:8};
+const PH={DAY:0,DUSK:1,NIGHT:2,DAWN:3};
+
+const S={
+  scene:SC.TITLE, prevScene:SC.GAME,
+  phase:PH.DAY, phaseT:0,
+  phaseDur:[2400,180,1800,120], // frames per phase (40fps equiv)
+  day:1,
+
+  player:{
+    x:240,y:192, vx:0,vy:0, spd:1.6,
+    hp:6,maxHp:6,
+    oil:100,maxOil:100,
+    curse:0,maxCurse:100,
+    weapon:0, // 0=shovel 1=hook 2=axe 3=hammer
+    facing:2, // 0=up 1=right 2=down 3=left
+    atkT:0,atkDur:16,
+    inv:0, knockX:0,knockY:0,
+    lantern:true,
+    walkF:0,walkT:0,
+    dead:false,
+  },
+
+  maps:{},curMap:'chapel',
+  cam:{x:0,y:0},
+  enemies:[],particles:[],
+  npcs:[],bells:[],items:[],signs:[],
+
+  dlg:{active:false,lines:[],idx:0,spk:'',cb:null},
+  flags:{},lore:[],
+  
+  // Bell system
+  bellHealth:{chapel:3,graveyard:3,village:3},
+  
+  fx:0,shakeX:0,shakeY:0,shakeDur:0,
+  fc:0, // frame counter
+  
+  // Transition
+  transAlpha:0,transDir:1,transCb:null,
+  
+  // Boss
+  boss:null,
+  
+  titleF:0,
+  introIdx:0,introT:0,introAlpha:0,introFade:false,
+  
+  ending:-1,
+  
+  // Location banner
+  banner:'',bannerT:0,
+  
+  // Night warning flash
+  nightWarn:0,
+};
+
+// ================================================================
+// MAP DEFINITIONS
+// ================================================================
+function buildAllMaps(){
+
+  // ---- CHAPEL 32×26 ----
+  const CW=32,CH=26;
+  const cm=mkMap(CW,CH);
+  // outer walls
+  for(let i=0;i<CW;i++){cm[i]=T.WALL;cm[(CH-1)*CW+i]=T.WALL;}
+  for(let i=0;i<CH;i++){cm[i*CW]=T.WALL;cm[i*CW+CW-1]=T.WALL;}
+  // fill floor
+  for(let r=1;r<CH-1;r++) for(let c=1;c<CW-1;c++) cm[r*CW+c]=T.FLOOR;
+  // pillars
+  [[4,3],[8,3],[12,3],[19,3],[23,3],[27,3]].forEach(([c,r])=>cm[r*CW+c]=T.PILLAR);
+  // altar
+  for(let r=3;r<7;r++) for(let c=14;c<18;c++) cm[r*CW+c]=T.ALTAR;
+  // pews (as brick rows)
+  [[4,7,6],[4,9,6],[4,11,6],[21,7,6],[21,9,6],[21,11,6]].forEach(([c,r,w])=>{
+    for(let i=c;i<c+w;i++) cm[r*CW+i]=T.BRICK;
+  });
+  // side walls creating rooms
+  for(let r=14;r<25;r++){cm[r*CW+6]=T.WALL;cm[r*CW+25]=T.WALL;}
+  cm[18*CW+6]=T.DOOR; cm[18*CW+25]=T.DOOR;
+  for(let i=1;i<6;i++) cm[14*CW+i]=T.WALL;
+  for(let i=26;i<31;i++) cm[14*CW+i]=T.WALL;
+  // torches
+  cm[3*CW+3]=T.TORCH; cm[3*CW+28]=T.TORCH;
+  cm[13*CW+3]=T.TORCH; cm[13*CW+28]=T.TORCH;
+  // bell
+  cm[3*CW+16]=T.BELL;
+  // south door exit
+  cm[24*CW+15]=T.DOOR; cm[24*CW+16]=T.DOOR;
+  // cracks
+  cm[10*CW+10]=T.CRACK; cm[15*CW+20]=T.CRACK; cm[20*CW+5]=T.CRACK;
+  // rubble corners
+  cm[2*CW+2]=T.RUBBLE; cm[2*CW+29]=T.RUBBLE;
+  // Stair down to catacombs (south-center)
+  cm[23*CW+15]=T.STAIR_D; cm[23*CW+16]=T.STAIR_D;
+  // sign
+  cm[8*CW+14]=T.SIGN;
+
+  S.maps.chapel={
+    data:cm,w:CW,h:CH,
+    name:'Chapel of Ash',
+    musicKey:'chapel',
+    exits:[
+      {x:15,y:25,dest:'graveyard',dx:16,dy:1,lock:false},
+      {x:16,y:25,dest:'graveyard',dx:17,dy:1,lock:false},
+    ],
+    bellPos:{x:16,y:3},
+    npcs:[
+      {id:'priest',x:15*TW+8,y:8*TW+8,name:'Father Aldric',talkDist:26,
+       lines:[
+         ["Father Aldric","The bells bind him. While they ring, He cannot rise from beneath."],
+         ["Father Aldric","Seven bells once sealed the king. One was melted down for gold... the chain grew weak."],
+         ["Father Aldric","Every night He reaches upward. Every night the bells hold him back. Mostly."],
+       ]
+      },
+    ],
+    items:[
+      {x:4*TW,y:12*TW,type:'lore',id:'L1',text:"Entry 1: The saint sealed him with seven bells. Each peal a link in the chain. We broke one link for gold. Forgive us."},
+      {x:28*TW,y:20*TW,type:'oil',id:'oil1',amt:25},
+    ],
+    signs:[
+      {x:8*TW,y:8*TW,text:"DO NOT ENTER THE CATACOMBS AT NIGHT. - FATHER ALDRIC"},
+    ],
+  };
+
+  // ---- GRAVEYARD 40×32 ----
+  const GW=40,GH=32;
+  const gm=mkMap(GW,GH);
+  for(let i=0;i<GW;i++){gm[i]=T.WALL;gm[(GH-1)*GW+i]=T.WALL;}
+  for(let i=0;i<GH;i++){gm[i*GW]=T.WALL;gm[i*GW+GW-1]=T.WALL;}
+  for(let r=1;r<GH-1;r++) for(let c=1;c<GW-1;c++) gm[r*GW+c]=T.FLOOR;
+  // fence top
+  for(let c=1;c<GW-1;c++) gm[1*GW+c]=T.FENCE;
+  // gate openings
+  gm[1*GW+15]=T.DOOR; gm[1*GW+16]=T.DOOR;
+  gm[16*GW+39]=T.DOOR;
+  // bell tower
+  for(let r=3;r<7;r++) for(let c=18;c<23;c++) gm[r*GW+c]=T.WALL;
+  gm[3*GW+20]=T.BELL;
+  gm[6*GW+19]=T.DOOR; gm[6*GW+20]=T.DOOR;
+  // graves — scattered
+  const gpos=[
+    [4,4],[7,4],[11,4],[16,5],[22,4],[26,5],[30,4],[35,5],[38,4],
+    [5,9],[9,10],[13,9],[18,11],[23,9],[27,10],[31,9],[36,10],
+    [3,16],[8,17],[12,16],[17,18],[21,16],[25,17],[29,16],[34,17],[38,16],
+    [6,22],[11,23],[15,22],[20,24],[24,22],[28,23],[33,22],[37,23],
+  ];
+  gpos.forEach(([c,r])=>gm[r*GW+c]=T.GRAVE);
+  // trees south
+  for(let c=2;c<GW-2;c+=4) gm[28*GW+c]=T.TREE;
+  // torches by bell tower
+  gm[4*GW+17]=T.TORCH; gm[4*GW+22]=T.TORCH;
+  // cracks
+  gm[12*GW+20]=T.CRACK; gm[20*GW+30]=T.CRACK; gm[25*GW+8]=T.CRACK;
+
+  S.maps.graveyard={
+    data:gm,w:GW,h:GH,
+    name:'Ashveil Graveyard',
+    musicKey:'graveyard',
+    exits:[
+      {x:15,y:1,dest:'chapel',dx:15,dy:24,lock:false},
+      {x:16,y:1,dest:'chapel',dx:16,dy:24,lock:false},
+      {x:39,y:16,dest:'village',dx:1,dy:16,lock:false},
+    ],
+    bellPos:{x:20,y:3},
+    npcs:[
+      {id:'ghost',x:20*TW+8,y:15*TW+8,name:'...',talkDist:30,
+       lines:[
+         ["...","...he rings it every night at midnight."],
+         ["...","Don't let him ring it. It feeds downward."],
+         ["...","We're still here... underground... still here."],
+       ]
+      },
+    ],
+    items:[
+      {x:8*TW,y:8*TW,type:'lore',id:'L2',text:"Entry 7: They found the executioner's grave empty. The chains still attached to stone. To nothing."},
+      {x:30*TW,y:20*TW,type:'weapon',id:'hook',name:'Grave Hook',wid:1},
+      {x:35*TW,y:25*TW,type:'oil',id:'oil2',amt:20},
+    ],
+    signs:[
+      {x:3*TW,y:7*TW,text:"HERE LIE THE ASHVEIL DEAD. MAY THEY REST."},
+    ],
+  };
+
+  // ---- VILLAGE 48×36 ----
+  const VW=48,VH=36;
+  const vm=mkMap(VW,VH);
+  for(let i=0;i<VW;i++){vm[i]=T.WALL;vm[(VH-1)*VW+i]=T.WALL;}
+  for(let i=0;i<VH;i++){vm[i*VW]=T.WALL;vm[i*VW+VW-1]=T.WALL;}
+  for(let r=1;r<VH-1;r++) for(let c=1;c<VW-1;c++) vm[r*VW+c]=T.FLOOR;
+  // roads — keep floor but vary
+  // Blacksmith building west
+  for(let r=2;r<12;r++) for(let c=2;c<12;c++) vm[r*VW+c]=T.BRICK;
+  for(let r=3;r<11;r++) for(let c=3;c<11;c++) vm[r*VW+c]=T.FLOOR;
+  vm[11*VW+7]=T.DOOR; // blacksmith door
+  vm[5*VW+5]=T.FORGE;   // forge inside
+  vm[4*VW+8]=T.TORCH; vm[4*VW+4]=T.TORCH;
+  // Inn center
+  for(let r=2;r<12;r++) for(let c=18;c<30;c++) vm[r*VW+c]=T.BRICK;
+  for(let r=3;r<11;r++) for(let c=19;c<29;c++) vm[r*VW+c]=T.FLOOR;
+  vm[11*VW+24]=T.DOOR;
+  vm[5*VW+22]=T.TORCH; vm[5*VW+26]=T.TORCH;
+  // Shop east
+  for(let r=2;r<12;r++) for(let c=36;c<46;c++) vm[r*VW+c]=T.BRICK;
+  for(let r=3;r<11;r++) for(let c=37;c<45;c++) vm[r*VW+c]=T.FLOOR;
+  vm[11*VW+40]=T.DOOR;
+  // Bell tower
+  for(let r=3;r<7;r++) for(let c=22;c<26;c++) vm[r*VW+c]=T.WALL;
+  vm[3*VW+24]=T.BELL;
+  vm[6*VW+24]=T.DOOR;
+  // Well center
+  vm[19*VW+24]=T.WELL;
+  // Trees south border
+  for(let c=2;c<VW-2;c+=3) vm[30*VW+c]=T.TREE;
+  // South houses
+  for(let r=20;r<28;r++) for(let c=2;c<10;c++) vm[r*VW+c]=T.BRICK;
+  for(let r=21;r<27;r++) for(let c=3;c<9;c++) vm[r*VW+c]=T.FLOOR;
+  vm[27*VW+6]=T.DOOR;
+  for(let r=20;r<28;r++) for(let c=20;c<28;c++) vm[r*VW+c]=T.BRICK;
+  for(let r=21;r<27;r++) for(let c=21;c<27;c++) vm[r*VW+c]=T.FLOOR;
+  vm[27*VW+24]=T.DOOR;
+  for(let r=20;r<28;r++) for(let c=38;c<46;c++) vm[r*VW+c]=T.BRICK;
+  for(let r=21;r<27;r++) for(let c=39;c<45;c++) vm[r*VW+c]=T.FLOOR;
+  vm[27*VW+42]=T.DOOR;
+  // Exits
+  vm[16*VW+0]=T.DOOR;
+  vm[35*VW+24]=T.DOOR; vm[35*VW+25]=T.DOOR;
+  // Torches on road
+  vm[15*VW+12]=T.TORCH; vm[15*VW+36]=T.TORCH;
+  // Cracks and rubble
+  vm[14*VW+24]=T.CRACK; vm[24*VW+12]=T.RUBBLE; vm[24*VW+35]=T.RUBBLE;
+  // Graves east field (ominous)
+  [[38,16],[40,18],[43,16],[42,20],[45,18],[38,22],[43,23]].forEach(([c,r])=>vm[r*VW+c]=T.GRAVE);
+
+  S.maps.village={
+    data:vm,w:VW,h:VH,
+    name:'Ashveil Village',
+    musicKey:'village',
+    exits:[
+      {x:0,y:16,dest:'graveyard',dx:38,dy:16,lock:false},
+      {x:24,y:35,dest:'woods',dx:24,dy:1,lock:false},
+      {x:25,y:35,dest:'woods',dx:25,dy:1,lock:false},
+    ],
+    bellPos:{x:24,y:3},
+    npcs:[
+      {id:'smith',x:7*TW+8,y:7*TW+8,name:'Brennan',talkDist:26,
+       lines:[
+         ["Brennan","*cough* ...the metal speaks at night. Names. It says names of the dead."],
+         ["Brennan","I sealed the forge shut but I can still hear it. Whispering. My wife's name."],
+         ["Brennan","Stay away from the east graves. Whatever's growing there... isn't from our soil."],
+       ]
+      },
+      {id:'child',x:24*TW+8,y:20*TW+8,name:'?',talkDist:24,
+       lines:[
+         ["...","(the child shows you a drawing — something vast beneath the church, arms reaching up through soil)"],
+         ["...","(the child points east, toward the graves, then shakes its head slowly)"],
+         ["...","(the child draws a circle around a cracked bell. Crosses it out.)"],
+       ]
+      },
+    ],
+    items:[
+      {x:16*TW,y:15*TW,type:'lore',id:'L3',text:"Posted Notice: DO NOT ring the north bell between midnight and dawn. Father A."},
+      {x:40*TW,y:8*TW,type:'oil',id:'oil3',amt:30},
+      {x:26*TW,y:24*TW,type:'weapon',id:'axe',name:'Blessed Axe',wid:2},
+    ],
+    signs:[
+      {x:24*TW,y:17*TW,text:"ASHVEIL WELL. 1683. MAY THE WATER STAY CLEAN."},
+    ],
+  };
+
+  // ---- WOODS 36×40 (maze-like) ----
+  const WW=36,WH=40;
+  const wm=mkMap(WW,WH);
+  // fill with trees (solid)
+  for(let r=0;r<WH;r++) for(let c=0;c<WW;c++) wm[r*WW+c]=T.TREE;
+  // carve paths
+  const paths=[
+    // main north-south path
+    ...Array.from({length:WH},(_,r)=>({r,c:18})),
+    // horizontal branches
+    ...Array.from({length:10},(_,i)=>({r:8,c:i+10})),
+    ...Array.from({length:8},(_,i)=>({r:15,c:i+20})),
+    ...Array.from({length:12},(_,i)=>({r:22,c:i+8})),
+    ...Array.from({length:8},(_,i)=>({r:30,c:i+12})),
+    // clearings
+    ...Array.from({length:5},(_,r)=>[...Array.from({length:5},(_,c)=>({r:r+6,c:c+10}))]).flat(),
+    ...Array.from({length:4},(_,r)=>[...Array.from({length:4},(_,c)=>({r:r+20,c:c+20}))]).flat(),
+    ...Array.from({length:6},(_,r)=>[...Array.from({length:6},(_,c)=>({r:r+28,c:c+14}))]).flat(),
+  ];
+  paths.forEach(({r,c})=>{ if(r>=0&&r<WH&&c>=0&&c<WW) wm[r*WW+c]=T.FLOOR; });
+  // exits
+  wm[0*WW+18]=T.DOOR; wm[0*WW+17]=T.DOOR;
+  wm[(WH-1)*WW+18]=T.WALL; // dead end south
+  // torches on path
+  wm[8*WW+10]=T.TORCH; wm[15*WW+20]=T.TORCH; wm[22*WW+18]=T.TORCH;
+  // graves in clearing
+  wm[7*WW+11]=T.GRAVE; wm[7*WW+13]=T.GRAVE; wm[9*WW+12]=T.GRAVE;
+  // cracks
+  wm[16*WW+18]=T.CRACK; wm[24*WW+14]=T.CRACK;
+
+  S.maps.woods={
+    data:wm,w:WW,h:WH,
+    name:'The Ashveil Wood',
+    musicKey:'woods',
+    exits:[
+      {x:18,y:0,dest:'village',dx:24,dy:34,lock:false},
+      {x:17,y:0,dest:'village',dx:24,dy:34,lock:false},
+    ],
+    bellPos:null,
+    npcs:[
+      {id:'wanderer',x:18*TW+8,y:20*TW+8,name:'Stranger',talkDist:28,
+       lines:[
+         ["Stranger","Turn back. The woods shift at night. Paths you walked an hour ago simply... aren't there."],
+         ["Stranger","I've been trying to leave for three days. The trees move when I'm not looking."],
+         ["Stranger","...Did you come from the church? Is the priest still alive? He knows something. Something he isn't saying."],
+       ]
+      },
+    ],
+    items:[
+      {x:18*TW,y:7*TW,type:'lore',id:'L4',text:"Scratched into bark: THE BELLS DRAIN DOWNWARD. THEY ARE NOT PROTECTION. THEY ARE A DRAIN."},
+      {x:18*TW,y:30*TW,type:'lore',id:'L5',text:"Worn journal: ...I finally understand. We aren't being protected. We are being used. The travelers — they feed it so we don't have to."},
+      {x:22*TW,y:22*TW,type:'weapon',id:'hammer',name:'Bell Hammer',wid:3},
+    ],
+    signs:[],
+  };
+}
+
+// ================================================================
+// TILE RENDERER
+// ================================================================
+function drawTile(ctx,t,px,py,dark,fc){
+  const fl=Math.floor(fc/20)%2;
+  switch(t){
+    case T.FLOOR:{
+      ctx.fillStyle=dark?'#12081a':'#0e1030';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle=dark?'#180a22':'#10122e';
+      ctx.fillRect(px,py,1,TW); ctx.fillRect(px,py,TW,1);
+      break;}
+    case T.WALL:{
+      ctx.fillStyle=dark?'#160516':'#101014';
+      ctx.fillRect(px,py,TW,TW);
+      const alt=((px/TW)+(py/TW))%2===0;
+      ctx.fillStyle=dark?'#28082a':'#1e1e24';
+      ctx.fillRect(px+(alt?0:8),py,8,7);
+      ctx.fillRect(px+(alt?8:0),py+8,8,7);
+      ctx.fillStyle=dark?'#380a3a':'#26263a';
+      ctx.fillRect(px+(alt?0:8),py,7,1);
+      ctx.fillRect(px+(alt?8:0),py+8,7,1);
+      break;}
+    case T.BRICK:{
+      const alt2=Math.floor(py/TW)%2===0;
+      ctx.fillStyle='#140e06';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle='#221408';
+      ctx.fillRect(px+(alt2?0:8),py,8,7);
+      ctx.fillRect(px+(alt2?8:0),py+8,8,7);
+      ctx.fillStyle='#3a2210';
+      ctx.fillRect(px+(alt2?0:8),py,7,1);
+      ctx.fillRect(px+(alt2?8:0),py+8,7,1);
+      break;}
+    case T.DOOR:{
+      ctx.fillStyle='#5c2a00';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle='#7a3800';
+      ctx.fillRect(px+2,py+2,12,12);
+      ctx.fillStyle='#b88000';
+      ctx.fillRect(px+7,py+7,2,2);
+      ctx.fillStyle='#d8b000';
+      ctx.fillRect(px+7,py+7,1,1);
+      break;}
+    case T.ALTAR:{
+      ctx.fillStyle=dark?'#200808':'#181010';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle=dark?'#600010':C.MIDGRY;
+      ctx.fillRect(px+2,py+2,12,10);
+      ctx.fillStyle=dark?C.BLOOD:C.SILV;
+      ctx.fillRect(px+3,py+3,10,7);
+      if(!dark&&fl){ctx.fillStyle=C.AMBRE;ctx.fillRect(px+3,py+1,2,2);ctx.fillRect(px+11,py+1,2,2);}
+      if(dark){ctx.fillStyle='#aa0000';ctx.fillRect(px+6,py+4,4,3);}
+      break;}
+    case T.GRAVE:{
+      ctx.fillStyle=dark?'#12081a':'#0e1030';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle=dark?'#4a1850':C.MIDGRY;
+      ctx.fillRect(px+4,py+2,8,2); ctx.fillRect(px+6,py+1,4,4);
+      ctx.fillRect(px+3,py+4,10,9);
+      ctx.fillStyle=dark?'#300a36':'#2a2a30';
+      ctx.fillRect(px+3,py+4,9,8);
+      break;}
+    case T.TREE:{
+      ctx.fillStyle=dark?'#0a0812':'#08100a';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle=C.BRN;
+      ctx.fillRect(px+6,py+10,4,6);
+      ctx.fillStyle=dark?'#0a1400':'#003400';
+      ctx.fillRect(px+2,py+1,12,11); ctx.fillRect(px+3,py+0,10,3);
+      ctx.fillStyle=dark?'#0f1e00':'#004400';
+      ctx.fillRect(px+3,py+2,10,9);
+      if(dark){ctx.fillStyle='#200818';ctx.fillRect(px+5,py+4,6,5);}
+      break;}
+    case T.BELL:{
+      ctx.fillStyle=dark?'#12081a':'#0e1030';
+      ctx.fillRect(px,py,TW,TW);
+      // get bell health
+      const mk=S.curMap;
+      const bpos=S.maps[mk]&&S.maps[mk].bellPos;
+      const txc=Math.floor(px/TW); // not px - cam, but px here is already tile-space pixel
+      // approximate
+      const blit=S.bellHealth[mk]>0;
+      ctx.fillStyle=blit?C.GOLD:'#404040';
+      ctx.fillRect(px+4,py+2,8,2); ctx.fillRect(px+3,py+4,10,6); ctx.fillRect(px+2,py+10,12,2);
+      ctx.fillStyle=blit?C.AMBRE:'#303030';
+      ctx.fillRect(px+7,py+11,2,3);
+      if(blit&&fl){ctx.fillStyle='rgba(218,120,0,0.4)';ctx.fillRect(px+1,py,14,TW);}
+      break;}
+    case T.PILLAR:{
+      ctx.fillStyle='#0e1030';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle=C.LTGRY;
+      ctx.fillRect(px+4,py,8,TW);
+      ctx.fillStyle=C.SILV;
+      ctx.fillRect(px+4,py,7,TW);
+      ctx.fillStyle=C.MIDGRY;
+      ctx.fillRect(px+4,py,8,2); ctx.fillRect(px+4,py+14,8,2);
+      ctx.fillStyle='#444450';
+      ctx.fillRect(px+4,py+2,1,12);
+      break;}
+    case T.TORCH:{
+      ctx.fillStyle='#0e1030';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle='#5c2a00';
+      ctx.fillRect(px+6,py+7,4,9);
+      if(fl){
+        ctx.fillStyle=C.FLAME; ctx.fillRect(px+5,py+2,6,6);
+        ctx.fillStyle=C.AMBRE; ctx.fillRect(px+6,py+3,4,4);
+        ctx.fillStyle=C.YLW; ctx.fillRect(px+7,py+4,2,2);
+      }else{
+        ctx.fillStyle=C.AMBRE; ctx.fillRect(px+5,py+3,6,5);
+        ctx.fillStyle=C.FLAME; ctx.fillRect(px+6,py+4,4,3);
+        ctx.fillStyle=C.YLW; ctx.fillRect(px+6,py+5,3,1);
+      }
+      break;}
+    case T.STAIR_D:{
+      ctx.fillStyle='#1a1a20';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle='#2a2a38';
+      for(let i=0;i<4;i++) ctx.fillRect(px+i*2,py+i*3,TW-i*4,3);
+      ctx.fillStyle='#660000';
+      ctx.fillRect(px+5,py+13,6,2);
+      break;}
+    case T.RUBBLE:{
+      ctx.fillStyle='#0e1030';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle=C.MIDGRY;
+      ctx.fillRect(px+1,py+8,5,5); ctx.fillRect(px+8,py+4,6,4);
+      ctx.fillRect(px+4,py+11,8,4); ctx.fillRect(px+2,py+2,3,4);
+      ctx.fillStyle=C.DKGRY;
+      ctx.fillRect(px+2,py+9,4,4); ctx.fillRect(px+9,py+5,5,3);
+      break;}
+    case T.FENCE:{
+      ctx.fillStyle='#0e1030';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle=C.MIDGRY;
+      ctx.fillRect(px,py+6,TW,2);
+      ctx.fillRect(px+4,py+2,2,12); ctx.fillRect(px+10,py+2,2,12);
+      ctx.fillRect(px,py+6,TW,1);
+      break;}
+    case T.CRACK:{
+      ctx.fillStyle=dark?'#12081a':'#0e1030';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle='#000';
+      ctx.fillRect(px+7,py+2,1,3); ctx.fillRect(px+6,py+5,2,2);
+      ctx.fillRect(px+5,py+7,3,3); ctx.fillRect(px+4,py+10,3,3);
+      if(dark){ctx.fillStyle='rgba(80,0,80,0.4)';ctx.fillRect(px+6,py+5,2,8);}
+      break;}
+    case T.CHEST:{
+      ctx.fillStyle='#0e1030';
+      ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle='#5c2a00'; ctx.fillRect(px+2,py+5,12,9);
+      ctx.fillStyle='#7a3800'; ctx.fillRect(px+2,py+4,12,3);
+      ctx.fillStyle='#b88000'; ctx.fillRect(px+6,py+7,4,3);
+      ctx.fillStyle='#d8b000'; ctx.fillRect(px+7,py+8,2,1);
+      break;}
+    case T.SIGN:{
+      ctx.fillStyle='#0e1030'; ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle='#7a5020'; ctx.fillRect(px+3,py+4,10,8);
+      ctx.fillStyle='#5c3a10'; ctx.fillRect(px+7,py+11,2,5);
+      ctx.fillStyle='#c8a050'; ctx.fillRect(px+4,py+5,8,6);
+      break;}
+    case T.WELL:{
+      ctx.fillStyle='#0e1030'; ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle=C.MIDGRY; ctx.fillRect(px+3,py+6,10,8);
+      ctx.fillStyle='#000a18'; ctx.fillRect(px+4,py+7,8,6);
+      ctx.fillStyle=C.SILV; ctx.fillRect(px+2,py+6,12,2);
+      ctx.fillStyle='#5c2a00'; ctx.fillRect(px+5,py+1,2,7); ctx.fillRect(px+9,py+1,2,7);
+      ctx.fillStyle=C.BRN; ctx.fillRect(px+4,py+1,8,2);
+      break;}
+    case T.FORGE:{
+      ctx.fillStyle='#100806'; ctx.fillRect(px,py,TW,TW);
+      ctx.fillStyle='#282020'; ctx.fillRect(px+2,py+2,12,12);
+      if(fl){ctx.fillStyle='#ff4400';ctx.fillRect(px+4,py+4,8,8);}
+      else{ctx.fillStyle='#aa2200';ctx.fillRect(px+4,py+5,8,7);}
+      ctx.fillStyle=C.DKGRY; ctx.fillRect(px+6,py+8,4,6);
+      break;}
+    default:
+      ctx.fillStyle='#0e1030'; ctx.fillRect(px,py,TW,TW);
+  }
+}
+
+// ================================================================
+// MAP RENDER
+// ================================================================
+function renderMap(cx,cy){
+  const map=S.maps[S.curMap]; if(!map) return;
+  const dark=S.phase===PH.NIGHT||(S.player.curse/S.player.maxCurse)>0.6;
+  const stx=Math.floor(cx/TW), sty=Math.floor(cy/TW);
+  const etx=Math.min(map.w,stx+17), ety=Math.min(map.h,sty+15);
+  for(let r=sty-1;r<ety+1;r++) for(let c=stx-1;c<etx+1;c++){
+    const t=getT(map.data,map.w,map.h,c,r);
+    const px=(c*TW-cx)|0, py=(r*TW-cy)|0+HH;
+    drawTile(GC,t,px,py,dark,S.fc);
+  }
+  // Draw items
+  if(map.items) for(const it of map.items){
+    if(it.collected) continue;
+    const ix=(it.x-cx)|0, iy=(it.y-cy)|0+HH;
+    if(ix<-8||ix>W+8||iy<HH-8||iy>H+8) continue;
+    drawItemSprite(GC,it,ix,iy);
+  }
+  // Draw signs (floating prompt)
+  if(map.signs) for(const sg of map.signs){
+    const sx=(sg.x-cx)|0,sy=(sg.y-cy)|0+HH;
+    if(Math.abs(S.player.x-sg.x)<24&&Math.abs(S.player.y-sg.y)<24){
+      // show sign popup
+      drawSignPopup(UC,sg.text);
+    }
+  }
+}
+
+function drawItemSprite(ctx,it,ix,iy){
+  const bob=(Math.sin(S.fc*0.1)*2)|0;
+  if(it.type==='lore'){
+    ctx.fillStyle=C.YLW; ctx.fillRect(ix+4,iy+3+bob,8,10);
+    ctx.fillStyle='#888800'; ctx.fillRect(ix+5,iy+4+bob,6,8);
+    ctx.fillStyle=C.YLW; ctx.fillRect(ix+6,iy+6+bob,4,1); ctx.fillRect(ix+6,iy+8+bob,4,1); ctx.fillRect(ix+6,iy+10+bob,4,1);
+    // glow
+    ctx.fillStyle='rgba(200,180,0,0.2)'; ctx.fillRect(ix+2,iy+1+bob,12,14);
+  } else if(it.type==='oil'){
+    ctx.fillStyle=C.AMBRE; ctx.fillRect(ix+5,iy+4+bob,6,9);
+    ctx.fillStyle=C.GOLD; ctx.fillRect(ix+6,iy+3+bob,4,3); ctx.fillRect(ix+7,iy+2+bob,2,2);
+    ctx.fillStyle=C.FLAME; ctx.fillRect(ix+7,iy+1+bob,2,2);
+  } else if(it.type==='weapon'){
+    ctx.fillStyle=C.SILV; ctx.fillRect(ix+6,iy+2+bob,4,11);
+    ctx.fillStyle=C.LTGRY; ctx.fillRect(ix+4,iy+4+bob,8,3);
+    ctx.fillStyle=C.GOLD; ctx.fillRect(ix+6,iy+2+bob,4,2);
+  }
+}
+
+function drawSignPopup(ctx,text){
+  const lines=[],words=text.split(' ');
+  let ln='';
+  for(const w of words){
+    const t=ln?ln+' '+w:w;
+    if(ptw(t)>200&&ln){lines.push(ln);ln=w;}else ln=t;
+  }
+  if(ln) lines.push(ln);
+  const bh=lines.length*9+10, by=H-bh-20;
+  ctx.fillStyle='#000a18'; ctx.fillRect(4,by,W-8,bh);
+  ctx.fillStyle=C.FOGBLU; ctx.fillRect(4,by,W-8,1); ctx.fillRect(4,by+bh-1,W-8,1);
+  ctx.fillRect(4,by,1,bh); ctx.fillRect(W-5,by,1,bh);
+  for(let i=0;i<lines.length;i++) ptext(ctx,lines[i],8,by+5+i*9,C.BONE);
+}
+
+// ================================================================
+// SPRITE: PLAYER
+// ================================================================
+function drawPlayer(cx,cy){
+  const p=S.player;
+  const sx=(p.x-cx)|0, sy=(p.y-cy)|0+HH;
+  if(p.inv>0&&Math.floor(p.inv/4)%2===1) return;
+  const cr=p.curse/p.maxCurse;
+  const bodyC=cr>0.7?C.DKPUR:C.MIDGRY;
+  const capeC=cr>0.7?'#3d0035':C.DKRED;
+  const skinC=cr>0.7?'#8a5858':C.SKIN;
+  const eyeC=cr>0.5?'#ff0033':'#000';
+  // shadow
+  GC.fillStyle='rgba(0,0,0,0.4)'; GC.fillRect(sx+3,sy+13,10,3);
+  // cape
+  GC.fillStyle=capeC; GC.fillRect(sx+3,sy+6,10,9);
+  // body
+  GC.fillStyle=bodyC; GC.fillRect(sx+4,sy+7,8,7);
+  // head
+  GC.fillStyle=skinC; GC.fillRect(sx+4,sy+2,8,6);
+  // hood
+  GC.fillStyle='#161616'; GC.fillRect(sx+3,sy,10,4); GC.fillRect(sx+2,sy+2,12,2);
+  // eyes
+  GC.fillStyle=eyeC;
+  if(p.facing===2){GC.fillRect(sx+5,sy+4,2,2);GC.fillRect(sx+9,sy+4,2,2);}
+  else if(p.facing===0){GC.fillRect(sx+5,sy+3,2,1);GC.fillRect(sx+9,sy+3,2,1);}
+  else if(p.facing===1){GC.fillRect(sx+9,sy+4,2,2);}
+  else{GC.fillRect(sx+5,sy+4,2,2);}
+  // legs walk anim
+  const wf=p.walkF;
+  GC.fillStyle=bodyC;
+  if(wf===0){GC.fillRect(sx+4,sy+13,4,3);GC.fillRect(sx+8,sy+13,4,3);}
+  else if(wf===1){GC.fillRect(sx+3,sy+12,4,4);GC.fillRect(sx+9,sy+14,4,2);}
+  else if(wf===2){GC.fillRect(sx+4,sy+13,4,3);GC.fillRect(sx+8,sy+13,4,3);}
+  else{GC.fillRect(sx+4,sy+14,4,2);GC.fillRect(sx+10,sy+12,4,4);}
+  // weapon swing arc
+  if(p.atkT>0){
+    const prog=1-(p.atkT/p.atkDur);
+    const wlen=(prog*14)|0;
+    const wid=p.weapon===2?5:p.weapon===3?6:3;
+    GC.fillStyle=p.weapon===2?C.GOLD:p.weapon===3?C.SILV:C.LTGRY;
+    if(p.facing===2){GC.fillRect(sx+12,sy+6,wid,wlen);}
+    else if(p.facing===0){GC.fillRect(sx+12,sy+8-wlen,wid,wlen);}
+    else if(p.facing===1){GC.fillRect(sx+13,sy+7,wlen,wid);}
+    else{GC.fillRect(sx-wlen+3,sy+7,wlen,wid);}
+  }
+  // lantern
+  if(p.lantern&&p.oil>0){
+    const lo=Math.floor(S.fc/12)%2;
+    GC.fillStyle=lo?C.AMBRE:C.GOLD;
+    GC.fillRect(sx-3,sy+7,3,5);
+    GC.fillStyle=lo?C.FLAME:C.AMBRE;
+    GC.fillRect(sx-2,sy+6,2,2);
+  }
+}
+
+// ================================================================
+// SPRITE: ENEMIES
+// ================================================================
+function drawEnemy(e,cx,cy){
+  const sx=(e.x-cx)|0, sy=(e.y-cy)|0+HH;
+  if(sx<-24||sx>W+24||sy<HH-24||sy>H+24) return;
+  const fl=Math.floor(S.fc/4)%2;
+  switch(e.type){
+    case 'gravewalker': drawGravewalker(sx,sy,e); break;
+    case 'bell_wraith': drawBellWraith(sx,sy,e,fl); break;
+    case 'husk_dog':    drawHuskDog(sx,sy,e); break;
+  }
+  // Hit flash white
+  if(e.hitF>0){
+    GC.globalAlpha=0.75;
+    GC.fillStyle='#ffffff';
+    GC.fillRect(sx,sy,16,16);
+    GC.globalAlpha=1;
+  }
+  // Knockback trail
+}
+
+function drawGravewalker(sx,sy,e){
+  const rot=Math.floor(S.fc/22)%2;
+  GC.fillStyle='#485050'; GC.fillRect(sx+3,sy+5,10,10);
+  GC.fillStyle=C.BONE; GC.fillRect(sx+4,sy+1,8,6);
+  GC.fillStyle='#000'; GC.fillRect(sx+5,sy+3,3,2); GC.fillRect(sx+9,sy+3,3,2);
+  GC.fillStyle='#880000'; GC.fillRect(sx+6,sy+3,1,2); GC.fillRect(sx+10,sy+3,1,2);
+  GC.fillStyle=C.BONE; GC.fillRect(sx+5,sy+6,6,2);
+  GC.fillStyle='#303838';
+  if(rot){GC.fillRect(sx,sy+6,4,3);GC.fillRect(sx+12,sy+6,4,3);}
+  else{GC.fillRect(sx,sy+8,4,3);GC.fillRect(sx+12,sy+8,4,3);}
+  GC.fillRect(sx+4,sy+14,3,3); GC.fillRect(sx+9,sy+14,3,3);
+  GC.fillStyle='#282828'; GC.fillRect(sx+3,sy+10,10,5);
+}
+
+function drawBellWraith(sx,sy,e,fl){
+  const off=(Math.sin(S.fc*0.12)*2)|0;
+  GC.globalAlpha=0.88;
+  GC.fillStyle=fl?'#003366':'#002244'; GC.fillRect(sx+2,sy+4+off,12,11);
+  GC.fillStyle=fl?'#0055cc':'#003388'; GC.fillRect(sx+4,sy+2+off,8,12);
+  GC.fillStyle='#aaccff'; GC.fillRect(sx+5,sy+5+off,2,2); GC.fillRect(sx+9,sy+5+off,2,2);
+  // bell emanation
+  GC.globalAlpha=fl?0.5:0.25;
+  GC.fillStyle=C.GOLD; GC.fillRect(sx+5,sy-2,6,2); GC.fillRect(sx+4,sy,8,4);
+  GC.globalAlpha=0.5;
+  GC.fillStyle='#003388'; GC.fillRect(sx+5,sy+13,6,3+Math.abs(off));
+  GC.fillRect(sx+3,sy+15,3,2); GC.fillRect(sx+10,sy+14,3,2);
+  GC.globalAlpha=1;
+}
+
+function drawHuskDog(sx,sy,e){
+  const lg2=Math.floor(S.fc/6)%2;
+  GC.fillStyle='#3a2810'; GC.fillRect(sx+2,sy+7,12,6);
+  GC.fillStyle='#2a1808'; GC.fillRect(sx,sy+6,8,5); GC.fillRect(sx+1,sy+9,6,3);
+  GC.fillStyle='#ff4400'; GC.fillRect(sx+2,sy+7,2,2);
+  GC.fillStyle='#2a1808';
+  if(lg2){GC.fillRect(sx+3,sy+12,3,4);GC.fillRect(sx+9,sy+12,3,4);}
+  else{GC.fillRect(sx+4,sy+13,3,3);GC.fillRect(sx+10,sy+13,3,3);}
+  GC.fillRect(sx+13,sy+6,3,2);
+  GC.fillStyle='#1a1000';
+  GC.fillRect(sx+4,sy+6,2,2); GC.fillRect(sx+7,sy+6,2,2); GC.fillRect(sx+10,sy+6,2,2);
+}
+
+// ================================================================
+// SPRITE: NPCS
+// ================================================================
+function drawNPC(npc,cx,cy){
+  const sx=(npc.x-cx)|0, sy=(npc.y-cy)|0+HH;
+  if(sx<-20||sx>W+20||sy<HH||sy>H+20) return;
+  const bob=(Math.sin(S.fc*0.05)*1)|0;
+  switch(npc.id){
+    case 'priest':
+      GC.fillStyle='#e0e0d0'; GC.fillRect(sx+3,sy+7+bob,10,9);
+      GC.fillStyle=C.SKIN; GC.fillRect(sx+4,sy+2+bob,8,6);
+      GC.fillStyle='#c8c8b8'; GC.fillRect(sx+2,sy+1+bob,12,5);
+      GC.fillStyle='#888800'; GC.fillRect(sx+6,sy+4+bob,4,4); // stole
+      GC.fillStyle=C.DKRED; GC.fillRect(sx+7,sy+4+bob,2,3);
+      // suspicious eyes
+      GC.fillStyle='#660000'; GC.fillRect(sx+5,sy+3+bob,2,2); GC.fillRect(sx+9,sy+3+bob,2,2);
+      // staff
+      GC.fillStyle=C.BRN; GC.fillRect(sx+15,sy+2+bob,2,14);
+      GC.fillStyle=C.GOLD; GC.fillRect(sx+14,sy+1+bob,4,3);
+      break;
+    case 'smith':
+      GC.fillStyle='#333333'; GC.fillRect(sx+3,sy+7+bob,10,9);
+      GC.fillStyle=C.SKIN; GC.fillRect(sx+4,sy+2+bob,8,6); // head
+      // beard
+      GC.fillStyle='#554433'; GC.fillRect(sx+4,sy+6+bob,8,3);
+      // apron
+      GC.fillStyle='#5c3010'; GC.fillRect(sx+4,sy+8+bob,8,8);
+      GC.fillStyle='#888888'; GC.fillRect(sx+6,sy+10+bob,4,6);
+      // arms
+      GC.fillStyle=C.SKIN; GC.fillRect(sx+0,sy+7+bob,4,7); GC.fillRect(sx+12,sy+7+bob,4,7);
+      // hammer
+      GC.fillStyle=C.SILV; GC.fillRect(sx+14,sy+8+bob,5,3);
+      GC.fillStyle=C.BRN; GC.fillRect(sx+15,sy+10+bob,2,5);
+      // blood mouth on day 2+
+      if(S.flags.day2){GC.fillStyle=C.BLOOD;GC.fillRect(sx+5,sy+6+bob,6,2);}
+      // dark eyes
+      GC.fillStyle='#000'; GC.fillRect(sx+5,sy+3+bob,2,2); GC.fillRect(sx+9,sy+3+bob,2,2);
+      break;
+    case 'child':
+      // small sprite
+      GC.fillStyle=C.SKIN; GC.fillRect(sx+5,sy+4+bob,6,5);
+      GC.fillStyle='#aa7744'; GC.fillRect(sx+4,sy+2+bob,8,4);
+      GC.fillStyle='#8888bb'; GC.fillRect(sx+4,sy+9+bob,8,7);
+      GC.fillStyle='#000'; GC.fillRect(sx+6,sy+5+bob,2,2); GC.fillRect(sx+9,sy+5+bob,2,2);
+      // drawing paper
+      GC.fillStyle=C.WHT; GC.fillRect(sx+12,sy+9+bob,5,6);
+      GC.fillStyle='#cc0000'; GC.fillRect(sx+13,sy+10+bob,3,4);
+      break;
+    case 'ghost':
+      GC.globalAlpha=0.7+Math.sin(S.fc*0.08)*0.15;
+      GC.fillStyle='#aaccff'; GC.fillRect(sx+4,sy+2+bob,8,6);
+      GC.fillStyle='#8899cc'; GC.fillRect(sx+3,sy+8+bob,10,7);
+      GC.fillStyle='#000020'; GC.fillRect(sx+6,sy+4+bob,2,2); GC.fillRect(sx+9,sy+4+bob,2,2);
+      GC.fillStyle='#aaccff';
+      GC.fillRect(sx+3,sy+14+bob,3,3); GC.fillRect(sx+7,sy+15+bob,2,3); GC.fillRect(sx+11,sy+14+bob,3,3);
+      GC.globalAlpha=1;
+      break;
+    case 'wanderer':
+      GC.fillStyle=C.BRN; GC.fillRect(sx+3,sy+7+bob,10,9);
+      GC.fillStyle='#c09060'; GC.fillRect(sx+4,sy+2+bob,8,6);
+      GC.fillStyle='#664422'; GC.fillRect(sx+3,sy+1+bob,10,4);
+      GC.fillStyle='#442211'; GC.fillRect(sx+4,sy+6+bob,8,3);
+      GC.fillStyle='#000'; GC.fillRect(sx+5,sy+3+bob,2,2); GC.fillRect(sx+9,sy+3+bob,2,2);
+      break;
+  }
+  // Talk prompt
+  const dist=Math.hypot(S.player.x-npc.x,S.player.y-npc.y);
+  if(dist<npc.talkDist+2){
+    const pulse=Math.floor(S.fc/20)%2;
+    if(pulse){ GC.fillStyle=C.YLW; GC.fillRect(sx+5,sy-8,8,6); GC.fillStyle='#000'; GC.fillRect(sx+7,sy-7,4,3); GC.fillRect(sx+7,sy-5,1,1); }
+  }
+}
+
+// ================================================================
+// PARTICLES
+// ================================================================
+function spawnParts(x,y,type,n=6){
+  for(let i=0;i<n;i++){
+    const a=Math.PI*2*i/n+Math.random();
+    const spd=0.6+Math.random()*1.8;
+    let col;
+    if(type==='blood') col=[C.BLOOD,C.MIDRED,'#440000'][i%3];
+    else if(type==='holy') col=[C.GOLD,C.YLW,C.WHT][i%3];
+    else if(type==='curse') col=[C.PURP,'#6600aa','#330066'][i%3];
+    else if(type==='smoke') col=['#444444','#333333','#222222'][i%3];
+    else col=C.LTGRY;
+    S.particles.push({x,y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,
+      life:15+Math.random()*25,maxLife:40,col,sz:(1+Math.random()*2)|0});
+  }
+}
+
+function tickParticles(){
+  for(let i=S.particles.length-1;i>=0;i--){
+    const p=S.particles[i];
+    p.x+=p.vx; p.y+=p.vy; p.vy+=0.06; p.vx*=0.95;
+    p.life--;
+    if(p.life<=0) S.particles.splice(i,1);
+  }
+}
+
+function drawParticles(cx,cy){
+  for(const p of S.particles){
+    GC.globalAlpha=p.life/p.maxLife;
+    GC.fillStyle=p.col;
+    GC.fillRect((p.x-cx)|0,(p.y-cy)|0+HH,p.sz,p.sz);
+  }
+  GC.globalAlpha=1;
+}
+
+// ================================================================
+// LIGHTING
+// ================================================================
+function renderLight(cx,cy){
+  LC.clearRect(0,0,W,H);
+  const p=S.player;
+  let dark=0;
+  if(S.phase===PH.NIGHT) dark=0.93;
+  else if(S.phase===PH.DUSK) dark=0.5;
+  else if(S.phase===PH.DAWN) dark=0.3;
+  dark=Math.min(0.97,dark+(p.curse/p.maxCurse)*0.25);
+  if(dark<=0) return;
+  LC.fillStyle=`rgba(0,0,0,${dark})`;
+  LC.fillRect(0,0,W,H);
+  if(p.lantern&&p.oil>0){
+    const lx=(p.x-cx)|0, ly=(p.y-cy)|0+HH+8;
+    const radius=Math.max(20,(p.oil/p.maxOil)*85);
+    LC.save();
+    LC.globalCompositeOperation='destination-out';
+    const gr=LC.createRadialGradient(lx,ly,0,lx,ly,radius);
+    gr.addColorStop(0,'rgba(0,0,0,1)');
+    gr.addColorStop(0.55,'rgba(0,0,0,0.9)');
+    gr.addColorStop(0.82,'rgba(0,0,0,0.4)');
+    gr.addColorStop(1,'rgba(0,0,0,0)');
+    LC.fillStyle=gr;
+    LC.beginPath(); LC.arc(lx,ly,radius,0,Math.PI*2); LC.fill();
+    LC.restore();
+    // warm tint
+    LC.save();
+    LC.globalCompositeOperation='source-over';
+    const warm=LC.createRadialGradient(lx,ly,0,lx,ly,radius*0.65);
+    warm.addColorStop(0,'rgba(200,80,0,0.07)');
+    warm.addColorStop(1,'rgba(0,0,0,0)');
+    LC.fillStyle=warm; LC.beginPath(); LC.arc(lx,ly,radius*0.65,0,Math.PI*2); LC.fill();
+    LC.restore();
+  }
+  // Torch lights in current map
+  const map=S.maps[S.curMap]; if(!map) return;
+  const stx=Math.floor(cx/TW),sty=Math.floor(cy/TW);
+  for(let r=sty-1;r<sty+15;r++) for(let c=stx-1;c<stx+18;c++){
+    if(getT(map.data,map.w,map.h,c,r)===T.TORCH){
+      const tx=(c*TW+8-cx)|0, ty=(r*TW+4-cy)|0+HH;
+      LC.save();
+      LC.globalCompositeOperation='destination-out';
+      const tg=LC.createRadialGradient(tx,ty,0,tx,ty,28);
+      tg.addColorStop(0,'rgba(0,0,0,0.75)');
+      tg.addColorStop(1,'rgba(0,0,0,0)');
+      LC.fillStyle=tg; LC.beginPath(); LC.arc(tx,ty,28,0,Math.PI*2); LC.fill();
+      LC.restore();
+    }
+  }
+}
+
+// ================================================================
+// HUD
+// ================================================================
+function drawHUD(){
+  const p=S.player;
+  UC.fillStyle='#07070f';
+  UC.fillRect(0,0,W,HH);
+  UC.fillStyle='#1a1a2a'; UC.fillRect(0,HH-1,W,1);
+
+  // HP hearts
+  for(let i=0;i<p.maxHp;i++){
+    const hx=2+i*10;
+    const full=i<p.hp;
+    UC.fillStyle=full?C.MIDRED:'#300808';
+    UC.fillRect(hx+1,1,4,2); UC.fillRect(hx+6,1,4,2);
+    UC.fillRect(hx,2,11,4); UC.fillRect(hx+1,6,9,2);
+    UC.fillRect(hx+2,8,7,2); UC.fillRect(hx+3,10,5,2);
+    UC.fillRect(hx+4,12,3,1); UC.fillRect(hx+5,13,1,1);
+    if(full){UC.fillStyle='#ff2222';UC.fillRect(hx+2,2,5,2);}
+  }
+
+  // Oil flame icon + bar
+  UC.fillStyle=C.AMBRE; UC.fillRect(62,3,8,10);
+  UC.fillStyle='#000'; UC.fillRect(63,4,6,8);
+  UC.fillStyle=C.FLAME; UC.fillRect(64,2,3,3); UC.fillRect(65,1,1,2);
+  UC.fillStyle='#1a1a00'; UC.fillRect(72,4,32,6);
+  UC.fillStyle=C.AMBRE; UC.fillRect(72,4,Math.floor(32*(p.oil/p.maxOil)),6);
+  if(p.oil<20){UC.fillStyle=C.FLAME;UC.fillRect(72,4,Math.floor(32*(p.oil/p.maxOil)),6);}
+
+  // Curse skull + bar
+  UC.fillStyle=C.LTGRY; UC.fillRect(108,2,9,8);
+  UC.fillStyle='#000'; UC.fillRect(109,3,3,3); UC.fillRect(113,3,3,3);
+  UC.fillRect(109,7,2,1); UC.fillRect(111,7,3,1); UC.fillRect(114,7,2,1);
+  UC.fillStyle='#1a0020'; UC.fillRect(119,4,40,6);
+  const cr=p.curse/p.maxCurse;
+  UC.fillStyle=cr>0.7?C.BLOOD:cr>0.4?'#880088':C.PURP;
+  UC.fillRect(119,4,Math.floor(40*cr),6);
+
+  // Phase/Day
+  const phc=[C.YLW,C.AMBRE,C.MIDBLU,C.SILV][S.phase];
+  const phn=['DAY','DUSK','NIGHT','DAWN'][S.phase];
+  ptext(UC,phn,163,4,phc);
+  ptext(UC,'N'+S.day,200,4,C.SILV);
+
+  // Bell status dots (per map)
+  const bh=S.bellHealth[S.curMap];
+  if(bh!==undefined){
+    for(let i=0;i<3;i++){
+      UC.fillStyle=i<bh?C.GOLD:'#333300';
+      UC.fillRect(230+i*6,4,4,6);
+    }
+  }
+
+  // Night warning
+  if(S.nightWarn>0&&Math.floor(S.fc/10)%2){
+    ptext(UC,'!BELL!',192,4,C.BLOOD);
+  }
+
+  // Banner
+  if(S.bannerT>0){
+    S.bannerT--;
+    UC.fillStyle='rgba(0,0,0,0.6)'; UC.fillRect(0,H/2-12,W,16);
+    const bw=ptw(S.banner);
+    ptext(UC,S.banner,(W-bw)/2|0,H/2-8,C.SILV);
+  }
+}
+
+// ================================================================
+// DIALOGUE
+// ================================================================
+function startDlg(lines,cb){
+  S.scene=SC.DIALOG;
+  S.dlg={active:true,lines,idx:0,spk:lines[0][0],cb:cb||null};
+}
+
+function drawDlg(){
+  const d=S.dlg; if(!d.active||!d.lines[d.idx]) return;
+  const [spk,text]=d.lines[d.idx];
+  const bx=2,by=H-56,bw=W-4,bh=54;
+  UC.fillStyle='#00060f'; UC.fillRect(bx,by,bw,bh);
+  UC.fillStyle=C.MIDBLU; UC.fillRect(bx,by,bw,1); UC.fillRect(bx,by+bh-1,bw,1);
+  UC.fillRect(bx,by,1,bh); UC.fillRect(bx+bw-1,by,1,bh);
+  if(spk){
+    const sw=ptw(spk)+8;
+    UC.fillStyle='#00060f'; UC.fillRect(bx+4,by-10,sw,10);
+    UC.fillStyle=C.MIDBLU; UC.fillRect(bx+4,by-11,sw,1);
+    UC.fillRect(bx+4,by-11,1,11); UC.fillRect(bx+4+sw-1,by-11,1,11);
+    ptext(UC,spk,bx+7,by-9,C.YLW);
+  }
+  // wrap text
+  const words=text.split(' '); let ln='',ly=by+8,lns=[];
+  for(const w of words){
+    const t=ln?ln+' '+w:w;
+    if(ptw(t)>bw-14&&ln){lns.push(ln);ln=w;}else ln=t;
+  }
+  if(ln) lns.push(ln);
+  for(let i=0;i<lns.length;i++) ptext(UC,lns[i],bx+6,ly+i*9,C.WHT);
+  // advance arrow
+  if(Math.floor(S.fc/22)%2){
+    UC.fillStyle=C.YLW;
+    UC.fillRect(W-12,by+bh-8,4,4); UC.fillRect(W-10,by+bh-5,2,2);
+  }
+}
+
+// ================================================================
+// BELL SYSTEM
+// ================================================================
+function tickBells(){
+  if(S.phase!==PH.NIGHT) return;
+  const map=S.maps[S.curMap]; if(!map||!map.bellPos) return;
+  // every 300 frames at night, damage the bell
+  if(S.fc%300===0&&S.bellHealth[S.curMap]>0){
+    const p=S.player;
+    const bx=map.bellPos.x*TW, by=map.bellPos.y*TW;
+    const dist=Math.hypot(p.x-bx,p.y-by);
+    if(dist>80){
+      // Player not defending — bell takes damage
+      S.bellHealth[S.curMap]--;
+      playBellDie();
+      spawnParts(bx,by,'curse',8);
+      S.nightWarn=180;
+      if(S.bellHealth[S.curMap]<=0){
+        startDlg([['','A bell has gone silent. The curse spreads deeper.']],()=>{});
+        S.player.curse=Math.min(S.player.maxCurse,S.player.curse+20);
+        playCurse();
+      }
+    } else {
+      // Player is near bell — it rings
+      playBell();
+      spawnParts(bx,by,'holy',6);
+    }
+  }
+  // Wraiths drawn to bell
+  if(S.fc%120===0){
+    for(const e of S.enemies){
+      if(e.type==='bell_wraith'&&map.bellPos){
+        // pull toward bell
+        e.targetBell=true;
+      }
+    }
+  }
+}
+
+// ================================================================
+// COLLISION
+// ================================================================
+function isSolid(x,y){
+  const map=S.maps[S.curMap]; if(!map) return true;
+  const tx=Math.floor(x/TW), ty=Math.floor(y/TW);
+  const t=getT(map.data,map.w,map.h,tx,ty);
+  return SOLID_TILES.has(t);
+}
+
+function moveWithCollision(obj,dx,dy){
+  const nx=obj.x+dx,ny=obj.y+dy;
+  const px1=3,px2=13,py1=8,py2=15;
+  let mx=true,my=true;
+  if(isSolid(nx+px1,obj.y+py1)||isSolid(nx+px2,obj.y+py1)||
+     isSolid(nx+px1,obj.y+py2)||isSolid(nx+px2,obj.y+py2)) mx=false;
+  if(isSolid(obj.x+px1,ny+py1)||isSolid(obj.x+px2,ny+py1)||
+     isSolid(obj.x+px1,ny+py2)||isSolid(obj.x+px2,ny+py2)) my=false;
+  if(mx) obj.x=nx;
+  if(my) obj.y=ny;
+}
+
+// ================================================================
+// ENEMY AI
+// ================================================================
+function spawnEnemy(type,x,y){
+  const cfg={
+    gravewalker:{hp:3,spd:0.45,atk:1,acd:60,aRange:12,detR:90},
+    bell_wraith: {hp:5,spd:0.75,atk:2,acd:80,aRange:14,detR:110,telCd:0},
+    husk_dog:    {hp:2,spd:1.15,atk:1,acd:38,aRange:10,detR:85},
+  };
+  const c=cfg[type]||cfg.gravewalker;
+  S.enemies.push({...c,type,x,y,vx:0,vy:0,atkT:0,hitF:0,dead:false,
+    knockX:0,knockY:0,targetBell:false});
+}
+
+function spawnNightEnemies(){
+  const map=S.maps[S.curMap]; if(!map) return;
+  S.enemies=[];
+  const count=Math.min(8,2+S.day);
+  const pool=['gravewalker'];
+  if(S.day>=2) pool.push('husk_dog');
+  if(S.day>=3) pool.push('bell_wraith');
+  for(let i=0;i<count;i++){
+    let ex,ey,tries=0;
+    do{
+      ex=(1+Math.floor(Math.random()*(map.w-2)))*TW;
+      ey=(1+Math.floor(Math.random()*(map.h-2)))*TW;
+      tries++;
+    }while(tries<30&&isSolid(ex+8,ey+8));
+    spawnEnemy(pool[Math.floor(Math.random()*pool.length)],ex,ey);
+  }
+}
+
+function tickEnemies(){
+  const p=S.player;
+  const map=S.maps[S.curMap]; if(!map) return;
+  for(let i=S.enemies.length-1;i>=0;i--){
+    const e=S.enemies[i];
+    if(e.dead){S.enemies.splice(i,1);continue;}
+    if(e.hitF>0) e.hitF--;
+    if(e.atkT>0) e.atkT--;
+
+    // knockback decay
+    if(e.knockX||e.knockY){
+      moveWithCollision(e,e.knockX,e.knockY);
+      e.knockX*=0.7; e.knockY*=0.7;
+      if(Math.abs(e.knockX)<0.1) e.knockX=0;
+      if(Math.abs(e.knockY)<0.1) e.knockY=0;
+      continue;
+    }
+
+    const bpos=map.bellPos;
+    let tx=p.x,ty=p.y;
+    // Bell wraith targets bell if player far
+    if(e.type==='bell_wraith'&&bpos){
+      const distP=Math.hypot(p.x-e.x,p.y-e.y);
+      const distB=Math.hypot(bpos.x*TW-e.x,bpos.y*TW-e.y);
+      if(distP>100&&distB<distP){tx=bpos.x*TW;ty=bpos.y*TW;}
+    }
+
+    const dx=tx-e.x, dy=ty-e.y;
+    const dist=Math.hypot(dx,dy);
+    const nightBoost=S.phase===PH.NIGHT?1.3:0.45;
+
+    if(dist<e.detR){
+      if(dist>e.aRange){
+        const spd=e.spd*nightBoost;
+        const mx=(dx/dist)*spd+(e.vx*0.6);
+        const my=(dy/dist)*spd+(e.vy*0.6);
+        const ms=Math.hypot(mx,my);
+        e.vx=ms>spd?mx/ms*spd:mx;
+        e.vy=ms>spd?my/ms*spd:my;
+        moveWithCollision(e,e.vx,e.vy);
+      } else {
+        if(e.atkT<=0){
+          damagePlayer(e.atk,dx,dy);
+          e.atkT=e.acd;
+        }
+      }
+    } else {
+      e.vx*=0.85; e.vy*=0.85;
+    }
+  }
+}
+
+// ================================================================
+// PLAYER UPDATE
+// ================================================================
+function tickPlayer(){
+  const p=S.player;
+  const map=S.maps[S.curMap]; if(!map) return;
+
+  let dx=0,dy=0;
+  if(dn('ArrowLeft')||dn('KeyA')){dx=-1;p.facing=3;}
+  if(dn('ArrowRight')||dn('KeyD')){dx=1;p.facing=1;}
+  if(dn('ArrowUp')||dn('KeyW')){dy=-1;p.facing=0;}
+  if(dn('ArrowDown')||dn('KeyS')){dy=1;p.facing=2;}
+  if(dx&&dy){dx*=0.707;dy*=0.707;}
+
+  // Knockback override
+  if(p.knockX||p.knockY){
+    moveWithCollision(p,p.knockX,p.knockY);
+    p.knockX*=0.65; p.knockY*=0.65;
+    if(Math.abs(p.knockX)<0.1) p.knockX=0;
+    if(Math.abs(p.knockY)<0.1) p.knockY=0;
+  } else {
+    moveWithCollision(p,dx*p.spd,dy*p.spd);
+  }
+
+  // Walk anim
+  if(dx||dy){p.walkT++;if(p.walkT>7){p.walkF=(p.walkF+1)%4;p.walkT=0;}}
+  else p.walkF=0;
+
+  // Invincibility
+  if(p.inv>0) p.inv--;
+
+  // Attack
+  if(p.atkT>0) p.atkT--;
+  if(jp('KeyZ')||jp('Space')) playerAtk();
+
+  // Lantern
+  if(jp('KeyX')){p.lantern=!p.lantern;}
+
+  // Oil drain
+  if(p.lantern&&(S.phase===PH.NIGHT||S.phase===PH.DUSK||S.phase===PH.DAWN)){
+    p.oil=Math.max(0,p.oil-0.02);
+  }
+
+  // Darkness curse tick
+  if(S.phase===PH.NIGHT){
+    if(!p.lantern||p.oil<=0) p.curse=Math.min(p.maxCurse,p.curse+0.04);
+  }
+
+  // NPC interact
+  if(jp('Enter')||jp('KeyZ')){
+    for(const npc of S.npcs){
+      const dist=Math.hypot(p.x-npc.x,p.y-npc.y);
+      if(dist<npc.talkDist){
+        const day=Math.min(npc.lines.length-1,S.day-1);
+        startDlg(npc.lines,null);
+        return;
+      }
+    }
+  }
+
+  // Exits
+  checkExits(p,map);
+
+  // Items
+  checkItems(p,map);
+
+  // Clamp
+  p.x=Math.max(TW,Math.min(map.w*TW-TW,p.x));
+  p.y=Math.max(TW,Math.min(map.h*TW-TW,p.y));
+
+  // Camera
+  const maxCX=Math.max(0,map.w*TW-W);
+  const maxCY=Math.max(0,map.h*TW-(H-HH));
+  S.cam.x=Math.max(0,Math.min(maxCX,(p.x-W/2)|0));
+  S.cam.y=Math.max(0,Math.min(maxCY,(p.y-(H-HH)/2)|0));
+}
+
+function checkExits(p,map){
+  const mdef=S.maps[S.curMap]; if(!mdef||!mdef.exits) return;
+  for(const ex of mdef.exits){
+    const ex_=ex.x*TW, ey_=ex.y*TW;
+    if(Math.abs(p.x-ex_)<14&&Math.abs(p.y-ey_)<14){
+      doTransition(()=>{
+        loadMap(ex.dest,ex.dx*TW,ex.dy*TW);
+      });
+      break;
+    }
+  }
+}
+
+function checkItems(p,map){
+  if(!map.items) return;
+  for(const it of map.items){
+    if(it.collected) continue;
+    if(Math.abs(p.x-it.x)<16&&Math.abs(p.y-it.y)<16){
+      collectItem(it);
+    }
+  }
+}
+
+function collectItem(it){
+  it.collected=true;
+  if(it.type==='lore'){
+    if(!S.lore.includes(it.id)){
+      S.lore.push(it.id);
+      startDlg([['LORE FOUND',it.text]],()=>{});
+      spawnParts(S.player.x+8,S.player.y+8,'holy',8);
+      playItem();
+    }
+  } else if(it.type==='oil'){
+    S.player.oil=Math.min(S.player.maxOil,S.player.oil+(it.amt||25));
+    spawnParts(S.player.x+8,S.player.y+8,'holy',4);
+    playItem();
+  } else if(it.type==='weapon'){
+    S.player.weapon=it.wid;
+    startDlg([['FOUND','You found the '+it.name+'! Your attack power has increased.']],()=>{});
+    spawnParts(S.player.x+8,S.player.y+8,'holy',10);
+    playItem();
+  }
+}
+
+// ================================================================
+// COMBAT
+// ================================================================
+function playerAtk(){
+  const p=S.player;
+  if(p.atkT>0) return;
+  p.atkT=p.atkDur+(p.weapon===2?8:p.weapon===3?10:0);
+  playAtk();
+  const reach=p.weapon===1?30:p.weapon===2?18:p.weapon===3?22:14;
+  let ax=p.x,ay=p.y,aw=TW,ah=TW;
+  if(p.facing===0){ay-=reach;ah=reach;}
+  else if(p.facing===1){ax+=TW;aw=reach;}
+  else if(p.facing===2){ay+=TW;ah=reach;}
+  else{ax-=reach;aw=reach;}
+  
+  let hit=false;
+  for(const e of S.enemies){
+    if(e.dead) continue;
+    if(ax<e.x+14&&ax+aw>e.x&&ay<e.y+14&&ay+ah>e.y){
+      const dmg=p.weapon===3?4:p.weapon===2?3:p.weapon===1?2:1;
+      e.hp-=dmg;
+      e.hitF=10;
+      hit=true;
+      // knockback
+      const kdx=e.x-p.x, kdy=e.y-p.y;
+      const kd=Math.hypot(kdx,kdy)||1;
+      e.knockX=kdx/kd*3.5; e.knockY=kdy/kd*3.5;
+      spawnParts(e.x+8,e.y+8,'blood',5);
+      playHit();
+      if(e.hp<=0){
+        e.dead=true;
+        spawnParts(e.x+8,e.y+8,'blood',10);
+        spawnParts(e.x+8,e.y+8,'smoke',4);
+        shake(6);
+        playDie();
+        S.player.curse=Math.max(0,S.player.curse-2); // killing reduces curse slightly
+      } else shake(3);
+    }
+  }
+  
+  // Bell Hammer holy area effect
+  if(p.weapon===3){
+    const bpos=S.maps[S.curMap]?.bellPos;
+    if(bpos&&Math.hypot(p.x-bpos.x*TW,p.y-bpos.y*TW)<60){
+      if(S.bellHealth[S.curMap]<3){
+        S.bellHealth[S.curMap]=Math.min(3,S.bellHealth[S.curMap]+1);
+        playBell();
+        spawnParts(bpos.x*TW,bpos.y*TW,'holy',10);
+        startDlg([['','The bell rings again... for now.']],()=>{});
+      }
+    }
+  }
+  
+  // Boss combat handled in boss tick
+  if(S.scene===SC.BOSS&&S.boss){
+    bossTakeDamage(ax,ay,aw,ah);
+  }
+}
+
+function damagePlayer(dmg,ex,ey){
+  const p=S.player;
+  if(p.inv>0) return;
+  p.hp=Math.max(0,p.hp-dmg);
+  p.inv=80;
+  p.curse=Math.min(p.maxCurse,p.curse+6);
+  // knockback away from enemy
+  if(ex!==undefined){
+    const dx=p.x-ex, dy=p.y-ey;
+    const d=Math.hypot(dx,dy)||1;
+    p.knockX=dx/d*4; p.knockY=dy/d*4;
+  }
+  shake(7); playHit();
+  if(p.hp<=0) S.scene=SC.GAMEOVER;
+}
+
+function shake(intensity){
+  S.shakeDur=Math.max(S.shakeDur,intensity*3);
+}
+
+// ================================================================
+// MAP LOAD / TRANSITION
+// ================================================================
+function doTransition(cb){
+  if(S.scene===SC.TRANSITION) return;
+  S.prevScene=S.scene;
+  S.scene=SC.TRANSITION;
+  S.transAlpha=0; S.transDir=1; S.transCb=cb;
+}
+
+function tickTransition(){
+  if(S.transDir===1){
+    S.transAlpha=Math.min(1,S.transAlpha+0.08);
+    if(S.transAlpha>=1){ S.transCb&&S.transCb(); S.transDir=-1; }
+  } else {
+    S.transAlpha=Math.max(0,S.transAlpha-0.05);
+    if(S.transAlpha<=0){ S.scene=SC.GAME; }
+  }
+  UC.fillStyle=`rgba(0,0,0,${S.transAlpha})`;
+  UC.fillRect(0,0,W,H);
+}
+
+function loadMap(mapId,px,py){
+  if(!S.maps[mapId]) return;
+  S.curMap=mapId;
+  S.player.x=px; S.player.y=py;
+  S.enemies=[];
+  if(S.phase===PH.NIGHT) spawnNightEnemies();
+  const mdef=S.maps[mapId];
+  S.npcs=mdef.npcs?mdef.npcs.map(n=>({...n})):[];
+  S.bells=mdef.bellPos?[mdef.bellPos]:[];
+  // set music
+  curMusicKey=S.phase===PH.NIGHT?'night':(mdef.musicKey||'chapel');
+  musicSeq=0; musicRow=0;
+  // show location banner
+  S.banner=mdef.name||'';
+  S.bannerT=120;
+  // update camera
+  const map=mdef;
+  const maxCX=Math.max(0,map.w*TW-W);
+  const maxCY=Math.max(0,map.h*TW-(H-HH));
+  S.cam.x=Math.max(0,Math.min(maxCX,(px-W/2)|0));
+  S.cam.y=Math.max(0,Math.min(maxCY,(py-(H-HH)/2)|0));
+}
+
+// ================================================================
+// DAY / NIGHT CYCLE
+// ================================================================
+function tickPhase(){
+  S.phaseT++;
+  if(S.phaseT>=S.phaseDur[S.phase]){
+    S.phaseT=0;
+    S.phase=(S.phase+1)%4;
+    onPhaseChange();
+  }
+  if(S.nightWarn>0) S.nightWarn--;
+}
+
+function onPhaseChange(){
+  if(S.phase===PH.NIGHT){
+    S.day++;
+    spawnNightEnemies();
+    curMusicKey='night'; musicSeq=0; musicRow=0;
+    doTransition(()=>{ startDlg([['','Night '+S.day+'. The bells must ring until dawn.']],()=>{}); });
+    S.glitch=90;
+    if(S.day>7){
+      // Trigger boss
+      doTransition(()=>{ startBoss(); });
+    }
+    S.flags['day'+S.day]=true;
+  } else if(S.phase===PH.DAY){
+    S.enemies=[];
+    S.player.oil=Math.min(S.player.maxOil,S.player.oil+15);
+    S.player.curse=Math.max(0,S.player.curse-8);
+    curMusicKey=S.maps[S.curMap]?.musicKey||'chapel';
+    musicSeq=0; musicRow=0;
+    doTransition(()=>{ startDlg([['','Dawn breaks. The dead retreat.']],()=>{}); });
+  } else if(S.phase===PH.DUSK){
+    startDlg([['','Darkness gathers. Light your lantern.']],()=>{});
+  }
+}
+
+// ================================================================
+// BOSS — THE HOLLOW KING
+// ================================================================
+function startBoss(){
+  S.scene=SC.BOSS;
+  S.boss={
+    x:W/2-16, y:60,
+    hp:30, maxHp:30,
+    phase:0, // 0=hands 1=skull 2=fullbody
+    atkT:0, atkPat:0,
+    hitF:0,
+    hands:[{x:W/2-50,y:80,vx:0,vy:0},{x:W/2+34,y:80,vx:0,vy:0}],
+    skullY:H/2, skullVY:0,
+    riseT:0,
+    projT:0,
+  };
+  S.enemies=[];
+  S.player.x=W/2; S.player.y=H-40;
+  S.cam.x=0; S.cam.y=0;
+  curMusicKey='boss'; musicSeq=0; musicRow=0;
+  // Reset bell for boss arena context
+}
+
+function bossTakeDamage(ax,ay,aw,ah){
+  const b=S.boss; if(!b||b.hitF>0) return;
+  // hit hands
+  for(const h of b.hands){
+    if(ax<h.x+24&&ax+aw>h.x&&ay<h.y+24&&ay+ah>h.y){
+      b.hp--; b.hitF=15; shake(8); playHit(); spawnParts(h.x+12,h.y+12,'blood',6);
+      break;
+    }
+  }
+  // hit main body
+  if(ax<b.x+32&&ax+aw>b.x&&ay<b.y+32&&ay+ah>b.y){
+    if(b.phase>=1){ b.hp-=2; b.hitF=15; shake(10); playHit(); spawnParts(b.x+16,b.y+16,'blood',8); }
+  }
+  if(b.hitF>0){
+    if(b.hp<=20&&b.phase<1){ b.phase=1; playBell(); spawnParts(W/2,H/2,'curse',12); }
+    if(b.hp<=10&&b.phase<2){ b.phase=2; playBell(); spawnParts(W/2,H/2,'curse',16); }
+    if(b.hp<=0){ endBoss(); }
+  }
+}
+
+function endBoss(){
+  doTransition(()=>{
+    S.scene=SC.ENDING;
+    S.ending=0; // sacrifice ending (default)
+    // if player has hammer = ending 3 (bell hammer = freed souls)
+    if(S.player.weapon===3) S.ending=3;
+    // if curse max = ending 2 hollow
+    else if(S.player.curse>=S.player.maxCurse) S.ending=2;
+    S.fc=0;
+  });
+}
+
+function tickBoss(){
+  const b=S.boss; if(!b) return;
+  const p=S.player;
+  if(b.hitF>0) b.hitF--;
+  b.riseT++;
+
+  // Hands oscillation
+  const t=S.fc*0.03;
+  b.hands[0].x=(W/2-60)+Math.sin(t)*20;
+  b.hands[0].y=80+Math.cos(t*0.7)*15;
+  b.hands[1].x=(W/2+28)+Math.sin(t+Math.PI)*20;
+  b.hands[1].y=80+Math.cos(t*0.7+Math.PI)*15;
+
+  // Skull bob
+  if(b.phase>=1){
+    b.skullY=70+Math.sin(S.fc*0.04)*8;
+  }
+
+  // Attack patterns
+  if(b.atkT>0){b.atkT--;} else {
+    b.atkT=b.phase===2?50:b.phase===1?80:120;
+    // Hand slam
+    if(b.atkPat%3===0){
+      // Hand lunges toward player
+      for(const h of b.hands){
+        const ddx=p.x-h.x, ddy=p.y-h.y;
+        const dd=Math.hypot(ddx,ddy)||1;
+        // just check collision
+        if(Math.hypot(p.x-h.x,p.y-h.y)<28){ damagePlayer(2,h.x,h.y); }
+      }
+    }
+    // Projectile bells
+    if(b.atkPat%5===2&&b.phase>=1){
+      const dx=p.x-W/2, dy=p.y-b.y;
+      const d=Math.hypot(dx,dy)||1;
+      S.particles.push({x:W/2+16,y:b.y+30,vx:dx/d*2.5,vy:dy/d*2.5,
+        life:60,maxLife:60,col:C.GOLD,sz:4,proj:true,dmg:1});
+    }
+    b.atkPat++;
+  }
+
+  // Darkness rising during phase 2
+  if(b.phase===2){
+    // extra darkness handled in render
+    if(S.fc%60===0) spawnParts(W/2+(Math.random()*80-40),H/2+(Math.random()*60-30),'curse',3);
+  }
+
+  // Projectile tick
+  for(let i=S.particles.length-1;i>=0;i--){
+    const pt=S.particles[i];
+    if(!pt.proj) continue;
+    if(Math.hypot(p.x-pt.x,p.y-pt.y)<10){
+      damagePlayer(pt.dmg||1,pt.x,pt.y);
+      S.particles.splice(i,1);
+    }
+  }
+}
+
+function drawBoss(){
+  const b=S.boss; if(!b) return;
+  // Arena background
+  GC.fillStyle='#000000'; GC.fillRect(0,0,W,H);
+  // Cathedral silhouette
+  GC.fillStyle='#080808';
+  GC.fillRect(0,H/2-20,W,H); // floor
+  GC.fillStyle='#060606';
+  // pillars
+  for(let i=0;i<4;i++){
+    GC.fillRect(i*(W/4),0,TW/2,H);
+  }
+  // chains
+  GC.fillStyle='#2a2a2a';
+  for(let i=0;i<6;i++){
+    const cx=20+i*36;
+    GC.fillRect(cx,0,2,60+(Math.sin(S.fc*0.03+i)*10)|0);
+  }
+  // rising darkness at phase 2
+  if(b.phase===2){
+    const dr=LC.createLinearGradient(0,H,0,H/2);
+    dr.addColorStop(0,'rgba(30,0,30,0.7)');
+    dr.addColorStop(1,'rgba(0,0,0,0)');
+    LC.fillStyle=dr; LC.fillRect(0,0,W,H);
+  }
+
+  const hitC=b.hitF>0&&Math.floor(b.hitF/3)%2;
+
+  // Phase 0+: GIANT HANDS
+  for(const h of b.hands){
+    const hx=h.x|0, hy=h.y|0;
+    GC.fillStyle=hitC?'#ffffff':'#2a1818';
+    GC.fillRect(hx,hy,24,20);
+    GC.fillStyle=hitC?'#ffffff':'#1a1010';
+    // fingers
+    for(let f=0;f<5;f++) GC.fillRect(hx+f*5,hy-8+Math.abs(Math.sin(S.fc*0.1+f))*6|0,4,10);
+    GC.fillStyle='#cc0000';
+    GC.fillRect(hx+4,hy+4,3,3); GC.fillRect(hx+12,hy+4,3,3); // knuckle wounds
+  }
+
+  // Phase 1+: SKULL
+  if(b.phase>=1){
+    const sx=(W/2-24)|0, sy=(b.skullY|0);
+    GC.fillStyle=hitC?'#ffffff':C.BONE;
+    GC.fillRect(sx,sy,48,40);
+    GC.fillStyle=hitC?'#888888':'#000820';
+    GC.fillRect(sx+4,sy+8,14,14); GC.fillRect(sx+30,sy+8,14,14); // eye sockets
+    GC.fillStyle=hitC?'#ff0000':'#cc0000';
+    GC.fillRect(sx+8,sy+10,6,6); GC.fillRect(sx+34,sy+10,6,6); // red eyes
+    // Crown of broken bells
+    GC.fillStyle=C.GOLD;
+    for(let i=0;i<5;i++) GC.fillRect(sx+4+i*9,sy-8,6,10);
+    // Jaw rattle
+    const jaw=Math.floor(S.fc/8)%2;
+    GC.fillStyle=C.BONE; GC.fillRect(sx+6,sy+30+jaw,36,12);
+    GC.fillStyle='#000'; for(let t2=0;t2<4;t2++) GC.fillRect(sx+10+t2*8,sy+30+jaw,4,10);
+    // Chains
+    GC.fillStyle='#3a3a3a';
+    for(let c=0;c<3;c++) GC.fillRect(sx+8+c*16,sy+40,4,H-sy-40);
+  }
+
+  // Phase 2: Full body emerging
+  if(b.phase>=2){
+    GC.fillStyle=hitC?'#ffffff':'#1a0808';
+    GC.fillRect(W/2-20,H/2-10,40,80); // ribcage
+    GC.fillStyle=hitC?'#ffffff':'#0a0404';
+    for(let rib=0;rib<5;rib++) GC.fillRect(W/2-30,H/2+rib*12,60,6);
+    GC.fillStyle='#cc0000';
+    GC.fillRect(W/2-4,H/2+10,8,30); // spine light
+  }
+
+  // HP bar
+  const bw2=120, bx2=(W-bw2)/2;
+  UC.fillStyle='#000'; UC.fillRect(bx2-1,H-16,bw2+2,9);
+  UC.fillStyle='#440000'; UC.fillRect(bx2,H-15,bw2,7);
+  UC.fillStyle='#cc0000'; UC.fillRect(bx2,H-15,Math.floor(bw2*(b.hp/b.maxHp)),7);
+  ptext(UC,'HOLLOW KING',bx2+2,H-14,'#ff4444');
+
+  // Phase name
+  const pnames=['I - HANDS','II - SKULL','III - RISEN'];
+  ptext(UC,'PHASE '+pnames[b.phase],(W-ptw('PHASE '+pnames[b.phase]))/2|0,H-24,C.AMBRE);
+}
+
+// ================================================================
+// TITLE SCREEN
+// ================================================================
+function drawTitle(){
+  S.titleF++;
+  GC.fillStyle='#000'; GC.fillRect(0,0,W,H);
+
+  // Moon
+  const mf=S.titleF;
+  const pulse=Math.sin(mf*0.02)*3;
+  GC.fillStyle='#550000'; GC.beginPath(); GC.arc(128,42+pulse|0,28,0,Math.PI*2); GC.fill();
+  GC.fillStyle='#880000'; GC.beginPath(); GC.arc(128,42+pulse|0,22,0,Math.PI*2); GC.fill();
+  GC.fillStyle='#aa1111'; GC.beginPath(); GC.arc(124,38+pulse|0,13,0,Math.PI*2); GC.fill();
+  // moon cracks
+  GC.fillStyle='#660000';
+  GC.fillRect(128,30+pulse|0,1,4); GC.fillRect(122,44+pulse|0,8,1); GC.fillRect(132,38+pulse|0,4,2);
+
+  // Church silhouette
+  GC.fillStyle='#060608';
+  GC.fillRect(82,80,92,100); // nave
+  GC.fillRect(104,55,48,30); // chancel
+  GC.fillRect(116,35,24,25); // tower
+  GC.fillRect(122,22,12,16); // steeple
+  GC.fillRect(124,16,8,8);   // cross top
+  GC.fillRect(120,20,16,4);  // cross arm
+  // Bell tower silhouettes
+  GC.fillRect(56,96,22,80); GC.fillRect(54,88,26,12); GC.fillRect(60,80,14,10);
+  GC.fillRect(178,96,22,80); GC.fillRect(176,88,26,12); GC.fillRect(182,80,14,10);
+  // windows (dark red glow if night-ish)
+  if(S.titleF>30){GC.fillStyle='#330000'; GC.fillRect(100,100,10,14); GC.fillRect(116,100,10,14); GC.fillRect(146,100,10,14);}
+
+  // Ground
+  GC.fillStyle='#06060a'; GC.fillRect(0,160,W,H);
+
+  // Graves
+  GC.fillStyle='#050508';
+  const grvs=[[15,155],[32,157],[52,152],[72,158],[188,156],[208,153],[225,157],[244,155]];
+  for(const [gx,gy] of grvs){
+    GC.fillRect(gx+3,gy-14,6,14); GC.fillRect(gx,gy-11,12,12);
+    GC.fillRect(gx+1,gy-13,10,2); GC.fillRect(gx+3,gy-11,6,8);
+  }
+
+  // Trees
+  GC.fillStyle='#040408';
+  for(let i=0;i<9;i++){
+    const tx=4+i*28;
+    GC.fillRect(tx+4,148,5,18); GC.fillRect(tx,134,14,17); GC.fillRect(tx+2,124,10,13); GC.fillRect(tx+4,116,6,11);
+  }
+
+  // Mist
+  const mtime=S.titleF*0.007;
+  GC.fillStyle='rgba(15,15,30,0.35)'; GC.fillRect((Math.sin(mtime)*16)|0,152,W+20,14);
+  GC.fillStyle='rgba(8,8,20,0.45)'; GC.fillRect((Math.cos(mtime*0.8)*12)|0,162,W+20,10);
+
+  // Title
+  if(S.titleF>30){
+    const a=Math.min(1,(S.titleF-30)/50);
+    // shadow
+    ptext(GC,'CURSEBOUND',27,92,`rgba(60,0,0,${a*0.6})`,5);
+    // main - red
+    ptext(GC,'CURSEBOUND',26,90,`rgba(160,0,0,${a})`,5);
+    // highlight stripe
+    if(a>0.8){
+      GC.fillStyle=`rgba(220,0,0,${(a-0.8)*3})`;
+      GC.fillRect(26,90,ptw('CURSEBOUND')*5,2);
+    }
+    // Blood drips
+    if(S.titleF>80){
+      GC.fillStyle=`rgba(120,0,0,${a*0.9})`;
+      const drips=[28,50,73,95,122,148,168,195,215,238];
+      for(let i=0;i<drips.length;i++){
+        const dh=(Math.sin(S.titleF*0.025+i*1.3)*4+5)|0;
+        GC.fillRect(drips[i],115,2,dh);
+        GC.fillRect(drips[i]+1,119+dh-2,1,3);
+      }
+    }
+    // Subtitle
+    ptext(GC,'DO NOT LET THE BELLS FALL SILENT',8,125,`rgba(90,90,130,${a})`);
+  }
+
+  // Press start blink
+  if(S.titleF>110){
+    if(Math.floor(S.titleF/28)%2) ptext(GC,'PRESS ENTER TO BEGIN',32,185,C.SILV);
+    ptext(GC,'NES JAM 2026',78,210,'#222230');
+  }
+}
+
+// ================================================================
+// INTRO
+// ================================================================
+const INTRO_SEQ=[
+  {t:"The valley of Ashveil has been cursed for three hundred years.",d:200},
+  {t:"A saint once sealed the Hollow King beneath the earth with seven sacred bells.",d:220},
+  {t:"Every peal of every bell was a link in the chain that bound him.",d:200},
+  {t:"One bell was melted down for gold. The chain weakened.",d:180},
+  {t:"Every night he reaches further upward through the soil.",d:180},
+  {t:"You awaken in chains inside an abandoned chapel.",d:160},
+  {t:"You do not remember your name. Only one warning echoes in your skull...",d:180},
+  {t:"DO NOT LET THE BELLS FALL SILENT.",d:240},
+];
+let iIdx=0,iT=0,iAlpha=0,iFade=false;
+
+function drawIntro(){
+  iT++;
+  GC.fillStyle='#000'; GC.fillRect(0,0,W,H);
+  if(iIdx>=INTRO_SEQ.length){ beginGame(); return; }
+  const seq=INTRO_SEQ[iIdx];
+  if(!iFade){ iAlpha=Math.min(1,iAlpha+0.025); if(iT>=seq.d) iFade=true; }
+  else{ iAlpha=Math.max(0,iAlpha-0.025); if(iAlpha<=0){iIdx++;iT=0;iFade=false;} }
+  const col=iIdx===7?`rgba(160,0,0,${iAlpha})`:`rgba(180,180,200,${iAlpha})`;
+  // center wrap
+  const words=seq.t.split(' '); let ln='',lns=[];
+  for(const w of words){ const t=ln?ln+' '+w:w; if(ptw(t)>220&&ln){lns.push(ln);ln=w;}else ln=t; }
+  if(ln) lns.push(ln);
+  const startY=(H-lns.length*11)/2;
+  for(let i=0;i<lns.length;i++) ptext(GC,lns[i],(W-ptw(lns[i]))/2|0,startY+i*11,col);
+  // skip
+  if(iT>40) ptext(GC,'ENTER TO SKIP',75,H-16,`rgba(60,60,80,${iAlpha*0.4})`);
+}
+
+// ================================================================
+// GAME OVER
+// ================================================================
+function drawGameOver(){
+  // render scene behind
+  renderGameFrame();
+  // overlay
+  const a=Math.min(0.85,S.fc%400/80);
+  UC.fillStyle=`rgba(0,0,0,${a})`; UC.fillRect(0,0,W,H);
+  UC.fillStyle=`rgba(100,0,0,${a*0.6})`; UC.fillRect(0,H/2-30,W,60);
+  ptext(UC,'YOU HAVE FALLEN',18,H/2-20,`rgba(220,0,0,${a})`,2);
+  ptext(UC,'THE BELLS ARE SILENT',14,H/2+6,`rgba(140,0,0,${a})`,2);
+  if(Math.floor(S.fc/28)%2) ptext(UC,'PRESS ENTER',72,H/2+36,C.SILV);
+  if(jp('Enter')){ resetGame(); }
+}
+
+// ================================================================
+// ENDINGS
+// ================================================================
+const ENDINGS=[
+  {title:'ENDING I - SACRIFICE',
+   lines:['You descend into the catacombs.','You seal yourself underground beside','the Hollow King forever.','The bells ring on above you.','The valley breathes.','Somewhere in the dark, you smile.'],
+   col:'#7a7a8a'},
+  {title:'ENDING II - HOLLOW THRONE',
+   lines:['You embrace the darkness completely.','The curse does not consume you.','It crowns you.','The village kneels.','The bells ring only when you command.','The valley is yours now.'],
+   col:C.BLOOD},
+  {title:'ENDING III - ESCAPE',
+   lines:['You flee the valley at dawn.','The curse follows. A thread, invisible.','Wherever you walk the bells grow quiet.','Wherever you sleep the dead grow restless.','You carry Ashveil with you forever.','It is not a burden. It is a warning.'],
+   col:C.MIDGRY},
+  {title:'TRUE ENDING - THE FREED',
+   lines:['The Bell Hammer rings true.','Every bell shattered. Every chain broken.','The Hollow King dissolves into light.','The dead exhale. Finally at rest.','The valley is quiet — truly quiet —','for the first time in three centuries.'],
+   col:C.GOLD},
+];
+
+function drawEnding(){
+  GC.fillStyle='#000'; GC.fillRect(0,0,W,H);
+  const end=ENDINGS[S.ending]||ENDINGS[0];
+  const maxf=end.lines.length*80+200;
+  const norm=Math.min(1,S.fc/80);
+
+  // Atmosphere
+  if(S.ending===1){ // hollow — red tint
+    GC.fillStyle=`rgba(30,0,0,${norm*0.4})`; GC.fillRect(0,0,W,H);
+  } else if(S.ending===3){ // true ending — golden light
+    const gl=GC.createRadialGradient(W/2,H/2,10,W/2,H/2,130);
+    gl.addColorStop(0,`rgba(180,140,0,${norm*0.3})`);
+    gl.addColorStop(1,'rgba(0,0,0,0)');
+    GC.fillStyle=gl; GC.fillRect(0,0,W,H);
+  }
+
+  ptext(GC,end.title,(W-ptw(end.title))/2|0,30,`rgba(${hex2rgb(end.col)},${norm})`);
+  // underline
+  GC.fillStyle=`rgba(${hex2rgb(end.col)},${norm*0.5})`;
+  GC.fillRect(4,40,W-8,1);
+
+  for(let i=0;i<end.lines.length;i++){
+    const la=Math.min(1,Math.max(0,(S.fc-60-i*40)/40));
+    if(la>0) ptext(GC,end.lines[i],(W-ptw(end.lines[i]))/2|0,60+i*14,`rgba(${hex2rgb(C.SILV)},${la*0.9})`);
+  }
+
+  if(S.fc>200&&Math.floor(S.fc/28)%2) ptext(GC,'PRESS ENTER',72,H-20,C.SILV);
+  if(jp('Enter')){ resetGame(); }
+}
+
+function hex2rgb(h){
+  return `${parseInt(h.slice(1,3),16)},${parseInt(h.slice(3,5),16)},${parseInt(h.slice(5,7),16)}`;
+}
+
+// ================================================================
+// PAUSE
+// ================================================================
+function drawPause(){
+  renderGameFrame();
+  UC.fillStyle='rgba(0,4,14,0.88)'; UC.fillRect(0,0,W,H);
+  ptext(UC,'PAUSED',86,12,C.SILV,2);
+  UC.fillStyle='#1a1a2a'; UC.fillRect(4,26,W-8,1);
+  const p=S.player;
+  const lines=[
+    ['HP', p.hp+'/'+p.maxHp, C.MIDRED],
+    ['OIL',Math.floor(p.oil)+'%',C.AMBRE],
+    ['CURSE',Math.floor(p.curse)+'%',C.PURP],
+    ['WEAPON',['SHOVEL','HOOK','AXE','HAMMER'][p.weapon],C.SILV],
+    ['NIGHT',S.day+'  PHASE: '+['DAY','DUSK','NIGHT','DAWN'][S.phase],C.YLW],
+    ['LORE',S.lore.length+' PAGES FOUND',C.GOLD],
+    ['BELLS','CHAPEL:'+S.bellHealth.chapel+' YARD:'+S.bellHealth.graveyard+' VILLAGE:'+S.bellHealth.village,C.GOLD],
+  ];
+  for(let i=0;i<lines.length;i++){
+    const [k,v,c]=lines[i];
+    ptext(UC,k+':',6,36+i*12,C.LTGRY);
+    ptext(UC,v,60,36+i*12,c);
+  }
+  UC.fillStyle='#1a1a2a'; UC.fillRect(4,H/2+4,W-8,1);
+  ptext(UC,'CONTROLS',6,H/2+8,C.LTGRY);
+  ptext(UC,'ARROWS/WASD - MOVE',6,H/2+20,C.DKGRY);
+  ptext(UC,'Z/SPACE - ATTACK',6,H/2+30,C.DKGRY);
+  ptext(UC,'X - TOGGLE LANTERN',6,H/2+40,C.DKGRY);
+  ptext(UC,'ENTER/Z NEAR NPC - TALK',6,H/2+50,C.DKGRY);
+  ptext(UC,'ESC - PAUSE/RESUME',6,H/2+60,C.DKGRY);
+  if(Math.floor(S.fc/28)%2) ptext(UC,'PRESS ESC TO RESUME',28,H-14,C.SILV);
+  if(jp('Escape')) S.scene=SC.GAME;
+}
+
+// ================================================================
+// MAIN RENDER FRAME
+// ================================================================
+function renderGameFrame(){
+  const cx=S.cam.x+(S.shakeDur>0?(Math.random()*8-4)|0:0);
+  const cy=S.cam.y+(S.shakeDur>0?(Math.random()*8-4)|0:0);
+  GC.fillStyle='#000'; GC.fillRect(0,0,W,H);
+  renderMap(cx,cy);
+  for(const npc of S.npcs) drawNPC(npc,cx,cy);
+  for(const e of S.enemies) drawEnemy(e,cx,cy);
+  drawPlayer(cx,cy);
+  drawParticles(cx,cy);
+  // glitch effect
+  if(S.glitch>0){ S.glitch--; applyGlitch(); }
+  // curse vignette
+  applyCurse();
+  renderLight(cx,cy);
+  drawHUD();
+}
+
+function applyGlitch(){
+  if(Math.random()>0.45) return;
+  const ly=(Math.random()*H)|0, lh=(1+Math.random()*5)|0;
+  try{ const d=GC.getImageData(0,ly,W,lh); GC.putImageData(d,(Math.random()*14-7)|0,ly); }catch(e){}
+  GC.fillStyle=`rgba(${Math.random()>0.5?'160,0,0':'0,0,160'},0.1)`;
+  GC.fillRect(0,ly,W,lh);
+}
+
+function applyCurse(){
+  const cr=S.player.curse/S.player.maxCurse;
+  if(cr<0.35) return;
+  const vg=GC.createRadialGradient(W/2,H/2,40,W/2,H/2,145);
+  vg.addColorStop(0,'rgba(0,0,0,0)');
+  vg.addColorStop(1,`rgba(25,0,0,${(cr-0.35)*0.9})`);
+  GC.fillStyle=vg; GC.fillRect(0,0,W,H);
+  if(cr>0.75&&Math.floor(S.fc/35)%3===0){
+    GC.fillStyle='rgba(60,0,0,0.06)'; GC.fillRect(0,0,W,H);
+  }
+}
+
+// ================================================================
+// GAME INIT / RESET
+// ================================================================
+function beginGame(){
+  S.player={
+    x:15*TW+8,y:20*TW+8,vx:0,vy:0,spd:1.6,
+    hp:6,maxHp:6,oil:100,maxOil:100,curse:0,maxCurse:100,
+    weapon:0,facing:2,atkT:0,atkDur:16,inv:0,
+    knockX:0,knockY:0,lantern:true,walkF:0,walkT:0,dead:false,
+  };
+  S.enemies=[]; S.particles=[]; S.lore=[]; S.flags={};
+  S.day=1; S.phase=PH.DAY; S.phaseT=0;
+  S.bellHealth={chapel:3,graveyard:3,village:3};
+  S.glitch=0; S.shakeDur=0; S.shakeX=0; S.shakeY=0;
+  S.fc=0; S.banner=''; S.bannerT=0; S.nightWarn=0;
+  S.boss=null;
+  S.scene=SC.GAME;
+  loadMap('chapel',15*TW+8,20*TW+8);
+  curMusicKey='chapel'; musicSeq=0; musicRow=0;
+}
+
+function resetGame(){
+  S.titleF=0; iIdx=0; iT=0; iAlpha=0; iFade=false;
+  S.scene=SC.TITLE;
+}
+
+// ================================================================
+// MAIN LOOP
+// ================================================================
+buildAllMaps();
+S.scene=SC.TITLE; S.titleF=0;
+
+function loop(){
+  requestAnimationFrame(loop);
+  S.fc++;
+  GC.clearRect(0,0,W,H);
+  LC.clearRect(0,0,W,H);
+  UC.clearRect(0,0,W,H);
+  tickMusic();
+  // shake decay
+  if(S.shakeDur>0){ S.shakeDur--; }
+
+  switch(S.scene){
+    case SC.TITLE:
+      drawTitle();
+      if(jp('Enter')||jp('Space')){ iIdx=0;iT=0;iAlpha=0;iFade=false; S.scene=SC.INTRO; }
+      break;
+    case SC.INTRO:
+      drawIntro();
+      if(jp('Enter')){ beginGame(); }
+      break;
+    case SC.GAME:
+      tickPlayer(); tickEnemies(); tickParticles(); tickPhase(); tickBells();
+      renderGameFrame();
+      break;
+    case SC.DIALOG:
+      tickPlayer(); tickEnemies(); tickParticles();
+      renderGameFrame();
+      drawDlg();
+      if(jp('Enter')||jp('KeyZ')||jp('Space')){
+        S.dlg.idx++;
+        if(S.dlg.idx>=S.dlg.lines.length){ S.dlg.active=false; S.scene=SC.GAME; S.dlg.cb&&S.dlg.cb(); }
+      }
+      break;
+    case SC.PAUSE:
+      drawPause();
+      break;
+    case SC.TRANSITION:
+      renderGameFrame();
+      tickTransition();
+      break;
+    case SC.BOSS:
+      tickPlayer(); tickBoss(); tickParticles();
+      GC.fillStyle='#000'; GC.fillRect(0,0,W,H);
+      drawBoss();
+      drawPlayer(0,HH); // boss arena is fixed cam
+      for(const e of S.enemies) drawEnemy(e,0,0);
+      drawParticles(0,0);
+      if(S.glitch>0){S.glitch--;applyGlitch();}
+      renderLight(0,0); drawHUD();
+      playerAtk(); // allow attack
+      break;
+    case SC.GAMEOVER:
+      S.fc++;
+      drawGameOver();
+      break;
+    case SC.ENDING:
+      drawEnding();
+      break;
+  }
+  clearJP();
+}
+loop();
+</script>
+</body>
+</html>

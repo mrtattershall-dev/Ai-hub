@@ -1,0 +1,9 @@
+Write the drift physics module for a top-down arcade racing game in vanilla JavaScript using the IIFE revealing-module pattern.
+
+Requirements:
+- Model a car with position, velocity, heading, and angular velocity.
+- Handle acceleration/braking, steering, and grip vs. slip so the car can drift when turning hard at speed.
+- Separate longitudinal and lateral forces; apply more lateral slip (less grip) during a drift, and recover grip as the car straightens.
+- Expose an update(dt, input) that advances the physics from semantic input (throttle, brake, steer, handbrake).
+- Keep tunable constants (grip, drift factor, accel, max speed) clearly grouped at the top.
+- Use section-header comments to organize the file.

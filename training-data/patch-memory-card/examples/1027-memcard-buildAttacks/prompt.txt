@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+buildAttacks (from js/entities/player.js)

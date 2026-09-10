@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Aethelgard — Playable Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; overflow: hidden; font-family: 'Georgia', serif; }
+  #c { display: block; width: 100vw; height: 100vh; }
+
+  #hud {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 10;
+  }
+
+  /* Health bar */
+  #health-wrap {
+    position: fixed; top: 22px; left: 22px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .bar-label {
+    font-size: 10px; letter-spacing: 3px; color: #888; text-transform: uppercase;
+    font-family: monospace;
+  }
+  .bar-track {
+    width: 220px; height: 6px; background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12); position: relative;
+  }
+  #health-fill {
+    height: 100%; background: #8b0000; transition: width 0.15s;
+    box-shadow: 0 0 8px #8b0000;
+  }
+  #health-trail {
+    position: absolute; top: 0; height: 100%;
+    background: rgba(180,0,0,0.35); transition: width 0.5s;
+  }
+
+  /* Stamina */
+  #stamina-fill { height: 100%; background: #2a5c3f; transition: width 0.1s; }
+
+  /* Wyrd energy nodes */
+  #wyrd-wrap {
+    position: fixed; top: 22px; left: 22px; margin-top: 68px;
+    display: flex; gap: 5px; align-items: center;
+  }
+  .wyrd-node {
+    width: 14px; height: 14px; border: 1px solid rgba(180,80,20,0.6);
+    background: rgba(180,80,20,0.12); transition: background 0.2s, box-shadow 0.2s;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  }
+  .wyrd-node.lit { background: #c85a10; box-shadow: 0 0 6px #c85a10; }
+  .wyrd-node.corrupt { background: #cc1020; box-shadow: 0 0 8px #cc1020; }
+
+  /* Poise bar */
+  #poise-fill { height: 100%; background: #3a3060; transition: width 0.12s; }
+
+  /* Combo rank */
+  #combo-rank {
+    position: fixed; top: 50%; right: 28px; transform: translateY(-50%);
+    font-size: 72px; font-weight: bold; letter-spacing: -2px;
+    color: rgba(200,200,200,0.08); transition: all 0.3s;
+    text-shadow: none; font-family: 'Georgia', serif;
+  }
+  #combo-rank.active { color: rgba(200,180,120,0.9); font-size: 80px; }
+  #combo-rank.s-rank { color: #c85a10; text-shadow: 0 0 20px rgba(200,90,16,0.6); }
+
+  /* Corruption vignette */
+  #corrupt-vignette {
+    position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(160,0,10,0) 100%);
+    opacity: 0; transition: opacity 0.5s; z-index: 5;
+  }
+
+  /* Hit flash */
+  #hit-flash {
+    position: fixed; inset: 0; pointer-events: none;
+    background: rgba(160,0,0,0.55); opacity: 0; z-index: 20;
+  }
+
+  /* Off-screen threat vignette */
+  #threat-north { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to bottom, rgba(200,0,0,0), rgba(200,0,0,0)); opacity: 0; z-index: 8; pointer-events: none; transition: opacity 0.15s; }
+  #threat-east { position: fixed; top: 0; right: 0; bottom: 0; width: 60px; background: linear-gradient(to left, rgba(200,0,0,0), rgba(200,0,0,0)); opacity: 0; z-index: 8; pointer-events: none; transition: opacity 0.15s; }
+
+  /* Boss health */
+  #boss-hud {
+    position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
+    width: 420px; opacity: 0; transition: opacity 0.5s;
+  }
+  #boss-name { color: #c8b87a; font-size: 13px; letter-spacing: 4px; text-align: center; margin-bottom: 6px; text-transform: uppercase; }
+  #boss-bar-track { width: 100%; height: 4px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); }
+  #boss-bar-fill { height: 100%; background: #7a1818; transition: width 0.2s; box-shadow: 0 0 6px #7a1818; }
+
+  /* Controls help */
+  #controls {
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 20px; font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.3);
+    text-transform: uppercase; font-family: monospace;
+  }
+  .ctrl { display: flex; align-items: center; gap: 5px; }
+  .key { border: 1px solid rgba(255,255,255,0.2); padding: 1px 5px; font-size: 9px; }
+
+  /* Execution prompt */
+  #exec-prompt {
+    position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%);
+    color: #c8b87a; font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    opacity: 0; transition: opacity 0.3s;
+  }
+
+  /* Title screen */
+  #title-screen {
+    position: fixed; inset: 0; background: #000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 100; transition: opacity 1s;
+  }
+  #title-screen h1 {
+    font-size: 52px; letter-spacing: 12px; color: #c8b87a;
+    text-transform: uppercase; font-weight: normal; margin-bottom: 8px;
+    text-shadow: 0 0 40px rgba(200,184,122,0.3);
+  }
+  #title-screen .sub {
+    font-size: 11px; letter-spacing: 6px; color: rgba(255,255,255,0.35);
+    text-transform: uppercase; margin-bottom: 60px; font-family: monospace;
+  }
+  #title-screen .start-btn {
+    font-size: 11px; letter-spacing: 5px; color: rgba(255,255,255,0.6);
+    text-transform: uppercase; font-family: monospace;
+    border: 1px solid rgba(255,255,255,0.2); padding: 12px 32px;
+    cursor: pointer; background: transparent; transition: all 0.3s; pointer-events: all;
+  }
+  #title-screen .start-btn:hover { color: #c8b87a; border-color: rgba(200,184,122,0.5); }
+
+  /* Blood-drunk text */
+  #blooddrunk-text {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-size: 22px; letter-spacing: 6px; color: #cc1020; text-transform: uppercase;
+    font-family: monospace; opacity: 0; pointer-events: none; z-index: 30;
+  }
+
+  /* Chapter text */
+  #chapter-text {
+    position: fixed; top: 40%; left: 50%; transform: translate(-50%,-50%);
+    text-align: center; pointer-events: none;
+  }
+  #chapter-text .chapter-label { font-size: 10px; letter-spacing: 6px; color: rgba(200,184,122,0.6); text-transform: uppercase; font-family: monospace; }
+  #chapter-text .chapter-name { font-size: 28px; letter-spacing: 4px; color: #c8b87a; font-weight: normal; margin-top: 6px; }
+  #chapter-text { opacity: 0; transition: opacity 1s; }
+
+  #damage-numbers { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 15; }
+  .dmg-num { position: absolute; font-size: 18px; font-family: monospace; font-weight: bold; pointer-events: none; animation: floatUp 1s ease-out forwards; }
+  @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-60px); opacity: 0; } }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div id="health-wrap">
+    <div class="bar-label">Vitality</div>
+    <div class="bar-track" style="width:220px">
+      <div id="health-trail" style="width:100%"></div>
+      <div id="health-fill" style="width:100%"></div>
+    </div>
+    <div class="bar-label" style="margin-top:6px">Stamina</div>
+    <div class="bar-track" style="width:160px">
+      <div id="stamina-fill" style="width:100%"></div>
+    </div>
+    <div class="bar-label" style="margin-top:6px">Poise</div>
+    <div class="bar-track" style="width:120px">
+      <div id="poise-fill" style="width:100%"></div>
+    </div>
+  </div>
+  <div id="wyrd-wrap">
+    <div class="bar-label" style="margin-right:4px">Wyrd</div>
+    <div class="wyrd-node" id="wn0"></div>
+    <div class="wyrd-node" id="wn1"></div>
+    <div class="wyrd-node" id="wn2"></div>
+    <div class="wyrd-node" id="wn3"></div>
+    <div class="wyrd-node" id="wn4"></div>
+    <div class="wyrd-node" id="wn5"></div>
+    <div class="wyrd-node" id="wn6"></div>
+    <div class="wyrd-node" id="wn7"></div>
+  </div>
+  <div id="combo-rank">D</div>
+  <div id="corrupt-vignette"></div>
+  <div id="hit-flash"></div>
+  <div id="threat-north"></div>
+  <div id="threat-east"></div>
+  <div id="boss-hud">
+    <div id="boss-name">Tiw, The Flayed General</div>
+    <div id="boss-bar-track"><div id="boss-bar-fill" style="width:100%"></div></div>
+  </div>
+  <div id="controls">
+    <div class="ctrl"><span class="key">WASD</span> Move</div>
+    <div class="ctrl"><span class="key">Mouse</span> Camera</div>
+    <div class="ctrl"><span class="key">LMB</span> Light Attack</div>
+    <div class="ctrl"><span class="key">RMB</span> Heavy Attack</div>
+    <div class="ctrl"><span class="key">Space</span> Dodge</div>
+    <div class="ctrl"><span class="key">Q</span> Tether Hook</div>
+    <div class="ctrl"><span class="key">E</span> Execute</div>
+  </div>
+  <div id="exec-prompt">[ E ] Execute</div>
+  <div id="damage-numbers"></div>
+  <div id="blooddrunk-text">— Blood-Drunk —</div>
+  <div id="chapter-text">
+    <div class="chapter-label">Chapter I</div>
+    <div class="chapter-name">The Ash-Mire</div>
+  </div>
+</div>
+
+<div id="title-screen">
+  <h1>Aethelgard</h1>
+  <div class="sub">The Oath-Broken</div>
+  <button class="start-btn" onclick="startGame()">Begin the Saga</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ============================================================
+// GAME STATE
+// ============================================================
+const G = {
+  health: 100, maxHealth: 100,
+  stamina: 100, maxStamina: 100,
+  poise: 120, maxPoise: 120,
+  wyrd: 6, maxWyrd: 8,
+  corruption: 0,
+  combo: 0, comboTimer: 0,
+  isAttacking: false, attackTimer: 0, attackPhase: 0,
+  isHeavyAttacking: false,
+  isDodging: false, dodgeTimer: 0, dodgeInvincible: false,
+  isTethering: false, tetherTimer: 0,
+  isExecuting: false,
+  bloodDrunk: false, bloodDrunkTimer: 0,
+  staggered: false, staggerTimer: 0,
+  nearExecutable: false,
+  enemies: [],
+  boss: null,
+  bossPhase: 1,
+  started: false,
+  keys: {},
+  mouseButtons: {},
+  cameraYaw: 0, cameraPitch: 0.4,
+  cameraLocked: false,
+  trailHealth: 100,
+  trailTimer: 0,
+  bossDetected: false,
+  stamRegenTimer: 0,
+  poiseRegenTimer: 0,
+  wyrdRegenTimer: 0,
+  comboRank: 'D',
+  lastDamageTime: 0,
+  thetherTarget: null,
+};
+
+// ============================================================
+// SCENE SETUP
+// ============================================================
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.6;
+const sceneFog = new THREE.FogExp2(0x0d0a08, 0.045);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d0a08);
+scene.fog = sceneFog;
+
+const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 0.1, 300);
+
+// ============================================================
+// LIGHTING — ash-mire cold dusk
+// ============================================================
+const ambientLight = new THREE.AmbientLight(0x151210, 1.0);
+scene.add(ambientLight);
+
+const dirLight = new THREE.DirectionalLight(0x3a3530, 1.2);
+dirLight.position.set(-15, 25, -10);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.set(2048, 2048);
+dirLight.shadow.camera.near = 0.1;
+dirLight.shadow.camera.far = 100;
+dirLight.shadow.camera.left = -40; dirLight.shadow.camera.right = 40;
+dirLight.shadow.camera.top = 40; dirLight.shadow.camera.bottom = -40;
+scene.add(dirLight);
+
+const rimLight = new THREE.DirectionalLight(0x1a1020, 0.5);
+rimLight.position.set(10, 5, 15);
+scene.add(rimLight);
+
+// Runic fire light — flickers
+const runeLight = new THREE.PointLight(0x8b2500, 2, 12);
+runeLight.position.set(0, 2, 0);
+scene.add(runeLight);
+
+// ============================================================
+// TERRAIN — The Ash-Mire
+// ============================================================
+const floorGeo = new THREE.PlaneGeometry(120, 120, 32, 32);
+const floorVerts = floorGeo.attributes.position;
+for (let i = 0; i < floorVerts.count; i++) {
+  const x = floorVerts.getX(i), z = floorVerts.getZ(i);
+  if (Math.abs(x) > 3 || Math.abs(z) > 3) {
+    floorVerts.setY(i, (Math.sin(x * 0.3) * Math.cos(z * 0.25) * 0.5) +
+      (Math.random() - 0.5) * 0.4);
+  }
+}
+floorGeo.computeVertexNormals();
+const floorMat = new THREE.MeshLambertMaterial({ color: 0x1a1510 });
+const floor = new THREE.Mesh(floorGeo, floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+// Water puddles
+function makePuddle(x, z, r) {
+  const geo = new THREE.CircleGeometry(r, 8);
+  const mat = new THREE.MeshLambertMaterial({ color: 0x0a0c10, transparent: true, opacity: 0.8 });
+  const m = new THREE.Mesh(geo, mat);
+  m.rotation.x = -Math.PI / 2; m.position.set(x, 0.01, z);
+  scene.add(m);
+}
+for (let i = 0; i < 14; i++) makePuddle((Math.random()-0.5)*50, (Math.random()-0.5)*50, 0.5+Math.random()*2);
+
+// Dead trees
+function makeTree(x, z) {
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.12, 0.18, 5 + Math.random() * 4, 6),
+    new THREE.MeshLambertMaterial({ color: 0x1a1208 })
+  );
+  trunk.position.set(x, 2.5, z);
+  trunk.rotation.y = Math.random() * Math.PI;
+  trunk.castShadow = true;
+  scene.add(trunk);
+
+  // branches
+  for (let i = 0; i < 3 + Math.floor(Math.random() * 3); i++) {
+    const b = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.04, 0.08, 1.5 + Math.random(), 4),
+      new THREE.MeshLambertMaterial({ color: 0x151008 })
+    );
+    b.position.set(x + (Math.random()-0.5)*1.5, 3 + Math.random()*3, z + (Math.random()-0.5)*1.5);
+    b.rotation.set((Math.random()-0.5)*1.2, Math.random()*Math.PI, (Math.random()-0.5)*1.2);
+    b.castShadow = true;
+    scene.add(b);
+  }
+}
+const treePositions = [[-12,8],[-15,-5],[10,12],[-8,15],[14,-8],[-18,2],[8,-14],[18,6],[-20,-12],[5,20],[-6,-18],[22,0],[-3,22],[16,14],[-14,-16],[20,-15]];
+treePositions.forEach(([x,z]) => makeTree(x,z));
+
+// Rocks
+function makeRock(x, z, s) {
+  const geo = new THREE.DodecahedronGeometry(s, 0);
+  const mat = new THREE.MeshLambertMaterial({ color: 0x1e1c18 });
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(x, s*0.5, z);
+  m.rotation.set(Math.random(), Math.random(), Math.random());
+  m.castShadow = true; m.receiveShadow = true;
+  scene.add(m);
+}
+[[5,5,0.4],[-4,3,0.6],[7,-3,0.3],[-2,-6,0.8],[3,8,0.35],[-7,1,0.5],[9,4,0.45],[-5,-4,0.3],[1,-9,0.7]].forEach(([x,z,s]) => makeRock(x,z,s));
+
+// Sacrificial altar remnants
+function makeAltarPillar(x, z) {
+  const geo = new THREE.BoxGeometry(0.5, 2+Math.random()*1.5, 0.5);
+  const mat = new THREE.MeshLambertMaterial({ color: 0x1a1510 });
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(x, (2+Math.random()*1.5)*0.5, z);
+  m.rotation.y = Math.random() * 0.3;
+  m.castShadow = true;
+  scene.add(m);
+}
+[[-1,10],[0,10.8],[1,10],[0.5,10.4],[-0.5,10.4]].forEach(([x,z]) => makeAltarPillar(x,z));
+
+// Runic torches
+function makeTorch(x, z) {
+  const pole = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.05, 0.05, 1.8, 5),
+    new THREE.MeshLambertMaterial({ color: 0x2a1a08 })
+  );
+  pole.position.set(x, 0.9, z);
+  scene.add(pole);
+  const flame = new THREE.PointLight(0xb84010, 1.5, 6);
+  flame.position.set(x, 1.9, z);
+  flame.userData.baseIntensity = 1.5;
+  flame.userData.flickerSpeed = 2 + Math.random() * 3;
+  scene.add(flame);
+}
+[[-4,6],[4,6],[-4,-6],[4,-6],[0,-4]].forEach(([x,z]) => makeTorch(x,z));
+
+// ============================================================
+// WULFRIC — player character
+// ============================================================
+const playerGroup = new THREE.Group();
+scene.add(playerGroup);
+playerGroup.position.set(0, 0, 2);
+
+// Body
+const bodyMat = new THREE.MeshLambertMaterial({ color: 0x1c1610 });
+const torso = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.85, 0.35), bodyMat);
+torso.position.y = 1.35;
+playerGroup.add(torso);
+
+// Plate armor
+const armorMat = new THREE.MeshLambertMaterial({ color: 0x2a2520 });
+const chestPlate = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.22), armorMat);
+chestPlate.position.set(0, 1.5, 0.09);
+playerGroup.add(chestPlate);
+
+// Head
+const head = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.4, 0.38), bodyMat);
+head.position.y = 1.97;
+playerGroup.add(head);
+
+// Helm
+const helm = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.25, 0.42), armorMat);
+helm.position.y = 2.08;
+playerGroup.add(helm);
+
+// Right arm (human)
+const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.7, 0.2), bodyMat);
+rightArm.position.set(-0.43, 1.3, 0);
+playerGroup.add(rightArm);
+
+// Left arm (Wyrd-Grip — dark oak + runic red)
+const wyrdMat = new THREE.MeshLambertMaterial({ color: 0x150c06 });
+const wyrdArm = new THREE.Group();
+const wyrdUpper = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.4, 0.22), wyrdMat);
+wyrdUpper.position.set(0.43, 1.45, 0);
+wyrdArm.add(wyrdUpper);
+const wyrdFore = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.4, 0.2), wyrdMat);
+wyrdFore.position.set(0.43, 1.1, 0);
+wyrdArm.add(wyrdFore);
+// Runic veins
+const veinMat = new THREE.MeshLambertMaterial({ color: 0x8b2500, emissive: 0x8b2500, emissiveIntensity: 0.6 });
+for (let i = 0; i < 4; i++) {
+  const vein = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.35, 0.02), veinMat);
+  vein.position.set(0.43 + (Math.random()-0.5)*0.2, 1.2 + Math.random()*0.3, (Math.random()-0.5)*0.2);
+  wyrdArm.add(vein);
+}
+playerGroup.add(wyrdArm);
+
+// Legs
+const legMat = new THREE.MeshLambertMaterial({ color: 0x1a140e });
+[-0.18, 0.18].forEach(x => {
+  const leg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.8, 0.22), legMat);
+  leg.position.set(x, 0.5, 0);
+  playerGroup.add(leg);
+});
+
+// Oathsliver — great axe
+const axeGroup = new THREE.Group();
+const axeHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.4, 6), new THREE.MeshLambertMaterial({ color: 0x1a1008 }));
+axeHandle.position.set(-0.7, 1.2, 0.3);
+axeGroup.add(axeHandle);
+const axeHead = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.45, 0.28), new THREE.MeshLambertMaterial({ color: 0x3a3530, emissive: 0x1a1510, emissiveIntensity: 0.3 }));
+axeHead.position.set(-0.7, 1.65, 0.3);
+axeGroup.add(axeHead);
+// Axe edge
+const axeEdge = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.4, 0.08), new THREE.MeshLambertMaterial({ color: 0x888080, emissive: 0x554040, emissiveIntensity: 0.5 }));
+axeEdge.position.set(-0.72, 1.65, 0.44);
+axeGroup.add(axeEdge);
+playerGroup.add(axeGroup);
+playerGroup.userData.axeGroup = axeGroup;
+
+// ============================================================
+// ENEMY CREATION
+// ============================================================
+function createEnemy(x, z, type = 'thrall') {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+
+  const configs = {
+    thrall: { bodyColor: 0x1a1410, h: 1.7, hp: 120, poise: 40, dmg: 15, speed: 1.8, label: 'Husked Thrall' },
+    elite: { bodyColor: 0x20181a, h: 1.85, hp: 280, poise: 80, dmg: 30, speed: 2.2, label: 'Iron-Plate Zealot' },
+    boss: { bodyColor: 0x180a08, h: 2.2, hp: 800, poise: 300, dmg: 50, speed: 1.4, label: 'Tiw, The Flayed General' }
+  };
+  const cfg = configs[type] || configs.thrall;
+
+  const bmat = new THREE.MeshLambertMaterial({ color: cfg.bodyColor });
+  const torsoE = new THREE.Mesh(new THREE.BoxGeometry(0.65*cfg.h/1.7, 0.8*cfg.h/1.7, 0.35*cfg.h/1.7), bmat);
+  torsoE.position.y = 1.3 * cfg.h / 1.7;
+  torsoE.castShadow = true;
+  group.add(torsoE);
+
+  const headE = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.38, 0.35), bmat);
+  headE.position.y = cfg.h - 0.1;
+  group.add(headE);
+
+  [-0.18, 0.18].forEach(x => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7*cfg.h/1.7, 0.22), bmat);
+    leg.position.set(x, 0.4*cfg.h/1.7, 0); group.add(leg);
+  });
+  [-0.4, 0.4].forEach(x => {
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.65*cfg.h/1.7, 0.18), bmat);
+    arm.position.set(x, 1.2*cfg.h/1.7, 0); group.add(arm);
+  });
+
+  // weapon for elite/boss
+  if (type !== 'thrall') {
+    const wep = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.2, 0.06), new THREE.MeshLambertMaterial({ color: 0x2a2520 }));
+    wep.position.set(0.5, 1.2*cfg.h/1.7, 0.3);
+    group.add(wep);
+  }
+
+  // Boss: expose raw musculature red
+  if (type === 'boss') {
+    const muscleMat = new THREE.MeshLambertMaterial({ color: 0x5a1010, emissive: 0x3a0808, emissiveIntensity: 0.4 });
+    const muscles = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.3), muscleMat);
+    muscles.position.y = 1.4;
+    group.add(muscles);
+    // stump
+    const stump = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 8), new THREE.MeshLambertMaterial({ color: 0x3a1010 }));
+    stump.position.set(-0.5, 1.3, 0);
+    group.add(stump);
+    // acid fluid drips
+    const acidMat = new THREE.MeshLambertMaterial({ color: 0x1a3a10, emissive: 0x0a2a08, emissiveIntensity: 0.8 });
+    const acid = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 4), acidMat);
+    acid.position.set(-0.5, 0.9, 0);
+    group.add(acid);
+  }
+
+  scene.add(group);
+
+  // Store base Y for each mesh child (used by bob animation)
+  group.children.forEach(child => {
+    if (child.isMesh) child.userData.baseY = child.position.y;
+  });
+
+  const enemy = {
+    group, type, label: cfg.label,
+    hp: cfg.hp, maxHp: cfg.hp,
+    poise: cfg.poise, maxPoise: cfg.poise,
+    dmg: cfg.dmg, speed: cfg.speed,
+    height: cfg.h,
+    state: 'patrol',
+    staggered: false, staggerTimer: 0, maxStagger: 4.0,
+    attackTimer: 0, attackCooldown: 2.5 + Math.random(),
+    alertTimer: 0,
+    patrolAngle: Math.random() * Math.PI * 2,
+    patrolRadius: 3 + Math.random() * 3,
+    patrolCenter: new THREE.Vector3(x, 0, z),
+    isAttacking: false,
+    attackActive: false,
+    attackActiveTimer: 0,
+    dead: false,
+  };
+
+  enemy.group.userData.enemy = enemy;
+  return enemy;
+}
+
+// ============================================================
+// CREATE ENEMIES
+// ============================================================
+function spawnEnemies() {
+  G.enemies = [];
+  // Thralls
+  [[-8,0],[8,1],[-5,7],[6,-5],[0,-8],[-3,-3]].forEach(([x,z]) => {
+    G.enemies.push(createEnemy(x,z,'thrall'));
+  });
+  // Elites
+  [[-12,5],[12,-4]].forEach(([x,z]) => {
+    G.enemies.push(createEnemy(x,z,'elite'));
+  });
+  // Boss
+  G.boss = createEnemy(0, -16, 'boss');
+  G.enemies.push(G.boss);
+  document.getElementById('boss-hud').style.opacity = '0';
+}
+
+// ============================================================
+// PLAYER MOVEMENT & PHYSICS
+// ============================================================
+const playerVel = new THREE.Vector3();
+const MOVE_SPEED = 4.5;
+const SPRINT_SPEED = 6.8;
+const DODGE_DIST = 1.8;
+
+function getInputDir() {
+  const dir = new THREE.Vector3();
+  const fwd = new THREE.Vector3(-Math.sin(G.cameraYaw), 0, -Math.cos(G.cameraYaw));
+  const right = new THREE.Vector3(Math.cos(G.cameraYaw), 0, -Math.sin(G.cameraYaw));
+  if (G.keys['w'] || G.keys['arrowup']) dir.add(fwd);
+  if (G.keys['s'] || G.keys['arrowdown']) dir.sub(fwd);
+  if (G.keys['a'] || G.keys['arrowleft']) dir.sub(right);
+  if (G.keys['d'] || G.keys['arrowright']) dir.add(right);
+  if (dir.lengthSq() > 0) dir.normalize();
+  return dir;
+}
+
+// ============================================================
+// COMBAT FUNCTIONS
+// ============================================================
+function spawnDamageNumber(dmg, worldPos, color = '#c8c880') {
+  const div = document.createElement('div');
+  div.className = 'dmg-num';
+  div.style.color = color;
+  const v = worldPos.clone().project(camera);
+  const x = (v.x * 0.5 + 0.5) * window.innerWidth + (Math.random()-0.5)*30;
+  const y = (-v.y * 0.5 + 0.5) * window.innerHeight;
+  div.style.left = x + 'px';
+  div.style.top = y + 'px';
+  div.textContent = typeof dmg === 'string' ? dmg : Math.round(dmg);
+  document.getElementById('damage-numbers').appendChild(div);
+  setTimeout(() => div.remove(), 1000);
+}
+
+function flashHit() {
+  const el = document.getElementById('hit-flash');
+  el.style.opacity = '0.55';
+  setTimeout(() => el.style.opacity = '0', 180);
+}
+
+const RANKS = ['D','C','B','A','S'];
+function updateComboRank() {
+  const idx = Math.min(Math.floor(G.combo / 4), 4);
+  G.comboRank = RANKS[idx];
+  const el = document.getElementById('combo-rank');
+  el.textContent = G.comboRank;
+  el.className = G.combo > 0 ? (G.comboRank === 'S' ? 'active s-rank' : 'active') : '';
+}
+
+function doLightAttack() {
+  if (G.stamina < 12) return;
+  if (G.isAttacking || G.isDodging || G.isExecuting) return;
+  G.isAttacking = true; G.attackTimer = 0.33; G.attackPhase = 1; G.isHeavyAttacking = false;
+  G.stamina = Math.max(0, G.stamina - 12);
+  // Swing animation
+  axeGroup.rotation.z = 0.8;
+  setTimeout(() => { axeGroup.rotation.z = 0; }, 200);
+
+  // Hit detection on nearest enemy in arc
+  let hit = false;
+  G.enemies.forEach(en => {
+    if (en.dead) return;
+    const dist = playerGroup.position.distanceTo(en.group.position);
+    if (dist < 2.5) {
+      const dmg = (12 + Math.random() * 8) * (G.bloodDrunk ? 1.5 : 1);
+      damageEnemy(en, dmg, 15);
+      hit = true;
+      G.wyrd = Math.min(G.maxWyrd, G.wyrd + 0.5);
+    }
+  });
+  if (hit) {
+    G.combo++;
+    G.comboTimer = 3;
+    updateComboRank();
+    if (G.comboRank === 'S') increaseComboAI();
+  }
+}
+
+function doHeavyAttack() {
+  if (G.stamina < 30) return;
+  if (G.isAttacking || G.isDodging || G.isExecuting) return;
+  G.isAttacking = true; G.attackTimer = 0.55; G.isHeavyAttacking = true;
+  G.stamina = Math.max(0, G.stamina - 30);
+  axeGroup.rotation.z = 1.5;
+  setTimeout(() => { axeGroup.rotation.z = 0; }, 350);
+
+  G.enemies.forEach(en => {
+    if (en.dead) return;
+    const dist = playerGroup.position.distanceTo(en.group.position);
+    if (dist < 3.0) {
+      const dmg = (38 + Math.random() * 12) * (G.bloodDrunk ? 1.5 : 1);
+      damageEnemy(en, dmg, 45);
+      G.wyrd = Math.min(G.maxWyrd, G.wyrd + 1.5);
+      G.combo++;
+      G.comboTimer = 3;
+      updateComboRank();
+    }
+  });
+}
+
+function damageEnemy(en, dmg, poiseDmg) {
+  if (en.dead) return;
+  en.hp -= dmg;
+  en.poise -= poiseDmg;
+  spawnDamageNumber(dmg, en.group.position.clone().add(new THREE.Vector3(0,2,0)));
+  G.corruption = Math.min(100, G.corruption + 3);
+  updateCorruption();
+
+  if (en.poise <= 0) {
+    en.staggered = true;
+    en.staggerTimer = 4.0;
+    en.state = 'staggered';
+    en.poise = en.maxPoise;
+    en.group.position.y = 0;
+  }
+
+  // Execution available
+  if (en.hp > 0 && en.hp < en.maxHp * 0.25 && en.staggered) {
+    G.nearExecutable = true;
+  }
+
+  if (en.hp <= 0) {
+    killEnemy(en);
+  }
+}
+
+function killEnemy(en) {
+  if (en.dead) return;
+  en.dead = true;
+  en.state = 'dead';
+  // Fall over
+  en.group.rotation.z = Math.PI / 2;
+  en.group.position.y = -0.3;
+  // Drop resources
+  G.wyrd = Math.min(G.maxWyrd, G.wyrd + 2);
+  if (en.type === 'boss') {
+    document.getElementById('boss-hud').style.opacity = '0';
+    showChapterText('Chapter II', 'Ironwood Ridge');
+  }
+  setTimeout(() => { scene.remove(en.group); G.enemies = G.enemies.filter(e => e !== en); }, 4000);
+}
+
+function doTetherHook() {
+  if (G.wyrd < 2) return;
+  if (G.isTethering) return;
+  G.wyrd -= 2;
+  G.isTethering = true;
+  G.tetherTimer = 0.4;
+
+  // Find nearest enemy
+  let nearest = null, minDist = 999;
+  G.enemies.forEach(en => {
+    if (en.dead) return;
+    const d = playerGroup.position.distanceTo(en.group.position);
+    if (d < 15 && d < minDist) { minDist = d; nearest = en; }
+  });
+
+  if (nearest) {
+    const mass = nearest.type === 'boss' ? 999 : 50;
+    const playerPower = 100;
+    if (mass < playerPower * 1.5) {
+      // Pull enemy to player
+      nearest.group.position.lerp(playerGroup.position.clone().add(new THREE.Vector3(0,0,-1.5)), 0.7);
+      nearest.staggered = true; nearest.staggerTimer = 1.5;
+      damageEnemy(nearest, 30, 30);
+    } else {
+      // Launch player toward enemy
+      const dir = nearest.group.position.clone().sub(playerGroup.position).normalize();
+      playerGroup.position.addScaledVector(dir, minDist * 0.6);
+      G.wyrd = Math.min(G.maxWyrd, G.wyrd + 2);
+    }
+    // Tether visual
+    showTetherBeam(playerGroup.position.clone(), nearest.group.position.clone());
+  }
+}
+
+// Tether visual
+const tetherLines = [];
+function showTetherBeam(from, to) {
+  const dir = to.clone().sub(from);
+  const len = dir.length();
+  const geo = new THREE.CylinderGeometry(0.03, 0.03, len, 4);
+  const mat = new THREE.MeshLambertMaterial({ color: 0xc85a10, emissive: 0x8b2500, emissiveIntensity: 1 });
+  const beam = new THREE.Mesh(geo, mat);
+  const mid = from.clone().add(to).multiplyScalar(0.5);
+  mid.y += 0.5;
+  beam.position.copy(mid);
+  beam.lookAt(to);
+  beam.rotateX(Math.PI/2);
+  scene.add(beam);
+  setTimeout(() => scene.remove(beam), 300);
+}
+
+function doExecute() {
+  if (!G.nearExecutable) return;
+  let target = null;
+  G.enemies.forEach(en => {
+    if (!en.dead && en.staggered && en.hp < en.maxHp * 0.3) {
+      const d = playerGroup.position.distanceTo(en.group.position);
+      if (d < 3) target = en;
+    }
+  });
+  if (!target) return;
+  G.isExecuting = true;
+  G.nearExecutable = false;
+  document.getElementById('exec-prompt').style.opacity = '0';
+
+  // Execution: recover resources
+  G.health = Math.min(G.maxHealth, G.health + G.maxHealth * 0.15);
+  G.stamina = Math.min(G.maxStamina, G.stamina * 0.5 + G.maxStamina * 0.5);
+  G.wyrd = Math.min(G.maxWyrd, G.wyrd + 3);
+  G.corruption = Math.max(0, G.corruption - 15);
+  G.combo += 2;
+  G.comboTimer = 3;
+  updateComboRank();
+
+  spawnDamageNumber('Execute!', target.group.position.clone().add(new THREE.Vector3(0,2.5,0)), '#c8b87a');
+  killEnemy(target);
+
+  setTimeout(() => { G.isExecuting = false; }, 600);
+  updateHUD();
+}
+
+function doDodge() {
+  if (G.stamina < 20 || G.isDodging) return;
+  G.isDodging = true;
+  G.dodgeTimer = 0.46;
+  G.dodgeInvincible = true;
+  G.stamina -= 20;
+  const dir = getInputDir();
+  // Default: dodge backward relative to camera facing
+  if (dir.lengthSq() < 0.01) {
+    dir.set(Math.sin(G.cameraYaw), 0, Math.cos(G.cameraYaw)); // camera-forward = retreat direction
+  }
+  playerGroup.position.addScaledVector(dir, DODGE_DIST);
+  setTimeout(() => { G.dodgeInvincible = false; }, 160);
+}
+
+function takeDamage(amount) {
+  if (G.dodgeInvincible || G.isExecuting) return;
+  // Capture pre-hit health as trail anchor
+  G.trailHealth = G.health / G.maxHealth * 100;
+  G.health -= amount;
+  G.health = Math.max(0, G.health);
+  G.trailTimer = 0.8;
+  flashHit();
+  G.poise -= 30;
+  G.lastDamageTime = performance.now() / 1000;
+  spawnDamageNumber(Math.round(amount), playerGroup.position.clone().add(new THREE.Vector3(0,2.5,0)), '#cc4040');
+
+  if (G.health <= 0) {
+    G.health = 0;
+    G.trailHealth = 0;
+    // Game over — respawn with penalty after 2s
+    setTimeout(() => {
+      G.health = G.maxHealth * 0.5;
+      G.trailHealth = G.health / G.maxHealth * 100;
+      G.combo = 0;
+      updateComboRank();
+      updateHUD();
+    }, 2000);
+  }
+  updateHUD();
+}
+
+function increaseComboAI() {
+  G.enemies.forEach(en => { if (!en.dead) en.attackCooldown = Math.max(0.8, en.attackCooldown - 0.5); });
+}
+
+// ============================================================
+// CORRUPTION & BLOOD-DRUNK
+// ============================================================
+function updateCorruption() {
+  const el = document.getElementById('corrupt-vignette');
+  const pct = G.corruption / 100;
+  el.style.background = `radial-gradient(ellipse at center, transparent ${40 - pct*20}%, rgba(160,0,10,${pct*0.4}) 100%)`;
+  el.style.opacity = pct > 0.25 ? pct : 0;
+
+  // Update wyrd nodes color
+  const wyrdInt = Math.floor(G.wyrd);
+  for (let i = 0; i < 8; i++) {
+    const node = document.getElementById('wn' + i);
+    if (i < wyrdInt) {
+      node.className = 'wyrd-node ' + (G.corruption > 75 ? 'corrupt' : 'lit');
+    } else {
+      node.className = 'wyrd-node';
+    }
+  }
+
+  if (G.corruption >= 100 && !G.bloodDrunk) {
+    G.bloodDrunk = true;
+    G.bloodDrunkTimer = 30;
+    const bt = document.getElementById('blooddrunk-text');
+    bt.style.opacity = '1';
+    setTimeout(() => bt.style.opacity = '0', 2500);
+  }
+}
+
+// ============================================================
+// HUD UPDATE
+// ============================================================
+function updateHUD() {
+  const hpPct = G.health / G.maxHealth * 100;
+  document.getElementById('health-fill').style.width = hpPct + '%';
+  document.getElementById('stamina-fill').style.width = (G.stamina / G.maxStamina * 100) + '%';
+  document.getElementById('poise-fill').style.width = (Math.max(0, G.poise) / G.maxPoise * 100) + '%';
+  // Trail lags behind actual health
+  if (G.trailTimer > 0) {
+    // keep stored trail value, only update if it drifted below actual
+    if (G.trailHealth < hpPct) G.trailHealth = hpPct;
+  } else {
+    G.trailHealth = hpPct; // snap to current when timer expires
+  }
+  document.getElementById('health-trail').style.width = G.trailHealth + '%';
+  // Execution prompt
+  document.getElementById('exec-prompt').style.opacity = G.nearExecutable ? '1' : '0';
+  // Boss bar — only show when boss has been detected (G.bossDetected flag)
+  if (G.boss && !G.boss.dead && G.bossDetected) {
+    document.getElementById('boss-hud').style.opacity = '1';
+    document.getElementById('boss-bar-fill').style.width = (G.boss.hp / G.boss.maxHp * 100) + '%';
+  } else if (!G.boss || G.boss.dead) {
+    document.getElementById('boss-hud').style.opacity = '0';
+  }
+}
+
+// ============================================================
+// CHAPTER TEXT
+// ============================================================
+function showChapterText(chapter, name) {
+  const el = document.getElementById('chapter-text');
+  el.querySelector('.chapter-label').textContent = chapter;
+  el.querySelector('.chapter-name').textContent = name;
+  el.style.opacity = '1';
+  setTimeout(() => el.style.opacity = '0', 3000);
+}
+
+// ============================================================
+// CAMERA
+// ============================================================
+let mouseLocked = false;
+document.addEventListener('click', () => {
+  if (G.started) document.getElementById('c').requestPointerLock();
+});
+document.addEventListener('pointerlockchange', () => {
+  mouseLocked = !!document.pointerLockElement;
+});
+document.addEventListener('mousemove', e => {
+  if (!mouseLocked || !G.started) return;
+  G.cameraYaw -= e.movementX * 0.002;
+  G.cameraPitch = Math.max(0.1, Math.min(1.1, G.cameraPitch + e.movementY * 0.002));
+});
+
+// ============================================================
+// INPUT
+// ============================================================
+document.addEventListener('keydown', e => {
+  G.keys[e.key.toLowerCase()] = true;
+  if (!G.started) return;
+  if (e.key === ' ') { e.preventDefault(); doDodge(); }
+  if (e.key.toLowerCase() === 'q') doTetherHook();
+  if (e.key.toLowerCase() === 'e') doExecute();
+  if (e.key.toLowerCase() === 'f') doLightAttack();
+});
+document.addEventListener('keyup', e => { G.keys[e.key.toLowerCase()] = false; });
+document.addEventListener('mousedown', e => {
+  G.mouseButtons[e.button] = true;
+  if (!G.started) return;
+  if (e.button === 0) doLightAttack();
+  if (e.button === 2) doHeavyAttack();
+});
+document.addEventListener('mouseup', e => { G.mouseButtons[e.button] = false; });
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// ============================================================
+// GAME START
+// ============================================================
+function startGame() {
+  const ts = document.getElementById('title-screen');
+  ts.style.opacity = '0';
+  setTimeout(() => ts.style.display = 'none', 1000);
+  G.started = true;
+  spawnEnemies();
+  setTimeout(() => showChapterText('Chapter I', 'The Ash-Mire'), 1200);
+  document.getElementById('c').requestPointerLock();
+}
+window.startGame = startGame;
+
+// ============================================================
+// MAIN LOOP
+// ============================================================
+let lastTime = 0;
+const clock = new THREE.Clock();
+
+function animate(time) {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.1);
+  const t = clock.getElapsedTime();
+
+  if (!G.started) {
+    renderer.render(scene, camera);
+    return;
+  }
+
+  // ── Runic light flicker ──
+  scene.traverse(obj => {
+    if (obj.isPointLight && obj.userData.flickerSpeed) {
+      obj.intensity = obj.userData.baseIntensity * (0.85 + 0.15 * Math.sin(t * obj.userData.flickerSpeed));
+    }
+  });
+
+  // ── Wyrd-Grip glow based on corruption ──
+  runeLight.intensity = 1.5 + G.corruption / 100 * 3;
+  runeLight.color.setHSL(0.04 - G.corruption/100 * 0.04, 1, 0.4);
+  runeLight.position.set(playerGroup.position.x, playerGroup.position.y + 1.2, playerGroup.position.z);
+
+  // ── Player movement ──
+  if (!G.isAttacking && !G.isDodging && !G.isExecuting && !G.staggered) {
+    const dir = getInputDir();
+    const speed = G.keys['shift'] ? SPRINT_SPEED : MOVE_SPEED;
+    playerGroup.position.addScaledVector(dir, speed * dt);
+    // Face movement direction
+    if (dir.lengthSq() > 0.01) {
+      const angle = Math.atan2(dir.x, dir.z);
+      playerGroup.rotation.y += (angle - playerGroup.rotation.y) * 0.18;
+    }
+    // Stamina drain on sprint
+    if (G.keys['shift'] && dir.lengthSq() > 0.01) {
+      G.stamina = Math.max(0, G.stamina - 5 * dt);
+    }
+  }
+
+  // Bound player to arena
+  playerGroup.position.x = Math.max(-25, Math.min(25, playerGroup.position.x));
+  playerGroup.position.z = Math.max(-25, Math.min(25, playerGroup.position.z));
+  playerGroup.position.y = 0;
+
+  // ── Attack timer ──
+  if (G.isAttacking) {
+    G.attackTimer -= dt;
+    if (G.attackTimer <= 0) { G.isAttacking = false; G.isHeavyAttacking = false; }
+  }
+
+  // ── Dodge timer ──
+  if (G.isDodging) {
+    G.dodgeTimer -= dt;
+    if (G.dodgeTimer <= 0) G.isDodging = false;
+  }
+
+  // ── Tether timer ──
+  if (G.isTethering) {
+    G.tetherTimer -= dt;
+    if (G.tetherTimer <= 0) G.isTethering = false;
+  }
+
+  // ── Combo decay ──
+  if (G.combo > 0) {
+    G.comboTimer -= dt;
+    if (G.comboTimer <= 0) { G.combo = 0; updateComboRank(); }
+  }
+
+  // ── Stamina regen — 25/sec, only when not sprinting ──
+  if (!G.keys['shift']) {
+    G.stamina = Math.min(G.maxStamina, G.stamina + 25 * dt);
+  }
+
+  // ── Poise regen ──
+  const now = performance.now()/1000;
+  if (now - G.lastDamageTime > 3.0) {
+    G.poise = Math.min(G.maxPoise, G.poise + 40 * dt);
+  }
+
+  // ── Corruption decay ──
+  G.corruption = Math.max(0, G.corruption - 2 * dt);
+  if (G.bloodDrunk) {
+    G.bloodDrunkTimer -= dt;
+    G.health -= 3 * dt * G.maxHealth/100;
+    G.health = Math.max(1, G.health);
+    if (G.bloodDrunkTimer <= 0) { G.bloodDrunk = false; G.corruption = 0; }
+  }
+
+  // ── Trail health ──
+  G.trailTimer -= dt;
+
+  // ── Enemy AI ──
+  updateEnemies(dt, t);
+
+  // ── Camera ──
+  const camDist = 5.0 + (G.comboRank === 'S' ? 0.5 : 0);
+  const camX = playerGroup.position.x + Math.sin(G.cameraYaw) * Math.cos(G.cameraPitch) * camDist;
+  const camY = playerGroup.position.y + Math.sin(G.cameraPitch) * camDist + 1.2;
+  const camZ = playerGroup.position.z + Math.cos(G.cameraYaw) * Math.cos(G.cameraPitch) * camDist;
+  camera.position.lerp(new THREE.Vector3(camX, camY, camZ), 0.12);
+  camera.lookAt(playerGroup.position.x, playerGroup.position.y + 1.4, playerGroup.position.z);
+
+  // ── Axe bob in idle ──
+  if (!G.isAttacking) {
+    axeGroup.rotation.y = Math.sin(t * 1.2) * 0.04;
+  }
+
+  // ── Wyrd arm idle ──
+  wyrdArm.children.forEach((c, i) => {
+    if (c.material && c.material.emissive) {
+      c.material.emissiveIntensity = (0.4 + G.corruption/100 * 0.8) * (0.9 + 0.1 * Math.sin(t * 3 + i));
+    }
+  });
+
+  // ── Fog darkens after boss is dead (entropy rising) ──
+  const entropyFactor = G.boss && G.boss.dead ? 1 : 0;
+  sceneFog.color.lerpColors(new THREE.Color(0x0d0a08), new THREE.Color(0x060408), entropyFactor * 0.5);
+
+  updateHUD();
+  updateCorruption();
+  renderer.render(scene, camera);
+}
+
+// ============================================================
+// ENEMY AI UPDATE
+// ============================================================
+const ACTIVE_ATTACK_TOKENS = { melee: 0, ranged: 0 };
+const TOKEN_COOLDOWN = { melee: 0, ranged: 0 };
+
+function updateEnemies(dt, t) {
+  // Decay token cooldowns
+  TOKEN_COOLDOWN.melee = Math.max(0, TOKEN_COOLDOWN.melee - dt);
+  TOKEN_COOLDOWN.ranged = Math.max(0, TOKEN_COOLDOWN.ranged - dt);
+
+  let meleeCount = 0;
+  G.enemies.forEach(en => {
+    if (!en.dead && en.isAttacking) meleeCount++;
+  });
+
+  G.nearExecutable = false;
+
+  G.enemies.forEach(en => {
+    if (en.dead) return;
+
+    const toPlayer = playerGroup.position.clone().sub(en.group.position);
+    const dist = toPlayer.length();
+
+    // Face player if in range
+    if (dist < 20 && en.state !== 'patrol') {
+      const angle = Math.atan2(toPlayer.x, toPlayer.z);
+      en.group.rotation.y += (angle - en.group.rotation.y) * 0.08;
+    }
+
+    // Check execution availability
+    if (en.staggered && en.hp < en.maxHp * 0.3 && dist < 3) {
+      G.nearExecutable = true;
+    }
+
+    // Stagger
+    if (en.staggered) {
+      en.staggerTimer -= dt;
+      if (en.staggerTimer <= 0) {
+        en.staggered = false;
+        en.state = 'alert';
+        en.group.rotation.z = 0; // upright on recovery
+      }
+      // Tip over immediately when staggered, stay fallen
+      const fallProgress = Math.min(1, (en.maxStagger - en.staggerTimer) / 0.3);
+      en.group.rotation.z = (Math.PI / 2) * fallProgress;
+      return;
+    }
+    en.group.rotation.z = 0;
+
+    // State machine
+    switch (en.state) {
+      case 'patrol': {
+        const pd = en.patrolAngle;
+        const tx = en.patrolCenter.x + Math.cos(pd) * en.patrolRadius;
+        const tz = en.patrolCenter.z + Math.sin(pd) * en.patrolRadius;
+        const moveDir = new THREE.Vector3(tx - en.group.position.x, 0, tz - en.group.position.z);
+        if (moveDir.length() < 0.5) en.patrolAngle += 0.8;
+        else { moveDir.normalize(); en.group.position.addScaledVector(moveDir, en.speed * 0.5 * dt); }
+        // Detect player
+        if (dist < (en.type === 'boss' ? 18 : 12)) {
+          en.state = 'alert';
+          if (en.type === 'boss') { G.bossDetected = true; document.getElementById('boss-hud').style.opacity = '1'; }
+        }
+        break;
+      }
+      case 'alert': {
+        if (dist > (en.type === 'boss' ? 22 : 16)) { en.state = 'patrol'; break; }
+        en.attackTimer -= dt;
+        // Strafe around player
+        const strafeAngle = Math.atan2(toPlayer.x, toPlayer.z) + Math.PI / 2;
+        const strafeMag = Math.max(0, dist - 2.5);
+        en.group.position.addScaledVector(
+          new THREE.Vector3(Math.cos(strafeAngle), 0, Math.sin(strafeAngle)),
+          0.3 * dt
+        );
+        // Advance to attack range
+        if (dist > 2.8 && dist < 12) {
+          const approach = toPlayer.normalize().multiplyScalar(en.speed * dt);
+          en.group.position.add(approach);
+        }
+        // Attack decision
+        if (en.attackTimer <= 0 && dist < 2.8 && meleeCount < 2 && TOKEN_COOLDOWN.melee <= 0) {
+          en.state = 'attacking';
+          en.attackTimer = en.attackCooldown;
+          en.attackActive = true;
+          en.attackActiveTimer = 0.3;
+          en.isAttacking = true;
+          meleeCount++;
+          TOKEN_COOLDOWN.melee = 1.2;
+          // Lunge animation
+          const lunge = toPlayer.normalize().multiplyScalar(0.4);
+          en.group.position.add(lunge);
+        }
+        break;
+      }
+      case 'attacking': {
+        en.attackActiveTimer -= dt;
+        if (en.attackActive && en.attackActiveTimer <= 0) {
+          en.attackActive = false;
+          en.isAttacking = false;
+          // Deal damage if still in range
+          if (dist < 3.0) {
+            takeDamage(en.dmg * (G.bloodDrunk ? 0.7 : 1));
+          }
+          en.state = 'recovering';
+          en.attackTimer = 0.8;
+        }
+        break;
+      }
+      case 'recovering': {
+        en.attackTimer -= dt;
+        if (en.attackTimer <= 0) en.state = 'alert';
+        break;
+      }
+      case 'staggered': break;
+      case 'dead': break;
+    }
+
+    // Enemy bob animation — use absolute sin so it doesn't drift
+    if (en.state === 'alert' || en.state === 'attacking') {
+      en.group.children.forEach((child, ci) => {
+        if (child.isMesh) {
+          child.position.y = child.userData.baseY !== undefined
+            ? child.userData.baseY + Math.sin(t * 4 + ci) * 0.025
+            : child.position.y;
+        }
+      });
+    } else {
+      // Snap back to base positions
+      en.group.children.forEach(child => {
+        if (child.isMesh && child.userData.baseY !== undefined) {
+          child.position.y = child.userData.baseY;
+        }
+      });
+    }
+  });
+}
+
+// ============================================================
+// RESIZE
+// ============================================================
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ============================================================
+// START RENDER LOOP
+// ============================================================
+animate(0);
+</script>
+</body>
+</html>

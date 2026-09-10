@@ -1,0 +1,111 @@
+export class Pickup {
+  /**
+   * @param {object} app
+   * @param {{kind:string,id?:string,x:number,y:number}} spec
+   * @param {object} meta entry from data/items.json pickups[kind]
+   */
+  constructor(app, spec, meta) {
+    this.app = app;
+    this.kind = spec.kind;
+    this.id = spec.id ?? null;
+    this.meta = meta;
+    this.size = meta.size ?? 12;
+    this.x = spec.x;
+    this.y = spec.y;
+    this.baseY = spec.y;
+    this.value = spec.value ?? meta.value ?? 1;
+    this.collected = false;
+    this.t = Math.random() * Math.PI * 2; // bob phase offset
+  }
+
+  get aabb() {
+    return { x: this.x - this.size / 2, y: this.y - this.size / 2, w: this.size, h: this.size };
+  }
+
+  update(dt, world) {
+    if (this.collected) return;
+    this.t += dt * 3;
+    this.y = this.baseY + Math.sin(this.t) * 4;
+
+    // Magnetise toward the player when close.
+    const pc = { x: world.player.x + world.player.w / 2, y: world.player.y + world.player.h / 2 };
+    const d = distance(this.x, this.y, pc.x, pc.y);
+    if (d < 90) {
+      const pull = (1 - d / 90) * 520 * dt;
+      this.x += ((pc.x - this.x) / d) * pull;
+      this.y += ((pc.y - this.y) / d) * pull;
+    }
+
+    if (aabb(this.aabb, world.player.aabb)) this._collect(world);
+  }
+
+  _collect(world) {
+    this.collected = true;
+    const prog = this.app.progression;
+    this.app.audio.sfx(this.meta.sfx ?? "pickup");
+    world.particles.sparkle(this.x, this.y, this.meta.color, 14);
+
+    switch (this.kind) {
+      case "shard":
+        prog.addShards(this.value);
+        break;
+      case "heart":
+        prog.data.maxHearts += 1;
+        world.player.maxHp = prog.maxHP();
+        world.player.hp = world.player.maxHp; // full heal on a new cell
+        prog.recomputeCompletion();
+        prog.persist();
+        break;
+      case "emblem":
+        prog.collectEmblem(this.id);
+        this._maybeUnlockReward();
+        break;
+      case "echo":
+        prog.collectEcho(this.id);
+        break;
+    }
+    // Persistent world pickups are recorded so they don't respawn on replay.
+    if (this.meta.permanent && this.id) prog.markPickedUp(this.id);
+    world.onPickup?.(this);
+  }
+
+  /** Emblems can carry a reward (cheat/art) defined in unlocks.json. */
+  _maybeUnlockReward() {
+    const entry = this.app.data.unlocks.emblems.find((e) => e.id === this.id);
+    if (entry?.reward?.startsWith("cheat:")) {
+      this.app.progression.unlock(entry.reward.slice(6));
+    }
+  }
+
+  render(ctx, cam) {
+    if (this.collected) return;
+    const x = this.x - cam.x;
+    const y = this.y - cam.y;
+    const s = this.size;
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Soft glow.
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = this.meta.color;
+    ctx.beginPath();
+    ctx.arc(0, 0, s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    ctx.fillStyle = this.meta.color;
+    if (this.kind === "shard") {
+      // diamond
+      ctx.rotate(Math.PI / 4);
+      ctx.fillRect(-s / 3, -s / 3, (s / 3) * 2, (s / 3) * 2);
+    } else if (this.kind === "emblem") {
+      ctx.rotate(this.t * 0.5);
+      drawStar(ctx, 0, 0, 5, s * 0.7, s * 0.32);
+    } else if (this.kind === "heart") {
+      drawHeart(ctx, s * 0.7);
+    } else {
+      ctx.fillRect(-s / 2, -s / 2, s, s);
+    }
+    ctx.restore();
+  }
+}

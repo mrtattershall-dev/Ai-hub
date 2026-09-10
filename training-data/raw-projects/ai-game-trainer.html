@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Game Trainer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --surface2: #1e1e24;
+    --surface3: #26262e;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8e8f0;
+    --muted: #888899;
+    --accent: #7c6bff;
+    --accent2: #b8abff;
+    --green: #3dd68c;
+    --amber: #f5a623;
+    --red: #ff5a5a;
+    --teal: #38d9c0;
+    --font: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --sans: system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .logo-text { font-size: 15px; font-weight: 600; color: var(--text); }
+  .logo-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .xp-bar { display: flex; align-items: center; gap: 10px; }
+  .xp-label { font-size: 12px; color: var(--muted); }
+  .xp-track { width: 120px; height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+  .xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--teal)); border-radius: 3px; transition: width 0.6s ease; }
+  .level-badge {
+    background: var(--accent); color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 8px; border-radius: 20px;
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 57px);
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sidebar-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--muted);
+    padding: 4px 0 8px;
+  }
+  .lesson-card {
+    padding: 12px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .lesson-card:hover { background: var(--surface2); border-color: var(--border); }
+  .lesson-card.active {
+    background: rgba(124,107,255,0.12);
+    border-color: rgba(124,107,255,0.35);
+  }
+  .lesson-card.done { opacity: 0.6; }
+  .lesson-card.done::after {
+    content: '✓';
+    position: absolute; top: 10px; right: 12px;
+    color: var(--green); font-size: 13px; font-weight: 700;
+  }
+  .lesson-num { font-size: 10px; color: var(--muted); margin-bottom: 4px; font-family: var(--font); }
+  .lesson-title { font-size: 13px; font-weight: 500; color: var(--text); }
+  .lesson-tag {
+    display: inline-block; margin-top: 6px;
+    font-size: 10px; padding: 2px 7px; border-radius: 4px;
+    font-family: var(--font);
+  }
+  .tag-loop { background: rgba(56,217,192,0.15); color: var(--teal); }
+  .tag-state { background: rgba(245,166,35,0.15); color: var(--amber); }
+  .tag-input { background: rgba(124,107,255,0.15); color: var(--accent2); }
+  .tag-render { background: rgba(61,214,140,0.15); color: var(--green); }
+  .tag-physics { background: rgba(255,90,90,0.15); color: var(--red); }
+  .tag-audio { background: rgba(180,171,255,0.15); color: var(--accent2); }
+
+  /* ─── CENTER: GAME CANVAS ─── */
+  .center {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .game-area {
+    flex: 1;
+    position: relative;
+    background: #0a0a0c;
+    overflow: hidden;
+  }
+  canvas#game {
+    display: block;
+    width: 100%; height: 100%;
+    image-rendering: pixelated;
+  }
+
+  /* Overlays */
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(10,10,12,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+    gap: 16px;
+    text-align: center;
+    padding: 32px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay h2 { font-size: 22px; font-weight: 600; color: var(--text); }
+  .overlay p { font-size: 14px; color: var(--muted); max-width: 380px; line-height: 1.6; }
+
+  /* Bottom bar */
+  .game-controls {
+    padding: 10px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ctrl-btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ctrl-btn:hover { background: var(--surface3); border-color: rgba(255,255,255,0.2); }
+  .ctrl-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .ctrl-btn.primary:hover { background: #6a5be8; }
+  .game-status { font-size: 12px; color: var(--muted); margin-left: auto; font-family: var(--font); }
+
+  /* ─── RIGHT PANEL: AI TUTOR ─── */
+  .right-panel {
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+  }
+  .tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+  .panel-content { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .panel-content.hidden { display: none; }
+
+  /* Concept cards */
+  .concept-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .concept-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px;
+  }
+  .concept-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .concept-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .code-snippet {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+    font-family: var(--font);
+    font-size: 11px;
+    color: #a8b8d8;
+    line-height: 1.7;
+    margin-top: 10px;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-snippet .kw { color: var(--accent2); }
+  .code-snippet .fn { color: var(--teal); }
+  .code-snippet .str { color: var(--green); }
+  .code-snippet .cm { color: #555566; }
+  .code-snippet .num { color: var(--amber); }
+
+  /* AI chat */
+  .chat-msg {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .msg-avatar {
+    width: 28px; height: 28px; border-radius: 8px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .msg-avatar.ai { background: rgba(124,107,255,0.2); color: var(--accent2); }
+  .msg-avatar.user { background: var(--surface3); color: var(--muted); }
+  .msg-bubble {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+    max-width: 220px;
+  }
+  .msg-bubble.ai { border-color: rgba(124,107,255,0.2); }
+  .chat-input-row {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+  }
+  .chat-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--sans);
+    outline: none;
+    resize: none;
+    height: 38px;
+  }
+  .chat-input:focus { border-color: var(--accent); }
+  .send-btn {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { background: #6a5be8; }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* thinking */
+  .thinking { display: flex; gap: 4px; align-items: center; padding: 10px 12px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+  /* Challenge panel */
+  .challenge-box {
+    background: rgba(61,214,140,0.06);
+    border: 1px solid rgba(61,214,140,0.2);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .challenge-box .concept-label { color: var(--green); }
+  .challenge-task { font-size: 13px; color: var(--text); line-height: 1.6; }
+  .check-btn {
+    margin-top: 10px;
+    padding: 7px 14px;
+    border-radius: 7px;
+    background: rgba(61,214,140,0.15);
+    border: 1px solid rgba(61,214,140,0.3);
+    color: var(--green);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-weight: 500;
+    transition: all 0.15s;
+    width: 100%;
+  }
+  .check-btn:hover { background: rgba(61,214,140,0.25); }
+
+  /* Score bar */
+  .score-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .score-row:last-child { border: none; }
+  .score-key { font-size: 12px; color: var(--muted); }
+  .score-val { font-size: 13px; font-weight: 600; color: var(--text); font-family: var(--font); }
+
+  /* Notification */
+  #notif {
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--text);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  #notif.show { opacity: 1; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .btn-sm {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    font-family: var(--sans);
+    transition: all 0.15s;
+    flex: 1;
+    text-align: center;
+  }
+  .btn-sm:hover { background: var(--surface3); }
+  .btn-sm.accent { background: rgba(124,107,255,0.2); border-color: rgba(124,107,255,0.4); color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎮</div>
+    <div>
+      <div class="logo-text">AI Game Trainer</div>
+      <div class="logo-sub">Teaching AI to build games</div>
+    </div>
+  </div>
+  <div class="xp-bar">
+    <span class="xp-label">XP</span>
+    <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+    <div class="level-badge" id="levelBadge">Lv 1</div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR: lessons -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Game Dev Modules</div>
+    <div id="lessonList"></div>
+  </aside>
+
+  <!-- CENTER: live game -->
+  <main class="center">
+    <div class="game-area" id="gameArea">
+      <canvas id="game"></canvas>
+      <div class="overlay" id="startOverlay">
+        <h2>🎮 Game Loop Basics</h2>
+        <p>Every game needs three things: a <strong>state</strong>, an <strong>update</strong> function, and a <strong>render</strong> function. Watch the live demo, then answer the AI tutor's questions.</p>
+        <button class="ctrl-btn primary" onclick="startLesson()">▶ Start Lesson</button>
+      </div>
+      <div class="overlay hidden" id="winOverlay">
+        <h2>✅ Concept Mastered!</h2>
+        <p id="winMsg">You correctly identified the pattern.</p>
+        <div class="btn-row" style="justify-content:center">
+          <button class="ctrl-btn" onclick="retryLesson()">↩ Replay</button>
+          <button class="ctrl-btn primary" onclick="nextLesson()">Next Lesson →</button>
+        </div>
+      </div>
+    </div>
+    <div class="game-controls">
+      <button class="ctrl-btn" onclick="retryLesson()">↩ Restart</button>
+      <button class="ctrl-btn" id="pauseBtn" onclick="togglePause()">⏸ Pause</button>
+      <span class="game-status" id="gameStatus">Score: 0 &nbsp;|&nbsp; Frame: 0</span>
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL: AI tutor -->
+  <aside class="right-panel">
+    <div class="panel-tabs">
+      <div class="tab active" id="tabConcept" onclick="switchTab('concept')">Concept</div>
+      <div class="tab" id="tabAI" onclick="switchTab('ai')">AI Tutor</div>
+      <div class="tab" id="tabScore" onclick="switchTab('score')">Progress</div>
+    </div>
+
+    <!-- Concept Panel -->
+    <div class="panel-content" id="panelConcept"></div>
+
+    <!-- AI Chat Panel -->
+    <div class="panel-content hidden" id="panelAI">
+      <div id="chatMessages" style="display:flex;flex-direction:column;gap:12px;flex:1"></div>
+    </div>
+    <div id="chatInputArea" class="chat-input-row" style="display:none">
+      <textarea class="chat-input" id="chatInput" placeholder="Ask about game design..." rows="1" onkeydown="handleChatKey(event)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendChat()">↑</button>
+    </div>
+
+    <!-- Progress Panel -->
+    <div class="panel-content hidden" id="panelScore">
+      <div class="concept-card">
+        <div class="concept-label">Session Stats</div>
+        <div id="scoreRows"></div>
+      </div>
+      <div class="concept-card" style="margin-top:8px">
+        <div class="concept-label">Concepts Learned</div>
+        <div id="conceptsLearned" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Notification -->
+<div id="notif"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// LESSON DATA — teaches AI models game dev patterns
+// ═══════════════════════════════════════════════════
+const LESSONS = [
+  {
+    id: 'game-loop',
+    title: 'The Game Loop',
+    tag: 'loop', tagClass: 'tag-loop',
+    concept: {
+      title: 'Game Loop Pattern',
+      desc: 'The foundation of every game. The loop runs 60× per second: read input → update state → render. Nothing works without it.',
+      code: `<span class="cm">// The core game loop</span>
+<span class="kw">function</span> <span class="fn">gameLoop</span>(timestamp) {
+  <span class="fn">update</span>(timestamp);  <span class="cm">// physics, AI</span>
+  <span class="fn">render</span>();          <span class="cm">// draw to canvas</span>
+  <span class="fn">requestAnimationFrame</span>(<span class="fn">gameLoop</span>);
+}
+<span class="fn">requestAnimationFrame</span>(<span class="fn">gameLoop</span>);`
+    },
+    challenge: 'The bouncing ball is running. How many times per second does the render() function get called on a 60 Hz display?',
+    answerKeyword: '60',
+    hint: 'requestAnimationFrame syncs to your display refresh rate.',
+    game: 'bouncingBall',
+    xp: 100
+  },
+  {
+    id: 'state',
+    title: 'Game State',
+    tag: 'state', tagClass: 'tag-state',
+    concept: {
+      title: 'Centralized State Object',
+      desc: 'All dynamic data — positions, scores, lives — lives in one state object. This makes saving, replaying, and debugging trivial.',
+      code: `<span class="kw">const</span> state = {
+  player: { x: <span class="num">100</span>, y: <span class="num">200</span>, vx: <span class="num">0</span>, vy: <span class="num">0</span> },
+  score: <span class="num">0</span>,
+  lives: <span class="num">3</span>,
+  entities: [],
+  phase: <span class="str">'playing'</span>   <span class="cm">// 'menu'|'playing'|'dead'</span>
+};
+
+<span class="cm">// Update mutates state, never the canvas</span>
+<span class="kw">function</span> <span class="fn">update</span>() {
+  state.player.x += state.player.vx;
+  state.player.y += state.player.vy;
+}`
+    },
+    challenge: 'Collect 5 coins to prove state tracking works. Each coin updates state.score. Watch the score counter.',
+    answerKeyword: 'score',
+    game: 'coinCollector',
+    xp: 150
+  },
+  {
+    id: 'input',
+    title: 'Input Handling',
+    tag: 'input', tagClass: 'tag-input',
+    concept: {
+      title: 'Decoupled Input Map',
+      desc: 'Never read keys inside the game loop. Instead, maintain a boolean input map that event listeners update — the loop just reads it.',
+      code: `<span class="kw">const</span> keys = {};
+
+<span class="cm">// Event listeners fill the map</span>
+<span class="fn">addEventListener</span>(<span class="str">'keydown'</span>, e => keys[e.key] = <span class="kw">true</span>);
+<span class="fn">addEventListener</span>(<span class="str">'keyup'</span>,   e => keys[e.key] = <span class="kw">false</span>);
+
+<span class="cm">// Game loop reads the map</span>
+<span class="kw">function</span> <span class="fn">update</span>() {
+  <span class="kw">if</span> (keys[<span class="str">'ArrowLeft'</span>])  player.x -= <span class="num">4</span>;
+  <span class="kw">if</span> (keys[<span class="str">'ArrowRight'</span>]) player.x += <span class="num">4</span>;
+}`
+    },
+    challenge: 'Use WASD or arrow keys to move the ship and dodge the asteroids for 10 seconds.',
+    game: 'dodger',
+    xp: 200
+  },
+  {
+    id: 'render',
+    title: 'Efficient Rendering',
+    tag: 'render', tagClass: 'tag-render',
+    concept: {
+      title: 'Clear → Draw → Repeat',
+      desc: 'Every frame: clear the canvas, then redraw everything from state. Dirty-rect tricks exist but the clear-and-redraw pattern is correct first.',
+      code: `<span class="kw">function</span> <span class="fn">render</span>() {
+  <span class="cm">// 1. Clear the whole canvas</span>
+  ctx.<span class="fn">clearRect</span>(<span class="num">0</span>, <span class="num">0</span>, W, H);
+
+  <span class="cm">// 2. Draw background</span>
+  ctx.fillStyle = <span class="str">'#0a0a0c'</span>;
+  ctx.<span class="fn">fillRect</span>(<span class="num">0</span>, <span class="num">0</span>, W, H);
+
+  <span class="cm">// 3. Draw each entity from state</span>
+  <span class="kw">for</span> (<span class="kw">const</span> e <span class="kw">of</span> state.entities) {
+    ctx.<span class="fn">fillRect</span>(e.x, e.y, e.w, e.h);
+  }
+}`
+    },
+    challenge: 'The render function is drawing objects in the wrong order. Drag the layers into the correct draw order: background → enemies → player → UI.',
+    game: 'layerDemo',
+    xp: 150
+  },
+  {
+    id: 'physics',
+    title: 'Simple Physics',
+    tag: 'physics', tagClass: 'tag-physics',
+    concept: {
+      title: 'Velocity + Gravity',
+      desc: 'Add velocity to position each frame. Add gravity to vertical velocity each frame. That\'s it — 90% of game physics in two lines.',
+      code: `<span class="cm">// Per-frame update</span>
+<span class="kw">function</span> <span class="fn">update</span>() {
+  <span class="cm">// Gravity pulls down</span>
+  player.vy += <span class="num">0.5</span>;
+
+  <span class="cm">// Velocity moves position</span>
+  player.x += player.vx;
+  player.y += player.vy;
+
+  <span class="cm">// Floor collision</span>
+  <span class="kw">if</span> (player.y > FLOOR) {
+    player.y = FLOOR;
+    player.vy = <span class="num">0</span>;   <span class="cm">// stop falling</span>
+  }
+}`
+    },
+    challenge: 'Use spacebar or click to jump. Land on all 3 platforms to complete the level.',
+    game: 'platformer',
+    xp: 250
+  },
+  {
+    id: 'collision',
+    title: 'AABB Collision',
+    tag: 'physics', tagClass: 'tag-physics',
+    concept: {
+      title: 'Axis-Aligned Bounding Box',
+      desc: 'The simplest collision check: two rectangles overlap if they don\'t NOT overlap on any axis. One function handles bullets, pickups, walls.',
+      code: `<span class="kw">function</span> <span class="fn">overlaps</span>(a, b) {
+  <span class="kw">return</span> a.x < b.x + b.w &&
+         a.x + a.w > b.x &&
+         a.y < b.y + b.h &&
+         a.y + a.h > b.y;
+}
+
+<span class="cm">// Check every pair (O(n²) — fine for <200 entities)</span>
+<span class="kw">for</span> (<span class="kw">const</span> bullet <span class="kw">of</span> bullets) {
+  <span class="kw">for</span> (<span class="kw">const</span> enemy <span class="kw">of</span> enemies) {
+    <span class="kw">if</span> (<span class="fn">overlaps</span>(bullet, enemy)) <span class="fn">hit</span>(enemy);
+  }
+}`
+    },
+    challenge: 'Shoot the enemies with spacebar. Each hit demonstrates AABB collision detection. Hit all 6 to win.',
+    game: 'shooter',
+    xp: 300
+  }
+];
+
+// ═══════════════════════════════════════════════════
+// APP STATE
+// ═══════════════════════════════════════════════════
+const app = {
+  currentLesson: 0,
+  completedLessons: new Set(),
+  xp: 0,
+  level: 1,
+  tab: 'concept',
+  paused: false,
+  score: 0,
+  frame: 0
+};
+
+// ═══════════════════════════════════════════════════
+// CANVAS / GAME ENGINES
+// ═══════════════════════════════════════════════════
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let gameState = null;
+let animId = null;
+let gameWon = false;
+
+function resizeCanvas() {
+  const area = document.getElementById('gameArea');
+  canvas.width = area.clientWidth;
+  canvas.height = area.clientHeight;
+}
+
+// ── Game: Bouncing Ball ──
+function initBouncingBall() {
+  return {
+    balls: Array.from({length: 5}, (_, i) => ({
+      x: 80 + i * 120, y: 60 + Math.random()*100,
+      vx: (Math.random()-0.5)*4+1.5,
+      vy: (Math.random()-0.5)*4+2,
+      r: 14 + i*4,
+      color: ['#7c6bff','#38d9c0','#f5a623','#3dd68c','#ff5a5a'][i]
+    })),
+    frameCount: 0
+  };
+}
+
+function updateBouncingBall(s) {
+  for (const b of s.balls) {
+    b.x += b.vx; b.y += b.vy;
+    if (b.x - b.r < 0 || b.x + b.r > canvas.width)  b.vx *= -1;
+    if (b.y - b.r < 0 || b.y + b.r > canvas.height) b.vy *= -1;
+  }
+  s.frameCount++;
+  return s;
+}
+
+function renderBouncingBall(s) {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#0a0a0c';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  for (const b of s.balls) {
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    ctx.fillStyle = b.color + '99';
+    ctx.fill();
+    ctx.strokeStyle = b.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  // Frame counter
+  ctx.fillStyle = '#555566';
+  ctx.font = '11px monospace';
+  ctx.fillText(`frame ${s.frameCount}`, 12, 20);
+  ctx.fillText('update() → render()', 12, canvas.height - 12);
+  return s;
+}
+
+// ── Game: Coin Collector ──
+function initCoinCollector() {
+  const s = {
+    player: { x: canvas.width/2, y: canvas.height/2, r: 14 },
+    coins: [],
+    score: 0,
+    won: false
+  };
+  for (let i = 0; i < 8; i++) {
+    s.coins.push({
+      x: 60 + Math.random()*(canvas.width-120),
+      y: 60 + Math.random()*(canvas.height-120),
+      r: 9, collected: false
+    });
+  }
+  return s;
+}
+
+function updateCoinCollector(s, keys, mouse) {
+  const spd = 3.5;
+  if (keys['ArrowLeft']||keys['a']||keys['A']) s.player.x -= spd;
+  if (keys['ArrowRight']||keys['d']||keys['D']) s.player.x += spd;
+  if (keys['ArrowUp']||keys['w']||keys['W']) s.player.y -= spd;
+  if (keys['ArrowDown']||keys['s']||keys['S']) s.player.y += spd;
+  if (mouse.active) {
+    const dx = mouse.x - s.player.x, dy = mouse.y - s.player.y;
+    const d = Math.hypot(dx, dy);
+    if (d > 4) { s.player.x += dx/d*spd; s.player.y += dy/d*spd; }
+  }
+  s.player.x = Math.max(14, Math.min(canvas.width-14, s.player.x));
+  s.player.y = Math.max(14, Math.min(canvas.height-14, s.player.y));
+  for (const c of s.coins) {
+    if (!c.collected && Math.hypot(s.player.x-c.x, s.player.y-c.y) < s.player.r + c.r) {
+      c.collected = true; s.score++;
+    }
+  }
+  if (s.score >= 5 && !s.won) { s.won = true; return s; }
+  return s;
+}
+
+function renderCoinCollector(s) {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#0a0a0c';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  for (const c of s.coins) {
+    if (c.collected) continue;
+    ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+    ctx.fillStyle = '#f5a623';
+    ctx.fill();
+    ctx.fillStyle = '#0a0a0c'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('$', c.x, c.y);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  }
+  // Player
+  ctx.beginPath(); ctx.arc(s.player.x, s.player.y, s.player.r, 0, Math.PI*2);
+  ctx.fillStyle = '#7c6bff88'; ctx.fill();
+  ctx.strokeStyle = '#b8abff'; ctx.lineWidth = 2; ctx.stroke();
+
+  // State display
+  ctx.fillStyle = '#333344';
+  ctx.fillRect(8, 8, 180, 50);
+  ctx.fillStyle = '#888899'; ctx.font = '11px monospace';
+  ctx.fillText('state.score = ' + s.score, 16, 26);
+  ctx.fillText('state.player.x = ' + Math.round(s.player.x), 16, 44);
+  ctx.fillStyle = s.score >= 5 ? '#3dd68c' : '#f5a623';
+  ctx.fillText('Collect 5 coins!  ' + s.score + '/5', canvas.width/2 - 60, canvas.height - 12);
+}
+
+// ── Game: Dodger ──
+function initDodger() {
+  return {
+    player: { x: canvas.width/2, y: canvas.height - 50, w: 30, h: 20 },
+    asteroids: [],
+    survived: 0, timer: 0, won: false
+  };
+}
+
+function updateDodger(s, keys, mouse) {
+  s.timer++;
+  if (s.timer % 40 === 0) {
+    s.asteroids.push({ x: Math.random()*(canvas.width-40)+20, y:-20, r:12+Math.random()*16, vy: 2+s.survived*0.3, vx:(Math.random()-0.5)*2 });
+  }
+  if (s.timer % 60 === 0 && !s.won) s.survived++;
+  const spd = 4;
+  if (keys['ArrowLeft']||keys['a']||keys['A']) s.player.x -= spd;
+  if (keys['ArrowRight']||keys['d']||keys['D']) s.player.x += spd;
+  s.player.x = Math.max(0, Math.min(canvas.width - s.player.w, s.player.x));
+  for (const a of s.asteroids) { a.x += a.vx; a.y += a.vy; }
+  s.asteroids = s.asteroids.filter(a => a.y < canvas.height + 40);
+  for (const a of s.asteroids) {
+    const cx = s.player.x + s.player.w/2, cy = s.player.y + s.player.h/2;
+    if (Math.hypot(a.x - cx, a.y - cy) < a.r + 12) {
+      initGame(); notify('💥 Hit! Try again.'); return s;
+    }
+  }
+  if (s.survived >= 10 && !s.won) s.won = true;
+  return s;
+}
+
+function renderDodger(s) {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  // Stars
+  ctx.fillStyle = '#ffffff18';
+  for (let i = 0; i < 40; i++) {
+    ctx.fillRect((i*97+s.timer)%canvas.width, (i*61+s.timer*0.3)%canvas.height, 1.5, 1.5);
+  }
+  // Asteroids
+  for (const a of s.asteroids) {
+    ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, Math.PI*2);
+    ctx.fillStyle = '#555566'; ctx.fill();
+    ctx.strokeStyle = '#888899'; ctx.lineWidth = 1.5; ctx.stroke();
+  }
+  // Ship
+  const p = s.player;
+  ctx.fillStyle = '#7c6bff';
+  ctx.beginPath();
+  ctx.moveTo(p.x + p.w/2, p.y);
+  ctx.lineTo(p.x + p.w, p.y + p.h);
+  ctx.lineTo(p.x, p.y + p.h);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#b8abff'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // HUD
+  ctx.fillStyle = '#38d9c0'; ctx.font = 'bold 13px monospace';
+  ctx.fillText(`Survived: ${s.survived}s / 10s`, 12, 20);
+  if (s.survived < 10) {
+    const pct = s.survived/10;
+    ctx.fillStyle = '#333344'; ctx.fillRect(12, 28, 160, 6);
+    ctx.fillStyle = '#38d9c0'; ctx.fillRect(12, 28, 160*pct, 6);
+  }
+  ctx.fillStyle = '#555566'; ctx.font = '11px monospace';
+  ctx.fillText('keys.ArrowLeft / keys.ArrowRight', 12, canvas.height-12);
+}
+
+// ── Game: Layer Demo ──
+const layerOrder = ['Background', 'Enemies', 'Player', 'UI'];
+function initLayerDemo() {
+  return {
+    dragging: null, dragY: 0,
+    layers: [
+      { name: 'Player', color: '#7c6bff', correct: 2 },
+      { name: 'Background', color: '#333344', correct: 0 },
+      { name: 'UI', color: '#3dd68c', correct: 3 },
+      { name: 'Enemies', color: '#ff5a5a', correct: 1 }
+    ],
+    won: false, checked: false, feedback: ''
+  };
+}
+
+function renderLayerDemo(s) {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Left: visual preview
+  const pw = canvas.width * 0.45;
+  // bg
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(20, 20, pw - 40, canvas.height - 40);
+  // enemies
+  ctx.fillStyle = '#ff5a5a99';
+  ctx.fillRect(pw*0.15, canvas.height*0.3, 50, 50);
+  ctx.fillRect(pw*0.4, canvas.height*0.5, 45, 45);
+  // player
+  ctx.fillStyle = '#7c6bffcc';
+  ctx.beginPath(); ctx.arc(pw*0.5, canvas.height*0.6, 22, 0, Math.PI*2); ctx.fill();
+  // ui
+  ctx.fillStyle = '#3dd68c';
+  ctx.font = 'bold 11px monospace';
+  ctx.fillText('SCORE: 100', 30, 40);
+  ctx.fillText('LIVES: 3', 30, 56);
+
+  // Right: drag list
+  const lx = pw + 20, lw = canvas.width - pw - 40;
+  ctx.fillStyle = '#888899'; ctx.font = '11px monospace';
+  ctx.fillText('Draw Order (drag to sort)', lx, 24);
+
+  s.layers.forEach((l, i) => {
+    const y = 40 + i * 52;
+    const highlight = s.checked && l.correct === i;
+    ctx.fillStyle = highlight ? l.color+'33' : '#1e1e24';
+    roundRect(ctx, lx, y, lw, 44, 8);
+    ctx.fillStyle = highlight ? l.color : '#333344';
+    roundRect(ctx, lx+8, y+12, 20, 20, 4);
+    ctx.fillStyle = l.color; ctx.font = 'bold 12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(i+1, lx+18, y+22);
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.fillStyle = '#e8e8f0'; ctx.font = '12px sans-serif';
+    ctx.fillText(l.name, lx+36, y+26);
+    if (s.checked) {
+      ctx.fillStyle = l.correct === i ? '#3dd68c' : '#ff5a5a';
+      ctx.font = '14px sans-serif';
+      ctx.fillText(l.correct === i ? '✓' : '✗', lx + lw - 24, y + 26);
+    }
+  });
+  if (s.feedback) {
+    ctx.fillStyle = s.won ? '#3dd68c' : '#ff5a5a';
+    ctx.font = 'bold 12px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(s.feedback, lx + lw/2, canvas.height - 12);
+    ctx.textAlign='left';
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath(); ctx.fill();
+}
+
+// ── Game: Platformer ──
+function initPlatformer() {
+  const platforms = [
+    { x: 60, y: canvas.height*0.7, w: 120, h: 12 },
+    { x: 230, y: canvas.height*0.55, w: 110, h: 12 },
+    { x: 400, y: canvas.height*0.4, w: 120, h: 12 }
+  ];
+  return {
+    player: { x: 80, y: canvas.height*0.7 - 30, w: 22, h: 30, vx:0, vy:0, onGround: false },
+    platforms, platformsTouched: new Set(), won: false
+  };
+}
+
+function updatePlatformer(s, keys, mouse) {
+  const p = s.player;
+  const GRAV = 0.45, MAX_FALL = 10;
+  if (keys[' ']||keys['ArrowUp']||keys['w']||keys['W']) {
+    if (p.onGround) { p.vy = -9.5; p.onGround = false; }
+  }
+  p.vy = Math.min(p.vy + GRAV, MAX_FALL);
+  p.x += p.vx; p.y += p.vy;
+  p.onGround = false;
+  for (let i=0; i<s.platforms.length; i++) {
+    const pl = s.platforms[i];
+    if (p.x+p.w > pl.x && p.x < pl.x+pl.w && p.y+p.h > pl.y && p.y+p.h < pl.y+pl.h+16 && p.vy>=0) {
+      p.y = pl.y - p.h; p.vy = 0; p.onGround = true;
+      s.platformsTouched.add(i);
+    }
+  }
+  if (p.y > canvas.height) { p.y = canvas.height*0.7 - 30; p.x = 80; p.vy = 0; }
+  p.x = Math.max(0, Math.min(canvas.width - p.w, p.x));
+  if (keys['ArrowLeft']||keys['a']||keys['A']) p.vx = -3.5;
+  else if (keys['ArrowRight']||keys['d']||keys['D']) p.vx = 3.5;
+  else p.vx *= 0.7;
+  if (s.platformsTouched.size === 3 && !s.won) s.won = true;
+  return s;
+}
+
+function renderPlatformer(s) {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  for (let i=0; i<s.platforms.length; i++) {
+    const pl = s.platforms[i];
+    const visited = s.platformsTouched.has(i);
+    ctx.fillStyle = visited ? '#3dd68c' : '#333344';
+    ctx.fillRect(pl.x, pl.y, pl.w, pl.h);
+    ctx.fillStyle = visited ? '#3dd68c' : '#555566';
+    ctx.font = 'bold 10px monospace'; ctx.textAlign='center';
+    ctx.fillText(visited ? '✓' : String(i+1), pl.x+pl.w/2, pl.y-5);
+    ctx.textAlign='left';
+  }
+  const p = s.player;
+  ctx.fillStyle = '#7c6bff';
+  ctx.fillRect(p.x, p.y, p.w, p.h);
+  // physics labels
+  ctx.fillStyle = '#555566'; ctx.font = '10px monospace';
+  ctx.fillText(`vy: ${p.vy.toFixed(1)}`, 8, 18);
+  ctx.fillText(`onGround: ${p.onGround}`, 8, 32);
+  ctx.fillStyle = '#888899'; ctx.font = '11px monospace'; ctx.textAlign='center';
+  ctx.fillText('Space / W / ↑ to jump   ←→ to move', canvas.width/2, canvas.height-10);
+  ctx.fillText(`Platforms: ${s.platformsTouched.size}/3`, canvas.width/2, 20);
+  ctx.textAlign='left';
+}
+
+// ── Game: Shooter ──
+function initShooter() {
+  const enemies = [];
+  for (let i = 0; i < 6; i++) {
+    enemies.push({ x: 60 + i*(Math.floor(canvas.width/6)), y:60 + (i%2)*60, w:34, h:28, alive:true, hit:0 });
+  }
+  return { player:{ x:canvas.width/2, y:canvas.height-50, w:28, h:20 }, bullets:[], enemies, killed:0, cooldown:0, won:false };
+}
+
+function updateShooter(s, keys, mouse) {
+  const spd = 4;
+  if (keys['ArrowLeft']||keys['a']||keys['A']) s.player.x -= spd;
+  if (keys['ArrowRight']||keys['d']||keys['D']) s.player.x += spd;
+  s.player.x = Math.max(0, Math.min(canvas.width-s.player.w, s.player.x));
+  s.cooldown = Math.max(0, s.cooldown - 1);
+  if ((keys[' '] || mouse.click) && s.cooldown === 0) {
+    s.bullets.push({ x: s.player.x + s.player.w/2 - 3, y: s.player.y, w:6, h:12, vy:-8 });
+    s.cooldown = 18;
+    mouse.click = false;
+  }
+  for (const b of s.bullets) b.y += b.vy;
+  s.bullets = s.bullets.filter(b => b.y > -20);
+  for (const b of s.bullets) {
+    for (const e of s.enemies) {
+      if (!e.alive) continue;
+      if (b.x < e.x+e.w && b.x+b.w > e.x && b.y < e.y+e.h && b.y+b.h > e.y) {
+        e.alive = false; e.hit = 20; s.killed++;
+        b.y = -999;
+      }
+    }
+  }
+  for (const e of s.enemies) if (e.hit > 0) e.hit--;
+  if (s.killed >= 6 && !s.won) s.won = true;
+  return s;
+}
+
+function renderShooter(s) {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  for (const e of s.enemies) {
+    if (!e.alive) {
+      if (e.hit > 0) {
+        ctx.fillStyle = '#ff5a5a44';
+        ctx.fillRect(e.x-4, e.y-4, e.w+8, e.h+8);
+        ctx.fillStyle = '#3dd68c'; ctx.font = 'bold 14px monospace'; ctx.textAlign='center';
+        ctx.fillText('HIT!', e.x+e.w/2, e.y+e.h/2+5);
+        ctx.textAlign='left';
+      }
+      continue;
+    }
+    ctx.fillStyle = '#ff5a5a';
+    ctx.fillRect(e.x, e.y, e.w, e.h);
+    ctx.fillStyle = '#0a0a0c'; ctx.font = 'bold 10px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('👾', e.x+e.w/2, e.y+e.h/2);
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  }
+  for (const b of s.bullets) {
+    ctx.fillStyle = '#f5a623';
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+  }
+  const p = s.player;
+  ctx.fillStyle = '#7c6bff';
+  ctx.beginPath(); ctx.moveTo(p.x+p.w/2, p.y); ctx.lineTo(p.x+p.w, p.y+p.h); ctx.lineTo(p.x, p.y+p.h); ctx.closePath(); ctx.fill();
+
+  // AABB debug label
+  ctx.strokeStyle = '#7c6bff44'; ctx.setLineDash([3,4]); ctx.lineWidth=1;
+  for (const b of s.bullets) { ctx.strokeRect(b.x, b.y, b.w, b.h); }
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#888899'; ctx.font = '11px monospace'; ctx.textAlign='center';
+  ctx.fillText('← → move  |  Space / Click to shoot', canvas.width/2, canvas.height-10);
+  ctx.fillText(`overlaps() checks: ${s.bullets.length} × ${s.enemies.filter(e=>e.alive).length}  |  Killed: ${s.killed}/6`, canvas.width/2, 20);
+  ctx.textAlign='left';
+}
+
+// ═══════════════════════════════════════════════════
+// INPUT SYSTEM
+// ═══════════════════════════════════════════════════
+const keys = {};
+const mouse = { x:0, y:0, active: false, click: false };
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+});
+document.addEventListener('keyup', e => { keys[e.key] = false; });
+canvas.addEventListener('mousemove', e => {
+  const r = canvas.getBoundingClientRect();
+  const sx = canvas.width / r.width, sy = canvas.height / r.height;
+  mouse.x = (e.clientX - r.left) * sx;
+  mouse.y = (e.clientY - r.top) * sy;
+  mouse.active = true;
+});
+canvas.addEventListener('mouseleave', () => { mouse.active = false; });
+canvas.addEventListener('click', e => {
+  mouse.click = true;
+  // Layer demo: detect click on layers
+  if (LESSONS[app.currentLesson].game === 'layerDemo' && gameState) {
+    const r = canvas.getBoundingClientRect();
+    const sx = canvas.width / r.width, sy = canvas.height / r.height;
+    const cx = (e.clientX - r.left) * sx, cy = (e.clientY - r.top) * sy;
+    const pw = canvas.width * 0.45, lx = pw + 20, lw = canvas.width - pw - 40;
+    gameState.layers.forEach((l, i) => {
+      const ly = 40 + i * 52;
+      if (cx > lx && cx < lx+lw && cy > ly && cy < ly+44) {
+        // Swap with adjacent on click
+        if (i < gameState.layers.length - 1) {
+          [gameState.layers[i], gameState.layers[i+1]] = [gameState.layers[i+1], gameState.layers[i]];
+        }
+      }
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// GAME RUNNER
+// ═══════════════════════════════════════════════════
+const gameFns = {
+  bouncingBall: { init: initBouncingBall, update: updateBouncingBall, render: renderBouncingBall },
+  coinCollector: { init: initCoinCollector, update: updateCoinCollector, render: renderCoinCollector },
+  dodger: { init: initDodger, update: updateDodger, render: renderDodger },
+  layerDemo: { init: initLayerDemo, update: (s)=>s, render: renderLayerDemo },
+  platformer: { init: initPlatformer, update: updatePlatformer, render: renderPlatformer },
+  shooter: { init: initShooter, update: updateShooter, render: renderShooter },
+};
+
+function initGame() {
+  if (animId) cancelAnimationFrame(animId);
+  gameWon = false;
+  resizeCanvas();
+  const lesson = LESSONS[app.currentLesson];
+  const fns = gameFns[lesson.game];
+  gameState = fns.init();
+  app.frame = 0;
+  app.score = 0;
+
+  function loop() {
+    if (!app.paused) {
+      const fns2 = gameFns[LESSONS[app.currentLesson].game];
+      gameState = fns2.update(gameState, keys, mouse) || gameState;
+      fns2.render(gameState);
+      app.frame++;
+      if (gameState.score !== undefined) app.score = gameState.score;
+      document.getElementById('gameStatus').textContent = `Score: ${app.score} | Frame: ${app.frame}`;
+      if (gameState.won && !gameWon) {
+        gameWon = true;
+        setTimeout(showWin, 400);
+      }
+    }
+    animId = requestAnimationFrame(loop);
+  }
+  animId = requestAnimationFrame(loop);
+}
+
+function showWin() {
+  const lesson = LESSONS[app.currentLesson];
+  if (!app.completedLessons.has(app.currentLesson)) {
+    app.xp += lesson.xp;
+    app.completedLessons.add(app.currentLesson);
+    updateXP();
+    updateProgress();
+  }
+  document.getElementById('winMsg').textContent = `+${lesson.xp} XP — ${lesson.concept.title} mastered.`;
+  document.getElementById('winOverlay').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════
+// UI FUNCTIONS
+// ═══════════════════════════════════════════════════
+function buildSidebar() {
+  const list = document.getElementById('lessonList');
+  list.innerHTML = '';
+  LESSONS.forEach((l, i) => {
+    const div = document.createElement('div');
+    div.className = 'lesson-card' + (i === app.currentLesson ? ' active' : '') + (app.completedLessons.has(i) ? ' done' : '');
+    div.innerHTML = `<div class="lesson-num">MODULE ${String(i+1).padStart(2,'0')}</div>
+      <div class="lesson-title">${l.title}</div>
+      <span class="lesson-tag ${l.tagClass}">${l.tag}</span>`;
+    div.onclick = () => selectLesson(i);
+    list.appendChild(div);
+  });
+}
+
+function buildConceptPanel() {
+  const lesson = LESSONS[app.currentLesson];
+  const c = lesson.concept;
+  document.getElementById('panelConcept').innerHTML = `
+    <div class="concept-card">
+      <div class="concept-label">Core Pattern</div>
+      <div class="concept-title">${c.title}</div>
+      <div class="concept-desc">${c.desc}</div>
+      <div class="code-snippet">${c.code}</div>
+    </div>
+    <div class="challenge-box">
+      <div class="concept-label">Challenge</div>
+      <div class="challenge-task">${lesson.challenge}</div>
+      ${lesson.game === 'layerDemo' ? `
+        <button class="check-btn" onclick="checkLayerOrder()">✓ Check Order</button>
+      ` : ''}
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Why This Matters</div>
+      <div class="concept-desc">AI models training on game code need to see this pattern appear consistently. Every game in this trainer demonstrates real, runnable implementations.</div>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn-sm accent" onclick="askAI('Explain ${c.title} in one sentence')">Ask AI Tutor ↗</button>
+        <button class="btn-sm" onclick="askAI('Give me a common mistake with ${c.title}')">Common mistakes ↗</button>
+      </div>
+    </div>
+  `;
+}
+
+function checkLayerOrder() {
+  if (!gameState) return;
+  const correct = gameState.layers.every((l, i) => l.correct === i);
+  gameState.checked = true;
+  gameState.feedback = correct ? '✓ Correct draw order!' : '✗ Not quite — think: what gets drawn over what?';
+  gameState.won = correct;
+}
+
+function selectLesson(i) {
+  app.currentLesson = i;
+  buildSidebar();
+  buildConceptPanel();
+  document.getElementById('startOverlay').classList.remove('hidden');
+  document.getElementById('winOverlay').classList.add('hidden');
+  const lesson = LESSONS[i];
+  document.getElementById('startOverlay').querySelector('h2').textContent = '🎮 ' + lesson.title;
+  document.getElementById('startOverlay').querySelector('p').textContent = lesson.concept.desc;
+  if (animId) cancelAnimationFrame(animId);
+}
+
+function startLesson() {
+  document.getElementById('startOverlay').classList.add('hidden');
+  initGame();
+}
+
+function retryLesson() {
+  document.getElementById('winOverlay').classList.add('hidden');
+  initGame();
+}
+
+function nextLesson() {
+  document.getElementById('winOverlay').classList.add('hidden');
+  if (app.currentLesson < LESSONS.length - 1) {
+    selectLesson(app.currentLesson + 1);
+  } else {
+    notify('🎉 All modules complete! You\'ve trained the basics of game development.');
+  }
+}
+
+function togglePause() {
+  app.paused = !app.paused;
+  document.getElementById('pauseBtn').textContent = app.paused ? '▶ Resume' : '⏸ Pause';
+}
+
+function switchTab(tab) {
+  app.tab = tab;
+  ['concept','ai','score'].forEach(t => {
+    document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== tab);
+    document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+  });
+  document.getElementById('chatInputArea').style.display = tab === 'ai' ? 'flex' : 'none';
+  if (tab === 'score') updateProgress();
+}
+
+function updateXP() {
+  const maxXP = 1000;
+  const lvl = Math.floor(app.xp / maxXP) + 1;
+  app.level = lvl;
+  const pct = (app.xp % maxXP) / maxXP * 100;
+  document.getElementById('xpFill').style.width = pct + '%';
+  document.getElementById('levelBadge').textContent = 'Lv ' + lvl;
+}
+
+function updateProgress() {
+  const rows = LESSONS.map(l => `
+    <div class="score-row">
+      <span class="score-key">${l.title}</span>
+      <span class="score-val" style="color:${app.completedLessons.has(LESSONS.indexOf(l)) ? 'var(--green)' : 'var(--muted)'}">
+        ${app.completedLessons.has(LESSONS.indexOf(l)) ? '+' + l.xp + ' XP' : '—'}
+      </span>
+    </div>`).join('');
+  document.getElementById('scoreRows').innerHTML = rows;
+  const tags = [...app.completedLessons].map(i => `<span class="lesson-tag ${LESSONS[i].tagClass}">${LESSONS[i].tag}</span>`).join('');
+  document.getElementById('conceptsLearned').innerHTML = tags || '<span style="color:var(--muted);font-size:12px">Complete lessons to earn concepts</span>';
+}
+
+function notify(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════════
+// AI TUTOR (Claude API)
+// ═══════════════════════════════════════════════════
+const chatHistory = [];
+
+async function askAI(q) {
+  switchTab('ai');
+  addMsg('user', q);
+  chatHistory.push({ role: 'user', content: q });
+  await callClaude();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  addMsg('user', q);
+  chatHistory.push({ role: 'user', content: q });
+  await callClaude();
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+function addMsg(role, text) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg';
+  div.innerHTML = `
+    <div class="msg-avatar ${role}">${role === 'ai' ? '🤖' : '👤'}</div>
+    <div class="msg-bubble ${role}">${text}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function addThinking() {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg'; div.id = 'thinkingMsg';
+  div.innerHTML = `<div class="msg-avatar ai">🤖</div>
+    <div class="msg-bubble ai"><div class="thinking"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeThinking() {
+  const t = document.getElementById('thinkingMsg');
+  if (t) t.remove();
+}
+
+async function callClaude() {
+  document.getElementById('sendBtn').disabled = true;
+  addThinking();
+  const lesson = LESSONS[app.currentLesson];
+  const system = `You are an expert game development tutor embedded in an interactive HTML5 game trainer. The student is currently on the "${lesson.title}" module, learning about: ${lesson.concept.desc}
+
+Your role: teach other AI models (and humans) how to build games using correct patterns. Keep responses SHORT (2-4 sentences max). Focus on: game loops, state management, input decoupling, canvas rendering, simple physics, collision detection. When giving code, give tiny runnable snippets. Be encouraging and specific.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system,
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.map(b => b.text||'').join('') || 'Sorry, I couldn\'t respond right now.';
+    removeThinking();
+    addMsg('ai', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    removeThinking();
+    addMsg('ai', 'Connection error — check your network and try again.');
+  }
+  document.getElementById('sendBtn').disabled = false;
+}
+
+// ═══════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════
+window.addEventListener('resize', () => { if (gameState) resizeCanvas(); });
+
+buildSidebar();
+buildConceptPanel();
+
+// Seed AI chat with a welcome
+setTimeout(() => {
+  addMsg('ai', 'Hi! I\'m your game dev tutor. Start a lesson to see a live game demo, then ask me anything about the pattern — or just say "show me an example" for more code snippets.');
+}, 300);
+</script>
+</body>
+</html>

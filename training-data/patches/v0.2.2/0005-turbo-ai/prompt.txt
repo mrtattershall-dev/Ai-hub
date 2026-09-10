@@ -1,0 +1,7 @@
+[REVIEW - replace with a real instruction]
+Module: ai.js
+Header hint: AI MODULE  – Pure Pursuit path follower + personalities
+
+  Technique: Pure Pursuit (Coulter 1992) adapted for 2D
+  racing games. The controller picks a "lookahead point"
+  on the track centerline at distance L ahead, then

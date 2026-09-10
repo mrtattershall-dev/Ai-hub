@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROUGE-ENGINE</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0d0d10; color:#f8f9fa; font-family:'Courier New',monospace; overflow:hidden; user-select:none; }
+#gameCanvas { display:block; cursor:crosshair; }
+
+#rougeBar {
+  position:fixed; left:16px; top:50%; transform:translateY(-50%);
+  width:18px; height:220px; background:#111116; border:1px solid #3a0a0f; border-radius:2px; overflow:hidden;
+}
+#rougeFill {
+  position:absolute; bottom:0; width:100%;
+  background:linear-gradient(to top,#8a0215,#ff3333);
+  border-radius:0 0 2px 2px; transition:height 0.08s;
+}
+#rougeFill.pulse { animation:rougePulse 0.35s ease-in-out infinite; }
+@keyframes rougePulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+#rougeLabel { position:fixed; left:7px; top:50%; transform:translateY(-130px); font-size:7px; color:#ba041c; letter-spacing:2px; writing-mode:vertical-rl; }
+#drainRate  { position:fixed; left:5px; top:calc(50% + 122px); font-size:9px; color:#5a1a1a; text-align:center; width:28px; }
+#rougeNum   { position:fixed; left:4px; top:calc(50% - 138px); font-size:8px; color:#ba041c; width:28px; text-align:center; }
+
+#graftDisplay { position:fixed; right:14px; top:50%; transform:translateY(-50%); width:64px; }
+.graftSlot {
+  width:64px; height:64px; border:1px solid #2a0a0f;
+  background:#0d0d10; border-radius:2px; margin-bottom:8px;
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  position:relative; overflow:hidden; transition:border-color 0.3s, opacity 0.1s;
+}
+.graftSlot.empty { opacity:0.22; }
+.graftSlot .gIcon { font-size:20px; line-height:1; }
+.graftSlot .gName { font-size:6px; color:#ba041c; text-align:center; margin-top:3px; letter-spacing:1px; }
+.graftSlot .gDesc { font-size:5px; color:#3a1a1a; text-align:center; margin-top:1px; }
+.decayBar { position:absolute; bottom:0; left:0; height:3px; background:#ba041c; }
+
+#floorIndicator { position:fixed; top:14px; left:50%; transform:translateX(-50%); font-size:10px; color:#3a3a50; letter-spacing:4px; }
+#killCount      { position:fixed; top:30px; left:50%; transform:translateX(-50%); font-size:9px; color:#242430; letter-spacing:2px; }
+
+#vignette { position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.65) 100%); }
+#vignette.warn { background:radial-gradient(ellipse at center,transparent 40%,rgba(80,0,15,0.35) 100%); }
+#vignette.crit { background:radial-gradient(ellipse at center,transparent 22%,rgba(186,4,28,0.55) 100%); }
+
+/* iframes can flash -- keep transition off vignette for snappy crit */
+
+#deathScreen {
+  position:fixed; inset:0; background:#ba041c; display:none; flex-direction:column;
+  align-items:center; justify-content:center; animation:dFlood 0.55s ease-out; pointer-events:all; z-index:300;
+}
+@keyframes dFlood { from{opacity:0} to{opacity:1} }
+#deathScreen h1   { font-size:44px; letter-spacing:8px; color:#0d0d10; margin-bottom:10px; font-weight:normal; }
+#deathScreen .ds  { font-size:12px; color:rgba(13,13,16,0.6); margin-bottom:28px; letter-spacing:2px; line-height:2.2; text-align:center; }
+#deathScreen button { background:#0d0d10; color:#ba041c; border:none; padding:12px 36px; font-family:'Courier New',monospace; font-size:13px; letter-spacing:4px; cursor:pointer; }
+#deathScreen button:hover { background:#1a1a22; }
+
+#titleScreen {
+  position:fixed; inset:0; background:#0d0d10; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; pointer-events:all; z-index:200;
+}
+#titleScreen h1   { font-size:56px; letter-spacing:10px; color:#ba041c; font-weight:normal; margin-bottom:5px; }
+#titleScreen .ts  { font-size:10px; color:#252530; letter-spacing:6px; margin-bottom:38px; }
+#titleScreen .td  { font-size:11px; color:#383848; max-width:380px; text-align:center; line-height:2; margin-bottom:4px; }
+#titleScreen .tq  { font-size:10px; color:#ba041c; margin:14px 0 30px; opacity:0.75; font-style:italic; }
+#titleScreen button { background:#ba041c; color:#f8f9fa; border:none; padding:13px 44px; font-family:'Courier New',monospace; font-size:12px; letter-spacing:5px; cursor:pointer; }
+#titleScreen button:hover { background:#d40622; }
+#titleScreen .tk  { font-size:9px; color:#252530; margin-top:20px; letter-spacing:2px; line-height:2; text-align:center; }
+#titleScreen .tk span { color:#ba041c; }
+
+#controls { position:fixed; bottom:11px; left:50%; transform:translateX(-50%); font-size:8px; color:#1a1a22; letter-spacing:2px; white-space:nowrap; }
+
+#pickupHint { position:fixed; display:none; background:#0d0d10; border:1px solid #ffb703; padding:4px 9px; font-size:8px; color:#ffb703; border-radius:2px; pointer-events:none; z-index:100; letter-spacing:1px; transform:translateX(-50%); }
+
+#iframes { position:fixed; top:14px; right:14px; font-size:8px; color:#1e1e28; letter-spacing:1px; }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<div id="ui">
+  <div id="rougeNum">100</div>
+  <div id="rougeLabel">ROUGE</div>
+  <div id="rougeBar"><div id="rougeFill" style="height:100%"></div></div>
+  <div id="drainRate">5/s</div>
+  <div id="floorIndicator">FLOOR 01</div>
+  <div id="killCount">0 KILLS</div>
+  <div id="graftDisplay">
+    <div class="graftSlot empty" id="slot0">
+      <div class="gIcon">⬡</div><div class="gName">PRIMARY</div><div class="gDesc"></div>
+      <div class="decayBar" style="width:0%"></div>
+    </div>
+    <div class="graftSlot empty" id="slot1">
+      <div class="gIcon">⬡</div><div class="gName">SECONDARY</div><div class="gDesc"></div>
+      <div class="decayBar" style="width:0%"></div>
+    </div>
+  </div>
+  <div id="vignette"></div>
+  <div id="iframes"></div>
+  <div id="controls">WASD — MOVE &nbsp;|&nbsp; CLICK — ATTACK &nbsp;|&nbsp; WALK OVER DROPS — GRAFT &nbsp;|&nbsp; WALK OVER CORPSES — SIPHON</div>
+  <div id="pickupHint"></div>
+</div>
+
+<div id="titleScreen">
+  <h1>ROUGE-ENGINE</h1>
+  <div class="ts">TATTERSHALL STUDIOS</div>
+  <div class="td">Your mech bleeds every second. Every kill refuels you.<br>Every drop of Rouge reshapes the world.<br>Every organ you rip from the dead makes you powerful —<br>and accelerates your death.</div>
+  <div class="tq">"You cannot play it safe. Aggression is survival. Hesitation is death."</div>
+  <button onclick="startGame()">INITIATE SEQUENCE</button>
+  <div class="tk">
+    <span>WASD</span> move &nbsp;|&nbsp; <span>CLICK</span> attack toward cursor<br>
+    walk over corpses → siphon rouge &nbsp;|&nbsp; walk over glowing drops → graft organ
+  </div>
+</div>
+
+<div id="deathScreen">
+  <h1>CORE FLATLINE</h1>
+  <div class="ds" id="dstats"></div>
+  <button onclick="restartGame()">[ RESTART ]</button>
+</div>
+
+<script>
+// ============================================================
+// ROUGE-ENGINE — Pillar 1 Solid Build
+// ALL timing in SECONDS. dt = seconds elapsed since last frame.
+// ============================================================
+
+const canvas = document.getElementById('gameCanvas');
+const ctx    = canvas.getContext('2d');
+
+const TILE = 40, COLS = 25, ROWS = 18, W = COLS*TILE, H = ROWS*TILE;
+const T = { FLOOR:0, WALL:1, CHASM:2, BIODOOR:3, EXIT:4 };
+const C = {
+  void:'#0d0d10', iron:'#3a3d54', floor:'#1e2128',
+  rouge:'#ba041c', bright:'#ff3333', gold:'#ffb703',
+  white:'#f0f0f8', necro:'#4f121a', dark:'#0d0e15',
+};
+
+// ── ORGANS ───────────────────────────────────────────────────
+// decay: seconds | drainMult: multiplier on base drain
+// cd: attack cooldown in seconds
+const ORGANS = {
+  'ORG-01':{ name:'Gatling-Lung',    icon:'⊕', col:'#ff6b35', drainMult:2.5, decay:8,  type:'ranged',  dmg:8,  cd:0.1,  desc:'rapid-fire x2' },
+  'ORG-02':{ name:'Blade-Scapula',   icon:'⊗', col:'#cc1122', drainMult:1.5, decay:12, type:'melee',   dmg:30, cd:0.6,  desc:'heavy swing' },
+  'ORG-03':{ name:'Ventricle-Pump',  icon:'♡', col:'#ff4455', drainMult:0.8, decay:10, type:'utility', dmg:8,  cd:0.5,  desc:'drain -20%' },
+  'ORG-06':{ name:'Myoblast-Jaw',    icon:'⊙', col:'#aa0010', drainMult:3.0, decay:7,  type:'melee',   dmg:22, cd:0.55, desc:'bite heals +15' },
+  'ORG-07':{ name:'Capillary-Eye',   icon:'◎', col:'#4a90d9', drainMult:1.2, decay:14, type:'utility', dmg:15, cd:0.45, desc:'+40% crit chance' },
+  'ORG-10':{ name:'Hemorrhage-Fist', icon:'✦', col:'#cc0022', drainMult:2.2, decay:10, type:'melee',   dmg:55, cd:1.3,  desc:'explosion on kill' },
+};
+
+// ── ENEMY TYPES ───────────────────────────────────────────────
+// spd: px/sec | rv: rouge value on siphon | dmg: per-second contact dmg
+// iframes given to player on each hit to prevent stacking
+const ETYPES = {
+  husk:   { name:'HUSK',    hp:40,  spd:58,  col:'#5a5a78', sz:10, rv:20, org:'ORG-02', dmg:10, contactDmg:true },
+  spitter:{ name:'SPITTER', hp:30,  spd:48,  col:'#4a7a30', sz:9,  rv:20, org:'ORG-07', dmg:0,  contactDmg:false, ranged:true },
+  charger:{ name:'CHARGER', hp:60,  spd:130, col:'#8a4a20', sz:12, rv:25, org:'ORG-03', dmg:18, contactDmg:true, charger:true },
+  brute:  { name:'BRUTE',   hp:120, spd:36,  col:'#5a3a6a', sz:16, rv:35, org:'ORG-06', dmg:14, contactDmg:true },
+  crawler:{ name:'CRAWLER', hp:25,  spd:85,  col:'#3a5a2a', sz:7,  rv:15, org:'ORG-07', dmg:6,  contactDmg:true },
+};
+
+// ── GAME STATE ────────────────────────────────────────────────
+let G = {};
+let audioCtx = null;
+let inputBound = false;
+
+function initState() {
+  G = {
+    running:   false,
+    rouge:     100, maxRouge: 100,
+    baseDrain: 5,              // rouge/sec with no grafts
+    grafts:    ['',''],        // [primary, secondary] organ IDs
+    graftDecay:[0, 0],         // seconds remaining on each graft
+    attackCd:  0,              // seconds until next attack
+    iframes:   0,              // player invincibility seconds (prevents damage stacking)
+    px: 200, py: 200,          // player world position (pixels)
+    pspeed: 112,               // pixels/sec base
+    psize:  11,
+    floorTransitioning: false, // guard against exit firing every frame
+    enemies: [], particles: [], projectiles: [], corpses: [], organDrops: [],
+    keys: {}, mx: W/2, my: H/2,
+    floor: 1, kills: 0, graftsEquipped: 0, tilesTransformed: 0,
+    ticks: 0, time: 0,
+    hbTimer: 0,
+    map: [], sat: [], chasmed: {}, doored: {},
+    rooms: [],
+    shakeMag: 0,
+  };
+}
+
+// ── MAP GENERATION ────────────────────────────────────────────
+function rng(a,b){ return a+Math.random()*(b-a); }
+function irng(a,b){ return Math.floor(a+Math.random()*(b-a+1)); }
+
+function generateMap() {
+  G.map=[]; G.sat=[]; G.chasmed={}; G.doored={};
+  for(let r=0;r<ROWS;r++){
+    G.map.push(new Uint8Array(COLS).fill(T.WALL));
+    G.sat.push(new Float32Array(COLS));
+  }
+
+  // Place rooms (no overlap, padding 2)
+  const rooms=[];
+  for(let attempt=0; attempt<60 && rooms.length<7; attempt++){
+    const rw=irng(4,7), rh=irng(3,5);
+    const rx=irng(1,COLS-rw-2), ry=irng(1,ROWS-rh-2);
+    let ok=true;
+    for(const rm of rooms)
+      if(rx<rm.x+rm.w+2&&rx+rw>rm.x-2&&ry<rm.y+rm.h+2&&ry+rh>rm.y-2){ ok=false; break; }
+    if(ok){
+      rooms.push({x:rx,y:ry,w:rw,h:rh});
+      for(let r=ry;r<ry+rh;r++)
+        for(let c=rx;c<rx+rw;c++)
+          G.map[r][c]=T.FLOOR;
+    }
+  }
+
+  // Fallback: guarantee at least 3 rooms
+  if(rooms.length<3){
+    rooms.length=0;
+    const r1={x:2,y:2,w:5,h:4}, r2={x:11,y:3,w:5,h:4}, r3={x:18,y:8,w:5,h:4};
+    for(const rm of[r1,r2,r3]){
+      rooms.push(rm);
+      for(let r=rm.y;r<rm.y+rm.h;r++) for(let c=rm.x;c<rm.x+rm.w;c++) G.map[r][c]=T.FLOOR;
+    }
+  }
+
+  // Connect rooms with L-corridors (2 tiles wide for easier navigation)
+  for(let i=1;i<rooms.length;i++){
+    const a=rooms[i-1], b=rooms[i];
+    let cx=Math.floor(a.x+a.w/2), cy=Math.floor(a.y+a.h/2);
+    const tx=Math.floor(b.x+b.w/2), ty=Math.floor(b.y+b.h/2);
+    while(cx!==tx){
+      G.map[cy][cx]=T.FLOOR;
+      if(cy+1<ROWS) G.map[cy+1][cx]=T.FLOOR; // wide corridor
+      cx+=(tx>cx?1:-1);
+    }
+    while(cy!==ty){
+      G.map[cy][cx]=T.FLOOR;
+      if(cx+1<COLS) G.map[cy][cx+1]=T.FLOOR;
+      cy+=(ty>cy?1:-1);
+    }
+  }
+
+  // Optional chasm before room 2 (only if there's room)
+  if(rooms.length>=3){
+    const rm=rooms[2];
+    const cx=rm.x-1;
+    if(cx>0){
+      for(let row=rm.y;row<rm.y+rm.h&&row<ROWS-1;row++)
+        if(G.map[row][cx]===T.FLOOR) G.map[row][cx]=T.CHASM;
+    }
+  }
+
+  // Optional bio-door corridor entry for room 3
+  if(rooms.length>=4){
+    const rm=rooms[3];
+    const dc=Math.floor(rm.x+rm.w/2), dr=rm.y-1;
+    if(dr>0 && G.map[dr][dc]===T.FLOOR) G.map[dr][dc]=T.BIODOOR;
+  }
+
+  // Exit tile — guaranteed in last room, not in a corner the player spawns at
+  const lr=rooms[rooms.length-1];
+  const exitR=Math.max(lr.y, Math.min(lr.y+lr.h-2, lr.y+Math.floor(lr.h/2)));
+  const exitC=Math.max(lr.x, Math.min(lr.x+lr.w-2, lr.x+lr.w-2));
+  G.map[exitR][exitC]=T.EXIT;
+
+  G.rooms=rooms;
+
+  // Player spawn: centre of room 0
+  const sr=rooms[0];
+  G.px=(sr.x+Math.floor(sr.w/2))*TILE+TILE/2;
+  G.py=(sr.y+Math.floor(sr.h/2))*TILE+TILE/2;
+  G.floorTransitioning=false;
+}
+
+// ── TILE UTILS ────────────────────────────────────────────────
+function tileAt(px,py){
+  const c=Math.floor(px/TILE), r=Math.floor(py/TILE);
+  if(r<0||r>=ROWS||c<0||c>=COLS) return T.WALL;
+  return G.map[r][c];
+}
+function passable(px,py){
+  const t=tileAt(px,py), c=Math.floor(px/TILE), r=Math.floor(py/TILE), k=r*1000+c;
+  if(t===T.WALL)    return false;
+  if(t===T.CHASM)   return !!G.chasmed[k];
+  if(t===T.BIODOOR) return !!G.doored[k];
+  return true;
+}
+function canMove(nx,ny,size){
+  const hs=size*0.85;
+  return passable(nx,ny)&&passable(nx+hs,ny)&&passable(nx-hs,ny)&&passable(nx,ny+hs)&&passable(nx,ny-hs);
+}
+
+// ── SATURATION / ROUGE-SHIFT ──────────────────────────────────
+function addSat(px,py,amt){
+  const c=Math.floor(px/TILE), r=Math.floor(py/TILE);
+  if(r<0||r>=ROWS||c<0||c>=COLS) return;
+  const prev=G.sat[r][c];
+  G.sat[r][c]=Math.min(100,prev+amt);
+  const s=G.sat[r][c], t=G.map[r][c];
+  // Wall dissolves at 80
+  if(t===T.WALL && s>=80 && prev<80){
+    G.map[r][c]=T.FLOOR; G.tilesTransformed++;
+    boom(c*TILE+20,r*TILE+20,10,C.iron,{spd:80,settles:false});
+  }
+  // Chasm bridges at 80
+  if(t===T.CHASM && s>=80 && !G.chasmed[r*1000+c]){
+    G.chasmed[r*1000+c]=true; G.tilesTransformed++;
+  }
+  // Bio-door tile itself at 60
+  if(t===T.BIODOOR && s>=60){ G.doored[r*1000+c]=true; G.tilesTransformed++; }
+  // Bio-door unlocks from adjacent saturation avg
+  for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]){
+    const nr=r+dr, nc=c+dc;
+    if(nr<0||nr>=ROWS||nc<0||nc>=COLS) continue;
+    if(G.map[nr][nc]!==T.BIODOOR) continue;
+    let tot=0,cnt=0;
+    for(const [dr2,dc2] of [[-1,0],[1,0],[0,-1],[0,1]]){
+      const nr2=nr+dr2,nc2=nc+dc2;
+      if(nr2>=0&&nr2<ROWS&&nc2>=0&&nc2<COLS){ tot+=G.sat[nr2][nc2]; cnt++; }
+    }
+    if(cnt && tot/cnt>=60) G.doored[nr*1000+nc]=true;
+  }
+}
+
+// ── PARTICLES ─────────────────────────────────────────────────
+// decay: life-loss per second (so life=1 / decay=0.6 → ~1.67s lifetime)
+function boom(x,y,n,col,opts={}){
+  const cap=500;
+  for(let i=0;i<n&&G.particles.length<cap;i++){
+    const a=Math.random()*Math.PI*2;
+    const spd=opts.spd||rng(60,180);
+    G.particles.push({
+      x, y,
+      vx: Math.cos(a)*spd,
+      vy: Math.sin(a)*spd - (opts.up?50:0),
+      col: col||C.rouge,
+      life: 1,
+      decay: rng(0.4, 1.1),   // life lost per second → 0.9–2.5s lifetime
+      sz: opts.sz||rng(1.2,3),
+      settles: opts.settles!==false,
+    });
+  }
+}
+
+function updateParticles(dt){
+  for(let i=G.particles.length-1;i>=0;i--){
+    const p=G.particles[i];
+    p.vy += 220*dt;            // gravity
+    p.vx *= Math.pow(0.82,60*dt);
+    p.vy *= Math.pow(0.86,60*dt);
+    p.x  += p.vx*dt;
+    p.y  += p.vy*dt;
+    p.life -= p.decay*dt;
+    if(p.life<=0){
+      if(p.settles && (p.col===C.rouge||p.col===C.bright)) addSat(p.x,p.y,1);
+      G.particles.splice(i,1);
+    }
+  }
+}
+
+// ── PROJECTILES ───────────────────────────────────────────────
+function spawnProj(x,y,tx,ty,dmg,fromPlayer,col){
+  const dx=tx-x, dy=ty-y, d=Math.hypot(dx,dy)||1;
+  G.projectiles.push({ x,y, vx:(dx/d)*400, vy:(dy/d)*400, dmg, fromPlayer, col, life:1.4 });
+}
+
+function updateProjectiles(dt){
+  for(let i=G.projectiles.length-1;i>=0;i--){
+    const p=G.projectiles[i];
+    p.x+=p.vx*dt; p.y+=p.vy*dt; p.life-=dt;
+    const t=tileAt(p.x,p.y);
+    // Hit solid tiles
+    if(t===T.WALL || (t===T.CHASM && !G.chasmed[Math.floor(p.y/TILE)*1000+Math.floor(p.x/TILE)]) || p.life<=0){
+      if(t===T.WALL) addSat(p.x,p.y,5);
+      boom(p.x,p.y,5,p.col,{spd:70,settles:true});
+      G.projectiles.splice(i,1); continue;
+    }
+    let removed=false;
+    if(p.fromPlayer){
+      for(let j=G.enemies.length-1;j>=0;j--){
+        const e=G.enemies[j];
+        if(Math.hypot(p.x-e.x,p.y-e.y)<e.sz+5){
+          hitEnemy(j,p.dmg);
+          boom(p.x,p.y,12,C.rouge,{settles:true});
+          G.projectiles.splice(i,1); removed=true; break;
+        }
+      }
+    } else {
+      // Enemy projectile hits player (iframes apply here too)
+      if(G.iframes<=0 && Math.hypot(p.x-G.px,p.y-G.py)<G.psize+5){
+        G.rouge=Math.max(0,G.rouge-p.dmg);
+        G.iframes=0.25; // brief iframes so one shot doesn't chain
+        G.shakeMag=4;
+        boom(p.x,p.y,6,C.rouge,{settles:false});
+        G.projectiles.splice(i,1); removed=true;
+      }
+    }
+    if(!removed && G.projectiles[i]===undefined) continue; // already spliced
+  }
+}
+
+// ── COMBAT ────────────────────────────────────────────────────
+function hitEnemy(idx,dmg){
+  if(idx<0||idx>=G.enemies.length) return;
+  const e=G.enemies[idx];
+  const hasCrit=(G.grafts[0]==='ORG-07'||G.grafts[1]==='ORG-07');
+  let d=dmg;
+  if(hasCrit&&Math.random()<0.4){
+    d*=2;
+    boom(e.x,e.y,20,C.bright,{settles:true,spd:200});
+  }
+  e.hp-=d;
+  boom(e.x,e.y,12,C.rouge,{settles:true});
+  G.shakeMag=Math.max(G.shakeMag,2);
+  if(e.hp<=0) killEnemy(idx);
+}
+
+function killEnemy(idx){
+  const e=G.enemies[idx];
+  G.enemies.splice(idx,1);
+  boom(e.x,e.y,40,C.rouge,{spd:160,settles:true});
+  boom(e.x,e.y,15,C.bright,{spd:220,settles:true});
+  // Organ drop (separate from corpse siphon — both exist simultaneously)
+  G.organDrops.push({ x:e.x, y:e.y, org:e.org, timer:4.0, id:Math.random() });
+  // Corpse for rouge siphon — offset slightly so player can grab organ first
+  G.corpses.push({ x:e.x, y:e.y, rv:e.rv, siphoned:false });
+  G.kills++;
+  // Myoblast-Jaw passive kill heal
+  if(G.grafts[0]==='ORG-06'||G.grafts[1]==='ORG-06')
+    G.rouge=Math.min(G.maxRouge,G.rouge+30);
+  // Hemorrhage-Fist kill explosion
+  if(G.grafts[0]==='ORG-10'){
+    for(let a=0;a<24;a++){
+      const ang=(a/24)*Math.PI*2;
+      addSat(e.x+Math.cos(ang)*50, e.y+Math.sin(ang)*50, 8);
+      boom(e.x,e.y,2,C.rouge,{settles:true,spd:200});
+    }
+  }
+  playSound('kill');
+}
+
+function playerAttack(){
+  if(G.attackCd>0) return;
+  const orgId=G.grafts[0];
+  const org=ORGANS[orgId];
+
+  // Only cost rouge if there are enemies nearby or we fire a projectile
+  const hasPrimary=!!org;
+  const attackRange = hasPrimary && org.type==='melee' ? (orgId==='ORG-10'?115:95) : 95;
+
+  if(!hasPrimary){
+    // Default pulse: instant melee in 95px radius
+    const cl=nearestEnemy(attackRange);
+    if(cl>=0){ G.rouge=Math.max(0,G.rouge-3); hitEnemy(cl,15); }
+    boom(G.px,G.py,8,C.rouge,{settles:true,spd:100,up:true});
+    G.attackCd=0.42;
+    playSound('attack');
+    return;
+  }
+
+  G.rouge=Math.max(0,G.rouge-3);
+  G.attackCd=org.cd;
+
+  if(org.type==='ranged'){
+    spawnProj(G.px,G.py,G.mx,G.my,org.dmg,true,C.bright);
+    if(orgId==='ORG-01'){
+      // Gatling spread shot
+      const a=Math.atan2(G.my-G.py,G.mx-G.px);
+      spawnProj(G.px,G.py, G.px+Math.cos(a+0.28)*200, G.py+Math.sin(a+0.28)*200, org.dmg*0.75, true, C.bright);
+      spawnProj(G.px,G.py, G.px+Math.cos(a-0.28)*200, G.py+Math.sin(a-0.28)*200, org.dmg*0.75, true, C.bright);
+    }
+  } else {
+    // Melee: hit nearest enemy in range
+    const cl=nearestEnemy(attackRange);
+    if(cl>=0){
+      hitEnemy(cl,org.dmg);
+      if(orgId==='ORG-06') G.rouge=Math.min(G.maxRouge,G.rouge+15); // Myoblast bite heal per hit
+    }
+    boom(G.px,G.py,16,C.rouge,{settles:true,spd:130});
+  }
+  playSound('attack');
+}
+
+function nearestEnemy(range){
+  let best=-1, bd=range;
+  for(let i=0;i<G.enemies.length;i++){
+    const d=Math.hypot(G.px-G.enemies[i].x, G.py-G.enemies[i].y);
+    if(d<bd){ bd=d; best=i; }
+  }
+  return best;
+}
+
+// ── GRAFTING ─────────────────────────────────────────────────
+// Walk-over pickup with a clear 2-second cooldown after grafting
+// so player doesn't accidentally chain-graft two drops at once
+let graftCooldown=0;
+
+function checkGraftPickup(){
+  if(graftCooldown>0) return;
+  for(let i=G.organDrops.length-1;i>=0;i--){
+    const d=G.organDrops[i];
+    if(Math.hypot(G.px-d.x,G.py-d.y)<26){
+      equipOrgan(d.org);
+      G.organDrops.splice(i,1);
+      G.graftsEquipped++;
+      graftCooldown=0.8; // 0.8s before next auto-pickup
+      playSound('graft');
+      return;
+    }
+  }
+}
+
+function equipOrgan(id){
+  const o=ORGANS[id]; if(!o) return;
+  // Fill empty slot first; if both full replace primary
+  if(!G.grafts[0]){
+    G.grafts[0]=id; G.graftDecay[0]=o.decay;
+  } else if(!G.grafts[1]){
+    G.grafts[1]=id; G.graftDecay[1]=o.decay;
+  } else {
+    // Both full — replace whichever has LESS time left
+    const replaceIdx = G.graftDecay[0]<=G.graftDecay[1] ? 0 : 1;
+    G.grafts[replaceIdx]=id; G.graftDecay[replaceIdx]=o.decay;
+  }
+  boom(G.px,G.py,25,o.col||C.rouge,{settles:false,spd:200});
+}
+
+// ── PLAYER UPDATE ─────────────────────────────────────────────
+function updatePlayer(dt){
+  const k=G.keys;
+  let dx=0, dy=0;
+  if(k['w']||k['ArrowUp'])    dy=-1;
+  if(k['s']||k['ArrowDown'])  dy= 1;
+  if(k['a']||k['ArrowLeft'])  dx=-1;
+  if(k['d']||k['ArrowRight']) dx= 1;
+  if(dx&&dy){ dx*=0.707; dy*=0.707; }
+
+  // Speed lane: saturated floor tiles give 1.75x speed
+  const pc=Math.floor(G.px/TILE), pr=Math.floor(G.py/TILE);
+  const satHere = (pr>=0&&pr<ROWS&&pc>=0&&pc<COLS) ? G.sat[pr][pc] : 0;
+  const onLane = G.map[pr]&&G.map[pr][pc]===T.FLOOR && satHere>20;
+  const spd = G.pspeed * (onLane?1.75:1);
+
+  const nx=G.px+dx*spd*dt, ny=G.py+dy*spd*dt;
+  if(canMove(nx, G.py, G.psize)) G.px=Math.max(5,Math.min(W-5,nx));
+  if(canMove(G.px, ny, G.psize)) G.py=Math.max(5,Math.min(H-5,ny));
+
+  // Corpse siphon — walk over, instant +rouge
+  for(let i=G.corpses.length-1;i>=0;i--){
+    const corp=G.corpses[i];
+    if(!corp.siphoned && Math.hypot(G.px-corp.x,G.py-corp.y)<32){
+      corp.siphoned=true;
+      G.rouge=Math.min(G.maxRouge,G.rouge+corp.rv);
+      boom(corp.x,corp.y,18,C.rouge,{settles:false,up:true,spd:110});
+      G.corpses.splice(i,1);
+    }
+  }
+
+  // Passive healing on hyper-saturated floor (>90 sat)
+  if(pr>=0&&pr<ROWS&&pc>=0&&pc<COLS && G.map[pr][pc]===T.FLOOR && satHere>90)
+    G.rouge=Math.min(G.maxRouge,G.rouge+2*dt);
+
+  // Organ pickup
+  if(graftCooldown>0) graftCooldown-=dt;
+  checkGraftPickup();
+
+  // Attack cooldown
+  if(G.attackCd>0)  G.attackCd-=dt;
+  if(G.iframes>0)   G.iframes-=dt;
+
+  // Floor exit — guard against firing every frame
+  if(!G.floorTransitioning && tileAt(G.px,G.py)===T.EXIT){
+    G.floorTransitioning=true;
+    nextFloor();
+  }
+}
+
+// ── ENEMY UPDATE ─────────────────────────────────────────────
+function updateEnemies(dt){
+  const px=G.px, py=G.py;
+  for(let i=G.enemies.length-1;i>=0;i--){
+    const e=G.enemies[i];
+    const dx=px-e.x, dy=py-e.y, dist=Math.hypot(dx,dy)||1;
+
+    // ── Charger ──
+    if(e.type==='charger'){
+      if(!e.charging){
+        e.chargeWait-=dt;
+        if(dist<230 && e.chargeWait<=0){
+          e.charging=true;
+          e.cdx=dx/dist; e.cdy=dy/dist;
+          e.chargeT=0.6;
+          boom(e.x,e.y,8,C.gold,{spd:80,settles:false}); // wind-up flash
+        }
+      } else {
+        const nx=e.x+e.cdx*e.spd*2.4*dt, ny=e.y+e.cdy*e.spd*2.4*dt;
+        if(canMove(nx,ny,e.sz)){ e.x=nx; e.y=ny; }
+        else { e.charging=false; e.chargeWait=rng(1.2,2.0); }
+        addSat(e.x,e.y,2*dt*60); // leaves rouge trail
+        e.chargeT-=dt;
+        if(e.chargeT<=0){ e.charging=false; e.chargeWait=rng(1.2,2.0); }
+      }
+    }
+    // ── Spitter ──
+    else if(e.type==='spitter'){
+      // Keep distance
+      if(dist<100){ e.x-=(dx/dist)*e.spd*dt; e.y-=(dy/dist)*e.spd*dt; }
+      else if(dist>200){ e.x+=(dx/dist)*e.spd*0.5*dt; e.y+=(dy/dist)*e.spd*0.5*dt; }
+      e.shotT=(e.shotT||rng(1,2))-dt;
+      if(e.shotT<=0&&dist<300){
+        spawnProj(e.x,e.y,px,py,e.dmg||8,false,'#6aaa44');
+        addSat(px,py,4); // spitter inadvertently paints tiles
+        e.shotT=rng(1.5,3.0);
+      }
+    }
+    // ── All other types: chase ──
+    else {
+      if(dist>6){
+        const nx=e.x+(dx/dist)*e.spd*dt, ny=e.y+(dy/dist)*e.spd*dt;
+        if(canMove(nx,ny,e.sz)){       e.x=nx; e.y=ny; }
+        else if(canMove(nx,e.y,e.sz)){ e.x=nx; }
+        else if(canMove(e.x,ny,e.sz)){ e.y=ny; }
+        else { // unstuck: random push
+          e.x+=rng(-40,40)*dt;
+          e.y+=rng(-40,40)*dt;
+        }
+      }
+    }
+
+    // ── Contact damage (ALL enemy types including charger) ──
+    // Uses iframes so multiple enemies can't all hit simultaneously
+    if(e.contactDmg && dist < e.sz+G.psize+2){
+      if(G.iframes<=0){
+        // dmg is per-second; clamp each hit to a reasonable chunk
+        const hit=Math.min(e.dmg, e.dmg*0.5); // half-second's worth per iframe window
+        G.rouge=Math.max(0,G.rouge-hit);
+        G.iframes=0.4; // 0.4s invincibility after each hit
+        G.shakeMag=Math.max(G.shakeMag,5);
+        boom(G.px,G.py,8,C.rouge,{settles:false,spd:80,up:true});
+      }
+    }
+  }
+}
+
+// ── ROUGE DRAIN ───────────────────────────────────────────────
+// All in seconds. base 5/sec. Grafts multiply it.
+function updateDrain(dt){
+  let drain=G.baseDrain * (1+(G.floor-1)*0.08);
+  const o0=ORGANS[G.grafts[0]], o1=ORGANS[G.grafts[1]];
+  if(o0) drain*=o0.drainMult;
+  if(o1) drain*=o1.drainMult;
+
+  G.rouge=Math.max(0,G.rouge-drain*dt);
+
+  // Graft decay — count down in seconds
+  for(let i=0;i<2;i++){
+    if(!G.grafts[i]) continue;
+    G.graftDecay[i]-=dt;
+    if(G.graftDecay[i]<=0){
+      boom(G.px,G.py,20,C.necro,{spd:160,settles:false});
+      G.grafts[i]=''; G.graftDecay[i]=0;
+      playSound('decay');
+    }
+  }
+  return drain;
+}
+
+// ── ENEMY SPAWN ───────────────────────────────────────────────
+function spawnEnemies(){
+  G.enemies=[];
+  const pool=Object.keys(ETYPES);
+  const count=Math.min(4+G.floor*2,20);
+  // Floor 1 is mostly husks
+  const typePool= G.floor===1
+    ? ['husk','husk','husk','spitter']
+    : pool;
+
+  for(let i=0;i<count;i++){
+    const type=typePool[Math.floor(Math.random()*typePool.length)];
+    const def=ETYPES[type];
+    // Spawn only in non-start rooms
+    const roomIdx=1+Math.floor(Math.random()*(G.rooms.length-1));
+    const room=G.rooms[Math.min(roomIdx,G.rooms.length-1)];
+    const ex=room.x*TILE+rng(TILE*0.5,room.w*TILE-TILE*0.5);
+    const ey=room.y*TILE+rng(TILE*0.5,room.h*TILE-TILE*0.5);
+    G.enemies.push({
+      ...def, type,
+      x:ex, y:ey,
+      hp:def.hp*(1+(G.floor-1)*0.1),
+      maxHp:def.hp*(1+(G.floor-1)*0.1),
+      charging:false, chargeWait:rng(0.5,2), chargeT:0, cdx:0, cdy:0,
+      shotT:rng(1,2.5),
+    });
+  }
+}
+
+// ── NEXT FLOOR ────────────────────────────────────────────────
+function nextFloor(){
+  G.floor++;
+  G.rouge=Math.min(G.maxRouge,G.rouge+45); // reward for reaching exit
+  generateMap();
+  spawnEnemies();
+  G.particles=[]; G.projectiles=[]; G.corpses=[]; G.organDrops=[];
+  graftCooldown=0;
+  document.getElementById('floorIndicator').textContent='FLOOR '+String(G.floor).padStart(2,'0');
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function renderTiles(){
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const t=G.map[r][c], s=G.sat[r][c];
+      const x=c*TILE, y=r*TILE;
+      ctx.textAlign='center';
+      if(t===T.WALL){
+        ctx.fillStyle=C.iron; ctx.fillRect(x,y,TILE,TILE);
+        if(s>0){  ctx.fillStyle=`rgba(186,4,28,${Math.min(s/160,0.6)})`; ctx.fillRect(x,y,TILE,TILE); }
+        if(s>60){ ctx.strokeStyle=`rgba(255,51,51,${(s-60)/80})`; ctx.lineWidth=0.5; ctx.strokeRect(x+1,y+1,TILE-2,TILE-2); }
+      } else if(t===T.FLOOR){
+        ctx.fillStyle=C.floor; ctx.fillRect(x,y,TILE,TILE);
+        if(s>0){  ctx.fillStyle=`rgba(186,4,28,${Math.min(s/120,0.65)})`; ctx.fillRect(x,y,TILE,TILE); }
+        if(s>20){ // speed lane shimmer
+          ctx.fillStyle='rgba(255,80,80,0.09)'; ctx.fillRect(x,y+TILE-3,TILE,3);
+        }
+      } else if(t===T.CHASM){
+        const bridged=G.chasmed[r*1000+c];
+        ctx.fillStyle=bridged?'#240818':C.dark; ctx.fillRect(x,y,TILE,TILE);
+        if(bridged){ ctx.fillStyle='rgba(186,4,28,0.38)'; ctx.fillRect(x,y,TILE,TILE); }
+        else if(s>20){ ctx.fillStyle=`rgba(186,4,28,${s/600})`; ctx.fillRect(x,y,TILE,TILE); }
+        // Chasm inner shadow
+        if(!bridged){ ctx.strokeStyle='rgba(0,0,0,0.5)'; ctx.lineWidth=2; ctx.strokeRect(x+2,y+2,TILE-4,TILE-4); }
+      } else if(t===T.BIODOOR){
+        const open=G.doored[r*1000+c];
+        if(open){ ctx.fillStyle=C.floor; ctx.fillRect(x,y,TILE,TILE); }
+        else{
+          ctx.fillStyle='#100e00'; ctx.fillRect(x,y,TILE,TILE);
+          ctx.fillStyle=C.gold;    ctx.fillRect(x+4,y+4,TILE-8,TILE-8);
+          ctx.fillStyle='#100e00'; ctx.fillRect(x+10,y+10,TILE-20,TILE-20);
+          if(s>25){ ctx.fillStyle=`rgba(255,183,3,${(s-25)/90})`; ctx.fillRect(x,y,TILE,TILE); }
+        }
+      } else if(t===T.EXIT){
+        ctx.fillStyle=C.floor; ctx.fillRect(x,y,TILE,TILE);
+        const pulse=0.45+0.55*Math.sin(G.time*3.5);
+        ctx.fillStyle=C.gold; ctx.globalAlpha=0.35+pulse*0.55; ctx.fillRect(x+5,y+5,TILE-10,TILE-10);
+        ctx.globalAlpha=1;
+        ctx.fillStyle='rgba(0,0,0,0.75)'; ctx.font='7px Courier New';
+        ctx.fillText('EXIT',x+TILE/2,y+TILE/2+3);
+      }
+    }
+  }
+}
+
+function renderEnemies(){
+  for(const e of G.enemies){
+    // Drop shadow
+    ctx.fillStyle='rgba(0,0,0,0.28)';
+    ctx.beginPath(); ctx.ellipse(e.x,e.y+e.sz,e.sz*0.9,e.sz*0.28,0,0,Math.PI*2); ctx.fill();
+    // Body
+    ctx.fillStyle=e.col; ctx.beginPath(); ctx.arc(e.x,e.y,e.sz,0,Math.PI*2); ctx.fill();
+    // Charger wind-up pulse
+    if(e.type==='charger'&&!e.charging&&e.chargeWait<=0.5){
+      ctx.strokeStyle=C.gold; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(e.x,e.y,e.sz+3,0,Math.PI*2); ctx.stroke();
+    }
+    // HP bar
+    const hf=e.hp/e.maxHp;
+    ctx.fillStyle='#0d0d10';  ctx.fillRect(e.x-e.sz,e.y-e.sz-8,e.sz*2,3);
+    ctx.fillStyle=hf>0.5?'#2a6a2a':'#ba041c'; ctx.fillRect(e.x-e.sz,e.y-e.sz-8,e.sz*2*hf,3);
+    // Name
+    ctx.fillStyle='rgba(180,180,200,0.4)'; ctx.font='6px Courier New'; ctx.textAlign='center';
+    ctx.fillText(e.name,e.x,e.y+e.sz+10);
+  }
+}
+
+function renderPlayer(){
+  const px=G.px, py=G.py, rf=G.rouge/G.maxRouge;
+
+  // Primary graft arm extension
+  if(G.grafts[0]){
+    const o=ORGANS[G.grafts[0]];
+    const df=Math.max(0,G.graftDecay[0]/o.decay);
+    const gc=df>0.35?o.col : df>0.15?C.necro : '#1a0606';
+    const angle=Math.atan2(G.my-py,G.mx-px);
+    ctx.save(); ctx.translate(px,py); ctx.rotate(angle);
+    if(df<0.35&&G.ticks%8<4) ctx.globalAlpha=0.4;
+    ctx.fillStyle=gc;
+    ctx.fillRect(10,-4,22,8);
+    ctx.fillStyle=df>0.35?C.bright : C.necro;
+    ctx.fillRect(30,-2,6,4);
+    ctx.globalAlpha=1; ctx.restore();
+  }
+  // Secondary graft (back bulge)
+  if(G.grafts[1]){
+    const o=ORGANS[G.grafts[1]];
+    const df=Math.max(0,G.graftDecay[1]/o.decay);
+    ctx.fillStyle=df>0.35?o.col : C.necro;
+    if(df<0.35&&G.ticks%8<4) ctx.globalAlpha=0.4;
+    ctx.beginPath(); ctx.arc(px-10,py,5,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+
+  // Mech body
+  const mc=rf>0.6?C.white : rf>0.3?'#b0b0c8' : '#707085';
+  ctx.fillStyle=mc; ctx.beginPath(); ctx.arc(px,py,G.psize,0,Math.PI*2); ctx.fill();
+
+  // Rouge ring arc
+  ctx.strokeStyle=rf>0.6?C.rouge : rf>0.3?'#ff5555' : C.bright;
+  ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.arc(px,py,G.psize+3,-Math.PI/2,-Math.PI/2+rf*Math.PI*2); ctx.stroke();
+
+  // Chassis cracks at low rouge
+  if(rf<0.6){
+    ctx.strokeStyle=`rgba(186,4,28,${Math.min(0.9,(0.9-rf)*1.5)})`;
+    ctx.lineWidth=0.5;
+    for(let k=0;k<4;k++){
+      const a=(k/4)*Math.PI*2+G.time*0.5;
+      ctx.beginPath();
+      ctx.moveTo(px+Math.cos(a)*4,py+Math.sin(a)*4);
+      ctx.lineTo(px+Math.cos(a)*G.psize,py+Math.sin(a)*G.psize);
+      ctx.stroke();
+    }
+  }
+  // Critical strobe ring
+  if(rf<0.15&&G.ticks%10<5){
+    ctx.strokeStyle=C.bright; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(px,py,G.psize+7,0,Math.PI*2); ctx.stroke();
+  }
+  // iframes flash (visual feedback that you're invincible)
+  if(G.iframes>0&&G.ticks%6<3){
+    ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(px,py,G.psize+4,0,Math.PI*2); ctx.stroke();
+  }
+}
+
+function renderOrganDrops(){
+  for(const d of G.organDrops){
+    const o=ORGANS[d.org];
+    const pulse=0.5+0.5*Math.sin(G.time*8+d.id*10);
+    // Glow base
+    ctx.fillStyle=o?o.col:C.gold; ctx.globalAlpha=0.55+pulse*0.4;
+    ctx.beginPath(); ctx.arc(d.x,d.y,9,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+    // Icon
+    ctx.fillStyle=C.white; ctx.font='12px serif'; ctx.textAlign='center';
+    ctx.fillText(o?o.icon:'?',d.x,d.y+4);
+    // Countdown ring
+    const frac=d.timer/4.0;
+    ctx.strokeStyle=frac>0.5?C.gold:'#ff9900'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(d.x,d.y,13,-Math.PI/2,-Math.PI/2+frac*Math.PI*2); ctx.stroke();
+    // Name label above
+    ctx.fillStyle=`rgba(255,183,3,${0.6+pulse*0.3})`; ctx.font='7px Courier New';
+    ctx.fillText(o?o.name.split('-')[0].toUpperCase():'ORG',d.x,d.y-16);
+  }
+}
+
+function renderParticles(){
+  for(const p of G.particles){
+    ctx.fillStyle=p.col;
+    ctx.globalAlpha=Math.max(0,p.life);
+    ctx.fillRect(p.x-p.sz/2,p.y-p.sz/2,p.sz,p.sz);
+  }
+  ctx.globalAlpha=1;
+}
+
+function renderProjectiles(){
+  for(const p of G.projectiles){
+    ctx.fillStyle=p.col; ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=p.col; ctx.globalAlpha=0.22;
+    ctx.beginPath(); ctx.arc(p.x-p.vx*0.02,p.y-p.vy*0.02,2,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+}
+
+function render(){
+  // Screen shake
+  let sx=0, sy=0;
+  if(G.shakeMag>0){
+    sx=(Math.random()-0.5)*G.shakeMag*2.5;
+    sy=(Math.random()-0.5)*G.shakeMag*2.5;
+    G.shakeMag*=0.72;
+    if(G.shakeMag<0.2) G.shakeMag=0;
+  }
+  ctx.save(); ctx.translate(sx,sy);
+  ctx.fillStyle=C.void; ctx.fillRect(-8,-8,W+16,H+16);
+  renderTiles();
+  renderParticles();
+  renderProjectiles();
+  renderOrganDrops();
+  renderEnemies();
+  renderPlayer();
+  ctx.restore();
+}
+
+// ── HUD ───────────────────────────────────────────────────────
+function updateHUD(drain){
+  const rf=G.rouge/G.maxRouge;
+  document.getElementById('rougeFill').style.height=(rf*100)+'%';
+  document.getElementById('rougeNum').textContent=Math.ceil(G.rouge);
+  document.getElementById('rougeFill').className=rf<0.3?'pulse':'';
+  document.getElementById('drainRate').textContent=drain.toFixed(1)+'/s';
+  document.getElementById('killCount').textContent=G.kills+' KILLS';
+
+  const v=document.getElementById('vignette');
+  v.className=rf<0.15?'crit':rf<0.3?'warn':'';
+
+  // Graft slots
+  for(let i=0;i<2;i++){
+    const el=document.getElementById('slot'+i);
+    const id=G.grafts[i], o=id?ORGANS[id]:null;
+    if(!o){
+      el.className='graftSlot empty';
+      el.querySelector('.gIcon').textContent='⬡';
+      el.querySelector('.gName').textContent=i===0?'PRIMARY':'SECONDARY';
+      el.querySelector('.gDesc').textContent='';
+      el.querySelector('.decayBar').style.width='0%';
+      el.style.borderColor='';
+    } else {
+      const df=Math.max(0,G.graftDecay[i]/o.decay);
+      el.className='graftSlot';
+      el.querySelector('.gIcon').textContent=o.icon;
+      el.querySelector('.gName').textContent=o.name.split('-')[0].toUpperCase();
+      el.querySelector('.gDesc').textContent=o.desc;
+      const db=el.querySelector('.decayBar');
+      db.style.width=(df*100)+'%';
+      db.style.background=df>0.35?'#ba041c':df>0.15?'#4f121a':'#1a0606';
+      el.style.borderColor=df>0.35?'#ba041c':df>0.15?'#3a0606':'#1a0404';
+      // Flicker at low decay
+      el.style.opacity=df<0.35&&G.ticks%8<4?'0.5':'1';
+    }
+  }
+
+  // Pickup hint — show above player when near an organ drop
+  const hint=document.getElementById('pickupHint');
+  let nearest=null, nd=50;
+  for(const d of G.organDrops){
+    const dist=Math.hypot(G.px-d.x,G.py-d.y);
+    if(dist<nd){ nd=dist; nearest=d; }
+  }
+  if(nearest&&graftCooldown<=0){
+    const o=ORGANS[nearest.org];
+    const canvasRect=canvas.getBoundingClientRect();
+    const scaleX=canvasRect.width/W, scaleY=canvasRect.height/H;
+    hint.style.display='block';
+    hint.style.left=(canvasRect.left+G.px*scaleX)+'px';
+    hint.style.top=(canvasRect.top+G.py*scaleY-40)+'px';
+    hint.textContent=(o?o.name:'ORG')+' — WALK OVER';
+  } else {
+    hint.style.display='none';
+  }
+
+  // Debug iframes
+  document.getElementById('iframes').textContent=G.iframes>0?`I-FRAMES ${G.iframes.toFixed(2)}s`:'';
+}
+
+// ── AUDIO ─────────────────────────────────────────────────────
+function initAudio(){ try{ audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+
+function playSound(type){
+  if(!audioCtx) return;
+  try{
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    const t=audioCtx.currentTime;
+    if(type==='kill'){
+      o.type='sawtooth';
+      o.frequency.setValueAtTime(240,t); o.frequency.exponentialRampToValueAtTime(35,t+0.2);
+      g.gain.setValueAtTime(0.35,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+      o.start(t); o.stop(t+0.2);
+    } else if(type==='attack'){
+      o.type='square';
+      o.frequency.setValueAtTime(400,t); o.frequency.exponentialRampToValueAtTime(160,t+0.07);
+      g.gain.setValueAtTime(0.1,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+      o.start(t); o.stop(t+0.07);
+    } else if(type==='graft'){
+      // Wet organic slam
+      o.type='sine';
+      o.frequency.setValueAtTime(60,t); o.frequency.linearRampToValueAtTime(520,t+0.18);
+      g.gain.setValueAtTime(0.55,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.32);
+      o.start(t); o.stop(t+0.32);
+    } else if(type==='decay'){
+      o.type='sawtooth';
+      o.frequency.setValueAtTime(380,t); o.frequency.exponentialRampToValueAtTime(18,t+0.55);
+      g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.55);
+      o.start(t); o.stop(t+0.55);
+    } else if(type==='hb'){
+      o.type='sine';
+      o.frequency.setValueAtTime(58,t); o.frequency.exponentialRampToValueAtTime(22,t+0.14);
+      g.gain.setValueAtTime(0.48,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+      o.start(t); o.stop(t+0.18);
+    }
+  }catch(e){}
+}
+
+// ── GAME LOOP ─────────────────────────────────────────────────
+let lastTs=0;
+function loop(ts){
+  if(!G.running) return;
+  // dt in SECONDS, capped at 50ms to prevent spiral-of-death on tab switch
+  const dt=Math.min((ts-lastTs)/1000, 0.05);
+  lastTs=ts;
+  G.time+=dt; G.ticks++;
+
+  updatePlayer(dt);
+  updateEnemies(dt);
+  updateParticles(dt);
+  updateProjectiles(dt);
+
+  // Organ drop timer
+  for(let i=G.organDrops.length-1;i>=0;i--){
+    G.organDrops[i].timer-=dt;
+    if(G.organDrops[i].timer<=0) G.organDrops.splice(i,1);
+  }
+
+  const drain=updateDrain(dt);
+
+  // Heartbeat audio
+  G.hbTimer-=dt;
+  if(G.hbTimer<=0){
+    const rf=G.rouge/G.maxRouge;
+    G.hbTimer=rf<0.15?0.35 : rf<0.3?0.65 : 2.0;
+    if(rf<0.3) playSound('hb');
+  }
+
+  render();
+  updateHUD(drain);
+
+  // Death
+  if(G.rouge<=0){
+    G.running=false;
+    document.getElementById('deathScreen').style.display='flex';
+    document.getElementById('dstats').innerHTML=
+      `FLOOR ${G.floor}<br>${G.kills} ENEMIES KILLED<br>`+
+      `${G.graftsEquipped} ORGANS GRAFTED<br>${G.tilesTransformed} TILES TRANSFORMED`;
+    return;
+  }
+  requestAnimationFrame(loop);
+}
+
+// ── INPUT ─────────────────────────────────────────────────────
+function setupInput(){
+  if(inputBound) return; // prevent stacking on restart
+  inputBound=true;
+
+  window.addEventListener('keydown',e=>{
+    G.keys[e.key]=true;
+    if(['w','s','a','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))
+      e.preventDefault();
+  });
+  window.addEventListener('keyup',e=>{ G.keys[e.key]=false; });
+
+  canvas.addEventListener('mousemove',e=>{
+    const r=canvas.getBoundingClientRect();
+    G.mx=(e.clientX-r.left)*(W/r.width);
+    G.my=(e.clientY-r.top)*(H/r.height);
+  });
+  canvas.addEventListener('click',e=>{
+    if(!G.running) return;
+    const r=canvas.getBoundingClientRect();
+    G.mx=(e.clientX-r.left)*(W/r.width);
+    G.my=(e.clientY-r.top)*(H/r.height);
+    playerAttack();
+  });
+  canvas.addEventListener('contextmenu',e=>{ e.preventDefault(); if(G.running) playerAttack(); });
+}
+
+// ── RESIZE ────────────────────────────────────────────────────
+function resize(){
+  const sw=window.innerWidth, sh=window.innerHeight;
+  const sc=Math.min(sw/W, sh/H);
+  canvas.width=W; canvas.height=H;
+  canvas.style.width=(W*sc)+'px'; canvas.style.height=(H*sc)+'px';
+  canvas.style.position='fixed';
+  canvas.style.left=((sw-W*sc)/2)+'px';
+  canvas.style.top=((sh-H*sc)/2)+'px';
+}
+window.addEventListener('resize',resize); resize();
+
+// ── BOOT ──────────────────────────────────────────────────────
+function startGame(){
+  document.getElementById('titleScreen').style.display='none';
+  initAudio();
+  launch();
+}
+function restartGame(){
+  document.getElementById('deathScreen').style.display='none';
+  launch();
+}
+function launch(){
+  initState();
+  generateMap();
+  spawnEnemies();
+  setupInput();
+  G.running=true;
+  lastTs=performance.now();
+  requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>

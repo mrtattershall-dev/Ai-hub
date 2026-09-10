@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aethelgard — The Oath-Broken</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#000; overflow:hidden; font-family:'Georgia',serif; cursor:none; }
+#c { display:block; width:100vw; height:100vh; }
+
+/* ── CUSTOM CURSOR ── */
+#cursor { position:fixed; width:12px; height:12px; border:1px solid rgba(200,184,122,0.7);
+  transform:translate(-50%,-50%); pointer-events:none; z-index:9999; transition:transform 0.05s; }
+#cursor.attacking { transform:translate(-50%,-50%) scale(2); border-color:#c85a10; }
+
+/* ── HUD ── */
+#hud { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10; }
+
+#stats-wrap { position:fixed; top:22px; left:22px; display:flex; flex-direction:column; gap:5px; }
+.bar-label { font-size:9px; letter-spacing:3px; color:#666; text-transform:uppercase; font-family:monospace; }
+.bar-track { height:5px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); position:relative; overflow:hidden; }
+#health-fill { height:100%; background:#8b0000; transition:width 0.12s; box-shadow:0 0 6px #8b0000; }
+#health-trail { position:absolute; top:0; height:100%; background:rgba(180,0,0,0.3); transition:width 0.6s; }
+#stamina-fill { height:100%; background:#2a5c3f; transition:width 0.08s; }
+#poise-fill { height:100%; background:#3a3060; transition:width 0.1s; }
+
+/* Wyrd nodes */
+#wyrd-row { display:flex; gap:4px; align-items:center; margin-top:4px; }
+.wn { width:12px; height:12px; border:1px solid rgba(180,80,20,0.5); background:rgba(180,80,20,0.08);
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%); transition:all 0.2s; }
+.wn.lit { background:#c85a10; box-shadow:0 0 5px #c85a10; }
+.wn.corrupt { background:#cc1020; box-shadow:0 0 8px #cc1020; }
+.wn.blood { background:#ff0040; box-shadow:0 0 12px #ff0040; animation:wn-pulse 0.4s infinite alternate; }
+@keyframes wn-pulse { to { box-shadow:0 0 18px #ff0040; } }
+
+/* Active ability indicator */
+#ability-bar { position:fixed; bottom:75px; left:50%; transform:translateX(-50%);
+  display:flex; gap:10px; align-items:center; }
+.ability-slot { width:40px; height:40px; border:1px solid rgba(255,255,255,0.15);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:8px; letter-spacing:1px; color:rgba(255,255,255,0.4); font-family:monospace;
+  position:relative; overflow:hidden; background:rgba(0,0,0,0.3); }
+.ability-slot .key { font-size:11px; color:rgba(200,184,122,0.7); margin-bottom:2px; }
+.ability-slot .cooldown-fill { position:absolute; bottom:0; left:0; right:0; background:rgba(200,90,16,0.3); transition:height 0.1s; }
+.ability-slot.active-glow { border-color:rgba(200,90,16,0.8); box-shadow:0 0 8px rgba(200,90,16,0.4); }
+
+/* Combo rank */
+#combo-rank { position:fixed; top:50%; right:28px; transform:translateY(-50%);
+  font-size:72px; font-weight:bold; letter-spacing:-2px; color:rgba(200,200,200,0.06);
+  transition:all 0.25s; font-family:'Georgia',serif; user-select:none; }
+#combo-rank.active { color:rgba(200,180,120,0.85); font-size:82px; }
+#combo-rank.s-rank { color:#c85a10; text-shadow:0 0 24px rgba(200,90,16,0.7); }
+#combo-count { position:fixed; top:50%; right:60px; transform:translateY(40px);
+  font-size:13px; letter-spacing:3px; color:rgba(200,180,120,0.0); font-family:monospace;
+  transition:all 0.25s; }
+#combo-count.active { color:rgba(200,180,120,0.7); }
+
+/* Parry flash */
+#parry-flash { position:fixed; inset:0; pointer-events:none; z-index:25;
+  background:radial-gradient(ellipse at center, rgba(200,184,122,0.15) 0%, transparent 70%);
+  opacity:0; }
+
+/* Hit flash */
+#hit-flash { position:fixed; inset:0; pointer-events:none; background:rgba(160,0,0,0.6); opacity:0; z-index:20; }
+
+/* Blood-drunk overlay */
+#blood-overlay { position:fixed; inset:0; pointer-events:none; z-index:6;
+  background:radial-gradient(ellipse at center, transparent 30%, rgba(180,0,30,0.0) 100%);
+  opacity:0; transition:opacity 1s; }
+
+/* Corruption vignette */
+#corrupt-vignette { position:fixed; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at center, transparent 40%, rgba(160,0,10,0) 100%);
+  opacity:0; transition:opacity 0.4s; z-index:5; }
+
+/* Boss HUD */
+#boss-hud { position:fixed; bottom:58px; left:50%; transform:translateX(-50%);
+  width:460px; opacity:0; transition:opacity 0.6s; text-align:center; }
+#boss-name { color:#c8b87a; font-size:12px; letter-spacing:5px; margin-bottom:5px; text-transform:uppercase; font-family:monospace; }
+#boss-phase-label { font-size:9px; letter-spacing:3px; color:rgba(200,100,20,0.7); font-family:monospace; margin-bottom:4px; }
+#boss-bar-track { width:100%; height:3px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); }
+#boss-bar-fill { height:100%; background:#7a1818; transition:width 0.18s; box-shadow:0 0 5px #7a1818; }
+
+/* Controls */
+#controls { position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+  display:flex; gap:16px; font-size:9px; letter-spacing:2px; color:rgba(255,255,255,0.25);
+  text-transform:uppercase; font-family:monospace; }
+.ctrl { display:flex; align-items:center; gap:4px; }
+.key { border:1px solid rgba(255,255,255,0.18); padding:1px 5px; font-size:8px; }
+.key.highlight { border-color:rgba(200,184,122,0.4); color:rgba(200,184,122,0.6); }
+
+/* Exec prompt */
+#exec-prompt { position:fixed; bottom:125px; left:50%; transform:translateX(-50%);
+  color:#c8b87a; font-size:10px; letter-spacing:5px; text-transform:uppercase;
+  opacity:0; transition:opacity 0.25s; font-family:monospace; animation:exec-pulse 0.8s infinite alternate; }
+@keyframes exec-pulse { to { letter-spacing:6px; color:#ffdd80; } }
+
+/* Parry prompt */
+#parry-prompt { position:fixed; top:42%; left:50%; transform:translate(-50%,-50%);
+  color:rgba(200,184,122,0.9); font-size:11px; letter-spacing:5px; text-transform:uppercase;
+  opacity:0; transition:opacity 0.1s; font-family:monospace; pointer-events:none; z-index:30; }
+
+/* Damage numbers */
+#damage-numbers { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:15; }
+.dmg-num { position:absolute; font-size:17px; font-family:monospace; font-weight:bold; pointer-events:none;
+  animation:floatUp 0.9s ease-out forwards; }
+.dmg-num.crit { font-size:24px; }
+.dmg-num.parried { color:#c8b87a !important; font-size:14px; letter-spacing:2px; }
+@keyframes floatUp { 0%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-65px) scale(0.8);opacity:0} }
+
+/* Blood-drunk text */
+#blooddrunk-text { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-size:20px; letter-spacing:8px; color:#cc1020; text-transform:uppercase;
+  font-family:monospace; opacity:0; pointer-events:none; z-index:30; text-align:center; }
+
+/* Status tags */
+#status-tags { position:fixed; top:22px; right:22px; display:flex; flex-direction:column;
+  gap:4px; align-items:flex-end; }
+.status-tag { font-size:8px; letter-spacing:3px; color:rgba(200,90,16,0.8); font-family:monospace;
+  text-transform:uppercase; border:1px solid rgba(200,90,16,0.3); padding:2px 6px;
+  animation:tag-fade-in 0.3s ease-out; }
+@keyframes tag-fade-in { from{opacity:0;transform:translateX(10px)} to{opacity:1;transform:none} }
+
+/* Chapter text */
+#chapter-text { position:fixed; top:38%; left:50%; transform:translate(-50%,-50%);
+  text-align:center; pointer-events:none; opacity:0; transition:opacity 1.2s; }
+.chapter-label { font-size:10px; letter-spacing:6px; color:rgba(200,184,122,0.5); text-transform:uppercase; font-family:monospace; }
+.chapter-name { font-size:30px; letter-spacing:5px; color:#c8b87a; font-weight:normal; margin-top:6px; }
+
+/* Title screen */
+#title-screen { position:fixed; inset:0; background:#000; display:flex;
+  flex-direction:column; align-items:center; justify-content:center; z-index:100; transition:opacity 1.2s; }
+#title-screen h1 { font-size:56px; letter-spacing:14px; color:#c8b87a; text-transform:uppercase;
+  font-weight:normal; margin-bottom:6px; text-shadow:0 0 50px rgba(200,184,122,0.25); }
+#title-screen .sub { font-size:10px; letter-spacing:7px; color:rgba(255,255,255,0.3);
+  text-transform:uppercase; margin-bottom:52px; font-family:monospace; }
+#title-screen .start-btn { font-size:10px; letter-spacing:5px; color:rgba(255,255,255,0.55);
+  text-transform:uppercase; font-family:monospace; border:1px solid rgba(255,255,255,0.18);
+  padding:13px 35px; cursor:pointer; background:transparent; transition:all 0.3s; pointer-events:all; }
+#title-screen .start-btn:hover { color:#c8b87a; border-color:rgba(200,184,122,0.5); letter-spacing:6px; }
+#title-controls { margin-top:40px; display:flex; flex-direction:column; gap:8px; align-items:center; }
+#title-controls .tc-row { display:flex; gap:24px; }
+#title-controls .tc { font-size:8px; letter-spacing:2px; color:rgba(255,255,255,0.2); font-family:monospace; text-transform:uppercase; }
+#title-controls .tc span { color:rgba(200,184,122,0.4); }
+
+/* Death screen */
+#death-screen { position:fixed; inset:0; background:rgba(0,0,0,0.0); display:none;
+  flex-direction:column; align-items:center; justify-content:center; z-index:90; transition:background 1s; }
+#death-screen.active { display:flex; background:rgba(0,0,0,0.85); }
+#death-screen h2 { font-size:32px; letter-spacing:8px; color:#8b0000; text-transform:uppercase;
+  font-weight:normal; margin-bottom:8px; animation:death-flicker 2s infinite; }
+@keyframes death-flicker { 0%,100%{opacity:1} 50%{opacity:0.7} }
+#death-screen p { font-size:10px; letter-spacing:4px; color:rgba(255,255,255,0.3); font-family:monospace;
+  text-transform:uppercase; margin-bottom:40px; }
+#death-screen .respawn-btn { font-size:10px; letter-spacing:4px; color:rgba(255,255,255,0.4);
+  text-transform:uppercase; font-family:monospace; border:1px solid rgba(255,255,255,0.15);
+  padding:12px 30px; cursor:pointer; background:transparent; transition:all 0.3s; pointer-events:all; }
+#death-screen .respawn-btn:hover { color:#c8b87a; border-color:rgba(200,184,122,0.4); }
+
+/* Victory screen */
+#victory-screen { position:fixed; inset:0; background:rgba(0,0,0,0); display:none;
+  flex-direction:column; align-items:center; justify-content:center; z-index:90; transition:background 1.5s; }
+#victory-screen.active { display:flex; background:rgba(0,0,0,0.9); }
+#victory-screen h2 { font-size:24px; letter-spacing:10px; color:#c8b87a; text-transform:uppercase;
+  font-weight:normal; margin-bottom:10px; }
+#victory-screen p { font-size:10px; letter-spacing:4px; color:rgba(255,255,255,0.3); font-family:monospace;
+  text-transform:uppercase; }
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div id="stats-wrap">
+    <div class="bar-label">Vitality</div>
+    <div class="bar-track" style="width:220px">
+      <div id="health-trail" style="width:100%"></div>
+      <div id="health-fill" style="width:100%"></div>
+    </div>
+    <div class="bar-label" style="margin-top:3px">Stamina</div>
+    <div class="bar-track" style="width:160px"><div id="stamina-fill" style="width:100%"></div></div>
+    <div class="bar-label" style="margin-top:3px">Poise</div>
+    <div class="bar-track" style="width:110px"><div id="poise-fill" style="width:100%"></div></div>
+    <div id="wyrd-row">
+      <div class="bar-label" style="margin-right:3px">Wyrd</div>
+      <div class="wn" id="wn0"></div><div class="wn" id="wn1"></div><div class="wn" id="wn2"></div>
+      <div class="wn" id="wn3"></div><div class="wn" id="wn4"></div><div class="wn" id="wn5"></div>
+      <div class="wn" id="wn6"></div><div class="wn" id="wn7"></div>
+    </div>
+  </div>
+
+  <div id="status-tags"></div>
+  <div id="combo-rank">D</div>
+  <div id="combo-count"></div>
+
+  <div id="corrupt-vignette"></div>
+  <div id="blood-overlay"></div>
+  <div id="hit-flash"></div>
+  <div id="parry-flash"></div>
+
+  <div id="boss-hud">
+    <div id="boss-name">Tiw, The Flayed General</div>
+    <div id="boss-phase-label">Phase I — The Crucible</div>
+    <div id="boss-bar-track"><div id="boss-bar-fill" style="width:100%"></div></div>
+  </div>
+
+  <div id="ability-bar">
+    <div class="ability-slot" id="slot-q">
+      <div class="key">Q</div>
+      <div style="font-size:7px">TETHER</div>
+      <div class="cooldown-fill" id="cd-q" style="height:0%"></div>
+    </div>
+    <div class="ability-slot" id="slot-r">
+      <div class="key">R</div>
+      <div style="font-size:7px">RUNIC</div>
+      <div class="cooldown-fill" id="cd-r" style="height:0%"></div>
+    </div>
+    <div class="ability-slot" id="slot-f">
+      <div class="key">F</div>
+      <div style="font-size:7px">LIGHT</div>
+      <div class="cooldown-fill" id="cd-f" style="height:0%"></div>
+    </div>
+    <div class="ability-slot" id="slot-g">
+      <div class="key">LMB</div>
+      <div style="font-size:7px">ATCK</div>
+      <div class="cooldown-fill" id="cd-g" style="height:0%"></div>
+    </div>
+    <div class="ability-slot" id="slot-e">
+      <div class="key">E</div>
+      <div style="font-size:7px">EXEC</div>
+      <div class="cooldown-fill" id="cd-e" style="height:0%"></div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <div class="ctrl"><span class="key">WASD</span> Move</div>
+    <div class="ctrl"><span class="key highlight">LMB</span> Attack</div>
+    <div class="ctrl"><span class="key highlight">RMB</span> Heavy</div>
+    <div class="ctrl"><span class="key highlight">RMB</span> PARRY (early)</div>
+    <div class="ctrl"><span class="key">Space</span> Dodge</div>
+    <div class="ctrl"><span class="key highlight">Q</span> Tether</div>
+    <div class="ctrl"><span class="key highlight">R</span> Runic Slam</div>
+    <div class="ctrl"><span class="key highlight">E</span> Execute</div>
+    <div class="ctrl"><span class="key">Shift</span> Sprint</div>
+  </div>
+
+  <div id="exec-prompt">[ E ] — Execute</div>
+  <div id="parry-prompt">PARRY</div>
+  <div id="damage-numbers"></div>
+  <div id="blooddrunk-text">— BLOOD-DRUNK —<br><span style="font-size:10px;letter-spacing:4px">EXECUTE TO SUSTAIN</span></div>
+
+  <div id="chapter-text">
+    <div class="chapter-label">Chapter I</div>
+    <div class="chapter-name">The Ash-Mire</div>
+  </div>
+</div>
+
+<div id="title-screen">
+  <h1>Aethelgard</h1>
+  <div class="sub">The Oath-Broken — Playable Demo</div>
+  <button class="start-btn" onclick="startGame()">Begin the Saga</button>
+  <div id="title-controls">
+    <div class="tc-row">
+      <div class="tc"><span>WASD</span> Move</div>
+      <div class="tc"><span>Mouse</span> Camera (click to lock)</div>
+      <div class="tc"><span>LMB</span> Light Attack</div>
+      <div class="tc"><span>RMB</span> Heavy / Parry</div>
+    </div>
+    <div class="tc-row">
+      <div class="tc"><span>Space</span> Dodge Roll</div>
+      <div class="tc"><span>Q</span> Tether Hook</div>
+      <div class="tc"><span>R</span> Runic Slam (AOE)</div>
+      <div class="tc"><span>E</span> Execute</div>
+      <div class="tc"><span>Shift</span> Sprint</div>
+    </div>
+  </div>
+</div>
+
+<div id="death-screen">
+  <h2>Oath Broken</h2>
+  <p>The gods take pleasure in your fall</p>
+  <button class="respawn-btn" onclick="respawn()">Rise Again</button>
+</div>
+
+<div id="victory-screen">
+  <h2>Tiw, The Flayed General — Slain</h2>
+  <p style="margin-top:8px">The crucible endured. The gods grow nervous.</p>
+  <p style="margin-top:24px;color:rgba(200,184,122,0.4)">Chapter II — Ironwood Ridge — Awaits</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ════════════════════════════════════════════════
+// WEB AUDIO ENGINE
+// ════════════════════════════════════════════════
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+function playTone(freq, type='sawtooth', dur=0.08, vol=0.15, detune=0) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filt = audioCtx.createBiquadFilter();
+  filt.type = 'lowpass'; filt.frequency.value = 800;
+  osc.type = type; osc.frequency.value = freq; osc.detune.value = detune;
+  osc.connect(filt); filt.connect(gain); gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+  osc.start(); osc.stop(audioCtx.currentTime + dur);
+}
+function playNoise(dur=0.05, vol=0.3, freq=400) {
+  if (!audioCtx) return;
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+  const src = audioCtx.createBufferSource();
+  const filt = audioCtx.createBiquadFilter();
+  const gain = audioCtx.createGain();
+  filt.type = 'bandpass'; filt.frequency.value = freq; filt.Q.value = 2;
+  src.buffer = buf; src.connect(filt); filt.connect(gain); gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+  src.start();
+}
+const SFX = {
+  lightHit: () => { playTone(180, 'sawtooth', 0.09, 0.18); playNoise(0.05, 0.2, 600); },
+  heavyHit: () => { playTone(90, 'sawtooth', 0.14, 0.28); playNoise(0.1, 0.35, 300); },
+  parry: () => { playTone(660, 'sine', 0.12, 0.25); playTone(880, 'sine', 0.08, 0.15, 1200); },
+  dodge: () => { playNoise(0.06, 0.12, 1200); },
+  tether: () => { playTone(220, 'sawtooth', 0.15, 0.2); playTone(440, 'square', 0.1, 0.1); },
+  runicSlam: () => { playTone(60, 'sawtooth', 0.3, 0.35); playNoise(0.2, 0.4, 150); },
+  execute: () => { playTone(55, 'sawtooth', 0.5, 0.4); playNoise(0.3, 0.5, 200); playTone(880, 'sine', 0.2, 0.2); },
+  takeDmg: () => { playTone(140, 'sawtooth', 0.1, 0.25); playNoise(0.08, 0.3, 500); },
+  bloodDrunk: () => { playTone(55, 'sawtooth', 0.8, 0.3); playTone(110, 'square', 0.6, 0.2); },
+  enemyDie: () => { playTone(120, 'sawtooth', 0.2, 0.2); playNoise(0.15, 0.25, 250); },
+  bossRoar: () => { playTone(40, 'sawtooth', 1.0, 0.5); playNoise(0.5, 0.6, 80); },
+};
+
+// ════════════════════════════════════════════════
+// GAME STATE
+// ════════════════════════════════════════════════
+const G = {
+  health:100, maxHealth:100,
+  stamina:100, maxStamina:100,
+  poise:120, maxPoise:120,
+  wyrd:4, maxWyrd:8,
+  corruption:0,
+  combo:0, comboTimer:0, comboRank:'D',
+  isAttacking:false, attackTimer:0, isHeavyAttacking:false,
+  isParrying:false, parryTimer:0, parryWindow:0, perfectParry:false,
+  isDodging:false, dodgeTimer:0, dodgeInvincible:false,
+  isTethering:false, tetherTimer:0, tetherCD:0,
+  isRunicSlamming:false, runicSlamTimer:0, runicSlamCD:0,
+  isExecuting:false,
+  bloodDrunk:false, bloodDrunkTimer:0,
+  staggered:false, staggerTimer:0,
+  nearExecutable:false,
+  enemies:[], boss:null,
+  bossPhase:1, bossDetected:false,
+  started:false, dead:false,
+  keys:{}, mouseButtons:{},
+  cameraYaw:0, cameraPitch:0.4,
+  trailHealth:100, trailTimer:0,
+  stamRegenCooldown:0,
+  lastDamageTime:0,
+  extractedElement:null, extractedTimer:0,
+  statusTags:[],
+};
+
+// ════════════════════════════════════════════════
+// RENDERER & SCENE
+// ════════════════════════════════════════════════
+const renderer = new THREE.WebGLRenderer({ canvas:document.getElementById('c'), antialias:true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.55;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0c0908);
+const sceneFog = new THREE.FogExp2(0x0c0908, 0.042);
+scene.fog = sceneFog;
+
+const camera = new THREE.PerspectiveCamera(88, innerWidth/innerHeight, 0.1, 300);
+
+// ════════════════════════════════════════════════
+// LIGHTING
+// ════════════════════════════════════════════════
+scene.add(new THREE.AmbientLight(0x4a4035, 2.2));
+const dirLight = new THREE.DirectionalLight(0xc8a878, 2.8);
+dirLight.position.set(-15, 28, -12);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.set(2048,2048);
+dirLight.shadow.camera.near=0.1; dirLight.shadow.camera.far=120;
+dirLight.shadow.camera.left=-45; dirLight.shadow.camera.right=45;
+dirLight.shadow.camera.top=45; dirLight.shadow.camera.bottom=-45;
+scene.add(dirLight);
+const rimLight = new THREE.DirectionalLight(0x6080a0, 1.0);
+rimLight.position.set(10,5,15);
+scene.add(rimLight);
+const fillLight = new THREE.DirectionalLight(0x3a2820, 0.8);
+fillLight.position.set(0,10,20);
+scene.add(fillLight);
+
+const runeLight = new THREE.PointLight(0x8b2500, 2.5, 14);
+scene.add(runeLight);
+
+// Stable warm fill light always on the player
+const playerLight = new THREE.PointLight(0xc8a060, 1.4, 10);
+scene.add(playerLight);
+
+// Torch flames
+const torchLights = [];
+function makeTorch(x,z) {
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,1.8,5), new THREE.MeshLambertMaterial({color:0x2a1a08}));
+  pole.position.set(x,0.9,z); scene.add(pole);
+  const fl = new THREE.PointLight(0xb84010, 1.8, 7);
+  fl.position.set(x,1.9,z);
+  fl.userData.base=1.8; fl.userData.speed=2+Math.random()*3; fl.userData.phase=Math.random()*Math.PI*2;
+  scene.add(fl); torchLights.push(fl);
+}
+[[-4,6],[4,6],[-4,-6],[4,-6],[0,-4],[-7,0],[7,0],[-3,13],[3,13]].forEach(([x,z])=>makeTorch(x,z));
+
+// ════════════════════════════════════════════════
+// TERRAIN
+// ════════════════════════════════════════════════
+const floorGeo = new THREE.PlaneGeometry(140,140,40,40);
+const fv = floorGeo.attributes.position;
+for(let i=0;i<fv.count;i++){
+  const x=fv.getX(i), z=fv.getZ(i);
+  if(Math.abs(x)>3||Math.abs(z)>3)
+    fv.setY(i,(Math.sin(x*0.28)*Math.cos(z*0.22)*0.6)+(Math.random()-0.5)*0.5);
+}
+floorGeo.computeVertexNormals();
+const floor = new THREE.Mesh(floorGeo, new THREE.MeshLambertMaterial({color:0x18130e}));
+floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
+
+// Puddles
+for(let i=0;i<18;i++){
+  const g=new THREE.CircleGeometry(0.4+Math.random()*2.2,7);
+  const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({color:0x090b0f,transparent:true,opacity:0.75}));
+  m.rotation.x=-Math.PI/2; m.position.set((Math.random()-0.5)*60,(Math.random()-0.5)*60,0.015);
+  m.position.y=0.012; scene.add(m);
+}
+
+// Dead trees
+function makeTree(x,z){
+  const h=5+Math.random()*4;
+  const t=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.19,h,6), new THREE.MeshLambertMaterial({color:0x18100a}));
+  t.position.set(x,h/2,z); t.rotation.y=Math.random()*Math.PI; t.castShadow=true; scene.add(t);
+  for(let i=0;i<3+Math.floor(Math.random()*3);i++){
+    const b=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.08,1.4+Math.random(),4), new THREE.MeshLambertMaterial({color:0x120c06}));
+    b.position.set(x+(Math.random()-0.5)*1.6,3+Math.random()*3.5,z+(Math.random()-0.5)*1.6);
+    b.rotation.set((Math.random()-0.5)*1.3,Math.random()*Math.PI,(Math.random()-0.5)*1.3);
+    b.castShadow=true; scene.add(b);
+  }
+}
+[[-12,8],[-16,-5],[10,13],[-8,16],[14,-9],[-19,2],[9,-15],[18,6],[-21,-11],[5,21],[-6,-19],[22,0],[-3,23],[16,14],[-13,-17],[20,-15],[-25,10],[25,8]].forEach(([x,z])=>makeTree(x,z));
+
+// Rocks
+[[5,5,0.4],[-4,3,0.6],[7,-3,0.3],[-2,-6,0.8],[3,8,0.35],[-7,1,0.5],[9,4,0.45],[-5,-4,0.3],[1,-9,0.7],[4,-12,0.5],[-8,-10,0.6]].forEach(([x,z,s])=>{
+  const m=new THREE.Mesh(new THREE.DodecahedronGeometry(s,0), new THREE.MeshLambertMaterial({color:0x1c1a16}));
+  m.position.set(x,s*0.5,z); m.rotation.set(Math.random(),Math.random(),Math.random());
+  m.castShadow=true; m.receiveShadow=true; scene.add(m);
+});
+
+// Arena boundary walls (invisible collision)
+const ARENA_BOUND = 28;
+
+// ════════════════════════════════════════════════
+// PLAYER CHARACTER — WULFRIC
+// ════════════════════════════════════════════════
+const playerGroup = new THREE.Group();
+scene.add(playerGroup);
+playerGroup.position.set(0,0,3);
+
+const bodyMat = new THREE.MeshLambertMaterial({color:0x1c1610});
+const armorMat = new THREE.MeshLambertMaterial({color:0x28221c});
+const legMat = new THREE.MeshLambertMaterial({color:0x1a140e});
+const wyrdMat = new THREE.MeshLambertMaterial({color:0x130b04});
+const veinMat = new THREE.MeshLambertMaterial({color:0x8b2500, emissive:0x8b2500, emissiveIntensity:0.7});
+
+// Torso
+const torso=new THREE.Mesh(new THREE.BoxGeometry(0.65,0.85,0.35),bodyMat); torso.position.y=1.35; playerGroup.add(torso);
+const chest=new THREE.Mesh(new THREE.BoxGeometry(0.72,0.52,0.22),armorMat); chest.position.set(0,1.5,0.09); playerGroup.add(chest);
+const head=new THREE.Mesh(new THREE.BoxGeometry(0.38,0.4,0.38),bodyMat); head.position.y=1.97; playerGroup.add(head);
+const helm=new THREE.Mesh(new THREE.BoxGeometry(0.44,0.26,0.44),armorMat); helm.position.y=2.08; playerGroup.add(helm);
+// Nose guard
+const noseguard=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.22,0.05),armorMat); noseguard.position.set(0,1.95,0.19); playerGroup.add(noseguard);
+
+// Human arm
+const rightArm=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.7,0.2),bodyMat); rightArm.position.set(-0.43,1.3,0); playerGroup.add(rightArm);
+
+// Wyrd-Grip arm
+const wyrdArm=new THREE.Group();
+const wyrdUpper=new THREE.Mesh(new THREE.BoxGeometry(0.24,0.4,0.24),wyrdMat); wyrdUpper.position.set(0.44,1.45,0); wyrdArm.add(wyrdUpper);
+const wyrdFore=new THREE.Mesh(new THREE.BoxGeometry(0.22,0.42,0.22),wyrdMat); wyrdFore.position.set(0.44,1.1,0); wyrdArm.add(wyrdFore);
+const wyrdHand=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.22,0.28),wyrdMat); wyrdHand.position.set(0.44,0.88,0.02); wyrdArm.add(wyrdHand);
+// Runic veins
+const veinMeshes=[];
+for(let i=0;i<5;i++){
+  const v=new THREE.Mesh(new THREE.BoxGeometry(0.025,0.38,0.025),veinMat.clone());
+  v.position.set(0.44+(Math.random()-0.5)*0.2,1.1+Math.random()*0.35,(Math.random()-0.5)*0.2);
+  wyrdArm.add(v); veinMeshes.push(v);
+}
+// Bone fragments
+for(let i=0;i<4;i++){
+  const bf=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.12,0.04), new THREE.MeshLambertMaterial({color:0x302820}));
+  bf.position.set(0.44+(Math.random()-0.5)*0.22,1.2+Math.random()*0.3,(Math.random()-0.5)*0.2);
+  bf.rotation.set(Math.random(),Math.random(),Math.random());
+  wyrdArm.add(bf);
+}
+playerGroup.add(wyrdArm);
+
+// Legs
+[-0.18,0.18].forEach(x=>{
+  const leg=new THREE.Mesh(new THREE.BoxGeometry(0.22,0.82,0.22),legMat); leg.position.set(x,0.5,0); playerGroup.add(leg);
+  const boot=new THREE.Mesh(new THREE.BoxGeometry(0.25,0.2,0.35),armorMat); boot.position.set(x,0.1,0.06); playerGroup.add(boot);
+});
+
+// Oathsliver — great axe
+const axeGroup=new THREE.Group();
+const axeHandle=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.03,1.5,6), new THREE.MeshLambertMaterial({color:0x18100a}));
+axeHandle.position.set(-0.72,1.2,0.32); axeGroup.add(axeHandle);
+const axeHead=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.5,0.32), new THREE.MeshLambertMaterial({color:0x3a3530,emissive:0x1a1510,emissiveIntensity:0.3}));
+axeHead.position.set(-0.72,1.68,0.32); axeGroup.add(axeHead);
+const axeEdge=new THREE.Mesh(new THREE.BoxGeometry(0.01,0.44,0.1), new THREE.MeshLambertMaterial({color:0x909090,emissive:0x554040,emissiveIntensity:0.6}));
+axeEdge.position.set(-0.74,1.68,0.46); axeGroup.add(axeEdge);
+// Runic markings on axe head
+const axeRune=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.06,0.33), new THREE.MeshLambertMaterial({color:0x8b2500,emissive:0x8b2500,emissiveIntensity:0.8}));
+axeRune.position.set(-0.71,1.68,0.32); axeGroup.add(axeRune);
+playerGroup.add(axeGroup);
+playerGroup.userData.axeGroup=axeGroup;
+
+// ════════════════════════════════════════════════
+// RUNIC SLAM SHOCKWAVE (reusable mesh)
+// ════════════════════════════════════════════════
+const slamRingGeo = new THREE.RingGeometry(0.1,0.3,24);
+const slamRingMat = new THREE.MeshLambertMaterial({color:0x8b2500,emissive:0x8b2500,emissiveIntensity:2,transparent:true,opacity:0.9,side:THREE.DoubleSide});
+const slamRing = new THREE.Mesh(slamRingGeo,slamRingMat);
+slamRing.rotation.x=-Math.PI/2; slamRing.position.y=0.05; slamRing.visible=false;
+scene.add(slamRing);
+
+// ════════════════════════════════════════════════
+// ENEMY FACTORY
+// ════════════════════════════════════════════════
+function createEnemy(x,z,type='thrall'){
+  const group=new THREE.Group(); group.position.set(x,0,z);
+  const cfgs={
+    thrall:  {bodyCol:0x1a1410,h:1.7, hp:100,poise:40,  dmg:12, speed:1.8,label:'Husked Thrall',   atk:2.5},
+    elite:   {bodyCol:0x201018,h:1.88,hp:260,poise:80,  dmg:28, speed:2.2,label:'Iron-Plate Zealot',atk:2.0},
+    boss:    {bodyCol:0x18080a,h:2.2, hp:700,poise:300, dmg:45, speed:1.5,label:'Tiw, The Flayed General',atk:1.5},
+  };
+  const cfg=cfgs[type]||cfgs.thrall;
+  const bm=new THREE.MeshLambertMaterial({color:cfg.bodyCol});
+  const s=cfg.h/1.7;
+
+  const torsoE=new THREE.Mesh(new THREE.BoxGeometry(0.65*s,0.8*s,0.35*s),bm); torsoE.position.y=1.3*s; torsoE.castShadow=true; group.add(torsoE);
+  const headE=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.38,0.35),bm); headE.position.y=cfg.h-0.12; group.add(headE);
+  [-0.18,0.18].forEach(xo=>{ const l=new THREE.Mesh(new THREE.BoxGeometry(0.22,0.7*s,0.22),bm); l.position.set(xo,0.4*s,0); group.add(l); });
+  [-0.42,0.42].forEach(xo=>{ const a=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.65*s,0.18),bm); a.position.set(xo,1.2*s,0); group.add(a); });
+
+  if(type==='elite'){
+    const wep=new THREE.Mesh(new THREE.BoxGeometry(0.06,1.3,0.06), new THREE.MeshLambertMaterial({color:0x2a2520}));
+    wep.position.set(0.54,1.2*s,0.3); group.add(wep);
+    const shld=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.7,0.55), new THREE.MeshLambertMaterial({color:0x1e1c18}));
+    shld.position.set(-0.54,1.2*s,0.1); group.add(shld);
+  }
+  if(type==='boss'){
+    // Exposed musculature
+    const muscleMat=new THREE.MeshLambertMaterial({color:0x5a0f0f,emissive:0x3a0808,emissiveIntensity:0.5});
+    const muscles=new THREE.Mesh(new THREE.BoxGeometry(0.62,0.75,0.32),muscleMat); muscles.position.y=1.45; group.add(muscles);
+    const stump=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.12,0.55,8), new THREE.MeshLambertMaterial({color:0x3c1010})); stump.position.set(-0.55,1.35,0); group.add(stump);
+    const acidMat=new THREE.MeshLambertMaterial({color:0x1a3a10,emissive:0x0a2a08,emissiveIntensity:1});
+    const acid=new THREE.Mesh(new THREE.SphereGeometry(0.14,6,4),acidMat); acid.position.set(-0.55,0.85,0); group.add(acid);
+    // Staples
+    const stapleMat=new THREE.MeshLambertMaterial({color:0x3a3030,emissive:0x1a0808,emissiveIntensity:0.3});
+    for(let i=0;i<6;i++){
+      const st=new THREE.Mesh(new THREE.BoxGeometry(0.22,0.04,0.04),stapleMat);
+      st.position.set((Math.random()-0.5)*0.5,1.2+Math.random()*0.6,(Math.random()-0.5)*0.2);
+      group.add(st);
+    }
+  }
+  scene.add(group);
+  group.children.forEach(c=>{ if(c.isMesh) c.userData.baseY=c.position.y; });
+
+  // Attack telegraph light
+  const atkLight=new THREE.PointLight(0xff2000, 0, 5);
+  group.add(atkLight);
+
+  const en={
+    group,type,label:cfg.label,
+    hp:cfg.hp,maxHp:cfg.hp,
+    poise:cfg.poise,maxPoise:cfg.poise,
+    dmg:cfg.dmg,speed:cfg.speed,
+    state:'patrol',
+    staggered:false,staggerTimer:0,
+    attackTimer:cfg.atk+Math.random(),attackCooldown:cfg.atk,
+    attackWindupTimer:0,
+    isAttacking:false,attackActive:false,attackActiveTimer:0,
+    dead:false,
+    patrolAngle:Math.random()*Math.PI*2,
+    patrolRadius:3+Math.random()*3,
+    patrolCenter:new THREE.Vector3(x,0,z),
+    atkLight,
+    telegraphActive:false, telegraphTimer:0,
+    phase:1,
+  };
+  en.group.userData.enemy=en;
+  return en;
+}
+
+// ════════════════════════════════════════════════
+// SPAWN
+// ════════════════════════════════════════════════
+function spawnEnemies(){
+  G.enemies=[];
+  [[-8,0],[8,1],[-5,7],[6,-5],[0,-8],[-4,-3],[4,10],[-10,4]].forEach(([x,z])=>G.enemies.push(createEnemy(x,z,'thrall')));
+  [[-12,5],[12,-4]].forEach(([x,z])=>G.enemies.push(createEnemy(x,z,'elite')));
+  G.boss=createEnemy(0,-18,'boss');
+  G.enemies.push(G.boss);
+  document.getElementById('boss-hud').style.opacity='0';
+}
+
+// ════════════════════════════════════════════════
+// MOVEMENT
+// ════════════════════════════════════════════════
+const MOVE_SPEED=4.5, SPRINT_SPEED=6.8, DODGE_DIST=1.85;
+function getInputDir(){
+  const dir=new THREE.Vector3();
+  const fwd=new THREE.Vector3(-Math.sin(G.cameraYaw),0,-Math.cos(G.cameraYaw));
+  const right=new THREE.Vector3(Math.cos(G.cameraYaw),0,-Math.sin(G.cameraYaw));
+  if(G.keys['w']||G.keys['arrowup']) dir.add(fwd);
+  if(G.keys['s']||G.keys['arrowdown']) dir.sub(fwd);
+  if(G.keys['a']||G.keys['arrowleft']) dir.sub(right);
+  if(G.keys['d']||G.keys['arrowright']) dir.add(right);
+  if(dir.lengthSq()>0) dir.normalize();
+  return dir;
+}
+
+// ════════════════════════════════════════════════
+// COMBAT FUNCTIONS
+// ════════════════════════════════════════════════
+function spawnDmgNum(dmg,worldPos,color='#c8c880',cls=''){
+  const div=document.createElement('div');
+  div.className='dmg-num'+cls;
+  div.style.color=color;
+  const v=worldPos.clone().project(camera);
+  div.style.left=((v.x*0.5+0.5)*innerWidth+(Math.random()-0.5)*25)+'px';
+  div.style.top=((-v.y*0.5+0.5)*innerHeight)+'px';
+  div.textContent=typeof dmg==='string'?dmg:Math.round(dmg);
+  document.getElementById('damage-numbers').appendChild(div);
+  setTimeout(()=>div.remove(),900);
+}
+function flashHit(){ const e=document.getElementById('hit-flash'); e.style.opacity='0.6'; setTimeout(()=>e.style.opacity='0',200); }
+function flashParry(){ const e=document.getElementById('parry-flash'); e.style.opacity='1'; setTimeout(()=>e.style.opacity='0',250); }
+
+const RANKS=['D','C','B','A','S'];
+function updateComboRank(){
+  const idx=Math.min(Math.floor(G.combo/5),4);
+  G.comboRank=RANKS[idx];
+  const el=document.getElementById('combo-rank');
+  const cc=document.getElementById('combo-count');
+  el.textContent=G.comboRank;
+  if(G.combo>0){ el.className=G.comboRank==='S'?'s-rank':'active'; cc.className='active'; cc.textContent=G.combo+' HIT'; }
+  else { el.className=''; cc.className=''; }
+}
+
+function doLightAttack(){
+  if(G.stamina<12||G.isAttacking||G.isDodging||G.isExecuting||G.isRunicSlamming) return;
+  ensureAudio();
+  G.isAttacking=true; G.attackTimer=0.32; G.isHeavyAttacking=false;
+  G.stamina=Math.max(0,G.stamina-12);
+  axeGroup.rotation.z=0.75; setTimeout(()=>axeGroup.rotation.z=0,200);
+  document.getElementById('cursor').className='attacking'; setTimeout(()=>document.getElementById('cursor').className='',300);
+
+  let hit=false;
+  G.enemies.forEach(en=>{
+    if(en.dead) return;
+    const dist=playerGroup.position.distanceTo(en.group.position);
+    if(dist<2.6){
+      const base=14+Math.random()*8;
+      const dmg=base*(G.bloodDrunk?1.5:1)*(G.extractedElement?1.3:1);
+      const isCrit=G.poise>G.maxPoise*0.8 && dist<2.0;
+      damageEnemy(en,isCrit?dmg*1.5:dmg,15);
+      if(isCrit) spawnDmgNum('CRIT',en.group.position.clone().add(new THREE.Vector3(0,2.2,0)),'#ffdd80',' crit');
+      SFX.lightHit();
+      hit=true;
+      G.wyrd=Math.min(G.maxWyrd,G.wyrd+0.5);
+    }
+  });
+  if(hit){ G.combo++; G.comboTimer=3.5; updateComboRank(); }
+}
+
+function doHeavyAttack(){
+  // If a NEARBY enemy is telegraphing, treat RMB as a parry
+  let nearbyTelegraph=false;
+  G.enemies.forEach(en=>{
+    if(!en.dead&&en.telegraphActive&&playerGroup.position.distanceTo(en.group.position)<6) nearbyTelegraph=true;
+  });
+  if(nearbyTelegraph&&!G.isAttacking){ doParry(); return; }
+
+  if(G.stamina<30||G.isAttacking||G.isDodging||G.isExecuting||G.isRunicSlamming) return;
+  ensureAudio();
+  G.isAttacking=true; G.attackTimer=0.55; G.isHeavyAttacking=true;
+  G.stamina=Math.max(0,G.stamina-30);
+  axeGroup.rotation.z=1.5; setTimeout(()=>axeGroup.rotation.z=0,380);
+
+  G.enemies.forEach(en=>{
+    if(en.dead) return;
+    const dist=playerGroup.position.distanceTo(en.group.position);
+    if(dist<3.2){
+      const dmg=(40+Math.random()*14)*(G.bloodDrunk?1.5:1);
+      damageEnemy(en,dmg,48);
+      SFX.heavyHit();
+      G.wyrd=Math.min(G.maxWyrd,G.wyrd+1.5);
+      G.combo++; G.comboTimer=3.5; updateComboRank();
+    }
+  });
+}
+
+function doParry(){
+  if(G.isAttacking||G.isDodging||G.stamina<15) return;
+  ensureAudio();
+  G.isParrying=true; G.parryTimer=0.45; G.parryWindow=0.35; // first 0.35s is parry-active
+  G.perfectParry=false;
+  G.stamina=Math.max(0,G.stamina-15);
+  // Shield-up animation
+  wyrdArm.rotation.z=-0.5; setTimeout(()=>wyrdArm.rotation.z=0,300);
+}
+
+function resolveParry(en){
+  // Called when enemy attacks during our parry window
+  const timing=G.parryWindow; // higher = better
+  const isPerfect=timing>0.22;
+  if(isPerfect){
+    spawnDmgNum('PERFECT PARRY',playerGroup.position.clone().add(new THREE.Vector3(0,2.5,0)),'#c8b87a',' parried');
+    G.wyrd=Math.min(G.maxWyrd,G.wyrd+2);
+    G.stamina=Math.min(G.maxStamina,G.stamina+20);
+    SFX.parry();
+    flashParry();
+    document.getElementById('parry-prompt').style.opacity='1';
+    setTimeout(()=>document.getElementById('parry-prompt').style.opacity='0',600);
+    // Stagger enemy hard
+    en.staggered=true; en.staggerTimer=5.0; en.state='staggered'; en.poise=en.maxPoise;
+    en.atkLight.intensity=0;
+    en.telegraphActive=false;
+    G.nearExecutable=true;
+  } else {
+    spawnDmgNum('PARRY',playerGroup.position.clone().add(new THREE.Vector3(0,2.2,0)),'#c8b87a',' parried');
+    SFX.parry();
+    flashParry();
+    en.staggered=true; en.staggerTimer=2.5; en.state='staggered'; en.poise=en.maxPoise;
+    en.telegraphActive=false;
+  }
+  G.isParrying=false; G.parryWindow=0;
+  return true;
+}
+
+function damageEnemy(en,dmg,poiseDmg){
+  if(en.dead) return;
+  en.hp-=dmg; en.poise-=poiseDmg;
+  spawnDmgNum(dmg,en.group.position.clone().add(new THREE.Vector3(0,en.type==='boss'?2.8:2,0)));
+  G.corruption=Math.min(100,G.corruption+3+(en.type==='boss'?2:0));
+  updateCorruption();
+  if(en.poise<=0){
+    en.staggered=true; en.staggerTimer=en.type==='boss'?3:4;
+    en.state='staggered'; en.poise=en.maxPoise;
+    en.atkLight.intensity=0; en.telegraphActive=false;
+  }
+  if(!en.dead && en.hp<en.maxHp*0.28 && en.staggered) G.nearExecutable=true;
+  // Boss phase transition — check BEFORE kill so en.dead is still false
+  if(en.type==='boss' && en.hp>0){
+    if(en.hp<en.maxHp*0.5 && en.phase===1){
+      en.phase=2; en.speed*=1.3; en.dmg*=1.2; en.attackCooldown*=0.75;
+      document.getElementById('boss-phase-label').textContent='Phase II — Unbridled Fury';
+      showStatusTag('BOSS ENRAGED','#cc2020');
+      SFX.bossRoar();
+    }
+    if(en.hp<en.maxHp*0.2 && en.phase===2){
+      en.phase=3; en.speed*=1.2; en.dmg*=1.15;
+      document.getElementById('boss-phase-label').textContent='Phase III — The Flayed God';
+      showStatusTag('FINAL PHASE','#ff0040');
+      SFX.bossRoar();
+    }
+  }
+  if(en.hp<=0) killEnemy(en);
+}
+
+function killEnemy(en){
+  if(en.dead) return;
+  en.dead=true; en.state='dead';
+  en.group.rotation.z=Math.PI/2; en.group.position.y=-0.3;
+  en.atkLight.intensity=0; en.telegraphActive=false;
+  SFX.enemyDie();
+  G.wyrd=Math.min(G.maxWyrd,G.wyrd+2.5);
+  if(en.type==='boss'){
+    document.getElementById('boss-hud').style.opacity='0';
+    setTimeout(()=>{ document.getElementById('victory-screen').className='active'; },1500);
+  }
+  setTimeout(()=>{ scene.remove(en.group); G.enemies=G.enemies.filter(e=>e!==en); },3500);
+}
+
+function doTetherHook(){
+  if(G.wyrd<2||G.isTethering||G.tetherCD>0) return;
+  ensureAudio();
+  G.wyrd-=2; G.isTethering=true; G.tetherTimer=0.4; G.tetherCD=1.2;
+  SFX.tether();
+  let nearest=null,minDist=999;
+  G.enemies.forEach(en=>{ if(en.dead) return; const d=playerGroup.position.distanceTo(en.group.position); if(d<18&&d<minDist){minDist=d;nearest=en;} });
+  if(nearest){
+    if(nearest.type!=='boss'){
+      nearest.group.position.lerp(playerGroup.position.clone().add(new THREE.Vector3(0,0,-2)),0.75);
+      nearest.staggered=true; nearest.staggerTimer=1.8; nearest.state='staggered';
+      damageEnemy(nearest,28,28);
+    } else {
+      // Launch player toward boss
+      const dir=nearest.group.position.clone().sub(playerGroup.position).normalize();
+      playerGroup.position.addScaledVector(dir,minDist*0.55);
+      G.wyrd=Math.min(G.maxWyrd,G.wyrd+2.5);
+      spawnDmgNum('GAP CLOSED',playerGroup.position.clone().add(new THREE.Vector3(0,2.5,0)),'#c85a10');
+    }
+    showTetherBeam(playerGroup.position.clone(),nearest.group.position.clone());
+  }
+}
+
+function showTetherBeam(from,to){
+  const dir=to.clone().sub(from); const len=dir.length();
+  const geo=new THREE.CylinderGeometry(0.04,0.04,len,4);
+  const mat=new THREE.MeshLambertMaterial({color:0xc85a10,emissive:0x8b2500,emissiveIntensity:2});
+  const beam=new THREE.Mesh(geo,mat);
+  const mid=from.clone().add(to).multiplyScalar(0.5); mid.y+=0.5;
+  beam.position.copy(mid); beam.lookAt(to); beam.rotateX(Math.PI/2);
+  scene.add(beam); setTimeout(()=>scene.remove(beam),280);
+}
+
+function doRunicSlam(){
+  if(G.wyrd<3||G.isRunicSlamming||G.runicSlamCD>0) return;
+  ensureAudio();
+  G.wyrd-=3; G.isRunicSlamming=true; G.runicSlamTimer=0.6; G.runicSlamCD=3.0;
+  SFX.runicSlam();
+  G.corruption=Math.min(100,G.corruption+12);
+  updateCorruption();
+
+  // Animate shockwave ring expanding
+  slamRing.visible=true;
+  slamRing.position.copy(playerGroup.position); slamRing.position.y=0.05;
+  slamRingMat.opacity=0.9;
+  let t=0;
+  const expand=setInterval(()=>{
+    t+=0.05;
+    slamRing.scale.set(1+t*18,1+t*18,1);
+    slamRingMat.opacity=Math.max(0,0.9-t*2.2);
+    if(t>=0.45){ clearInterval(expand); slamRing.visible=false; }
+  },16);
+
+  G.enemies.forEach(en=>{
+    if(en.dead) return;
+    const dist=playerGroup.position.distanceTo(en.group.position);
+    if(dist<5.5){
+      const dmg=(45+Math.random()*20)*(G.bloodDrunk?1.5:1);
+      damageEnemy(en,dmg,80);
+      en.staggered=true; en.staggerTimer=3.0; en.state='staggered';
+      G.combo++; G.comboTimer=3.5; updateComboRank();
+    }
+  });
+}
+
+function doExecute(){
+  if(!G.nearExecutable) return;
+  let target=null;
+  G.enemies.forEach(en=>{
+    if(!en.dead&&en.staggered&&en.hp<en.maxHp*0.32){
+      const d=playerGroup.position.distanceTo(en.group.position);
+      if(d<3.5) target=en;
+    }
+  });
+  if(!target) return;
+  ensureAudio();
+  G.isExecuting=true; G.nearExecutable=false;
+  SFX.execute();
+  document.getElementById('exec-prompt').style.opacity='0';
+
+  G.health=Math.min(G.maxHealth,G.health+G.maxHealth*0.18);
+  G.stamina=Math.min(G.maxStamina,G.stamina*0.5+G.maxStamina*0.5);
+  G.wyrd=Math.min(G.maxWyrd,G.wyrd+3);
+  G.corruption=Math.max(0,G.corruption-20);
+  G.combo+=3; G.comboTimer=4; updateComboRank();
+
+  // Runic extraction — grant element effect
+  if(target.type==='elite'){
+    G.extractedElement='lightning'; G.extractedTimer=20;
+    showStatusTag('LIGHTNING EXTRACTED','#aaff44');
+  } else if(target.type==='boss'){
+    G.extractedElement='fire'; G.extractedTimer=20;
+    showStatusTag('DIVINE FIRE EXTRACTED','#ff6020');
+  }
+
+  spawnDmgNum('EXECUTE',target.group.position.clone().add(new THREE.Vector3(0,3,0)),'#c8b87a');
+  killEnemy(target);
+
+  if(G.bloodDrunk){ G.bloodDrunkTimer=G.bloodDrunkTimer>0?G.bloodDrunkTimer+15:0; G.corruption=0; }
+  setTimeout(()=>{ G.isExecuting=false; updateHUD(); },550);
+}
+
+function doDodge(){
+  if(G.stamina<20||G.isDodging||G.isExecuting) return;
+  ensureAudio();
+  G.isDodging=true; G.dodgeTimer=0.42; G.dodgeInvincible=true; G.stamina-=20;
+  SFX.dodge();
+  const dir=getInputDir();
+  if(dir.lengthSq()<0.01) dir.set(-Math.sin(G.cameraYaw),0,-Math.cos(G.cameraYaw)).negate(); // back-dodge away from camera forward
+  playerGroup.position.addScaledVector(dir,DODGE_DIST);
+  setTimeout(()=>{ G.dodgeInvincible=false; },155);
+}
+
+function takeDamage(amount){
+  if(G.dodgeInvincible||G.isExecuting) return;
+  if(G.isParrying&&G.parryWindow>0) { SFX.parry(); flashParry(); G.isParrying=false; G.parryWindow=0; return; } // block with no specific enemy ref
+  ensureAudio();
+  G.trailHealth=G.health/G.maxHealth*100;
+  G.health-=amount; G.health=Math.max(0,G.health);
+  G.trailTimer=0.9; G.poise-=32; G.lastDamageTime=performance.now()/1000;
+  SFX.takeDmg(); flashHit();
+  G.stamRegenCooldown=1.5;
+  spawnDmgNum(Math.round(amount),playerGroup.position.clone().add(new THREE.Vector3(0,2.5,0)),'#cc4040');
+  if(G.health<=0){ G.health=0; G.trailHealth=0; triggerDeath(); }
+  updateHUD();
+}
+
+function triggerDeath(){
+  if(G.dead) return;
+  G.dead=true; G.started=false;
+  setTimeout(()=>{ document.getElementById('death-screen').className='active'; },1200);
+}
+
+function respawn(){
+  document.getElementById('death-screen').className='';
+  G.dead=false; G.started=true;
+  G.health=G.maxHealth*0.55; G.trailHealth=G.health/G.maxHealth*100;
+  G.stamina=G.maxStamina; G.poise=G.maxPoise; G.combo=0; G.corruption=0;
+  G.bloodDrunk=false; G.extractedElement=null;
+  G.isAttacking=false; G.isDodging=false; G.isParrying=false;
+  G.isExecuting=false; G.isRunicSlamming=false; G.isTethering=false;
+  G.dodgeInvincible=false; G.parryWindow=0; G.staggered=false;
+  playerGroup.position.set(0,0,3);
+  playerGroup.rotation.set(0,0,0);
+  updateComboRank(); updateHUD(); updateCorruption();
+  ensureAudio();
+}
+
+// ════════════════════════════════════════════════
+// CORRUPTION & BLOOD-DRUNK
+// ════════════════════════════════════════════════
+function updateCorruption(){
+  const pct=G.corruption/100;
+  const cv=document.getElementById('corrupt-vignette');
+  const bo=document.getElementById('blood-overlay');
+  cv.style.background=`radial-gradient(ellipse at center, transparent ${42-pct*20}%, rgba(160,0,10,${pct*0.45}) 100%)`;
+  cv.style.opacity=pct>0.2?pct:0;
+  if(G.bloodDrunk){ bo.style.opacity='0.18'; }
+  else { bo.style.opacity='0'; }
+
+  for(let i=0;i<8;i++){
+    const n=document.getElementById('wn'+i);
+    const wyrdI=Math.floor(G.wyrd);
+    if(i<wyrdI) n.className='wn '+(G.bloodDrunk?'blood':G.corruption>72?'corrupt':'lit');
+    else n.className='wn';
+  }
+  if(G.corruption>=100&&!G.bloodDrunk){
+    G.bloodDrunk=true; G.bloodDrunkTimer=30;
+    document.getElementById('blooddrunk-text').style.opacity='1';
+    setTimeout(()=>document.getElementById('blooddrunk-text').style.opacity='0',2800);
+    SFX.bloodDrunk();
+    showStatusTag('BLOOD-DRUNK','#ff0040');
+  }
+}
+
+// ════════════════════════════════════════════════
+// STATUS TAGS
+// ════════════════════════════════════════════════
+function showStatusTag(msg, col='#c85a10'){
+  const el=document.getElementById('status-tags');
+  const tag=document.createElement('div');
+  tag.className='status-tag'; tag.style.color=col; tag.style.borderColor=col+'55';
+  tag.textContent=msg; el.appendChild(tag);
+  setTimeout(()=>{ tag.style.transition='opacity 0.5s'; tag.style.opacity='0'; setTimeout(()=>tag.remove(),500); },2500);
+}
+
+// ════════════════════════════════════════════════
+// HUD UPDATE
+// ════════════════════════════════════════════════
+function updateHUD(){
+  const hp=G.health/G.maxHealth*100;
+  document.getElementById('health-fill').style.width=hp+'%';
+  document.getElementById('stamina-fill').style.width=(G.stamina/G.maxStamina*100)+'%';
+  document.getElementById('poise-fill').style.width=(Math.max(0,G.poise)/G.maxPoise*100)+'%';
+  if(G.trailTimer>0){ if(G.trailHealth<hp) G.trailHealth=hp; }
+  else G.trailHealth=hp;
+  document.getElementById('health-trail').style.width=G.trailHealth+'%';
+  document.getElementById('exec-prompt').style.opacity=G.nearExecutable?'1':'0';
+  if(G.boss&&!G.boss.dead&&G.bossDetected){
+    document.getElementById('boss-hud').style.opacity='1';
+    document.getElementById('boss-bar-fill').style.width=(G.boss.hp/G.boss.maxHp*100)+'%';
+  } else if(!G.boss||G.boss.dead){
+    document.getElementById('boss-hud').style.opacity='0';
+  }
+
+  // Ability cooldown display
+  const runicPct=Math.max(0,Math.min(1,G.runicSlamCD/3.0));
+  const tetherPct=Math.max(0,Math.min(1,G.tetherCD/1.2));
+  document.getElementById('cd-r').style.height=(runicPct*100)+'%';
+  document.getElementById('cd-q').style.height=(tetherPct*100)+'%';
+  document.getElementById('slot-r').className='ability-slot'+(G.wyrd>=3&&G.runicSlamCD<=0?' active-glow':'');
+  document.getElementById('slot-q').className='ability-slot'+(G.wyrd>=2&&G.tetherCD<=0?' active-glow':'');
+  document.getElementById('slot-e').className='ability-slot'+(G.nearExecutable?' active-glow':'');
+}
+
+// ════════════════════════════════════════════════
+// CHAPTER TEXT
+// ════════════════════════════════════════════════
+function showChapterText(label,name){
+  const el=document.getElementById('chapter-text');
+  el.querySelector('.chapter-label').textContent=label;
+  el.querySelector('.chapter-name').textContent=name;
+  el.style.opacity='1'; setTimeout(()=>el.style.opacity='0',3500);
+}
+
+// ════════════════════════════════════════════════
+// CAMERA & MOUSE
+// ════════════════════════════════════════════════
+let mouseLocked=false;
+document.addEventListener('click',()=>{ if(G.started) document.getElementById('c').requestPointerLock(); });
+document.addEventListener('pointerlockchange',()=>{ mouseLocked=!!document.pointerLockElement; });
+document.addEventListener('mousemove',e=>{
+  const c=document.getElementById('cursor');
+  c.style.left=e.clientX+'px'; c.style.top=e.clientY+'px';
+  if(!mouseLocked||!G.started) return;
+  G.cameraYaw-=e.movementX*0.002;
+  G.cameraPitch=Math.max(0.1,Math.min(1.1,G.cameraPitch+e.movementY*0.002));
+});
+
+// ════════════════════════════════════════════════
+// INPUT
+// ════════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  G.keys[e.key.toLowerCase()]=true;
+  if(!G.started) return;
+  if(e.key===' '){ e.preventDefault(); doDodge(); return; }
+  const k=e.key.toLowerCase();
+  if(k==='q') doTetherHook();
+  if(k==='r') doRunicSlam();
+  if(k==='e') doExecute();
+  if(k==='f') doLightAttack();
+});
+document.addEventListener('keyup',e=>{ G.keys[e.key.toLowerCase()]=false; });
+document.addEventListener('mousedown',e=>{
+  G.mouseButtons[e.button]=true;
+  if(!G.started) return;
+  ensureAudio();
+  if(e.button===0) doLightAttack();
+  if(e.button===2) doHeavyAttack();
+});
+document.addEventListener('mouseup',e=>{ G.mouseButtons[e.button]=false; });
+document.addEventListener('contextmenu',e=>e.preventDefault());
+
+// ════════════════════════════════════════════════
+// GAME START
+// ════════════════════════════════════════════════
+function startGame(){
+  ensureAudio();
+  const ts=document.getElementById('title-screen');
+  ts.style.opacity='0'; setTimeout(()=>ts.style.display='none',1200);
+  G.started=true;
+  spawnEnemies();
+  setTimeout(()=>showChapterText('Chapter I','The Ash-Mire'),1400);
+  document.getElementById('c').requestPointerLock();
+}
+window.startGame=startGame;
+
+// ════════════════════════════════════════════════
+// ENEMY AI
+// ════════════════════════════════════════════════
+const MELEE_BUDGET={count:0,cooldown:0};
+
+function updateEnemies(dt,t){
+  MELEE_BUDGET.cooldown=Math.max(0,MELEE_BUDGET.cooldown-dt);
+  if(MELEE_BUDGET.cooldown<=0) MELEE_BUDGET.count=0;
+  G.nearExecutable=false;
+
+  G.enemies.forEach(en=>{
+    if(en.dead) return;
+    const toPlayer=playerGroup.position.clone().sub(en.group.position);
+    const dist=toPlayer.length();
+
+    if(dist<25&&en.state!=='patrol'){
+      const angle=Math.atan2(toPlayer.x,toPlayer.z);
+      en.group.rotation.y+=(angle-en.group.rotation.y)*0.1;
+    }
+
+    // Execution check
+    if(en.staggered&&en.hp<en.maxHp*0.3&&dist<3.5) G.nearExecutable=true;
+
+    // Telegraph light update
+    const atkLightTarget=en.telegraphActive?4:0;
+    en.atkLight.intensity+=(atkLightTarget-en.atkLight.intensity)*dt*10;
+
+    // Stagger handling
+    if(en.staggered){
+      en.staggerTimer-=dt;
+      const maxStag=en.type==='boss'?3:4;
+      const fp=Math.min(1,Math.max(0,(maxStag-en.staggerTimer)/0.3));
+      en.group.rotation.z=(Math.PI/2)*fp;
+      if(en.staggerTimer<=0){ en.staggered=false; en.state='alert'; en.group.rotation.z=0; }
+      return;
+    }
+    en.group.rotation.z=0;
+
+    switch(en.state){
+      case 'patrol':{
+        const tx=en.patrolCenter.x+Math.cos(en.patrolAngle)*en.patrolRadius;
+        const tz=en.patrolCenter.z+Math.sin(en.patrolAngle)*en.patrolRadius;
+        const mv=new THREE.Vector3(tx-en.group.position.x,0,tz-en.group.position.z);
+        if(mv.length()<0.5) en.patrolAngle+=0.7;
+        else { mv.normalize(); en.group.position.addScaledVector(mv,en.speed*0.5*dt); }
+        const alertDist=en.type==='boss'?20:13;
+        if(dist<alertDist){
+          en.state='alert';
+          if(en.type==='boss'&&!G.bossDetected){
+            G.bossDetected=true;
+            document.getElementById('boss-hud').style.opacity='1';
+            SFX.bossRoar();
+            showChapterText('Chapter I — Final Trial','Tiw, The Flayed General');
+          }
+        }
+        break;
+      }
+      case 'alert':{
+        const alertRange=en.type==='boss'?25:18;
+        if(dist>alertRange){ en.state='patrol'; break; }
+        en.attackTimer-=dt;
+        // Advance / strafe
+        const strafeDir=new THREE.Vector3(-toPlayer.z,0,toPlayer.x).normalize();
+        en.group.position.addScaledVector(strafeDir,0.25*dt*(Math.random()<0.5?1:-1));
+        if(dist>2.8&&dist<15){
+          const approach=toPlayer.clone().normalize().multiplyScalar(en.speed*dt);
+          en.group.position.add(approach);
+        }
+        // Check attack
+        const atkRange=en.type==='boss'?3.5:2.8;
+        if(en.attackTimer<=0&&dist<atkRange&&MELEE_BUDGET.count<2){
+          en.state='telegraph';
+          en.telegraphActive=true;
+          en.telegraphTimer=en.type==='boss'?0.55:0.4;
+          MELEE_BUDGET.count++; MELEE_BUDGET.cooldown=1.5;
+        }
+        break;
+      }
+      case 'telegraph':{
+        // Wind-up visible warning
+        en.telegraphTimer-=dt;
+        if(en.telegraphTimer<=0){
+          en.telegraphActive=false;
+          en.state='attacking';
+          en.attackActive=true;
+          en.attackActiveTimer=en.type==='boss'?0.45:0.3;
+          en.isAttacking=true;
+          const lunge=toPlayer.clone().normalize().multiplyScalar(0.5);
+          en.group.position.add(lunge);
+        }
+        break;
+      }
+      case 'attacking':{
+        en.attackActiveTimer-=dt;
+        if(en.attackActive&&en.attackActiveTimer<=0){
+          en.attackActive=false; en.isAttacking=false;
+          MELEE_BUDGET.count=Math.max(0,MELEE_BUDGET.count-1);
+          if(dist<3.2){
+            if(G.isParrying&&G.parryWindow>0) resolveParry(en);
+            else takeDamage(en.dmg*(G.bloodDrunk?0.65:1));
+          }
+          en.state='recovering';
+          en.attackTimer=en.attackCooldown+(en.type==='boss'?0:Math.random());
+        }
+        break;
+      }
+      case 'recovering':{
+        en.attackTimer-=dt;
+        if(en.attackTimer<=0) en.state='alert';
+        break;
+      }
+    }
+
+    // Clamp to arena
+    const ab=ARENA_BOUND-1;
+    en.group.position.x=Math.max(-ab,Math.min(ab,en.group.position.x));
+    en.group.position.z=Math.max(-ab,Math.min(ab,en.group.position.z));
+
+    // Bob animation
+    if(en.state==='alert'||en.state==='attacking'||en.state==='telegraph'){
+      en.group.children.forEach((c,ci)=>{
+        if(c.isMesh&&c.userData.baseY!==undefined) c.position.y=c.userData.baseY+Math.sin(t*4+ci)*0.022;
+      });
+    } else {
+      en.group.children.forEach(c=>{ if(c.isMesh&&c.userData.baseY!==undefined) c.position.y=c.userData.baseY; });
+    }
+  });
+}
+
+// ════════════════════════════════════════════════
+// MAIN LOOP
+// ════════════════════════════════════════════════
+const clock=new THREE.Clock();
+
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(),0.1);
+  const t=clock.getElapsedTime();
+
+  // Torch flicker
+  torchLights.forEach(fl=>{
+    fl.intensity=fl.userData.base*(0.82+0.18*Math.sin(t*fl.userData.speed+fl.userData.phase));
+  });
+
+  if(!G.started){ renderer.render(scene,camera); return; }
+
+  // Both lights track player position directly
+  runeLight.position.set(playerGroup.position.x, playerGroup.position.y+1.3, playerGroup.position.z);
+  runeLight.intensity=1.8+G.corruption/100*3.5+(G.bloodDrunk?2:0);
+  runeLight.color.setHSL(0.04-G.corruption/100*0.04,1,0.38);
+  playerLight.position.set(playerGroup.position.x, playerGroup.position.y+1.8, playerGroup.position.z);
+
+  // Player movement
+  if(!G.isAttacking&&!G.isDodging&&!G.isExecuting&&!G.staggered&&!G.isRunicSlamming){
+    const dir=getInputDir();
+    const speed=G.keys['shift']?SPRINT_SPEED:MOVE_SPEED;
+    playerGroup.position.addScaledVector(dir,speed*dt);
+    if(dir.lengthSq()>0.01){
+      const angle=Math.atan2(dir.x,dir.z);
+      playerGroup.rotation.y+=(angle-playerGroup.rotation.y)*0.2;
+    }
+    if(G.keys['shift']&&dir.lengthSq()>0.01) G.stamina=Math.max(0,G.stamina-5*dt);
+  }
+  playerGroup.position.x=Math.max(-ARENA_BOUND,Math.min(ARENA_BOUND,playerGroup.position.x));
+  playerGroup.position.z=Math.max(-ARENA_BOUND,Math.min(ARENA_BOUND,playerGroup.position.z));
+  playerGroup.position.y=0;
+
+  // Timers
+  if(G.isAttacking){ G.attackTimer-=dt; if(G.attackTimer<=0){G.isAttacking=false;G.isHeavyAttacking=false;} }
+  if(G.isDodging){ G.dodgeTimer-=dt; if(G.dodgeTimer<=0) G.isDodging=false; }
+  if(G.isTethering){ G.tetherTimer-=dt; if(G.tetherTimer<=0) G.isTethering=false; }
+  if(G.isRunicSlamming){ G.runicSlamTimer-=dt; if(G.runicSlamTimer<=0) G.isRunicSlamming=false; }
+  if(G.isParrying){ G.parryTimer-=dt; G.parryWindow-=dt; if(G.parryTimer<=0){G.isParrying=false;G.parryWindow=0;} }
+  if(G.tetherCD>0) G.tetherCD-=dt;
+  if(G.runicSlamCD>0) G.runicSlamCD-=dt;
+  if(G.extractedTimer>0){ G.extractedTimer-=dt; if(G.extractedTimer<=0){G.extractedElement=null;} }
+  if(G.combo>0){ G.comboTimer-=dt; if(G.comboTimer<=0){G.combo=0;updateComboRank();} }
+
+  // Stamina regen
+  G.stamRegenCooldown=Math.max(0,G.stamRegenCooldown-dt);
+  if(!G.keys['shift']&&G.stamRegenCooldown<=0) G.stamina=Math.min(G.maxStamina,G.stamina+26*dt);
+
+  // Poise regen
+  const now=performance.now()/1000;
+  if(now-G.lastDamageTime>2.8) G.poise=Math.min(G.maxPoise,G.poise+38*dt);
+
+  // Corruption decay
+  G.corruption=Math.max(0,G.corruption-1.8*dt);
+  if(G.bloodDrunk){
+    G.bloodDrunkTimer-=dt;
+    G.health-=3*dt*G.maxHealth/100;
+    G.health=Math.max(1,G.health);
+    if(G.bloodDrunkTimer<=0){G.bloodDrunk=false;G.corruption=0;} 
+  }
+
+  // Trail
+  G.trailTimer-=dt;
+
+  // Enemy AI
+  updateEnemies(dt,t);
+
+  // Camera
+  const comboBoost=G.comboRank==='S'?0.6:0;
+  const camDist=5.0+comboBoost;
+  const tx=playerGroup.position.x+Math.sin(G.cameraYaw)*Math.cos(G.cameraPitch)*camDist;
+  const ty=playerGroup.position.y+Math.sin(G.cameraPitch)*camDist+1.3;
+  const tz=playerGroup.position.z+Math.cos(G.cameraYaw)*Math.cos(G.cameraPitch)*camDist;
+  camera.position.lerp(new THREE.Vector3(tx,ty,tz),0.11);
+  camera.lookAt(playerGroup.position.x,playerGroup.position.y+1.5,playerGroup.position.z);
+
+  // Axe idle / attack animation
+  if(!G.isAttacking) axeGroup.rotation.y=Math.sin(t*1.1)*0.05;
+
+  // Wyrd-Grip vein glow
+  veinMeshes.forEach((v,i)=>{
+    v.material.emissiveIntensity=(0.5+G.corruption/100*1.0)*(0.85+0.15*Math.sin(t*3.5+i));
+    if(G.bloodDrunk) v.material.emissiveIntensity*=2.5;
+    v.material.color.setHSL(0.04-G.corruption/100*0.04,1,0.3);
+    v.material.emissive.copy(v.material.color);
+  });
+
+  // Axe rune glow
+  axeRune.material.emissiveIntensity=G.extractedElement?2:0.8+G.corruption/100*0.8;
+
+  updateHUD(); updateCorruption();
+  renderer.render(scene,camera);
+}
+
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+animate();
+</script>
+</body>
+</html>

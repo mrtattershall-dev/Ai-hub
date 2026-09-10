@@ -1,0 +1,11 @@
+function _revealDeepArea(tx, ty, radius) {
+  for (let dy = -radius; dy <= radius; dy++) {
+    for (let dx = -radius; dx <= radius; dx++) {
+      if (dx*dx + dy*dy > radius*radius) continue;
+      const nx = tx + dx, ny = ty + dy;
+      if (nx >= 0 && nx < DJ_W && ny >= 0 && ny < DJ_H) {
+        exploredDeep[ny * DJ_W + nx] = 2;
+      }
+    }
+  }
+}

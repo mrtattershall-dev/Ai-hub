@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+BEHAVIORS (from js/entities/enemy.js)

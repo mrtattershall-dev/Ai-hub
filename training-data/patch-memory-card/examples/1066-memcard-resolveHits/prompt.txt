@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+resolveHits (from js/systems/combat.js)

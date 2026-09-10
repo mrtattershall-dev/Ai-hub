@@ -1,0 +1,3 @@
+[REVIEW - replace with a real instruction]
+Module: game.js
+Header hint: GAME MODULE  –  Main loop, state, race orchestration

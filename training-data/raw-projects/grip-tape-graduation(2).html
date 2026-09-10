@@ -1,0 +1,2469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grip Tape & Graduation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0f; overflow: hidden; font-family: 'Courier New', monospace; }
+  #canvas { display: block; width: 100vw; height: 100vh; }
+
+  /* Flow warp overlay — SVG filter applied via CSS */
+  #flow-warp {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 8; opacity: 0; transition: opacity 0.6s;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(255,180,0,0.06) 100%);
+  }
+  #flow-warp.active { opacity: 1; }
+
+  /* Flick-It stick visualizer */
+  #stick-hud {
+    position: fixed; bottom: 140px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 40px; pointer-events: none; z-index: 11; opacity: 0; transition: opacity 0.3s;
+  }
+  #stick-hud.visible { opacity: 1; }
+  .stick-zone {
+    width: 60px; height: 60px; border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50%; position: relative; background: rgba(0,0,0,0.4);
+  }
+  .stick-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: #ffd600;
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    transition: top 0.05s, left 0.05s;
+  }
+  .stick-label { color: #333; font-size: 9px; letter-spacing: 2px; text-align: center; margin-top: 4px; }
+
+  #hud {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 10;
+  }
+
+  #stats { position: absolute; top: 20px; left: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .stat-row { display: flex; align-items: center; gap: 8px; }
+  .stat-label { color: #aaa; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; width: 80px; }
+  .stat-bar { width: 120px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .stat-fill { height: 100%; border-radius: 2px; transition: width 0.3s ease; }
+  .stat-val { color: #fff; font-size: 11px; width: 28px; text-align: right; }
+  #stat-academics .stat-fill { background: #4fc3f7; }
+  #stat-clout .stat-fill { background: #f06292; }
+  #stat-skate .stat-fill { background: #aed581; }
+
+  #flow-section { position: absolute; top: 20px; right: 20px; text-align: right; }
+  #flow-label { color: #aaa; font-size: 11px; letter-spacing: 3px; margin-bottom: 6px; }
+  #flow-bar-wrap { width: 160px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin-left: auto; }
+  #flow-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #ff6d00, #ffd600); border-radius: 3px; transition: width 0.2s ease; }
+  #flow-state-text { color: #ffd600; font-size: 13px; font-weight: bold; letter-spacing: 2px; margin-top: 6px; opacity: 0; transition: opacity 0.3s; }
+
+  #clock-section { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); text-align: center; }
+  #period-label { color: #555; font-size: 10px; letter-spacing: 3px; margin-bottom: 3px; }
+  #clock-display { color: #888; font-size: 18px; letter-spacing: 4px; }
+
+  #location { position: absolute; top: 58px; left: 50%; transform: translateX(-50%); color: #333; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; }
+  #guard-alert { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); color: #ef5350; font-size: 13px; letter-spacing: 3px; opacity: 0; transition: opacity 0.3s; }
+
+  #bottom-hud { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); text-align: center; min-width: 300px; }
+  #trick-display { color: #fff; font-size: 22px; font-weight: bold; letter-spacing: 3px; text-shadow: 0 0 20px #ffd600; min-height: 32px; margin-bottom: 8px; opacity: 0; transition: opacity 0.4s; }
+  #flick-hint { color: #ff9800; font-size: 11px; letter-spacing: 2px; opacity: 0; transition: opacity 0.3s; margin-bottom: 4px; }
+  #grind-indicator { color: #ff9800; font-size: 13px; letter-spacing: 3px; opacity: 0; transition: opacity 0.2s; margin-bottom: 4px; }
+  #combo-score { color: #ffd600; font-size: 15px; letter-spacing: 2px; min-height: 22px; }
+  #speed-display { color: #888; font-size: 11px; letter-spacing: 2px; margin-top: 6px; }
+
+  /* Bruise — red tint on bar label when high */
+  #bruise-section { position: absolute; bottom: 30px; left: 20px; }
+  #bruise-label { color: #aaa; font-size: 10px; letter-spacing: 2px; margin-bottom: 5px; transition: color 0.5s; }
+  #bruise-bar { width: 100px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  #bruise-fill { height: 100%; width: 0%; background: #ef5350; border-radius: 2px; transition: width 0.4s ease; }
+  #recovery-hint { color: #ef5350; font-size: 9px; letter-spacing: 1px; margin-top: 4px; opacity: 0; transition: opacity 0.3s; line-height: 1.6; white-space: pre; }
+
+  #controls { position: absolute; bottom: 30px; right: 20px; color: #444; font-size: 10px; letter-spacing: 1px; line-height: 1.9; text-align: right; }
+
+  #skategram-panel {
+    position: absolute; bottom: 200px; right: 20px;
+    width: 200px; background: rgba(10,10,15,0.92);
+    border: 1px solid #222; border-radius: 4px; overflow: hidden;
+    pointer-events: all;
+  }
+  #sg-header { background: #111; padding: 8px 12px; font-size: 10px; letter-spacing: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; }
+  #sg-header span { color: #f06292; }
+  #sg-feed { padding: 8px; max-height: 120px; overflow: hidden; }
+  .sg-post { font-size: 10px; color: #444; line-height: 1.6; padding: 3px 0; border-bottom: 1px solid #1a1a1a; }
+  .sg-post.new { color: #aaa; animation: sgfade 3s forwards; }
+  @keyframes sgfade { 0%{color:#fff} 100%{color:#555} }
+  #sg-upload-btn { width: 100%; background: none; border: none; border-top: 1px solid #1a1a1a; color: #444; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; padding: 8px; cursor: pointer; transition: color 0.2s; }
+  #sg-upload-btn:hover { color: #f06292; }
+  #sg-upload-btn:disabled { color: #222; cursor: default; }
+
+  #minimap { position: absolute; bottom: 80px; right: 20px; width: 100px; height: 100px; border: 1px solid #222; border-radius: 50%; overflow: hidden; background: rgba(0,0,0,0.6); opacity: 0.7; }
+  #minimap canvas { width: 100%; height: 100%; }
+
+  #toast-stack { position: absolute; top: 120px; left: 20px; display: flex; flex-direction: column; gap: 6px; }
+  .toast { background: rgba(10,10,15,0.9); border-left: 2px solid #ffd600; padding: 6px 10px; font-size: 10px; letter-spacing: 1px; color: #888; animation: toastin 0.3s ease, toastout 0.4s ease 2.6s forwards; max-width: 200px; }
+  .toast.danger { border-left-color: #ef5350; }
+  .toast.success { border-left-color: #aed581; }
+  @keyframes toastin { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes toastout { from{opacity:1} to{opacity:0} }
+
+  #bail-flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(239,83,80,0.35); pointer-events: none; opacity: 0; transition: opacity 0.1s; z-index: 20; }
+  #bell-flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,200,0,0.18); pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 19; }
+  #bell-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #ffd600; font-size: 28px; font-weight: bold; letter-spacing: 4px; opacity: 0; transition: opacity 0.4s; pointer-events: none; text-shadow: 0 0 30px #ffd600; text-align: center; z-index: 21; }
+  #flow-vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at center, transparent 60%, rgba(255,214,0,0.08) 100%); transition: opacity 0.5s; z-index: 9; }
+
+  /* Chromatic aberration for flow state — pure CSS */
+  body.in-flow #canvas { filter: none; }
+  body.in-flow #flow-warp { opacity: 1; }
+
+  #intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0f; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 1s ease; }
+  #intro h1 { color: #fff; font-size: 42px; font-weight: 900; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 8px; }
+  #intro h1 span { color: #ffd600; }
+  #intro p { color: #555; font-size: 13px; letter-spacing: 3px; margin-bottom: 40px; }
+  #faction-select { display: flex; gap: 16px; margin-bottom: 20px; }
+  .faction-btn { background: none; border: 1px solid #333; color: #555; padding: 10px 20px; font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; pointer-events: all; }
+  .faction-btn.selected { border-color: #ffd600; color: #ffd600; }
+  .faction-btn:hover { border-color: #888; color: #aaa; }
+  .faction-desc { color: #333; font-size: 10px; letter-spacing: 1px; margin-bottom: 30px; text-align: center; max-width: 360px; line-height: 1.8; }
+  #intro-btn { background: none; border: 1px solid #333; color: #aaa; padding: 12px 32px; font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 3px; cursor: pointer; transition: all 0.2s; pointer-events: all; }
+  #intro-btn:hover { border-color: #ffd600; color: #ffd600; }
+
+  /* SVG warp filter */
+  #svg-filters { position: absolute; width: 0; height: 0; }
+
+  /* ── CONSEQUENCE SYSTEM ── */
+  #grounded-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.88); pointer-events: all; z-index: 50;
+    display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  }
+  #grounded-overlay.show { display: flex; }
+  #grounded-title { color: #ef5350; font-size: 32px; font-weight: 900; letter-spacing: 6px; margin-bottom: 12px; }
+  #grounded-sub { color: #555; font-size: 11px; letter-spacing: 3px; margin-bottom: 28px; line-height: 2.2; }
+  #grounded-timer { color: #ef5350; font-size: 42px; font-weight: 900; letter-spacing: 4px; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+  #grounded-timer-label { color: #333; font-size: 9px; letter-spacing: 3px; margin-bottom: 28px; }
+  #grounded-stats { display: flex; gap: 40px; margin-bottom: 32px; }
+  .gs-item { text-align: center; }
+  .gs-label { color: #333; font-size: 9px; letter-spacing: 2px; margin-bottom: 6px; }
+  .gs-val { font-size: 24px; font-weight: 900; }
+  .gs-val.bad { color: #ef5350; }
+  .gs-val.ok  { color: #aed581; }
+  #grounded-action { background: none; border: 1px solid #333; color: #aaa; padding: 10px 28px; font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 3px; cursor: pointer; transition: all 0.2s; }
+  #grounded-action:hover { border-color: #aed581; color: #aed581; }
+
+  .stat-label.danger { color: #ef5350 !important; animation: statpulse 1s infinite; }
+  .stat-label.warn   { color: #ff9800 !important; }
+  @keyframes statpulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  #sponsor-lock {
+    position: absolute; bottom: 330px; right: 20px;
+    background: rgba(10,10,15,0.95); border: 1px solid #ef5350;
+    border-radius: 4px; padding: 8px 12px; font-size: 9px;
+    letter-spacing: 1px; color: #ef5350; opacity: 0;
+    transition: opacity 0.4s; pointer-events: none; max-width: 200px; line-height: 1.8;
+  }
+
+  #skill-gate {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    color: #ef5350; font-size: 13px; letter-spacing: 3px; font-weight: bold;
+    opacity: 0; transition: opacity 0.15s; pointer-events: none; z-index: 30;
+    text-shadow: 0 0 20px #ef5350; text-align: center;
+  }
+
+  #fisheye-hud {
+    position: absolute; top: 112px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 10px; opacity: 0; transition: opacity 0.3s;
+  }
+  #fisheye-label { color: #333; font-size: 9px; letter-spacing: 2px; }
+  #fisheye-bar-wrap { width: 80px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+  #fisheye-bar { height: 100%; width: 0%; background: #f06292; border-radius: 2px; transition: width 0.2s; }
+  #fisheye-angle { color: #444; font-size: 9px; letter-spacing: 1px; }
+
+  #edit-suite {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.92); pointer-events: all; z-index: 60;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+  }
+  #edit-suite.show { display: flex; }
+  #edit-title { color: #fff; font-size: 18px; font-weight: 900; letter-spacing: 5px; margin-bottom: 6px; }
+  #edit-sub { color: #444; font-size: 10px; letter-spacing: 3px; margin-bottom: 24px; }
+  #edit-timeline {
+    width: 580px; max-width: 88vw; height: 64px;
+    background: rgba(255,255,255,0.02); border: 1px solid #1a1a1a;
+    border-radius: 4px; position: relative; overflow: hidden; margin-bottom: 16px; cursor: pointer;
+  }
+  .edit-clip {
+    position: absolute; top: 8px; height: 48px;
+    background: linear-gradient(135deg, #0e1a24, #1a2a3a);
+    border: 1px solid #2a4060; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: #4fc3f7; letter-spacing: 1px; transition: border-color 0.15s;
+  }
+  .edit-clip.beat { border-color: #ffd600; background: linear-gradient(135deg, #1a1a00, #2a2a00); color: #ffd600; }
+  #edit-beat-line { position: absolute; top: 0; width: 1px; height: 100%; background: rgba(255,214,0,0.5); pointer-events: none; animation: beatmove 1s linear infinite; }
+  @keyframes beatmove { 0%{left:0%} 100%{left:100%} }
+  #edit-multiplier { color: #ffd600; font-size: 28px; font-weight: 900; letter-spacing: 3px; }
+  #edit-mult-label { color: #444; font-size: 10px; letter-spacing: 2px; margin-bottom: 22px; }
+  #edit-actions { display: flex; gap: 12px; }
+  .edit-btn { background: none; border: 1px solid #333; color: #888; padding: 8px 22px; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; }
+  .edit-btn:hover { border-color: #ffd600; color: #ffd600; }
+  .edit-btn.primary { border-color: #f06292; color: #f06292; }
+  .edit-btn.primary:hover { background: rgba(240,98,146,0.15); }
+
+  /* ── CHLOE RIVAL ── */
+  #chloe-feed {
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    margin-top: 140px;
+    background: rgba(10,10,15,0.92); border: 1px solid #f06292;
+    border-radius: 4px; padding: 10px 14px; min-width: 220px; max-width: 260px;
+    opacity: 0; transition: opacity 0.4s; pointer-events: none;
+  }
+  #chloe-feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  #chloe-name { color: #f06292; font-size: 10px; letter-spacing: 3px; font-weight: bold; }
+  #chloe-followers-hud { color: #555; font-size: 9px; letter-spacing: 2px; }
+  #chloe-gap { color: #333; font-size: 9px; letter-spacing: 1px; margin-bottom: 4px; }
+  #chloe-last-post { color: #555; font-size: 9px; letter-spacing: 1px; line-height: 1.6; font-style: italic; }
+  #chloe-bar-wrap { width: 100%; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+  #chloe-bar { height: 100%; background: #f06292; border-radius: 2px; transition: width 0.5s; }
+  #chloe-bar-label { color: #333; font-size: 8px; letter-spacing: 1px; margin-top: 3px; text-align: right; }
+
+  #chloe-nearby {
+    position: absolute; top: 108px; right: 20px;
+    color: #f06292; font-size: 10px; letter-spacing: 2px;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    text-shadow: 0 0 8px rgba(240,98,146,0.5);
+  }
+
+  /* ── SHIFTY RAY'S SHOP ── */
+  #shop-prompt {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    color: #aed581; font-size: 11px; letter-spacing: 3px;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 15;
+    text-shadow: 0 0 10px rgba(174,213,129,0.4);
+  }
+  #shop-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.93); pointer-events: all; z-index: 65;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+  }
+  #shop-overlay.show { display: flex; }
+  #shop-header { text-align: center; margin-bottom: 28px; }
+  #shop-title { color: #aed581; font-size: 22px; font-weight: 900; letter-spacing: 5px; margin-bottom: 6px; }
+  #shop-sub { color: #333; font-size: 10px; letter-spacing: 3px; line-height: 1.9; }
+  #shop-funds { color: #ffd600; font-size: 13px; letter-spacing: 3px; margin-top: 8px; }
+  #shop-items {
+    display: flex; gap: 14px; margin-bottom: 28px; flex-wrap: wrap; justify-content: center;
+    max-width: 680px;
+  }
+  .shop-item {
+    background: rgba(255,255,255,0.02); border: 1px solid #1a1a1a;
+    border-radius: 4px; padding: 16px 18px; width: 145px; cursor: pointer;
+    transition: all 0.2s; text-align: center; pointer-events: all;
+  }
+  .shop-item:hover { border-color: #aed581; background: rgba(174,213,129,0.04); }
+  .shop-item.disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+  .shop-item.purchased { border-color: #ffd600; background: rgba(255,214,0,0.04); }
+  .item-icon  { font-size: 26px; margin-bottom: 8px; }
+  .item-name  { color: #aaa; font-size: 10px; letter-spacing: 2px; margin-bottom: 6px; font-weight: bold; }
+  .item-desc  { color: #444; font-size: 9px; letter-spacing: 1px; line-height: 1.7; margin-bottom: 10px; }
+  .item-price { color: #ffd600; font-size: 11px; letter-spacing: 2px; }
+  .item-price.free { color: #aed581; }
+  #shop-close { background: none; border: 1px solid #222; color: #444; padding: 8px 24px; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 3px; cursor: pointer; transition: all 0.2s; }
+  #shop-close:hover { border-color: #aed581; color: #aed581; }
+  #shop-shifty-quote { color: #333; font-size: 10px; letter-spacing: 1px; font-style: italic; margin-bottom: 20px; max-width: 400px; text-align: center; line-height: 1.8; }
+
+  /* ── PRINCIPAL VANCE ── */
+  #vance-alert {
+    position: absolute; top: 108px; left: 50%; transform: translateX(-50%);
+    color: #ff6d00; font-size: 12px; letter-spacing: 3px; font-weight: bold;
+    opacity: 0; transition: opacity 0.2s; text-shadow: 0 0 12px #ff6d00;
+    pointer-events: none;
+  }
+
+  #detention-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.92); pointer-events: all; z-index: 55;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  #detention-overlay.show { display: flex; }
+  #detention-title { color: #ff6d00; font-size: 28px; font-weight: 900; letter-spacing: 6px; margin-bottom: 10px; }
+  #detention-sub { color: #444; font-size: 11px; letter-spacing: 2px; line-height: 2.2; margin-bottom: 24px; }
+  #detention-task { 
+    background: rgba(255,109,0,0.06); border: 1px solid rgba(255,109,0,0.2);
+    padding: 16px 28px; margin-bottom: 24px; max-width: 360px;
+    color: #888; font-size: 11px; letter-spacing: 1px; line-height: 2;
+  }
+  #detention-task span { color: #ff6d00; }
+  #detention-timer { color: #ff6d00; font-size: 36px; font-weight: 900; letter-spacing: 4px; margin-bottom: 8px; }
+  #detention-timer-label { color: #333; font-size: 9px; letter-spacing: 3px; margin-bottom: 24px; }
+  #detention-action { background: none; border: 1px solid #333; color: #aaa; padding: 10px 28px; font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 3px; cursor: pointer; transition: all 0.2s; }
+  #detention-action:hover { border-color: #ff6d00; color: #ff6d00; }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="bail-flash"></div>
+<div id="bell-flash"></div>
+<div id="bell-msg"></div>
+<div id="flow-vignette"></div>
+<div id="flow-warp"></div>
+
+<!-- Grounded overlay -->
+<div id="grounded-overlay">
+  <div id="grounded-title">🏠 GROUNDED</div>
+  <div id="grounded-sub">Your parents found out.<br>Board confiscated. Curfew enforced.</div>
+  <div id="grounded-timer">00:00</div>
+  <div id="grounded-timer-label">UNTIL CURFEW LIFTS</div>
+  <div id="grounded-stats">
+    <div class="gs-item"><div class="gs-label">ACADEMICS</div><div class="gs-val" id="gs-acad">--</div></div>
+    <div class="gs-item"><div class="gs-label">CLOUT</div><div class="gs-val" id="gs-clout">--</div></div>
+    <div class="gs-item"><div class="gs-label">SKATE</div><div class="gs-val" id="gs-skate">--</div></div>
+  </div>
+  <button id="grounded-action">WAIT IT OUT →</button>
+</div>
+
+<!-- Editing suite -->
+<div id="edit-suite">
+  <div id="edit-title">EDITING SUITE</div>
+  <div id="edit-sub">MATCH TRICKS TO THE BEAT DROP FOR MULTIPLIER</div>
+  <div id="edit-timeline"><div id="edit-beat-line"></div></div>
+  <div id="edit-multiplier">1.0×</div>
+  <div id="edit-mult-label">BEAT SYNC MULTIPLIER</div>
+  <div id="edit-actions">
+    <button class="edit-btn" id="edit-discard">DISCARD</button>
+    <button class="edit-btn primary" id="edit-upload">UPLOAD PART →</button>
+  </div>
+</div>
+
+<!-- Sponsor lock badge -->
+<div id="sponsor-lock">⛔ LOW CLOUT<br>SPONSORS NOT WATCHING</div>
+
+<!-- Skill gate flash -->
+<div id="skill-gate"></div>
+
+<!-- Shop proximity prompt -->
+<div id="shop-prompt">[ T ] SHIFTY RAY'S SHOP</div>
+
+<!-- Shifty Ray's Shop -->
+<div id="shop-overlay">
+  <div id="shop-header">
+    <div id="shop-title">⚙ SHIFTY RAY'S</div>
+    <div id="shop-sub">Oakhaven's last real skate shop. Cash only.<br>Facing eviction — buy something.</div>
+    <div id="shop-funds">FUNDS: $<span id="shop-cash">0</span></div>
+  </div>
+  <div id="shop-shifty-quote"></div>
+  <div id="shop-items">
+    <div class="shop-item" data-item="icepack">
+      <div class="item-icon">🧊</div>
+      <div class="item-name">ICE PACK</div>
+      <div class="item-desc">Reduces bruise meter by 40. Get back out there.</div>
+      <div class="item-price">$20</div>
+    </div>
+    <div class="shop-item" data-item="icepack-pro">
+      <div class="item-icon">❄️</div>
+      <div class="item-name">PRO ICE PACK</div>
+      <div class="item-desc">Full bruise recovery. Shifty's secret recipe.</div>
+      <div class="item-price">$45</div>
+    </div>
+    <div class="shop-item" data-item="grip-gutter">
+      <div class="item-icon">🛹</div>
+      <div class="item-name">GUTTER GRIP</div>
+      <div class="item-desc">Custom grip tape. +8 Skate skill. Raw texture, better pop feel.</div>
+      <div class="item-price">$30</div>
+    </div>
+    <div class="shop-item" data-item="grip-pro">
+      <div class="item-icon">⚡</div>
+      <div class="item-name">PRO GRIP</div>
+      <div class="item-desc">Competition-grade tape. +15 Skate. Unlocks harder tricks sooner.</div>
+      <div class="item-price">$60</div>
+    </div>
+    <div class="shop-item" data-item="spot-map">
+      <div class="item-icon">🗺️</div>
+      <div class="item-name">SPOT MAP</div>
+      <div class="item-desc">Shifty marks hidden gaps and rails on your minimap.</div>
+      <div class="item-price">$25</div>
+    </div>
+    <div class="shop-item" data-item="energy">
+      <div class="item-icon">⚡</div>
+      <div class="item-name">LOCAL ZINE</div>
+      <div class="item-desc">+12 Academics. Counts as studying. Shifty has connections.</div>
+      <div class="item-price">$15</div>
+    </div>
+    <div class="shop-item" data-item="board-upgrade">
+      <div class="item-icon">🔧</div>
+      <div class="item-name">TUNE-UP</div>
+      <div class="item-desc">Fresh bearings & bushings. Max speed +15% for this session.</div>
+      <div class="item-price">$35</div>
+    </div>
+    <div class="shop-item" data-item="bail-insurance">
+      <div class="item-icon">🩹</div>
+      <div class="item-name">KNEE PADS</div>
+      <div class="item-desc">Next 3 bails deal 50% less bruise. Gutter Punks won't judge you.</div>
+      <div class="item-price">$18</div>
+    </div>
+  </div>
+  <button id="shop-close">LEAVE THE SHOP →</button>
+</div>
+
+<!-- Vance alert -->
+<div id="vance-alert">🧑‍💼 PRINCIPAL VANCE — RUN!</div>
+
+<!-- Detention overlay -->
+<div id="detention-overlay">
+  <div id="detention-title">📋 DETENTION</div>
+  <div id="detention-sub">Principal Vance caught you skating on school property.<br>Board confiscated. Report to Room 104.</div>
+  <div id="detention-task">
+    <span>CONSEQUENCE:</span><br>
+    Academics −20 &nbsp;·&nbsp; Clout −10<br>
+    Board returned after detention ends
+  </div>
+  <div id="detention-timer">00:00</div>
+  <div id="detention-timer-label">DETENTION REMAINING</div>
+  <button id="detention-action">SERVE YOUR TIME →</button>
+</div>
+
+<!-- SVG turbulence filter for flow warp -->
+<svg id="svg-filters" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="warp-filter" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence id="turb" type="turbulence" baseFrequency="0.012 0.008" numOctaves="2" seed="2" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" id="disp"/>
+    </filter>
+  </defs>
+</svg>
+
+<div id="intro">
+  <h1>GRIP TAPE <span>&</span> GRADUATION</h1>
+  <p>OAKHAVEN CITY — JUNIOR YEAR</p>
+  <div id="faction-select">
+    <button class="faction-btn selected" data-faction="gutter">GUTTER PUNKS</button>
+    <button class="faction-btn" data-faction="syndicate">THE SYNDICATE</button>
+    <button class="faction-btn" data-faction="vertigo">VERTIGO CREW</button>
+  </div>
+  <div class="faction-desc" id="faction-desc">DIY purists. Anti-establishment. Hidden spots, custom grip, real respect.</div>
+  <button id="intro-btn">DROP IN →</button>
+</div>
+
+<!-- Flick-It stick visualizer -->
+<div id="stick-hud">
+  <div>
+    <div class="stick-zone"><div class="stick-dot" id="lstick-dot"></div></div>
+    <div class="stick-label">BODY</div>
+  </div>
+  <div>
+    <div class="stick-zone"><div class="stick-dot" id="rstick-dot"></div></div>
+    <div class="stick-label">BOARD</div>
+  </div>
+</div>
+
+<div id="hud">
+  <div id="clock-section">
+    <div id="period-label">FREE PERIOD</div>
+    <div id="clock-display">02:00</div>
+  </div>
+  <div id="location">Westbridge High — Plaza</div>
+  <div id="guard-alert">⚠ GUARD SPOTTED YOU</div>
+  <div id="vance-hud-alert" style="position:absolute;top:108px;left:50%;transform:translateX(-50%);color:#ff6d00;font-size:12px;letter-spacing:3px;font-weight:bold;opacity:0;transition:opacity 0.2s;text-shadow:0 0 12px #ff6d00;pointer-events:none;">🧑‍💼 PRINCIPAL VANCE</div>
+
+  <div id="stats">
+    <div class="stat-row" id="stat-academics">
+      <span class="stat-label">Academics</span>
+      <div class="stat-bar"><div class="stat-fill" id="fill-academics" style="width:65%"></div></div>
+      <span class="stat-val" id="val-academics">65</span>
+    </div>
+    <div class="stat-row" id="stat-clout">
+      <span class="stat-label">Clout</span>
+      <div class="stat-bar"><div class="stat-fill" id="fill-clout" style="width:30%"></div></div>
+      <span class="stat-val" id="val-clout">30</span>
+    </div>
+    <div class="stat-row" id="stat-skate">
+      <span class="stat-label">Skate</span>
+      <div class="stat-bar"><div class="stat-fill" id="fill-skate" style="width:20%"></div></div>
+      <span class="stat-val" id="val-skate">20</span>
+    </div>
+  </div>
+
+  <div id="flow-section">
+    <div id="flow-label">FLOW STATE</div>
+    <div id="flow-bar-wrap"><div id="flow-fill"></div></div>
+    <div id="flow-state-text">IN THE ZONE</div>
+  </div>
+
+  <div id="bottom-hud">
+    <div id="trick-display"></div>
+    <div id="flick-hint"></div>
+    <div id="grind-indicator">⬛ GRINDING</div>
+    <div id="combo-score"></div>
+    <div id="speed-display">SPEED: 0 MPH</div>
+  </div>
+
+  <div id="cash-display" style="position:absolute;bottom:58px;left:20px;color:#ffd600;font-size:10px;letter-spacing:2px;">$<span id="hud-cash">80</span></div>
+  <div id="bruise-section">
+    <div id="bruise-label">BRUISE</div>
+    <div id="bruise-bar"><div id="bruise-fill"></div></div>
+    <div id="recovery-hint"></div>
+  </div>
+
+  <div id="skategram-panel">
+    <div id="sg-header"><span>SkateGram</span> <span id="sg-followers">30 followers</span></div>
+    <div id="sg-feed"></div>
+    <button id="sg-upload-btn" disabled>[ UPLOAD CLIP — SKATE FIRST ]</button>
+  </div>
+
+  <div id="controls">
+    W/↑ — PUSH<br>
+    S/↓ — BRAKE<br>
+    A/D — TURN<br>
+    SPACE — OLLIE<br>
+    ─ FLICK-IT ─<br>
+    ↑↓ (airborne) — KICKFLIP<br>
+    ←→ (airborne) — HEELFLIP<br>
+    ↑← or ↑→ — 180<br>
+    ↓← — VARIAL<br>
+    ↓→ — HARDFLIP<br>
+    SHIFT — GRIND<br>
+    G — UPLOAD CLIP<br>
+    T — SHIFTY RAY'S SHOP<br>
+    F — TOGGLE CAM NPC<br>
+    E — EDIT SUITE<br>
+    MOUSE — CAMERA<br>
+  </div>
+
+  <div id="fisheye-hud">
+    <div id="fisheye-label">📷 CAM</div>
+    <div id="fisheye-bar-wrap"><div id="fisheye-bar"></div></div>
+    <div id="fisheye-angle"></div>
+  </div>
+
+  <!-- Chloe rival feed -->
+  <div id="chloe-feed">
+    <div id="chloe-feed-header">
+      <div id="chloe-name">✦ CHLOE</div>
+      <div id="chloe-followers-hud">0 followers</div>
+    </div>
+    <div id="chloe-gap"></div>
+    <div id="chloe-last-post"></div>
+    <div id="chloe-bar-wrap"><div id="chloe-bar" style="width:0%"></div></div>
+    <div id="chloe-bar-label">YOU vs CHLOE</div>
+  </div>
+  <div id="chloe-nearby">📱 CHLOE IS FILMING HERE</div>
+
+  <div id="minimap"><canvas id="minimap-canvas" width="100" height="100"></canvas></div>
+  <div id="toast-stack"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function() {
+
+// ─── RENDERER ─────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.9;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d1117);
+scene.fog = new THREE.FogExp2(0x0d1117, 0.018);
+
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500);
+camera.position.set(0, 5, 12);
+
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
+
+// ─── LIGHTING ─────────────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0x1a1a2e, 1.2));
+const sun = new THREE.DirectionalLight(0xfff5e6, 1.8);
+sun.position.set(30, 60, 20); sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.camera.near = 1; sun.shadow.camera.far = 200;
+sun.shadow.camera.left = -80; sun.shadow.camera.right = 80;
+sun.shadow.camera.top = 80; sun.shadow.camera.bottom = -80;
+sun.shadow.bias = -0.001; scene.add(sun);
+const fill = new THREE.DirectionalLight(0x4fc3f7, 0.4);
+fill.position.set(-20, 10, -10); scene.add(fill);
+
+// ─── MATERIALS ────────────────────────────────────────────────────────────────
+function mat(color, rough=0.8, metal=0) {
+  return new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
+}
+const mats = {
+  concrete:      mat(0x2a2d35, 0.95),
+  concreteLight: mat(0x3a3d45, 0.9),
+  asphalt:       mat(0x1a1c22, 1),
+  marble:        mat(0xd4cfc8, 0.3),
+  steel:         mat(0x5a6070, 0.4, 0.8),
+  glass:         new THREE.MeshStandardMaterial({ color: 0x4fc3f7, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.25 }),
+  board:         mat(0xd4a85a, 0.6),
+  wheel:         mat(0xf5f5f5, 0.9),
+  truck:         mat(0x888ea0, 0.3, 0.9),
+  schoolbrick:   mat(0x8b4513, 0.9),
+  grass:         mat(0x1a3a0a, 1),
+  railing:       mat(0x888888, 0.4, 0.7),
+  guard:         mat(0x1a3a6a, 0.8),
+  guardFace:     mat(0xd4a574, 0.8),
+  vanceSuit:     mat(0x1a1a2a, 0.7, 0.1),
+  vanceShirt:    mat(0xd4d4cc, 0.9),
+  vanceSkin:     mat(0xd4a574, 0.8),
+  chloeJacket:   mat(0xf8f0e8, 0.6),
+  chloePants:    mat(0x1a1a2a, 0.8),
+  chloeSkin:     mat(0xf0c8a0, 0.8),
+  chloeAccent:   mat(0xf06292, 0.4, 0.3),
+};
+
+// ─── GEOMETRY HELPERS ─────────────────────────────────────────────────────────
+function box(w, h, d, material, x=0, y=0, z=0, rx=0, ry=0, rz=0) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  m.position.set(x, y, z); m.rotation.set(rx, ry, rz);
+  m.castShadow = true; m.receiveShadow = true;
+  scene.add(m); return m;
+}
+function cyl(rt, rb, h, seg, material, x=0, y=0, z=0) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), material);
+  m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true;
+  scene.add(m); return m;
+}
+
+// ─── WORLD ────────────────────────────────────────────────────────────────────
+box(200, 0.4, 200, mats.asphalt, 0, -0.2, 0);
+box(60, 0.5, 50, mats.concrete, 0, 0.25, 0);
+box(15, 0.4, 10, mats.grass, -25, 0.2, 5);
+box(15, 0.4, 10, mats.grass,  25, 0.2, 5);
+box(20, 0.4,  8, mats.grass,   0, 0.2, -30);
+box(60, 20, 8, mats.schoolbrick, 0, 10, -35);
+box(62, 0.6, 9, mats.concrete, 0, 20.3, -35);
+for (let i = -4; i <= 4; i++) {
+  for (let j = 0; j < 3; j++) {
+    const wm = new THREE.Mesh(new THREE.BoxGeometry(3.5, 3, 0.1),
+      i%2===0 && j===1 ? mats.glass : new THREE.MeshStandardMaterial({ color: 0x1a2a3a, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.7 }));
+    wm.position.set(i*6.2, 4+j*5.5, -31.1); scene.add(wm);
+  }
+}
+for (let i = 0; i < 5; i++) box(12, 0.4, 0.8, mats.concreteLight, -20, 0.2+i*0.4, -8+i*1.2);
+for (let i = 0; i < 7; i++) box(10, 0.4, 0.8, mats.concreteLight,  18, 0.2+i*0.4, -6+i*1.0);
+{
+  const rg = new THREE.CylinderGeometry(0.05, 0.05, 8, 8);
+  const r1 = new THREE.Mesh(rg, mats.railing); r1.position.set(-15,1.4,-5); r1.rotation.x=-0.28; scene.add(r1);
+  const r2 = new THREE.Mesh(rg, mats.railing); r2.position.set(-25,1.4,-5); r2.rotation.x=-0.28; scene.add(r2);
+  for (let i = 0; i < 5; i++) {
+    cyl(0.04,0.04,1.2+i*0.3,6,mats.railing,-15,0.6+i*0.4,-8+i*1.2);
+    cyl(0.04,0.04,1.2+i*0.3,6,mats.railing,-25,0.6+i*0.4,-8+i*1.2);
+  }
+}
+box(14, 0.6, 1.2, mats.marble,  5, 0.8, 10);
+box(14, 0.6, 1.2, mats.marble,  5, 0.8, 13);
+box(8,  0.6, 1.2, mats.marble, -10, 0.8, 10);
+function makeRail(x, z, len, ry=0) {
+  const r = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,len,8), mats.railing);
+  r.position.set(x,1.0,z); r.rotation.y=ry; r.castShadow=true; scene.add(r);
+}
+makeRail(-5, 17, 10); makeRail(15, -5, 8, 0.4);
+
+// ── Shifty Ray's Shop — bottom-left of plaza ──
+// Shop building
+box(10, 6, 7, mat(0x2a2020, 0.9), -24, 3.5, 20);          // main structure
+box(10.4, 0.3, 7.4, mat(0x1a1a1a, 0.95), -24, 6.65, 20);  // flat roof
+box(10, 0.15, 7, mat(0x3a2a1a, 0.8), -24, 0.575, 20);      // floor
+// Shutters / rolling door (front face, partial)
+box(4, 3.5, 0.15, mat(0x3a3a3a, 0.7, 0.3), -24, 2.25, 16.56); // door
+// Sign board above door
+box(7, 1.0, 0.2, mat(0x1a0a0a, 0.9), -24, 5.8, 16.5);
+// Sign text backing (yellow strip)
+box(6, 0.35, 0.22, mat(0xffd600, 0.5), -24, 5.8, 16.5);
+// Window (left of door)
+const shopWinMat = new THREE.MeshStandardMaterial({color:0x4fc3f7,roughness:0.1,transparent:true,opacity:0.3,emissive:0x4fc3f7,emissiveIntensity:0.08});
+const shopWin = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.2, 0.1), shopWinMat);
+shopWin.position.set(-27.5, 2.6, 16.55); scene.add(shopWin);
+// Window glow (point light inside)
+const shopLight = new THREE.PointLight(0xffc060, 0.8, 8);
+shopLight.position.set(-24, 3, 18); scene.add(shopLight);
+// Sticker clutter on window
+[[-27.2,3.5],[-27.8,2.2],[-26.9,2.8]].forEach(([sx,sy])=>{
+  const stk=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.3,0.05),mat(Math.random()>0.5?0xef5350:0xffd600,0.6));
+  stk.position.set(sx,sy,16.6); scene.add(stk);
+});
+// Boards leaning outside (visual props)
+[-22.5,-21.8,-21.2].forEach((bx,i)=>{
+  const board=new THREE.Mesh(new THREE.BoxGeometry(0.22,2.4,0.06),mat(0xd4a85a,0.5));
+  board.position.set(bx,1.7,16.4); board.rotation.z=(i-1)*0.12; board.castShadow=true; scene.add(board);
+});
+// Step up to door
+box(4, 0.15, 0.8, mat(0x3a3030,0.9), -24, 0.575, 16.1);
+// Eviction notice on door (small paper)
+const noticeGeo = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.9,0.05), mat(0xf5f0dc,0.8));
+noticeGeo.position.set(-22.8, 2.8, 16.52); noticeGeo.rotation.z=0.08; scene.add(noticeGeo);
+const sculptureGeo = new THREE.Mesh(new THREE.OctahedronGeometry(2,1), mats.steel);
+sculptureGeo.position.set(-5,2,-5); sculptureGeo.castShadow=true; scene.add(sculptureGeo);
+function bench(x, z, ry=0) {
+  const g = new THREE.Group();
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(3,0.12,0.8), mats.concreteLight);
+  seat.position.y=0.6; g.add(seat);
+  [-1.2,1.2].forEach(dx => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.6,0.8), mats.steel);
+    leg.position.set(dx,0.3,0); g.add(leg);
+  });
+  g.position.set(x,0.5,z); g.rotation.y=ry;
+  g.traverse(c => { c.castShadow=true; c.receiveShadow=true; });
+  scene.add(g);
+}
+bench(-5,15); bench(10,15,0.3); bench(-12,-2,-0.2); bench(8,-12);
+function lamp(x, z) {
+  cyl(0.06,0.06,8,6,mats.steel,x,4,z);
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.05,0.05,1.5), mats.steel);
+  arm.position.set(x,7.8,z-0.7); scene.add(arm);
+  cyl(0.3,0.3,0.2,8,new THREE.MeshStandardMaterial({color:0xffc947,emissive:0xffc947,emissiveIntensity:2}),x,7.6,z-1.3);
+  const pl = new THREE.PointLight(0xffc947,1.5,18); pl.position.set(x,7.2,z-1.3); scene.add(pl);
+}
+// Full lamps (with point light) — only nearest two
+lamp(-22,2); lamp(22,2);
+// Decorative lamps (visual only, no point light) — save GPU
+function lampDecor(x, z) {
+  cyl(0.06,0.06,8,6,mats.steel,x,4,z);
+  const arm=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.05,1.5),mats.steel);
+  arm.position.set(x,7.8,z-0.7); scene.add(arm);
+  cyl(0.3,0.3,0.2,8,new THREE.MeshStandardMaterial({color:0xffc947,emissive:0xffc947,emissiveIntensity:1.5}),x,7.6,z-1.3);
+}
+lampDecor(-22,-20); lampDecor(22,-20); lampDecor(0,-20);
+const bColors = [0x1a1f2e,0x0f1419,0x1e2533,0x161b26];
+[[-50,25,-60],[50,35,-60],[-70,18,-50],[70,40,-55],[-35,20,-80],[35,28,-80],[0,45,-90],[-80,15,-70],[80,22,-70]].forEach(([x,h,z]) => {
+  box(Math.random()*8+6,h,Math.random()*8+6,mat(bColors[Math.floor(Math.random()*4)],0.9,0.1),x,h/2,z);
+  for (let i=0;i<15;i++) {
+    const on=Math.random()>0.5;
+    const wm=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.6,0.05),new THREE.MeshStandardMaterial({color:on?0xffd600:0x1a2a4a,emissive:on?0xffaa00:0,emissiveIntensity:on?0.8:0}));
+    wm.position.set(x+(Math.random()-0.5)*6,Math.random()*h*0.8+2,z+Math.random()*0.5-Math.random()*0.5); scene.add(wm);
+  }
+});
+
+// ─── GUARDS ───────────────────────────────────────────────────────────────────
+const guards = [];
+function makeGuard(x, z, patrolA, patrolB) {
+  const g = new THREE.Group();
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.35,0.55,0.28), mats.guard);
+  torso.position.y=1.0; torso.castShadow=true; g.add(torso);
+  const hd = new THREE.Mesh(new THREE.BoxGeometry(0.26,0.26,0.26), mats.guardFace);
+  hd.position.y=1.42; hd.castShadow=true; g.add(hd);
+  const cap2 = new THREE.Mesh(new THREE.BoxGeometry(0.30,0.07,0.30), mat(0x0a1a3a));
+  cap2.position.y=1.58; g.add(cap2);
+  [-0.10,0.10].forEach(lx => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.13,0.38,0.14), mat(0x0a1a3a));
+    leg.position.set(lx,0.49,-0.05); leg.castShadow=true; g.add(leg);
+  });
+  const coneMat = new THREE.MeshBasicMaterial({ color:0xef5350, transparent:true, opacity:0.0, side:THREE.DoubleSide, depthWrite:false });
+  const coneMesh = new THREE.Mesh(new THREE.ConeGeometry(4,8,8,1,true), coneMat);
+  coneMesh.position.set(0,0.8,-4); coneMesh.rotation.x=Math.PI/2; g.add(coneMesh);
+  g.position.set(x,0.5,z); scene.add(g);
+  guards.push({ group:g, patrolA:new THREE.Vector3(patrolA[0],0.5,patrolA[1]), patrolB:new THREE.Vector3(patrolB[0],0.5,patrolB[1]), target:0, speed:2.2+Math.random()*0.5, alertLevel:0, coneMat });
+}
+makeGuard(-18,-5,[-18,-5],[-18,12]);
+makeGuard(16,-8,[16,-8],[0,-8]);
+makeGuard(3,-22,[-10,-22],[10,-22]);
+
+// ─── PRINCIPAL VANCE ─────────────────────────────────────────────────────────
+// Vance is the primary antagonist. Faster than guards, wider detection cone,
+// direct-chases the player rather than patrolling. Spawns near school entrance.
+// Catching player triggers detention (worse than guards).
+
+const vanceGroup = new THREE.Group();
+
+// Body — dark suit
+const vanceTorso = new THREE.Mesh(new THREE.BoxGeometry(0.38,0.62,0.30), mats.vanceSuit);
+vanceTorso.position.y = 1.05; vanceTorso.castShadow = true; vanceGroup.add(vanceTorso);
+
+// Tie
+const vanceTie = new THREE.Mesh(new THREE.BoxGeometry(0.07,0.45,0.04), mat(0x8b0000, 0.8));
+vanceTie.position.set(0, 1.05, 0.16); vanceGroup.add(vanceTie);
+
+// Shirt collar
+const vanceShirt = new THREE.Mesh(new THREE.BoxGeometry(0.22,0.12,0.05), mats.vanceShirt);
+vanceShirt.position.set(0, 1.32, 0.15); vanceGroup.add(vanceShirt);
+
+// Head
+const vanceHead = new THREE.Mesh(new THREE.BoxGeometry(0.28,0.30,0.28), mats.vanceSkin);
+vanceHead.position.y = 1.52; vanceHead.castShadow = true; vanceGroup.add(vanceHead);
+
+// Glasses
+const glassL = new THREE.Mesh(new THREE.BoxGeometry(0.10,0.06,0.02), mat(0x111111, 0.2, 0.9));
+glassL.position.set(-0.07, 1.54, 0.15); vanceGroup.add(glassL);
+const glassR = new THREE.Mesh(new THREE.BoxGeometry(0.10,0.06,0.02), mat(0x111111, 0.2, 0.9));
+glassR.position.set( 0.07, 1.54, 0.15); vanceGroup.add(glassR);
+const glassBridge = new THREE.Mesh(new THREE.BoxGeometry(0.04,0.02,0.02), mat(0x111111, 0.2, 0.9));
+glassBridge.position.set(0, 1.54, 0.15); vanceGroup.add(glassBridge);
+
+// Hair (thin, receding)
+const vanceHair = new THREE.Mesh(new THREE.BoxGeometry(0.27,0.04,0.20), mat(0x1a1a1a, 0.9));
+vanceHair.position.set(0, 1.68, -0.02); vanceGroup.add(vanceHair);
+
+// Arms (suit)
+[-0.28, 0.28].forEach(x => {
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.13,0.45,0.14), mats.vanceSuit);
+  arm.position.set(x, 1.0, 0); arm.castShadow = true; vanceGroup.add(arm);
+});
+
+// Clipboard prop (in right hand)
+const clipboard = new THREE.Mesh(new THREE.BoxGeometry(0.18,0.24,0.02), mat(0xc8a850, 0.6));
+clipboard.position.set(0.36, 0.82, 0.05); clipboard.rotation.z = 0.15; vanceGroup.add(clipboard);
+
+// Legs
+[-0.10, 0.10].forEach(lx => {
+  const leg = new THREE.Mesh(new THREE.BoxGeometry(0.15,0.45,0.16), mats.vanceSuit);
+  leg.position.set(lx, 0.52, 0); leg.castShadow = true; vanceGroup.add(leg);
+});
+
+// Shoes
+[-0.10, 0.10].forEach(lx => {
+  const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.14,0.08,0.22), mat(0x0a0a0a, 0.9));
+  shoe.position.set(lx, 0.24, 0.04); vanceGroup.add(shoe);
+});
+
+// Wide detection cone — angrier red than guards
+const vanceConemat = new THREE.MeshBasicMaterial({ color:0xff6d00, transparent:true, opacity:0.0, side:THREE.DoubleSide, depthWrite:false });
+const vanceCone = new THREE.Mesh(new THREE.ConeGeometry(6, 10, 8, 1, true), vanceConemat);
+vanceCone.position.set(0, 1.0, -5); vanceCone.rotation.x = Math.PI / 2;
+vanceGroup.add(vanceCone);
+
+vanceGroup.position.set(0, 0.5, -28); // starts near school entrance
+vanceGroup.visible = false;
+scene.add(vanceGroup);
+
+const vance = {
+  group:      vanceGroup,
+  coneMat:    vanceConemat,
+  pos:        new THREE.Vector3(0, 0.5, -28),
+  alertLevel: 0,
+  state:      'idle',    // 'idle' | 'patrol' | 'chase' | 'returning'
+  patrolTimer:0,
+  patrolTarget: new THREE.Vector3(0, 0.5, -28),
+  active:     false,     // spawns in after first bell
+  legPhase:   0,         // walk anim
+  detentionActive: false,
+  detentionTimer:  0,
+};
+
+// Patrol waypoints — wanders around school entrance and front plaza
+const vanceWaypoints = [
+  new THREE.Vector3(-8,  0.5, -20),
+  new THREE.Vector3( 8,  0.5, -20),
+  new THREE.Vector3( 0,  0.5, -15),
+  new THREE.Vector3(-12, 0.5, -12),
+  new THREE.Vector3( 12, 0.5, -12),
+  new THREE.Vector3( 0,  0.5, -25),
+];
+let vanceWPIdx = 0;
+
+// Scratch vectors for Vance AI (reuse pool)
+const _vv1 = new THREE.Vector3();
+const _vv2 = new THREE.Vector3();
+
+// ─── CHLOE (RIVAL) ───────────────────────────────────────────────────────────
+// Wealthy rival. Manufactured clout, private park access, top-tier gear.
+// Spawns at the plaza ledges, films herself, posts frequently.
+// Her follower count grows independently — player must outpace her.
+
+const chloeGroup = new THREE.Group();
+
+// Body — white/cream jacket (influencer aesthetic)
+const chloeTorso = new THREE.Mesh(new THREE.BoxGeometry(0.32,0.58,0.26), mats.chloeJacket);
+chloeTorso.position.y = 1.0; chloeTorso.castShadow = true; chloeGroup.add(chloeTorso);
+
+// Pink stripe on jacket
+const chloeStripe = new THREE.Mesh(new THREE.BoxGeometry(0.04,0.58,0.27), mats.chloeAccent);
+chloeStripe.position.set(0.12, 1.0, 0); chloeGroup.add(chloeStripe);
+
+// Head
+const chloeHead = new THREE.Mesh(new THREE.BoxGeometry(0.26,0.28,0.26), mats.chloeSkin);
+chloeHead.position.y = 1.48; chloeHead.castShadow = true; chloeGroup.add(chloeHead);
+
+// Hair (long, dark)
+const chloeHairBack = new THREE.Mesh(new THREE.BoxGeometry(0.28,0.55,0.08), mat(0x1a0808, 0.9));
+chloeHairBack.position.set(0, 1.28, -0.14); chloeGroup.add(chloeHairBack);
+const chloeHairTop = new THREE.Mesh(new THREE.BoxGeometry(0.30,0.06,0.28), mat(0x1a0808, 0.9));
+chloeHairTop.position.set(0, 1.66, 0); chloeGroup.add(chloeHairTop);
+
+// Arms
+[-0.24, 0.24].forEach(x => {
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.11,0.42,0.12), mats.chloeJacket);
+  arm.position.set(x, 0.97, 0); arm.castShadow = true; chloeGroup.add(arm);
+});
+
+// Pants
+[-0.09, 0.09].forEach(lx => {
+  const leg = new THREE.Mesh(new THREE.BoxGeometry(0.13,0.46,0.14), mats.chloePants);
+  leg.position.set(lx, 0.49, 0); leg.castShadow = true; chloeGroup.add(leg);
+});
+
+// Shoes (white sneakers)
+[-0.09, 0.09].forEach(lx => {
+  const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.13,0.08,0.22), mat(0xf5f5f5, 0.5));
+  shoe.position.set(lx, 0.22, 0.04); chloeGroup.add(shoe);
+});
+
+// Phone in hand (she's always filming)
+const chloePhone = new THREE.Mesh(new THREE.BoxGeometry(0.06,0.12,0.01), mat(0x111111, 0.2, 0.8));
+chloePhone.position.set(-0.30, 1.05, 0.08); chloeGroup.add(chloePhone);
+const phoneScreen = new THREE.Mesh(new THREE.BoxGeometry(0.05,0.10,0.012),
+  new THREE.MeshStandardMaterial({color:0xf06292,emissive:0xf06292,emissiveIntensity:0.6}));
+phoneScreen.position.set(-0.30, 1.05, 0.09); chloeGroup.add(phoneScreen);
+
+// Skateboard (premium, clean)
+const chloeBoardMesh = new THREE.Mesh(new THREE.BoxGeometry(0.75,0.08,2.2),
+  new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.4}));
+chloeBoardMesh.position.y = 0.22; chloeGroup.add(chloeBoardMesh);
+// Board graphic (pink stripe)
+const chloeGraphic = new THREE.Mesh(new THREE.BoxGeometry(0.75,0.085,1.0), mats.chloeAccent);
+chloeGraphic.position.set(0, 0.22, 0.2); chloeGroup.add(chloeGraphic);
+
+chloeGroup.position.set(12, 0.5, 10);
+chloeGroup.visible = false;
+scene.add(chloeGroup);
+
+// Chloe spot locations — she visits the best spots
+const chloeSpots = [
+  new THREE.Vector3(5,  0.5, 10),   // marble ledge
+  new THREE.Vector3(5,  0.5, 13),   // second ledge
+  new THREE.Vector3(-5, 0.5, -5),   // sculpture
+  new THREE.Vector3(12, 0.5, 8),    // open plaza
+  new THREE.Vector3(0,  0.5, 5),    // center
+];
+let chloeSpotIdx = 0;
+let chloeSpotTimer = 0;
+
+const chloe = {
+  group:       chloeGroup,
+  board:       chloeBoardMesh,
+  followers:   2400,       // starts way ahead of player
+  postTimer:   0,          // time until next auto-post
+  spotDwellTime: 0,        // how long she's been at current spot
+  active:      false,
+  legPhase:    0,
+  state:       'skating',  // 'skating' | 'filming' | 'posing'
+  stateTimer:  0,
+};
+
+// Scratch vec for Chloe
+const _cv1 = new THREE.Vector3();
+
+// Manufactured comments — always over the top
+const chloeComments = [
+  'brand deal incoming omg',
+  'content queen 👑',
+  '50k by summer no cap',
+  'SPONSORED collab dropping soon',
+  'private park privileges hit different',
+  'my followers went crazy for this',
+  'algorithm loves me rn',
+  'gear budget = unlimited lol',
+];
+
+const chloePostTypes = [
+  'GOLDEN HOUR TRICK SHOT',
+  'PRIVATE PARK EXCLUSIVE',
+  'SPONSORED CONTENT',
+  'COLLAB WITH @BRAND',
+  'FILTERED LINE AT THE PLAZA',
+  'PERFECTLY EDITED REEL',
+];
+
+// ─── SKATER ───────────────────────────────────────────────────────────────────
+const skaterGroup = new THREE.Group();
+scene.add(skaterGroup);
+skaterGroup.position.set(0,0.5,8);
+const boardMesh = new THREE.Mesh(new THREE.BoxGeometry(0.8,0.10,2.4), mats.board);
+boardMesh.position.y=0.245; boardMesh.castShadow=true; skaterGroup.add(boardMesh);
+[-0.75,0.75].forEach(tz => {
+  const truck=new THREE.Mesh(new THREE.BoxGeometry(0.75,0.07,0.22),mats.truck);
+  truck.position.set(0,0.16,tz); skaterGroup.add(truck);
+  [-0.33,0.33].forEach(x => {
+    const wheel=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.10,12),mats.wheel);
+    wheel.rotation.z=Math.PI/2; wheel.position.set(x,0.12,tz); skaterGroup.add(wheel);
+  });
+});
+[-0.10,0.10].forEach(x => {
+  const leg=new THREE.Mesh(new THREE.BoxGeometry(0.13,0.38,0.14),mat(0x1a237e));
+  leg.position.set(x,0.49,-0.05); leg.castShadow=true; skaterGroup.add(leg);
+});
+const body=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.65,0.28),mat(0x2c3e50));
+body.position.set(0,1.0,-0.08); body.castShadow=true; skaterGroup.add(body);
+[[-0.26,1.0],[0.26,1.0]].forEach(([x,y]) => {
+  const arm=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.40,0.13),mat(0x2c3e50));
+  arm.position.set(x,y,-0.05); arm.castShadow=true; skaterGroup.add(arm);
+});
+const head=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.28,0.28),mat(0xd4a574));
+head.position.set(0,1.47,-0.08); head.castShadow=true; skaterGroup.add(head);
+const cap=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.08,0.32),mat(0x1a1a1a));
+cap.position.set(0,1.63,-0.08); skaterGroup.add(cap);
+
+// ─── PHYSICS CONSTANTS ────────────────────────────────────────────────────────
+const GRAVITY=-18, GROUND_Y=0, PUSH_FORCE=28, FRICTION=0.97, TURN_SPEED=2.2, MAX_SPEED=40;
+const obstacles=[
+  {minX:-2,  maxX:12, minZ:9.4,   maxZ:10.6, topY:1.1},
+  {minX:-2,  maxX:12, minZ:12.4,  maxZ:13.6, topY:1.1},
+  {minX:-14, maxX:-6, minZ:9.4,   maxZ:10.6, topY:1.1},
+  {minX:-30, maxX:30, minZ:-25.5, maxZ:25.5, topY:0.5},
+];
+
+// ─── PLAYER STATE ─────────────────────────────────────────────────────────────
+const player = {
+  pos: new THREE.Vector3(0,0.5,8), vel: new THREE.Vector3(),
+  onGround:true, grinding:false, grindTime:0,
+  speed:0, facing:0, ollieTime:0, isOllying:false,
+  trickAir:null, trickAngle:0,
+  bruise:0, flow:0, lastTricks:[], comboScore:0, airTime:0,
+  academics:65, clout:30, skate:20,
+  clipScore:0, pendingUpload:false,
+  busted:false, bustedTimer:0,
+};
+// Reusable scratch vectors — avoid per-frame allocation
+const _v1 = new THREE.Vector3();
+const _v2 = new THREE.Vector3();
+const _v3 = new THREE.Vector3();
+
+// ─── INPUT ────────────────────────────────────────────────────────────────────
+const keys = {};
+document.addEventListener('keydown', e => { keys[e.code]=true; e.preventDefault?.(); });
+document.addEventListener('keyup',   e => { keys[e.code]=false; });
+let camYaw=0, camPitch=0.28;
+canvas.addEventListener('mousedown', ()=>canvas.requestPointerLock?.());
+document.addEventListener('mousemove', e => {
+  if (document.pointerLockElement===canvas) {
+    camYaw  -= e.movementX*0.003;
+    camPitch = Math.max(0.05, Math.min(0.8, camPitch+e.movementY*0.002));
+  }
+});
+
+// ─── DOM CACHE (queried once, never per-frame) ────────────────────────────────
+const trickDisplay    = document.getElementById('trick-display');
+const elFlowFill      = document.getElementById('flow-fill');
+const elFlowText      = document.getElementById('flow-state-text');
+const elFlowVignette  = document.getElementById('flow-vignette');
+const elSpeedDisplay  = document.getElementById('speed-display');
+const elComboScore    = document.getElementById('combo-score');
+const elGrindIndicator= document.getElementById('grind-indicator');
+const elGuardAlert    = document.getElementById('guard-alert');
+const elBailFlash     = document.getElementById('bail-flash');
+const elBruiseFill    = document.getElementById('bruise-fill');
+const elBruiseLabel   = document.getElementById('bruise-label');
+const elRecoveryHint  = document.getElementById('recovery-hint');
+const elSponsorLock   = document.getElementById('sponsor-lock');
+const elSkillGate     = document.getElementById('skill-gate');
+const elFisheyeHud    = document.getElementById('fisheye-hud');
+const elFisheyeBar    = document.getElementById('fisheye-bar');
+const elFisheyeAngle  = document.getElementById('fisheye-angle');
+const elFlickHint     = document.getElementById('flick-hint');
+const elFillAcad      = document.getElementById('fill-academics');
+const elValAcad       = document.getElementById('val-academics');
+const elFillClout     = document.getElementById('fill-clout');
+const elValClout      = document.getElementById('val-clout');
+const elFillSkate     = document.getElementById('fill-skate');
+const elValSkate      = document.getElementById('val-skate');
+const elAcadLabel     = document.querySelector('#stat-academics .stat-label');
+const elCloutLabel    = document.querySelector('#stat-clout .stat-label');
+const elSkateLabel    = document.querySelector('#stat-skate .stat-label');
+const elGroundedTimer   = document.getElementById('grounded-timer');
+const elVanceHudAlert   = document.getElementById('vance-hud-alert');
+const elDetentionOverlay= document.getElementById('detention-overlay');
+const elDetentionTimer  = document.getElementById('detention-timer');
+const elChloeFeed       = document.getElementById('chloe-feed');
+const elChloeFollHud    = document.getElementById('chloe-followers-hud');
+const elChloeGap        = document.getElementById('chloe-gap');
+const elChloeLastPost   = document.getElementById('chloe-last-post');
+const elChloeBar        = document.getElementById('chloe-bar');
+const elChloeNearby     = document.getElementById('chloe-nearby');
+const elShopPrompt      = document.getElementById('shop-prompt');
+const elShopOverlay     = document.getElementById('shop-overlay');
+const elShopCash        = document.getElementById('shop-cash');
+const elEditSuite       = document.getElementById('edit-suite');
+const elBellFlash       = document.getElementById('bell-flash');
+const elBellMsg         = document.getElementById('bell-msg');
+const elLStickDot       = document.getElementById('lstick-dot');
+const elRStickDot       = document.getElementById('rstick-dot');
+const elStickHud        = document.getElementById('stick-hud');
+let trickTimeout = null;
+
+// ─── FLICK-IT SYSTEM ──────────────────────────────────────────────────────────
+// Arrow keys simulate right-stick input. Track gesture while airborne.
+// Gestures are evaluated on key combo at moment of press.
+const flickGestures = {
+  // right-stick: up+down = kickflip, left+right = heelflip
+  // diagonal combos = rotations / varials
+  'up':        { name:'KICKFLIP',     score:100, axis:'z', dir: 1 },
+  'down':      { name:'KICKFLIP',     score:100, axis:'z', dir: 1 },  // same
+  'left':      { name:'HEELFLIP',     score:100, axis:'z', dir:-1 },
+  'right':     { name:'HEELFLIP',     score:100, axis:'z', dir: 1 },
+  'up-left':   { name:'BACKSIDE 180', score:150, axis:'y', dir: 1 },
+  'up-right':  { name:'FRONTSIDE 180',score:150, axis:'y', dir:-1 },
+  'down-left': { name:'VARIAL FLIP',  score:200, axis:'z', dir: 1 },
+  'down-right':{ name:'HARDFLIP',     score:250, axis:'z', dir:-1 },
+};
+
+// Map arrow keys to right-stick directions
+function getFlickDir() {
+  const u = keys['ArrowUp']   || keys['KeyI'];
+  const d = keys['ArrowDown'] || keys['KeyK'];
+  const l = keys['ArrowLeft'] || keys['KeyJ'];
+  const r = keys['ArrowRight']|| keys['KeyL'];
+  if (u && l) return 'up-left';
+  if (u && r) return 'up-right';
+  if (d && l) return 'down-left';
+  if (d && r) return 'down-right';
+  if (u) return 'up';
+  if (d) return 'down';
+  if (l) return 'left';
+  if (r) return 'right';
+  return null;
+}
+
+let lastFlickDir = null;
+let flickQueued  = null;   // trick queued for next airborne frame
+
+document.addEventListener('keydown', e => {
+  // SHIFT = grind
+  if (e.code==='ShiftLeft' && player.onGround && player.speed>2) player.grinding=true;
+  // G = upload
+  if (e.code==='KeyG' && player.pendingUpload) uploadClip();
+  // SPACE = ollie (handled in update)
+
+  // Flick-It: register trick gesture while airborne
+  if (player.isOllying && !player.trickAir) {
+    const dir = getFlickDir();
+    if (dir && flickGestures[dir]) {
+      flickQueued = dir;
+    }
+  }
+});
+document.addEventListener('keyup', e => {
+  if (e.code==='ShiftLeft') { player.grinding=false; player.grindTime=0; }
+});
+
+// Update stick visualizer positions each frame
+function updateStickHud(hspd) {
+  if (!player.isOllying && player.onGround) {
+    elStickHud.classList.remove('visible');
+    return;
+  }
+  elStickHud.classList.add('visible');
+  // Left stick = movement direction
+  const lx = -Math.sin(player.facing)*25 * (hspd/MAX_SPEED);
+  const lz = -Math.cos(player.facing)*25 * (hspd/MAX_SPEED);
+  const ld=elLStickDot;
+  ld.style.left = (50 + lx) + '%'; ld.style.top = (50 + lz) + '%';
+  // Right stick = current flick direction
+  const dir = getFlickDir();
+  const rd=elRStickDot;
+  const rx = dir ? (dir.includes('right') ? 25 : dir.includes('left') ? -25 : 0) : 0;
+  const rz = dir ? (dir.includes('up')    ? -25 : dir.includes('down') ? 25  : 0) : 0;
+  rd.style.left = (50+rx)+'%'; rd.style.top = (50+rz)+'%';
+}
+
+
+
+// ─── BELL SYSTEM ──────────────────────────────────────────────────────────────
+const periods=[
+  {name:'PERIOD 1',duration:180,skate:false},
+  {name:'PASSING', duration: 30,skate:true },
+  {name:'PERIOD 2',duration:180,skate:false},
+  {name:'PASSING', duration: 30,skate:true },
+  {name:'FREE PER',duration:120,skate:true },
+  {name:'PERIOD 3',duration:180,skate:false},
+  {name:'LUNCH',   duration: 90,skate:true },
+  {name:'PERIOD 4',duration:180,skate:false},
+];
+let periodIdx=4, periodTimer=120;
+
+function updateClock() {
+  const p=periods[periodIdx];
+  const mins=Math.floor(periodTimer/60), secs=Math.floor(periodTimer%60);
+  document.getElementById('period-label').textContent=p.name;
+  document.getElementById('clock-display').textContent=String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
+}
+function ringBell() {
+  elBellFlash.style.opacity='1';
+  setTimeout(()=>{elBellFlash.style.opacity='0';},300);
+  const p=periods[periodIdx];
+  const bm=elBellMsg;
+  bm.textContent=p.skate?'🛹 '+p.name+' — SKATE!':'🔔 '+p.name+' — GET TO CLASS!';
+  bm.style.opacity='1';
+  setTimeout(()=>bm.style.opacity='0',2500);
+  // Spawn NPCs on any bell after their period threshold (not gated to skate periods)
+  if (!vance.active && periodIdx >= 1) {
+    vance.active = true;
+    vance.group.visible = true;
+    vance.state = 'patrol';
+    toast('Principal Vance has entered the building.', 'danger');
+  }
+  if (!chloe.active && periodIdx >= 2) {
+    chloe.active = true;
+    chloe.group.visible = true;
+    chloe.postTimer = 5;
+    toast('Chloe just showed up. She already has her camera out.', '');
+  }
+  if (p.skate) {
+    toast('Free time — skate!','success');
+    guards.forEach(g=>g.speed=1.5+Math.random()*0.5);
+  } else {
+    toast('Bell rang — guards on patrol!','danger');
+    guards.forEach(g=>g.speed=3.0+Math.random()*0.8);
+    player.academics=Math.max(0,player.academics-8);
+    // Sitting through a class period heals bruise
+    player.bruise=Math.max(0,player.bruise-20);
+    updateBruise();
+    toast('Class healed some bruise','success');
+  }
+}
+
+// ─── SKATEGRAM ────────────────────────────────────────────────────────────────
+let followers=30;
+const sgFeed=document.getElementById('sg-feed');
+const sgBtn=document.getElementById('sg-upload-btn');
+const sgFollEl=document.getElementById('sg-followers');
+const clipComments={
+  gutter:   ['🔥 raw as hell','keep it street','no pads respect','locals only 🤙','grimy. love it'],
+  syndicate:['🔥 viral material','brand collab incoming','go off king','💰 sponsor this','mad views'],
+  vertigo:  ['clean pop 🎯','textbook execution','competition ready','that form tho 🤌','podium material'],
+};
+function uploadClip() {
+  if (!player.pendingUpload) return;
+  player.pendingUpload=false; sgBtn.disabled=true; sgBtn.textContent='[ UPLOADING... ]';
+  const gain=Math.floor(player.clipScore/30);
+  const comments=clipComments[faction]||clipComments.gutter;
+  followers+=gain; player.clout=Math.min(100,player.clout+gain*0.5);
+  sgFollEl.textContent=followers+' followers';
+  const post=document.createElement('div'); post.className='sg-post new';
+  post.textContent='+'+gain+' followers — "'+comments[Math.floor(Math.random()*comments.length)]+'"';
+  sgFeed.prepend(post);
+  if (sgFeed.children.length>4) sgFeed.removeChild(sgFeed.lastChild);
+  player.clipScore=0; toast('+'+gain+' followers on SkateGram','success');
+  setTimeout(()=>{ sgBtn.textContent='[ UPLOAD CLIP — SKATE FIRST ]'; },2000);
+}
+document.getElementById('sg-upload-btn').addEventListener('click',uploadClip);
+function markClipReady(score) {
+  player.clipScore+=score; player.pendingUpload=true; sgBtn.disabled=false;
+  sgBtn.textContent='[ G — UPLOAD CLIP +'+player.clipScore+'pts ]';
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+function toast(msg,type='') {
+  const stack=document.getElementById('toast-stack');
+  const el=document.createElement('div'); el.className='toast '+type; el.textContent=msg;
+  stack.appendChild(el); setTimeout(()=>el.remove(),3100);
+}
+
+// ─── HUD HELPERS ──────────────────────────────────────────────────────────────
+function updateStat(id,val) {
+  if(id==='academics'){elFillAcad.style.width=val+'%';elValAcad.textContent=Math.round(val);} else if(id==='clout'){elFillClout.style.width=val+'%';elValClout.textContent=Math.round(val);} else{elFillSkate.style.width=val+'%';elValSkate.textContent=Math.round(val);}
+}
+
+// ─── BRUISE SYSTEM ────────────────────────────────────────────────────────────
+function updateBruise() {
+  const b=player.bruise;
+  elBruiseFill.style.width=b+'%';
+  const label=elBruiseLabel;
+  const hint=elRecoveryHint;
+  if (b >= 75) {
+    label.style.color='#ef5350';
+    hint.style.opacity='1';
+    hint.textContent='REST AT HOME\nOR SIT IN CLASS';
+  } else if (b >= 40) {
+    label.style.color='#ff9800';
+    hint.style.opacity='1';
+    hint.textContent='FIND AN ICE PACK';
+  } else {
+    label.style.color='#aaa';
+    hint.style.opacity='0';
+  }
+}
+
+// ─── FLOW STATE ───────────────────────────────────────────────────────────────
+let warpAmount=0;
+const dispEl=document.getElementById('disp');
+
+function updateFlow() {
+  const f=player.flow;
+  elFlowFill.style.width=f+'%';
+  const inZone=f>=80;
+  elFlowText.style.opacity=inZone?'1':'0';
+  elFlowVignette.style.opacity=inZone?'1':'0';
+  renderer.toneMappingExposure = inZone ? 1.05 : 0.9;
+}
+
+// Called every frame to smoothly animate the warp
+function updateWarp() {
+  const inZone=player.flow>=80;
+  const targetWarp = inZone ? 6 : 0;
+  warpAmount += (targetWarp - warpAmount) * 0.05;
+  const warpStr = warpAmount.toFixed(2);
+  if (dispEl && dispEl.getAttribute('scale') !== warpStr) dispEl.setAttribute('scale', warpStr);
+  if (inZone || warpAmount > 0.1) {
+    canvas.style.filter='url(#warp-filter)';
+    canvas.style.transform='scale(1.005)';
+  } else {
+    canvas.style.filter='none';
+    canvas.style.transform='none';
+  }
+}
+
+// ─── TRICK DISPLAY ────────────────────────────────────────────────────────────
+
+
+function showTrick(name, pts) {
+  // Fisheye cam bonus — better framing = higher clip score
+  const camBonus = fisheyeNPC.active ? (1 + fisheyeNPC.score * 0.5) : 1.0;
+  // Chloe filming nearby: she might capture your trick (boost + she posts it)
+  const chloeDx = player.pos.x - (chloe.active ? chloe.group.position.x : 999);
+  const chloeDz = player.pos.z - (chloe.active ? chloe.group.position.z : 999);
+  const chloeNear = chloe.active && chloe.state === 'filming' && Math.sqrt(chloeDx*chloeDx+chloeDz*chloeDz) < 5;
+  pts = Math.round(pts * camBonus * (chloeNear ? 1.2 : 1.0));
+  if (chloeNear) toast('Chloe caught that on camera! +20% score', '');
+  trickDisplay.textContent=name;
+  trickDisplay.style.opacity='1';
+  clearTimeout(trickTimeout);
+  trickTimeout=setTimeout(()=>{ trickDisplay.style.opacity='0'; },1500);
+  player.skate=Math.min(100,player.skate+0.5);
+  player.clout=Math.min(100,player.clout+0.2);
+  player.comboScore+=pts;
+  elComboScore.textContent='+'+player.comboScore+' PTS';
+  player.flow=Math.min(100,player.flow+12);
+  updateFlow();
+  markClipReady(pts);
+  addToEditBuffer(name, pts);
+  earnCash(Math.ceil(pts / 20));  // tricks earn cash
+  player.lastTricks.push(name);
+  if (player.lastTricks.length>3) player.lastTricks.shift();
+  if (player.lastTricks.length===3 &&
+      player.lastTricks[0]===player.lastTricks[1] &&
+      player.lastTricks[1]===player.lastTricks[2]) {
+    player.flow=0; player.lastTricks=[]; updateFlow();
+    trickDisplay.textContent='TRICK SPAM!';
+    trickDisplay.style.textShadow='0 0 20px #ef5350';
+    setTimeout(()=>{ trickDisplay.style.textShadow='0 0 20px #ffd600'; },1000);
+  }
+}
+
+function bail() {
+  elBailFlash.style.opacity='1';
+  setTimeout(()=>{elBailFlash.style.opacity='0';},200);
+  const bailDmg = shopState.kneePadsCharges > 0 ? 8 : 15;
+  if (shopState.kneePadsCharges > 0) {
+    shopState.kneePadsCharges--;
+    toast('Knee pads absorbed impact. ' + shopState.kneePadsCharges + ' charges left', '');
+  }
+  player.bruise=Math.min(100,player.bruise+bailDmg);
+  player.flow=Math.max(0,player.flow-30);
+  player.comboScore=0; player.lastTricks=[];
+  updateBruise();
+  elComboScore.textContent='';
+  updateFlow();
+  trickDisplay.textContent='BAILED!';
+  trickDisplay.style.opacity='1';
+  clearTimeout(trickTimeout);
+  trickTimeout=setTimeout(()=>{ trickDisplay.style.opacity='0'; },1200);
+  player.vel.x*=0.3; player.vel.z*=0.3;
+}
+
+function getBusted() {
+  if (player.busted) return;
+  player.busted=true; player.bustedTimer=3;
+  player.vel.set(0,0,0);
+  trickDisplay.textContent='🚫 BUSTED!';
+  trickDisplay.style.opacity='1';
+  clearTimeout(trickTimeout);
+  trickTimeout=setTimeout(()=>{ trickDisplay.style.opacity='0'; },2500);
+  player.academics=Math.max(0,player.academics-15);
+  toast('Confiscated! Academics -15','danger');
+  player.flow=0; updateFlow();
+}
+
+// ─── MINIMAP ──────────────────────────────────────────────────────────────────
+const mmCtx=document.getElementById('minimap-canvas').getContext('2d');
+function drawMinimap() {
+  mmCtx.clearRect(0,0,100,100);
+  const cx=50,cy=50,scale=0.6;
+  mmCtx.fillStyle='rgba(255,255,255,0.07)'; mmCtx.fillRect(0,0,100,100);
+  mmCtx.fillStyle='rgba(255,255,255,0.12)';
+  mmCtx.fillRect(cx-18*scale,cy-15*scale,36*scale,30*scale);
+  guards.forEach(g=>{
+    const gx=cx+g.group.position.x*scale, gz=cy+g.group.position.z*scale;
+    mmCtx.beginPath(); mmCtx.arc(gx,gz,3,0,Math.PI*2);
+    mmCtx.fillStyle=g.alertLevel>0.5?'#ef5350':'#1a3a6a'; mmCtx.fill();
+  });
+  // Vance — larger dot, orange
+  // Chloe — pink dot
+  if (chloe.active) {
+    const cx2=cx+chloe.group.position.x*scale, cz2=cy+chloe.group.position.z*scale;
+    mmCtx.beginPath(); mmCtx.arc(cx2,cz2,4,0,Math.PI*2);
+    mmCtx.fillStyle='#f06292'; mmCtx.fill();
+    mmCtx.fillStyle='#fff'; mmCtx.font='bold 6px monospace';
+    mmCtx.fillText('C',cx2-3,cz2+2);
+  }
+  if (vance.active) {
+    const vx2=cx+vance.group.position.x*scale, vz2=cy+vance.group.position.z*scale;
+    mmCtx.beginPath(); mmCtx.arc(vx2,vz2,5,0,Math.PI*2);
+    mmCtx.fillStyle=vance.state==='chase'?'#ff2200':'#ff6d00'; mmCtx.fill();
+    // Vance label
+    mmCtx.fillStyle='#ff6d00'; mmCtx.font='6px monospace';
+    mmCtx.fillText('V', vx2-2, vz2-6);
+  }
+  // Shop marker
+  const smx=cx+SHOP_POS.x*scale, smz=cy+SHOP_POS.z*scale;
+  mmCtx.beginPath(); mmCtx.arc(smx,smz,4,0,Math.PI*2);
+  mmCtx.fillStyle='#aed581'; mmCtx.fill();
+  mmCtx.fillStyle='#0a0a0f'; mmCtx.font='bold 6px monospace';
+  mmCtx.fillText('S',smx-3,smz+2);
+
+  const px=cx+player.pos.x*scale, pz=cy+player.pos.z*scale;
+  mmCtx.beginPath(); mmCtx.arc(px,pz,3,0,Math.PI*2);
+  mmCtx.fillStyle='#ffd600'; mmCtx.fill();
+  mmCtx.beginPath(); mmCtx.moveTo(px,pz);
+  mmCtx.lineTo(px+Math.sin(player.facing)*8,pz+Math.cos(player.facing)*8);
+  mmCtx.strokeStyle='#ffd600'; mmCtx.lineWidth=1; mmCtx.stroke();
+
+  // Hidden spots (only visible after buying spot map)
+  if (shopState.spotMapOwned) {
+    const hiddenSpots=[{x:18,z:-14},{x:-8,z:22},{x:22,z:8},{x:-18,z:0}];
+    hiddenSpots.forEach(sp=>{
+      const hx=cx+sp.x*scale, hz=cy+sp.z*scale;
+      mmCtx.beginPath(); mmCtx.arc(hx,hz,3,0,Math.PI*2);
+      mmCtx.fillStyle='rgba(255,214,0,0.5)'; mmCtx.fill();
+    });
+  }
+}
+
+// ─── GAME STATE ───────────────────────────────────────────────────────────────
+let gameRunning=false, faction='gutter', statWarnTimer=0;
+const clock=new THREE.Clock();
+
+// ─── SHIFTY RAY'S SHOP ────────────────────────────────────────────────────────
+const SHOP_POS = { x: -24, z: 17 };  // world position of shop door
+const SHOP_RADIUS = 4.5;
+
+const shopState = {
+  open: false,
+  cash: 80,             // starting cash
+  boughtItems: new Set(),
+  kneePadsCharges: 0,   // remaining bail reductions
+  tuneUpActive: false,  // session speed boost
+  spotMapOwned: false,
+};
+
+const shiftyQuotes = [
+  'You\'re the only one keeping this place alive. No pressure.',
+  'Vance tried to shut me down twice this year. Still standing.',
+  'That grip tape? I got it from a guy. Don\'t ask which guy.',
+  'If you see Chloe out there, don\'t let her film your lines.',
+  'Bearings are fresh. Don\'t waste \'em on a flatground kickflip.',
+  'City gave me 30 days. Been 31. We\'re fine.',
+  'The industrial zone\'s got sick spots. Nobody goes there anymore.',
+  'Pro scouts watch SkateGram now. Post everything.',
+];
+
+const shopItems = {
+  'icepack':       { price: 20, repeatable: true  },
+  'icepack-pro':   { price: 45, repeatable: true  },
+  'grip-gutter':   { price: 30, repeatable: false },
+  'grip-pro':      { price: 60, repeatable: false },
+  'spot-map':      { price: 25, repeatable: false },
+  'energy':        { price: 15, repeatable: true  },
+  'board-upgrade': { price: 35, repeatable: true  },
+  'bail-insurance':{ price: 18, repeatable: true  },
+};
+
+function openShop() {
+  if (shopState.open) return;
+  shopState.open = true;
+  gameRunning = false;
+  elShopOverlay.classList.add('show');
+  elShopCash.textContent = shopState.cash;
+  // Random Shifty quote
+  document.getElementById('shop-shifty-quote').textContent =
+    shiftyQuotes[Math.floor(Math.random() * shiftyQuotes.length)];
+  // Update item states
+  document.querySelectorAll('.shop-item').forEach(el => {
+    const key = el.dataset.item;
+    const item = shopItems[key];
+    const owned = shopState.boughtItems.has(key);
+    const canAfford = shopState.cash >= item.price;
+    el.classList.remove('disabled','purchased');
+    const priceEl = el.querySelector('.item-price');
+    if (!item.repeatable && owned) {
+      el.classList.add('purchased');
+      if (priceEl) { priceEl.textContent = '✓ OWNED'; priceEl.classList.add('free'); }
+    } else if (!canAfford) {
+      el.classList.add('disabled');
+    } else {
+      // Restore original price if re-opening shop
+      if (priceEl && priceEl.textContent === '✓ OWNED') priceEl.textContent = '$'+item.price;
+    }
+  });
+}
+
+function closeShop() {
+  shopState.open = false;
+  elShopOverlay.classList.remove('show');
+  gameRunning = true;
+}
+
+function buyItem(key) {
+  const item = shopItems[key];
+  if (!item) return;
+  if (shopState.cash < item.price) { toast('Not enough cash', 'danger'); return; }
+  if (!item.repeatable && shopState.boughtItems.has(key)) return;
+
+  shopState.cash -= item.price;
+  elShopCash.textContent = shopState.cash;
+  if (!item.repeatable) shopState.boughtItems.add(key);
+
+  switch (key) {
+    case 'icepack':
+      player.bruise = Math.max(0, player.bruise - 40);
+      updateBruise();
+      toast('Ice pack applied. Bruise -40', 'success');
+      break;
+    case 'icepack-pro':
+      player.bruise = 0;
+      updateBruise();
+      toast("Full recovery. Shifty's secret formula.", 'success');
+      break;
+    case 'grip-gutter':
+      player.skate = Math.min(100, player.skate + 8);
+      toast('Gutter Grip applied. Skate +8', 'success');
+      break;
+    case 'grip-pro':
+      player.skate = Math.min(100, player.skate + 15);
+      toast('Pro Grip applied. Skate +15', 'success');
+      break;
+    case 'spot-map':
+      shopState.spotMapOwned = true;
+      toast('Spot map unlocked — check the minimap', 'success');
+      break;
+    case 'energy':
+      player.academics = Math.min(100, player.academics + 12);
+      toast('Local Zine read. Academics +12', 'success');
+      break;
+    case 'board-upgrade':
+      shopState.tuneUpActive = true;
+      toast('Tune-up done. Max speed +15% this session', 'success');
+      break;
+    case 'bail-insurance':
+      shopState.kneePadsCharges = 3;
+      toast('Knee pads on. Next 3 bails -50% bruise', 'success');
+      break;
+  }
+
+  // Refresh item states after purchase
+  openShop();
+}
+
+// Earn cash from tricks and grinds
+function earnCash(amount) {
+  shopState.cash += amount;
+  const el = document.getElementById('hud-cash');
+  if (el) el.textContent = shopState.cash;
+}
+
+// Hook buy clicks
+document.querySelectorAll('.shop-item').forEach(el => {
+  el.addEventListener('click', () => buyItem(el.dataset.item));
+});
+document.getElementById('shop-close').addEventListener('click', closeShop);
+
+// T key opens shop when near
+document.addEventListener('keydown', e => {
+  if (e.code === 'KeyT' && gameRunning) {
+    const dx = player.pos.x - SHOP_POS.x;
+    const dz = player.pos.z - SHOP_POS.z;
+    if (Math.sqrt(dx*dx+dz*dz) <= SHOP_RADIUS * 1.5) {
+      openShop();
+    } else {
+      toast('Too far from shop — get closer', '');
+    }
+  }
+});
+
+// ─── CONSEQUENCE SYSTEM ──────────────────────────────────────────────────────
+
+// Thresholds
+const THRESH = {
+  academics: { ground: 25, warn: 40 },
+  clout:     { sponsorLock: 20, warn: 35 },
+  skate:     { warn: 30 },
+};
+
+// Trick skill requirements (skate stat must be >= to attempt)
+const trickRequirements = {
+  'up':        0,   // kickflip — always available
+  'down':      0,
+  'left':      0,   // heelflip
+  'right':     0,
+  'up-left':   25,  // backside 180
+  'up-right':  25,  // frontside 180
+  'down-left': 50,  // varial flip
+  'down-right':65,  // hardflip
+};
+
+// ── Grounded state ──
+const groundedState = {
+  active: false,
+  timer: 0,          // seconds until curfew lifts
+  reason: '',
+};
+const CURFEW_DURATION = 60; // 60 real seconds of curfew
+
+function triggerGrounded(reason) {
+  if (groundedState.active) return;
+  groundedState.active = true;
+  groundedState.timer = CURFEW_DURATION;
+  groundedState.reason = reason;
+  // Freeze game
+  gameRunning = false;
+  player.vel.set(0,0,0);
+  const overlay = document.getElementById('grounded-overlay');
+  document.getElementById('grounded-sub').innerHTML = reason;
+  overlay.classList.add('show');
+  updateGroundedDisplay();
+  toast('GROUNDED — wait for curfew to lift', 'danger');
+}
+
+function updateGroundedDisplay() {
+  const mins = Math.floor(groundedState.timer / 60);
+  const secs = Math.floor(groundedState.timer % 60);
+  elGroundedTimer.textContent =
+    String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+  const acad = Math.round(player.academics);
+  const clout = Math.round(player.clout);
+  const skate = Math.round(player.skate);
+  const acadEl = document.getElementById('gs-acad');
+  acadEl.textContent = acad;
+  acadEl.className = 'gs-val ' + (acad < THRESH.academics.ground ? 'bad' : 'ok');
+  document.getElementById('gs-clout').textContent = clout;
+  document.getElementById('gs-skate').textContent = skate;
+}
+
+document.getElementById('grounded-action').addEventListener('click', () => {
+  groundedState.timer = Math.max(0, groundedState.timer - 10);
+  updateGroundedDisplay();
+});
+
+// ── Detention system (Vance-specific, worse than grounded) ──
+const DETENTION_DURATION = 45;
+
+function triggerDetention() {
+  if (vance.detentionActive) return;
+  vance.detentionActive = true;
+  vance.detentionTimer = DETENTION_DURATION;
+  vance.state = 'returning';
+  gameRunning = false;
+  player.vel.set(0,0,0);
+  player.academics = Math.max(0, player.academics - 20);
+  player.clout     = Math.max(0, player.clout - 10);
+  elDetentionOverlay.classList.add('show');
+  updateDetentionTimer();
+  toast('Detention! Academics -20, Clout -10', 'danger');
+}
+
+function updateDetentionTimer() {
+  const m = Math.floor(vance.detentionTimer / 60);
+  const s = Math.floor(vance.detentionTimer % 60);
+  elDetentionTimer.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+function tickDetention(dt) {
+  if (!vance.detentionActive) return;
+  vance.detentionTimer -= dt;
+  updateDetentionTimer();
+  if (vance.detentionTimer <= 0) {
+    vance.detentionActive = false;
+    elDetentionOverlay.classList.remove('show');
+    player.academics = Math.min(100, player.academics + 5); // small recovery
+    gameRunning = true;
+    vance.state = 'patrol';
+    toast('Detention served. Try not to get caught again.', '');
+  }
+}
+
+document.getElementById('detention-action').addEventListener('click', () => {
+  vance.detentionTimer = Math.max(0, vance.detentionTimer - 8);
+  updateDetentionTimer();
+});
+
+// Grounded tick — runs even when gameRunning=false
+function tickGrounded(dt) {
+  if (!groundedState.active) return;
+  groundedState.timer -= dt;
+  updateGroundedDisplay();
+  if (groundedState.timer <= 0) {
+    groundedState.active = false;
+    document.getElementById('grounded-overlay').classList.remove('show');
+    // Academics recover slightly while grounded
+    player.academics = Math.min(100, player.academics + 15);
+    shopState.tuneUpActive = false; // tune-up expires when grounded
+    gameRunning = true;
+    toast('Curfew lifted. Academics recovered a bit.', 'success');
+  }
+}
+
+// ── Stat warning pulse ──
+function updateStatWarnings() {
+  const acadLabel=elAcadLabel;
+  const cloutLabel=elCloutLabel;
+  const skateLabel=elSkateLabel;
+
+  // Academics
+  if (player.academics < THRESH.academics.ground) {
+    acadLabel.classList.add('danger'); acadLabel.classList.remove('warn');
+  } else if (player.academics < THRESH.academics.warn) {
+    acadLabel.classList.add('warn'); acadLabel.classList.remove('danger');
+  } else {
+    acadLabel.classList.remove('danger','warn');
+  }
+
+  // Clout
+  if (player.clout < THRESH.clout.sponsorLock) {
+    cloutLabel.classList.add('danger'); cloutLabel.classList.remove('warn');
+  } else if (player.clout < THRESH.clout.warn) {
+    cloutLabel.classList.add('warn'); cloutLabel.classList.remove('danger');
+  } else {
+    cloutLabel.classList.remove('danger','warn');
+  }
+
+  // Skate
+  if (player.skate < THRESH.skate.warn) {
+    skateLabel.classList.add('warn');
+  } else {
+    skateLabel.classList.remove('warn','danger');
+  }
+
+  // Sponsor lock badge
+  const lock=elSponsorLock;
+  lock.style.opacity = player.clout < THRESH.clout.sponsorLock ? '1' : '0';
+  lock.textContent = player.clout < THRESH.clout.sponsorLock
+    ? '⛔ CLOUT TOO LOW — SPONSORS NOT WATCHING'
+    : '';
+
+  // Check grounded trigger
+  if (player.academics <= THRESH.academics.ground && !groundedState.active && gameRunning) {
+    triggerGrounded('Grades tanked.<br>Parents confiscated your board.<br>Sit tight until curfew lifts.');
+  }
+}
+
+// ── Skill gate check ──
+let skillGateTimeout = null;
+function checkSkillGate(gestureKey) {
+  const req = trickRequirements[gestureKey] ?? 0;
+  if (player.skate < req) {
+    const g = flickGestures[gestureKey];
+    const el=elSkillGate;
+    el.textContent = (g ? g.name : gestureKey).toUpperCase() + ' — REQUIRES SKATE ' + req;
+    el.style.opacity = '1';
+    clearTimeout(skillGateTimeout);
+    skillGateTimeout = setTimeout(() => { el.style.opacity = '0'; }, 1400);
+    return false; // blocked
+  }
+  return true; // allowed
+}
+
+// ── Fisheye camera NPC ──
+const fisheyeNPC = {
+  pos: new THREE.Vector3(6, 0.5, 8),  // starts offset from player spawn
+  targetOffset: new THREE.Vector3(5, 0, 5),
+  score: 0,
+  active: false,
+};
+
+// Simple fisheye cam mesh (person holding camera)
+const fisheyeGroup = new THREE.Group();
+const fisheyeBody = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.5,0.24), mat(0x2a2a2a));
+fisheyeBody.position.y = 0.9;
+fisheyeGroup.add(fisheyeBody);
+const fisheyeHead = new THREE.Mesh(new THREE.BoxGeometry(0.22,0.22,0.22), mat(0xc8a882));
+fisheyeHead.position.y = 1.32;
+fisheyeGroup.add(fisheyeHead);
+// Camera prop
+const camBody = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.10,0.18), mat(0x111111, 0.3, 0.5));
+camBody.position.set(0.18, 1.05, -0.1);
+fisheyeGroup.add(camBody);
+const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.05,0.08,8), mat(0x333333, 0.1, 0.9));
+lens.rotation.z = Math.PI/2; lens.position.set(0.28, 1.05, -0.1);
+fisheyeGroup.add(lens);
+fisheyeGroup.position.copy(fisheyeNPC.pos);
+fisheyeGroup.visible = false;
+scene.add(fisheyeGroup);
+
+function updateFisheye(dt) {
+  if (!fisheyeNPC.active) {
+    elFisheyeHud.style.opacity = '0';
+    return;
+  }
+
+  // Follow player at a distance with lag
+  _v1.set(
+    player.pos.x + Math.sin(player.facing + 0.8) * 5,
+    0.5,
+    player.pos.z + Math.cos(player.facing + 0.8) * 5
+  );
+  fisheyeNPC.pos.lerp(_v1, dt * 1.8);
+  fisheyeGroup.position.copy(fisheyeNPC.pos);
+
+  // Face toward player
+  const dx = player.pos.x - fisheyeNPC.pos.x;
+  const dz = player.pos.z - fisheyeNPC.pos.z;
+  fisheyeGroup.rotation.y = Math.atan2(dx, dz);
+
+  // Score: distance (3-8 units = ideal), angle (facing player = good)
+  const dist = Math.sqrt(dx*dx + dz*dz);
+  const distScore = dist > 2 && dist < 9 ? 1 - Math.abs(dist - 5) / 5 : 0;
+  _v2.set(Math.sin(fisheyeGroup.rotation.y), 0, Math.cos(fisheyeGroup.rotation.y));
+  _v3.set(dx, 0, dz).normalize();
+  fisheyeNPC.score = Math.max(0, Math.min(1, distScore * 0.5 + _v2.dot(_v3) * 0.5));
+
+  // HUD
+  const hud=elFisheyeHud;
+  hud.style.opacity = '1';
+  elFisheyeBar.style.width = (fisheyeNPC.score * 100) + '%';
+  elFisheyeAngle.textContent = Math.round(dist * 10) / 10 + 'm';
+}
+
+// Activate fisheye cam with F key
+document.addEventListener('keydown', e => {
+  if (e.code === 'KeyF' && gameRunning) {
+    fisheyeNPC.active = !fisheyeNPC.active;
+    fisheyeGroup.visible = fisheyeNPC.active;
+    toast(fisheyeNPC.active ? '📷 Camera NPC active — F to toggle' : '📷 Camera NPC off', '');
+  }
+});
+
+// ── Editing Suite ──
+const editState = {
+  clips: [],         // { name, pts, beatSync } from session
+  multiplier: 1.0,
+  open: false,
+};
+
+function openEditSuite() {
+  if (editState.clips.length === 0) {
+    toast('No clips to edit yet — land some tricks first', 'danger');
+    return;
+  }
+  editState.open = true;
+  gameRunning = false;
+  elEditSuite.classList.add('show');
+  renderEditTimeline();
+}
+
+function renderEditTimeline() {
+  const tl = document.getElementById('edit-timeline');
+  // Remove old clips
+  [...tl.querySelectorAll('.edit-clip')].forEach(c => c.remove());
+  const W = tl.offsetWidth || 580;
+  const perClip = Math.min(100, Math.floor(W / Math.max(1, editState.clips.length)) - 4);
+  editState.clips.forEach((clip, i) => {
+    const el = document.createElement('div');
+    el.className = 'edit-clip' + (clip.beatSync ? ' beat' : '');
+    el.style.left  = (i * (perClip + 4) + 2) + 'px';
+    el.style.width = perClip + 'px';
+    el.textContent = clip.name.slice(0,8);
+    el.title = clip.name + ' (' + clip.pts + 'pts)';
+    el.addEventListener('click', () => {
+      clip.beatSync = !clip.beatSync;
+      el.classList.toggle('beat', clip.beatSync);
+      recalcMultiplier();
+    });
+    tl.appendChild(el);
+  });
+  recalcMultiplier();
+}
+
+function recalcMultiplier() {
+  const synced = editState.clips.filter(c => c.beatSync).length;
+  const total  = editState.clips.length;
+  editState.multiplier = total > 0 ? (1 + (synced / total) * 1.5) : 1;
+  document.getElementById('edit-multiplier').textContent = editState.multiplier.toFixed(1) + '×';
+}
+
+document.getElementById('edit-discard').addEventListener('click', () => {
+  editState.clips = [];
+  editState.open = false;
+  elEditSuite.classList.remove('show');
+  gameRunning = true;
+  toast('Session discarded.', '');
+});
+
+document.getElementById('edit-upload').addEventListener('click', () => {
+  if (!editState.clips.length) return;
+  const raw = editState.clips.reduce((s, c) => s + c.pts, 0);
+  const final = Math.round(raw * editState.multiplier * (fisheyeNPC.active ? 1.3 : 1.0));
+  // Clout type based on clip content
+  const hasHighTricks = editState.clips.some(c => c.pts >= 200);
+  const cloutGain = Math.floor(final / 40);
+  player.clout = Math.min(100, player.clout + cloutGain * 0.5);
+  if (chloe.active && followers + cloutGain > chloe.followers) {
+    toast('You overtook Chloe! She won\'t like that.', 'success');
+    chloe.postTimer = 3;
+  }
+  // Check if player has overtaken Chloe
+  if (chloe.active && followers > chloe.followers) {
+    toast('You passed Chloe in followers!', 'success');
+    chloe.postTimer = Math.min(chloe.postTimer, 5); // she posts sooner in response
+  }
+  followers += cloutGain;
+  document.getElementById('sg-followers').textContent = followers + ' followers';
+
+  // Push to SkateGram feed
+  const clipType = hasHighTricks ? 'TECH PART' : 'STREET CLIP';
+  const techComments  = ['competition circuit incoming 🎯', 'that form is unreal', 'podium watch 👀'];
+  const streetComments = ['raw as hell 🔥', 'real ones know', 'no cap this slaps'];
+  const comment = hasHighTricks
+    ? techComments[Math.floor(Math.random()*techComments.length)]
+    : streetComments[Math.floor(Math.random()*streetComments.length)];
+  const post = document.createElement('div');
+  post.className = 'sg-post new';
+  post.textContent = '🎬 ' + clipType + ' — ' + final + ' views — "' + comment + '"';
+  sgFeed.prepend(post);
+  if (sgFeed.children.length > 6) sgFeed.lastChild.remove();
+
+  editState.clips = [];
+  editState.open = false;
+  elEditSuite.classList.remove('show');
+  gameRunning = true;
+  toast('Uploaded! +' + cloutGain + ' clout, ×' + editState.multiplier.toFixed(1) + ' beat sync', 'success');
+});
+
+// Open edit suite with E key after session
+document.addEventListener('keydown', e => {
+  if (e.code === 'KeyE' && gameRunning && !editState.open) openEditSuite();
+});
+
+// Add clips to edit buffer when tricks land
+function addToEditBuffer(name, pts) {
+  editState.clips.push({ name, pts, beatSync: false });
+  if (editState.clips.length > 12) editState.clips.shift(); // cap at 12 clips
+}
+
+// ─── CHLOE AI ────────────────────────────────────────────────────────────────
+let chloeHudTimer = 0;  // throttle HUD updates
+
+function updateChloe(dt) {
+  if (!chloe.active) return;
+
+  const g = chloe.group;
+  chloe.stateTimer -= dt;
+  chloe.postTimer  -= dt;
+
+  // ── Auto-post: Chloe posts on a timer regardless of skill ──
+  if (chloe.postTimer <= 0) {
+    chloe.postTimer = 18 + Math.random() * 22; // every 18-40s
+    const gain = 80 + Math.floor(Math.random() * 120); // 80-200 followers per post
+    chloe.followers += gain;
+
+    const postType = chloePostTypes[Math.floor(Math.random() * chloePostTypes.length)];
+    const comment  = chloeComments[Math.floor(Math.random()  * chloeComments.length)];
+
+    // Push to SkateGram feed as Chloe post
+    const post = document.createElement('div');
+    post.className = 'sg-post new';
+    post.textContent = '❤ CHLOE: ' + postType + ' — "' + comment + '"';
+    post.style.color = '#f06292';
+    sgFeed.prepend(post);
+    if (sgFeed.children.length > 6) sgFeed.lastChild.remove();
+
+    updateChloeHud();
+  }
+
+  // ── State machine ──
+  if (chloe.state === 'skating') {
+    // Move toward current spot
+    const target = chloeSpots[chloeSpotIdx];
+    _cv1.set(target.x - g.position.x, 0, target.z - g.position.z);
+    const dist = _cv1.length();
+
+    if (dist < 1.2) {
+      // Arrived — switch to filming or posing
+      chloe.state = Math.random() < 0.6 ? 'filming' : 'posing';
+      chloe.stateTimer = 6 + Math.random() * 10;
+      chloe.spotDwellTime = 0;
+    } else {
+      const spd = 3.0;
+      g.position.x += (_cv1.x / dist) * spd * dt;
+      g.position.z += (_cv1.z / dist) * spd * dt;
+      g.rotation.y = Math.atan2(_cv1.x, _cv1.z);
+      // Board wobble while skating
+      chloe.legPhase += spd * dt * 2.5;
+      chloe.board.rotation.z = Math.sin(chloe.legPhase) * 0.06;
+    }
+
+  } else if (chloe.state === 'filming') {
+    // Hold phone up, face player occasionally
+    const toPlayer = player.pos.x - g.position.x;
+    const toPlayerZ = player.pos.z - g.position.z;
+    // Slowly rotate toward player
+    const targetAngle = Math.atan2(toPlayer, toPlayerZ);
+    const da = targetAngle - g.rotation.y;
+    g.rotation.y += da * dt * 0.8;
+
+    // Phone glow pulses
+    const pulse = 0.4 + Math.sin(Date.now() * 0.004) * 0.3;
+    chloe.group.children.forEach(c => {
+      if (c.material && c.material.emissiveIntensity !== undefined &&
+          c.material.color && c.material.color.r > 0.8) {
+        c.material.emissiveIntensity = pulse;
+      }
+    });
+
+    if (chloe.stateTimer <= 0) {
+      chloe.state = 'skating';
+      chloeSpotIdx = (chloeSpotIdx + 1) % chloeSpots.length;
+    }
+
+  } else if (chloe.state === 'posing') {
+    // Stand still, subtle sway
+    g.rotation.y += Math.sin(Date.now() * 0.001) * dt * 0.5;
+    chloe.board.rotation.z = Math.sin(Date.now() * 0.002) * 0.04;
+
+    if (chloe.stateTimer <= 0) {
+      chloe.state = 'skating';
+      chloeSpotIdx = Math.floor(Math.random() * chloeSpots.length);
+    }
+  }
+
+  // ── Nearby detection — show alert if Chloe is close ──
+  const cdx = player.pos.x - g.position.x;
+  const cdz = player.pos.z - g.position.z;
+  const cDist = Math.sqrt(cdx*cdx + cdz*cdz);
+  elChloeNearby.style.opacity = cDist < 6 ? '1' : '0';
+
+  // ── HUD throttle ──
+  chloeHudTimer += dt;
+  if (chloeHudTimer > 0.5) { chloeHudTimer = 0; updateChloeHud(); }
+}
+
+function updateChloeHud() {
+  if (!chloe.active) return;
+  elChloeFeed.style.opacity = '1';
+  elChloeFollHud.textContent = chloe.followers.toLocaleString() + ' followers';
+
+  const gap = chloe.followers - followers;
+  if (gap > 0) {
+    elChloeGap.textContent = '▲ Chloe leads by ' + gap.toLocaleString();
+    elChloeGap.style.color = '#ef5350';
+  } else {
+    elChloeGap.textContent = '▼ You lead by ' + Math.abs(gap).toLocaleString() + '!';
+    elChloeGap.style.color = '#aed581';
+  }
+
+  // Feed: last post type hint
+  const lastPost = document.querySelector('#sg-feed .sg-post');
+  if (lastPost && lastPost.textContent.includes('CHLOE')) {
+    elChloeLastPost.textContent = lastPost.textContent.slice(0, 50) + '...';
+  }
+
+  // Bar shows player/chloe ratio
+  const total = Math.max(1, followers + chloe.followers);
+  const playerFrac = followers / total * 100;
+  elChloeBar.style.width = playerFrac + '%';
+  elChloeBar.style.background = playerFrac > 50 ? '#aed581' : '#f06292';
+}
+
+// ─── VANCE AI ─────────────────────────────────────────────────────────────────
+function updateVance(dt) {
+  if (!vance.active) return;
+
+  const g = vance.group;
+  const px = player.pos.x, pz = player.pos.z;
+  const vx = g.position.x, vz = g.position.z;
+  const dx = px - vx, dz = pz - vz;
+  const distToPlayer = Math.sqrt(dx*dx + dz*dz);
+
+  // ── Detection — wide cone (90deg), long range (12 units) ──
+  const facingAngle = g.rotation.y;
+  _vv1.set(dx, 0, dz);
+  const distN = _vv1.length();
+  _vv2.set(Math.sin(facingAngle), 0, Math.cos(facingAngle));
+  const dot = distN > 0 ? _vv1.normalize().dot(_vv2) : 0;
+  const inCone  = dot > 0.5 && distN < 12; // 90deg FOV
+  const inClose = distN < 3.0;             // too close regardless
+  const hspd = Math.sqrt(player.vel.x**2 + player.vel.z**2);
+
+  if ((inCone || inClose) && hspd > 0.3) {
+    vance.alertLevel = Math.min(1, vance.alertLevel + dt * 1.8); // locks on faster than guards
+  } else {
+    vance.alertLevel = Math.max(0, vance.alertLevel - dt * 0.4);
+  }
+
+  // Cone visual
+  vance.coneMat.opacity = vance.alertLevel * 0.3;
+  vance.coneMat.color.setHex(vance.alertLevel > 0.5 ? 0xff2200 : 0xff6d00);
+
+  // Detention trigger
+  if (vance.alertLevel >= 1.0 && !vance.detentionActive && !player.busted) {
+    triggerDetention();
+    vance.alertLevel = 0;
+    return;
+  }
+
+  // ── State machine ──
+  let speed = 0;
+
+  if (vance.state === 'idle') {
+    // stays near school entrance, rarely moves
+    vance.patrolTimer -= dt;
+    if (vance.patrolTimer <= 0) {
+      vance.patrolTimer = 8 + Math.random() * 6;
+      vance.state = 'patrol';
+      vanceWPIdx = Math.floor(Math.random() * vanceWaypoints.length);
+      vance.patrolTarget.copy(vanceWaypoints[vanceWPIdx]);
+    }
+    speed = 0;
+
+  } else if (vance.state === 'patrol') {
+    // Walk between waypoints
+    const tx = vance.patrolTarget.x - vx, tz = vance.patrolTarget.z - vz;
+    const td = Math.sqrt(tx*tx + tz*tz);
+    if (td < 0.8) {
+      vanceWPIdx = (vanceWPIdx + 1) % vanceWaypoints.length;
+      vance.patrolTarget.copy(vanceWaypoints[vanceWPIdx]);
+      if (Math.random() < 0.3) { vance.state = 'idle'; vance.patrolTimer = 4 + Math.random() * 4; }
+    } else {
+      g.position.x += (tx/td) * 2.5 * dt;
+      g.position.z += (tz/td) * 2.5 * dt;
+      g.rotation.y = Math.atan2(tx, tz);
+      speed = 2.5;
+    }
+    // Switch to chase if alert is high
+    if (vance.alertLevel > 0.4) vance.state = 'chase';
+
+  } else if (vance.state === 'chase') {
+    // Sprint directly at player — faster than guards
+    if (distToPlayer > 0.5) {
+      const chaseSpeed = 4.5 + (vance.alertLevel * 1.5); // speeds up as alert fills
+      g.position.x += (dx/distToPlayer) * chaseSpeed * dt;
+      g.position.z += (dz/distToPlayer) * chaseSpeed * dt;
+      g.rotation.y = Math.atan2(dx, dz);
+      speed = chaseSpeed;
+    }
+    // Give up chase if player gets far and alert drops
+    if (vance.alertLevel < 0.1 && distToPlayer > 15) {
+      vance.state = 'returning';
+    }
+
+  } else if (vance.state === 'returning') {
+    // Walk back to school entrance
+    const home = vanceWaypoints[5]; // near school
+    const hx = home.x - vx, hz = home.z - vz;
+    const hd = Math.sqrt(hx*hx + hz*hz);
+    if (hd < 1.0) {
+      vance.state = 'idle';
+      vance.patrolTimer = 5;
+    } else {
+      g.position.x += (hx/hd) * 2.0 * dt;
+      g.position.z += (hz/hd) * 2.0 * dt;
+      g.rotation.y = Math.atan2(hx, hz);
+      speed = 2.0;
+    }
+  }
+
+  // ── Walk animation — legs alternate ──
+  vance.legPhase += speed * dt * 3;
+  const legSwing = Math.sin(vance.legPhase) * 0.25;
+  // Legs are children indices 9 and 10 in vanceGroup (0-indexed from push order)
+  // Find them by position
+  vance.group.children.forEach((c, i) => {
+    if (c.geometry && c.geometry.type === 'BoxGeometry') {
+      const p = c.position;
+      if (Math.abs(p.y - 0.52) < 0.05 && Math.abs(Math.abs(p.x) - 0.10) < 0.02) {
+        c.rotation.x = p.x < 0 ? legSwing : -legSwing;
+      }
+    }
+  });
+
+  // ── HUD alert ──
+  const isChasing = vance.state === 'chase' && vance.alertLevel > 0.3;
+  elVanceHudAlert.style.opacity = isChasing ? '1' : '0';
+}
+
+// ─── UPDATE ───────────────────────────────────────────────────────────────────
+function update(dt) {
+  tickGrounded(dt);
+  tickDetention(dt);
+  if (!gameRunning) return;
+
+  periodTimer-=dt;
+  if (periodTimer<=0) {
+    periodIdx=(periodIdx+1)%periods.length;
+    periodTimer=periods[periodIdx].duration;
+    ringBell();
+  }
+  updateClock();
+
+  if (player.busted) {
+    player.bustedTimer-=dt;
+    if (player.bustedTimer<=0) {
+      player.busted=false;
+      player.pos.set(0,0.5,8); player.vel.set(0,0,0); shopState.tuneUpActive=false;
+    }
+    skaterGroup.position.copy(player.pos);
+    return;
+  }
+
+  const inFlow=player.flow>=80;
+  const popBoost=inFlow?1.1:1.0;
+  // Bruise reduces max speed AND pop height
+  const bruisePenalty=player.bruise*0.003;
+  const maxSpd=MAX_SPEED*(1-bruisePenalty)*(shopState.tuneUpActive?1.15:1.0);
+
+  // ── Movement — only when wheels on ground ──
+  // No steering, pushing, or braking mid-air. Momentum carries you.
+  let pushing=false;
+  if (player.onGround) {
+    if (keys['KeyW']||keys['ArrowUp']) {
+      player.vel.x+=-Math.sin(player.facing)*PUSH_FORCE*dt;
+      player.vel.z+=-Math.cos(player.facing)*PUSH_FORCE*dt;
+      pushing=true;
+    }
+    if (keys['KeyS']||keys['ArrowDown']) {
+      player.vel.x*=0.90; player.vel.z*=0.90;
+    }
+    // Turning only on ground (arrows reserved for flick-it tricks)
+    if (keys['KeyA']||keys['ArrowLeft'])  player.facing+=TURN_SPEED*dt;
+    if (keys['KeyD']||keys['ArrowRight']) player.facing-=TURN_SPEED*dt;
+  }
+
+  const hspd=Math.sqrt(player.vel.x**2+player.vel.z**2);
+  if (hspd>maxSpd) { player.vel.x=player.vel.x/hspd*maxSpd; player.vel.z=player.vel.z/hspd*maxSpd; }
+
+  // ── Ollie — pop height reduced by bruise ──
+  if (keys['Space']&&player.onGround&&player.ollieTime<=0) {
+    const popHeight=7*(1-bruisePenalty*0.5)*popBoost;
+    player.vel.y=popHeight;
+    player.onGround=false; player.isOllying=true;
+    player.airTime=0; player.ollieTime=0.5;
+    player.comboScore=0; player.lastTricks=[];
+    player.grinding=false; player.grindTime=0;
+    // Show flick hint
+    elFlickHint.textContent='FLICK ARROWS FOR TRICK';
+    elFlickHint.style.opacity='1';
+    setTimeout(()=>{elFlickHint.style.opacity='0';},800);
+  }
+  if (player.ollieTime>0) player.ollieTime-=dt;
+
+  // ── Flick-It: register gesture mid-air ──
+  if (player.isOllying && !player.trickAir && flickQueued) {
+    const g=flickGestures[flickQueued];
+    if (g && checkSkillGate(flickQueued)) {
+      player.trickAir=flickQueued;
+      player.trickAngle=0;
+    }
+    flickQueued=null;
+  }
+  // Also check live key combos each frame (held gesture)
+  if (player.isOllying && !player.trickAir) {
+    const dir=getFlickDir();
+    if (dir && flickGestures[dir] && dir!==lastFlickDir) {
+      if (checkSkillGate(dir)) {
+        player.trickAir=dir;
+        player.trickAngle=0;
+      }
+    }
+    lastFlickDir=dir;
+  } else {
+    lastFlickDir=null;
+    flickQueued=null;
+  }
+
+  // ── Grind ──
+  if (player.grinding&&player.onGround&&hspd>1) {
+    player.grindTime+=dt;
+    const grindScore=Math.floor(player.grindTime*10)*5;
+    elGrindIndicator.style.opacity='1';
+    elComboScore.textContent='GRIND +'+grindScore;
+    markClipReady(1); earnCash(1);
+    player.flow=Math.min(100,player.flow+dt*6);
+    updateFlow();
+  } else {
+    if (player.grindTime>0.3) showTrick('BOARDSLIDE',Math.floor(player.grindTime*50+50));
+    if (!player.grinding) player.grindTime=0;
+    elGrindIndicator.style.opacity='0';
+  }
+
+  // ── Ground check + edge detection ──
+  let groundY=GROUND_Y;
+  for (const ob of obstacles) {
+    const nx=player.pos.x, nz=player.pos.z+player.vel.z*dt;
+    if (nx>ob.minX&&nx<ob.maxX&&nz>ob.minZ&&nz<ob.maxZ) groundY=Math.max(groundY,ob.topY);
+  }
+  groundY=Math.max(groundY,GROUND_Y);
+  // Edge detection: if standing but surface has dropped away, start falling
+  if (player.onGround && player.pos.y > groundY + 0.08) player.onGround = false;
+
+  // ── Gravity ──
+  if (!player.onGround) { player.vel.y+=GRAVITY*dt; player.airTime+=dt; }
+
+  // ── Friction ──
+  if (player.onGround) {
+    const fd=Math.pow(FRICTION,dt*60);
+    player.vel.x*=fd; player.vel.z*=fd;
+  }
+
+  // ── Integrate ──
+  player.pos.x+=player.vel.x*dt;
+  player.pos.z+=player.vel.z*dt;
+  player.pos.y+=player.vel.y*dt;
+
+  // ── Land ──
+  if (player.pos.y<=groundY&&!player.onGround) {
+    player.pos.y=groundY;
+    const impact=Math.abs(player.vel.y);
+    player.vel.y=0; player.onGround=true;
+    if (player.trickAir&&player.trickAngle<Math.PI*1.8) {
+      bail();
+    } else if (player.trickAir) {
+      const g=flickGestures[player.trickAir];
+      if (g) { showTrick(g.name,g.score); player.skate=Math.min(100,player.skate+1.5); }
+    }
+    if (impact>10&&!player.trickAir) bail();
+    player.trickAir=null; player.trickAngle=0;
+    player.isOllying=false; player.airTime=0;
+    player.flow=Math.max(0,player.flow-3);
+    updateFlow();
+    lastFlickDir=null; flickQueued=null;
+  }
+
+  // ── Bounds ──
+  player.pos.x=Math.max(-90,Math.min(90,player.pos.x));
+  player.pos.z=Math.max(-90,Math.min(90,player.pos.z));
+
+  // ── Skater mesh ──
+  skaterGroup.position.copy(player.pos);
+  skaterGroup.rotation.y=player.facing;
+  boardMesh.rotation.z=player.vel.x*0.03*0.3;
+
+  // ── Trick animation ──
+  if (player.trickAir&&!player.onGround) {
+    const g=flickGestures[player.trickAir];
+    player.trickAngle+=dt*8;
+    if (g && g.axis==='z') boardMesh.rotation.z=player.trickAngle*g.dir;
+    if (g && g.axis==='y') skaterGroup.rotation.y=player.facing+player.trickAngle*g.dir;
+  } else if (player.onGround) {
+    boardMesh.rotation.z*=0.85;
+  }
+
+  // Wheel spin
+  skaterGroup.children.forEach(c => {
+    if (c.geometry&&c.geometry.type==='CylinderGeometry'&&c.position.y<-0.3) c.rotation.y+=hspd*dt*0.8;
+  });
+
+  // Push pump
+  if (pushing&&player.onGround) boardMesh.position.y=0.245+Math.sin(Date.now()*0.012)*0.012;
+  else if (player.onGround)     boardMesh.position.y=0.245;
+
+  // Flow decay
+  if (player.onGround&&!pushing&&!player.grinding) {
+    player.flow=Math.max(0,player.flow-dt*4);
+    updateFlow();
+  }
+
+  // ── Guard AI ──
+  let guardAlerted=false;
+  guards.forEach(guard=>{
+    const g=guard.group;
+    const tgt=guard.target===0?guard.patrolA:guard.patrolB;
+    const dx=tgt.x-g.position.x, dz=tgt.z-g.position.z;
+    const dist=Math.sqrt(dx*dx+dz*dz);
+    if (dist<0.5) { guard.target=1-guard.target; }
+    else { g.position.x+=(dx/dist)*guard.speed*dt; g.position.z+=(dz/dist)*guard.speed*dt; g.rotation.y=Math.atan2(dx,dz); }
+    _v1.set(player.pos.x-g.position.x,0,player.pos.z-g.position.z);
+    const toPlayerDist=_v1.length();
+    _v2.set(Math.sin(g.rotation.y),0,Math.cos(g.rotation.y));
+    const dot=toPlayerDist>0?_v1.normalize().dot(_v2):0;
+    if ((dot>0.75&&toPlayerDist<8||toPlayerDist<2.5)&&hspd>0.5) {
+      guard.alertLevel=Math.min(1,guard.alertLevel+dt*1.2);
+    } else {
+      guard.alertLevel=Math.max(0,guard.alertLevel-dt*0.5);
+    }
+    guard.coneMat.opacity=guard.alertLevel*0.25;
+    guard.coneMat.color.setHex(guard.alertLevel>0.7?0xef5350:0xff9800);
+    if (guard.alertLevel>=1.0) getBusted();
+    if (guard.alertLevel>0.3) guardAlerted=true;
+  });
+  elGuardAlert.style.opacity=guardAlerted?'1':'0';
+
+  // ── Vance AI ──
+  updateVance(dt);
+
+  // ── Chloe AI ──
+  updateChloe(dt);
+
+  // ── Speed & stats ──
+  player.speed=hspd;
+  elSpeedDisplay.textContent='SPEED: '+Math.round(hspd*2.2)+' MPH';
+  updateStat('academics',player.academics);
+  updateStat('clout',player.clout);
+  updateStat('skate',player.skate);
+
+  // ── Camera ──
+  const camDist=10, camHeight=5+player.airTime*0.5;
+  camera.position.x+=(player.pos.x+Math.sin(camYaw)*camDist-camera.position.x)*0.08;
+  camera.position.z+=(player.pos.z+Math.cos(camYaw)*camDist-camera.position.z)*0.08;
+  camera.position.y+=(player.pos.y+camHeight-camera.position.y)*0.08;
+  camera.lookAt(player.pos.x,player.pos.y+0.8,player.pos.z);
+
+  sculptureGeo.rotation.y+=dt*0.3; sculptureGeo.rotation.x+=dt*0.15;
+  updateWarp();
+  updateStickHud(hspd);
+  statWarnTimer+=dt;
+  if(statWarnTimer>0.25){ statWarnTimer=0; updateStatWarnings(); }
+  updateFisheye(dt);
+  // Shop proximity prompt
+  if (!shopState.open) {
+    const sdx=player.pos.x-SHOP_POS.x, sdz=player.pos.z-SHOP_POS.z;
+    const shopDist=Math.sqrt(sdx*sdx+sdz*sdz);
+    elShopPrompt.style.opacity = shopDist < SHOP_RADIUS ? '1' : '0';
+  }
+  drawMinimap();
+}
+
+// ─── RENDER LOOP ──────────────────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(),0.05);
+  update(dt);
+  renderer.render(scene,camera);
+}
+animate();
+
+// ─── INTRO ────────────────────────────────────────────────────────────────────
+const factionDescs={
+  gutter:   'DIY purists. Anti-establishment. Hidden spots, custom grip, real respect.',
+  syndicate:'Hyper-commercialized. Energy drinks and social clout. High cash, private parks.',
+  vertigo:  'Competition-focused. Athletic perfection. Olympic hopefuls with technical boards.',
+};
+document.querySelectorAll('.faction-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.faction-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected'); faction=btn.dataset.faction;
+    document.getElementById('faction-desc').textContent=factionDescs[faction];
+  });
+});
+document.getElementById('intro-btn').addEventListener('click',()=>{
+  const intro=document.getElementById('intro');
+  intro.style.opacity='0';
+  setTimeout(()=>{ intro.style.display='none'; },1000);
+  gameRunning=true; clock.start();
+  toast('Drop in! Push to gain speed.','');
+  setTimeout(()=>toast('ARROWS mid-air for Flick-It tricks',''),3000);
+  setTimeout(()=>toast('SHIFT while rolling to grind',''),5000);
+  setTimeout(()=>toast('G to upload your clip to SkateGram',''),7000);
+  setTimeout(()=>toast('T near the green S on minimap — Shifty Ray\'s shop',''),10000);
+  setTimeout(()=>toast('F to spawn your camera friend',''),9000);
+  setTimeout(()=>toast('E to open the editing suite after skating',''),11000);
+});
+
+})();
+</script>
+</body>
+</html>

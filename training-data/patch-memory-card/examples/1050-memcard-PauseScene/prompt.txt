@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+PauseScene (from js/scenes/pause.js)

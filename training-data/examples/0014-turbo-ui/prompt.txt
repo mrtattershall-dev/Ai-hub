@@ -1,0 +1,3 @@
+[REVIEW - replace with a real instruction]
+Module: ui.js
+Header hint: UI MODULE  –  Screen management, HUD, Garage, Shop

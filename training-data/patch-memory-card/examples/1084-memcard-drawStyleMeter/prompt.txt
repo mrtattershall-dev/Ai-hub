@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+drawStyleMeter (from js/ui/hud.js)

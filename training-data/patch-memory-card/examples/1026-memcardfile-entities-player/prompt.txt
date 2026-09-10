@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/entities/player.js: * player.js — Vex Torrent: movement + combat avatar.

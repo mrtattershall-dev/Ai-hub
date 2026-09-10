@@ -1,0 +1,2 @@
+[REVIEW - write a real instruction]
+module js/engine/input.js: * input.js — unified keyboard + gamepad input mapped to game "actions".

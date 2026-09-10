@@ -1,0 +1,2434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CURSEBOUND</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+#screen {
+  position: relative;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  outline: none;        /* suppress browser focus ring */
+}
+/* Debug overlay — visible only when DEBUG=true */
+#debug-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  color: #0f0;
+  font: 9px monospace;
+  pointer-events: none;
+  padding: 2px 4px;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  white-space: pre;
+}
+</style>
+</head>
+<body>
+<div id="screen">
+  <canvas id="gameCanvas" tabindex="0"></canvas>
+  <div id="debug-overlay"></div>
+</div>
+
+<script>
+"use strict";
+
+/* ================================================================
+   CURSEBOUND — Section 1: Engine Foundation
+   NES Jam | Single-file HTML5 | 256×224 | NES Aesthetic
+   ================================================================
+
+   SECTION SCOPE:
+   - Constants, NES palette
+   - Canvas setup + pixel-perfect scaling
+   - Input system (keyboard + gamepad)
+   - Game state machine (TITLE / PLAYING / PAUSED / DEAD / WIN)
+   - Main game loop (60fps, requestAnimationFrame)
+   - Camera object (stub — populated in Section 2)
+   - Zone registry (stub — zones added in Sections 3–6)
+   - Debug overlay toggle
+
+   NOT IN THIS SECTION (added later):
+   - Tilemap renderer (Section 2)
+   - Player entity (Section 3)
+   - Enemies, The Hand (Sections 4–5)
+   - Boss (Section 7)
+   - Audio (Section 8)
+   - HUD, lore, localStorage (Section 9)
+================================================================ */
+
+
+/* ----------------------------------------------------------------
+   1. DEBUG FLAG — set true to show frame stats & state
+---------------------------------------------------------------- */
+const DEBUG = true;
+
+
+/* ----------------------------------------------------------------
+   2. NES-ACCURATE CONSTANTS
+---------------------------------------------------------------- */
+const NES = Object.freeze({
+  W:       256,
+  H:       224,
+  TILE:     16,    // 16×16px tiles
+  FPS:      60,
+  FRAME_MS: 1000 / 60,
+});
+
+
+/* ----------------------------------------------------------------
+   3. NES COLOUR PALETTE
+   Subset of the 64-colour NES palette used in this game.
+   Keys are semantic names — reference by name throughout code.
+   Never hardcode hex strings outside this block.
+---------------------------------------------------------------- */
+const PAL = Object.freeze({
+  // Backgrounds / environment
+  BLACK:      '#000000',
+  DARKGRAY:   '#2d2d2d',
+  MIDGRAY:    '#555555',
+  LIGHTGRAY:  '#aaaaaa',
+  WHITE:      '#f8f8f8',
+
+  // Castle stone tones
+  STONE_DARK: '#1a1210',
+  STONE_MID:  '#3c2e26',
+  STONE_LITE: '#6b5040',
+  STONE_HIGH: '#9c7a60',
+
+  // Accent / hazard
+  BLOOD_RED:  '#6d1313',
+  FIRE_RED:   '#cc2200',
+  GOLD:       '#d4a017',
+  PALE_GOLD:  '#f0d080',
+
+  // Player / UI
+  CLOAK_DARK: '#14142a',
+  CLOAK_MID:  '#2a2a4a',
+  CLOAK_LITE: '#4a4a8a',
+  SKIN:       '#f0c090',
+  SWORD_GREY: '#c0c0c0',
+
+  // UI chrome
+  HUD_BG:     '#0a0a0a',
+  HUD_HEART:  '#cc0000',
+  HUD_EMPTY:  '#330000',
+  HUD_TEXT:   '#f0e0b0',
+
+  // Cursor / selected
+  CURSOR:     '#ffff00',
+});
+
+
+/* ----------------------------------------------------------------
+   4. GAME STATE MACHINE
+   All state transitions go through setState().
+   Never assign G.state directly outside this function.
+---------------------------------------------------------------- */
+const STATE = Object.freeze({
+  TITLE:    'TITLE',
+  PLAYING:  'PLAYING',
+  PAUSED:   'PAUSED',
+  DEAD:     'DEAD',
+  WIN:      'WIN',
+});
+
+/* Global game object — single source of truth */
+const G = {
+  state:        STATE.TITLE,
+  prevState:    STATE.TITLE,
+  stateTimer:   0,          // frames since last state change
+  frame:        0,          // total frames elapsed
+
+  /* populated by Section 3 */
+  player:       null,
+
+  /* populated by Section 2 */
+  camera:       null,
+
+  /* populated by Section 2 */
+  currentZoneId: null,
+
+  /* Weapon pickups collected this run — survives death, cleared on TITLE */
+  collectedWeapons: new Set(),
+
+  /* populated by Section 5 */
+  theHand:      null,
+
+  /* populated by Section 7 */
+  boss:         null,
+
+  /* populated by Section 8 */
+  audio:        null,
+
+  /* populated by Section 9 */
+  hud:          null,
+  lore:         null,
+};
+
+function setState(next) {
+  if (G.state === next) return;
+  G.prevState   = G.state;
+  G.state       = next;
+  G.stateTimer  = 0;
+  if (DEBUG) console.log(`[state] ${G.prevState} → ${G.state}`);
+  onStateEnter(next);
+}
+
+function onStateEnter(s) {
+  switch (s) {
+    case STATE.TITLE:
+      G.collectedWeapons.clear();   /* full reset — fresh run starts from scratch */
+      titleScreen.reset();
+      break;
+    case STATE.PLAYING:
+      if (!G.currentZoneId) enterZone(ZONE_ID.ENTRY);
+      if (!G.player) initPlayer(G.currentZoneId);
+      break;
+    case STATE.PAUSED:
+      pauseScreen.cursor = 0;  /* always start on RESUME, not wherever it was left */
+      break;
+    case STATE.DEAD:
+      deadScreen.timer = 0;
+      break;
+    case STATE.WIN:
+      winScreen.timer    = 0;
+      winScreen.showText = false;
+      break;
+  }
+}
+
+
+/* ----------------------------------------------------------------
+   5. ZONE REGISTRY
+   Zones are registered here. Each zone object is defined in
+   Sections 2–6. This registry is the ONLY place zone IDs live.
+   Never reference a zone string outside ZONES.
+
+   Structure (populated later):
+   {
+     id:         string,
+     mapData:    null,   ← Section 2 fills this
+     enemies:    [],     ← Sections 4–6 fill this
+     music:      null,   ← Section 8 fills this
+     connects:   {},     ← {left, right, up, down} zone IDs
+   }
+---------------------------------------------------------------- */
+const ZONE_ID = Object.freeze({
+  ENTRY:    'ENTRY',    // Zone 1 — The Entry Hall
+  CRYPT:    'CRYPT',    // Zone 2 — The Crypt
+  CLOCK:    'CLOCK',    // Zone 3 — The Clocktower
+  SANCTUM:  'SANCTUM',  // Zone 4 — The Sanctum
+  THRONE:   'THRONE',   // Zone 5 — The Throne Room
+  BOSS:     'BOSS',     // Boss arena (separate from Zone 5)
+});
+
+const ZONES = {};   /* filled by Section 2 — one canvas per zone */
+
+function registerZone(def) {
+  if (ZONES[def.id]) {
+    console.warn(`[zones] duplicate zone id: ${def.id}`);
+    return;
+  }
+  ZONES[def.id] = Object.assign({
+    mapData:  null,
+    enemies:  [],
+    music:    null,
+    connects: {},
+  }, def);
+  if (DEBUG) console.log(`[zones] registered: ${def.id}`);
+}
+
+/* Pre-register all zone stubs so code can safely reference them
+   before their maps are built in Section 2. */
+Object.values(ZONE_ID).forEach(id => registerZone({ id }));
+
+
+/* ----------------------------------------------------------------
+   6. CANVAS + PIXEL-PERFECT SCALING
+   One master canvas at NES.W × NES.H.
+   Scale fills the browser window without stretching the aspect.
+   Recalculates on every resize event.
+
+   IMPORTANT: Each zone will have its own OFF-SCREEN canvas for its
+   tilemap. This screen canvas is the ONLY one that touches the DOM.
+   Zone canvases are never appended to the document.
+---------------------------------------------------------------- */
+const screenCanvas  = document.getElementById('gameCanvas');
+const screenCtx     = screenCanvas.getContext('2d', { alpha: false });
+const screenEl      = document.getElementById('screen');
+
+/* Set the logical resolution once — never changes */
+screenCanvas.width  = NES.W;
+screenCanvas.height = NES.H;
+
+/* Disable smoothing globally — pixel art must stay sharp */
+screenCtx.imageSmoothingEnabled = false;
+
+let SCALE = 1;   /* current CSS scale factor */
+
+function fitCanvas() {
+  const sx = Math.floor(window.innerWidth  / NES.W);
+  const sy = Math.floor(window.innerHeight / NES.H);
+  SCALE = Math.max(1, Math.min(sx, sy));
+
+  const w = NES.W * SCALE;
+  const h = NES.H * SCALE;
+
+  screenEl.style.width  = w + 'px';
+  screenEl.style.height = h + 'px';
+  screenCanvas.style.width  = w + 'px';
+  screenCanvas.style.height = h + 'px';
+
+  /* Sync debug overlay size */
+  document.getElementById('debug-overlay').style.fontSize =
+    Math.max(9, SCALE * 6) + 'px';
+}
+
+window.addEventListener('resize', fitCanvas);
+fitCanvas();
+
+/* Focus the canvas immediately so keyboard events reach it.
+   Re-focus on any click anywhere in the page — covers cases where
+   the user clicks outside the canvas within the iframe. */
+screenCanvas.focus();
+document.addEventListener('click', () => screenCanvas.focus());
+
+/* Helper — create an off-screen canvas (for zone tilemaps).
+   Call this from Section 2 for each zone. */
+function createOffscreenCanvas(w, h) {
+  const c = document.createElement('canvas');
+  c.width  = w;
+  c.height = h;
+  const ctx = c.getContext('2d', { alpha: false });
+  ctx.imageSmoothingEnabled = false;
+  return { canvas: c, ctx };
+}
+
+
+/* ----------------------------------------------------------------
+   7. INPUT SYSTEM
+   Virtual NES controller. Listens on both window and document
+   so events are caught regardless of which element has iframe focus.
+   WASD mirrors arrow keys; Space mirrors Z (jump) — avoids iframe
+   arrow-key scroll capture in embedded environments.
+---------------------------------------------------------------- */
+const KEY_MAP = {
+  /* D-pad */
+  ArrowLeft:  'LEFT',   ArrowRight: 'RIGHT',
+  ArrowUp:    'UP',     ArrowDown:  'DOWN',
+  /* WASD mirror — never captured by scroll */
+  KeyA:       'LEFT',   KeyD:       'RIGHT',
+  KeyW:       'UP',     KeyS:       'DOWN',
+  /* Face buttons */
+  KeyZ:       'A',      /* Jump  */
+  Space:      'A',      /* Jump  (spacebar — more reliable in iframes) */
+  KeyX:       'B',      /* Attack */
+  /* System */
+  Enter:      'START',
+  ShiftLeft:  'SELECT',
+  ShiftRight: 'SELECT',
+};
+
+/* Current frame input state */
+const INPUT = {
+  LEFT:   { pressed: false, just: false, released: false },
+  RIGHT:  { pressed: false, just: false, released: false },
+  UP:     { pressed: false, just: false, released: false },
+  DOWN:   { pressed: false, just: false, released: false },
+  A:      { pressed: false, just: false, released: false },
+  B:      { pressed: false, just: false, released: false },
+  START:  { pressed: false, just: false, released: false },
+  SELECT: { pressed: false, just: false, released: false },
+};
+
+
+function _pressBtn(name) {
+  if (!INPUT[name]) return;
+  if (!INPUT[name].pressed) {
+    INPUT[name].just    = true;
+    INPUT[name].pressed = true;
+  }
+}
+function _releaseBtn(name) {
+  if (!INPUT[name]) return;
+  if (INPUT[name].pressed) {
+    INPUT[name].released = true;
+    INPUT[name].pressed  = false;
+  }
+}
+
+/* Named handlers so they can be registered on multiple targets */
+function _handleKeyDown(e) {
+  if (e.repeat) return;
+  const btn = KEY_MAP[e.code];
+  if (btn) { e.preventDefault(); _pressBtn(btn); }
+}
+function _handleKeyUp(e) {
+  const btn = KEY_MAP[e.code];
+  if (btn) { e.preventDefault(); _releaseBtn(btn); }
+}
+
+/* Listen on both window and document — catches events regardless of
+   which iframe element has focus */
+window.addEventListener('keydown',   _handleKeyDown);
+window.addEventListener('keyup',     _handleKeyUp);
+document.addEventListener('keydown', _handleKeyDown);
+document.addEventListener('keyup',   _handleKeyUp);
+
+/* Gamepad polling — called each frame in update() */
+/* Pre-detect iframe / sandboxed context before the loop ever starts.
+   SecurityErrors from getGamepads() are flagged as "Uncaught" by the
+   browser even inside a try/catch, so we must prevent the call entirely
+   rather than catch it after the fact. */
+const _gamepadDead = (function() {
+  try {
+    /* Cross-origin iframes throw on window.top access — that also means blocked */
+    if (window.self !== window.top) return true;
+    /* No API at all */
+    if (!navigator.getGamepads) return true;
+    return false;
+  } catch (_) {
+    return true;
+  }
+})();
+if (DEBUG && _gamepadDead) console.log('[input] Gamepad disabled (sandboxed iframe) — keyboard only.');
+
+function pollGamepad() {
+  if (_gamepadDead) return;
+  const pads = navigator.getGamepads();
+  const pad = pads[0];
+  if (!pad) return;
+
+  /* Standard gamepad layout mapping */
+  const axes = pad.axes;
+  const btns = pad.buttons;
+
+  /* D-pad via axes (deadzone ±0.5) or digital buttons */
+  const DEAD = 0.5;
+  _applyGPBtn('LEFT',   (axes[0] < -DEAD) || (btns[14] && btns[14].pressed));
+  _applyGPBtn('RIGHT',  (axes[0] >  DEAD) || (btns[15] && btns[15].pressed));
+  _applyGPBtn('UP',     (axes[1] < -DEAD) || (btns[12] && btns[12].pressed));
+  _applyGPBtn('DOWN',   (axes[1] >  DEAD) || (btns[13] && btns[13].pressed));
+
+  /* Face buttons: A=Cross(0), B=Circle(1), Start=Options(9), Select=Share(8) */
+  _applyGPBtn('A',      btns[0] && btns[0].pressed);
+  _applyGPBtn('B',      btns[1] && btns[1].pressed);
+  _applyGPBtn('START',  btns[9] && btns[9].pressed);
+  _applyGPBtn('SELECT', btns[8] && btns[8].pressed);
+}
+
+const _gpPrev = {};
+function _applyGPBtn(name, held) {
+  if (held && !_gpPrev[name]) _pressBtn(name);
+  if (!held && _gpPrev[name]) _releaseBtn(name);
+  _gpPrev[name] = !!held;
+}
+
+/* Call at END of each game frame to clear single-frame flags */
+function inputFlush() {
+  for (const name in INPUT) {
+    INPUT[name].just     = false;
+    INPUT[name].released = false;
+  }
+}
+
+
+/* ----------------------------------------------------------------
+   8. CAMERA
+---------------------------------------------------------------- */
+const Camera = {
+  x: 0, y: 0, targetX: 0, targetY: 0,
+
+  follow(entity) {
+    const zone = G.currentZoneId ? ZONES[G.currentZoneId] : null;
+    const mapW = zone && zone.mapData ? zone.mapData.cols * NES.TILE : NES.W;
+    const mapH = zone && zone.mapData ? zone.mapData.rows * NES.TILE : NES.H;
+    const maxX = Math.max(0, mapW - NES.W);
+    const maxY = Math.max(0, mapH - NES.H);
+    const cx = entity ? entity.x - NES.W / 2 + (entity.w >> 1) : this.targetX;
+    const cy = entity ? entity.y - NES.H / 2 + (entity.h >> 1) : this.targetY;
+    this.targetX = Math.max(0, Math.min(cx, maxX));
+    this.targetY = Math.max(0, Math.min(cy, maxY));
+    this.x = Math.round(this.targetX);
+    this.y = Math.round(this.targetY);
+  },
+
+  pan(dx, dy) {
+    const zone = G.currentZoneId ? ZONES[G.currentZoneId] : null;
+    const mapW = zone && zone.mapData ? zone.mapData.cols * NES.TILE : NES.W;
+    const mapH = zone && zone.mapData ? zone.mapData.rows * NES.TILE : NES.H;
+    const maxX = Math.max(0, mapW - NES.W);
+    const maxY = Math.max(0, mapH - NES.H);
+    this.x = Math.max(0, Math.min(this.x + dx, maxX));
+    this.y = Math.max(0, Math.min(this.y + dy, maxY));
+    this.targetX = this.x; this.targetY = this.y;
+  },
+
+  reset() { this.x = this.y = this.targetX = this.targetY = 0; },
+};
+G.camera = Camera;
+
+
+/* ================================================================
+   SECTION 2 — TILEMAP RENDERER, ZONE 1 MAP, COLLISION
+================================================================ */
+
+/* ----------------------------------------------------------------
+   S2-A. TILE ID CONSTANTS + PROPERTY TABLE
+---------------------------------------------------------------- */
+const T = Object.freeze({
+  AIR: 0, SOLID: 1, PLATFORM: 2, SPIKE: 3,
+  LORE: 5, WEAPON: 6, DOOR_UP: 7, DOOR_L: 8, DOOR_R: 9, DOOR_D: 10,
+});
+
+/* Indexed by tile ID — properties used by collision + trigger logic */
+const TILE_PROPS = (function() {
+  const p = [];
+  const def = (id, solid, oneway, hazard, trigger) =>
+    (p[id] = { solid, oneway, hazard, trigger: trigger || null });
+  def(T.AIR,      false, false, false);
+  def(T.SOLID,    true,  false, false);
+  def(T.PLATFORM, false, true,  false);
+  def(T.SPIKE,    false, false, true);
+  def(T.LORE,     false, false, false, 'lore');
+  def(T.WEAPON,   false, false, false, 'weapon');
+  def(T.DOOR_UP,  false, false, false, 'door_up');
+  def(T.DOOR_L,   false, false, false, 'door_l');
+  def(T.DOOR_R,   false, false, false, 'door_r');
+  def(T.DOOR_D,   false, false, false, 'door_d');
+  return p;
+})();
+
+function tileAt(mapData, tx, ty) {
+  if (tx < 0 || ty < 0 || tx >= mapData.cols || ty >= mapData.rows) return T.SOLID;
+  return mapData.data[ty * mapData.cols + tx];
+}
+function tileIsSolid(id)  { return TILE_PROPS[id] ? TILE_PROPS[id].solid  : false; }
+function tileIsOneway(id) { return TILE_PROPS[id] ? TILE_PROPS[id].oneway : false; }
+function tileIsHazard(id) { return TILE_PROPS[id] ? TILE_PROPS[id].hazard : false; }
+
+
+/* ----------------------------------------------------------------
+   S2-B. MAP COMPILER
+   Converts a flat Uint8Array + dims into a mapData object.
+   Validates size in DEBUG mode.
+---------------------------------------------------------------- */
+function buildMapData(arr, cols, rows) {
+  if (DEBUG && arr.length !== cols * rows)
+    console.warn(`[map] size mismatch: expected ${cols*rows}, got ${arr.length}`);
+  return { data: new Uint8Array(arr), cols, rows };
+}
+
+
+/* ----------------------------------------------------------------
+   S2-C. ZONE 1 MAP — THE ENTRY HALL  (64 cols × 14 rows = 896)
+   Each row is exactly 64 values. Verified by visual grouping.
+---------------------------------------------------------------- */
+/* prettier-ignore */
+ZONES[ZONE_ID.ENTRY].mapData    = buildMapData([
+// r0  ceiling ─────────────────────────────────────────────────────
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+// r1  sky (left/right walls only — DOOR_UP removed, was never wired up)
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+// r2  sky
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+// r3  high platforms — cols 11-12, 20-21, 38-39, 56-57
+1,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,1,
+// r4  open
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+// r5  mid platforms — cols 7-8, 17-18, 26-27, 35-36, 44-45, 53-54
+1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,2,2,0,0,0,0,
+0,0,0,2,2,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,1,
+// r6  open — bone whip at col 26 (body-height pickup from row-7 platforms)
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+// r7  low platforms — cols 4-6, 13-15, 22-24, 31-33, 40-42, 49-51, 58-60
+//     lore fragment at col 37 (between mid-map platforms)
+1,0,0,0,2,2,2,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,2,
+2,2,0,0,0,5,0,0,2,2,2,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,2,2,2,0,0,1,
+// r8  left exit: DOOR_L at col 0 → CRYPT  |  right exit: DOOR_R at col 63 → CLOCK
+8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,
+// r9  spikes at cols 20-21 (above the pit) — col 0 AIR lets player reach left door
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,
+// r10 floor — pit at cols 20-21 (jump over or fall in, spikes punish the fall)
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+// r11 solid floor
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+// r12-13 sub-floor
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+], 64, 14);
+
+ZONES[ZONE_ID.ENTRY].spawnTX    = 3;
+ZONES[ZONE_ID.ENTRY].spawnTY    = 10;
+ZONES[ZONE_ID.ENTRY].staticCanvas = null;
+ZONES[ZONE_ID.ENTRY].connects    = { left: ZONE_ID.CRYPT, up: ZONE_ID.CLOCK };
+
+/* ----------------------------------------------------------------
+   Zone 1 map patches — applied after buildMapData so the tile
+   constants (T.*) are available for readability.
+---------------------------------------------------------------- */
+(function patchEntryHall() {
+  const md = ZONES[ZONE_ID.ENTRY].mapData;
+
+  /* Upper staircase to Clocktower — ceiling row 0, cols 37-39.
+     Col 37 + 39: AIR (visual opening), col 38: DOOR_UP (trigger). */
+  md.data[0 * 64 + 37] = T.AIR;
+  md.data[0 * 64 + 38] = T.DOOR_UP;
+  md.data[0 * 64 + 39] = T.AIR;
+
+  /* Second lore fragment — row 2 col 11, floats above the high
+     platform at cols 11-12 (row 3). Auto-collects when player
+     stands on that platform. */
+  md.data[2 * 64 + 11] = T.LORE;
+
+  /* Remove old horizontal right exit — no DOOR_R on right wall.
+     Zone 3 is now accessed via the upper staircase only. */
+  md.data[8 * 64 + 63] = T.SOLID;
+  md.data[9 * 64 + 63] = T.SOLID;
+})();
+
+/* Lore text — keyed by flat tile index (row * cols + col).
+   GDD Zone 1 lore: "The player's name carved into a stone slab.
+   A death date. Tonight's date." + atmosphere fragment. */
+ZONES[ZONE_ID.ENTRY].loreTexts = new Map([
+  [7 * 64 + 37, [                       /* main lore slab — mid-hall floor */
+    'YOUR NAME. CARVED IN THE STONE.',
+    'A DATE BELOW IT. THE NIGHT YOU DIED.',
+    'THE DATE BELOW THAT IS TONIGHT.',
+  ]],
+  [2 * 64 + 11, [                       /* second fragment — high platform */
+    'THE CHANDELIER HAS NOT GONE OUT',
+    'IN THREE HUNDRED YEARS.',
+    'SOMETHING KEEPS THE LIGHTS ON.',
+  ]],
+]);
+
+/* Enemy spawn definitions — tx/ty in tile coordinates */
+ZONES[ZONE_ID.ENTRY].enemySpawns = [
+  /* Skeletons — ground patrol across the hall */
+  { type: 'skeleton',      tx:  8, ty: 10 },   /* left section */
+  { type: 'skeleton',      tx: 30, ty: 10 },   /* centre, past the pit */
+  { type: 'skeleton',      tx: 47, ty: 10 },   /* right section */
+  /* Bats — sine-wave float at platform height */
+  { type: 'bat',           tx: 16, ty:  6 },   /* row-6 air, left-centre */
+  { type: 'bat',           tx: 38, ty:  5 },   /* row-5 height, centre */
+  { type: 'bat',           tx: 54, ty:  6 },   /* right, near exit */
+  /* Armored guards — slow, heavy. Two of them flank the zone. */
+  { type: 'armored_guard', tx: 25, ty: 10 },   /* left of centre, near pit */
+  { type: 'armored_guard', tx: 55, ty: 10 },   /* right side, near staircase */
+];
+
+
+/* ----------------------------------------------------------------
+   S2-D. ZONE PALETTE
+   Each zone gets its own color set for tile drawing.
+   Future zones add entries here.
+---------------------------------------------------------------- */
+const ZONE_PAL = {
+  [ZONE_ID.ENTRY]: {
+    bg:          PAL.STONE_DARK,
+    solidBase:   PAL.STONE_MID,
+    solidTop:    PAL.STONE_HIGH,
+    solidShad:   PAL.STONE_DARK,
+    platformTop: PAL.STONE_HIGH,
+    platformMid: PAL.STONE_LITE,
+    platformBot: PAL.STONE_MID,
+  },
+};
+/* Fallback so future zones don't crash before their palette is defined */
+const _DEFAULT_ZPAL = ZONE_PAL[ZONE_ID.ENTRY];
+function zonePal(id) { return ZONE_PAL[id] || _DEFAULT_ZPAL; }
+
+
+/* ----------------------------------------------------------------
+   S2-E. TILE DRAW — draws one 16×16 tile at pixel (px, py)
+   Only called during the static layer build (or dynamic pickups).
+   tileCol/tileRow are the tile's grid position (used for brick seam).
+---------------------------------------------------------------- */
+function drawTile(ctx, id, px, py, tileCol, tileRow, zpal) {
+  const T16 = NES.TILE;
+  switch (id) {
+
+    case T.SOLID: {
+      ctx.fillStyle = zpal.solidBase;
+      ctx.fillRect(px, py, T16, T16);
+      /* top highlight */
+      ctx.fillStyle = zpal.solidTop;
+      ctx.fillRect(px, py, T16, 2);
+      /* right + bottom shadow */
+      ctx.fillStyle = zpal.solidShad;
+      ctx.fillRect(px + T16 - 2, py, 2, T16);
+      ctx.fillRect(px, py + T16 - 2, T16, 2);
+      /* brick seam — horizontal, alternates x-offset every row */
+      const seamX = px + ((tileRow % 2 === 0) ? 0 : 8);
+      ctx.fillRect(seamX, py + 8, 8, 1);
+      break;
+    }
+
+    case T.PLATFORM: {
+      /* Transparent base (air) — nothing. Just the ledge surface. */
+      ctx.fillStyle = zpal.platformTop;
+      ctx.fillRect(px, py, T16, 2);           /* bright lip */
+      ctx.fillStyle = zpal.platformMid;
+      ctx.fillRect(px, py + 2, T16, 4);       /* ledge body */
+      ctx.fillStyle = zpal.platformBot;
+      ctx.fillRect(px, py + 6, T16, 2);       /* underside */
+      break;
+    }
+
+    case T.SPIKE: {
+      ctx.fillStyle = zpal.solidShad;
+      ctx.fillRect(px, py + 8, T16, 8);       /* base plate */
+      /* Two spikes — pixel-art triangles via stacked fillRects */
+      for (let s = 0; s < 2; s++) {
+        const sx = px + 2 + s * 8;
+        ctx.fillStyle = PAL.BLOOD_RED;
+        ctx.fillRect(sx,     py + 12, 4, 4);  /* spike base */
+        ctx.fillStyle = PAL.FIRE_RED;
+        ctx.fillRect(sx + 1, py + 8,  2, 4);  /* spike mid */
+        ctx.fillStyle = PAL.LIGHTGRAY;
+        ctx.fillRect(sx + 1, py + 6,  2, 2);  /* spike tip */
+      }
+      break;
+    }
+
+    case T.DOOR_UP: {
+      ctx.fillStyle = PAL.CLOAK_DARK;
+      ctx.fillRect(px, py, T16, T16);
+      ctx.fillStyle = PAL.STONE_MID;
+      ctx.fillRect(px, py, 2, T16);            /* left pillar */
+      ctx.fillRect(px + T16 - 2, py, 2, T16); /* right pillar */
+      ctx.fillStyle = PAL.GOLD;
+      ctx.fillRect(px + 2, py, T16 - 4, 2);   /* lintel */
+      /* up arrow */
+      ctx.fillStyle = PAL.PALE_GOLD;
+      ctx.fillRect(px + 7, py + 4, 2, 8);
+      ctx.fillRect(px + 4, py + 6, 8, 2);
+      ctx.fillRect(px + 5, py + 4, 6, 2);
+      break;
+    }
+
+    case T.DOOR_L: {
+      ctx.fillStyle = PAL.CLOAK_DARK;
+      ctx.fillRect(px, py, T16, T16);
+      ctx.fillStyle = PAL.STONE_MID;
+      ctx.fillRect(px, py, T16, 2);
+      ctx.fillRect(px, py + T16 - 2, T16, 2);
+      ctx.fillStyle = PAL.GOLD;
+      ctx.fillRect(px, py + 2, 2, T16 - 4);
+      ctx.fillStyle = PAL.PALE_GOLD;
+      ctx.fillRect(px + 4, py + 7, 8, 2);
+      ctx.fillRect(px + 4, py + 5, 2, 6);
+      ctx.fillRect(px + 6, py + 5, 2, 2);
+      break;
+    }
+
+    case T.DOOR_R: {
+      ctx.fillStyle = PAL.CLOAK_DARK;
+      ctx.fillRect(px, py, T16, T16);
+      ctx.fillStyle = PAL.STONE_MID;
+      ctx.fillRect(px, py, T16, 2);            /* top lintel */
+      ctx.fillRect(px, py + T16 - 2, T16, 2); /* bottom sill */
+      ctx.fillStyle = PAL.GOLD;
+      ctx.fillRect(px + T16 - 2, py + 2, 2, T16 - 4); /* right accent */
+      /* right-pointing arrow */
+      ctx.fillStyle = PAL.PALE_GOLD;
+      ctx.fillRect(px + 4, py + 7, 8, 2);
+      ctx.fillRect(px + 10, py + 5, 2, 6);
+      ctx.fillRect(px + 8,  py + 5, 2, 2);
+      break;
+    }
+
+    /* LORE + WEAPON are dynamic — drawn per-frame in drawDynamicPickups */
+    default: break;
+  }
+}
+
+
+/* ----------------------------------------------------------------
+   S2-F. BUILD ZONE STATIC CANVAS
+   Renders background + static tiles once to an offscreen canvas.
+   Lazy: only called when zone.staticCanvas is null.
+   NEVER appended to document — blit only.
+---------------------------------------------------------------- */
+function buildZoneStaticCanvas(zoneId) {
+  const zone = ZONES[zoneId];
+  if (!zone || !zone.mapData) return;
+  const { cols, rows } = zone.mapData;
+  const pw = cols * NES.TILE;
+  const ph = rows * NES.TILE;
+
+  const { canvas, ctx } = createOffscreenCanvas(pw, ph);
+  const zp = zonePal(zoneId);
+
+  /* Fill background */
+  ctx.fillStyle = zp.bg;
+  ctx.fillRect(0, 0, pw, ph);
+
+  /* Draw all static tiles */
+  for (let ty = 0; ty < rows; ty++) {
+    for (let tx = 0; tx < cols; tx++) {
+      const id = zone.mapData.data[ty * cols + tx];
+      if (id === T.AIR || id === T.LORE || id === T.WEAPON) continue;
+      drawTile(ctx, id, tx * NES.TILE, ty * NES.TILE, tx, ty, zp);
+    }
+  }
+
+  /* Zone-specific atmospheric decorations baked into the static layer */
+  if (zoneId === ZONE_ID.ENTRY) drawEntryDecorations(ctx, cols);
+
+  zone.staticCanvas = canvas;
+  if (DEBUG) console.log(`[zone] static canvas built: ${zoneId} (${pw}×${ph})`);
+}
+
+
+/* ----------------------------------------------------------------
+   S2-F.1  ENTRY HALL ATMOSPHERE — chandeliers + cobwebs
+   Drawn once into the Entry Hall static canvas.
+   NES palette only — no transparency, no gradients.
+---------------------------------------------------------------- */
+function drawEntryDecorations(ctx, cols) {
+  /* ── Chandeliers ── three hanging from the ceiling */
+  [Math.floor(cols * 0.2), Math.floor(cols * 0.5), Math.floor(cols * 0.8)].forEach(col => {
+    const cx = col * NES.TILE + 8;
+    const cy = NES.TILE;           /* top of row 1 — hangs beneath ceiling */
+
+    /* Chain links */
+    ctx.fillStyle = PAL.STONE_HIGH;
+    ctx.fillRect(cx - 1, cy,      2, 3);
+    ctx.fillRect(cx - 1, cy + 5,  2, 3);
+    ctx.fillRect(cx - 1, cy + 10, 2, 3);
+
+    /* Crosspiece */
+    ctx.fillStyle = PAL.STONE_MID;
+    ctx.fillRect(cx - 10, cy + 13, 20, 3);
+    ctx.fillStyle = PAL.STONE_HIGH;
+    ctx.fillRect(cx - 10, cy + 13, 20, 1);   /* top highlight */
+
+    /* Four candle stubs + flames */
+    [-7, -2, 3, 8].forEach(dx => {
+      ctx.fillStyle = PAL.STONE_LITE;
+      ctx.fillRect(cx + dx - 1, cy + 16, 2, 4);
+      ctx.fillStyle = PAL.PALE_GOLD;
+      ctx.fillRect(cx + dx - 1, cy + 14, 2, 2);
+      ctx.fillStyle = PAL.FIRE_RED;
+      ctx.fillRect(cx + dx,     cy + 13, 1, 1);
+    });
+  });
+
+  /* ── Cobwebs ── pixel-art corner webs */
+  ctx.fillStyle = PAL.STONE_HIGH;
+
+  /* Upper-left corner */
+  for (let r = 4; r <= 20; r += 4) {
+    ctx.fillRect(NES.TILE,     NES.TILE + r, r, 1);   /* horizontal strand */
+    ctx.fillRect(NES.TILE + r, NES.TILE,     1, r);   /* vertical strand   */
+    if (r > 4) ctx.fillRect(NES.TILE + (r >> 1), NES.TILE + (r >> 1), 1, 1);
+  }
+  /* Upper-right corner */
+  const rEdge = (cols - 2) * NES.TILE;
+  for (let r = 4; r <= 20; r += 4) {
+    ctx.fillRect(rEdge - r,       NES.TILE + r, r, 1);
+    ctx.fillRect(rEdge,           NES.TILE,     1, r);
+    if (r > 4) ctx.fillRect(rEdge - (r >> 1), NES.TILE + (r >> 1), 1, 1);
+  }
+}
+
+
+/* ----------------------------------------------------------------
+   S2-F.2  SCREEN SHAKE
+---------------------------------------------------------------- */
+const Shake = {
+  timer:     0,
+  maxFrames: 12,
+  magnitude: 3,
+
+  trigger() { this.timer = this.maxFrames; },
+  update()  { if (this.timer > 0) this.timer--; },
+
+  offset() {
+    if (this.timer <= 0) return { x: 0, y: 0 };
+    const m = Math.round(this.magnitude * (this.timer / this.maxFrames));
+    return {
+      x: (Math.random() < 0.5 ? -1 : 1) * m,
+      y: (Math.random() < 0.5 ? -1 : 1) * m,
+    };
+  },
+};
+
+
+/* ----------------------------------------------------------------
+   S2-F.3  LORE PANEL
+   Displays collected lore text in a bordered panel at the bottom
+   of the screen. Fades in/out smoothly. Never interrupts gameplay.
+---------------------------------------------------------------- */
+const lorePanel = {
+  lines:    [],
+  timer:    0,
+  MAX_TIME: 360,   /* 6 seconds */
+
+  show(lines) {
+    this.lines = lines.slice();
+    this.timer = this.MAX_TIME;
+  },
+
+  update() { if (this.timer > 0) this.timer--; },
+
+  draw(ctx) {
+    if (this.timer <= 0 || this.lines.length === 0) return;
+
+    /* Fade in over 40fr, fade out over last 40fr */
+    const fade = Math.min(1,
+      this.timer / 40,
+      (this.MAX_TIME - this.timer + 1) / 40
+    );
+    ctx.globalAlpha = fade;
+
+    const PH = this.lines.length * 10 + 12;
+    const PY = NES.H - PH - 6;
+
+    /* Panel body */
+    ctx.fillStyle = PAL.STONE_DARK;
+    ctx.fillRect(4, PY, NES.W - 8, PH);
+    /* Border */
+    ctx.fillStyle = PAL.STONE_HIGH;
+    ctx.fillRect(4,          PY,          NES.W - 8, 1);
+    ctx.fillRect(4,          PY + PH - 1, NES.W - 8, 1);
+    ctx.fillRect(4,          PY,          1, PH);
+    ctx.fillRect(NES.W - 5,  PY,          1, PH);
+
+    /* Lore text */
+    ctx.fillStyle = PAL.PALE_GOLD;
+    ctx.font      = '6px monospace';
+    ctx.textAlign = 'center';
+    this.lines.forEach((line, i) => {
+      ctx.fillText(line, NES.W / 2, PY + 8 + i * 10);
+    });
+    ctx.textAlign  = 'left';
+    ctx.globalAlpha = 1;
+  },
+};
+
+
+/* ----------------------------------------------------------------
+   S2-G. DRAW DYNAMIC PICKUPS (lore, weapon) — called each frame
+   These animate and disappear on collection so they skip the static canvas.
+---------------------------------------------------------------- */
+function drawDynamicPickups(ctx, zoneId, camX, camY) {
+  const zone = ZONES[zoneId];
+  if (!zone || !zone.mapData) return;
+  const { cols, rows } = zone.mapData;
+  const pulse = Math.sin(G.frame * 0.1) * 0.5 + 0.5;  /* 0–1 oscillate */
+
+  /* Only draw tiles in the visible viewport */
+  const tx0 = Math.max(0,          ( camX              / NES.TILE) | 0);
+  const tx1 = Math.min(cols - 1,  (((camX + NES.W)    / NES.TILE) | 0) + 1);
+  const ty0 = Math.max(0,          ( camY              / NES.TILE) | 0);
+  const ty1 = Math.min(rows - 1,  (((camY + NES.H)    / NES.TILE) | 0) + 1);
+
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      const id = zone.mapData.data[ty * cols + tx];
+      if (id !== T.LORE && id !== T.WEAPON) continue;
+
+      const px = tx * NES.TILE - camX;
+      const py = ty * NES.TILE - camY;
+
+      if (id === T.WEAPON) {
+        /* Gold shimmer */
+        const bright = Math.floor(pulse * 40);
+        ctx.fillStyle = PAL.STONE_MID;
+        ctx.fillRect(px, py, NES.TILE, NES.TILE);
+        ctx.fillStyle = PAL.GOLD;
+        ctx.fillRect(px + 2, py + 6, NES.TILE - 4, 4);
+        ctx.fillStyle = PAL.PALE_GOLD;
+        ctx.fillRect(px + 4, py + 5, NES.TILE - 8, 2);
+        /* shimmer pulse */
+        if (bright > 20) {
+          ctx.fillStyle = PAL.WHITE;
+          ctx.fillRect(px + 7, py + 5, 2, 2);
+        }
+      }
+
+      if (id === T.LORE) {
+        /* Pulsing blue rune */
+        ctx.fillStyle = PAL.STONE_MID;
+        ctx.fillRect(px, py, NES.TILE, NES.TILE);
+        /* diamond */
+        const c = PAL.CLOAK_LITE;
+        ctx.fillStyle = c;
+        ctx.fillRect(px + 7, py + 2, 2, 2);
+        ctx.fillRect(px + 5, py + 4, 6, 2);
+        ctx.fillRect(px + 3, py + 6, 10, 2);
+        ctx.fillRect(px + 5, py + 8, 6, 2);
+        ctx.fillRect(px + 7, py + 10, 2, 2);
+        /* pulse overlay */
+        if (pulse > 0.5) {
+          ctx.fillStyle = PAL.WHITE;
+          ctx.fillRect(px + 7, py + 6, 2, 2);
+        }
+      }
+    }
+  }
+}
+
+
+/* ----------------------------------------------------------------
+   S2-H. RENDER ZONE — called every frame from the PLAYING renderer
+---------------------------------------------------------------- */
+function renderZone(ctx, zoneId, camX, camY) {
+  const zone = ZONES[zoneId];
+  if (!zone) return;
+
+  if (!zone.staticCanvas) buildZoneStaticCanvas(zoneId);
+
+  /* Zone has no map data yet — show a placeholder rather than crash */
+  if (!zone.staticCanvas) {
+    ctx.fillStyle = PAL.BLACK;
+    ctx.fillRect(0, 0, NES.W, NES.H);
+    ctx.fillStyle = PAL.STONE_HIGH;
+    ctx.font = '8px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('[ ' + zoneId + ' ]', NES.W / 2, NES.H / 2 - 8);
+    ctx.fillStyle = PAL.MIDGRAY;
+    ctx.font = '6px monospace';
+    ctx.fillText('COMING IN NEXT SECTION', NES.W / 2, NES.H / 2 + 8);
+    ctx.textAlign = 'left';
+    return;
+  }
+
+  ctx.drawImage(zone.staticCanvas, -camX, -camY);
+  drawDynamicPickups(ctx, zoneId, camX, camY);
+}
+
+
+/* ----------------------------------------------------------------
+   S2-I. AABB TILE COLLISION RESOLVER
+   Standard separated-axis approach:
+     1. Move X, resolve X-collisions
+     2. Move Y, resolve Y-collisions
+   One-way platforms only block downward movement.
+
+   entity: { x, y, w, h, vx, vy }
+   mapData: from ZONES[id].mapData
+   Returns updated { x, y, vx, vy, onGround, hitCeiling, hitWallL, hitWallR }
+---------------------------------------------------------------- */
+function resolveCollision(entity, mapData) {
+  const T16 = NES.TILE;
+  let { x, y, w, h, vx, vy } = entity;
+  let onGround = false, hitCeiling = false, hitWallL = false, hitWallR = false;
+
+  /* ── X axis ── */
+  x += vx;
+  if (vx !== 0) {
+    const left  = (x / T16) | 0;
+    const right = ((x + w - 1) / T16) | 0;
+    const top   = ((y + 1) / T16) | 0;
+    const bot   = ((y + h - 2) / T16) | 0;
+    if (vx > 0) {
+      /* moving right — check right edge at top and bottom of entity */
+      if (tileIsSolid(tileAt(mapData, right, top)) ||
+          tileIsSolid(tileAt(mapData, right, bot))) {
+        x = right * T16 - w;
+        vx = 0; hitWallR = true;
+      }
+    } else {
+      /* moving left — check left edge */
+      if (tileIsSolid(tileAt(mapData, left, top)) ||
+          tileIsSolid(tileAt(mapData, left, bot))) {
+        x = (left + 1) * T16;
+        vx = 0; hitWallL = true;
+      }
+    }
+  }
+
+  /* ── Y axis ── */
+  y += vy;
+  {
+    const left  = ((x + 1) / T16) | 0;
+    const right = ((x + w - 2) / T16) | 0;
+    const top   = (y / T16) | 0;
+    const bot   = ((y + h) / T16) | 0;
+
+    if (vy >= 0) {
+      /* falling or standing — check bottom edge; include one-way platforms */
+      const tL = tileAt(mapData, left,  bot);
+      const tR = tileAt(mapData, right, bot);
+      const solidDown = tileIsSolid(tL) || tileIsSolid(tR) ||
+        ((tileIsOneway(tL) || tileIsOneway(tR)) && ((y - vy) + h) <= bot * T16);
+      if (solidDown) {
+        y = bot * T16 - h;
+        vy = 0; onGround = true;
+      }
+    } else {
+      /* rising — check top edge, solid only */
+      if (tileIsSolid(tileAt(mapData, left,  top)) ||
+          tileIsSolid(tileAt(mapData, right, top))) {
+        y = (top + 1) * T16;
+        vy = 0; hitCeiling = true;
+      }
+    }
+  }
+
+  return { x, y, vx, vy, onGround, hitCeiling, hitWallL, hitWallR };
+}
+
+
+/* ----------------------------------------------------------------
+   S2-J. ZONE TRANSITIONS
+---------------------------------------------------------------- */
+function enterZone(zoneId) {
+  if (!ZONES[zoneId]) {
+    console.warn(`[zone] unknown zone: ${zoneId}`); return;
+  }
+  G.currentZoneId = zoneId;
+  Camera.reset();
+  initZoneEnemies(zoneId);
+  if (DEBUG) console.log(`[zone] entered: ${zoneId}`);
+}
+
+function transitionZone(destId) {
+  if (!ZONES[destId]) return;
+  if (DEBUG) console.log(`[zone] transition → ${destId}`);
+  G.player = null;        /* cleared before enterZone so initPlayer re-creates */
+  enterZone(destId);
+  initPlayer(destId);     /* initPlayer also calls Camera.reset() */
+}
+
+
+/* ----------------------------------------------------------------
+   S2-K. PLAYING STATE — zone renderer + debug camera pan
+   (Player entity added in Section 3 — for now: manual camera pan)
+---------------------------------------------------------------- */
+const zoneView = {
+  update() {
+    if (INPUT.START.just) { setState(STATE.PAUSED); return; }
+    if (G.player) {
+      playerUpdate();
+      updateEnemies();
+    } else {
+      const spd = 2;
+      if (INPUT.LEFT.pressed)  Camera.pan(-spd, 0);
+      if (INPUT.RIGHT.pressed) Camera.pan( spd, 0);
+      if (INPUT.UP.pressed)    Camera.pan(0, -spd);
+      if (INPUT.DOWN.pressed)  Camera.pan(0,  spd);
+    }
+  },
+
+  draw(ctx) {
+    if (!G.currentZoneId) {
+      ctx.fillStyle = PAL.BLACK;
+      ctx.fillRect(0, 0, NES.W, NES.H);
+      return;
+    }
+    renderZone(ctx, G.currentZoneId, Camera.x, Camera.y);
+    drawEnemies(ctx);
+    if (G.player) playerDraw(ctx);
+  },
+};
+
+
+/* ----------------------------------------------------------------
+   9. TITLE SCREEN
+   Draws the title and waits for START/A.
+   Uses a simple blink timer for the "PRESS START" prompt.
+   No assets — pure canvas drawing.
+---------------------------------------------------------------- */
+const titleScreen = {
+  blinkTimer: 0,
+  showPrompt: true,
+
+  reset() {
+    this.blinkTimer = 0;
+    this.showPrompt = true;
+  },
+
+  update() {
+    this.blinkTimer++;
+    if (this.blinkTimer >= 30) {        /* blink every 0.5s */
+      this.blinkTimer  = 0;
+      this.showPrompt  = !this.showPrompt;
+    }
+    if (INPUT.START.just || INPUT.A.just) {
+      setState(STATE.PLAYING);
+    }
+  },
+
+  draw(ctx) {
+    /* Background gradient — deep black to dark red */
+    ctx.fillStyle = PAL.BLACK;
+    ctx.fillRect(0, 0, NES.W, NES.H);
+
+    /* Atmospheric castle silhouette (pixel art via rects) */
+    drawCastleSilhouette(ctx);
+
+    /* Title: CURSEBOUND */
+    ctx.fillStyle = PAL.PALE_GOLD;
+    ctx.font = '16px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('CURSEBOUND', NES.W / 2, 72);
+
+    /* Subtitle */
+    ctx.fillStyle = PAL.LIGHTGRAY;
+    ctx.font = '7px monospace';
+    ctx.fillText('A HORRIBLE NIGHT TO HAVE A CURSE', NES.W / 2, 88);
+
+    /* Divider */
+    ctx.fillStyle = PAL.BLOOD_RED;
+    ctx.fillRect(48, 93, 160, 1);
+
+    /* Press Start */
+    if (this.showPrompt) {
+      ctx.fillStyle = PAL.WHITE;
+      ctx.font = '8px monospace';
+      ctx.fillText('PRESS START', NES.W / 2, 140);
+    }
+
+    /* Controls reminder */
+    ctx.fillStyle = PAL.MIDGRAY;
+    ctx.font = '6px monospace';
+    ctx.fillText('WASD/ARROWS=MOVE  SPACE/Z=JUMP  X=ATTACK  ENTER=START', NES.W / 2, 212);
+    ctx.textAlign = 'left';
+  },
+};
+
+/* Pixel art castle silhouette — drawn procedurally */
+function drawCastleSilhouette(ctx) {
+  ctx.fillStyle = PAL.STONE_DARK;
+
+  /* Base ramparts */
+  ctx.fillRect(0, 160, 256, 64);
+
+  /* Tower left */
+  ctx.fillRect(10, 110, 30, 50);
+  ctx.fillRect(8,  105, 6, 6);    /* battlement */
+  ctx.fillRect(18, 105, 6, 6);
+  ctx.fillRect(28, 105, 6, 6);
+
+  /* Tower center-left */
+  ctx.fillRect(60, 120, 40, 40);
+  ctx.fillRect(58, 114, 8, 8);
+  ctx.fillRect(72, 114, 8, 8);
+  ctx.fillRect(86, 114, 8, 8);
+
+  /* Main keep */
+  ctx.fillRect(108, 95, 48, 65);
+  ctx.fillRect(106, 87, 10, 10);
+  ctx.fillRect(122, 87, 10, 10);
+  ctx.fillRect(138, 87, 10, 10);
+
+  /* Clocktower spire */
+  ctx.fillRect(124, 60, 12, 35);
+  /* spire tip */
+  ctx.fillRect(128, 52, 4, 10);
+  ctx.fillRect(129, 46, 2, 8);
+  ctx.fillRect(130, 42, 1, 6);
+
+  /* Tower center-right */
+  ctx.fillRect(160, 118, 36, 42);
+  ctx.fillRect(158, 112, 8, 8);
+  ctx.fillRect(172, 112, 8, 8);
+  ctx.fillRect(184, 112, 8, 8);
+
+  /* Tower right */
+  ctx.fillRect(210, 112, 34, 48);
+  ctx.fillRect(208, 106, 6, 8);
+  ctx.fillRect(220, 106, 6, 8);
+  ctx.fillRect(232, 106, 6, 8);
+
+  /* Moon */
+  ctx.fillStyle = PAL.LIGHTGRAY;
+  ctx.beginPath();
+  ctx.arc(210, 50, 18, 0, Math.PI * 2);
+  ctx.fill();
+
+  /* Moon shadow (crescent) */
+  ctx.fillStyle = PAL.STONE_DARK;
+  ctx.beginPath();
+  ctx.arc(218, 46, 16, 0, Math.PI * 2);
+  ctx.fill();
+
+  /* Stars */
+  ctx.fillStyle = PAL.WHITE;
+  [[30,30],[55,18],[80,40],[148,25],[178,35],[230,20]].forEach(([x,y]) => {
+    ctx.fillRect(x, y, 1, 1);
+  });
+  [[40,50],[70,55],[160,48],[200,28]].forEach(([x,y]) => {
+    ctx.fillRect(x, y, 2, 2);
+  });
+}
+
+
+/* ----------------------------------------------------------------
+   10. PLAYING STATE — delegates to zoneView (Section 2)
+---------------------------------------------------------------- */
+const playingPlaceholder = zoneView;   /* alias — keeps render dispatch clean */
+
+
+/* ================================================================
+   SECTION 3 — PLAYER ENTITY
+================================================================ */
+
+/* ----------------------------------------------------------------
+   S3-A. PHYSICS CONSTANTS
+---------------------------------------------------------------- */
+const PHYS = Object.freeze({
+  GRAVITY:      0.35,
+  MAX_FALL:     8,
+  WALK:         1.5,
+  JUMP:         -6.5,    /* 60px max height: row-7(48px)✓ row-5 via row-7(32px)✓ */
+  KB_X:         3.5,
+  KB_Y:         -3.0,
+  KB_FRAMES:    20,
+  IFRAME_DUR:   60,
+  /* ATTACK_DUR removed — weapon recovery is in WEAPON_DEF[name].recovery */
+  PLAYER_W:     14,
+  PLAYER_H:     22,
+});
+
+/* ----------------------------------------------------------------
+   S3-B. PLAYER INIT
+   Called from onStateEnter(PLAYING). Safe to call again on respawn.
+---------------------------------------------------------------- */
+function initPlayer(zoneId) {
+  const zone = ZONES[zoneId];
+  if (!zone) return;
+  const spawnX = (zone.spawnTX != null ? zone.spawnTX : 3) * NES.TILE;
+  const spawnY = (zone.spawnTY != null ? zone.spawnTY : 10) * NES.TILE - PHYS.PLAYER_H;
+
+  Camera.reset();   /* always reset — prevents camera snap on respawn */
+
+  G.player = {
+    /* Position + velocity (hitbox top-left) */
+    x: spawnX, y: spawnY,
+    w: PHYS.PLAYER_W, h: PHYS.PLAYER_H,
+    vx: 0, vy: 0,
+
+    /* State flags */
+    onGround:  false,
+    facing:    1,         /* 1=right  -1=left */
+
+    /* Combat */
+    hp:        6,
+    maxHp:     6,
+    iFrames:   0,         /* invincibility frames remaining */
+    kbTimer:   0,         /* knockback frames remaining */
+    attackTimer: 0,       /* attack animation frames remaining */
+
+    /* Animation */
+    animFrame: 0,
+    animTimer: 0,
+
+    /* Inventory — sword always present; re-add anything collected this run */
+    weapons:    ['sword', ...Array.from(G.collectedWeapons)],
+    weaponIdx:  0,
+    swingId:    0,     /* increments each attack swing — deduplicates enemy hits */
+
+    /* Notification text for pickups */
+    notifyText: '',
+    notifyTimer: 0,
+  };
+  if (DEBUG) console.log(`[player] spawned at (${spawnX}, ${spawnY})`);
+}
+
+/* ----------------------------------------------------------------
+   S3-C. DAMAGE + KNOCKBACK HELPERS
+---------------------------------------------------------------- */
+function damagePlayer(amount, sourceX) {
+  const p = G.player;
+  if (!p || p.iFrames > 0) return;
+  p.hp = Math.max(0, p.hp - amount);
+  Shake.trigger();   /* screen shake on every hit */
+  p.iFrames = PHYS.IFRAME_DUR;
+  if (sourceX !== undefined) {
+    const dir = p.x + p.w * 0.5 > sourceX ? 1 : -1;
+    p.vx = dir * PHYS.KB_X;
+    p.vy = PHYS.KB_Y;
+    p.kbTimer = PHYS.KB_FRAMES;
+  }
+  if (p.hp === 0) setState(STATE.DEAD);
+}
+
+/* ----------------------------------------------------------------
+   S3-D. TILE INTERACTION
+---------------------------------------------------------------- */
+function checkPlayerTiles() {
+  const p  = G.player;
+  if (!p) return;
+  const md = G.currentZoneId ? ZONES[G.currentZoneId].mapData : null;
+  if (!md) return;
+
+  /* Scan tiles overlapping the player's AABB — clamped to map bounds */
+  const tx0 = Math.max(0,          ( p.x              / NES.TILE) | 0);
+  const tx1 = Math.min(md.cols-1, ((p.x + p.w - 1)   / NES.TILE) | 0);
+  const ty0 = Math.max(0,          ( p.y              / NES.TILE) | 0);
+  const ty1 = Math.min(md.rows-1, ((p.y + p.h - 1)   / NES.TILE) | 0);
+
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      const idx = ty * md.cols + tx;
+      const id  = md.data[idx];
+      if (!id) continue;
+
+      const props = TILE_PROPS[id];
+      if (!props) continue;
+
+      /* Spike — damage from source at spike center */
+      if (props.hazard) {
+        damagePlayer(1, tx * NES.TILE + 8);
+        /* If the hit killed the player, stop scanning — a door tile later in
+           the same AABB could call transitionZone and override STATE.DEAD. */
+        if (G.state !== STATE.PLAYING) return;
+      }
+
+      /* Weapon pickup */
+      if (id === T.WEAPON) {
+        if (!p.weapons.includes('bone_whip')) {
+          p.weapons.push('bone_whip');
+          G.collectedWeapons.add('bone_whip');  /* persists through death */
+          p.notifyText  = 'BONE WHIP';
+          p.notifyTimer = 120;
+        }
+        md.data[idx] = T.AIR;   /* remove from map (dynamic layer stops drawing it) */
+      }
+
+      /* Zone door triggers */
+      if (props.trigger === 'door_l' || props.trigger === 'door_r') {
+        const dir = props.trigger === 'door_l' ? 'left' : 'right';
+        const dest = ZONES[G.currentZoneId]?.connects?.[dir];
+        if (dest) { transitionZone(dest); return; }
+      }
+      if (props.trigger === 'door_up') {
+        const dest = ZONES[G.currentZoneId]?.connects?.up;
+        if (dest) { transitionZone(dest); return; }
+      }
+
+      /* Lore pickup — look up GDD text for this tile, show in lore panel */
+      if (id === T.LORE) {
+        const zone   = ZONES[G.currentZoneId];
+        const lLines = zone.loreTexts && zone.loreTexts.get(idx);
+        lorePanel.show(lLines || ['LORE FOUND']);
+        md.data[idx] = T.AIR;
+      }
+    }
+  }
+
+  /* Pit death — fell past map bottom */
+  if (p.y > md.rows * NES.TILE + 32) {
+    p.hp = 0;
+    setState(STATE.DEAD);
+  }
+}
+
+function playerUpdate() {
+  const p  = G.player;
+  if (!p) return;
+  const md = ZONES[G.currentZoneId] && ZONES[G.currentZoneId].mapData;
+  if (!md) {
+    /* Zone not yet built — immediately return player to entry hall */
+    transitionZone(ZONE_ID.ENTRY);
+    return;
+  }
+
+  /* ── Timers ── */
+  if (p.iFrames     > 0) p.iFrames--;
+  if (p.attackTimer > 0) p.attackTimer--;
+  if (p.kbTimer     > 0) p.kbTimer--;
+  if (p.notifyTimer > 0) p.notifyTimer--;
+
+  /* ── Gravity ── */
+  p.vy += PHYS.GRAVITY;
+  if (p.vy > PHYS.MAX_FALL) p.vy = PHYS.MAX_FALL;
+
+  /* ── Input (locked during knockback) ── */
+  if (p.kbTimer === 0) {
+    if (INPUT.LEFT.pressed) {
+      p.vx = -PHYS.WALK;
+      p.facing = -1;
+    } else if (INPUT.RIGHT.pressed) {
+      p.vx = PHYS.WALK;
+      p.facing = 1;
+    } else {
+      p.vx = 0;
+    }
+
+    if (INPUT.A.just && p.onGround) {
+      p.vy = PHYS.JUMP;
+      p.onGround = false;
+    }
+
+    if (INPUT.B.just && p.attackTimer === 0) {
+      const wdef    = getWeaponDef(p);
+      p.attackTimer = wdef.recovery;
+      p.swingId++;          /* new swing — enemies can be hit again */
+    }
+
+    if (INPUT.SELECT.just && p.weapons.length > 1) {
+      p.weaponIdx = (p.weaponIdx + 1) % p.weapons.length;
+      p.notifyText  = p.weapons[p.weaponIdx].toUpperCase().replace(/_/g, ' ');
+      p.notifyTimer = 90;
+    }
+  } else {
+    p.vx *= 0.82;
+  }
+
+  /* ── Collision resolution ── */
+  const res = resolveCollision(p, md);
+  p.x = res.x;  p.y = res.y;
+  p.vx = res.vx; p.vy = res.vy;
+  p.onGround = res.onGround;
+
+  if (res.onGround && p.kbTimer > 0) p.kbTimer = 0;
+
+  /* ── Tile interactions ── */
+  checkPlayerTiles();
+  /* Guard: transitionZone inside checkPlayerTiles replaces G.player.
+     If p is now stale, abort — new player's first update runs next frame. */
+  if (G.player !== p) return;
+
+  /* ── Walk animation ── */
+  if (p.onGround && Math.abs(p.vx) > 0.1) {
+    if (++p.animTimer >= 8) { p.animTimer = 0; p.animFrame++; }
+  } else {
+    p.animTimer = 0;
+  }
+
+  /* ── Camera ── */
+  Camera.follow(p);
+}
+
+/* ----------------------------------------------------------------
+   S3-F. PLAYER DRAW — 16×24 pixel-art cloaked figure
+   Uses translate + scale(-1,1) for left-facing flip.
+   globalAlpha flicker for i-frames (classic NES invincibility).
+---------------------------------------------------------------- */
+function playerDraw(ctx) {
+  const p = G.player;
+  if (!p) return;
+
+  const sx = Math.round(p.x - Camera.x) - 1;
+  const sy = Math.round(p.y - Camera.y) - 1;
+
+  /* I-frame flicker: hide SPRITE every other 3-frame burst, but draw notification regardless */
+  const spriteVisible = !(p.iFrames > 0 && (p.iFrames % 6) < 3);
+
+  if (spriteVisible) {
+    ctx.save();
+    if (p.facing === -1) {
+      ctx.translate(sx + 16, sy);
+      ctx.scale(-1, 1);
+    } else {
+      ctx.translate(sx, sy);
+    }
+
+    /* ── Hood ── */
+    ctx.fillStyle = PAL.CLOAK_DARK;
+    ctx.fillRect(5, 0, 6, 2);
+    ctx.fillRect(4, 2, 8, 3);
+    ctx.fillRect(3, 4, 10, 2);
+
+    /* ── Face ── */
+    ctx.fillStyle = PAL.SKIN;
+    ctx.fillRect(4, 4, 8, 4);
+
+    /* ── Eyes ── */
+    ctx.fillStyle = PAL.CLOAK_DARK;
+    ctx.fillRect(5, 6, 2, 1);
+    ctx.fillRect(9, 6, 2, 1);
+
+    /* ── Cloak upper body ── */
+    ctx.fillStyle = PAL.CLOAK_MID;
+    ctx.fillRect(1, 8, 14, 5);
+
+    /* ── Cloak mid + lower ── */
+    ctx.fillStyle = PAL.CLOAK_DARK;
+    ctx.fillRect(2, 13, 12, 4);
+    ctx.fillRect(3, 17, 10, 3);
+
+    /* ── Legs ── */
+    const walking  = p.onGround && Math.abs(p.vx) > 0.1;
+    const legShift = walking ? (p.animFrame % 2 === 0 ? -1 : 1) : 0;
+    ctx.fillStyle = PAL.CLOAK_DARK;
+    ctx.fillRect(4, 20 - legShift, 4, 4);
+    ctx.fillRect(8, 20 + legShift, 4, 4);
+
+    /* ── Attack sprite varies by weapon ── */
+    if (p.attackTimer > 0) {
+      const wName = p.weapons[p.weaponIdx] || 'sword';
+      if (wName === 'bone_whip') {
+        ctx.fillStyle = PAL.STONE_HIGH;
+        ctx.fillRect(12, 6, 2, 4);    /* handle base  */
+        ctx.fillRect(14, 2, 6, 2);    /* mid arc      */
+        ctx.fillStyle = PAL.PALE_GOLD;
+        ctx.fillRect(20, -2, 8, 2);   /* whip stretch */
+        ctx.fillStyle = PAL.WHITE;
+        ctx.fillRect(28, -4, 2, 2);   /* tip glint    */
+      } else {
+        ctx.fillStyle = PAL.GOLD;
+        ctx.fillRect(12, 9,  3, 6);   /* guard  */
+        ctx.fillStyle = PAL.SWORD_GREY;
+        ctx.fillRect(15, 10, 8, 3);   /* blade  */
+        ctx.fillStyle = PAL.WHITE;
+        ctx.fillRect(22, 11, 1, 1);   /* tip    */
+      }
+    }
+
+    ctx.restore();
+  }
+
+  /* ── Pickup notification — always visible, fades out over last 20 frames ── */
+  if (p.notifyTimer > 0) {
+    const alpha = Math.min(1, p.notifyTimer / 20);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle   = PAL.PALE_GOLD;
+    ctx.font        = '6px monospace';
+    ctx.textAlign   = 'center';
+    ctx.fillText(p.notifyText, sx + 8, sy - 6);
+    ctx.globalAlpha = 1;
+    ctx.textAlign   = 'left';
+  }
+}
+
+
+/* ================================================================
+   SECTION 4 — WEAPON DIFFERENTIATION + ENEMY SYSTEM
+================================================================ */
+
+/* ----------------------------------------------------------------
+   S4-A. WEAPON DEFINITIONS
+   Each weapon has distinct reach, vertical offset, arc height,
+   recovery frames, and damage. Bone Whip hits overhead; sword hits
+   forward at chest height.
+---------------------------------------------------------------- */
+const WEAPON_DEF = Object.freeze({
+  sword: {
+    reach:    20,   /* horizontal reach px            */
+    yOff:     -2,   /* y offset from player mid       */
+    arcH:     14,   /* hitbox height                  */
+    recovery: 18,   /* frames attack window is active */
+    damage:   1,
+  },
+  bone_whip: {
+    reach:    48,   /* much longer arc                */
+    yOff:    -10,   /* hits high — above the player   */
+    arcH:     20,
+    recovery: 28,   /* slower than sword              */
+    damage:   1,
+  },
+});
+
+function getWeaponDef(player) {
+  return WEAPON_DEF[player.weapons[player.weaponIdx]] || WEAPON_DEF.sword;
+}
+
+/* Returns world-space {x,y,w,h} attack rectangle, or null if not attacking */
+function getAttackHitbox(player) {
+  if (!player || player.attackTimer <= 0) return null;
+  const def = getWeaponDef(player);
+  const hbx = player.facing === 1
+    ? player.x + player.w
+    : player.x - def.reach;
+  const hby = player.y + (player.h >> 1) + def.yOff;
+  return { x: hbx, y: hby, w: def.reach, h: def.arcH };
+}
+
+
+/* ----------------------------------------------------------------
+   S4-B. ENEMY CONFIG
+   Single source of truth for per-type stats.
+---------------------------------------------------------------- */
+const ENEMY_CFG = Object.freeze({
+  skeleton: {
+    w: 14, h: 22, hp: 2,
+    speed: 0.8, aggroRange: 96, lungeVx: 2.8,
+    gravity: true, contactDamage: 1,
+  },
+  bat: {
+    w: 14, h: 12, hp: 1,
+    diveSpeed: 2.4, aggroRange: 80,
+    gravity: false, contactDamage: 1,
+    ampX: 36, ampY: 10,
+  },
+  armored_guard: {
+    w: 14, h: 22, hp: 3,
+    speed: 0.45, aggroRange: 80,
+    gravity: true, contactDamage: 2,
+  },
+});
+
+
+/* ----------------------------------------------------------------
+   S4-C. SHARED HELPERS
+---------------------------------------------------------------- */
+function aabbOverlap(a, b) {
+  return a.x < b.x + b.w && a.x + a.w > b.x &&
+         a.y < b.y + b.h && a.y + a.h > b.y;
+}
+
+/* True if there is no solid floor one step ahead of the enemy */
+function enemyWouldFall(enemy, dir, md) {
+  const edgeX  = dir === 1 ? enemy.x + enemy.w + 2 : enemy.x - 2;
+  const floorY = enemy.y + enemy.h + 4;
+  return !tileIsSolid(tileAt(md, (edgeX / NES.TILE) | 0, (floorY / NES.TILE) | 0));
+}
+
+
+/* ----------------------------------------------------------------
+   S4-D. ENEMY FACTORY
+   tx/ty are tile coordinates. Ground enemies: feet land on ty*TILE.
+   Bats: base center at ty*TILE.
+---------------------------------------------------------------- */
+function createEnemy(type, tx, ty) {
+  const cfg  = ENEMY_CFG[type];
+  const wx   = tx * NES.TILE;
+  const wy   = cfg.gravity ? ty * NES.TILE - cfg.h : ty * NES.TILE;
+  const e = {
+    type, x: wx, y: wy, w: cfg.w, h: cfg.h,
+    vx: 0, vy: 0, facing: 1,
+    hp: cfg.hp, maxHp: cfg.hp,
+    state: 'patrol', stateTimer: 0,
+    hurtTimer: 0, dead: false,
+    animFrame: 0, animTimer: 0,
+    lastHitSwing: -1,
+  };
+  if (type === 'bat') {
+    e.baseX     = wx;
+    e.baseY     = wy;
+    e.animPhase = (tx * 0.37 + ty * 0.19) % (Math.PI * 2);
+  }
+  return e;
+}
+
+/* Spawn fresh enemies from a zone's enemySpawns definition list */
+function initZoneEnemies(zoneId) {
+  const zone = ZONES[zoneId];
+  if (!zone) return;
+  zone.enemies = (zone.enemySpawns && zone.enemySpawns.length)
+    ? zone.enemySpawns.map(d => createEnemy(d.type, d.tx, d.ty))
+    : [];
+}
+
+
+/* ----------------------------------------------------------------
+   S4-E. COMBAT
+---------------------------------------------------------------- */
+function enemyTakeDamage(enemy, amount, sourceX) {
+  if (enemy.state === 'hurt' || enemy.state === 'dead') return;
+  enemy.hp = Math.max(0, enemy.hp - amount);
+  enemy.state    = 'hurt';
+  enemy.stateTimer = 0;
+  enemy.hurtTimer  = 20;
+  const dir  = (enemy.x + enemy.w * 0.5) > sourceX ? 1 : -1;
+  enemy.vx   = dir * 2.5;
+  enemy.vy   = enemy.type === 'bat' ? -1.5 : -2.0;
+}
+
+
+/* ----------------------------------------------------------------
+   S4-F. GROUND ENEMY AI  (skeleton + armored_guard)
+   Skeleton:      patrol → alert (pause) → attack (lunge) → patrol
+   Armored guard: patrol → chase (persistent pursuit) → patrol
+---------------------------------------------------------------- */
+function updateEnemyGround(enemy, md, player) {
+  const cfg = ENEMY_CFG[enemy.type];
+
+  /* ── Dead flash ── */
+  if (enemy.state === 'dead') {
+    if (++enemy.stateTimer >= 30) enemy.dead = true;
+    return;
+  }
+
+  /* ── Hurt — knockback + brief stun ── */
+  if (enemy.state === 'hurt') {
+    enemy.stateTimer++;
+    enemy.vx *= 0.75;
+    enemy.vy += PHYS.GRAVITY;
+    if (enemy.vy > PHYS.MAX_FALL) enemy.vy = PHYS.MAX_FALL;
+    const res = resolveCollision(enemy, md);
+    enemy.x = res.x; enemy.y = res.y; enemy.vx = res.vx; enemy.vy = res.vy;
+    if (enemy.stateTimer >= 14) {
+      enemy.state      = enemy.hp <= 0 ? 'dead' : 'patrol';
+      enemy.stateTimer = 0;
+      if (enemy.state === 'patrol') enemy.vx = 0;
+    }
+    return;
+  }
+
+  const hasPlayer = !!(player && player.hp > 0);
+  const pdx       = hasPlayer ? (player.x + (player.w >> 1)) - (enemy.x + (enemy.w >> 1)) : 0;
+  const sameFloor = hasPlayer &&
+    Math.abs((player.y + player.h) - (enemy.y + enemy.h)) < 40;
+
+  /* ─────────────────────────────────────────────────────────────
+     SKELETON: patrol → alert (18fr pause) → attack (22fr lunge)
+  ───────────────────────────────────────────────────────────── */
+  if (enemy.type === 'skeleton') {
+    if (enemy.state === 'patrol') {
+      enemy.vx = enemy.facing * cfg.speed;
+      if (hasPlayer && sameFloor && Math.abs(pdx) < cfg.aggroRange) {
+        enemy.facing     = pdx > 0 ? 1 : -1;
+        enemy.state      = 'alert';
+        enemy.stateTimer = 0;
+        enemy.vx = 0;
+      }
+    } else if (enemy.state === 'alert') {
+      enemy.stateTimer++;
+      enemy.vx = 0;
+      if (hasPlayer) enemy.facing = pdx > 0 ? 1 : -1;
+      if (enemy.stateTimer >= 18) {
+        enemy.state      = 'attack';
+        enemy.stateTimer = 0;
+        enemy.vx         = enemy.facing * cfg.lungeVx;
+      }
+    } else if (enemy.state === 'attack') {
+      /* Decelerate lunge over the 22 frames rather than running full speed */
+      enemy.vx *= 0.93;
+      if (++enemy.stateTimer >= 22) {
+        enemy.state      = 'patrol';
+        enemy.stateTimer = 0;
+        enemy.vx = 0;
+      }
+    }
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     ARMORED GUARD: patrol → chase (continuous pursuit, 150fr max)
+     No lunge. Slow, heavy, persistent.
+  ───────────────────────────────────────────────────────────── */
+  if (enemy.type === 'armored_guard') {
+    if (enemy.state === 'patrol') {
+      enemy.vx = enemy.facing * cfg.speed;
+      if (hasPlayer && sameFloor && Math.abs(pdx) < cfg.aggroRange) {
+        enemy.facing     = pdx > 0 ? 1 : -1;
+        enemy.state      = 'chase';
+        enemy.stateTimer = 0;
+      }
+    } else if (enemy.state === 'chase') {
+      enemy.stateTimer++;
+      if (hasPlayer) enemy.facing = pdx > 0 ? 1 : -1;
+      enemy.vx = enemy.facing * cfg.speed;
+      const lostPlayer = !hasPlayer || !sameFloor;
+      if (lostPlayer && enemy.stateTimer > 30) {
+        enemy.state      = 'patrol';
+        enemy.stateTimer = 0;
+      }
+    }
+  }
+
+  /* ── Gravity + collision ── */
+  enemy.vy += PHYS.GRAVITY;
+  if (enemy.vy > PHYS.MAX_FALL) enemy.vy = PHYS.MAX_FALL;
+  const res = resolveCollision(enemy, md);
+  enemy.x = res.x; enemy.y = res.y;
+  enemy.vx = res.vx; enemy.vy = res.vy;
+
+  /* ── Turn logic — only ONE flip per frame ── */
+  const inAttack = enemy.state === 'attack';
+  const inChase  = enemy.state === 'chase';
+
+  if (inAttack && (res.hitWallL || res.hitWallR)) {
+    /* Lunge cancelled by wall */
+    enemy.state      = 'patrol';
+    enemy.stateTimer = 0;
+    enemy.facing    *= -1;
+    enemy.vx = 0;
+
+  } else if (inChase && (res.hitWallL || res.hitWallR)) {
+    /* Chase hits wall — turn and keep going */
+    enemy.facing *= -1;
+    enemy.vx = enemy.facing * cfg.speed;
+
+  } else if (!inAttack && !inChase) {
+    /* Patrol: wall, pit, and door checks — only one flip allowed */
+    let turned = false;
+    if (res.hitWallL || res.hitWallR) {
+      enemy.facing *= -1;
+      turned = true;
+    }
+    if (!turned && res.onGround && enemyWouldFall(enemy, enemy.facing, md)) {
+      enemy.facing *= -1;
+      turned = true;
+    }
+    if (!turned) {
+      const ftx = ((enemy.x + (enemy.facing === 1 ? enemy.w + 1 : -1)) / NES.TILE) | 0;
+      const fty = ((enemy.y + enemy.h * 0.5) / NES.TILE) | 0;
+      const fid = tileAt(md, ftx, fty);
+      if (!tileIsSolid(fid) && TILE_PROPS[fid] && TILE_PROPS[fid].trigger) {
+        enemy.facing *= -1;
+      }
+    }
+    /* Only restore patrol speed — alert and other non-moving states keep their own vx */
+    if (enemy.state === 'patrol') enemy.vx = enemy.facing * cfg.speed;
+  }
+
+  /* ── Walk animation ── */
+  if (res.onGround && Math.abs(enemy.vx) > 0.1) {
+    if (++enemy.animTimer >= 10) { enemy.animTimer = 0; enemy.animFrame++; }
+  }
+}
+
+
+/* ----------------------------------------------------------------
+   S4-G. BAT AI
+   States: patrol (sine wave) → dive → returning → patrol
+   No teleporting — every transition uses velocity-based movement.
+---------------------------------------------------------------- */
+function updateEnemyBat(enemy, player) {
+  const cfg = ENEMY_CFG.bat;
+
+  /* ── Dead flash ── */
+  if (enemy.state === 'dead') {
+    if (++enemy.stateTimer >= 30) enemy.dead = true;
+    return;
+  }
+
+  /* ── Hurt — knocked away, then return to base ── */
+  if (enemy.state === 'hurt') {
+    enemy.stateTimer++;
+    enemy.x += enemy.vx;
+    enemy.y += enemy.vy;
+    enemy.vx *= 0.80;
+    enemy.vy *= 0.85;
+    if (enemy.stateTimer >= 14) {
+      enemy.state      = enemy.hp <= 0 ? 'dead' : 'returning';
+      enemy.stateTimer = 0;
+    }
+    if (++enemy.animTimer >= 7) { enemy.animTimer = 0; enemy.animFrame++; }
+    return;
+  }
+
+  /* ── Returning — fly smoothly back to base, then resume patrol ── */
+  if (enemy.state === 'returning') {
+    const dx   = enemy.baseX - enemy.x;
+    const dy   = enemy.baseY - enemy.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 5) {
+      /* Arrived — snap cleanly and resume sine wave */
+      enemy.x     = enemy.baseX;
+      enemy.y     = enemy.baseY;
+      enemy.state = 'patrol';
+    } else {
+      /* Proportional speed — faster when far, slows near base */
+      const spd = Math.min(2.2, Math.max(0.8, dist * 0.07));
+      enemy.x  += (dx / dist) * spd;
+      enemy.y  += (dy / dist) * spd;
+      enemy.facing = dx >= 0 ? 1 : -1;
+    }
+    if (++enemy.animTimer >= 7) { enemy.animTimer = 0; enemy.animFrame++; }
+    return;
+  }
+
+  /* ── Dive — tracks player horizontally while falling ── */
+  if (enemy.state === 'dive') {
+    enemy.stateTimer++;
+    if (player && player.hp > 0) {
+      const targetCX = player.x + (player.w >> 1);
+      const selfCX   = enemy.x  + (enemy.w  >> 1);
+      enemy.vx += (targetCX - selfCX) * 0.04;
+    }
+    enemy.vx = Math.max(-3, Math.min(3, enemy.vx));
+    enemy.x += enemy.vx;
+    enemy.y += enemy.vy;
+    enemy.facing = enemy.vx >= 0 ? 1 : -1;
+
+    /* End dive: overshot base or ran too long */
+    if (enemy.y > enemy.baseY + 110 || enemy.stateTimer > 80) {
+      enemy.state      = 'returning';
+      enemy.stateTimer = 0;
+      enemy.vx = 0;
+      enemy.vy = 0;
+    }
+    if (++enemy.animTimer >= 5) { enemy.animTimer = 0; enemy.animFrame++; }
+    return;
+  }
+
+  /* ── Patrol — sine-wave float ── */
+  const t    = G.frame;
+  enemy.x    = enemy.baseX + Math.sin(t * 0.025 + enemy.animPhase) * cfg.ampX;
+  enemy.y    = enemy.baseY + Math.sin(t * 0.018 + enemy.animPhase * 1.5) * cfg.ampY;
+  enemy.facing = Math.cos(t * 0.025 + enemy.animPhase) >= 0 ? 1 : -1;
+
+  /* Dive trigger: player is below within horizontal + vertical range */
+  if (player && player.hp > 0) {
+    const cx  = enemy.x  + (enemy.w  >> 1);
+    const pcx = player.x + (player.w >> 1);
+    const dx  = Math.abs(pcx - cx);
+    const dy  = (player.y + player.h) - (enemy.y + enemy.h);   /* +ve = player below */
+    if (dx < 44 && dy > 0 && dy < cfg.aggroRange) {
+      enemy.state      = 'dive';
+      enemy.stateTimer = 0;
+      enemy.vy = cfg.diveSpeed;
+      enemy.vx = (pcx - cx) * 0.06;
+    }
+  }
+  if (++enemy.animTimer >= 7) { enemy.animTimer = 0; enemy.animFrame++; }
+}
+
+
+/* ----------------------------------------------------------------
+   S4-H. MAIN ENEMY UPDATE — called each PLAYING frame
+---------------------------------------------------------------- */
+function updateEnemies() {
+  const zone = ZONES[G.currentZoneId];
+  if (!zone || !zone.enemies || zone.enemies.length === 0) return;
+  const md      = zone.mapData;
+  const p       = G.player;
+  const hitbox  = getAttackHitbox(p);
+  const wdef    = p ? getWeaponDef(p) : null;
+
+  for (let i = zone.enemies.length - 1; i >= 0; i--) {
+    const e = zone.enemies[i];
+
+    /* Decrement visual hurt flash independently of AI state */
+    if (e.hurtTimer > 0) e.hurtTimer--;
+
+    /* Type-specific AI update */
+    if (e.type === 'bat') {
+      updateEnemyBat(e, p);
+    } else {
+      if (md) updateEnemyGround(e, md, p);
+    }
+
+    /* Remove fully dead enemies */
+    if (e.dead) { zone.enemies.splice(i, 1); continue; }
+
+    /* Skip interactions during hurt/dead states */
+    if (e.state === 'dead' || e.state === 'hurt') continue;
+
+    /* Player attack hitbox → enemy damage */
+    if (hitbox && wdef && p && e.lastHitSwing !== p.swingId) {
+      if (aabbOverlap(hitbox, e)) {
+        e.lastHitSwing = p.swingId;
+        enemyTakeDamage(e, wdef.damage, p.x + (p.facing === 1 ? p.w : 0));
+      }
+    }
+
+    /* Enemy body contact → player damage */
+    if (p && p.hp > 0 && aabbOverlap(e, p)) {
+      damagePlayer(ENEMY_CFG[e.type].contactDamage, e.x + e.w * 0.5);
+    }
+  }
+}
+
+
+/* ----------------------------------------------------------------
+   S4-I. ENEMY DRAW FUNCTIONS
+   All sprites drawn at local (0,0); save/restore + translate handles
+   world→screen and facing flip.
+---------------------------------------------------------------- */
+function _drawSkeleton(ctx, e) {
+  const flash = e.hurtTimer > 0 && (e.hurtTimer % 4) < 2;
+  const CB = flash ? PAL.WHITE : PAL.LIGHTGRAY;
+  const CD = flash ? PAL.WHITE : PAL.STONE_DARK;
+
+  ctx.fillStyle = CB;
+  ctx.fillRect(4, 0, 6, 5);              /* skull */
+  ctx.fillStyle = CD;
+  ctx.fillRect(4, 1, 2, 2);              /* left eye  */
+  ctx.fillRect(8, 1, 2, 2);              /* right eye */
+  ctx.fillRect(6, 4, 2, 1);              /* jaw gap   */
+  ctx.fillStyle = CB;
+  ctx.fillRect(6, 5, 2, 2);              /* neck */
+  ctx.fillRect(3, 7, 8, 4);              /* ribcage */
+  ctx.fillStyle = CD;
+  ctx.fillRect(5, 8, 4, 2);              /* rib shadow */
+  ctx.fillStyle = CB;
+  ctx.fillRect(0, 9, 3, 2);              /* left arm  */
+  ctx.fillRect(11, 9, 3, 2);             /* right arm */
+  ctx.fillRect(4, 11, 6, 3);             /* pelvis */
+  const leg = e.animFrame % 2 === 0 ? 1 : -1;
+  ctx.fillRect(4, 14 - leg, 3, 8);       /* left leg  */
+  ctx.fillRect(7, 14 + leg, 3, 8);       /* right leg */
+}
+
+function _drawBat(ctx, e) {
+  const flash  = e.hurtTimer > 0 && (e.hurtTimer % 4) < 2;
+  const C1 = flash ? PAL.WHITE : PAL.CLOAK_DARK;
+  const C2 = flash ? PAL.WHITE : PAL.CLOAK_MID;
+  const CE = flash ? PAL.WHITE : PAL.BLOOD_RED;
+  const up = e.animFrame % 2 === 0;      /* wing flap */
+
+  ctx.fillStyle = C1;
+  ctx.fillRect(0,  up ? 2 : 5, 4, 4);   /* left wing  */
+  ctx.fillRect(10, up ? 2 : 5, 4, 4);   /* right wing */
+  ctx.fillStyle = C2;
+  ctx.fillRect(1,  up ? 3 : 6, 3, 2);   /* left membrane  */
+  ctx.fillRect(10, up ? 3 : 6, 3, 2);   /* right membrane */
+  ctx.fillStyle = C1;
+  ctx.fillRect(4, 3, 6, 6);             /* body */
+  ctx.fillStyle = CE;
+  ctx.fillRect(5, 4, 2, 2);             /* left eye  */
+  ctx.fillRect(8, 4, 2, 2);             /* right eye */
+}
+
+function _drawArmoredGuard(ctx, e) {
+  const flash = e.hurtTimer > 0 && (e.hurtTimer % 4) < 2;
+  const C1 = flash ? PAL.WHITE : PAL.STONE_MID;
+  const C2 = flash ? PAL.WHITE : PAL.STONE_HIGH;
+  const C3 = flash ? PAL.WHITE : PAL.STONE_DARK;
+
+  ctx.fillStyle = C1;
+  ctx.fillRect(1, 0, 12, 8);             /* helmet body */
+  ctx.fillStyle = C2;
+  ctx.fillRect(2, 0, 10, 2);             /* helmet top  */
+  ctx.fillStyle = C3;
+  ctx.fillRect(3, 2, 3, 3);              /* visor left  */
+  ctx.fillRect(8, 2, 3, 3);              /* visor right */
+  ctx.fillStyle = C1;
+  ctx.fillRect(0, 8, 14, 7);             /* armored torso */
+  ctx.fillStyle = C2;
+  ctx.fillRect(2, 9, 10, 4);             /* chest plate   */
+  ctx.fillStyle = C3;
+  ctx.fillRect(6, 10, 2, 2);             /* chest line    */
+  ctx.fillStyle = C1;
+  const leg = e.animFrame % 2 === 0 ? 1 : -1;
+  ctx.fillRect(1, 15 - leg, 5, 7);       /* left leg  */
+  ctx.fillRect(8, 15 + leg, 5, 7);       /* right leg */
+}
+
+function drawEnemies(ctx) {
+  const zone = ZONES[G.currentZoneId];
+  if (!zone || !zone.enemies || zone.enemies.length === 0) return;
+
+  for (const e of zone.enemies) {
+    if (e.dead) continue;
+    const sx = Math.round(e.x - Camera.x);
+    const sy = Math.round(e.y - Camera.y);
+    if (sx + e.w < 0 || sx > NES.W || sy + e.h < 0 || sy > NES.H) continue;
+
+    /* Death flicker — skip alternate 3-frame bursts */
+    if (e.state === 'dead' && (e.stateTimer % 6) < 3) continue;
+
+    ctx.save();
+    if (e.facing === -1) {
+      ctx.translate(sx + e.w, sy);
+      ctx.scale(-1, 1);
+    } else {
+      ctx.translate(sx, sy);
+    }
+
+    switch (e.type) {
+      case 'skeleton':      _drawSkeleton(ctx, e);      break;
+      case 'bat':           _drawBat(ctx, e);           break;
+      case 'armored_guard': _drawArmoredGuard(ctx, e);  break;
+    }
+    ctx.restore();
+  }
+}
+
+
+/* ----------------------------------------------------------------
+   11. PAUSE SCREEN
+---------------------------------------------------------------- */
+const pauseScreen = {
+  cursor: 0,   /* 0=RESUME 1=TITLE */
+  options: ['RESUME', 'QUIT TO TITLE'],
+
+  update() {
+    if (INPUT.START.just || INPUT.A.just) {
+      if (this.cursor === 0) setState(STATE.PLAYING);
+      else                   setState(STATE.TITLE);
+    }
+    if (INPUT.DOWN.just) this.cursor = (this.cursor + 1) % this.options.length;
+    if (INPUT.UP.just)   this.cursor = (this.cursor - 1 + this.options.length) % this.options.length;
+  },
+
+  draw(ctx) {
+    /* Darken the background */
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(0, 0, NES.W, NES.H);
+
+    /* Panel */
+    ctx.fillStyle = PAL.STONE_MID;
+    ctx.fillRect(72, 80, 112, 64);
+    ctx.fillStyle = PAL.STONE_HIGH;
+    ctx.fillRect(72, 80, 112, 1);
+    ctx.fillRect(72, 143, 112, 1);
+    ctx.fillRect(72, 80, 1, 64);
+    ctx.fillRect(183, 80, 1, 64);
+
+    ctx.fillStyle = PAL.PALE_GOLD;
+    ctx.font = '8px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('- PAUSED -', NES.W / 2, 96);
+
+    this.options.forEach((opt, i) => {
+      ctx.fillStyle = (i === this.cursor) ? PAL.CURSOR : PAL.HUD_TEXT;
+      ctx.fillText(opt, NES.W / 2, 116 + i * 14);
+      if (i === this.cursor) {
+        ctx.fillText('>', 82, 116 + i * 14);
+      }
+    });
+    ctx.textAlign = 'left';
+  },
+};
+
+
+/* ----------------------------------------------------------------
+   12. DEAD SCREEN (stub — Section 3 expands)
+---------------------------------------------------------------- */
+const deadScreen = {
+  timer: 0,
+
+  update() {
+    this.timer++;
+    if (this.timer > 180 && (INPUT.START.just || INPUT.A.just)) {
+      this.timer = 0;
+      G.player       = null;   /* re-init on PLAYING enter */
+      G.currentZoneId = null;  /* always respawn in ENTRY, not the zone of death */
+      setState(STATE.PLAYING);
+    }
+  },
+
+  draw(ctx) {
+    ctx.fillStyle = PAL.BLACK;
+    ctx.fillRect(0, 0, NES.W, NES.H);
+
+    ctx.fillStyle = PAL.BLOOD_RED;
+    ctx.font = '16px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('YOU DIED', NES.W / 2, 100);
+
+    if (this.timer > 180) {
+      ctx.fillStyle = PAL.LIGHTGRAY;
+      ctx.font = '7px monospace';
+      ctx.fillText('PRESS START TO TRY AGAIN', NES.W / 2, 140);
+    }
+    ctx.textAlign = 'left';
+  },
+};
+
+
+/* ----------------------------------------------------------------
+   13. WIN SCREEN (stub — Section 7 expands)
+---------------------------------------------------------------- */
+const winScreen = {
+  timer: 0,
+  showText: false,
+
+  update() {
+    this.timer++;
+    if (this.timer === 180) this.showText = true;
+    /* Allow exit to title once the text has appeared */
+    if (this.showText && (INPUT.START.just || INPUT.A.just)) {
+      this.timer    = 0;
+      this.showText = false;
+      setState(STATE.TITLE);
+    }
+  },
+
+  draw(ctx) {
+    ctx.fillStyle = PAL.WHITE;
+    ctx.fillRect(0, 0, NES.W, NES.H);
+
+    if (this.showText) {
+      ctx.fillStyle = PAL.STONE_DARK;
+      ctx.font = 'italic 8px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('"You remembered."', NES.W / 2, NES.H / 2);
+
+      /* Blinking prompt — appears after another 3s */
+      if (this.timer > 360 && Math.floor(this.timer / 30) % 2 === 0) {
+        ctx.font = '6px monospace';
+        ctx.fillText('PRESS START', NES.W / 2, NES.H / 2 + 24);
+      }
+      ctx.textAlign = 'left';
+    }
+  },
+};
+
+
+/* ----------------------------------------------------------------
+   14. DEBUG OVERLAY
+---------------------------------------------------------------- */
+const dbgEl = document.getElementById('debug-overlay');
+if (DEBUG) dbgEl.style.display = 'block';
+
+function drawDebug() {
+  if (!DEBUG) return;
+  const p = G.player;
+  const lines = [
+    `STATE: ${G.state}  F:${G.frame}`,
+    `INPUT: ${Object.entries(INPUT).filter(([,v])=>v.pressed).map(([k])=>k).join(' ')||'—'}`,
+    `CAM: ${G.camera.x|0},${G.camera.y|0}  SCALE:${SCALE}`,
+    `ZONE: ${G.currentZoneId||'—'}`,
+    p ? `PL: (${p.x|0},${p.y|0}) v:(${p.vx.toFixed(1)},${p.vy.toFixed(1)}) HP:${p.hp}/${p.maxHp} GND:${p.onGround?1:0} KB:${p.kbTimer}` : '',
+  ].filter(Boolean);
+  dbgEl.textContent = lines.join('\n');
+}
+
+
+/* ----------------------------------------------------------------
+   15. MAIN RENDER DISPATCH
+---------------------------------------------------------------- */
+function render() {
+  /* Always clear with black to avoid ghost frames */
+  screenCtx.fillStyle = PAL.BLACK;
+  screenCtx.fillRect(0, 0, NES.W, NES.H);
+
+  /* imageSmoothingEnabled can be reset by fillRect on some browsers;
+     re-assert it every frame to be safe */
+  screenCtx.imageSmoothingEnabled = false;
+
+  /* Screen shake — translate canvas before drawing game content */
+  const { x: shakeX, y: shakeY } = Shake.offset();
+  screenCtx.save();
+  screenCtx.translate(shakeX, shakeY);
+
+  switch (G.state) {
+    case STATE.TITLE:   titleScreen.draw(screenCtx);        break;
+    case STATE.PLAYING: playingPlaceholder.draw(screenCtx); break;
+    case STATE.PAUSED:
+      playingPlaceholder.draw(screenCtx);
+      pauseScreen.draw(screenCtx);
+      break;
+    case STATE.DEAD:    deadScreen.draw(screenCtx);         break;
+    case STATE.WIN:     winScreen.draw(screenCtx);          break;
+  }
+
+  screenCtx.restore();
+
+  /* Lore panel sits outside the shake transform — stays readable during hits */
+  if (G.state === STATE.PLAYING || G.state === STATE.PAUSED) {
+    lorePanel.draw(screenCtx);
+  }
+
+  drawDebug();
+}
+
+
+/* ----------------------------------------------------------------
+   16. MAIN UPDATE DISPATCH
+---------------------------------------------------------------- */
+function update() {
+  pollGamepad();
+  G.stateTimer++;
+  G.frame++;
+  Shake.update();
+  lorePanel.update();
+
+  switch (G.state) {
+    case STATE.TITLE:   titleScreen.update();        break;
+    case STATE.PLAYING: playingPlaceholder.update(); break;
+    case STATE.PAUSED:  pauseScreen.update();        break;
+    case STATE.DEAD:    deadScreen.update();         break;
+    case STATE.WIN:     winScreen.update();          break;
+  }
+  /* inputFlush moved to gameLoop — called once per rAF, not per logic step */
+}
+
+
+/* ----------------------------------------------------------------
+   17. MAIN LOOP
+   Fixed-timestep accumulator — keeps logic at exactly 60fps
+   regardless of display refresh rate.
+   Render is called once per rAF tick (uncapped visually,
+   but game logic is always 60Hz).
+---------------------------------------------------------------- */
+let lastTime    = 0;
+let accumulator = 0;
+
+function gameLoop(timestamp) {
+  requestAnimationFrame(gameLoop);
+
+  /* First frame guard */
+  if (!lastTime) { lastTime = timestamp; }
+
+  const dt = Math.min(timestamp - lastTime, 100); /* cap at 100ms to prevent spiral-of-death */
+  lastTime  = timestamp;
+  accumulator += dt;
+
+  while (accumulator >= NES.FRAME_MS) {
+    update();
+    accumulator -= NES.FRAME_MS;
+  }
+
+  inputFlush();   /* once per rAF — preserves .just flags across catch-up steps */
+  render();
+}
+
+requestAnimationFrame(gameLoop);
+
+/* ----------------------------------------------------------------
+   EXPORTS — expose these so future sections can hook in cleanly
+   without having to search for variable names.
+---------------------------------------------------------------- */
+window.CB = {
+  /* Core */
+  G, STATE, ZONE_ID, ZONES, NES, PAL,
+
+  /* Systems */
+  INPUT, Camera,
+
+  /* Section 2 */
+  T, TILE_PROPS,
+  tileAt, tileIsSolid, tileIsOneway, tileIsHazard,
+  resolveCollision,
+  buildZoneStaticCanvas,
+  enterZone, transitionZone,
+  renderZone,
+
+  /* Section 3 */
+  PHYS, initPlayer, damagePlayer, playerUpdate, playerDraw,
+
+  /* Section 4 */
+  WEAPON_DEF, ENEMY_CFG,
+  getWeaponDef, getAttackHitbox,
+  createEnemy, initZoneEnemies, enemyTakeDamage,
+  updateEnemies, drawEnemies,
+
+  /* Atmosphere / Polish */
+  Shake, lorePanel,
+
+  /* Canvas factory */
+  createOffscreenCanvas,
+
+  /* State control */
+  setState,
+  registerZone,
+
+  /* Render target */
+  screenCanvas,
+  screenCtx,
+
+  /* Utilities */
+  inputFlush,
+
+  /* Debug */
+  DEBUG,
+};
+
+if (DEBUG) console.log('[CURSEBOUND] Zone 1 complete — enemies, weapons, lore, atmosphere, shake all active.');
+</script>
+</body>
+</html>

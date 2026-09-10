@@ -1,0 +1,279 @@
+/**
+ * fakemodel.mjs - an Ollama-shaped endpoint that plays SCRIPTED misbehaviour.
+ *
+ *   node server/fakemodel.mjs --port 11500 --script loop
+ *   then point the hub's Ollama base_url at http://localhost:11500
+ *
+ * WHY A DUMB MODEL IS THE RIGHT TEST
+ * ----------------------------------
+ * The agent's guards - the loop detector, the parse-failure window, the budget, the
+ * finish gate, the approval policy, the auto-checkpoint - have only ever been verified
+ * by REGEX AGAINST THE SOURCE. agent_audit.mjs checks that the code says it does these
+ * things. Nothing has ever watched one actually fire.
+ *
+ * That is a real gap, and a smart model cannot close it: you cannot ask a good model to
+ * reliably loop, or to emit exactly five unparseable replies in ten. You need a model
+ * that misbehaves ON PURPOSE, deterministically, for free, in seconds.
+ *
+ * So this speaks the /api/chat contract the hub already uses and returns canned agent
+ * actions from a named script. Each script provokes one guard:
+ *
+ *   loop        the same response over and over        -> sliding-window loop guard
+ *   garbage     unparseable replies                    -> parse-failure window
+ *   denied      a command the policy refuses           -> continues instead of halting
+ *   approval    a command that needs a human           -> pauses (fatal when unattended)
+ *   premature   edits a file then calls finish         -> finish gate demands proof
+ *   ledger      builds without ever marking a task     -> ledger left untouched
+ *   happy       writes a working file, verifies, ends  -> the control
+ *   assets      looks a sprite up in the library, loads it by exact path, verifies
+ *
+ * Nothing here is intelligent, and that is the point. It tests the LOOP, not the model.
+ */
+import { createServer } from 'http';
+
+const argv = process.argv.slice(2);
+const val = (n, d) => { const i = argv.indexOf('--' + n); return i > -1 && argv[i + 1] ? argv[i + 1] : d; };
+const PORT = parseInt(val('port', '11500'), 10);
+const SCRIPT = val('script', 'happy');
+
+// ── the scripts ───────────────────────────────────────────────────────────────
+// Each is a list of replies. Once exhausted the last one repeats, so a guard that
+// SHOULD fire has unlimited opportunity to - and a guard that does not fire shows up
+// as a run that never ends.
+const SCRIPTS = {
+  // Uses the asset library the way a real model should: look a sprite up FIRST, then load
+  // it by the exact path returned. The loop under test: list_assets is dispatched with its
+  // FILTER, the summary + result reach the model, the game verifies with a real texture.
+  // Paths below are real library entries; if the library changes, the run tells you so
+  // by name ("Loads 1 asset(s) that do not exist").
+  assets: [
+    'THOUGHT: I need an orc sprite and a footstep sound, so I will look them up rather than guess names.\nACTION: list_assets\nFILTER: orc idle',
+    "THOUGHT: Found the sprite. Building the scene with the exact paths.\nACTION: write_file\nPATH: index.html\n```html\n<!DOCTYPE html><html><head><meta charset='utf-8'><script src='https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js'></script></head><body><script>\nconst config = { type: Phaser.AUTO, width: 800, height: 600, scene: { preload, create } };\nfunction preload () {\n  this.load.image('orc', 'assets/orc_orc1_idle_with_shadow_2.png');\n  this.load.audio('step', 'assets/dirt_walk_1.wav');\n}\nfunction create () {\n  const orc = this.add.image(400, 300, 'orc').setScale(2);\n  this.input.on('pointerdown', () => { this.sound.play('step'); orc.x += 8; });\n}\nnew Phaser.Game(config);\n</script></body></html>\n```",
+    'THOUGHT: Checking it really renders with the sprite.\nACTION: test_web\nPATH: index.html',
+    'THOUGHT: It renders and the assets resolved.\nACTION: finish\nSUMMARY: An orc from the asset library stands on screen and steps forward with a footstep sound on click.',
+  ],
+
+  // Identical reply forever. The window guard should stop this within ~3 repeats.
+  loop: [
+    'THOUGHT: Checking the workspace before I start.\nACTION: list_dir\nPATH: .',
+  ],
+
+  // Never a valid ACTION. The parse window should give up at 5 failures in 10.
+  garbage: [
+    'Sure! Let me help you build that. First I will look at the files.',
+    'Here is my plan: I will write some code and then test it thoroughly.',
+    'Let me start by examining what we have in the workspace directory.',
+    'I think the best approach is to begin with the core module.',
+    'Working on it now — this should only take a moment.',
+    'Almost there, just organising my thoughts about the structure.',
+  ],
+
+  // A hard-denied command. The agent must report the refusal and KEEP GOING.
+  denied: [
+    'THOUGHT: Clearing out the old build first.\nACTION: run_command\nCOMMAND: rm -rf /',
+    'THOUGHT: That was refused, so I will just write the file directly.\nACTION: write_file\nPATH: main.js\n```javascript\nconsole.log("built without the delete");\n```',
+    'THOUGHT: Done.\nACTION: finish\nSUMMARY: Wrote main.js without needing to delete anything.',
+  ],
+
+  // Needs a human. Under strict mode this HALTS - which is the failure mode that
+  // makes a model useless overnight, and the harness should report it as such.
+  approval: [
+    'THOUGHT: Installing the dependency.\nACTION: run_command\nCOMMAND: npm install left-pad',
+  ],
+
+  // Edits then immediately claims completion. The finish gate should refuse.
+  premature: [
+    'THOUGHT: Writing the app.\nACTION: write_file\nPATH: index.html\n```html\n<!doctype html><html><body><h1>Hi</h1><script>document.title="x";</script></body></html>\n```',
+    'THOUGHT: All done.\nACTION: finish\nSUMMARY: Built the page.',
+  ],
+
+  // Builds real work but never touches the ledger.
+  ledger: [
+    'THOUGHT: Writing the module.\nACTION: write_file\nPATH: calc.js\n```javascript\nfunction add(a, b) { return a + b; }\nif (add(2, 2) !== 4) throw new Error("FAIL");\nconsole.log("PASS - add works");\n```',
+    'THOUGHT: Adding a second module.\nACTION: write_file\nPATH: sub.js\n```javascript\nfunction sub(a, b) { return a - b; }\nif (sub(4, 2) !== 2) throw new Error("FAIL");\nconsole.log("PASS - sub works");\n```',
+    'THOUGHT: Finished the modules.\nACTION: finish\nSUMMARY: Wrote calc.js and sub.js, both self-checking.',
+  ],
+
+  /**
+   * MARATHON — a generative script, not a fixed list.
+   *
+   * The short scripts prove a guard fires. This proves the loop SURVIVES: run it for
+   * twenty minutes and it drives several hundred steps of varied, parseable, never-
+   * repeating work. That exercises what no short run can:
+   *
+   *   history pruning     MAX_HISTORY_MSGS is 16, so after ~8 steps every later step is
+   *                       running on a pruned history. Does the GOAL still survive at
+   *                       step 300? (The marker-based head exists precisely for this.)
+   *   ledger drift        does TASKS.md still match what is actually on disk?
+   *   git growth          one checkpoint per mutation, hundreds of commits deep
+   *   memory              runs are held in a Map and persisted per step
+   *
+   * Every reply is distinct - a repeat would trip the loop guard and end the test early,
+   * which is the guard working but not what is being measured here.
+   */
+  marathon: (n) => {
+    const i = Math.floor(n / 6);              // which "feature" we are on
+    const phase = n % 6;                      // where we are within it
+    const name = `mod${String(i).padStart(3, '0')}`;
+    switch (phase) {
+      case 0:
+        return `THOUGHT: Planning feature ${i}.\nACTION: task_add\nTEXT:\nbuild ${name}\nverify ${name}`;
+      case 1:
+        return `THOUGHT: Writing ${name}.\nACTION: write_file\nPATH: ${name}.js\n\`\`\`javascript\n`
+          + `// ${name}: feature ${i} of the marathon\n`
+          + `function ${name}(x) { return x * ${i + 2} + ${i}; }\n`
+          + `if (${name}(2) !== ${2 * (i + 2) + i}) throw new Error("FAIL: ${name}");\n`
+          + `console.log("PASS - ${name}");\n\`\`\``;
+      case 2:
+        return `THOUGHT: ${name} written, marking it off.\nACTION: task_done\nWHICH: build ${name}`;
+      case 3:
+        return `THOUGHT: Recording what feature ${i} does so a later step need not re-read it.\n`
+          + `ACTION: remember\nTEXT: ${name} multiplies by ${i + 2} and offsets by ${i}; verified at step ${n}`;
+      case 4:
+        return `THOUGHT: Checking what changed for feature ${i}.\nACTION: git_diff\nREF: HEAD`;
+      default:
+        return `THOUGHT: Feature ${i} is complete and checked.\nACTION: task_done\nWHICH: verify ${name}`;
+    }
+  },
+
+  // Delegation. spawn_subtask shipped tonight and has NEVER executed - the parent
+  // spawns a sub-agent, the sub-agent gets its own fresh context and this same script
+  // (reset by the assistant-count heuristic), does one job, and finishes. Proves the
+  // depth cap, the parent/child step tagging, and that a sub-task cannot spawn another.
+  subtask: [
+    'THOUGHT: The maths module is separable, so I will delegate it.' + String.fromCharCode(10) +
+      'ACTION: spawn_subtask' + String.fromCharCode(10) +
+      'GOAL: write maths.js with a double(n) function and an assertion that double(4) is 8',
+    'THOUGHT: The sub-agent reported back; recording what it built.' + String.fromCharCode(10) +
+      'ACTION: remember' + String.fromCharCode(10) +
+      'TEXT: maths.js was written by a sub-task; double(4) === 8 is asserted inside it',
+    'THOUGHT: Delegated work is done.' + String.fromCharCode(10) +
+      'ACTION: finish' + String.fromCharCode(10) +
+      'SUMMARY: Delegated maths.js to a sub-task, which wrote and self-checked it.',
+  ],
+
+  // Queues follow-on work, then finishes cleanly - which is what the supervisor waits
+  // for. With AGENT_SUPERVISOR=1 the finished run should pull the queued goal by itself.
+  queueing: [
+    'THOUGHT: Writing the first module.' + String.fromCharCode(10) +
+      'ACTION: write_file' + String.fromCharCode(10) + 'PATH: first.js' + String.fromCharCode(10) +
+      '```javascript' + String.fromCharCode(10) + 'function first(){return 1;}' + String.fromCharCode(10) +
+      'if(first()!==1) throw new Error("FAIL");' + String.fromCharCode(10) +
+      'console.log("PASS - first");' + String.fromCharCode(10) + '```',
+    'THOUGHT: A second module is worth doing but not in this run.' + String.fromCharCode(10) +
+      'ACTION: queue_task' + String.fromCharCode(10) + 'GOAL: write second.js with a self-check',
+    'THOUGHT: This run is complete.' + String.fromCharCode(10) +
+      'ACTION: finish' + String.fromCharCode(10) + 'SUMMARY: Wrote first.js and queued the follow-on.',
+  ],
+
+  // The control: real work, marked on the ledger, verified, then finished.
+  happy: [
+    'THOUGHT: Recording what this build needs.\nACTION: task_add\nTEXT:\nwrite the calculator module\nverify it runs',
+    'THOUGHT: Writing the module.\nACTION: write_file\nPATH: calc.js\n```javascript\nfunction add(a, b) { return a + b; }\nif (add(2, 2) !== 4) throw new Error("FAIL: add");\nconsole.log("PASS - add works");\n```',
+    'THOUGHT: Module written.\nACTION: task_done\nWHICH: 1',
+    'THOUGHT: Proving it actually runs.\nACTION: verify_project',
+    'THOUGHT: It runs.\nACTION: task_done\nWHICH: 2',
+    'THOUGHT: Everything on the ledger is done and the project runs.\nACTION: finish\nSUMMARY: Wrote calc.js with a self-check; verify_project confirms it runs.',
+  ],
+};
+
+const script = SCRIPTS[SCRIPT];
+if (!script) {
+  console.error(`unknown script "${SCRIPT}". one of: ${Object.keys(SCRIPTS).join(', ')}`);
+  process.exit(1);
+}
+
+// A script is either a fixed LIST (short — provokes one guard, then repeats its last
+// reply forever so the guard has unlimited chances to fire) or a GENERATOR taking the
+// step index (long — never repeats, so the run ends because the loop finished rather
+// than because the loop guard tripped).
+const generative = typeof script === 'function';
+const replyAt = (i) => (generative ? script(i) : script[Math.min(i, script.length - 1)]);
+
+let n = 0;
+const served = [];
+
+// ── the Ollama /api/chat contract, minimally ──────────────────────────────────
+// The hub streams NDJSON and concatenates message.content, so one final frame with
+// done:true is enough. The planner call is answered too - it happens before the loop
+// and would otherwise hang.
+const server = createServer((req, res) => {
+  if (req.method !== 'POST') { res.writeHead(404).end(); return; }
+  let body = '';
+  req.on('data', (d) => { body += d; });
+  req.on('end', () => {
+    let isPlanner = false;
+    try {
+      const j = JSON.parse(body || '{}');
+      const msgs = j.messages || [];
+      const sys = msgs.find((m) => m.role === 'system');
+      isPlanner = /architect/i.test(sys?.content || '');
+      // Reset on a FRESH run. The script pointer is stateful, so after one run it sits
+      // on the last reply and replays it forever - which made a second run look like the
+      // model immediately called finish. A new run's first call carries only the system
+      // prompt, the optional notes, and the goal.
+      // A fresh action loop has exactly ONE assistant message in history: the BUILD
+      // PLAN the planner just produced. Counting raw messages did not work — after
+      // planning, the first action call already carries five.
+      // A SUB-TASK gets its own fresh context and its own opening message, so without
+      // this it looks exactly like a new parent run and replays the parent's script -
+      // which is why the first spawn_subtask test saw the child call `remember` instead
+      // of doing its job. Detect the sub-agent by its distinctive opening line and serve
+      // it a different script.
+      const isSub = msgs.some((m) => /You are a SUB-AGENT/.test(m.content || ''));
+      if (isSub) {
+        // Look for evidence the file was WRITTEN, not for the filename - the sub-agent's
+        // own goal text mentions maths.js, so matching that made it finish immediately
+        // without building anything.
+        const done = msgs.some((m) => /TOOL RESULT \(write_file\)/.test(m.content || ''));
+        const reply = done
+          ? 'THOUGHT: maths.js is written and self-checking.' + String.fromCharCode(10)
+            + 'ACTION: finish' + String.fromCharCode(10)
+            + 'SUMMARY: Wrote maths.js with double(n); double(4) === 8 is asserted inside it.'
+          : 'THOUGHT: Writing the module I was asked for.' + String.fromCharCode(10)
+            + 'ACTION: write_file' + String.fromCharCode(10) + 'PATH: maths.js' + String.fromCharCode(10)
+            + '```javascript' + String.fromCharCode(10)
+            + 'function double(n) { return n * 2; }' + String.fromCharCode(10)
+            + 'if (double(4) !== 8) throw new Error("FAIL: double");' + String.fromCharCode(10)
+            + 'console.log("PASS - double");' + String.fromCharCode(10) + '```';
+        res.writeHead(200, { 'Content-Type': 'application/x-ndjson' });
+        res.end(JSON.stringify({ message: { role: 'assistant', content: reply }, done: true }) + String.fromCharCode(10));
+        return;
+      }
+      const assistants = msgs.filter((m) => m.role === 'assistant').length;
+      if (!isPlanner && assistants <= 1 && n > 0) {
+        console.log(`  [reset] new run detected — script pointer back to 0 (was ${n})`);
+        n = 0; served.length = 0;
+      }
+    } catch { /* malformed request - answer anyway */ }
+
+    const content = isPlanner
+      ? '1. SYSTEMS NEEDED\n- a single module\n2. BUILD ORDER\n- write it, then verify it'
+      : replyAt(n++);
+    if (!isPlanner) served.push(content.split('\n')[0].slice(0, 60));
+
+    // Two wire formats, chosen by the path the caller used - so the SAME scripts can
+    // exercise the agent's Ollama path and its OpenAI-compatible path (google, openai,
+    // groq, ...) without an API key or a cent of spend.
+    if (/chat[/]completions$/.test(req.url || '')) {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+      res.write('data: ' + JSON.stringify({ choices: [{ delta: { content } }] }) + String.fromCharCode(10, 10));
+      res.write('data: [DONE]' + String.fromCharCode(10, 10));
+      res.end();
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': 'application/x-ndjson' });
+    res.end(JSON.stringify({ message: { role: 'assistant', content }, done: true }) + '\n');
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`  fake model on http://localhost:${PORT}  script="${SCRIPT}" ` + (generative ? "(generative — never repeats)" : `(${script.length} canned replies)`));
+  console.log(`  point the hub's Ollama base_url here, then start a run.\n`);
+});
+
+process.on('SIGINT', () => {
+  console.log(`\n  served ${n} replies:`);
+  served.forEach((s, i) => console.log(`    ${i + 1}. ${s}`));
+  process.exit(0);
+});

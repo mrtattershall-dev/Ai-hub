@@ -1,0 +1,3 @@
+[REVIEW - replace with a real instruction]
+Module: renderer.js
+Header hint: RENDERER MODULE  –  All canvas drawing

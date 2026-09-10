@@ -1,0 +1,57 @@
+node_modules/
+dist/
+*.db
+*.db-journal
+.env
+.DS_Store
+
+# ── secrets ───────────────────────────────────────────────────────────────────
+# hub.json holds provider API keys in `api_keys[*].key_value`. It must never be
+# committed.
+server/hub.json
+server/hub.json.*
+
+# ── large regenerable data ────────────────────────────────────────────────────
+# The asset BINARIES are 109MB of licence-restricted pack art (CraftPix terms: usable in
+# games, NO redistribution). They are re-importable from the source archives, and the
+# canonical placeholders regenerate from canonicalAssets.mjs, so they stay out of history.
+#
+# manifest.json and LICENSES.md are NOT ignored, deliberately. The manifest is the
+# irreplaceable part - labels, roles, canonical/placeholder state, content hashes - and it
+# is what every consumer (hub, agent, both verifiers, the training gate) trusts. Losing it
+# loses the meaning of 13,500 files even though the bytes are still on disk.
+assets/*
+!assets/manifest.json
+!assets/LICENSES.md
+
+# Training corpora and generated evals: hundreds of MB, rebuildable by the assemblers.
+training-data/factory/*.jsonl
+training-data/factory/eval/
+training-data/factory/gen-output/
+training-data/*.jsonl
+training-data/factory/__pycache__/
+training-data/**/*.safetensors
+training-data/**/*.bin
+training-data/factory/snapshots/
+training-data/factory/raw/
+training-data/correctness/
+training-data/**/dataset*.jsonl
+training-data/**/trained_*.jsonl
+
+# ── vendored binaries ─────────────────────────────────────────────────────────
+# The headless Godot binary is 172MB and is a download, not source. verifyProject.js
+# already resolves it via vendor/godot/ or $GODOT_BIN.
+vendor/godot/
+vendor/**/*.exe
+
+# ── run-time state ────────────────────────────────────────────────────────────
+workspace/
+pingpong-workspace/
+server/agent-runs/
+server/agent-queue.json
+server/_upload_*.zip
+server/_exec_tmp/
+devserver.log
+*.log
+*.bak
+*.prefake
