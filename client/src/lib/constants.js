@@ -33,11 +33,33 @@ export const CODE_MODES = [
 
 // Strategy tab: canvas types, each maps to a set of structured sections
 export const CANVAS_TYPES = [
+  // WHAT THESE ARE FOR
+  // -----------------
+  // The first four were generic consultancy shapes - Project Map, Architecture - written
+  // before a plan meant anything. A plan now becomes a chain of goals an agent executes,
+  // so the canvas is the shape of the WORK, and the work this hub does is: build a game,
+  // run an experiment, and find out why a run failed.
+  //
+  // EVERY canvas must contain a section whose label is in flow.js's WORK_LABELS, or its
+  // plans cannot become a chain and the unattended path silently disappears. That is not a
+  // convention to remember - `flow.test.mjs` asserts it for every entry in this list.
   {
-    id: 'map',
-    label: 'Project Map',
-    description: 'Break a project or feature down into its key parts and dependencies.',
-    sections: ['Overview', 'Key Components', 'Dependencies', 'Open Questions'],
+    id: 'build',
+    label: 'Build a Game',
+    description: 'Turn a game idea into ordered, buildable work an agent can pick up.',
+    sections: ['Goal', 'Tasks', 'Assets & Engine', 'Risks & Mitigations'],
+  },
+  {
+    id: 'experiment',
+    label: 'Run an Experiment',
+    description: 'Design a measurement: what you expect, how you will know, what would disprove it.',
+    sections: ['Question', 'Hypothesis', 'Tasks', 'How This Gets Measured', 'Risks & Mitigations'],
+  },
+  {
+    id: 'triage',
+    label: 'Triage a Failure',
+    description: 'Work back from a symptom to a cause, and out again to the fix.',
+    sections: ['Symptom', 'Evidence', 'Suspects', 'Tasks', 'Ruled Out'],
   },
   {
     id: 'plan',
@@ -46,10 +68,10 @@ export const CANVAS_TYPES = [
     sections: ['Goal', 'Milestones', 'Tasks', 'Risks & Mitigations'],
   },
   {
-    id: 'architecture',
-    label: 'Architecture',
-    description: 'Sketch a technical architecture for a system or feature.',
-    sections: ['Overview', 'Components', 'Data Flow', 'Tradeoffs'],
+    id: 'map',
+    label: 'Project Map',
+    description: 'Break a project or feature down into its key parts and dependencies.',
+    sections: ['Overview', 'Key Components', 'Dependencies', 'Open Questions'],
   },
   {
     id: 'review',

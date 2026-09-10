@@ -10,9 +10,10 @@
 import assert from 'node:assert/strict';
 import {
   planToCodeBrief, codeToGame, hopsFor, planToChain, parseListItems, verdictToFix,
-  chainBlockReason, historyToPlan, godotVerdictToFix,
+  chainBlockReason, historyToPlan, workSectionOf, godotVerdictToFix,
   FLOW, MAX_CHAIN, MAX_FIX_ERRORS, MAX_FIX_CODE, MAX_GODOT_FIX_ERRORS,
 } from './flow.js';
+import { CANVAS_TYPES } from './constants.js';
 
 let passed = 0;
 const test = (name, fn) => {
@@ -398,6 +399,38 @@ test('the two repair briefs stay distinguishable', () => {
   // verifier spoke. Collapsing them would make a Godot failure look like a Chromium one.
   assert.equal(godotVerdictToFix(GD_FAIL, GD_FILES).from, 'godot');
   assert.ok(MAX_GODOT_FIX_ERRORS > 0);
+});
+
+
+// ---- every canvas must be chainable BY CONSTRUCTION ---------------------------------
+// A canvas whose sections contain no WORK_LABELS produces plans that can never become a
+// chain: the derivation returns null, the hop renders blocked, and the unattended path is
+// gone for that canvas. That is invisible until someone writes a plan and finds the button
+// dimmed, so it is asserted here rather than left as a convention to remember.
+test('every canvas has a work section the chain can read', () => {
+  for (const canvas of CANVAS_TYPES) {
+    const work = workSectionOf(canvas);
+    assert.ok(work, `canvas "${canvas.id}" has no section in WORK_LABELS - its plans can never be queued`);
+    assert.ok(canvas.sections.includes(work), `workSectionOf returned "${work}", which is not one of ${canvas.id}'s sections`);
+  }
+});
+
+test('a plan written to any canvas shape derives goals', () => {
+  for (const canvas of CANVAS_TYPES) {
+    const work = workSectionOf(canvas);
+    // The minimum a model could return for this canvas: the work section, bulleted.
+    const body = `## ${work}\n- First piece of work\n- Second piece of work`;
+    const chain = planToChain({ kind: 'strategy', response: body, streaming: false, canvasId: canvas.id });
+    assert.ok(chain, `canvas "${canvas.id}" produced no chain from its own work section`);
+    assert.equal(chain.goals.length, 2, `canvas "${canvas.id}" derived ${chain.goals && chain.goals.length} goals`);
+  }
+});
+
+test('the canvases cover what this hub actually does', () => {
+  const ids = CANVAS_TYPES.map((c) => c.id);
+  // Not decoration: these three are the work - build a game, measure something, find out
+  // why a run failed. If one is removed, say so deliberately by editing this line.
+  for (const id of ['build', 'experiment', 'triage']) assert.ok(ids.includes(id), `missing canvas: ${id}`);
 });
 
 console.log(`flow: ${passed} passed${process.exitCode ? ' (with failures above)' : ''}`);
