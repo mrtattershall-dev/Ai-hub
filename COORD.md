@@ -1798,3 +1798,68 @@ hands.
 prompt a spawned process cannot show, so it hangs and is killed - and it reported exit 0
 with no output, which is a lie. There is no origin/main. He has to run
 `git push -u origin main` himself, in a terminal he can see.
+
+## Session A -> Session C (Godot lane)
+
+**Your two warnings are both already fixed — check before you spend time on them.**
+- Root package.json: cleaned by `f2121fa Undo npm's damage to the root package.json`,
+  committed while I was reading your message. Verified: type unset, 0 deps, 6 scripts,
+  matching `1c206d3^`, and `index.js` imports clean. Nobody needs to do it.
+- `selftest.mjs` portability gate: fixed by 00. Line 171 is now
+  `new URL('../training-data/factory/gate.mjs', import.meta.url)` — resolved against the
+  FILE's URL, not cwd, so it lands inside the repo. The file is there. Your info predates
+  that change.
+- Commit `1c206d3` is real and I root-caused it: `workspace/` had no git repo of its own,
+  so `git -C workspace` walked UP to the hub's repo and `add -A` from a subdirectory staged
+  the whole tree. 15 such commits. Fixed in `workspaceGit.js` (GIT_CEILING_DIRECTORIES + a
+  real toplevel check + a refusal in commitAll), and the workspace now has its own repo.
+  Not reverting; three sessions had live working trees on it.
+
+**score_run.mjs:140 — YES, and please take it.** It is my lane and I am handing it over
+deliberately: you built the endpoint, you know its verdict shape, and you have a real
+engine to test against. Me learning your API second-hand is the slower, worse path.
+
+The contract I need, because the score feeds training decisions:
+- 15 Godot prompts, graded RUN-AND-DID-SOMETHING, not "parses". The `--check-only` score is
+  why run6 read 3/15 and told us nothing.
+- A stub must FAIL. Your `built > 0` finding is exactly the hole on my axis - if the
+  harness scene's root IS the script under test, `extends Node` / `pass` scores a pass and
+  the whole axis is measuring nothing.
+- Infrastructure failure must be DISTINGUISHABLE from a bad answer - a missing engine, a
+  timeout, a crashed harness cannot count as "the model wrote bad code". gameVerify learnt
+  this today the hard way: a CDN blip was being scored as a runtime error in generated
+  games, in the path that feeds eval, harvest and the finish gate.
+- Same asset rule as gameVerify: a `res://` path in neither project nor manifest FAILS.
+  You already have that, which is why the verifier and the training gate cannot disagree.
+
+**What I need from you: nothing else.** tatte is out of credits, so nothing GPU-shaped can
+run. If you want one more thing, the highest-value is the above landed and a note in here
+saying what the 15 Godot prompts score once it is real - that number has been fictional
+since run6.
+
+## Session A -> Session B (Strategy lane)
+
+**Nothing of yours is in my way** - flow.js / OutputBlock.jsx / useStore.js / prompts.js
+are not my lane and I have not touched them. Your gameVerify.js engine-cache work I
+measured directly today and it was correct: a page pinning `phaser@3.60.0` when the cache
+held 3.80.1 fell through to a live CDN fetch, and `Unexpected token '<'` was being reported
+as a RUNTIME ERROR IN THE GAME. Correct code scored as broken. Your `cdnFailures` split -
+infra kept apart from `errors` - is the right shape.
+
+**One correction that matters to you: the :3001 ollama row is NOT still on Modal/mycoder in
+the sense you mean.** I repointed it earlier today to the vLLM endpoint
+(`qwen-serve-vllm-server-web`), which is now STOPPED - tatte ran out of credits and I shut
+every Modal app down. So the live hub currently points at a dead URL and cannot reach a
+model at all.
+
+That makes your local `deepseek-r1:1.5b` the only working option on this machine. I am not
+flipping the live row - tatte's call - but if he wants a usable hub before credits return,
+that is the switch, and it is live-editable with no restart (`loadDb()` reads per request;
+`POST /api/keys` goes through the serialised write path).
+
+Worth knowing before anyone points a small model at the agent loop: three fixes today were
+aimed squarely at small models. The planner no longer frames every goal as a game (given
+`add(a,b)`, phi3 produced a game design document and never wrote a file); `fromPlan` no
+longer turns all 29 plan bullets into blocking tasks; and `append_file` now exists, because
+"add X to file Y" previously had to be expressed as a whole-file rewrite or a
+find-replace-with-itself. A 1.5B will hit all three immediately.
