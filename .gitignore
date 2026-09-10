@@ -69,3 +69,4 @@ server/trials-index.jsonl
 server/variance-index.jsonl
 server/yolo-index.jsonl
 server/agent-queue.json.prerestart
+server/cycle1-mixed-index.jsonl

@@ -2289,3 +2289,46 @@ code, nothing of yours touched. tatte is running all four sessions continuously 
 shared GPU, so anyone else driving queued work in bulk will hit this too. Worth knowing
 before you conclude a chain is broken: a stalled queue with 'done' runs and zero errors is
 this cap, not a bug.
+
+- 2026-09-10 ~11:1x — Session C (Godot lane): **score_run.mjs:140 landed. The Godot axis
+  now grades run-and-did-something, and run6's real Godot score is 1/15, not 3/15.**
+
+  `scoreGodot` no longer runs `--check-only` on the first fenced block. It parses the reply
+  into a FILE SET with the same `parseFileSet` the Godot tab uses, then grades it with the
+  same `verifyGodotFiles` the tab's Run button and the agent's finish gate call. Imported
+  in-process — no HTTP, no Modal, no GPU; 170ms to load, and it uses the local vendored
+  Godot binary. An eval that graded Godot by a different standard than the gate could not
+  tell us whether the gate is passable.
+
+  Session A's four contract points, all held:
+  - run-and-did-something, not parses (stages: parse -> run -> activity)
+  - a stub FAILS: `extends Node` / `pass` is refused on `activity`
+  - infrastructure is distinguishable: `pass: null` for a missing binary or a 5xx from the
+    verifier; a 400/413 is the model handing us something unusable, which IS a result
+  - a `res://` path in neither project nor manifest FAILS, same rule as gameVerify
+
+  **ce's request granted, and it earned itself immediately:** the OLD bar is scored on the
+  same generations and printed directly underneath.
+
+        axis         run6
+        godot        1/15          RAN in headless Godot + did something
+          └ parses   3/15          the OLD bar - comparable to pre-2026-09-10 scores
+
+  The legacy column reproduces the historical **3/15 exactly**, which is the proof the two
+  numbers are comparable rather than two unrelated measurements. So run6's Godot capability
+  is **1/15**: of the three that "passed", two compiled and did nothing.
+
+  The old bar is not merely lenient, it is noisy in BOTH directions. Its `fence()` regex
+  cannot read a fence labelled ```` ```gdscript res://Main.gd ````, so a correct, properly
+  labelled multi-file answer scored ZERO on it. It passed stubs and failed good work.
+
+  NEW `training-data/factory/scoreGodot.test.mjs` (7) scores five synthetic generations
+  whose answers are known in advance - good / stub / syntax error / invented asset / prose -
+  and asserts the stub fails, the old bar is reported, and the two bars differ. It skips
+  cleanly with no Godot binary rather than reddening the build. `EVAL_DIR` is now
+  overridable so it never writes into `factory/eval/` (same lesson as AGENT_QUEUE_FILE).
+
+  **Caveat for whoever reads the number next:** scoring run6 left 15 prompts marked `?`
+  on OTHER axes - the Chromium verifier on Modal is unreachable. The godot column has zero
+  `?`, so 1/15 is a real result; the rest of that run's table is not, until the Phaser
+  verifier is back.
