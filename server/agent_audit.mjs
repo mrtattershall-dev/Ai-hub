@@ -15,13 +15,32 @@
  *
  * This checks all four mechanically, then exercises the git and notes layers for real.
  */
-import { readFileSync, existsSync, unlinkSync, mkdtempSync, rmSync } from 'fs';
+import { readFileSync, readdirSync, existsSync, unlinkSync, mkdtempSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const src = readFileSync(join(__dirname, 'agent.js'), 'utf8');
+
+/**
+ * The agent's source as ONE string, across however many files it now lives in.
+ *
+ * Sixty-odd checks below are regexes over `src`. While the agent was a single 3,400-line
+ * file that was the same thing as "the agent". The moment any of it moves to agentTools.js
+ * or agentPrompt.js, every check looking for the moved code searches an empty haystack and
+ * reports PASS. The suite would go green BY LOSING ITS SUBJECT - silently, during a
+ * refactor, which is exactly when it is the only thing standing between a mistake and the
+ * loop.
+ *
+ * Globbed rather than listed: a list is one forgotten line away from the same silent hole.
+ */
+const AGENT_SOURCES = readdirSync(__dirname).filter((f) => /^agent[A-Za-z]*\.js$/.test(f)).sort();
+if (!AGENT_SOURCES.includes('agent.js')) {
+  console.error('FATAL: agent.js not found - this audit would have checked nothing and said so cheerfully.');
+  process.exit(1);
+}
+const src = AGENT_SOURCES.map((f) => readFileSync(join(__dirname, f), 'utf8')).join('\n');
+console.log(`auditing: ${AGENT_SOURCES.join(', ')}`);
 // The live-layer tests get their OWN throwaway workspace.
 //
 // They used to run against the REAL workspace, so every audit left probe commits in the

@@ -25,6 +25,7 @@ import { classifyCommand, classifyPython, describeMode, MODE as APPROVAL_MODE } 
 import * as ledger from './taskLedger.js';
 import * as visual from './visualCheck.js';
 import * as verifier from './verifyProject.js';
+import { verifyGodotFiles } from './godotVerify.js';
 import { escalate, estimateTokens, tokenBudgetExceeded } from './escalate.js';
 import * as workQueue from './queue.js';
 import * as assetLib from './assets.js';
@@ -953,6 +954,39 @@ const tools = {
     return r.report;
   },
 
+  // ---- does the Godot project actually RUN? -----------------------------------
+  //
+  // verify_project already understands Godot, but only as far as `--check-only`: it
+  // proves every .gd file PARSES. Parsing is nearly free for any competent model, so a
+  // Godot run could finish - gate satisfied, chain step green - on a scene that creates
+  // nothing and prints nothing. That is the same shape as every other bug worth fixing
+  // here: a gate that passes because it never asked the question that mattered.
+  //
+  // This calls the SAME core the Godot tab's Run button calls, deliberately. A verifier
+  // that grades the agent differently from the human pressing Run is worse than none,
+  // and `verifyGodotFiles` exists precisely so both callers share one answer.
+  async verify_godot({ main, frames, mode } = {}) {
+    ensureWorkspace();
+    const files = collectGodotFiles(WORKSPACE);
+
+    if (!files.length) {
+      return 'ERROR: no Godot files in workspace/ (nothing matching *.gd, *.tscn, *.tres or project.godot). '
+        + 'This tool is for Godot projects; use verify_project for anything else.';
+    }
+    if (!files.some((x) => /.gd$/i.test(x.path))) {
+      return 'ERROR: found Godot resources but no .gd script, so there is nothing to run. Write the script first.';
+    }
+
+    const r = await verifyGodotFiles({
+      files,
+      main: main || undefined,
+      frames: frames || undefined,
+      mode: mode || 'auto',
+      run: true,          // the whole point of this tool - never the parse-only path
+    });
+    return formatGodotVerdict(r);
+  },
+
   // ---- does it actually run? -------------------------------------------------
   // The finish gate only understood web apps. This detects what kind of project this is
   // and runs the proof appropriate to it, so a Python script or a Node service can no
@@ -1012,6 +1046,110 @@ Object.assign(tools, googleTools({
   safePath,
 }));
 
+// ---- Godot file collection + verdict rendering, for verify_godot ---------------------
+//
+// Kept beside the tool rather than inside godotVerify.js: that file owns the CONTRACT and
+// belongs to the Godot lane, and a caller reaching in to reshape its output is how two
+// implementations of one idea start.
+
+/** What a Godot project is made of, as far as the verifier is concerned. */
+const GODOT_EXT = /\.(gd|tscn|tres|godot)$/i;
+
+// Names the verifier GENERATES into its own temp dir. Sending a previous run's leftovers
+// back in would make the agent verify the harness instead of the game.
+const GODOT_GENERATED = new Set(['__hub_probe.gd', '__hub_main.tscn']);
+
+// The verifier refuses 40 files / 600k chars. Cutting at the same numbers here means the
+// agent gets a sentence it can act on instead of a 413 from a layer it cannot see.
+const GODOT_MAX_FILES = 40;
+const GODOT_MAX_TOTAL = 600_000;
+
+function collectGodotFiles(root) {
+  const out = [];
+  let total = 0;
+  const walk = (dir, rel = '') => {
+    if (out.length >= GODOT_MAX_FILES || total >= GODOT_MAX_TOTAL) return;
+    let names = [];
+    try { names = readdirSync(dir); } catch { return; }
+    for (const name of names) {
+      if (name === 'node_modules' || name === '.git' || name === '.godot' || name === '.screenshots') continue;
+      const fp = join(dir, name);
+      const r = rel ? `${rel}/${name}` : name;
+      let st;
+      try { st = statSync(fp); } catch { continue; }
+      if (st.isDirectory()) { walk(fp, r); continue; }
+      if (!GODOT_EXT.test(name) || GODOT_GENERATED.has(name)) continue;
+      if (out.length >= GODOT_MAX_FILES || total + st.size > GODOT_MAX_TOTAL) return;
+      try {
+        const content = readFileSync(fp, 'utf8');
+        total += content.length;
+        out.push({ path: r, content });
+      } catch { /* unreadable file: report the rest rather than nothing */ }
+    }
+  };
+  walk(root);
+  return out;
+}
+
+/**
+ * The verdict, as something a model can act on.
+ *
+ * Errors carry file and line because the next thing the agent does is open that file, and
+ * "SCRIPT ERROR somewhere" costs it a search. `assetsMissing` is stated as a hard failure
+ * for the same reason it is in the Chromium verifier: a texture that 404s leaves a scene
+ * that "runs" and shows nothing.
+ */
+function formatGodotVerdict(r) {
+  if (!r || r.error) {
+    return `ERROR: ${(r && r.error) || 'the Godot verifier returned nothing'}`;
+  }
+
+  const L = [];
+  L.push(`GODOT VERIFICATION — ${r.ok ? 'PASS' : 'FAIL'}${r.mode ? ` (mode: ${r.mode})` : ''}`);
+  if (r.verdict) L.push(r.verdict);
+  if (r.main) L.push(`entry: ${r.main}`);
+
+  for (const s of r.stages || []) {
+    L.push(`  stage ${s.stage}: ${s.ok ? 'ok' : 'FAILED'}`);
+  }
+
+  const errs = r.errors || [];
+  if (errs.length) {
+    L.push('errors:');
+    for (const e of errs.slice(0, 12)) {
+      const where = [e.file, e.line ? `line ${e.line}` : ''].filter(Boolean).join(' ');
+      L.push(`  - ${where ? `${where}: ` : ''}${String(e.message || '').slice(0, 300)}`);
+    }
+    if (errs.length > 12) L.push(`  - (${errs.length - 12} more)`);
+  }
+
+  if (r.treeStats) {
+    L.push(`scene: ${r.treeStats.built || 0} node(s) built${
+      r.treeStats.classes && r.treeStats.classes.length ? ` (${r.treeStats.classes.slice(0, 6).join(', ')})` : ''}`);
+  }
+  if (r.prints && r.prints.length) {
+    L.push(`printed: ${r.prints.slice(0, 8).map((p) => String(p).slice(0, 120)).join(' | ')}`);
+  }
+  if (r.assetsMissing && r.assetsMissing.length) {
+    L.push(`MISSING ASSETS (these do not exist — use list_assets for exact names):`);
+    for (const a of r.assetsMissing.slice(0, 8)) {
+      L.push(`  - ${a.path || a}${a.from && a.from.length ? ` (referenced by ${a.from.slice(0, 3).join(', ')})` : ''}`);
+    }
+  }
+  for (const n of (r.notes || []).slice(0, 6)) L.push(`note: ${n}`);
+
+  return L.join('\n');
+}
+
+// The two halves of verify_godot that are mine rather than the verifier's: which files
+// get sent, and how the answer is worded. Exported for the same reason parseAction is -
+// a collector that quietly skips the entry script, or a verdict that drops the missing
+// asset names, fails in a way no syntax check can see.
+export const __godotToolTest = {
+  collect: (root) => collectGodotFiles(root),
+  format: (r) => formatGodotVerdict(r),
+};
+
 // Tools that run WITHOUT human approval.
 //
 // The line is "can this reach outside the sandbox, or spend/destroy something
@@ -1047,7 +1185,7 @@ const AUTO_TOOLS = new Set(['list_dir', 'read_file', 'search_file', 'outline_fil
   // page in a headless browser, verify_project runs the project's own entry point.
   // (verify_project executes workspace code, which is exactly what it is for: a claim
   // of "done" that never ran anything is the failure this closes.)
-  'see_screen', 'verify_project',
+  'see_screen', 'verify_project', 'verify_godot',
   // Queueing costs nothing and running a bounded sub-task is just more model calls.
   'queue_task', 'spawn_subtask',
   // Reading the asset manifest is a lookup, nothing more.
@@ -1525,6 +1663,13 @@ verify_project — prove the project runs. Detects what kind of project this is 
 THOUGHT: <why>
 ACTION: verify_project
 
+verify_godot — prove a GODOT project RUNS, not merely that it parses. verify_project only
+--check-only's your .gd files, and a scene that builds nothing and prints nothing passes that.
+This runs it headless for real frames and reports the scene tree, prints and missing assets.
+Use it before finishing ANY Godot work. Add PATH only to name the entry script/scene:
+THOUGHT: <why>
+ACTION: verify_godot
+
 task_list — see your checklist: what is done, what is left:
 THOUGHT: <why>
 ACTION: task_list
@@ -1769,6 +1914,8 @@ function parseAction(text, lastPath) {
   }
   if (tool === 'see_screen') return { tool, thought, args: { path: path || 'index.html' } };
   if (tool === 'verify_project') return { tool, thought, args: { entry: path || undefined } };
+  // PATH on a verify_godot action names the entry scene/script, not a file to read.
+  if (tool === 'verify_godot') return { tool, thought, args: { main: path || undefined } };
   if (tool === 'spawn_subtask') {
     const g = (text.match(/GOAL:\s*([\s\S]+)/i)?.[1] || '').split(/\n[A-Z]{3,}:/)[0].trim();
     return { tool, thought, args: { goal: g } };
@@ -2657,14 +2804,41 @@ async function drive(loadDb, run) {
           if ((!hasWeb || !run.touchedWeb) && !run.verified) {
             // Same rule: only mark verified once it actually verifies.
             try {
-              const v = await verifier.verify(WORKSPACE);
-              if (!v.ok) {
-                blocked(`Project does not run (${v.kind}) — not finished.`,
-                  `Do NOT finish yet — the project does not run:\n\n${verifier.format(v)}\n\nFix these, then finish.`);
-                continue;
+              // A Godot project is graded by RUNNING it, not by parsing it.
+              //
+              // verifier.verify() reaches Godot through --check-only, so a scene that
+              // compiles and does nothing passes the gate: no nodes, no output, nothing on
+              // screen, "verified". That is the same shape as every gate bug this file has
+              // already been bitten by — it passes because it never asks the question that
+              // matters. godotVerify can actually run N frames and tell "ran but nothing
+              // observable happened" apart from "60 frames, 4 nodes live", and the agent now
+              // has a tool for exactly that, so the GATE should hold work to the same
+              // standard instead of leaving the model to volunteer for it.
+              const kind = verifier.detectKind(WORKSPACE).kind;
+              if (kind === 'godot' || kind === 'gdscript') {
+                const files = collectGodotFiles(WORKSPACE);
+                if (files.some((x) => /\.gd$/i.test(x.path))) {
+                  const gv = await verifyGodotFiles({ files, mode: 'auto', run: true });
+                  if (!gv.ok) {
+                    blocked('Godot project does not RUN — not finished.',
+                      `Do NOT finish yet — it may parse, but it does not run:\n\n${formatGodotVerdict(gv)}\n\nFix that, then finish.`);
+                    continue;
+                  }
+                  run.verified = true;
+                  pushStep(run, { type: 'note', text: `Verified (godot, ran): ${formatGodotVerdict(gv).split('\n')[0]}` });
+                }
               }
-              run.verified = true;    // passed — do not pay for it again
-              pushStep(run, { type: 'note', text: `Verified (${v.kind}): ${v.evidence.join('; ')}` });
+
+              if (!run.verified) {
+                const v = await verifier.verify(WORKSPACE);
+                if (!v.ok) {
+                  blocked(`Project does not run (${v.kind}) — not finished.`,
+                    `Do NOT finish yet — the project does not run:\n\n${verifier.format(v)}\n\nFix these, then finish.`);
+                  continue;
+                }
+                run.verified = true;    // passed — do not pay for it again
+                pushStep(run, { type: 'note', text: `Verified (${v.kind}): ${v.evidence.join('; ')}` });
+              }
             } catch { /* verification is evidence, not a gate that can hang a run */ }
           }
         }
