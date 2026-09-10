@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Orc Coin Collector</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+    <script>
+        // Game configuration
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: 'game-container',
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        // Game variables
+        let player;
+        let cursors;
+        let coins;
+        let score = 0;
+        let scoreText;
+
+        // Create the game
+        const game = new Phaser.Game(config);
+
+        function preload() {
+            // Load assets
+            this.load.image('orc', 'assets/orc.png');
+            this.load.image('coin', 'assets/coin.png');
+            this.load.image('ground', 'assets/ground.png');
+        }
+
+        function create() {
+            // Create player
+            player = this.physics.add.sprite(100, 450, 'orc');
+            player.setCollideWorldBounds(true);
+            
+            // Create ground
+            const ground = this.add.tileSprite(0, 550, 800, 50, 'ground');
+            ground.setOrigin(0, 0);
+            
+            // Create coins
+            coins = this.physics.add.group();
+            for (let i = 0; i < 10; i++) {
+                const x = Phaser.Math.Between(50, 750);
+                const y = Phaser.Math.Between(50, 400);
+                coins.create(x, y, 'coin');
+            }
+            
+            // Set up collision
+            this.physics.add.overlap(player, coins, collectCoin, null, this);
+            
+            // Create score text
+            scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#ffffff' });
+            
+            // Create cursor keys
+            cursors = this.input.keyboard.createCursorKeys();
+        }
+
+        function update() {
+            // Player movement
+            if (cursors.left.isDown) {
+                player.setVelocityX(-160);
+            } else if (cursors.right.isDown) {
+                player.setVelocityX(160);
+            } else {
+                player.setVelocityX(0);
+            }
+            
+            if (cursors.up.isDown) {
+                player.setVelocityY(-160);
+            } else if (cursors.down.isDown) {
+                player.setVelocityY(160);
+            } else {
+                player.setVelocityY(0);
+            }
+        }
+
+        function collectCoin(player, coin) {
+            coin.disableBody(true, true);
+            score += 10;
+            scoreText.setText('Score: ' + score);
+        }
+    </script>
+</body>
+</html>
