@@ -2757,6 +2757,26 @@ async function drive(loadDb, run) {
       }
     }
 
+    // ── Mark the work done ──────────────────────────────────────────────────────
+    // FINISHING IS NOT SUPERVISION, and this used to be inside the gate below.
+    //
+    // With the supervisor off - the posture all three sessions have been recommending -
+    // a clean run wrote its file, verified it, passed the finish gate, and then left its
+    // queue item on 'taken' for ever. Reproduced on an isolated hub: item 1 taken, item 2
+    // queued behind an `after` that could never reach 'done', unchanged at t+60s. So the
+    // unattended path worked and the human-paced one did not, which is exactly backwards,
+    // and `requeueOrphans()` then re-ran the already-succeeded goal on the next boot -
+    // silent duplicate work, and for a write_file goal that overwrites whatever came after.
+    //
+    // The failure path was fixed hours ago and this comment was already sitting above it:
+    // an item stuck on 'taken' is "invisible to dequeue, and re-queued on the next restart
+    // as if nothing had happened". That was a word-for-word description of what the
+    // SUCCESS path was still doing. Reported by the Strategy session with a reproduction.
+    if (run.status === 'done' && !run.depth && run.queueItemId) {
+      try { workQueue.complete(run.queueItemId, { status: 'done', runId: run.id }); }
+      catch { /* the queue must never take a finished run down with it */ }
+    }
+
     // ── Take the next ticket ────────────────────────────────────────────────────
     // Every entry point was a human pressing something, so "autonomous" meant
     // autonomous within one goal and then idle. A finished run now pulls the next
@@ -2767,7 +2787,6 @@ async function drive(loadDb, run) {
     // other path above - one retry of the same goal, then it stops and waits for a human.
     if (supervisorEnabled && run.status === 'done' && !run.depth) {
       try {
-        if (run.queueItemId) workQueue.complete(run.queueItemId, { status: 'done', runId: run.id });
         const next = workQueue.dequeue({ completedIds: completedQueueIds() });
         if (next) {
           const stop = supervisorBrake(next);
