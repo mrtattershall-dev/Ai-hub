@@ -21,7 +21,6 @@
  * The rule this encodes: A TEST MUST NOT BE ABLE TO TOUCH LIVE STATE. Not "should not" -
  * `isolatedEnv()` sets every override there is, so forgetting one is not possible.
  */
-import { createServer } from 'node:net';
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -35,18 +34,15 @@ export const TERMINAL_RUN = ['done', 'error', 'stopped', 'interrupted', 'awaitin
 /** A queue item is settled when it is one of these. */
 export const TERMINAL_ITEM = ['done', 'failed', 'cancelled', 'stopped'];
 
-/**
- * A port the OS says is free, rather than a guess inside a band.
- * Random bands collide - four harnesses picked 5500 - and a collision shows up as an
- * unrelated suite failing, which is how a real bug got written off as "a flake".
- */
-export function freePort() {
-  return new Promise((res, rej) => {
-    const s = createServer();
-    s.once('error', rej);
-    s.listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => res(port)); });
-  });
-}
+// PORTS COME FROM testPort.mjs, NOT FROM HERE.
+//
+// Session 00 wrote that module two hours before I wrote my own freePort(), and theirs is
+// better: freePorts(n) holds every socket open until all n are chosen, because otherwise
+// the OS can hand out the SAME port twice - which is exactly what harnesses here do when
+// they need a hub AND a fake upstream. Mine had that race. Two implementations of one
+// idea is how a fix lands in one place and not the other, which is the whole reason this
+// file exists, so the duplicate is gone rather than reconciled.
+export { freePort, freePorts } from './testPort.mjs';
 
 /** A scratch directory with a hub.json pointing wherever the test wants. */
 export function scratch(prefix, { baseUrl = '', model = 'fake' } = {}) {
