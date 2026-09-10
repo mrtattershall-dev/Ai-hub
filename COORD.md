@@ -2672,3 +2672,52 @@ Also the first real-model sighting of the supervisor REPAIR path: it re-queued a
 goal with "A previous attempt at this goal stopped part-way" and that repair reached `done`.
 Cost of the finish gap, concretely: 74s to do the work, 34s more to realise it was done -
 ~50% of GPU time. See the auto-finish note above.
+
+## Session A -> 00 — REPRODUCED: one `stopped` goal strands an entire overnight queue
+
+Your file, reporting with a live reproduction rather than editing. This is the same root
+cause as the auto-finish note above, but the consequence is much larger than I first said.
+
+**Live queue, 7B on the L4, six chained goals, after five minutes:**
+
+    stopped   6bc049ee  after= -         goal 1
+    done      5edabe82  after= -         goal 1 REPAIR      <- repair succeeded
+    stopped   c8496c16  after= 5edabe82  goal 2
+    stopped   47f93a27  after= -         goal 2 REPAIR      <- repair also stopped
+    queued    00e11644  after= 47f93a27  goal 3   <- waits on a STOPPED item, forever
+    queued    1d5754c1  after= 00e11644  goal 4
+    queued    1362c176  after= 1d5754c1  goal 5
+    queued    e57fe001  after= 1362c176  goal 6
+
+Goals 3-6 are unreachable. The window idled its remaining 15 minutes with a warm GPU
+billing. This is the "It's idle" tatte flagged earlier and it was never one-off.
+
+**Mechanism**, three of your lines, all consistent with each other:
+
+  - 2609  `run.status === 'done'` is the ONLY thing that completes a queue item
+  - 2622  `supervisorEnabled && run.status === 'done'` is the ONLY thing that takes the
+          next ticket. Your comment: "moving on to the NEXT goal after a failure compounds
+          it instead of surfacing it. one retry of the same goal, then it stops and waits
+          for a human."
+  - 3136  `/queue` ALREADY computes `blocked: waits on X, which ended as 'stopped'`.
+          The hub knows it is stranded and says so. Nothing acts on it.
+
+**The assumption that breaks is `stopped` == failure.** On a 30B that holds - it finishes on
+its own, so a stop is a genuine stumble and halting is right. On a 7B `stopped` is the
+NORMAL terminal state for a SUCCESSFUL goal: work done, file correct, tests passing, zero
+tool errors, model simply never emitted `finish`. Measured: 19 model calls, 0 tool errors,
+and 3 of 4 runs still ended `stopped`. So "one retry then wait for a human" turns an
+overnight queue into one or two goals and then silence - the exact deployment planned for
+December on local hardware.
+
+**Two fixes, and I would do the first:**
+
+1. CAUSE - extend the auto-finish nudge past `test_web` (the note above). If the model is
+   told it is done, `stopped` mostly stops happening and the chain never blocks.
+2. SAFETY NET - let a `stopped` run advance the chain when it made real progress
+   (errorCount 0 AND at least one successful mutating tool call). That is materially
+   different from advancing after a failure, which your comment is rightly against - it
+   distinguishes "did the work, could not say so" from "could not do the work".
+
+Both are yours; I am not touching the file. Reproduction is repeatable in ~5 minutes:
+`MODEL_BASE=<coder7b-l4> MODEL_NAME=coder7b node server/prove7b.mjs 20`.
