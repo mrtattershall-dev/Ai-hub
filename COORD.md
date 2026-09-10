@@ -8,7 +8,7 @@ Claim a file before you edit it. If a claim is stale (>2h, session gone), take i
 
 | session | files claimed | since | status |
 |---|---|---|---|
-| ai-native-engine-00 | `COORD.md`, `client/src/lib/flow*.js`, `client/src/store/useStore.js`, `client/src/components/{OutputBlock,ChatMessage}.jsx`, `client/src/pages/CodePage.jsx`, **`server/agent.js` (queue routes only, from 22:32)**, `server/queueChain.test.mjs` (new) | 22:00 | active |
+| ai-native-engine-00 (NEW LANE 00:4x: **Settings / Accounts / Google OAuth** — `server/googleAuth*.{js,mjs}`, `client/src/pages/SettingsPage.jsx`, the google block of `client/src/lib/api.js`, the google mount in `server/index.js`) | `COORD.md`, `client/src/lib/flow*.js`, `client/src/store/useStore.js`, `client/src/components/{OutputBlock,ChatMessage}.jsx`, `client/src/pages/CodePage.jsx`, **`server/agent.js` (queue routes only, from 22:32)**, `server/queueChain.test.mjs` (new) | 22:00 | active |
 | other session | `server/canonicalAssets.mjs` — **observed live-editing, do not touch** (CANON 46 -> 77 between 21:59 and 22:12) | 22:12 | active |
 | ai-native-engine (assets/verifier/training) | see "Session A claims" below | 2026-09-09 20:xx | active |
 
@@ -381,3 +381,151 @@ Measured so far, so nobody repeats it:
 - 2026-09-10 — Session A: tree-sitter extraction (js/ts/tsx via wasm, gdscript native),
   GitHub token in use for search (env only, never written to disk - it is gitignored
   nowhere because it is nowhere). Godot handed to whoever tatte has on it.
+
+- 2026-09-10 00:0x — ai-native-engine-00: **flow drawn as a tree, and the loop closed.**
+
+  1. The sidebar's Flow group was a straight line, which claimed Code feeds Agent. Nothing
+     does. `views.jsx` now exports `FLOW_TREE` and the sidebar renders it with real tree
+     connectors:
+
+         Strategy ─┬─ Code ─┬─ Game        you drive it, turn by turn
+                   │        └─ Godot
+                   └─ Agent               it runs the queued chain without you
+
+     Every edge in that tree is a handoff that exists in code (`lib/flow.js`, and
+     `loadCodeIntoGame`). An edge added there without the handoff behind it would make the
+     sidebar lie about what the hub can do. Connector shape is decided in JS, not CSS:
+     `:last-child` cannot see "last sibling" here, because each node is followed by its own
+     subtree rather than by the next sibling.
+
+  2. **Game -> Code now exists.** A failed Chromium verdict was a dead end — it told you the
+     game was broken and left you to retype the failure into Code, which is the exact
+     copy-paste the flow exists to delete, and where the useful detail (which check failed,
+     which asset was missing) got dropped. `verdictToFix` in `flow.js` builds a repair brief
+     — verdict, failed checks, DISTINCT console errors (the same error fires once a frame),
+     missing assets with the canonical rule, and the failing source, capped — and a
+     "Fix in Code" button on the failed verdict hands it over with the task chip set to Debug.
+     The verdict now carries the exact source that produced it, since the editor stays live.
+
+  Tests: flow 39 (was 29), queue chain 7, `vite build` clean. Verified in the browser:
+  deliberately broken Phaser -> Verify -> FAIL -> Fix in Code -> composer holds the brief.
+
+  **Note for tatte, not for the other session:** that browser test overwrote the Game tab's
+  Phaser buffer (Verify saves the editor before running). I reset it to the starter
+  template afterwards; if you had code parked there, it is gone and I am sorry.
+
+---
+
+# Session C (Godot lane) — appended 2026-09-10 ~05:4x
+
+## Claim
+
+| files | status |
+|---|---|
+| `client/src/pages/GodotPage.jsx` | claimed — full rewrite |
+| `server/godotVerify.js` | claimed — router grows |
+| `server/godotProject.js` (NEW), `server/godotProject.test.mjs` (NEW) | claimed |
+| `client/src/lib/godot.js` (NEW), `client/src/lib/godot.test.mjs` (NEW) | claimed |
+| `client/src/lib/api.js`, `client/src/store/useStore.js`, `client/src/index.css` | **small additive edits only** — a few Godot lines each. These are ai-native-engine-00's files; I am not restructuring them. |
+
+Deliberately NOT touched: `flow.js` (00's, actively edited — the Godot repair brief lives in
+`lib/godot.js` instead and calls `sendHandoff` directly, exactly as GamePage does),
+`prompts.js`, `CodePage.jsx`, the agent tool table in `agent.js` (Session A's).
+
+## Why this lane
+
+Session A's own finding, 09-09: **the Godot eval axis only runs `--check-only` — it scores
+"does it parse."** The tab has the same ceiling and a lower one besides: it accepts exactly
+one file, that file must `extends SceneTree`, and there is no model anywhere in the loop.
+So the tab can only exercise the *least* representative shape of GDScript there is.
+
+Verified on the vendored 4.6.3 binary before building on it:
+- `--headless --path <dir> --quit-after <N>` runs a **real scene** with a real `Node2D`
+  script: `_ready` fires, `_process` fires N times, the process exits 0 deterministically.
+- A missing `res://` resource and a runtime nil-access both surface with `res://File.gd:LINE`
+  in the backtrace — structured, attributable errors, not just a pass/fail.
+- A parse error terminates the scene run promptly rather than hanging out to the timeout.
+
+That is the unlock: Node-shaped and scene-shaped GDScript become verifiable, which is what
+a model trained for "full Godot operations" actually emits.
+
+- 2026-09-10 00:3x — ai-native-engine-00: **failed chain steps no longer strand the queue.**
+
+  A real bug, not a missing feature. `workQueue.complete` was called in exactly ONE place:
+  the clean-finish branch. So a queue-started run that failed left its item in `taken`
+  for good — invisible to `dequeue`, everything behind it waiting on an id that could never
+  reach 'done', and `requeueOrphans` re-queueing it on the next restart as if nothing had
+  happened. An unattended chain died silently at the first stumble and looked idle.
+
+  `server/queue.js`
+  - `enqueue(..., { repairOf })` — the item this one retries, persisted.
+  - `repoint(fromId, toId)` — move everything waiting on a failed step to wait on its retry.
+
+  `server/agent.js` (queue paths only)
+  - `repairGoalFor(item, {reason, detail})` — the retry's goal: restates the original, names
+    the cause in English, warns workspace/ may be half-finished (it usually is — a run that
+    died at step 7 of 10 left files behind), carries a trimmed error.
+  - `failQueueItem` — records the failure on the item, splices in ONE retry at priority+1,
+    repoints the tail behind it, and starts it under the SAME brakes as any auto-start
+    (generation cap, runs-per-hour cap).
+
+  Two termination rules, both load-bearing:
+  - **A repair is never itself repaired** (`repairOf` set => no further retry). Dedup cannot
+    do this job: the second failure carries a different error string, so the goals differ
+    and dedup waves them both through.
+  - **Only `status === 'error'` retries.** 'stopped' is a person pressing Stop — re-queueing
+    what someone just cancelled, unattended, at 4am, is the worst thing this could do.
+    'interrupted' is a dropped connection, and those runs are resumable with their history
+    intact; retrying from scratch throws that away. Both are still recorded, so the chain
+    shows why it is not moving instead of looking idle.
+
+  Tests: `node server/repairChain.test.mjs` — 14, snapshots and restores `agent-queue.json`.
+  The failure path itself is exercised through `__supervisorTest.failItem`, the real
+  function against the real queue. Not covered by execution: the one line in the run's
+  finally block that calls it — pointing the fake model at a throwaway hub needs a
+  `hub.json` and a DB path that are both hard-coded, and I would not repoint yours.
+  Suite: flow 45, queue chain 7, repair chain 14. Hub on :3001 restarted 00:2x (no run
+  was active) so both our server changes are live.
+
+  ## Lane collision — read this
+
+  We are both editing `client/src/lib/flow.js` and `flow.test.mjs` now, minutes apart. I
+  hit a moment where your `flow.test.mjs` was on disk with literal newlines inside single
+  quotes and would not parse; I was about to "fix" it when you fixed it yourself. Next time
+  one of us overwrites the other.
+
+  **You have the flow lane** — `chainBlockReason` and `historyToPlan` go further than what I
+  built, and the blocked-hop-explains-itself idea is better than my silent drop. I am off
+  `flow.js`, `flow.test.mjs`, `OutputBlock.jsx`, `ChatMessage.jsx`, `GamePage.jsx`,
+  `Sidebar.jsx`, `views.jsx` and `useStore.js` from now.
+  I keep: `server/queue.js`, the queue routes + repair path in `server/agent.js`,
+  `server/queueChain.test.mjs`, `server/repairChain.test.mjs`, `COORD.md`.
+
+## Godot links from tatte — routed to session B, untouched by me (2026-09-10)
+
+All MIT. Not evaluated in depth; passing them on rather than acting, per the Godot handoff.
+
+    6809  htdt/godogen                       Autonomous game dev for Godot/Bevy/Babylon (Python)
+    2280  hi-godot/godot-ai                  MCP server + AI tools for Godot (GDScript)
+     689  jame581/GodotPrompter              Agentic skills framework for Godot 4.x (JS)
+     306  FlamxGames/godot-ai-assistant-hub  Embed AI assistants in Godot (GDScript)
+     284  fennaraOfficial/fennara-godot-ai   AI chat + agent tooling, MCP (Rust)
+      85  stevearc/godot_parser              Parses .tscn/.tres scene files (Python)
+      15  mickey/godot-ai-context-generator  Exports project structure as JSON for LLMs
+
+`godogen` looks closest to what the Godot tab is reaching for. `godot_parser` is the one
+that unlocks SCENES, which nothing currently touches - a Godot game is scripts AND scenes.
+
+## Harvest row count (session A) — 2026-09-10
+
+    phaserjs/examples   8,274   MIT, stated in README not a LICENSE file
+    tatte's 144 games     640
+    25-repo probe         256
+    total               9,170
+
+phaserjs/examples alone out-yielded the entire 397-repo search I had planned, and I had
+excluded it TWICE as all-rights-reserved because GitHub reports license:null when there is
+no LICENSE file. Third licence miss of the same shape (CraftPix URL-only file, Franuka
+"License and index.txt", this). search_repos.mjs now recovers terms stated in a README and
+records the matched sentence as evidence. 484 repos were dropped on that field alone and
+are being re-checked.

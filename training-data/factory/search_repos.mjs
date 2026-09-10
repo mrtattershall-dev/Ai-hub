@@ -49,24 +49,30 @@ const SETS = {
 };
 
 const QUERIES = SETS[flag('set', '')] || [
+  // TOPIC QUERIES ONLY. Keyword queries drift: with a token paging 4x deeper they pulled
+  // reactjs-interview-questions and awesome-shell into a list of harvestable game repos,
+  // and a bare OR once matched 2,118,666 repos. A topic is applied by the repo owner and
+  // means what it says.
   'topic:phaser',
   'topic:phaser3',
   'topic:phaserjs',
-  'phaser rpg in:name,description,readme',
-  'phaser roguelike in:name,description,readme',
-  'phaser dungeon in:name,description,readme',
-  'phaser tilemap in:name,description,readme',
-  'phaser top-down in:name,description,readme',
-  'phaser topdown in:name,description,readme',
-  'phaser fantasy in:name,description,readme',
-  'phaser adventure game in:name,description,readme',
   'topic:html5-game language:JavaScript',
-  'topic:gamedev language:JavaScript phaser',
+  'topic:html5-games language:JavaScript',
+  'topic:canvas-game language:JavaScript',
   'topic:game-jam language:JavaScript',
   'topic:js13kgames',
   'topic:ludum-dare language:JavaScript',
+  'topic:gamedev language:JavaScript',
+  'topic:game-development language:JavaScript',
   'topic:roguelike language:JavaScript',
   'topic:rpg language:JavaScript',
+  'topic:2d-game language:JavaScript',
+  'topic:browser-game language:JavaScript',
+  'topic:pixel-art language:JavaScript',
+  'topic:tilemap language:JavaScript',
+  'topic:javascript-game',
+  'topic:game language:TypeScript',
+  'topic:phaser language:TypeScript',
 ];
 
 const headers = {
@@ -120,7 +126,55 @@ for (const q of QUERIES) {
   await sleep(TOKEN ? 2500 : 7000);
 }
 
+/**
+ * GitHub reports `license: null` when there is no LICENSE *file*, even when the README
+ * states terms plainly. phaserjs/examples - the single highest-yield Phaser source on
+ * GitHub, hundreds of self-contained scenes - says "The source code in this repo is
+ * released under the MIT license" in its README and was excluded twice as all-rights-
+ * reserved. 484 repos were dropped on that field alone, so the README is checked before
+ * anything is discarded.
+ */
+async function licenceFromReadme(name) {
+  try {
+    const r = await fetch(`https://api.github.com/repos/${name}/readme`, {
+      headers: { ...headers, Accept: 'application/vnd.github.raw' },
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!r.ok) return null;
+    const t = await r.text();
+    const m = t.match(/^.*\b(released|licen[cs]ed|available)\b.*\blicen[cs]e[sd]?\b.*$/im)
+      || t.match(/^.*\blicen[cs]e[sd]?\b.*\b(MIT|Apache|BSD|ISC|CC0|Unlicense|zlib|MPL)\b.*$/im);
+    if (!m) return null;
+    const line = m[0];
+    for (const [rx, key] of [[/MIT/i, 'mit'], [/Apache/i, 'apache-2.0'],
+      [/BSD/i, 'bsd-3-clause'], [/ISC/i, 'isc'], [/CC0/i, 'cc0-1.0'],
+      [/Unlicense/i, 'unlicense'], [/zlib/i, 'zlib'], [/MPL/i, 'mpl-2.0']]) {
+      if (rx.test(line)) return { key, evidence: line.trim().slice(0, 140) };
+    }
+    return null;
+  } catch { return null; }
+}
+
 const all = [...seen.values()];
+let recovered = 0;
+if (!args.includes('--no-readme-check')) {
+  const noFile = all.filter((r) => !r.licenseKey);
+  console.log(`
+checking README of ${noFile.length} repo(s) GitHub reports as unlicensed…`);
+  for (const r of noFile) {
+    const hit = await licenceFromReadme(r.name);
+    if (hit) {
+      r.licenseKey = hit.key;
+      r.license = hit.key.toUpperCase();
+      r.licenceFrom = 'readme';
+      r.licenceEvidence = hit.evidence;
+      recovered++;
+    }
+    await sleep(TOKEN ? 90 : 1200);
+  }
+  console.log(`  recovered ${recovered} repo(s) whose terms are stated in the README`);
+}
+
 const permissive = all.filter((r) => r.licenseKey && OK_LICENCE.has(r.licenseKey));
 const unlicensed = all.filter((r) => !r.licenseKey);
 
