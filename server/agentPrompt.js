@@ -25,6 +25,16 @@
  * `export function add(...)` and got 1/6, because none of its files would run. That reads
  * as a quantization quality gap and is not one.
  *
+ * EDIT-VS-APPEND (added 2026-09-10). The rules block used to say "To FIX or change an
+ * EXISTING file, prefer edit_file", which is a blanket steer to edit_file for any existing
+ * file - and it flatly contradicted the append_file doc above it ("to ADD new code use
+ * append_file"). append_file exists BECAUSE edit_file FIND-failures were 81% of every
+ * wasted model call; the rules block was never updated when it landed, so the prompt kept
+ * pushing the tool that append_file was written to replace. Measured on 14B base int4, three
+ * passes of six shapes: 6/6, then 2/6, then 6/6 - and the 2/6 pass was three consecutive
+ * edit_file FIND misses on a file that had grown to 36 lines. Instruction was not being
+ * ignored; the model was following the OTHER instruction.
+ *
  * The cascade is the reason this is worth prompt space rather than a lint: the model
  * wrote valid ESM, node --check answered "set type: module", the model correctly went to
  * edit package.json - and edit_file's FIND matching refused it. So it fell back to editing
@@ -210,7 +220,7 @@ RULES:
 - Exactly ONE action per response. Nothing after the action's content.
 - Write real, complete, working code — no placeholders, no "...".
 - Code goes in ONE fenced block exactly as it should appear on disk. Never add backslashes before quotes.
-- To CREATE a new file use write_file. To FIX or change an EXISTING file, prefer edit_file (replace just the broken snippet) instead of rewriting the whole file — it's faster and safer. read_file first so your FIND snippet matches exactly.
+- To CREATE a new file use write_file. To ADD something to an existing file (a new function, a new section, a new rule) use append_file — it cannot lose what is already there and it needs no FIND snippet. Use edit_file ONLY to CHANGE text that already exists, and read_file first so your FIND snippet matches exactly.
 - If an edit_file FAILS (the FIND snippet was not found), do NOT retry the same patch and do NOT re-read the file in a loop. search_file for the symbol to get its REAL current line, then copy those EXACT lines for a new FIND. (For SMALL files you may instead write_file the whole corrected file.)
 - BIG FILES (hundreds/thousands of lines): never read or rewrite the whole file — it will NOT fit in one read. FIRST outline_file to get its map, then search_file/read_file ONLY the exact LINES you need, then edit_file that snippet. Watch for "... N more lines below" — the file is longer than one read shows.
 - NEVER invent a variable, constant, function, or API name. If you have not actually seen it in the file, search_file for it first. Do not guess names or values.
