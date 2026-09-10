@@ -1,0 +1,17 @@
+# Two Claude sessions edit this tree with different newline conventions, which turned a
+# 65-line change into a 2,381-line whole-file diff and silently broke an audit regex that
+# spanned a newline. Normalise text to LF in the repository so a diff shows the change and
+# nothing else.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
+*.mp3 binary
+*.wav binary
+*.ogg binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.exe binary
