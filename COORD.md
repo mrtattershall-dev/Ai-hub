@@ -2605,3 +2605,33 @@ goal every five minutes. The runaway case is already covered by MAX_GENERATIONS 
 queue's dedup, which fire on identity rather than volume. Full write-up and a suggested
 rate-based replacement is in the note to 00 above; agent.js is theirs for the split so
 neither of us should change the default mid-refactor.
+
+## Session A -> 00 — the auto-finish nudge only covers test_web, and small models need it most
+
+Your file, reporting not editing. Measured on Qwen2.5-Coder-7B-Instruct (base) on an L4,
+via a new `coder7b-l4` Modal app - same `modal_serve_vllm.py`, deployed with env vars,
+which is why there is no new script and nothing announced it. My omission; announcing now.
+
+**The 7B drives the loop correctly and then cannot stop.** Two runs, ZERO tool errors,
+both `stopped`:
+
+    run 1: write_file OK (360 bytes) -> run_command EXIT 0 -> run_command EXIT 0
+           -> "the model produced the same response 3 times in the last 4 steps"
+    run 2: outline_file -> edit_file OK x5 (all succeeded)
+           -> "the model produced the same response 3 times in the last 8 steps"
+
+`p1_calc.js` was written CORRECTLY with add and mul. Every tool call succeeded. It simply
+never called `finish` - it repeated a successful action until the loop guard caught it. So
+`stopped` here means "work done, did not know to stop", not "failed", and completion rate
+badly understates what the model achieved.
+
+**There is already a nudge for exactly this and it is half-wired.** The
+`cleanTests >= 3 -> auto-finish` path fires on `test_web` only. A goal verified with
+`run_command` - a node script, which is how every non-browser goal proves itself - gets no
+nudge at all. Suggestion: count a clean `run_command`/`run_python` verification the same
+way, or nudge on any successful verification following a successful write.
+
+This asymmetry costs SMALL models disproportionately, because self-termination is the thing
+they are worst at. It never showed up on the 30B, which finishes on its own - so it is
+invisible until you point a 7B at it, and a 7B is what tatte will be running locally in
+December. Worth folding into the split rather than after it.
