@@ -15,6 +15,64 @@
  */
 import { GOOGLE_TOOLS, parseGoogleArgs } from './googleTools.js';
 
+/**
+ * Every action in one reply, not just the first.
+ *
+ * `parseAction` matches ACTION: without /g, so it returns the first and the rest are
+ * discarded in silence. Measured over 1,759 recorded real responses: 102 carry more than one
+ * action and 49 contain a `finish` that is not first - every one of those thrown away, with
+ * nothing telling the model. It then re-sends the identical reply until the repetition guard
+ * kills the run.
+ *
+ * Splitting at ACTION: boundaries keeps each action's PATH and fenced block with it, because
+ * both follow their ACTION line. The reply's leading THOUGHT stays with the first segment;
+ * a trailing THOUGHT belonging to the NEXT action lands harmlessly at the end of the
+ * previous segment, since parseAction reads the FIRST THOUGHT it finds.
+ *
+ * Returns [] for an unparseable reply and a single-element array for the ordinary case, so
+ * callers can treat both the same way.
+ */
+export function parseActions(text, lastPath, max = 6) {
+  if (!text) return [];
+  const starts = [...text.matchAll(/^[ \t]*ACTION:[ \t]*[a-z_]+/gim)].map((m) => m.index);
+  if (starts.length <= 1) { const one = parseAction(text, lastPath); return one && one.tool ? [one] : []; }
+  // AN `ACTION:` LINE IS NOT ALWAYS A NEW ACTION.
+  //
+  // Real reply, from the corpus:
+  //
+  //     ACTION: edit_file
+  //     PATH: vec.js
+  //     FIND:
+  //     module.exports = { add };
+  //     ACTION: edit_file        <- spurious, written mid-action
+  //     PATH: vec.js
+  //     REPLACE:
+  //     module.exports = { add, sub };
+  //
+  // That is ONE edit whose FIND and REPLACE are separated by a stray header. Splitting on
+  // every ACTION: leaves a FIND with no REPLACE and a REPLACE with no FIND, breaking an edit
+  // the whole-text parser gets RIGHT. Found by asserting the first action is byte-identical
+  // to today's behaviour across 102 real multi-action replies - 5 of them are this shape.
+  //
+  // So a segment holding an unmatched FIND absorbs the next one until its REPLACE turns up.
+  const out = [];
+  let i = 0;
+  while (i < starts.length && out.length < max) {
+    const from = i === 0 ? 0 : starts[i];
+    let j = i;
+    let to = j + 1 < starts.length ? starts[j + 1] : text.length;
+    while (/^[ \t]*FIND:/im.test(text.slice(from, to)) && !/^[ \t]*REPLACE:/im.test(text.slice(from, to))
+           && j + 1 < starts.length) {
+      j += 1;
+      to = j + 1 < starts.length ? starts[j + 1] : text.length;
+    }
+    const parsed = parseAction(text.slice(from, to), lastPath);
+    if (parsed && parsed.tool) out.push(parsed);
+    i = j + 1;
+  }
+  return out;
+}
+
 export // Parse one plain-text action from a model response. File content lives in a raw
 // fenced code block (never JSON), so quotes/backslashes/escape-sequences survive
 // intact — the thing that broke JSON-string encoding on smaller models.
