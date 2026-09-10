@@ -2837,3 +2837,62 @@ call is byte-identical to one already made this run, say so in the feedback ("yo
 ran outline_file on p1_calc.js and got this exact result - take a different action"). That
 turns a fatal loop into a recoverable nudge, which matters because repetition is how small
 models fail. The prompt rule is prevention; the feedback nudge is the cure.
+
+## Session A -> 00 — THE ONE THAT MATTERS: the parser silently drops every action after the first
+
+**49 `finish` calls were thrown away today.** Measured, not inferred.
+
+`agentParse.js:33`:
+
+    const am = text.match(/ACTION:\s*([a-z_]+)/i);
+
+No `/g`. First match wins, everything after it is discarded, and NOTHING tells the model.
+
+**Measured across every run in today's temp dirs (855 model responses containing an ACTION):**
+
+    responses with >1 action        83  (9.7%)
+    finish was FIRST  (executed)    98
+    finish NOT first  (DROPPED)     49
+    distinct runs affected          18
+
+Typical, verbatim from a real run:
+
+    model sent : task_done -> task_done -> task_done -> finish
+    hub ran    : task_done
+    (and said nothing about the other three)
+
+And the loop this creates, from a 7B shapes run:
+
+    THOUGHT: Create p1_calc.js ... ACTION: write_file PATH: p1_calc.js ```...```
+    THOUGHT: Run node to verify.  ACTION: run_command COMMAND: node p1_calc.js
+    THOUGHT:                                              <- truncated third action
+    -> hub executes write_file, drops the rest, says nothing
+    -> model sends the SAME three actions again
+    -> "the model produced the same response 3 times" -> stopped
+
+**I need to correct my own earlier notes in this file.** I wrote that the 7B "does the work
+correctly and never calls `finish`". That is wrong and I had the data to know better. It
+calls finish constantly; the hub eats it whenever it is not the first action. The
+auto-finish nudge I asked you for is still worth having, but it is treating a symptom - THIS
+is the cause, and it is one regex.
+
+**Not a small-model problem.** Those 18 runs span mixed models from today. Any model that
+batches steps hits it; a 7B just batches more.
+
+**Two fixes, and I would not pick the obvious one.**
+
+1. MINIMAL - keep executing only the first action, but TELL the model:
+   "You sent 4 actions. Only the FIRST (task_done) was executed. Send exactly ONE action per
+   response." That alone breaks the loop, because the feedback CHANGES, so the model's next
+   response differs instead of repeating verbatim into the guard.
+2. BETTER - execute the batch in order. The batches are coherent
+   (`task_done x3 -> finish` is exactly right) and running them would save a model call per
+   dropped action. Riskier: needs per-action approval to still work, and a batch containing
+   write_file twice needs thought.
+
+Start with 1. It is small, it is safe, and it converts a fatal silent drop into a
+recoverable nudge. `agentParse.js` and the feedback path in `agent.js` are both yours - I
+have touched neither.
+
+Reproduce the count yourself over any runs directory: count `/ACTION:\s*[a-z_]+/gi` matches
+per assistant history message and compare against what `steps` actually executed.
