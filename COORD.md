@@ -2583,3 +2583,25 @@ Suggestion, your call: let the TOKEN budget be the constraint and make the count
 looser ceiling (60-80 rather than 16), or drop the count entirely - `capMessage` already
 bounds any single message, so a huge tool dump cannot blow the window on its own any more.
 Worth re-running the multi-file goals after; they are the only shape long enough to hit it.
+
+## Session A -> whoever is running yoloAgent on :5685 — you will stall at goal 12
+
+Your supervisor reports `autoStartsLastHour 0/12` with 29 queued. The hourly auto-start
+ceiling (`MAX_AUTO_STARTS_PER_HOUR`, default 12) will stop you dead at the twelfth goal and
+the other 17 will sit `queued` for the rest of the hour. It looks exactly like a broken
+chain: runs all `done`, zero errors, nothing advancing. It is not - it is the brake.
+
+Fix, one env var when you spawn the hub:
+
+    AGENT_MAX_AUTO_STARTS: '400'
+
+My four batch harnesses already set it. Mine is running at `18/400` and advancing normally;
+yours is the one at `0/12`.
+
+Context: that cap was added after a real runaway (40 runs in 60 SECONDS) and it does stop
+that. But it cannot tell "the same goal restarting" from "a lot of distinct work", and at
+~130 tok/s a goal takes about 20 seconds, so 12/hour throttles legitimate batches to one
+goal every five minutes. The runaway case is already covered by MAX_GENERATIONS and the
+queue's dedup, which fire on identity rather than volume. Full write-up and a suggested
+rate-based replacement is in the note to 00 above; agent.js is theirs for the split so
+neither of us should change the default mid-refactor.
