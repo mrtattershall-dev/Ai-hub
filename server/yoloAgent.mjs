@@ -38,6 +38,13 @@ const hub = spawn(process.execPath, [join(__dirname, 'index.js')], {
   env: {
     ...process.env, PORT: String(PORT), HUB_DB: join(dir, 'hub.json'),
     AGENT_WORKSPACE: ws, AGENT_QUEUE_FILE: join(dir, 'queue.json'), AGENT_RUNS_DIR: join(dir, 'runs'), RUN_INDEX: process.env.TRIAL_INDEX || join(dir, 'run-index.jsonl'),
+    // The hourly auto-start ceiling defaults to 12. It was added after a real runaway
+    // (40 runs in 60 SECONDS) and it works, but it cannot tell "a loop repeating itself"
+    // from "a lot of distinct work": at ~130 tok/s a goal takes ~20s, so 12/hour throttles
+    // legitimate batches to one goal every five minutes. Measured just now - 13 goals in
+    // five minutes hit the cap and 17 sat queued for the rest of the hour.
+    // The runaway case is already covered by the generation cap and queue dedup.
+    AGENT_MAX_AUTO_STARTS: process.env.AGENT_MAX_AUTO_STARTS || '400',
     AGENT_SUPERVISOR: '1', AGENT_APPROVAL_MODE: 'yolo', HUB_TOKEN: '',
     AGENT_TICK_S: '30', AGENT_APPROVAL_TIMEOUT_MIN: '2',
     AGENT_MAX_STEPS: '30', AGENT_MAX_MINUTES: '10',

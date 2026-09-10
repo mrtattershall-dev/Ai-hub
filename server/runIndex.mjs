@@ -73,7 +73,13 @@ const recent = runs.slice(-N);
 console.log(`\nlast ${recent.length} of ${runs.length} runs\n`);
 console.log('  when         status     calls  errs  tok/s   goal');
 for (const r of recent) {
-  const when = new Date(r.ts).toISOString().slice(5, 16).replace('T', ' ');
+  // LOCAL time, not UTC. This file exists to correlate what happened - with the runner's
+  // output, with a hub log, with what you remember doing - and toISOString() printed 15:37
+  // for a run that happened at 10:37 on the machine reading it. Five hours of mental
+  // arithmetic on the one tool whose whole job is lining events up.
+  const d = new Date(r.ts);
+  const when = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} `
+    + `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   const tok = r.tokPerSec ? String(Math.round(r.tokPerSec.max)) : '—';
   console.log(`  ${when}  ${String(r.status).padEnd(9)} ${String(r.calls).padStart(5)} ${String(r.errorCount).padStart(5)}  ${tok.padStart(5)}   ${String(r.goal).slice(0, 46)}`);
 }
