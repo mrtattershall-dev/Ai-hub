@@ -2238,7 +2238,19 @@ async function drive(loadDb, run) {
       run.recent.push(norm);
       if (run.recent.length > 8) run.recent.shift();
       const seenTimes = run.recent.filter((r) => r === norm).length;
-      if (seenTimes >= 3) {
+      // FORGIVE ONE REPEAT AFTER A SUBSTITUTION.
+      //
+      // The guard was firing at the exact moment the loop-break took effect. Substitution
+      // triggers on the SECOND duplicate; the guard trips on the THIRD identical response -
+      // which is the first response the model gives AFTER receiving the new information.
+      // Traced live: the model was handed the full contents of p1_calc.js and killed on the
+      // very next turn, so the fix never got a turn to work. One pardon per substitution,
+      // and only for a repeat that came after one, so a genuine dead loop still dies at 4.
+      if (seenTimes >= 3 && run.justSubstituted) {
+        run.justSubstituted = false;
+        run.recent = run.recent.filter((r) => r !== norm).concat([norm]);
+        pushStep(run, { type: 'note', text: 'Repeat pardoned once: the model had just been handed new information and had not had a turn to use it.' });
+      } else if (seenTimes >= 3) {
         run.status = 'stopped';
         pushStep(run, { type: 'error', text: `Stopped: the model produced the same response ${seenTimes} times in the last ${run.recent.length} steps without making progress.` });
         break;
@@ -2530,7 +2542,67 @@ async function drive(loadDb, run) {
         else if (/\.(py|c?js|mjs)$/i.test(args.path || '')) syntaxNote = `\n\n✅ ${args.path} passed a syntax check.`;
       }
 
-      let feedback = `TOOL RESULT (${tool}):\n${result}${syntaxNote}`;
+      // ── MECHANICAL LOOP BREAK ───────────────────────────────────────────────
+      //
+      // The run-killer is an orientation tool that returns what the model already has: the
+      // opening message lists the workspace files, `list_dir .` echoes that list back
+      // byte-for-byte, the context is unchanged, so the model emits the identical action
+      // again and dies to the repetition guard - reported as "not making progress" when the
+      // truth is we handed it nothing to progress WITH.
+      //
+      // EVERY advisory fix for this failed, and why is worth recording. Repetition is
+      // self-reinforcing: once two identical assistant turns are in history the model copies
+      // that precedent, and a sentence cannot outweigh it. Measured on the real stuck
+      // context, 5 samples each:
+      //
+      //   control (return the same result)         list_dir x5     productive 0/5
+      //   advisory ("you already ran this")        read_file x4    productive 0/5
+      //   MECHANICAL (substitute what it needed)   edit_file x5    productive 5/5
+      //
+      // A live advisory attempt scored WORSE than doing nothing (tool errors 0 -> 8) and was
+      // reverted. So this does not ask; it REFUSES the duplicate and hands back the file the
+      // goal names, as the NEWEST thing in context - position matters, because the same
+      // contents injected at the TOP of the prompt scored 0/5. Capped at 2 per run so a
+      // genuine re-list cannot turn into the hub driving the run.
+      // Every READ-ONLY tool that can return the same answer twice, not just the three I
+      // guessed first. Measured on live runs: the deterministic failures were looping on
+      // `list_assets` and `task_list`, both of which I had missed, so no substitution fired
+      // and those two shapes failed 3/3. A tool belongs here if repeating it cannot change
+      // the world - mutating tools are deliberately absent, since a second write_file is a
+      // real action and must never be swapped out from under the model.
+      const ORIENT = new Set(['list_dir', 'outline_file', 'search_file', 'read_file', 'list_assets', 'task_list', 'recall', 'git_log', 'git_diff']);
+      const sig = `${tool}|${JSON.stringify(args || {})}|${String(result).slice(0, 800)}`;
+      run.resultSigs = run.resultSigs || [];
+      const duplicate = run.resultSigs.includes(sig);
+      run.resultSigs.push(sig);
+      if (run.resultSigs.length > 40) run.resultSigs = run.resultSigs.slice(-40);
+
+      let substituted = null;
+      if (duplicate && ORIENT.has(tool) && (run.escalations || 0) < 2) {
+        // The file the GOAL names, if it exists - that is what an edit goal is starving for.
+        const named = String(run.goal || '').match(/[\w.\-/]+\.(?:m?js|py|html?|css|json|md|txt)/gi) || [];
+        let target = named.find((f) => { try { return statSync(join(WORKSPACE, f)).isFile(); } catch { return false; } });
+        if (!target) {
+          const skip = new Set(['package.json', 'TASKS.md', 'ESCALATIONS.md', 'NOTES.md']);
+          try {
+            target = readdirSync(WORKSPACE)
+              .filter((f) => !skip.has(f) && !f.startsWith('.') && statSync(join(WORKSPACE, f)).isFile())
+              .sort((a, b) => statSync(join(WORKSPACE, b)).mtimeMs - statSync(join(WORKSPACE, a)).mtimeMs)[0];
+          } catch { /* unreadable workspace - leave it to the normal result */ }
+        }
+        if (target) {
+          try {
+            const src = readFileSync(join(WORKSPACE, target), 'utf8').slice(0, 6000);
+            run.escalations = (run.escalations || 0) + 1;
+            substituted = `TOOL RESULT (read_file ${target}):\n\`\`\`\n${src}\n\`\`\`\n\n`
+              + `(You called ${tool} twice with the same arguments and got the same answer, so it was replaced with the contents of ${target}. You now have what you need — do the work.)`;
+            run.justSubstituted = true;   // buys the model one pardon from the repetition guard
+            pushStep(run, { type: 'note', text: `Repeated ${tool} returned nothing new — substituted the contents of ${target}.` });
+          } catch { /* unreadable file - leave it to the normal result */ }
+        }
+      }
+
+      let feedback = substituted || `TOOL RESULT (${tool}):\n${result}${syntaxNote}`;
 
       // Say so when we dropped the rest of a batch. Silence here is what created the loop:
       // the model got no signal that its 2nd..Nth actions never happened, so it re-sent the
