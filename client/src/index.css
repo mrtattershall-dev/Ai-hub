@@ -430,6 +430,97 @@ label { font-size: 11.5px; color: var(--text-secondary); font-weight: 500; displ
 }
 .godot-toggle input { margin: 0; cursor: pointer; }
 
+/* The Godot tab is a project, not a buffer: a file strip and a composer share the left
+   column with the editor, so the editor is a flex child here rather than the fixed-width
+   one `.game-editor` is on the Game tab. */
+.godot-editor-col {
+  width: 46%; flex-shrink: 0; min-width: 0;
+  display: flex; flex-direction: column;
+  border-right: 0.5px solid var(--border);
+}
+.godot-code { width: auto; flex: 1; min-height: 0; border-right: none; tab-size: 4; }
+
+.godot-plan {
+  font-size: 11px; padding: 2px 7px; border-radius: 999px;
+  background: var(--bg-tertiary, #1b1e25); color: var(--text-secondary);
+  white-space: nowrap;
+}
+.godot-frames { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary); }
+.godot-frames input {
+  width: 46px; padding: 2px 4px; font-size: 11px; font-family: var(--mono);
+  background: var(--bg-secondary); color: var(--text);
+  border: 0.5px solid var(--border); border-radius: 3px;
+}
+.godot-starter, .godot-entry {
+  font-size: 11px; padding: 2px 6px; max-width: 150px;
+  background: var(--bg-secondary); color: var(--text-secondary);
+  border: 0.5px solid var(--border); border-radius: 3px;
+}
+
+/* File strip. Scrolls horizontally rather than wrapping: a project that grows to nine
+   files must not silently eat half the editor's height to show them. */
+.godot-files {
+  display: flex; align-items: center; gap: 3px;
+  padding: 4px 6px; overflow-x: auto;
+  border-bottom: 0.5px solid var(--border); background: var(--bg);
+  flex-shrink: 0;
+}
+.godot-file {
+  display: flex; align-items: center; gap: 5px;
+  padding: 3px 6px; border-radius: 4px; cursor: pointer;
+  font-size: 11.5px; font-family: var(--mono); color: var(--text-secondary);
+  border: 0.5px solid transparent; white-space: nowrap;
+}
+.godot-file:hover { background: var(--bg-tertiary, #1b1e25); }
+.godot-file.active { background: var(--bg-tertiary, #1b1e25); color: var(--text); border-color: var(--border); }
+/* The chosen entry point is marked, because which file runs changes what Run means. */
+.godot-file.entry { box-shadow: inset 2px 0 0 var(--accent, #6b8afd); }
+.godot-file-lines { font-size: 10px; opacity: .5; }
+.godot-file-x { opacity: 0; }
+.godot-file:hover .godot-file-x, .godot-file.active .godot-file-x { opacity: .6; }
+.godot-file-add { flex-shrink: 0; }
+
+/* Composer: the model, in the tab, with the project attached to every request. */
+.godot-composer {
+  flex-shrink: 0; border-top: 0.5px solid var(--border);
+  background: var(--bg); padding: 6px 8px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.godot-composer-row { display: flex; align-items: flex-end; gap: 6px; }
+.godot-prompt {
+  flex: 1; min-height: 46px; max-height: 130px; resize: vertical;
+  padding: 6px 8px; font-size: 12px; line-height: 1.45;
+  background: var(--bg-secondary); color: var(--text);
+  border: 0.5px solid var(--border); border-radius: 4px; outline: none;
+}
+
+.godot-note { font-size: 11px; color: var(--text-tertiary); margin-bottom: 5px; font-style: italic; }
+/* An error carrying a res:// address can be clicked to its line. One without cannot, and
+   must not pretend otherwise. */
+.godot-err-link { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
+.godot-err-link:hover { opacity: .8; }
+.godot-tree { margin-top: 8px; border: 0.5px solid var(--border); border-radius: 4px; overflow: hidden; }
+.godot-tree-head {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 7px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--text-tertiary); background: var(--bg-secondary);
+  border-bottom: 0.5px solid var(--border);
+}
+.godot-tree pre {
+  margin: 0; padding: 6px 8px; max-height: 160px; overflow: auto;
+  font-family: var(--mono); font-size: 11px; line-height: 1.45; color: var(--text-secondary);
+}
+.godot-reply {
+  margin: 0 0 6px; white-space: pre-wrap; word-break: break-word;
+  font-family: var(--mono); font-size: 11.5px; line-height: 1.5; color: var(--text-secondary);
+}
+
+/* Narrower than this, the file strip and the composer would leave no editor at all. */
+@media (max-width: 900px) {
+  .godot-editor-col { width: 100%; border-right: none; }
+  .game-layout.godot-layout .game-body { flex-direction: column; }
+}
+
 /* ---- Terminal tab ------------------------------------------------------- */
 .term-layout { display: flex; flex-direction: column; height: 100%; min-height: 0; }
 .term-host {

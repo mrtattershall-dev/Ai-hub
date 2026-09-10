@@ -529,3 +529,182 @@ no LICENSE file. Third licence miss of the same shape (CraftPix URL-only file, F
 "License and index.txt", this). search_repos.mjs now recovers terms stated in a README and
 records the matched sentence as evidence. 484 repos were dropped on that field alone and
 are being re-checked.
+
+- 2026-09-10 01:0x — ai-native-engine-00: **new lane — Settings / Accounts / Google OAuth.**
+  Nothing here overlaps the flow lane; I stayed off every file I handed over.
+
+  NEW `server/googleAuth.js` — OAuth 2.0 authorization code + PKCE for Gmail, Drive,
+  YouTube and Calendar under one sign-in, with the refresh token held server-side so the
+  hub keeps working unattended. NEW `client/src/components/GoogleAccount.jsx`,
+  NEW `GOOGLE_SETUP.md`, NEW `server/googleAuth.test.mjs` (16, no network).
+  Touched: `server/index.js` (mount only), `client/src/lib/api.js` (google block only),
+  `client/src/pages/SettingsPage.jsx` (an Accounts section above the providers).
+
+  Decisions worth knowing about:
+  - **The callback is at `/oauth/google/callback`, deliberately outside the `/api` gate.**
+    Google's redirect is a plain browser navigation carrying no hub token; with HUB_TOKEN
+    set behind a tunnel it would be refused. It is protected by a single-use, 10-minute,
+    constant-time-compared `state` this server issued instead.
+  - **`access_type=offline` + `prompt=consent`.** Without the second one Google omits the
+    refresh token on every sign-in after the first, and the hub works for exactly an hour.
+  - **`invalid_grant` on refresh clears the stored token** rather than retrying a token
+    that can never work again.
+  - **Status reports what was GRANTED, not what was requested** — Google's consent screen
+    lets you untick individual services, and claiming four when two were approved is a lie
+    that surfaces at the worst moment. Tested.
+  - **`/probe`** makes one cheap call per service, because a granted scope is not an enabled
+    API and that gap otherwise shows up as a 403 in the middle of an unattended run.
+  - Disconnect revokes at Google and says so if the revoke failed.
+
+  Verified live on :3001: guards return 400 (no client, no secret, forged state), the
+  authorize URL carries only the ticked scopes with S256 + offline + consent and no secret,
+  status leaks neither token nor client secret, and the Settings card renders and persists
+  service toggles. A dummy client id used for that round-trip was removed from `hub.json`
+  afterwards — `google` is absent again, so the file is as you left it.
+
+  Not done, and not mine to do: creating the Cloud project and OAuth client. That needs a
+  Google sign-in and belongs to tatte.
+
+## Log
+
+- 2026-09-10 ~06:0x — Session C: **Godot tab rebuilt around a project, not a buffer.**
+
+  Files (mine, all listed in the claim above): `server/godotProject.js` NEW,
+  `server/godotProject.test.mjs` NEW (35), `server/godotVerify.test.mjs` NEW (14, real
+  engine, spare port), `client/src/lib/godot.js` NEW, `client/src/lib/godot.test.mjs` NEW
+  (30), `server/godotVerify.js` and `client/src/pages/GodotPage.jsx` rewritten.
+  Small additive edits only: `useStore.js` (godotFiles/Main/Op/Frames + setters, the old
+  `godotCode` string migrates into the file set), `index.css` (a `godot-*` block appended
+  under the existing one). `api.js` NOT touched — `verifyGodot` already takes a body.
+  `flow.js` NOT touched — the Godot repair brief lives in `lib/godot.js` and calls
+  `sendHandoff` the way GamePage's `verdictToFix` does.
+
+  **Verifier.** The unit is now a file set. Node-shaped scripts run inside a scene the
+  verifier generates for them (`--headless --path <dir> --quit-after N`), so ordinary
+  GDScript is testable without the code under test calling `quit()`. Scenes, multi-file
+  projects and `res://` all work; a `res://` path that is neither a project file nor a
+  real asset is copied from the library or FAILS the run — the same rule as gameVerify.js,
+  so verifier and training gate agree. Errors come back structured, with `res://File.gd:LINE`
+  taken from the GDScript backtrace (never from the C++ `at:` line).
+
+  **Stage 3 is the point.** A probe autoload dumps the live scene tree three frames in;
+  the run fails unless something beyond the entry node exists or something printed. Worth
+  knowing: my first cut used `built > 0` and an `extends Node` / `pass` stub still PASSED,
+  because the generated harness scene's root IS the script under test. `godotVerify.test.mjs`
+  now pins the stub as a failure.
+
+  **Session A — this is your eval finding, and the capability is here.** `godotVerify`'s
+  stage 2 is wired and stage 3 exists. `score_run.mjs:140` is still `--check-only`; moving
+  it to `POST /api/godot/verify` with `{ files, frames }` would score run-and-did-something
+  instead of parses, on 15 of 75 prompts, for no GPU. Your call, your lane — I have not
+  touched `factory/`.
+
+  **Tab.** File strip (add/rename/remove, entry-point picker), tab-indenting editor,
+  11 Godot op chips and a composer that streams from the active provider and loads the
+  files out of the reply — four label shapes accepted, since we compare models. Failed
+  errors are clickable to the line; "Fix in Code" hands the failure plus the project to
+  the Code tab.
+
+  Verified live against a real local model (Ollama/phi3, on a spare server at :3712 and a
+  spare vite at :5199 — **your hub on :3001 was never touched or restarted**): prompt →
+  4-file project parsed out of the reply → Run → PASS, 60 frames, 4 nodes live, scene tree
+  and prints shown. Then a deliberate parse error → FAIL → click the error → editor jumps
+  to the line → Fix in Code → Code tab prefilled with the Debug task.
+
+  Suites: godotProject 35, godot 30, godotVerify 14, audit 308/0, and selftest's godot
+  block 5/5 against the new code (back-compat intact — `{ code }` still behaves exactly
+  as before). `vite build` clean. flow.test.mjs 45 still passes, untouched.
+
+  **Unrelated pre-existing break, not mine:** `server/selftest.mjs` dies at the portability
+  gate — it imports `C:\Users\tatte\Projects\training-data\factory\gate.mjs`, one directory
+  above the repo, so the path is wrong. Everything before it passes. Session A's lane.
+
+  **Not done, deliberately:** nothing queues a Godot verify unattended — that needs an
+  agent tool in the loop half of `agent.js`, which is Session A's claim. `verify_project`
+  already handles a Godot project on disk; a `verify_godot` tool over a file set would be
+  the piece that lets a chain generate and check Godot work with nobody watching.
+
+---
+
+# Session C (Claude Code / desktop) — appended 2026-09-10
+
+## I worked in your lane. Here is exactly what I touched and why.
+
+tatte asked for the Strategy tab: "I'm trying to enter an idea into strategy, and let it
+flow down to execution." That lands squarely on `flow.js`, `OutputBlock.jsx` and
+`prompts.js`, which the 2026-09-09 split assigns to ai-native-engine-00. I did not know
+that until after the work was underway. Nothing here changes the queue routes, the agent
+loop, or `useStore`'s handoff contract - `sendHandoff`/`consumeHandoff` are used exactly as
+documented, with a new destination (`strategy`) and no change to their shape. If you want
+any of it reverted or reshaped, it is five files and it is yours.
+
+## The problem: the plan surface was the thinnest part of the pipeline
+
+Strategy was a one-shot prompt box. You typed an idea, got one blob, and that was the end
+of the road unless the blob happened to be shaped right. Three failures, all measured:
+
+1. **A drifted heading silently removed unattended execution.** `planToChain` returns null
+   when no work section matches, `hopsFor` filtered the null out, and "Queue as an
+   unattended chain" simply was not on the block. No message. You would find out at 3am by
+   the queue being empty.
+2. **A plan could not be revised.** The only way to change one was to retype the brief at
+   the top of the tab and generate a different plan. CodePage has had a thread since day
+   one; the planning surface did not.
+3. **The prompt never asked for the shape the chain reads.** It said "use bullet points
+   where helpful". The chain does not find bullets helpful, it finds them mandatory.
+
+## What changed
+
+**`flow.js`** — `hopsFor` keeps a hop that cannot fire when it can say why, as
+`{ payload: null, blocked: <reason> }`. New `chainBlockReason(output)`: null when the plan
+chains, otherwise a sentence naming the fix ("this plan has no "tasks" ... section - refine
+it and ask for the work as a Tasks section of bullet points", or ""Tasks" is written as
+prose ... ask for tasks as a bulleted list"). New `historyToPlan(row)` re-wraps a saved
+history row as a strategy output. `WORK_LABELS` is exported so the prompt can demand
+bullets in the same section the chain will read.
+
+**`prompts.js`** — `workSectionOf(canvas)` resolves which section carries the work, in
+WORK_LABELS priority order, *not* canvas order (the Action Plan canvas has both Milestones
+and Tasks; `pick` reads Tasks, so demanding bullets in Milestones would have demanded
+nothing). `buildStrategyPrompt` now requires that section as a flat bullet list of
+self-contained units of work. New `buildStrategyRevisionPrompt` sends the whole previous
+plan back and asks for the whole revised plan - never a diff, since everything downstream
+reads complete sections.
+
+**`OutputBlock.jsx`** — blocked hops render dimmed-and-dashed but deliberately NOT
+`disabled`: the click is how the reason gets read (it toasts). New optional `footer` prop,
+which is how the page hangs its own controls under a block without this component learning
+about Strategy.
+
+**`StrategyPage.jsx`** — a refine box under every finished plan: one line, sent as an
+amendment, producing a revision that carries `rev` / `revisionOf` / `revisionNote` and is
+labelled "Action Plan - revision 2". It also consumes a `strategy` handoff, which is how a
+plan comes back from History.
+
+**`HistoryPage.jsx`** — "Open in Strategy" on any saved strategy row. History already held
+every plan (`saveHistory()` writes them with `tab: 'strategy'`); it just rendered them as
+transcripts you could read and not act on. This restores the hops without a second copy of
+the truth.
+
+**`index.css`** — `.hop-blocked`, `.refine-row`, `.refine-note`.
+
+## Verified, live, against your running hub
+
+Reopened last night's Pong plan from History → it landed in Strategy with the canvas
+switched to Action Plan and its hops live → "Build this in Code" prefilled the Code
+composer with Goal / Build this / Constraints → "Queue as an unattended chain" enqueued
+**8 goals in dependency order**, each carrying "Part of: ..." inline (`after` chaining
+intact, supervisor was off, nothing ran). I removed all 8 through the Agent tab afterwards
+- your queue is back to 0 and I did not touch the supervisor.
+
+`flow.test.mjs` is **45 passed** (was 39, three of which encoded the old hide-the-button
+behaviour and were rewritten to the new intent). `vite build` clean.
+
+## One thing I could not demonstrate end to end
+
+Every one of the 20 saved plans in your history is chainable, so the blocked-hop state has
+unit coverage but no screenshot from real data. I also hit a transient 500 on the first
+streaming call to Ollama (the retry streamed fine, ~40s for a trivial prompt on phi3) - it
+is not from this change, the client renders the failure as the bare word "OK" because the
+proxy's error body is not JSON. Worth someone's time: a 500 with no message is the same
+class of silent failure I just removed from the chain.

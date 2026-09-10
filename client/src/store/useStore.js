@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { PHASER_STARTER, PIXI_STARTER, THREE_STARTER } from '../lib/gameTemplate.js';
+import { STARTERS as GODOT_STARTERS } from '../lib/godot.js';
 import { leaf, splitNode, closeNode, setNodeView, setNodeRatio, findLeaf, firstLeaf, nextPaneId } from '../lib/panes.js';
 
 // Persist chat threads and training log to localStorage
@@ -42,12 +43,16 @@ export const useStore = create((set, get) => ({
   gameEngine: loadLocal('gameEngine', 'phaser'),
   gameCode: loadLocal('gameCode', PHASER_STARTER),       // Phaser editor buffer
   gamePixiCode: loadLocal('gamePixiCode', PIXI_STARTER), // PixiJS editor buffer
-  godotCode: loadLocal('godotCode', `extends SceneTree
-
-func _init():
-	print("hello from Godot")
-	quit()
-`),  // GDScript buffer
+  // Godot is a PROJECT, not a buffer: several files, one of them the entry point. An
+  // older single-buffer `godotCode` is migrated into the file set rather than dropped, so
+  // an unsaved snippet from before the tab grew up survives the upgrade.
+  godotFiles: loadLocal('godotFiles', null) || [{
+    path: 'res://Player.gd',
+    content: loadLocal('godotCode', null) || GODOT_STARTERS.node.files[0].content,
+  }],
+  godotMain: loadLocal('godotMain', ''),                  // '' = let the verifier choose
+  godotOp: loadLocal('godotOp', 'script'),                // which Godot operation to ask for
+  godotFrames: loadLocal('godotFrames', 60),              // iterations a scene run gets
   godotUseProject: loadLocal('godotUseProject', false),   // run inside the real game project
   gameThreeCode: loadLocal('gameThreeCode', THREE_STARTER), // Three.js editor buffer
   theme: (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) || 'dark',
@@ -708,7 +713,19 @@ func _init():
   setGameEngine: (e) => { saveLocal('gameEngine', e); set({ gameEngine: e }); },
   setGameCode: (code) => { saveLocal('gameCode', code); set({ gameCode: code }); },
   setGamePixiCode: (code) => { saveLocal('gamePixiCode', code); set({ gamePixiCode: code }); },
-  setGodotCode: (code) => { saveLocal('godotCode', code); set({ godotCode: code }); },
+  setGodotFiles: (files) => {
+    // The entry point is remembered by path, so it has to be forgotten when that path
+    // stops existing - otherwise the tab keeps promising to run a file that is gone and
+    // the verifier silently picks something else.
+    const next = Array.isArray(files) ? files : [];
+    saveLocal('godotFiles', next);
+    const main = next.some((f) => f.path === get().godotMain) ? get().godotMain : '';
+    if (main !== get().godotMain) saveLocal('godotMain', main);
+    set({ godotFiles: next, godotMain: main });
+  },
+  setGodotMain: (path) => { saveLocal('godotMain', path || ''); set({ godotMain: path || '' }); },
+  setGodotOp: (op) => { saveLocal('godotOp', op); set({ godotOp: op }); },
+  setGodotFrames: (n) => { saveLocal('godotFrames', n); set({ godotFrames: n }); },
   setGodotUseProject: (v) => { saveLocal('godotUseProject', v); set({ godotUseProject: v }); },
   setGameThreeCode: (code) => { saveLocal('gameThreeCode', code); set({ gameThreeCode: code }); },
 
