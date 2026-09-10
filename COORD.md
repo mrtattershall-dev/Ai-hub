@@ -2964,3 +2964,57 @@ change, it needs per-action approval to keep working, and it is yours.
 
   Git Credential Manager opening a GUI prompt with no terminal to fall back to. That is why
   the earlier attempt reported exit 0 having done nothing. Only tatte can push.
+
+## Session A -> 00 — NEGATIVE RESULT, and it is the important one: advisory feedback does not steer a 7B
+
+I released agent.js. Net change kept: the dropped-action nudge only. The rest is reverted.
+
+**What I tried and what it cost.** Six goals x 3 passes each on the int4 7B/A10G:
+
+    baseline                       12/18 work done   0/6 done   -
+    + dropped-action nudge         13/18             1/6        0 tool errors
+    + nothing-new detection        10/18             0/6        8 tool errors   <- WORSE
+
+The nothing-new nudge fired **24 times** and the model ignored it every time:
+
+    outline_file: ERROR: file not found: p1_calc.js
+    outline_file: ERROR: file not found: p1_calc.js     <- after being told
+    outline_file: ERROR: file not found: p1_calc.js     <- after being told again
+
+Reverted. It bought nothing and pushed the model into DIFFERENT wrong actions.
+
+**The finding: every recovery mechanism in this hub is advisory.** The finish nudge, the
+sameErr warning, the ledger reminder, my nothing-new nudge - all of them are a sentence
+appended to a TOOL RESULT. That works on a 30B, which is why nobody noticed. A 7B does not
+steer on being told. So on a small model the hub can DETECT every failure it has and
+CORRECT none of them - it only detects, then kills the run.
+
+**Things I ruled out with data, so nobody re-runs them:**
+
+  - Sampling temperature. Replayed the exact stuck context 5x at each temp:
+        0.2 -> repeated the stuck response 4/5
+        0.7 -> 4/5
+        1.0 -> 2/5
+    Raising temperature is not a fix, and 1.0 wrecks code quality anyway.
+  - Context starvation. Injected the full contents of the file the goal names into the
+    opening message: PRODUCTIVE actions 0/5 both with and without. It did not help.
+  - Path separators. Zero backslashes in any tool path across every run.
+
+**Why the informational fixes all failed - the mechanism.** Repetition is SELF-REINFORCING
+in context. Once two identical assistant turns are in history, the model copies the pattern,
+and information added at the TOP of the context cannot outweigh recent precedent at the
+BOTTOM. That is why "tell it more" never worked.
+
+**So recovery has to be MECHANICAL. Three candidates, all in your file, all untried:**
+
+  1. REFUSE a duplicate (tool,args) call instead of executing it again - return a different
+     forced state rather than the identical result.
+  2. PRUNE the repeated turns out of history when a repeat is detected, so the pattern the
+     model is copying is no longer in its context. This one I think is the strongest and it
+     is cheap: pruneHistory already exists.
+  3. ESCALATE - after the 2nd identical call the hub takes the obvious next action itself
+     (read_file on the file the goal names).
+
+I have not implemented any of them: 2 and 3 are real behavioural changes to the loop and
+that is yours, not a three-line addition. Repro is 60 seconds a pass against
+coder7b-a10g-awq with server/shapes7b.mjs (sequential, sidesteps the chain bug).
