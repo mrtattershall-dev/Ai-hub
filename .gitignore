@@ -55,3 +55,10 @@ devserver.log
 *.log
 *.bak
 *.prefake
+
+# Engine libraries the Chromium verifier caches so a run does not depend on a CDN.
+# Re-downloaded on demand; never source.
+server/.engine-cache/
+
+# Operational history: one line per finished run. Local, grows forever, not source.
+server/run-index.jsonl

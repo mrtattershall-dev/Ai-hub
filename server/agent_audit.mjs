@@ -237,8 +237,17 @@ console.log('\n--- task ledger (live) ---');
     L.read(WORKSPACE).filter((t) => t.state === 'doing').length === 1);
   const plan = '1. SYSTEMS NEEDED\n- input handling\n- collision\n2. BUILD ORDER\n- draw the paddle';
   const items = L.fromPlan(plan);
-  check('a plan becomes tasks, skipping its section headings',
-    items.length === 3 && !items.some((i) => /SYSTEMS NEEDED/.test(i)), items.join(' | '));
+  // Updated 2026-09-10. This asserted length === 3 - i.e. EVERY bullet becomes a task,
+  // including "input handling" and "collision", which are architecture notes, not work.
+  // Measured on a live game run: that rule seeded 29 TASKS from one sensible plan and the
+  // run could not finish inside its step budget. fromPlan now takes the BUILD ORDER
+  // section when the plan has one, which took 29 -> 5 and a three-goal chain from
+  // stopped/stopped/done to done/done/done. The heading rule is unchanged and still checked.
+  check('a plan becomes tasks: the BUILD ORDER steps, not every bullet',
+    items.length === 1 && items[0] === 'draw the paddle'
+      && !items.some((i) => /SYSTEMS NEEDED|BUILD ORDER/.test(i)), items.join(' | '));
+  check('a plan with no BUILD ORDER section still yields its bullets',
+    L.fromPlan('1. WHAT IT DOES\n- adds two numbers\n- exports add()').length === 2);
   try { rmSync(join(WORKSPACE, 'TASKS.md')); } catch {}
 }
 

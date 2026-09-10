@@ -8,6 +8,7 @@
 
 import express from 'express';
 import { launchOptions } from './browser.js';
+import { serveScriptsFromCache } from './engineCache.js';
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve, relative, sep } from 'path';
 import { randomUUID } from 'crypto';
@@ -54,6 +55,10 @@ const googleReady = () => {
  */
 export const __toolPolicyTest = {
   autoTools: () => new Set(AUTO_TOOLS),
+  // The real parser. Exported so a test can assert on BEHAVIOUR - what the model's text
+  // turns into - rather than on the source of the regex, which is how agent_audit ended
+  // up asserting a bug twice today.
+  parseAction: (text, lastPath) => parseAction(text, lastPath),
   writeReason: (tool, args) => googleWriteReason(tool, args),
   // The lookup the run loop actually does (`tools[tool]`), so a test can ask whether a tool
   // the model might emit is callable - without constructing a router, which would run
@@ -350,13 +355,72 @@ const tools = {
     return `OK: wrote ${Buffer.byteLength(content)} bytes to ${path}`;
   },
 
+  /**
+   * Add to the END of a file. The missing primitive.
+   *
+   * Measured across 32 real runs on 2026-09-10: 11.3% of ALL model calls returned an
+   * error, and 81% of those were one message - `edit_file` refusing for want of a FIND
+   * snippet. Every one of the worst runs was an EDIT goal ("add lerp to the EXISTING
+   * utils.js", "add a score counter to the EXISTING index.html"), and write_file was
+   * REWRITING an existing path twice as often as it created a new one.
+   *
+   * The cause is a gap in the vocabulary, not a weak model. The commonest edit anyone
+   * makes is "add this to that file", and the tools offered exactly two ways to say it:
+   * rewrite the whole file, or find an anchor and replace it with ITSELF PLUS the new
+   * code. The first is expensive and can silently destroy working code; the second is a
+   * strange way to express appending and needs an exact quotation of text you did not
+   * write. So the agent burned its step budget failing at both.
+   *
+   * Appending cannot lose anything, which is why this is safe to auto-approve alongside
+   * write_file: the failure mode of a bad append is a file with junk at the bottom, not a
+   * file with the work missing.
+   */
+  append_file({ path, content = '' }) {
+    const full = safePath(path);
+    if (!content) return `ERROR: append_file needs CONTENT — put the lines to add in a fenced code block.`;
+    if (!existsSync(full)) {
+      writeFileSync(full, content.endsWith('\n') ? content : content + '\n', 'utf8');
+      return `OK: ${path} did not exist, so it was created with ${Buffer.byteLength(content)} bytes.`;
+    }
+    const before = readFileSync(full, 'utf8');
+    const joiner = before.endsWith('\n') ? '' : '\n';
+    const body = content.endsWith('\n') ? content : content + '\n';
+    writeFileSync(full, before + joiner + body, 'utf8');
+    return `OK: appended ${Buffer.byteLength(body)} bytes to ${path} (now ${Buffer.byteLength(before + joiner + body)} bytes). The existing content was not touched.`;
+  },
+
   // Surgical edit: replace a snippet in an existing file. Tries an exact match
   // first; if that fails, falls back to whitespace-tolerant line matching (small
   // models rarely reproduce exact indentation). Refuses if not found or ambiguous.
   edit_file({ path, find, replace = '' }) {
     const full = safePath(path);
     if (!existsSync(full)) return `ERROR: file not found: ${path} (use write_file to create it)`;
-    if (find == null || find === '') return 'ERROR: missing FIND snippet.';
+    if (find == null || find === '') {
+      // SAY WHAT TO SEND, AND SHOW IT.
+      //
+      // This was four words: "ERROR: missing FIND snippet." Measured 2026-09-10 on a live
+      // unattended run, the model called edit_file SEVEN times in a row without FIND, got
+      // the same four words each time, and burned its whole 25-call step budget on the
+      // goal "add lerp() to utils.js" - a one-function edit. It had already read the file
+      // twelve times; it knew the content, it just could not work out the request shape.
+      //
+      // Fourth instance of the same bug class in this file (edit_file ambiguity,
+      // run_command's bare EXIT 1, list_assets' failed multi-word filter): a tool that
+      // refuses correctly while withholding the one fact needed to act. Refusing is
+      // cheap; refusing usefully is what keeps an unattended run moving.
+      const head = existsSync(full)
+        ? readFileSync(full, 'utf8').split('\n').slice(0, 6).map((l, i) => `${i + 1}: ${l}`).join('\n')
+        : '';
+      return 'ERROR: edit_file needs a FIND snippet — the exact text to replace. You sent PATH'
+        + (replace ? ' and REPLACE' : '') + ' but no FIND.\n'
+        + 'The shape is:\n'
+        + '  ACTION: edit_file\n'
+        + `  PATH: ${path}\n`
+        + '  FIND:\n  ```\n  <the exact lines to replace>\n  ```\n'
+        + '  REPLACE:\n  ```\n  <the new lines>\n  ```\n'
+        + (head ? `First lines of ${path}, so you can copy a snippet verbatim:\n${head}\n` : '')
+        + `To ADD something to the end of the file, use append_file instead — it is far simpler and cannot lose what is already there. To rewrite the file completely, use write_file.`;
+    }
     const content = readFileSync(full, 'utf8');
 
     // 1) exact unique match
@@ -754,6 +818,18 @@ const tools = {
       });
       page.on('pageerror', (e) => logs.push(`[JS ERROR] ${e.message}`));
       page.on('response', (r) => { if (r.status() >= 400 && !/favicon/i.test(r.url())) logs.push(`[HTTP ${r.status()}] ${r.url().split('/').pop()}`); });
+
+      // Serve every CDN script from the shared cache before navigating.
+      //
+      // test_web had NO interception, so each `<script src="https://cdn...">` in a page the
+      // agent wrote hit the live network on every run. Measured 2026-09-10: jsdelivr
+      // answered with something HTML-ish, Chromium reported `Unexpected token '<'`, and it
+      // arrived here as a [JS ERROR] - the model told its correct code was broken, by the
+      // tool it uses to check its work. gameVerify already cached the engine, but only for
+      // the exact URL IT injected; the agent writes its own script tag and pins its own
+      // version, so it was never covered.
+      const cdnFailures = await serveScriptsFromCache(page);
+
       const resp = await page.goto(url, { waitUntil: 'networkidle2', timeout: 15000 });
       const status = resp ? resp.status() : 'no response';
       await new Promise((r) => setTimeout(r, 700));
@@ -767,14 +843,23 @@ const tools = {
       await new Promise((r) => setTimeout(r, 400));
       const after = (await page.evaluate(() => document.body ? document.body.innerText : '')).slice(0, 700);
       await browser.close();
-      const errs = logs.length ? logs.slice(0, 25).join('\n') : '(none)';
+      // Anything the failed CDN fetch knocked over is infrastructure noise, not evidence
+      // about the page. Kept out of ERRORS entirely, and named separately - a model that
+      // reads "your code threw" starts rewriting code that was never wrong.
+      const fromCdn = (l) => cdnFailures.some((u) => l.includes(u));
+      const codeLogs = logs.filter((l) => !fromCdn(l));
+      const errs = codeLogs.length ? codeLogs.slice(0, 25).join('\n') : '(none)';
       return [
         `Loaded ${url} (HTTP ${status}). Clicked ${clicked} control(s).`,
+        cdnFailures.length
+          ? `NOTE: ${cdnFailures.length} library script(s) could not be fetched (${cdnFailures[0]}${cdnFailures.length > 1 ? ', …' : ''}). `
+            + `That is a network problem on this machine, NOT a fault in your code. Anything the page did afterwards may be missing a library — do not rewrite working code because of it.`
+          : null,
         `ERRORS:\n${errs}`,
         `VISIBLE TEXT (on load): ${before.replace(/\n+/g, ' | ')}`,
         `VISIBLE TEXT (after clicking): ${after.replace(/\n+/g, ' | ')}`,
         `(Review the visible text for wrong values, e.g. "$0" where money was expected, or features that did nothing.)`,
-      ].join('\n\n');
+      ].filter(Boolean).join('\n\n');
     } catch (e) {
       try { if (browser) await browser.close(); } catch {}
       return `ERROR loading the page: ${e.message}\nCollected so far:\n${logs.join('\n') || '(none)'}`;
@@ -943,7 +1028,7 @@ Object.assign(tools, googleTools({
 //
 // run_python and run_command execute code and are NOT here.
 // web_search/web_fetch are read-only network reads with truncated output.
-const AUTO_TOOLS = new Set(['list_dir', 'read_file', 'search_file', 'outline_file', 'write_file', 'edit_file', 'test_web', 'web_search', 'web_fetch',
+const AUTO_TOOLS = new Set(['list_dir', 'read_file', 'search_file', 'outline_file', 'write_file', 'append_file', 'edit_file', 'test_web', 'web_search', 'web_fetch',
   // Reading history is as safe as reading a file. Committing and undoing change state,
   // so they stay gated.
   'git_diff', 'git_log',
@@ -1330,7 +1415,7 @@ ACTION: read_file
 PATH: <a file from the workspace listing>
 LINES: 200-260
 
-outline_file — get a COMPACT map of a big file: every function/class with its line number. Do this FIRST on any large file, then read_file only the lines you need (never try to read a whole big file — it will not fit):
+outline_file — map a file: every function/class with its line number. Two uses. (1) On a BIG file, do this FIRST and then read_file only the lines you need — never try to read a whole big file, it will not fit. (2) Before EDITING, to find exactly which function you need to change and where it starts, so your FIND snippet matches one place:
 THOUGHT: <why>
 ACTION: outline_file
 PATH: <a file from the workspace listing>
@@ -1349,7 +1434,15 @@ PATH: main.py
 print("hello")
 \`\`\`
 
-edit_file — change a small part of an EXISTING file (preferred over rewriting it). The FIND text must match the file EXACTLY and be unique:
+append_file — ADD to the end of a file, keeping everything already in it. Use this to add a function, a rule, a section — it is the easiest and safest way to extend a file:
+THOUGHT: <why>
+ACTION: append_file
+PATH: utils.js
+\`\`\`javascript
+export function lerp(a, b, t) { return a + (b - a) * t; }
+\`\`\`
+
+edit_file — CHANGE text that is already in a file. Use this only when you are replacing or modifying something specific; to ADD new code use append_file, which is easier and cannot lose what is there. The FIND text must match the file EXACTLY and be unique:
 THOUGHT: <why>
 ACTION: edit_file
 PATH: <the file from the listing>
@@ -1569,14 +1662,44 @@ function parseAction(text, lastPath) {
   if (!tool && fenced !== undefined) tool = 'write_file';
   if (!tool) return null;
 
-  if (tool === 'write_file') {
+  // append_file carries its payload exactly like write_file does - a fenced block. It was
+  // missing here when the tool was added, so the block was parsed but never handed over,
+  // and append_file dutifully reported "needs CONTENT" for content the model HAD sent.
+  // Four wasted calls in its first live run. Adding a tool means touching five places
+  // (tool, prompt, AUTO_TOOLS, MUTATING, parser) and the parser is the silent one.
+  if (tool === 'write_file' || tool === 'append_file') {
     if (!path) path = langFile[fenceLang] || lastPath || 'index.html';
     return { tool, thought, args: { path, content: fenced ?? '' } };
   }
   if (tool === 'edit_file') {
-    const findM = text.match(/FIND:\s*```[^\n]*\n([\s\S]*?)```/i);
-    const replM = text.match(/REPLACE:\s*```[^\n]*\n([\s\S]*?)```/i);
-    return { tool, thought, args: { path: path || lastPath, find: findM?.[1]?.replace(/\n$/, ''), replace: replM ? replM[1].replace(/\n$/, '') : '' } };
+    // ACCEPT FIND/REPLACE WITH OR WITHOUT CODE FENCES.
+    //
+    // This required fences. The model very reasonably writes:
+    //
+    //   FIND:
+    //   function len(v) {
+    //     return Math.sqrt(v.x * v.x + v.y * v.y);
+    //   }
+    //   REPLACE:
+    //   function len(v) { ...validation... }
+    //
+    // which is a perfectly correct edit, and the parser returned find=undefined, so the
+    // tool answered "needs a FIND snippet" for a snippet that was RIGHT THERE. Measured
+    // 2026-09-10 across 6 real runs: 20 wasted model calls and two runs stopped dead on
+    // "add input validation to EVERY function" - a goal append_file cannot help with, so
+    // there was no escape route. The model was doing the right thing and the tool refused
+    // it, which is the worst failure a tool can have: it punishes correct behaviour.
+    //
+    // Fenced first (unambiguous), then bare: FIND runs to the REPLACE: marker, REPLACE
+    // runs to the next ALL-CAPS field or the end. A stray closing fence is trimmed.
+    const clean = (v) => (v == null ? v : String(v).replace(/\n?```\s*$/, '').replace(/\n$/, ''));
+    const findFenced = text.match(/FIND:\s*```[^\n]*\n([\s\S]*?)```/i);
+    const replFenced = text.match(/REPLACE:\s*```[^\n]*\n([\s\S]*?)```/i);
+    const findBare = text.match(/FIND:[ \t]*\n([\s\S]*?)(?=\n[ \t]*REPLACE:)/i);
+    const replBare = text.match(/REPLACE:[ \t]*\n([\s\S]*?)(?=\n[ \t]*[A-Z][A-Z_]{2,}:|$)/i);
+    const find = clean(findFenced ? findFenced[1] : findBare?.[1]);
+    const replace = clean(replFenced ? replFenced[1] : replBare?.[1]) ?? '';
+    return { tool, thought, args: { path: path || lastPath, find, replace } };
   }
   if (tool === 'run_command') {
     const cmd = (text.match(/COMMAND:\s*(.+)/i)?.[1]?.trim()) || (fenced ? fenced.trim().split('\n')[0] : undefined);
@@ -2033,6 +2156,95 @@ const planTaskFor = (goal) => (isGameGoal(goal) ? PLAN_TASK : PLAN_TASK_CODE);
 
 // Append a (goal -> plan -> code) trace for later v0.3 training. Lives OUTSIDE the
 // workspace so a "New project" reset never wipes it.
+/**
+ * THE RUN INDEX — one line per finished run, kept forever.
+ *
+ * Three things were being written about a run and none of them answered "is this getting
+ * better?":
+ *   agent-runs/*.json   the full record, but CAPPED AT 40 and evicted - operational
+ *                       history is actively thrown away
+ *   traces.jsonl        built for TRAINING (goal -> plan -> code). Its step entries are
+ *                       {type, tool, path}: no errors, no timings, no tok/s
+ *   ESCALATIONS.md      only the runs that stopped
+ *
+ * So the questions that actually matter run-over-run - what fraction of calls fail, which
+ * tool refuses most often, are prompts growing, did a change help - could only be answered
+ * by hand-mining whatever run files had not been evicted yet. That is how the four biggest
+ * findings of 2026-09-10 were made (25 wasted calls on one error message, a 26:13
+ * rewrite-to-create ratio, 29 ledger tasks, an 11.3% error rate), and none of them were
+ * visible from inside the product.
+ *
+ * This is deliberately TINY - a few hundred bytes per run, never truncated - because the
+ * value is entirely in having a long series. Read it with `node server/runIndex.mjs`.
+ */
+function recordRunIndex(run) {
+  try {
+    const steps = run.steps || [];
+    const errors = {};
+    const samples = {};   // one example of what was sent, per distinct failure
+    const tools = {};
+    const files = new Set();
+    for (const st of steps) {
+      if (st.tool) tools[st.tool] = (tools[st.tool] || 0) + 1;
+      if (st.args && st.args.path) files.add(String(st.args.path).slice(0, 80));
+      const res = String(st.result || '');
+      if (/^ERROR/.test(res)) {
+        // Normalised so the same failure counts as the same failure across runs.
+        const key = res.replace(/^ERROR:?\s*/, '').replace(/[0-9]+/g, 'N')
+          .replace(/["'`][^"'`]{1,40}["'`]/g, 'X').slice(0, 60).trim();
+        errors[key] = (errors[key] || 0) + 1;
+
+        // KEEP ONE SAMPLE OF WHAT THE MODEL ACTUALLY SENT.
+        //
+        // Counting failures says a tool refused; it never says whether the refusal was
+        // right. The edit_file parser demanded code fences and answered "needs a FIND
+        // snippet" to correct, unfenced edits - 20 wasted calls and two dead runs - and
+        // finding that took an hour of digging through run files the 40-run cap was busy
+        // deleting, because the index recorded THAT it failed and not WHAT was sent.
+        // One short sample per distinct failure is a few hundred bytes and turns "this
+        // keeps breaking" into "look, the tool is wrong".
+        if (!samples[key]) {
+          const a = st.args || {};
+          const shown = {};
+          for (const [k, v] of Object.entries(a)) {
+            shown[k] = typeof v === 'string'
+              ? (v.length > 220 ? v.slice(0, 220) + `…(+${v.length - 220})` : v)
+              : v;
+          }
+          samples[key] = { tool: st.tool || null, args: shown };
+        }
+      }
+    }
+    const rates = (run.callStats || []).map((c) => c.tokPerSec).filter((n) => n > 0);
+    const prompts = (run.callStats || []).map((c) => c.promptTok).filter(Boolean);
+    const rec = {
+      ts: Date.now(),
+      id: run.id,
+      goal: String(run.goal || '').slice(0, 160),
+      status: run.status,
+      ms: Date.now() - (run.createdAt || Date.now()),
+      calls: run.modelCalls || 0,
+      steps: steps.length,
+      errorCount: Object.values(errors).reduce((a, b) => a + b, 0),
+      errors,
+      errorSamples: samples,
+      // What the run was working from, so a bad plan or a bloated ledger is visible
+      // without needing the (evicted) full record.
+      planLines: String(run.plan || '').split('\n').filter((l) => l.trim()).length,
+      firstBytesMs: (run.callStats || [])[0]?.ms ?? null,
+      tools,
+      files: [...files].slice(0, 12),
+      tokens: run.tokens || 0,
+      tokPerSec: rates.length ? { min: Math.min(...rates), max: Math.max(...rates) } : null,
+      promptMax: prompts.length ? Math.max(...prompts) : null,
+      source: run.source || 'human',
+      generation: run.generation || 0,
+    };
+    const f = join(__dirname, 'run-index.jsonl');
+    appendFileSync(f, JSON.stringify(rec) + '\n', 'utf8');
+  } catch { /* a record of the work must never break the work */ }
+}
+
 function saveTrace(run) {
   if (run.traced) return;
   run.traced = true;
@@ -2315,7 +2527,7 @@ async function drive(loadDb, run) {
       // you would most want them, because nobody watched it happen. Checkpointing before
       // the hand-off makes the whole delegated chunk revertible as a unit, which is the
       // natural granularity anyway: you undo "the sub-task", not step 6 of it.
-      const MUTATING = new Set(['write_file', 'edit_file', 'run_command', 'run_python', 'download_file', 'spawn_subtask']);
+      const MUTATING = new Set(['write_file', 'append_file', 'edit_file', 'run_command', 'run_python', 'download_file', 'spawn_subtask']);
       if (MUTATING.has(tool)) {
         try {
           // Create the repo BEFORE asking whether anything changed.
@@ -2569,7 +2781,7 @@ async function drive(loadDb, run) {
     }
   } finally {
     run.busy = false;
-    if (['done', 'error', 'stopped'].includes(run.status)) saveTrace(run);
+    if (['done', 'error', 'stopped'].includes(run.status)) { saveTrace(run); recordRunIndex(run); }
     persist(run);   // capture final/paused state (incl. 'interrupted' and 'awaiting_approval')
 
     // ── Tell someone ────────────────────────────────────────────────────────────
@@ -3010,6 +3222,12 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
   if (orphans) console.log(`[agent] re-queued ${orphans} orphaned work item(s) after restart`);
   workQueue.prune();
   console.log(`[agent] approval mode: ${describeMode()}`);
+
+  // The unattended tick. Defined but never called is not a feature - it is dead code that
+  // reads like one, which is exactly what wiring.test.mjs exists to catch. Started here
+  // because this is where loadDb becomes available; it no-ops unless the supervisor is on.
+  startSupervisorTick(loadDb);
+  if (supervisorEnabled) console.log(`[agent] unattended tick every ${TICK_MS / 1000}s (stale approvals DENIED after ${APPROVAL_TIMEOUT_MS / 60000} min, interrupted runs resumed, queued work picked up)`);
 
   // Hand the already-registered Google tools a real database. Until this runs they exist
   // but report "not connected", which is also what they should do.
