@@ -2710,7 +2710,7 @@ async function drive(loadDb, run) {
       pushStep(run, { type: 'error', text: `Stopped: ran out of ${spent}. Raise AGENT_MAX_STEPS / AGENT_MAX_MINUTES to go further.` });
     }
   } finally {
-    run.busy = false;
+    // run.busy stays true through this whole teardown - it is cleared at "IDLE ONLY NOW".
 
     // ── DO NOT LEAVE CODE THAT WILL NOT PARSE ──────────────────────────────────
     //
@@ -2801,6 +2801,22 @@ async function drive(loadDb, run) {
       try { workQueue.complete(run.queueItemId, { status: 'done', runId: run.id }); }
       catch { /* the queue must never take a finished run down with it */ }
     }
+
+    // ── IDLE ONLY NOW ───────────────────────────────────────────────────────────
+    // Everything above is teardown in the shared workspace: the syntax rollback walks git
+    // history and rewrites files, then the trace, the run index and the run file are
+    // written. `busy` used to be cleared on the first line of this finally, so the moment a
+    // run reported 'done' a client could start the next run on top of that teardown -
+    // activeTopLevelRun() counts a busy run as active, but busy was already false. A fuzz
+    // campaign caught /start throwing mid-teardown (the new run's workspace listing stat'ed
+    // a __pycache__ temp file py_compile had just renamed away), and the previous run's
+    // file still said 'running'.
+    //
+    // Cleared HERE rather than at the very end because the hand-off below starts the next
+    // queued goal and must find the workspace free, not held by this same run. Nothing from
+    // here down awaits, so no request can get in between. If the teardown above throws,
+    // driveDetached's catch clears busy instead.
+    run.busy = false;
 
     // ── Take the next ticket ────────────────────────────────────────────────────
     // Every entry point was a human pressing something, so "autonomous" meant
@@ -3432,7 +3448,10 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     const run = runs.get(req.params.id);
     if (!run) return res.status(404).json({ error: 'run not found' });
     const { history, busy, ...view } = run;
-    res.json(view);
+    // busy: true while the run's teardown (syntax rollback, trace, persist) is still going,
+    // even though its status may already be terminal. /start answers 409 until it clears,
+    // so a client that starts runs back to back should wait for busy:false.
+    res.json({ ...view, busy: !!busy });
   });
 
   // Approve or reject a pending run_command, then resume.

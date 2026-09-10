@@ -122,7 +122,9 @@ async function iteration(seed) {
         await new Promise((ok) => setTimeout(ok, 400));
         continue;
       }
-      if (run && ['done', 'error', 'stopped', 'interrupted', 'failed'].includes(run.status)) break;
+      // Terminal is not idle: the teardown (rollback, persist) runs after it, and /start is
+      // refused until busy clears. Older hubs never send busy, so undefined counts as idle.
+      if (run && ['done', 'error', 'stopped', 'interrupted', 'failed'].includes(run.status) && run.busy !== true) break;
       await new Promise((ok) => setTimeout(ok, 400));
     }
     // A run still waiting on a human at the deadline IS a stall now - denials are answered

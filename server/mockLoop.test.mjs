@@ -157,7 +157,9 @@ await test('the loop runs real recorded output end to end without crashing', asy
     let run = null;
     while (Date.now() < deadline) {
       run = await api('/agent/' + s.runId).catch(() => null);
-      if (run && ['done', 'error', 'stopped', 'interrupted', 'failed', 'awaiting_approval'].includes(run.status)) break;
+      // Terminal is not idle: the teardown (rollback, persist) runs after it, and /start is
+      // refused until busy clears.
+      if (run && ['done', 'error', 'stopped', 'interrupted', 'failed', 'awaiting_approval'].includes(run.status) && run.busy !== true) break;
       await new Promise((r) => setTimeout(r, 500));
     }
     assert.ok(run, 'run never reached a terminal state');

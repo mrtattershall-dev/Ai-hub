@@ -178,7 +178,8 @@ async function runHostile(mode) {
   let last = null;
   while (Date.now() < deadline) {
     last = await api('/agent/' + started.runId);
-    if (['done', 'error', 'stopped', 'interrupted', 'awaiting_approval'].includes(last.status)) break;
+    // Terminal is not idle: /start is refused until the run's teardown clears busy.
+    if (['done', 'error', 'stopped', 'interrupted', 'awaiting_approval'].includes(last.status) && last.busy !== true) break;
     await new Promise((r) => setTimeout(r, 600));
   }
   if (!last || !['done', 'error', 'stopped', 'interrupted', 'awaiting_approval'].includes(last.status)) {
