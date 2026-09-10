@@ -122,13 +122,17 @@ async function iteration(seed) {
         await new Promise((ok) => setTimeout(ok, 400));
         continue;
       }
-      if (run && ['done', 'error', 'stopped', 'interrupted', 'failed'].includes(run.status)) break;
+      // Terminal is not finished: the syntax rollback runs in teardown AFTER the status flips,
+      // and `busy` stays set until it is done. Seed 14 checked the workspace the moment it saw
+      // 'stopped', then killed the hub mid-rollback, and reported p1_calc.js BROKEN although its
+      // history held a version that parsed - the repair simply had not happened yet.
+      if (run && ['done', 'error', 'stopped', 'interrupted', 'failed'].includes(run.status) && !run.busy) break;
       await new Promise((ok) => setTimeout(ok, 400));
     }
     // A run still waiting on a human at the deadline IS a stall now - denials are answered
     // above, so anything left parked means the denial path itself did not resume the run.
-    if (!run || !['done', 'error', 'stopped', 'interrupted', 'failed'].includes(run.status)) {
-      v.push(`HANG: "${goal.slice(0, 40)}" never reached a terminal state (last: ${run?.status}, denied ${denied})`);
+    if (!run || !['done', 'error', 'stopped', 'interrupted', 'failed'].includes(run.status) || run.busy) {
+      v.push(`HANG: "${goal.slice(0, 40)}" never reached a terminal state (last: ${run?.status}${run?.busy ? ', still tearing down' : ''}, denied ${denied})`);
     }
     statuses.push(run?.status);
   }
