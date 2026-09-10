@@ -73,7 +73,13 @@ app = modal.App("qwen-train")
 
 # RAM: unsloth offloads gradients to CPU to save VRAM, so guarantee host memory
 # explicitly rather than inheriting Modal's default for the GPU class.
-@app.function(image=image, gpu=GPU, timeout=60 * 60 * int(os.environ.get("TRAIN_TIMEOUT_HRS", "4")),
+# retries=0 explicitly. A training call that failed at IMPORT (a bad env, a guard tripping)
+# is not transient, and Modal happily re-ran one on a fresh H100 the moment a redeploy fixed
+# the image - so a dead call from an hour ago came back to life alongside the new one, two
+# containers training the same run_name into the same adapter directory. Wasted money is the
+# smaller half; the corrupted adapter is the real cost.
+@app.function(image=image, gpu=GPU, retries=0,
+              timeout=60 * 60 * int(os.environ.get("TRAIN_TIMEOUT_HRS", "4")),
               cpu=float(os.environ.get("TRAIN_CPU", "4")),
               memory=int(os.environ.get("TRAIN_MEM_MB", "16384")),
               volumes={"/root/.cache/huggingface": hf_cache, "/adapters": adapters})
