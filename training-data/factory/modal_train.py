@@ -51,7 +51,14 @@ image = (
     .apt_install("git")
     .pip_install("unsloth", "trl", "peft", "transformers", "datasets",
                  "accelerate", "bitsandbytes", "huggingface_hub", "hf_transfer")
-    .env({"HF_HUB_ENABLE_HF_TRANSFER": "1"})
+    # The resolved values are BAKED INTO THE IMAGE, not merely read from the local shell.
+    # Module-level constants are re-evaluated when Modal imports this file INSIDE the
+    # container, where TRAIN_BASE is unset - so without this, `TRAIN_BASE=...32B... modal
+    # deploy` registers gpu=H100 (captured locally, at deploy) and then trains the 14B
+    # default (resolved remotely, at import). An H100 billed to fine-tune the wrong model,
+    # with nothing failing.
+    .env({"HF_HUB_ENABLE_HF_TRANSFER": "1", "TRAIN_BASE": BASE,
+          "TRAIN_MAXLEN": os.environ.get("TRAIN_MAXLEN", "8192")})
     .add_local_file(str(DATA), "/root/dataset.jsonl", copy=True)
 )
 
@@ -84,6 +91,14 @@ def train(epochs: int = 2, maxlen: int = int(os.environ.get("TRAIN_MAXLEN", "819
     # already; a line in the log is the cheapest possible guard against repeating it.
     print(f"base {BASE} on {GPU}", flush=True)
     print(f"training on {len(ds)} rows | maxlen {maxlen} | {epochs} epochs")
+    # Write the provenance next to the adapter. Which base an adapter was trained on is not
+    # recoverable from the weights, and getting it wrong at eval time is a silent failure -
+    # so it goes on the volume with the adapter that needs it.
+    import json as _json, os as _os
+    _os.makedirs(f"/adapters/{run_name}", exist_ok=True)
+    with open(f"/adapters/{run_name}/PROVENANCE.json", "w") as _f:
+        _json.dump({"base": BASE, "gpu": GPU, "rows": len(ds), "maxlen": maxlen,
+                    "epochs": epochs, "lr": lr, "run_name": run_name}, _f, indent=2)
 
     bf16 = torch.cuda.is_bf16_supported()
     trainer = SFTTrainer(

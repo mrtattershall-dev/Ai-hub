@@ -165,7 +165,7 @@ image = (
     .apt_install("git")
     .pip_install("unsloth", "trl", "peft", "transformers", "datasets",
                  "accelerate", "bitsandbytes", "huggingface_hub", "hf_transfer")
-    .env({"HF_HUB_ENABLE_HF_TRANSFER": "1"})
+    .env({"HF_HUB_ENABLE_HF_TRANSFER": "1", "EVAL_BASE": BASE})
 )
 
 app = modal.App("qwen-evalset")
