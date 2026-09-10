@@ -150,6 +150,23 @@ export async function showFile(workspace, ref, relPath) {
   return r.ok ? r.out : null;
 }
 
+/**
+ * The commits that touched one file, newest first.
+ *
+ * Needed because HEAD is NOT the pre-damage state. Every mutating tool checkpoints before it
+ * runs, so once a bad write lands, the NEXT checkpoint commits the damage - and by the end of
+ * a run HEAD holds the broken file with the good one buried several commits back. Measured
+ * offline: the rollback found only a broken version at HEAD and correctly did nothing, which
+ * meant it would have repaired almost nothing in a real run.
+ */
+export async function fileHistory(workspace, relPath, n = 25) {
+  await ensureRepo(workspace);
+  const clean = String(relPath || '').split('\\').join('/').replace(/^\.\//, '');
+  if (!clean || clean.startsWith('..')) return [];
+  const r = await git(workspace, ['log', `-${n}`, '--format=%H', '--', clean]);
+  return r.ok && r.out ? r.out.split('\n').map((s) => s.trim()).filter(Boolean) : [];
+}
+
 /** Recent history, newest first. */
 export async function log(workspace, n = 15) {
   await ensureRepo(workspace);

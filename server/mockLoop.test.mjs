@@ -55,7 +55,38 @@ const firstAction = (t) => (t.match(/ACTION:\s*([a-z_]+)/i) || [])[1] || '';
 const firstPath = (t) => ((t.match(/PATH:\s*(.+)/i) || [])[1] || '').trim();
 const markerAttacks = acting.filter((r) =>
   /^(write_file|edit_file|append_file)$/i.test(firstAction(r.text)) && /package\.json/i.test(firstPath(r.text)));
-const replayOrder = [...markerAttacks, ...acting];
+// ONE SYNTHETIC RESPONSE, and it is worth explaining why the corpus alone is not enough.
+//
+// 92 recorded write_file responses target a .js file and ALL 92 produce code that parses -
+// the model does not write syntactically broken files in one shot. The 10 broken files found
+// in the workspace audit came from EDITS splicing a file into an invalid state, which
+// depends on what that file already contained and so cannot be reproduced by replay.
+//
+// Verified the gap rather than assumed it: with the rollback disabled and the marker guard
+// intact, this test still passed - the broken-code invariant was only ever firing as a side
+// effect of marker destruction, never on its own. A deterministic trigger is the only way to
+// exercise it, so this is a fabricated reply, marked as such, and the ONLY one here.
+// It takes TWO responses, and finding that out was the point of writing them.
+//
+// A single broken write is NOT the real failure and is not recoverable: `git show HEAD:file`
+// returns null for a file that never existed, so there is no earlier version to restore and
+// the rollback correctly does nothing. The first version of this probe wrote one broken file
+// and "failed" the test against working code.
+//
+// The 10 broken files in the workspace audit were all EDITS to files that already parsed.
+// So: write it good (which checkpoints it), then break it. Now HEAD holds a version worth
+// going back to, which is exactly the situation the rollback exists for.
+const SYNTHETIC_GOOD_WRITE = {
+  goal: '(synthetic)',
+  actions: ['write_file'],
+  text: 'THOUGHT: writing the module.\nACTION: write_file\nPATH: broken_probe.js\n```javascript\nfunction add(a, b) {\n  return a + b;\n}\nmodule.exports = { add };\n```',
+};
+const SYNTHETIC_BROKEN_WRITE = {
+  goal: '(synthetic)',
+  actions: ['write_file'],
+  text: 'THOUGHT: adjusting it.\nACTION: write_file\nPATH: broken_probe.js\n```javascript\nfunction add(a, b) {\n  return a + b;\n}\n};\nmodule.exports = { add };\n```',
+};
+const replayOrder = [...markerAttacks, SYNTHETIC_GOOD_WRITE, SYNTHETIC_BROKEN_WRITE, ...acting];
 console.log(`  corpus: ${rows.length} responses (${acting.length} act, ${markerAttacks.length} attack the boundary marker)\n`);
 
 const [mockPort, hubPort] = await freePorts(2);

@@ -20,7 +20,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 import { mirrorAgentCommand, mirrorAgentResult } from './terminal.js';
-import { ensureRepo, commitAll, diff as gitDiff, log as gitLog, undo as gitUndo, isDirty, showFile } from './workspaceGit.js';
+import { ensureRepo, commitAll, diff as gitDiff, log as gitLog, undo as gitUndo, isDirty, showFile, fileHistory } from './workspaceGit.js';
 import { classifyCommand, classifyPython, describeMode, MODE as APPROVAL_MODE } from './approvalPolicy.js';
 import * as ledger from './taskLedger.js';
 import * as visual from './visualCheck.js';
@@ -2729,14 +2729,26 @@ async function drive(loadDb, run) {
         const files = readdirSync(WORKSPACE).filter((f) => /\.(c|m)?js$|\.py$/i.test(f));
         for (const f of files.slice(0, 40)) {
           if (!(await quickCheck(f))) continue;                 // parses fine - leave it alone
-          const prev = await showFile(WORKSPACE, 'HEAD', f).catch(() => null);
-          if (prev == null) continue;                           // no earlier version to go back to
           const full = join(WORKSPACE, f);
           const broken = readFileSync(full, 'utf8');
-          if (prev === broken) continue;
-          writeFileSync(full, prev, 'utf8');
-          if (await quickCheck(f)) { writeFileSync(full, broken, 'utf8'); continue; }  // old one is no better
-          pushStep(run, { type: 'note', text: `${f} did not parse at the end of the run — restored the last version that did.` });
+
+          // Search BACK through this file's history; do NOT just look at HEAD.
+          //
+          // Every mutating tool checkpoints BEFORE it runs, so the checkpoint taken after a
+          // bad write CONTAINS the bad write. By the end of a run HEAD holds the broken file
+          // and the last good version is several commits back. Verified offline against real
+          // replayed output: the HEAD-only version found a broken file at HEAD, restored
+          // nothing, and reported success - it would have repaired almost nothing in a real
+          // run while looking like it worked.
+          let restored = false;
+          for (const sha of await fileHistory(WORKSPACE, f, 25).catch(() => [])) {
+            const prev = await showFile(WORKSPACE, sha, f).catch(() => null);
+            if (prev == null || prev === broken) continue;
+            writeFileSync(full, prev, 'utf8');
+            if (!(await quickCheck(f))) { restored = true; break; }   // this one parses - keep it
+            writeFileSync(full, broken, 'utf8');                      // no better; restore and keep looking
+          }
+          if (restored) pushStep(run, { type: 'note', text: `${f} did not parse at the end of the run — restored the last committed version that did.` });
         }
       } catch { /* never let the repair take the run down */ }
     }
