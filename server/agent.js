@@ -529,6 +529,12 @@ const tools = {
       [/\bphp\s+-S\b/i, 'php -S'],
       [/\bruby\s+-run\s+-e\s+httpd\b/i, 'ruby httpd'],
       [/\bcaddy\s+file-server\b|\bdarkhttpd\b|\bminiserve\b/i, 'a static file server'],
+      // Not a server, same intent and the same dead end: open/start/xdg-open hand the file
+      // to a desktop browser the agent cannot see, and `open` does not exist on Windows at
+      // all. Measured 2026-09-10: right after the http.server refusal the 32B tried
+      // `open index.html` with the thought "verify the game loads" - the goal test_web
+      // already serves. The policy correctly asked a human, which stalls an unattended run.
+      [/^\s*(open|start|xdg-open|explorer)\s+\S+\.html?/i, 'open/start (a desktop browser the agent cannot read)'],
     ];
     const hit = blocking.find(([rx]) => rx.test(String(cmd || '')));
     if (hit) {
