@@ -52,6 +52,22 @@ const clip = (s, n = MAX_CHARS) => {
   return t.length > n ? `${t.slice(0, n)}\n…(truncated, ${t.length - n} more chars)` : t;
 };
 
+/** A page size that is always a sane integer, whatever the model typed. */
+const pageSize = (n) => Math.min(MAX_ROWS, Math.max(1, Math.floor(Number(n) || 10)));
+
+/**
+ * Strip anything that could end a header line.
+ *
+ * MIME headers are separated by CRLF, so a newline inside TO or SUBJECT does not travel as
+ * text - it starts a new header. `SUBJECT: Report\r\nBcc: someone@else` silently blind-copies
+ * a stranger, and a doubled CRLF ends the header block and forges the body.
+ *
+ * This is reachable: the model composes these fields from goal text, and a goal can come
+ * from a plan, a file it read, or a page it fetched. The approval prompt shows a human the
+ * recipient and subject, and the injected header is exactly the part they would not see.
+ */
+const headerValue = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').replace(/\p{Cc}/gu, '').trim();
+
 export function parseGoogleArgs(tool, text, fenced) {
   const field = (name) => (text.match(new RegExp(`^${name}:\\s*(.+)$`, 'im'))?.[1] || '').trim().replace(/^["'`]|["'`]$/g, '');
   // BODY is the one multi-line field: a fenced block if there is one, else everything after
@@ -200,7 +216,7 @@ export function googleTools({ loadDb, saveDb, withDb, safePath }) {
   return {
     gmail_search: wrap('gmail_search', async ({ query, max }) => {
       if (!query) return 'ERROR: missing QUERY.';
-      const u = `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=${Math.min(max, MAX_ROWS)}`;
+      const u = `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=${pageSize(max)}`;
       const list = await (await call(u)).json();
       if (!list.messages?.length) return `No messages match: ${query}`;
       const rows = await Promise.all(list.messages.map(async (m) => {
@@ -221,8 +237,15 @@ export function googleTools({ loadDb, saveDb, withDb, safePath }) {
     }),
 
     gmail_send: wrap('gmail_send', async ({ to, subject, body }) => {
-      if (!to || !subject) return 'ERROR: gmail_send needs TO and SUBJECT.';
-      const mime = [`To: ${to}`, `Subject: ${subject}`, 'Content-Type: text/plain; charset="UTF-8"', '', body || ''].join('\r\n');
+      const safeTo = headerValue(to);
+      const safeSubject = headerValue(subject);
+      if (!safeTo || !safeSubject) return 'ERROR: gmail_send needs TO and SUBJECT.';
+      // A recipient list is commas and addresses. Anything else means the model built the
+      // field from prose, and sending it would be a guess about who it is addressed to.
+      if (!/^[^@\s,]+@[^@\s,]+(\s*,\s*[^@\s,]+@[^@\s,]+)*$/.test(safeTo)) {
+        return `ERROR: TO must be one address, or several separated by commas. Got: ${safeTo.slice(0, 80)}`;
+      }
+      const mime = [`To: ${safeTo}`, `Subject: ${safeSubject}`, 'Content-Type: text/plain; charset="UTF-8"', '', body || ''].join('\r\n');
       const r = await (await call('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ raw: b64url(mime) }),
@@ -235,7 +258,7 @@ export function googleTools({ loadDb, saveDb, withDb, safePath }) {
       // Escape single quotes: Drive's query language is a string grammar, and a file named
       // "Bob's plan" would otherwise be a syntax error rather than a search.
       const q = `name contains '${String(query).replace(/'/g, "\\'")}' and trashed = false`;
-      const u = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&pageSize=${Math.min(max, MAX_ROWS)}&fields=files(id,name,mimeType,size,modifiedTime)`;
+      const u = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&pageSize=${pageSize(max)}&fields=files(id,name,mimeType,size,modifiedTime)`;
       const list = await (await call(u)).json();
       if (!list.files?.length) return `No Drive files match: ${query}`;
       const rows = list.files.map((f) => `${f.id}  ${f.name}  [${f.mimeType.replace('application/vnd.google-apps.', 'google-')}]  ${f.modifiedTime?.slice(0, 10) || ''}`);
@@ -323,7 +346,7 @@ export function googleTools({ loadDb, saveDb, withDb, safePath }) {
       if (!ch) return 'No YouTube channel is associated with this Google account.';
       const uploads = ch.contentDetails?.relatedPlaylists?.uploads;
       if (!uploads) return `Channel "${ch.snippet?.title}" has no uploads playlist.`;
-      const list = await (await call(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploads}&maxResults=${Math.min(max, MAX_ROWS)}`)).json();
+      const list = await (await call(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploads}&maxResults=${pageSize(max)}`)).json();
       const rows = (list.items || []).map((i) => `${i.snippet?.resourceId?.videoId}  ${i.snippet?.publishedAt?.slice(0, 10)}  ${i.snippet?.title}`);
       return clip(`Channel: ${ch.snippet?.title}\n${rows.length} recent upload(s):\nID  PUBLISHED  TITLE\n${rows.join('\n')}`);
     }),

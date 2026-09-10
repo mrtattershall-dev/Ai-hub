@@ -154,6 +154,101 @@ await test('a binary Drive file is refused rather than decoded into the context 
   } finally { globalThis.fetch = real; }
 });
 
+// ---- MIME header injection -------------------------------------------------------------------
+const GMAIL = ['https://www.googleapis.com/auth/gmail.modify', 'https://www.googleapis.com/auth/gmail.send'];
+
+/** Capture what gmail_send would actually put on the wire, without sending anything. */
+async function sentMime(args) {
+  const real = globalThis.fetch;
+  let raw = null;
+  globalThis.fetch = async (url, opts) => {
+    if (String(url).includes('/messages/send')) {
+      raw = JSON.parse(opts.body).raw;
+      return { ok: true, json: async () => ({ id: 'sent1' }) };
+    }
+    throw new Error(`unexpected fetch: ${url}`);
+  };
+  try {
+    const out = await connected(GMAIL).gmail_send(args);
+    const mime = raw == null ? null : Buffer.from(raw.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+    return { out, mime };
+  } finally { globalThis.fetch = real; }
+}
+
+await test('a CRLF in SUBJECT cannot inject a Bcc header', async () => {
+  const { mime } = await sentMime({ to: 'a@b.com', subject: 'Report\r\nBcc: attacker@evil.com', body: 'hi' });
+  assert.ok(mime, 'the message should still be sent');
+  // What makes a header a header is being at the START of a line. Flattened onto the
+  // Subject line the same characters are inert text, which is the whole point - the words
+  // are not censored, they just cannot become a header any more.
+  const headers = mime.split('\r\n\r\n')[0].split('\r\n');
+  assert.ok(!headers.some(h => /^bcc:/i.test(h)), `an injected header reached the wire:\n${mime}`);
+  assert.equal(headers.length, 3, 'exactly To, Subject and Content-Type');
+  assert.match(mime, /Subject: Report Bcc: attacker@evil\.com/, 'the text survives, flattened onto one line');
+});
+
+await test('U+2028 and U+2029 are neutralised too - they are line terminators to a parser', async () => {
+  // Written as escapes on purpose: raw separators are invisible in a diff, and putting one
+  // straight into a regex literal is what broke the parser while this was being fixed.
+  const sneaky = 'A\u2028Bcc: x@y.com\u2029B';
+  const { mime } = await sentMime({ to: 'a@b.com', subject: sneaky, body: 'hi' });
+  const headerBlock = mime.split('\r\n\r\n')[0];
+  assert.ok(!/[\u2028\u2029]/.test(headerBlock), 'a raw line separator survived into the headers');
+  assert.equal(headerBlock.split('\r\n').length, 3, 'exactly To, Subject and Content-Type');
+});
+
+await test('a CRLF in TO cannot inject headers either', async () => {
+  const { out } = await sentMime({ to: 'a@b.com\r\nBcc: attacker@evil.com', subject: 'S', body: 'x' });
+  // Flattened, the recipient stops looking like an address list, so it is refused outright.
+  assert.match(out, /^ERROR: TO must be one address/);
+});
+
+await test('a recipient built out of prose is refused rather than guessed at', async () => {
+  const { out } = await sentMime({ to: 'the person who filed the bug', subject: 'S', body: 'x' });
+  assert.match(out, /^ERROR: TO must be one address/);
+});
+
+await test('ordinary recipients still work, including a comma-separated list', async () => {
+  const one = await sentMime({ to: 'a@b.com', subject: 'S', body: 'x' });
+  assert.match(one.out, /^Sent to a@b\.com/);
+  const many = await sentMime({ to: 'a@b.com, c@d.com', subject: 'S', body: 'x' });
+  assert.match(many.out, /^Sent to a@b\.com, c@d\.com/);
+});
+
+await test('the BODY may still contain newlines - only headers are flattened', async () => {
+  const { mime } = await sentMime({ to: 'a@b.com', subject: 'S', body: 'line one\nline two' });
+  assert.match(mime, /line one\nline two/);
+});
+
+// ---- page sizes ---------------------------------------------------------------------------
+async function requestedUrl(fn) {
+  const real = globalThis.fetch;
+  let seen = null;
+  globalThis.fetch = async (url) => {
+    seen = String(url);
+    return { ok: true, json: async () => ({ messages: [], files: [], items: [] }) };
+  };
+  try { await fn(); return seen; } finally { globalThis.fetch = real; }
+}
+
+await test('a negative MAX cannot reach Google as maxResults=-5', async () => {
+  const t = connected(GMAIL);
+  const url = await requestedUrl(() => t.gmail_search({ query: 'x', max: -5 }));
+  assert.match(url, /maxResults=1\b/, `sent: ${url}`);
+});
+
+await test('an absurd MAX is clamped to the listing cap', async () => {
+  const t = connected(GMAIL);
+  const url = await requestedUrl(() => t.gmail_search({ query: 'x', max: 9999 }));
+  assert.match(url, /maxResults=25\b/, `sent: ${url}`);
+});
+
+await test('a fractional MAX becomes a whole number', async () => {
+  const t = connected(GMAIL);
+  const url = await requestedUrl(() => t.gmail_search({ query: 'x', max: 3.7 }));
+  assert.match(url, /maxResults=3\b/, `sent: ${url}`);
+});
+
 // ---- the tools are really registered with the agent ------------------------------------------
 await test('every Google tool is callable by the run loop, not merely exported from this module', () => {
   // `tools[tool]` is the exact lookup the loop does; anything missing there comes back to

@@ -33,10 +33,22 @@
 import { Router, json } from 'express';
 import { createHash, randomBytes, timingSafeEqual } from 'crypto';
 
-const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
-const TOKEN_URL = 'https://oauth2.googleapis.com/token';
-const REVOKE_URL = 'https://oauth2.googleapis.com/revoke';
-const USERINFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo';
+/**
+ * Google's endpoints, overridable ONLY from the environment at boot.
+ *
+ * This exists so the whole exchange can be tested against a scripted Google
+ * (`fakegoogle.mjs`) instead of only up to the guard. Everything past "the token came
+ * back" - storing it, keeping the refresh token, refreshing, revoking, reporting what was
+ * granted - was previously reachable in exactly one way: connecting a real account.
+ *
+ * Read once, from the environment, never from a request. A request that could redirect the
+ * token exchange would be a way to make the hub hand your authorization code to someone
+ * else's server; the environment is already trusted (it sets HUB_TOKEN and the DB path).
+ */
+const AUTH_URL = process.env.GOOGLE_AUTH_URL || 'https://accounts.google.com/o/oauth2/v2/auth';
+const TOKEN_URL = process.env.GOOGLE_TOKEN_URL || 'https://oauth2.googleapis.com/token';
+const REVOKE_URL = process.env.GOOGLE_REVOKE_URL || 'https://oauth2.googleapis.com/revoke';
+const USERINFO_URL = process.env.GOOGLE_USERINFO_URL || 'https://www.googleapis.com/oauth2/v3/userinfo';
 
 /** Identity. Always requested - without it "connected as who?" has no answer. */
 const BASE_SCOPES = ['openid', 'email', 'profile'];
