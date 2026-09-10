@@ -78,13 +78,24 @@ function walk(dir, out = []) {
 const files = [...walk(join(ROOT, 'server')), ...walk(join(ROOT, 'client/src')), ...walk(join(ROOT, 'shared'))];
 
 /**
- * Comments are stripped before anything is scanned.
+ * Blank out everything that is prose rather than code, before any scanning.
  *
- * Not a nicety: the first run of this check reported `supervisorOn` as an unwired export,
- * and it was reading the COMMENT left where that export used to be. A detector that treats
- * prose as code reports the tombstone as the body.
+ * Comments were stripped from the first version because a tombstone comment for a deleted
+ * export re-reported it. STRING LITERALS matter just as much and were missed: agent.js
+ * embeds its whole system prompt as a template literal, and that prompt contains worked
+ * examples of tool calls - including a literal `export function lerp(a, b, t)` showing the
+ * model how append_file works. The scanner read that as a real export with no importer, and
+ * two of us nearly deleted a line of the agent's prompt documentation on its say-so.
+ *
+ * A detector that cannot tell code from a code EXAMPLE will confidently report the example.
  */
-const stripComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+const stripComments = (s) => s
+  .replace(/\/\*[\s\S]*?\*\//g, ' ')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1')
+  .replace(/`(?:[^`\\]|\\.)*`/g, '``')
+  .replace(/'(?:[^'\\\n]|\\.)*'/g, "''")
+  .replace(/"(?:[^"\\\n]|\\.)*"/g, '""');
+
 const src = Object.fromEntries(files.map((f) => [f, stripComments(readFileSync(f, 'utf8'))]));
 const isClient = (f) => f.includes(`client${'\\'}src`) || f.includes('client/src');
 
