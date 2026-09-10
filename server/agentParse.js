@@ -16,6 +16,42 @@
 import { GOOGLE_TOOLS, parseGoogleArgs } from './googleTools.js';
 
 /**
+ * Strip line-number prefixes a model copied out of a tool result back into code.
+ *
+ * read_file shows every line as `${n}: ${line}`, and the FIND-miss hint shows
+ * `      ${n}| ${line}`. Models copy those lines straight back into write_file and edit_file,
+ * prefixes and all. Found by fuzzing the loop with recorded real output: q3_list.js was left
+ * on disk as
+ *
+ *     19:   function zip(a, b) {
+ *     20:     return a.map((val, i) => [val, b[i]]);
+ *
+ * which no module system will parse, and its only version in git history was already
+ * broken, so the syntax rollback had nothing to restore. The prompt has told the model not to
+ * do this for months; that is advice, and advice does not hold. This does.
+ *
+ * DELIBERATELY NARROW, because legitimate code can start a line with digits - object keys
+ * such as `  1: 'one',`. It fires only when EVERY non-empty line carries the prefix, the
+ * numbers ASCEND, and (for the `N: ` form) the number sits at column 0, where read_file puts
+ * it and where an indented object key never is. Anything ambiguous is returned untouched.
+ */
+export function stripLineNumberPrefixes(text) {
+  if (typeof text !== 'string' || !text) return text;
+  const lines = text.split('\n');
+  const body = lines.filter((l) => l.trim() !== '');
+  if (!body.length) return text;
+  const READ = /^(\d+):(?: |$)/;     // read_file:       "19: code"
+  const HINT = /^\s*(\d+)\| ?/;      // FIND-miss hint:  "      19| code"
+  for (const re of [READ, HINT]) {
+    if (!body.every((l) => re.test(l))) continue;
+    const nums = body.map((l) => parseInt(l.match(re)[1], 10));
+    if (!nums.every((n, i) => i === 0 || n > nums[i - 1])) continue;
+    return lines.map((l) => l.replace(re, '')).join('\n');
+  }
+  return text;
+}
+
+/**
  * Every action in one reply, not just the first.
  *
  * `parseAction` matches ACTION: without /g, so it returns the first and the rest are
@@ -131,7 +167,7 @@ function parseAction(text, lastPath) {
     // now only applies when the fence really is html and nothing better is known.
     if (!path) path = lastPath || scavenged || langFile[fenceLang] || (fenceLang === 'html' ? 'index.html' : undefined);
     if (!path) return null;   // refuse rather than invent a destination
-    return { tool, thought, args: { path, content: fenced ?? '' } };
+    return { tool, thought, args: { path, content: stripLineNumberPrefixes(fenced ?? '') } };
   }
   if (tool === 'edit_file') {
     // ACCEPT FIND/REPLACE WITH OR WITHOUT CODE FENCES.
@@ -175,10 +211,10 @@ function parseAction(text, lastPath) {
     // stands and now explains the shape - guessing at a half-written edit is how you
     // replace the wrong thing.
     if (!find && fenced !== undefined && !/\bFIND:/i.test(text)) {
-      return { tool: 'write_file', thought, args: { path: path || lastPath, content: fenced } };
+      return { tool: 'write_file', thought, args: { path: path || lastPath, content: stripLineNumberPrefixes(fenced) } };
     }
 
-    return { tool, thought, args: { path: path || lastPath, find, replace } };
+    return { tool, thought, args: { path: path || lastPath, find: stripLineNumberPrefixes(find), replace: stripLineNumberPrefixes(replace) } };
   }
   if (tool === 'run_command') {
     const cmd = (text.match(/COMMAND:\s*(.+)/i)?.[1]?.trim()) || (fenced ? fenced.trim().split('\n')[0] : undefined);

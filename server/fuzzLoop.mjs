@@ -23,6 +23,7 @@ import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { freePorts } from './testPort.mjs';
+import { checkInvariants } from './fuzzInvariants.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ITER = parseInt(process.argv[2] || '12', 10);
@@ -95,61 +96,34 @@ async function iteration(seed) {
     if (!s.runId) { v.push(`START refused: ${JSON.stringify(s).slice(0, 100)}`); continue; }
     const deadline = Date.now() + 4 * 60000;
     let run = null;
+    let denied = 0;
     while (Date.now() < deadline) {
       run = await api('/agent/' + s.runId).catch(() => null);
-      if (run && ['done', 'error', 'stopped', 'interrupted', 'failed', 'awaiting_approval'].includes(run.status)) break;
+      // Answer approvals the way the supervisor tick does in production: a stale request is
+      // DENIED, never approved. The first version of this fuzzer ran with the supervisor off,
+      // so nobody answered, a parked run held the workspace lock, and every later goal was
+      // refused - 14 false violations in one campaign, each of them `rm <file>`, which is
+      // exactly what SHOULD need a human. That was the harness, not the hub.
+      if (run && run.status === 'awaiting_approval') {
+        if (denied >= 5) await api(`/agent/${s.runId}/stop`, { method: 'POST', body: '{}' }).catch(() => null);
+        else { denied++; await api(`/agent/${s.runId}/approve`, { method: 'POST', body: JSON.stringify({ approve: false }) }).catch(() => null); }
+        await new Promise((ok) => setTimeout(ok, 400));
+        continue;
+      }
+      if (run && ['done', 'error', 'stopped', 'interrupted', 'failed'].includes(run.status)) break;
       await new Promise((ok) => setTimeout(ok, 400));
     }
-    if (!run || !['done', 'error', 'stopped', 'interrupted', 'failed', 'awaiting_approval'].includes(run.status)) {
-      v.push(`HANG: "${goal.slice(0, 40)}" never reached a terminal state (last: ${run?.status})`);
+    // A run still waiting on a human at the deadline IS a stall now - denials are answered
+    // above, so anything left parked means the denial path itself did not resume the run.
+    if (!run || !['done', 'error', 'stopped', 'interrupted', 'failed'].includes(run.status)) {
+      v.push(`HANG: "${goal.slice(0, 40)}" never reached a terminal state (last: ${run?.status}, denied ${denied})`);
     }
     statuses.push(run?.status);
   }
 
-  // ── invariants ────────────────────────────────────────────────────────────
-  if (hub.exitCode !== null) v.push(`CRASH: hub exited ${hub.exitCode}: ${log.join('').slice(-200).replace(/\s+/g, ' ')}`);
-
-  const pkg = join(ws, 'package.json');
-  if (existsSync(pkg)) {
-    const raw = readFileSync(pkg, 'utf8');
-    try { const j = JSON.parse(raw); if (j.type !== 'commonjs' || raw.length < 100) v.push(`MARKER: type=${j.type} ${raw.length}B`); }
-    catch { v.push(`MARKER: package.json is not valid JSON (${raw.length}B)`); }
-  }
-
-  if (existsSync(ws)) {
-    for (const f of readdirSync(ws).filter((x) => /\.(c|m)?js$/i.test(x))) {
-      try { execFileSync(process.execPath, ['--check', join(ws, f)], { timeout: 15000, stdio: 'pipe' }); }
-      catch { v.push(`BROKEN: ${f} does not parse`); }
-    }
-  }
-
-  // Nothing may appear beside the workspace except what the harness put there.
-  const allowed = new Set(['workspace', 'hub.json', 'queue.json', 'runs', 'index.jsonl', 'hub.json.bak', 'queue.json.bak']);
-  for (const f of readdirSync(dir)) if (!allowed.has(f) && !/\.(bak|tmp)$/.test(f)) v.push(`STRAY: ${f} written beside the workspace`);
-
-  // The workspace repo must be its OWN - a real past bug committed agent checkpoints into the
-  // hub's own source tree because git walked UP to the nearest .git.
-  if (existsSync(join(ws, '.git'))) {
-    try {
-      const top = execFileSync('git', ['-C', ws, 'rev-parse', '--show-toplevel'], { encoding: 'utf8', stdio: 'pipe',
-        env: { ...process.env, GIT_CEILING_DIRECTORIES: dirname(resolve(ws)) } }).trim();
-      if (resolve(top).toLowerCase() !== resolve(ws).toLowerCase()) v.push(`GIT: workspace repo resolves to ${top}`);
-    } catch (e) { v.push(`GIT: could not resolve the workspace repo (${String(e.message).slice(0, 60)})`); }
-  }
-
-  // Every persisted run must be valid JSON - a truncated run file loses the history.
-  const runsDir = join(dir, 'runs');
-  if (existsSync(runsDir)) {
-    for (const f of readdirSync(runsDir)) {
-      try { JSON.parse(readFileSync(join(runsDir, f), 'utf8')); } catch { v.push(`RUNFILE: ${f} is not valid JSON`); }
-    }
-  }
-  const idx = join(dir, 'index.jsonl');
-  if (existsSync(idx)) {
-    readFileSync(idx, 'utf8').split('\n').filter(Boolean).forEach((l, i) => {
-      try { JSON.parse(l); } catch { v.push(`INDEX: line ${i + 1} is not valid JSON`); }
-    });
-  }
+  // ── invariants ─ one source of truth, shared with fuzzInvariants.test.mjs, which proves
+  // each check actually fires on the damage it names.
+  v.push(...checkInvariants(dir, { hubExitCode: hub.exitCode, hubLog: log.join('') }));
 
   hub.kill(); mock.close();
   return { seed, goals: goals.length, served, statuses, violations: v, dir };
