@@ -26,8 +26,27 @@ function parseAction(text, lastPath) {
   const fenced = fenceM ? fenceM[2].replace(/\n$/, '') : undefined;
   const pathM = text.match(/PATH:\s*(.+)/i);
   let path = pathM ? pathM[1].trim().replace(/[`"']/g, '') : undefined;
-  // if no PATH given, try a filename mentioned anywhere in the text
-  if (!path) { const fm = text.match(/\b([\w.\-/]+\.(?:html|css|js|py|json|md|txt))\b/i); if (fm) path = fm[1]; }
+  // If no PATH was given, a filename mentioned in the text is a GUESS, not an instruction.
+  //
+  // This took the FIRST filename appearing anywhere - including inside the THOUGHT. So:
+  //   "THOUGHT: q1_math.js already works, so now I will extend q2_str.js"
+  //   ACTION: write_file   (no PATH)
+  // wrote the new content to q1_math.js and destroyed a working file. Reproduced against
+  // the real parser. Only the FILE THE MODEL IS ABOUT TO WRITE should win, and the model
+  // does not say which one it means - so prefer lastPath (the file it was just working on)
+  // and only fall back to a scavenged name when there is nothing better.
+  //
+  // Latent rather than active: 0 of 1,759 recorded real responses omitted PATH on a write.
+  // Kept as a guess of last resort because a small model DOES omit it, and returning null
+  // would throw away a step it can still salvage.
+  // Guess ONLY when unambiguous. If the text names two different files there is no honest
+  // way to pick: "q1_math.js already works, so extend q2_str.js" wants the last one,
+  // "update q2_str.js using helpers from q1_math.js" wants the first. Taking either is a
+  // coin flip that overwrites working code when it loses. One distinct name is evidence;
+  // two is a question, and the run loop recovers from "I could not parse that" far better
+  // than from a file silently destroyed.
+  const mentioned = [...new Set((text.match(/\b[\w.\-/]+\.(?:html|css|js|mjs|py|json|md|txt)\b/gi) || []).map((s) => s.toLowerCase()))];
+  const scavenged = mentioned.length === 1 ? mentioned[0] : undefined;
 
   const langFile = { html: 'index.html', css: 'style.css', js: 'script.js', javascript: 'script.js', python: 'main.py', py: 'main.py' };
   const am = text.match(/ACTION:\s*([a-z_]+)/i);
@@ -44,7 +63,16 @@ function parseAction(text, lastPath) {
   // Four wasted calls in its first live run. Adding a tool means touching five places
   // (tool, prompt, AUTO_TOOLS, MUTATING, parser) and the parser is the silent one.
   if (tool === 'write_file' || tool === 'append_file') {
-    if (!path) path = langFile[fenceLang] || lastPath || 'index.html';
+    // PRECEDENCE, most trustworthy first. This used to be
+    // `langFile[fenceLang] || lastPath || 'index.html'`, which put a GENERIC default from
+    // the fence language ahead of the file the model was demonstrably just editing: a js
+    // fence with lastPath=q3_list.js wrote to `script.js` instead. Backwards. lastPath is
+    // evidence about this run; langFile is a guess about any run.
+    //
+    // 'index.html' as a final fallback also silently overwrote a working game page, so it
+    // now only applies when the fence really is html and nothing better is known.
+    if (!path) path = lastPath || scavenged || langFile[fenceLang] || (fenceLang === 'html' ? 'index.html' : undefined);
+    if (!path) return null;   // refuse rather than invent a destination
     return { tool, thought, args: { path, content: fenced ?? '' } };
   }
   if (tool === 'edit_file') {
