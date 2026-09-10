@@ -31,6 +31,12 @@ BASE = os.environ.get("TRAIN_BASE", "unsloth/Qwen2.5-Coder-14B-Instruct-bnb-4bit
 # A 32B in 4-bit is ~19GB of weights before optimizer state, gradients and activations.
 # On a 40GB card that OOMs partway in - which costs the whole run, not just the step. Fail
 # here instead, where it is free.
+#
+# GPU must be baked into the image env for the same reason BASE is: this module is imported
+# again INSIDE the container, where TRAIN_GPU is unset. The first 32B attempt died on this
+# very check - the container really was on an H100 (the decorator captured that at deploy)
+# but re-resolved GPU to the "A100" default and refused itself. A guard that reads a value
+# the container cannot see is a guard against the wrong thing.
 if "32B" in BASE.upper() and GPU in ("A100", "A10", "A10G", "L4", "T4"):
     raise SystemExit(
         f"refusing to start: BASE is {BASE} but TRAIN_GPU={GPU}. "
@@ -57,7 +63,7 @@ image = (
     # deploy` registers gpu=H100 (captured locally, at deploy) and then trains the 14B
     # default (resolved remotely, at import). An H100 billed to fine-tune the wrong model,
     # with nothing failing.
-    .env({"HF_HUB_ENABLE_HF_TRANSFER": "1", "TRAIN_BASE": BASE,
+    .env({"HF_HUB_ENABLE_HF_TRANSFER": "1", "TRAIN_BASE": BASE, "TRAIN_GPU": GPU,
           "TRAIN_MAXLEN": os.environ.get("TRAIN_MAXLEN", "8192")})
     .add_local_file(str(DATA), "/root/dataset.jsonl", copy=True)
 )
