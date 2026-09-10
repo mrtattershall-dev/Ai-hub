@@ -56,6 +56,28 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install("playwright==1.47.0", "fastapi[standard]")
     .run_commands("playwright install --with-deps chromium")
+    # THE ENGINES SHIP WITH THE IMAGE.
+    #
+    # Every verification used to fetch Phaser/Pixi/Three from jsdelivr at run time, so a
+    # CDN hiccup was scored as a defect in the generated code. Measured 2026-09-10 on a
+    # correct Phaser page: jsdelivr answered with something HTML-ish and the verdict was
+    # "Rendered, but 1 runtime error(s) fired" - the error being `Unexpected token '<'`.
+    # That is a network blip recorded as "the model wrote broken code", in the numbers that
+    # decide whether a fine-tune was worth it and whether a training row is kept.
+    #
+    # Baked at build time rather than cached at run time: a cache still misses once, and
+    # the first miss is indistinguishable from the failure it is meant to prevent.
+    .run_commands(
+        "mkdir -p /engines",
+        # python, not curl - debian_slim ships no curl, and the build failed loudly on
+        # that rather than shipping an image with missing engines, which is the right way
+        # round.
+        "python -c \"import urllib.request as u; u.urlretrieve('https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js','/engines/phaser.min.js')\"",
+        "python -c \"import urllib.request as u; u.urlretrieve('https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js','/engines/pixi.min.js')\"",
+        "python -c \"import urllib.request as u; u.urlretrieve('https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js','/engines/three.min.js')\"",
+        # Fail the BUILD if a download was silently an error page, rather than shipping one.
+        "python -c \"import sys,glob; bad=[f for f in glob.glob('/engines/*.js') if open(f,'rb').read(200).lstrip()[:1] == b'<' or len(open(f,'rb').read()) < 10000]; print('engines:', {f: len(open(f,'rb').read()) for f in glob.glob('/engines/*.js')}); sys.exit(1) if bad else None\"",
+    )
 )
 
 ENGINES = {
@@ -151,11 +173,32 @@ class Verifier:
 
         eng = ENGINES[engine]
         errors: list[str] = []
+        warnings: list[str] = []   # collected and reported, never fatal
+        cdn_blocked: list[str] = []  # INFRASTRUCTURE, never the code's fault
         page = await self.browser.new_page(viewport={"width": 800, "height": 600})
         try:
+            # A WARNING IS NOT AN ERROR.
+            #
+            # This counted console.warning as a runtime error, so a page that loaded, ran
+            # and rendered perfectly was scored as FAILED because Chromium advised that a
+            # <script src> from a CDN is parser-blocking. Measured 2026-09-10 on a correct
+            # Phaser page: engineLoaded true, canvas 320x240, rendered true, and the verdict
+            # was "Rendered, but 1 runtime error(s) fired" - the one error being that advice.
+            #
+            # Browsers warn about parser-blocking scripts, deprecations, autoplay policy,
+            # passive listeners and a dozen other things that are style notes about the
+            # platform, not defects in the code under test. This axis feeds eval scores and
+            # the training gate, and Phaser is the ONE axis where the fine-tune looked
+            # better than base (4/6 vs 2/6) - a systematic false failure there is not a
+            # small measurement error, it is the measurement.
+            #
+            # Warnings are still COLLECTED, because "it works but warns" is worth seeing.
+            # They just do not decide pass or fail.
             page.on("pageerror", lambda e: errors.append(f"[JS ERROR] {e}"))
-            page.on("console", lambda m: errors.append(f"[console.{m.type}] {m.text}")
-                    if m.type in ("error", "warning") and "Failed to load resource" not in m.text else None)
+            page.on("console", lambda m: errors.append(f"[console.error] {m.text}")
+                    if m.type == "error" and "Failed to load resource" not in m.text else None)
+            page.on("console", lambda m: warnings.append(f"[console.{m.type}] {m.text}")
+                    if m.type == "warning" else None)
             page.on("requestfailed", lambda r: errors.append(f"[NETWORK] {r.failure} - {r.url}"))
             page.on("response", lambda r: errors.append(f"[HTTP {r.status}] {r.url}") if r.status >= 400 else None)
 
@@ -186,6 +229,25 @@ class Verifier:
                     body = f.read()
                 await route.fulfill(status=200, content_type=MIME.get(ext, "application/octet-stream"), headers=cors, body=body)
 
+            # Serve every known engine from disk. ANY other external script is aborted
+            # and recorded apart from `errors`, so "a library would not download" can never
+            # be mistaken for "this code throws".
+            async def serve_engine(route, request):
+                url = request.url
+                local = None
+                for key, meta in ENGINES.items():
+                    stem = {"phaser": "phaser", "pixi": "pixi", "three": "three"}[key]
+                    if stem in url.lower():
+                        local = f"/engines/{stem}.min.js"
+                        break
+                if local and os.path.exists(local):
+                    with open(local, "rb") as fh:
+                        await route.fulfill(status=200, content_type="application/javascript", body=fh.read())
+                    return
+                cdn_blocked.append(url)
+                await route.abort()
+
+            await page.route("https://cdn.jsdelivr.net/**", serve_engine)
             await page.route(f"{ASSET_HOST}**", serve_asset)
 
             await page.set_content(build_doc(engine, code), wait_until="networkidle", timeout=20000)
@@ -231,7 +293,10 @@ class Verifier:
             else:
                 verdict = f"Runs clean in Chromium - {eng['label']} loaded and rendered {checks['canvasWidth']}x{checks['canvasHeight']}."
 
+            # warnings are reported so "it works but warns" is visible, and are absent
+            # from `errors` so they cannot decide pass/fail.
             return {"ok": ok, "verdict": verdict, "engine": engine, "checks": checks, "errors": errors[:30],
+                    "warnings": warnings[:15], "cdnBlocked": cdn_blocked[:8],
                     "assetsUsed": used, "assetsMissing": missing, "assetVersion": manifest["version"],
                     "assetCount": manifest["count"]}
         except Exception as e:  # noqa: BLE001

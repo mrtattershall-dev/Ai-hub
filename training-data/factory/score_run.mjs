@@ -279,6 +279,44 @@ function scoreInterpret(row) {
 }
 
 // ── run ───────────────────────────────────────────────────────────────────────
+/**
+ * WHICH WEIGHTS PRODUCED THIS NUMBER?
+ *
+ * The eval graded whatever the endpoint served and recorded only the alias it chose to
+ * call itself. `/api/tags` says "mycoder" - a NAME, set by an env var, identical whether
+ * the container is serving base, run5 or something nobody meant to deploy. That is how
+ * "the hub may not actually be serving run5" became a doubt that survived three eval runs:
+ * every number was real and none of them was attached to an identified model.
+ *
+ * `/api/health` reports the actual weights (`Qwen/Qwen3-Coder-30B-A3B-Instruct`), and
+ * modal_serve.py's `/whoami` reports the LoRA adapter. Ask both, stamp whatever comes back
+ * into the results, and say so loudly when neither answers - a score whose subject is
+ * unknown is not a weaker result, it is a different kind of thing, and it should not sit
+ * in a table next to identified ones without a mark against it.
+ */
+async function identifyModel(base) {
+  if (!base) return { identified: false, why: 'no endpoint configured' };
+  const ask = async (path) => {
+    try {
+      const r = await fetch(base.replace(/\/+$/, '') + path, { signal: AbortSignal.timeout(15_000) });
+      return r.ok ? await r.json() : null;
+    } catch { return null; }
+  };
+  const health = await ask('/api/health');
+  const who = await ask('/whoami');
+  const weights = health?.model || who?.model || null;
+  const adapter = who?.adapter ?? null;
+  return {
+    identified: Boolean(weights || adapter),
+    weights, adapter,
+    engine: health?.engine ?? null,
+    gpu: health?.gpu ?? null,
+    maxLen: health?.max_len ?? null,
+    at: new Date().toISOString(),
+    why: (weights || adapter) ? null : 'endpoint answered neither /api/health nor /whoami',
+  };
+}
+
 const AXES = ['code', 'phaser', 'godot', 'structured', 'interpret'];
 const results = {};
 // Per-prompt results, so variants generated from DIFFERENT prompt sets can still be
@@ -287,6 +325,18 @@ const results = {};
 // were the same test. They are not, and presenting them that way is worse than not
 // comparing at all.
 const scoredById = {};
+
+// Ask BEFORE grading, so the identity belongs to the run rather than to whenever someone
+// happened to look afterwards.
+const MODEL_ID = await identifyModel(process.env.MODEL_BASE || process.env.OLLAMA_BASE || '');
+if (MODEL_ID.identified) {
+  console.log(`model under test: ${MODEL_ID.weights || '(adapter only)'}`
+    + (MODEL_ID.adapter ? ` + adapter ${MODEL_ID.adapter}` : '')
+    + (MODEL_ID.gpu ? ` on ${MODEL_ID.gpu}` : ''));
+} else {
+  console.log(`!! MODEL NOT IDENTIFIED (${MODEL_ID.why}). These scores are real numbers`
+    + ` attached to an UNKNOWN model - do not put them beside identified ones.`);
+}
 
 for (const name of names) {
   const path = join(EVAL_DIR, `eval_${name}.jsonl`);

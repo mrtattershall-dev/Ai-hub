@@ -2332,3 +2332,98 @@ this cap, not a bug.
   on OTHER axes - the Chromium verifier on Modal is unreachable. The godot column has zero
   `?`, so 1/15 is a real result; the rest of that run's table is not, until the Phaser
   verifier is back.
+
+## Addendum 9 — a clean run never completes its queue item unless the supervisor is ON
+
+Found by `server/planToExecution.test.mjs`, the plan→execution test I wrote as the consumer
+wiring.test.mjs was asking for. It is the first test that drives markdown from a planner all
+the way to executed work, and it found a real bug on its first honest run.
+
+**The bug.** The completion call sits inside the supervisor gate:
+
+    if (supervisorEnabled && run.status === 'done' && !run.depth) {
+      if (run.queueItemId) workQueue.complete(run.queueItemId, { status: 'done', runId: run.id });
+      const next = workQueue.dequeue(...)
+
+So with the supervisor OFF, a run that finishes cleanly leaves its queue item `taken`
+forever. (No line number: agent.js is being split right now and this moved from 3018 to
+2769 within the hour.)
+
+**Reproduced** on an isolated hub, fakemodel `happy`, supervisor off, approvalMode build:
+
+    run status: done | steps: 8 | write_file -> task_done -> verify_project -> task_done -> note -> finish
+    t+15s items: taken,queued | runs: done
+    t+30s items: taken,queued | runs: done
+    t+60s items: taken,queued | runs: done
+
+The run wrote the file, verified it, passed the finish gate. The item never left `taken`,
+and the second goal stayed `queued` behind an `after` that can no longer reach 'done'.
+
+**Why it is worse than it looks.**
+1. It breaks the SAFE posture specifically. Supervisor-off is what all three sessions have
+   been recommending to tatte, and in that posture the queue is a one-way trip: the work
+   happens and the item is stuck.
+2. Every Strategy chain is stranded after step 1 unless the supervisor is armed. The
+   unattended path works and the human-paced path does not — exactly backwards.
+3. `requeueOrphans()` re-queues `taken` items on restart, so a goal that already succeeded
+   RUNS AGAIN next boot. For a write_file goal that overwrites whatever came after it.
+
+**The shape of it is the lesson.** `failQueueItem` on the failure path is already NOT gated
+on the supervisor, and its comment reads: an item that stays 'taken' is "invisible to
+dequeue, and re-queued on the next restart as if nothing had happened... everything behind
+it waited on an id that could never reach done". That is a word-for-word description of
+what the SUCCESS path still does. The failure path was fixed; the success path was not, and
+nothing noticed because no test had ever watched a queued goal finish.
+
+**Not fixed by me** — agent.js is ai-native-engine-00's lane and they are mid-split.
+Reported with the reproduction and the one-line fix (completion belongs to finishing, only
+the "take the next ticket" half belongs behind `supervisorEnabled`).
+`planToExecution.test.mjs` fails on exactly this today and goes green when it lands.
+
+**Second-order note, and the reason this was invisible for so long:** my own first run of
+that test reported "7 passed". The wrapper was synchronous while one check was async, so
+that check ran after teardown had killed the hub — it counted green having asserted
+nothing. Fixed (the wrapper awaits, all eight call sites await), and the suite told the
+truth on the very next run. A test that cannot fail is worth less than no test, and I wrote
+one into the file that consumes the harness written to prevent exactly that.
+
+## Session A -> ALL — the Phaser eval axis was failing correct code. Old Phaser scores are suspect.
+
+Redeploying the Chromium verifier (it was down, which is why scoring run6 left 15 `?`)
+turned up two systematic false failures. Both are fixed and deployed.
+
+**1. WARNINGS WERE COUNTED AS ERRORS.** modal_chromium.py:158 read
+`if m.type in ("error", "warning")`. Browsers warn about parser-blocking scripts,
+deprecations, autoplay policy, passive listeners - style notes about the platform, not
+defects in the code under test. Measured on a minimal, correct Phaser page:
+
+    before:  6 console warnings -> counted as 6 errors -> ok:false, "runtime error(s) fired"
+    after :  ok:true, "Runs clean in Chromium - Phaser loaded and rendered 320x240"
+             errors [] , warnings 6 (collected, reported, never fatal)
+
+**2. THE ENGINE WAS FETCHED LIVE ON EVERY VERIFICATION.** A jsdelivr hiccup was recorded as
+a defect in the generated code. Phaser/Pixi/Three are now baked into the image at BUILD
+time and served from disk by route interception; any other external script is aborted and
+recorded in a separate `cdnBlocked` list. Baked rather than cached because a cache still
+misses once, and the first miss is indistinguishable from the failure it prevents. The
+build FAILS if a download was silently an error page.
+
+**WHY THIS MATTERS MORE THAN A VERIFIER BUG.** Phaser is the ONE axis where the fine-tune
+beat base (4/6 vs 2/6) - that single result is most of the argument that the Phaser slice
+of the training data is worth anything. If correct pages were being failed on browser
+advisories, that number is unreliable in BOTH directions, exactly like the Godot
+`--check-only` bar the Godot lane just retired. **Any pre-2026-09-10 Phaser score should be
+re-run before anyone reasons from it.**
+
+Also landed: `score_run.mjs` now calls `identifyModel()` BEFORE grading - it asks
+`/api/health` and `/whoami` and stamps the real weights into the run, or says loudly that
+the model is UNIDENTIFIED. `/api/tags` only ever reported the alias "mycoder", which is why
+"the hub may not actually be serving run5" survived three eval runs: every number was real
+and none was attached to an identified model. Verified live ->
+`Qwen/Qwen3-Coder-30B-A3B-Instruct` on H100; against a dead endpoint -> `identified:false`.
+
+MY OWN CORRECTION, since it cost three deploys: I chased `Unexpected token '<'` through two
+fixes before noticing it was MY TEST. `/api/game/verify` takes JAVASCRIPT - build_doc wraps
+it in a `<script>` block - and I was posting a full HTML document, which becomes JS source
+and fails on character one. The two fixes above are real and measured; the `'<'` was never
+the verifier's fault. Tenth instrumentation error of the day, same direction as the others.
