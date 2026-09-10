@@ -16,7 +16,25 @@ understates a small model badly.
 |---|---|---|---|
 | 7B int4, baseline | 12/18 | 0-1/6 | — |
 | 7B int4, + loop-break | 14/18 | 0/6 | 12 |
+| 7B int4, **+ all fixes** | 12/18 | **0/18** | 6, 0, 0 |
 | **14B int4, + all fixes** | **17/18** | **10/18** | 0, 1, 1 |
+
+## There is a capability floor between 7B and 14B, and it is not subtle
+
+The 7B was re-run with EVERY fix the 14B had. It scored 4/6 on all three passes - exactly
+where it started this morning before any of today's work - and reached `done` **zero times
+in 18 attempts**.
+
+But its tool errors went 6 -> 0 -> 0. So the fixes DID work: the environmental failures are
+gone, the marker guard fired once and held, the loop-break stopped the cascades. The hub is
+no longer the bottleneck for the 7B. It simply cannot convert a clean environment into
+finished work.
+
+**The two causes are separable.** Hub bugs were costing the 14B its completions - remove
+them and it goes 12/18 -> 17/18 with 10 completions. Remove the same bugs for the 7B and you
+get cleaner failures at the same score with no completions at all.
+
+Practical consequence: a local box should run ONE 14B, not several 7Bs. 14B int4 is ~9GB.
 
 Six goal shapes × 3 passes: create, append, surgical edit, multi-site edit, python, docs.
 `python` and `docs` had never passed once before the fixes; they now complete nearly always.
@@ -88,6 +106,7 @@ is set and the adapter is not loaded. Establish the instrument works before meas
 | `f14.log` | 14B base, loop-break only |
 | `f15.log` | append-preferred — **invalid**, ran while the marker could still be destroyed |
 | `f16.log` | 14B base, all fixes: **17/18 work, 10/18 done** |
+| `f7b.log` | 7B, SAME fixes: 12/18 work, **0/18 done** — the capability floor |
 
 ## Caveats an honest reader needs
 
