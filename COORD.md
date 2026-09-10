@@ -3018,3 +3018,40 @@ BOTTOM. That is why "tell it more" never worked.
 I have not implemented any of them: 2 and 3 are real behavioural changes to the loop and
 that is yours, not a three-line addition. Repro is 60 seconds a pass against
 coder7b-a10g-awq with server/shapes7b.mjs (sequential, sidesteps the chain bug).
+
+## Session A — GPU LEDGER (standing, kept current from here)
+
+Raised by the Strategy session: four apps went up in three hours with nobody holding a
+ledger. Fair catch. Every deploy WAS authorised by tatte turn-by-turn in conversation
+("just run 7b base on the cheapest reliable gpu", "A10g it is", "Hook up 14b to the hub
+then", "Let's do base then", "Stop 7b and only run 14b") - but per-deploy approval in chat
+leaves no trace anyone else can audit, which is a real gap. Keeping the list here instead.
+
+    LIVE   coder14b-base      Qwen2.5-Coder-14B-Instruct-AWQ  A10G  min=1  <- BILLS UNTIL STOPPED
+    stopped coder14b-run5     14B base + /adapters/run5 LoRA  A100-40GB
+    stopped coder7b-a10g-awq  Qwen2.5-Coder-7B-Instruct-AWQ   A10G
+    stopped coder7b-l4        Qwen2.5-Coder-7B-Instruct bf16  L4
+
+`min_containers` is the setting that spends money continuously. `max_containers` is a
+CEILING and is free - Modal bills containers that actually run, so raising it costs nothing
+and only stops sessions queueing behind each other.
+
+**Measured cost per unit of work, which is what should drive GPU choice:**
+
+    7B bf16  / L4     11.5 tok/s  ~$0.80/hr  ~$19   per 1M output tokens
+    30B      / H100    133 tok/s  ~$4/hr     ~$8    per 1M
+    7B int4  / A10G   81.5 tok/s  ~$1.10/hr  ~$3.75 per 1M
+    14B int4 / A10G   61.7 tok/s  ~$1.10/hr  ~$4.95 per 1M
+
+The L4 was a false economy: cheapest per HOUR, ~2x the most expensive per TOKEN.
+
+**HUB BACKEND, corrected today.** `hub.json`'s ollama entry pointed at `qwen-serve-vllm`
+(the old 30B) until 13:56. So "the hub may not actually be serving run5" was right and
+broader than suspected - it was serving neither run5 nor any 7B. Now -> `coder14b-base`,
+model `coder14b`. `/api/health` gained a `lora` field so the loaded weights are checkable
+rather than assumed. Backup of the previous config: `server/hub.json.bak-14b-*` (gitignored).
+
+Not mine, for the record: `server/STOP` (never git-tracked, no harness of mine references
+it) and `server/prove7b-index.jsonl` (mine went to my session scratchpad via TRIAL_INDEX and
+is still there). I cannot fully reconstruct one pre-compaction run's invocation, so I will
+not claim certainty about that file - only that I have no record of deleting anything.
