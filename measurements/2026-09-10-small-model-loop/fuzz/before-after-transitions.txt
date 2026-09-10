@@ -1,0 +1,19 @@
+=== 4/iter ===
+  seed    4  BROKEN         -> ESM          instrument: was ESM, now classified apart
+  seed    5  STALL          -> clean        harness: fuzzer now answers approvals
+  tally: {"unchanged":8,"instrument: was ESM, now classified apart":1,"harness: fuzzer now answers approvals":1}
+
+=== 6/iter ===
+  seed 1006  STALL          -> ESM          harness: fuzzer now answers approvals
+  seed 1007  STALL          -> clean        harness: fuzzer now answers approvals
+  seed 1008  STALL          -> clean        harness: fuzzer now answers approvals
+  seed 1009  BROKEN         -> ESM          instrument: was ESM, now classified apart
+  seed 1011  BROKEN         -> ESM          instrument: was ESM, now classified apart
+  seed 1012  BROKEN         -> ESM          instrument: was ESM, now classified apart
+  seed 1015  BROKEN         -> ESM          instrument: was ESM, now classified apart
+  seed 1017  STALL          -> clean        harness: fuzzer now answers approvals
+  seed 1018  STALL          -> BROKEN       harness: fuzzer now answers approvals; NEW BROKEN: appeared after the fix
+  seed 1019  BROKEN         -> ESM          instrument: was ESM, now classified apart
+  seed 1020  BROKEN         -> ESM          instrument: was ESM, now classified apart
+  tally: {"unchanged":10,"harness: fuzzer now answers approvals":5,"instrument: was ESM, now classified apart":6,"NEW BROKEN: appeared after the fix":1}
+

@@ -1,0 +1,12 @@
+{"seed":100012,"served":44,"statuses":["stopped","done","done","done","done","stopped"],"violations":["ESM: p1_calc.js uses import/export in a commonjs workspace"]}
+{"seed":100013,"served":89,"statuses":["stopped","stopped","stopped","stopped","stopped","done"],"violations":["ESM: q6_index.js uses import/export in a commonjs workspace"]}
+{"seed":100014,"served":69,"statuses":["stopped","done","done","stopped","done","done"],"violations":[]}
+{"seed":100015,"served":68,"statuses":["done","stopped","done","done","done","done"],"violations":[]}
+{"seed":100016,"served":33,"statuses":["done","done","done","done","done","done"],"violations":[]}
+{"seed":100017,"served":90,"statuses":["stopped","done","stopped","stopped","stopped","stopped"],"violations":["ESM: test_q1_math.js uses import/export in a commonjs workspace"]}
+{"seed":100018,"served":44,"statuses":["done","done","done","done","done","stopped"],"violations":[]}
+{"seed":100019,"served":85,"statuses":["stopped","stopped","done","stopped","done","done"],"violations":[]}
+{"seed":100020,"served":84,"statuses":["stopped","done","done","stopped","stopped","stopped"],"violations":["ESM: test_q1_math.js uses import/export in a commonjs workspace"]}
+{"seed":100021,"served":61,"statuses":["stopped","done","done","stopped","done","done"],"violations":[]}
+{"seed":100022,"served":72,"statuses":["done","done","stopped","stopped","stopped","stopped"],"violations":["ESM: test_p1_calc.js uses import/export in a commonjs workspace"]}
+{"seed":100023,"served":75,"statuses":["stopped","stopped","done","done","stopped","done"],"violations":[]}
