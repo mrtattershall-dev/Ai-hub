@@ -47,8 +47,24 @@ HEARTBEAT_S = float(os.environ.get("MYCODER_HEARTBEAT_S", "5"))
 # bounds what several agents hammering this at once can cost. Both are env-tunable so the
 # expensive setting is a deliberate act, not a default.
 MIN_CONTAINERS = int(os.environ.get("MYCODER_MIN_CONTAINERS", "0"))
-MAX_CONTAINERS = int(os.environ.get("MYCODER_MAX_CONTAINERS", "4"))
+# A CEILING, NOT A RESERVATION. Modal bills per container-second actually running, so
+# raising this costs nothing unless load genuinely demands it - it is free headroom for
+# a burst. `min_containers` is the setting that spends money continuously.
+# Measured 2026-09-10 with four sessions sharing this: ONE container was running and
+# four simultaneous requests returned in 1-2s, so the ceiling was never the limit.
+# Raised anyway, because the cost of being wrong in this direction is zero and the
+# cost of being wrong in the other is every session queueing behind one GPU.
+MAX_CONTAINERS = int(os.environ.get("MYCODER_MAX_CONTAINERS", "8"))
 SCALEDOWN_S = int(os.environ.get("MYCODER_SCALEDOWN_S", "600"))
+
+# LoRA. The fine-tunes in this project are ADAPTERS, not merged weights - run5 is a QLoRA
+# trained with unsloth against Qwen2.5-Coder-14B. An adapter trained on a bnb-4bit base is
+# applied to the FULL-PRECISION base at serve time, which is why MYCODER_BASE below is the
+# plain Qwen repo and not the -bnb-4bit one named in adapter_config.json. Getting that
+# backwards loads a 4-bit base and silently serves something the adapter was not shaped for.
+LORA_PATH = os.environ.get("MYCODER_LORA", "")          # e.g. /adapters/run5
+LORA_NAME = os.environ.get("MYCODER_LORA_NAME", "tuned")
+LORA_RANK = int(os.environ.get("MYCODER_LORA_RANK", "16"))
 
 if any(k in MODEL.upper() for k in ("30B", "32B", "70B", "72B")) and GPU in ("A10", "A10G", "L4", "T4", "A100"):
     raise SystemExit(
@@ -56,8 +72,14 @@ if any(k in MODEL.upper() for k in ("30B", "32B", "70B", "72B")) and GPU in ("A1
         f"A model this size needs 80GB - set MYCODER_GPU=H100 (or H200/A100-80GB)."
     )
 
-app = modal.App("qwen-serve-vllm")
+# CONFIGURABLE APP NAME. Deploying a different model under the SAME name silently
+# REPLACES the running one - I did exactly that once today and swapped a 30B out from
+# under live batches mid-run. Distinct names let several sizes coexist.
+APP_NAME = os.environ.get("MYCODER_APP", "qwen-serve-vllm")
+app = modal.App(APP_NAME)
 hf_cache = modal.Volume.from_name("hf-cache", create_if_missing=True)
+# The trained adapters live here (run1..run8). Mounted read-only in practice; vLLM only reads.
+adapters = modal.Volume.from_name("qwen-adapters", create_if_missing=True)
 
 image = (
     modal.Image.debian_slim(python_version="3.12")
@@ -81,7 +103,7 @@ image = (
 @app.cls(
     image=image,
     gpu=GPU,
-    volumes={"/root/.cache/huggingface": hf_cache},
+    volumes={"/root/.cache/huggingface": hf_cache, "/adapters": adapters},
     scaledown_window=SCALEDOWN_S,
     timeout=60 * 30,
     min_containers=MIN_CONTAINERS,
@@ -116,7 +138,16 @@ class Server:
             quantization=os.environ.get("MYCODER_QUANT") or None,
             trust_remote_code=True,
             enforce_eager=False,
+            enable_lora=bool(LORA_PATH),
+            max_lora_rank=LORA_RANK,
         )
+        # Built once: a LoRARequest is just a handle, and rebuilding it per call makes vLLM
+        # re-read the adapter from disk on every request.
+        self.lora = None
+        if LORA_PATH:
+            from vllm.lora.request import LoRARequest
+            self.lora = LoRARequest(LORA_NAME, 1, LORA_PATH)
+            print(f"[vllm] LoRA {LORA_NAME} r={LORA_RANK} from {LORA_PATH}", flush=True)
         self.tok = self.llm.get_tokenizer()
         # vLLM's OFFLINE LLM class is not thread-safe, and this server calls generate()
         # from a worker thread (so the ASGI loop can emit heartbeats while it blocks).
@@ -140,7 +171,7 @@ class Server:
     def _chat(self, messages, temp, max_new):
         prompt = self.tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         with self._gen_lock:
-            out = self.llm.generate([prompt], self._params(temp, max_new))
+            out = self.llm.generate([prompt], self._params(temp, max_new), lora_request=self.lora)
         return out[0].outputs[0].text
 
     @modal.asgi_app()
@@ -157,7 +188,7 @@ class Server:
 
         @api.get("/api/health")
         def health():
-            return {"ok": True, "engine": "vllm", "model": MODEL, "gpu": GPU, "max_len": MAX_LEN}
+            return {"ok": True, "engine": "vllm", "model": MODEL, "gpu": GPU, "max_len": MAX_LEN, "lora": LORA_PATH or None}
 
         # HOW THE HUB ACTUALLY SPEAKS.
         #

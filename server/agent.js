@@ -2570,7 +2570,15 @@ async function drive(loadDb, run) {
       // and those two shapes failed 3/3. A tool belongs here if repeating it cannot change
       // the world - mutating tools are deliberately absent, since a second write_file is a
       // real action and must never be swapped out from under the model.
-      const ORIENT = new Set(['list_dir', 'outline_file', 'search_file', 'read_file', 'list_assets', 'task_list', 'recall', 'git_log', 'git_diff']);
+      // The read-only tools OBSERVED looping, and only those. Widening this to every
+      // read-only tool cost 20 tool errors across 3 passes against 0, because for some of
+      // them the substitution is meaningless: a duplicate `read_file` swapped for the same
+      // file's contents returns exactly what it already returned, and `recall`/`git_log`/
+      // `git_diff` answer questions that file contents do not. Those runs then flailed for
+      // 12-26 steps instead of 4-8. `list_assets` and `task_list` ARE here because live
+      // traces caught both looping. Mutating tools stay out on principle - a second
+      // write_file is a real action and must never be swapped out from under the model.
+      const ORIENT = new Set(['list_dir', 'outline_file', 'search_file', 'list_assets', 'task_list']);
       const sig = `${tool}|${JSON.stringify(args || {})}|${String(result).slice(0, 800)}`;
       run.resultSigs = run.resultSigs || [];
       const duplicate = run.resultSigs.includes(sig);
