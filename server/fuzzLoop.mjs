@@ -18,7 +18,7 @@
  */
 import { spawn, execFileSync } from 'node:child_process';
 import { createServer } from 'node:http';
-import { mkdtempSync, writeFileSync, readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, existsSync, readdirSync, statSync, appendFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,6 +26,7 @@ import { freePorts } from './testPort.mjs';
 import { checkInvariants } from './fuzzInvariants.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+const live = new Set();   // hub children still running - killed on ANY exit so no port is left held
 const ITER = parseInt(process.argv[2] || '12', 10);
 const PER = parseInt(process.argv[3] || '4', 10);
 const SEED0 = parseInt(process.argv[4] || '1', 10);
@@ -82,6 +83,7 @@ async function iteration(seed) {
       AGENT_MAX_STEPS: '14', AGENT_MAX_MINUTES: '3', MODEL_FIRST_BYTE_S: '30', MODEL_STALL_S: '30', MODEL_TIMEOUT_S: '60' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
+  live.add(hub);
   const log = []; hub.stdout.on('data', (d) => log.push(d.toString())); hub.stderr.on('data', (d) => log.push(d.toString()));
   const API = `http://127.0.0.1:${hubPort}/api`;
   const api = async (p, o) => (await fetch(API + p, { headers: { 'Content-Type': 'application/json' }, ...o, signal: AbortSignal.timeout(60000) })).json();
@@ -125,28 +127,53 @@ async function iteration(seed) {
   // each check actually fires on the damage it names.
   v.push(...checkInvariants(dir, { hubExitCode: hub.exitCode, hubLog: log.join('') }));
 
-  hub.kill(); mock.close();
+  hub.kill(); live.delete(hub); mock.close();
   return { seed, goals: goals.length, served, statuses, violations: v, dir };
 }
 
-console.log(`fuzzing: ${ITER} iterations x ${PER} goals, seeds ${SEED0}..${SEED0 + ITER - 1}, corpus ${acting.length} acting responses\n`);
+// A campaign that dies must still leave its tally.
+//
+// Campaign A of the first fuzz run exited 127 after 10 of 40 iterations, with no summary and
+// no stack trace. The per-iteration lines survived in the log, but nothing said how many were
+// clean or what kinds had failed, and whatever killed it left its hub children holding ports.
+// Results now stream to a JSONL file as each iteration finishes, the summary prints on every
+// exit path, and live hubs are killed on the way out.
+const OUT = process.env.FUZZ_OUT || join(tmpdir(), `fuzz-results-${SEED0}-${Date.now()}.jsonl`);
+console.log(`fuzzing: ${ITER} iterations x ${PER} goals, seeds ${SEED0}..${SEED0 + ITER - 1}, corpus ${acting.length} acting responses`);
+console.log(`results: ${OUT}\n`);
 const all = [];
+let summarized = false;
+const summarize = (why) => {
+  if (summarized) return;
+  summarized = true;
+  for (const h of live) { try { h.kill(); } catch { /* already gone */ } }
+  const bad = all.filter((r) => r.violations.length);
+  const kinds = {};
+  for (const r of bad) for (const x of r.violations) { const k = x.split(':')[0]; kinds[k] = (kinds[k] || 0) + 1; }
+  console.log(`\n${all.length - bad.length}/${all.length} iterations clean${why ? `  (${why})` : ''}`);
+  if (bad.length) {
+    console.log('violations by kind:', JSON.stringify(kinds));
+    console.log('reproduce one:     node server/fuzzLoop.mjs 1 ' + PER + ' ' + bad[0].seed);
+  }
+  if (all.length < ITER) console.log(`INCOMPLETE: only ${all.length} of ${ITER} iterations ran`);
+};
+process.on('SIGINT', () => { summarize('interrupted'); process.exit(130); });
+process.on('SIGTERM', () => { summarize('terminated'); process.exit(143); });
+process.on('exit', () => summarize());
+// Recorded, not swallowed silently - a stray rejection from a mock socket must not end the
+// campaign, but it must not disappear either.
+process.on('unhandledRejection', (e) => { console.log(`  HARNESS unhandledRejection: ${String((e && e.message) || e).slice(0, 160)}`); });
+
 for (let k = 0; k < ITER; k++) {
   const seed = SEED0 + k;
   const t0 = Date.now();
   const res = await iteration(seed).catch((e) => ({ seed, violations: [`HARNESS: ${e.message}`], served: 0, statuses: [] }));
   all.push(res);
+  try { appendFileSync(OUT, JSON.stringify({ seed, served: res.served, statuses: res.statuses, violations: res.violations }) + '\n'); }
+  catch { /* the console line below is still the record */ }
   const mark = res.violations.length ? 'FAIL' : 'ok  ';
   console.log(`  ${mark} seed ${String(seed).padStart(3)}  ${((Date.now() - t0) / 1000).toFixed(0).padStart(3)}s  replayed ${String(res.served).padStart(3)}  [${(res.statuses || []).join(',')}]`);
   for (const x of res.violations) console.log(`         ${x}`);
 }
-
-const bad = all.filter((r) => r.violations.length);
-const kinds = {};
-for (const r of bad) for (const x of r.violations) { const k = x.split(':')[0]; kinds[k] = (kinds[k] || 0) + 1; }
-console.log(`\n${all.length - bad.length}/${all.length} iterations clean`);
-if (bad.length) {
-  console.log('violations by kind:', JSON.stringify(kinds));
-  console.log('reproduce one:     node server/fuzzLoop.mjs 1 ' + PER + ' ' + bad[0].seed);
-}
-process.exit(bad.length ? 1 : 0);
+summarize();
+process.exit(all.some((r) => r.violations.length) ? 1 : 0);
