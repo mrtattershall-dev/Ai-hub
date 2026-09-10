@@ -88,6 +88,44 @@ chk('strict', 'ask');
 chk('build', 'allow');
 chk('yolo', 'allow');
 
+console.log('\n--- a single & is a separator (measured bypass, 2026-09-10) ---');
+// `&` was missing from segments(), so each of these was ONE segment whose head is an
+// allowlisted command - and build mode auto-ran it unattended. cmd.exe runs both sides
+// sequentially; a POSIX shell backgrounds the first and runs the second. Both execute.
+for (const mode of ['strict', 'build', 'yolo']) {
+  t(mode, 'echo hi & rm -rf .', 'deny');
+  t(mode, 'npm test & del /s /q .', 'deny');
+  t(mode, 'ls & shutdown /s', 'deny');
+}
+t('build', 'echo done & npm run lint', 'allow');   // a benign pair must still run
+
+console.log('\n--- environment expansion reaches outside the workspace ---');
+// No `..`, no drive letter, nothing escapesWorkspace used to look for - yet
+// `cat $HOME/.ssh/id_rsa` reads a private key, and was classed "read-only inspection".
+t('build', 'cat $HOME/.ssh/id_rsa', 'ask');
+t('build', 'type %USERPROFILE%\\.ssh\\id_rsa', 'ask');
+t('build', 'echo x > %TEMP%/evil.bat', 'ask');
+t('strict', 'cat $HOME/.bashrc', 'ask');
+// ...without breaking commands that merely CONTAIN a dollar or a percent sign.
+t('build', 'grep "foo$" README.md', 'allow');
+t('build', 'node build.js', 'allow');
+t('build', 'npm test && npm run lint', 'allow');
+
+console.log('\n--- separators inside QUOTES are not separators (measured on a live chain) ---');
+// The agent verified its own work with:
+//   node -e "const m = require('./maths.js'); console.log('add:', m.add(2,3));"
+// segments() split on the `;` INSIDE the -e script, leaving `console.log('add:',` as a
+// segment whose head is on no allowlist. The run stopped to ask a human, and the
+// unattended chain ended there. This is the most common self-check an agent writes.
+t('build', `node -e "const m = require('./maths.js'); console.log('add:', m.add(2,3));"`, 'allow');
+t('build', `node -e "console.log(1); console.log(2)"`, 'allow');
+t('build', `python -c "import sys; print(sys.version)"`, 'allow');
+t('build', `git commit -m "fix: handle a; b and x && y in messages"`, 'allow');
+// ...and a real separator OUTSIDE quotes must still be caught.
+t('build', `node -e "console.log(1)" && rm -rf .`, 'deny');
+t('build', `echo "safe" & rm -rf .`, 'deny');
+t('build', `echo "safe"; shutdown /s`, 'deny');
+
 console.log(`\n================  ${pass} passed, ${fail} failed  ================`);
 if (fail) { console.log('\nfailures:'); fails.forEach((f) => console.log('  ' + f)); }
 process.exit(fail ? 1 : 0);

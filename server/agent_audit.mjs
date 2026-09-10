@@ -167,8 +167,15 @@ check('terminal states escalate to a human',
 check('the NEXT queued goal is only pulled after a CLEAN finish',
   /supervisorEnabled && run\.status === 'done' && !run\.depth/.test(src));
 check('a failed step retries at most once, and never one a human stopped',
+  // Assert the INTENT, not the exact source line. This check used to pin the literal
+  // `if (run.status && run.status !== 'error')`, and broke the moment a real improvement
+  // added a condition to it - a brittle test that fails on correct changes teaches people
+  // to ignore the suite. What must stay true: a repair is never repaired again; a run that
+  // is not in 'error' is gated; a GUARD-fired stop is retryable while a HUMAN stop is not.
   /if \(!item \|\| item\.repairOf\) return null;/.test(src)
-  && /if \(run\.status && run\.status !== 'error'\)/.test(src));
+  && /run\.status !== 'error'/.test(src)
+  && /machineFailure/.test(src)
+  && /you stopped this one/.test(src));
 check('unattended pickup stays off unless it was explicitly turned on',
   /let supervisorEnabled = SUPERVISOR_FORCED;/.test(src)
   && /settings\?\.agentSupervisor/.test(src));

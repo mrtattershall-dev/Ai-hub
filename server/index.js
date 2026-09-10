@@ -1,4 +1,5 @@
 import express from 'express';
+import { readJsonSafe, refreshBackup } from './safeJson.js';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -34,12 +35,81 @@ app.get('/api/auth/hint', (req, res) => {
 
 app.use('/api', requireAuth);
 
+// ── Upstream request budget ───────────────────────────────────────────────────
+//
+// Node's fetch has NO default timeout. Both calls below were written without a signal,
+// so a backend that accepted the connection and then went quiet held the request open
+// forever: the browser spinner never stopped, the socket never closed, and on a stopped
+// Modal endpoint every Chat and Code request piled up until the process was restarted.
+//
+// Same rule as the agent loop (see callModel in agent.js): a stream that is still
+// delivering bytes is alive however slow, and one that has been silent for CHAT_STALL_MS
+// is gone. The non-streaming path gets a plain ceiling because it has no progress signal
+// to watch. Both also abort when the BROWSER goes away - an abandoned tab should not keep
+// a GPU generating.
+const CHAT_STALL_MS = (parseInt(process.env.CHAT_STALL_S, 10) || 90) * 1000;
+const CHAT_CEILING_MS = (parseInt(process.env.CHAT_TIMEOUT_S, 10) || 900) * 1000;
+
+/**
+ * The same diagnosis wherever a stall is noticed.
+ *
+ * A stall before the first byte and a stall mid-reply are the same fault - the server
+ * accepted the connection and then stopped producing - so they get the same explanation.
+ * "Stream went silent after 0 characters" was accurate and told the reader nothing they
+ * could act on.
+ */
+function stallMessage(baseUrl, chars, secs) {
+  const got = chars > 0 ? ` after ${chars} characters` : ' without producing anything';
+  return `${baseUrl} accepted the connection but sent nothing for ${secs}s${got}. `
+    + `The model server is probably still loading, crash-looping, or out of memory — check its logs. `
+    + `If it is a remote GPU endpoint, confirm it is actually running.`;
+}
+
+/**
+ * An AbortController wired to the client going away, plus a resettable stall timer.
+ *
+ * Listen on the RESPONSE, not the request. `req.on('close')` on an IncomingMessage fires
+ * when the REQUEST STREAM ends - which for a POST is the moment express.json() finishes
+ * reading the body, long before any answer exists. Wiring the abort to that killed every
+ * call instantly and reported it as "could not reach", caught by chatTimeout.test.mjs.
+ * `res.on('close')` is the one that means the browser actually left.
+ */
+function requestBudget(req, res, stallMs) {
+  const ac = new AbortController();
+  let timer = null, finished = false;
+  const state = { stalled: false, clientGone: false };
+  const bump = () => {
+    if (!stallMs) return;
+    clearTimeout(timer);
+    timer = setTimeout(() => { state.stalled = true; try { ac.abort(); } catch {} }, stallMs);
+  };
+  function onClose() {
+    if (finished) return;                 // our own res.end() - not a disconnect
+    state.clientGone = true;
+    clearTimeout(timer);
+    try { ac.abort(); } catch {}
+  }
+  const done = () => { finished = true; clearTimeout(timer); res.off?.('close', onClose); };
+  res.on('close', onClose);
+  bump();
+  return { signal: ac.signal, bump, done, state };
+}
+
 // ── JSON file database ────────────────────────────────────────────────────────
-const DB_PATH = join(__dirname, 'hub.json');
+// Overridable so tests can exercise the real server against a scratch config instead of
+// mutating the developer's own hub.json - which holds live API keys.
+const DB_PATH = process.env.HUB_DB || join(__dirname, 'hub.json');
 
 function loadDb() {
-  if (!existsSync(DB_PATH)) return { api_keys: {}, history: [], settings: {} };
-  try { return JSON.parse(readFileSync(DB_PATH, 'utf8')); } catch { return { api_keys: {}, history: [], settings: {} }; }
+  // A corrupt hub.json used to be read as EMPTY, and since every handler is
+  // load -> mutate -> save, the next save wrote that emptiness over your API keys and
+  // your entire conversation history. Recover from the backup or refuse; see safeJson.js.
+  return readJsonSafe(DB_PATH, {
+    empty: { api_keys: {}, history: [], settings: {} },
+    label: 'hub.json',
+    tryBak: true,
+    onUnrecoverable: 'throw',
+  });
 }
 
 // Atomic save: write a sibling temp file, fsync it, then rename over the target.
@@ -71,7 +141,9 @@ function saveDb(db) {
   } finally {
     closeSync(fd);
   }
-  try { if (existsSync(DB_PATH)) copyFileSync(DB_PATH, bak); } catch {}
+  // Only back up a file that actually parses. This used to copy whatever was on disk,
+  // so one corrupt generation destroyed the very backup that could have recovered it.
+  refreshBackup(DB_PATH);
   renameSync(tmp, DB_PATH);
 }
 
@@ -217,11 +289,17 @@ app.post('/api/chat', async (req, res) => {
       res.flushHeaders?.();
 
       const { url, headers, body } = buildRequest(type, base_url, apiKey, model, convo, temperature, true);
+      const budget = requestBudget(req, res, CHAT_STALL_MS);
       let upstream;
       try {
-        upstream = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+        upstream = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal: budget.signal });
       } catch (fetchErr) {
-        res.write(`data: ${JSON.stringify({ error: `Could not reach ${base_url}: ${fetchErr.message}` })}\n\n`);
+        budget.done();
+        if (res.writableEnded || budget.state.clientGone) return;
+        const why = budget.state.stalled
+          ? stallMessage(base_url, 0, CHAT_STALL_MS / 1000)
+          : `Could not reach ${base_url}: ${fetchErr.message}`;
+        res.write(`data: ${JSON.stringify({ error: why })}\n\n`);
         return res.end();
       }
 
@@ -259,13 +337,28 @@ app.post('/api/chat', async (req, res) => {
           if (usage) tokensUsed = usage.total_tokens || (usage.input_tokens || 0) + (usage.output_tokens || 0) || tokensUsed;
         } catch {}
       };
-      for await (const chunk of upstream.body) {
-        streamBuf += chunk.toString();
-        const lines = streamBuf.split('\n');
-        streamBuf = lines.pop(); // keep the (possibly incomplete) last line
-        for (const line of lines) handleLine(line);
+      try {
+        for await (const chunk of upstream.body) {
+          budget.bump();                 // bytes arrived - the stream is alive
+          streamBuf += chunk.toString();
+          const lines = streamBuf.split('\n');
+          streamBuf = lines.pop(); // keep the (possibly incomplete) last line
+          for (const line of lines) handleLine(line);
+        }
+        if (streamBuf) handleLine(streamBuf); // flush any final complete line
+      } catch (streamErr) {
+        budget.done();
+        if (res.writableEnded || budget.state.clientGone) { if (responseText) saveHistory(); return; }
+        // Keep whatever arrived: a partial answer is still worth showing in a chat window,
+        // and unlike the agent loop nothing here EXECUTES the text.
+        if (responseText) { saveHistory(); }
+        const why = budget.state.stalled
+          ? stallMessage(base_url, responseText.length, CHAT_STALL_MS / 1000)
+          : `Stream ended early: ${streamErr.message}`;
+        res.write(`data: ${JSON.stringify({ error: why })}\n\n`);
+        return res.end();
       }
-      if (streamBuf) handleLine(streamBuf); // flush any final complete line
+      budget.done();
 
       if (!tokensUsed) tokensUsed = estimateTokens(logPrompt) + estimateTokens(responseText);
       saveHistory();
@@ -273,12 +366,25 @@ app.post('/api/chat', async (req, res) => {
       res.end();
     } else {
       const { url, headers, body } = buildRequest(type, base_url, apiKey, model, convo, temperature, false);
+      // No progress to watch on a non-streamed reply, so this is a plain ceiling rather
+      // than a stall timer. It still aborts if the browser goes away.
+      const budget = requestBudget(req, res, 0);
       let upstream;
       try {
-        upstream = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+        upstream = await fetch(url, {
+          method: 'POST', headers, body: JSON.stringify(body),
+          signal: AbortSignal.any([budget.signal, AbortSignal.timeout(CHAT_CEILING_MS)]),
+        });
       } catch (fetchErr) {
-        return res.status(502).json({ error: `Could not reach ${base_url}: ${fetchErr.message}` });
+        budget.done();
+        const timedOut = fetchErr.name === 'TimeoutError';
+        return res.status(502).json({
+          error: timedOut
+            ? `${base_url} did not answer within ${CHAT_CEILING_MS / 1000}s. A non-streamed reply sends nothing until it is finished, so a slow backend looks identical to a dead one here — try again with streaming on.`
+            : `Could not reach ${base_url}: ${fetchErr.message}`,
+        });
       }
+      budget.done();
       // Read as text first — a flaky tunnel can return an HTML error/timeout
       // page instead of JSON, and a blind .json() would throw "Unexpected token '<'".
       const raw = await upstream.text();

@@ -28,6 +28,8 @@ volume, which is how a freshly trained run gets tried without a merge step. This
 serving a whole model fast. Same routes, so the hub points at either unchanged.
 """
 import os
+import threading
+
 import modal
 
 MODEL = os.environ.get("MYCODER_BASE", "Qwen/Qwen3-Coder-30B-A3B-Instruct")
@@ -37,6 +39,10 @@ MAX_LEN = int(os.environ.get("MYCODER_MAXLEN", "16384"))
 # A MoE keeps all experts resident even though few are active, so headroom matters more
 # than the "active parameters" figure suggests.
 GPU_FRAC = float(os.environ.get("MYCODER_GPU_FRAC", "0.90"))
+DEFAULT_MAX_NEW = int(os.environ.get("MYCODER_MAX_NEW", "3072"))
+# Cadence of the keep-alive chunk emitted while a blocking generation runs. Must stay
+# comfortably under the hub's MODEL_STALL_S (default 90).
+HEARTBEAT_S = float(os.environ.get("MYCODER_HEARTBEAT_S", "5"))
 
 if any(k in MODEL.upper() for k in ("30B", "32B", "70B", "72B")) and GPU in ("A10", "A10G", "L4", "T4", "A100"):
     raise SystemExit(
@@ -49,7 +55,11 @@ hf_cache = modal.Volume.from_name("hf-cache", create_if_missing=True)
 
 image = (
     modal.Image.debian_slim(python_version="3.12")
-    .pip_install("vllm==0.11.0", "fastapi[standard]", "huggingface_hub", "hf_transfer")
+    # transformers MUST stay on 4.x. vLLM 0.11.0 calls tokenizer.all_special_tokens_extended,
+    # which transformers 5 removed - pip resolved 5.x on the first deploy and every container
+    # crash-looped on AttributeError before the model ever loaded (measured 2026-09-10).
+    .pip_install("vllm==0.11.0", "transformers>=4.55,<5", "fastapi[standard]",
+                 "huggingface_hub", "hf_transfer")
     .env({
         "HF_HUB_ENABLE_HF_TRANSFER": "1",
         "VLLM_WORKER_MULTIPROC_METHOD": "spawn",
@@ -69,7 +79,10 @@ image = (
     scaledown_window=600,
     timeout=60 * 30,
 )
-@modal.concurrent(max_inputs=16)     # continuous batching is the point; let requests overlap
+# Requests may OVERLAP, but generation itself is serialised - see the lock in load().
+# Concurrency still earns its keep: a queued request keeps its connection and its
+# keep-alive heartbeat alive while it waits, instead of being refused or timing out.
+@modal.concurrent(max_inputs=16)
 class Server:
     @modal.enter()
     def load(self):
@@ -84,6 +97,15 @@ class Server:
             enforce_eager=False,
         )
         self.tok = self.llm.get_tokenizer()
+        # vLLM's OFFLINE LLM class is not thread-safe, and this server calls generate()
+        # from a worker thread (so the ASGI loop can emit heartbeats while it blocks).
+        # With @modal.concurrent(max_inputs=16), several requests can be in flight at
+        # once, so without this lock two threads could enter the same engine and corrupt
+        # its scheduler state. Serialising costs throughput that the offline API never
+        # actually offered - generate() blocks until its batch is done either way. Real
+        # overlapping generation needs AsyncLLMEngine, which is a bigger change than I can
+        # verify without a GPU, so this takes the safe side deliberately.
+        self._gen_lock = threading.Lock()
         print("[vllm] ready", flush=True)
 
     def _params(self, temp, max_new):
@@ -96,7 +118,8 @@ class Server:
 
     def _chat(self, messages, temp, max_new):
         prompt = self.tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        out = self.llm.generate([prompt], self._params(temp, max_new))
+        with self._gen_lock:
+            out = self.llm.generate([prompt], self._params(temp, max_new))
         return out[0].outputs[0].text
 
     @modal.asgi_app()
@@ -115,6 +138,30 @@ class Server:
         def health():
             return {"ok": True, "engine": "vllm", "model": MODEL, "gpu": GPU, "max_len": MAX_LEN}
 
+        # HOW THE HUB ACTUALLY SPEAKS.
+        #
+        # This endpoint claims to be Ollama-shaped, and the hub POSTs the Ollama body:
+        #
+        #     {"model", "messages", "stream", "keep_alive",
+        #      "options": {"temperature", "num_ctx", "num_predict"}}
+        #
+        # The first version of this file read top-level b["temperature"] and
+        # b["max_tokens"], which the hub never sends - so EVERY option was silently
+        # dropped and every request ran at the hard-coded defaults. Silently ignoring a
+        # caller's parameters is worse than rejecting them: nothing fails, and the knobs
+        # simply do not work. modal_serve.py had this right; this file did not.
+        def _opts(b):
+            o = b.get("options") or {}
+            temp = o.get("temperature", b.get("temperature", 0.2))
+            # num_predict is Ollama's max-new-tokens, and -1 means "no limit".
+            npred = o.get("num_predict", None)
+            if npred is None:
+                npred = b.get("max_tokens", DEFAULT_MAX_NEW)
+            npred = int(npred)
+            if npred <= 0:
+                npred = MAX_LEN                      # -1 => as much as the window allows
+            return temp, min(npred, MAX_LEN)
+
         def _run(messages, temp, max_new, stream, chat_shape):
             if not stream:
                 text = self._chat(messages, temp, max_new)
@@ -123,11 +170,46 @@ class Server:
                         {"model": MODEL_NAME, "response": text, "done": True})
                 return JSONResponse(body)
 
-            # The hub reads Ollama's NDJSON stream. vLLM's offline LLM API returns the whole
-            # completion, so this emits one chunk then the terminator - correct for the
-            # client, and honest about not being token-by-token.
+            # KEEP BYTES FLOWING WHILE GENERATING.
+            #
+            # vLLM's offline LLM API returns the whole completion at once, so a naive
+            # implementation sends nothing until generation finishes: first-byte latency
+            # equals TOTAL generation time. That is fine against a wall-clock client and
+            # fatal against the hub's stall timer, which (correctly) treats a stream that
+            # has been silent for MODEL_STALL_S as dead. A 3-minute generation would be
+            # killed at 90 seconds having produced nothing.
+            #
+            # So generation runs on a worker thread and this yields an empty-content
+            # keep-alive every few seconds until it finishes. The hub accumulates only
+            # non-empty content, so the heartbeats are invisible to it - they exist purely
+            # to prove the connection is alive.
+            #
+            # The honest limitation: because heartbeats never stop, the hub's stall timer
+            # cannot detect a generation that has genuinely hung on THIS server. The
+            # absolute ceiling (MODEL_TIMEOUT_S) is what bounds that case. Real per-token
+            # streaming would need AsyncLLMEngine; this is the smaller, safer change.
             def gen():
-                text = self._chat(messages, temp, max_new)
+                from concurrent.futures import ThreadPoolExecutor
+                box = {}
+
+                def work():
+                    box["text"] = self._chat(messages, temp, max_new)
+
+                with ThreadPoolExecutor(max_workers=1) as ex:
+                    fut = ex.submit(work)
+                    while not fut.done():
+                        try:
+                            fut.result(timeout=HEARTBEAT_S)
+                        except Exception:
+                            pass
+                        if not fut.done():
+                            beat = ({"model": MODEL_NAME, "message": {"role": "assistant", "content": ""}, "done": False}
+                                    if chat_shape else
+                                    {"model": MODEL_NAME, "response": "", "done": False})
+                            yield json.dumps(beat) + "\n"
+                    fut.result()                      # re-raise a real generation failure
+
+                text = box.get("text", "")
                 first = ({"model": MODEL_NAME, "message": {"role": "assistant", "content": text}, "done": False}
                          if chat_shape else
                          {"model": MODEL_NAME, "response": text, "done": False})
@@ -138,14 +220,14 @@ class Server:
         @api.post("/api/chat")
         async def chat(req: Request):
             b = await req.json()
-            return _run(b.get("messages") or [], b.get("temperature", 0.2),
-                        b.get("max_tokens", 3072), bool(b.get("stream")), True)
+            temp, max_new = _opts(b)
+            return _run(b.get("messages") or [], temp, max_new, bool(b.get("stream")), True)
 
         @api.post("/api/generate")
         async def generate(req: Request):
             b = await req.json()
+            temp, max_new = _opts(b)
             msgs = [{"role": "user", "content": b.get("prompt", "")}]
-            return _run(msgs, b.get("temperature", 0.2),
-                        b.get("max_tokens", 3072), bool(b.get("stream")), False)
+            return _run(msgs, temp, max_new, bool(b.get("stream")), False)
 
         return api

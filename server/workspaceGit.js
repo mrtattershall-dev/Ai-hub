@@ -20,15 +20,34 @@
  */
 import { execFile } from 'child_process';
 import { existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { join, dirname, resolve, sep } from 'path';
 
 const GIT_TIMEOUT_MS = 20_000;
 const AUTHOR = ['-c', 'user.name=hub-agent', '-c', 'user.email=agent@localhost'];
 
+/**
+ * `git -C <dir>` DOES NOT CONFINE GIT TO <dir>.
+ *
+ * Git discovers its repository by walking UP from the working directory until it finds a
+ * .git. So when the workspace had no repo of its own, every command here silently
+ * operated on the first repo above it - the hub's own source tree. Measured 2026-09-10:
+ * 15 agent auto-checkpoints had been committed to the hub repository, each running
+ * `add -A`, which from a subdirectory stages the WHOLE tree - sweeping in three parallel
+ * sessions' uncommitted work under a message like "before write_file: ...".
+ *
+ * GIT_CEILING_DIRECTORIES stops that walk. Git will not ascend into or above a listed
+ * directory while discovering, so pointing it at the workspace's PARENT means the search
+ * can find workspace/.git and nothing beyond it. This is the mechanical guarantee;
+ * ensureRepo() below is the one that makes sure workspace/.git actually exists.
+ */
 function git(cwd, args, timeout = GIT_TIMEOUT_MS) {
-  return new Promise((resolve) => {
-    execFile('git', ['-C', cwd, ...AUTHOR, ...args], { timeout, windowsHide: true, maxBuffer: 8 * 1024 * 1024 },
-      (err, stdout, stderr) => resolve({
+  const ceiling = dirname(resolve(cwd));
+  return new Promise((res) => {
+    execFile('git', ['-C', cwd, ...AUTHOR, ...args], {
+      timeout, windowsHide: true, maxBuffer: 8 * 1024 * 1024,
+      env: { ...process.env, GIT_CEILING_DIRECTORIES: ceiling },
+    },
+      (err, stdout, stderr) => res({
         ok: !err,
         out: (stdout || '').trim(),
         err: (stderr || '').trim() || (err ? err.message : ''),
@@ -36,11 +55,38 @@ function git(cwd, args, timeout = GIT_TIMEOUT_MS) {
   });
 }
 
+/** Same path, allowing for Windows case and trailing separators. */
+function samePath(a, b) {
+  const norm = (x) => {
+    const r = resolve(String(x || '')).replace(new RegExp(`\${sep}+$`), '');
+    return process.platform === 'win32' ? r.toLowerCase() : r;
+  };
+  return norm(a) === norm(b);
+}
+
+/**
+ * Refuse to touch any repository that is not the workspace's own.
+ *
+ * Belt to GIT_CEILING_DIRECTORIES' braces: if discovery ever finds a repo whose root is
+ * not exactly the workspace, every operation here must fail loudly rather than commit,
+ * reset or revert somebody else's tree.
+ */
+async function ownRepoOrNull(workspace) {
+  const top = await git(workspace, ['rev-parse', '--show-toplevel']);
+  if (!top.ok || !top.out) return null;
+  return samePath(top.out, workspace) ? top.out : null;
+}
+
 /** Make the workspace a repo if it isn't one. Safe to call repeatedly. */
 export async function ensureRepo(workspace) {
   if (!existsSync(workspace)) mkdirSync(workspace, { recursive: true });
-  const inside = await git(workspace, ['rev-parse', '--is-inside-work-tree']);
-  if (inside.ok && inside.out === 'true') return { ok: true, created: false };
+
+  // The old test was `rev-parse --is-inside-work-tree`, which answers TRUE for a
+  // directory sitting inside ANY enclosing repository. The workspace lives inside the
+  // hub's own checkout, so this always said "already a repo", `git init` never ran, and
+  // every later commit landed on the hub's source tree. What matters is not "am I inside
+  // a work tree" but "is the work tree I found MINE".
+  if (await ownRepoOrNull(workspace)) return { ok: true, created: false };
 
   const init = await git(workspace, ['init', '-q']);
   if (!init.ok) return { ok: false, error: init.err };
@@ -53,6 +99,11 @@ export async function ensureRepo(workspace) {
 /** Commit whatever changed. Returns the short sha, or null when nothing changed. */
 export async function commitAll(workspace, message) {
   await ensureRepo(workspace);
+  // If the workspace still is not its own repo after ensureRepo, something is wrong with
+  // the checkout and the next `add -A` would stage an unrelated tree. Stop.
+  if (!(await ownRepoOrNull(workspace))) {
+    return { ok: false, error: `refusing to commit: ${workspace} is not the root of its own git repository, so this would commit an enclosing repo` };
+  }
   const status = await git(workspace, ['status', '--porcelain']);
   if (!status.out) return { ok: true, sha: null, note: 'nothing to commit' };
   const add = await git(workspace, ['add', '-A']);

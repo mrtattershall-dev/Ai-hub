@@ -59,6 +59,17 @@ export const __toolPolicyTest = {
   // the model might emit is callable - without constructing a router, which would run
   // requeueOrphans() against the live work queue.
   hasTool: (name) => typeof tools[name] === 'function',
+  // The single-run-at-a-time lock, exercisable without a model. `autoStart` is the only
+  // path the agent may start work on its own, and it had no test at all until it was
+  // pointed out that a guard nobody has watched fail is not a guard.
+  autoStart: (loadDb, item) => autoStart(loadDb, item),
+  fakeActiveRun: (status = 'running') => {
+    const run = { id: `fake-${randomUUID().slice(0, 8)}`, goal: 'holding the workspace', status, steps: [], depth: 0 };
+    runs.set(run.id, run);
+    return run;
+  },
+  forgetRun: (id) => runs.delete(id),
+  autoStartsInLastHour: () => autoStarts.filter((t) => t > Date.now() - 3600_000).length,
 };
 
 /** What an approval prompt for a Google write should say, in terms of the real effect. */
@@ -69,7 +80,13 @@ function googleWriteReason(tool, args = {}) {
   return `${tool} changes your Google account`;
 }
 
-export const WORKSPACE = join(__dirname, '..', 'workspace');
+// Overridable so a loop test can drive the REAL agent against a scratch directory.
+// Without this, every end-to-end test writes into the developer's live workspace - the
+// same hazard that had two tests mutating the live queue and hub.json. Unset in normal
+// use, so the hub's own workspace is unchanged.
+export const WORKSPACE = process.env.AGENT_WORKSPACE
+  ? resolve(process.env.AGENT_WORKSPACE)
+  : join(__dirname, '..', 'workspace');
 const PORT = process.env.PORT || 3001;
 
 // A step COUNT was the right guard when a bad edit was permanent: 30 steps kept a
@@ -107,8 +124,45 @@ const TEMPERATURE = 0.2;
 const MAX_HISTORY_MSGS = 16;     // keep recent context dense; older tool dumps are pruned
 
 // ── Workspace sandbox helpers ────────────────────────────────────────────────
+
+/**
+ * THE WORKSPACE MUST LOOK LIKE A PROJECT ROOT TO THE TOOLS THAT RUN INSIDE IT.
+ *
+ * `safePath` confines the FILE tools and `cwd` confines the COMMAND tools, but neither
+ * confines a PROGRAM the agent runs - and the programs it runs most (npm, node, tsc,
+ * vite) all locate their project by walking UP the directory tree until they find a
+ * marker file. The workspace lives inside the hub's own checkout, so with no marker of
+ * its own the nearest one is the hub's.
+ *
+ * That is not theoretical. Measured 2026-09-10: an agent asked to write a CommonJS module
+ * caused npm to walk up and rewrite the HUB'S OWN root package.json - adding
+ * `"type": "commonjs"` and ~250 hoisted dependencies, which broke the server's ESM
+ * loading. The same shape as the git escape (see workspaceGit.js), through a different
+ * program: `git -C workspace` had resolved to the hub repo for exactly the same reason.
+ *
+ * A package.json here is the marker that stops the walk. `type: commonjs` preserves what
+ * node already did for a .js file with no package.json in scope, so nothing the agent
+ * writes changes meaning. `private` makes an accidental publish impossible.
+ *
+ * This does NOT confine a program that ignores markers and takes an absolute path. The
+ * approval policy is what covers that; this closes the accidental route, which is the one
+ * that actually fired.
+ */
+const WORKSPACE_MANIFEST = {
+  name: 'agent-workspace',
+  version: '0.0.0',
+  private: true,
+  type: 'commonjs',
+  description: 'Boundary marker. Stops npm/node/tsc walking up into the hub\u0027s own project. Do not delete.',
+};
+
 function ensureWorkspace() {
   if (!existsSync(WORKSPACE)) mkdirSync(WORKSPACE, { recursive: true });
+  const manifest = join(WORKSPACE, 'package.json');
+  if (!existsSync(manifest)) {
+    try { writeFileSync(manifest, JSON.stringify(WORKSPACE_MANIFEST, null, 2) + '\n', 'utf8'); }
+    catch (e) { console.error('[agent] could not write the workspace boundary marker:', e.message); }
+  }
 }
 
 // Resolve a user/model-supplied path and refuse anything outside WORKSPACE.
@@ -951,10 +1005,47 @@ function quickCheck(path) {
   });
 }
 
-// ── Model call (Ollama /api/chat, non-streaming for reliability) ──────────────
-// Uncapped num_predict at 32K ctx means a long file can take minutes on a T4 (~15-25 tok/s).
-// 180s would abort it mid-write; 600s tolerates a full long generation while still bounding a dead tunnel.
-const MODEL_TIMEOUT_MS = (parseInt(process.env.MODEL_TIMEOUT_S, 10) || 600) * 1000;
+// ── Model call (streamed; Ollama /api/chat or an OpenAI-shaped /v1/chat/completions) ──
+//
+// THE BUDGET IS A STALL TIMER, NOT A WALL CLOCK.
+//
+// It used to be one 600s wall clock over the whole call, sized - the old comment said so
+// outright - for "a T4 at ~15-25 tok/s". Measured 2026-09-10 against a remote 30B, the
+// backend delivered 3.3 tok/s and ONE legitimate game-sized reply took 496s: 83% of the
+// budget, on a reply that was arriving correctly the whole time. Nobody had edited a line;
+// the same constant silently went from ~12,000 tokens of headroom to ~2,000 when the
+// backend changed. That is the failure mode of measuring an LLM in seconds.
+//
+// A wall clock cannot tell a slow-but-working stream from a dead one, so given enough time
+// it kills the working one. What separates them is SILENCE: a stream still delivering bytes
+// is alive however slow, and a stream that has sent nothing for MODEL_STALL_MS is gone.
+// So the stall timer resets on every chunk and does the real work; MODEL_TIMEOUT_MS stays
+// only as a far-away ceiling so a backend dribbling one token a minute cannot run forever.
+// WAITING FOR A COLD START IS NOT A STALL.
+//
+// One stall window for both events was wrong: the gap before the FIRST byte and the gaps
+// BETWEEN tokens are different things. A serverless GPU endpoint has to boot a container
+// and load the weights before it can emit anything - measured 2026-09-10, a Modal cold
+// start of Qwen3-Coder-30B took 4 MINUTES, and modal_serve.py streams token-by-token so
+// nothing arrives until that finishes. A 90s stall timer would have declared a perfectly
+// healthy backend dead, every time, on the first call of the day.
+//
+// So the first byte gets a generous budget, and once tokens are flowing the tight
+// inter-token window takes over - by then the model IS loaded, and silence really is a
+// fault. Both are far below the absolute ceiling.
+const MODEL_FIRST_BYTE_MS = (parseInt(process.env.MODEL_FIRST_BYTE_S, 10) || 420) * 1000;
+const MODEL_STALL_MS = (parseInt(process.env.MODEL_STALL_S, 10) || 90) * 1000;
+const MODEL_TIMEOUT_MS = (parseInt(process.env.MODEL_TIMEOUT_S, 10) || 1800) * 1000;
+// How long a liveness probe may take. Short: it exists to answer "is anything there at
+// all", and a backend that cannot list its models in 8s is not going to serve a token.
+const PROBE_MS = (parseInt(process.env.MODEL_PROBE_S, 10) || 8) * 1000;
+// Below this, say so. 3.3 tok/s was the single most important operational fact about this
+// system and it took a throwaway benchmark script to find, because nothing measured it.
+const SLOW_TOK_S = parseFloat(process.env.MODEL_SLOW_TOK_S || '8');
+// Context the OpenAI-shaped path should assume when a provider row does not declare one.
+// NUM_CTX is an OLLAMA option - it is sent in `options` and means nothing to an OpenAI
+// endpoint - so before this the hub had NO context bound on that path at all.
+const OPENAI_CTX_DEFAULT = parseInt(process.env.OPENAI_CTX, 10) || 16_384;
 // How many times a transient upstream failure (429 / 5xx) is retried before the run
 // pauses. Free-tier endpoints 503 under load; three tries with backoff covers a spike.
 const MODEL_RETRIES = parseInt(process.env.MODEL_RETRIES || '3', 10);
@@ -982,103 +1073,243 @@ function agentProvider(db) {
   return { name: want, row, kind, versioned };
 }
 
+/**
+ * Telemetry for the most recent model call. Read by the step loop and surfaced on the run.
+ *
+ * The hub counted modelCalls and nothing else, so "the backend is 30x too slow" was
+ * invisible from inside the product. The bytes already flow through the stream loop; the
+ * measurement is free there.
+ */
+let lastModelCall = null;
+export function getLastModelCall() { return lastModelCall; }
+
+/** How many tokens of history this provider can actually take. */
+export function contextTokensFor(db) {
+  const prov = agentProvider(db);
+  const declared = parseInt((prov.row || {}).context_tokens, 10);
+  if (Number.isFinite(declared) && declared > 0) return declared;
+  return prov.kind === 'ollama' ? NUM_CTX : OPENAI_CTX_DEFAULT;
+}
+
+/**
+ * Is the backend there at all?
+ *
+ * Called only on the failure path, so a healthy run pays nothing. It exists because the
+ * hub could not distinguish DEAD from COLD from SLOW: when a vLLM container was
+ * crash-looping on an AttributeError, /api/health returned empty, the call hung to the
+ * timeout, and the hub blamed the tunnel URL - which was correct. Diagnosing it took
+ * reading container logs by hand. One 8s probe answers it.
+ */
+async function probeBackend(base, isOllama, headers) {
+  const u = isOllama ? `${base}/api/tags` : `${base}/v1/models`;
+  try {
+    const r = await fetch(u, { headers, signal: AbortSignal.timeout(PROBE_MS) });
+    // A 404 means something IS listening and speaking HTTP - it just has no model-list
+    // route (Google's versioned base does not). That is reachable, not dead.
+    if (r.ok || r.status === 404) return { state: 'reachable', code: r.status };
+    return { state: 'http-error', code: r.status };
+  } catch (e) {
+    return { state: 'unreachable', why: (e && (e.cause?.code || e.name)) || 'no response' };
+  }
+}
+
+function describeProbe(pr, base, provName) {
+  if (pr.state === 'reachable') {
+    return `The backend at ${base} IS reachable (${provName}), so the URL and key are fine - it accepted a connection but did not produce tokens. That points at the model server itself: still loading, crash-looping, or out of memory. Check its logs.`;
+  }
+  if (pr.state === 'http-error') {
+    return `The backend at ${base} answered HTTP ${pr.code} on its model-list route, so it is running but rejecting requests - usually auth, or a model name it does not serve.`;
+  }
+  return `Nothing is listening at ${base} (${pr.why}). The ${provName} endpoint is down or the base URL is wrong - check it in Settings, or redeploy the server.`;
+}
+
+/** A context-overflow is recoverable by pruning, so it gets its own type. */
+function overflowError(detail) {
+  const e = new Error('Model rejected the request as too long for its context: ' + detail);
+  e.code = 'CONTEXT_OVERFLOW';
+  return e;
+}
+
 async function callModel(loadDb, messages, signal, override) {
   const db = loadDb();
   const prov = agentProvider(db);
   const o = prov.row || {};
   const base = ((override && override.base_url) || o.base_url || 'http://localhost:11434').replace(/\/+$/, '');
   const model = (override && override.model) || o.model || 'qwen2.5-coder:7b';
-  // abort on either the run's stop signal OR a hard timeout
-  const sigs = [AbortSignal.timeout(MODEL_TIMEOUT_MS)];
-  if (signal) sigs.push(signal);
-  const merged = AbortSignal.any(sigs);
-  try {
-    // STREAM the reply. A non-streaming 14B reply sends no bytes until the whole
-    // generation is done — on a Cloudflare quick tunnel (~100s idle cap) that
-    // returns a 524 HTML error page mid-think. Streaming keeps bytes flowing per
-    // token so the connection stays alive; we accumulate and return the full text
-    // so every caller (planner + action loop) is unchanged.
-    const isOllama = prov.kind === 'ollama';
-    const url = isOllama ? `${base}/api/chat`
-      : `${base}${prov.versioned ? '' : '/v1'}/chat/completions`;
-    const headers = { 'Content-Type': 'application/json' };
-    if (!isOllama && o.key_value) headers.Authorization = `Bearer ${o.key_value}`;
-    const payload = isOllama
-      ? { model, messages, stream: true, keep_alive: KEEP_ALIVE,
-          options: { temperature: TEMPERATURE, num_ctx: NUM_CTX, num_predict: NUM_PREDICT } }
-      // OpenAI-compatible: no keep_alive, no num_ctx — the server owns those.
-      : { model, messages, stream: true, temperature: TEMPERATURE };
+  const isOllama = prov.kind === 'ollama';
+  const url = isOllama ? `${base}/api/chat`
+    : `${base}${prov.versioned ? '' : '/v1'}/chat/completions`;
+  const headers = { 'Content-Type': 'application/json' };
+  if (!isOllama && o.key_value) headers.Authorization = `Bearer ${o.key_value}`;
 
-    // Transient upstream failures get retried HERE rather than surfacing as a paused run.
-    //
-    // A free-tier endpoint returns 503 "experiencing high demand" and 429 rate-limits
-    // routinely - measured against Gemini, one in two calls during a spike. Those are
-    // already classed as resumable, but "resumable" means a human clicks Resume, which
-    // is exactly what an unattended agent cannot rely on. A few seconds of backoff turns
-    // a stalled overnight run into a slightly slower one.
-    let r, lastErr;
+  // STREAM the reply. A non-streaming reply sends no bytes until generation is done - on a
+  // Cloudflare quick tunnel (~100s idle cap) that returns a 524 HTML error page mid-think.
+  // Streaming keeps bytes flowing per token, and it is what makes a stall timer possible
+  // at all: silence becomes observable.
+  const payload = isOllama
+    ? { model, messages, stream: true, keep_alive: KEEP_ALIVE,
+        options: { temperature: TEMPERATURE, num_ctx: NUM_CTX, num_predict: NUM_PREDICT } }
+    // OpenAI-compatible. num_ctx/num_predict are Ollama options and are ignored here, so
+    // an explicit max_tokens is the ONLY generation bound this path has.
+    : { model, messages, stream: true, temperature: TEMPERATURE,
+        ...(NUM_PREDICT > 0 ? { max_tokens: NUM_PREDICT } : {}) };
+
+  const t0 = Date.now();
+  const promptTok = estimateTokens(messages);
+  let full = '', buf = '', attempts = 0, firstByteMs = null;
+  let ac = null, stallTimer = null, stalled = false;
+
+  const disarm = () => { if (stallTimer) { clearTimeout(stallTimer); stallTimer = null; } };
+  // Generous until the first byte (cold start), tight afterwards (a live stream).
+  const armStall = (ms = firstByteMs === null ? MODEL_FIRST_BYTE_MS : MODEL_STALL_MS) => {
+    disarm();
+    stalled = false;
+    stallTimer = setTimeout(() => { stalled = true; try { ac && ac.abort(); } catch {} }, ms);
+  };
+
+  try {
+    // Transient upstream failures are retried HERE rather than surfacing as a paused run.
+    // A free-tier endpoint 503s and 429s routinely; "resumable" means a human clicks
+    // Resume, which is exactly what an unattended agent cannot rely on.
+    let r = null, lastErr = null;
     for (let attempt = 0; attempt < MODEL_RETRIES; attempt++) {
-      r = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload), signal: merged });
+      attempts = attempt + 1;
+      // EACH ATTEMPT GETS ITS OWN BUDGET. Previously one AbortSignal.timeout covered the
+      // whole retry sequence including the backoff sleeps, so on a slow backend attempt 3
+      // could begin with no time left and was dead before it was sent.
+      ac = new AbortController();
+      stalled = false;
+      const sigs = [ac.signal, AbortSignal.timeout(MODEL_TIMEOUT_MS)];
+      if (signal) sigs.push(signal);
+      const merged = AbortSignal.any(sigs);
+      armStall();
+      try {
+        r = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload), signal: merged });
+      } catch (fetchErr) {
+        disarm();
+        if (signal && signal.aborted) throw new Error('stopped');
+        if (stalled) throw new Error(`No response from the model for ${MODEL_FIRST_BYTE_MS / 1000}s (nothing arrived at all)`);
+        throw fetchErr;
+      }
       if (r.ok) break;
+
+      const bodyText = (await r.text().catch(() => '')).slice(0, 400);
+      disarm();
+
+      // Context overflow is a 400, which the old classifier called permanent and threw -
+      // stopping the run for a human. It is the ONE error with an obvious automatic
+      // recovery: prune the history and try again. Typed so the step loop can do that.
+      if (r.status === 400 && /context|too long|max_model_len|maximum.{0,20}token|reduce.{0,20}length/i.test(bodyText)) {
+        throw overflowError(bodyText || 'no detail returned');
+      }
+
+      lastErr = `Model error ${r.status}: ${bodyText.slice(0, 200)}`;
       const transient = r.status === 429 || r.status >= 500;
-      lastErr = `Model error ${r.status}: ${(await r.text().catch(() => '')).slice(0, 200)}`;
       if (!transient || attempt === MODEL_RETRIES - 1) throw new Error(lastErr);
-      // Exponential backoff, and honour Retry-After when the server sends one.
       const hinted = parseInt(r.headers.get('retry-after') || '', 10);
       const waitMs = Number.isFinite(hinted) ? hinted * 1000 : Math.min(30_000, 2000 * 2 ** attempt);
       await new Promise((res) => setTimeout(res, waitMs));
-      if (signal?.aborted) throw new Error('stopped');
+      if (signal && signal.aborted) throw new Error('stopped');
     }
-    if (!r.ok) throw new Error(lastErr || `Model error ${r.status}`);
+    if (!r || !r.ok) throw new Error(lastErr || 'Model call failed');
 
-    // Ollama /api/chat streams NDJSON: { message: { content }, done }. Buffer
-    // across network chunk boundaries so a split JSON line isn't dropped.
-    // Two stream shapes. Ollama sends bare NDJSON objects; OpenAI-compatible servers
-    // send Server-Sent Events - "data: {...}" lines ending with "data: [DONE]".
-    let full = '', buf = '';
+    // Ollama /api/chat streams NDJSON: { message: { content }, done }. OpenAI-compatible
+    // servers stream SSE: "data: {...}" lines ending with "data: [DONE]". Buffer across
+    // chunk boundaries so a split JSON line is not dropped.
     const take = (line) => {
-      let s = line.trim();
-      if (!s) return;
+      let t = line.trim();
+      if (!t) return;
       if (!isOllama) {
-        if (!s.startsWith('data:')) return;
-        s = s.slice(5).trim();
-        if (s === '[DONE]') return;
+        if (!t.startsWith('data:')) return;
+        t = t.slice(5).trim();
+        if (t === '[DONE]') return;
       }
       try {
-        const j = JSON.parse(s);
+        const j = JSON.parse(t);
         if (isOllama) { if (j.message?.content) full += j.message.content; }
         else { const d = j.choices?.[0]?.delta?.content; if (d) full += d; }
       } catch {}
     };
+
     // A streaming provider can drop the connection mid-body ("Premature close",
-    // "terminated"). Measured against OpenRouter's free tier on 2026-09-09: the plan
-    // arrived, the next stream died, and the whole run was marked 'error'.
-    //
-    // If bytes already arrived, KEEP them. A truncated reply is not automatically
-    // useless - the parser decides, and a genuinely unusable one is caught by the
-    // parse-failure window. Discarding a nearly complete response and killing the run
-    // is strictly worse. Only a drop with NOTHING accumulated is a real error.
+    // "terminated"). If bytes already arrived, KEEP them: a truncated reply is not
+    // automatically useless - the parser decides. Only a drop with NOTHING is a real error.
     try {
       for await (const chunk of r.body) {
+        if (firstByteMs === null) firstByteMs = Date.now() - t0;
+        armStall();                     // <- the whole point: silence, not elapsed time
         buf += chunk.toString();
         const lines = buf.split('\n');
         buf = lines.pop();
         for (const l of lines) take(l);
       }
       if (buf) take(buf);
+      disarm();
     } catch (streamErr) {
+      disarm();
       if (buf) take(buf);
+      // A STALL IS NOT A CLOSED CONNECTION, and must not inherit the keep-the-partial rule.
+      //
+      // When the connection ENDS mid-body the server is done sending, so keeping what
+      // arrived and letting the parser judge it is right. A stall is the opposite: the
+      // socket is still open and there is no way to know whether 5% or 95% of the reply
+      // is in hand. Returning it means the agent executes a HALF-WRITTEN action - a
+      // truncated write_file commits half a file over working code, which is the exact
+      // class of silent damage the write_file guard exists to prevent. So a stall always
+      // fails the call; isConnError classes it resumable and the run retries with its
+      // history intact. Caught by modelBudget.test.mjs 'a SILENT stream fails fast'.
+      if (stalled) throw new Error(`Model stream went silent for ${(full.length ? MODEL_STALL_MS : MODEL_FIRST_BYTE_MS) / 1000}s after ${full.length} chars`);
       if (!full) throw new Error('Model stream failed before any content: ' + streamErr.message);
-      console.warn('[agent] stream ended early (' + streamErr.message + ') - keeping ' + full.length + ' chars already received');
+      console.warn(`[agent] stream ended early (${stalled ? 'went silent' : streamErr.message}) - keeping ${full.length} chars already received`);
+    }
+
+    const ms = Date.now() - t0;
+    const outTok = Math.ceil(full.length / 4);
+    const tokPerSec = ms > 0 ? +(outTok / (ms / 1000)).toFixed(1) : 0;
+    lastModelCall = { provider: prov.name, model, ms, chars: full.length, outTok, promptTok,
+                      tokPerSec, firstByteMs, attempts, at: Date.now() };
+    if (tokPerSec && tokPerSec < SLOW_TOK_S) {
+      console.warn(`[agent] SLOW BACKEND: ${prov.name}/${model} produced ${outTok} tok in ${(ms / 1000).toFixed(1)}s = ${tokPerSec} tok/s (first byte ${firstByteMs}ms). Under ${SLOW_TOK_S} tok/s usually means the server is not using its GPU.`);
+    } else {
+      console.log(`[agent] model ${prov.name}/${model}: ${outTok} tok in ${(ms / 1000).toFixed(1)}s = ${tokPerSec} tok/s (prompt ~${promptTok} tok)`);
     }
     return full;
   } catch (e) {
-    if (e.name === 'TimeoutError' || (merged.aborted && !(signal && signal.aborted))) {
-      throw new Error(`Model call timed out after ${MODEL_TIMEOUT_MS / 1000}s — the Ollama tunnel may be down. Re-check the tunnel URL in Settings.`);
-    }
-    throw e;
+    disarm();
+    if (e.code === 'CONTEXT_OVERFLOW') throw e;
+    if (e.message === 'stopped' || (signal && signal.aborted)) throw e;
+
+    const timedOut = e.name === 'TimeoutError' || stalled || /No response from the model|sent nothing/.test(e.message);
+    if (!timedOut) throw e;
+
+    // Say WHICH failure this is and what is actually on the other end, instead of the old
+    // hard-coded "the Ollama tunnel may be down. Re-check the tunnel URL in Settings" -
+    // which was simply the wrong advice for google/openrouter/vLLM, and wrong even for
+    // Ollama when the container was crash-looping rather than unreachable.
+    const pr = await probeBackend(base, isOllama, headers);
+    const waited = (full.length ? MODEL_STALL_MS : MODEL_FIRST_BYTE_MS) / 1000;
+    const what = stalled
+      ? (full.length
+          ? `Model stream went silent for ${waited}s mid-reply`
+          : `Model sent nothing at all for ${waited}s - long enough for a cold start to have finished`)
+      : `Model call hit the ${MODEL_TIMEOUT_MS / 1000}s ceiling`;
+    const got = full.length ? ` ${full.length} chars had already arrived.` : ' Nothing arrived.';
+    throw new Error(`${what}.${got} ${describeProbe(pr, base, prov.name)}`);
   }
 }
+
+/** Test hook: model-call budget internals (see modelBudget.test.mjs). */
+export const __modelCallTest = {
+  callModel, pruneHistory, capMessage, probeBackend, historyBudget, contextTokensFor,
+  MODEL_STALL_MS, MODEL_TIMEOUT_MS, MODEL_FIRST_BYTE_MS,
+  slimForDisk, isGameGoal,
+  // Getters: these are const arrows declared further down, so a direct reference
+  // here would hit the temporal dead zone when this object is built.
+  get planTaskFor() { return planTaskFor; },
+  get plannerSystemFor() { return plannerSystemFor; },
+  // A getter: this object is built before the const below it is initialised (TDZ).
+  get RUN_ARG_MAX() { return RUN_ARG_MAX; },
+};
 
 const SYSTEM_PROMPT = `You are an autonomous coding agent. You build software by taking ONE action per step.
 
@@ -1456,10 +1687,80 @@ function evictOldRuns() {
     try { const f = join(RUNS_DIR, `${r.id}.json`); if (existsSync(f)) unlinkSync(f); } catch {}
   }
 }
-const RUNS_DIR = join(__dirname, 'agent-runs');
+// Overridable for the same reason AGENT_WORKSPACE and AGENT_QUEUE_FILE are: without it
+// every isolated harness still wrote its runs into the developer's live agent-runs/, so
+// /agent/list returned other tests' history and the 40-run cap kept evicting real runs to
+// make room for throwaway ones. That confused two of my own tests today before I noticed
+// the directory was the one piece of state I had not isolated.
+const RUNS_DIR = process.env.AGENT_RUNS_DIR
+  ? resolve(process.env.AGENT_RUNS_DIR)
+  : join(__dirname, 'agent-runs');
 
 function pushStep(run, step) {
   run.steps.push({ n: run.steps.length + 1, ts: Date.now(), ...step });
+}
+
+// ── Retention. The three things that decide whether this survives being left alone. ──
+//
+// Measured 2026-09-10 on real run files: a FIVE-step run produced a 1.05 MB JSON, of
+// which 400,068 bytes was `args` - the file bodies handed to write_file, stored verbatim
+// in the step log. persist() rewrites the WHOLE file after every step, so a long run
+// re-serialises everything it has ever written, on every step: quadratic disk I/O whose
+// constant is the size of the generated code. Nothing capped the directory, and
+// loadRuns() read every file it found straight into memory at boot.
+//
+// None of that shows up in a test that finishes in ninety seconds. All of it shows up on
+// day three of an unattended loop.
+const RUN_ARG_MAX = 30_000;      // matches what the trace harvester keeps, so training data is intact
+const MAX_RUN_FILES = 300;       // on disk
+const TRACE_MAX_BYTES = 64 * 1024 * 1024;
+
+/**
+ * Shrink a run for DISK only.
+ *
+ * Deliberately not done in pushStep: the trace writer harvests `args.content` (to 30,000
+ * chars) at the end of a run, and that harvest is the point of this project. Truncating
+ * at the source would have silently degraded the training corpus - a much worse bug than
+ * the one being fixed. Capping at the same 30,000 means the persisted copy carries
+ * everything the harvester would ever read, and nothing more.
+ */
+function slimForDisk(run) {
+  const { abort, busy, ...save } = run;
+  if (!Array.isArray(save.steps)) return save;
+  save.steps = save.steps.map((st) => {
+    if (!st.args) return st;
+    let touched = false;
+    const args = {};
+    for (const [k, v] of Object.entries(st.args)) {
+      if (typeof v === 'string' && v.length > RUN_ARG_MAX) {
+        args[k] = v.slice(0, RUN_ARG_MAX) + `\n… [${v.length - RUN_ARG_MAX} more characters not kept on disk]`;
+        touched = true;
+      } else args[k] = v;
+    }
+    return touched ? { ...st, args } : st;
+  });
+  return save;
+}
+
+/** Keep the newest run files; delete the rest. Cheap, and bounds unattended growth. */
+function reapRuns() {
+  try {
+    const files = readdirSync(RUNS_DIR).filter((f) => f.endsWith('.json'))
+      .map((f) => ({ f, m: statSync(join(RUNS_DIR, f)).mtimeMs }))
+      .sort((a, b) => b.m - a.m);
+    for (const { f } of files.slice(MAX_RUN_FILES)) {
+      try { unlinkSync(join(RUNS_DIR, f)); } catch {}
+    }
+  } catch {}
+  // NO in-memory eviction here on purpose: evictOldRuns() (AGENT_MAX_RUNS, default 40)
+  // already does exactly that, and does it more strictly. A second cap would never be the
+  // binding one - dead code that reads like a safety net, which is worse than no net at
+  // all because the next person raises one limit and believes they are covered.
+  //
+  // This function earns its place on ONE case evictOldRuns cannot cover: files left by a
+  // PREVIOUS process. loadRuns() reads every file it finds straight into memory before
+  // any eviction runs, so a directory that grew while the hub was down becomes a boot-time
+  // memory spike. Trimming the directory first bounds that.
 }
 
 // Write the full run (incl. history) to disk. abort is an AbortController (not
@@ -1467,8 +1768,7 @@ function pushStep(run, step) {
 function persist(run) {
   try {
     mkdirSync(RUNS_DIR, { recursive: true });
-    const { abort, busy, ...save } = run;
-    writeFileSync(join(RUNS_DIR, `${run.id}.json`), JSON.stringify(save));
+    writeFileSync(join(RUNS_DIR, `${run.id}.json`), JSON.stringify(slimForDisk(run)));
   } catch {}
 }
 
@@ -1477,6 +1777,7 @@ function persist(run) {
 function loadRuns() {
   try {
     mkdirSync(RUNS_DIR, { recursive: true });
+    reapRuns();                       // bound the directory BEFORE reading it all into memory
     for (const name of readdirSync(RUNS_DIR)) {
       if (!name.endsWith('.json')) continue;
       try {
@@ -1497,7 +1798,7 @@ function isConnError(e) {
   // Network/tunnel failures AND Cloudflare/gateway pages (524/502/503) or a
   // timed-out reply — all are "tunnel down / too slow", i.e. resumable once the
   // tunnel is re-pointed, NOT a real agent error that should kill the run.
-  return /TimeoutError|AbortError|fetch failed|ECONNREFUSED|ENOTFOUND|ECONNRESET|EAI_AGAIN|network|socket hang up|timed out|tunnel may be down|Model error 5\d\d|Model error 429|Premature close|terminated|stream failed|cloudflare|<!doctype|<html|gateway/i.test(s);
+  return /TimeoutError|AbortError|fetch failed|ECONNREFUSED|ENOTFOUND|ECONNRESET|EAI_AGAIN|network|socket hang up|timed out|tunnel may be down|Model error 5\d\d|Model error 429|Premature close|terminated|stream failed|went silent|sent nothing|nothing is listening|cloudflare|<!doctype|<html|gateway/i.test(s);
 }
 
 /**
@@ -1544,9 +1845,44 @@ function pauseAdvice(e) {
 // system prompt, the goal+file listing, and the BUILD PLAN — plus the most recent
 // exchanges, and trim the stale middle (old read_file/test_web dumps). Without this,
 // long runs grow unbounded and Ollama silently drops the oldest (goal-bearing) messages.
-function pruneHistory(run) {
+/**
+ * Fold the last call's rate into the run so throughput is visible in the product, not
+ * only in a benchmark script someone remembered to write.
+ */
+function noteModelCall(run) {
+  const st = getLastModelCall();
+  if (!st) return;
+  run.lastTokPerSec = st.tokPerSec;
+  run.slowestTokPerSec = Math.min(run.slowestTokPerSec ?? Infinity, st.tokPerSec || Infinity);
+  (run.callStats ||= []).push({ ms: st.ms, tokPerSec: st.tokPerSec, outTok: st.outTok, promptTok: st.promptTok, attempts: st.attempts });
+  if (run.callStats.length > 60) run.callStats.shift();
+}
+
+const HISTORY_SHARE = 0.55;   // the rest of the window is for the ledger + the reply
+function historyBudget(db) { return Math.max(1500, Math.floor(contextTokensFor(db) * HISTORY_SHARE)); }
+
+/**
+ * A single message may not eat the whole window.
+ *
+ * One read_file window or test_web dump can be tens of thousands of characters, and the
+ * old prune measured MESSAGES, so sixteen of those sailed through untouched. Truncating
+ * the middle keeps both ends, which is where a stack trace and a file's shape live.
+ */
+function capMessage(m, maxTok) {
+  const text = String(m.content || '');
+  const maxChars = maxTok * 4;
+  if (text.length <= maxChars) return m;
+  const keep = Math.floor(maxChars / 2) - 60;
+  return { ...m, content: text.slice(0, keep)
+    + `\n\n… [${text.length - keep * 2} characters trimmed to fit the context window] …\n\n`
+    + text.slice(-keep) };
+}
+
+function pruneHistory(run, budgetTokens, opts = {}) {
   const h = run.history;
-  if (h.length <= MAX_HISTORY_MSGS) return;
+  const budget = Number.isFinite(budgetTokens) && budgetTokens > 0
+    ? budgetTokens : Math.floor(NUM_CTX * HISTORY_SHARE);
+  if (!opts.force && h.length <= MAX_HISTORY_MSGS && estimateTokens(h) <= budget) return;
   // Preserve by MARKER, not by index. NOTES.md is injected at the start when it exists,
   // which shifted the goal from h[1] to h[2] - an index-based head silently pruned the
   // goal and left the agent working from notes with no objective.
@@ -1558,9 +1894,56 @@ function pruneHistory(run) {
   const plan = h.find(m => m.role === 'assistant' && /^BUILD PLAN:/.test(m.content || ''));
   if (plan && !head.includes(plan)) head.push(plan);
   if (head.length === 1 && h[1]) head.push(h[1]);        // fallback: no marker found
-  const tail = h.slice(-(MAX_HISTORY_MSGS - head.length - 1));
+
+  // CAP THE ANCHORS TOO.
+  //
+  // The anchors are preserved BY DESIGN - drop the goal and the agent works with no
+  // objective - so they were exempt from trimming entirely. That exemption is unbounded:
+  // whatever lands in one of these slots is carried, at full size, into every subsequent
+  // call for the rest of the run.
+  //
+  // Found 2026-09-10 by hostileModel.test.mjs: a model that answers every request with a
+  // 200KB reply answers the PLANNER that way too, so "BUILD PLAN:" became a 50,000-token
+  // anchor. Prompts sat at ~57,000 tokens against a 13,516 budget for the whole run and
+  // never came down, because pruning dutifully trimmed everything EXCEPT the thing that
+  // was actually large. A small model with a runaway repetition loop produces exactly
+  // this shape by accident.
+  //
+  // Anchors get a bigger allowance than ordinary messages - they are the most valuable
+  // context in the window - but not an infinite one.
+  const anchorCap = Math.max(800, Math.floor(budget / 3));
+  for (let i = 0; i < head.length; i++) head[i] = capMessage(head[i], anchorCap);
+
+  // Admit recent messages newest-first until the TOKEN budget is spent.
+  //
+  // The old line was `h.slice(-(MAX_HISTORY_MSGS - head.length - 1))` - keep the last N
+  // MESSAGES, whatever they weigh. Sixteen messages can be 200 tokens or 200,000, so this
+  // was not a defence against overflow at all; it defended against message-count growth,
+  // which was never a failure mode. Tokens are the only unit the backend charges in.
+  const perMsgCap = Math.max(400, Math.floor(budget / 4));
+  const headTok = estimateTokens(head);
+  const MIN_TAIL = 2;                       // the model must always see the latest result
+  const tail = [];
+  let spent = headTok;
+  for (let i = h.length - 1; i >= 0; i--) {
+    const m = h[i];
+    if (head.includes(m)) continue;
+    if (tail.length >= MAX_HISTORY_MSGS - head.length - 1) break;
+    const capped = capMessage(m, perMsgCap);
+    const cost = estimateTokens([capped]);
+    if (spent + cost > budget && tail.length >= MIN_TAIL) break;
+    tail.unshift(capped);
+    spent += cost;
+  }
   const dropped = h.length - head.length - tail.length;
-  if (dropped <= 0) return;                 // nothing meaningful to trim
+  if (dropped <= 0) {
+    // Nothing to DROP, but an anchor or a survivor may still have been truncated to fit,
+    // and that rewrite has to be committed or the capping is silently thrown away.
+    const tailChanged = tail.some((m, i) => m !== h[h.length - tail.length + i]);
+    const headChanged = head.some((m) => !h.includes(m));
+    if (tailChanged || headChanged) run.history = [...head, ...tail];
+    return;
+  }
   run.history = [
     ...head,
     { role: 'user', content: `(… ${dropped} earlier steps trimmed to save context. The GOAL and PLAN above still stand — keep following them. Recent steps follow.)` },
@@ -1600,7 +1983,31 @@ function withLedger(history) {
 }
 
 // ── Plan-first gate (Stage 1) ─────────────────────────────────────────────────
-const PLANNER_SYSTEM = 'You are a senior game/software architect. You produce a short, concrete BUILD PLAN. You do NOT write code.';
+/**
+ * THE PLAN MUST FIT THE GOAL.
+ *
+ * There was one planner prompt and it assumed a game: "senior game/software architect",
+ * SYSTEMS NEEDED (input, player, physics, inventory), GAMEPLAY LOOP with a win/lose
+ * condition, a crop state machine as the worked example, and a "first-PLAYABLE slice".
+ * Every goal got that frame, including "write a function add(a, b)".
+ *
+ * A capable model quietly routes around a bad frame. A small one obeys it. Measured by a
+ * parallel session: given `add(a, b)`, phi3 (3.8B) produced a game design document with an
+ * Input System, spent 4.5 MINUTES on that single call, and never wrote a file; qwen14b
+ * answered "SYSTEMS NEEDED — None (this is a simple JavaScript function)" and got on with
+ * it. The whole point of this repo is training SMALL models, so a prompt only a big model
+ * survives is backwards - and it is the first thing a 1.5B will hit.
+ *
+ * So the frame branches on the goal. Games still get the game plan, because for a game it
+ * is a good plan. Everything else gets four lines.
+ */
+const GAMEY = /\b(game|gameplay|phaser|godot|unity|sprite|sprites?heet|tilemap|player|enemy|enemies|platformer|rpg|shooter|puzzle|roguelike|level design|score|power-?up|collision|win\/lose|playable)\b/i;
+
+function isGameGoal(goal) { return GAMEY.test(String(goal || '')); }
+
+const PLANNER_SYSTEM_GAME = 'You are a senior game architect. You produce a short, concrete BUILD PLAN. You do NOT write code.';
+const PLANNER_SYSTEM_CODE = 'You are a senior software engineer. You produce a SHORT, concrete BUILD PLAN for exactly what was asked - no more. You do NOT write code.';
+const plannerSystemFor = (goal) => (isGameGoal(goal) ? PLANNER_SYSTEM_GAME : PLANNER_SYSTEM_CODE);
 const PLAN_TASK = `Before any code is written, produce a BUILD PLAN for the goal above. Do NOT write code. Be concise — a numbered list.
 
 1. SYSTEMS NEEDED — the distinct systems required (e.g. input, player, physics, inventory, save, UI).
@@ -1610,6 +2017,19 @@ const PLAN_TASK = `Before any code is written, produce a BUILD PLAN for the goal
 5. BUILD ORDER — the smallest first-PLAYABLE slice, then what to add after.
 
 Output ONLY the plan.`;
+
+// The non-game frame. Deliberately four lines: a plan longer than the thing it plans is
+// how a small model talks itself out of ever writing the file.
+const PLAN_TASK_CODE = `Before any code is written, produce a SHORT BUILD PLAN for the goal above. Do NOT write code.
+
+1. WHAT IT DOES — one sentence.
+2. FILES — the file(s) to create or change, and what each is for.
+3. BUILD ORDER — the steps, smallest working thing first.
+4. HOW TO VERIFY — the command or check that proves it works.
+
+Keep it under 12 lines. If the goal is a single small function or file, say so and keep the plan to two or three lines. Output ONLY the plan.`;
+
+const planTaskFor = (goal) => (isGameGoal(goal) ? PLAN_TASK : PLAN_TASK_CODE);
 
 // Append a (goal -> plan -> code) trace for later v0.3 training. Lives OUTSIDE the
 // workspace so a "New project" reset never wipes it.
@@ -1628,7 +2048,13 @@ function saveTrace(run) {
       steps: run.steps.map(s => ({ type: s.type, tool: s.tool, path: s.args?.path })),
       code,
     };
-    appendFileSync(join(dir, 'traces.jsonl'), JSON.stringify(rec) + '\n');
+    // Append-only with no rotation is a slow disk leak: written once per finished run,
+    // never truncated. One rollover keeps the recent corpus and bounds the file.
+    const tf = join(dir, 'traces.jsonl');
+    try {
+      if (existsSync(tf) && statSync(tf).size > TRACE_MAX_BYTES) renameSync(tf, tf + '.1');
+    } catch {}
+    appendFileSync(tf, JSON.stringify(rec) + '\n');
   } catch {}
 }
 
@@ -1742,8 +2168,8 @@ async function drive(loadDb, run) {
       try {
         const planner = loadDb().api_keys?.ollama_planner;   // optional: a stronger/base model just for planning
         const planText = await callModel(loadDb, [
-          { role: 'system', content: PLANNER_SYSTEM },
-          { role: 'user', content: `${run.history[1]?.content || ('GOAL: ' + run.goal)}\n\n${PLAN_TASK}` },
+          { role: 'system', content: plannerSystemFor(run.goal) },
+          { role: 'user', content: `${run.history[1]?.content || ('GOAL: ' + run.goal)}\n\n${planTaskFor(run.goal)}` },
         ], run.abort.signal, planner);
         if (planText && planText.trim()) {
           run.plan = planText.trim();
@@ -1781,7 +2207,7 @@ async function drive(loadDb, run) {
 
     while (run.status === 'running' && !budgetExhausted(run)) {
       run.modelCalls++;
-      pruneHistory(run);                 // keep context dense before each model call
+      pruneHistory(run, historyBudget(loadDb()));   // fit the PROVIDER's window, in tokens
       let raw;
       run.abort = new AbortController();
       // The ledger is appended to the messages for THIS call only — never pushed into
@@ -1791,8 +2217,31 @@ async function drive(loadDb, run) {
       const msgs = withLedger(run.history);
       try {
         raw = await callModel(loadDb, msgs, run.abort.signal);
+        noteModelCall(run);
       } catch (e) {
         if (run.status === 'stopped') break;        // Stop aborted the call — exit quietly
+
+        // The BACKEND is the authority on its own context window, not our estimate. When
+        // it says the request was too long, squash and retry instead of stopping for a
+        // human: this is the one error with an obvious automatic recovery, and an
+        // unattended run cannot wait for someone to click Resume.
+        if (e.code === 'CONTEXT_OVERFLOW') {
+          run.ctxSquashes = (run.ctxSquashes || 0) + 1;
+          if (run.ctxSquashes <= 3) {
+            const before = run.history.length;
+            // Halve again on each successive rejection - our estimate is clearly wrong,
+            // so stop trusting it and converge on something the server will take.
+            const tighter = Math.floor(historyBudget(loadDb()) / (2 ** run.ctxSquashes));
+            pruneHistory(run, tighter, { force: true });
+            pushStep(run, { type: 'note', text: `Context overflow — history squashed ${before} → ${run.history.length} messages (~${tighter} tok) and retrying.` });
+            run.abort = null;
+            continue;
+          }
+          run.status = 'error';
+          pushStep(run, { type: 'error', text: `Context overflow persisted after 3 squashes: ${e.message}. The provider's context_tokens in Settings is probably larger than what the server actually allows.` });
+          break;
+        }
+
         if (isConnError(e)) {                        // tunnel/Ollama unreachable — pause (resumable), don't kill
           run.status = 'interrupted';
           pushStep(run, { type: 'error', text: `Run paused at step ${run.modelCalls} — ${pauseAdvice(e)} (${e.message})` });
@@ -1806,6 +2255,7 @@ async function drive(loadDb, run) {
       }
       if (run.status !== 'running') break;            // stopped during the call — don't run another step
       run.tokens = (run.tokens || 0) + estimateTokens(msgs, raw);
+      run.ctxSquashes = 0;                  // a call went through - reset the squash ladder
       run.history.push({ role: 'assistant', content: raw });
 
       // Stuck-loop guard.
@@ -1858,9 +2308,26 @@ async function drive(loadDb, run) {
       //
       // Read-only tools are skipped: committing before list_dir would bury the log in
       // noise and make the history useless for finding the change that mattered.
-      const MUTATING = new Set(['write_file', 'edit_file', 'run_command', 'run_python', 'download_file']);
+      //
+      // spawn_subtask is here even though it writes nothing ITSELF. The sub-agent it
+      // starts runs its own loop with its own tools and takes NO checkpoints, so an
+      // entire delegated build used to land with zero undo points - the one case where
+      // you would most want them, because nobody watched it happen. Checkpointing before
+      // the hand-off makes the whole delegated chunk revertible as a unit, which is the
+      // natural granularity anyway: you undo "the sub-task", not step 6 of it.
+      const MUTATING = new Set(['write_file', 'edit_file', 'run_command', 'run_python', 'download_file', 'spawn_subtask']);
       if (MUTATING.has(tool)) {
         try {
+          // Create the repo BEFORE asking whether anything changed.
+          //
+          // isDirty() ran first, and on a workspace with no repo of its own it reported
+          // the state of the nearest ENCLOSING repo - the hub's - which was almost always
+          // dirty, so the checkpoint fired and committed the hub's tree. Now that git
+          // cannot escape the workspace (GIT_CEILING_DIRECTORIES), a fresh workspace has
+          // no repo, isDirty() answers "nothing changed", and auto-checkpointing would
+          // silently never happen at all - losing the undo history that makes an
+          // unattended run safe to leave alone. Caught by loopSmoke.test.mjs.
+          await ensureRepo(WORKSPACE);
           if (await isDirty(WORKSPACE)) {
             const cp = await commitAll(WORKSPACE, `before ${tool}: ${(thought || '').slice(0, 80)}`);
             if (cp.ok && cp.sha) pushStep(run, { type: 'checkpoint', text: `checkpoint ${cp.sha}` });
@@ -2009,6 +2476,7 @@ async function drive(loadDb, run) {
         }
         if (verdict.decision === 'ask') {
           run.pending = { tool, args, thought, why: verdict.reason };
+          run.pendingSince = Date.now();   // the approval timeout measures from HERE
           run.status = 'awaiting_approval';
           pushStep(run, { type: 'approval_request', tool, args, thought, why: verdict.reason });
           await escalate(WORKSPACE, {
@@ -2149,11 +2617,8 @@ async function drive(loadDb, run) {
             workQueue.release(next.id);
             pushStep(run, { type: 'note', text: `Supervisor stopped: ${stop} The queue keeps "${next.goal.slice(0, 60)}" — start it from the queue panel to continue.` });
           } else {
-            autoStarts.push(Date.now());
             pushStep(run, { type: 'note', text: `Supervisor: picking up the next queued goal (gen ${next.generation || 0}) — ${next.goal.slice(0, 100)}` });
-            setTimeout(() => {
-              try { startRun(loadDb, next.goal, { queueItemId: next.id, source: 'queue', generation: next.generation || 0 }); } catch {}
-            }, 250);
+            autoStart(loadDb, next);   // checks the workspace is free at the moment of starting
           }
         }
       } catch { /* the queue must never take a finished run down with it */ }
@@ -2175,7 +2640,10 @@ async function drive(loadDb, run) {
  */
 const SUPERVISOR_FORCED = process.env.AGENT_SUPERVISOR === '1';
 let supervisorEnabled = SUPERVISOR_FORCED;
-export const supervisorOn = () => supervisorEnabled;
+// (an `export const supervisorOn = () => supervisorEnabled` lived here. Nothing ever
+//  imported it - it was added reflexively while making the supervisor a setting. An export
+//  with no importer is a promise to a caller that does not exist; wiring.test.mjs catches
+//  this class now instead of leaving it to be noticed by eye.)
 
 /** The ceilings that bound unattended work, reported wherever it is switched on. */
 const supervisorLimits = () => ({
@@ -2295,14 +2763,25 @@ function failQueueItem(loadDb, run, reason, detail) {
     runId: run.id, summary: `${reason}: ${String(detail || '').slice(0, 200)}`,
   });
 
-  // Only a genuine error earns an automatic retry.
+  // Only a genuine failure earns an automatic retry - and `status` alone cannot tell you
+  // whether this was one.
   //
-  // 'stopped' is a person pressing Stop. Re-queueing what someone just cancelled, at 4am,
-  // is the single most obnoxious thing an unattended agent could do. 'interrupted' is a
-  // dropped connection, and those runs are resumable with their history intact - retrying
-  // from scratch throws that away and redoes work the run had already done. Both still get
-  // recorded above, so the chain shows why it is not moving instead of looking idle.
-  if (run.status && run.status !== 'error') {
+  // A person pressing Stop and the stuck-loop guard tripping BOTH land in status
+  // 'stopped'. Re-queueing what someone just cancelled, at 4am, is the single most
+  // obnoxious thing an unattended agent could do - but refusing to retry a model that got
+  // stuck is how a chain dies at the first stumble. Measured 2026-09-10 on a real
+  // unattended run: the loop guard fired, the item was marked 'stopped', no repair was
+  // spliced in, the four goals behind it were stranded on an id that could never reach
+  // 'done', and the note told the operator "you stopped this one" - which nobody had.
+  //
+  // `reason` is what separates them, it is computed correctly one frame up (from the
+  // error text, for the escalation), and it was already being passed in here and thrown
+  // away. A human Stop leaves no matching error text and falls through to 'error', so it
+  // stays non-retryable; a guard names itself. 'interrupted'/'tunnel' is deliberately NOT
+  // retryable: those runs are resumable with their history intact, and retrying from
+  // scratch throws that away and redoes work the run had already done.
+  const machineFailure = ['budget', 'loop', 'parse', 'same_error'].includes(reason);
+  if (run.status && run.status !== 'error' && !machineFailure) {
     pushStep(run, { type: 'note', text: `Queue: ${run.queueItemId} marked '${run.status}'. No automatic retry — `
       + (run.status === 'stopped' ? 'you stopped this one.' : 'resume it rather than starting over.') });
     return;
@@ -2336,10 +2815,125 @@ function failQueueItem(loadDb, run, reason, detail) {
     pushStep(run, { type: 'note', text: `Supervisor held the retry: ${stop} It stays queued.` });
     return;
   }
-  autoStarts.push(Date.now());
+  autoStart(loadDb, r.item);
+}
+
+/**
+ * Start a queued item on the agent's own initiative - the ONE place that may.
+ *
+ * Every human entry point (/start, /queue/run) refuses to start a second top-level run,
+ * because there is a single shared WORKSPACE and two runs writing into it corrupt each
+ * other. Both automatic paths - the supervisor pulling the next goal, and the retry of a
+ * failed one - called startRun directly and never checked. The invariant held only for
+ * people. A Build pressed in the 250ms window, or a resumed interrupted run, would have
+ * shared the workspace with an auto-started one.
+ *
+ * The check is inside the timeout, at the moment of starting, not when scheduling: that
+ * is the window the race lives in. Losing the race releases the item back to 'queued'
+ * rather than dropping it - the work is still wanted, it just needs the workspace free.
+ */
+/**
+ * THE UNATTENDED LOOP. Three ways a chain dies, three different answers.
+ *
+ * The supervisor advances only when a run finishes with status 'done' (see "Take the next
+ * ticket"). That is correct for a supervised session and fatal for an unattended one,
+ * because every other terminal state is NORMAL, not exceptional - measured on real runs
+ * today: a refused command -> awaiting_approval, a dropped socket -> interrupted, a
+ * loop-guard trip or an exhausted budget -> stopped. Each one left the queue full and the
+ * hub idle forever, because nothing polls: an idle hub with queued work stays idle.
+ *
+ * So this tick handles exactly the three, in priority order, and does at most ONE thing
+ * per pass so a bad state cannot cascade:
+ *
+ *   1. A STALE APPROVAL IS DENIED - never approved. This is the important one to get
+ *      right. Auto-approving a command a human was asked about would turn the whole
+ *      approval gate into theatre; the gate exists precisely because nobody is watching.
+ *      Denying is safe, is already a supported path, and tells the agent "continue another
+ *      way or finish" - which is what an unattended agent should do with a command it is
+ *      not allowed to run. It also releases the workspace, which is what unblocks the
+ *      chain.
+ *   2. AN INTERRUPTED RUN IS RESUMED. Those are resumable BY DESIGN with their history
+ *      intact - a tunnel blip should not need a human.
+ *   3. QUEUED WORK IS PICKED UP when nothing holds the workspace, behind the same brakes
+ *      every other auto-start uses (generation cap, hourly ceiling).
+ *
+ * OFF unless the supervisor is on. Turning the supervisor on is already the deliberate
+ * "run without me" act; this makes that mean what it says.
+ */
+const TICK_MS = Math.max(15, Number(process.env.AGENT_TICK_S || 60)) * 1000;
+const APPROVAL_TIMEOUT_MS = Math.max(1, Number(process.env.AGENT_APPROVAL_TIMEOUT_MIN || 15)) * 60_000;
+let tickTimer = null;
+
+function supervisorTick(loadDb) {
+  if (!supervisorEnabled) return;
+  try {
+    const all = [...runs.values()];
+
+    // 1. Stale approval -> DENY (never approve).
+    const waiting = all.find((r) => r.status === 'awaiting_approval' && r.pending && !r.depth);
+    if (waiting) {
+      const age = Date.now() - (waiting.pendingSince || waiting.updatedAt || waiting.createdAt || 0);
+      if (age >= APPROVAL_TIMEOUT_MS) {
+        const { tool, args } = waiting.pending;
+        waiting.pending = null;
+        pushStep(waiting, { type: 'approval_denied', tool, args,
+          text: `No answer for ${Math.round(age / 60000)} min while running unattended — treated as DENIED. Never auto-approved.` });
+        waiting.history.push({ role: 'user', content: `The command "${String(args?.cmd || tool).slice(0, 160)}" was NOT approved (nobody answered while running unattended). Do not run it. Continue another way, or finish.` });
+        waiting.status = 'running';
+        persist(waiting);
+        driveDetached(loadDb, waiting);
+      }
+      return;                       // it holds the workspace either way
+    }
+
+    if (activeTopLevelRun()) return; // something is working; leave it alone
+
+    // 2. Resume an interrupted run before starting anything new.
+    const stalled = all
+      .filter((r) => r.status === 'interrupted' && !r.depth && !r.busy)
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+    if (stalled) {
+      stalled.status = 'running';
+      pushStep(stalled, { type: 'note', text: 'Resumed automatically (supervisor).' });
+      persist(stalled);
+      driveDetached(loadDb, stalled);
+      return;
+    }
+
+    // 3. Nothing running, nothing to resume - take the next ticket.
+    const next = workQueue.dequeue({ completedIds: completedQueueIds() });
+    if (!next) return;
+    const stop = supervisorBrake(next);
+    if (stop) { workQueue.release(next.id); return; }
+    console.log(`[agent] supervisor picked up a queued goal: ${String(next.goal).slice(0, 70)}`);
+    autoStart(loadDb, next);
+  } catch (e) {
+    console.error('[agent] supervisor tick failed:', e.message);
+  }
+}
+
+/** Start/stop the tick with the supervisor. Exported for tests. */
+export function startSupervisorTick(loadDb) {
+  if (tickTimer) clearInterval(tickTimer);
+  tickTimer = setInterval(() => supervisorTick(loadDb), TICK_MS);
+  tickTimer.unref?.();              // never hold the process open just for this
+  return tickTimer;
+}
+
+function autoStart(loadDb, item) {
   setTimeout(() => {
-    try { startRun(loadDb, r.item.goal, { queueItemId: r.item.id, source: 'queue', generation: r.item.generation }); }
-    catch { /* the retry is best-effort; the queue still records the failure */ }
+    const active = activeTopLevelRun();
+    if (active) {
+      workQueue.release(item.id);
+      pushStep(active, { type: 'note', text: `Queue: "${item.goal.slice(0, 60)}" was due to start automatically, but this run holds the workspace. It stays queued.` });
+      return;
+    }
+    // Counted here, not when scheduling. The hourly ceiling exists to bound runs that
+    // actually START; charging it for an attempt that was declined would let a busy
+    // workspace silently eat the budget and throttle work nobody ever ran.
+    autoStarts.push(Date.now());
+    try { startRun(loadDb, item.goal, { queueItemId: item.id, source: 'queue', generation: item.generation || 0 }); }
+    catch { workQueue.release(item.id); }
   }, 250);
 }
 
@@ -2377,8 +2971,33 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
   runs.set(id, run);
   evictOldRuns();
   persist(run);       // on disk before step 1 so it survives a restart even mid-planning
-  drive(loadDb, run); // fire and forget
+  driveDetached(loadDb, run);
   return run;
+}
+
+/**
+ * Start the run loop in the background, and make sure a rejection stays inside the run.
+ *
+ * `drive` is async and was called fire-and-forget from five places with nothing attached.
+ * Anything that throws before its own try/catch - a bad db handle, a failure while building
+ * the opening context - becomes an unhandled promise rejection, and Node terminates the
+ * process on those. So one unexpected throw in ONE run took down the entire hub: the API,
+ * every terminal session, any other run in flight. Found by a test whose fake db threw on
+ * purpose; the test died with the server rather than failing.
+ *
+ * A run that cannot start is a failed run. It is not a reason for the server to exit.
+ */
+function driveDetached(loadDb, run) {
+  Promise.resolve()
+    .then(() => drive(loadDb, run))
+    .catch((e) => {
+      run.status = 'error';
+      run.busy = false;
+      pushStep(run, { type: 'error', text: `The run loop stopped unexpectedly: ${e?.message || e}` });
+      try { persist(run); } catch { /* the disk is not worth a second failure here */ }
+      // A queue-started run that dies this way must not leave its item stuck in 'taken'.
+      if (run.queueItemId) { try { workQueue.release(run.queueItemId); } catch {} }
+    });
 }
 
 // ── Router ────────────────────────────────────────────────────────────────────
@@ -2629,7 +3248,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       run.history.push({ role: 'user', content: `TOOL RESULT (${tool}):\n${result}` });
     }
     run.status = 'running';
-    drive(loadDb, run);
+    driveDetached(loadDb, run);
     res.json({ ok: true });
   });
 
@@ -2644,7 +3263,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     if (run.status === 'done') return res.status(409).json({ error: 'run already finished' });
     run.status = 'running';
     pushStep(run, { type: 'note', text: 'Resumed.' });
-    drive(loadDb, run);
+    driveDetached(loadDb, run);
     res.json({ ok: true });
   });
 
@@ -2690,7 +3309,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     run.status = 'running';
     pushStep(run, { type: 'followup', text: instruction });
     persist(run);
-    drive(loadDb, run);
+    driveDetached(loadDb, run);
     res.json({ ok: true, runId: run.id });
   });
 

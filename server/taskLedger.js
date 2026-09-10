@@ -25,7 +25,7 @@
  *   - [>] 2. in progress
  *   - [x] 3. done
  */
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, renameSync, unlinkSync } from 'fs';
 import { join } from 'path';
 
 const FILE = 'TASKS.md';
@@ -71,7 +71,30 @@ const CARRIED = '<!--carried-->';
 function write(workspace, tasks, fromPlan = false) {
   const body = HEADER + (fromPlan ? PLAN_MARK + '\n\n' : '')
     + tasks.map((t, i) => `- [${MARK[t.state] || ' '}] ${i + 1}. ${t.title}${t.carried ? ' ' + CARRIED : ''}`).join('\n') + '\n';
-  writeFileSync(pathOf(workspace), body, 'utf8');
+
+  // ATOMIC. TASKS.md is the agent's memory of what it is doing and what it has finished,
+  // and it is rewritten in full on every mark/add - dozens of times in a long run, from
+  // the run loop, from sub-tasks and from the supervisor. A plain writeFileSync truncates
+  // the file and then fills it, so anything that interrupts the middle of that - a crash,
+  // a Stop, a second writer - leaves a half-written ledger. This file has been corrupted
+  // in exactly that way before (six concurrent runs, 2026-09). `activeTopLevelRun()` stops
+  // the concurrent case; this stops the interrupted-write case, which no guard can.
+  //
+  // rename() is atomic on the same volume, so a reader sees either the whole old ledger or
+  // the whole new one. The temp file sits beside the target for that reason - a temp on
+  // another volume would make rename a copy, and copies are not atomic.
+  const target = pathOf(workspace);
+  const tmp = target + '.tmp';
+  try {
+    writeFileSync(tmp, body, 'utf8');
+    renameSync(tmp, target);
+  } catch (e) {
+    // Never let a ledger write kill a run: the ledger is a record OF the work, not the
+    // work itself. Fall back to the direct write rather than losing the update entirely.
+    try { unlinkSync(tmp); } catch {}
+    try { writeFileSync(target, body, 'utf8'); }
+    catch { console.error('[ledger] could not write TASKS.md:', e.message); }
+  }
   return tasks;
 }
 
@@ -247,14 +270,42 @@ export function contextBlock(workspace) {
  */
 export function fromPlan(planText) {
   const lines = String(planText || '').split(/\r?\n/);
-  const out = [];
-  for (const raw of lines) {
-    const l = raw.trim();
-    // Skip the planner's own section headings (e.g. "1. SYSTEMS NEEDED") - they are
-    // categories, not work items.
-    if (/^\d+\.\s*[A-Z][A-Z\s/]{3,}$/.test(l)) continue;
-    const m = l.match(/^(?:\d+\.\d+|\d+\)|[-*•])\s+(.{4,})$/);
-    if (m) out.push(m[1].replace(/\*\*/g, '').trim());
+  // Strip markdown emphasis BEFORE anything is matched. The heading skip below was
+  // written for "1. SYSTEMS NEEDED" and a real model writes "1. **SYSTEMS NEEDED**", so
+  // every section heading was surviving as a work item.
+  const clean = (t) => t.replace(/\*\*/g, '').replace(/^#+\s*/, '').trim();
+  const isHeading = (l) => /^(?:\d+\.)?\s*[A-Z][A-Z\s/&-]{3,}:?$/.test(clean(l));
+
+  const bulletsIn = (ls) => {
+    const out = [];
+    for (const raw of ls) {
+      const l = clean(raw);
+      if (!l || isHeading(l)) continue;
+      const m = l.match(/^(?:\d+\.\d+|\d+[.)]|[-*•])\s+(.{4,})$/);
+      if (m) out.push(m[1].trim());
+    }
+    return out;
+  };
+
+  // PREFER THE BUILD ORDER SECTION.
+  //
+  // Every bullet in the plan used to become a ledger task. A game plan has five sections -
+  // systems, gameplay loop, state, missing, build order - so a perfectly reasonable plan
+  // seeded 29 TASKS, of which only the last handful were things to DO. Measured
+  // 2026-09-10 on a live run: "Input system (arrow key handling)" became a task the agent
+  // then had to mark complete. With a 30-step budget and a finish gate that wants the
+  // ledger closed, that plan was close to unfinishable before a line was written.
+  //
+  // The plan already tells us which part is work: BUILD ORDER. Take that when present and
+  // fall back to every bullet when the model did not use the heading.
+  const startIdx = lines.findIndex((l) => /BUILD\s*ORDER/i.test(clean(l)));
+  if (startIdx !== -1) {
+    let endIdx = lines.length;
+    for (let i = startIdx + 1; i < lines.length; i++) {
+      if (isHeading(lines[i]) && !/BUILD\s*ORDER/i.test(clean(lines[i]))) { endIdx = i; break; }
+    }
+    const ordered = bulletsIn(lines.slice(startIdx + 1, endIdx));
+    if (ordered.length) return ordered.slice(0, 12);
   }
-  return out.slice(0, 30);
+  return bulletsIn(lines).slice(0, 12);
 }

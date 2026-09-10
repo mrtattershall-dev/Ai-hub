@@ -29,6 +29,7 @@
  * means harvested code does not need rewriting to be legal.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, unlinkSync, renameSync } from 'fs';
+import { readJsonSafe, renameWithRetry } from './safeJson.js';
 import { join, dirname, extname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { createHash } from 'crypto';
@@ -121,12 +122,20 @@ function load() {
     }
     const m = statSync(MANIFEST).mtimeMs;
     if (m !== cache.mtimeMs) {
-      const j = JSON.parse(readFileSync(MANIFEST, 'utf8'));
+      // Was JSON.parse in a try/catch that returned { items: [] } - so one unreadable
+      // manifest, followed by any add(), wiped the index for every asset on disk. The
+      // files would still be there; nothing would know their names.
+      const j = readJsonSafe(MANIFEST, {
+        empty: { items: [] }, label: 'assets/manifest.json', onUnrecoverable: 'quarantine',
+      });
       const items = Array.isArray(j.items) ? j.items : [];
       cache = { mtimeMs: m, items, ...index(items), version: null };
     }
     return { items: cache.items };
-  } catch { return { items: [] }; }
+  } catch (e) {
+    console.error('[assets] manifest load failed:', e.message);
+    return { items: cache.items || [] };
+  }
 }
 
 // Atomic: the manifest is what every other consumer trusts, so a torn write here would
@@ -137,7 +146,7 @@ function save(state) {
   ensureDir();
   const tmp = MANIFEST + '.tmp';
   writeFileSync(tmp, JSON.stringify({ items: state.items, updatedAt: Date.now() }, null, 2), 'utf8');
-  renameSync(tmp, MANIFEST);
+  renameWithRetry(tmp, MANIFEST);
   let m = -1;
   try { m = statSync(MANIFEST).mtimeMs; } catch { /* next load() will re-read */ }
   cache = { mtimeMs: m, items: state.items, ...index(state.items), version: null };

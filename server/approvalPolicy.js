@@ -100,10 +100,48 @@ const NPM_OK = new Set(['install', 'i', 'ci', 'add', 'run', 'test', 'start', 'bu
 export function segments(cmd) {
   // Chaining is the obvious bypass: `npm install && rm -rf /` has an allowlisted head
   // and a catastrophic tail. Every segment is classified, and the WEAKEST one decides.
-  return String(cmd || '')
-    .split(/&&|\|\||;|\||\n/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+  // A SINGLE `&` is a separator too, and missing it defeated this whole function.
+  // cmd.exe runs `a & b` sequentially; POSIX shells background `a` and then run `b`.
+  // Either way BOTH execute, and `echo hi & rm -rf .` was one segment whose head is
+  // `echo` - read-only inspection - and was auto-approved in build mode.
+  //
+  // BUT SEPARATORS INSIDE QUOTES ARE NOT SEPARATORS.
+  //
+  // A regex split cannot see quoting, so this tore up the INSIDE of quoted arguments.
+  // Measured 2026-09-10 on a live unattended chain against a real model: the agent
+  // verified its own work with
+  //
+  //   node -e "const m = require('./maths.js'); console.log('add:', m.add(2,3));"
+  //
+  // which split on the `;` inside the -e script, leaving `console.log('add:',` as a
+  // "segment". Its head is not on any allowlist, so the run stopped and asked a human -
+  // at which point the whole unattended chain was over. `node -e "…;…"` is the most
+  // common way an agent checks its own code, and today's addition of `&` to this list
+  // made the same class of false positive more likely, not less.
+  //
+  // So: walk the string and only break on a separator that is OUTSIDE quotes. A lone
+  // unbalanced quote falls through to treating the rest as quoted, which yields ONE
+  // segment - the conservative direction, since a whole unsplit command is classified by
+  // its head and an unknown head still asks.
+  const src = String(cmd || '');
+  const out = [];
+  let cur = '', quote = null;
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i];
+    if (quote) {
+      cur += c;
+      if (c === '\\' && i + 1 < src.length) { cur += src[++i]; continue; }  // escaped char
+      if (c === quote) quote = null;
+      continue;
+    }
+    if (c === '"' || c === "'") { quote = c; cur += c; continue; }
+    const two = src.slice(i, i + 2);
+    if (two === '&&' || two === '||') { out.push(cur); cur = ''; i++; continue; }
+    if (c === ';' || c === '|' || c === '&' || c === '\n') { out.push(cur); cur = ''; continue; }
+    cur += c;
+  }
+  out.push(cur);
+  return out.map((x) => x.trim()).filter(Boolean);
 }
 
 /**
@@ -114,6 +152,14 @@ export function segments(cmd) {
  */
 function escapesWorkspace(seg) {
   if (/\$\(|`|\$\{/.test(seg)) return 'uses shell substitution, which can build any path at runtime';
+  // Plain environment-variable expansion reaches anywhere on the machine without a single
+  // `..` or drive letter ever appearing in the text. `cat $HOME/.ssh/id_rsa` and
+  // `cat %USERPROFILE%\.ssh\id_rsa` were both auto-approved as "read-only inspection".
+  // Checked on BOTH platforms: the agent writes commands for whichever shell it imagines,
+  // and one needless "ask" is far cheaper than one leaked private key. The identifier
+  // requirement keeps `grep "foo$"` and `printf "100%%"` from matching.
+  if (/%[A-Za-z_][A-Za-z0-9_]*%/.test(seg)) return 'expands a Windows environment variable, which can point anywhere on the machine';
+  if (/\$[A-Za-z_]\w*/.test(seg)) return 'expands an environment variable, which can point anywhere on the machine';
   if (/(^|\s)["']?[A-Za-z]:[\\/]/.test(seg)) return 'names a drive-absolute path';
   if (/(^|\s)["']?\\\\/.test(seg)) return 'names a UNC network path';
   if (process.platform !== 'win32' && /(^|\s)["']?\/(?!\/)[A-Za-z]/.test(seg)) return 'names an absolute path';
