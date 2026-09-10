@@ -10,8 +10,8 @@
 import assert from 'node:assert/strict';
 import {
   planToCodeBrief, codeToGame, hopsFor, planToChain, parseListItems, verdictToFix,
-  chainBlockReason, historyToPlan,
-  FLOW, MAX_CHAIN, MAX_FIX_ERRORS, MAX_FIX_CODE,
+  chainBlockReason, historyToPlan, godotVerdictToFix,
+  FLOW, MAX_CHAIN, MAX_FIX_ERRORS, MAX_FIX_CODE, MAX_GODOT_FIX_ERRORS,
 } from './flow.js';
 
 let passed = 0;
@@ -337,6 +337,67 @@ test('no code still produces a usable brief rather than nothing', () => {
   const out = verdictToFix(FAIL, {});
   assert.ok(out.input.length > 0);
   assert.doesNotMatch(out.input, /```/);
+});
+
+
+// ---- Godot verdict -> repair brief --------------------------------------------------
+// Moved here with the function itself: one home for tab-to-tab handoffs, and the tests
+// belong beside the code they pin. The Godot brief differs from the Chromium one in the
+// thing that matters most - Godot errors carry an ADDRESS (res://File.gd:LINE), so the
+// brief can name the line instead of quoting a message and hoping the model finds it.
+
+const GD_FAIL = {
+  ok: false,
+  verdict: 'Parsed, but errored while running.',
+  stages: [{ stage: 'parse', ok: true }, { stage: 'run', ok: false }],
+  errors: [{ message: "Invalid access to property 'foo'", file: 'res://Player.gd', line: 7 }],
+};
+const GD_FILES = [{ path: 'res://Player.gd', content: 'extends Node2D' }];
+
+test('a passing Godot verdict produces no repair brief', () => {
+  assert.equal(godotVerdictToFix({ ok: true, verdict: 'fine' }, []), null);
+  assert.equal(godotVerdictToFix(null, []), null);
+});
+
+test('the Godot brief leads with the address of the error', () => {
+  const fix = godotVerdictToFix(GD_FAIL, GD_FILES);
+  assert.equal(fix.task, 'debug');
+  assert.equal(fix.from, 'godot');
+  assert.ok(fix.input.includes('res://Player.gd:7'), 'names the line');
+  assert.ok(fix.input.includes('Failed stage(s): run'));
+  assert.ok(fix.input.includes('```gdscript res://Player.gd'), 'the project that failed travels with it');
+});
+
+test('the same Godot error repeating every frame is sent once', () => {
+  const same = { message: 'nope', file: 'res://A.gd', line: 3 };
+  const fix = godotVerdictToFix({ ok: false, errors: Array(60).fill(same) }, []);
+  assert.equal((fix.input.match(/res:\/\/A\.gd:3/g) || []).length, 1);
+});
+
+test('missing Godot resources are named, with the rule that explains them', () => {
+  const fix = godotVerdictToFix(
+    { ok: false, verdict: 'missing', errors: [], assetsMissing: [{ path: 'res://art/hero.png' }] }, []);
+  assert.ok(fix.input.includes('res://art/hero.png'));
+  assert.match(fix.input, /Do not invent art paths/);
+});
+
+test('"ran but did nothing" asks for behaviour, not for a bug fix', () => {
+  // Telling a model to fix the error when there was no error sends it hunting for one.
+  const fix = godotVerdictToFix({
+    ok: false,
+    verdict: 'nothing observable happened',
+    stages: [{ stage: 'run', ok: true }, { stage: 'activity', ok: false }],
+    errors: [],
+  }, []);
+  assert.match(fix.input, /did nothing observable/);
+  assert.doesNotMatch(fix.input, /Errors:/);
+});
+
+test('the two repair briefs stay distinguishable', () => {
+  // Both land in the Code tab, and `from` is how a reader (or a later hop) tells which
+  // verifier spoke. Collapsing them would make a Godot failure look like a Chromium one.
+  assert.equal(godotVerdictToFix(GD_FAIL, GD_FILES).from, 'godot');
+  assert.ok(MAX_GODOT_FIX_ERRORS > 0);
 });
 
 console.log(`flow: ${passed} passed${process.exitCode ? ' (with failures above)' : ''}`);

@@ -33,9 +33,20 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { tmpdir } from 'os';
 
+// The Godot axis calls the SAME core the hub's verifier and the agent's finish gate call.
+// Importing it rather than re-implementing is the whole point: an eval that grades Godot
+// by a different standard than the gate is an eval that cannot tell you whether the gate
+// is passable. `parseFileSet` likewise is the parser the Godot tab uses to read a model's
+// reply, so the eval reads a generation exactly the way the product does.
+import { verifyGodotFiles } from '../../server/godotVerify.js';
+import { parseFileSet, shortPath } from '../../client/src/lib/godot.js';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = join(__dirname, '..', '..');
-const EVAL_DIR = join(__dirname, 'eval');
+// Overridable so a test can score a synthetic set without writing into the real eval
+// directory. Same lesson as AGENT_QUEUE_FILE: a fixed path is why tests end up editing
+// live state, and a grader is exactly the thing you want to be able to test offline.
+const EVAL_DIR = process.env.EVAL_DIR || join(__dirname, 'eval');
 // The URL is class-shaped: <workspace>--<app>-<Class>-<method>.modal.run. The obvious
 // guess (app-method, no class) returns "modal-http: invalid function call", which this
 // scorer would have recorded as "verifier unreachable" for every Phaser prompt - i.e. a
@@ -130,20 +141,68 @@ async function scorePhaser(row) {
   }
 }
 
-/** godot: parsed by real headless Godot. Godot exits 0 on parse failure, so read output. */
+/**
+ * godot: RUN in real headless Godot, and did it actually do anything.
+ *
+ * This used to be `--check-only` on the first fenced block — it scored "does it parse".
+ * That is a bar a stub clears, and it is why run6 read 3/15 and told us nothing: a model
+ * that emits syntactically-valid GDScript which creates no nodes and prints nothing
+ * scored identically to one that built a working scene. The axis was measuring
+ * compilation, and we were reading it as capability.
+ *
+ * Now the unit is a PROJECT, parsed out of the reply the way the Godot tab parses it, and
+ * graded by the same `verifyGodotFiles` the hub's Run button and the agent's finish gate
+ * use. Three stages have to hold: every script parses, it executes without erroring, and
+ * something observable happened (a node beyond the entry, or output). A `res://` path that
+ * is in neither the project nor the asset manifest fails the run, exactly as it does for
+ * Phaser — so the eval and the training gate cannot disagree about what a valid asset is.
+ *
+ * `legacy` carries the OLD bar for the same generation, so historical Godot numbers stay
+ * interpretable. Without it, every comparison against a pre-2026-09-10 score silently
+ * compares two different questions.
+ */
 async function scoreGodot(row, tmp) {
+  if (!GODOT) return { pass: null, why: 'no Godot binary (vendor/godot/ or GODOT_BIN)', legacy: null };
+
+  // Scored first and independently: the old number must not depend on anything new.
+  const legacy = await legacyGodotParses(row, tmp);
+
+  const files = parseFileSet(row.text);
+  if (!files.length) return { pass: false, why: 'no code block', legacy };
+
+  try {
+    const v = await verifyGodotFiles({
+      files: files.map((f) => ({ path: shortPath(f.path), content: f.content })),
+      mode: 'auto',
+      run: true,
+      frames: 60,
+    });
+    // A harness failure is NOT a model failure - the same rule the Phaser axis learned the
+    // hard way. 5xx is ours (no binary, crashed spawn); 4xx is the model handing us
+    // something unusable, which IS a result.
+    if (v.status >= 500) return { pass: null, why: `verifier: ${String(v.error || v.verdict).slice(0, 60)}`, legacy };
+    if (v.status === 400 || v.status === 413) return { pass: false, why: String(v.error).slice(0, 90), legacy };
+    return { pass: !!v.ok, why: (v.verdict || '').slice(0, 90), legacy };
+  } catch (e) {
+    return { pass: null, why: `godot harness failed: ${e.message.slice(0, 60)}`, legacy };
+  }
+}
+
+/**
+ * The pre-2026-09-10 Godot bar, reproduced exactly: first fenced block, `--check-only`.
+ *
+ * Kept deliberately dumb and deliberately separate. Its only job is to make the old scores
+ * comparable to the new ones for one overlapping run; if it drifts toward the new grader
+ * it stops being the thing it is here to reproduce.
+ */
+async function legacyGodotParses(row, tmp) {
   const b = fence(row.text);
-  if (!b) return { pass: false, why: 'no code block' };
-  if (!GODOT) return { pass: null, why: 'no Godot binary (vendor/godot/ or GODOT_BIN)' };
-  const f = join(tmp, `${row.id}.gd`);
+  if (!b) return false;
+  const f = join(tmp, `${row.id}.legacy.gd`);
   writeFileSync(f, b.code, 'utf8');
   const r = await run(GODOT, ['--headless', '--check-only', '--script', f], tmp, 30000);
-  const text = `${r.out}\n${r.err}`;
-  if (/SCRIPT ERROR|Parse Error|Failed to load script/i.test(text)) {
-    const m = text.match(/(SCRIPT ERROR|Parse Error)[^\n]*/i);
-    return { pass: false, why: (m ? m[0] : 'parse error').slice(0, 90) };
-  }
-  return { pass: true, why: 'parses in headless Godot' };
+  return !/SCRIPT ERROR|Parse Error|Failed to load script/i.test(`${r.out}
+${r.err}`);
 }
 
 /** structured: the requested headers, in order, and NOT a code block. */
@@ -238,6 +297,9 @@ for (const name of names) {
 
   const per = {};
   for (const a of AXES) per[a] = { pass: 0, fail: 0, skip: 0, detail: [] };
+  // The OLD Godot bar, scored on the same generations. Reported beside the new one so a
+  // pre-2026-09-10 score can still be read; see scoreGodot.
+  per.godot.legacy = { pass: 0, total: 0 };
   const byId = {};
 
   process.stderr.write(`\nscoring ${name} (${rows.length} generations)`);
@@ -255,6 +317,10 @@ for (const name of names) {
     if (r.pass === null) bucket.skip++;
     else if (r.pass) bucket.pass++;
     else bucket.fail++;
+    if (axis === 'godot' && r.legacy !== null && r.legacy !== undefined) {
+      bucket.legacy.total++;
+      if (r.legacy) bucket.legacy.pass++;
+    }
     bucket.detail.push({ id: row.id, pass: r.pass, why: r.why });
     byId[row.id] = { axis, pass: r.pass, why: r.why };
     process.stderr.write(r.pass === null ? '?' : r.pass ? '.' : 'x');
@@ -326,7 +392,7 @@ console.log('-'.repeat(76));
 const HOW = {
   code: 'node --check + execute',
   phaser: 'rendered in Chromium',
-  godot: 'parsed in headless Godot',
+  godot: 'RAN in headless Godot + did something',
   structured: 'headers present, in order',
   interpret: 'stated interpretation + domain',
 };
@@ -337,6 +403,18 @@ for (const a of AXES) {
     return pad(`${b.pass}/${total}${b.skip ? ` (${b.skip}?)` : ''}`, 14);
   });
   console.log(`${pad(a, 13)}${cells.join('')}${HOW[a]}`);
+
+  // The old Godot bar, on the same generations. Printed directly underneath because the
+  // two numbers answer different questions and the gap between them IS the finding: every
+  // prompt that parses but does nothing sits in it. Historical Godot scores (run6's 3/15)
+  // were measured the lower way, and comparing them to the row above is meaningless.
+  if (a === 'godot' && names.some((n) => results[n].godot.legacy.total)) {
+    const old = names.map((n) => {
+      const L = results[n].godot.legacy;
+      return pad(L.total ? `${L.pass}/${L.total}` : '-', 14);
+    });
+    console.log(`${pad('  └ parses', 13)}${old.join('')}the OLD bar — comparable to pre-2026-09-10 scores`);
+  }
 }
 
 for (const n of names) {

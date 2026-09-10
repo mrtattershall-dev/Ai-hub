@@ -11,7 +11,7 @@
 import assert from 'assert';
 import {
   parseFileSet, filesToBlocks, resPath, shortPath, inferName,
-  buildGodotSystem, buildGodotPrompt, godotVerdictToFix, describeRun,
+  buildGodotSystem, buildGodotPrompt, describeRun,
   GODOT_OPS, GODOT_OP_MAP, STARTERS,
 } from './godot.js';
 
@@ -185,53 +185,8 @@ t('an explicitly chosen entry changes what describeRun promises', () => {
   assert.equal(describeRun(files, 'res://Main.tscn').mode, 'scene');
 });
 
-// ------------------------------------------------------------- repair brief
-
-t('a passing verdict produces no repair brief', () => {
-  assert.equal(godotVerdictToFix({ ok: true, verdict: 'fine' }, []), null);
-  assert.equal(godotVerdictToFix(null, []), null);
-});
-
-t('the repair brief leads with the address of the error', () => {
-  const fix = godotVerdictToFix({
-    ok: false,
-    verdict: 'Parsed, but errored while running.',
-    stages: [{ stage: 'parse', ok: true }, { stage: 'run', ok: false }],
-    errors: [{ message: "Invalid access to property 'foo'", file: 'res://Player.gd', line: 7 }],
-  }, [{ path: 'res://Player.gd', content: 'extends Node2D' }]);
-  assert.equal(fix.task, 'debug');
-  assert.equal(fix.from, 'godot');
-  assert.ok(fix.input.includes('res://Player.gd:7'), 'names the line');
-  assert.ok(fix.input.includes('Failed stage(s): run'));
-  assert.ok(fix.input.includes('```gdscript res://Player.gd'), 'the code that failed travels with it');
-});
-
-t('the same error repeating every frame is sent once', () => {
-  const same = { message: 'nope', file: 'res://A.gd', line: 3 };
-  const fix = godotVerdictToFix({ ok: false, errors: Array(60).fill(same) }, []);
-  assert.equal((fix.input.match(/res:\/\/A\.gd:3/g) || []).length, 1);
-});
-
-t('missing resources are named, with the rule that explains them', () => {
-  const fix = godotVerdictToFix({
-    ok: false, verdict: 'missing', errors: [],
-    assetsMissing: [{ path: 'res://art/hero.png' }],
-  }, []);
-  assert.ok(fix.input.includes('res://art/hero.png'));
-  assert.ok(/Do not invent art paths/.test(fix.input));
-});
-
-t('"ran but did nothing" asks for behaviour, not for a bug fix', () => {
-  // Telling a model to "fix the error" when there was no error sends it hunting for one.
-  const fix = godotVerdictToFix({
-    ok: false,
-    verdict: 'nothing observable happened',
-    stages: [{ stage: 'run', ok: true }, { stage: 'activity', ok: false }],
-    errors: [],
-  }, []);
-  assert.ok(/did nothing observable/.test(fix.input));
-  assert.ok(!/Errors:/.test(fix.input));
-});
+// The repair brief moved to lib/flow.js (one home for tab-to-tab handoffs); its tests
+// moved with it, into flow.test.mjs. Tests belong beside the code they pin.
 
 // ----------------------------------------------------------------- starters
 

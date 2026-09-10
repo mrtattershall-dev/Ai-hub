@@ -19,6 +19,10 @@
  * browser - see `flow.test.mjs`.
  */
 import { splitMarkdownSections, extractCodeBlocks } from './markdown.js';
+// The Godot repair brief carries a multi-file project, and `filesToBlocks` is the one
+// renderer that agrees with what the Godot tab asks a model to emit. Importing it beats a
+// second copy that can drift; godot.js does not import this file, so there is no cycle.
+import { filesToBlocks } from './godot.js';
 import { CANVAS_TYPES } from './constants.js';
 
 /**
@@ -252,6 +256,91 @@ export function verdictToFix(verdict, { code = '', engine = '' } = {}) {
   }
 
   return { task: 'debug', input: parts.join('\n\n'), from: 'game' };
+}
+
+/** Longest run of PROJECT text carried into a Godot repair brief before truncation.
+ *  Higher than the Chromium one: a Godot repair carries several files, not one. */
+export const MAX_GODOT_FIX_CODE = 14000;
+/** Distinct Godot errors worth passing on. Past this it is the same failure repeating. */
+export const MAX_GODOT_FIX_ERRORS = 8;
+
+/**
+ * A failed Godot verdict -> a repair brief for the Code tab, or null when it passed.
+ *
+ * Lives here rather than in lib/godot.js so one concept has one home: this file is where
+ * a tab's output becomes another tab's input, and a second repair-brief builder elsewhere
+ * is how the two drift apart. Deliberately NOT in the FLOW table, for the same reason
+ * verdictToFix is not: its source is the Godot verdict panel, which renders no output
+ * blocks, so a table entry would promise a button that can never appear. It needs no
+ * `explain` either - it returns null only when the verdict PASSED, and a pass shows no
+ * repair button at all, which is not a hop blocked for a knowable reason.
+ *
+ * This is the link that closes the loop, and it is the same argument as the Game tab's:
+ * verification could already tell you the project was broken and then left you to retype
+ * the failure somewhere useful, which is the copy-paste step the flow exists to remove -
+ * and the step where the useful detail quietly gets dropped because it is tedious to
+ * transcribe.
+ *
+ * What Godot gives us that Chromium does not is an ADDRESS. Every error carries
+ * `res://File.gd:LINE`, so the brief can name the line instead of quoting a message and
+ * hoping the model finds it. That address is the most valuable thing in the payload and
+ * it goes first, before the code.
+ */
+export function godotVerdictToFix(verdict, files = []) {
+  if (!verdict || verdict.ok) return null;
+
+  const parts = ['This Godot 4 project failed verification in the real engine, headless. Fix it.'];
+  if (verdict.verdict) parts.push(`Verdict: ${verdict.verdict}`);
+
+  const failed = (verdict.stages || []).filter((s) => !s.ok);
+  if (failed.length) {
+    parts.push(`Failed stage(s): ${failed.map((s) => `${s.stage}${s.timedOut ? ' (timed out)' : ''}`).join(', ')}`);
+  }
+
+  // Deduplicated by address AND message: the same error inside `_process` fires once per
+  // frame, so an unfiltered list is one message copied sixty times with the real second
+  // error scrolled off the end.
+  const seen = new Set();
+  const errors = [];
+  for (const e of verdict.errors || []) {
+    const key = `${e.file || ''}:${e.line || ''}:${e.message}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    errors.push(e.file ? `${e.file}:${e.line} — ${e.message}` : e.message);
+  }
+  if (errors.length) {
+    parts.push(`Errors:\n${errors.slice(0, MAX_GODOT_FIX_ERRORS).map((e) => `- ${e}`).join('\n')}`);
+    if (errors.length > MAX_GODOT_FIX_ERRORS) parts.push(`(${errors.length - MAX_GODOT_FIX_ERRORS} further distinct errors omitted)`);
+  }
+
+  if (verdict.assetsMissing?.length) {
+    parts.push(
+      `These resources do not exist: ${verdict.assetsMissing.map((a) => a.path).join(', ')}.\n` +
+      'Every res:// path must be either a file in this project or a real asset from the library. ' +
+      'Do not invent art paths - draw with generated nodes (ColorRect, Polygon2D, Label) instead.',
+    );
+  }
+
+  // The activity stage failing is a different instruction from an error, and saying
+  // "fix the error" when there was no error sends the model looking for one.
+  const activity = (verdict.stages || []).find((s) => s.stage === 'activity' && !s.ok);
+  if (activity && !errors.length) {
+    parts.push(
+      'The project ran without erroring but did nothing observable. Give it real behaviour: ' +
+      'create the child nodes the request calls for, and print() what happened so the run is verifiable.',
+    );
+  }
+
+  const body = filesToBlocks(files);
+  if (body) {
+    const truncated = body.length > MAX_GODOT_FIX_CODE;
+    parts.push(
+      'Return every changed file in full, in the same fenced format, not a diff.\n\n' +
+      (truncated ? `${body.slice(0, MAX_GODOT_FIX_CODE)}\n\n/* …project truncated… */` : body),
+    );
+  }
+
+  return { task: 'debug', input: parts.join('\n\n'), from: 'godot' };
 }
 
 /**

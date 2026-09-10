@@ -8,8 +8,11 @@ import { extractCodeBlocks } from '../lib/markdown.js';
 import { godotStatus, verifyGodot, chatStream } from '../lib/api.js';
 import {
   STARTERS, GODOT_OPS, buildGodotSystem, buildGodotPrompt, parseFileSet,
-  godotVerdictToFix, describeRun, resPath, shortPath,
+  describeRun, resPath, shortPath,
 } from '../lib/godot.js';
+// The repair brief lives with every other tab-to-tab handoff, not here - flow.js is the
+// one place that defines what a tab's output becomes.
+import { godotVerdictToFix } from '../lib/flow.js';
 import ChipGroup from '../components/ChipGroup.jsx';
 
 /**
