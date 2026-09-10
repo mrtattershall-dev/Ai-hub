@@ -16,9 +16,10 @@
  * run, so it is pinned here.
  */
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const ws = mkdtempSync(join(tmpdir(), 'append-'));
 process.env.AGENT_WORKSPACE = ws;
@@ -30,7 +31,20 @@ const test = (n, f) => {
   catch (e) { failed++; console.error(`  FAIL  ${n}\n        ${e.message}`); }
 };
 
-const src = readFileSync('./agent.js', 'utf8');
+// Read every agent*.js in THIS directory, not './agent.js'.
+//
+// Two bugs in one line. It resolved against the CWD, so this passed when run from server/
+// and died with ENOENT from the repo root - which is how it is actually run in a batch, so
+// the failure looked like the feature breaking rather than the test. And agent.js is being
+// SPLIT: the system prompt already moved to agentPrompt.js and the action parser to
+// agentParse.js. A check that greps agent.js alone searches a shrinking haystack and would
+// report PASS once its subject moved out. agent_audit.mjs hit this first and globs
+// agent*.js for the same reason; matching it here so the split cannot quietly blind this.
+const HERE = dirname(fileURLToPath(import.meta.url));
+const src = readdirSync(HERE)
+  .filter((f) => /^agent.*\.js$/.test(f))
+  .map((f) => readFileSync(join(HERE, f), 'utf8'))
+  .join('\n');
 console.log('\nappend_file\n');
 
 test('the tool exists and is auto-approved with the other file writes', () => {

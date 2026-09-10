@@ -2244,6 +2244,16 @@ async function drive(loadDb, run) {
         break;
       }
 
+      // How many actions did the model send? parseAction matches ACTION: WITHOUT /g, so it
+      // returns the FIRST one and everything after it is discarded in silence. Measured
+      // across 855 real responses: 9.7% carried more than one action, and 49 `finish` calls
+      // were thrown away because they were not first. The model then re-sends the identical
+      // response - nothing it asked for happened - until the repetition guard kills the run.
+      // That single silence explains the finish failures AND the "same response 3 times"
+      // stops. Counting here rather than in agentParse.js deliberately: the parser has ~15
+      // return sites and threading a field through all of them is a merge conflict waiting
+      // to happen. The raw text is right here and it is the same information.
+      const extraActions = Math.max(0, (raw.match(/ACTION:\s*[a-z_]+/gi) || []).length - 1);
       const action = parseAction(raw, run.lastPath);
       if (!action || !action.tool || !tools[action.tool] && action.tool !== 'finish') {
         run.parseLog = (run.parseLog || []).concat(false).slice(-10);
@@ -2521,6 +2531,39 @@ async function drive(loadDb, run) {
       }
 
       let feedback = `TOOL RESULT (${tool}):\n${result}${syntaxNote}`;
+
+      // NOTHING-NEW DETECTION - the loop that actually kills small-model runs.
+      //
+      // Observed verbatim: the opening message already lists the workspace files, the model
+      // runs `list_dir .`, and the TOOL RESULT is BYTE-IDENTICAL to that list. Its context
+      // is then effectively unchanged, so it emits the same THOUGHT/ACTION again, gets the
+      // same result again, and dies to the repetition guard - which reports "not making
+      // progress" when the truth is we handed it nothing to progress WITH. Same shape with
+      // outline_file twice on an 18-line file.
+      //
+      // The guard already detects this and can only kill. This recovers instead: same tool,
+      // same args AND same result means genuinely no new information, so say so and point
+      // somewhere else. Requiring the RESULT to match too is what keeps a legitimate repeat
+      // (re-running a test after an edit, where the output SHOULD change) from being scolded.
+      const sig = `${tool}|${JSON.stringify(args || {})}|${String(result).slice(0, 800)}`;
+      run.resultSigs = run.resultSigs || [];
+      if (run.resultSigs.includes(sig)) {
+        feedback += `\n\n⚠️ You already ran ${tool} with these exact arguments earlier and got this EXACT result. Repeating it cannot make progress.`
+          + ` Take a DIFFERENT action now: if you need a file's contents use read_file (outline_file only gives names and line numbers);`
+          + ` if you already have what you need, do the actual work; and if the goal is complete, send ACTION: finish with a SUMMARY.`;
+      }
+      run.resultSigs.push(sig);
+      if (run.resultSigs.length > 40) run.resultSigs = run.resultSigs.slice(-40);
+
+      // Say so when we dropped the rest of a batch. Silence here is what created the loop:
+      // the model got no signal that its 2nd..Nth actions never happened, so it re-sent the
+      // same block verbatim and died to the repetition guard. Naming the dropped count also
+      // makes the feedback DIFFERENT from last step's, which is what actually breaks the
+      // cycle - the model has something new to react to instead of the identical result.
+      if (extraActions > 0) {
+        feedback += `\n\n⚠️ You sent ${extraActions + 1} actions in one response. ONLY THE FIRST (${tool}) was executed — the other ${extraActions} were DISCARDED and did NOT happen.`
+          + ` Send exactly ONE action per response and wait for its result. If you meant to finish, send finish on its own as your NEXT response.`;
+      }
       if (tool === 'test_web') {
         const hasErr = /\[JS ERROR\]|\[console\.error\]|\[HTTP \d/.test(result);
         run.needsTest = hasErr;
