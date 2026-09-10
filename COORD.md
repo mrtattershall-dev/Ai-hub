@@ -3327,3 +3327,41 @@ points at coder14b-base, which now answers `modal-http: invalid function call`. 
 is still configured for Chat. Nobody is repointing it - his row, his spend - and it is in front
 of him as a decision. Nothing currently running depends on it: all fuzzing is against mock
 models on isolated ports.
+  ADDENDUM, same entry, two corrections:
+  - POSTURE IS SAFE. :3001 now reports supervisor:false, approvalMode:strict, 0 queued,
+    0 taken, 0 active runs. I flagged supervisor:ON + build three times today; it has since
+    been disarmed. So the dead row is an inconvenience, not a risk: nothing can fail its way
+    through a chain overnight against a model that isn't there.
+  - OPTION 2 PROVEN: deepseek-r1:1.5b answered the hub's exact call locally — 14.2 tok/s,
+    11.5s including cold load, no <think> leak (asked for "READY", said "Ready!": reliable
+    shape, weak semantics). TRAP: local ollama also lists qwen2.5-coder:7b. Do NOT offer it —
+    7B-and-up crashes this laptop (tatte's standing rule). Honest local choices are
+    deepseek-r1:1.5b or phi3 only.
+
+## Session A — LEDGER CLOSE-OUT under the binding GPU rule (checked myself at 18:09)
+
+Modal state at 18:09, my own check, not relayed: 0 apps listed, 0 deployed/running: []
+Nothing of mine is deployed. Today's GPU spend is closed.
+
+Every deploy and stop, with tatte's words as the rule now requires:
+
+    11:41  coder7b-l4        L4    deployed   "Just run 7b base on the cheapest reliable gpu"
+    12:07  coder7b-a10g-awq  A10G  deployed   "A10g it is"
+    13:34  coder14b-run5     A100  deployed   "Hook up 14b to the hub then."
+    13:37  both 7B apps            STOPPED    "Stop 7b and only run 14b"
+    13:50  coder14b-run5           STOPPED    "Let's do base then"
+    13:50  coder14b-base     A10G  deployed   "Let's do base then"
+    13:56  :3001 ollama row -> coder14b-base   "Hook up 14b to the hub then."   (his row, his words)
+    14:xx  coder7b-a10g-awq  A10G  redeployed "Should we retry 7b with the fix"  (matched comparison)
+    14:49  coder14b-base + coder7b-a10g-awq STOPPED   "Let's stop the 14b and run one coder 3 pass"
+    14:5x  coder3-h100       H100  deployed   "Let's stop the 14b and run one coder 3 pass"
+           (H100 and min_containers=1 would both need his words under the new rule; this is them)
+    15:1x  coder3-h100             min=1 -> min=0 while fixing, so it was not billing idle
+    17:1x  coder3-h100             STOPPED    "When it ends kill modal"
+
+**Yes, coder14b-base was stopped deliberately**, at 14:49, on "Let's stop the 14b and run one
+coder 3 pass". That is why :3001's ollama row now points at a dead URL. The row is tatte's;
+it is in front of him as a decision and nobody is repointing it.
+
+Complying with the binding rule as written. My four worktree agents are offline only - no GPU,
+no Modal, no real model calls - and run nothing against the live hub.
