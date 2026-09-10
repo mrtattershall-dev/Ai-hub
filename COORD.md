@@ -306,3 +306,78 @@ I ran the suite against your in-flight state: **308 passed, 0 failed** after the
 - 2026-09-09 22:4x — Session A: git init (2 commits), `.gitattributes`, audit regex made
   CRLF-tolerant, claim on `agent.js` narrowed to the loop. Modal asset sync verified:
   hub and verifier both at `e763c2101315c46f`, 13,523 files.
+
+- 2026-09-09 23:0x — ai-native-engine-00: **sidebar reordered as the pipeline.** tatte's
+  ask: Strategy on top, the tabs reading like a flow chart.
+
+  `client/src/lib/views.jsx` is now the single source for nav order, labels and icons.
+  `Sidebar.jsx` had its own second copy of that list (`NAV_ITEMS`) whose order already
+  disagreed with the pane menu's; that copy is gone, so the sidebar and the
+  "Change what this pane shows" menu cannot drift again. Both now read:
+
+      FLOW      Strategy (plan) -> Code (write) -> Agent (build) -> Game (run) -> Godot (run)
+      DRAWS ON  Assets, Terminal
+      RECORD    Training Log, History, Settings
+
+  The Flow group is drawn as a chain - one rail, a node per step, the node filled when
+  that tab is active - and each step carries its verb. Assets and Terminal are deliberately
+  NOT on the rail: they are reached for at any point, not passed through.
+
+  A fresh hub now opens on Strategy instead of Code (`FIRST_VIEW` in `useStore.js`). A
+  saved paneTree still wins - reordering a sidebar is not a reason to move someone's panes.
+
+  Collapsed sidebar (<680px) drops the rail and indent so the icons stay centred.
+  Verified in the browser at both widths; `vite build` clean; flow tests still 29.
+
+---
+
+# Session A — appended 2026-09-10 (Godot handoff + harvest status)
+
+## Godot is NOT mine — handing over one finding
+
+tatte says an agent is fleshing out Godot. I am staying off `server/godotVerify.js`, the
+Godot tab, and Godot eval scoring. One thing to carry, because it is measured and cheap:
+
+**The eval scores Godot by PARSING ONLY.** `training-data/factory/score_run.mjs:140` runs
+`godot --headless --check-only --script <f>` and passes on "no parse error". A script that
+parses and does nothing scores a pass. Compare the other axes:
+
+    phaser   renders in Chromium, canvas non-zero, no runtime errors, assets must resolve
+    code     node --check AND executes cleanly
+    godot    parses. that is all.
+
+The stronger capability already exists and is unused by the eval: `server/godotVerify.js`
+has a two-stage path (`--check-only`, then `--script` to really run it) with verdicts for
+"parsed, but errored while running" and "ran without finishing - a SceneTree script must
+call quit()". Switching the eval to stage 2 is a scoring change, costs no GPU, and without
+it the Godot third of any dataset is graded by a test that cannot tell working code from a
+stub. run6 scored 3/15 there and we cannot say whether the 3 did anything.
+
+Two follow-ons if you want them: `.tscn` scenes are untouched (a Godot game is scripts AND
+scenes - `stevearc/godot_parser`, MIT, parses them), and `res://` asset loading is
+currently a REJECT in my harvester, the same problem Phaser had before the asset library.
+
+## Harvest status (mine)
+
+Building a 30k-row dataset. Claimed, in addition to earlier: `factory/search_repos.mjs`,
+`factory/harvest_pipeline.mjs`, `factory/extract_units.mjs`, `factory/ts_extract.mjs`,
+`factory/RUN7.md`, and `training-data/node_modules` (tree-sitter).
+
+Measured so far, so nobody repeats it:
+- Repo harvest yields **0.24 rows/repo** taking whole standalone programs, **10.2/repo**
+  taking units-with-resolved-context. The earlier "16 per repo" was extrapolated from four
+  hand-picked repos, one holding 98 mini-games. Do not trust that number.
+- A bare `OR` in a GitHub search (`phaser topdown OR top-down`) matched 2,118,666 repos and
+  pulled ohmyzsh and public-apis into a "harvestable game repos" list. Only `topic:` queries
+  are trustworthy; keyword queries drift and are being dropped.
+- tatte's own 144 games: 10,596 units, but **8,128 are duplicates across version chains**,
+  leaving 640 usable. The version-chain diffs are the untapped part.
+- Extraction moved to tree-sitter (real ASTs). GDScript needs whole-FILE rows, not unit
+  extraction: its functions read inherited members (`velocity`) and engine singletons
+  (`Input`) that no local declaration resolves, so unit extraction rejected 100% of them.
+
+## Log
+
+- 2026-09-10 — Session A: tree-sitter extraction (js/ts/tsx via wasm, gdscript native),
+  GitHub token in use for search (env only, never written to disk - it is gitignored
+  nowhere because it is nowhere). Godot handed to whoever tatte has on it.
