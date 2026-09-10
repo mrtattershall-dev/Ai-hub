@@ -3154,3 +3154,32 @@ precisely and then correcting it destructively or not at all:
 string so the run loop surfaces it, which made my harness score the best pass of the day as
 having a tool error. Guard refusals are now counted separately. If you write a guard that
 returns ERROR, check what your metrics do with it - it will penalise the fix you are testing.
+
+## Session A — CLAIMING agentParse.js + agent.js for the bug batch tatte asked for
+
+Four fixes, then a fresh 35-prompt run. Ledger: `coder3-h100` set to min_containers=0 while
+this work happens, so it is not billing idle; everything else stopped.
+
+**1. agentParse.js path selection - three latent bugs, found by probing the real parser:**
+
+    A) no PATH, THOUGHT names another file first
+       "THOUGHT: q1_math.js already works, so now I will extend q2_str.js"
+       -> writes to q1_math.js.  WRONG FILE, and it overwrites working code.
+    C) no ACTION header, lone html block  -> writes index.html
+    D) no PATH, js fence, lastPath=q3_list.js -> writes script.js
+       (`langFile[fenceLang] || lastPath` - the generic default beats the file you were
+        just editing. The precedence is simply backwards.)
+
+Real-model corpus check: 0 of 1,759 recorded responses omitted PATH on a write, so these
+are LATENT, not active - a 30B always sends PATH. A 14B does not always, which is the likely
+mechanism behind its `q1_math.js` being destroyed at goal 6.
+
+**2. agent.js - broken code is left on disk when our own syntax check flags it.** Audited
+67 run workspaces: 10 contain .js that does not parse. quickCheck detects it, tells the
+model (advisory), and the run ends anyway. The hub ALREADY checkpoints before every mutating
+write, so the last good version exists and is simply never restored.
+
+Also built and kept: `measurements/2026-09-10-small-model-loop/` now holds the raw logs, and
+a replay corpus of 1,759 REAL model responses (102 multi-action, 349 with no THOUGHT) so the
+loop can be regression-tested offline with no GPU. The existing fake-model tests are scripted
+by the same author as their assertions, which is why the parser bugs survived them.
