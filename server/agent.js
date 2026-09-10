@@ -510,6 +510,39 @@ const tools = {
   },
 
   run_command({ cmd }) {
+    // A SERVER COMMAND NEVER RETURNS, AND THE WORKSPACE IS ALREADY SERVED.
+    //
+    // Measured 2026-09-10: the 32B ran `python -m http.server 8000` to preview the game it
+    // had just written. It blocks forever, is killed at the 60s timeout, reports EXIT 1 -
+    // which reads as a transient failure - so the model ran it again, and again. Three
+    // identical timeouts, three minutes of GPU, no progress.
+    //
+    // The agent was reaching for something that already exists: index.js serves WORKSPACE
+    // at /workspace, and test_web loads it in headless Chromium and reports what rendered.
+    // So this refuses and points at it, rather than letting the run burn on a command whose
+    // success condition is "hangs forever".
+    const blocking = [
+      [/\bpython3?\s+-m\s+http\.server\b/i, 'python -m http.server'],
+      [/\bnpx?\s+(-y\s+)?(serve|http-server|live-server|browser-sync)\b/i, 'a node static server'],
+      [/\bnpm\s+(start|run\s+(dev|serve|start|watch))\b/i, 'npm start / npm run dev'],
+      [/\b(vite|webpack(-dev-server)?|parcel|next|nuxt)\s+(dev|serve|start)?\b/i, 'a dev server'],
+      [/\bphp\s+-S\b/i, 'php -S'],
+      [/\bruby\s+-run\s+-e\s+httpd\b/i, 'ruby httpd'],
+      [/\bcaddy\s+file-server\b|\bdarkhttpd\b|\bminiserve\b/i, 'a static file server'],
+    ];
+    const hit = blocking.find(([rx]) => rx.test(String(cmd || '')));
+    if (hit) {
+      return Promise.resolve(
+        `ERROR: refusing to run ${hit[1]} - it never exits, so it will hit the ${CMD_TIMEOUT_MS / 1000}s timeout `
+        + `and report EXIT 1 no matter how many times you try.\n`
+        + `You do not need a server: this workspace is ALREADY served at `
+        + `http://localhost:${PORT}/workspace/ (index.html is at /workspace/index.html).\n`
+        + `To check that your page actually works, use:\n`
+        + `ACTION: test_web\nPATH: index.html\n`
+        + `That loads it in a real headless browser and reports console errors and what rendered.`,
+      );
+    }
+
     return new Promise((res) => {
       // Mirror into any open Terminal view so you SEE what the agent runs. The
       // command still executes via exec(), not the PTY: the model needs a clean
