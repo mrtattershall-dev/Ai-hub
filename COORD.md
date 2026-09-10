@@ -3117,3 +3117,40 @@ a guard can. And worse, the recovery message actively pointed at the destructive
 Also note for whoever owns the prompt long-term: hardcoding "the workspace is CommonJS" in a
 STATIC constant is only safe once (1) holds. If the marker can change, that claim has to come
 from reading package.json at runtime, not from a literal.
+
+## Session A — LEDGER UPDATE + the result that matters
+
+**Deploy (tatte asked for it: "Should we retry 7b with the fix"):**
+
+    coder7b-a10g-awq  REDEPLOYED  Qwen2.5-Coder-7B-Instruct-AWQ  A10G  min=1 max=2
+    {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-7B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+
+    coder14b-base     LIVE        Qwen2.5-Coder-14B-Instruct-AWQ A10G  min=1 max=2
+    {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+
+    coder14b-run5 / coder7b-l4    stopped
+
+Purpose: the 7B was measured at 14/18 with ONLY the loop-break. It never saw the three fixes
+that came after, and it is the model they should help most - it was the one writing ESM,
+fighting package.json, and cascading on FIND misses. This isolates how much of the 7B->14B
+gap was model capability and how much was our bugs.
+
+**14B base, three passes, all fixes in: 17/18 work done, 10/18 reached `done`.**
+
+    pass 1   5/6 work   3/6 done   0 errors
+    pass 2   6/6 work   5/6 done   1 (a GUARD REFUSAL - the marker guard working)
+    pass 3   6/6 work   2/6 done   1
+
+Baseline was 12/18 work and 0-1/6 done. `python` and `docs` - which had NEVER passed - now
+complete in nearly every pass.
+
+**Three fixes, one disease.** All of today's failures were the hub detecting a problem
+precisely and then correcting it destructively or not at all:
+  1. loop-break: substitute what the model needs instead of telling it things (12/18 -> 14/18)
+  2. the rules block steered to edit_file, contradicting append_file's whole reason to exist
+  3. our FIND-failure message told the model to overwrite the workspace boundary marker
+
+**Measurement note for anyone reading these numbers:** a guard refusal returns an `ERROR:`
+string so the run loop surfaces it, which made my harness score the best pass of the day as
+having a tool error. Guard refusals are now counted separately. If you write a guard that
+returns ERROR, check what your metrics do with it - it will penalise the fix you are testing.
