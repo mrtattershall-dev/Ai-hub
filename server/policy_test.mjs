@@ -7,7 +7,7 @@
  * most: an allowlisted head with a catastrophic tail is the obvious way past a naive
  * allowlist, and it is exactly what an agent produces when it "helpfully" cleans up.
  */
-import { classifyCommand, classifyPython } from './approvalPolicy.js';
+import { classifyCommand, classifyPython, segments } from './approvalPolicy.js';
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -98,6 +98,47 @@ for (const mode of ['strict', 'build', 'yolo']) {
   t(mode, 'ls & shutdown /s', 'deny');
 }
 t('build', 'echo done & npm run lint', 'allow');   // a benign pair must still run
+
+
+// Direct coverage for the splitter itself. It surfaced in wiring.test.mjs as an unwired
+// export, and the tempting fix was to drop the export keyword - but this function has
+// produced TWO measured incidents, and every case above exercises it only THROUGH
+// classifyCommand, where a split bug shows up as a wrong verdict and never as a wrong
+// split. A caller is the right answer to an unwired capability; this is the caller, and it
+// pins both incidents at the level they actually happened.
+console.log('\n--- segments(): the splitter itself, at the level its bugs happened ---');
+{
+  let segPass = 0;
+  const seg = (cmd, want) => {
+    const got = segments(cmd);
+    const ok = JSON.stringify(got.map((x) => x.trim())) === JSON.stringify(want);
+    ok ? segPass++ : fail++;
+    if (!ok) fails.push(`segments(${cmd})\n      wanted ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
+    console.log(`  ${ok ? 'PASS' : 'FAIL'}  segments  ${cmd.slice(0, 58)}`);
+  };
+
+  // The plain cases, so a rewrite cannot quietly stop splitting at all.
+  seg('npm test', ['npm test']);
+  seg('npm install && rm -rf /', ['npm install', 'rm -rf /']);
+  seg('a; b', ['a', 'b']);
+  seg('a | b', ['a', 'b']);
+
+  // Incident 1: a single & was not a separator, so this was ONE segment headed by echo -
+  // read-only inspection - and build mode ran it unattended.
+  seg('echo hi & rm -rf .', ['echo hi', 'rm -rf .']);
+
+  // Incident 2: separators inside a quoted -e script were treated as separators, leaving a
+  // fragment on no allowlist, which stopped a live unattended chain to ask a human. Quoted
+  // text is ONE segment whatever is inside it.
+  seg('node -e "console.log(1); console.log(2)"', ['node -e "console.log(1); console.log(2)"']);
+  seg('git commit -m "fix: a; b and x && y"', ['git commit -m "fix: a; b and x && y"']);
+
+  // ...and a real separator OUTSIDE the quotes still splits, or the fix for incident 2
+  // would have re-opened incident 1.
+  seg('node -e "console.log(1)" && rm -rf .', ['node -e "console.log(1)"', 'rm -rf .']);
+
+  pass += segPass;
+}
 
 console.log('\n--- environment expansion reaches outside the workspace ---');
 // No `..`, no drive letter, nothing escapesWorkspace used to look for - yet

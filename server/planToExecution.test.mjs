@@ -28,7 +28,7 @@ import { spawn } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { scratch, startHub, waitForQueue, freePorts, TERMINAL_RUN, TERMINAL_ITEM } from './testHarness.mjs';
+import { scratch, startHub, freePorts, TERMINAL_RUN } from './testHarness.mjs';
 import { planToChain, planToCodeBrief } from '../client/src/lib/flow.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -57,6 +57,25 @@ const PLAN = [
   '## Risks & Mitigations',
   '- Do not fetch anything remote.',
 ].join('\n');
+
+/**
+ * Poll until ONE item settles. waitForQueue asks whether the whole backlog is empty,
+ * which a disarmed queue deliberately never is - it holds the next goal until a human
+ * releases it. Asking the wrong question there is what made this test report stranding
+ * where the product was behaving as designed.
+ */
+async function waitForItem(api, id, { seconds = 180 } = {}) {
+  const deadline = Date.now() + seconds * 1000;
+  let item = null;
+  while (Date.now() < deadline) {
+    const q = await api('/agent/queue');
+    item = (q.items || []).find((i) => i.id === id);
+    if (!item) return { status: 'gone' };
+    if (['done', 'failed', 'cancelled', 'stopped'].includes(item.status)) return item;
+    await new Promise((r) => setTimeout(r, 1500));
+  }
+  return item || { status: 'never appeared' };
+}
 
 const planOutput = { kind: 'strategy', response: PLAN, streaming: false, canvasId: 'plan' };
 
@@ -102,33 +121,78 @@ try {
     assert.equal(second.after, first.id, 'step 2 must wait on step 1, or an agent runs them out of order');
   });
 
-  // Release the chain. One explicit start; the supervisor pulls the rest as each finishes.
-  const run = await api('/agent/queue/run', { method: 'POST' });
-  await test('releasing the chain starts a run rather than reporting nothing to do', () => {
-    assert.ok(run && (run.id || run.runId || run.started), JSON.stringify(run).slice(0, 200));
+  // ---- the human-paced posture, which is the one tatte is told to use ----------------
+  //
+  // Supervisor OFF means the queue does not advance itself: a person presses Run for each
+  // goal. That is BY DESIGN and must not be confused with stranding, which is what the
+  // first version of this test did. The real bug it found was different and worse - a run
+  // that finished cleanly never marked its item 'done' unless the supervisor was armed, so
+  // the item sat on 'taken' forever and everything behind it waited on an id that could
+  // never be satisfied. Fixed by ai-native-engine-00; these two checks are what prove it.
+  // Release the first goal the way a person does. This line was lost in a rewrite, and
+  // its absence looked exactly like a product bug: the test waited three minutes for an
+  // item it had never started, reported it stranded, and the release below then ran goal
+  // ONE rather than goal two. A missing action is indistinguishable from a broken system
+  // unless the assertion checks what the action returned - so this one does.
+  const released = await api("/agent/queue/run", { method: "POST" });
+
+  await test("releasing the first goal starts a run on that goal", () => {
+    // The route answers { runId, item } on success, 404 { error } when the queue is empty,
+    // 409 { busy } when a run holds the workspace. An earlier version of this check
+    // accepted anything truthy, so a refusal passed and surfaced three assertions later.
+    assert.ok(released && released.runId, "queue/run refused: " + JSON.stringify(released).slice(0, 200));
+    assert.equal(released.item && released.item.id, posted.queued[0].id, "started the wrong item");
   });
 
-  const settled = await waitForQueue(api, { minutes: 4, every: 1500 });
+  const firstSettled = await waitForItem(api, posted.queued[0].id, { seconds: 180 });
 
-  await test('every queued goal reaches a settled state - nothing is stranded', () => {
-    assert.ok(settled.settled, `queue never settled: ${JSON.stringify(settled.items.map((i) => [i.goal.slice(0, 30), i.status]))}`);
-    for (const item of settled.items) {
-      assert.ok(TERMINAL_ITEM.includes(item.status), `${item.goal.slice(0, 40)} left in ${item.status}`);
-    }
-  });
-
-  await test('the runs those goals produced also finished, in a state the loop recognises', async () => {
+  // A test that fails must say what it saw. The first version reported only the item's
+  // status, which is the one fact that cannot explain itself.
+  if (firstSettled.status !== 'done') {
     const list = await api('/agent/list');
     const runs = Array.isArray(list) ? list : (list.runs || []);
-    assert.ok(runs.length >= 1, 'no runs recorded for a chain that settled');
+    console.error('  DIAGNOSTIC: runs =', JSON.stringify(runs.map((r) => ({ id: r.id, status: r.status, queueItemId: r.queueItemId, steps: (r.steps || []).length }))));
     for (const r of runs) {
-      assert.ok(TERMINAL_RUN.includes(r.status), `run ${r.id} left in ${r.status}`);
+      const d = await api(`/agent/${r.id}`);
+      console.error(`  DIAGNOSTIC: run ${r.id} status=${d.status}`,
+        'steps:', (d.steps || []).slice(-6).map((s) => `${s.type}${s.tool ? ':' + s.tool : ''}`).join(' -> '),
+        d.pending ? `PENDING ${JSON.stringify(d.pending).slice(0, 120)}` : '');
     }
+    console.error('  DIAGNOSTIC: hub log tail:', started.log.join('').slice(-700));
+  }
+
+  await test('a clean run marks its own queue item done, with no supervisor involved', () => {
+    assert.equal(firstSettled.status, 'done',
+      `item 1 is '${firstSettled.status}' - finishing is not supervision, and a run that ` +
+      `completed must complete its ticket whatever the posture`);
+  });
+
+  await test('the next goal waits for a human rather than advancing itself', async () => {
+    const q = await api('/agent/queue');
+    const second = q.items.find((i) => i.id === posted.queued[1].id);
+    assert.equal(second.status, 'queued', 'a disarmed queue must not start work on its own');
+    assert.equal(second.after, posted.queued[0].id, 'and it must still remember what it waits on');
+  });
+
+  // Press Run again, the way a person would.
+  await api('/agent/queue/run', { method: 'POST' });
+  const secondSettled = await waitForItem(api, posted.queued[1].id, { seconds: 180 });
+
+  await test('releasing the second goal by hand runs it, in the order the plan asked for', () => {
+    assert.equal(secondSettled.status, 'done', `item 2 is '${secondSettled.status}'`);
+  });
+
+  await test('the runs behind those goals finished in a state the loop recognises', async () => {
+    const list = await api('/agent/list');
+    const runs = Array.isArray(list) ? list : (list.runs || []);
+    assert.ok(runs.length >= 2, `expected a run per goal, got ${runs.length}`);
+    for (const r of runs) assert.ok(TERMINAL_RUN.includes(r.status), `run ${r.id} left in ${r.status}`);
   });
 
   await test('the hub survived the whole path', () => {
     assert.equal(started.died(), null, `hub exited: ${started.died()}`);
   });
+
 } finally {
   try { fake.kill(); } catch {}
   try { hub && hub.kill(); } catch {}
