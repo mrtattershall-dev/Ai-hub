@@ -3,10 +3,9 @@
  *
  *   node server/queueChain.test.mjs
  *
- * Boots its own hub on a spare port rather than talking to yours, so running it while
- * something else is working is safe. It does share `agent-queue.json` (the path is fixed
- * in queue.js), so every goal it adds is tagged and deleted again on the way out - including
- * on failure. Check the queue is as you left it if this ever dies half way.
+ * Boots its own hub on a spare port, with its own backlog and its own config in a temp
+ * directory (AGENT_QUEUE_FILE + HUB_DB), so it cannot touch yours even if it dies hard and
+ * even if a hub is queueing at the same moment.
  *
  * What is actually being pinned: that a chain runs IN ORDER and only in order. `after`
  * existed in the queue from the start but nothing could set it, so this path has never
@@ -17,9 +16,13 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { freePort } from './testPort.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PORT = 3099 + Math.floor(Math.random() * 300);
+// Asked for, not guessed - the old band overlapped godotVerify's. See testPort.mjs.
+const PORT = await freePort();
 const BASE = `http://127.0.0.1:${PORT}/api`;
 const TAG = `chaintest-${Date.now().toString(36)}`;
 
@@ -41,8 +44,20 @@ const api = async (path, options) => {
 const goal = (n) => `${TAG} step ${n}`;
 
 // ---- boot ---------------------------------------------------------------------------
+// Its own backlog and its own config, in a temp dir. This test used to enqueue into the
+// REAL agent-queue.json and delete its own items again afterwards, which is not safe: on
+// 2026-09-10 a sibling test doing the same thing lost a goal a running hub had queued
+// seconds earlier. Tidying up carefully does not help when a live hub is writing the same
+// file - the only fix is not to share it.
+const TMP = mkdtempSync(join(tmpdir(), 'queuechain-'));
 const child = spawn(process.execPath, [join(__dirname, 'index.js')], {
-  env: { ...process.env, PORT: String(PORT), AGENT_SUPERVISOR: '0' },
+  env: {
+    ...process.env,
+    PORT: String(PORT),
+    AGENT_SUPERVISOR: '0',
+    AGENT_QUEUE_FILE: join(TMP, 'agent-queue.json'),
+    HUB_DB: join(TMP, 'hub.json'),
+  },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
 let serverLog = '';
@@ -58,14 +73,11 @@ async function waitForServer(deadlineMs = 20000) {
   throw new Error(`server did not start on ${PORT}\n${serverLog.slice(-800)}`);
 }
 
-async function cleanup() {
-  try {
-    const { body } = await api('/agent/queue');
-    for (const item of (body.items || []).filter((i) => i.goal?.startsWith(TAG))) {
-      await api(`/agent/queue/${item.id}`, { method: 'DELETE' });
-    }
-  } catch {}
+function cleanup() {
+  // Nothing to un-do in a shared file any more: the whole backlog lived in TMP, so killing
+  // the server and removing the directory is the entire teardown.
   child.kill();
+  try { rmSync(TMP, { recursive: true, force: true }); } catch { /* Windows may still hold it */ }
 }
 
 try {
@@ -144,7 +156,7 @@ try {
     assert.match(orphaned.blocked, /no longer exists/);
   });
 } finally {
-  await cleanup();
+  cleanup();
 }
 
 console.log(`queue chain: ${passed} passed${process.exitCode ? ' (with failures above)' : ''}`);

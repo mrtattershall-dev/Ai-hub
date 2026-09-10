@@ -10,6 +10,7 @@
  */
 import { readFileSync, existsSync } from 'fs';
 import { resolve, sep } from 'path';
+import { fileURLToPath } from 'url';
 import WebSocket from 'ws';
 
 const HUB = process.env.HUB || 'http://localhost:3001';
@@ -55,7 +56,13 @@ console.log('\n--- path confinement (write_file is auto-approved, so this is loa
 
 console.log('\n--- atomic db write ---');
 {
-  const db = resolve(process.cwd(), 'hub.json');
+  // Where the SERVER actually keeps it: HUB_DB if set, else beside index.js. Resolving
+  // this against process.cwd() meant the documented invocation - `node server/selftest.mjs`
+  // from the repo root - looked for a hub.json that is one directory up from the real one,
+  // and reported the hub's own database as unreadable.
+  const db = process.env.HUB_DB
+    ? resolve(process.env.HUB_DB)
+    : fileURLToPath(new URL('./hub.json', import.meta.url));
   let ok = false, why = '';
   try { JSON.parse(readFileSync(db, 'utf8')); ok = true; } catch (e) { why = String(e.message).slice(0, 50); }
   check('hub.json is valid JSON', ok, why);
@@ -156,14 +163,39 @@ console.log('\n--- terminal ---');
 
 console.log('\n--- portability gate ---');
 {
-  const gatePath = resolve(process.cwd(), '..', 'training-data', 'factory', 'gate.mjs').replace(/\\/g, '/');
-  const g = await import('file:///' + gatePath);
-  const p = (c) => g.dependsOnExternalResources(c).portable;
-  check('generated graphics portable', p('this.add.rectangle(1,1,1,1,0);'));
-  check('data: URI portable', p('const i=new Image(); i.src="data:image/png;base64,AA";'));
-  check('asset load rejected', !p('this.load.image("p","assets/p.png");'));
-  check('setBaseURL rejected', !p('this.load.setBaseURL("https://cdn.phaserfiles.com/v385");'));
-  check('remote image rejected', !p('const i=new Image(); i.src="https://x.com/a.png";'));
+  // Resolved against THIS FILE, not the working directory. It used to be
+  // `resolve(process.cwd(), '..', ...)`, which points one level ABOVE the repo - so the
+  // import threw ERR_MODULE_NOT_FOUND, took the process down before the summary line,
+  // and left the gate unverified for however long that had been true. A suite that
+  // cannot find a file has to report a failure, not die.
+  const gateUrl = new URL('../training-data/factory/gate.mjs', import.meta.url);
+  let g = null;
+  try { g = await import(gateUrl.href); }
+  catch (e) { check('portability gate module loads', false, e.message); }
+
+  if (g) {
+    const p = (c) => g.dependsOnExternalResources(c).portable;
+    check('generated graphics portable', p('this.add.rectangle(1,1,1,1,0);'));
+    check('data: URI portable', p('const i=new Image(); i.src="data:image/png;base64,AA";'));
+    check('asset load rejected', !p('this.load.image("p","assets/p.png");'));
+    check('setBaseURL rejected', !p('this.load.setBaseURL("https://cdn.phaserfiles.com/v385");'));
+    check('remote image rejected', !p('const i=new Image(); i.src="https://x.com/a.png";'));
+
+    // The second contract, and the one a training row has to satisfy now that the
+    // verifier serves the library: an asset IN the manifest is legal, one that is not is
+    // a 404 and a blank canvas. Untested until now, and it decides whether a harvested
+    // row is kept.
+    const manifest = ['hero.png', 'tiles/grass.png'];
+    const r = (c) => g.runnableWithAssets(c, manifest);
+    const inLib = 'this.load.image("h","assets/hero.png");';
+    const notInLib = 'this.load.image("h","assets/nope.png");';
+    check('asset in the library is runnable', r(inLib).runnable);
+    check('asset NOT in the library is refused', !r(notInLib).runnable);
+    check('the missing asset is named', (r(notInLib).missing || []).includes('nope.png'));
+    check('a remote URL stays refused even with a manifest',
+      !r('const i=new Image(); i.src="https://x.com/a.png";').runnable);
+    check('no manifest falls back to the strict rule', !g.runnableWithAssets(inLib, []).runnable);
+  }
 }
 
 console.log('\n================  ' + pass + ' passed, ' + fail + ' failed  ================');

@@ -41,7 +41,7 @@ const hub = spawn(process.execPath, [join(__dirname, 'index.js')], {
   env: {
     ...process.env, PORT: String(HUB), HUB_DB: join(dir, 'hub.json'),
     AGENT_WORKSPACE: join(dir, 'workspace'), AGENT_QUEUE_FILE: join(dir, 'queue.json'),
-    AGENT_RUNS_DIR: join(dir, 'runs'),
+    AGENT_RUNS_DIR: join(dir, 'runs'), RUN_INDEX: join(dir, 'run-index.jsonl'),
     AGENT_SUPERVISOR: '1', AGENT_APPROVAL_MODE: 'strict',   // strict => the command WILL ask
     AGENT_TICK_S: '15', AGENT_APPROVAL_TIMEOUT_MIN: '1',
     HUB_TOKEN: '', AGENT_MAX_STEPS: '10', AGENT_MAX_MINUTES: '5',

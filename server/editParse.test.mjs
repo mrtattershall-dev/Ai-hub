@@ -67,5 +67,20 @@ test('a FENCED edit still parses', () => {
   assert.equal(a.replace, 'const a = 2;');
 });
 
+test('edit_file with a lone block and NO FIND is treated as write_file', () => {
+  // Verbatim shape from a real run: the model pasted the complete new file under
+  // ACTION: edit_file. The intent is unambiguous; refusing it only burns a call.
+  const r = parse('THOUGHT: fix it\nACTION: edit_file\nPATH: check.js\n```javascript\nvar add = require("./index.js").add;\n```');
+  assert.equal(r.tool, 'write_file', 'stayed edit_file and would fail: ' + JSON.stringify(r.args));
+  assert.match(r.args.content, /require/, 'lost the pasted content');
+  assert.equal(r.args.path, 'check.js');
+});
+
+test('a MALFORMED FIND still errors rather than guessing', () => {
+  // FIND: is present but empty. Guessing here would replace the wrong thing.
+  const r = parse('ACTION: edit_file\nPATH: x.js\nFIND:\nREPLACE:\n```\nnew\n```');
+  assert.equal(r.tool, 'edit_file', 'silently turned a broken edit into a whole-file overwrite');
+});
+
 console.log(`\n${passed} passed, ${failed} failed\n`);
 process.exit(failed ? 1 : 0);

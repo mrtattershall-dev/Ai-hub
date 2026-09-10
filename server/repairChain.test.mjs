@@ -3,9 +3,8 @@
  *
  *   node server/repairChain.test.mjs
  *
- * Touches the real `agent-queue.json` (its path is fixed in queue.js), so the file is
- * snapshotted up front and restored in a finally, whatever happens. Run it while nothing
- * else is queueing; if it ever dies hard, check the file before trusting the queue.
+ * Runs against its own throwaway backlog (AGENT_QUEUE_FILE), so it cannot touch yours -
+ * not even if it dies hard, and not even if a hub is queueing at the same time.
  *
  * Worth pinning because the failure path has no UI and no logs anyone reads at 4am: the
  * only evidence it works is the queue's own shape afterwards.
@@ -14,11 +13,24 @@ import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as q from './queue.js';
-import { repairGoalFor, __supervisorTest } from './agent.js';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 
-const FILE = join(dirname(fileURLToPath(import.meta.url)), 'agent-queue.json');
-const snapshot = existsSync(FILE) ? readFileSync(FILE, 'utf8') : null;
+// Its own backlog, decided BEFORE queue.js is loaded - it reads the path once, at module
+// load, so these imports have to be dynamic to sit after this line.
+//
+// This used to run against the real queue and restore it in a `finally`, which cannot
+// protect a file a live hub is writing at the same time: on 2026-09-10 a test doing
+// exactly that lost a goal a running hub had queued seconds earlier. A test should not be
+// able to cost you work, however carefully it tidies up.
+const TMP = mkdtempSync(join(tmpdir(), 'repairchain-'));
+const FILE = join(TMP, 'agent-queue.json');
+process.env.AGENT_QUEUE_FILE = FILE;
+
+const q = await import('./queue.js');
+const { repairGoalFor, __supervisorTest } = await import('./agent.js');
+
+const snapshot = null;   // nothing of yours is touched, so there is nothing to restore
 
 let passed = 0;
 const test = (name, fn) => {
@@ -188,8 +200,9 @@ try {
     assert.equal(q.enqueue('plain goal').item.repairOf, null, 'an ordinary goal is not a repair');
   });
 } finally {
-  if (snapshot != null) writeFileSync(FILE, snapshot, 'utf8');
-  else writeFileSync(FILE, JSON.stringify({ items: [] }, null, 2), 'utf8');
+  // The whole temp directory goes, backlog and all. There is nothing to restore, because
+  // nothing of yours was ever opened.
+  rmSync(TMP, { recursive: true, force: true });
 }
 
 console.log(`repair chain: ${passed} passed${process.exitCode ? ' (with failures above)' : ''}`);
