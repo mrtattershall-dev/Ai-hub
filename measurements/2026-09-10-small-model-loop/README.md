@@ -115,3 +115,39 @@ is set and the adapter is not loaded. Establish the instrument works before meas
 - `f15.log` is retained but **must not be cited** — the workspace was mutating under the model.
 - A guard refusal returns an `ERROR:` string, which made the best pass of the day report a
   tool error. If you add a guard that returns ERROR, check what your metrics do with it.
+
+## 35-goal run — Qwen3-Coder-30B / H100 (`t35-coder3.log`)
+
+    goals run           : 35
+    status 'done'       : 32/35
+    WORK ACTUALLY DONE  : 34/35
+    tool errors         : 10
+    total model calls   : 382
+    wall clock          : 13.6 min
+
+Sequential, not chained - a chained 35-goal run strands on the first `stopped` predecessor.
+Covers create / append / surgical / multi-site / cross-file re-export / rename-with-call-sites
+/ break-then-fix / docs-from-real-code / Phaser game with real assets.
+
+**The single substantive failure is instructive.** `q4_time.py`'s `humanize()` is CORRECT.
+The model then wrote seven self-checks, two of which contradict each other:
+
+    assert humanize(120)  == "2m"       # agrees with the code
+    assert humanize(3660) == "61m 0s"   # FAILS - contradicts the line above
+
+It ran the file, saw the AssertionError, and finished anyway. The goal explicitly said
+"plus asserts at the bottom. Run it with python", so verification WAS the deliverable - this
+is a real miss, not a scoring artifact. Pattern worth remembering: **this model's
+implementation is more reliable than its self-verification.** A green run only proves the
+code and its author-written test agree; a red run does not prove the code is wrong.
+
+**Scoring caveat, learned the hard way.** The harness marks any `.html` as `:ok` when the
+file merely EXISTS. That let me call the Phaser game a stub and then call its docs
+hallucinated - both WRONG. The logic was in `q10_game.js` (which is what the prompt tells the
+model to do), the game had preload/create/update, arrow keys AND WASD, scoring, and
+`assets/player.png` which resolves in the manifest. Verify the artifact, not the filename.
+
+**The point of this run is what was NOT fixed.** 34/35 came out of a hub that still leaves
+broken code on disk when its own syntax check flags it (10 workspaces), still discards every
+action after the first (102 real responses hit it), still strands a chained queue on one
+`stopped` goal, and still carries three latent parser path bugs. That score is a floor.
