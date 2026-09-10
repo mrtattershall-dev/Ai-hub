@@ -43,6 +43,12 @@ DEFAULT_MAX_NEW = int(os.environ.get("MYCODER_MAX_NEW", "3072"))
 # Cadence of the keep-alive chunk emitted while a blocking generation runs. Must stay
 # comfortably under the hub's MODEL_STALL_S (default 90).
 HEARTBEAT_S = float(os.environ.get("MYCODER_HEARTBEAT_S", "5"))
+# Scaling. min_containers=1 keeps one warm so a test never pays a cold start; max_containers
+# bounds what several agents hammering this at once can cost. Both are env-tunable so the
+# expensive setting is a deliberate act, not a default.
+MIN_CONTAINERS = int(os.environ.get("MYCODER_MIN_CONTAINERS", "0"))
+MAX_CONTAINERS = int(os.environ.get("MYCODER_MAX_CONTAINERS", "4"))
+SCALEDOWN_S = int(os.environ.get("MYCODER_SCALEDOWN_S", "600"))
 
 if any(k in MODEL.upper() for k in ("30B", "32B", "70B", "72B")) and GPU in ("A10", "A10G", "L4", "T4", "A100"):
     raise SystemExit(
@@ -76,13 +82,28 @@ image = (
     image=image,
     gpu=GPU,
     volumes={"/root/.cache/huggingface": hf_cache},
-    scaledown_window=600,
+    scaledown_window=SCALEDOWN_S,
     timeout=60 * 30,
+    min_containers=MIN_CONTAINERS,
+    max_containers=MAX_CONTAINERS,
 )
-# Requests may OVERLAP, but generation itself is serialised - see the lock in load().
-# Concurrency still earns its keep: a queued request keeps its connection and its
-# keep-alive heartbeat alive while it waits, instead of being refused or timing out.
-@modal.concurrent(max_inputs=16)
+# ONE GENERATION PER CONTAINER; SCALE OUT INSTEAD OF SHARING.
+#
+# vLLM's offline LLM class is not thread-safe, so generation here is serialised behind a
+# lock. That makes max_inputs > 1 actively harmful: extra requests do not batch, they QUEUE
+# behind the lock and each one waits for all the others. Measured 2026-09-10 when four test
+# batches accidentally ran at once against one container - throughput fell from ~130 to
+# 50 tok/s and runs "stopped" with zero errors, which looked exactly like a product
+# deadlock and was pure starvation.
+#
+# So: one in-flight request per container, and let Modal add containers under load. Each
+# container gets its own engine and its own GPU, which is real parallelism rather than the
+# appearance of it. MAX_CONTAINERS bounds the spend - without a ceiling, N concurrent
+# agents means N H100s.
+#
+# (The honest alternative is AsyncLLMEngine, which batches properly inside ONE container.
+# That is the better answer and a bigger change; this one cannot silently under-deliver.)
+@modal.concurrent(max_inputs=1)
 class Server:
     @modal.enter()
     def load(self):
