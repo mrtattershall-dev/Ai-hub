@@ -278,13 +278,15 @@ const tools = {
     // 1) exact unique match
     const exact = content.split(find).length - 1;
     if (exact === 1) { writeFileSync(full, content.replace(find, replace), 'utf8'); return `OK: edited ${path}.`; }
-    if (exact > 1) return `ERROR: the FIND snippet appears ${exact} times; include more surrounding lines so it is unique.`;
+    // An ambiguous EXACT match falls through to the line-based path below, which computes
+    // where each match is - the caller needs those positions to disambiguate.
 
     // 2) whitespace-tolerant: match by trimmed non-blank lines (ignores indentation)
     const fileLines = content.split('\n');
     const findLines = find.split('\n').map(l => l.replace(/^\s*\d+:\s?/, '').trim()).filter(Boolean);
     if (!findLines.length) return `ERROR: the FIND snippet was not found in ${path}.`;
     let start = -1, end = -1, hits = 0;
+    const where = [];
     for (let i = 0; i < fileLines.length; i++) {
       let fi = i, ki = 0;
       while (fi < fileLines.length && ki < findLines.length) {
@@ -292,15 +294,61 @@ const tools = {
         if (t === '') { fi++; continue; }            // skip blank lines in the file
         if (t === findLines[ki]) { fi++; ki++; } else break;
       }
-      if (ki === findLines.length) { hits++; if (hits === 1) { start = i; end = fi - 1; } }
+      if (ki === findLines.length) {
+        hits++;
+        where.push({ start: i, end: fi - 1 });
+        if (hits === 1) { start = i; end = fi - 1; }
+      }
     }
     if (hits === 1) {
       const out = [...fileLines.slice(0, start), replace, ...fileLines.slice(end + 1)].join('\n');
       writeFileSync(full, out, 'utf8');
       return `OK: edited ${path} (matched ignoring indentation).`;
     }
-    if (hits > 1) return `ERROR: the snippet matches ${hits} places; include more lines so it is unique.`;
-    return `ERROR: the FIND snippet was not found in ${path}. read_file again and copy the exact lines you want to replace.`;
+
+    // A REFUSAL HAS TO HAND BACK SOMETHING TO ACT ON.
+    //
+    // Measured 2026-09-10 against the 32B: told only "the snippet matches 2 places;
+    // include more lines so it is unique", the model re-sent the IDENTICAL snippet five
+    // times and the run died on the repeat guard. The instruction was correct and
+    // unusable - it named the problem while withholding the one fact needed to solve it,
+    // which is WHERE the matches are. An error that a caller cannot act on is a loop.
+    const preview = (m) => {
+      const from = Math.max(0, m.start - 1);
+      const to = Math.min(fileLines.length - 1, m.end + 1);
+      return fileLines.slice(from, to + 1)
+        .map((l, k) => `      ${String(from + k + 1).padStart(4)}| ${l}`.slice(0, 130))
+        .join('\n');
+    };
+
+    if (hits > 1) {
+      const sites = where.slice(0, 4)
+        .map((m, n) => `  match ${n + 1} - lines ${m.start + 1}-${m.end + 1}:\n${preview(m)}`)
+        .join('\n');
+      return `ERROR: the FIND snippet matches ${hits} places in ${path}, so it is ambiguous.\n`
+        + `Here is each one, with the line above and below:\n${sites}\n`
+        + `Pick the one you meant and extend FIND with a neighbouring line - the line above or below is usually enough. `
+        + `Do NOT resend the same snippet; it will match ${hits} places again.`;
+    }
+
+    // Not found: show what IS there, anchored on the most distinctive word the caller
+    // asked for, so the next attempt sees how the file actually reads.
+    const longest = [...findLines].sort((a, b) => b.length - a.length)[0] || '';
+    const token = longest.replace(/[^A-Za-z0-9_$]+/g, ' ').split(' ').filter((w) => w.length > 3)[0];
+    let near = '';
+    if (token) {
+      const idx = fileLines.findIndex((l) => l.includes(token));
+      if (idx >= 0) {
+        const from = Math.max(0, idx - 3);
+        const to = Math.min(fileLines.length - 1, idx + 5);
+        near = `\nThe closest match in the file is around "${token}":\n`
+          + fileLines.slice(from, to + 1)
+            .map((l, k) => `      ${String(from + k + 1).padStart(4)}| ${l}`.slice(0, 130))
+            .join('\n');
+      }
+    }
+    return `ERROR: the FIND snippet was not found in ${path} (${fileLines.length} lines).${near}\n`
+      + `Copy the target lines EXACTLY as read_file shows them, or use write_file to replace the whole file.`;
   },
 
   // ---- durable memory --------------------------------------------------------
