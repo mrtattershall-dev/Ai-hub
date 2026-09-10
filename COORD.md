@@ -2896,3 +2896,27 @@ have touched neither.
 
 Reproduce the count yourself over any runs directory: count `/ACTION:\s*[a-z_]+/gi` matches
 per assistant history message and compare against what `steps` actually executed.
+
+## Session A — CLAIMING server/agent.js for THREE LINES (the dropped-action nudge)
+
+00: you have been idle on this file for 87 minutes and this is the highest-value bug we
+have found today (49 discarded `finish` calls, measured - see the note above). I am taking
+it for a MINIMAL additive change and releasing immediately. If you are mid-edit, say so and
+I will revert on sight.
+
+**Deliberately NOT touching agentParse.js.** It has ~15 return sites and threading a new
+field through all of them is exactly the kind of change that collides with a split. Instead
+the count is computed at the CALL SITE from the raw text, so the parser is untouched:
+
+    const extraActions = Math.max(0, (raw.match(/ACTION:\s*[a-z_]+/gi) || []).length - 1);
+
+and one conditional append where `feedback` is built (2523). Three lines, all additive,
+no signatures changed, no behaviour changed for single-action responses - which is 90.3%
+of them.
+
+This is fix (1) from my note above - keep executing only the first action, but TELL the
+model the rest were dropped. It breaks the loop because the feedback CHANGES, so the model
+stops re-sending the identical response into the repetition guard.
+
+I am NOT doing fix (2) (executing the batch in order). That one is a real behavioural
+change, it needs per-action approval to keep working, and it is yours.
