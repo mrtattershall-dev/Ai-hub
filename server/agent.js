@@ -2710,7 +2710,14 @@ async function drive(loadDb, run) {
       pushStep(run, { type: 'error', text: `Stopped: ran out of ${spent}. Raise AGENT_MAX_STEPS / AGENT_MAX_MINUTES to go further.` });
     }
   } finally {
-    run.busy = false;
+    // `run.busy = false` USED TO BE HERE, and that was the bug. The status is already
+    // terminal by now, so releasing busy at the top told every client the run was over and
+    // freed the workspace lock (activeTopLevelRun) while the rollback below was still walking
+    // git history and rewriting files. `fuzzLoop.mjs 1 4 14` reported p1_calc.js BROKEN
+    // although its history held a version that parsed: the fuzzer saw 'stopped', checked the
+    // workspace and killed the hub mid-rollback. The same gap lets /agent/start accept the
+    // next goal while this run is still restoring files underneath it. busy is now released
+    // only once the repair is done - see below.
 
     // ── DO NOT LEAVE CODE THAT WILL NOT PARSE ──────────────────────────────────
     //
@@ -2752,6 +2759,10 @@ async function drive(loadDb, run) {
         }
       } catch { /* never let the repair take the run down */ }
     }
+    // The workspace is settled - release it. Before the queue hand-off below, which calls
+    // autoStart and needs the workspace free. No await between the parked-run break and
+    // here, so awaiting_approval/interrupted release exactly as promptly as before.
+    run.busy = false;
 
     if (['done', 'error', 'stopped'].includes(run.status)) { saveTrace(run); recordRunIndex(run); }
     persist(run);   // capture final/paused state (incl. 'interrupted' and 'awaiting_approval')
@@ -3431,8 +3442,10 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
   router.get('/:id', (req, res) => {
     const run = runs.get(req.params.id);
     if (!run) return res.status(404).json({ error: 'run not found' });
+    // busy IS reported: a terminal status with busy still set means teardown (the syntax
+    // rollback) is in progress, and the workspace is not yet in its final state.
     const { history, busy, ...view } = run;
-    res.json(view);
+    res.json({ ...view, busy: !!busy });
   });
 
   // Approve or reject a pending run_command, then resume.

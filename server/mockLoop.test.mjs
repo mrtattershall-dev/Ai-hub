@@ -157,7 +157,9 @@ await test('the loop runs real recorded output end to end without crashing', asy
     let run = null;
     while (Date.now() < deadline) {
       run = await api('/agent/' + s.runId).catch(() => null);
-      if (run && ['done', 'error', 'stopped', 'interrupted', 'failed', 'awaiting_approval'].includes(run.status)) break;
+      // Terminal is not finished: the run keeps the workspace (busy) until its teardown - the
+      // syntax rollback - is done, so starting the next goal on status alone is refused.
+      if (run && ['done', 'error', 'stopped', 'interrupted', 'failed', 'awaiting_approval'].includes(run.status) && !run.busy) break;
       await new Promise((r) => setTimeout(r, 500));
     }
     assert.ok(run, 'run never reached a terminal state');
