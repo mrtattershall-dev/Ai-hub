@@ -592,8 +592,12 @@ console.log('\n--- asset library (live) ---');
   check('the new step type has a label, so it never renders as "Ran"', /list_assets: 'Looked up assets'/.test(ui));
   const views = readFileSync(join(__dirname, '..', 'client', 'src', 'lib', 'views.jsx'), 'utf8');
   check('the Assets page is registered as a view', /assets:\s+AssetsPage/.test(views));
-  const side = readFileSync(join(__dirname, '..', 'client', 'src', 'components', 'Sidebar.jsx'), 'utf8');
-  check('the Assets page is in the nav', /id: 'assets'/.test(side));
+  // Test the invariant, not the implementation. The sidebar used to hold its own copy of
+  // the nav list and now derives it from views.jsx NAV_GROUPS - a good change that broke a
+  // check pinned to the old literal. What actually matters is that Assets is REACHABLE.
+  check('the Assets page is reachable from the nav',
+    /NAV_GROUPS[\s\S]*?'assets'[\s\S]*?\];/.test(views)
+    || /id: 'assets'/.test(readFileSync(join(__dirname, '..', 'client', 'src', 'components', 'Sidebar.jsx'), 'utf8')));
   const api = readFileSync(join(__dirname, '..', 'client', 'src', 'lib', 'api.js'), 'utf8');
   check('the client uploads in batches', /assetsAdd\s*=\s*\(files\)/.test(api));
 }
