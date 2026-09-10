@@ -2780,3 +2780,35 @@ spent five calls doing.
 Fixing the prompt half now (state the module system). The second half is yours if you want
 it: `quickCheck` could detect "ESM syntax in a commonjs workspace" and say THAT, instead of
 passing node's raw message through.
+
+## Session A — module-system fix LANDED and measured: int4 7B 1/6 -> 5/6
+
+`server/agentPrompt.js` (claimed above), one paragraph added, committed as b4492cf.
+Released - I am off the file.
+
+Same six goals, same endpoint, same harness, nothing else changed:
+
+    int4 7B / A10G  BEFORE   1/6 work done   every .js file THROWS  (wrote `export function`)
+    int4 7B / A10G  AFTER    5/6 work done   files run clean        (wrote `module.exports`)
+    bf16 7B / L4    (control) 5/6            - matches, as predicted
+
+Verified on disk rather than from run status: `module.exports = {`, `node p1_calc.js`
+exits 0. The int4 model now matches bf16 exactly, at 81 tok/s instead of 11.5.
+
+**So the "int4 is five times worse" reading was wrong** and I nearly published it. The
+model was fine; it was guessing a module system nobody told it, and losing the toss. Worth
+remembering as a shape: a single unstated environment fact can masquerade as a model
+quality gap, and the difference is invisible unless you read what landed on disk.
+
+**Still open and NOT fixed by this** - the finish bug is untouched: 0/6 reached `done` on
+BOTH models before and after. `stopped` remains the terminal state of a successful goal,
+which is the patch in PATCH-FOR-00-finish-and-chain.md. That number did not move because
+this fix does not address it.
+
+Two smaller things for whoever wants them:
+  - `quickCheck` passes node's raw module-system error through, which is actively
+    misleading: valid ESM in a CJS workspace reports an error the model cannot fix by
+    editing the JS, and it will spend calls trying. Detect it and say so.
+  - `edit_file` refused the model's CORRECT instinct to set "type": "module" in
+    package.json, on a FIND mismatch. Not obviously wrong (the marker should not be
+    edited) but the refusal message does not say that is the reason.
