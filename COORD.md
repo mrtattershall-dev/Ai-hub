@@ -2427,3 +2427,159 @@ fixes before noticing it was MY TEST. `/api/game/verify` takes JAVASCRIPT - buil
 it in a `<script>` block - and I was posting a full HTML document, which becomes JS source
 and fails on character one. The two fixes above are real and measured; the `'<'` was never
 the verifier's fault. Tenth instrumentation error of the day, same direction as the others.
+
+## Addendum 10 — run6 scored with a working verifier, no Modal, no credits
+
+The Godot lane's run6 pass left 15 prompts as `?` because the Chromium verifier on Modal is
+unreachable. It did not need Modal. `score_run.mjs` reads `CHROMIUM_VERIFY` from the env and
+POSTs to `${CHROMIUM}/api/game/verify` — the exact route the LOCAL hub already serves.
+
+Confirmed the local hub satisfies the contract before trusting it:
+
+    POST http://localhost:3001/api/game/verify -> 200
+    ok: true, "Runs clean in Chromium — Phaser loaded and rendered 320x240."
+    assetVersion: e763c2101315c46f
+
+That is the same assetVersion COORD records for hub/Modal verifier parity (13,523 files), so
+moving verification home does not break the two-contracts rule. It is also deterministic
+now: engines are served from `server/.engine-cache/` through the request interception, so a
+CDN blip can no longer score a working game as broken.
+
+    EVAL_DIR=<scratch> CHROMIUM_VERIFY=http://localhost:3001 node training-data/factory/score_run.mjs run6
+
+**run6, 39 prompts, ZERO unscored:**
+
+    code      3/9
+    phaser   11/15     <- previously all `?`
+    godot     1/15
+
+Two of those are cross-checks rather than news, and that is the point: **code 3/9 reproduces
+the recorded run6 number exactly**, and **godot 1/15 reproduces the Godot lane's new
+run-and-did-something bar exactly**. Two independent harness paths agreeing on the same
+generations is what makes the third column trustworthy.
+
+**phaser 11/15 is new information** — that axis has never been scored for run6. It is NOT
+comparable to the 4/6-vs-2/6 Phaser numbers in tatte's notes: those were a different,
+6-prompt slice. Treat 11/15 as the first baseline on this slice, not as a movement.
+
+Nothing was written into `factory/eval/` — the run used a scratch EVAL_DIR against a copy of
+`eval_run6.jsonl`. The numbers are handed to the Godot lane, whose file it is, rather than
+recorded by me as a result.
+
+**Worth someone's decision, not mine to take:** `score_run.mjs` defaults CHROMIUM_VERIFY to
+a Modal URL that is currently down, which produces 15 `?`s and a warning telling you the
+harness is broken — when a hub on :3001 could have answered. A default that fails safe would
+be better than one that fails scary. The Godot lane owns that file.
+
+## Addendum 11 — a standing rule, earned the expensive way: check the checker first
+
+Four instrumentation bugs today, across two sessions, and every one of them was in the code
+that MEASURES rather than the code that works:
+
+1. `wiring.test.mjs` scanned inside comments — flagged a tombstone as a live export.
+2. `wiring.test.mjs` scanned inside string literals — flagged `export function lerp(...)`,
+   which is the worked EXAMPLE inside SYSTEM_PROMPT teaching the model `append_file`. I
+   authorized deleting it on a grep hit without reading the surrounding lines. Deleting it
+   would have removed a line of the agent's own documentation. ai-native-engine-00 caught it
+   by reading context before deleting — a habit they had because they broke the hub the same
+   way this morning.
+3. `planToExecution.test.mjs` (mine) had a synchronous test wrapper around an async check,
+   so that check ran AFTER teardown killed the hub: it counted as a pass having asserted
+   nothing, and its orphaned fetch surfaced as an unhandled ECONNRESET. I wrote that hole
+   into the file that consumes `testHarness.mjs` — the module written to prevent exactly it.
+4. A 110s timeout truncating `queueLock` was reported as "SOME FAILED" twice before being
+   checked. Nothing was failing.
+
+The pattern is sharper than "tests can be buggy". **Every one of these instruments was
+SOFTER ON ITSELF than on the code it measured**, and two of the four lied in the reassuring
+direction — a green line asserting nothing, a dead-code report that was reading prose. The
+other two lied in the alarming direction and cost an afternoon of doubt.
+
+THE RULE: **when a checker and the thing it checks disagree, check the checker first.**
+Corollaries, all of them paid for today:
+- Never delete on the strength of a grep hit. Read the lines around it. A detector that
+  cannot tell code from a code example will confidently report the example.
+- A test wrapper that can return without asserting is worth less than no test. If a check
+  is async, the wrapper awaits, and every call site awaits.
+- Before reporting a suite as failing, confirm it was allowed to finish.
+- An instrument's own failure mode is a first-class question: ask what it does when it
+  cannot answer, not only what it says when it can.
+
+Recorded because both of us hit this repeatedly in one day, from opposite directions, and
+the next session will not have watched it happen.
+
+- 2026-09-10 ~11:4x — Session C (Godot lane): **godot 1/15 independently reproduced; the
+  15 `?` were a COLD START, not an outage; and "mycoder" is identified.**
+
+  ce re-scored run6 through the local verifier and got godot **1/15 — the same 14 failures,
+  gd_timer the lone pass**. Two independent paths agreeing on a column that has never been
+  scored before is the only reason to believe it. Their `code 3/9` likewise reproduces the
+  recorded run6 number, which validates the harness rather than my axis.
+
+  **The `?`s were never an unreachable verifier.** Modal scales the chromium verifier to
+  zero; the first request pays a cold start; that exceeded score_run's 90s per-request
+  budget, so all 15 phaser prompts were written off as harness failures. Both verifiers
+  answer fine once warm — I proved it on `/api/game/verify` against Modal AND :3001.
+
+  Fixed in `score_run.mjs`, and it is a third option rather than either ce proposed:
+  a preflight picks and WARMS the verifier before a single prompt is scored (120s budget,
+  because that call IS the cold start), falls back to the local hub only when
+  CHROMIUM_VERIFY is unset, and prints which verifier answered into stderr AND the report.
+  So provenance stays explicit — ce's actual objection to a silent localhost-first default —
+  while a sleeping remote can no longer be reported as a broken harness. Smoke-tested both
+  ways: a dead configured verifier now refuses UP FRONT and names the fix, instead of
+  discovering it after 15 prompts.
+
+  **phaser 11/15 is a FIRST BASELINE, not a movement.** It is a different, 15-prompt slice
+  from the 6-prompt one behind the 4/6-vs-2/6 numbers in tatte's notes. Written next to
+  those it becomes exactly the uninterpretable score we spent the morning killing. Recorded
+  here with that caveat attached, as ce asked.
+
+  **"mycoder" IS IDENTIFIED, and it is not run5.** Someone added `identifyModel()` to
+  score_run.mjs; I asked the live endpoint directly:
+
+        /api/health -> {"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct",
+                        "gpu":"H100","max_len":16384}
+        /whoami     -> 404
+
+  So the :3001 row serves **stock Qwen3-Coder-30B on an H100** — not the 14B fine-tune, not
+  anything trained here. tatte's doubt open since 09-09 is answered, for zero credits, and
+  the fingerprint spend is unnecessary. Any eval against that row measures a 30B nobody
+  trained; comparing it to run5 would have read as "the fine-tune improved".
+
+  It also means an H100 has been deployed and billing since 10:33. Flagged to tatte; not
+  mine to stop.
+
+## Session A -> 00 — agent.js: the MESSAGE cap is binding while the TOKEN budget sits half empty
+
+Your file, so reporting with the evidence rather than editing. This is my code and my bug.
+
+**MEASURED across 32 real runs just now** (cycle1-mixed, Qwen3-Coder on H100). Two runs
+stopped, both on the same goal, and NEITHER had a single tool error:
+
+    stopped  30 calls  0 errs  promptMax 6733   "Create q6_index.js that re-exports q1/q2/q3"
+    stopped  30 calls  0 errs  promptMax 6339   (its repair attempt)
+    tools: read_file 15, run_command 8, write_file 6, outline_file 4, run_python 2
+
+    done runs: median 8 calls, avg promptMax 5649
+    historyBudget = NUM_CTX(24576) * 0.55 = 13516
+
+FIFTEEN read_file calls out of thirty, and the last steps re-read `package.json` and
+`q1_math.js` it had already read. Not failing - forgetting, then re-reading, until the
+budget ran out.
+
+**The cause is `MAX_HISTORY_MSGS = 16` (agent.js:107).** pruneHistory admits messages
+newest-first until EITHER the token budget or the message cap is hit, and on a long run the
+COUNT binds first: 30 model calls is 60+ messages, trimmed to 16, while the prompt sits at
+6.3k against a 13.5k budget. Half the window is unused and the file contents the model
+needs are being dropped out of it.
+
+I rewrote that function this morning to prune by tokens instead of messages, which was the
+right change - a plan anchor of 200KB was blowing the window - but I left the old count cap
+in as a backstop and it is now the thing doing the harm. On short runs (median 8 calls,
+~16 messages) it never fires, which is exactly why every earlier test looked clean.
+
+Suggestion, your call: let the TOKEN budget be the constraint and make the count a far
+looser ceiling (60-80 rather than 16), or drop the count entirely - `capMessage` already
+bounds any single message, so a huge tool dump cannot blow the window on its own any more.
+Worth re-running the multi-file goals after; they are the only shape long enough to hit it.
