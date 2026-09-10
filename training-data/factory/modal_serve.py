@@ -21,10 +21,27 @@ import modal
 # The qwen-adapters volume is the same one modal_train.py writes to, so a finished
 # run is servable immediately - no merge, no GGUF conversion, no upload.
 ADAPTER = os.environ.get("MYCODER_ADAPTER", "/adapters/run3")
+# Serve the BASE model with no adapter at all: MYCODER_ADAPTER=none.
+#
+# Measured 2026-09-09, the untuned 32B beat every fine-tune on the shared eval subset
+# (12/18 vs run5's 9/18) and scores 19/20 on code, so "no adapter" is a real configuration
+# and not a fallback. The base model is configurable for the same reason the trainer's is:
+# a 32B is a different model, not a flag on the 14B.
+BASE_MODEL = os.environ.get("MYCODER_BASE", "unsloth/Qwen2.5-Coder-14B-Instruct-bnb-4bit")
+SERVE_BASE_ONLY = ADAPTER.strip().lower() in ("", "none", "base", "off")
 # GPU is env-configurable too: A10G is the cheap default, H100 is ~3-4x faster on
 # single-stream decode (14B decode is memory-bandwidth bound) at ~3.6x the hourly
 # rate - roughly cost-neutral, materially faster wall-clock.
 GPU = os.environ.get("MYCODER_GPU", "A10G")
+
+# A 32B in 4-bit is ~19GB of weights plus a KV cache that grows with context. On a 24GB
+# A10G it loads and then dies partway through a long generation - after the load is billed.
+# Same guard as modal_train.py and modal_evalset.py, for the same reason.
+if "32B" in BASE_MODEL.upper() and GPU in ("A10", "A10G", "L4", "T4", "A100"):
+    raise SystemExit(
+        f"refusing to start: MYCODER_BASE is {BASE_MODEL} but MYCODER_GPU={GPU}. "
+        f"Serving a 32B needs 80GB - set MYCODER_GPU=H100 (or H200/A100-80GB)."
+    )
 MODEL_NAME = "mycoder"
 SYSTEM = ("You are a senior engineer who writes complete, self-contained, runnable code. "
           "Every identifier you reference must be declared or imported, declarations must "
@@ -43,6 +60,7 @@ hf_cache = modal.Volume.from_name("hf-cache", create_if_missing=True)
 adapters = modal.Volume.from_name("qwen-adapters", create_if_missing=True)
 image = (
     modal.Image.debian_slim(python_version="3.11").apt_install("git")
+    .env({"MYCODER_BASE": BASE_MODEL, "MYCODER_ADAPTER": ADAPTER, "MYCODER_GPU": GPU})
     .pip_install("unsloth", "trl", "peft", "transformers", "datasets",
                  "accelerate", "bitsandbytes", "huggingface_hub", "hf_transfer")
     .pip_install("fastapi[standard]")                 # extra layer on top of the cached train image
@@ -79,12 +97,17 @@ class Server:
         # LATER container - which is exactly what modal_train.py does - is invisible
         # until reload(). Without this, serving a freshly trained run crash-loops with
         # "Unsloth: No config file found" even though the files are plainly on the volume.
-        adapters.reload()
-        if not os.path.isdir(ADAPTER):
-            raise RuntimeError(f"adapter not found on volume after reload: {ADAPTER}")
-        print(f"[serve] loading adapter {ADAPTER}", flush=True)
+        if SERVE_BASE_ONLY:
+            ref = BASE_MODEL
+            print(f"[serve] loading BASE model, no adapter: {ref}", flush=True)
+        else:
+            adapters.reload()
+            if not os.path.isdir(ADAPTER):
+                raise RuntimeError(f"adapter not found on volume after reload: {ADAPTER}")
+            ref = ADAPTER
+            print(f"[serve] loading adapter {ADAPTER}", flush=True)
         self.model, self.tok = FastLanguageModel.from_pretrained(
-            model_name=ADAPTER, max_seq_length=8192, dtype=None, load_in_4bit=True)
+            model_name=ref, max_seq_length=8192, dtype=None, load_in_4bit=True)
         FastLanguageModel.for_inference(self.model)
         self.lock = threading.Lock()
 
