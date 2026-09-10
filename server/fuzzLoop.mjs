@@ -13,7 +13,12 @@
  *            answers approvals itself. Unchanged from before modes existed.
  *   hostile  serve ONLY the replies fuzzCorpus.mjs classes as hostile: multi-action, first
  *            action writes package.json, leaked line-number prefixes in a fence, no THOUGHT
- *            outside a planner turn. The pool is printed per category at start.
+ *            outside a planner turn. The pool is printed per category at start. Implies
+ *            --settle.
+ *   --settle (flag, any mode) after each goal, wait until the run's FINAL state is on disk
+ *            before checking or starting the next goal - otherwise the check races the
+ *            hub's end-of-run syntax rollback (see waitFinal). Off in default mode so that
+ *            mode's behaviour is unchanged; add it to re-check a BROKEN from a default run.
  *   chain    AGENT_SUPERVISOR=1 with the shortest tick (15s) and approval timeout (1 min) the
  *            hub accepts. The goals are queued as ONE ordered chain, each `after` the one
  *            before; the head is started and the supervisor drives the rest, denying stale
@@ -61,7 +66,10 @@ for (const m of MODES) {
 const HOSTILE_POOL = MODES.has('hostile');
 const CHAIN = MODES.has('chain');
 const MODE = [...MODES].filter((m) => m !== 'default').join(',');   // '' = default mode
-const MODE_ARG = MODE ? ` --mode=${MODE}` : '';
+// --settle: wait for each run's end-of-run block before checking or moving on (see waitFinal).
+// Implied by hostile; opt-in for default so default mode's behaviour stays exactly as it was.
+const SETTLE = HOSTILE_POOL || FLAGS.settle === true;
+const MODE_ARG = (MODE ? ` --mode=${MODE}` : '') + (SETTLE && !HOSTILE_POOL ? ' --settle' : '');
 const CORPUS = join(HERE, 'testdata', 'model-corpus.jsonl');
 
 const rows = readFileSync(CORPUS, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
@@ -166,6 +174,8 @@ async function iteration(seed) {
     // above, so anything left parked means the denial path itself did not resume the run.
     if (!run || !['done', 'error', 'stopped', 'interrupted', 'failed'].includes(run.status)) {
       v.push(`HANG: "${goal.slice(0, 40)}" never reached a terminal state (last: ${run?.status}, denied ${denied})`);
+    } else if (SETTLE && !(await waitFinal(dir, s.runId))) {
+      v.push(`HANG: "${goal.slice(0, 40)}" reported ${run.status} but never persisted its final state (end-of-run block still going after 90s)`);
     }
     statuses.push(run?.status);
   }
@@ -188,6 +198,26 @@ async function iteration(seed) {
 const LIVE = ['running', 'awaiting_approval', 'interrupted'];
 const SETTLE_MS = 40000;             // > 2 supervisor ticks of 15s
 const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
+
+// A run's status turns terminal in the API BEFORE its end-of-run block runs: agent.js sets
+// 'stopped' / 'done' inside the loop, then its `finally` restores any .js that no longer
+// parses from git history, writes the trace and index line, and only THEN persists the run.
+// The default loop checks invariants and kills the hub the moment it sees the terminal
+// status - measured 2026-09-10: in 122 of 153 default/hostile iteration dirs the last run was
+// still 'running' on disk, i.e. the hub died before that block finished. A BROKEN file the
+// rollback would have restored is then reported anyway (hostile seed 6: p1_calc.js, with a
+// parseable version sitting in git history). The final persist is the last thing the block
+// does, so a terminal status ON DISK means the rollback is over.
+const FINAL = ['done', 'error', 'stopped', 'interrupted', 'failed'];
+async function waitFinal(dir, runId, ms = 90000) {
+  const f = join(dir, 'runs', `${runId}.json`);
+  const until = Date.now() + ms;
+  while (Date.now() < until) {
+    try { if (FINAL.includes(JSON.parse(readFileSync(f, 'utf8')).status)) return true; } catch { /* mid-write or not yet there */ }
+    await sleep(300);
+  }
+  return false;
+}
 
 async function driveChain(api, goals) {
   const v = [];
