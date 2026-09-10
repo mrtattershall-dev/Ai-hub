@@ -499,6 +499,21 @@ app.post('/api/terminal/send', (req, res) => {
   res.json({ ok: true, sessionId });
 });
 
+// ── /api errors are JSON, and never carry a stack ─────────────────────────────
+// A route that threw fell through to Express's default handler: an HTML page with the full
+// stack trace (file paths, module layout) for whoever asked - and this hub can be reached
+// through a tunnel. Every /api client parses JSON, so the page also surfaced as
+// "Unexpected token '<'" with the real error lost (fuzz seed 39, the 4th /agent/start).
+// The stack is logged here; the client gets the message. Registered after every /api route.
+app.use('/api', (err, req, res, next) => {
+  if (res.headersSent) return next(err);   // mid-response: only Express can end it now
+  console.error(`[api] ${req.method} ${req.originalUrl} failed:`, err?.stack || err);
+  // Keep a deliberate 4xx (a malformed JSON body is body-parser's 400); anything else is a 500.
+  const status = Number(err?.status || err?.statusCode);
+  res.status(status >= 400 && status < 500 ? status : 500)
+    .json({ error: String(err?.message || err || 'internal error') });
+});
+
 // Serve whatever the agent builds so web apps open at http://localhost:3001/workspace/
 app.use('/workspace', express.static(WORKSPACE));
 
