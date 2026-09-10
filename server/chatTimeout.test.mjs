@@ -48,7 +48,7 @@ writeFileSync(dbPath, JSON.stringify({
 }), 'utf8');
 
 const hub = spawn(process.execPath, [join(__dirname, 'index.js')], {
-  env: { ...process.env, PORT: String(PORT), HUB_DB: dbPath, CHAT_STALL_S: String(STALL_S), HUB_TOKEN: '' },
+  env: { ...process.env, PORT: String(PORT), HUB_DB: dbPath, AGENT_WORKSPACE: join(dir, 'workspace'), AGENT_QUEUE_FILE: join(dir, 'queue.json'), AGENT_RUNS_DIR: join(dir, 'runs'), RUN_INDEX: join(dir, 'run-index.jsonl'), CHAT_STALL_S: String(STALL_S), HUB_TOKEN: '' },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
 hub.stderr.on('data', (d) => { const s = d.toString(); if (/Error|error:/i.test(s)) process.stderr.write('  [hub] ' + s); });

@@ -54,7 +54,7 @@ writeFileSync(dbPath, JSON.stringify({
 const hub = spawn(process.execPath, [join(__dirname, 'index.js')], {
   env: {
     ...process.env,
-    PORT: String(PORT), HUB_DB: dbPath,
+    PORT: String(PORT), HUB_DB: dbPath, AGENT_RUNS_DIR: join(dir, 'runs'), RUN_INDEX: join(dir, 'run-index.jsonl'),
     AGENT_WORKSPACE: ws, AGENT_QUEUE_FILE: join(dir, 'queue.json'),
     AGENT_SUPERVISOR: '1',              // the whole point: it must pull the next goal itself
     AGENT_APPROVAL_MODE: 'build',

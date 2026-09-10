@@ -54,7 +54,7 @@ console.log(`\nreal model: ${BASE_URL}\n`);
 const hub = spawn(process.execPath, [join(__dirname, 'index.js')], {
   env: {
     ...process.env,
-    PORT: String(HUB_PORT), HUB_DB: dbPath,
+    PORT: String(HUB_PORT), HUB_DB: dbPath, AGENT_RUNS_DIR: join(dir, 'runs'), RUN_INDEX: join(dir, 'run-index.jsonl'),
     AGENT_WORKSPACE: ws, AGENT_QUEUE_FILE: join(dir, 'queue.json'),
     AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
     AGENT_MAX_STEPS: '24', AGENT_MAX_MINUTES: '12',
