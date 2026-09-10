@@ -20,7 +20,22 @@ import modal
 from pathlib import Path
 
 GPU = os.environ.get("TRAIN_GPU", "A100")                 # 40GB default; "A100-80GB", "H100", "H200"
-BASE = "unsloth/Qwen2.5-Coder-14B-Instruct-bnb-4bit"      # train from base (clean comparison)
+
+# The base model is overridable so a 32B run is a env-var away, NOT a code edit.
+#
+# It MUST be kept in step with BASE in modal_evalset.py: an adapter trained on 32B and
+# evaluated against a 14B base measures nothing. Both read TRAIN_BASE/EVAL_BASE, and the
+# eval prints the base it loaded so a mismatch is visible in the log rather than silent.
+BASE = os.environ.get("TRAIN_BASE", "unsloth/Qwen2.5-Coder-14B-Instruct-bnb-4bit")
+
+# A 32B in 4-bit is ~19GB of weights before optimizer state, gradients and activations.
+# On a 40GB card that OOMs partway in - which costs the whole run, not just the step. Fail
+# here instead, where it is free.
+if "32B" in BASE.upper() and GPU in ("A100", "A10", "A10G", "L4", "T4"):
+    raise SystemExit(
+        f"refusing to start: BASE is {BASE} but TRAIN_GPU={GPU}. "
+        f"A 32B 4-bit LoRA needs 80GB - set TRAIN_GPU=H100 (or A100-80GB)."
+    )
 # Dataset is overridable so run 2 (different data) is a one-liner:
 #   TRAIN_DATA=factory/dataset_v2.jsonl python -m modal run factory/modal_train.py --run-name v2
 DATA = Path(os.environ["TRAIN_DATA"]).resolve() if os.environ.get("TRAIN_DATA") \
@@ -49,7 +64,8 @@ app = modal.App("qwen-train")
               cpu=float(os.environ.get("TRAIN_CPU", "4")),
               memory=int(os.environ.get("TRAIN_MEM_MB", "16384")),
               volumes={"/root/.cache/huggingface": hf_cache, "/adapters": adapters})
-def train(epochs: int = 2, maxlen: int = 8192, lr: float = 2e-4, run_name: str = "run1"):
+def train(epochs: int = 2, maxlen: int = int(os.environ.get("TRAIN_MAXLEN", "8192")),
+          lr: float = 2e-4, run_name: str = "run1"):
     import torch
     from unsloth import FastLanguageModel
     from trl import SFTTrainer, SFTConfig
@@ -64,6 +80,9 @@ def train(epochs: int = 2, maxlen: int = 8192, lr: float = 2e-4, run_name: str =
 
     ds = load_dataset("json", data_files="/root/dataset.jsonl", split="train")
     ds = ds.map(lambda ex: {"text": tokenizer.apply_chat_template(ex["messages"], tokenize=False)})
+    # State the base explicitly. run5/run6 were compared against the wrong baseline once
+    # already; a line in the log is the cheapest possible guard against repeating it.
+    print(f"base {BASE} on {GPU}", flush=True)
     print(f"training on {len(ds)} rows | maxlen {maxlen} | {epochs} epochs")
 
     bf16 = torch.cuda.is_bf16_supported()
@@ -119,7 +138,8 @@ def train(epochs: int = 2, maxlen: int = 8192, lr: float = 2e-4, run_name: str =
 
 
 @app.local_entrypoint()
-def main(epochs: int = 2, maxlen: int = 8192, run_name: str = "run1"):
+def main(epochs: int = 2, maxlen: int = int(os.environ.get("TRAIN_MAXLEN", "8192")),
+         run_name: str = "run1"):
     if not DATA.exists():
         raise SystemExit(f"dataset not found at {DATA}")
     print(f"dataset: {DATA}  ->  training on Modal {GPU} ...")

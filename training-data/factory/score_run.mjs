@@ -42,6 +42,10 @@ const EVAL_DIR = join(__dirname, 'eval');
 // clean 0/6 that says nothing about the model. Verify /api/health before trusting a run.
 const CHROMIUM = process.env.CHROMIUM_VERIFY || 'https://mr-tattershall--chromium-verify-verifier-web.modal.run';
 
+// Every distinct asset-library version the verifier reported while scoring. More than one
+// means the library changed mid-run and the Phaser column is not internally comparable.
+const ASSET_VERSIONS = new Set();
+
 const names = process.argv.slice(2);
 if (!names.length) {
   console.error('usage: node factory/score_run.mjs <name> [name2 ...]   e.g. run4 run5');
@@ -114,6 +118,10 @@ async function scorePhaser(row) {
     });
     if (!r.ok) return { pass: null, why: `verifier HTTP ${r.status}` };
     const j = await r.json();
+    // Record which asset library this was scored against. A Phaser score is only comparable
+    // across runs if the code loaded the same bytes, and the library changes as packs are
+    // imported - so an unpinned score silently compares two different worlds.
+    if (j.assetVersion) ASSET_VERSIONS.add(j.assetVersion);
     return { pass: !!j.ok, why: (j.verdict || '').slice(0, 90) };
   } catch (e) {
     // A harness failure is NOT a model failure. Tonight we cached 356 of those as real
@@ -281,6 +289,12 @@ if (differs) {
   console.log(`  ${pad('shared', 12)} ${shared.length} prompts  <- the only comparable subset`);
 
   console.log(`\n${'='.repeat(76)}`);
+  if (ASSET_VERSIONS.size === 1) {
+    console.log(`  asset library: ${[...ASSET_VERSIONS][0]}`);
+  } else if (ASSET_VERSIONS.size > 1) {
+    console.log(`  !! asset library CHANGED during scoring (${[...ASSET_VERSIONS].join(', ')})`);
+    console.log('     the phaser column is not internally comparable - rescore.');
+  }
   console.log(`COMPARABLE — the ${shared.length} prompts every variant answered`);
   console.log('='.repeat(76));
   console.log(`\n${pad('axis', 13)}${names.map((n) => pad(n, 14)).join('')}`);

@@ -33,7 +33,10 @@ for maybe half the speed, which is the right trade when the whole eval is ~40 pr
 import os
 import modal
 
-BASE = "unsloth/Qwen2.5-Coder-14B-Instruct-bnb-4bit"
+# Must match TRAIN_BASE in modal_train.py. An adapter trained on 32B and evaluated against
+# a 14B base measures nothing at all, and the failure is silent - the load succeeds and the
+# generations are simply wrong. The base actually loaded is printed below for that reason.
+BASE = os.environ.get("EVAL_BASE", "unsloth/Qwen2.5-Coder-14B-Instruct-bnb-4bit")
 GPU = os.environ.get("EVAL_GPU", "A10G")
 
 # ── The five system prompts, verbatim from the training set ───────────────────
@@ -188,7 +191,7 @@ def generate(ref: str, out_name: str):
         _gpu = torch.cuda.get_device_name(0)
     except Exception:
         _gpu = GPU
-    print(f"[evalset] loading {ref} on {_gpu}", flush=True)
+    print(f"[evalset] loading {ref} on {_gpu} | base {BASE}", flush=True)
 
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=ref, max_seq_length=8192, dtype=None, load_in_4bit=True)
