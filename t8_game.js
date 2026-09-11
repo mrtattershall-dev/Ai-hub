@@ -83,15 +83,15 @@ function gameLoop() {
 }
 
 // Handle keyboard input
-    let keys = {};
-    
-    window.addEventListener('keydown', function(e) {
-        keys[e.key] = true;
-    });
-    
-    window.addEventListener('keyup', function(e) {
-        keys[e.key] = false;
-    });
-    
-    // Start the game when the page loads
-    window.addEventListener('load', init);
+let keys = {};
+
+window.addEventListener('keydown', function(e) {
+    keys[e.key] = true;
+});
+
+window.addEventListener('keyup', function(e) {
+    keys[e.key] = false;
+});
+
+// Start the game when the page loads
+window.addEventListener('load', init);
