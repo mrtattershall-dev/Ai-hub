@@ -39,7 +39,7 @@ function isValidCard(number) {
 // Test cases with asserts
 console.assert(isValidCard(4532015112830366) === true, "Valid card number should return true");
 console.assert(isValidCard(6011514433546201) === true, "Valid card number should return true");
-console.assert(isValidCard(4000000000000002) === false, "Invalid card number should return false");
+console.assert(isValidCard(4000000000000002) === true, "Valid card number should return true");
 console.assert(isValidCard(1234567812345678) === false, "Invalid card number should return false");
 console.assert(isValidCard("4532 0151 1283 0366") === true, "Valid card with spaces should return true");
 console.assert(isValidCard("4532015112830366") === true, "Valid card without spaces should return true");
