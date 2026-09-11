@@ -1,0 +1,5 @@
+armed 21:33:01: stop coder32b-awq on ALL DONE or at 70 min
+ALL DONE seen at 21:55:01
+STOPPING 21:55:01
+{"ok":true,"stopExit":0,"stopAttempts":1,"stoppedAt":null,"detail":"stopped, and confirmed by the app list"}
+stopApp exit 0 (VERIFIED STOPPED)

@@ -1,0 +1,40 @@
+coder32b-awq set A start 21:32:55
+waiting for the endpoint to come up (cold start)...
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-32B-Instruct-AWQ","gpu":"H100","max_len":16384,"lora":null}
+
+20 goals, sequential: coder32b-awq-setA
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-lxhvAB\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  done          11     4   0   0    12  t1_temp.js:runs
+   2  done          11     4   0   0    12  t1_temp.js:runs
+   3  done           8     4   0   0    15  t2_text.py:runs
+   4  done          11     5   0   0    18  t3_inventory.js:runs
+   5  done           9     7   0   0    12  t3_inventory.js:runs
+   6  stopped        8     7   0   0    15  T_NOTES.md:ok t3_inventory.js:runs
+   7  done          10     4   0   0    15  t4_intervals.js:runs
+   8  done          11     7   0   0    15  t4_intervals.js:runs T_INTERVALS.md:ok
+   9  done           8     4   0   0    18  t5_page.html:ok t5_page.js:parses
+  10  done          16    10   0   0    33  t5_page.html:ok t5_page.js:parses
+  11  done          14     6   0   0    18  t6_stats.py:runs
+  12  done          11     5   0   0    18  t7_router.js:runs
+  13  done          17    10   0   0    21  t7_router.js:runs
+  14  done           7     4   0   0    21  t8_game.html:ok t8_game.js:parses
+  15  stopped       23    14   1   0    39  t8_game.js:parses
+  16  stopped       22    11   0   0    33  t9_csvsum.py:THROWS
+  17  done          10     4   0   0    15  t10_debounce.js:runs
+  18  stopped        7     6   0   0    12  t11_check.js:MISSING t1_temp.js:runs t4_intervals.js:runs
+  19  done          14     6   0   0    27  t12_bits.js:runs
+  20  stopped       45    30   0   0    45  T_INDEX.md:ok
+
+--- summary ---
+goals run           : 20
+status 'done'       : 15/20
+WORK ACTUALLY DONE  : 18/20   <- the number that matters
+tool errors         : 1
+guard refusals      : 0   (the system working)
+total model calls   : 152
+wall clock          : 6.9 min
+files: ESCALATIONS.md, package.json, t10_debounce.js, t10_debounce.test.js, t12_bits.js, t1_temp.js, t2_text.py, t3_inventory.js, t4_intervals.js, t5_page.html, t5_page.js, t6_stats.py, t7_router.js, t8_game.html, t8_game.js, t9_csvsum.py, TASKS.md, T_INDEX.md, T_INTERVALS.md, T_NOTES.md, __pycache__
+tok/s: min 22.1 max 75.4
+harness exit 0 at 21:44:03
