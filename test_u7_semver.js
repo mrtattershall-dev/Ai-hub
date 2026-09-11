@@ -27,3 +27,8 @@ console.assert(compare('1.0.0', '1.0.0.0') === 0, '1.0.0 should equal 1.0.0.0');
 console.assert(compare('1.2.3', '1.2.3.0') === 0, '1.2.3 should equal 1.2.3.0');
 
 console.log('All tests passed!');
+// Test pre-release versions
+console.assert(compare('1.0.0-beta', '1.0.0') === -1, '1.0.0-beta should be less than 1.0.0');
+console.assert(compare('1.0.0', '1.0.0-beta') === 1, '1.0.0 should be greater than 1.0.0-beta');
+console.assert(compare('1.0.0-beta', '1.0.0-alpha') === 1, '1.0.0-beta should be greater than 1.0.0-alpha');
+console.assert(compare('1.0.0-alpha', '1.0.0-beta') === -1, '1.0.0-alpha should be less than 1.0.0-beta');
