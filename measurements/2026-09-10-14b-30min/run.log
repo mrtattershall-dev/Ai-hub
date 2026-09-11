@@ -1,0 +1,45 @@
+harness start 20:35:15, no new goals after 21:00:15
+waiting for the endpoint to come up (cold start)...
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+
+25 goals, sequential: coder14b-base
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-qy1VKb\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  stopped       11     6   0   0    51  s1_stack.js:THROWS
+   2  stopped       12     6   2   0    27  s1_stack.js:THROWS
+   3  stopped       15     8   0   0    60  s2_dates.js:runs
+   4  stopped       13     7   0   0    36  s2_dates.js:runs
+   5  stopped       11     8   0   0    69  S_NOTES.md:ok s1_stack.js:THROWS s2_dates.js:runs
+   6  stopped       17     8   0   0    57  s3_words.py:THROWS
+   7  stopped       15    10   0   0    48  s3_words.py:THROWS
+   8  stopped       30    18   1   0    87  s4_queue.js:runs
+   9  done          11     6   0   0    27  s4_queue.js:runs S_QUEUE.md:MISSING
+  10  done           7     4   0   0    30  s5_index.html:ok s5_app.js:parses
+  11  done          11     7   0   0    30  s5_index.html:ok s5_app.js:parses
+  12  done           7     3   0   0    36  s6_matrix.js:runs
+  13  done          10     5   0   0    27  s6_matrix.js:runs
+  14  done          11     5   0   0    33  s7_roman.py:runs
+  15  stopped       17     9   2   0    75  s8_cache.js:runs
+  16  done           9     4   0   0    30  s9_validate.js:runs
+  17  done           9     4   0   0    27  s10_load.js:runs
+  18  done          15     7   0   0    45  s11_bank.js:runs
+  19  stopped        9     5   0   0    36  s11_bank.js:runs
+  20  stopped       10     5   1   0    45  s12_grid.py:THROWS
+  21  stopped       12     7   0   0    63  s13_game.html:ok s13_game.js:parses
+  22  stopped       13     7   0   0    57  s13_game.js:parses
+  23  stopped       16     8   2   0    57  s14_sort.js:runs
+  24  stopped       21    11   0   0    78  s16_events.js:THROWS
+  25  stopped       12     5   0   0    57  s15_extra_test.js:THROWS s4_queue.js:runs s9_validate.js:runs
+
+--- summary ---
+goals run           : 25
+status 'done'       : 9/25
+WORK ACTUALLY DONE  : 16/25   <- the number that matters
+tool errors         : 8
+guard refusals      : 0   (the system working)
+total model calls   : 173
+wall clock          : 19.9 min
+files: ESCALATIONS.md, node_modules, package-lock.json, package.json, s10_config.json, s10_load.js, s11_bank.js, s12_grid.py, s13_game.html, s13_game.js, s14_sort.js, s14_sort.test.js, s15_extra_test.js, s16_events.js, s1_stack.js, s2_dates.js, s3_words.py, s4_queue.js, s5_app.js, s5_index.html, s6_matrix.js, s7_roman.py, s8_cache.js, s9_validate.js, S_NOTES.md, TASKS.md, __pycache__
+tok/s: min 9.2 max 47.6
+harness exit 0 at 20:57:25

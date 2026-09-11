@@ -1,0 +1,14 @@
+watchdog armed 20:35:19, stop due 21:05:19
+STOPPING 21:05:20
+Are you sure you want to stop App 'coder14b-base' in the 'main' environment? This will immediately terminate 1 running container. [y/N]: Aborted!
+stop exit 1
+                                            Apps                               
+┌───────────────────────────┬───────────────┬──────────┬───────┬──────────────┬
+│ App ID                    │ Description   │ State    │ Tasks │ Created at   │
+├───────────────────────────┼───────────────┼──────────┼───────┼──────────────┼
+│ ap-SAgsTr9PZI8qz73xuNmwZx │ coder14b-base │ deployed │ 1     │ 2026-09-10   │
+│                           │               │          │       │ 20:33        │
+│                           │               │          │       │ Central      │
+│                           │               │          │       │ Daylight     │
+│                           │               │          │       │ Time         │
+└───────────────────────────┴───────────────┴──────────┴───────┴──────────────┴

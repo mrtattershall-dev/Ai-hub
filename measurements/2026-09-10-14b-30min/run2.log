@@ -1,0 +1,30 @@
+pass 2 start 20:58:31, no new goals after 21:03:00, app stop at ~21:05 (watchdog)
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+
+25 goals, sequential: coder14b-base-pass2
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-9AZ8X1\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  done          11     4   0   0    27  s1_stack.js:runs
+   2  stopped       16     8   0   0    27  s1_stack.js:runs
+   3  done          13     5   0   0    33  s2_dates.js:runs
+   4  stopped        9     5   0   0    21  s2_dates.js:runs
+   5  done          12     7   0   0    30  S_NOTES.md:ok s1_stack.js:runs s2_dates.js:runs
+   6  stopped        8     4   0   0    45  s3_words.py:THROWS
+   7  stopped        5     4   0   0    15  s3_words.py:THROWS
+   8  done          11     4   0   0    27  s4_queue.js:runs
+   9  done          13     7   0   0    33  s4_queue.js:runs S_QUEUE.md:ok
+  10  done           9     4   0   0    27  s5_index.html:ok s5_app.js:parses
+  -- window closed: 15 goal(s) not started --
+
+--- summary ---
+goals run           : 10
+status 'done'       : 6/10
+WORK ACTUALLY DONE  : 8/10   <- the number that matters
+tool errors         : 0
+guard refusals      : 0   (the system working)
+total model calls   : 52
+wall clock          : 4.8 min
+files: ESCALATIONS.md, package.json, s1_stack.js, s2_dates.js, s3_words.py, s4_queue.js, s5_app.js, s5_index.html, S_NOTES.md, S_QUEUE.md, TASKS.md, __pycache__
+tok/s: min 15.3 max 42.9
+harness exit 0 at 21:03:23
