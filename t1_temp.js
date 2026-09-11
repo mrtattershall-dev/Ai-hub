@@ -19,3 +19,9 @@ console.assert(cToF(-40) === -40, "-40°C should equal -40°F");
 console.assert(fToC(-40) === -40, "-40°F should equal -40°C");
 
 console.log("All tests passed");
+function kToC(k) {
+    if (k < 0) {
+        throw new Error("Temperature in Kelvin cannot be negative");
+    }
+    return k - 273.15;
+}
