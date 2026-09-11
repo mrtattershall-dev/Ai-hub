@@ -33,6 +33,7 @@ import { canonicalSummary } from './canonicalAssets.mjs';
 import { SYSTEM_PROMPT } from './agentPrompt.js';
 import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
+import { lostDefs } from './defNames.js';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 
 /**
@@ -3008,6 +3009,11 @@ async function drive(loadDb, run) {
       // Depth is supplied here rather than trusted from the model. The parent is passed
       // through module scope - see spawn_subtask for why it must not go on args.
       if (tool === 'spawn_subtask') { args.depth = (run.depth || 0) + 1; _activeRun = run; }
+      // The file as it was BEFORE this write/edit, so a write that silently drops definitions can say so (defNames.js).
+      let beforeSrc = null;
+      if ((tool === 'write_file' || tool === 'edit_file') && args.path && /\.(py|c?js|mjs)$/i.test(args.path)) {
+        try { beforeSrc = readFileSync(safePath(args.path), 'utf8'); } catch { /* a new file */ }
+      }
       let result;
       try { result = await tools[tool](args); }
       catch (e) { result = `ERROR: ${e.message}`; }
@@ -3051,6 +3057,19 @@ async function drive(loadDb, run) {
         if (!err && /\.(py|c?js|mjs)$/i.test(args.path || '')) {
           try { syntaxNote += duplicateNote(readFileSync(safePath(args.path), 'utf8'), args.path); }
           catch { /* unreadable after the write - the syntax verdict above still stands */ }
+        }
+        // Set D: Qwen3-Coder lost seven working functions to whole-file rewrites (add_days, is_weekend and
+        // add_business_days in one; earliestStart and ready() inside the goals that added them), and nothing said so
+        // until the hidden checks at the end. Name what a write removed, at the moment it happens.
+        if (beforeSrc !== null && !/^ERROR/.test(String(result ?? ''))) {
+          try {
+            const lost = lostDefs(beforeSrc, readFileSync(safePath(args.path), 'utf8'), args.path);
+            if (lost.length) {
+              syntaxNote += `\n\n⚠️ This ${tool} REMOVED ${lost.length} definition(s) that ${args.path} had before: ${lost.join(', ')}. If you did not mean to delete them, put them back now - earlier work depends on them.`;
+              run.defsLost = (run.defsLost || 0) + lost.length;
+              pushStep(run, { type: 'note', text: `${tool} ${args.path} removed ${lost.join(', ')}` });
+            }
+          } catch { /* evidence only - never a reason to fail the step */ }
         }
       }
 
