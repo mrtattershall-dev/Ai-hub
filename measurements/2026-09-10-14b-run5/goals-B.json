@@ -1,0 +1,22 @@
+[
+  "Create u1_queue.js exporting a Queue class with enqueue(x), dequeue() that throws on an empty queue, and size(). Include asserts that all pass, then run it with node.",
+  "Add peek() to the EXISTING u1_queue.js that returns the front item without removing it and throws on an empty queue. Keep the other methods unchanged. Run it with node.",
+  "Create u2_anagram.py with a function are_anagrams(a, b) that ignores case and spaces, plus asserts at the bottom. Run it with python.",
+  "Create u3_cart.js exporting a Cart class with addItem(name, price, qty), total() and applyDiscount(pct) that throws if pct is outside 0-100. Include asserts that all pass, then run it with node.",
+  "In the EXISTING u3_cart.js, change ONLY total() so it rounds to two decimal places. Touch nothing else. Run it with node.",
+  "Write U_NOTES.md listing every method that really exists on the Cart class in u3_cart.js, with its arguments and what it throws. Read the file first; do not invent anything.",
+  "Create u4_flatten.js exporting flatten(obj) that turns a nested object into dotted keys, so { a: { b: 1 } } becomes { 'a.b': 1 }. Include asserts that all pass, then run it with node.",
+  "Reason about the EXISTING u4_flatten.js: what does flatten do with an array value such as { a: [1, 2] }? Write the answer and why in U_FLATTEN.md, then add an assert to u4_flatten.js that pins that behaviour down. Run it with node.",
+  "Create u5_page.html with two number inputs and a button that shows their sum below them, using u5_page.js loaded at the end of the body.",
+  "Add input validation to the EXISTING u5_page.js: if either input is empty or not a number, show an error message instead of a sum.",
+  "Create u6_wrap.py with wrap(text, width) that breaks text into lines no longer than width without splitting words, plus asserts at the bottom. Run it with python.",
+  "Create u7_semver.js exporting compare(a, b) for version strings like '1.10.2', returning -1, 0 or 1. Include asserts that all pass, then run it with node.",
+  "Add pre-release support to the EXISTING u7_semver.js so '1.0.0-beta' sorts before '1.0.0'. Keep the existing behaviour. Run it with node.",
+  "Create u8_game.html: a canvas game where the player moves a circle with WASD and it wraps around the edges. Put the logic in u8_game.js.",
+  "In the EXISTING u8_game.js, add three moving obstacles and show a 'Game Over' message when the circle touches one.",
+  "Create u9_deep.py with deep_get(data, path) that reads 'a.b.0.c' style paths from nested dicts and lists and returns None when anything is missing, plus asserts at the bottom. Run it with python.",
+  "Create u10_retry.js exporting retry(fn, times) that calls an async fn until it resolves or the attempts run out, then rethrows the last error. Include asserts that all pass, then run it with node.",
+  "Create u11_check.js with asserts that test u1_queue.js and u4_flatten.js, requiring them from the workspace. Read them first so you use their real exports. Run it with node.",
+  "Create u12_luhn.js exporting isValidCard(number) that implements the Luhn check. Include asserts that all pass, then run it with node.",
+  "Write U_INDEX.md listing every u-file that really exists in the workspace, with one line on what each does. Read them first."
+]
