@@ -666,8 +666,33 @@ const tools = {
 
   // Undo. Defaults to `revert` (a new commit undoing the old one) so history is never
   // lost; HARD: true resets and discards, which is why it is not the default.
+  //
+  // Checkpoints are taken BEFORE each mutating tool, so the change an agent wants undone is
+  // normally still UNCOMMITTED when this runs - and `git revert` refuses a dirty tree ("Your
+  // local changes to the following files would be overwritten by merge"). git_undo takes no
+  // checkpoint of its own (it is not in MUTATING, and it runs from the approve route), so it
+  // failed in the ordinary case. Found by calling every tool once in an isolated hub: it was
+  // the only one of 29 that failed. A revert now commits what is uncommitted first, so
+  // SHA: HEAD means "the latest change" - what an agent asking to undo means.
+  //
+  // The hub's own ledgers are never rolled back. An undo is about the agent's code: reverting
+  // TASKS.md would un-tick finished tasks, and NOTES.md is what the prompt calls permanent.
   async git_undo({ sha, hard } = {}) {
-    const r = await gitUndo(WORKSPACE, { sha: sha || 'HEAD', hard: String(hard) === 'true' });
+    const isHard = String(hard) === 'true';
+    const kept = {};
+    for (const f of ['TASKS.md', 'NOTES.md', 'ESCALATIONS.md']) {
+      try { kept[f] = readFileSync(join(WORKSPACE, f)); } catch { /* not there - nothing to keep */ }
+    }
+    if (!isHard) {
+      try {
+        await ensureRepo(WORKSPACE);
+        if (await isDirty(WORKSPACE)) await commitAll(WORKSPACE, 'before git_undo: the latest, uncommitted change');
+      } catch { /* the revert below reports its own error */ }
+    }
+    const r = await gitUndo(WORKSPACE, { sha: sha || 'HEAD', hard: isHard });
+    for (const [f, bytes] of Object.entries(kept)) {
+      try { writeFileSync(join(WORKSPACE, f), bytes); } catch { /* best effort */ }
+    }
     return r.ok ? `OK: ${r.out}` : `ERROR: ${r.error}`;
   },
 

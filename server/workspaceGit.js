@@ -187,7 +187,12 @@ export async function undo(workspace, { sha = 'HEAD', hard = false } = {}) {
     return r.ok ? { ok: true, out: `working tree reset to ${sha} (later changes discarded)` } : { ok: false, error: r.err };
   }
   const r = await git(workspace, ['revert', '--no-edit', sha]);
-  return r.ok ? { ok: true, out: `reverted ${sha} with a new commit` } : { ok: false, error: r.err };
+  if (r.ok) return { ok: true, out: `reverted ${sha} with a new commit` };
+  // A revert that conflicts stops HALF-DONE: conflict markers written into the files and a
+  // revert left "in progress". Leaving that behind turns a failed undo into broken code, so
+  // back out to exactly where we were. (Harmless when the revert failed for another reason.)
+  await git(workspace, ['revert', '--abort']);
+  return { ok: false, error: r.err };
 }
 
 /** Uncommitted changes, if any - used to decide whether a step is worth committing. */
