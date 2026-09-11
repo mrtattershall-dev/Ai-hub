@@ -2,6 +2,7 @@
 let canvas;
 let ctx;
 let ball;
+let paddle;
 
 // Initialize the game
 function init() {
