@@ -24,7 +24,7 @@ def mode(xs):
         frequency[x] = frequency.get(x, 0) + 1
     max_frequency = max(frequency.values())
     modes = [k for k, v in frequency.items() if v == max_frequency]
-    return modes[0] if len(modes) == 1 else modes
+    return modes[0]  # Return first mode when multiple exist
 
 # Asserts
 assert mean([1, 2, 3, 4, 5]) == 3.0
