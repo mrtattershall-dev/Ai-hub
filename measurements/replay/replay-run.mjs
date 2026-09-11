@@ -48,7 +48,7 @@ async function replay(s) {
     let body = ''; req.on('data', (d) => { body += d; });
     req.on('end', () => {
       // Every NEW hub message since the model last spoke - not just the last one, which is always the task ledger.
-      try { const b = JSON.parse(body); const msgs = b.messages || []; const la = msgs.map((m) => m.role).lastIndexOf('assistant'); asked.push(msgs.slice(la + 1).map((m) => String(m.content || '')).join('\n---\n').slice(0, 4000)); } catch { asked.push(''); }
+      try { const b = JSON.parse(body); const msgs = b.messages || []; const la = msgs.map((m) => m.role).lastIndexOf('assistant'); asked.push(msgs.slice(la + 1).map((m) => String(m.content || '')).join('\n---\n').slice(0, 12000)); } catch { asked.push(''); }
       let text; if (served < s.replies.length) text = s.replies[served++]; else { exhausted++; text = FINISH; }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ model: s.model, message: { role: 'assistant', content: text }, done: true }));
@@ -98,6 +98,13 @@ async function replay(s) {
     gateBlocks: asked.filter((a) => /Do NOT finish yet/.test(a)).length,
     defLossWarnings: asked.filter((a) => /REMOVED \d+ definition/.test(a)).length,
     defLossNamed: [...new Set(asked.flatMap((a) => [...a.matchAll(/had before: ([^.]+)\./g)].map((m) => m[1])))],
+    // The set-E fixes (f-fixes): what each one told the model during the replay.
+    noChangeEdits: asked.filter((a) => /NO CHANGE: your REPLACE/.test(a)).length,
+    shadowHints: asked.filter((a) => /HIDES the method/.test(a)).length,
+    ledgerHidden: asked.filter((a) => /left over from earlier goals about other work are not shown/.test(a)).length,
+    staleShown: asked.filter((a) => /left over from earlier work — only do this if the goal needs it/.test(a)).length,
+    verifyDetected: [...new Set(asked.flatMap((a) => [...a.matchAll(/PROJECT VERIFICATION \(detected: (\w+)\)/g)].map((m) => m[1])))],
+    connRetries: steps.filter((x) => x.type === 'note' && /connection dropped/.test(String(x.text || ''))).length,
     lastSteps: steps.slice(-4).map((x) => `${x.type}${x.tool ? ':' + x.tool : ''} ${String(x.text || x.summary || '').slice(0, 80)}`),
     dir: KEEP ? dir : undefined,
   };
@@ -106,6 +113,6 @@ async function replay(s) {
 
 for (const s of scen) {
   const r = await replay(s);
-  console.log(`${r.id} | ${r.error ? 'ERROR ' + r.error : `status ${r.status} (was ${r.original.status}) | finishBlocks ${r.finishBlocks} (was ${r.original.finishBlocks}) | forcedFinish ${r.forcedFinish} | served ${r.served}/${r.recorded}${r.exhausted ? ' EXHAUSTED x' + r.exhausted : ''} | discard nudges ${r.discardNudges} | gate blocks ${r.gateBlocks}`}`);
+  console.log(`${r.id} | ${r.error ? 'ERROR ' + r.error : `status ${r.status} (was ${r.original.status}) | finishBlocks ${r.finishBlocks} (was ${r.original.finishBlocks}) | forcedFinish ${r.forcedFinish} | served ${r.served}/${r.recorded}${r.exhausted ? ' EXHAUSTED x' + r.exhausted : ''} | discard nudges ${r.discardNudges} | gate blocks ${r.gateBlocks} | no-change ${r.noChangeEdits} | shadow ${r.shadowHints} | ledger hidden ${r.ledgerHidden} | stale shown ${r.staleShown} | verify ${r.verifyDetected.join('/') || '-'} | conn retries ${r.connRetries}`}`);
   if (OUT) appendFileSync(OUT, JSON.stringify(r) + '\n');
 }
