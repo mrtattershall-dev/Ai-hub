@@ -97,7 +97,8 @@ Qwen3-Coder's score is therefore not a test of its prediction; the 14B's is.
   goal, no silent checkpoint death: met - end states known for 100 of 100 and 64 of 64 goals, a transcript for every goal, no checkpoint failure.
 - Definition-loss warning predicted to fire at least 3 times for Qwen3-Coder: it fired exactly 3 times, two of them on its own test file - the prediction holds, just.
 
-### Hub bugs set E exposed - fixed on branch f-fixes (each with a test that fails without it), not yet merged
+### Hub bugs set E exposed - fixed on branch f-fixes (each with a test that fails without it)
+Merged into main 2026-09-11 as 947c48d, f62768e and b3c2614, after the full suite passed on the branch.
 Found by reading what the models were actually told, in the full transcripts. Replayed through f-fixes on the real
 recordings ($0): the 14B's 100 goals and Qwen3-Coder's 64 (measurements/replay/results/setE-*).
 | # | bug | how often in set E (14B / Qwen3-Coder) | replay through f-fixes |

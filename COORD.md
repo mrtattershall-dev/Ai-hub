@@ -4106,3 +4106,5 @@ tatte, verbatim, this thread: "After d has results, analyze the deep seated bugs
       test passes (verifierInfra timed out once under fuzzer load and passed 3/3 alone on the branch and on main;
       real* need a live MODEL_BASE). The LIVE hub (index.js since 05:09) was NOT restarted - it runs the old code until
       tatte says restart.
+      (The rebase onto main renamed the fix commits named in the set E findings entry above: 5ddc063 -> 947c48d,
+      aa0fc13 -> f62768e, 2baa03c -> b3c2614. Main now holds all three; the f-fixes branch and worktree are removed.)
