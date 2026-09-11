@@ -14,6 +14,7 @@
  *   GIT      agent checkpoints committed into the HUB's repo, because git walked up to the
  *            nearest .git when the workspace had none of its own
  *   RUNFILE  a persisted run truncated, losing its history
+ *   TRANSCRIPT  a run's <id>.transcript.jsonl with a line that is not JSON (it is JSONL: one record per line)
  *   INDEX    a run-index line that no longer parses, silently skewing every trend
  *
  * checkQueueInvariants (chain mode, below) adds three for the backlog: STRANDED, ORPHAN,
@@ -86,6 +87,13 @@ export function checkInvariants(dir, { hubExitCode = null, hubLog = '' } = {}) {
   const runsDir = join(dir, 'runs');
   if (existsSync(runsDir)) {
     for (const f of readdirSync(runsDir)) {
+      // A transcript is JSONL (one record per model call), not one document: validate it line by line.
+      if (f.endsWith('.transcript.jsonl')) {
+        const lines = readFileSync(join(runsDir, f), 'utf8').split('\n').filter((l) => l.trim());
+        const bad = lines.findIndex((l) => { try { JSON.parse(l); return false; } catch { return true; } });
+        if (bad >= 0) v.push(`TRANSCRIPT: ${f} line ${bad + 1} is not valid JSON`);
+        continue;
+      }
       try { JSON.parse(readFileSync(join(runsDir, f), 'utf8')); } catch { v.push(`RUNFILE: ${f} is not valid JSON`); }
     }
   }
@@ -146,7 +154,7 @@ export function checkQueueInvariants(dir, { queueFile = join(dir, 'queue.json') 
   const runs = [];
   const runsDir = join(dir, 'runs');
   if (existsSync(runsDir)) {
-    for (const f of readdirSync(runsDir)) {
+    for (const f of readdirSync(runsDir).filter((x) => x.endsWith('.json'))) {
       try { runs.push(JSON.parse(readFileSync(join(runsDir, f), 'utf8'))); } catch { /* RUNFILE */ }
     }
   }

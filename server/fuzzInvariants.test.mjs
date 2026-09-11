@@ -38,6 +38,8 @@ function healthy() {
   writeFileSync(join(ws, 'ok.js'), 'function add(a, b) { return a + b; }\nmodule.exports = { add };\n', 'utf8');
   writeFileSync(join(dir, 'hub.json'), '{}', 'utf8');
   writeFileSync(join(dir, 'runs', 'r1.json'), JSON.stringify({ id: 'r1', status: 'done' }), 'utf8');
+  // A healthy run also has its JSONL transcript beside it; every check below must accept it.
+  writeFileSync(join(dir, 'runs', 'r1.transcript.jsonl'), JSON.stringify({ n: 0, kind: 'plan', reply: 'p' }) + '\n' + JSON.stringify({ n: 1, kind: 'turn', reply: 'r' }) + '\n', 'utf8');
   writeFileSync(join(dir, 'index.jsonl'), JSON.stringify({ id: 'r1' }) + '\n', 'utf8');
   return { dir, ws };
 }
@@ -114,6 +116,12 @@ test('GIT fires when the workspace .git is not a usable repo of its own', () => 
   const { dir, ws } = healthy();
   mkdirSync(join(ws, '.git'), { recursive: true });                      // empty = not a repo
   assert.deepEqual(kinds(checkInvariants(dir)), ['GIT']);
+});
+
+test('TRANSCRIPT fires on a transcript line that is not JSON (and a healthy transcript is not RUNFILE)', () => {
+  const { dir } = healthy();
+  writeFileSync(join(dir, 'runs', 'r3.transcript.jsonl'), JSON.stringify({ n: 1, reply: 'ok' }) + '\n{"n":2,"reply":"cut', 'utf8');
+  assert.deepEqual(kinds(checkInvariants(dir)), ['TRANSCRIPT']);
 });
 
 test('RUNFILE fires on a truncated persisted run', () => {

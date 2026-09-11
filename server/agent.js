@@ -1851,6 +1851,8 @@ function reapRuns() {
       .sort((a, b) => b.m - a.m);
     for (const { f } of files.slice(MAX_RUN_FILES)) {
       try { unlinkSync(join(RUNS_DIR, f)); } catch {}
+      // ...and its full transcript, or transcripts would outlive their runs and grow without bound.
+      try { unlinkSync(join(RUNS_DIR, f.replace(/\.json$/, '.transcript.jsonl'))); } catch {}
     }
   } catch {}
   // NO in-memory eviction here on purpose: evictOldRuns() (AGENT_MAX_RUNS, default 40)

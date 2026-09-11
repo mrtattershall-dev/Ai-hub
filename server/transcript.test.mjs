@@ -16,7 +16,7 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
-import { mkdtempSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, existsSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -99,6 +99,25 @@ await test('the first turn sends everything, later turns only what is new', () =
   assert.ok(turns.slice(1, 6).every((t) => t.sent.some((m) => /TOOL RESULT \(write_file\)/.test(String(m.content)))), 'the hub\'s answer to a write is not in the next turn');
 });
 
-hub.kill(); mock.close();
+// Reaping: a run file removed by the disk cap takes its transcript with it (no orphans, no unbounded growth).
+rig.script = [finish('second goal')];
+const st2 = await api('/agent/start', { method: 'POST', body: JSON.stringify({ goal: 'Say done.' }) });
+for (let i = 0; i < 200; i++) { const r2 = await api('/agent/' + st2.runId).catch(() => null); if (r2 && TERMINAL.includes(r2.status) && r2.busy !== true) break; await sleep(300); }
+hub.kill(); await sleep(800);
+const hub2 = spawn(process.execPath, [join(HERE, 'index.js')], {
+  env: { ...process.env, PORT: String(hubPort), HUB_DB: join(dir, 'hub.json'), AGENT_WORKSPACE: join(dir, 'workspace'), AGENT_QUEUE_FILE: join(dir, 'queue.json'),
+    AGENT_RUNS_DIR: join(dir, 'runs'), AGENT_TRACES_DIR: join(dir, 'traces'), RUN_INDEX: join(dir, 'index.jsonl'),
+    AGENT_SUPERVISOR: '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '', AGENT_MAX_RUN_FILES: '1' },
+  stdio: ['ignore', 'pipe', 'pipe'],
+});
+let up2 = false; for (let i = 0; i < 240 && !up2; i++) { try { await fetch(API + '/auth/hint'); up2 = true; } catch { await sleep(250); } }
+await test('reaping a run file removes its transcript too', () => {
+  assert.ok(up2, 'the restarted hub did not come up');
+  const left = readdirSync(join(dir, 'runs'));
+  const runsLeft = left.filter((f) => f.endsWith('.json')), tLeft = left.filter((f) => f.endsWith('.transcript.jsonl'));
+  assert.equal(runsLeft.length, 1, 'run files after the reap: ' + runsLeft.length);
+  for (const t of tLeft) assert.ok(runsLeft.includes(t.replace(/\.transcript\.jsonl$/, '.json')), 'orphan transcript: ' + t);
+});
+hub2.kill(); mock.close();
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);
