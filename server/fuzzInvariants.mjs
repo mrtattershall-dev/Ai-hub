@@ -23,7 +23,7 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 
 // What the harness itself puts beside the workspace. Anything else there is a stray write.
-const HARNESS_FILES = new Set(['workspace', 'hub.json', 'queue.json', 'runs', 'index.jsonl']);
+const HARNESS_FILES = new Set(['workspace', 'hub.json', 'queue.json', 'runs', 'index.jsonl', 'traces']);
 
 export function checkInvariants(dir, { hubExitCode = null, hubLog = '' } = {}) {
   const v = [];

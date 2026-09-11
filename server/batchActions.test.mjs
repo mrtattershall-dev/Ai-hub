@@ -115,7 +115,7 @@ async function startRig(batchOn) {
     env: {
       ...process.env, PORT: String(hubPort), HUB_DB: join(rig.dir, 'hub.json'),
       AGENT_WORKSPACE: rig.ws, AGENT_QUEUE_FILE: join(rig.dir, 'queue.json'),
-      AGENT_RUNS_DIR: join(rig.dir, 'runs'), RUN_INDEX: join(rig.dir, 'index.jsonl'),
+      AGENT_RUNS_DIR: join(rig.dir, 'runs'), AGENT_TRACES_DIR: join(rig.dir, 'traces'), RUN_INDEX: join(rig.dir, 'index.jsonl'),
       AGENT_SUPERVISOR: '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
       AGENT_BATCH_ACTIONS: batchOn ? '1' : '0',
       AGENT_MAX_STEPS: '16', AGENT_MAX_MINUTES: '5',

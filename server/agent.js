@@ -87,6 +87,8 @@ export const __toolPolicyTest = {
   pendingAutoStarts: () => pendingAutoStarts,
   // The real append_file, so a test can pin what it does to the workspace.
   appendFile: (args) => tools.append_file(args),
+  // The real trace writer, so a test can check WHERE training rows land and what they carry.
+  saveTrace: (run) => saveTrace(run),
 };
 
 /** What an approval prompt for a Google write should say, in terms of the real effect. */
@@ -1806,6 +1808,11 @@ function pauseAdvice(e) {
 function noteModelCall(run) {
   const st = getLastModelCall();
   if (!st) return;
+  // WHICH model wrote this run. traces.jsonl is training data, and until now no row said
+  // which model produced it - 7B, 14B, 30B and replayed mock output all look identical, so a
+  // "14B only" training slice could not be cut from it after the fact.
+  run.provider = st.provider;
+  run.model = st.model;
   run.lastTokPerSec = st.tokPerSec;
   run.slowestTokPerSec = Math.min(run.slowestTokPerSec ?? Infinity, st.tokPerSec || Infinity);
   (run.callStats ||= []).push({ ms: st.ms, tokPerSec: st.tokPerSec, outTok: st.outTok, promptTok: st.promptTok, attempts: st.attempts });
@@ -2084,13 +2091,21 @@ function saveTrace(run) {
   if (run.traced) return;
   run.traced = true;
   try {
-    const dir = join(__dirname, 'agent-traces');
+    // Overridable, like AGENT_RUNS_DIR and RUN_INDEX. It was not, so every isolated test hub
+    // and every offline fuzz run appended its REPLAYED mock output to the real training
+    // corpus: 359 committed rows became 2,000+ in one day, indistinguishable from real runs.
+    // testHarness.isolatedEnv and every mock harness set it; real-model harnesses do not,
+    // because their output is genuine and worth keeping.
+    const dir = process.env.AGENT_TRACES_DIR || join(__dirname, 'agent-traces');
     mkdirSync(dir, { recursive: true });
     const code = run.steps
       .filter(s => s.tool === 'write_file' || s.tool === 'edit_file')
       .map(s => ({ tool: s.tool, path: s.args?.path, content: String(s.args?.content ?? s.args?.replace ?? '').slice(0, 30_000) }));
     const rec = {
-      ts: Date.now(), status: run.status, goal: run.goal, plan: run.plan || null,
+      ts: Date.now(), id: run.id, status: run.status, goal: run.goal, plan: run.plan || null,
+      // Who wrote it (stamped by noteModelCall) and who asked for it - so a training slice
+      // can be cut by model, and supervisor-generated goals told apart from a human's.
+      provider: run.provider || null, model: run.model || null, source: run.source || 'human',
       followups: run.followups || [],   // later instructions that built on the first
       steps: run.steps.map(s => ({ type: s.type, tool: s.tool, path: s.args?.path })),
       code,
