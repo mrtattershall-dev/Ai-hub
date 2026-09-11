@@ -90,7 +90,7 @@ PATH: utils.js
 export function lerp(a, b, t) { return a + (b - a) * t; }
 \`\`\`
 
-edit_file — CHANGE text that is already in a file. Use this only when you are replacing or modifying something specific; to ADD new code use append_file, which is easier and cannot lose what is there. The FIND text must match the file EXACTLY and be unique:
+edit_file — CHANGE text that is already in a file. Use this only when you are replacing or modifying something specific; to ADD new code use append_file, which is easier and cannot lose what is there. Two ways to say WHERE. (1) LINES: <a>-<b> replaces those lines - the numbers read_file and outline_file print - and needs no FIND; REPLACE with nothing to delete them. Use it whenever a FIND snippet missed. (2) FIND text, which must match the file EXACTLY and be unique; when it matches several places, add OCCURRENCE: <n> to pick one. Never rewrite a whole file just because an edit missed:
 THOUGHT: <why>
 ACTION: edit_file
 PATH: <the file from the listing>

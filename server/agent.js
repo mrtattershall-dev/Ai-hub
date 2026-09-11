@@ -395,7 +395,13 @@ const tools = {
     try { re = new RegExp(query, 'i'); }
     catch { re = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); }
     const targets = [];
-    if (path) targets.push(path);
+    // A DIRECTORY PATH IS A SCOPE, NOT A FILE. Set E (2026-09-11): Qwen3-Coder searched the workspace for
+    // "template" with PATH: . and was told "(no matches)" - in a workspace holding q4_template.js. "." is
+    // truthy, so it became the only target, and the loop below skips directories: a confident empty answer to a
+    // question the tool never asked. A directory now means: search everything under it.
+    let scope = null;
+    if (path) { try { if (statSync(safePath(path)).isDirectory()) scope = path; } catch { /* not there: leave it to the loop */ } }
+    if (path && !scope) targets.push(path);
     else {
       const walk = (dir, rel = '') => {
         for (const name of readdirSync(dir)) {
@@ -407,7 +413,7 @@ const tools = {
           st.isDirectory() ? walk(fp, r) : targets.push(r);
         }
       };
-      try { walk(WORKSPACE); } catch {}
+      try { walk(scope ? safePath(scope) : WORKSPACE, scope && scope !== '.' ? scope.replace(/[/]+$/, '') : ''); } catch {}
     }
     const out = [];
     for (const t of targets) {
@@ -539,10 +545,28 @@ const tools = {
   // Surgical edit: replace a snippet in an existing file. Tries an exact match
   // first; if that fails, falls back to whitespace-tolerant line matching (small
   // models rarely reproduce exact indentation). Refuses if not found or ambiguous.
-  edit_file({ path, find, replace = '' }) {
+  edit_file({ path, find, replace = '', lines, occurrence }) {
     { const r = markerRefusal(path, 'edit_file'); if (r) return r; }
     const full = safePath(path);
     if (!existsSync(full)) return `ERROR: file not found: ${path} (use write_file to create it)`;
+
+    // LINES: a-b - address the text by the numbers read_file and outline_file already print, so an edit never
+    // depends on reproducing the file's text exactly. Set E (2026-09-11): 65 of the two models' edits failed on
+    // the FIND snippet (27 of them "matches N places"), and the usual workaround - rewriting the whole file -
+    // is what silently dropped q4_template.js's export. An empty REPLACE deletes those lines.
+    if (lines) {
+      const src = readFileSync(full, 'utf8');
+      const srcLines = src.split('\n');
+      const [a, b] = lines;
+      if (!Number.isInteger(a) || !Number.isInteger(b) || a < 1 || b < a || b > srcLines.length) {
+        return `ERROR: LINES: ${a}-${b} is outside ${path}, which has ${srcLines.length} lines. read_file shows the line numbers; ask for a range inside the file.`;
+      }
+      const repl = String(replace) === '' ? [] : String(replace).split('\n');
+      const out = [...srcLines.slice(0, a - 1), ...repl, ...srcLines.slice(b)].join('\n');
+      if (out === src) return `NO CHANGE: lines ${a}-${b} of ${path} already read exactly like your REPLACE, so nothing was edited and whatever you were fixing is still there.`;
+      writeFileSync(full, out, 'utf8');
+      return `OK: edited ${path} lines ${a}-${b} (${b - a + 1} line(s) ${repl.length ? 'replaced by ' + repl.length : 'deleted'}).`;
+    }
     if (find == null || find === '') {
       // SAY WHAT TO SEND, AND SHOW IT.
       //
@@ -571,8 +595,17 @@ const tools = {
     }
     const content = readFileSync(full, 'utf8');
 
-    // 1) exact unique match
+    // 1) exact unique match - or the OCCURRENCE the caller picked out of several
     const exact = content.split(find).length - 1;
+    if (exact > 1 && occurrence) {
+      if (occurrence < 1 || occurrence > exact) return `ERROR: OCCURRENCE: ${occurrence} but the snippet appears ${exact} times in ${path}.`;
+      let at = -1;
+      for (let k = 0; k < occurrence; k++) at = content.indexOf(find, at + 1);
+      const out = content.slice(0, at) + replace + content.slice(at + find.length);
+      if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
+      writeFileSync(full, out, 'utf8');
+      return `OK: edited ${path} (occurrence ${occurrence} of ${exact}).`;
+    }
     // NO CHANGE IS NOT AN EDIT. Set E (2026-09-11), 14B goal 5: the model sent the SAME 13-line edit three times with
     // FIND identical to REPLACE; each time this said "OK: edited" plus a passing syntax check, so the model believed
     // it had fixed the failing assert and repeated itself until the repeat guard ended the goal.
@@ -611,6 +644,14 @@ const tools = {
         i = fi - 1;
       }
     }
+    if (hits > 1 && occurrence) {
+      if (occurrence < 1 || occurrence > hits) return `ERROR: OCCURRENCE: ${occurrence} but the snippet matches ${hits} places in ${path}.`;
+      const m = where[occurrence - 1];
+      const out = [...fileLines.slice(0, m.start), replace, ...fileLines.slice(m.end + 1)].join('\n');
+      if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
+      writeFileSync(full, out, 'utf8');
+      return `OK: edited ${path} (occurrence ${occurrence} of ${hits}, matched ignoring indentation).`;
+    }
     if (hits === 1) {
       const out = [...fileLines.slice(0, start), replace, ...fileLines.slice(end + 1)].join('\n');
       if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
@@ -639,7 +680,8 @@ const tools = {
         .join('\n');
       return `ERROR: the FIND snippet matches ${hits} places in ${path}, so it is ambiguous.\n`
         + `Here is each one, with the line above and below:\n${sites}\n`
-        + `Pick the one you meant and extend FIND with a neighbouring line - the line above or below is usually enough. `
+        + `Either add OCCURRENCE: <n> to pick one of them, or use LINES: <a>-<b> with the numbers above - both skip matching entirely. `
+        + `Extending FIND with a neighbouring line also works. `
         + `Do NOT resend the same snippet; it will match ${hits} places again.`;
     }
 

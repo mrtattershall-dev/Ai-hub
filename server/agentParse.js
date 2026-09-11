@@ -236,11 +236,15 @@ function parseAction(text, lastPath) {
     // Only when FIND: is ENTIRELY ABSENT. If FIND: is there but malformed, the error
     // stands and now explains the shape - guessing at a half-written edit is how you
     // replace the wrong thing.
-    if (!find && fenced !== undefined && !/\bFIND:/i.test(text)) {
+    if (!find && fenced !== undefined && !/\bFIND:/i.test(text) && !/\bLINES:/i.test(text)) {
       return { tool: 'write_file', thought, args: { path: path || lastPath, content: stripLineNumberPrefixes(fenced) } };
     }
 
-    return { tool, thought, args: { path: path || lastPath, find: stripLineNumberPrefixes(find), replace: stripLineNumberPrefixes(replace) } };
+    // LINES: a-b addresses the edit by line number (no FIND needed); OCCURRENCE: n picks one of several matches.
+    const lm = text.match(/LINES:\s*(\d+)\s*-\s*(\d+)/i);
+    const om = text.match(/OCCURRENCE:\s*(\d+)/i);
+    return { tool, thought, args: { path: path || lastPath, find: stripLineNumberPrefixes(find), replace: stripLineNumberPrefixes(replace),
+      ...(lm ? { lines: [+lm[1], +lm[2]] } : {}), ...(om ? { occurrence: +om[1] } : {}) } };
   }
   if (tool === 'run_command') {
     const cmd = (text.match(/COMMAND:\s*(.+)/i)?.[1]?.trim()) || (fenced ? fenced.trim().split('\n')[0] : undefined);
