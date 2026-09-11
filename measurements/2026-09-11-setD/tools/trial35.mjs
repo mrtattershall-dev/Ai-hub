@@ -12,7 +12,7 @@
  * work is correct and the model never said so" - completion rate alone understates badly.
  */
 import { spawn, execFileSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, readFileSync, existsSync, readdirSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, existsSync, readdirSync, cpSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -49,6 +49,8 @@ if (want && String(health.lora || '') !== want) {
 
 const dir = mkdtempSync(join(tmpdir(), 'trial35-'));
 const ws = join(dir, 'workspace');
+// SEED_DIR: start the workspace from a saved state (continuing a sequence from a given goal's start state).
+if (process.env.SEED_DIR) { mkdirSync(ws, { recursive: true }); cpSync(process.env.SEED_DIR, ws, { recursive: true }); console.log('seeded from ' + process.env.SEED_DIR); }
 writeFileSync(join(dir, 'hub.json'), JSON.stringify({
   api_keys: { ollama: { base_url: BASE, model: MODEL } }, history: [], settings: {},
 }), 'utf8');
@@ -62,7 +64,7 @@ const hub = spawn(process.execPath, [HUB], {
     // rows deliberately, rather than mixed into the repo's traces.jsonl.
     AGENT_TRACES_DIR: process.env.TRIAL_TRACES_DIR || join(dir, 'traces'),
     AGENT_SUPERVISOR: '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
-    AGENT_MAX_AUTO_STARTS: '400', AGENT_MAX_STEPS: '30', AGENT_MAX_MINUTES: '8',
+    AGENT_MAX_AUTO_STARTS: '400', AGENT_MAX_RUNS: '1000', AGENT_MAX_STEPS: '30', AGENT_MAX_MINUTES: '8',
     MODEL_FIRST_BYTE_S: '600', MODEL_STALL_S: '90', MODEL_TIMEOUT_S: '1800',
   },
   stdio: ['ignore', 'pipe', 'pipe'],

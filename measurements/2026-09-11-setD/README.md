@@ -78,3 +78,18 @@ are approved, anything else is denied. It was proven offline first with tools/pr
 model replays the 14B's own goal-9 replies, the "open" is denied, and goal 2 starts. Qwen3-Coder's run was
 already in flight on the unpatched copy and has never parked (0 START FAILED), so for it the change is a no-op.
 The 14B re-runs as coder14b-setd2.
+
+## Qwen3-Coder continuation from goal 72 (decided before its GPU run, 2026-09-11 08:5x)
+Qwen3-Coder's run (coder30b-setd) was in flight on the unpatched trial35. At goal 72 it asked to git_undo, which
+needs approval, and goals 73-100 all failed to start. Two more facts constrain the resume:
+- The hub had stopped checkpointing after goal 53, because a model-made file named "10 + 20 + 5 = 35, not 45." cannot
+  be added by git on Windows, and checkpoint errors are swallowed. So no commit holds goal 72's start state.
+- The hub also deletes run files past 40, so only goals 33-72 kept their run records. The traces keep all steps,
+  without replies.
+
+The continuation (coder30b-setdc) therefore seeds a fresh workspace from the LIVE parked workspace: 56 files,
+with the one unaddable file left out and goal 72's partial edits included. It then runs goals 72-100 with the
+patched trial35 (approvals answered; AGENT_MAX_RUNS=1000) on the same hub code.
+
+The final hidden-check score is reported on the continuation's final workspace. Regressions are counted only
+across goals whose start and end states exist as checkpoints.

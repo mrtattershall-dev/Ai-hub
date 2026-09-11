@@ -4008,3 +4008,23 @@ tatte, verbatim, this thread: "After c is done running, run one more with d that
       started true | recorded replies served 4/4"). Re-running the base 14B as coder14b-setd2 under tatte's set-D
       instruction above: A10G min 0 max 1 scaledown 120 s, watchdog cap 100 min via stopApp.mjs (Rule 7a), worst
       case ~$1.8. New label, so the failed attempt's ALL DONE status cannot fire the new watchdog. Identity below.
+      coder14b-setd2 health try 1 07:59:43: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+      Harness started 07:59:43; no new goals after 09:26:43.
+    [set D ledger, Session A] coder30b-setd: harness exit 08:39:49 after 72 goals. Goal 72 parked in awaiting_approval
+      on the model's own git_undo (this run was already in flight on the UNPATCHED trial35), so goals 73-100 all got
+      START FAILED - the same deadlock as the 14B. STOPPED by the watchdog through stopApp.mjs 08:40:43 (exit 0,
+      "stopped, and confirmed by the app list"); independent re-list: stopped, 0 tasks. ~71 min H100, ~$4.7.
+      Hidden checks on its final workspace: 40/100 (the 28 never-attempted steps included). Plan, same set-D
+      instruction: continue from the start state of goal 72 (rebuilt from the run's checkpoints) with the patched
+      harness as coder30b-setdc - goals 72-100, ~$2. Running total of the $30 cap: ~$11.7 plus the running 14B.
+    [set D ledger, Session A] HUB FINDING (deep, long-run): auto-checkpointing DIED SILENTLY in both set D runs.
+      coder30b-setd: a model command created a file named "10 + 20 + 5 = 35, not 45." - Windows cannot open a name
+      ending in a dot, so `git add -A` fails ("unable to index file") and every checkpoint after goal 53 failed
+      without a word (commitAll errors are swallowed). coder14b-setd2: a stale .git/index.lock has blocked every
+      commit since 08:18 (227 uncommitted changes, still running). Also: evictOldRuns deletes run FILES past
+      AGENT_MAX_RUNS=40 (the 300-file disk cap never binds), so set D lost goals 1-32 / 1-18 run records (traces
+      survive, without replies). Effect on the measurement: regression analysis is valid only while checkpoints
+      lived (coder3 through goal 53). Fixes for E go on e-fixes (skip unaddable files, clear stale locks, make a
+      failed checkpoint a visible note, stop deleting run files). Harness: AGENT_MAX_RUNS=1000.
+      coder3 continuation (goals 72-100, coder30b-setdc) seeds from the LIVE parked workspace - goal 72's partial
+      edits included, the one unaddable file left out - because no checkpoint exists for goal 72's start.
