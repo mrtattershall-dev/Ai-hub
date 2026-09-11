@@ -31,7 +31,7 @@ import * as workQueue from './queue.js';
 import * as assetLib from './assets.js';
 import { canonicalSummary } from './canonicalAssets.mjs';
 import { SYSTEM_PROMPT } from './agentPrompt.js';
-import { parseAction } from './agentParse.js';
+import { parseAction, parseActions } from './agentParse.js';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 
 /**
@@ -112,6 +112,11 @@ const PORT = process.env.PORT || 3001;
 // which is what the step cap was really standing in for.
 const MAX_STEPS = parseInt(process.env.AGENT_MAX_STEPS || '250', 10);
 const MAX_MINUTES = parseInt(process.env.AGENT_MAX_MINUTES || '90', 10);
+// Batch actions: OPT-IN, OFF BY DEFAULT. Off, the loop runs the FIRST action of a reply and
+// discards the rest, exactly as it always has. On, up to BATCH_MAX of them run in order under
+// the rules documented at planBatch(). Read once at load, like every other AGENT_* knob.
+const BATCH_ACTIONS = process.env.AGENT_BATCH_ACTIONS === '1';
+const BATCH_MAX = 4;
 
 // The clock runs from budgetStart, NOT createdAt. A follow-up on a run that started
 // two hours ago must get a fresh 90 minutes - otherwise the first follow-up to a
@@ -2169,6 +2174,131 @@ async function runSubtask(goal, depth, parent) {
     + `You did NOT see its steps — if you need to be sure of something it claims, check the file yourself.`;
 }
 
+// ── BATCH ACTIONS (opt-in: AGENT_BATCH_ACTIONS=1, off by default) ────────────────────────
+//
+// A reply can hold several actions. The loop has always run the FIRST and discarded the rest:
+// of 1,759 recorded real replies, 102 carry more than one action and 53 hold a `finish` that
+// is not first. With the flag on, the actions run IN ORDER through the very same single-action
+// path in drive(). Every rule below exists because the actions after the first were written
+// WITHOUT SEEING ANY RESULT:
+//
+//   1. At most BATCH_MAX per reply. The rest are reported, never run.
+//   2. The batch stops at the first action that fails (batchStepFailed): every later action
+//      assumed it had worked.
+//   3. `finish` is NEVER executed from inside a batch. Models write a file, run it and finish
+//      in one reply, having seen none of the results; finishing blind would let a run declare
+//      success after a failing test. The actions before it run, the finish is HELD, and the
+//      model is told to send it alone once it has read the results.
+//   4. Approval is untouched: each action goes through the same policy path a lone action
+//      does. One that needs a human parks the run in awaiting_approval (`break turn`), and
+//      the batch ends there - the actions after it are not run, even once it is approved.
+//   5. The model gets ONE message back: each executed action's result, then which actions did
+//      not run and why (closeBatch).
+//
+// Returns null whenever the reply should take the ordinary single-action path.
+function planBatch(raw, lastPath, first, anchor) {
+  const all = parseActions(raw, lastPath, 1000);
+  if (all.length < 2) return null;
+  // The loop has already validated `first` (parseAction over the whole reply). If the split
+  // parse disagrees about it - 1 of 98 real multi-action replies, where the first action's
+  // fenced block only appears after a later ACTION: line - trust the path that always ran.
+  if (JSON.stringify(all[0]) !== JSON.stringify(first)) return null;
+  // A LEADING finish is not blind: nothing else would run this turn, so it has seen every
+  // result there is. It takes the ordinary path (finish gate; the extras are reported as
+  // dropped). 0 of 1,759 real replies have this shape.
+  if (all[0].tool === 'finish') return null;
+
+  // lastPath, SEQUENTIALLY. parseActions resolves a missing PATH against this turn's
+  // lastPath, but run one at a time, action 2 would see the lastPath action 1 just set. A
+  // sentinel probe finds the actions that inherited it and gives them what the sequential
+  // loop would have - otherwise a PATH-less write_file after a write to b.js would land on
+  // the PREVIOUS turn's file and overwrite it.
+  const SENT = '\u0000lastPath\u0000';
+  const probe = parseActions(raw, SENT, 1000);
+  if (probe.length === all.length) {
+    let lp = lastPath;
+    all.forEach((a, i) => {
+      if (i > 0 && lp && a.args && probe[i].args?.path === SENT) a.args.path = lp;
+      if ((a.tool === 'write_file' || a.tool === 'edit_file') && a.args?.path) lp = a.args.path;
+    });
+  }
+
+  const fin = all.findIndex((a) => a.tool === 'finish');
+  const before = fin === -1 ? all : all.slice(0, fin);
+  return {
+    all,
+    run: before.slice(0, BATCH_MAX),                     // rule 1
+    overCap: before.slice(BATCH_MAX),
+    held: fin === -1 ? null : all[fin],                  // rule 3
+    afterFinish: fin === -1 ? [] : all.slice(fin + 1),
+    started: 0, completed: 0, stop: null,
+    anchor,                                              // the assistant reply this batch answers
+  };
+}
+
+// RULE 2's test: did this action fail? The tools' own convention is a result starting with
+// ERROR (the marker guard, a FIND that missed, a missing file). Three more signals mean the
+// same to an action written on the assumption this one worked: a command that exited
+// non-zero (a failing test), a write that does not parse, a browser test that reported errors.
+// Returns a short reason, or '' for success.
+function batchStepFailed(tool, result, syntaxNote) {
+  const r = String(result ?? '');
+  if (/^\s*ERROR\b/.test(r)) return 'returned an error';
+  if ((tool === 'run_command' || tool === 'run_python') && /(^|\n)EXIT: (?!0\s*$)\S+\s*$/.test(r)) return 'exited non-zero';
+  if (/SYNTAX CHECK FAILED/.test(syntaxNote || '')) return 'left a file that does not parse';
+  if (tool === 'test_web' && /\[JS ERROR\]|\[console\.error\]|\[HTTP \d/.test(r)) return 'reported errors in the browser';
+  return '';
+}
+
+// RULE 5: one message back, however the batch ended. Each executed action pushed its own
+// feedback through the unchanged single-action path; those are folded into ONE user message
+// after the reply they answer, followed by what did not run and why. One message rather than
+// four keeps a single turn from eating pruneHistory's recent-message window. Called from a
+// `finally`, so it also covers a turn that ended on a refusal, an approval park or a stop.
+function closeBatch(run, batch) {
+  const desc = (a) => {
+    const x = a.args || {};
+    const what = x.path || x.cmd || x.which || x.query || x.url || '';
+    return `#${batch.all.indexOf(a) + 1} ${a.tool}${what ? ' ' + String(what).slice(0, 60) : ''}`;
+  };
+  let why = batch.stop?.why || '';
+  // An action that began but never reached the end of the path ended the TURN: refused by
+  // policy, an unknown tool, parked for approval, or it finished/stopped the run itself.
+  if (batch.started > batch.completed) {
+    const a = batch.run[batch.completed];
+    why = run.status === 'awaiting_approval' ? `${desc(a)} needs human approval - the run is paused on it`
+      : run.status === 'running' ? `${desc(a)} did not run (see the message above)`
+      : `${desc(a)} ended the run (${run.status})`;
+  }
+  const lines = [];
+  for (const a of batch.run.slice(batch.started)) lines.push(`- ${desc(a)}: NOT run - the batch stopped because ${why}. It was written without seeing that.`);
+  for (const a of batch.overCap) lines.push(`- ${desc(a)}: NOT run - over the limit of ${BATCH_MAX} actions per response.`);
+  if (batch.held) {
+    lines.push(`- ${desc(batch.held)}: HELD, not executed - you wrote it before seeing any of the results above. `
+      + `Read them; if the goal really is met, send finish ON ITS OWN as your next response.`);
+  }
+  for (const a of batch.afterFinish) lines.push(`- ${desc(a)}: NOT run - it came after finish.`);
+
+  const n = batch.all.length;
+  const head = `You sent ${n} actions in one response. They were run IN ORDER, one at a time, stopping at the first failure. `
+    + `${batch.completed} ran; each result follows.${why ? ` The batch stopped early: ${why}.` : ''}`;
+  const tail = lines.length ? `NOT EXECUTED - these did NOT happen:\n${lines.join('\n')}` : `All ${n} actions ran.`;
+
+  const at = batch.anchor ? run.history.lastIndexOf(batch.anchor) : -1;
+  const after = at === -1 ? [] : run.history.slice(at + 1);
+  if (after.length && after.every((m) => m.role === 'user')) {
+    run.history.splice(at + 1, after.length, { role: 'user', content: [head, ...after.map((m) => m.content), tail].join('\n\n────────\n\n') });
+  } else {
+    run.history.push({ role: 'user', content: `${head}\n\n${tail}` });
+  }
+  pushStep(run, {
+    type: 'note',
+    batch: { total: n, ran: batch.completed, held: !!batch.held, notRun: lines.length, stop: why || null },
+    text: `Batch: ${batch.completed} of ${n} action(s) ran${why ? ` - stopped: ${why}` : ''}${batch.held ? '; finish held' : ''}.`,
+  });
+  persist(run);
+}
+
 // Drive the loop until it finishes, errors, hits the step ceiling, or needs
 // approval. Auto-tools execute inline; run_command pauses the run.
 async function drive(loadDb, run) {
@@ -2220,7 +2350,9 @@ async function drive(loadDb, run) {
       }
     }
 
-    while (run.status === 'running' && !budgetExhausted(run)) {
+    // Labelled for the per-action loop further down: every exit that used to end this model
+    // turn is now `continue turn` / `break turn`, so it still means exactly what it meant.
+    turn: while (run.status === 'running' && !budgetExhausted(run)) {
       run.modelCalls++;
       pruneHistory(run, historyBudget(loadDb()));   // fit the PROVIDER's window, in tokens
       let raw;
@@ -2334,7 +2466,36 @@ async function drive(loadDb, run) {
       // half-broken model while tolerating the occasional bad parse.
       run.parseLog = (run.parseLog || []).concat(true).slice(-10);
 
-      const { tool, args = {}, thought = '' } = action;
+      // ── BATCH ACTIONS (opt-in, AGENT_BATCH_ACTIONS=1) - rules at planBatch() ──────────
+      // null = the ordinary single-action path, which is ALL there is with the flag off.
+      const batch = BATCH_ACTIONS ? planBatch(raw, run.lastPath, action, run.history[run.history.length - 1]) : null;
+      // What the dropped-action nudge below may claim (rule 7). Flag off: the raw ACTION:
+      // count, unchanged. Flag on: only actions that genuinely did not run - a batch reports
+      // its own leftovers in closeBatch(), and a stray `ACTION:` line in the middle of one
+      // edit_file (5 of the 102 real multi-action replies) is not a second action at all.
+      const dropped = !BATCH_ACTIONS ? extraActions
+        : batch ? 0 : Math.max(0, parseActions(raw, run.lastPath, 1000).length - 1);
+
+      // THE PER-ACTION LOOP. With the flag off it runs exactly once, over `action`.
+      //
+      // Its body is the unchanged single-action path, so every action in a batch gets the
+      // same checkpoint, approval policy, marker guard, syntax check, repetition bookkeeping,
+      // pushStep and persist a lone action gets - reused, not duplicated. It is deliberately
+      // NOT re-indented: that would bury the few lines that changed under 400 that did not.
+      //
+      // Exits: every pre-existing continue/break is now `continue turn` / `break turn` and
+      // ends the model turn exactly as before; the `finally` closes the batch whichever way
+      // the turn ends (a refusal, an approval park, a stop). The only exits that end the
+      // batch WITHOUT leaving the turn are the two plain `break`s inside `if (batch)`.
+      try {
+      for (const act of (batch ? batch.run : [action])) {
+      if (batch) {
+        // Stop pressed (or anything else took the run out of 'running') between actions: do
+        // not start another one on a run nobody wants continued.
+        if (run.status !== 'running') { batch.stop = { why: `the run is no longer running (${run.status})` }; break; }
+        batch.started++;
+      }
+      const { tool, args = {}, thought = '' } = act;
 
       // AUTO-CHECKPOINT before anything destructive.
       //
@@ -2421,7 +2582,7 @@ async function drive(loadDb, run) {
             blocked(`${p.remainingOwn} task(s) still open — not finished yet.`,
               `Do NOT finish yet — ${p.remainingOwn} of ${p.total} tasks on your ledger are not done:\n${ledger.contextBlock(WORKSPACE)}\n`
               + `Either complete them, or if one is genuinely unnecessary say why and task_done it. Then finish.`);
-            continue;
+            continue turn;
           }
 
           // 2. web apps: a browser test since the last edit.
@@ -2430,7 +2591,7 @@ async function drive(loadDb, run) {
           if (hasWeb && run.touchedWeb && run.needsTest) {
             blocked('Verifying in a browser before finishing…',
               'Do NOT finish yet — you changed files since the last clean browser test. Run test_web, read the report, fix any [JS ERROR]/console errors or wrong on-screen values, and only finish once test_web is clean.');
-            continue;
+            continue turn;
           }
 
           // 3. anything visual: is there actually something on the screen? test_web
@@ -2448,7 +2609,7 @@ async function drive(loadDb, run) {
               if (r.ok && visual.hasProblems(r)) {
                 blocked('The page renders, but something is wrong with what is on screen.',
                   `Do NOT finish yet — the app loads without errors but it does not LOOK right:\n\n${r.report}\n\nFix these, then finish.`);
-                continue;
+                continue turn;
               }
               if (r.ok) {
                 run.sawScreen = true;   // passed — no need to launch a browser again
@@ -2479,7 +2640,7 @@ async function drive(loadDb, run) {
                   if (!gv.ok) {
                     blocked('Godot project does not RUN — not finished.',
                       `Do NOT finish yet — it may parse, but it does not run:\n\n${formatGodotVerdict(gv)}\n\nFix that, then finish.`);
-                    continue;
+                    continue turn;
                   }
                   run.verified = true;
                   pushStep(run, { type: 'note', text: `Verified (godot, ran): ${formatGodotVerdict(gv).split('\n')[0]}` });
@@ -2491,7 +2652,7 @@ async function drive(loadDb, run) {
                 if (!v.ok) {
                   blocked(`Project does not run (${v.kind}) — not finished.`,
                     `Do NOT finish yet — the project does not run:\n\n${verifier.format(v)}\n\nFix these, then finish.`);
-                  continue;
+                  continue turn;
                 }
                 run.verified = true;    // passed — do not pay for it again
                 pushStep(run, { type: 'note', text: `Verified (${v.kind}): ${v.evidence.join('; ')}` });
@@ -2502,13 +2663,13 @@ async function drive(loadDb, run) {
 
         run.status = 'done';
         pushStep(run, { type: 'finish', thought, summary: args.summary || '' });
-        break;
+        break turn;
       }
 
       if (!tools[tool]) {
         pushStep(run, { type: 'error', thought, text: `Unknown tool: ${tool}` });
         run.history.push({ role: 'user', content: `TOOL ERROR: unknown tool "${tool}". Use only the listed tools.` });
-        continue;
+        continue turn;
       }
 
       // ── Approval: three answers, not two ──────────────────────────────────────
@@ -2536,7 +2697,7 @@ async function drive(loadDb, run) {
             + ' This will not be run under any approval mode. Achieve the goal another way.';
           pushStep(run, { type: 'policy_denied', tool, args, thought, text: msg });
           run.history.push({ role: 'user', content: `TOOL REFUSED (${tool}): ${msg}` });
-          continue;                                   // keep working — do NOT halt
+          continue turn;                                   // keep working — do NOT halt
         }
         if (verdict.decision === 'ask') {
           run.pending = { tool, args, thought, why: verdict.reason };
@@ -2547,7 +2708,7 @@ async function drive(loadDb, run) {
             runId: run.id, goal: run.goal, status: run.status, reason: 'approval',
             detail: `${tool}: ${args.cmd || args.path || ''} — ${verdict.reason}`,
           });
-          break;
+          break turn;
         }
         // allow → fall through and run it, recording WHY it was allowed so the step
         // feed shows an auto-run command was a policy decision, not an ungated hole.
@@ -2666,8 +2827,8 @@ async function drive(loadDb, run) {
       // same block verbatim and died to the repetition guard. Naming the dropped count also
       // makes the feedback DIFFERENT from last step's, which is what actually breaks the
       // cycle - the model has something new to react to instead of the identical result.
-      if (extraActions > 0) {
-        feedback += `\n\n⚠️ You sent ${extraActions + 1} actions in one response. ONLY THE FIRST (${tool}) was executed — the other ${extraActions} were DISCARDED and did NOT happen.`
+      if (dropped > 0) {
+        feedback += `\n\n⚠️ You sent ${dropped + 1} actions in one response. ONLY THE FIRST (${tool}) was executed — the other ${dropped} were DISCARDED and did NOT happen.`
           + ` Send exactly ONE action per response and wait for its result. If you meant to finish, send finish on its own as your NEXT response.`;
       }
       if (tool === 'test_web') {
@@ -2681,7 +2842,7 @@ async function drive(loadDb, run) {
           if (run.sameErr >= 4) {
             pushStep(run, { type: 'error', tool, args, thought, result, text: 'Same error persisted after several fix attempts — stopping. Likely a structural cause (script load order / id mismatch) that needs a stronger model or a manual fix.' });
             run.status = 'stopped';
-            break;
+            break turn;
           }
           if (run.sameErr >= 2) {
             feedback += `\n\n⚠️ This is the SAME error ${run.sameErr + 1} times. STOP rewriting the same file the same way. A null element means EITHER (a) your <script> runs before the DOM exists — move it to the very END of <body> or add defer; OR (b) an id used in your JS does not exist in index.html. READ index.html, then fix the <script> placement and make every getElementById id match a real element.`;
@@ -2695,13 +2856,24 @@ async function drive(loadDb, run) {
             pushStep(run, { type: 'tool', tool, args, thought, result });
             pushStep(run, { type: 'finish', thought: 'auto', summary: 'App passed browser tests with no errors (auto-finished after repeated clean tests).' });
             run.status = 'done';
-            break;
+            break turn;
           }
         }
       }
       pushStep(run, { type: 'tool', tool, args, thought, result });
       run.history.push({ role: 'user', content: feedback });
       persist(run);   // checkpoint after each completed step — a drop loses at most one step
+      if (batch) {
+        batch.completed++;
+        // RULE 2: stop at the first failure. Every later action in this reply was written on
+        // the assumption that this one worked, without seeing its result.
+        const failed = batchStepFailed(tool, result, syntaxNote);
+        if (failed) { batch.stop = { why: `#${batch.all.indexOf(act) + 1} ${tool} ${failed}` }; break; }
+      }
+      }   // ── end of the per-action loop
+      } finally {
+        if (batch) closeBatch(run, batch);
+      }
     }
 
     const spent = budgetExhausted(run);
