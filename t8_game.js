@@ -1,15 +1,25 @@
 // Game variables
-let canvas = document.getElementById('gameCanvas');
-let ctx = canvas.getContext('2d');
+let canvas;
+let ctx;
+let ball;
 
-// Ball properties
-let ball = {
-    x: canvas.width / 2,
-    y: canvas.height / 2,
-    radius: 10,
-    dx: 2,
-    dy: 2
-};
+// Initialize the game
+function init() {
+    canvas = document.getElementById('gameCanvas');
+    ctx = canvas.getContext('2d');
+    
+    // Ball properties
+    ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 10,
+        dx: 2,
+        dy: 2
+    };
+    
+    // Start the game loop
+    gameLoop();
+}
 
 // Game loop
 function gameLoop() {
@@ -39,5 +49,5 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Start the game
-gameLoop();
+// Start the game when the page loads
+window.addEventListener('load', init);
