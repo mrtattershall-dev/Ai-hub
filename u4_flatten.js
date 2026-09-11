@@ -30,3 +30,6 @@ console.assert(JSON.stringify(flatten({ a: [1, 2, 3] })) === JSON.stringify({ a:
 
 console.log('All asserts passed!');
 module.exports = flatten;
+console.assert(JSON.stringify(flatten({ a: [1, 2] })) === JSON.stringify({ a: [1, 2] }), 'Test 8 failed');
+console.log('All asserts passed!');
+module.exports = flatten;
