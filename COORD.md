@@ -4099,3 +4099,10 @@ tatte, verbatim, this thread: "After d has results, analyze the deep seated bugs
         render's export - worth up to 20 of its steps; the replay of that goal now warns by name).
       Replays through f-fixes (measurements/replay/results/setE-*): 14B 100/100 replayed, fixes fired as counted above;
       Qwen3-Coder goals 15/47/54 reproduce the recording exactly with approvals answered like the harness.
+    [set E fixes, Session A] MERGED f-fixes into main (fast-forward; verified with merge-base --is-ancestor). Seven hub
+      fixes from set E, each with a test that fails without it: dropped-connection retry; leftover tasks scoped to the
+      goal's files; verify_project checks the goal's own file and language; FIND==REPLACE edits say NO CHANGE; a value
+      hiding a method is named; a write dropping module.exports names says so. Full suite on the branch: every offline
+      test passes (verifierInfra timed out once under fuzzer load and passed 3/3 alone on the branch and on main;
+      real* need a live MODEL_BASE). The LIVE hub (index.js since 05:09) was NOT restarted - it runs the old code until
+      tatte says restart.
