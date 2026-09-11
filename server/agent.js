@@ -3149,6 +3149,20 @@ async function drive(loadDb, run) {
       try { result = await tools[tool](args); }
       catch (e) { result = `ERROR: ${e.message}`; }
       result = await withAssertEvidence(tool, result);   // a failing Python assert gains both sides
+
+      // THE SAME CALL, THE SAME ANSWER, AGAIN. Set E (2026-09-11): 155 such calls for the base 14B and 221 for
+      // Qwen3-Coder - a file re-read unchanged, a command re-run to the same failure, an edit re-applied. The
+      // repeat guard only sees identical REPLIES, so a loop made of identical CALLS was invisible. Saying it costs
+      // one sentence and is the only signal the model gets that this step changed nothing.
+      const callKey = tool + ' ' + JSON.stringify(args || {});
+      run.callLog = run.callLog || new Map();
+      const seenBefore = run.callLog.get(callKey);
+      const answer = String(result ?? '');
+      if (seenBefore !== undefined && seenBefore === answer) {
+        run.repeatCalls = (run.repeatCalls || 0) + 1;
+        result = answer + `\n\n⚠️ You already ran this exact ${tool} in this run and got exactly this answer. Nothing changed, so repeating it cannot help - do something different: a different file or range, a different action, or fix the problem the answer describes.`;
+      }
+      run.callLog.set(callKey, answer);
       let syntaxNote = '';
       // append_file is an edit too, and needs the same checks. It used to skip this whole
       // block, so an append that broke an existing file was never flagged to the model, an
