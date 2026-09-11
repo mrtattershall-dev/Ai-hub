@@ -1,0 +1,103 @@
+  1 q1_stock.js     done     then P  end P   [c90cdef] trial35: done FN-MISSING(quantity)  
+  2 q2_table.py     done     then P  end P   [b7bd9af] trial35: done FN-MISSING(commas,quotes)  
+  3 q3_calendar.js  done     then F  end F   [b8d9755] trial35: done FN-MISSING(midnight)  load: Missing expected exception (Error): Invalid start or end time
+  4 q4_template.js  interrupted then F  end F   [b8d9755] trial35: interrupted q4_template.js:MISSING  threw: r is not a function
+  5 q5_limits.py    stopped  then F  end F   [cefe47b] trial35: stopped FN-MISSING(TokenBucket)  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+  6 q6_jpath.py     done     then P  end F   <- REGRESSED  [0d49f54] trial35: done FN-MISSING(dicts,lists)  threw: AttributeError: 'dict' object has no attribute 'split'
+  7 q7_buffer.js    stopped  then F  end F   [d33ca6c] trial35: stopped FN-MISSING(TextBuffer)  load: buffer.text is not a function
+  8 q8_units.py     stopped  then P  end F   <- REGRESSED  [69a6747] trial35: stopped FN-MISSING(lb)  threw: ValueError: Density must be provided for mass-volume conversion
+  9 q9_shop.html    done     then P  end F   <- REGRESSED  [7d42b19] trial35: done FN-MISSING(price)  cart ["Apple - 50 cents","Bread - 225 cents","Milk - 199 cents"] | js error: Can
+ 10 q10_report.js   done     then F  end P   [5a82917] trial35: done FN-MISSING(js,render)  
+ 11 q1_stock.js     stopped  then F  end F   [658c6fe] trial35: stopped FN-MISSING(remove)  threw: w.remove is not a function
+ 12 q2_table.py     stopped  then P  end P   [fc30881] trial35: stopped q2_table.py:runs  
+ 13 q3_calendar.js  stopped  then F  end F   [c6d6971] trial35: stopped FN-MISSING(conflicts,touch)  load: Missing expected exception (Error): Invalid start or end time
+ 14 q4_template.js  stopped  then F  end F   [c6d6971] trial35: stopped q4_template.js:MISSING  threw: r is not a function
+ 15 q5_limits.py    stopped  then F  end F   [b0fac1c] trial35: stopped q5_limits.py:THROWS  threw: TypeError: 'int' object is not callable
+ 16 q6_jpath.py     stopped  then F  end F   [cfb2f30] trial35: stopped q6_jpath.py:runs  threw: TypeError: get() takes 2 positional arguments but 3 were given
+ 17 q7_buffer.js    stopped  then F  end F   [57464b8] trial35: stopped FN-MISSING(undo,redo)  load: buffer.text is not a function
+ 18 q8_units.py     stopped  then F  end F   [3aaa7f3] trial35: stopped FN-MISSING(tsp,tbsp,cup)  threw: ValueError: Unknown unit
+ 19 q9_shop.html    stopped  then F  end F   [1fc3cd1] trial35: stopped FN-MISSING(shop)  total "$0.00" | js error: Cannot read properties of null (reading 'textContent')
+ 20 q10_report.js   done     then P  end P   [4258d73] trial35: done FN-MISSING(render)  
+ 21 q1_stock.js     stopped  then F  end F   [1a11e28] trial35: stopped FN-MISSING(reserve,available)  threw: w.reserve is not a function
+ 22 q2_table.py     done     then P  end P   [ac7940e] trial35: done q2_table.py:runs  
+ 23 q3_calendar.js  done     then P  end CT  [5f74948] trial35: done q3_calendar.js:runs  
+ 24 q4_template.js  stopped  then F  end F   [5f74948] trial35: stopped q4_template.js:MISSING  threw: r is not a function
+ 25 q5_limits.py    stopped  then F  end F   [028cf13] trial35: stopped FN-MISSING(SlidingWindow,seconds)  sliding window [True, True, False, False, False]
+ 26 q6_jpath.py     stopped  then F  end F   [2258eb8] trial35: stopped q6_jpath.py:runs  threw: AttributeError: 'dict' object has no attribute 'split'
+ 27 q7_buffer.js    stopped  then F  end F   [21d0ede] trial35: stopped FN-MISSING(lines,lineCol,posOf)  load: buffer.text is not a function
+ 28 q8_units.py     stopped  then P  end F   <- REGRESSED  [fd19e95] trial35: stopped FN-MISSING(py)  threw: ValueError: Density must be provided for mass-volume conversion
+ 29 q9_shop.html    stopped  then F  end F   [d892168] trial35: stopped FN-MISSING(shop)  after + ["Apple - 50 cents","Bread - 225 cents","Milk - 199 cents"] $0.00 | js e
+ 30 q10_report.js   stopped  then F  end F   [1b94047] trial35: stopped FN-MISSING(render,available,stock)  threw: w.reserve is not a function
+ 31 q1_stock.js     stopped  then F  end F   [a066b5b] trial35: stopped FN-MISSING(release,freed)  threw: w.reserve is not a function
+ 32 q2_table.py     done     then P  end P   [c5b8877] trial35: done q2_table.py:runs  
+ 33 q3_calendar.js  stopped  then F  end F   [022d81c] trial35: stopped FN-MISSING(remove)  load: Missing expected exception (Error): Invalid start or end time
+ 34 q4_template.js  stopped  then F  end F   [022d81c] trial35: stopped q4_template.js:MISSING  threw: r is not a function
+ 35 q5_limits.py    stopped  then F  end F   [65806ad] trial35: stopped FN-MISSING(succeed)  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+ 36 q6_jpath.py     stopped  then F  end F   [82f71a4] trial35: stopped q6_jpath.py:THROWS  threw: AttributeError: 'dict' object has no attribute 'split'
+ 37 q7_buffer.js    stopped  then F  end F   [71053af] trial35: stopped FN-MISSING(find,findAll)  load: buffer.text is not a function
+ 38 q8_units.py     stopped  then F  end F   [27ea231] trial35: stopped FN-MISSING(into,names)  parse_quantity('2 kg') = (2.0, 'kilograms')
+ 39 q9_shop.html    stopped  then F  end F   [4bcfbf5] trial35: stopped FN-MISSING(shop)  one "0 items" | js error: Cannot read properties of null (reading 'textContent')
+ 40 q10_report.js   done     then F  end F   [fde3e1e] trial35: done FN-MISSING(render)  shoutLine "{{sku | upper}}: 5"
+ 41 q1_stock.js     stopped  then F  end F   [0bb015b] trial35: stopped FN-MISSING(fulfil)  threw: w.reserve is not a function
+ 42 q2_table.py     stopped  then P  end P   [6e8783d] trial35: stopped q2_table.py:runs  
+ 43 q3_calendar.js  stopped  then CT end CT  [bf0b961] trial35: stopped q3_calendar.js:THROWS  
+ 44 q4_template.js  stopped  then F  end F   [ac170a7] trial35: stopped FN-MISSING(array)  threw: r is not a function
+ 45 q5_limits.py    stopped  then F  end F   [394cab4] trial35: stopped FN-MISSING(KeyedLimiter,factory)  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+ 46 q6_jpath.py     stopped  then F  end F   [e2d2c4f] trial35: stopped FN-MISSING(segment)  threw: AttributeError: 'dict' object has no attribute 'split'
+ 47 q7_buffer.js    stopped  then F  end F   [e74ac9a] trial35: stopped FN-MISSING(replaceAll,undo)  load: buffer.text is not a function
+ 48 q8_units.py     stopped  then P  end P   [2a15eea] trial35: stopped FN-MISSING(of)  
+ 49 q9_shop.html    stopped  then F  end F   [e29f645] trial35: stopped FN-MISSING(shop,total)  an invalid code changed the total $0.00 | js error: Cannot read properties of nu
+ 50 q10_report.js   done     then F  end F   [6f4bff7] trial35: done FN-MISSING(render,skus)  stockTable "items=[object Object]"
+ 51 q1_stock.js     stopped  then F  end F   [dfc0922] trial35: stopped FN-MISSING(remove)  threw: w.reserve is not a function
+ 52 q2_table.py     done     then P  end P   [c6615b3] trial35: done q2_table.py:runs  
+ 53 q3_calendar.js  stopped  then F  end F   [bbc7cc0] trial35: stopped FN-MISSING(freeSlots)  load: Missing expected exception (Error): Invalid start or end time
+ 54 q4_template.js  stopped  then F  end F   [56394d9] trial35: stopped q4_template.js:runs  threw: r is not a function
+ 55 q5_limits.py    stopped  then F  end F   [f4e719e] trial35: stopped q5_limits.py:THROWS  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+ 56 q6_jpath.py     stopped  then F  end F   [1567b26] trial35: stopped FN-MISSING(value,predicate)  threw: AttributeError: 'dict' object has no attribute 'split'
+ 57 q7_buffer.js    stopped  then F  end F   [bb1efc6] trial35: stopped FN-MISSING(beginGroup,endGroup,undone)  load: buffer.text is not a function
+ 58 q8_units.py     stopped  then F  end F   [e32a2e9] trial35: stopped FN-MISSING(fraction,zeros)  format_quantity ['1 1/2 cup', '0 1/4 tsp', '2 cup', '1.37 kg', '0 1/3 cup', '1.1
+ 59 q9_shop.html    stopped  then F  end F   [e32a2e9] trial35: stopped FN-MISSING(shop,cart)  after reload ["Apple - 50 cents","Bread - 225 cents","Milk - 199 cents"] | js er
+ 60 q10_report.js   done     then F  end F   [8610cd9] trial35: done FN-MISSING(render)  threw: render is not defined
+ 61 q1_stock.js     stopped  then F  end F   [f2461d7] trial35: stopped FN-MISSING(lowStock)  threw: w.reserve is not a function
+ 62 q2_table.py     done     then F  end F   [5757a0f] trial35: done FN-MISSING(value_col)  threw: TypeError: unsupported operand type(s) for +: 'int' and 'str'
+ 63 q3_calendar.js  stopped  then F  end F   [1522669] trial35: stopped FN-MISSING(firstFree,midnight)  load: Missing expected exception (Error): Invalid start or end time
+ 64 q4_template.js  stopped  then F  end F   [4fbb687] trial35: stopped FN-MISSING(render)  the unclosed error does not name alpha: r is not a function
+ 65 q5_limits.py    stopped  then F  end F   [c3591c8] trial35: stopped q5_limits.py:THROWS  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+ 66 q6_jpath.py     stopped  then F  end F   [d06edb5] trial35: stopped q6_jpath.py:THROWS  flatten {'a.b': 1, 'l': [{'x': 2}, 3]}
+ 67 q7_buffer.js    stopped  then F  end F   [1e94fba] trial35: stopped FN-MISSING(wordAt,word)  load: buffer.text is not a function
+ 68 q8_units.py     stopped  then F  end F   [fb0527d] trial35: stopped FN-MISSING(units)  threw: ValueError: Density must be provided for mass-volume conversion
+ 69 q9_shop.html    done     then F  end F   [49704c1] trial35: done FN-MISSING(shop)  the empty message is not shown at start | js error: Cannot read properties of nu
+ 70 q10_report.js   done     then F  end F   [439a2c1] trial35: done FN-MISSING(render,lowStock)  threw: warehouse.lowStock is not a function
+ 71 q1_stock.js     stopped  then F  end F   [c0b3086] trial35: stopped FN-MISSING(toJSON,fromJSON)  threw: w.reserve is not a function
+ 72 q2_table.py     done     then F  end F   [d7810f7] trial35: done q2_table.py:runs  join [{'id': '1', 'name': 'ann', 'right_city': 'y', 'right_name': 'A2'}]
+ 73 q3_calendar.js  stopped  then F  end F   [16cafa5] trial35: stopped FN-MISSING(formatTime,parseTime)  load: Missing expected exception (Error): Invalid start or end time
+ 74 q4_template.js  stopped  then F  end F   [2869e0c] trial35: stopped q4_template.js:runs  threw: r is not a function
+ 75 q5_limits.py    stopped  then F  end F   [14dcf41] trial35: stopped q5_limits.py:THROWS  threw: TypeError: '<=' not supported between instances of 'str' and 'int'
+ 76 q6_jpath.py     stopped  then CT end F   <- REGRESSED  [593fb21] trial35: stopped FN-MISSING(of,changed,added,removed)  diff {'r': 5, 'n': 4}
+ 77 q7_buffer.js    stopped  then F  end F   [f93d492] trial35: stopped FN-MISSING(TextBuffer)  load: buffer.text is not a function
+ 78 q8_units.py     stopped  then F  end F   [a015eea] trial35: stopped FN-MISSING(occurrence,returns)  threw: ValueError: Unknown unit
+ 79 q9_shop.html    stopped  then F  end F   [8623c5b] trial35: stopped FN-MISSING(shop,total)  at $9.00 "" | js error: Cannot read properties of null (reading 'textContent')
+ 80 q10_report.js   stopped  then F  end F   [64ac204] trial35: stopped FN-MISSING(render,stringify,toJSON)  threw: w.reserve is not a function
+ 81 q1_stock.js     stopped  then F  end F   [26f3ff1] trial35: stopped FN-MISSING(history,objects)  threw: w.remove is not a function
+ 82 q2_table.py     stopped  then F  end F   [c7a9ad3] trial35: stopped FN-MISSING(CSV)  CLI printed ['All tests passed.'] | --------------------------------------------
+ 83 q3_calendar.js  stopped  then CT end CT  [b8dd662] trial35: stopped q3_calendar.js:THROWS  
+ 84 q4_template.js  stopped  then F  end F   [9b901ab] trial35: stopped FN-MISSING(render)  threw: r is not a function
+ 85 q5_limits.py    stopped  then F  end F   [c4b9826] trial35: stopped q5_limits.py:THROWS  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+ 86 q6_jpath.py     done     then F  end F   [61c5258] trial35: done FN-MISSING(segments)  threw: AttributeError: 'dict' object has no attribute 'split'
+ 87 q7_buffer.js    stopped  then F  end F   [8dc3e9b] trial35: stopped FN-MISSING(toJSON,fromJSON,undo)  load: buffer.text is not a function
+ 88 q8_units.py     stopped  then F  end F   [1e629ab] trial35: stopped FN-MISSING(density)  threw: ValueError: Unknown unit
+ 89 q9_shop.html    stopped  then F  end F   [d7c1656] trial35: stopped FN-MISSING(shop)  Enter did not apply the code: $0.00 | js error: Cannot read properties of null (
+ 90 q10_report.js   done     then F  end F   [8eeb516] trial35: done FN-MISSING(history)  threw: w.remove is not a function
+ 91 Q1_NOTES.md     done     then F  end F   [fabf67b] trial35: done q1_stock.js:runs  notes miss remove, reserve, available, release, fulfil, lowStock, toJSON, fromJS
+ 92 q2_table.py     done     then P  end P   [58047b8] trial35: done FN-MISSING(field,repeated)  
+ 93 q3_calendar.js  stopped  then F  end F   [8f42128] trial35: stopped FN-MISSING(fromText)  load: Missing expected exception (Error): Invalid start or end time
+ 94 q4_template.js  stopped  then F  end F   [5ff259d] trial35: stopped FN-MISSING(function,render)  compiled 1-{{#l}}{{.}}{{/l}}
+ 95 q5_limits.py    stopped  then F  end F   [9b3af6e] trial35: stopped FN-MISSING(cost)  threw: TypeError: SlidingWindow.allow() takes 1 positional argument but 2 were g
+ 96 q6_jpath.py     done     then P  end P   [0074900] trial35: done FN-MISSING(wins)  
+ 97 q7_buffer.js    stopped  then F  end F   [1e2406a] trial35: stopped q7_buffer.js:THROWS  load: buffer.text is not a function
+ 98 q8_units.py     stopped  then F  end F   [f5b928a] trial35: stopped FN-MISSING(unit)  CLI printed '' | me conversion")
+ValueError: Density must be provided for mass-
+ 99 q9_shop.html    stopped  then F  end F   [final] trial35: stopped FN-MISSING(shop)  the discount did not survive a reload: $0.00 | js error: Cannot read properties 
+100 Q_INDEX.md      interrupted then F  end F   [final] trial35: running Q_INDEX.md:MISSING  Q_INDEX.md missing
+
+coder14b-sete: 100 goals run | worked when written 19 | works at the end 15 (as asked 12) | REGRESSED 5

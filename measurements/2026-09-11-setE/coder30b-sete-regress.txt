@@ -1,0 +1,66 @@
+  1 q1_stock.js     done     then P  end P   [cb72fc0] trial35: done FN-MISSING(quantity)  
+  2 q2_table.py     done     then P  end P   [1c1ee6e] trial35: done FN-MISSING(commas,quotes)  
+  3 q3_calendar.js  done     then P  end P   [8ba78a4] trial35: done FN-MISSING(midnight)  
+  4 q4_template.js  stopped  then F  end F   [8ba78a4] trial35: stopped q4_template.js:MISSING  threw: r is not a function
+  5 q5_limits.py    stopped  then F  end F   [0762c33] trial35: stopped FN-MISSING(TokenBucket)  refill at 1 per second
+  6 q6_jpath.py     done     then P  end P   [9f2db21] trial35: done FN-MISSING(dicts,lists)  
+  7 q7_buffer.js    done     then P  end P   [a12ae49] trial35: done FN-MISSING(TextBuffer)  
+  8 q8_units.py     done     then P  end P   [ea1f096] trial35: done FN-MISSING(lb)  
+  9 q9_shop.html    done     then P  end P   [dcb715f] trial35: done FN-MISSING(price)  
+ 10 q10_report.js   done     then P  end F   <- REGRESSED  [1697d2d] trial35: done FN-MISSING(js)  load: render is not a function
+ 11 q1_stock.js     done     then P  end P   [0b72d71] trial35: done q1_stock.js:runs  
+ 12 q2_table.py     done     then P  end P   [96c5ee7] trial35: done q2_table.py:runs  
+ 13 q3_calendar.js  done     then P  end P   [233c9b2] trial35: done FN-MISSING(touch)  
+ 14 q4_template.js  done     then P  end F   <- REGRESSED  [bdfe7a1] trial35: done q4_template.js:runs  threw: r is not a function
+ 15 q5_limits.py    done     then F  end F   [ad8b2e9] trial35: done q5_limits.py:THROWS  threw: TypeError: 'int' object is not callable
+ 16 q6_jpath.py     done     then F  end F   [e70379d] trial35: done q6_jpath.py:runs  threw: KeyError: "Path a.b.9 is invalid: 'Path a.b.9 is invalid: index 9 out of 
+ 17 q7_buffer.js    stopped  then F  end F   [66249b5] trial35: stopped q7_buffer.js:runs  first undo ab
+ 18 q8_units.py     done     then P  end P   [da7c82c] trial35: done FN-MISSING(tsp,tbsp,cup)  
+ 19 q9_shop.html    stopped  then F  end F   [da7c82c] trial35: stopped FN-MISSING(shop)  empty total null
+ 20 q10_report.js   done     then P  end F   <- REGRESSED  [8c56f89] trial35: done FN-MISSING(render)  load: render is not a function
+ 21 q1_stock.js     done     then P  end P   [9cacb6a] trial35: done q1_stock.js:runs  
+ 22 q2_table.py     done     then P  end P   [98181f4] trial35: done q2_table.py:runs  
+ 23 q3_calendar.js  done     then P  end P   [e2f74bd] trial35: done q3_calendar.js:runs  
+ 24 q4_template.js  done     then P  end F   <- REGRESSED  [2dea1ed] trial35: done FN-MISSING(values)  threw: r is not a function
+ 25 q5_limits.py    done     then P  end P   [14a6e71] trial35: done FN-MISSING(SlidingWindow,seconds)  
+ 26 q6_jpath.py     done     then F  end F   [7c5e668] trial35: done q6_jpath.py:runs  past the end did not raise IndexError
+ 27 q7_buffer.js    stopped  then F  end P   [c7ca492] trial35: stopped q7_buffer.js:runs  
+ 28 q8_units.py     done     then P  end P   [f743532] trial35: done FN-MISSING(py)  
+ 29 q9_shop.html    done     then F  end F   [573d908] trial35: done FN-MISSING(shop)  after + ["Apple x2"] null
+ 30 q10_report.js   done     then P  end F   <- REGRESSED  [f4a931f] trial35: done FN-MISSING(render,available,stock)  load: render is not a function
+ 31 q1_stock.js     done     then P  end P   [557503e] trial35: done FN-MISSING(freed)  
+ 32 q2_table.py     done     then P  end P   [53e99bf] trial35: done q2_table.py:runs  
+ 33 q3_calendar.js  done     then P  end P   [a086ddf] trial35: done q3_calendar.js:runs  
+ 34 q4_template.js  done     then P  end F   <- REGRESSED  [3b18c41] trial35: done FN-MISSING(chained)  threw: r is not a function
+ 35 q5_limits.py    done     then F  end F   [10331b1] trial35: done FN-MISSING(succeed)  wait (0.4999956999963615, 1.4999947999895085)
+ 36 q6_jpath.py     done     then P  end P   [e5bf7c4] trial35: done q6_jpath.py:runs  
+ 37 q7_buffer.js    stopped  then F  end F   [3aea895] trial35: stopped q7_buffer.js:runs  overlapping matches
+ 38 q8_units.py     stopped  then F  end F   [8920510] trial35: stopped FN-MISSING(into,names)  threw: TypeError: 'NoneType' object is not subscriptable
+ 39 q9_shop.html    stopped  then F  end F   [5e2026a] trial35: stopped FN-MISSING(shop)  one "50.00 cents"
+ 40 q10_report.js   done     then P  end F   <- REGRESSED  [47e4107] trial35: done FN-MISSING(render)  load: render is not a function
+ 41 q1_stock.js     stopped  then F  end F   [67d06de] trial35: stopped q1_stock.js:runs  after fulfil stock 5 available 5
+ 42 q2_table.py     done     then P  end P   [b81702f] trial35: done q2_table.py:runs  
+ 43 q3_calendar.js  done     then P  end P   [ef847c0] trial35: done q3_calendar.js:runs  
+ 44 q4_template.js  done     then P  end F   <- REGRESSED  [f83159d] trial35: done FN-MISSING(array)  threw: r is not a function
+ 45 q5_limits.py    stopped  then F  end P   [f83159d] trial35: stopped FN-MISSING(KeyedLimiter,factory,keys)  
+ 46 q6_jpath.py     done     then P  end P   [29556c4] trial35: done FN-MISSING(segment)  
+ 47 q7_buffer.js    done     then F  end F   [1b6a1d0] trial35: done q7_buffer.js:runs  one undo did not revert all: a+b+c
+ 48 q8_units.py     done     then P  end P   [30dcdff] trial35: done FN-MISSING(of)  
+ 49 q9_shop.html    done     then F  end F   [4205732] trial35: done FN-MISSING(shop,total)  an invalid code changed the total null
+ 50 q10_report.js   done     then F  end F   [2c4f13d] trial35: done FN-MISSING(render)  load: render is not a function
+ 51 q1_stock.js     done     then P  end P   [e225cdc] trial35: done q1_stock.js:runs  
+ 52 q2_table.py     done     then P  end P   [1f6aa58] trial35: done q2_table.py:runs  
+ 53 q3_calendar.js  done     then P  end P   [9cbf735] trial35: done q3_calendar.js:runs  
+ 54 q4_template.js  stopped  then F  end F   [583367d] trial35: stopped q4_template.js:runs  threw: r is not a function
+ 55 q5_limits.py    stopped  then P  end P   [3a30216] trial35: stopped q5_limits.py:THROWS  
+ 56 q6_jpath.py     done     then P  end P   [1210a37] trial35: done FN-MISSING(value,predicate)  
+ 57 q7_buffer.js    stopped  then F  end F   [4af8267] trial35: stopped FN-MISSING(undone)  threw: Position out of bounds
+ 58 q8_units.py     stopped  then P  end P   [7fe671e] trial35: stopped FN-MISSING(fraction,zeros)  
+ 59 q9_shop.html    done     then F  end F   [846e464] trial35: done FN-MISSING(shop,cart)  after reload []
+ 60 q10_report.js   stopped  then F  end F   [a25c6d4] trial35: stopped FN-MISSING(render)  load: render is not a function
+ 61 q1_stock.js     stopped  then P  end P   [0ebaf48] trial35: stopped q1_stock.js:runs  
+ 62 q2_table.py     stopped  then P  end P   [bc1dc25] trial35: stopped FN-MISSING(value_col)  
+ 63 q3_calendar.js  done     then P  end P   [final] trial35: done FN-MISSING(midnight)  
+ 64 q4_template.js  running  then F  end F   [final] trial35: running q4_template.js:runs  the unclosed error does not name alpha: r is not a function
+
+coder30b-sete: 64 goals run | worked when written 41 | works at the end 35 (as asked 35) | REGRESSED 8
