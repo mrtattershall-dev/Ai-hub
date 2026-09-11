@@ -192,6 +192,51 @@ function ensureWorkspace() {
   }
 }
 
+// THE PAGE A RUN IS WORKING ON, and what was already wrong with it.
+//
+// The finish gate used to ask one fixed question - is /workspace/index.html right? - and that went
+// wrong both ways for an EXISTING project. A page anywhere else (public/index.html,
+// game/index.html) got no browser or visual check at all, so a run that blanked it finished clean.
+// And a problem the project already had (a spare blank canvas, a collapsed element) blocked every
+// run until the gate's cap let a repeated finish through: 88 of 327 harvested games were refused
+// for things the agent never touched. Now the gate judges the page the run actually worked on, and
+// blocks only on visual problems that are NEW since the run started. A page that did not exist at
+// the start has no baseline and keeps full strictness.
+const normPage = (p) => String(p || '').split(String.fromCharCode(92)).join('/').split('/').filter((x) => x && x !== '.').join('/');
+function webPageFor(run) {
+  if (run.webPage && existsSync(join(WORKSPACE, run.webPage))) return run.webPage;
+  return existsSync(join(WORKSPACE, 'index.html')) ? 'index.html' : null;
+}
+function candidatePagesForBaseline() {
+  const out = [];
+  try {
+    if (existsSync(join(WORKSPACE, 'index.html'))) out.push('index.html');
+    for (const e of readdirSync(WORKSPACE, { withFileTypes: true })) {
+      if (out.length >= 3) break;
+      if (e.isFile() && /\.html?$/i.test(e.name) && e.name !== 'index.html') out.push(e.name);
+      else if (e.isDirectory() && !e.name.startsWith('.') && e.name !== 'node_modules' && existsSync(join(WORKSPACE, e.name, 'index.html'))) out.push(e.name + '/index.html');
+    }
+  } catch { /* unreadable workspace - no baseline */ }
+  return out.slice(0, 3);
+}
+// The port THIS process is serving /workspace on - set by index.js once it is listening, and by
+// nothing else. The baseline must never inspect a port it is not serving: an in-process test
+// (router mounted on a private port, no PORT env) fell back to PORT = 3001 and opened a headless
+// browser against the LIVE hub. No serving port, no baseline.
+let servingPort = null;
+export function setServingPort(port) { servingPort = port; }
+async function takeVisualBaseline() {
+  const base = {};
+  if (!servingPort) return base;
+  for (const page of candidatePagesForBaseline()) {
+    try {
+      const r = await visual.inspect(`http://localhost:${servingPort}/workspace/${page}`, { label: 'baseline' });
+      if (r.ok) base[page] = visual.problemKeys(r);
+    } catch { /* no baseline for this page - it is judged strictly */ }
+  }
+  return base;
+}
+
 // Resolve a user/model-supplied path and refuse anything outside WORKSPACE.
 // Confine a model-supplied path to WORKSPACE.
 //
@@ -2442,6 +2487,13 @@ async function drive(loadDb, run) {
   run.busy = true;
   _loadDb = loadDb;          // sub-tasks call the model through this
   try {
+    // VISUAL BASELINE, once per run, before anything is changed: what the existing pages already
+    // get wrong. The finish gate then blocks only on problems that are new (see webPageFor).
+    // A follow-up keeps the original baseline, so a run cannot grandfather its own damage.
+    if (run.visualBaseline === undefined && !run.depth && run.status === 'running') {
+      run.visualBaseline = {};
+      try { run.visualBaseline = await takeVisualBaseline(); } catch { /* every page judged strictly */ }
+    }
     // ── Stage 1: PLAN-FIRST GATE — a build plan is produced before ANY code (runs once) ──
     if (!run.planned && run.status === 'running') {
       run.planned = true;
@@ -2694,7 +2746,8 @@ async function drive(loadDb, run) {
         };
 
         if ((run.finishBlocks || 0) < 3) {
-          const hasWeb = existsSync(join(WORKSPACE, 'index.html'));
+          const webPage = webPageFor(run);          // the page this run worked on (index.html by default)
+          const hasWeb = !!webPage;
 
           // 1. unfinished work on the ledger
           const p = ledger.progress(WORKSPACE);
@@ -2776,14 +2829,23 @@ async function drive(loadDb, run) {
             // entirely. A one-shot gate that a second attempt walks straight past is not
             // a gate. finishBlocks (capped at 3) is what stops this looping.
             try {
-              const r = await visual.inspect(`http://localhost:${PORT}/workspace/index.html`,
+              const r = await visual.inspect(`http://localhost:${PORT}/workspace/${webPage}`,
                 { saveTo: join(WORKSPACE, '.screenshots'), label: 'finish' });
               if (r.ok && visual.hasProblems(r)) {
-                blocked('The page renders, but something is wrong with what is on screen.',
-                  `Do NOT finish yet — the app loads without errors but it does not LOOK right:\n\n${r.report}\n\nFix these, then finish.`);
-                continue turn;
-              }
-              if (r.ok) {
+                // Only what this run INTRODUCED blocks. A page with a baseline (it existed when the
+                // run started) is compared against it; a page without one is judged strictly.
+                const before = (run.visualBaseline || {})[webPage];
+                const fresh = visual.newProblems(before, visual.problemKeys(r));
+                if (fresh.length) {
+                  blocked('The page renders, but something is wrong with what is on screen.',
+                    `Do NOT finish yet — the app loads without errors but it does not LOOK right:\n\n${r.report}\n\n`
+                    + (before ? `New since this run started: ${fresh.join('; ')}\n\n` : '')
+                    + `Fix these, then finish.`);
+                  continue turn;
+                }
+                run.sawScreen = true;
+                pushStep(run, { type: 'note', text: `Visual check: only problems ${webPage} already had before this run (left alone): ${Object.keys(before || {}).join('; ').slice(0, 240)}` });
+              } else if (r.ok) {
                 run.sawScreen = true;   // passed — no need to launch a browser again
                 pushStep(run, { type: 'note', text: 'Visual check passed — content is actually on screen.' });
               }
@@ -2915,15 +2977,16 @@ async function drive(loadDb, run) {
         // forever, told to browser-test a page it had never touched. Found 2026-09-09
         // by driving the loop with a scripted model.
         if (args.path) {
-          if (/\.html?$/i.test(args.path)) run.touchedWeb = true;
+          if (/\.html?$/i.test(args.path)) { run.touchedWeb = true; run.webPage = normPage(args.path); }
           else if (/\.(css|c?js|mjs)$/i.test(args.path)) {
-            // A stylesheet or script counts only if the entry point actually loads it.
+            // A stylesheet or script counts only if a page actually loads it - the page this run is
+            // working on, or one of the project's pages (not only the root index.html).
             try {
-              const idx = join(WORKSPACE, 'index.html');
-              if (existsSync(idx) && readFileSync(idx, 'utf8').includes(args.path.split('/').pop())) {
-                run.touchedWeb = true;
-              }
-            } catch { /* unreadable entry point - leave the flag alone */ }
+              const name = args.path.split('/').pop();
+              const pages = [webPageFor(run), ...candidatePagesForBaseline()].filter(Boolean);
+              const hit = pages.find((pg) => { try { return readFileSync(join(WORKSPACE, pg), 'utf8').includes(name); } catch { return false; } });
+              if (hit) { run.touchedWeb = true; if (!run.webPage) run.webPage = hit; }
+            } catch { /* unreadable pages - leave the flag alone */ }
           }
         }
         const err = await quickCheck(args.path);
@@ -3019,6 +3082,8 @@ async function drive(loadDb, run) {
           + ` Send exactly ONE action per response and wait for its result. If you meant to finish, send finish on its own as your NEXT response.`;
       }
       if (tool === 'test_web') {
+        // The page the agent browser-tests is the page it is working on.
+        if (args.path && /\.html?$/i.test(args.path) && existsSync(join(WORKSPACE, normPage(args.path)))) run.webPage = normPage(args.path);
         const hasErr = /\[JS ERROR\]|\[console\.error\]|\[HTTP \d/.test(result);
         run.needsTest = hasErr;
         if (hasErr) {

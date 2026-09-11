@@ -604,5 +604,10 @@ function extractContent(type, data) {
 }
 
 // Keep the http.Server so the terminal's WebSocket can share the same port.
-const server = app.listen(PORT, () => console.log(`AI Hub server running on http://localhost:${PORT}`));
+const server = app.listen(PORT, () => {
+  console.log(`AI Hub server running on http://localhost:${PORT}`);
+  // Only now is THIS process serving /workspace on PORT - and the visual baseline inspects no
+  // other port (an in-process test once fell back to :3001 and looked at the live hub).
+  import('./agent.js').then((m) => m.setServingPort(PORT)).catch(() => {});
+});
 attachTerminal(server, { cwd: process.env.HUB_TERMINAL_CWD || WORKSPACE });

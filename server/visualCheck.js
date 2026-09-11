@@ -234,3 +234,27 @@ export function hasProblems(r) {
     || r.facts.issues.length > 0
     || (r.facts.canvases.length === 0 && r.facts.painted <= 2 && r.facts.textLen < 5);
 }
+
+/**
+ * Stable keys for the problems an inspection found, each with a count, so the finish gate can tell
+ * what a run INTRODUCED from what the page already had (a spare blank canvas, a collapsed element
+ * that was there before the agent touched anything). The same problem classes as hasProblems().
+ */
+export function problemKeys(r) {
+  const keys = {};
+  if (!r || !r.ok || !r.facts) return keys;
+  r.facts.canvases.forEach((c, i) => { if (c.blank === true) keys[`canvas ${i + 1} (${c.w}x${c.h}) blank`] = 1; });
+  for (const s of r.facts.issues) {
+    const k = String(s).replace(/\d+/g, '#');
+    const n = Number((String(s).match(/^(\d+)/) || [])[1] || 1);
+    keys[k] = Math.max(keys[k] || 0, n);
+  }
+  if (r.facts.canvases.length === 0 && r.facts.painted <= 2 && r.facts.textLen < 5) keys['page renders nothing'] = 1;
+  return keys;
+}
+
+/** Keys that are new in `now`, or whose count grew. With no baseline, every problem is new. */
+export function newProblems(before, now) {
+  const b = before || {};
+  return Object.keys(now || {}).filter((k) => (now[k] || 0) > (b[k] || 0));
+}
