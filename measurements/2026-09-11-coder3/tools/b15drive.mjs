@@ -1,0 +1,18 @@
+import { createRequire } from 'node:module';
+import { pathToFileURL } from 'node:url';
+const HUB = 'C:/Users/tatte/Projects/ai-coding-hub/server/';
+const require = createRequire(HUB + 'index.js');
+const puppeteer = require('puppeteer');
+const { launchOptions } = await import(pathToFileURL(HUB + 'browser.js').href);
+const browser = await puppeteer.launch(launchOptions());
+const page = await browser.newPage();
+const errs = []; page.on('pageerror', (e) => errs.push(e.message));
+await page.goto(pathToFileURL('C:/Users/tatte/Projects/ai-coding-hub/measurements/2026-09-11-coder3/data/coder30b-base-setB/workspace/u8_game.html').href);
+await new Promise((r) => setTimeout(r, 400));
+const before = await page.evaluate('JSON.stringify({ go: gameState.gameOver, obs: (gameState.obstacles || obstacles || []).length })').catch((e) => 'ERR ' + e.message);
+const put = await page.evaluate('(() => { const o = (gameState.obstacles || obstacles)[0]; player.x = o.x; player.y = o.y; return [o.x, o.y]; })()').catch((e) => 'ERR ' + e.message);
+await new Promise((r) => setTimeout(r, 300));
+const after = await page.evaluate('JSON.stringify({ go: gameState.gameOver })').catch((e) => 'ERR ' + e.message);
+await page.screenshot({ path: 'C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/b15.png' });
+console.log(JSON.stringify({ before, put, after, errs }));
+await browser.close();

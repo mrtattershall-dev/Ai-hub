@@ -3962,3 +3962,9 @@ then "Let's do it" (inside the $30 trace-generation cap; ~$4.2 of it used so far
     node training-data/factory/stopApp.mjs (Rule 7a) on ALL DONE or cap. Worst case ~$3.3 + ~$0.9.
     Identity (Rule 3): /api/health pasted below before any number counts. Offline fuzzer stays paused
     for the window; resumes at seed 400912 afterwards.
+    [set C ledger, Session A] DEPLOYED both 06:33 (min 0, max 1, scaledown 120 s). Watchdogs armed at deploy
+      start 06:33:54 / 06:33:57, cap 55 min (covers deploy + cold start; harness stops new goals 42 min after
+      its own start). Worst case ~$3.6 + ~$1.0. Identity (Rule 3), verbatim, before any number:
+      coder30b-base health try 2 06:36:55: {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+      coder14b-base health try 1 06:36:02: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+      Harnesses started 06:36:55 / 06:36:02; no new goals after 07:18:55 / 07:18:02.
