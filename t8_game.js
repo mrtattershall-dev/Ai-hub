@@ -40,12 +40,24 @@ function gameLoop() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Move paddle
+    if (keys['ArrowLeft'] && paddle.x > 0) {
+        paddle.x -= paddle.speed;
+    }
+    if (keys['ArrowRight'] && paddle.x + paddle.width < canvas.width) {
+        paddle.x += paddle.speed;
+    }
+    
     // Draw ball
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
     ctx.fill();
     ctx.closePath();
+    
+    // Draw paddle
+    ctx.fillStyle = '#00ff00';
+    ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
     
     // Update ball position
     ball.x += ball.dx;
@@ -56,6 +68,13 @@ function gameLoop() {
         ball.dx = -ball.dx;
     }
     if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+        ball.dy = -ball.dy;
+    }
+    
+    // Bounce off paddle
+    if (ball.y + ball.radius > paddle.y &&
+        ball.x > paddle.x &&
+        ball.x < paddle.x + paddle.width) {
         ball.dy = -ball.dy;
     }
     
