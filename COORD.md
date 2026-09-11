@@ -4087,3 +4087,15 @@ tatte, verbatim, this thread: "After d has results, analyze the deep seated bugs
       12/100 as asked, 15/100 implementation. Qwen3-Coder was CUT AT GOAL 64 by the sleep (36 goals never started):
       35/100 = 35 of the 64 steps it attempted. Records complete for everything that ran (100 + 64 run files, as
       many transcripts, git bundles). Offline fuzzer resumes at seed 400960.
+    [set E analysis, Session A] HUB FINDINGS from set E's full transcripts -> branch f-fixes (worktree
+      ~/Projects/ai-coding-hub-ffix; NOT merged - full suite first). Each fix has a test that fails without it:
+      5ddc063 a dropped model connection (stream closed before any content) is retried in the run, up to 2x, instead
+        of pausing it for a human (14B goal 4 was lost to one "Premature close");
+      aa0fc13 leftover tasks show only to goals naming their file (goal 1's plan rode on every later goal - 699 calls
+        in the 14B replay; Qwen3-Coder spent 45 calls closing them); verify_project checks the goal's own file in its
+        language (it ran node q1_stock.js for a Python goal); FIND==REPLACE edits say NO CHANGE (41 times for the 14B,
+        each answered "OK: edited"); a stored value hiding a method is named with both lines (this.text vs text());
+      2baa03c a write that drops names from module.exports says so (Qwen3-Coder goal 54 rewrote q4_template.js and lost
+        render's export - worth up to 20 of its steps; the replay of that goal now warns by name).
+      Replays through f-fixes (measurements/replay/results/setE-*): 14B 100/100 replayed, fixes fired as counted above;
+      Qwen3-Coder goals 15/47/54 reproduce the recording exactly with approvals answered like the harness.
