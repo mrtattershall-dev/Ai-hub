@@ -4144,3 +4144,10 @@ D and E".
       among matches; the parser no longer turns a LINES edit into a whole-file rewrite; a directory is a search scope.
       editAddress.test 9/9, six mutants caught. Still open (biggest untouched waste): the same tool called with the same
       arguments returning the same answer - 155 times for the 14B, 221 for Qwen3-Coder in set E - with nothing said.
+    [set F live, Session A] CONNECTION DROPS MEASURED, and the first fix for them was wrong. Four goals lost so far
+      (14B goal 5; Qwen3-Coder 38, 44, 54), every one the same shape: a very large reply (18k, 31k, 7.7k, 1.7k chars
+      against a median of 351) and then every following connection refused. The retry fired as designed each time
+      (2 s, then 4 s) and still lost the goal, because - measured from the transcripts against the NEXT goal's first
+      successful call - the endpoint only answered again after 9.6-12.8 s. Raising the count from 2 to 4 at the same
+      cadence would have changed nothing; that change was amended away. g-fixes now waits past the window instead:
+      3 attempts, 15 s then 30 s (AGENT_CONN_RETRY_MS), giving up inside a minute on a genuinely dead endpoint.
