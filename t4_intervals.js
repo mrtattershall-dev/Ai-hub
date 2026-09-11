@@ -81,3 +81,12 @@ module.exports = { mergeIntervals };
 
 // Run tests
 runTests();
+    // Test case 7: Unsorted intervals (should still work due to sorting)
+    const test7 = [[1, 4], [0, 2], [3, 5]];
+    const expected7 = [[0, 5]];
+    const result7 = mergeIntervals(test7);
+    console.assert(JSON.stringify(result7) === JSON.stringify(expected7), 
+        "Test 7 failed:", result7, "expected:", expected7);
+    
+    console.log("All tests passed!");
+}
