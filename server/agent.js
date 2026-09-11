@@ -32,6 +32,7 @@ import * as assetLib from './assets.js';
 import { canonicalSummary } from './canonicalAssets.mjs';
 import { SYSTEM_PROMPT } from './agentPrompt.js';
 import { parseAction, parseActions } from './agentParse.js';
+import { duplicateNote } from './duplicateDecls.js';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 
 /**
@@ -2853,6 +2854,14 @@ async function drive(loadDb, run) {
         const err = await quickCheck(args.path);
         if (err) syntaxNote = `\n\n❌ SYNTAX CHECK FAILED for ${args.path}:\n${err}\nFix this before doing anything else — it will not run as written.`;
         else if (/\.(py|c?js|mjs)$/i.test(args.path || '')) syntaxNote = `\n\n✅ ${args.path} passed a syntax check.`;
+        // "Passed a syntax check" is not "does what it did": a top-level function declared
+        // twice is legal, and the LAST one silently wins. Both models broke a working game this
+        // way in the head-to-head (update() x4, checkCollisions() x3) - see duplicateDecls.js.
+        // A warning with names and lines, not a failure: it does not stop a batch.
+        if (!err && /\.(py|c?js|mjs)$/i.test(args.path || '')) {
+          try { syntaxNote += duplicateNote(readFileSync(safePath(args.path), 'utf8'), args.path); }
+          catch { /* unreadable after the write - the syntax verdict above still stands */ }
+        }
       }
 
       // ── MECHANICAL LOOP BREAK ───────────────────────────────────────────────
