@@ -36,5 +36,16 @@ function isValidCard(number) {
     return sum % 10 === 0;
 }
 
+// Test cases with asserts
+console.assert(isValidCard(4532015112830366) === true, "Valid card number should return true");
+console.assert(isValidCard(6011514433546201) === true, "Valid card number should return true");
+console.assert(isValidCard(4000000000000002) === false, "Invalid card number should return false");
+console.assert(isValidCard(1234567812345678) === false, "Invalid card number should return false");
+console.assert(isValidCard("4532 0151 1283 0366") === true, "Valid card with spaces should return true");
+console.assert(isValidCard("4532015112830366") === true, "Valid card without spaces should return true");
+console.assert(isValidCard("1234 5678 9012 3456") === false, "Invalid card with spaces should return false");
+console.assert(isValidCard(123) === false, "Card with less than 2 digits should return false");
+console.assert(isValidCard("abc123") === false, "Card with non-digit characters should return false");
+
 // Export the function
 module.exports = { isValidCard };
