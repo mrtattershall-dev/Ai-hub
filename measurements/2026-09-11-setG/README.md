@@ -24,7 +24,9 @@ g-fixes (branch, commits 1467016, 9eb907c/4cc60ff, 727d3bb - full suite and merg
 3. The parser no longer turns a LINES edit into a whole-file rewrite - the shape that dropped q4_template.js's export.
 4. A directory path is a search SCOPE.
 5. A repeated identical call is named in the result.
-6. Dropped connections retry 4 times, not 2 (set F lost one goal per model to drops that came in threes).
+6. A dropped connection is retried after a wait that clears the measured dead window: 3 attempts, 15 s then 30 s.
+   (Set F lost four goals to the same shape - a very large reply, then every following connection refused. The
+   endpoint answered again after 9.6-12.8 s, while the old retries waited 2 s and 4 s, entirely inside that window.)
 
 ## Predictions (to be fixed before launch, with the checker and harness unchanged from set F)
 - edit_file failure rate falls from set F's rate (the 14B's was 36% at goal 39) to under 15%, because 42% of set E's
