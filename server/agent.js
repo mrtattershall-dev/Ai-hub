@@ -1325,6 +1325,47 @@ if (process.env.AGENT_ALLOW_DOWNLOADS === '1' && process.env.AGENT_AUTO_DOWNLOAD
 // Cheap, automatic verification: after the model writes/edits a .py or .js file,
 // compile-check it (no execution). Catches the most common failure mode — broken
 // syntax — instantly and for free, the same way test_web catches runtime bugs.
+// ── WHEN THE MODEL'S OWN PYTHON ASSERT FAILS, SHOW BOTH SIDES ─────────────────────────
+//
+// Node's assert prints actual-vs-expected; a bare Python `assert f(x) == y` prints only the
+// line. In the 14B-vs-32B head-to-head (2026-09-10) a model's own test failed 22 times, 8 of
+// them in Python, where the model got "AssertionError" and no value to reason from - and in 7
+// goals the 14B's CODE was right and its TEST wrong, which it cannot tell without the value.
+// explain_assert.py reruns the file with its comparison asserts rewritten to capture both
+// sides in place (pytest's trick - inspecting afterwards fails, because `except E as e:`
+// deletes `e` while the exception unwinds), and the result gains e.g.
+//     LEFT  word_count("This is a test. This test is only a test.")  ->  {..., 'test': 3, ...}
+//     RIGHT {..., "test": 2, ...}
+// Evidence, not advice. Never fatal: no python, a timeout or nothing to explain adds nothing.
+const EXPLAIN_ASSERT = join(__dirname, 'explain_assert.py');
+function assertEvidence(result) {
+  return new Promise((res) => {
+    const r = String(result ?? '');
+    if (!/AssertionError/.test(r) || /Its two sides were:/.test(r)) return res('');
+    // The deepest traceback frame that is a .py file INSIDE the workspace. A relative path (a
+    // `python x.py` through run_command) resolves against the workspace, where it ran.
+    const root = resolve(WORKSPACE);
+    const files = [...r.matchAll(/File "([^"]+\.py)", line \d+/g)].map((m) => resolve(root, m[1]));
+    const inside = files.filter((f) => f.startsWith(root + sep) && existsSync(f));
+    const target = inside[inside.length - 1];
+    if (!target) return res('');
+    exec(`python -B "${EXPLAIN_ASSERT}" "${target}"`, { cwd: WORKSPACE, timeout: 20_000, windowsHide: true },
+      (err, stdout) => res(err ? '' : String(stdout || '').trim()));
+  });
+}
+// Inserted BEFORE the trailing "EXIT: n" line, not after it: batch mode decides a command
+// failed by the result ENDING in a non-zero EXIT (batchStepFailed), and appending after it
+// would quietly turn a failing assert into a "success" that lets the batch run on.
+async function withAssertEvidence(tool, result) {
+  if (tool !== 'run_python' && tool !== 'run_command') return result;
+  const ev = await assertEvidence(result).catch(() => '');
+  if (!ev) return result;
+  const block = `\n${ev}\nDecide WHICH side is wrong - the function's result or your expected value - before you edit either.`;
+  const r = String(result);
+  const m = r.match(/\nEXIT: \S+\s*$/);
+  return m ? r.slice(0, m.index) + block + r.slice(m.index) : r + '\n' + block;
+}
+
 function quickCheck(path) {
   return new Promise((res) => {
     if (!path) return res(null);
@@ -2822,6 +2863,7 @@ async function drive(loadDb, run) {
       let result;
       try { result = await tools[tool](args); }
       catch (e) { result = `ERROR: ${e.message}`; }
+      result = await withAssertEvidence(tool, result);   // a failing Python assert gains both sides
       let syntaxNote = '';
       // append_file is an edit too, and needs the same checks. It used to skip this whole
       // block, so an append that broke an existing file was never flagged to the model, an
@@ -3761,6 +3803,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       let result;
       try { result = await tools[tool](args); }
       catch (e) { result = `ERROR: ${e.message}`; }
+      result = await withAssertEvidence(tool, result);   // same evidence for a human-approved run
       pushStep(run, { type: 'tool', tool, args, result, approved: true });
       run.history.push({ role: 'user', content: `TOOL RESULT (${tool}):\n${result}` });
     }
