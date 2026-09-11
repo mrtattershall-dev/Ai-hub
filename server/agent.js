@@ -129,6 +129,12 @@ const BATCH_ACTIONS = process.env.AGENT_BATCH_ACTIONS === '1';
 // AGENT_UNATTENDED=1: nobody is watching this run, so an action that would ask a human is DENIED (with a reason
 // the model can act on) instead of parking the run. Off by default: an attended run still asks.
 const UNATTENDED = process.env.AGENT_UNATTENDED === '1';
+// A DROPPED connection (the stream closed before any content, a reset socket) means nothing ran and nothing entered
+// the history, so the same call can simply be made again. Set E (2026-09-11): one 'Premature close' right after a
+// runaway reply paused a 14B goal as 'interrupted' - an unattended run has nobody to press Resume, so the goal was
+// lost. Only drops are retried here: a stall or a timeout already cost minutes, and those still pause as before.
+const CONN_RETRIES = parseInt(process.env.AGENT_CONN_RETRIES || '2', 10);
+const isDropError = (e) => /Premature close|terminated|before any content|ECONNRESET|socket hang up|EPIPE|fetch failed/i.test(`${e?.name} ${e?.message} ${e?.cause?.code || ''}`);
 const BATCH_MAX = 4;
 
 // The clock runs from budgetStart, NOT createdAt. A follow-up on a run that started
@@ -2610,6 +2616,13 @@ async function drive(loadDb, run) {
           break;
         }
 
+        if (isDropError(e) && (run.connRetries || 0) < CONN_RETRIES) {
+          run.connRetries = (run.connRetries || 0) + 1;
+          pushStep(run, { type: 'note', text: `The model connection dropped (${String(e.message).slice(0, 120)}) - nothing ran; retrying the same call (${run.connRetries}/${CONN_RETRIES}).` });
+          await new Promise((r) => setTimeout(r, 2000 * run.connRetries));
+          if (run.status !== 'running') break;     // stopped during the wait
+          continue;
+        }
         if (isConnError(e)) {                        // tunnel/Ollama unreachable — pause (resumable), don't kill
           run.status = 'interrupted';
           pushStep(run, { type: 'error', text: `Run paused at step ${run.modelCalls} — ${pauseAdvice(e)} (${e.message})` });
@@ -2624,6 +2637,7 @@ async function drive(loadDb, run) {
       if (run.status !== 'running') break;            // stopped during the call — don't run another step
       run.tokens = (run.tokens || 0) + estimateTokens(msgs, raw);
       run.ctxSquashes = 0;                  // a call went through - reset the squash ladder
+      run.connRetries = 0;                  // ...and the dropped-connection retries
       run.history.push({ role: 'assistant', content: raw });
 
       // Stuck-loop guard.
