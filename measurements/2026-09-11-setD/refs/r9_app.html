@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>r9 todo</title>
+  <style>.done span { text-decoration: line-through; color: #888; } .hidden { display: none; }</style>
+</head>
+<body>
+  <h1>Todo</h1>
+  <input type="text" id="r9-input" placeholder="What needs doing?">
+  <div>
+    <button id="r9-all">All</button>
+    <button id="r9-active">Active</button>
+    <button id="r9-done">Done</button>
+    <button id="r9-clear">Clear done</button>
+  </div>
+  <p id="r9-count">0 items left</p>
+  <p id="r9-empty">Nothing to do</p>
+  <ul id="r9-list"></ul>
+  <script src="r9_app.js"></script>
+</body>
+</html>

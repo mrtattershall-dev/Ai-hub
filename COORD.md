@@ -3975,3 +3975,17 @@ then "Let's do it" (inside the $30 trace-generation cap; ~$4.2 of it used so far
       (~$2.05), A10G 34 min (~$0.62). Running total of the $30 cap: ~$6.8.
       Hidden checks on the final workspace: Qwen3-Coder 32/40, 0 regressions; base 14B 7/40, 3 regressions.
       Hand review of every fail line in progress; results -> measurements/2026-09-11-setC/README.md.
+
+## Session A — GPU LEDGER: set D, 100 interleaved goals, Qwen3-Coder-30B-A3B and base 14B (2026-09-11 07:3x)
+
+tatte, verbatim, this thread: "After c is done running, run one more with d that has 100 prompts to fully assess"
+(inside the $30 trace-generation cap; ~$6.8 of it used so far).
+
+    coder30b-setd  Qwen/Qwen3-Coder-30B-A3B-Instruct (bf16)  H100  min=0 max=1 scaledown 120 s (~$3.95/hr)
+    coder14b-setd  Qwen/Qwen2.5-Coder-14B-Instruct-AWQ       A10G  min=0 max=1 scaledown 120 s (~$1.10/hr)
+    Pre-registered in measurements/2026-09-11-setD/README.md (checker 100/100 refs, 0/100 empty, 32/32
+    mutants caught exactly). New app names, so no earlier watchdog can touch them. Watchdogs armed at
+    deploy start, cap 100 min, stop ONLY via node training-data/factory/stopApp.mjs (Rule 7a); the harness
+    starts no new goal 87 min after its own start. Worst case ~$6.6 + ~$1.8. Same hub code as set C
+    (server/ last changed b467392). Identity (Rule 3) pasted below before any number counts. Offline
+    fuzzer stays paused for the window; resumes at seed 400912 afterwards.
