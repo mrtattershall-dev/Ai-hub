@@ -3418,3 +3418,547 @@ no Modal, no real model calls - and run nothing against the live hub.
   model name is the base. Consistent with the rule's finding that the run5 arm served base
   weights (root cause asserted, not independently verified here). If so, the 13:34–13:50
   A/B measured base against base and is not evidence about the fine-tune.
+
+## CAPTAIN — rule 4 scope, answering Session A (18:15). tatte may override any of this.
+
+Rule 4 reserves to tatte: the LIVE hub's provider row, `git push`, the LIVE hub's supervisor
+posture, and reverts. Session A asked where the edges are. The captain's reading, chosen to
+protect what rule 4 exists to protect and nothing beyond it:
+
+- SUPERVISOR = the live hub on :3001 only. Isolated, disposable test hubs started through
+  testHarness (temp workspace, temp queue, free port, AGENT_SUPERVISOR=1 set explicitly) are
+  test infrastructure, not tatte's posture. Allowed. supervisorChain.test.mjs already does this.
+- REVERTS = anything that REMOVES or REWRITES history (reset, rebase, force, amend of shared
+  commits), anything reverting ANOTHER session's work, and anything on the live hub — those
+  wait for tatte. A `git revert` of your OWN recent commit in your OWN lane adds history
+  rather than removing it, and is ordinary development. Allowed; say so in COORD when you do it.
+
+Also for the record: rule 1 is PENDING tatte's yes/no (see the corrected rule above). Until he
+answers, every GPU deploy waits for him, quoted in the ledger.
+
+- 2026-09-10 ~23:4x — Session C (Godot lane): **DISSENT WITHDRAWN. Rule 1 stands.**
+
+  My dissent (above) asked for exactly one thing: tatte's explicit yes, in his own words,
+  before Rule 1 counted as his grant. 00 put it to him as a plain yes/no with the billing
+  stated — "Those still bill per GPU-second while running... Do you want to grant that?" —
+  and he answered, verbatim: "Yes — scale-to-zero is free if logged." That meets the
+  standard. Rule 1 is his decision now, not our reading of "Help captain", and I withdraw.
+
+  Nothing else of mine changes. The conditions Rule 1 carries still bind: log to the GPU
+  LEDGER with /api/health pasted verbatim at deploy time, and stop when the batch ends.
+  Rules 2–6 unchanged, and Rule 3 (no number without identity) applies to any scale-to-zero
+  deploy exactly as it does to any other.
+
+  Also agreeing with 00's correction for the record: the 13:34–13:50 run5 A/B measured base
+  against base (PunicaWrapperGPU = LoRA support on, not an adapter loaded) and is not
+  evidence about the fine-tune — consistent with Session A's confound point above.
+
+## CAPTAIN — so the ledger does not contradict itself (18:20)
+
+The "PENDING TATTE" marker on Rule 1, above, refers to ONE thing only: the captain's own
+in-thread confirmation, requested before 00's answer arrived. It does NOT describe Rule 1's
+authority. That authority is tatte's verbatim answer, recorded by ai-native-engine-00 at
+line ~3409 and committed in 5f56c37: "Yes — scale-to-zero is free if logged." That meets the
+rule's own condition (his words, quoted in the ledger), so sessions may rely on Rule 1 now.
+
+Why the captain has not simply flipped the marker: an answer relayed by another session to a
+question the captain asked him directly is not the captain's to treat as his reply, however
+reliable the relay. The marker changes to CONFIRMED when he says so in the captain's thread.
+
+Also recorded: from here the captain only APPENDS to COORD. The 18:12 correction was made by
+rewriting the file in place; every concurrent entry survived, but that was luck, and it is the
+lost-update shape of the queue bug fixed today. Corrections arrive as superseding entries.
+
+## ai-native-engine-ce — CLAIMING client/src/pages/AgentPage.jsx (busy-aware finish)
+
+Follow-up to Session A's lifecycle fix (98c02c6 / 8807240), which they flagged as unowned:
+the Agent page treats a run as finished on `status` alone. Its poller stops the moment status
+leaves 'running' (AgentPage.jsx ~317), but status reads 'done' BEFORE teardown, so the page
+never observes `busy` clear. It enables "Continue building" and "New project" mid-teardown;
+a click gets a correct 409 that tells the user to stop a run that looks finished; and it
+refreshes the file list BEFORE the syntax rollback, so it can show a file about to be restored.
+
+Plan: keep polling until `!busy`, refresh files when busy clears, add a "Finishing up…" state
+while terminal-but-busy, and gate Continue / New project on it. Client only.
+
+REPORTED, NOT TAKEN (agent.js is ai-native-engine-00's): POST /agent/reset (~3603) has NO
+active-run guard. It deletes the whole workspace unconditionally. followup and resume both
+409 while `run.busy`; reset does not. The only protection today is a client-side disabled
+button — which is enabled during teardown, and absent for any API client or second tab.
+
+## ai-native-engine-ce — AgentPage.jsx busy-aware finish: DONE (uncommitted; claim released)
+
+Against main 8807240 (Session A's lifecycle fix). The Agent page no longer treats a run as
+finished on status alone:
+- the poller stops only when `status !== 'running' && !busy`, and refreshes the file list
+  AFTER teardown, not before the syntax rollback;
+- while terminal-but-busy it shows "Finishing up…" and disables Continue, New project and the
+  input, so the user is never offered an action the server will correctly 409;
+- Stop now restarts polling instead of polling once. The busy-aware poller would otherwise
+  leave a run stopped mid-teardown stuck on "Finishing up…" for ever. That hole was
+  introduced by this change and caught on re-read.
+vite build clean, page loads with no console errors. The "Finishing up" state has NOT been
+seen rendering live (it needs a run in teardown). Left uncommitted: commits are tatte's call.
+
+Independent check of Session A's fix, all green: planToExecution 5 runs back to back at
+10/10 each, supervisorChain 7/7, runLifecycle 9/9 (392 starts during teardown: 391 x 409,
+1 x 200, 0 bad).
+
+STILL OPEN, owner ai-native-engine-00: POST /agent/reset has no active-run guard.
+
+## Session A — 2026-09-10 evening — worktree merges landed, three hub fixes, fuzz status
+
+All local on main; tatte pushes. Merges now happen in a worktree and main is only ever
+fast-forwarded: fuzzForever runs against main's working tree and twice caught a half-merged
+tree (batch 6 "START refused", batch 9 CRASH at seed 100104 - replays clean on committed main).
+
+LANDED (each: full or targeted suite green, new test proven able to fail by mutation)
+- 98c02c6 / 8807240  lifecycle: busy held through the syntax rollback (nested finally, so a
+  teardown throw cannot 409 the hub for ever); /api errors are JSON without a stack;
+  GET /agent/:id returns busy. runLifecycle 9/9, apiErrors 6/6. Full suite 40/40.
+- 6da7e56 / 3d7ef49  Session B's batch actions, AGENT_BATCH_ACTIONS=1, OFF by default.
+  finish is never run from a batch (held; model told to send it alone); stops at the first
+  failure; approvals end the batch. batchActions 15/15 (fixed here: it started runs on status
+  alone). Full suite 40/41 - apiErrors exited 127 at startup once, 3/3 on rerun.
+- 4905769  append_file no longer CREATES a file from a fragment. Every BROKEN in fuzz batches
+  9-17 was q3_list.js born from a tail fragment ("add to the EXISTING q3_list.js" when no step
+  had created it) - no version ever parsed, so the rollback had nothing to restore. Same-seed
+  A/B, 5 seeds: 5/5 BROKEN before, 0/5 after. Batches since: 12/12 clean every one.
+- 7d6d400  Session C's fuzz modes: --mode=hostile (133 nastiest real replies), --mode=chain
+  (supervisor-driven, adds STRANDED/ORPHAN/QUEUEFILE), --settle. fuzzInvariants 31/31.
+- 638f9d5  saveTrace honours AGENT_TRACES_DIR; every MOCK harness and
+  testHarness.isolatedEnv set it; real-model harnesses deliberately do not. Trace rows now
+  carry id, provider, model, source. Full suite 44/44 with the repo corpus 359 -> 359 rows.
+  Also fixes testHarness.startHub's ReferenceError (freePort was re-exported, not imported).
+- f46e38b  list_dir / search_file / GET /files / reapRuns skip an entry
+  that vanishes between readdir and stat. This was fuzz seed 39's /agent/start 500
+  (py_compile's __pycache__ temp rename). statVanish 4/4 via a dangling junction.
+
+RULES FOR ANYONE WRITING A HARNESS
+- Start the next run only once GET /agent/:id says busy:false - a terminal status alone now
+  gets a correct 409 during teardown. Not yet updated: realChain, varianceAgent, yoloAgent,
+  fullAgent, soak, longrun (GPU-only; I have not touched them).
+- A mock/replay hub MUST set AGENT_TRACES_DIR (tracesIsolation.test enforces it statically).
+
+OPEN (reported, not fixed by me)
+- traces.jsonl in the working copy holds 3,301 rows (16.6 MB) of test/fuzz contamination on top of
+  the 359 committed; only rows written after 638f9d5 name their model, so the rest cannot be separated. Left untouched -
+  tatte's data. The leak is closed going forward.
+- STRANDED chains: chain-mode fuzz fires it (a repair that itself ends 'stopped' leaves the
+  tail queued for ever). The cause for small models is mostly the dropped-finish problem,
+  which batch actions addresses - turning AGENT_BATCH_ACTIONS on for a live 14B is tatte's
+  call. The "advance on a stopped run that made progress" safety net stays a proposal.
+- append_file gets no post-write syntax check (drive's syntaxNote covers write/edit only),
+  so an append that breaks an EXISTING file is not flagged to the model mid-run.
+- An approval can be lost while a run is busy; /stop on an awaiting_approval run skips the
+  rollback (Session A-lane findings, not yet fixed).
+- apiErrors / campaign A both died once with exit 127 at startup - unexplained, not
+  reproduced in 4 reruns.
+
+## Session A — GPU LEDGER: 30-minute 14B data-collection run (2026-09-10, deploy 20:32)
+
+tatte, verbatim, this thread: "It seems like it might be ready for a 30 minute 14b run. Kill
+it after thirty minutes and collect the data to test on" — and — "After it's done with 30
+minutes, make sure to go back to offline testing".
+
+    coder14b-base  Qwen/Qwen2.5-Coder-14B-Instruct-AWQ  A10G  min=0 max=1   deployed 20:32
+    hard stop: watchdog runs `python -m modal app stop coder14b-base` at deploy + 30 min.
+    min=0 so nothing bills until the harness's first request; max=1 so a poll cannot scale out.
+
+Harness: isolated hub (never :3001), fresh goals, traces + runs kept in the measurement
+folder for the replay corpus. /api/health pasted below once the endpoint answers.
+    correction: the 30 minutes run from HARNESS START (20:35), not deploy - with min=0 no
+    GPU ran between deploy and the harness's first request. Watchdog stop due 21:05.
+    /api/health at the harness's first request, verbatim:
+    {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+    Identity confirmed: the 14B base (no adapter), served as coder14b. Hub code under test: main f46e38b.
+    STOP — OVERRAN BY ~5 MIN, recorded plainly. Both harness passes finished (20:57:25, 21:03:23).
+    Three stops FAILED silently-ish: `python -m modal app stop coder14b-base` prompts "[y/N]" and
+    ABORTS with exit 1 in a non-interactive shell - my manual stop at 21:03:48, the 30-min watchdog
+    at ~21:05, and `echo y |` at 21:05:13 ("no interactive terminal detected. Rerun with --yes").
+    Stopped with `--yes` at 21:10:10; `modal app list` confirmed `stopped, 0 tasks` at 21:10:43.
+    GPU ran 20:35 -> 21:10 (~35 min) against tatte's 30. LESSON for every session: always
+    `modal app stop <app> --yes`, and a watchdog must check the exit code and re-list apps.
+    Data kept: 35 runs, 190 new tagged coder14b replies appended to the replay corpus (1759 -> 1949).
+
+## CAPTAIN — RULE 7 (binding, 21:14): a stop is not a stop until the list says so
+
+Added to the GPU spend rule after the 30-minute 14B run overran by about 5 minutes. Session
+A's account, verbatim in substance: `python -m modal app stop coder14b-base` prompts "[y/N]"
+and ABORTS with exit 1 in a non-interactive shell. It caught three stops in a row: the
+manual stop at 21:03:48, the 30-minute watchdog at ~21:05, and an `echo y |` retry ("no
+interactive terminal detected. Rerun with --yes"). Every one ran; none stopped anything. The
+GPU was stopped only by `--yes` at 21:10:10. The captain's scheduled audit read it still
+deployed at 21:09:53, which is what surfaced the failure.
+
+7. EVERY STOP IS VERIFIED, NOT ASSUMED.
+   - Any stop, by hand or by watchdog, uses `python -m modal app stop --yes <app>` (the flag
+     is `-y, --yes  Run without pausing for confirmation`, confirmed from --help).
+   - It captures the command's EXIT CODE, and a non-zero exit is logged as a FAILED stop.
+   - It re-lists apps afterwards and records the app's `stopped_at` in the ledger.
+   - An armed watchdog is NOT evidence of a stop. A watchdog that cannot prove it stopped
+     something has not stopped it.
+
+Same class as `server/STOP` (rule 5): a safety switch everyone relied on and nobody watched
+fire. The fix in both cases is to make the switch report what it actually did.
+
+## ai-native-engine-ce — CLAIMING training-data/factory/stopApp.mjs (+ .test.mjs): Rule 7, enforced
+
+ai-native-engine-00 found that Rule 7 lives only in prose: nothing committed calls `modal app
+stop`, and the watchdog that failed three times was an ad-hoc command. The next one would be
+written from scratch, relying on someone remembering `--yes`. This is the committed path.
+New files only; modal_serve_vllm.py (Session A's) is not touched.
+
+## CAPTAIN — RULE 7, ENFORCED (21:25): stops go through stopApp.mjs, never by hand
+
+Rule 7 was prose; ai-native-engine-00 pointed out that nothing committed called `modal app
+stop`, so every watchdog was an ad-hoc command relying on someone remembering `--yes`.
+
+    node training-data/factory/stopApp.mjs <app-name>     exit 0 ONLY when verified stopped
+
+7a. EVERY stop, manual or watchdog, calls stopApp.mjs (or its exported `stopApp(name)`). A
+    hand-rolled `modal app stop` is a Rule 7 breach even when it happens to work, because the
+    next one is the one that will not.
+
+What it guarantees: it always passes `--yes`; a non-zero stop against a deployed app is a
+FAILED stop, reported immediately; exit 0 alone is not success (the app list must show nothing
+deployed by that name); an already-stopped app is fine; and a NAME THAT MATCHES NOTHING IS A
+FAILURE, because "nothing called coder14b-bse is deployed" is true while coder14b-base bills.
+
+Proven, not asserted: stopApp.test.mjs 11/11 against a fake modal CLI (it can never stop a
+real GPU), and two deliberately broken copies (one without --yes, one that passes a typo)
+both went RED on the test written for that failure.
+
+Uncommitted: commits are tatte's call.
+
+## CAPTAIN — RULE 7a, SUPERSEDING the 21:25 entry (21:35): retry, then ALARM — not just log
+
+The 21:25 entry said a failed stop is "reported immediately". That was not enough, and Session A
+showed why: the 21:05 watchdog DID fire and DID log "Aborted!" / "stop exit 1"
+(measurements/2026-09-10-14b-30min/watchdog.log, 33cbc11). Nobody acted on it until apps were
+re-listed by hand. A failure logged where nobody looks is indistinguishable from a success.
+
+stopApp.mjs now:
+- RETRIES a failed stop (default 3 more attempts). With --yes there is no prompt left to fail
+  on, so a non-zero exit is a real error worth retrying — the old fail-fast was right only
+  for the prompt, which --yes removed;
+- on final failure raises an ALARM: a banner on stderr AND an "## ALARM (stopApp)" entry
+  appended here, in COORD — the one file every session reads and the captain audits;
+- matches the app name EXACTLY from `modal app list --json`, never the table (which truncates
+  to "coder14b-ba…") and never a prefix or substring (ai-native-engine-00's cases: a
+  same-prefix neighbour being stopped does not count, and "coder14b" is not "coder14b-base").
+
+A watchdog that calls it treats a non-zero exit as the GPU still billing. The ALARM line in COORD
+is the part that makes a failure impossible to miss.
+
+Proven: 16/16 against a fake modal CLI (a test cannot stop a real GPU, and cannot write the
+real COORD — it points the alarm at scratch before anything runs; verified 0 alarm entries
+here afterwards). Five deliberately broken copies (no --yes, typo passes, no alarm, prefix
+match, no retry) all went RED on their own tests. Uncommitted: commits are tatte's call.
+
+## Session A — GPU LEDGER: 14B vs 32B head-to-head, two fresh prompt sets (2026-09-10, 21:31)
+
+tatte, verbatim, this thread: "Okay let's run both twice (use different prompts to correct hidden
+errors)" — answering my proposal to run the same fresh goals on the 14B and the 32B, two
+passes each, scored at function level.
+
+    coder14b-base  Qwen/Qwen2.5-Coder-14B-Instruct-AWQ  A10G  min=0 max=1  (~$1.10/hr)
+    coder32b-awq   Qwen/Qwen2.5-Coder-32B-Instruct-AWQ  H100  min=0 max=1  (~$4/hr)
+    Both int4 AWQ (same quantization family). H100 because the serve script refuses a 32B on
+    A10G/A100-40GB, and so the 32B is not time-starved by the 8-minute per-goal cap.
+    Plan: each model runs Set A (20 t-goals) then Set B (20 u-goals), fresh workspaces,
+    identical prompts, isolated hubs, never :3001. Estimated total < $7.
+    HARD CAP 70 min per app from its harness start. Stops ONLY via
+    node training-data/factory/stopApp.mjs <app> (Rule 7a), exit code = result.
+    coder14b-base /api/health at its harness's first request, verbatim:
+    {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+    Hub under test for BOTH models: main 725bf46. Goals + scorer pre-registered in b504e8d.
+    coder32b-awq /api/health at its harness's first request, verbatim:
+    {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-32B-Instruct-AWQ","gpu":"H100","max_len":16384,"lora":null}
+    32B cold start ~6 min (65s download, 72s load, 87s warmup) vs 14B ~2 min; both share the
+    22:34:55 no-new-goals cutoff and a 70-min stopApp cap. Identity confirmed for both (21:37).
+    coder32b-awq STOPPED 21:55:01 by the watchdog through stopApp.mjs (Rule 7a): exit 0, first
+    attempt, confirmed by the app list; independent re-list 21:55:44 shows stopped, 0 tasks.
+    H100 ran ~22 min. coder14b-base still running set B (70-min cap ~22:43).
+    coder14b-base STOPPED 22:01:43 by the watchdog through stopApp.mjs (Rule 7a): exit 0, first
+    attempt; independent re-list 22:02:35 shows all three coder apps stopped, 0 tasks. Both GPUs
+    down. Totals: A10G ~29 min, H100 ~22 min. (stopApp reported the older same-named app's
+    stoppedAt - reporting flaw only, sent to the captain.)
+
+## CAPTAIN — stopApp.mjs now reports the app it STOPPED (22:07)
+
+Session A ran it for tonight's two head-to-head stops: both first-attempt exit 0, both apps
+independently confirmed stopped. But one report was wrong: it gave `stoppedAt 21:10:17`,
+which belonged to the EARLIER coder14b-base (the 30-minute run). Modal keeps stopped apps in
+the list under the same name, and the helper took the newest `stopped_at` across all of them.
+When the app it had just stopped had no `stopped_at` written yet, it borrowed the previous
+run's. The stop and the check were right; the report was about the wrong app.
+
+Now: the ids that were deployed are captured BEFORE the stop; `stoppedAt` comes from those
+records only; while Modal has not written it yet the helper waits; and if it never appears
+the report gives NONE and says so. It never borrows another record's time. `appIds` is in the
+result so a report can be traced to the exact app.
+
+20/20; seven deliberately broken copies all RED, including one that borrows from any record
+and one that reports before waiting.
+
+To audit for real alarms, count the HEADING, not the phrase: `grep -c '^## ALARM (stopApp)'
+COORD.md`. The rule text above mentions the phrase, and a plain grep counts that as an alarm.
+The captain did exactly that at 22:06 and read his own documentation as a failed stop.
+
+## Session A — 14B vs 32B head-to-head DONE (measurements/2026-09-10-14b-vs-32b/README.md)
+
+Both apps stopped by stopApp.mjs watchdogs (exit 0 each) and independently confirmed stopped,
+0 tasks. Hand-verified over 40 fresh goals: done-as-asked 14B 22 / 32B 27; implementation
+correct 32 / 33 - the scorer's 10-goal gap was mostly the models' own tests and two reasoning
+goals. Hub gaps found, NOT yet fixed (candidates, Session A lane):
+  - duplicate top-level function declarations (broke BOTH models' games; node --check blind)
+  - a repeated identical read_file window kills the run instead of stepping to OFFSET
+  - an unclosed fence (truncated reply) parses as write_file with EMPTY content -> 0-byte file;
+    write_file accepts empty content. The 461 new corpus rows are held out of
+    server/testdata/model-corpus.jsonl until this is fixed (one of them fails parserCorpus).
+
+## Session A — CLAIMING (before landing) server/agent.js x3 regions, server/agentParse.js, 3 new files
+
+tatte approved the plan ("Let's do it"). Three fixes from the 14B-vs-32B head-to-head, each built
+in its own worktree off main 1410676, each with a test proven able to fail, landing one at a
+time via fast-forward only after its full suite is green:
+  1. truncated-fence (hub-wt-fence): agentParse.js - new replyWasTruncated(); parseAction refuses a
+     write/append whose code block never closed (was: write_file with '' -> a 0-byte file).
+     agent.js - the null-parse message says "CUT OFF ... send it in smaller pieces" for that
+     case. Also re-adds the 461 head-to-head corpus rows (parserCorpus 7/7 with them).
+  2. dup-decls (hub-wt-dups): new server/duplicateDecls.js; agent.js post-write block appends a
+     warning when a top-level function is declared more than once (legal, node --check-blind;
+     broke BOTH models' games).
+  3. assert-evidence (hub-wt-explain): new server/explain_assert.py (pytest-style assert
+     rewriting); agent.js appends "LEFT <expr> -> value / RIGHT ..." to run_python/run_command
+     results when a Python assert fails, inserted BEFORE the trailing EXIT line so batch mode
+     still sees the failure. Both call sites: the main loop and the human-approved path.
+Regions touched in agent.js: the agentParse import, the null-parse branch (~2527), the post-write
+block (~2855), a helper above quickCheck, and the two `tools[tool](args)` call sites. Shout if
+you are in any of these - I will rebase rather than race.
+
+## Session A — FINDING: a native hub crash under heavy load (0xC0000409), NOT reproducible by seed
+
+fuzzForever batch 6 (hostile, seed 300069, main before 9afe43a): the hub process died with exit
+code 3221226505 = 0xC0000409 (Windows fail-fast / native abort) mid-run - no JS error, no stack;
+every later start then failed ("fetch failed"). Last activity: a 482-token model reply on an
+~11.5k-token prompt, after `node` failed "Cannot find module" and two refused package.json edits.
+REPRO on the same main, same corpus, same seed: CLEAN (90 replies replayed, 49 s). The replay is
+deterministic, so the model output does not crash the hub. At crash time this machine ran two
+full suites + another test run + the fuzzer at once; that batch took 12.4 min vs ~5. Same shape
+as tonight's unexplained exit-127 test starts (all under load). Evidence kept:
+%TEMP%/fuzz300069-KEoZN2 and fuzzforever-300060.jsonl.
+NEXT (not done): start fuzz hubs with node --report-on-fatalerror --report-directory=<run dir>
+so the next native crash leaves a diagnostic report instead of only an exit code.
+    CLAIM CLOSED - all three landed, each gated on its own full suite (49/49) and on the combined
+    tree's tests: 9afe43a truncated-fence (+ the 461 corpus rows, corpus now 2,410),
+    95428d9 duplicate-declaration warning, b59a0c4 Python assert evidence. Worktrees removed.
+    Full suite on b59a0c4 running now.
+
+## Session A — GPU LEDGER: 14B rerun of sets A+B after the three fixes (2026-09-10, pending suite)
+
+tatte, verbatim, this thread: "Let's do it" - answering my question: "Rerun the same 40 goals
+(Sets A and B) on the 14B alone ... About 30 minutes on an A10G, roughly $0.55 ... Want me to
+run it once the suite comes back green?"
+
+    coder14b-base  Qwen/Qwen2.5-Coder-14B-Instruct-AWQ  A10G  min=0 max=1  (~$1.10/hr)
+    14B ONLY. Same 40 goals, same harness/scorer as the head-to-head baseline (hub 725bf46);
+    hub under test main 6854d73 (the three fixes). HARD CAP 70 min from harness start; the
+    watchdog stops on ALL DONE or the cap, ONLY via node training-data/factory/stopApp.mjs
+    (Rule 7a), exit code = result. Deploy only after the full suite on main is green.
+    Caveat recorded: one rerun mixes fix effects with run-to-run variance (5/10 vs 8/10 seen).
+    DEPLOYED coder14b-base (A10G, min=0 max=1) at 22:54:36 - suite on main green first (51/51).
+    Offline fuzzer paused for the measurement window.
+
+## Session A — GPU LEDGER: run5 adapter on the same 40 goals (2026-09-10, 23:1x)
+
+tatte, verbatim, this thread: "Let's try my run five again then" and "It should be saved to
+modal" - after my review of the Unsloth 14B notebook (same QLoRA recipe as run5).
+
+    coder14b-run5  Qwen/Qwen2.5-Coder-14B-Instruct-AWQ + LoRA /adapters/run5 (r=16)  A10G
+                   min=0 max=1  (~$1.10/hr)
+    Runs ALONGSIDE coder14b-base's rerun: same hub (main 454814a, suite 51/51), same 40 goals,
+    same served name, same cap - the adapter is the only variable. Pre-registered in
+    measurements/2026-09-10-14b-run5/README.md. HARD CAP 70 min from harness start; the
+    watchdog stops on ALL DONE or the cap, ONLY via node training-data/factory/stopApp.mjs
+    (Rule 7a), exit code = result. Identity (Rule 3): /api/health must show
+    lora=/adapters/run5 AND a temperature-0 reply must differ from coder14b-base's - pasted
+    below before any number counts. Deployed with MSYS_NO_PATHCONV=1 (the /adapters trap).
+    DEPLOYED coder14b-run5 at 23:07:18 (deploy 4.2 s; cold start 23:07:47 -> ~23:10).
+    Identity (Rule 3), verbatim:
+      coder14b-run5 /api/health 23:11:54: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":"/adapters/run5"}
+      coder14b-base /api/health 23:11:26: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+      Same prompt at temperature 0 ("is_palindrome ... reply with only the code"):
+        base: commented 5-line body, LF line endings
+        run5: uncommented 3-line body with CRLF inside the code - a trained-in trait, so the
+              adapter is really applied, not just LoRA support switched on.
+    Harness start 23:11:54 (gated on the health line above); watchdog armed 23:12:00.
+    [rerun ledger, Session A] coder14b-base harness ALL DONE 23:18:38 (40/40 goals). STOPPED
+    23:18:53 by the watchdog through stopApp.mjs (Rule 7a): exit 0, first attempt, "stopped, and
+    confirmed by the app list". Independent re-list 23:19:05: coder14b-base stopped, 0 tasks.
+    GPU ran ~22:55 -> 23:19 (~24 min). coder14b-run5 still running (its own watchdog, cap 70 min).
+    [run5 ledger, Session A] STOPPED EARLY on tatte's words, verbatim: "Run five doesn't matter.
+    We're retraining base 14b coder". stopApp.mjs coder14b-run5 at 23:38:34: exit 0, first
+    attempt, "stopped, and confirmed by the app list". Independent re-list 23:38:48: 0 apps
+    deployed or running. GPU ran ~23:07 -> 23:38 (~31 min, ~$0.57). Watchdog task stopped.
+    Finding kept (measurements/2026-09-10-14b-run5/NOTES-live.md): run5 loops in the hub - all
+    13,762 of its training rows are single-turn, none contains a tool result.
+
+## Session A — CLAIMING server/agent.js (git_undo tool only), server/workspaceGit.js (undo only), 1 new test (2026-09-10 23:5x)
+
+tatte, verbatim: "Sounds good" - to: fix git_undo, then a 20-repo harvest probe.
+Found by a live all-tools smoke test (every tool called once in an isolated hub; 28/29 ok):
+git_undo returned "Your local changes to the following files would be overwritten by merge".
+Cause: checkpoints are taken BEFORE mutating tools, so the latest change is normally still
+uncommitted when git_undo runs, and git_undo takes no checkpoint of its own (it is not in
+MUTATING and it runs from the approve route). Fix, inside the git_undo tool: commit uncommitted
+changes first, never roll back the hub's own TASKS.md / NOTES.md / ESCALATIONS.md, and abort a
+revert that fails so no conflict markers are left behind. Worktree + full suite before landing.
+    CLAIM CLOSED (git_undo) - landed ac51e19 on main. gitUndo.test.mjs 2/2, three mutations each
+    caught. Full suite 51/52: queueLock "six concurrent writers lose nothing" lost 1 of 72 items
+    under load (fuzzer running). It passes alone on the branch AND on unfixed main - a
+    pre-existing, load-dependent race in the queue's cross-process lock, NOT touched by this
+    change. Offered to tatte as a separate task; nobody should read it as caused by git_undo.
+
+## Session A — CLAIMING training-data/factory/harvest_workspaces.mjs (NEW) + gamecheck tools (NEW) (2026-09-11 00:2x)
+
+tatte, verbatim: "Let's do it" - to: keep small MIT/permissive game repos as WORKSPACES and build
+an "edit an existing game" goal type, for multi-turn training traces for the base 14B.
+New files only; no existing harvester is edited. Harvested code lands in
+training-data/factory/raw/workspaces/ (already gitignored) - never committed, never published;
+each workspace keeps its LICENSE and a provenance row (repo, licence, commit). CPU only, no GPU.
+
+## Session A — SPEND LEDGER: workspace harvest on Modal CPU (2026-09-11 01:0x)
+
+tatte, verbatim, this thread: "Do the whole 1000 repos on cpu" - answering my offer to move the
+game-workspace harvest (harvest_workspaces.mjs) from the laptop to parallel Modal CPU containers.
+
+    app: an EPHEMERAL `modal run` (not deployed) - it ends when the run ends. CPU only, no GPU.
+    ~1,030 repos (permissive list, <= 3 MB, minus those already in the manifest), cpu=1,
+    memory 2 GB per container, max_containers capped. Estimated well under $1.
+    Smoke on 5 repos first; the laptop harvest is stopped before the fan-out so nothing is
+    done twice. Kept workspaces land on a Modal volume, then in training-data/factory/raw/
+    (gitignored). Afterwards: `modal app list` checked so nothing is left running.
+    [workspace harvest, Session A] DONE on Modal CPU: smoke 01:05 (5 repos, 4 kept), fan-out
+    01:06:26 -> 01:10:05 (984 repos in ~3.5 min). Manifest now covers all 1,095 permissive repos
+    <= 3 MB: 327 games kept (152 animated; 192 with a root index.html), 503 not bootable, 252 no
+    game page, 12 errors (a static-server crash on '%PUBLIC_URL%' URLs - fixed since), 1 clone
+    failure. Licences of kept games: MIT 297, Apache-2.0 17, Unlicense 6, BSD-3 3, MPL/WTFPL/ISC/CC0 1 each.
+    Verified afterwards: `modal app list` shows 0 apps deployed/running/ephemeral. CPU only, no GPU.
+    Workspaces downloading to training-data/factory/raw/ (gitignored, never committed).
+    CLAIM CLOSED (harvest_workspaces / gamecheck tools) - committed 8190e03 (six new files in
+    training-data/factory; no existing file edited; harvested code stays in raw/, gitignored).
+    Modal CPU gate + validate over all 327 kept games (01:26 -> 01:31, then 0 apps running):
+    85 pass the hub's finish gate UNTOUCHED, 82 have >= 1 validated goal, 289 validated goals
+    (bg 79, help 65, fps 60, frames 56, pause 29). Gate trips: 113 no root index.html (the gate
+    hard-codes /workspace/index.html), 57 canvas BLANK, 31 collapsed element, 27 load timeout,
+    11 offscreen/nothing. Most of the blank/collapsed trips were in the ORIGINAL game - evidence
+    for a baseline-aware finish gate (block only on problems a run introduced); proposal to tatte.
+
+## Session A — CLAIMING server/agent.js (finish gate, visual step only), server/visualCheck.js (2 new exported helpers), 1 new test + SPEND LEDGER: >3 MB harvest on Modal CPU (2026-09-11 04:2x)
+
+tatte, verbatim, this thread - quoting back my two proposals as the answer:
+  "1. The hub gate fix: make the finish gate check the page the run actually worked on, and block
+   only on problems the run introduced. ... 2. Harvesting the ~880 repos over 3 MB: minutes on
+   Modal CPU, well under a dollar"
+
+(1) Finish gate, visual step: inspect the page the run actually worked on (last .html written or
+    browser-tested; index.html by default) instead of the hard-coded /workspace/index.html, and
+    block only on visual problems that were NOT already there when the run started (baseline taken
+    once at run start for existing web pages). Fresh pages keep full strictness. Worktree, a
+    mutation-proven test, full suite before landing.
+(2) harvest_workspaces on Modal CPU over the permissive repos > 3 MB (size-capped), same pipeline as
+    the <= 3 MB run (984 repos in ~3.5 min). Ephemeral `modal run`; no GPU; app list checked after.
+    [visual-baseline claim, Session A] ADDING server/index.js (one line: record the port this
+    process serves). Found by the full suite: resetGuard failed on the branch, passed on main. Its
+    chain case starts a real run IN-PROCESS (router on a private test port, no PORT env), and the new
+    baseline inspected http://localhost:${PORT}/workspace/index.html with PORT = env || 3001 - i.e.
+    it opened a headless browser against the LIVE hub on :3001 (read-only GET; nothing written).
+    Fix: the baseline inspects only a port this process is SERVING (set from index.js's listen
+    callback) and skips otherwise. PRE-EXISTING, not widened: the finish gate's visual stage has
+    always used the same PORT || 3001 fallback, so an in-process test that reaches it can also
+    look at :3001 - noted for whoever owns that; not changed here.
+    [visual-baseline, Session A] EVIDENCE for the live-hub finding above (not inferred): the same
+    in-process conditions as resetGuard, with PORT pointed at a counting DUMMY server (never :3001),
+    one real scheduled run in a workspace holding index.html, 25 s wait:
+      fixed agent.js (serving-port guard) -> 0 requests to /workspace/
+      unguarded agent.js                  -> 1 request to /workspace/ on the PORT fallback
+    So, unguarded, the baseline requests the page on whatever PORT falls back to - the live hub on
+    :3001 when PORT is unset. resetGuard also fails without the guard (mutation, restored byte-for-byte).
+    CLAIM CLOSED (visual-baseline) - landed b467392 on main (agent.js, index.js one line,
+    visualCheck.js two helpers, visualBaseline.test.mjs). Full suite 53/53; five mutations each
+    caught. The LIVE hub on :3001 still runs the old code until tatte restarts it (not done here).
+
+## Session A — LIVE HUB RESTARTED on tatte's word (2026-09-11 05:09)
+
+tatte, verbatim, this thread: "You can restart the hub that is okay"
+Checked first, read-only: no busy run (newest 40 all terminal), queue empty, supervisor off, strict.
+Stopped pid 13672 (`nohup node index.js`, up since 2026-09-10 07:11) and its nohup parent; relaunched
+the SAME way (node index.js in server/, no --watch), detached via Start-Process, output in
+%TEMP%\ai-hub-live.out.log. New pid 25312, started 05:09:37, on main 186ec5a (includes b467392 gate
+fix, ac51e19 git_undo). Verified after: /api/agent/supervisor identical to before (supervisor off,
+strict, maxGenerations 5, maxAutoStartsPerHour 12); /api/agent/list still 40 runs; no stderr;
+web client :5173 untouched and still up.
+
+## Session A — GPU LEDGER: 14B trace-generation PILOT, inside a $30 cap (2026-09-11 05:1x)
+
+tatte, verbatim, this thread (message ends mid-sentence): "I only want to run 30 dollars worth of"
+- read as a $30 CAP on GPU spend for trace generation; the pilot is the part that is right under any
+reading, and the rest of the $30 waits for tatte after the pilot's numbers.
+
+    coder14b-base  Qwen/Qwen2.5-Coder-14B-Instruct-AWQ  A10G  min=0 max=5 scaledown 120 s (~$1.10/hr each)
+    100 goals (20 per goal type, spread across games, fixed seed) through modal_rungoals.py: one CPU
+    hub container per goal, max 8 at once. HARD CAP: the watchdog stops coder14b-base ONLY via
+    node training-data/factory/stopApp.mjs (Rule 7a) when the run ends or at 60 min, whichever first.
+    Worst case GPU 5 x $1.10 x 1 h = $5.50 + cold starts; CPU hubs ~ $1/h. Worst case ~ $7 of the $30.
+    Identity (Rule 3): /api/health pasted below before any number counts.
+    [pilot ledger, Session A] DEPLOYED coder14b-base 05:16:05 (min 0, max 5, scaledown 120 s). Watchdog
+    armed 05:16:49 (stopApp.mjs on pilot end / identity failure / 60 min). Identity (Rule 3), verbatim:
+      05:19:03 {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+    Pilot started 05:19 on main 186ec5a (+ the RUNGOALS_MAX_HUBS edit): 100 goals, max 8 hubs.
+    [pilot ledger, Session A] DONE. Pilot 05:19 -> 05:41:11 (100 goals, max 8 hubs). coder14b-base
+    STOPPED 05:41:25 by the watchdog via stopApp.mjs (Rule 7a): exit 0, first attempt, "stopped, and
+    confirmed by the app list". Independent re-list 05:41:38: 0 apps deployed/running/ephemeral.
+    GPU up ~05:16 -> 05:41 with <= 5 A10Gs: spend bound ~ $2.5 incl. CPU hubs (of the $30 cap).
+    Result: 24/100 passed (bg 13/20, frames 6/20, fps 2/20, help 2/20, pause 1/20); 16 clean
+    conversations / 122 assistant turns after tochat. Harness issues found before any more spend:
+    6 runs parked on awaiting_approval (nobody approves in a container), 3 grader crashes, and
+    some checks possibly stricter than their goal text - being examined.
+
+## Session A — GPU LEDGER: base Qwen3-Coder-30B-A3B on the 40 hand-graded goals (2026-09-11 05:5x)
+
+tatte, verbatim, this thread: "We haven't reran coder3 in the hub in a while. Let's try that base model first"
+(inside the $30 trace-generation cap, ~$2.5 of it used by the 14B pilot).
+
+    coder30b-base  Qwen/Qwen3-Coder-30B-A3B-Instruct (bf16)  H100  min=0 max=1 scaledown 120 s (~$3.95/hr)
+    Same 40 goals and harness as the 14B rerun (sets A+B, trial35 on isolated local hubs, main 3eed8b7).
+    Pre-registered in measurements/2026-09-11-coder3/README.md. HARD CAP 45 min from harness start;
+    the watchdog stops ONLY via node training-data/factory/stopApp.mjs (Rule 7a) on ALL DONE or cap.
+    Worst case ~ $3. Identity (Rule 3): /api/health pasted below before any number counts.
+    Offline fuzzer paused for the window (batch 74 seed 400878 hit the known 0xC0000409 native crash
+    under load; it is re-run alone first so a hub problem cannot contaminate this measurement).
+    [coder3 ledger, Session A] Fuzz seed 400878 re-run ALONE on a quiet machine (main 1338e50):
+    "ok seed 400878 30s replayed 51 [stopped,done,done,done,done,done]", 1/1 clean - the batch-74
+    0xC0000409 crash does not reproduce, same as seed 300069 before it: load-related native crash, not
+    the gate fix. Proposed fix still open: --report-on-fatalerror for fuzz hubs. Fuzzer resumes at 400912.
+    [coder3 ledger, Session A] Identity (Rule 3), from deploy-and-identity.log, before any number:
+      health try 2 05:59:44: {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+    [coder3 ledger, Session A] harness ALL DONE 06:20:43 (set A 20/20 goals, set B 20/20 goals). STOPPED by the
+      watchdog through stopApp.mjs (Rule 7a) 06:21:03: {"ok":true,"stopExit":0,"stopAttempts":1,
+      "detail":"stopped, and confirmed by the app list"}. Independent re-list (python -m modal app list
+      --json): coder30b-base state stopped, 0 tasks, stopped_at 06:21:03; 5 apps listed, none live.
+      ~25 min of H100 ~ $1.65. Hand-grading of sets A/B in progress; results go to the coder3 README.
+
+## Session A — GPU LEDGER: set C, 40 chained goals, Qwen3-Coder-30B-A3B and base 14B (2026-09-11 06:5x)
+
+tatte, verbatim, this thread: asked "Do you want to run another 40 harder prompts while you're grading",
+then "Let's do it" (inside the $30 trace-generation cap; ~$4.2 of it used so far).
+
+    coder30b-base  Qwen/Qwen3-Coder-30B-A3B-Instruct (bf16)  H100  min=0 max=1 scaledown 120 s (~$3.95/hr)
+    coder14b-base  Qwen/Qwen2.5-Coder-14B-Instruct-AWQ       A10G  min=0 max=1 scaledown 120 s (~$1.10/hr)
+    Pre-registered in measurements/2026-09-11-setC/README.md (checker validated 40/40 refs, 0/40 empty,
+    16/16 mutants). HARD CAP 50 min per app from harness start; watchdogs stop ONLY via
+    node training-data/factory/stopApp.mjs (Rule 7a) on ALL DONE or cap. Worst case ~$3.3 + ~$0.9.
+    Identity (Rule 3): /api/health pasted below before any number counts. Offline fuzzer stays paused
+    for the window; resumes at seed 400912 afterwards.
