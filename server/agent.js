@@ -33,7 +33,7 @@ import { canonicalSummary } from './canonicalAssets.mjs';
 import { SYSTEM_PROMPT } from './agentPrompt.js';
 import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
-import { lostDefs } from './defNames.js';
+import { lostDefs, lostExports } from './defNames.js';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 
 /**
@@ -3157,6 +3157,20 @@ async function drive(loadDb, run) {
               syntaxNote += `\n\n⚠️ This ${tool} REMOVED ${lost.length} definition(s) that ${args.path} had before: ${lost.join(', ')}. If you did not mean to delete them, put them back now - earlier work depends on them.`;
               run.defsLost = (run.defsLost || 0) + lost.length;
               pushStep(run, { type: 'note', text: `${tool} ${args.path} removed ${lost.join(', ')}` });
+            }
+          } catch { /* evidence only - never a reason to fail the step */ }
+        }
+        // Set E: Qwen3-Coder's goal 54 rewrote q4_template.js whole and dropped `module.exports = { render };` while
+        // render() stayed defined - so the definition check above saw nothing, and every later require() got
+        // undefined (the rest of q4 and all of q10 failed at the end). Name a dropped EXPORT too.
+        if (beforeSrc !== null && !/^ERROR/.test(String(result ?? ''))) {
+          try {
+            const gone = lostExports(beforeSrc, readFileSync(safePath(args.path), 'utf8'), args.path);
+            if (gone.length) {
+              const them = gone.length === 1 ? 'it' : 'them';
+              syntaxNote += `\n\n⚠️ This ${tool} REMOVED what ${args.path} exported: ${gone.join(', ')}. module.exports no longer has ${them}, so require('./${args.path}') now gives undefined for ${them} and every caller breaks. Put ${them} back in module.exports.`;
+              run.exportsLost = (run.exportsLost || 0) + gone.length;
+              pushStep(run, { type: 'note', text: `${tool} ${args.path} dropped export(s) ${gone.join(', ')}` });
             }
           } catch { /* evidence only - never a reason to fail the step */ }
         }

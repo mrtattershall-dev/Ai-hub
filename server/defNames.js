@@ -36,3 +36,41 @@ export function lostDefs(before, after, path) {
   const a = defNames(before, path), b = defNames(after, path);
   return [...a].filter((n) => !b.has(n)).sort();
 }
+
+/**
+ * The names a JS file EXPORTS - CommonJS (module.exports = { a, b: c }, module.exports = name, module.exports.x =,
+ * exports.x =) and ESM (export function/class/const, export { a, b as c }).
+ *
+ * Measured in set E (2026-09-11): Qwen3-Coder's goal 54 could not match an edit twice, rewrote q4_template.js whole,
+ * and the rewrite dropped `module.exports = { render };`. render() itself was still defined, so defNames saw no
+ * loss and the hub said only "OK: wrote 10932 bytes". From then on every require('./q4_template') got undefined:
+ * the rest of q4's steps and all of q10 (built on q4) failed at the end. A name comparison, like defNames: it never
+ * throws on half-written code, and a missed form costs only a missing warning.
+ */
+export function exportNames(src, path = '') {
+  const out = new Set();
+  if (!/\.(c?js|mjs)$/i.test(path)) return out;
+  const text = String(src || '');
+  for (const m of text.matchAll(/(?:module\.)?exports\.([A-Za-z_$][\w$]*)\s*=(?!=)/g)) out.add(m[1]);
+  for (const m of text.matchAll(/module\.exports\s*=\s*\{([^}]*)\}/g)) {
+    for (const part of m[1].split(',')) {
+      const k = part.trim().match(/^(?:async\s+)?\*?\s*([A-Za-z_$][\w$]*)/);
+      if (k) out.add(k[1]);
+    }
+  }
+  for (const m of text.matchAll(/module\.exports\s*=\s*([A-Za-z_$][\w$]*)\s*;?\s*$/gm)) out.add(m[1]);
+  for (const m of text.matchAll(/^export\s+(?:default\s+)?(?:async\s+)?(?:function\*?|class|const|let|var)\s+([A-Za-z_$][\w$]*)/gm)) out.add(m[1]);
+  for (const m of text.matchAll(/^export\s*\{([^}]*)\}/gm)) {
+    for (const part of m[1].split(',')) {
+      const k = part.trim().split(/\s+as\s+/).pop().trim();
+      if (/^[A-Za-z_$][\w$]*$/.test(k)) out.add(k);
+    }
+  }
+  return out;
+}
+
+/** Names `before` exported that `after` no longer does (sorted). */
+export function lostExports(before, after, path) {
+  const a = exportNames(before, path), b = exportNames(after, path);
+  return [...a].filter((n) => !b.has(n)).sort();
+}
