@@ -4077,3 +4077,13 @@ tatte, verbatim, this thread: "After d has results, analyze the deep seated bugs
       Harnesses started 11:12:51 / 11:14:23; no new goals after 12:39:51 / 13:06:23. Both logs: hub 664e8ad (server/ =
       421ce9e), AGENT_UNATTENDED=0, AGENT_BATCH_ACTIONS=0. Independent re-list (python -m modal app list --json):
       coder30b-sete deployed 1 task, coder14b-sete deployed 1 task; no other app live.
+    [set E ledger, Session A] BOTH APPS STOPPED 14:27:54 by their watchdogs via stopApp.mjs (Rule 7a): "stopped, and
+      confirmed by the app list" for each; independent re-list 14:28: coder30b-sete stopped 0 tasks, coder14b-sete
+      stopped 0 tasks. THE LAPTOP SLEPT ON LOW BATTERY 12:37:18 -> 14:27:19 (Windows Kernel-Power 42 "Sleep Reason:
+      Battery"; Power-Troubleshooter 1). Watchdogs and harnesses were suspended with it and fired on wake. Apps scale to
+      zero 120 s after the last request, so GPU time is ~11:10 -> ~12:39: ~89 min H100 (~$5.9) + ~89 min A10G (~$1.6),
+      ~$7.5 (estimate; Modal's dashboard is authoritative). Running total of the $30 cap: ~$23.3.
+      Results (hidden checks on the final workspaces): base 14B ran all 100 goals (the last one cut by the sleep):
+      12/100 as asked, 15/100 implementation. Qwen3-Coder was CUT AT GOAL 64 by the sleep (36 goals never started):
+      35/100 = 35 of the 64 steps it attempted. Records complete for everything that ran (100 + 64 run files, as
+      many transcripts, git bundles). Offline fuzzer resumes at seed 400960.
