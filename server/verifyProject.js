@@ -140,7 +140,15 @@ async function syntaxSweep(workspace, files) {
  * Returns { ok, kind, evidence, problems[] } - `ok:false` blocks finishing.
  */
 export async function verify(workspace, { entry } = {}) {
-  const { kind, files, pkg } = detectKind(workspace);
+  const detected = detectKind(workspace);
+  let { kind } = detected;
+  const { files, pkg } = detected;
+  // An ENTRY decides the language. Set E (2026-09-11): a workspace holding ten projects had package.json (the
+  // workspace marker), so every check was "node" - a .py entry would have run under node.
+  if (entry && ['node', 'python', 'unknown'].includes(kind)) {
+    if (/\.py$/i.test(entry)) kind = 'python';
+    else if (/\.(c|m)?js$/i.test(entry)) kind = 'node';
+  }
   const problems = [];
   const evidence = [];
 

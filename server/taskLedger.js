@@ -49,11 +49,13 @@ export function read(workspace) {
     if (m) {
       const raw = m[3];
       const carried = raw.includes(CARRIED);
+      const aged = raw.includes(AGED);
       out.push({
         n: out.length + 1,
         state: STATE[m[1]] || 'todo',
-        title: raw.replace(CARRIED, '').trim(),
+        title: raw.replace(CARRIED, '').replace(AGED, '').trim(),
         ...(carried ? { carried: true } : {}),
+        ...(aged ? { aged: true } : {}),
       });
     }
   }
@@ -68,9 +70,21 @@ const PLAN_MARK = '<!-- seeded-from-plan -->';
 // Per-task marker for work INHERITED from an earlier run in this workspace.
 const CARRIED = '<!--carried-->';
 
+// Per-task marker for a carried task that has been carried past a SECOND run start: it is not from the goal just
+// before this one. Set E (2026-09-11): the first goal's plan tasks stayed on the ledger of every later interleaved
+// goal ("0/9 done"), sent with every model call, and the 14B acted on them - goal 8 (q8_units.py) closed "Create
+// q1_stock.js". A leftover now shows only where it can matter: a task naming a file shows when the goal names that
+// file (so "Re-add X to f" reaches the next goal on f, however many goals later); a task naming no file shows for the
+// one goal right after its own, then drops out of the per-call block. TASKS.md itself keeps everything.
+const AGED = '<!--aged-->';
+const FILE_RE = /[\w./-]+\.(?:js|mjs|cjs|py|html?|md|json|css|ts|gd|txt|csv)\b/gi;
+export function namedFiles(text) {
+  return [...new Set((String(text || '').match(FILE_RE) || []).map((f) => f.toLowerCase().replace(/^\.\//, '')))];
+}
+
 function write(workspace, tasks, fromPlan = false) {
   const body = HEADER + (fromPlan ? PLAN_MARK + '\n\n' : '')
-    + tasks.map((t, i) => `- [${MARK[t.state] || ' '}] ${i + 1}. ${t.title}${t.carried ? ' ' + CARRIED : ''}`).join('\n') + '\n';
+    + tasks.map((t, i) => `- [${MARK[t.state] || ' '}] ${i + 1}. ${t.title}${t.carried ? ' ' + CARRIED : ''}${t.aged ? ' ' + AGED : ''}`).join('\n') + '\n';
 
   // ATOMIC. TASKS.md is the agent's memory of what it is doing and what it has finished,
   // and it is rewritten in full on every mark/add - dozens of times in a long run, from
@@ -132,14 +146,15 @@ export function adopt(workspace, runId) {
   // 0 and task_done announced "ALL 3 TASKS FOR THIS GOAL ARE COMPLETE" for a goal that had no
   // tasks at all. `carried` keeps its meaning (unfinished leftovers, for the run-start note);
   // `prior` counts everything marked.
-  let carried = 0, prior = 0;
+  let carried = 0, prior = 0, aged = 0;
   for (const t of tasks) {
-    if (t.carried) continue;
+    // Already carried once, so now at least two goals old (see AGED).
+    if (t.carried) { if (!t.aged && t.state !== 'done') { t.aged = true; aged++; } continue; }
     t.carried = true;
     prior++;
     if (t.state !== 'done') carried++;
   }
-  if (prior) write(workspace, tasks, isPlanSeeded(workspace));
+  if (prior || aged) write(workspace, tasks, isPlanSeeded(workspace));
   return { carried, prior };
 }
 
@@ -257,12 +272,25 @@ export function progress(workspace) {
  * paid for on every single step, so it must cost tens of tokens, not hundreds.
  * Done items collapse to a count; what is left is what the agent needs to see.
  */
-export function contextBlock(workspace) {
+export function contextBlock(workspace, goal = null) {
   const tasks = read(workspace);
   if (!tasks.length) return null;
   const done = tasks.filter((t) => t.state === 'done');
-  const rest = tasks.filter((t) => t.state !== 'done');
-  const lines = rest.slice(0, 12).map((t, i) => {
+  let rest = tasks.filter((t) => t.state !== 'done');
+  // Scope leftovers to this goal (see AGED). A caller with no goal gets everything, as before.
+  let hidden = 0;
+  if (goal) {
+    const want = new Set(namedFiles(goal));
+    const keep = rest.filter((t) => {
+      if (!t.carried) return true;
+      const files = namedFiles(t.title);
+      if (files.length) return files.some((f) => want.has(f));
+      return !t.aged;
+    });
+    hidden = rest.length - keep.length;
+    rest = keep;
+  }
+  const lines = rest.slice(0, 12).map((t) => {
     const n = tasks.indexOf(t) + 1;
     // Say where a carried task came from. Unlabelled, a model reads another run's
     // leftovers as its own forgotten work: on 2026-09-09 one run planned a task to
@@ -270,9 +298,11 @@ export function contextBlock(workspace) {
     // reason. It needs to know this is context, not an instruction.
     return `  ${t.state === 'doing' ? '>' : ' '} ${n}. ${t.title}${t.carried ? '  (left over from earlier work — only do this if the goal needs it)' : ''}`;
   });
+  if (!lines.length) lines.push('  (nothing open for this goal)');
   const more = rest.length > 12 ? `\n  … and ${rest.length - 12} more` : '';
+  const off = hidden ? `\n  (${hidden} task(s) left over from earlier goals about other work are not shown - TASKS.md still has them)` : '';
   return `TASK LEDGER (TASKS.md — ${done.length}/${tasks.length} done)\n`
-    + `Remaining:\n${lines.join('\n')}${more}\n`
+    + `Remaining:\n${lines.join('\n')}${more}${off}\n`
     + `Mark a task done as soon as it works (ACTION: task_done). When every task is done, finish.`;
 }
 

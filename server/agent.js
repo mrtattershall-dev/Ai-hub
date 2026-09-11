@@ -573,6 +573,10 @@ const tools = {
 
     // 1) exact unique match
     const exact = content.split(find).length - 1;
+    // NO CHANGE IS NOT AN EDIT. Set E (2026-09-11), 14B goal 5: the model sent the SAME 13-line edit three times with
+    // FIND identical to REPLACE; each time this said "OK: edited" plus a passing syntax check, so the model believed
+    // it had fixed the failing assert and repeated itself until the repeat guard ended the goal.
+    if (find === replace) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
     if (exact === 1) { writeFileSync(full, content.replace(find, replace), 'utf8'); return `OK: edited ${path}.`; }
     // An ambiguous EXACT match falls through to the line-based path below, which computes
     // where each match is - the caller needs those positions to disambiguate.
@@ -609,6 +613,7 @@ const tools = {
     }
     if (hits === 1) {
       const out = [...fileLines.slice(0, start), replace, ...fileLines.slice(end + 1)].join('\n');
+      if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
       writeFileSync(full, out, 'utf8');
       return `OK: edited ${path} (matched ignoring indentation).`;
     }
@@ -1053,7 +1058,7 @@ const tools = {
   // before every model call so pruning can never drop it.
 
   async task_list() {
-    const b = ledger.contextBlock(WORKSPACE);
+    const b = ledger.contextBlock(WORKSPACE, _toolGoal);
     return b || 'No tasks yet. Use task_add to write down what this build needs.';
   },
 
@@ -1109,7 +1114,7 @@ const tools = {
     if (r.added < titles.length) notes.push(`${titles.length - r.added} were already on the list`);
     if (r.evicted) notes.push(`${r.evicted} completed task(s) evicted to make room (still in the git log)`);
     if (r.dropped) notes.push(`WARNING: ${r.dropped} could NOT be recorded - the ledger is at its cap. Close open tasks before adding more`);
-    return `OK: added ${r.added} task(s)${notes.length ? ` - ${notes.join('; ')}` : ''}. Ledger now ${p.done}/${p.total} done.\n${ledger.contextBlock(WORKSPACE)}`;
+    return `OK: added ${r.added} task(s)${notes.length ? ` - ${notes.join('; ')}` : ''}. Ledger now ${p.done}/${p.total} done.\n${ledger.contextBlock(WORKSPACE, _toolGoal)}`;
   },
 
   async task_done({ which }) {
@@ -1125,7 +1130,7 @@ const tools = {
       const own = !p.own
         ? 'This goal has no tasks of its own on the ledger - before you finish, check its deliverables yourself: every file the goal or your plan names exists and does what was asked.'
         : p.remainingOwn
-          ? `${p.remainingOwn} of this goal's ${p.own} task(s) still open.\n${ledger.contextBlock(WORKSPACE)}`
+          ? `${p.remainingOwn} of this goal's ${p.own} task(s) still open.\n${ledger.contextBlock(WORKSPACE, _toolGoal)}`
           : `All ${p.own} task(s) for this goal are done - verify, then finish.`;
       return `OK: "${r.task.title}" done - that task was LEFT OVER from earlier work in this workspace, not part of this goal. ${own}`;
     }
@@ -1133,7 +1138,7 @@ const tools = {
     // from an earlier run must not stop the agent being told it is done.
     return p.remainingOwn === 0
       ? `OK: "${r.task.title}" done. ALL ${p.own} TASKS FOR THIS GOAL ARE COMPLETE — verify, then finish.`
-      : `OK: "${r.task.title}" done (${p.done}/${p.total}). ${p.remainingOwn} left.\n${ledger.contextBlock(WORKSPACE)}`;
+      : `OK: "${r.task.title}" done (${p.done}/${p.total}). ${p.remainingOwn} left.\n${ledger.contextBlock(WORKSPACE, _toolGoal)}`;
   },
 
   // ---- looking at the result -------------------------------------------------
@@ -1184,7 +1189,11 @@ const tools = {
   // and runs the proof appropriate to it, so a Python script or a Node service can no
   // longer be declared finished having never executed.
   async verify_project({ entry } = {}) {
-    const r = await verifier.verify(WORKSPACE, { entry });
+    // With no ENTRY, verify the code the GOAL is about. Set E (2026-09-11), 14B goal 8: in a workspace holding ten
+    // projects this reported "detected: node ... `node q1_stock.js` ran and exited cleanly" for a goal about
+    // q8_units.py; the model took that as its own work verified and repeated it until the repeat guard stopped it.
+    const named = entry ? null : ledger.namedFiles(_toolGoal || '').find((f) => /\.(py|c?js|mjs)$/i.test(f) && existsSync(join(WORKSPACE, f)));
+    const r = await verifier.verify(WORKSPACE, { entry: entry || named });
     return verifier.format(r);
   },
 
@@ -1434,14 +1443,71 @@ function assertEvidence(result) {
       (err, stdout) => res(err ? '' : String(stdout || '').trim()));
   });
 }
+// ── WHEN "x.name is not a function" IS A STORED VALUE HIDING A METHOD, SAY SO ────────────────
+//
+// Set D (r1: this.history vs history()) and set E (q7: this.text vs text()), 2026-09-11: a constructor stored a
+// value under the same name as a method, so every call failed with "is not a function" / "object is not callable".
+// The model re-read the method, saw it defined, and looped until the repeat guard stopped the run - the file had
+// both, and nothing said they collide. Evidence, not advice: it names the two lines. Never fatal, never guesses:
+// it fires only when one file really has both the assignment and the method.
+const SHADOW_SKIP = new Set(['node_modules', '.git', '__pycache__']);
+function shadowEvidence(result) {
+  const r = String(result ?? '');
+  let name = null, lang = null;
+  const js = r.match(/TypeError: .*?\.([A-Za-z_$][\w$]*) is not a function/);
+  if (js) { name = js[1]; lang = 'js'; }
+  else if (/TypeError: '[^']+' object is not callable/.test(r)) {
+    // Python names the type, not the attribute: take it from the failing source line the traceback quotes.
+    const lines = r.split('\n');
+    const i = lines.findIndex((l) => /object is not callable/.test(l));
+    for (let k = i - 1; k >= 0 && k >= i - 4; k--) {
+      const c = lines[k].match(/\.([A-Za-z_]\w*)\s*\(/);
+      if (c) { name = c[1]; lang = 'py'; break; }
+    }
+  }
+  if (!name) return '';
+  const self = lang === 'js' ? 'this.' : 'self.';
+  const out = [];
+  let entries = [];
+  try { entries = readdirSync(WORKSPACE, { withFileTypes: true }); } catch { return ''; }
+  for (const e of entries) {
+    if (!e.isFile() || SHADOW_SKIP.has(e.name)) continue;
+    if (lang === 'js' ? !/\.(c|m)?js$/i.test(e.name) : !/\.py$/i.test(e.name)) continue;
+    let src = '';
+    try { src = readFileSync(join(WORKSPACE, e.name), 'utf8'); } catch { continue; }
+    if (src.length > 400_000) continue;
+    let assignAt = 0, defAt = 0;
+    src.split('\n').forEach((line, n) => {
+      const t = line.trim();
+      if (!assignAt && t.startsWith(self + name)) {
+        const rest = t.slice((self + name).length).trimStart();
+        if (rest.startsWith('=') && !rest.startsWith('==')) assignAt = n + 1;
+      }
+      if (!defAt) {
+        const m = lang === 'js'
+          ? line.match(/^\s+(?:static\s+|async\s+)*([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/)
+          : line.match(/^\s+def\s+([A-Za-z_]\w*)\s*\(\s*self/);
+        if (m && m[1] === name) defAt = n + 1;
+      }
+    });
+    if (assignAt && defAt) {
+      out.push(`${e.name} stores a value in ${self}${name} (line ${assignAt}) AND defines a ${name}() method (line ${defAt}). `
+        + `The stored value HIDES the method on every instance, so calling .${name}() fails. `
+        + `Rename one of them - e.g. keep the value in ${self}_${name} and return it from ${name}().`);
+    }
+  }
+  return out.join('\n');
+}
+
 // Inserted BEFORE the trailing "EXIT: n" line, not after it: batch mode decides a command
 // failed by the result ENDING in a non-zero EXIT (batchStepFailed), and appending after it
 // would quietly turn a failing assert into a "success" that lets the batch run on.
 async function withAssertEvidence(tool, result) {
   if (tool !== 'run_python' && tool !== 'run_command') return result;
   const ev = await assertEvidence(result).catch(() => '');
-  if (!ev) return result;
-  const block = `\n${ev}\nDecide WHICH side is wrong - the function's result or your expected value - before you edit either.`;
+  let sh = ''; try { sh = shadowEvidence(result); } catch { /* never fatal */ }
+  if (!ev && !sh) return result;
+  const block = (ev ? `\n${ev}\nDecide WHICH side is wrong - the function's result or your expected value - before you edit either.` : '') + (sh ? `\n${sh}` : '');
   const r = String(result);
   const m = r.match(/\nEXIT: \S+\s*$/);
   return m ? r.slice(0, m.index) + block + r.slice(m.index) : r + '\n' + block;
@@ -2098,7 +2164,10 @@ function withLedger(history) {
   // call returns "not connected", and invites it to plan a run around one.
   if (googleReady()) extra.push({ role: 'user', content: `GOOGLE ACCOUNT TOOLS (an account is connected):\n${GOOGLE_TOOL_DOCS}` });
   let block;
-  try { block = ledger.contextBlock(WORKSPACE); } catch { block = null; }
+  // The goal scopes carried-over tasks (taskLedger AGED). It lives in the anchor message pruneHistory never drops.
+  const anchor = history.find((m) => m.role === 'user' && String(m.content || '').includes('\nGOAL: '));
+  const goal = anchor ? String(anchor.content).split('\nGOAL: ')[1].split('\n\nBegin step by step')[0] : null;
+  try { block = ledger.contextBlock(WORKSPACE, goal); } catch { block = null; }
   if (block) extra.push({ role: 'user', content: block });
   // The asset library SUMMARY rides along the same way, for the same reason: it has to
   // survive pruning. It is a handful of lines - the full listing is a tool call away.
@@ -2297,6 +2366,9 @@ let _loadDb = null;
 // progress steps into it; routing that through the tool ARGS created a cycle
 // (run -> steps -> args -> run) that made the run unserialisable.
 let _activeRun = null;
+// The goal of the run whose tool is executing: scopes the ledger the task tools print (taskLedger AGED) and gives
+// verify_project its default entry.
+let _toolGoal = null;
 
 /**
  * Run a self-contained sub-task in a FRESH context, and hand back a summary.
@@ -2830,7 +2902,7 @@ async function drive(loadDb, run) {
           }
           if (!advisory && p.total && p.remainingOwn > 0) {
             blocked(`${p.remainingOwn} task(s) still open — not finished yet.`,
-              `Do NOT finish yet — ${p.remainingOwn} of ${p.total} tasks on your ledger are not done:\n${ledger.contextBlock(WORKSPACE)}\n`
+              `Do NOT finish yet — ${p.remainingOwn} of ${p.total} tasks on your ledger are not done:\n${ledger.contextBlock(WORKSPACE, run.goal)}\n`
               + `Either complete them, or if one is genuinely unnecessary say why and task_done it. Then finish.`);
             continue turn;
           }
@@ -3024,6 +3096,7 @@ async function drive(loadDb, run) {
       // recurse without bound.
       // Depth is supplied here rather than trusted from the model. The parent is passed
       // through module scope - see spawn_subtask for why it must not go on args.
+      _toolGoal = run.goal || null;
       if (tool === 'spawn_subtask') { args.depth = (run.depth || 0) + 1; _activeRun = run; }
       // The file as it was BEFORE this write/edit, so a write that silently drops definitions can say so (defNames.js).
       let beforeSrc = null;
