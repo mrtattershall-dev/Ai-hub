@@ -119,10 +119,12 @@ def check_game(row: dict) -> dict:
     gate = _read_jsonl(raw / "gate_check.jsonl")
     gate_row = gate[0] if gate else {"repo": row["repo"], "dir": row.get("dir"), "entry": row.get("entry"),
                                      "gateClean": False, "why": "gate produced no row: " + log[-200:]}
-    goals = []
-    if gate_row.get("gateClean"):
-        log += node("validate", 60 * 10)
-        goals = _read_jsonl(raw / "game_goals.jsonl")
+    # Every game is validated. The hub's finish gate now blocks only on visual problems a run
+    # INTRODUCED (baseline taken at run start, 2026-09-11), so an untouched game's pre-existing
+    # issues no longer rule it out; the gate row is kept as information. Runs that still hit the
+    # gate are dropped later by tochat.mjs.
+    log += node("validate", 60 * 10)
+    goals = _read_jsonl(raw / "game_goals.jsonl")
     lines = [l for l in log.splitlines() if l.startswith(("clean ", "TRIPS ")) or row["repo"] in l]
     return {"repo": row["repo"], "gate": gate_row, "goals": goals, "log": lines[-4:]}
 
