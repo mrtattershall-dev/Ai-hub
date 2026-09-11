@@ -1,0 +1,4 @@
+setE-coder14b-base-g010 | status done (was done) | finishBlocks 1 (was 1) | forcedFinish false | served 8/8 | discard nudges 0 | gate blocks 1 | no-change 0 | shadow 0 | ledger hidden 7 | stale shown 7 | verify - | conn retries 0
+setE-coder14b-base-g019 | status stopped (was stopped) | finishBlocks 0 (was 0) | forcedFinish false | served 11/11 | discard nudges 0 | gate blocks 0 | no-change 0 | shadow 0 | ledger hidden 10 | stale shown 0 | verify - | conn retries 0
+setE-coder14b-base-g049 | status stopped (was stopped) | finishBlocks 0 (was 0) | forcedFinish false | served 10/10 | discard nudges 0 | gate blocks 0 | no-change 0 | shadow 0 | ledger hidden 9 | stale shown 0 | verify - | conn retries 0
+setE-coder14b-base-g096 | status done (was done) | finishBlocks 0 (was 0) | forcedFinish false | served 6/6 | discard nudges 0 | gate blocks 0 | no-change 0 | shadow 0 | ledger hidden 5 | stale shown 0 | verify - | conn retries 0
