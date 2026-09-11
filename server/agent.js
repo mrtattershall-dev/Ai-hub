@@ -1781,7 +1781,9 @@ function evictOldRuns() {
   for (const r of finished) {
     if (over-- <= 0) break;
     runs.delete(r.id);
-    try { const f = join(RUNS_DIR, `${r.id}.json`); if (existsSync(f)) unlinkSync(f); } catch {}
+    // Memory only. This used to unlink the run FILE too, so the 300-file disk cap below never bound: a 100-goal
+    // sequence kept its last 40 run records and lost the rest (set D: goals 1-32 of Qwen3-Coder's run). reapRuns()
+    // bounds the directory.
   }
 }
 // Overridable for the same reason AGENT_WORKSPACE and AGENT_QUEUE_FILE are: without it
@@ -1809,7 +1811,7 @@ function pushStep(run, step) {
 // None of that shows up in a test that finishes in ninety seconds. All of it shows up on
 // day three of an unattended loop.
 const RUN_ARG_MAX = 30_000;      // matches what the trace harvester keeps, so training data is intact
-const MAX_RUN_FILES = 300;       // on disk
+const MAX_RUN_FILES = parseInt(process.env.AGENT_MAX_RUN_FILES || '300', 10);   // on disk
 const TRACE_MAX_BYTES = 64 * 1024 * 1024;
 
 /**
@@ -2753,6 +2755,12 @@ async function drive(loadDb, run) {
           if (await isDirty(WORKSPACE)) {
             const cp = await commitAll(WORKSPACE, `before ${tool}: ${(thought || '').slice(0, 80)}`);
             if (cp.ok && cp.sha) pushStep(run, { type: 'checkpoint', text: `checkpoint ${cp.sha}` });
+            // A checkpoint that fails must SAY so. These errors were swallowed, and in set D both runs lost their
+            // undo history partway through (an unaddable file; a stale index.lock) with nothing in the run to show
+            // it. Once per distinct problem, so a persistent failure is one line, not one per step.
+            const problem = !cp.ok ? `checkpoint FAILED - undo history is not being kept: ${String(cp.error || '').split('\n')[0].slice(0, 160)}`
+              : (cp.skipped && cp.skipped.length ? `checkpoint skipped file(s) git cannot add: ${cp.skipped.slice(0, 5).join(', ')}` : null);
+            if (problem && run.checkpointProblem !== problem) { run.checkpointProblem = problem; pushStep(run, { type: 'note', text: problem }); }
           }
         } catch { /* never let bookkeeping stop the run */ }
       }

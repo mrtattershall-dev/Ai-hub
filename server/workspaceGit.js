@@ -19,7 +19,7 @@
  *   - identity is set per-repo so it cannot inherit or alter global git config
  */
 import { execFile } from 'child_process';
-import { existsSync, mkdirSync } from 'fs';
+import { existsSync, mkdirSync, statSync, unlinkSync } from 'fs';
 import { join, dirname, resolve, sep } from 'path';
 
 const GIT_TIMEOUT_MS = 20_000;
@@ -95,9 +95,24 @@ export async function ensureRepo(workspace) {
   const init = await git(workspace, ['init', '-q']);
   if (!init.ok) return { ok: false, error: init.err };
   // No remote is ever configured: an autonomous agent must not be able to publish.
-  await git(workspace, ['add', '-A']);
+  await git(workspace, ['add', '-A', '--ignore-errors']);
   await git(workspace, ['commit', '-q', '-m', 'baseline: workspace before the agent touched it', '--allow-empty']);
   return { ok: true, created: true };
+}
+
+/**
+ * A git that crashed or hit GIT_TIMEOUT_MS mid-write leaves .git/index.lock behind, and from then on EVERY add and
+ * commit fails with "Unable to create index.lock: File exists". In set D the base 14B's workspace kept one from
+ * 08:18 to the end of the run: 227 changes never checkpointed, and nothing said so. A lock older than a minute
+ * belongs to no live git (every call here times out at 20 s), so it is removed; a fresh one is left alone.
+ */
+const LOCK_STALE_MS = 60_000;
+function clearStaleLock(workspace) {
+  const lock = join(workspace, '.git', 'index.lock');
+  try {
+    if (existsSync(lock) && Date.now() - statSync(lock).mtimeMs > LOCK_STALE_MS) { unlinkSync(lock); return true; }
+  } catch { /* cannot tell - leave it */ }
+  return false;
 }
 
 /** Commit whatever changed. Returns the short sha, or null when nothing changed. */
@@ -108,15 +123,21 @@ export async function commitAll(workspace, message) {
   if (!(await ownRepoOrNull(workspace))) {
     return { ok: false, error: `refusing to commit: ${workspace} is not the root of its own git repository, so this would commit an enclosing repo` };
   }
+  const clearedLock = clearStaleLock(workspace);
   const status = await git(workspace, ['status', '--porcelain']);
-  if (!status.out) return { ok: true, sha: null, note: 'nothing to commit' };
-  const add = await git(workspace, ['add', '-A']);
-  if (!add.ok) return { ok: false, error: add.err };
+  if (!status.out) return { ok: true, sha: null, note: 'nothing to commit', clearedLock };
+  // --ignore-errors: ONE file git cannot index used to fail the whole add, so every later checkpoint failed too.
+  // In set D a model-made file named "10 + 20 + 5 = 35, not 45." (Windows cannot open a name ending in '.') ended
+  // Qwen3-Coder's undo history at goal 53 of 100. Now the rest is committed and the skipped names are reported.
+  const add = await git(workspace, ['add', '-A', '--ignore-errors']);
+  const skipped = [...new Set([...String(add.err || '').matchAll(/unable to index file '([^']+)'|open\("([^"]+)"\)/g)].map((m) => m[1] || m[2]))];
+  const staged = await git(workspace, ['diff', '--cached', '--quiet']);   // fails (exit 1) when something IS staged
+  if (staged.ok) return add.ok ? { ok: true, sha: null, note: 'nothing to commit', clearedLock } : { ok: false, error: add.err, skipped, clearedLock };
   const msg = String(message || 'agent step').slice(0, 200);
   const c = await git(workspace, ['commit', '-q', '-m', msg]);
-  if (!c.ok) return { ok: false, error: c.err };
+  if (!c.ok) return { ok: false, error: c.err, skipped, clearedLock };
   const sha = await git(workspace, ['rev-parse', '--short', 'HEAD']);
-  return { ok: true, sha: sha.out, note: msg };
+  return { ok: true, sha: sha.out, note: msg, skipped, clearedLock };
 }
 
 /** What has changed, and since when. `ref` defaults to the previous commit. */
