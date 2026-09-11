@@ -125,6 +125,9 @@ const MAX_MINUTES = parseInt(process.env.AGENT_MAX_MINUTES || '90', 10);
 // discards the rest, exactly as it always has. On, up to BATCH_MAX of them run in order under
 // the rules documented at planBatch(). Read once at load, like every other AGENT_* knob.
 const BATCH_ACTIONS = process.env.AGENT_BATCH_ACTIONS === '1';
+// AGENT_UNATTENDED=1: nobody is watching this run, so an action that would ask a human is DENIED (with a reason
+// the model can act on) instead of parking the run. Off by default: an attended run still asks.
+const UNATTENDED = process.env.AGENT_UNATTENDED === '1';
 const BATCH_MAX = 4;
 
 // The clock runs from budgetStart, NOT createdAt. A follow-up on a run that started
@@ -1867,6 +1870,23 @@ function persist(run) {
   } catch {}
 }
 
+/**
+ * The FULL transcript: every model call, untrimmed, appended beside the run file as <id>.transcript.jsonl.
+ *
+ * run.history is a context WINDOW. pruneHistory drops old messages in place so the next call fits - right for
+ * the model, and wrong for anyone who later needs to know what the model actually said. Set C lost 248 of
+ * Qwen3-Coder's 568 replies that way, which left 75 of 120 recorded runs impossible to replay faithfully.
+ * Each line: { ts, n, kind: 'plan' | 'turn' | 'subtask', sent: the messages new since the model last spoke
+ * (everything, on a run's first call), reply } - or { ..., error } for a call that failed. The loop never reads
+ * it; replay rigs and training rows do.
+ */
+function appendTranscript(run, rec) {
+  try {
+    mkdirSync(RUNS_DIR, { recursive: true });
+    appendFileSync(join(RUNS_DIR, `${run.id}.transcript.jsonl`), JSON.stringify({ ts: Date.now(), ...rec }) + '\n');
+  } catch { /* evidence, never a reason to fail a run */ }
+}
+
 // Restore checkpointed runs on boot. Anything caught mid-flight (the process died
 // while it was running/awaiting) becomes 'interrupted' so the UI can offer Resume.
 function loadRuns() {
@@ -2310,8 +2330,10 @@ async function runSubtask(goal, depth, parent) {
     sub.modelCalls++;
     pruneHistory(sub);
     let raw;
-    try { raw = await callModel(_loadDb, withLedger(sub.history), null); }
+    const subMsgs = withLedger(sub.history);
+    try { raw = await callModel(_loadDb, subMsgs, null); }
     catch (e) { summary = `sub-task failed to reach the model: ${e.message}`; break; }
+    if (parent) appendTranscript(parent, { n: sub.modelCalls, kind: 'subtask', depth, sent: subMsgs.slice(subMsgs.map((m) => m.role).lastIndexOf('assistant') + 1), reply: raw });
     sub.history.push({ role: 'assistant', content: raw });
 
     const action = parseAction(raw, sub.lastPath);
@@ -2500,10 +2522,12 @@ async function drive(loadDb, run) {
       run.abort = new AbortController();
       try {
         const planner = loadDb().api_keys?.ollama_planner;   // optional: a stronger/base model just for planning
-        const planText = await callModel(loadDb, [
+        const planMsgs = [
           { role: 'system', content: plannerSystemFor(run.goal) },
           { role: 'user', content: `${run.history[1]?.content || ('GOAL: ' + run.goal)}\n\n${planTaskFor(run.goal)}` },
-        ], run.abort.signal, planner);
+        ];
+        const planText = await callModel(loadDb, planMsgs, run.abort.signal, planner);
+        appendTranscript(run, { n: 0, kind: 'plan', sent: planMsgs, reply: planText });
         if (planText && planText.trim()) {
           run.plan = planText.trim();
           pushStep(run, { type: 'plan', text: run.plan });
@@ -2553,7 +2577,11 @@ async function drive(loadDb, run) {
       try {
         raw = await callModel(loadDb, msgs, run.abort.signal);
         noteModelCall(run);
+        const lastSaid = msgs.map((m) => m.role).lastIndexOf('assistant');
+        appendTranscript(run, { n: run.modelCalls, kind: 'turn', sent: run.transcribed ? msgs.slice(lastSaid + 1) : msgs, reply: raw });
+        run.transcribed = true;
       } catch (e) {
+        appendTranscript(run, { n: run.modelCalls, kind: 'turn', error: e.code || String(e.message || e).slice(0, 300) });
         if (run.status === 'stopped') break;        // Stop aborted the call — exit quietly
 
         // The BACKEND is the authority on its own context window, not our estimate. When
@@ -2895,6 +2923,14 @@ async function drive(loadDb, run) {
           }
         }
 
+        // A forced finish is not a verified one. After 3 blocks the gate steps aside, so a run that can never
+        // satisfy it does not hang - but it used to be recorded exactly like a clean finish. Set B goal 14
+        // (Qwen3-Coder) wrote a page whose script never existed, test_web reported the 404 four times, and the
+        // run ended 'done'. The status stays 'done' (harnesses and the UI key on it); the run says plainly what it is.
+        if ((run.finishBlocks || 0) >= 3) {
+          run.forcedFinish = true;
+          pushStep(run, { type: 'note', text: `Finished UNVERIFIED: the finish gate blocked ${run.finishBlocks} times and was never satisfied.` });
+        }
         run.status = 'done';
         pushStep(run, { type: 'finish', thought, summary: args.summary || '' });
         break turn;
@@ -2932,6 +2968,14 @@ async function drive(loadDb, run) {
           pushStep(run, { type: 'policy_denied', tool, args, thought, text: msg });
           run.history.push({ role: 'user', content: `TOOL REFUSED (${tool}): ${msg}` });
           continue turn;                                   // keep working — do NOT halt
+        }
+        if (verdict.decision === 'ask' && UNATTENDED) {
+          // Nobody is here to answer, and a parked run holds the workspace for ever: in set D one parked run
+          // ("open r9_app.html") made all 91 later goals fail to start. Deny it, say why, and keep working.
+          const msg = `DENIED: ${verdict.reason}. This run is unattended (AGENT_UNATTENDED=1), so nobody can approve it. Achieve the goal another way.`;
+          pushStep(run, { type: 'policy_denied', tool, args, thought, text: msg, unattended: true });
+          run.history.push({ role: 'user', content: `TOOL REFUSED (${tool}): ${msg}` });
+          continue turn;
         }
         if (verdict.decision === 'ask') {
           run.pending = { tool, args, thought, why: verdict.reason };
