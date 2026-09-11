@@ -8,6 +8,10 @@ function init() {
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
     
+    // Test: Draw a simple rectangle to see if drawing works
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(10, 10, 50, 50);
+    
     // Ball properties
     ball = {
         x: canvas.width / 2,
@@ -29,7 +33,7 @@ function gameLoop() {
     // Draw ball
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#ffffff';
     ctx.fill();
     ctx.closePath();
     
