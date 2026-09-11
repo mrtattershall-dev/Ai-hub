@@ -109,6 +109,27 @@ export function parseActions(text, lastPath, max = 6) {
   return out;
 }
 
+/**
+ * Was this reply CUT OFF inside a code block?
+ *
+ * The 14B's runaway reply in the head-to-head (2026-09-10, set A goal 19) opened a
+ * ```javascript block for t12_bits.js and then wrote console.asserts until it hit the token
+ * limit - 31,046 characters, no closing fence. parseAction's fence regex needs a closing
+ * fence, so it matched nothing, the write branch fell back to `fenced ?? ''`, and the hub
+ * wrote a 0-byte t12_bits.js.
+ *
+ * An odd fence count alone is NOT the signal: 387 of 1,949 recorded replies end with a stray
+ * lone fence after a complete reply ("ACTION: task_list" then a bare fence). The signal is an
+ * unmatched fence that OPENS a body - real content follows it and nothing closes it. Across
+ * all 2,410 recorded replies this fires on exactly one: the runaway.
+ */
+export function replyWasTruncated(text) {
+  const t = String(text || '');
+  const n = (t.match(/```/g) || []).length;
+  if (n % 2 === 0) return false;
+  return /\n\s*\S/.test(t.slice(t.lastIndexOf('```') + 3));
+}
+
 export // Parse one plain-text action from a model response. File content lives in a raw
 // fenced code block (never JSON), so quotes/backslashes/escape-sequences survive
 // intact — the thing that broke JSON-string encoding on smaller models.
@@ -165,6 +186,11 @@ function parseAction(text, lastPath) {
     //
     // 'index.html' as a final fallback also silently overwrote a working game page, so it
     // now only applies when the fence really is html and nothing better is known.
+    //
+    // A file cut off mid-fence is not an EMPTY file (see replyWasTruncated). Refuse, so the
+    // loop re-asks and says why, instead of handing write_file '' and leaving a 0-byte file.
+    // A reply whose FIRST block closed properly still writes that complete block.
+    if (fenced === undefined && replyWasTruncated(text)) return null;
     if (!path) path = lastPath || scavenged || langFile[fenceLang] || (fenceLang === 'html' ? 'index.html' : undefined);
     if (!path) return null;   // refuse rather than invent a destination
     return { tool, thought, args: { path, content: stripLineNumberPrefixes(fenced ?? '') } };
