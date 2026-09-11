@@ -30,6 +30,9 @@ training-data/factory/eval/
 training-data/factory/gen-output/
 training-data/*.jsonl
 training-data/factory/__pycache__/
+# explain_assert.py is the first .py in server/; the hub runs it with -B, but importing or
+# py_compile-ing it here writes bytecode that should never show up in git status.
+server/__pycache__/
 training-data/**/*.safetensors
 training-data/**/*.bin
 training-data/factory/snapshots/
