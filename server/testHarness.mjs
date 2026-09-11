@@ -43,6 +43,7 @@ export const TERMINAL_ITEM = ['done', 'failed', 'cancelled', 'stopped'];
 // idea is how a fix lands in one place and not the other, which is the whole reason this
 // file exists, so the duplicate is gone rather than reconciled.
 export { freePort, freePorts } from './testPort.mjs';
+import { freePort } from './testPort.mjs';   // the re-export above does not bind it in THIS module
 
 /** A scratch directory with a hub.json pointing wherever the test wants. */
 export function scratch(prefix, { baseUrl = '', model = 'fake' } = {}) {
@@ -65,7 +66,7 @@ export function isolatedEnv(dir, port, extra = {}) {
     AGENT_WORKSPACE: join(dir, 'workspace'),
     AGENT_QUEUE_FILE: join(dir, 'queue.json'),
     AGENT_RUNS_DIR: join(dir, 'runs'),
-    RUN_INDEX: join(dir, 'run-index.jsonl'),
+    AGENT_TRACES_DIR: join(dir, 'traces'), RUN_INDEX: join(dir, 'run-index.jsonl'),
     HUB_TOKEN: '',
     ...extra,
   };

@@ -26,6 +26,7 @@ process.env.AGENT_WORKSPACE = join(TMP, 'workspace');
 process.env.AGENT_QUEUE_FILE = join(TMP, 'queue.json');
 process.env.AGENT_RUNS_DIR = join(TMP, 'runs');
 process.env.RUN_INDEX = join(TMP, 'run-index.jsonl');
+process.env.AGENT_TRACES_DIR = join(TMP, 'traces');
 delete process.env.AGENT_SUPERVISOR;
 mkdirSync(process.env.AGENT_WORKSPACE, { recursive: true });
 writeFileSync(process.env.AGENT_QUEUE_FILE, JSON.stringify({ items: [] }), 'utf8');

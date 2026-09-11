@@ -42,7 +42,7 @@ const fake = spawn(process.execPath, [join(__dirname, 'fakemodel.mjs'), '--port'
 const hub = spawn(process.execPath, [join(__dirname, 'index.js')], {
   env: {
     ...process.env,
-    PORT: String(HUB_PORT), HUB_DB: dbPath, AGENT_RUNS_DIR: join(dir, 'runs'), RUN_INDEX: join(dir, 'run-index.jsonl'),
+    PORT: String(HUB_PORT), HUB_DB: dbPath, AGENT_RUNS_DIR: join(dir, 'runs'), AGENT_TRACES_DIR: join(dir, 'traces'), RUN_INDEX: join(dir, 'run-index.jsonl'),
     AGENT_WORKSPACE: ws, AGENT_QUEUE_FILE: join(dir, 'queue.json'),
     AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
     MODEL_STALL_S: '30', MODEL_FIRST_BYTE_S: '30',

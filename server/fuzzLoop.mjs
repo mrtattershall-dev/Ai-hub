@@ -126,7 +126,7 @@ async function iteration(seed) {
   writeFileSync(join(dir, 'hub.json'), JSON.stringify({ api_keys: { ollama: { base_url: `http://127.0.0.1:${mockPort}`, model: 'fuzz' } }, history: [], settings: {} }), 'utf8');
   const hub = spawn(process.execPath, [join(HERE, 'index.js')], {
     env: { ...process.env, PORT: String(hubPort), HUB_DB: join(dir, 'hub.json'), AGENT_WORKSPACE: ws,
-      AGENT_QUEUE_FILE: join(dir, 'queue.json'), AGENT_RUNS_DIR: join(dir, 'runs'), RUN_INDEX: join(dir, 'index.jsonl'),
+      AGENT_QUEUE_FILE: join(dir, 'queue.json'), AGENT_RUNS_DIR: join(dir, 'runs'), AGENT_TRACES_DIR: join(dir, 'traces'), RUN_INDEX: join(dir, 'index.jsonl'),
       AGENT_SUPERVISOR: CHAIN ? '1' : '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
       // chain: the shortest tick and approval timeout the hub accepts (its floors are 15s / 1 min).
       ...(CHAIN ? { AGENT_TICK_S: '15', AGENT_APPROVAL_TIMEOUT_MIN: '1' } : {}),
