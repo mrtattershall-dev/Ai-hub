@@ -22,6 +22,13 @@ class Queue {
   isEmpty() {
     return this.items.length === 0;
   }
+  
+  peek() {
+    if (this.isEmpty()) {
+      throw new Error("Cannot peek at an empty queue");
+    }
+    return this.items[0];
+  }
 }
 
 // Test assertions
