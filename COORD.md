@@ -4108,3 +4108,19 @@ tatte, verbatim, this thread: "After d has results, analyze the deep seated bugs
       tatte says restart.
       (The rebase onto main renamed the fix commits named in the set E findings entry above: 5ddc063 -> 947c48d,
       aa0fc13 -> f62768e, 2baa03c -> b3c2614. Main now holds all three; the f-fixes branch and worktree are removed.)
+
+## Session A — set F prepared (100 new interleaved goals), NOT yet launched (2026-09-11 16:5x)
+
+tatte, verbatim: asked to choose between re-running set E's goals on the fixed hub and a fresh set, "Fresh f set";
+asked which models with ~$6.7 of the $30 cap left, chose "14B + Qwen3-Coder" (the option stating ~$10 worst case,
+~$3.3 OVER the $30 cap - so the cap is raised to ~$33 by that choice); asked about batch actions, chose "Off, as in
+D and E".
+
+    Ten new projects (s1..s10), 10 steps each, interleaved; s10 is built on s1 and s7, so a dropped export or a
+    changed rule in either shows up there too. Checker validated before any model saw the goals: refs/ 100/100 both
+    ways, empty 0/100, tools/mutate-F.mjs 69/69 caught exactly. Harness trialF/run-setF dry-run proven on a mock
+    (records, transcripts, traces, git bundle). Pre-registration in measurements/2026-09-11-setF/README.md:
+    coder30b-setf H100 120/125 min (~$8.2), coder14b-setf A10G 95/100 min (~$1.8), AGENT_BATCH_ACTIONS=0, approvals
+    answered as in D and E, hub = main with the seven set-E fixes (server/ at b3c2614).
+    LAUNCH HELD: the laptop is on battery (18%). Set E lost Qwen3-Coder's last 36 goals to a battery sleep, so the
+    window starts only on AC, with a keep-awake power request for its duration.
