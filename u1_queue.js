@@ -69,5 +69,22 @@ console.assert(queue.isEmpty() === true, "Empty queue should be empty");
 queue.enqueue("test");
 console.assert(queue.isEmpty() === false, "Non-empty queue should not be empty");
 
+// Test peek
+queue.enqueue(42);
+const peeked = queue.peek();
+console.assert(peeked === "test", "Peek should return the front item without removing it");
+console.assert(queue.size() === 3, "Peek should not change queue size");
+
+// Test peek on empty queue throws error
+let errorCaught = false;
+try {
+  const emptyQueue = new Queue();
+  emptyQueue.peek();
+} catch (e) {
+  errorCaught = true;
+  console.assert(e.message === "Cannot peek at an empty queue", "Should throw correct error message for peek on empty queue");
+}
+console.assert(errorCaught, "Should throw error when peeking at empty queue");
+
 // Export the Queue class
 module.exports = Queue;
