@@ -83,6 +83,8 @@ export const __toolPolicyTest = {
   },
   forgetRun: (id) => runs.delete(id),
   autoStartsInLastHour: () => autoStarts.filter((t) => t > Date.now() - 3600_000).length,
+  // A counter that leaked would jam /reset shut for ever, so the test must be able to see it.
+  pendingAutoStarts: () => pendingAutoStarts,
 };
 
 /** What an approval prompt for a Google write should say, in terms of the real effect. */
@@ -3306,8 +3308,27 @@ export function startSupervisorTick(loadDb) {
   return tickTimer;
 }
 
+/**
+ * Automatic starts that have been scheduled but have not fired yet.
+ *
+ * activeTopLevelRun() answers "is a run holding the workspace", and in the 250ms between
+ * one chained step finishing and the next starting, the honest answer is no: the old run
+ * is done and the new one does not exist yet. So anything that only asks that question -
+ * POST /reset did - sees an idle workspace, deletes it, and the next step then starts on an
+ * empty directory it expected to find its predecessor's output in. The gap is short; it is
+ * also exactly where an unattended chain spends its time between every pair of steps.
+ *
+ * Decremented at the TOP of the callback, deliberately: every path after it either declines
+ * (the run holding the workspace is visible to activeTopLevelRun) or calls startRun, which
+ * registers the new run as 'running' synchronously. There is no instant where neither
+ * guard can see the work.
+ */
+let pendingAutoStarts = 0;
+
 function autoStart(loadDb, item) {
+  pendingAutoStarts++;
   setTimeout(() => {
+    pendingAutoStarts--;
     const active = activeTopLevelRun();
     if (active) {
       workQueue.release(item.id);
@@ -3773,6 +3794,28 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
 
   // Wipe the workspace for a fresh project (clears every file, base + uploaded).
   router.post('/reset', (req, res) => {
+    // DELETES THE ENTIRE WORKSPACE, and used to check nothing first. Its neighbours
+    // (/:id/resume, /:id/followup) all 409 while a run is active; this one, the only route
+    // that destroys files outright, did not. The client greying out "New project" was the
+    // only protection, and it had three holes: a run in teardown already reads 'done' while
+    // the syntax rollback is still rewriting files; a second tab or any API client has no
+    // client gate at all; and a supervisor chain sits in the 250ms gap between steps, where
+    // nothing is "running". Reported by the Strategy session.
+    // activeTopLevelRun() covers the first two (it counts `busy` through teardown since
+    // 98c02c6, and 'awaiting_approval'); pendingAutoStarts covers the third.
+    const active = activeTopLevelRun();
+    if (active) {
+      return res.status(409).json({
+        error: `a run is active in this workspace (${active.status}${active.busy ? ', finishing up' : ''}) — stop it first`,
+        busy: true,
+      });
+    }
+    if (pendingAutoStarts > 0) {
+      return res.status(409).json({
+        error: 'a queued goal is about to start in this workspace — stop the queue first',
+        busy: true,
+      });
+    }
     ensureWorkspace();
     try {
       for (const name of readdirSync(WORKSPACE)) {
