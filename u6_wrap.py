@@ -21,7 +21,7 @@ def wrap(text, width):
     return lines
 
 # Asserts
-assert wrap("hello world", 10) == ["hello world"]
+assert wrap("hello world", 11) == ["hello world"]
 assert wrap("hello world", 5) == ["hello", "world"]
 assert wrap("The quick brown fox jumps over the lazy dog", 10) == ["The quick", "brown fox", "jumps over", "the lazy", "dog"]
 assert wrap("", 5) == []
