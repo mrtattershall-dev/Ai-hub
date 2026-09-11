@@ -47,7 +47,8 @@ async function replay(s) {
     if (req.url.startsWith('/api/health')) { res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ ok: true, engine: 'replay', model: s.model, lora: null })); }
     let body = ''; req.on('data', (d) => { body += d; });
     req.on('end', () => {
-      try { const b = JSON.parse(body); const msgs = b.messages || []; const last = msgs[msgs.length - 1]; asked.push(String(last && last.content || '').slice(0, 600)); } catch { asked.push(''); }
+      // Every NEW hub message since the model last spoke - not just the last one, which is always the task ledger.
+      try { const b = JSON.parse(body); const msgs = b.messages || []; const la = msgs.map((m) => m.role).lastIndexOf('assistant'); asked.push(msgs.slice(la + 1).map((m) => String(m.content || '')).join('\n---\n').slice(0, 4000)); } catch { asked.push(''); }
       let text; if (served < s.replies.length) text = s.replies[served++]; else { exhausted++; text = FINISH; }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ model: s.model, message: { role: 'assistant', content: text }, done: true }));
@@ -89,7 +90,7 @@ async function replay(s) {
     sameAsOriginal: !!run && run.status === s.outcome.status && (run.finishBlocks || 0) === s.outcome.finishBlocks,
     batchRuns: steps.filter((x) => /batch/i.test(String(x.text || ''))).length,
     discardNudges: asked.filter((a) => /were DISCARDED/.test(a)).length,
-    gateBlocks: asked.filter((a) => /^Do NOT finish yet/.test(a)).length,
+    gateBlocks: asked.filter((a) => /Do NOT finish yet/.test(a)).length,
     lastSteps: steps.slice(-4).map((x) => `${x.type}${x.tool ? ':' + x.tool : ''} ${String(x.text || x.summary || '').slice(0, 80)}`),
     dir: KEEP ? dir : undefined,
   };

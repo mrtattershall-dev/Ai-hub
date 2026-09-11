@@ -1,0 +1,3 @@
+{ "10": "F: read t5_page.html five times, never wrote the Clear button; each reply was a read plus more actions, only the first ran",
+  "18": "F: t11_check.js tests isEven/isOdd/isInRange on t4_intervals.js - none exist; it swallows the TypeErrors and prints success",
+  "20": "F: T_INDEX.md invents what four t-files do" }

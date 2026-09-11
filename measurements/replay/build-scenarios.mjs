@@ -17,6 +17,7 @@ import { join, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 import { runStates, exportTree } from './runstates.mjs';
 import { createdMs } from './regress.mjs';
+import { rebuild } from './reconstruct.mjs';
 
 const arg = (k) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : undefined; };
 const WS = arg('ws'), RUNS = arg('runs'), LABEL = arg('label'), SET = arg('set'), OUT = arg('out');
@@ -56,14 +57,46 @@ for (let j = 0; j < runs.length; j++) {
   if (sha === 'final') start = finalSnap || {};
   else if (cache.has(sha)) start = cache.get(sha);
   else { const base = mkdtempSync(join(tmpdir(), 'scen-')); const d = join(base, 'w'); exportTree(WS, sha, d); start = snapshot(d); rmSync(base, { recursive: true, force: true }); cache.set(sha, start); }
-  const hist = r.history || [];
+  // Prefer the hub's full transcript (<id>.transcript.jsonl, written from set E on): every raw reply in order,
+  // the plan first, and what the hub said next is exactly the following call's new messages. Without one, fall
+  // back to run.history - a PRUNED context window, so the scenario is only complete if nothing was trimmed.
+  const tPath = join(RUNS, `${r.id}.transcript.jsonl`);
   const replies = [], hubSaid = [];
-  hist.forEach((m, k) => {
-    if (m.role !== 'assistant') return;
-    replies.push(String(m.content || ''));
-    const nx = hist[k + 1];
-    hubSaid.push(nx && nx.role === 'user' ? String(nx.content || '').slice(0, 600) : '');
-  });
+  let source, complete, lossyCount = 0;
+  if (existsSync(tPath)) {
+    const recs = readFileSync(tPath, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)).filter((x) => typeof x.reply === 'string' && x.kind !== 'subtask');
+    recs.forEach((x, k) => {
+      replies.push(x.reply);
+      const nx = recs[k + 1];
+      hubSaid.push(nx ? (nx.sent || []).map((m) => String(m.content || '')).join('\n---\n').slice(0, 600) : '');
+    });
+    source = 'transcript'; complete = true;
+  } else {
+    const hist = r.history || [];
+    hist.forEach((m, k) => {
+      if (m.role !== 'assistant') return;
+      replies.push(String(m.content || ''));
+      const nx = hist[k + 1];
+      hubSaid.push(nx && nx.role === 'user' ? String(nx.content || '').slice(0, 600) : '');
+    });
+    source = 'history';
+    complete = !hubSaid.some((h) => /earlier steps trimmed/.test(h)) && (r.modelCalls || 0) <= replies.length;
+    // Pruned: rebuild the replies that fell out from the untrimmed steps (reconstruct.mjs - validated on every
+    // unpruned run of sets A-C: reply count 45/45, actions 269/269, parser round-trip 269/269). The plan stays
+    // first; the surviving replies stay verbatim at the end. A rebuilt write whose content the run file cut on
+    // disk cannot be reproduced, so that scenario stays partial and is tagged lossy.
+    if (!complete && replies.length && /^BUILD PLAN:/.test(replies[0])) {
+      const rb = rebuild(r, replies.slice(1));
+      if (rb && rb.rebuilt > 0) {
+        const kept = hubSaid.slice(1);
+        replies.splice(0, replies.length, replies[0], ...rb.replies);
+        hubSaid.splice(0, hubSaid.length, hubSaid[0] || '', ...Array(rb.rebuilt).fill(''), ...kept);
+        source = 'history+steps';
+        complete = rb.lossy === 0;
+        if (rb.lossy) lossyCount = rb.lossy;
+      }
+    }
+  }
   const multi = replies.filter((t) => (t.match(/^\s*ACTION:/gim) || []).length > 1).length;
   const rg = regress ? regress.find((x) => x.goal === j + 1) : null;
   const grade = grades[String(j + 1)] || null;
@@ -74,8 +107,11 @@ for (let j = 0; j < runs.length; j++) {
   if (rg && rg.regressed) tags.push('regressed');
   if (r.status === 'stopped') tags.push('stopped');
   if (grade && /^F/.test(grade)) tags.push('hand-F');
+  if (lossyCount) tags.push('lossy');
+  if (!complete) tags.push('partial');       // history was pruned: a replay will run out of recorded replies early
   const row = {
     id: `${SET}-${LABEL}-g${String(j + 1).padStart(3, '0')}`, set: SET, model: LABEL, goalNo: j + 1, goal: r.goal,
+    source, complete,
     startFrom: sha === 'final' ? 'final' : sha.slice(0, 10), startHow: rs.how(j), start, replies, hubSaid,
     outcome: { status: r.status, finishBlocks: r.finishBlocks || 0, modelCalls: r.modelCalls, steps: (r.steps || []).length,
       verdict: rg ? { whenWritten: rg.thenImpl, atEnd: rg.endImpl, why: rg.why || rg.thenWhy || '' } : (grade ? { hand: grade } : null) },
