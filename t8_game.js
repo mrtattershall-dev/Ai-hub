@@ -22,6 +22,15 @@ function init() {
         dy: 2
     };
     
+    // Paddle properties
+    paddle = {
+        x: canvas.width / 2 - 50,
+        y: canvas.height - 30,
+        width: 100,
+        height: 20,
+        speed: 8
+    };
+    
     // Start the game loop
     gameLoop();
 }
