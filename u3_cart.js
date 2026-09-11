@@ -8,7 +8,7 @@ class Cart {
   }
   
   total() {
-    return this.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    return Math.round((this.items.reduce((sum, item) => sum + (item.price * item.qty), 0)) * 100) / 100;
   }
   
   applyDiscount(pct) {
