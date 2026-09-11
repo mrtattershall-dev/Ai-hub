@@ -4124,3 +4124,12 @@ D and E".
     answered as in D and E, hub = main with the seven set-E fixes (server/ at b3c2614).
     LAUNCH HELD: the laptop is on battery (18%). Set E lost Qwen3-Coder's last 36 goals to a battery sleep, so the
     window starts only on AC, with a keep-awake power request for its duration.
+    [set F ledger, Session A] DEPLOYED both 16:55 (min 0, max 1, scaledown 120 s). Watchdogs armed 16:55:32 / 16:55:34,
+      caps 125 / 100 min. Identity (Rule 3), verbatim, before any number:
+      coder14b-setf health try 1 16:57:53: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+      coder30b-setf health try 2 16:58:34: {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+      Harnesses started 16:57:53 / 16:58:34; no new goals after 18:24:53 / 18:50:34. Both logs: hub f446c21 (server/ =
+      b3c2614, the seven set-E fixes), AGENT_UNATTENDED=0, AGENT_BATCH_ACTIONS=0. Independent re-list (python -m modal
+      app list --json) 17:0x: coder30b-setf deployed 1 task, coder14b-setf deployed 1 task; no other app live.
+      Laptop on AC (23%, charging) with a keep-awake power request held for the window; offline fuzzer PAUSED after
+      batch 18 (206/206 clean), resumes at seed 401176 afterwards.
