@@ -1,42 +1,42 @@
   1 s1_bank.js      done     then P  end P   [80eb888] trial35: done s1_bank.js:runs  
-  2 s1_bank.js      done     then P  end P   [22f0c90] trial35: done FN-MISSING(money)  
-  3 s1_bank.js      done     then P  end P   [12e8930] trial35: done FN-MISSING(throws)  
-  4 s1_bank.js      done     then P  end P   [bf5df0d] trial35: done s1_bank.js:runs  
+  2 s1_bank.js      done     then P  end P   [9461d21] trial35: done FN-MISSING(money)  
+  3 s1_bank.js      done     then P  end P   [74a0561] trial35: done FN-MISSING(throws)  
+  4 s1_bank.js      done     then P  end P   [cd125a2] trial35: done s1_bank.js:runs  
   5 S1_NOTES.md     done     then P  end P   [bf5df0d] trial35: done s1_bank.js:runs  
   6 s2_text.py      done     then P  end P   [5086f86] trial35: done FN-MISSING(punctuation)  
-  7 s2_text.py      done     then P  end P   [97efaf3] trial35: done FN-MISSING(as)  
-  8 s2_text.py      done     then P  end P   [bb9dafc] trial35: done FN-MISSING(word)  
-  9 s2_text.py      done     then P  end P   [30fbfe6] trial35: done s2_text.py:runs  
+  7 s2_text.py      done     then P  end P   [7029432] trial35: done FN-MISSING(as)  
+  8 s2_text.py      done     then P  end P   [7463c7a] trial35: done FN-MISSING(word)  
+  9 s2_text.py      done     then P  end P   [e9c03ae] trial35: done s2_text.py:runs  
  10 s2_text.py      done     then P  end P   [21ef889] trial35: done s2_text.py:THROWS  
- 11 s3_events.js    done     then P  end P   [b0bd88e] trial35: done s3_events.js:runs  
- 12 s3_events.js    done     then P  end P   [916fd4a] trial35: done s3_events.js:runs  
- 13 s3_events.js    done     then F  end F   [865e3ee] trial35: done s3_events.js:runs  emit returned 0 then 0
- 14 s3_events.js    done     then P  end P   [65b5b72] trial35: done s3_events.js:runs  
- 15 s3_events.js    done     then P  end P   [898fc67] trial35: done FN-MISSING(event)  
- 16 s4_matrix.js    done     then P  end P   [05a4016] trial35: done s4_matrix.js:runs  
- 17 s4_matrix.js    done     then P  end P   [bcbfd64] trial35: done s4_matrix.js:runs  
- 18 s4_matrix.js    done     then P  end P   [acefc00] trial35: done s4_matrix.js:runs  
+ 11 s3_events.js    done     then P  end P   [7a57ff9] trial35: done s3_events.js:runs  
+ 12 s3_events.js    done     then P  end P   [3cb2e83] trial35: done s3_events.js:runs  
+ 13 s3_events.js    done     then F  end F   [8bc1cf7] trial35: done s3_events.js:runs  emit returned 0 then 0
+ 14 s3_events.js    done     then P  end P   [464b462] trial35: done s3_events.js:runs  
+ 15 s3_events.js    done     then P  end P   [498c313] trial35: done FN-MISSING(event)  
+ 16 s4_matrix.js    done     then P  end P   [21fa212] trial35: done s4_matrix.js:runs  
+ 17 s4_matrix.js    done     then P  end P   [19a1e20] trial35: done s4_matrix.js:runs  
+ 18 s4_matrix.js    done     then P  end P   [29e7a45] trial35: done s4_matrix.js:runs  
  19 s4_matrix.js    done     then P  end P   [6b04ed1] trial35: done s4_matrix.js:runs  
- 20 s4_matrix.js    done     then F  end F   [964a760] trial35: done FN-MISSING(matrix)  a non-number entry did not throw
- 21 s5_cache.js     done     then P  end P   [a5d4fea] trial35: done FN-MISSING(LRUCache,evicted)  
- 22 s5_cache.js     done     then F  end F   [9fe3996] trial35: done FN-MISSING(later,LRUCache)  did not expire at ttl
- 23 s5_cache.js     done     then P  end P   [2480ee9] trial35: done FN-MISSING(else)  
- 24 s5_cache.js     done     then P  end P   [98a95e3] trial35: done s5_cache.js:runs  
- 25 s5_cache.js     done     then P  end P   [b5bffb9] trial35: done s5_cache.js:runs  
- 26 s6_parser.js    done     then P  end P   [74960df] trial35: done FN-MISSING(numbers)  
- 27 s6_parser.js    done     then P  end P   [b12aa79] trial35: done FN-MISSING(precedence)  
+ 20 s4_matrix.js    done     then F  end F   [135b017] trial35: done FN-MISSING(matrix)  a non-number entry did not throw
+ 21 s5_cache.js     done     then P  end P   [d923dd0] trial35: done FN-MISSING(LRUCache,evicted)  
+ 22 s5_cache.js     done     then F  end F   [828b956] trial35: done FN-MISSING(later,LRUCache)  did not expire at ttl
+ 23 s5_cache.js     done     then P  end P   [c8bf386] trial35: done FN-MISSING(else)  
+ 24 s5_cache.js     done     then P  end P   [12c3cbb] trial35: done s5_cache.js:runs  
+ 25 s5_cache.js     done     then P  end P   [6f9d955] trial35: done s5_cache.js:runs  
+ 26 s6_parser.js    done     then P  end P   [aef08c8] trial35: done FN-MISSING(numbers)  
+ 27 s6_parser.js    done     then P  end P   [a17ff0a] trial35: done FN-MISSING(precedence)  
  28 s6_parser.js    stopped  then F  end F   [fc110a0] trial35: stopped s6_parser.js:runs  threw: Invalid expression
- 29 s6_parser.js    done     then P  end P   [21d29e9] trial35: done s6_parser.js:runs  
- 30 s6_parser.js    done     then F  end F   [45b2306] trial35: done FN-MISSING(associative)  threw: Invalid expression
- 31 s7_todo.py      done     then P  end P   [128622b] trial35: done s7_todo.py:runs  
+ 29 s6_parser.js    done     then P  end P   [a690079] trial35: done s6_parser.js:runs  
+ 30 s6_parser.js    done     then F  end F   [7fe7370] trial35: done FN-MISSING(associative)  threw: Invalid expression
+ 31 s7_todo.py      done     then P  end P   [7df975a] trial35: done s7_todo.py:runs  
  32 s7_todo.py      done     then F  end F   [44a0ec9] trial35: done s7_todo.py:runs  done(999) did not raise
- 33 s7_todo.py      done     then P  end P   [4398d0f] trial35: done FN-MISSING(increasing)  
+ 33 s7_todo.py      done     then P  end P   [a377aed] trial35: done FN-MISSING(increasing)  
  34 s7_todo.py      stopped  then F  end F   [462819c] trial35: stopped s7_todo.py:runs  priority order ['a', 'd', 'b', 'c']
  35 s7_todo.py      done     then P  end P   [8955cc6] trial35: done FN-MISSING(today)  
- 36 s8_router.js    done     then P  end P   [12a5389] trial35: done s8_router.js:runs  
- 37 s8_router.js    done     then F  end F   [c7759e0] trial35: done s8_router.js:runs  query 404
- 38 s8_router.js    done     then P  end P   [c66ba52] trial35: done s8_router.js:runs  
- 39 s8_router.js    done     then P  end P   [ab93ee9] trial35: done s8_router.js:runs  
+ 36 s8_router.js    done     then P  end P   [cf78585] trial35: done s8_router.js:runs  
+ 37 s8_router.js    done     then F  end F   [12a5389] trial35: done s8_router.js:runs  query 404
+ 38 s8_router.js    done     then P  end P   [a9d725c] trial35: done s8_router.js:runs  
+ 39 s8_router.js    done     then P  end P   [4ef6c6e] trial35: done s8_router.js:runs  
  40 s8_router.js    done     then P  end P   [final] trial35: done s8_router.js:runs  
 
-coder30b-base: 40 goals run | worked when written 32 | works at the end 32 (as asked 32) | REGRESSED 0 | end-states located by timing (~): 0
+coder30b-base: 40 goals run | worked when written 32 | works at the end 32 (as asked 32) | REGRESSED 0

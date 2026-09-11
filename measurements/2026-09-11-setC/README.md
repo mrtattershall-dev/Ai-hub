@@ -62,7 +62,7 @@ that worked when written still worked after the remaining goals. The base 14B fi
 |---|---|---|
 | **steps that work at the end** (hidden checks, final workspace) | **32** | **7** |
 | ... counting goal 22's 1 ms-late expiry as a pass | 33 | 7 |
-| steps that worked when written (checkpoint state, same checks) | 32 | 9 |
+| steps that worked when written (checkpoint state, same checks) | 32 | 10 |
 | **REGRESSED** (worked when written, broken by a later goal) | **0** | **3** |
 | hub status "done" | 38 | 7 |
 | hub said "done", hidden check fails | 6 | 4 |
@@ -110,9 +110,10 @@ on the same files.
 
 ### Against the pre-registration
 - The regression count uses a stricter method than the README named: each goal's end state is rebuilt
-  from the hub's git checkpoints and run through the same hidden checks (tools/regress-C.mjs, with
-  checkpoints matched to goals by their thought text; 0 of Qwen3-Coder's and 5 of the 14B's end states
-  needed the timing fallback). trial35's own per-goal flag is kept in the ON DISK column of the logs.
+  from the hub's git checkpoints and run through the same hidden checks (tools/regress-C.mjs -> ../replay/regress.mjs). End states come from each run file's own
+  checkpoint steps (../replay/runstates.mjs): no timing, and no borrowing the next goal's first checkpoint when
+  that goal found a clean tree - the first version of the tool did, which could have hidden a regression. The
+  correction left Qwen3-Coder unchanged and moved the 14B's "worked when written" from 9 to 10). trial35's own per-goal flag is kept in the ON DISK column of the logs.
 - Predictions: Qwen3-Coder 30-36 correct with 1-4 regressions (got 32, and 0 regressions). Base 14B
   20-30 (got 7, far below). "More regressions than Qwen3-Coder" held (3 vs 0), but not "concentrated
   in the rule-change steps": its regressions were step-1 and step-3 work broken by later rewrites.

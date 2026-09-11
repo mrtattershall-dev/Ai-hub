@@ -1,0 +1,103 @@
+  1 fail r1_ledger.js   s1  threw: Unknown account a.
+  2 PASS r2_text.py     s1  
+  3 fail r3_tasks.js    s1  duration x did not throw
+  4 PASS r4_geom.js     s1  
+  5 PASS r5_store.py    s1  
+  6 fail r6_days.py     s1  threw: AttributeError: 'datetime.date' object has no attribute 'date'
+  7 PASS r7_grid.py     s1  
+  8 fail r8_money.js    s1  threw: Invalid money format
+  9 PASS r9_app.html    s1  
+ 10 fail r10_report.js  s1  missing r10_report.js
+ 11 fail r1_ledger.js   s2  threw: Unknown account a.
+ 12 fail r2_text.py     s2  threw: AttributeError: module 'r2_text_mod' has no attribute 'sentences'
+ 13 fail r3_tasks.js    s2  threw: g.depend is not a function
+ 14 fail r4_geom.js     s2  threw: M.perimeter is not a function
+ 15 fail r5_store.py    s2  threw: AttributeError: 'Store' object has no attribute 'begin'
+ 16 fail r6_days.py     s2  threw: AttributeError: module 'r6_days_mod' has no attribute 'add_days'
+ 17 fail r7_grid.py     s2  threw: AttributeError: module 'r7_grid_mod' has no attribute 'shortest_path'
+ 18 fail r8_money.js    s2  threw: M.addMoney is not a function
+ 19 fail r9_app.html    s2  a blank item was added
+ 20 fail r10_report.js  s2  missing r10_report.js
+ 21 fail r1_ledger.js   s3  threw: Unknown account a.
+ 22 fail r2_text.py     s3  threw: AttributeError: module 'r2_text_mod' has no attribute 'top_words'
+ 23 fail r3_tasks.js    s3  threw: g.depend is not a function
+ 24 fail r4_geom.js     s3  threw: M.centroid is not a function
+ 25 fail r5_store.py    s3  threw: AttributeError: 'Store' object has no attribute 'begin'
+ 26 fail r6_days.py     s3  threw: AttributeError: module 'r6_days_mod' has no attribute 'is_weekend'
+ 27 fail r7_grid.py     s3  threw: AttributeError: module 'r7_grid_mod' has no attribute 'shortest_path'
+ 28 fail r8_money.js    s3  threw: m is not a function
+ 29 fail r9_app.html    s3  at start null
+ 30 fail r10_report.js  s3  missing r10_report.js
+ 31 fail r1_ledger.js   s4  threw: Unknown account a.
+ 32 fail r2_text.py     s4  threw: AttributeError: module 'r2_text_mod' has no attribute 'bigrams'
+ 33 fail r3_tasks.js    s4  threw: g.depend is not a function
+ 34 fail r4_geom.js     s4  threw: M.boundingBox is not a function
+ 35 fail r5_store.py    s4  threw: TypeError: Store.__init__() got an unexpected keyword argument 'now'
+ 36 fail r6_days.py     s4  threw: AttributeError: module 'r6_days_mod' has no attribute 'add_business_days'
+ 37 fail r7_grid.py     s4  threw: AttributeError: module 'r7_grid_mod' has no attribute 'render'
+ 38 fail r8_money.js    s4  threw: s is not a function
+ 39 fail r9_app.html    s4  a is not done after a click
+ 40 fail r10_report.js  s4  missing r10_report.js
+ 41 fail r1_ledger.js   s5  threw: Unknown account a.
+ 42 fail r2_text.py     s5  threw: AttributeError: module 'r2_text_mod' has no attribute 'avg_sentence_length'
+ 43 fail r3_tasks.js    s5  threw: g.depend is not a function
+ 44 fail r4_geom.js     s5  threw: f is not a function
+ 45 fail r5_store.py    s5  threw: TypeError: Store.__init__() got an unexpected keyword argument 'now'
+ 46 fail r6_days.py     s5  threw: AttributeError: module 'r6_days_mod' has no attribute 'business_days_between'
+ 47 fail r7_grid.py     s5  threw: AttributeError: module 'r7_grid_mod' has no attribute 'parse_costs'
+ 48 fail r8_money.js    s5  threw: a is not a function
+ 49 fail r9_app.html    s5  no .r9-del button in the item
+ 50 fail r10_report.js  s5  missing r10_report.js
+ 51 fail r1_ledger.js   s6  threw: Unknown account a.
+ 52 fail r2_text.py     s6  threw: AttributeError: module 'r2_text_mod' has no attribute 'read_counts'
+ 53 fail r3_tasks.js    s6  threw: g.depend is not a function
+ 54 fail r4_geom.js     s6  threw: M.convexHull is not a function
+ 55 fail r5_store.py    s6  threw: TypeError: Store.__init__() got an unexpected keyword argument 'now'
+ 56 fail r6_days.py     s6  threw: AttributeError: module 'r6_days_mod' has no attribute 'month_end'
+ 57 fail r7_grid.py     s6  threw: AttributeError: module 'r7_grid_mod' has no attribute 'reachable'
+ 58 fail r8_money.js    s6  threw: M.taxMoney is not a function
+ 59 fail r9_app.html    s6  threw: No element found for selector: #r9-active
+ 60 fail r10_report.js  s6  missing r10_report.js
+ 61 fail r1_ledger.js   s7  threw: Unknown account a.
+ 62 fail r2_text.py     s7  CLI printed []
+ 63 fail r3_tasks.js    s7  threw: g.depend is not a function
+ 64 fail r4_geom.js     s7  threw: M.translate is not a function
+ 65 fail r5_store.py    s7  threw: AttributeError: 'Store' object has no attribute 'incr'
+ 66 fail r6_days.py     s7  threw: AttributeError: module 'r6_days_mod' has no attribute 'iso_week'
+ 67 fail r7_grid.py     s7  threw: AttributeError: module 'r7_grid_mod' has no attribute 'count_regions'
+ 68 fail r8_money.js    s7  threw: c is not a function
+ 69 fail r9_app.html    s7  threw: No element found for selector: #r9-clear
+ 70 fail r10_report.js  s7  missing r10_report.js
+ 71 fail r1_ledger.js   s8  threw: Unknown account alice.
+ 72 fail r2_text.py     s8  not JSON: ''
+ 73 fail r3_tasks.js    s8  threw: g.depend is not a function
+ 74 fail r4_geom.js     s8  area of 2 points did not throw
+ 75 fail r5_store.py    s8  threw: TypeError: Store.__init__() got an unexpected keyword argument 'max_keys'
+ 76 fail r6_days.py     s8  threw: AttributeError: module 'r6_days_mod' has no attribute 'weekday_name'
+ 77 fail r7_grid.py     s8  threw: AttributeError: module 'r7_grid_mod' has no attribute 'life_step'
+ 78 fail r8_money.js    s8  format with codes [null,null,null,null,null]
+ 79 fail r9_app.html    s8  after reload []
+ 80 fail r10_report.js  s8  missing r10_report.js
+ 81 fail r1_ledger.js   s9  threw: Unknown account alice.
+ 82 PASS r2_text.py     s9  
+ 83 fail r3_tasks.js    s9  threw: g.depend is not a function
+ 84 fail r4_geom.js     s9  threw: M.isConvex is not a function
+ 85 fail r5_store.py    s9  threw: AttributeError: 'Store' object has no attribute 'stats'
+ 86 fail r6_days.py     s9  threw: AttributeError: module 'r6_days_mod' has no attribute 'next_weekday'
+ 87 fail r7_grid.py     s9  threw: AttributeError: module 'r7_grid_mod' has no attribute 'life_run'
+ 88 fail r8_money.js    s9  threw: M.sumMoney is not a function
+ 89 fail r9_app.html    s9  the empty message is not shown at start
+ 90 fail r10_report.js  s9  missing r10_report.js
+ 91 fail R1_NOTES.md    s10 R1_NOTES.md missing
+ 92 fail r2_text.py     s10 threw: AttributeError: module 'r2_text_mod' has no attribute 'summary'
+ 93 fail r3_tasks.js    s10 threw: g.depend is not a function
+ 94 fail r4_geom.js     s10 threw: M.rotate is not a function
+ 95 fail r5_store.py    s10 threw: TypeError: Store.__init__() got an unexpected keyword argument 'now'
+ 96 fail r6_days.py     s10 threw: AttributeError: module 'r6_days_mod' has no attribute 'add_days'
+ 97 fail r7_grid.py     s10 threw: AttributeError: module 'r7_grid_mod' has no attribute 'to_text'
+ 98 fail r8_money.js    s10 threw: Invalid money format
+ 99 fail r9_app.html    s10 items ["Milk","milk"]
+100 fail R_INDEX.md     s10 R_INDEX.md missing
+
+per chain (implementation correct): r1 0/10  r2 2/10  r3 0/10  r4 1/10  r5 1/10  r6 0/10  r7 1/10  r8 0/10  r9 1/10  r10 0/10
+done as asked 6/100 | implementation correct 6/100 (CT = correct code, own test broke it)

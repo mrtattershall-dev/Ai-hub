@@ -3989,3 +3989,22 @@ tatte, verbatim, this thread: "After c is done running, run one more with d that
     starts no new goal 87 min after its own start. Worst case ~$6.6 + ~$1.8. Same hub code as set C
     (server/ last changed b467392). Identity (Rule 3) pasted below before any number counts. Offline
     fuzzer stays paused for the window; resumes at seed 400912 afterwards.
+    [set D ledger, Session A] DEPLOYED both 07:29 (min 0, max 1, scaledown 120 s). Watchdogs armed 07:29:06 /
+      07:29:10, cap 100 min. Identity (Rule 3), verbatim, before any number:
+      coder14b-setd health try 1 07:31:22: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+      coder30b-setd health try 2 07:32:32: {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+      Harnesses started 07:31:22 / 07:32:32; no new goals after 08:58:22 / 08:59:32.
+    [set D ledger, Session A] coder14b-setd FAILED AS A MEASUREMENT (harness, not model): at goal 9 the 14B ran
+      run_command "open r9_app.html" ("open" is not on any allowlist) and the run parked in awaiting_approval.
+      trial35 treats that as terminal but never answers it, so the parked run held the workspace and goals
+      10-100 all got START FAILED ("a run is already working in this workspace"). Harness exit 07:40:21; the
+      watchdog stopped coder14b-setd through stopApp.mjs 07:41:03 (exit 0, confirmed); independent re-list:
+      stopped, 0 tasks. ~12 min A10G, ~$0.22. coder30b-setd unaffected (20/20 goals done, no parked run).
+      Fix (measurement harness only, set D's trial35 copy): answer approvals as rungoals.mjs does - approve
+      git_commit/git_undo, deny anything else. Proven offline first (mock replay of the 14B's own goal-9
+      replies) before re-running the 14B as coder14b-setd2 under the same set-D instruction.
+      Hub finding for E/F: in an unattended run ONE approval request deadlocks every later goal.
+    [set D ledger, Session A] Harness fix proven offline (tools/preflight-approval.mjs: "open denied true | goal 2
+      started true | recorded replies served 4/4"). Re-running the base 14B as coder14b-setd2 under tatte's set-D
+      instruction above: A10G min 0 max 1 scaledown 120 s, watchdog cap 100 min via stopApp.mjs (Rule 7a), worst
+      case ~$1.8. New label, so the failed attempt's ALL DONE status cannot fire the new watchdog. Identity below.

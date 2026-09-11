@@ -98,6 +98,7 @@ console.log(`workspace ${ws}\n`);
 console.log('   #  status      steps calls err grd  secs  ON DISK');
 
 const rows = [];
+const approvals = [];
 for (let i = 0; i < GOALS.length; i++) {
   const goal = GOALS[i];
   // A timed GPU window: start no new goal after TRIAL_STOP_AT (epoch ms). The app itself is
@@ -116,6 +117,17 @@ for (let i = 0; i < GOALS.length; i++) {
     // Wait for teardown too: the status flips before the syntax rollback finishes, and the hub
     // now refuses the next start with a 409 until `busy` clears. Breaking on status alone would
     // turn every goal after the first into a false "START FAILED" on the next GPU run.
+    // Nobody answers approvals in a measurement. A scratch workspace's own git history is harmless, so commits and
+    // undos are approved; anything else is denied and the model carries on another way (rungoals.mjs's policy).
+    // Without this one parked run held the workspace and every later goal failed to start (set D, 14B, goal 9: 'open').
+    if (run && run.status === 'awaiting_approval' && run.pending) {
+      const ok = ['git_commit', 'git_undo'].includes(run.pending.tool);
+      await api(`/agent/${s.runId}/approve`, { method: 'POST', body: JSON.stringify({ approve: ok }) }).catch(() => null);
+      approvals.push(`${i + 1}:${run.pending.tool}:${ok ? 'approved' : 'denied'}`);
+      console.log(`      approval ${ok ? 'approved' : 'denied'}: ${run.pending.tool} ${JSON.stringify(run.pending.args || {}).slice(0, 60)}`);
+      await new Promise((r) => setTimeout(r, 1500));
+      continue;
+    }
     if (run && ['done', 'error', 'stopped', 'interrupted', 'failed', 'awaiting_approval'].includes(run.status) && run.busy !== true) break;
     await new Promise((r) => setTimeout(r, 3000));
   }
@@ -201,4 +213,5 @@ console.log(`wall clock          : ${(rows.reduce((a, r) => a + r.secs, 0) / 60)
 console.log(`files: ${existsSync(ws) ? readdirSync(ws).filter((f) => f !== '.git').join(', ') : '(none)'}`);
 const rates = (log.join('').match(/= ([0-9.]+) tok\/s/g) || []).map((m) => parseFloat(m.match(/[0-9.]+/)[0]));
 if (rates.length) console.log(`tok/s: min ${Math.min(...rates)} max ${Math.max(...rates)}`);
+console.log(`approvals           : ${approvals.length ? approvals.join(', ') : 'none'}`);
 hub.kill();

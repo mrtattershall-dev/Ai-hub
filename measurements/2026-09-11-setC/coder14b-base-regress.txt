@@ -1,4 +1,4 @@
-  1 s1_bank.js      stopped  then F  end F   [54ac9d4~] trial35: stopped s1_bank.js:runs  threw: Account does not exist
+  1 s1_bank.js      stopped  then F  end F   [54ac9d4] trial35: stopped s1_bank.js:runs  threw: Account does not exist
   2 s1_bank.js      stopped  then F  end F   [ac78489] trial35: stopped FN-MISSING(withdraw,money)  threw: Account does not exist
   3 s1_bank.js      stopped  then F  end F   [a2e3edf] trial35: stopped FN-MISSING(transfer,throws)  threw: Account does not exist
   4 s1_bank.js      stopped  then F  end F   [b1026c2] trial35: stopped FN-MISSING(history)  threw: Account does not exist
@@ -8,35 +8,35 @@
   8 s2_text.py      stopped  then P  end P   [34553ab] trial35: stopped FN-MISSING(word)  
   9 s2_text.py      stopped  then F  end F   [4703f0b] trial35: stopped s2_text.py:runs  read_file_counts gave 3
  10 s2_text.py      stopped  then F  end F   [e843ec4] trial35: stopped s2_text.py:THROWS  CLI printed ["[('test', 3), ('this', 2)]", 'b 3', 'a 2']
- 11 s3_events.js    done     then P  end P   [0115f2d] trial35: done s3_events.js:runs  
- 12 s3_events.js    done     then F  end P   [3b05aed] trial35: done s3_events.js:runs  
+ 11 s3_events.js    done     then P  end P   [c07f905] trial35: done s3_events.js:runs  
+ 12 s3_events.js    done     then P  end P   [0115f2d] trial35: done s3_events.js:runs  
  13 s3_events.js    stopped  then F  end F   [1177d63] trial35: stopped FN-MISSING(once)  threw: bus.once is not a function
- 14 s3_events.js    done     then P  end P   [2bd2378] trial35: done s3_events.js:runs  
- 15 s3_events.js    done     then F  end F   [f094ba4] trial35: done FN-MISSING(event)  threw: bus.once is not a function
+ 14 s3_events.js    done     then P  end P   [2389af8] trial35: done s3_events.js:runs  
+ 15 s3_events.js    done     then F  end F   [2bd2378] trial35: done FN-MISSING(event)  threw: bus.once is not a function
  16 s4_matrix.js    stopped  then F  end F   [847c597] trial35: stopped s4_matrix.js:runs  load: add is not defined
  17 s4_matrix.js    stopped  then F  end F   [d6d5dfc] trial35: stopped FN-MISSING(transpose,identity)  load: add is not defined
- 18 s4_matrix.js    stopped  then F  end F   [5c4bc12~] trial35: stopped s4_matrix.js:runs  load: add is not defined
+ 18 s4_matrix.js    stopped  then F  end F   [5c4bc12] trial35: stopped s4_matrix.js:runs  load: add is not defined
  19 s4_matrix.js    stopped  then F  end F   [5a11dda] trial35: stopped FN-MISSING(identity)  load: add is not defined
  20 s4_matrix.js    stopped  then F  end F   [507893b] trial35: stopped FN-MISSING(matrix)  load: add is not defined
  21 s5_cache.js     stopped  then P  end P   [f3d8fda] trial35: stopped FN-MISSING(LRUCache,evicted)  
  22 s5_cache.js     stopped  then F  end F   [e9969d4] trial35: stopped FN-MISSING(later,LRUCache)  did not expire at ttl
- 23 s5_cache.js     stopped  then F  end F   [bf445ac~] trial35: stopped FN-MISSING(stats,else)  threw: c.stats is not a function
+ 23 s5_cache.js     stopped  then F  end F   [bf445ac] trial35: stopped FN-MISSING(stats,else)  threw: c.stats is not a function
  24 s5_cache.js     stopped  then F  end F   [56e4dc5] trial35: stopped FN-MISSING(delete,clear)  threw: c.delete is not a function
  25 s5_cache.js     stopped  then P  end P   [6ffba48] trial35: stopped s5_cache.js:runs  
  26 s6_parser.js    stopped  then P  end F   <- REGRESSED  [679a499] trial35: stopped FN-MISSING(numbers)  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 
- 27 s6_parser.js    stopped  then F  end F   [40b1e66~] trial35: stopped FN-MISSING(precedence)  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 
+ 27 s6_parser.js    stopped  then F  end F   [40b1e66] trial35: stopped FN-MISSING(precedence)  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 
  28 s6_parser.js    stopped  then F  end F   [f06cde7] trial35: stopped s6_parser.js:runs  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 
  29 s6_parser.js    stopped  then F  end F   [7a52ee3] trial35: stopped s6_parser.js:runs  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 
  30 s6_parser.js    stopped  then F  end F   [68e8b2b] trial35: stopped FN-MISSING(associative)  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 
- 31 s7_todo.py      done     then P  end F   <- REGRESSED  [a312fd3] trial35: done s7_todo.py:runs  threw: AttributeError: 'TodoList' object has no attribute 'todos'
- 32 s7_todo.py      done     then F  end F   [7405435] trial35: done s7_todo.py:runs  threw: AttributeError: 'TodoList' object has no attribute 'todos'
+ 31 s7_todo.py      done     then P  end F   <- REGRESSED  [d400069] trial35: done s7_todo.py:runs  threw: AttributeError: 'TodoList' object has no attribute 'todos'
+ 32 s7_todo.py      done     then F  end F   [a312fd3] trial35: done s7_todo.py:runs  threw: AttributeError: 'TodoList' object has no attribute 'todos'
  33 s7_todo.py      done     then P  end F   <- REGRESSED  [984aefd] trial35: done FN-MISSING(increasing)  threw: AttributeError: 'TodoList' object has no attribute 'todos'
  34 s7_todo.py      stopped  then F  end F   [53cafdd] trial35: stopped s7_todo.py:runs  threw: AttributeError: 'TodoList' object has no attribute 'todos'
  35 s7_todo.py      stopped  then F  end F   [2d34c74] trial35: stopped FN-MISSING(overdue,today)  threw: NameError: name 'datetime' is not defined
  36 s8_router.js    stopped  then F  end F   [8a3e7f8] trial35: stopped s8_router.js:runs  params: 404
  37 s8_router.js    stopped  then F  end F   [d265f3f] trial35: stopped s8_router.js:runs  params with a query broke
  38 s8_router.js    stopped  then F  end F   [d73b3ef] trial35: stopped s8_router.js:runs  wildcard gave 404
- 39 s8_router.js    stopped  then F  end F   [5611b6e~] trial35: stopped FN-MISSING(use)  threw: r.use is not a function
+ 39 s8_router.js    stopped  then F  end F   [5611b6e] trial35: stopped FN-MISSING(use)  threw: r.use is not a function
  40 s8_router.js    stopped  then F  end F   [final] trial35: stopped s8_router.js:runs  threw: Cannot read properties of undefined (reading '/items')
 
-coder14b-base: 40 goals run | worked when written 9 | works at the end 7 (as asked 7) | REGRESSED 3 | end-states located by timing (~): 5
+coder14b-base: 40 goals run | worked when written 10 | works at the end 7 (as asked 7) | REGRESSED 3

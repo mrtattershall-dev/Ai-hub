@@ -67,3 +67,14 @@ regressions. Set D is longer and harder on memory. The next set, E, follows the 
   harder r4 steps (hull, validation), and the two documentation steps. R_INDEX.md is expected to fail
   on invented or missing names, as its indexes did in sets A/B.
 - Base 14B: 15-35/100, 5-15 regressions.
+
+## Harness change before the base 14B's re-run (made before that GPU run, 2026-09-11 07:5x)
+The first 14B attempt (coder14b-setd) failed as a measurement. At goal 9 it ran "open r9_app.html". That needs
+approval, and trial35 never answered approvals, so the parked run held the workspace and goals 10-100 all failed
+to start. Details are in COORD.
+
+set D's trial35 now answers approvals the way rungoals.mjs does, and logs every answer: git_commit and git_undo
+are approved, anything else is denied. It was proven offline first with tools/preflight-approval.mjs: a mock
+model replays the 14B's own goal-9 replies, the "open" is denied, and goal 2 starts. Qwen3-Coder's run was
+already in flight on the unpatched copy and has never parked (0 START FAILED), so for it the change is a no-op.
+The 14B re-runs as coder14b-setd2.

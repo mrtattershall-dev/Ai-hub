@@ -1,0 +1,907 @@
+{
+  "ws": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\measurements\\2026-09-11-setD\\data\\coder14b-setd\\workspace",
+  "asIs": 6,
+  "impl": 6,
+  "results": [
+    {
+      "goal": 1,
+      "chain": 1,
+      "step": 1,
+      "file": "r1_ledger.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown account a."
+    },
+    {
+      "goal": 2,
+      "chain": 2,
+      "step": 1,
+      "file": "r2_text.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 3,
+      "chain": 3,
+      "step": 1,
+      "file": "r3_tasks.js",
+      "asIs": false,
+      "impl": false,
+      "why": "duration x did not throw"
+    },
+    {
+      "goal": 4,
+      "chain": 4,
+      "step": 1,
+      "file": "r4_geom.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 5,
+      "chain": 5,
+      "step": 1,
+      "file": "r5_store.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 6,
+      "chain": 6,
+      "step": 1,
+      "file": "r6_days.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'datetime.date' object has no attribute 'date'"
+    },
+    {
+      "goal": 7,
+      "chain": 7,
+      "step": 1,
+      "file": "r7_grid.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 8,
+      "chain": 8,
+      "step": 1,
+      "file": "r8_money.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid money format"
+    },
+    {
+      "goal": 9,
+      "chain": 9,
+      "step": 1,
+      "file": "r9_app.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 10,
+      "chain": 10,
+      "step": 1,
+      "file": "r10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "missing r10_report.js"
+    },
+    {
+      "goal": 11,
+      "chain": 1,
+      "step": 2,
+      "file": "r1_ledger.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown account a."
+    },
+    {
+      "goal": 12,
+      "chain": 2,
+      "step": 2,
+      "file": "r2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r2_text_mod' has no attribute 'sentences'"
+    },
+    {
+      "goal": 13,
+      "chain": 3,
+      "step": 2,
+      "file": "r3_tasks.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: g.depend is not a function"
+    },
+    {
+      "goal": 14,
+      "chain": 4,
+      "step": 2,
+      "file": "r4_geom.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: M.perimeter is not a function"
+    },
+    {
+      "goal": 15,
+      "chain": 5,
+      "step": 2,
+      "file": "r5_store.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Store' object has no attribute 'begin'"
+    },
+    {
+      "goal": 16,
+      "chain": 6,
+      "step": 2,
+      "file": "r6_days.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r6_days_mod' has no attribute 'add_days'"
+    },
+    {
+      "goal": 17,
+      "chain": 7,
+      "step": 2,
+      "file": "r7_grid.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r7_grid_mod' has no attribute 'shortest_path'"
+    },
+    {
+      "goal": 18,
+      "chain": 8,
+      "step": 2,
+      "file": "r8_money.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: M.addMoney is not a function"
+    },
+    {
+      "goal": 19,
+      "chain": 9,
+      "step": 2,
+      "file": "r9_app.html",
+      "asIs": false,
+      "impl": false,
+      "why": "a blank item was added"
+    },
+    {
+      "goal": 20,
+      "chain": 10,
+      "step": 2,
+      "file": "r10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "missing r10_report.js"
+    },
+    {
+      "goal": 21,
+      "chain": 1,
+      "step": 3,
+      "file": "r1_ledger.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown account a."
+    },
+    {
+      "goal": 22,
+      "chain": 2,
+      "step": 3,
+      "file": "r2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r2_text_mod' has no attribute 'top_words'"
+    },
+    {
+      "goal": 23,
+      "chain": 3,
+      "step": 3,
+      "file": "r3_tasks.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: g.depend is not a function"
+    },
+    {
+      "goal": 24,
+      "chain": 4,
+      "step": 3,
+      "file": "r4_geom.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: M.centroid is not a function"
+    },
+    {
+      "goal": 25,
+      "chain": 5,
+      "step": 3,
+      "file": "r5_store.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Store' object has no attribute 'begin'"
+    },
+    {
+      "goal": 26,
+      "chain": 6,
+      "step": 3,
+      "file": "r6_days.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r6_days_mod' has no attribute 'is_weekend'"
+    },
+    {
+      "goal": 27,
+      "chain": 7,
+      "step": 3,
+      "file": "r7_grid.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r7_grid_mod' has no attribute 'shortest_path'"
+    },
+    {
+      "goal": 28,
+      "chain": 8,
+      "step": 3,
+      "file": "r8_money.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: m is not a function"
+    },
+    {
+      "goal": 29,
+      "chain": 9,
+      "step": 3,
+      "file": "r9_app.html",
+      "asIs": false,
+      "impl": false,
+      "why": "at start null"
+    },
+    {
+      "goal": 30,
+      "chain": 10,
+      "step": 3,
+      "file": "r10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "missing r10_report.js"
+    },
+    {
+      "goal": 31,
+      "chain": 1,
+      "step": 4,
+      "file": "r1_ledger.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown account a."
+    },
+    {
+      "goal": 32,
+      "chain": 2,
+      "step": 4,
+      "file": "r2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r2_text_mod' has no attribute 'bigrams'"
+    },
+    {
+      "goal": 33,
+      "chain": 3,
+      "step": 4,
+      "file": "r3_tasks.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: g.depend is not a function"
+    },
+    {
+      "goal": 34,
+      "chain": 4,
+      "step": 4,
+      "file": "r4_geom.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: M.boundingBox is not a function"
+    },
+    {
+      "goal": 35,
+      "chain": 5,
+      "step": 4,
+      "file": "r5_store.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Store.__init__() got an unexpected keyword argument 'now'"
+    },
+    {
+      "goal": 36,
+      "chain": 6,
+      "step": 4,
+      "file": "r6_days.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r6_days_mod' has no attribute 'add_business_days'"
+    },
+    {
+      "goal": 37,
+      "chain": 7,
+      "step": 4,
+      "file": "r7_grid.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r7_grid_mod' has no attribute 'render'"
+    },
+    {
+      "goal": 38,
+      "chain": 8,
+      "step": 4,
+      "file": "r8_money.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: s is not a function"
+    },
+    {
+      "goal": 39,
+      "chain": 9,
+      "step": 4,
+      "file": "r9_app.html",
+      "asIs": false,
+      "impl": false,
+      "why": "a is not done after a click"
+    },
+    {
+      "goal": 40,
+      "chain": 10,
+      "step": 4,
+      "file": "r10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "missing r10_report.js"
+    },
+    {
+      "goal": 41,
+      "chain": 1,
+      "step": 5,
+      "file": "r1_ledger.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown account a."
+    },
+    {
+      "goal": 42,
+      "chain": 2,
+      "step": 5,
+      "file": "r2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r2_text_mod' has no attribute 'avg_sentence_length'"
+    },
+    {
+      "goal": 43,
+      "chain": 3,
+      "step": 5,
+      "file": "r3_tasks.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: g.depend is not a function"
+    },
+    {
+      "goal": 44,
+      "chain": 4,
+      "step": 5,
+      "file": "r4_geom.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: f is not a function"
+    },
+    {
+      "goal": 45,
+      "chain": 5,
+      "step": 5,
+      "file": "r5_store.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Store.__init__() got an unexpected keyword argument 'now'"
+    },
+    {
+      "goal": 46,
+      "chain": 6,
+      "step": 5,
+      "file": "r6_days.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r6_days_mod' has no attribute 'business_days_between'"
+    },
+    {
+      "goal": 47,
+      "chain": 7,
+      "step": 5,
+      "file": "r7_grid.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r7_grid_mod' has no attribute 'parse_costs'"
+    },
+    {
+      "goal": 48,
+      "chain": 8,
+      "step": 5,
+      "file": "r8_money.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: a is not a function"
+    },
+    {
+      "goal": 49,
+      "chain": 9,
+      "step": 5,
+      "file": "r9_app.html",
+      "asIs": false,
+      "impl": false,
+      "why": "no .r9-del button in the item"
+    },
+    {
+      "goal": 50,
+      "chain": 10,
+      "step": 5,
+      "file": "r10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "missing r10_report.js"
+    },
+    {
+      "goal": 51,
+      "chain": 1,
+      "step": 6,
+      "file": "r1_ledger.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown account a."
+    },
+    {
+      "goal": 52,
+      "chain": 2,
+      "step": 6,
+      "file": "r2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r2_text_mod' has no attribute 'read_counts'"
+    },
+    {
+      "goal": 53,
+      "chain": 3,
+      "step": 6,
+      "file": "r3_tasks.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: g.depend is not a function"
+    },
+    {
+      "goal": 54,
+      "chain": 4,
+      "step": 6,
+      "file": "r4_geom.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: M.convexHull is not a function"
+    },
+    {
+      "goal": 55,
+      "chain": 5,
+      "step": 6,
+      "file": "r5_store.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Store.__init__() got an unexpected keyword argument 'now'"
+    },
+    {
+      "goal": 56,
+      "chain": 6,
+      "step": 6,
+      "file": "r6_days.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r6_days_mod' has no attribute 'month_end'"
+    },
+    {
+      "goal": 57,
+      "chain": 7,
+      "step": 6,
+      "file": "r7_grid.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r7_grid_mod' has no attribute 'reachable'"
+    },
+    {
+      "goal": 58,
+      "chain": 8,
+      "step": 6,
+      "file": "r8_money.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: M.taxMoney is not a function"
+    },
+    {
+      "goal": 59,
+      "chain": 9,
+      "step": 6,
+      "file": "r9_app.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: No element found for selector: #r9-active"
+    },
+    {
+      "goal": 60,
+      "chain": 10,
+      "step": 6,
+      "file": "r10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "missing r10_report.js"
+    },
+    {
+      "goal": 61,
+      "chain": 1,
+      "step": 7,
+      "file": "r1_ledger.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown account a."
+    },
+    {
+      "goal": 62,
+      "chain": 2,
+      "step": 7,
+      "file": "r2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI printed []"
+    },
+    {
+      "goal": 63,
+      "chain": 3,
+      "step": 7,
+      "file": "r3_tasks.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: g.depend is not a function"
+    },
+    {
+      "goal": 64,
+      "chain": 4,
+      "step": 7,
+      "file": "r4_geom.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: M.translate is not a function"
+    },
+    {
+      "goal": 65,
+      "chain": 5,
+      "step": 7,
+      "file": "r5_store.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Store' object has no attribute 'incr'"
+    },
+    {
+      "goal": 66,
+      "chain": 6,
+      "step": 7,
+      "file": "r6_days.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r6_days_mod' has no attribute 'iso_week'"
+    },
+    {
+      "goal": 67,
+      "chain": 7,
+      "step": 7,
+      "file": "r7_grid.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r7_grid_mod' has no attribute 'count_regions'"
+    },
+    {
+      "goal": 68,
+      "chain": 8,
+      "step": 7,
+      "file": "r8_money.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c is not a function"
+    },
+    {
+      "goal": 69,
+      "chain": 9,
+      "step": 7,
+      "file": "r9_app.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: No element found for selector: #r9-clear"
+    },
+    {
+      "goal": 70,
+      "chain": 10,
+      "step": 7,
+      "file": "r10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "missing r10_report.js"
+    },
+    {
+      "goal": 71,
+      "chain": 1,
+      "step": 8,
+      "file": "r1_ledger.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown account alice."
+    },
+    {
+      "goal": 72,
+      "chain": 2,
+      "step": 8,
+      "file": "r2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "not JSON: ''"
+    },
+    {
+      "goal": 73,
+      "chain": 3,
+      "step": 8,
+      "file": "r3_tasks.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: g.depend is not a function"
+    },
+    {
+      "goal": 74,
+      "chain": 4,
+      "step": 8,
+      "file": "r4_geom.js",
+      "asIs": false,
+      "impl": false,
+      "why": "area of 2 points did not throw"
+    },
+    {
+      "goal": 75,
+      "chain": 5,
+      "step": 8,
+      "file": "r5_store.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Store.__init__() got an unexpected keyword argument 'max_keys'"
+    },
+    {
+      "goal": 76,
+      "chain": 6,
+      "step": 8,
+      "file": "r6_days.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r6_days_mod' has no attribute 'weekday_name'"
+    },
+    {
+      "goal": 77,
+      "chain": 7,
+      "step": 8,
+      "file": "r7_grid.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r7_grid_mod' has no attribute 'life_step'"
+    },
+    {
+      "goal": 78,
+      "chain": 8,
+      "step": 8,
+      "file": "r8_money.js",
+      "asIs": false,
+      "impl": false,
+      "why": "format with codes [null,null,null,null,null]"
+    },
+    {
+      "goal": 79,
+      "chain": 9,
+      "step": 8,
+      "file": "r9_app.html",
+      "asIs": false,
+      "impl": false,
+      "why": "after reload []"
+    },
+    {
+      "goal": 80,
+      "chain": 10,
+      "step": 8,
+      "file": "r10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "missing r10_report.js"
+    },
+    {
+      "goal": 81,
+      "chain": 1,
+      "step": 9,
+      "file": "r1_ledger.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown account alice."
+    },
+    {
+      "goal": 82,
+      "chain": 2,
+      "step": 9,
+      "file": "r2_text.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 83,
+      "chain": 3,
+      "step": 9,
+      "file": "r3_tasks.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: g.depend is not a function"
+    },
+    {
+      "goal": 84,
+      "chain": 4,
+      "step": 9,
+      "file": "r4_geom.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: M.isConvex is not a function"
+    },
+    {
+      "goal": 85,
+      "chain": 5,
+      "step": 9,
+      "file": "r5_store.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Store' object has no attribute 'stats'"
+    },
+    {
+      "goal": 86,
+      "chain": 6,
+      "step": 9,
+      "file": "r6_days.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r6_days_mod' has no attribute 'next_weekday'"
+    },
+    {
+      "goal": 87,
+      "chain": 7,
+      "step": 9,
+      "file": "r7_grid.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r7_grid_mod' has no attribute 'life_run'"
+    },
+    {
+      "goal": 88,
+      "chain": 8,
+      "step": 9,
+      "file": "r8_money.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: M.sumMoney is not a function"
+    },
+    {
+      "goal": 89,
+      "chain": 9,
+      "step": 9,
+      "file": "r9_app.html",
+      "asIs": false,
+      "impl": false,
+      "why": "the empty message is not shown at start"
+    },
+    {
+      "goal": 90,
+      "chain": 10,
+      "step": 9,
+      "file": "r10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "missing r10_report.js"
+    },
+    {
+      "goal": 91,
+      "chain": 1,
+      "step": 10,
+      "file": "R1_NOTES.md",
+      "asIs": false,
+      "impl": false,
+      "why": "R1_NOTES.md missing"
+    },
+    {
+      "goal": 92,
+      "chain": 2,
+      "step": 10,
+      "file": "r2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r2_text_mod' has no attribute 'summary'"
+    },
+    {
+      "goal": 93,
+      "chain": 3,
+      "step": 10,
+      "file": "r3_tasks.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: g.depend is not a function"
+    },
+    {
+      "goal": 94,
+      "chain": 4,
+      "step": 10,
+      "file": "r4_geom.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: M.rotate is not a function"
+    },
+    {
+      "goal": 95,
+      "chain": 5,
+      "step": 10,
+      "file": "r5_store.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Store.__init__() got an unexpected keyword argument 'now'"
+    },
+    {
+      "goal": 96,
+      "chain": 6,
+      "step": 10,
+      "file": "r6_days.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r6_days_mod' has no attribute 'add_days'"
+    },
+    {
+      "goal": 97,
+      "chain": 7,
+      "step": 10,
+      "file": "r7_grid.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'r7_grid_mod' has no attribute 'to_text'"
+    },
+    {
+      "goal": 98,
+      "chain": 8,
+      "step": 10,
+      "file": "r8_money.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid money format"
+    },
+    {
+      "goal": 99,
+      "chain": 9,
+      "step": 10,
+      "file": "r9_app.html",
+      "asIs": false,
+      "impl": false,
+      "why": "items [\"Milk\",\"milk\"]"
+    },
+    {
+      "goal": 100,
+      "chain": 10,
+      "step": 10,
+      "file": "R_INDEX.md",
+      "asIs": false,
+      "impl": false,
+      "why": "R_INDEX.md missing"
+    }
+  ]
+}
