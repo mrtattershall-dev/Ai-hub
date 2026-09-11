@@ -31,7 +31,7 @@ import * as workQueue from './queue.js';
 import * as assetLib from './assets.js';
 import { canonicalSummary } from './canonicalAssets.mjs';
 import { SYSTEM_PROMPT } from './agentPrompt.js';
-import { parseAction, parseActions } from './agentParse.js';
+import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 
@@ -2525,8 +2525,16 @@ async function drive(loadDb, run) {
           pushStep(run, { type: 'error', text: `Gave up: ${run.parseLog.filter((ok) => !ok).length} of the last ${run.parseLog.length} responses could not be parsed.` });
           break;
         }
-        pushStep(run, { type: 'error', text: 'Could not parse an action; asking the model to retry.' });
-        run.history.push({ role: 'user', content: 'Your last response did not contain a valid ACTION. Reply using the exact plain-text format: a THOUGHT line, an ACTION line, then its fields (file content in a single fenced code block, written normally).' });
+        // A reply cut off inside its code block (replyWasTruncated) needs a different answer
+        // from "that was not an ACTION": the action WAS fine - the file was too long to arrive
+        // in one reply, and asking for the same thing again just reproduces it.
+        const cutOff = replyWasTruncated(raw);
+        pushStep(run, { type: 'error', text: cutOff
+          ? 'The reply was cut off inside its code block - nothing was written; asking for the file in smaller pieces.'
+          : 'Could not parse an action; asking the model to retry.' });
+        run.history.push({ role: 'user', content: cutOff
+          ? 'Your last response was CUT OFF before its code block closed, so the file never arrived and NOTHING was written. It was too long for one reply. Send it in smaller pieces: first write_file with the core code in a complete, closed code block (no long lists of asserts), then add the rest with append_file in later steps.'
+          : 'Your last response did not contain a valid ACTION. Reply using the exact plain-text format: a THOUGHT line, an ACTION line, then its fields (file content in a single fenced code block, written normally).' });
         continue;
       }
       // A WINDOW, not a streak. A plain counter reset to zero on every success, so a
