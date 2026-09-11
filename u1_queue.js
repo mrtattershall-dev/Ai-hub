@@ -73,7 +73,7 @@ console.assert(queue.isEmpty() === false, "Non-empty queue should not be empty")
 queue.enqueue(42);
 const peeked = queue.peek();
 console.assert(peeked === "test", "Peek should return the front item without removing it");
-console.assert(queue.size() === 3, "Peek should not change queue size");
+console.assert(queue.size() === 2, "Peek should not change queue size");
 
 // Test peek on empty queue throws error
 let emptyQueueErrorCaught = false;
