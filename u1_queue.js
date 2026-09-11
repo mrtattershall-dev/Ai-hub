@@ -76,15 +76,15 @@ console.assert(peeked === "test", "Peek should return the front item without rem
 console.assert(queue.size() === 3, "Peek should not change queue size");
 
 // Test peek on empty queue throws error
-let errorCaught = false;
+let emptyQueueErrorCaught = false;
 try {
   const emptyQueue = new Queue();
   emptyQueue.peek();
 } catch (e) {
-  errorCaught = true;
+  emptyQueueErrorCaught = true;
   console.assert(e.message === "Cannot peek at an empty queue", "Should throw correct error message for peek on empty queue");
 }
-console.assert(errorCaught, "Should throw error when peeking at empty queue");
+console.assert(emptyQueueErrorCaught, "Should throw error when peeking at empty queue");
 
 // Export the Queue class
 module.exports = Queue;
