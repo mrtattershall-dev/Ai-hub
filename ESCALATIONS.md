@@ -13,3 +13,9 @@ Runs that stopped and need a person. Newest at the bottom.
 - goal: Create t7_router.js exporting match(pattern, path) where pattern segments starting with ':' capture values, so match('/u/:id', '/u/7') returns { id: '7' } and a non-match returns null. Include asserts that all pass, then run it with node.
 - what happened: Run paused at step 2 — the model is unreachable. Check Ollama is running, or re-point the tunnel in Settings, then Resume. (Model stream failed before any content: Premature close)
 - what to do: The model endpoint was unreachable. Re-point the Ollama tunnel, then Resume.
+
+## 2026-09-11 11:08:47 — loop
+- run: `0fa63d9f-45cb-46ba-8923-22c4ea0a378a`  (status: stopped)
+- goal: Create t10_debounce.js exporting debounce(fn, ms), plus a test that uses real timers to prove only the last call in a burst runs. Run it with node.
+- what happened: Stopped: the model produced the same response 3 times in the last 4 steps without making progress.
+- what to do: The model repeated itself. It usually needs a clearer goal or a stronger model.
