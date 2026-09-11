@@ -68,6 +68,7 @@ async function replay(s) {
   const api = async (p, o) => (await fetch(API + p, { headers: { 'Content-Type': 'application/json' }, ...o, signal: AbortSignal.timeout(60000) })).json();
   let up = false; for (let i = 0; i < 240 && !up; i++) { try { await fetch(API + '/auth/hint'); up = true; } catch { await sleep(250); } }
   let run = null, error = null;
+  const approvals = [];
   try {
     if (!up) throw new Error('hub never came up: ' + hubLog.join('').slice(-300));
     const st = await api('/agent/start', { method: 'POST', body: JSON.stringify({ goal: s.goal }) });
@@ -75,6 +76,17 @@ async function replay(s) {
     const deadline = Date.now() + 8 * 60000;
     while (Date.now() < deadline) {
       run = await api('/agent/' + st.runId).catch(() => null);
+      // Answer approvals the way the recording's harness did (trial35 / trialE): git_commit and git_undo approved,
+      // everything else denied. Unanswered, a replay parks where the original run carried on - set E, Qwen3-Coder
+      // goal 54 had a git_undo approved and the first replay of it stopped there at 22 of 31 replies.
+      // --approvals none turns this off.
+      if (run && run.status === 'awaiting_approval' && run.pending && (opt('approvals') || 'harness') === 'harness') {
+        const ok = ['git_commit', 'git_undo'].includes(run.pending.tool);
+        await api(`/agent/${st.runId}/approve`, { method: 'POST', body: JSON.stringify({ approve: ok }) }).catch(() => null);
+        approvals.push(`${run.pending.tool}:${ok ? 'approved' : 'denied'}`);
+        await sleep(1000);
+        continue;
+      }
       if (run && ['done', 'error', 'stopped', 'interrupted', 'failed', 'awaiting_approval'].includes(run.status) && run.busy !== true) break;
       await sleep(1000);
     }
@@ -89,6 +101,7 @@ async function replay(s) {
   const res = {
     rollbackNotes: steps.filter((x) => x.type === 'note' && /did not parse at the end of the run/.test(String(x.text || ''))).map((x) => String(x.text).slice(0, 400)),
     carriedTasks: carried,
+    approvals,
     id: s.id, error, status: run && run.status, finishBlocks: run && (run.finishBlocks || 0), forcedFinish: run ? !!run.forcedFinish : null,
     served, recorded: s.replies.length, exhausted, modelCalls: run && run.modelCalls,
     original: { status: s.outcome.status, finishBlocks: s.outcome.finishBlocks },
@@ -100,6 +113,8 @@ async function replay(s) {
     defLossNamed: [...new Set(asked.flatMap((a) => [...a.matchAll(/had before: ([^.]+)\./g)].map((m) => m[1])))],
     // The set-E fixes (f-fixes): what each one told the model during the replay.
     noChangeEdits: asked.filter((a) => /NO CHANGE: your REPLACE/.test(a)).length,
+    exportLossWarnings: asked.filter((a) => /REMOVED what \S+ exported:/.test(a)).length,
+    exportLossNamed: [...new Set(asked.flatMap((a) => [...a.matchAll(/REMOVED what (\S+) exported: ([^.]+)\./g)].map((m) => `${m[1]}: ${m[2]}`)))],
     shadowHints: asked.filter((a) => /HIDES the method/.test(a)).length,
     ledgerHidden: asked.filter((a) => /left over from earlier goals about other work are not shown/.test(a)).length,
     staleShown: asked.filter((a) => /left over from earlier work — only do this if the goal needs it/.test(a)).length,
