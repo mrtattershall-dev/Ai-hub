@@ -92,9 +92,21 @@ tagged `model=coder14b` plus a pass-specific `source`, were appended to
 
 ## Reproduce
 
+The tools that produced this data are kept in `tools/`:
+
+- `trial35.mjs` is the harness. It spawns an isolated hub, runs goals sequentially, waits for
+  `busy:false`, and scores what is on disk. **One change since this run:** the function-existence
+  check (`FN-MISSING`) was added afterwards, so the numbers in `run.log`/`run2.log` were scored
+  without it.
+- `buildcorpus14b.mjs` turns one run folder into tagged corpus rows, deduped against an
+  existing corpus.
+- `collect14b.sh` is what ran after the window: copy both passes, build and append the rows
+  (guarding the corpus's missing trailing newline), then rerun the corpus tests.
+
 ```bash
 TRIAL_STOP_AT=<epoch ms> GOALS_FILE=measurements/2026-09-10-14b-30min/goals.json \
-MODEL_BASE=<endpoint> MODEL_NAME=coder14b LABEL=coder14b-base node trial35.mjs
+MODEL_BASE=<endpoint> MODEL_NAME=coder14b LABEL=coder14b-base \
+node measurements/2026-09-10-14b-30min/tools/trial35.mjs
 ```
-(`trial35.mjs` lives in the session scratchpad; it spawns an isolated hub, runs goals
-sequentially, waits for `busy:false`, and scores what is on disk.)
+
+Stop the endpoint afterwards **only** with `node training-data/factory/stopApp.mjs <app>` (COORD Rule 7a).
