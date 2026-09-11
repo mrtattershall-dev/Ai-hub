@@ -94,7 +94,7 @@ while (Date.now() < end && !hubDied) {
       await api('/agent/queue', { method: 'POST', body: JSON.stringify({ goal: `soak goal ${++queued}: write counter${queued}.js and verify it` }) });
     }
     const list = await api('/agent/list');
-    const live = (Array.isArray(list) ? list : []).filter((r) => ['running', 'awaiting_approval'].includes(r.status));
+    const live = (Array.isArray(list) ? list : []).filter((r) => ['running', 'awaiting_approval'].includes(r.status) || r.busy);   // busy = still tearing down; /start would 409
     if (live.length === 0) {
       const goal = `soak prime ${++primes}: write primed${primes}.js and verify it`;
       const r = await api('/agent/start', { method: 'POST', body: JSON.stringify({ goal }) });

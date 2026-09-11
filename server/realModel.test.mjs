@@ -140,7 +140,7 @@ await test('AGENT: a non-game goal completes, with a SHORT plan', async () => {
   let run = null;
   while (Date.now() < deadline) {
     run = await (await fetch(API + '/agent/' + started.runId)).json();
-    if (['done', 'error', 'stopped', 'interrupted', 'awaiting_approval'].includes(run.status)) break;
+    if (['done', 'error', 'stopped', 'interrupted', 'awaiting_approval'].includes(run.status) && !run.busy) break;   // teardown too
     await new Promise((r) => setTimeout(r, 2000));
   }
   const steps = (run.steps || []).length;

@@ -140,7 +140,8 @@ async function live(goal) {
       console.log(`  ${String(steps.indexOf(s) + 1).padStart(3)}  ${(s.type || '').padEnd(18)} ${(s.tool || '').padEnd(14)} ${(s.text || s.summary || '').slice(0, 60).replace(/\n/g, ' ')}`);
     }
     last = steps.length;
-    if (['done', 'error', 'stopped', 'interrupted', 'awaiting_approval'].includes(run.status)) return run;
+    // busy: the hub answers the NEXT /start with a 409 until this run's teardown finishes.
+    if (['done', 'error', 'stopped', 'interrupted', 'awaiting_approval'].includes(run.status) && !run.busy) return run;
   }
 }
 

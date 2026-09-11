@@ -37,10 +37,16 @@ log(`fuzzForever: batches of ${BATCH} from seed ${seed}, alternating 4 and 6 goa
 for (;;) {
   batchNo += 1;
   const per = batchNo % 2 ? 4 : 6;
+  // Every third batch serves ONLY the hostile corpus (fuzzCorpus.mjs: multi-action replies,
+  // package.json-first writes, leaked line numbers, no THOUGHT). Default mode went seven
+  // batches in a row without a non-ESM violation once the append fix landed; a quiet fuzzer
+  // is only worth something if it is still looking where the bugs are. Hostile implies
+  // --settle, so these batches run slower.
+  const mode = batchNo % 3 === 0 ? ['--mode=hostile'] : [];
   const out = join(tmpdir(), `fuzzforever-${seed}.jsonl`);
   try { rmSync(out, { force: true }); } catch { /* fresh file each batch - results append */ }
   const t0 = Date.now();
-  const r = spawnSync(process.execPath, [join(HERE, 'fuzzLoop.mjs'), String(BATCH), String(per), String(seed)], {
+  const r = spawnSync(process.execPath, [join(HERE, 'fuzzLoop.mjs'), String(BATCH), String(per), String(seed), ...mode], {
     env: { ...process.env, FUZZ_OUT: out }, stdio: 'ignore', timeout: 45 * 60 * 1000, windowsHide: true,
   });
 
@@ -64,14 +70,14 @@ for (;;) {
   }
   totalRuns += rows.length;
   totalClean += clean.length;
-  log(`BATCH ${batchNo} seeds ${seed}-${seed + BATCH - 1} (${per} goals): ${clean.length}/${rows.length} clean ignoring ESM | kinds ${JSON.stringify(kinds)} | esm ${esm} | ${((Date.now() - t0) / 60000).toFixed(1)} min | total ${totalClean}/${totalRuns}`);
+  log(`BATCH ${batchNo} seeds ${seed}-${seed + BATCH - 1} (${per} goals${mode.length ? ', HOSTILE' : ''}): ${clean.length}/${rows.length} clean ignoring ESM | kinds ${JSON.stringify(kinds)} | esm ${esm} | ${((Date.now() - t0) / 60000).toFixed(1)} min | total ${totalClean}/${totalRuns}`);
 
   for (const row of rows) {
     for (const v of real(row)) {
       const k = v.split(':')[0];
       if (seen.has(k)) continue;
       seen.add(k);
-      log(`NEW KIND ${k} at seed ${row.seed} (${per} goals): ${v.slice(0, 200)}  -> reproduce: node server/fuzzLoop.mjs 1 ${per} ${row.seed}`);
+      log(`NEW KIND ${k} at seed ${row.seed} (${per} goals): ${v.slice(0, 200)}  -> reproduce: node server/fuzzLoop.mjs 1 ${per} ${row.seed}${mode.length ? ' ' + mode.join(' ') : ''}`);
     }
   }
 

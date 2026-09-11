@@ -2782,7 +2782,13 @@ async function drive(loadDb, run) {
       try { result = await tools[tool](args); }
       catch (e) { result = `ERROR: ${e.message}`; }
       let syntaxNote = '';
-      if (tool === 'write_file' || tool === 'edit_file') {
+      // append_file is an edit too, and needs the same checks. It used to skip this whole
+      // block, so an append that broke an existing file was never flagged to the model, an
+      // append to a script index.html loads let the run finish with no browser test, and a
+      // batch did not stop after one. A REFUSED append (a fragment for a file that does not
+      // exist) wrote nothing, so it gets no verdict about a file that is not there.
+      const appended = tool === 'append_file' && !/^ERROR/.test(String(result ?? ''));
+      if (tool === 'write_file' || tool === 'edit_file' || appended) {
         run.needsTest = true; if (args.path) run.lastPath = args.path; // edited → needs a fresh test
         // Did this run touch WEB content specifically?
         //
