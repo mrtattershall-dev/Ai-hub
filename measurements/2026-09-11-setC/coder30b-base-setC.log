@@ -1,0 +1,60 @@
+coder30b-base set C start 06:36:55
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+
+40 goals, sequential: coder30b-base-setC
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-LkRNz8\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  done          24    12   0   0    36  s1_bank.js:runs
+   2  done          14     8   0   0    18  s1_bank.js:runs FN-MISSING(money)
+   3  done          21    14   0   0    30  s1_bank.js:runs FN-MISSING(throws)
+   4  done          25    15   0   0    36  s1_bank.js:runs
+   5  done          10     8   0   0    15  S1_NOTES.md:ok s1_bank.js:runs
+   6  done          13     8   1   0    27  s2_text.py:runs FN-MISSING(punctuation)
+   7  done          13     8   0   0    15  s2_text.py:runs FN-MISSING(as)
+   8  done          16    10   0   0    21  s2_text.py:runs FN-MISSING(word)
+   9  done          12     7   0   0    15  s2_text.py:runs
+  10  done          16     9   0   0    21  s2_text.py:THROWS
+  11  done          19    11   0   0    33  s3_events.js:runs
+  12  done          16    11   0   0    24  s3_events.js:runs
+  13  done          16    11   0   0    27  s3_events.js:runs
+  14  done          23    15   0   0    27  s3_events.js:runs
+  15  done          24    16   0   0    30  s3_events.js:runs FN-MISSING(event)
+  16  done          34    20   1   0   105  s4_matrix.js:runs
+  17  done          23    15   0   0    36  s4_matrix.js:runs
+  18  done          22    14   0   0    33  s4_matrix.js:runs
+  19  done          42    29   0   0    60  s4_matrix.js:runs
+  20  done          35    24   2   0   142  s4_matrix.js:runs FN-MISSING(matrix)
+  21  done          12     7   1   0    21  s5_cache.js:runs FN-MISSING(LRUCache,evicted)
+  22  done          16    11   0   0    27  s5_cache.js:runs FN-MISSING(later,LRUCache)
+  23  done          17    11   0   0    36  s5_cache.js:runs FN-MISSING(else)
+  24  done          16    11   0   0    27  s5_cache.js:runs
+  25  done          17    11   0   0    30  s5_cache.js:runs
+  26  done          14     8   0   0    21  s6_parser.js:runs FN-MISSING(numbers)
+  27  done          15     9   0   0    27  s6_parser.js:runs FN-MISSING(precedence)
+  28  stopped       47    30   0   0   102  s6_parser.js:runs
+  29  done          33    22   0   0    75  s6_parser.js:runs
+  30  done          45    30   0   0    78  s6_parser.js:runs FN-MISSING(associative)
+  31  done          13     7   0   0    21  s7_todo.py:runs
+  32  done          14     8   0   0    24  s7_todo.py:runs
+  33  done          18    11   0   0    30  s7_todo.py:runs FN-MISSING(increasing)
+  34  stopped       52    30   0   0    72  s7_todo.py:runs
+  35  done          26    15   0   0    51  s7_todo.py:runs FN-MISSING(today)
+  36  done          26    13   1   0    45  s8_router.js:runs
+  37  done          15    10   0   0    33  s8_router.js:runs
+  38  done          29    17   0   0    51  s8_router.js:runs
+  39  done          38    26   1   0    87  s8_router.js:runs
+  40  done          24    16   0   0    45  s8_router.js:runs
+
+--- summary ---
+goals run           : 40
+status 'done'       : 38/40
+WORK ACTUALLY DONE  : 24/40   <- the number that matters
+tool errors         : 7
+guard refusals      : 0   (the system working)
+total model calls   : 568
+wall clock          : 27.7 min
+files: ESCALATIONS.md, package.json, s1_bank.js, S1_NOTES.md, s2_text.py, s3_events.js, s4_matrix.js, s5_cache.js, s6_parser.js, s7_todo.py, s8_router.js, TASKS.md, test_apostrophe.py, test_bank.js, test_cache.js, test_emit_error_behavior.js, test_evaluate.js, test_events.js, test_matrix.js, test_matrix_validation.js, test_parser.js, test_router.js, _snippet.py, __pycache__
+tok/s: min 12.6 max 162.8
+harness exit 0 at 07:04:39
+done as asked 32/40 | implementation correct 32/40 (CT = correct code, own test broke it)

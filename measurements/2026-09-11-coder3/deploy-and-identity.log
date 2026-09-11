@@ -1,0 +1,46 @@
+deploy start 05:55:59
+Building image im-YzObKUQ0kRehOwmpqlA7mg
+
+=> Step 0: FROM base
+
+=> Step 1: ENV HF_HUB_ENABLE_HF_TRANSFER=1
+
+=> Step 2: ENV VLLM_WORKER_MULTIPROC_METHOD=spawn
+
+=> Step 3: ENV MYCODER_BASE=Qwen/Qwen3-Coder-30B-A3B-Instruct
+
+=> Step 4: ENV MYCODER_GPU=H100
+
+=> Step 5: ENV MYCODER_NAME=coder30b
+
+=> Step 6: ENV MYCODER_MAXLEN=16384
+
+=> Step 7: ENV MYCODER_GPU_FRAC=0.9
+
+=> Step 8: ENV MYCODER_LORA=''
+
+=> Step 9: ENV MYCODER_LORA_NAME=tuned
+
+=> Step 10: ENV MYCODER_LORA_RANK=16
+Saving image...
+Image saved, took 809.55ms
+
+Built image im-YzObKUQ0kRehOwmpqlA7mg in 1.59s
+
+
+✓ Created objects.
+├── 🔨 Created mount 
+│   C:\Users\tatte\Projects\ai-coding-hub\training-data\factory\modal_serve_vll
+│   m.py
+├── 🔨 Created function Server.*.
+└── 🔨 Created Web Function URL for Server.web => 
+    https://mr-tattershall--coder30b-base-server-web.modal.run
+✓ App deployed in 4.203s! 🎉
+
+View Deployment: 
+https://modal.com/apps/mr-tattershall/main/deployed/coder30b-base
+deploy rc=0 at 05:56:05
+health try 1 05:58:35: 
+health try 2 05:59:44: {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+IDENTITY OK 05:59:44
+harness finished 06:20:43

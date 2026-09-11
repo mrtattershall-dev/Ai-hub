@@ -1,0 +1,39 @@
+coder30b-base set A start 05:59:45
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+
+20 goals, sequential: coder30b-base-setA
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-u7Wp2f\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  done           9     4   0   0     9  t1_temp.js:runs
+   2  done          21    13   0   0    45  t1_temp.js:runs
+   3  done           9     5   0   0     9  t2_text.py:runs
+   4  done          11     6   0   0    15  t3_inventory.js:runs
+   5  done           9     6   0   0     9  t3_inventory.js:runs
+   6  done           9     6   0   0     9  T_NOTES.md:ok t3_inventory.js:runs
+   7  done          15     8   0   0    18  t4_intervals.js:runs
+   8  done          28    19   0   0    30  t4_intervals.js:runs T_INTERVALS.md:ok
+   9  done          16    13   0   0    30  t5_page.html:ok t5_page.js:parses
+  10  stopped        7     6   0   0    36  t5_page.html:ok t5_page.js:parses
+  11  done          17     9   0   0    24  t6_stats.py:runs
+  12  interrupted    3     2   0   0    90  t7_router.js:runs
+  13  done          19    12   0   0    24  t7_router.js:runs
+  14  done          30    22   0   0    75  t8_game.html:ok t8_game.js:parses
+  15  done          25    17   0   0    51  t8_game.js:parses
+  16  done          17    10   0   0    36  t9_csvsum.py:runs
+  17  stopped        7     4   0   0    30  t10_debounce.js:runs
+  18  done          10     6   0   0   120  t11_check.js:runs t1_temp.js:runs t4_intervals.js:runs
+  19  done          13     7   1   0    24  t12_bits.js:runs
+  20  done          21    17   0   0    33  T_INDEX.md:ok
+
+--- summary ---
+goals run           : 20
+status 'done'       : 17/20
+WORK ACTUALLY DONE  : 20/20   <- the number that matters
+tool errors         : 1
+guard refusals      : 0   (the system working)
+total model calls   : 192
+wall clock          : 12.0 min
+files: .screenshots, ESCALATIONS.md, package.json, t10_debounce.js, t11_check.js, t12_bits.js, t1_temp.js, t2_text.py, t3_inventory.js, t4_intervals.js, t5_page.html, t5_page.js, t6_stats.py, t7_router.js, t8_game.html, t8_game.js, t9_csvsum.py, TASKS.md, test_kToC.js, test_remove.js, T_INDEX.md, T_INTERVALS.md, T_NOTES.md, _snippet.py, __pycache__
+tok/s: min 27.8 max 162.4
+harness exit 0 at 06:11:47
