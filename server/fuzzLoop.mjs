@@ -2,8 +2,29 @@
  * fuzzLoop.mjs - throw recorded real model output at the loop in many orders, and look for
  * anything that breaks.
  *
- *   node server/fuzzLoop.mjs [iterations=12] [goalsPerIteration=4] [firstSeed=1]
+ *   node server/fuzzLoop.mjs [iterations=12] [goalsPerIteration=4] [firstSeed=1] [--mode=...]
  *   node server/fuzzLoop.mjs 1 4 37          # re-run exactly the iteration that failed
+ *   node server/fuzzLoop.mjs 20 4 1 --mode=hostile         # only the nastiest real replies
+ *   node server/fuzzLoop.mjs 20 4 1 --mode=chain           # one ordered chain, supervisor on
+ *   node server/fuzzLoop.mjs 20 4 1 --mode=hostile,chain   # both
+ *
+ * MODES (the flag may go anywhere; positional arguments keep their meaning):
+ *   default  the whole acting corpus, shuffled; the harness starts each goal itself and
+ *            answers approvals itself. Unchanged from before modes existed.
+ *   hostile  serve ONLY the replies fuzzCorpus.mjs classes as hostile: multi-action, first
+ *            action writes package.json, leaked line-number prefixes in a fence, no THOUGHT
+ *            outside a planner turn. The pool is printed per category at start. Implies
+ *            --settle.
+ *   --settle (flag, any mode) after each goal, wait until the run's FINAL state is on disk
+ *            before checking or starting the next goal - otherwise the check races the
+ *            hub's end-of-run syntax rollback (see waitFinal). Off in default mode so that
+ *            mode's behaviour is unchanged; add it to re-check a BROKEN from a default run.
+ *   chain    AGENT_SUPERVISOR=1 with the shortest tick (15s) and approval timeout (1 min) the
+ *            hub accepts. The goals are queued as ONE ordered chain, each `after` the one
+ *            before; the head is started and the supervisor drives the rest, denying stale
+ *            approvals itself. Once nothing is running and the queue has stopped changing
+ *            (or a deadline passes), checkQueueInvariants adds STRANDED / ORPHAN / QUEUEFILE
+ *            to the usual checks.
  *
  * mockLoop.test.mjs replays ONE fixed sequence. That proves the loop survives that sequence.
  * The bugs found today all depended on ORDER - a marker write only destroys the marker if it
@@ -23,17 +44,44 @@ import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { freePorts } from './testPort.mjs';
-import { checkInvariants } from './fuzzInvariants.mjs';
+import { checkInvariants, checkQueueInvariants } from './fuzzInvariants.mjs';
+import { HOSTILE, hostileCategories } from './fuzzCorpus.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const live = new Set();   // hub children still running - killed on ANY exit so no port is left held
-const ITER = parseInt(process.argv[2] || '12', 10);
-const PER = parseInt(process.argv[3] || '4', 10);
-const SEED0 = parseInt(process.argv[4] || '1', 10);
+const ARGV = process.argv.slice(2);
+const POS = ARGV.filter((a) => !a.startsWith('--'));
+const FLAGS = Object.fromEntries(ARGV.filter((a) => a.startsWith('--'))
+  .map((a) => { const [k, ...x] = a.slice(2).split('='); return [k, x.join('=') || true]; }));
+const ITER = parseInt(POS[0] || '12', 10);
+const PER = parseInt(POS[1] || '4', 10);
+const SEED0 = parseInt(POS[2] || '1', 10);
+const MODES = new Set(String(FLAGS.mode || 'default').split(',').map((m) => m.trim()).filter(Boolean));
+for (const m of MODES) {
+  if (!['default', 'hostile', 'chain'].includes(m)) {
+    console.error(`unknown --mode=${m}: use default, hostile or chain (comma-combine, e.g. --mode=hostile,chain)`);
+    process.exit(2);
+  }
+}
+const HOSTILE_POOL = MODES.has('hostile');
+const CHAIN = MODES.has('chain');
+const MODE = [...MODES].filter((m) => m !== 'default').join(',');   // '' = default mode
+// --settle: wait for each run's end-of-run block before checking or moving on (see waitFinal).
+// Implied by hostile; opt-in for default so default mode's behaviour stays exactly as it was.
+const SETTLE = HOSTILE_POOL || FLAGS.settle === true;
+const MODE_ARG = (MODE ? ` --mode=${MODE}` : '') + (SETTLE && !HOSTILE_POOL ? ' --settle' : '');
 const CORPUS = join(HERE, 'testdata', 'model-corpus.jsonl');
 
 const rows = readFileSync(CORPUS, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
 const acting = rows.filter((r) => r.actions.length > 0);
+
+// hostile: every reply in at least one category - NOT only acting ones. A reply with no
+// THOUGHT and no parseable action is exactly the kind of input the loop has to survive.
+const hostileCount = Object.fromEntries(Object.keys(HOSTILE).map((k) => [k, 0]));
+const hostile = HOSTILE_POOL
+  ? rows.filter((r) => { const c = hostileCategories(r); for (const k of c) hostileCount[k]++; return c.length > 0; })
+  : [];
+const pool = HOSTILE_POOL ? hostile : acting;
 
 // mulberry32 - small, fast, and identical on every machine, which is the whole point.
 const rng = (seed) => () => {
@@ -57,7 +105,7 @@ const GOAL_POOL = [
 
 async function iteration(seed) {
   const r = rng(seed);
-  const order = shuffle(acting, r);
+  const order = shuffle(pool, r);
   const goals = shuffle(GOAL_POOL, r).slice(0, PER);
   const [mockPort, hubPort] = await freePorts(2);
 
@@ -79,7 +127,9 @@ async function iteration(seed) {
   const hub = spawn(process.execPath, [join(HERE, 'index.js')], {
     env: { ...process.env, PORT: String(hubPort), HUB_DB: join(dir, 'hub.json'), AGENT_WORKSPACE: ws,
       AGENT_QUEUE_FILE: join(dir, 'queue.json'), AGENT_RUNS_DIR: join(dir, 'runs'), AGENT_TRACES_DIR: join(dir, 'traces'), RUN_INDEX: join(dir, 'index.jsonl'),
-      AGENT_SUPERVISOR: '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
+      AGENT_SUPERVISOR: CHAIN ? '1' : '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '',
+      // chain: the shortest tick and approval timeout the hub accepts (its floors are 15s / 1 min).
+      ...(CHAIN ? { AGENT_TICK_S: '15', AGENT_APPROVAL_TIMEOUT_MIN: '1' } : {}),
       AGENT_MAX_STEPS: '14', AGENT_MAX_MINUTES: '3', MODEL_FIRST_BYTE_S: '30', MODEL_STALL_S: '30', MODEL_TIMEOUT_S: '60' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -101,7 +151,12 @@ async function iteration(seed) {
 
   const v = [];                       // violations
   const statuses = [];
-  for (const goal of goals) {
+  if (CHAIN) {
+    const c = await driveChain(api, goals);
+    v.push(...c.violations);
+    statuses.push(...c.statuses);
+  }
+  for (const goal of CHAIN ? [] : goals) {
     let s;
     try { s = await api('/agent/start', { method: 'POST', body: JSON.stringify({ goal }) }); }
     catch (e) { v.push(`START threw: ${e.message}`); continue; }
@@ -131,8 +186,13 @@ async function iteration(seed) {
     }
     // A run still waiting on a human at the deadline IS a stall now - denials are answered
     // above, so anything left parked means the denial path itself did not resume the run.
+    // main waits for busy:false above, and busy now clears only once the end-of-run block has
+    // restored files and persisted - so a run still busy at the deadline is a HANG too.
+    // --settle's on-disk check is kept as a second, independent witness of the same thing.
     if (!run || !['done', 'error', 'stopped', 'interrupted', 'failed'].includes(run.status) || run.busy) {
       v.push(`HANG: "${goal.slice(0, 40)}" never reached a terminal state (last: ${run?.status}${run?.busy ? ', still tearing down' : ''}, denied ${denied})`);
+    } else if (SETTLE && !(await waitFinal(dir, s.runId))) {
+      v.push(`HANG: "${goal.slice(0, 40)}" reported ${run.status} but never persisted its final state (end-of-run block still going after 90s)`);
     }
     statuses.push(run?.status);
   }
@@ -140,9 +200,81 @@ async function iteration(seed) {
   // ── invariants ─ one source of truth, shared with fuzzInvariants.test.mjs, which proves
   // each check actually fires on the damage it names.
   v.push(...checkInvariants(dir, { hubExitCode: hub.exitCode, hubLog: log.join('') }));
+  if (CHAIN) v.push(...checkQueueInvariants(dir));
 
   hub.kill(); live.delete(hub); mock.close();
   return { seed, goals: goals.length, served, statuses, violations: v, dir };
+}
+
+// ── chain mode ──────────────────────────────────────────────────────────────────────────
+// The supervisor, not the harness, drives: it pulls the next link when a run ends 'done',
+// denies approvals left unanswered for AGENT_APPROVAL_TIMEOUT_MIN, resumes interrupted runs,
+// and picks up runnable work on its tick. The harness only queues, starts the head, and
+// waits for the chain to SETTLE - nothing running, and the queue and run list unchanged for
+// longer than two ticks - because the queue invariants only mean something at rest.
+const LIVE = ['running', 'awaiting_approval', 'interrupted'];
+const SETTLE_MS = 40000;             // > 2 supervisor ticks of 15s
+const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
+
+// A run's status turns terminal in the API BEFORE its end-of-run block runs: agent.js sets
+// 'stopped' / 'done' inside the loop, then its `finally` restores any .js that no longer
+// parses from git history, writes the trace and index line, and only THEN persists the run.
+// The default loop checks invariants and kills the hub the moment it sees the terminal
+// status - measured 2026-09-10: in 122 of 153 default/hostile iteration dirs the last run was
+// still 'running' on disk, i.e. the hub died before that block finished. A BROKEN file the
+// rollback would have restored is then reported anyway (hostile seed 6: p1_calc.js, with a
+// parseable version sitting in git history). The final persist is the last thing the block
+// does, so a terminal status ON DISK means the rollback is over.
+const FINAL = ['done', 'error', 'stopped', 'interrupted', 'failed'];
+async function waitFinal(dir, runId, ms = 90000) {
+  const f = join(dir, 'runs', `${runId}.json`);
+  const until = Date.now() + ms;
+  while (Date.now() < until) {
+    try { if (FINAL.includes(JSON.parse(readFileSync(f, 'utf8')).status)) return true; } catch { /* mid-write or not yet there */ }
+    await sleep(300);
+  }
+  return false;
+}
+
+async function driveChain(api, goals) {
+  const v = [];
+  const ids = [];
+  let prev = null;
+  for (const goal of goals) {
+    let q;
+    try { q = await api('/agent/queue', { method: 'POST', body: JSON.stringify(prev ? { goal, after: prev } : { goal }) }); }
+    catch (e) { v.push(`QUEUE threw: ${e.message}`); break; }
+    const id = q?.item?.id || q?.id;
+    if (!id) { v.push(`QUEUE refused: ${JSON.stringify(q).slice(0, 100)}`); break; }
+    ids.push(id); prev = id;
+  }
+  if (!ids.length) return { violations: v, statuses: [] };
+
+  let s = null;
+  try { s = await api('/agent/queue/run', { method: 'POST', body: JSON.stringify({ id: ids[0] }) }); }
+  catch (e) { v.push(`START threw: ${e.message}`); }
+  if (s && !s.runId) v.push(`START refused: ${JSON.stringify(s).slice(0, 100)}`);
+
+  const budgetMin = goals.length * 5 + 3;
+  const deadline = Date.now() + budgetMin * 60000;
+  let sig = '', since = Date.now(), items = [], runList = [], settled = false;
+  while (Date.now() < deadline) {
+    await sleep(2000);
+    const q = await api('/agent/queue').catch(() => null);
+    const l = await api('/agent/list').catch(() => null);
+    if (!q || !Array.isArray(q.items) || !Array.isArray(l)) continue;
+    items = q.items; runList = l;
+    const now = JSON.stringify([items.map((i) => [i.id, i.status, i.after]), runList.map((x) => [x.id, x.status, x.steps])]);
+    if (now !== sig) { sig = now; since = Date.now(); }
+    const busy = runList.some((x) => LIVE.includes(x.status));
+    const open = items.some((i) => ['queued', 'taken'].includes(i.status));
+    if (!busy && (!open || Date.now() - since >= SETTLE_MS)) { settled = true; break; }
+  }
+  if (!settled) {
+    v.push(`HANG: chain did not settle in ${budgetMin} min (runs: ${runList.map((x) => x.status).join(',')}; items: ${items.map((i) => i.status).join(',')})`);
+  }
+  // Final state of every item in queue order; R: marks a repair the hub spliced in.
+  return { violations: v, statuses: items.map((i) => (i.repairOf ? 'R:' : '') + i.status) };
 }
 
 // A campaign that dies must still leave its tally.
@@ -153,7 +285,10 @@ async function iteration(seed) {
 // Results now stream to a JSONL file as each iteration finishes, the summary prints on every
 // exit path, and live hubs are killed on the way out.
 const OUT = process.env.FUZZ_OUT || join(tmpdir(), `fuzz-results-${SEED0}-${Date.now()}.jsonl`);
-console.log(`fuzzing: ${ITER} iterations x ${PER} goals, seeds ${SEED0}..${SEED0 + ITER - 1}, corpus ${acting.length} acting responses`);
+console.log(`fuzzing: ${ITER} iterations x ${PER} goals, seeds ${SEED0}..${SEED0 + ITER - 1}, corpus ${pool.length} ${HOSTILE_POOL ? 'hostile' : 'acting'} responses${MODE ? `, mode ${MODE}` : ''}`);
+if (HOSTILE_POOL) {
+  console.log(`hostile pool (a reply can be in several): ${Object.entries(hostileCount).map(([k, n]) => `${k}=${n}`).join('  ')}  -> ${hostile.length} distinct`);
+}
 console.log(`results: ${OUT}\n`);
 const all = [];
 let summarized = false;
@@ -167,7 +302,7 @@ const summarize = (why) => {
   console.log(`\n${all.length - bad.length}/${all.length} iterations clean${why ? `  (${why})` : ''}`);
   if (bad.length) {
     console.log('violations by kind:', JSON.stringify(kinds));
-    console.log('reproduce one:     node server/fuzzLoop.mjs 1 ' + PER + ' ' + bad[0].seed);
+    console.log('reproduce one:     node server/fuzzLoop.mjs 1 ' + PER + ' ' + bad[0].seed + MODE_ARG);
   }
   if (all.length < ITER) console.log(`INCOMPLETE: only ${all.length} of ${ITER} iterations ran`);
 };
@@ -183,7 +318,7 @@ for (let k = 0; k < ITER; k++) {
   const t0 = Date.now();
   const res = await iteration(seed).catch((e) => ({ seed, violations: [`HARNESS: ${e.message}`], served: 0, statuses: [] }));
   all.push(res);
-  try { appendFileSync(OUT, JSON.stringify({ seed, served: res.served, statuses: res.statuses, violations: res.violations }) + '\n'); }
+  try { appendFileSync(OUT, JSON.stringify({ seed, ...(MODE ? { mode: MODE } : {}), served: res.served, statuses: res.statuses, violations: res.violations }) + '\n'); }
   catch { /* the console line below is still the record */ }
   const mark = res.violations.length ? 'FAIL' : 'ok  ';
   console.log(`  ${mark} seed ${String(seed).padStart(3)}  ${((Date.now() - t0) / 1000).toFixed(0).padStart(3)}s  replayed ${String(res.served).padStart(3)}  [${(res.statuses || []).join(',')}]`);

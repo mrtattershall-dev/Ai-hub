@@ -16,11 +16,14 @@
  *   RUNFILE  a persisted run truncated, losing its history
  *   INDEX    a run-index line that no longer parses, silently skewing every trend
  *
+ * checkQueueInvariants (chain mode, below) adds three for the backlog: STRANDED, ORPHAN,
+ * QUEUEFILE.
+ *
  * Returns a list of violation strings, each prefixed with its kind. Empty means clean.
  */
 import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
-import { join, dirname, resolve } from 'node:path';
+import { join, dirname, resolve, basename } from 'node:path';
 
 // What the harness itself puts beside the workspace. Anything else there is a stray write.
 const HARNESS_FILES = new Set(['workspace', 'hub.json', 'queue.json', 'runs', 'index.jsonl', 'traces']);
@@ -94,5 +97,75 @@ export function checkInvariants(dir, { hubExitCode = null, hubLog = '' } = {}) {
     });
   }
 
+  return v;
+}
+
+/**
+ * checkQueueInvariants - what must be true of the backlog once a chain has SETTLED.
+ *
+ *   QUEUEFILE  queue.json is not valid JSON, has no items array, or the hub already moved a
+ *              corrupt one aside (queue.json.corrupt-*): its load() quarantines on read, so by
+ *              check time the evidence may only survive under that name.
+ *   STRANDED   an item still 'queued' whose `after` predecessor ended stopped / failed / error,
+ *              or no longer exists. dequeue() releases a chained item only once its predecessor
+ *              is 'done', so this item waits for ever and nothing retries it. KNOWN hub
+ *              behaviour: failQueueItem repoints the tail only when it splices in a repair.
+ *              'interrupted' is deliberately NOT dead - that run is resumable by design.
+ *   ORPHAN     an item left 'taken' with no run that could still finish it - invisible to
+ *              dequeue, and silently re-run by requeueOrphans() on the next boot.
+ *
+ * Call it only when nothing is running: autoStart() legitimately holds an item 'taken' for
+ * 250ms before its run exists, so a mid-flight check would report a false ORPHAN.
+ */
+const DEAD_ITEM = new Set(['stopped', 'failed', 'error']);
+const LIVE_RUN = new Set(['running', 'awaiting_approval', 'interrupted']);
+
+export function checkQueueInvariants(dir, { queueFile = join(dir, 'queue.json') } = {}) {
+  const v = [];
+  const qdir = dirname(queueFile);
+  const base = basename(queueFile);
+  if (existsSync(qdir)) {
+    for (const f of readdirSync(qdir)) {
+      if (f.startsWith(`${base}.corrupt-`)) v.push(`QUEUEFILE: the hub quarantined a corrupt queue as ${f}`);
+    }
+  }
+  if (!existsSync(queueFile)) return v;
+
+  let items;
+  try {
+    const j = JSON.parse(readFileSync(queueFile, 'utf8'));
+    if (!j || !Array.isArray(j.items)) throw new Error('no items array');
+    items = j.items;
+  } catch (e) {
+    v.push(`QUEUEFILE: ${base} is not a valid queue (${String(e.message).slice(0, 60)})`);
+    return v;                          // nothing below can be trusted without the items
+  }
+
+  // Persisted runs carry queueItemId and their final status. Unparseable ones are RUNFILE's
+  // business, not this check's.
+  const runs = [];
+  const runsDir = join(dir, 'runs');
+  if (existsSync(runsDir)) {
+    for (const f of readdirSync(runsDir)) {
+      try { runs.push(JSON.parse(readFileSync(join(runsDir, f), 'utf8'))); } catch { /* RUNFILE */ }
+    }
+  }
+
+  const byId = new Map(items.map((i) => [i.id, i]));
+  for (const it of items) {
+    if (it.status === 'queued' && it.after) {
+      const dep = byId.get(it.after);
+      if (!dep) v.push(`STRANDED: ${it.id} waits on ${it.after}, which no longer exists`);
+      else if (DEAD_ITEM.has(dep.status)) {
+        v.push(`STRANDED: ${it.id} waits on ${dep.id}, which ended '${dep.status}'${dep.repairOf ? ` (itself the repair of ${dep.repairOf})` : ''}`);
+      }
+    }
+    if (it.status === 'taken') {
+      const mine = runs.filter((r) => r && r.queueItemId === it.id);
+      if (!mine.some((r) => LIVE_RUN.has(r.status))) {
+        v.push(`ORPHAN: ${it.id} is 'taken' with no run in progress (its runs: ${mine.map((r) => r.status).join(',') || 'none'})`);
+      }
+    }
+  }
   return v;
 }
