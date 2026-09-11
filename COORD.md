@@ -4055,3 +4055,18 @@ tatte, verbatim, this thread: "After c is done running, run one more with d that
       removed and leaves a "Re-add" task. Full suite 60/60 offline tests (real* need a live MODEL_BASE, as before).
       The LIVE hub (index.js since 05:09) was NOT restarted - it runs the old code until tatte says restart.
       Offline fuzzer resumed on the merged code: seed 400912.
+
+## Session A — GPU LEDGER: set E, 100 new interleaved goals, Qwen3-Coder-30B-A3B and base 14B (2026-09-11 10:5x)
+
+tatte, verbatim, this thread: "After d has results, analyze the deep seated bugs and fix them so run E can have another
+100 prompts." Then, shown the two open set-E choices with recommended defaults and asked to say go: "Continue".
+(Inside the $30 trace-generation cap; ~$15.8 of it used so far.)
+
+    coder30b-sete  Qwen/Qwen3-Coder-30B-A3B-Instruct (bf16)  H100  min=0 max=1 scaledown 120 s (~$3.95/hr)
+    coder14b-sete  Qwen/Qwen2.5-Coder-14B-Instruct-AWQ       A10G  min=0 max=1 scaledown 120 s (~$1.10/hr)
+    Pre-registered in measurements/2026-09-11-setE/README.md (checker 100/100 refs, 0/100 empty, 41/41 mutants caught
+    exactly; harness dry-run proven offline). Hub: server/ at 421ce9e (the set-D fixes). AGENT_BATCH_ACTIONS=0;
+    approvals answered by the harness as in set D. New app names, so no earlier watchdog can touch them. Watchdogs
+    armed before deploy, caps 125 min (H100) / 100 min (A10G), stop ONLY via node training-data/factory/stopApp.mjs
+    (Rule 7a). Worst case ~$8.2 + ~$1.8. Identity (Rule 3) pasted below before any number counts. Offline fuzzer
+    PAUSED for the window (stopped after batch 4, 37/37 clean); resumes at seed 400960 afterwards.
