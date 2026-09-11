@@ -56,7 +56,7 @@ writeFileSync(join(dir, 'hub.json'), JSON.stringify({ api_keys: { ollama: { base
 const hub = spawn(process.execPath, [join(HERE, 'index.js')], {
   env: { ...process.env, PORT: String(hubPort), HUB_DB: join(dir, 'hub.json'), AGENT_WORKSPACE: join(dir, 'workspace'), AGENT_QUEUE_FILE: join(dir, 'queue.json'),
     AGENT_RUNS_DIR: join(dir, 'runs'), AGENT_TRACES_DIR: join(dir, 'traces'), RUN_INDEX: join(dir, 'index.jsonl'),
-    AGENT_SUPERVISOR: '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '', AGENT_BATCH_ACTIONS: '0', AGENT_CONN_RETRIES: '2',
+    AGENT_SUPERVISOR: '0', AGENT_APPROVAL_MODE: 'build', HUB_TOKEN: '', AGENT_BATCH_ACTIONS: '0', AGENT_CONN_RETRIES: '2', AGENT_CONN_RETRY_MS: '20',
     AGENT_MAX_STEPS: '20', AGENT_MAX_MINUTES: '4', MODEL_FIRST_BYTE_S: '30', MODEL_STALL_S: '30', MODEL_TIMEOUT_S: '60' },
   stdio: ['ignore', 'pipe', 'pipe'],
 });

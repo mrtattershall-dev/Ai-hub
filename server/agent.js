@@ -133,7 +133,15 @@ const UNATTENDED = process.env.AGENT_UNATTENDED === '1';
 // the history, so the same call can simply be made again. Set E (2026-09-11): one 'Premature close' right after a
 // runaway reply paused a 14B goal as 'interrupted' - an unattended run has nobody to press Resume, so the goal was
 // lost. Only drops are retried here: a stall or a timeout already cost minutes, and those still pause as before.
-const CONN_RETRIES = parseInt(process.env.AGENT_CONN_RETRIES || '2', 10);
+// Set F (2026-09-11) drops came in THREES: the base 14B lost goal 5 and Qwen3-Coder goal 38 after two retries each,
+// so the third attempt was the one that would have landed. Four costs at most a few seconds of backoff on a genuinely
+// dead endpoint, and saves the goal on a flapping one.
+const CONN_RETRIES = parseInt(process.env.AGENT_CONN_RETRIES || '3', 10);
+// HOW LONG to wait, not how many times to try. Set F (2026-09-11) lost four goals to the same shape: a very large
+// reply (18k-31k chars against a median of 351), then every following connection refused. Measured from the
+// recordings, the endpoint answered again 9.6-12.8 s later - and all the old retries (2 s, then 4 s) landed inside
+// that dead window, so more of them at the same cadence would have failed too. Wait past the window instead.
+const CONN_RETRY_MS = parseInt(process.env.AGENT_CONN_RETRY_MS || '15000', 10);
 const isDropError = (e) => /Premature close|terminated|before any content|ECONNRESET|socket hang up|EPIPE|fetch failed/i.test(`${e?.name} ${e?.message} ${e?.cause?.code || ''}`);
 const BATCH_MAX = 4;
 
@@ -2732,8 +2740,8 @@ async function drive(loadDb, run) {
 
         if (isDropError(e) && (run.connRetries || 0) < CONN_RETRIES) {
           run.connRetries = (run.connRetries || 0) + 1;
-          pushStep(run, { type: 'note', text: `The model connection dropped (${String(e.message).slice(0, 120)}) - nothing ran; retrying the same call (${run.connRetries}/${CONN_RETRIES}).` });
-          await new Promise((r) => setTimeout(r, 2000 * run.connRetries));
+          pushStep(run, { type: 'note', text: `The model connection dropped (${String(e.message).slice(0, 120)}) - nothing ran; waiting ${Math.round(CONN_RETRY_MS * run.connRetries / 1000)}s and retrying the same call (${run.connRetries}/${CONN_RETRIES}).` });
+          await new Promise((r) => setTimeout(r, CONN_RETRY_MS * run.connRetries));
           if (run.status !== 'running') break;     // stopped during the wait
           continue;
         }
