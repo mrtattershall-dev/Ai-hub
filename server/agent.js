@@ -3250,7 +3250,18 @@ async function drive(loadDb, run) {
             if (!(await quickCheck(f))) { restored = true; break; }   // this one parses - keep it
             writeFileSync(full, broken, 'utf8');                      // no better; restore and keep looking
           }
-          if (restored) pushStep(run, { type: 'note', text: `${f} did not parse at the end of the run — restored the last committed version that did.` });
+          if (restored) {
+            // Name what the rollback took away, and leave it for the next goal. Set D (Qwen3-Coder): the restored
+            // version predated functions the run had just written - earliestStart in goal 43, ready() in goal 93 -
+            // and nothing said so until the hidden checks at the end.
+            let lost = [];
+            try { lost = lostDefs(broken, readFileSync(full, 'utf8'), f); } catch { /* evidence only */ }
+            pushStep(run, { type: 'note', text: `${f} did not parse at the end of the run — restored the last committed version that did.` + (lost.length ? ` That removed: ${lost.join(', ')}.` : '') });
+            if (lost.length) {
+              try { ledger.add(WORKSPACE, [`Re-add ${lost.slice(0, 6).join(', ')} to ${f} - lost when ${f} was rolled back at the end of a run because it did not parse`]); }
+              catch { /* the ledger is a helper, never a reason to fail the run */ }
+            }
+          }
         }
       } catch { /* never let the repair take the run down */ }
     }
