@@ -35,6 +35,10 @@ transcripts, traces, the run index and a git bundle of the workspace in runs/<la
 | coder14b-sete | Qwen/Qwen2.5-Coder-14B-Instruct-AWQ | A10G | 95 min (D: 100 goals in 77 min) | ~$1.75 |
 Worst case ~$9.7 against ~$14.2 left of the $30 cap.
 
+**Dry run (offline, no GPU, 2026-09-11 10:38):** trialE + run-setE on the merged hub (421ce9e) against a mock model,
+3 goals: the log names the hub commit and every goal's runId, the per-goal rows are written, and runs/<label> holds
+3 run files, 3 full transcripts (plan, turn, turn), the traces, the run index and a git bundle of the workspace.
+
 **Open choices (recommended defaults shown; tatte's call):**
 1. AGENT_BATCH_ACTIONS - recommended OFF, as in set D, so E measures the set-D fixes and nothing else.
 2. Approvals - recommended: the harness answers as in set D (approve git_commit and git_undo, deny the rest), so
