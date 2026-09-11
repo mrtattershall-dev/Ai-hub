@@ -1,0 +1,42 @@
+ 1 PASS s1_bank.js    
+ 2 PASS s1_bank.js    
+ 3 PASS s1_bank.js    
+ 4 PASS s1_bank.js    
+ 5 PASS S1_NOTES.md   
+ 6 PASS s2_text.py    
+ 7 PASS s2_text.py    
+ 8 PASS s2_text.py    
+ 9 PASS s2_text.py    
+10 PASS s2_text.py    
+11 PASS s3_events.js  
+12 PASS s3_events.js  
+13 fail s3_events.js  emit returned 0 then 0
+14 PASS s3_events.js  
+15 PASS s3_events.js  
+16 PASS s4_matrix.js  
+17 PASS s4_matrix.js  
+18 PASS s4_matrix.js  
+19 PASS s4_matrix.js  
+20 fail s4_matrix.js  a non-number entry did not throw
+21 PASS s5_cache.js   
+22 fail s5_cache.js   did not expire at ttl
+23 PASS s5_cache.js   
+24 PASS s5_cache.js   
+25 PASS s5_cache.js   
+26 PASS s6_parser.js  
+27 PASS s6_parser.js  
+28 fail s6_parser.js  threw: Invalid expression
+29 PASS s6_parser.js  
+30 fail s6_parser.js  threw: Invalid expression
+31 PASS s7_todo.py    
+32 fail s7_todo.py    done(999) did not raise
+33 PASS s7_todo.py    
+34 fail s7_todo.py    priority order ['a', 'd', 'b', 'c']
+35 PASS s7_todo.py    
+36 PASS s8_router.js  
+37 fail s8_router.js  query 404
+38 PASS s8_router.js  
+39 PASS s8_router.js  
+40 PASS s8_router.js  
+
+done as asked 32/40 | implementation correct 32/40 (CT = correct code, own test broke it)

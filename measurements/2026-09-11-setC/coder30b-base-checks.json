@@ -1,0 +1,287 @@
+{
+  "ws": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\measurements\\2026-09-11-setC\\data\\coder30b-base\\workspace",
+  "asIs": 32,
+  "impl": 32,
+  "results": [
+    {
+      "file": "s1_bank.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 1
+    },
+    {
+      "file": "s1_bank.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 2
+    },
+    {
+      "file": "s1_bank.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 3
+    },
+    {
+      "file": "s1_bank.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 4
+    },
+    {
+      "file": "S1_NOTES.md",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 5
+    },
+    {
+      "file": "s2_text.py",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 6
+    },
+    {
+      "file": "s2_text.py",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 7
+    },
+    {
+      "file": "s2_text.py",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 8
+    },
+    {
+      "file": "s2_text.py",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 9
+    },
+    {
+      "file": "s2_text.py",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 10
+    },
+    {
+      "file": "s3_events.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 11
+    },
+    {
+      "file": "s3_events.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 12
+    },
+    {
+      "file": "s3_events.js",
+      "asIs": false,
+      "impl": false,
+      "why": "emit returned 0 then 0",
+      "goal": 13
+    },
+    {
+      "file": "s3_events.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 14
+    },
+    {
+      "file": "s3_events.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 15
+    },
+    {
+      "file": "s4_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 16
+    },
+    {
+      "file": "s4_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 17
+    },
+    {
+      "file": "s4_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 18
+    },
+    {
+      "file": "s4_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 19
+    },
+    {
+      "file": "s4_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "a non-number entry did not throw",
+      "goal": 20
+    },
+    {
+      "file": "s5_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 21
+    },
+    {
+      "file": "s5_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "did not expire at ttl",
+      "goal": 22
+    },
+    {
+      "file": "s5_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 23
+    },
+    {
+      "file": "s5_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 24
+    },
+    {
+      "file": "s5_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 25
+    },
+    {
+      "file": "s6_parser.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 26
+    },
+    {
+      "file": "s6_parser.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 27
+    },
+    {
+      "file": "s6_parser.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid expression",
+      "goal": 28
+    },
+    {
+      "file": "s6_parser.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 29
+    },
+    {
+      "file": "s6_parser.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid expression",
+      "goal": 30
+    },
+    {
+      "file": "s7_todo.py",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 31
+    },
+    {
+      "file": "s7_todo.py",
+      "asIs": false,
+      "impl": false,
+      "why": "done(999) did not raise",
+      "goal": 32
+    },
+    {
+      "file": "s7_todo.py",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 33
+    },
+    {
+      "file": "s7_todo.py",
+      "asIs": false,
+      "impl": false,
+      "why": "priority order ['a', 'd', 'b', 'c']",
+      "goal": 34
+    },
+    {
+      "file": "s7_todo.py",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 35
+    },
+    {
+      "file": "s8_router.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 36
+    },
+    {
+      "file": "s8_router.js",
+      "asIs": false,
+      "impl": false,
+      "why": "query 404",
+      "goal": 37
+    },
+    {
+      "file": "s8_router.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 38
+    },
+    {
+      "file": "s8_router.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 39
+    },
+    {
+      "file": "s8_router.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 40
+    }
+  ]
+}

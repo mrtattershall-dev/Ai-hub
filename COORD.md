@@ -3968,3 +3968,10 @@ then "Let's do it" (inside the $30 trace-generation cap; ~$4.2 of it used so far
       coder30b-base health try 2 06:36:55: {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
       coder14b-base health try 1 06:36:02: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
       Harnesses started 06:36:55 / 06:36:02; no new goals after 07:18:55 / 07:18:02.
+    [set C ledger, Session A] DONE. coder30b-base harness ALL DONE 07:04:41 (40/40 goals run); STOPPED by the
+      watchdog through stopApp.mjs 07:04:55 (exit 0, "stopped, and confirmed by the app list"). coder14b-base
+      ALL DONE 07:07:31 (40/40 run); STOPPED 07:07:56 (exit 0, confirmed). Independent re-list (python -m
+      modal app list --json): both stopped, 0 tasks; 5 apps listed, none live. Deploy -> stop: H100 31 min
+      (~$2.05), A10G 34 min (~$0.62). Running total of the $30 cap: ~$6.8.
+      Hidden checks on the final workspace: Qwen3-Coder 32/40, 0 regressions; base 14B 7/40, 3 regressions.
+      Hand review of every fail line in progress; results -> measurements/2026-09-11-setC/README.md.

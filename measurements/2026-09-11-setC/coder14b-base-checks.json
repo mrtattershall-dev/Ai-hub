@@ -1,0 +1,287 @@
+{
+  "ws": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\measurements\\2026-09-11-setC\\data\\coder14b-base\\workspace",
+  "asIs": 7,
+  "impl": 7,
+  "results": [
+    {
+      "file": "s1_bank.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Account does not exist",
+      "goal": 1
+    },
+    {
+      "file": "s1_bank.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Account does not exist",
+      "goal": 2
+    },
+    {
+      "file": "s1_bank.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Account does not exist",
+      "goal": 3
+    },
+    {
+      "file": "s1_bank.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Account does not exist",
+      "goal": 4
+    },
+    {
+      "file": "S1_NOTES.md",
+      "asIs": false,
+      "impl": false,
+      "why": "notes miss withdraw, transfer, history",
+      "goal": 5
+    },
+    {
+      "file": "s2_text.py",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 6
+    },
+    {
+      "file": "s2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "tie order gave [['y', 1], ['x', 1]]",
+      "goal": 7
+    },
+    {
+      "file": "s2_text.py",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 8
+    },
+    {
+      "file": "s2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "read_file_counts gave 3",
+      "goal": 9
+    },
+    {
+      "file": "s2_text.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI printed [\"[('test', 3), ('this', 2)]\", 'b 3', 'a 2']",
+      "goal": 10
+    },
+    {
+      "file": "s3_events.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 11
+    },
+    {
+      "file": "s3_events.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 12
+    },
+    {
+      "file": "s3_events.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: bus.once is not a function",
+      "goal": 13
+    },
+    {
+      "file": "s3_events.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 14
+    },
+    {
+      "file": "s3_events.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: bus.once is not a function",
+      "goal": 15
+    },
+    {
+      "file": "s4_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: add is not defined",
+      "goal": 16
+    },
+    {
+      "file": "s4_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: add is not defined",
+      "goal": 17
+    },
+    {
+      "file": "s4_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: add is not defined",
+      "goal": 18
+    },
+    {
+      "file": "s4_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: add is not defined",
+      "goal": 19
+    },
+    {
+      "file": "s4_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: add is not defined",
+      "goal": 20
+    },
+    {
+      "file": "s5_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 21
+    },
+    {
+      "file": "s5_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "did not expire at ttl",
+      "goal": 22
+    },
+    {
+      "file": "s5_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.stats is not a function",
+      "goal": 23
+    },
+    {
+      "file": "s5_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.delete is not a function",
+      "goal": 24
+    },
+    {
+      "file": "s5_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": "",
+      "goal": 25
+    },
+    {
+      "file": "s6_parser.js",
+      "asIs": false,
+      "impl": false,
+      "why": "no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450\r | 11: 00000219E66775FA",
+      "goal": 26
+    },
+    {
+      "file": "s6_parser.js",
+      "asIs": false,
+      "impl": false,
+      "why": "no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450\r | 11: 00000219E66775FA",
+      "goal": 27
+    },
+    {
+      "file": "s6_parser.js",
+      "asIs": false,
+      "impl": false,
+      "why": "no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450\r | 11: 00000219E66775FA",
+      "goal": 28
+    },
+    {
+      "file": "s6_parser.js",
+      "asIs": false,
+      "impl": false,
+      "why": "no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450\r | 11: 00000219E66775FA",
+      "goal": 29
+    },
+    {
+      "file": "s6_parser.js",
+      "asIs": false,
+      "impl": false,
+      "why": "no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450\r | 11: 00000219E66775FA",
+      "goal": 30
+    },
+    {
+      "file": "s7_todo.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'TodoList' object has no attribute 'todos'",
+      "goal": 31
+    },
+    {
+      "file": "s7_todo.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'TodoList' object has no attribute 'todos'",
+      "goal": 32
+    },
+    {
+      "file": "s7_todo.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'TodoList' object has no attribute 'todos'",
+      "goal": 33
+    },
+    {
+      "file": "s7_todo.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'TodoList' object has no attribute 'todos'",
+      "goal": 34
+    },
+    {
+      "file": "s7_todo.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: NameError: name 'datetime' is not defined",
+      "goal": 35
+    },
+    {
+      "file": "s8_router.js",
+      "asIs": false,
+      "impl": false,
+      "why": "params: 404",
+      "goal": 36
+    },
+    {
+      "file": "s8_router.js",
+      "asIs": false,
+      "impl": false,
+      "why": "params with a query broke",
+      "goal": 37
+    },
+    {
+      "file": "s8_router.js",
+      "asIs": false,
+      "impl": false,
+      "why": "wildcard gave 404",
+      "goal": 38
+    },
+    {
+      "file": "s8_router.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r.use is not a function",
+      "goal": 39
+    },
+    {
+      "file": "s8_router.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Cannot read properties of undefined (reading '/items')",
+      "goal": 40
+    }
+  ]
+}

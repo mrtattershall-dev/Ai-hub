@@ -1,0 +1,42 @@
+ 1 fail s1_bank.js    threw: Account does not exist
+ 2 fail s1_bank.js    threw: Account does not exist
+ 3 fail s1_bank.js    threw: Account does not exist
+ 4 fail s1_bank.js    threw: Account does not exist
+ 5 fail S1_NOTES.md   notes miss withdraw, transfer, history
+ 6 PASS s2_text.py    
+ 7 fail s2_text.py    tie order gave [['y', 1], ['x', 1]]
+ 8 PASS s2_text.py    
+ 9 fail s2_text.py    read_file_counts gave 3
+10 fail s2_text.py    CLI printed ["[('test', 3), ('this', 2)]", 'b 3', 'a 2']
+11 PASS s3_events.js  
+12 PASS s3_events.js  
+13 fail s3_events.js  threw: bus.once is not a function
+14 PASS s3_events.js  
+15 fail s3_events.js  threw: bus.once is not a function
+16 fail s4_matrix.js  load: add is not defined
+17 fail s4_matrix.js  load: add is not defined
+18 fail s4_matrix.js  load: add is not defined
+19 fail s4_matrix.js  load: add is not defined
+20 fail s4_matrix.js  load: add is not defined
+21 PASS s5_cache.js   
+22 fail s5_cache.js   did not expire at ttl
+23 fail s5_cache.js   threw: c.stats is not a function
+24 fail s5_cache.js   threw: c.delete is not a function
+25 PASS s5_cache.js   
+26 fail s6_parser.js  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 00000219E66775FA
+27 fail s6_parser.js  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 00000219E66775FA
+28 fail s6_parser.js  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 00000219E66775FA
+29 fail s6_parser.js  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 00000219E66775FA
+30 fail s6_parser.js  no result: 10: 00007FF7595862F2 v8::String::Utf8Value::~Utf8Value+142450 | 11: 00000219E66775FA
+31 fail s7_todo.py    threw: AttributeError: 'TodoList' object has no attribute 'todos'
+32 fail s7_todo.py    threw: AttributeError: 'TodoList' object has no attribute 'todos'
+33 fail s7_todo.py    threw: AttributeError: 'TodoList' object has no attribute 'todos'
+34 fail s7_todo.py    threw: AttributeError: 'TodoList' object has no attribute 'todos'
+35 fail s7_todo.py    threw: NameError: name 'datetime' is not defined
+36 fail s8_router.js  params: 404
+37 fail s8_router.js  params with a query broke
+38 fail s8_router.js  wildcard gave 404
+39 fail s8_router.js  threw: r.use is not a function
+40 fail s8_router.js  threw: Cannot read properties of undefined (reading '/items')
+
+done as asked 7/40 | implementation correct 7/40 (CT = correct code, own test broke it)
