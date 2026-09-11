@@ -4151,3 +4151,15 @@ D and E".
       successful call - the endpoint only answered again after 9.6-12.8 s. Raising the count from 2 to 4 at the same
       cadence would have changed nothing; that change was amended away. g-fixes now waits past the window instead:
       3 attempts, 15 s then 30 s (AGENT_CONN_RETRY_MS), giving up inside a minute on a genuinely dead endpoint.
+    [set F ledger, Session A] WINDOW CLOSED. Both apps stopped by their watchdogs via stopApp.mjs (Rule 7a):
+      coder14b-setf 18:23:38 ("stopped, and confirmed by the app list"), coder30b-setf 18:42:00; independent re-list
+      18:42: both stopped, 0 tasks. GPU: A10G 16:55 -> 18:23 (~88 min, ~$1.6) + H100 16:55 -> 18:42 (~107 min, ~$7.0)
+      = ~$8.6. Running total: ~$31.9 (tatte raised the $30 cap by choosing both models).
+      Results (hidden checks on the final workspaces): base 14B 2/100 (22 goals 'done'), Qwen3-Coder 32/100 (71 'done').
+      Records complete for BOTH: 100 run files + 100 transcripts each, traces, git bundles. The 14B failed 96 of its 203
+      edit_file calls (47%); 26 were ambiguity and 64 were "not found" on a file it had already read in that run - so
+      90 of 96 (94%) are addressable by the g-fixes addressing modes. 34 no-op edits were named by the set-E fix.
+      MERGED g-fixes into main (fast-forward, verified with merge-base --is-ancestor): LINES/OCCURRENCE editing, the
+      rewrite guard, search scope, the repeated-identical-call notice, and a connection retry that waits past the
+      measured 9.6-12.8 s dead window. Full suite on the branch: 72 files, only the three real* tests skipped (no live
+      MODEL_BASE). The LIVE hub was NOT restarted - it runs the old code until tatte says restart.
