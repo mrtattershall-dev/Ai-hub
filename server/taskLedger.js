@@ -125,13 +125,22 @@ export function isPlanSeeded(workspace) {
  */
 export function adopt(workspace, runId) {
   const tasks = read(workspace);
-  if (!tasks.length) return { carried: 0 };
-  let carried = 0;
+  if (!tasks.length) return { carried: 0, prior: 0 };
+  // EVERY task present when a run starts is prior work - the DONE ones too. Only open ones
+  // used to be marked, so tasks earlier runs had completed still counted as this run's own:
+  // in the 14B data run (2026-09-10, goal 9) closing one carried task left "remainingOwn" at
+  // 0 and task_done announced "ALL 3 TASKS FOR THIS GOAL ARE COMPLETE" for a goal that had no
+  // tasks at all. `carried` keeps its meaning (unfinished leftovers, for the run-start note);
+  // `prior` counts everything marked.
+  let carried = 0, prior = 0;
   for (const t of tasks) {
-    if (t.state !== 'done' && !t.carried) { t.carried = true; carried++; }
+    if (t.carried) continue;
+    t.carried = true;
+    prior++;
+    if (t.state !== 'done') carried++;
   }
-  if (carried) write(workspace, tasks, isPlanSeeded(workspace));
-  return { carried };
+  if (prior) write(workspace, tasks, isPlanSeeded(workspace));
+  return { carried, prior };
 }
 
 /** Replace the whole list. Used to seed the ledger from the BUILD PLAN. */
@@ -237,6 +246,9 @@ export function progress(workspace) {
     // What the finish gate may hold a run to: only tasks THIS run took on.
     remainingOwn: open.filter((t) => !t.carried).length,
     carried: open.filter((t) => t.carried).length,
+    // This run's OWN tasks, open or done. adopt() marks every task present when a run starts
+    // as carried, so these are exactly the tasks this run itself added or was seeded with.
+    own: tasks.filter((t) => !t.carried).length,
   };
 }
 
@@ -308,4 +320,37 @@ export function fromPlan(planText) {
     if (ordered.length) return ordered.slice(0, 12);
   }
   return bulletsIn(lines).slice(0, 12);
+}
+
+/**
+ * The files a BUILD PLAN says it will create or change - its FILES section - so the finish
+ * gate can ask about one that was never written.
+ *
+ * The planner is told "2. FILES - the file(s) to create or change, and what each is for", and
+ * real 14B plans write it as `2. FILES —` or `2. **FILES**:` followed by backticked names. In
+ * the 2026-09-10 data run one plan listed S_QUEUE.md there, the run finished without writing
+ * it, and nothing noticed. Game plans use SYSTEMS / BUILD ORDER instead and have no FILES
+ * section: that returns [], and the gate stays out of the way.
+ *
+ * Backticked names are taken when present; bare file names are the fallback. Anything that
+ * could point outside the workspace (absolute, drive-letter, `..`, a URL) is dropped.
+ */
+export function filesFromPlan(planText) {
+  const lines = String(planText || '').split(/\r?\n/);
+  const clean = (t) => t.replace(/\*\*/g, '').replace(/^#+\s*/, '').trim();
+  const HEAD = /^(?:\d+[.)]\s*)?FILES\b/i;
+  const start = lines.findIndex((l) => HEAD.test(clean(l)));
+  if (start === -1) return [];
+  const section = [clean(lines[start]).replace(HEAD, '')];
+  for (let i = start + 1; i < lines.length; i++) {
+    const l = clean(lines[i]);
+    if (/^\d+[.)]\s*\S/.test(l)) break;                  // the next numbered section
+    section.push(l);
+  }
+  const text = section.join('\n');
+  const ticked = [...text.matchAll(/`([^`\s]+\.[A-Za-z0-9]{1,6})`/g)].map((m) => m[1]);
+  const names = ticked.length ? ticked
+    : [...text.matchAll(/(?:^|[\s(])([\w][\w./-]*\.(?:m?js|cjs|ts|py|html?|css|json|md|txt|gd|tscn))\b/g)].map((m) => m[1]);
+  const safe = names.filter((f) => !/^(?:[/\\]|[A-Za-z]:)/.test(f) && !f.split(/[/\\]/).includes('..') && !f.includes('://'));
+  return [...new Set(safe)].slice(0, 12);
 }

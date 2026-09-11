@@ -1035,10 +1035,23 @@ const tools = {
     const r = ledger.mark(WORKSPACE, which, 'done');
     if (!r.ok) return `ERROR: ${r.error}. Use task_list to see the numbered list.`;
     const p = ledger.progress(WORKSPACE);
+    // A task LEFT OVER from an earlier run is not this goal's work, and closing one says
+    // nothing about whether THIS goal is finished. It used to: in the 14B data run
+    // (2026-09-10, goal 9) the model closed a goal-1 task and was told "ALL 3 TASKS FOR THIS
+    // GOAL ARE COMPLETE - verify, then finish" - the 3 were tasks EARLIER goals had
+    // completed - and it finished without writing the S_QUEUE.md its own plan listed.
+    if (r.task.carried) {
+      const own = !p.own
+        ? 'This goal has no tasks of its own on the ledger - before you finish, check its deliverables yourself: every file the goal or your plan names exists and does what was asked.'
+        : p.remainingOwn
+          ? `${p.remainingOwn} of this goal's ${p.own} task(s) still open.\n${ledger.contextBlock(WORKSPACE)}`
+          : `All ${p.own} task(s) for this goal are done - verify, then finish.`;
+      return `OK: "${r.task.title}" done - that task was LEFT OVER from earlier work in this workspace, not part of this goal. ${own}`;
+    }
     // Counted against THIS run's own tasks, matching the finish gate. Carried-over work
     // from an earlier run must not stop the agent being told it is done.
     return p.remainingOwn === 0
-      ? `OK: "${r.task.title}" done. ALL ${p.total - p.carried} TASKS FOR THIS GOAL ARE COMPLETE — verify, then finish.`
+      ? `OK: "${r.task.title}" done. ALL ${p.own} TASKS FOR THIS GOAL ARE COMPLETE — verify, then finish.`
       : `OK: "${r.task.title}" done (${p.done}/${p.total}). ${p.remainingOwn} left.\n${ledger.contextBlock(WORKSPACE)}`;
   },
 
@@ -2639,6 +2652,34 @@ async function drive(loadDb, run) {
               `Do NOT finish yet — ${p.remainingOwn} of ${p.total} tasks on your ledger are not done:\n${ledger.contextBlock(WORKSPACE)}\n`
               + `Either complete them, or if one is genuinely unnecessary say why and task_done it. Then finish.`);
             continue turn;
+          }
+
+          // 1b. The files the BUILD PLAN said it would write.
+          //
+          // In the 14B data run (2026-09-10, goal 9) the plan listed S_QUEUE.md under FILES, the
+          // model never wrote it, closed an unrelated leftover task, and finished - and the run
+          // counted as done. The plan is the model's own statement of what the goal produces,
+          // so a file it named that does not exist is worth ONE question. Only one: a plan can
+          // over-promise, and the ledger gate above was made advisory precisely because binding
+          // plan items turned finished work into stopped runs. The second finish is accepted,
+          // with a note saying what was left out.
+          if (run.plan) {
+            let missing = [];
+            try {
+              missing = ledger.filesFromPlan(run.plan)
+                .filter((f) => { try { return !existsSync(safePath(f)); } catch { return false; } });
+            } catch { /* the plan is a helper, never a reason finishing breaks */ }
+            if (missing.length && !run.planFilesAsked) {
+              run.planFilesAsked = true;
+              const them = missing.length > 1;
+              blocked(`The plan lists ${missing.join(', ')} under FILES - not written yet.`,
+                `Do NOT finish yet — your BUILD PLAN listed ${missing.join(', ')} under FILES, and ${them ? 'they do' : 'it does'} not exist. `
+                + `Write ${them ? 'them' : 'it'} now. If ${them ? 'they are' : 'it is'} genuinely not needed, say why in your finish SUMMARY and finish again.`);
+              continue turn;
+            }
+            if (missing.length) {
+              pushStep(run, { type: 'note', text: `Finished without ${missing.join(', ')}, which the build plan listed under FILES (asked once).` });
+            }
           }
 
           // 2. web apps: a browser test since the last edit.
