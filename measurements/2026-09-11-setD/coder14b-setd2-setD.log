@@ -1,0 +1,122 @@
+coder14b-setd2 set D start 07:59:43
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+
+100 goals, sequential: coder14b-setd2-setD
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-p2MbI0\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  stopped       69    16   0   0   205  r1_ledger.js:THROWS
+   2  stopped       17     8   0   0    39  r2_text.py:runs
+   3  stopped       17     9   0   0    42  r3_tasks.js:runs
+   4  stopped       15     8   0   0    39  r4_geom.js:runs FN-MISSING(order)
+   5  stopped       21    11   0   0    42  r5_store.py:runs
+   6  stopped       19     9   0   0    45  r6_days.py:THROWS FN-MISSING(date)
+   7  stopped       18     9   0   0    66  r7_grid.py:THROWS FN-MISSING(booleans,to,as)
+   8  stopped       24    12   1   0    84  r8_money.js:THROWS FN-MISSING(cents)
+   9  done           9     5   0   0    36  r9_app.html:ok r9_app.js:parses
+  10  stopped       19    12   2   0    60  r10_report.js:runs r1_ledger.js:THROWS r8_money.js:THROWS FN-MISSING(js,cents,round)
+  11  stopped       11     7   0   0    33  r1_ledger.js:THROWS
+  12  stopped       20    10   5   0    33  r2_text.py:runs FN-MISSING(sentences)
+  13  stopped       19    12   0   0    54  r3_tasks.js:runs
+  14  stopped       18    11   2   0    42  r4_geom.js:runs
+  15  stopped       19    11   0   0    45  r5_store.py:runs
+  16  stopped       17    12   0   0    45  r6_days.py:THROWS FN-MISSING(s)
+  17  stopped       16     8   0   0    42  r7_grid.py:THROWS FN-MISSING(of)
+  18  stopped       18    12   0   0    51  r8_money.js:THROWS
+      approval denied: run_command {"cmd":"open r9_app.html"}
+  19  stopped       15     9   0   0    41  r9_app.js:parses
+  20  stopped        9     7   0   0    27  r10_report.js:runs r8_money.js:THROWS
+  21  stopped       22    13   1   0   120  r1_ledger.js:runs FN-MISSING(throws)
+  22  stopped        7     4   0   0    24  r2_text.py:runs FN-MISSING(as,stopwords)
+  23  done           9     6   1   0    42  r3_tasks.js:runs
+  24  done           8     5   0   0    27  r4_geom.js:runs FN-MISSING(AREA)
+  25  done          10     7   3   0    33  r5_store.py:runs FN-MISSING(one)
+  26  stopped       14    10   0   0    48  r6_days.py:THROWS FN-MISSING(is_weekend,add_business_days,days)
+  27  stopped        7     6   0   0    30  r7_grid.py:THROWS
+  28  stopped        9     7   0   0    39  r8_money.js:THROWS FN-MISSING(zero)
+  29  done           6     4   0   0    33  r9_app.html:ok r9_app.js:parses
+  30  done           6     4   0   0    24  r10_report.js:runs FN-MISSING(multiplyMoney)
+  31  stopped        9     7   0   0    30  r1_ledger.js:runs FN-MISSING(history)
+  32  done           8     5   0   0    27  r2_text.py:runs FN-MISSING(words)
+  33  done           8     5   0   0    30  r3_tasks.js:runs
+  34  done           9     6   0   0    27  r4_geom.js:runs
+  35  stopped       15    11   1   0    42  r5_store.py:THROWS FN-MISSING(Store,now,ttl)
+  36  stopped       14    10   0   0    45  r6_days.py:THROWS FN-MISSING(argument)
+  37  stopped       12     8   0   0    42  r7_grid.py:THROWS
+  38  stopped       13    10   0   0    48  r8_money.js:THROWS FN-MISSING(first)
+  39  stopped       12    10   1   0    63  r9_app.html:ok r9_app.js:parses FN-MISSING(app)
+  40  done           7     4   0   0    27  r10_report.js:runs FN-MISSING(splitMoney)
+  41  stopped        8     6   1   0    33  r1_ledger.js:runs FN-MISSING(freeze,unfreeze,js)
+  42  done          10     7   0   0    33  r2_text.py:runs FN-MISSING(sentence,sentences,words)
+  43  done           9     6   0   0    30  r3_tasks.js:runs FN-MISSING(time)
+  44  done           8     5   0   0    27  r4_geom.js:runs
+  45  stopped       21    14   1   0    54  r5_store.py:THROWS FN-MISSING(of)
+  46  stopped        9     7   0   0    33  r6_days.py:THROWS
+  47  stopped        9     7   0   0    33  r7_grid.py:THROWS FN-MISSING(returns,entered)
+  48  stopped        7     6   0   0    33  r8_money.js:THROWS FN-MISSING(remainders)
+  49  stopped        9     8   0   0    48  r9_app.html:ok r9_app.js:parses FN-MISSING(app,item)
+  50  done           6     4   0   0    24  r10_report.js:runs
+  51  stopped       12    10   1   0    78  r1_ledger.js:runs FN-MISSING(undo)
+  52  stopped       10     6   1   0    30  r2_text.py:runs
+  53  done           9     6   0   0    36  r3_tasks.js:runs FN-MISSING(once)
+  54  done           8     5   0   0    33  r4_geom.js:runs FN-MISSING(y)
+  55  stopped       13     9   2   0    57  r5_store.py:THROWS
+  56  stopped       17    11   0   0    42  r6_days.py:THROWS
+  57  stopped       12     9   0   0    57  r7_grid.py:THROWS FN-MISSING(moves)
+  58  stopped        7     5   1   0    27  r8_money.js:THROWS FN-MISSING(taxMoney,cent)
+  59  stopped       10     9   2   0    54  r9_app.html:ok r9_app.js:parses FN-MISSING(app)
+  60  stopped       11     7   0   0    30  r10_report.js:runs
+  61  stopped       11     7   0   0    39  r1_ledger.js:runs FN-MISSING(cents,round,undo)
+  62  done           8     5   1   0    39  r2_text.py:THROWS
+  63  stopped       12    10   0   0    72  r3_tasks.js:runs FN-MISSING(criticalPath,totalTime)
+  64  done          10     7   0   0    39  r4_geom.js:runs
+  65  done           9     6   0   0    36  r5_store.py:THROWS
+  66  stopped       13     9   0   0    42  r6_days.py:runs FN-MISSING(the)
+  67  stopped       10     8   0   0    42  r7_grid.py:THROWS FN-MISSING(are)
+  68  stopped       12     9   2   0    57  r8_money.js:THROWS
+  69  stopped       15    10   0   0    45  r9_app.html:ok r9_app.js:parses FN-MISSING(app)
+  70  done           6     4   0   0    27  r10_report.js:runs
+  71  stopped        9     7   0   0    33  r1_ledger.js:runs FN-MISSING(toCSV,decimals)
+  72  stopped        8     7   3   0    54  r2_text.py:THROWS
+  73  stopped       11     9   2   0    75  r3_tasks.js:runs
+  74  interrupted    6     5   1   0    33  r4_geom.js:THROWS FN-MISSING(functions)
+  75  done          17    14   3   0    81  r5_store.py:THROWS FN-MISSING(Store)
+  76  stopped       14     9   1   0    39  r6_days.py:runs FN-MISSING(weekday_name)
+  77  stopped       13    10   0   0    90  r7_grid.py:runs
+  78  stopped       11     9   0   0    42  r8_money.js:THROWS FN-MISSING(first)
+  79  stopped       10     8   1   0    48  r9_app.html:ok r9_app.js:parses FN-MISSING(app,items)
+  80  done           9     6   0   0    39  r10_report.js:runs
+  81  done          10     7   0   0    45  r1_ledger.js:runs
+  82  stopped       15    12   0   0    57  r2_text.py:THROWS FN-MISSING(words)
+  83  stopped        9     7   0   0    42  r3_tasks.js:runs FN-MISSING(toJSON,added,fromJSON,graph,order)
+  84  stopped       10     7   0   0    51  r4_geom.js:THROWS FN-MISSING(convex)
+  85  stopped       12     9   0   0    72  r5_store.py:THROWS
+  86  done           8     5   0   0    42  r6_days.py:runs FN-MISSING(weekday)
+  87  done           9     6   0   0    30  r7_grid.py:runs
+  88  stopped       18    13   0   0    57  r8_money.js:THROWS FN-MISSING(cents)
+  89  stopped       12    10   2   0    66  r9_app.html:ok r9_app.js:parses FN-MISSING(app)
+  90  done           6     4   0   0    30  r10_report.js:runs FN-MISSING(toCSV)
+  91  done           6     4   0   0    27  R1_NOTES.md:ok r1_ledger.js:runs
+  92  done          11     7   0   0    45  r2_text.py:THROWS
+  93  stopped       10     8   0   0    48  r3_tasks.js:runs
+  94  stopped       10     8   0   0    66  r4_geom.js:THROWS FN-MISSING(origin)
+  95  stopped       15    11   0   0    48  r5_store.py:THROWS FN-MISSING(py)
+  96  done           8     5   0   0    36  r6_days.py:runs
+  97  done           8     5   0   0    30  r7_grid.py:runs FN-MISSING(parse_grid)
+  98  stopped       12     9   0   0    63  r8_money.js:THROWS FN-MISSING(number)
+  99  stopped       13     9   0   0    36  r9_app.html:ok r9_app.js:parses FN-MISSING(app,item)
+  100  stopped       20    16   4   0    66  R_INDEX.md:ok
+
+--- summary ---
+goals run           : 100
+status 'done'       : 30/100
+WORK ACTUALLY DONE  : 27/100   <- the number that matters
+tool errors         : 46
+guard refusals      : 0   (the system working)
+total model calls   : 808
+wall clock          : 76.8 min
+files: .screenshots, ESCALATIONS.md, node_modules, package-lock.json, package.json, r10_report.js, r1_ledger.js, R1_NOTES.md, r2_text.py, r3_tasks.js, r4_geom.js, r5_store.py, r6_days.py, r7_grid.py, r8_money.js, r9_app.html, r9_app.js, R_INDEX.md, TASKS.md, test_r10_report.js, test_r1_ledger.js, test_r2_text.py, test_r3_tasks.js, test_r3_tasks_ready.js, test_r3_tasks_remove.js, test_r5_store.py, test_r6_days.py, test_r7_grid.py, test_r7_grid_life_step.py, test_r8_money.js, _snippet.py, __pycache__
+tok/s: min 10.3 max 42.9
+approvals           : 19:run_command:denied
+harness exit 0 at 09:16:42
+done as asked 5/100 | implementation correct 5/100 (CT = correct code, own test broke it)

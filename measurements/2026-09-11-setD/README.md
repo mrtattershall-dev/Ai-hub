@@ -29,7 +29,7 @@ regressions. Set D is longer and harder on memory. The next set, E, follows the 
   or export, and must not name anything that exists in no r-file. That is the fabrication seen in
   sets A/B.
 - **Regressions (tools/regress-D.mjs):** each goal's end state is rebuilt from the hub's git checkpoints
-  (matched to goals by thought text) and run through the same checks. The count is the steps that
+  (each run file's own checkpoint steps - measurements/replay/runstates.mjs; unknowable states are marked unknown) and run through the same checks. The count is the steps that
   worked when written and fail at the end.
 
 ## Validation of the checker (before any run)
@@ -93,3 +93,62 @@ patched trial35 (approvals answered; AGENT_MAX_RUNS=1000) on the same hub code.
 
 The final hidden-check score is reported on the continuation's final workspace. Regressions are counted only
 across goals whose start and end states exist as checkpoints.
+
+## Results (hidden checks on the final workspaces, 2026-09-11)
+
+**Qwen3-Coder finished set D with 52/100 steps working at the end. The base 14B finished with 5/100.** Neither
+model's own asserts ever broke correct code (0 CT). Both runs were hurt by hub and harness bugs this set exposed;
+the hub bugs are fixed and proven on the e-fixes branch (below).
+
+| set D, 100 interleaved goals | Qwen3-Coder-30B-A3B | base 14B |
+|---|---|---|
+| **steps that work at the end** | **52** | **5** |
+| per project (of 10) | r1 3, r2 6, r3 7, r4 8, r5 5, r6 3, r7 6, r8 5, r9 4, r10 5 | r2 2, r3 2, r6 1, all others 0 |
+| failures: function or method missing | 19 | 52 |
+| failures: wrong result | 22 | 11 |
+| failures: throws on a valid call / error case not handled | 3 / 4 | 11 / 1 |
+| failures: the file does not load | 0 | 20 |
+
+How the runs actually went (see COORD for the ledger):
+- **Qwen3-Coder** ran goals 1-72 on the unpatched harness. At goal 72 it asked for git_undo, which needs approval,
+  nobody answered, and goals 73-100 failed to start. It was continued from goal 72 (coder30b-setdc), seeded from the
+  live parked workspace because checkpoints had died after goal 53. The score is on the continuation's final workspace.
+- **Base 14B**: the first attempt parked at goal 9 ("open r9_app.html"). The re-run, with the harness answering
+  approvals, ran all 100 goals.
+
+### Regressions - and what could not be known
+The hub's own record keeping failed during set D, so regressions can be counted only where an end state survives
+(measurements/replay/regress-multi.mjs, which marks everything else unknown rather than guessing):
+- **Qwen3-Coder:** end state known for **49 of 100** goals. 32 run files were deleted by the hub (40-file cap), 18
+  goals came after checkpointing died, and 1 is the resume boundary. Of the 49, 26 worked when written, and
+  **1 regressed: goal 36 (r6 holidays), broken by goal 46's whole-file rewrite.**
+- **Git forensics tell the fuller story:** 7 working functions were written and later deleted - r5 delete, r7
+  neighbors, and r6 add_days, is_weekend and add_business_days by whole-file rewrites; r3 earliestStart and ready()
+  by the hub's end-of-run syntax rollback. Most fall in goals whose records were lost, which is why the regression
+  count alone undercounts.
+- **Base 14B:** end state known for 1 goal (60 run files deleted, 39 goals after its checkpoints died). Its
+  regressions cannot be counted.
+
+### Hub bugs found by set D, fixed on e-fixes (each with a test that fails without it; merged after the full suite)
+1. **Approval deadlock.** One approval request in an unattended run parks the run, and every later goal fails to
+   start. Fix: AGENT_UNATTENDED=1 denies instead of parking (unattendedApproval 4/4).
+2. **Checkpoints died silently.** A model-made file Windows cannot open ("10 + 20 + 5 = 35, not 45.") broke `git add`
+   for the rest of Qwen3-Coder's run; a stale .git/index.lock did the same to the 14B's. Fix: add with
+   --ignore-errors, clear stale locks, and note any checkpoint failure in the run (checkpointResilience 5/5).
+3. **Run files deleted at 40.** evictOldRuns unlinked run files, so the 300-file disk cap never bound. Fix: memory
+   only (checkpointResilience).
+4. **Whole-file rewrites silently dropped working functions.** Fix: the write result names what was removed
+   (defLoss 6/6). Replayed on the real goal 46, it fired and named add_business_days, add_days,
+   business_days_between, fmt, is_weekend, parse.
+5. **The end-of-run syntax rollback silently deleted new work.** Fix: the note names what it removed, and a
+   "Re-add ..." task goes into TASKS.md for the next goal (rollbackCarryover 3/3). Replayed on the real goals 43 and
+   93, it named earliestStart and ready and left the tasks.
+Also carried from sets A-C: full untrimmed transcripts per run, and forced finishes marked UNVERIFIED.
+
+### Against the predictions
+- Qwen3-Coder: predicted 75-88 correct with 0-4 regressions. Got 52, with 1 measured regression plus 7 deleted
+  functions found by forensics. The prediction missed badly: interleaving 10 projects cost far more than set C's
+  one-project-at-a-time chains.
+- Base 14B: predicted 15-35, got 5.
+
+GPU: set D cost ~$9.0 (14B ~$0.22 + ~$1.5; Qwen3-Coder ~$4.7 + ~$2.6). Running total of the $30 cap: ~$15.8.

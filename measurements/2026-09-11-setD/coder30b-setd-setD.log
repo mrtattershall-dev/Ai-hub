@@ -1,0 +1,120 @@
+coder30b-setd set D start 07:32:32
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+
+100 goals, sequential: coder30b-setd-setD
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-iIZ4mx\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  done          11     5   0   0    15  r1_ledger.js:runs
+   2  done          15     8   1   0    21  r2_text.py:runs
+   3  done          16    12   0   0    45  r3_tasks.js:runs
+   4  done          24    14   0   0    42  r4_geom.js:runs FN-MISSING(order)
+   5  done          10     5   0   0    12  r5_store.py:runs
+   6  done          11     7   0   0    33  r6_days.py:THROWS FN-MISSING(date)
+   7  done          16     8   0   0    21  r7_grid.py:runs FN-MISSING(booleans,neighbors,to,as)
+   8  done          13     7   0   0    27  r8_money.js:runs FN-MISSING(cents)
+   9  done          20    17   1   0    48  r9_app.html:ok r9_app.js:parses
+  10  done          21    13   1   0    36  r10_report.js:runs r1_ledger.js:runs r8_money.js:runs FN-MISSING(js,cents,round)
+  11  done          17    11   0   0    24  r1_ledger.js:runs
+  12  done          23    13   0   0    36  r2_text.py:runs
+  13  done          23    13   0   0    36  r3_tasks.js:runs
+  14  done          47    28   0   0    78  r4_geom.js:runs
+  15  done          17    10   0   0    27  r5_store.py:runs
+  16  done          25    14   0   0    39  r6_days.py:THROWS FN-MISSING(s)
+  17  done          22    12   0   0    45  r7_grid.py:runs FN-MISSING(of)
+  18  done          17     9   0   0    24  r8_money.js:runs
+  19  done           9     7   0   0    24  r9_app.js:parses
+  20  done          21    13   0   0    30  r10_report.js:runs r8_money.js:runs
+  21  done          22    14   0   0    42  r1_ledger.js:runs FN-MISSING(throws)
+  22  stopped       56    30   3   0   124  r2_text.py:THROWS FN-MISSING(as,stopwords)
+  23  done          20    12   0   0    33  r3_tasks.js:runs
+  24  done          18    12   0   0    30  r4_geom.js:runs FN-MISSING(AREA)
+  25  stopped       46    30   1   0   108  r5_store.py:runs FN-MISSING(one)
+  26  done          28    16   0   0    51  r6_days.py:runs FN-MISSING(days)
+  27  done          21    13   0   0    45  r7_grid.py:runs
+  28  done          17     9   0   0    30  r8_money.js:runs FN-MISSING(zero)
+  29  stopped        8     7   0   0    60  r9_app.html:ok r9_app.js:parses
+  30  done          27    16   0   0    39  r10_report.js:runs FN-MISSING(multiplyMoney)
+  31  stopped       51    30   0   0    75  r1_ledger.js:runs
+  32  done          27    12   0   0    45  r2_text.py:THROWS
+  33  done          44    27   0   0    69  r3_tasks.js:runs
+  34  done          18    12   0   0    36  r4_geom.js:runs
+  35  stopped       50    30   0   0   102  r5_store.py:THROWS FN-MISSING(Store,now,ttl)
+  36  error         34    26   0   0    60  r6_days.py:THROWS FN-MISSING(argument)
+  37  done          23    13   0   0    36  r7_grid.py:runs
+  38  done          38    26   0   0    66  r8_money.js:runs FN-MISSING(first)
+  39  interrupted    3     2   0   0    84  r9_app.html:ok r9_app.js:parses FN-MISSING(app)
+  40  done          21    12   0   0    36  r10_report.js:runs FN-MISSING(splitMoney)
+  41  interrupted    5     4   1   0    72  r1_ledger.js:runs FN-MISSING(freeze,unfreeze,js)
+  42  done          40    23   0   0    66  r2_text.py:THROWS FN-MISSING(sentence)
+  43  error         21    17   1   0   148  r3_tasks.js:runs FN-MISSING(earliestStart,time)
+  44  done          16    10   0   0    39  r4_geom.js:runs
+  45  done          23    14   0   0    51  r5_store.py:THROWS FN-MISSING(of)
+  46  stopped       56    30   0   0   145  r6_days.py:runs
+  47  done          13     8   0   0    81  r7_grid.py:runs FN-MISSING(parse_costs,cheapest_path,returns,entered)
+  48  done          19    12   0   0    42  r8_money.js:runs FN-MISSING(remainders)
+  49  interrupted    3     2   0   0    87  r9_app.html:ok r9_app.js:parses FN-MISSING(app,item)
+  50  stopped       36    30   8   0    63  r10_report.js:runs
+  51  stopped       44    30   0   0   108  r1_ledger.js:runs
+  52  done          25    16   0   0    54  r2_text.py:THROWS
+  53  stopped       45    30   1   0   120  r3_tasks.js:runs FN-MISSING(once)
+  54  done          23    18   0   0    54  r4_geom.js:runs FN-MISSING(y)
+  55  done          39    29   2   0    84  r5_store.py:THROWS
+  56  stopped       35    30   2   0    75  r6_days.py:runs
+  57  done          13     9   0   0    42  r7_grid.py:runs FN-MISSING(moves)
+  58  done          23    17   0   0    39  r8_money.js:runs FN-MISSING(cent)
+  59  stopped        6     5   0   0    75  r9_app.html:ok r9_app.js:parses FN-MISSING(app)
+  60  stopped       35    30   3   0    54  r10_report.js:runs
+  61  stopped       42    30   1   0    66  r1_ledger.js:runs FN-MISSING(cents,round)
+  62  done           8     6   1   0    63  r2_text.py:THROWS
+  63  done          25    19   0   0   102  r3_tasks.js:runs
+  64  done          21    15   0   0    39  r4_geom.js:runs
+  65  stopped       35    30   2   0    81  r5_store.py:THROWS
+  66  done          18    13   0   0    36  r6_days.py:runs FN-MISSING(the)
+  67  done          14    11   0   0    69  r7_grid.py:runs FN-MISSING(count_regions,are)
+  68  done          32    23   0   0    51  r8_money.js:runs
+  69  done          10     8   0   0    27  r9_app.html:ok r9_app.js:parses FN-MISSING(app)
+  70  done          26    20   0   0    45  r10_report.js:runs
+  71  done          21    15   0   0    39  r1_ledger.js:runs FN-MISSING(decimals)
+  72  awaiting_approval    8     6   0   0    60  r2_text.py:THROWS
+  73  START FAILED {"error":"a run is already working in this workspace (awaiti
+  74  START FAILED {"error":"a run is already working in this workspace (awaiti
+  75  START FAILED {"error":"a run is already working in this workspace (awaiti
+  76  START FAILED {"error":"a run is already working in this workspace (awaiti
+  77  START FAILED {"error":"a run is already working in this workspace (awaiti
+  78  START FAILED {"error":"a run is already working in this workspace (awaiti
+  79  START FAILED {"error":"a run is already working in this workspace (awaiti
+  80  START FAILED {"error":"a run is already working in this workspace (awaiti
+  81  START FAILED {"error":"a run is already working in this workspace (awaiti
+  82  START FAILED {"error":"a run is already working in this workspace (awaiti
+  83  START FAILED {"error":"a run is already working in this workspace (awaiti
+  84  START FAILED {"error":"a run is already working in this workspace (awaiti
+  85  START FAILED {"error":"a run is already working in this workspace (awaiti
+  86  START FAILED {"error":"a run is already working in this workspace (awaiti
+  87  START FAILED {"error":"a run is already working in this workspace (awaiti
+  88  START FAILED {"error":"a run is already working in this workspace (awaiti
+  89  START FAILED {"error":"a run is already working in this workspace (awaiti
+  90  START FAILED {"error":"a run is already working in this workspace (awaiti
+  91  START FAILED {"error":"a run is already working in this workspace (awaiti
+  92  START FAILED {"error":"a run is already working in this workspace (awaiti
+  93  START FAILED {"error":"a run is already working in this workspace (awaiti
+  94  START FAILED {"error":"a run is already working in this workspace (awaiti
+  95  START FAILED {"error":"a run is already working in this workspace (awaiti
+  96  START FAILED {"error":"a run is already working in this workspace (awaiti
+  97  START FAILED {"error":"a run is already working in this workspace (awaiti
+  98  START FAILED {"error":"a run is already working in this workspace (awaiti
+  99  START FAILED {"error":"a run is already working in this workspace (awaiti
+  100  START FAILED {"error":"a run is already working in this workspace (awaiti
+
+--- summary ---
+goals run           : 72
+status 'done'       : 52/72
+WORK ACTUALLY DONE  : 30/72   <- the number that matters
+tool errors         : 29
+guard refusals      : 0   (the system working)
+total model calls   : 1135
+wall clock          : 67.1 min
+files: .screenshots, 10 + 20 + 5 = 35, not 45., check_date.py, clean_ledger.js, debug_business_days.py, debug_cycle.js, debug_holidays.py, debug_keys.py, debug_quad.js, debug_simple.py, debug_store.py, debug_test.js, debug_test.py, ESCALATIONS.md, package.json, r10_report.js, r1_ledger.js, r2_text.py, r3_tasks.js, r4_geom.js, r5_store.py, r6_days.py, r7_grid.py, r8_money.js, r9_app.html, r9_app.js, simple_debug.py, simple_test.py, TASKS.md, test_apply_interest.js, test_avg_function.py, test_bigrams.py, test_business_days.py, test_centroid.js, test_clean_history.js, test_convert.js, test_convert_balances.js, test_convex_hull.js, test_critical_path.js, test_csv.js, test_cycle.js, test_cycle_fixed.js, test_debug.js, test_evenSplit.js, test_file.txt, test_geom.js, test_history.js, test_money_functions.js, test_my_function.py, test_new_methods.py, test_perimeter.js, test_reachable.py, test_render.py, test_split.js, test_tax.js, test_total_report.js, test_undo.js, _snippet.py, __pycache__
+tok/s: min 17.9 max 177.1
+harness exit 0 at 08:39:49
+done as asked 40/100 | implementation correct 40/100 (CT = correct code, own test broke it)

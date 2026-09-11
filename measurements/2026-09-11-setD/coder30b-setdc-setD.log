@@ -1,0 +1,51 @@
+coder30b-setdc set D continuation start 08:54:03 seed C:/Users/tatte/Projects/ai-coding-hub/measurements/2026-09-11-setD/data/coder30b-setd-seed72live goals C:/Users/tatte/Projects/ai-coding-hub/measurements/2026-09-11-setD/goals-D-72to100.json
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+seeded from C:/Users/tatte/Projects/ai-coding-hub/measurements/2026-09-11-setD/data/coder30b-setd-seed72live
+
+29 goals, sequential: coder30b-setdc-setD
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-wihsEw\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  interrupted    2     1   0   0    54  r2_text.py:THROWS
+   2  stopped       42    30   0   0   108  r3_tasks.js:runs
+   3  stopped       41    30   0   0   111  r4_geom.js:runs FN-MISSING(functions)
+   4  stopped       46    30   0   0    93  r5_store.py:THROWS FN-MISSING(Store)
+   5  done          17    10   0   0    39  r6_days.py:runs
+   6  done          45    29   0   0    69  r7_grid.py:runs
+   7  stopped       37    30   0   0    66  r8_money.js:runs FN-MISSING(first)
+   8  done          14    11   0   0    45  r9_app.html:ok r9_app.js:parses FN-MISSING(app,items)
+   9  done          12     7   0   0    36  r10_report.js:runs FN-MISSING(formatMoney)
+  10  stopped       45    30   0   0    78  r1_ledger.js:runs
+  11  done          19    12   0   0    48  r2_text.py:runs
+  12  stopped       45    30   0   0   108  r3_tasks.js:runs FN-MISSING(added,graph)
+  13  done          18    11   0   0    45  r4_geom.js:runs FN-MISSING(convex)
+  14  done          20    12   0   0    54  r5_store.py:THROWS
+  15  done          15     8   1   0    42  r6_days.py:runs FN-MISSING(weekday)
+  16  done          20    13   0   0    42  r7_grid.py:runs
+  17  done          15     9   0   0    36  r8_money.js:runs FN-MISSING(cents)
+  18  stopped        5     4   0   0    60  r9_app.html:ok r9_app.js:parses FN-MISSING(app)
+  19  done          18    12   0   0    51  r10_report.js:runs FN-MISSING(toCSV)
+  20  done           9     7   0   0    33  R1_NOTES.md:ok r1_ledger.js:runs
+  21  done          25    12   0   0    51  r2_text.py:runs
+  22  stopped       42    30   5   0    69  r3_tasks.js:runs FN-MISSING(ready)
+  23  done          39    27   1   0    72  r4_geom.js:runs FN-MISSING(origin)
+  24  stopped       43    30   3   0    72  r5_store.py:THROWS FN-MISSING(py)
+  25  stopped       46    30   2   0   105  r6_days.py:runs
+  26  done          25    16   0   0    54  r7_grid.py:runs
+  27  done          44    27   0   0    90  r8_money.js:runs FN-MISSING(number)
+  28  done           9     7   0   0    30  r9_app.html:ok r9_app.js:parses FN-MISSING(app,item)
+  29  done          25    20   1   0   120  R_INDEX.md:ok
+
+--- summary ---
+goals run           : 29
+status 'done'       : 18/29
+WORK ACTUALLY DONE  : 11/29   <- the number that matters
+tool errors         : 13
+guard refusals      : 0   (the system working)
+total model calls   : 525
+wall clock          : 31.5 min
+files: .screenshots, check_date.py, clean_ledger.js, comprehensive_test.js, debug_business_days.py, debug_cycle.js, debug_holidays.py, debug_keys.py, debug_quad.js, debug_simple.py, debug_store.py, debug_test.js, debug_test.py, ESCALATIONS.md, package.json, r10_report.js, r1_ledger.js, R1_NOTES.md, r2_text.py, r3_tasks.js, r4_geom.js, r5_store.py, r6_days.py, r7_grid.py, r8_money.js, r9_app.html, r9_app.js, R_INDEX.md, simple_debug.py, simple_test.js, simple_test.py, simple_test_fromcsv.js, TASKS.md, test_apply_interest.js, test_avg_function.py, test_bigrams.py, test_business_days.py, test_centroid.js, test_clean_history.js, test_convert.js, test_convert_balances.js, test_convex_hull.js, test_critical_path.js, test_csv.js, test_currency.js, test_cycle.js, test_cycle_fixed.js, test_debug.js, test_evenSplit.js, test_file.txt, test_fromcsv.js, test_geom.js, test_geom_validation.js, test_history.js, test_life_functions.py, test_life_step.py, test_money_functions.js, test_my_function.py, test_new_methods.py, test_perimeter.js, test_r2_summary.py, test_reachable.py, test_ready.js, test_ready_final.js, test_remove.js, test_render.py, test_rich.js, test_rotate.js, test_split.js, test_store_limit.py, test_store_operators.py, test_tax.js, test_tojson.js, test_total_report.js, test_undo.js, _snippet.py, __pycache__
+tok/s: min 5.1 max 179
+approvals           : none
+harness exit 0 at 09:25:39
+done as asked 52/100 | implementation correct 52/100 (CT = correct code, own test broke it)

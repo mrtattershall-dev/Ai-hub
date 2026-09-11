@@ -4028,3 +4028,22 @@ tatte, verbatim, this thread: "After c is done running, run one more with d that
       failed checkpoint a visible note, stop deleting run files). Harness: AGENT_MAX_RUNS=1000.
       coder3 continuation (goals 72-100, coder30b-setdc) seeds from the LIVE parked workspace - goal 72's partial
       edits included, the one unaddable file left out - because no checkpoint exists for goal 72's start.
+      coder30b-setdc (continuation, goals 72-100) health try 3 08:54:03: {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+      Seeded from the live parked workspace; harness started 08:54:03, no new goals after 09:36:03; watchdog cap 60 min.
+    [set D ledger, Session A] coder14b-setd2 DONE: harness exit 09:16:42, all 100 goals run (0 START FAILED; the
+      patched harness denied one approval: goal 19 "open r9_app.html"). STOPPED by the watchdog through stopApp.mjs
+      09:17:32 (exit 0, "stopped, and confirmed by the app list"); independent re-list: stopped, 0 tasks.
+      ~80 min A10G, ~$1.5. Hidden checks on its final workspace: 5/100. Its checkpoints died at 08:18 (stale
+      index.lock), and only its last 40 run files survive (AGENT_MAX_RUNS 40), so its regressions are mostly unknowable.
+    [set D ledger, Session A] coder30b-setdc (continuation, goals 72-100) DONE: harness exit 09:25:39, 29/29 goals,
+      no approvals needed. STOPPED by the watchdog through stopApp.mjs 09:26:33 (exit 0, "stopped, and confirmed by
+      the app list"). ~39 min H100, ~$2.6. Qwen3-Coder's set D final workspace (original 1-71 + continuation 72-100):
+      hidden checks 52/100. SET D GPU WINDOW CLOSED. Running total of the $30 cap: ~$15.8 (pilot 2.5, coder3 A/B
+      1.65, set C 2.67, set D: 14B 0.22 + 1.5, Qwen3-Coder 4.7 + 2.6). Offline fuzzer resumes after the e-fixes suite.
+    [set D analysis, Session A] HUB FINDING: the end-of-run SYNTAX ROLLBACK silently deletes correct new work.
+      Qwen3-Coder set D goals 43 and 93 ended with r3_tasks.js not parsing (43: gave up on unparseable replies; 93:
+      out of step budget); the hub "restored the last committed version that did" - which predated the functions those
+      goals had just written (earliestStart, ready). Nothing told the next goal; the hidden checks found the holes at
+      the end. Also found and fixed on e-fixes (f2fbd07): whole-file rewrites that drop definitions (r6 lost add_days,
+      is_weekend, add_business_days in goal 46) now name what they removed; proven by replaying the real goal 46.
+      Planned for e-fixes: the rollback names what it removed and leaves a ledger task for the next goal.

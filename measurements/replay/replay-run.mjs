@@ -81,9 +81,14 @@ async function replay(s) {
   } catch (e) { error = e.message; }
   hub.kill(); mock.close();
   await sleep(300);
+  // What the run left for the NEXT goal: carried-over ledger tasks (e.g. the rollback's "Re-add ..." task).
+  let carried = [];
+  try { carried = readFileSync(join(ws, 'TASKS.md'), 'utf8').split('\n').filter((l) => /Re-add/.test(l)).map((l) => l.trim().slice(0, 300)); } catch { /* no ledger */ }
   if (!KEEP) rmSync(dir, { recursive: true, force: true });
   const steps = (run && run.steps) || [];
   const res = {
+    rollbackNotes: steps.filter((x) => x.type === 'note' && /did not parse at the end of the run/.test(String(x.text || ''))).map((x) => String(x.text).slice(0, 400)),
+    carriedTasks: carried,
     id: s.id, error, status: run && run.status, finishBlocks: run && (run.finishBlocks || 0), forcedFinish: run ? !!run.forcedFinish : null,
     served, recorded: s.replies.length, exhausted, modelCalls: run && run.modelCalls,
     original: { status: s.outcome.status, finishBlocks: s.outcome.finishBlocks },
@@ -91,6 +96,8 @@ async function replay(s) {
     batchRuns: steps.filter((x) => /batch/i.test(String(x.text || ''))).length,
     discardNudges: asked.filter((a) => /were DISCARDED/.test(a)).length,
     gateBlocks: asked.filter((a) => /Do NOT finish yet/.test(a)).length,
+    defLossWarnings: asked.filter((a) => /REMOVED \d+ definition/.test(a)).length,
+    defLossNamed: [...new Set(asked.flatMap((a) => [...a.matchAll(/had before: ([^.]+)\./g)].map((m) => m[1])))],
     lastSteps: steps.slice(-4).map((x) => `${x.type}${x.tool ? ':' + x.tool : ''} ${String(x.text || x.summary || '').slice(0, 80)}`),
     dir: KEEP ? dir : undefined,
   };

@@ -1,0 +1,133 @@
+  1 fail r1_ledger.js   s1  threw: l.open is not a function
+  2 fail r2_text.py     s1  threw: AttributeError: module 'r2_text_mod' has no attribute 'words'
+  3 PASS r3_tasks.js    s1  
+  4 fail r4_geom.js     s1  load: a is not defined
+  5 fail r5_store.py    s1  threw: AttributeError: 'Store' object has no attribute 'max_keys'
+  6 fail r6_days.py     s1  threw: AttributeError: module 'datetime' has no attribute 'strptime'
+  7 fail r7_grid.py     s1  threw: AttributeError: module 'r7_grid_mod' has no attribute 'parse_grid'
+  8 fail r8_money.js    s1  load: Expected values to be strictly equal:
+
+100 !== 123456
+
+  9 fail r9_app.html    s1  threw: Error: failed to find element matching selector "#r9-input" | js error: Cannot read propertie
+ 10 fail r10_report.js  s1  threw: l.open is not a function
+ 11 fail r1_ledger.js   s2  threw: l.open is not a function
+ 12 fail r2_text.py     s2  threw: AttributeError: module 'r2_text_mod' has no attribute 'sentences'
+ 13 PASS r3_tasks.js    s2  
+ 14 fail r4_geom.js     s2  load: a is not defined
+ 15 fail r5_store.py    s2  threw: AttributeError: 'Store' object has no attribute 'begin'
+ 16 fail r6_days.py     s2  threw: AttributeError: module 'datetime' has no attribute 'strptime'
+ 17 fail r7_grid.py     s2  threw: AttributeError: module 'r7_grid_mod' has no attribute 'parse_grid'
+ 18 fail r8_money.js    s2  load: Expected values to be strictly equal:
+
+100 !== 123456
+
+ 19 fail r9_app.html    s2  threw: Error: failed to find element matching selector "#r9-input" | js error: Cannot read propertie
+ 20 fail r10_report.js  s2  threw: l.open is not a function
+ 21 fail r1_ledger.js   s3  threw: l.open is not a function
+ 22 fail r2_text.py     s3  top ['b', 'a']
+ 23 fail r3_tasks.js    s3  threw: g.order is not a function
+ 24 fail r4_geom.js     s3  load: a is not defined
+ 25 fail r5_store.py    s3  threw: AttributeError: 'Store' object has no attribute 'max_keys'
+ 26 fail r6_days.py     s3  threw: AttributeError: module 'r6_days_mod' has no attribute 'is_weekend'
+ 27 fail r7_grid.py     s3  threw: AttributeError: module 'r7_grid_mod' has no attribute 'parse_grid'
+ 28 fail r8_money.js    s3  load: Expected values to be strictly equal:
+
+100 !== 123456
+
+ 29 fail r9_app.html    s3  threw: Error: failed to find element matching selector "#r9-input" | js error: Cannot read propertie
+ 30 fail r10_report.js  s3  threw: l.open is not a function
+ 31 fail r1_ledger.js   s4  threw: l.open is not a function
+ 32 PASS r2_text.py     s4  
+ 33 fail r3_tasks.js    s4  the cycle a->c->b->a was accepted
+ 34 fail r4_geom.js     s4  load: a is not defined
+ 35 fail r5_store.py    s4  threw: AttributeError: 'Store' object has no attribute 'max_keys'
+ 36 fail r6_days.py     s4  threw: AttributeError: module 'datetime' has no attribute 'strptime'
+ 37 fail r7_grid.py     s4  threw: AttributeError: module 'r7_grid_mod' has no attribute 'parse_grid'
+ 38 fail r8_money.js    s4  load: Expected values to be strictly equal:
+
+100 !== 123456
+
+ 39 fail r9_app.html    s4  threw: Error: failed to find element matching selector "#r9-input" | js error: Cannot read propertie
+ 40 fail r10_report.js  s4  threw: l.open is not a function
+ 41 fail r1_ledger.js   s5  threw: l.open is not a function
+ 42 fail r2_text.py     s5  threw: NameError: name 'sentences' is not defined
+ 43 fail r3_tasks.js    s5  threw: g.earliestStart is not a function
+ 44 fail r4_geom.js     s5  load: a is not defined
+ 45 fail r5_store.py    s5  threw: AttributeError: 'Store' object has no attribute 'max_keys'
+ 46 fail r6_days.py     s5  threw: TypeError: can only concatenate str (not "datetime.timedelta") to str
+ 47 fail r7_grid.py     s5  threw: AttributeError: module 'r7_grid_mod' has no attribute 'parse_costs'
+ 48 fail r8_money.js    s5  load: Expected values to be strictly equal:
+
+100 !== 123456
+
+ 49 fail r9_app.html    s5  threw: Error: failed to find element matching selector "#r9-input" | js error: Cannot read propertie
+ 50 fail r10_report.js  s5  threw: l.open is not a function
+ 51 fail r1_ledger.js   s6  threw: l.open is not a function
+ 52 fail r2_text.py     s6  read_counts 3
+ 53 fail r3_tasks.js    s6  threw: g.totalTime is not a function
+ 54 fail r4_geom.js     s6  load: a is not defined
+ 55 fail r5_store.py    s6  threw: AttributeError: 'Store' object has no attribute 'max_keys'
+ 56 fail r6_days.py     s6  months [datetime.datetime(2026, 2, 28, 0, 0), datetime.datetime(2024, 2, 29, 0, 0), datetime.datetim
+ 57 fail r7_grid.py     s6  threw: AttributeError: module 'r7_grid_mod' has no attribute 'parse_grid'
+ 58 fail r8_money.js    s6  load: Expected values to be strictly equal:
+
+100 !== 123456
+
+ 59 fail r9_app.html    s6  threw: Error: failed to find element matching selector "#r9-input" | js error: Cannot read propertie
+ 60 fail r10_report.js  s6  threw: l.open is not a function
+ 61 fail r1_ledger.js   s7  threw: l.open is not a function
+ 62 PASS r2_text.py     s7  
+ 63 fail r3_tasks.js    s7  threw: g.criticalPath is not a function
+ 64 fail r4_geom.js     s7  load: a is not defined
+ 65 fail r5_store.py    s7  threw: AttributeError: 'Store' object has no attribute 'incr'
+ 66 PASS r6_days.py     s7  
+ 67 fail r7_grid.py     s7  threw: AttributeError: module 'r7_grid_mod' has no attribute 'parse_grid'
+ 68 fail r8_money.js    s7  load: Expected values to be strictly equal:
+
+100 !== 123456
+
+ 69 fail r9_app.html    s7  threw: Error: failed to find element matching selector "#r9-input" | js error: Cannot read propertie
+ 70 fail r10_report.js  s7  threw: l.open is not a function
+ 71 fail r1_ledger.js   s8  threw: l.open is not a function
+ 72 fail r2_text.py     s8  not JSON: 'Usage: python r2_text.py FILE N\r\n'
+ 73 fail r3_tasks.js    s8  threw: g.remove is not a function
+ 74 fail r4_geom.js     s8  load: a is not defined
+ 75 fail r5_store.py    s8  threw: TypeError: Store.__init__() got an unexpected keyword argument 'max_keys'
+ 76 fail r6_days.py     s8  threw: AttributeError: module 'r6_days_mod' has no attribute 'weekday_name'
+ 77 fail r7_grid.py     s8  blinker [[False, False, False], [False, True, False], [False, False, False]]
+ 78 fail r8_money.js    s8  load: Expected values to be strictly equal:
+
+100 !== 123456
+
+ 79 fail r9_app.html    s8  threw: Error: failed to find element matching selector "#r9-input" | js error: Cannot read propertie
+ 80 fail r10_report.js  s8  threw: l.open is not a function
+ 81 fail r1_ledger.js   s9  threw: l.open is not a function
+ 82 fail r2_text.py     s9  threw: AttributeError: module 'r2_text_mod' has no attribute 'words'
+ 83 fail r3_tasks.js    s9  threw: g.toJSON is not a function
+ 84 fail r4_geom.js     s9  load: a is not defined
+ 85 fail r5_store.py    s9  threw: AttributeError: 'Store' object has no attribute 'max_keys'
+ 86 fail r6_days.py     s9  threw: AttributeError: 'str' object has no attribute 'weekday'
+ 87 fail r7_grid.py     s9  life_run(2)
+ 88 fail r8_money.js    s9  load: Expected values to be strictly equal:
+
+100 !== 123456
+
+ 89 fail r9_app.html    s9  the empty message is not shown at start | js error: Cannot read properties of null (reading 'addEven
+ 90 fail r10_report.js  s9  threw: l.open is not a function
+ 91 fail R1_NOTES.md    s10 notes miss open, deposit, withdraw, transfer, history, freeze, unfreeze, undo, applyInterest
+ 92 fail r2_text.py     s10 summary {'words': 4, 'unique': 3, 'sentences': 2, 'top': ['a', 'b', 'c']}
+ 93 fail r3_tasks.js    s10 ready([]) []
+ 94 fail r4_geom.js     s10 load: a is not defined
+ 95 fail r5_store.py    s10 threw: AttributeError: 'Store' object has no attribute 'max_keys'
+ 96 fail r6_days.py     s10 threw: AttributeError: module 'r6_days_mod' has no attribute 'is_weekend'
+ 97 fail r7_grid.py     s10 threw: AttributeError: module 'r7_grid_mod' has no attribute 'parse_grid'
+ 98 fail r8_money.js    s10 load: Expected values to be strictly equal:
+
+100 !== 123456
+
+ 99 fail r9_app.html    s10 threw: Error: failed to find element matching selector "#r9-input" | js error: Cannot read propertie
+100 fail R_INDEX.md     s10 index misses names: r10_report.js:balancesReport, r10_report.js:totalReport, r10_report.js:interestP
+
+per chain (implementation correct): r1 0/10  r2 2/10  r3 2/10  r4 0/10  r5 0/10  r6 1/10  r7 0/10  r8 0/10  r9 0/10  r10 0/10
+done as asked 5/100 | implementation correct 5/100 (CT = correct code, own test broke it)

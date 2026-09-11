@@ -22,6 +22,7 @@ import { rebuild } from './reconstruct.mjs';
 const arg = (k) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : undefined; };
 const WS = arg('ws'), RUNS = arg('runs'), LABEL = arg('label'), SET = arg('set'), OUT = arg('out');
 if (!WS || !RUNS || !LABEL || !SET || !OUT) { console.error('usage: see header'); process.exit(2); }
+const FIRST = Number(arg('first') || 1);   // goal number of the first run file (a segment that does not start at goal 1)
 const regress = arg('regress') && existsSync(arg('regress')) ? JSON.parse(readFileSync(arg('regress'), 'utf8')) : null;
 const grades = arg('grades') && existsSync(arg('grades')) ? JSON.parse(readFileSync(arg('grades'), 'utf8')) : {};
 
@@ -53,8 +54,13 @@ let bytes = 0;
 for (let j = 0; j < runs.length; j++) {
   const r = runs[j];
   const sha = rs.start(j);
+  // The start state is only in the repo while checkpointing was alive: some run at or after this one must have made a
+  // checkpoint. After an unaddable file or a stale index.lock killed checkpointing (set D), the newest commit is a
+  // STALE tree, and seeding a replay from it would be silently wrong - so such a scenario keeps no start at all.
+  const startKnown = sha === 'final' || rs.info.slice(j).some((x) => x.cps.length > 0);
   let start;
-  if (sha === 'final') start = finalSnap || {};
+  if (!startKnown) start = null;
+  else if (sha === 'final') start = finalSnap || {};
   else if (cache.has(sha)) start = cache.get(sha);
   else { const base = mkdtempSync(join(tmpdir(), 'scen-')); const d = join(base, 'w'); exportTree(WS, sha, d); start = snapshot(d); rmSync(base, { recursive: true, force: true }); cache.set(sha, start); }
   // Prefer the hub's full transcript (<id>.transcript.jsonl, written from set E on): every raw reply in order,
@@ -98,19 +104,21 @@ for (let j = 0; j < runs.length; j++) {
     }
   }
   const multi = replies.filter((t) => (t.match(/^\s*ACTION:/gim) || []).length > 1).length;
-  const rg = regress ? regress.find((x) => x.goal === j + 1) : null;
-  const grade = grades[String(j + 1)] || null;
+  const goalNo = FIRST + j;
+  const rg = regress ? regress.find((x) => x.goal === goalNo) : null;
+  const grade = grades[String(goalNo)] || null;
   const tags = [];
   if (multi) tags.push('multi-action');
   if (r.status === 'done' && (r.finishBlocks || 0) >= 3) tags.push('forced-finish');
-  if (r.status === 'done' && ((rg && !rg.thenImpl) || (grade && /^F/.test(grade)))) tags.push('false-done');
+  if (r.status === 'done' && ((rg && rg.thenImpl === false) || (grade && /^F/.test(grade)))) tags.push('false-done');
   if (rg && rg.regressed) tags.push('regressed');
   if (r.status === 'stopped') tags.push('stopped');
   if (grade && /^F/.test(grade)) tags.push('hand-F');
+  if (!startKnown) { tags.push('start-unknown'); complete = false; }   // cannot be replayed faithfully
   if (lossyCount) tags.push('lossy');
   if (!complete) tags.push('partial');       // history was pruned: a replay will run out of recorded replies early
   const row = {
-    id: `${SET}-${LABEL}-g${String(j + 1).padStart(3, '0')}`, set: SET, model: LABEL, goalNo: j + 1, goal: r.goal,
+    id: `${SET}-${LABEL}-g${String(goalNo).padStart(3, '0')}`, set: SET, model: LABEL, goalNo, goal: r.goal,
     source, complete,
     startFrom: sha === 'final' ? 'final' : sha.slice(0, 10), startHow: rs.how(j), start, replies, hubSaid,
     outcome: { status: r.status, finishBlocks: r.finishBlocks || 0, modelCalls: r.modelCalls, steps: (r.steps || []).length,

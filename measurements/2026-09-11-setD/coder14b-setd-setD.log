@@ -1,0 +1,120 @@
+coder14b-setd set D start 07:31:22
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+
+100 goals, sequential: coder14b-setd-setD
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-N5x9Sp\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  stopped       74    19   1   1   232  r1_ledger.js:runs
+   2  done          13     5   0   0    30  r2_text.py:runs
+   3  done          14     6   0   0    36  r3_tasks.js:runs
+   4  done          10     4   0   0    30  r4_geom.js:runs FN-MISSING(order)
+   5  done          18     8   0   0    36  r5_store.py:runs
+   6  stopped       13     7   0   0    33  r6_days.py:THROWS FN-MISSING(date)
+   7  stopped       15     7   1   0    39  r7_grid.py:THROWS FN-MISSING(booleans,to,as)
+   8  stopped       22    12   1   0    84  r8_money.js:runs FN-MISSING(cents)
+   9  awaiting_approval    7     3   0   0    15  r9_app.html:ok r9_app.js:parses
+  10  START FAILED {"error":"a run is already working in this workspace (awaiti
+  11  START FAILED {"error":"a run is already working in this workspace (awaiti
+  12  START FAILED {"error":"a run is already working in this workspace (awaiti
+  13  START FAILED {"error":"a run is already working in this workspace (awaiti
+  14  START FAILED {"error":"a run is already working in this workspace (awaiti
+  15  START FAILED {"error":"a run is already working in this workspace (awaiti
+  16  START FAILED {"error":"a run is already working in this workspace (awaiti
+  17  START FAILED {"error":"a run is already working in this workspace (awaiti
+  18  START FAILED {"error":"a run is already working in this workspace (awaiti
+  19  START FAILED {"error":"a run is already working in this workspace (awaiti
+  20  START FAILED {"error":"a run is already working in this workspace (awaiti
+  21  START FAILED {"error":"a run is already working in this workspace (awaiti
+  22  START FAILED {"error":"a run is already working in this workspace (awaiti
+  23  START FAILED {"error":"a run is already working in this workspace (awaiti
+  24  START FAILED {"error":"a run is already working in this workspace (awaiti
+  25  START FAILED {"error":"a run is already working in this workspace (awaiti
+  26  START FAILED {"error":"a run is already working in this workspace (awaiti
+  27  START FAILED {"error":"a run is already working in this workspace (awaiti
+  28  START FAILED {"error":"a run is already working in this workspace (awaiti
+  29  START FAILED {"error":"a run is already working in this workspace (awaiti
+  30  START FAILED {"error":"a run is already working in this workspace (awaiti
+  31  START FAILED {"error":"a run is already working in this workspace (awaiti
+  32  START FAILED {"error":"a run is already working in this workspace (awaiti
+  33  START FAILED {"error":"a run is already working in this workspace (awaiti
+  34  START FAILED {"error":"a run is already working in this workspace (awaiti
+  35  START FAILED {"error":"a run is already working in this workspace (awaiti
+  36  START FAILED {"error":"a run is already working in this workspace (awaiti
+  37  START FAILED {"error":"a run is already working in this workspace (awaiti
+  38  START FAILED {"error":"a run is already working in this workspace (awaiti
+  39  START FAILED {"error":"a run is already working in this workspace (awaiti
+  40  START FAILED {"error":"a run is already working in this workspace (awaiti
+  41  START FAILED {"error":"a run is already working in this workspace (awaiti
+  42  START FAILED {"error":"a run is already working in this workspace (awaiti
+  43  START FAILED {"error":"a run is already working in this workspace (awaiti
+  44  START FAILED {"error":"a run is already working in this workspace (awaiti
+  45  START FAILED {"error":"a run is already working in this workspace (awaiti
+  46  START FAILED {"error":"a run is already working in this workspace (awaiti
+  47  START FAILED {"error":"a run is already working in this workspace (awaiti
+  48  START FAILED {"error":"a run is already working in this workspace (awaiti
+  49  START FAILED {"error":"a run is already working in this workspace (awaiti
+  50  START FAILED {"error":"a run is already working in this workspace (awaiti
+  51  START FAILED {"error":"a run is already working in this workspace (awaiti
+  52  START FAILED {"error":"a run is already working in this workspace (awaiti
+  53  START FAILED {"error":"a run is already working in this workspace (awaiti
+  54  START FAILED {"error":"a run is already working in this workspace (awaiti
+  55  START FAILED {"error":"a run is already working in this workspace (awaiti
+  56  START FAILED {"error":"a run is already working in this workspace (awaiti
+  57  START FAILED {"error":"a run is already working in this workspace (awaiti
+  58  START FAILED {"error":"a run is already working in this workspace (awaiti
+  59  START FAILED {"error":"a run is already working in this workspace (awaiti
+  60  START FAILED {"error":"a run is already working in this workspace (awaiti
+  61  START FAILED {"error":"a run is already working in this workspace (awaiti
+  62  START FAILED {"error":"a run is already working in this workspace (awaiti
+  63  START FAILED {"error":"a run is already working in this workspace (awaiti
+  64  START FAILED {"error":"a run is already working in this workspace (awaiti
+  65  START FAILED {"error":"a run is already working in this workspace (awaiti
+  66  START FAILED {"error":"a run is already working in this workspace (awaiti
+  67  START FAILED {"error":"a run is already working in this workspace (awaiti
+  68  START FAILED {"error":"a run is already working in this workspace (awaiti
+  69  START FAILED {"error":"a run is already working in this workspace (awaiti
+  70  START FAILED {"error":"a run is already working in this workspace (awaiti
+  71  START FAILED {"error":"a run is already working in this workspace (awaiti
+  72  START FAILED {"error":"a run is already working in this workspace (awaiti
+  73  START FAILED {"error":"a run is already working in this workspace (awaiti
+  74  START FAILED {"error":"a run is already working in this workspace (awaiti
+  75  START FAILED {"error":"a run is already working in this workspace (awaiti
+  76  START FAILED {"error":"a run is already working in this workspace (awaiti
+  77  START FAILED {"error":"a run is already working in this workspace (awaiti
+  78  START FAILED {"error":"a run is already working in this workspace (awaiti
+  79  START FAILED {"error":"a run is already working in this workspace (awaiti
+  80  START FAILED {"error":"a run is already working in this workspace (awaiti
+  81  START FAILED {"error":"a run is already working in this workspace (awaiti
+  82  START FAILED {"error":"a run is already working in this workspace (awaiti
+  83  START FAILED {"error":"a run is already working in this workspace (awaiti
+  84  START FAILED {"error":"a run is already working in this workspace (awaiti
+  85  START FAILED {"error":"a run is already working in this workspace (awaiti
+  86  START FAILED {"error":"a run is already working in this workspace (awaiti
+  87  START FAILED {"error":"a run is already working in this workspace (awaiti
+  88  START FAILED {"error":"a run is already working in this workspace (awaiti
+  89  START FAILED {"error":"a run is already working in this workspace (awaiti
+  90  START FAILED {"error":"a run is already working in this workspace (awaiti
+  91  START FAILED {"error":"a run is already working in this workspace (awaiti
+  92  START FAILED {"error":"a run is already working in this workspace (awaiti
+  93  START FAILED {"error":"a run is already working in this workspace (awaiti
+  94  START FAILED {"error":"a run is already working in this workspace (awaiti
+  95  START FAILED {"error":"a run is already working in this workspace (awaiti
+  96  START FAILED {"error":"a run is already working in this workspace (awaiti
+  97  START FAILED {"error":"a run is already working in this workspace (awaiti
+  98  START FAILED {"error":"a run is already working in this workspace (awaiti
+  99  START FAILED {"error":"a run is already working in this workspace (awaiti
+  100  START FAILED {"error":"a run is already working in this workspace (awaiti
+
+--- summary ---
+goals run           : 9
+status 'done'       : 4/9
+WORK ACTUALLY DONE  : 5/9   <- the number that matters
+tool errors         : 3
+guard refusals      : 1   (the system working)
+total model calls   : 71
+wall clock          : 8.9 min
+files: ESCALATIONS.md, node_modules, package-lock.json, package.json, r1_ledger.js, r2_text.py, r3_tasks.js, r4_geom.js, r5_store.py, r6_days.py, r7_grid.py, r8_money.js, r9_app.html, r9_app.js, TASKS.md, test_r1_ledger.js, test_r3_tasks.js, test_r8_money.js, __pycache__
+tok/s: min 11.1 max 41.7
+harness exit 0 at 07:40:21
+done as asked 6/100 | implementation correct 6/100 (CT = correct code, own test broke it)
