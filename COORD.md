@@ -4047,3 +4047,11 @@ tatte, verbatim, this thread: "After c is done running, run one more with d that
       the end. Also found and fixed on e-fixes (f2fbd07): whole-file rewrites that drop definitions (r6 lost add_days,
       is_weekend, add_business_days in goal 46) now name what they removed; proven by replaying the real goal 46.
       Planned for e-fixes: the rollback names what it removed and leaves a ledger task for the next goal.
+    [set D fixes, Session A] MERGED e-fixes into main (fast-forward, 421ce9e; verified with merge-base --is-ancestor).
+      Hub changes: full untrimmed transcript per run (<id>.transcript.jsonl, checked by the fuzz TRANSCRIPT invariant,
+      reaped with its run file); forced finish marked UNVERIFIED; AGENT_UNATTENDED=1 denies instead of parking;
+      checkpoints survive unaddable files and stale index.lock (and say so when they fail); run files no longer deleted
+      at 40 (AGENT_MAX_RUN_FILES); rewrites that drop definitions name them; the end-of-run rollback names what it
+      removed and leaves a "Re-add" task. Full suite 60/60 offline tests (real* need a live MODEL_BASE, as before).
+      The LIVE hub (index.js since 05:09) was NOT restarted - it runs the old code until tatte says restart.
+      Offline fuzzer resumed on the merged code: seed 400912.
