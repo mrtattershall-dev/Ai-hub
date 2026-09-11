@@ -4070,3 +4070,10 @@ tatte, verbatim, this thread: "After d has results, analyze the deep seated bugs
     armed before deploy, caps 125 min (H100) / 100 min (A10G), stop ONLY via node training-data/factory/stopApp.mjs
     (Rule 7a). Worst case ~$8.2 + ~$1.8. Identity (Rule 3) pasted below before any number counts. Offline fuzzer
     PAUSED for the window (stopped after batch 4, 37/37 clean); resumes at seed 400960 afterwards.
+    [set E ledger, Session A] DEPLOYED both 11:10 (min 0, max 1, scaledown 120 s). Watchdogs armed 11:10:30 / 11:10:31,
+      caps 125 / 100 min. Identity (Rule 3), verbatim, before any number:
+      coder14b-sete health try 1 11:12:50: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+      coder30b-sete health try 2 11:14:23: {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+      Harnesses started 11:12:51 / 11:14:23; no new goals after 12:39:51 / 13:06:23. Both logs: hub 664e8ad (server/ =
+      421ce9e), AGENT_UNATTENDED=0, AGENT_BATCH_ACTIONS=0. Independent re-list (python -m modal app list --json):
+      coder30b-sete deployed 1 task, coder14b-sete deployed 1 task; no other app live.
