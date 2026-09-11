@@ -1,0 +1,22 @@
+[
+  "Create t1_temp.js exporting cToF(c) and fToC(f), with asserts that all pass, then run it with node.",
+  "Add kToC(k) to the EXISTING t1_temp.js that throws on a negative Kelvin value. Keep the other functions unchanged. Run it with node.",
+  "Create t2_text.py with a function is_palindrome(s) that ignores case, spaces and punctuation, plus asserts at the bottom. Run it with python.",
+  "Create t3_inventory.js exporting an Inventory class with add(name, qty), remove(name, qty) that throws when stock would go negative, and count(name). Include asserts that all pass, then run it with node.",
+  "In the EXISTING t3_inventory.js, change ONLY remove so that removing the last unit of an item deletes that item entirely. Touch nothing else. Run it with node.",
+  "Write T_NOTES.md listing every method that really exists on the Inventory class in t3_inventory.js, with its arguments and what it throws. Read the file first; do not invent anything.",
+  "Create t4_intervals.js exporting mergeIntervals(list) that merges overlapping [start, end] pairs. Include asserts that all pass, then run it with node.",
+  "Reason about the EXISTING t4_intervals.js: does mergeIntervals give the right answer when the input is NOT sorted by start? Write the answer and why in T_INTERVALS.md, then add an assert to t4_intervals.js that proves it, fixing the function first if it is wrong. Run it with node.",
+  "Create t5_page.html with a text input and a list; typing text and pressing Enter adds it to the list. Put the logic in t5_page.js loaded at the end of the body.",
+  "Add a Clear button to the EXISTING t5_page.html, wired up in t5_page.js, that empties the list.",
+  "Create t6_stats.py with mean(xs), median(xs) and mode(xs), each raising ValueError on an empty list, plus asserts at the bottom. Run it with python.",
+  "Create t7_router.js exporting match(pattern, path) where pattern segments starting with ':' capture values, so match('/u/:id', '/u/7') returns { id: '7' } and a non-match returns null. Include asserts that all pass, then run it with node.",
+  "Add wildcard support to the EXISTING t7_router.js: a trailing '*' in the pattern matches any remaining path. Keep the existing behaviour. Run it with node.",
+  "Create t8_game.html: a canvas game where a ball bounces off all four walls forever. Put the logic in t8_game.js.",
+  "In the EXISTING t8_game.js, add a paddle at the bottom, moved with the left and right arrow keys, that the ball bounces off.",
+  "Create t9_csvsum.py with sum_column(text, name) that returns the sum of a named numeric column from CSV text and raises KeyError for an unknown column, plus asserts at the bottom. Run it with python.",
+  "Create t10_debounce.js exporting debounce(fn, ms), plus a test that uses real timers to prove only the last call in a burst runs. Run it with node.",
+  "Create t11_check.js with asserts that test t1_temp.js and t4_intervals.js, requiring them from the workspace. Read them first so you use their real exports. Run it with node.",
+  "Create t12_bits.js exporting countBits(n) and isPowerOfTwo(n) for non-negative integers. Include asserts that all pass, then run it with node.",
+  "Write T_INDEX.md listing every t-file that really exists in the workspace, with one line on what each does. Read them first."
+]
