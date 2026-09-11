@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>s9 board</title>
+  <style>
+    .col { display: inline-block; vertical-align: top; width: 30%; }
+    .s9-card button { margin-left: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Board</h1>
+  <input id="s9-new" placeholder="New card"> <button id="s9-add">Add</button>
+  <input id="s9-filter" placeholder="Filter"> <button id="s9-clear-done">Clear done</button>
+  <div id="s9-msg"></div>
+  <section class="col" id="s9-todo"><h2>To Do <span id="s9-count-todo">0</span></h2><ul></ul></section>
+  <section class="col" id="s9-doing"><h2>Doing <span id="s9-count-doing">0</span></h2><ul></ul></section>
+  <section class="col" id="s9-done"><h2>Done <span id="s9-count-done">0</span></h2><ul></ul></section>
+  <script src="s9_board.js"></script>
+</body>
+</html>

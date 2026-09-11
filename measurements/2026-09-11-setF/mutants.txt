@@ -1,0 +1,71 @@
+ok   checkout lets a member take the same book twice want fail 11                             got 11
+ok   no hold hand-over on return                    want fail 31,41,71                       got 31,41,71
+ok   fine is 20 cents a day (s10 too)               want fail 51,60,61,70,71                 got 51,60,61,70,71
+ok   the due day counts as overdue                  want fail 41                             got 41
+ok   loan limit is 4                                want fail 61                             got 61
+ok   toJSON loans unsorted                          want fail 71                             got 71
+ok   search is case-sensitive (s10 too)             want fail 81,90                          got 81,90
+ok   notes invent a method                          want fail 91                             got 91
+ok   notes miss dueDay                              want fail 91                             got 91
+ok   a - size is -1                                 want fail 2,52                           got 2,52
+ok   top_paths keeps the query string               want fail 32,82                          got 32,82
+ok   percentile one rank too high                   want fail 42,92                          got 42,92
+ok   a gap of exactly gap_minutes splits            want fail 72                             got 72
+ok   CLI errors count 4xx too                       want fail 82                             got 82
+ok   the seconds field is required                  want fail 92                             got 92
+ok   scalar mul ignores the number                  want fail 23                             got 23
+ok   transpose returns a copy                       want fail 33                             got 33
+ok   determinant ignores row swaps                  want fail 53                             got 53
+ok   solve ignores the length of b                  want fail 73                             got 73
+MISS toString writes '-0'                           want fail 83                             got  | 
+ok   > not escaped                                  want fail 4                              got 4
+ok   no <em>                                        want fail 24,34                          got 24,34
+ok   ordered lists stop at 9                        want fail 64                             got 64
+ok   code blocks not escaped                        want fail 74                             got 74
+ok   blockquote not converted                       want fail 84                             got 84
+ok   duplicate slugs not numbered                   want fail 94                             got 94
+ok   division by zero allowed                       want fail 5,85                           got 5,85
+ok   ^ not right-associative                        want fail 25,75                          got 25,75
+MISS an unknown variable is 0                       want fail 35,85                          got 35 | 35:an unknown variable did not throw
+ok   error positions off by one                     want fail 55                             got 55
+ok   unary minus is '-' in RPN                      want fail 75                             got 75
+ok   < gives a boolean                              want fail 95                             got 95
+ok   bfs in insertion order                         want fail 16                             got 16
+ok   Dijkstra never relaxes                         want fail 26                             got 26
+ok   topo_order not smallest first                  want fail 46                             got 46
+ok   remove_node leaves edges into it               want fail 56                             got 56
+ok   reachable always includes the start            want fail 66                             got 66
+ok   to_dot leaves out isolated nodes               want fail 86                             got 86
+ok   from_text counts lines from 0                  want fail 96                             got 96
+ok   get is not a use                               want fail 7,27,77,87                     got 7,27,77,87
+ok   peek is a use                                  want fail 37                             got 37
+MISS size counts expired entries                    want fail 47                             got  | 
+ok   evictions not counted                          want fail 57                             got 57
+ok   delete reports 'lru'                           want fail 67                             got 67
+ok   toJSON most recent first                       want fail 87                             got 87
+ok   a failed factory stores something              want fail 97                             got 97
+ok   points above max accepted                      want fail 8                              got 8
+ok   percent not rounded                            want fail 18                             got 18
+ok   weights not rescaled                           want fail 38                             got 38
+ok   drop_lowest drops the highest                  want fail 48                             got 48
+ok   curve not capped                               want fail 68                             got 68
+ok   to_csv percent without 2 decimals              want fail 78,98                          got 78,98
+ok   median of an even count                        want fail 88                             got 88
+ok   web: blank card added                          want fail 9                              got 9
+ok   web: moving wraps around                       want fail 19                             got 19
+ok   web: nothing saved                             want fail 49,99                          got 49,99
+ok   web: Doing holds 4                             want fail 59                             got 59
+ok   web: Enter ignored                             want fail 69                             got 69
+ok   web: filter is case-sensitive                  want fail 79                             got 79
+ok   web: duplicates allowed                        want fail 89                             got 89
+ok   availability upside down                       want fail 20                             got 20
+ok   makeLookup never answers from the cache        want fail 40                             got 40
+ok   fineReport sorted by name                      want fail 60                             got 60
+ok   restore of a missing key throws                want fail 80                             got 80
+ok   index misses a file                            want fail 100                            got 100
+ok   index invents a function                       want fail 100                            got 100
+ok   index misses a name                            want fail 100                            got 100
+ok   JS own assert wrong -> CT                      want ct 3,13,23,33,43,53,63,73,83,93   got 3,13,23,33,43,53,63,73,83,93 (CT 10)
+ok   PY own assert wrong -> CT                      want ct 8,18,28,38,48,58,68,78,88,98   got 8,18,28,38,48,58,68,78,88,98 (CT 10)
+
+mutants caught exactly: 66/69
