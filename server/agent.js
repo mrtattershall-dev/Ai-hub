@@ -85,6 +85,8 @@ export const __toolPolicyTest = {
   autoStartsInLastHour: () => autoStarts.filter((t) => t > Date.now() - 3600_000).length,
   // A counter that leaked would jam /reset shut for ever, so the test must be able to see it.
   pendingAutoStarts: () => pendingAutoStarts,
+  // The real append_file, so a test can pin what it does to the workspace.
+  appendFile: (args) => tools.append_file(args),
 };
 
 /** What an approval prompt for a Google write should say, in terms of the real effect. */
@@ -421,11 +423,34 @@ const tools = {
    * write_file: the failure mode of a bad append is a file with junk at the bottom, not a
    * file with the work missing.
    */
-  append_file({ path, content = '' }) {
+  async append_file({ path, content = '' }) {
     const full = safePath(path);
     if (!content) return `ERROR: append_file needs CONTENT — put the lines to add in a fenced code block.`;
     if (!existsSync(full)) {
       writeFileSync(full, content.endsWith('\n') ? content : content + '\n', 'utf8');
+      // ── A FRAGMENT IS NOT A FILE ────────────────────────────────────────────────
+      //
+      // "Add five helpers to the EXISTING q3_list.js" - but an earlier goal never created
+      // it. The model appends anyway, sending what it believes is the tail of the file
+      // (`  function zip(a, b) {...}` then `};`), and this used to CREATE q3_list.js from
+      // that fragment. Offline fuzzing against 1,759 recorded replies: every BROKEN file left
+      // behind in batches 9-13 was this - q3_list.js, one version ever, a fragment. The
+      // end-of-run syntax rollback can only restore a version that parsed, and a file born
+      // as a fragment never had one, so it outlived every run after it.
+      //
+      // So a NEW file created by append must parse on its own. If it does not, nothing is
+      // written (the checkpoint taken before this tool already holds the workspace as it
+      // was), and the model is told the thing it did not know: the file does not exist.
+      // Only a real syntax error refuses - a missing interpreter (no python on PATH) must
+      // not turn every new .py into a refusal. Appending to an EXISTING file is unchanged.
+      const err = await quickCheck(path);
+      if (err && /SyntaxError|IndentationError|TabError/.test(err)) {
+        try { unlinkSync(full); } catch { /* already gone */ }
+        const why = String(err).split('\n').filter((l) => l.trim()).slice(0, 6).join('\n');
+        return `ERROR: ${path} does not exist, so there was nothing to append to - and what you sent does not parse on its own, so NOTHING was written:\n${why}\n`
+          + `If you thought ${path} already existed, it does not: no earlier step created it. `
+          + `Create it with write_file containing the COMPLETE file (every function it needs, and its exports), then run it.`;
+      }
       return `OK: ${path} did not exist, so it was created with ${Buffer.byteLength(content)} bytes.`;
     }
     const before = readFileSync(full, 'utf8');
