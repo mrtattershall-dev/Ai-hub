@@ -4133,3 +4133,14 @@ D and E".
       app list --json) 17:0x: coder30b-setf deployed 1 task, coder14b-setf deployed 1 task; no other app live.
       Laptop on AC (23%, charging) with a keep-awake power request held for the window; offline fuzzer PAUSED after
       batch 18 (206/206 clean), resumes at seed 401176 afterwards.
+    [set E/F analysis, Session A] TOOL BUGS, not model failures - branch g-fixes (worktree ~/Projects/ai-coding-hub-gfix,
+      1467016; NOT merged: set F is pre-registered on the current hub). Measured across set E's two runs: 65 of 278
+      edit_file calls FAILED (27 "matches N places", 32 "not found", 6 malformed) across 32 goal-runs - 89% of the 14B's
+      and 90% of Qwen3-Coder's tool errors. The workaround for a missed edit is a whole-file rewrite, which is what
+      dropped q4_template.js's export. Set F (live) shows the same: the 14B has failed 14 of 39 edits (36%).
+      Also found: search_file with PATH: . returned "(no matches for template)" in a workspace holding q4_template.js -
+      a directory path became the only target and directories are skipped. A confident empty answer from a tool bug.
+      Fixes: LINES: a-b addresses an edit by the numbers read_file prints (empty REPLACE deletes); OCCURRENCE: n picks
+      among matches; the parser no longer turns a LINES edit into a whole-file rewrite; a directory is a search scope.
+      editAddress.test 9/9, six mutants caught. Still open (biggest untouched waste): the same tool called with the same
+      arguments returning the same answer - 155 times for the 14B, 221 for Qwen3-Coder in set E - with nothing said.
