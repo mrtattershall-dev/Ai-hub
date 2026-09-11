@@ -1,0 +1,105 @@
+  1 PASS q1_stock.js    s1  
+  2 PASS q2_table.py    s1  
+  3 fail q3_calendar.js s1  load: Missing expected exception (Error): Invalid start or end time
+  4 fail q4_template.js s1  threw: r is not a function
+  5 fail q5_limits.py   s1  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+  6 fail q6_jpath.py    s1  threw: AttributeError: 'dict' object has no attribute 'split'
+  7 fail q7_buffer.js   s1  load: buffer.text is not a function
+  8 fail q8_units.py    s1  threw: ValueError: Density must be provided for mass-volume conversion
+  9 fail q9_shop.html   s1  cart ["Apple - 50 cents","Bread - 225 cents","Milk - 199 cents"] | js error: Cannot read properties 
+ 10 PASS q10_report.js  s1  
+ 11 fail q1_stock.js    s2  threw: w.remove is not a function
+ 12 PASS q2_table.py    s2  
+ 13 fail q3_calendar.js s2  load: Missing expected exception (Error): Invalid start or end time
+ 14 fail q4_template.js s2  threw: r is not a function
+ 15 fail q5_limits.py   s2  threw: TypeError: 'int' object is not callable
+ 16 fail q6_jpath.py    s2  threw: TypeError: get() takes 2 positional arguments but 3 were given
+ 17 fail q7_buffer.js   s2  load: buffer.text is not a function
+ 18 fail q8_units.py    s2  threw: ValueError: Unknown unit
+ 19 fail q9_shop.html   s2  total "$0.00" | js error: Cannot read properties of null (reading 'textContent')
+ 20 PASS q10_report.js  s2  
+ 21 fail q1_stock.js    s3  threw: w.reserve is not a function
+ 22 PASS q2_table.py    s3  
+ 23 CT   q3_calendar.js s3  load: Missing expected exception (Error): Invalid start or end time
+ 24 fail q4_template.js s3  threw: r is not a function
+ 25 fail q5_limits.py   s3  sliding window [True, True, False, False, False]
+ 26 fail q6_jpath.py    s3  threw: AttributeError: 'dict' object has no attribute 'split'
+ 27 fail q7_buffer.js   s3  load: buffer.text is not a function
+ 28 fail q8_units.py    s3  threw: ValueError: Density must be provided for mass-volume conversion
+ 29 fail q9_shop.html   s3  after + ["Apple - 50 cents","Bread - 225 cents","Milk - 199 cents"] $0.00 | js error: Cannot read pr
+ 30 fail q10_report.js  s3  threw: w.reserve is not a function
+ 31 fail q1_stock.js    s4  threw: w.reserve is not a function
+ 32 PASS q2_table.py    s4  
+ 33 fail q3_calendar.js s4  load: Missing expected exception (Error): Invalid start or end time
+ 34 fail q4_template.js s4  threw: r is not a function
+ 35 fail q5_limits.py   s4  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+ 36 fail q6_jpath.py    s4  threw: AttributeError: 'dict' object has no attribute 'split'
+ 37 fail q7_buffer.js   s4  load: buffer.text is not a function
+ 38 fail q8_units.py    s4  parse_quantity('2 kg') = (2.0, 'kilograms')
+ 39 fail q9_shop.html   s4  one "0 items" | js error: Cannot read properties of null (reading 'textContent')
+ 40 fail q10_report.js  s4  shoutLine "{{sku | upper}}: 5"
+ 41 fail q1_stock.js    s5  threw: w.reserve is not a function
+ 42 PASS q2_table.py    s5  
+ 43 CT   q3_calendar.js s5  load: Missing expected exception (Error): Invalid start or end time
+ 44 fail q4_template.js s5  threw: r is not a function
+ 45 fail q5_limits.py   s5  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+ 46 fail q6_jpath.py    s5  threw: AttributeError: 'dict' object has no attribute 'split'
+ 47 fail q7_buffer.js   s5  load: buffer.text is not a function
+ 48 PASS q8_units.py    s5  
+ 49 fail q9_shop.html   s5  an invalid code changed the total $0.00 | js error: Cannot read properties of null (reading 'textCon
+ 50 fail q10_report.js  s5  stockTable "items=[object Object]"
+ 51 fail q1_stock.js    s6  threw: w.reserve is not a function
+ 52 PASS q2_table.py    s6  
+ 53 fail q3_calendar.js s6  load: Missing expected exception (Error): Invalid start or end time
+ 54 fail q4_template.js s6  threw: r is not a function
+ 55 fail q5_limits.py   s6  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+ 56 fail q6_jpath.py    s6  threw: AttributeError: 'dict' object has no attribute 'split'
+ 57 fail q7_buffer.js   s6  load: buffer.text is not a function
+ 58 fail q8_units.py    s6  format_quantity ['1 1/2 cup', '0 1/4 tsp', '2 cup', '1.37 kg', '0 1/3 cup', '1.10 kg']
+ 59 fail q9_shop.html   s6  after reload ["Apple - 50 cents","Bread - 225 cents","Milk - 199 cents"] | js error: Cannot read pro
+ 60 fail q10_report.js  s6  threw: render is not defined
+ 61 fail q1_stock.js    s7  threw: w.reserve is not a function
+ 62 fail q2_table.py    s7  threw: TypeError: unsupported operand type(s) for +: 'int' and 'str'
+ 63 fail q3_calendar.js s7  load: Missing expected exception (Error): Invalid start or end time
+ 64 fail q4_template.js s7  the unclosed error does not name alpha: r is not a function
+ 65 fail q5_limits.py   s7  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+ 66 fail q6_jpath.py    s7  flatten {'a.b': 1, 'l': [{'x': 2}, 3]}
+ 67 fail q7_buffer.js   s7  load: buffer.text is not a function
+ 68 fail q8_units.py    s7  threw: ValueError: Density must be provided for mass-volume conversion
+ 69 fail q9_shop.html   s7  the empty message is not shown at start | js error: Cannot read properties of null (reading 'textCon
+ 70 fail q10_report.js  s7  threw: warehouse.lowStock is not a function
+ 71 fail q1_stock.js    s8  threw: w.reserve is not a function
+ 72 fail q2_table.py    s8  join [{'id': '1', 'name': 'ann', 'right_city': 'y', 'right_name': 'A2'}]
+ 73 fail q3_calendar.js s8  load: Missing expected exception (Error): Invalid start or end time
+ 74 fail q4_template.js s8  threw: r is not a function
+ 75 fail q5_limits.py   s8  threw: TypeError: '<=' not supported between instances of 'str' and 'int'
+ 76 fail q6_jpath.py    s8  diff {'r': 5, 'n': 4}
+ 77 fail q7_buffer.js   s8  load: buffer.text is not a function
+ 78 fail q8_units.py    s8  threw: ValueError: Unknown unit
+ 79 fail q9_shop.html   s8  at $9.00 "" | js error: Cannot read properties of null (reading 'textContent')
+ 80 fail q10_report.js  s8  threw: w.reserve is not a function
+ 81 fail q1_stock.js    s9  threw: w.remove is not a function
+ 82 fail q2_table.py    s9  CLI printed ['All tests passed.'] | ---------------------------------------------------
+Ran 5 tests
+ 83 CT   q3_calendar.js s9  load: Missing expected exception (Error): Invalid start or end time
+ 84 fail q4_template.js s9  threw: r is not a function
+ 85 fail q5_limits.py   s9  threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'
+ 86 fail q6_jpath.py    s9  threw: AttributeError: 'dict' object has no attribute 'split'
+ 87 fail q7_buffer.js   s9  load: buffer.text is not a function
+ 88 fail q8_units.py    s9  threw: ValueError: Unknown unit
+ 89 fail q9_shop.html   s9  Enter did not apply the code: $0.00 | js error: Cannot read properties of null (reading 'textContent
+ 90 fail q10_report.js  s9  threw: w.remove is not a function
+ 91 fail Q1_NOTES.md    s10 notes miss remove, reserve, available, release, fulfil, lowStock, toJSON, fromJSON, history
+ 92 PASS q2_table.py    s10 
+ 93 fail q3_calendar.js s10 load: Missing expected exception (Error): Invalid start or end time
+ 94 fail q4_template.js s10 compiled 1-{{#l}}{{.}}{{/l}}
+ 95 fail q5_limits.py   s10 threw: TypeError: SlidingWindow.allow() takes 1 positional argument but 2 were given
+ 96 PASS q6_jpath.py    s10 
+ 97 fail q7_buffer.js   s10 load: buffer.text is not a function
+ 98 fail q8_units.py    s10 CLI printed '' | me conversion")
+ValueError: Density must be provided for mass-volume conversion
+ 99 fail q9_shop.html   s10 the discount did not survive a reload: $0.00 | js error: Cannot read properties of null (reading 'te
+100 fail Q_INDEX.md     s10 Q_INDEX.md missing
+
+per project (implementation correct): q1 1/10  q2 7/10  q3 3/10  q4 0/10  q5 0/10  q6 1/10  q7 0/10  q8 1/10  q9 0/10  q10 2/10
+done as asked 12/100 | implementation correct 15/100 (CT = correct code, own test broke it)

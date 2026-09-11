@@ -1,0 +1,907 @@
+{
+  "ws": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\measurements\\2026-09-11-setE\\data\\coder14b-sete\\workspace",
+  "asIs": 12,
+  "impl": 15,
+  "results": [
+    {
+      "goal": 1,
+      "chain": 1,
+      "step": 1,
+      "file": "q1_stock.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 2,
+      "chain": 2,
+      "step": 1,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 3,
+      "chain": 3,
+      "step": 1,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Missing expected exception (Error): Invalid start or end time"
+    },
+    {
+      "goal": 4,
+      "chain": 4,
+      "step": 1,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 5,
+      "chain": 5,
+      "step": 1,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'"
+    },
+    {
+      "goal": 6,
+      "chain": 6,
+      "step": 1,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'dict' object has no attribute 'split'"
+    },
+    {
+      "goal": 7,
+      "chain": 7,
+      "step": 1,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: buffer.text is not a function"
+    },
+    {
+      "goal": 8,
+      "chain": 8,
+      "step": 1,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: ValueError: Density must be provided for mass-volume conversion"
+    },
+    {
+      "goal": 9,
+      "chain": 9,
+      "step": 1,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "cart [\"Apple - 50 cents\",\"Bread - 225 cents\",\"Milk - 199 cents\"] | js error: Cannot read properties of null (reading 'textContent')"
+    },
+    {
+      "goal": 10,
+      "chain": 10,
+      "step": 1,
+      "file": "q10_report.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 11,
+      "chain": 1,
+      "step": 2,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.remove is not a function"
+    },
+    {
+      "goal": 12,
+      "chain": 2,
+      "step": 2,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 13,
+      "chain": 3,
+      "step": 2,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Missing expected exception (Error): Invalid start or end time"
+    },
+    {
+      "goal": 14,
+      "chain": 4,
+      "step": 2,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 15,
+      "chain": 5,
+      "step": 2,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: 'int' object is not callable"
+    },
+    {
+      "goal": 16,
+      "chain": 6,
+      "step": 2,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: get() takes 2 positional arguments but 3 were given"
+    },
+    {
+      "goal": 17,
+      "chain": 7,
+      "step": 2,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: buffer.text is not a function"
+    },
+    {
+      "goal": 18,
+      "chain": 8,
+      "step": 2,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: ValueError: Unknown unit"
+    },
+    {
+      "goal": 19,
+      "chain": 9,
+      "step": 2,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "total \"$0.00\" | js error: Cannot read properties of null (reading 'textContent')"
+    },
+    {
+      "goal": 20,
+      "chain": 10,
+      "step": 2,
+      "file": "q10_report.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 21,
+      "chain": 1,
+      "step": 3,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.reserve is not a function"
+    },
+    {
+      "goal": 22,
+      "chain": 2,
+      "step": 3,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 23,
+      "chain": 3,
+      "step": 3,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": true,
+      "why": "load: Missing expected exception (Error): Invalid start or end time"
+    },
+    {
+      "goal": 24,
+      "chain": 4,
+      "step": 3,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 25,
+      "chain": 5,
+      "step": 3,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "sliding window [True, True, False, False, False]"
+    },
+    {
+      "goal": 26,
+      "chain": 6,
+      "step": 3,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'dict' object has no attribute 'split'"
+    },
+    {
+      "goal": 27,
+      "chain": 7,
+      "step": 3,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: buffer.text is not a function"
+    },
+    {
+      "goal": 28,
+      "chain": 8,
+      "step": 3,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: ValueError: Density must be provided for mass-volume conversion"
+    },
+    {
+      "goal": 29,
+      "chain": 9,
+      "step": 3,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "after + [\"Apple - 50 cents\",\"Bread - 225 cents\",\"Milk - 199 cents\"] $0.00 | js error: Cannot read properties of null (reading 'textContent')"
+    },
+    {
+      "goal": 30,
+      "chain": 10,
+      "step": 3,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.reserve is not a function"
+    },
+    {
+      "goal": 31,
+      "chain": 1,
+      "step": 4,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.reserve is not a function"
+    },
+    {
+      "goal": 32,
+      "chain": 2,
+      "step": 4,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 33,
+      "chain": 3,
+      "step": 4,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Missing expected exception (Error): Invalid start or end time"
+    },
+    {
+      "goal": 34,
+      "chain": 4,
+      "step": 4,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 35,
+      "chain": 5,
+      "step": 4,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'"
+    },
+    {
+      "goal": 36,
+      "chain": 6,
+      "step": 4,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'dict' object has no attribute 'split'"
+    },
+    {
+      "goal": 37,
+      "chain": 7,
+      "step": 4,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: buffer.text is not a function"
+    },
+    {
+      "goal": 38,
+      "chain": 8,
+      "step": 4,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "parse_quantity('2 kg') = (2.0, 'kilograms')"
+    },
+    {
+      "goal": 39,
+      "chain": 9,
+      "step": 4,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "one \"0 items\" | js error: Cannot read properties of null (reading 'textContent')"
+    },
+    {
+      "goal": 40,
+      "chain": 10,
+      "step": 4,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "shoutLine \"{{sku | upper}}: 5\""
+    },
+    {
+      "goal": 41,
+      "chain": 1,
+      "step": 5,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.reserve is not a function"
+    },
+    {
+      "goal": 42,
+      "chain": 2,
+      "step": 5,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 43,
+      "chain": 3,
+      "step": 5,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": true,
+      "why": "load: Missing expected exception (Error): Invalid start or end time"
+    },
+    {
+      "goal": 44,
+      "chain": 4,
+      "step": 5,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 45,
+      "chain": 5,
+      "step": 5,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'"
+    },
+    {
+      "goal": 46,
+      "chain": 6,
+      "step": 5,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'dict' object has no attribute 'split'"
+    },
+    {
+      "goal": 47,
+      "chain": 7,
+      "step": 5,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: buffer.text is not a function"
+    },
+    {
+      "goal": 48,
+      "chain": 8,
+      "step": 5,
+      "file": "q8_units.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 49,
+      "chain": 9,
+      "step": 5,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "an invalid code changed the total $0.00 | js error: Cannot read properties of null (reading 'textContent')"
+    },
+    {
+      "goal": 50,
+      "chain": 10,
+      "step": 5,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "stockTable \"items=[object Object]\""
+    },
+    {
+      "goal": 51,
+      "chain": 1,
+      "step": 6,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.reserve is not a function"
+    },
+    {
+      "goal": 52,
+      "chain": 2,
+      "step": 6,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 53,
+      "chain": 3,
+      "step": 6,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Missing expected exception (Error): Invalid start or end time"
+    },
+    {
+      "goal": 54,
+      "chain": 4,
+      "step": 6,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 55,
+      "chain": 5,
+      "step": 6,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'"
+    },
+    {
+      "goal": 56,
+      "chain": 6,
+      "step": 6,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'dict' object has no attribute 'split'"
+    },
+    {
+      "goal": 57,
+      "chain": 7,
+      "step": 6,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: buffer.text is not a function"
+    },
+    {
+      "goal": 58,
+      "chain": 8,
+      "step": 6,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "format_quantity ['1 1/2 cup', '0 1/4 tsp', '2 cup', '1.37 kg', '0 1/3 cup', '1.10 kg']"
+    },
+    {
+      "goal": 59,
+      "chain": 9,
+      "step": 6,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "after reload [\"Apple - 50 cents\",\"Bread - 225 cents\",\"Milk - 199 cents\"] | js error: Cannot read properties of null (reading 'textContent')"
+    },
+    {
+      "goal": 60,
+      "chain": 10,
+      "step": 6,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: render is not defined"
+    },
+    {
+      "goal": 61,
+      "chain": 1,
+      "step": 7,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.reserve is not a function"
+    },
+    {
+      "goal": 62,
+      "chain": 2,
+      "step": 7,
+      "file": "q2_table.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: unsupported operand type(s) for +: 'int' and 'str'"
+    },
+    {
+      "goal": 63,
+      "chain": 3,
+      "step": 7,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Missing expected exception (Error): Invalid start or end time"
+    },
+    {
+      "goal": 64,
+      "chain": 4,
+      "step": 7,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "the unclosed error does not name alpha: r is not a function"
+    },
+    {
+      "goal": 65,
+      "chain": 5,
+      "step": 7,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'"
+    },
+    {
+      "goal": 66,
+      "chain": 6,
+      "step": 7,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "flatten {'a.b': 1, 'l': [{'x': 2}, 3]}"
+    },
+    {
+      "goal": 67,
+      "chain": 7,
+      "step": 7,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: buffer.text is not a function"
+    },
+    {
+      "goal": 68,
+      "chain": 8,
+      "step": 7,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: ValueError: Density must be provided for mass-volume conversion"
+    },
+    {
+      "goal": 69,
+      "chain": 9,
+      "step": 7,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "the empty message is not shown at start | js error: Cannot read properties of null (reading 'textContent')"
+    },
+    {
+      "goal": 70,
+      "chain": 10,
+      "step": 7,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: warehouse.lowStock is not a function"
+    },
+    {
+      "goal": 71,
+      "chain": 1,
+      "step": 8,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.reserve is not a function"
+    },
+    {
+      "goal": 72,
+      "chain": 2,
+      "step": 8,
+      "file": "q2_table.py",
+      "asIs": false,
+      "impl": false,
+      "why": "join [{'id': '1', 'name': 'ann', 'right_city': 'y', 'right_name': 'A2'}]"
+    },
+    {
+      "goal": 73,
+      "chain": 3,
+      "step": 8,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Missing expected exception (Error): Invalid start or end time"
+    },
+    {
+      "goal": 74,
+      "chain": 4,
+      "step": 8,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 75,
+      "chain": 5,
+      "step": 8,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: '<=' not supported between instances of 'str' and 'int'"
+    },
+    {
+      "goal": 76,
+      "chain": 6,
+      "step": 8,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "diff {'r': 5, 'n': 4}"
+    },
+    {
+      "goal": 77,
+      "chain": 7,
+      "step": 8,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: buffer.text is not a function"
+    },
+    {
+      "goal": 78,
+      "chain": 8,
+      "step": 8,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: ValueError: Unknown unit"
+    },
+    {
+      "goal": 79,
+      "chain": 9,
+      "step": 8,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "at $9.00 \"\" | js error: Cannot read properties of null (reading 'textContent')"
+    },
+    {
+      "goal": 80,
+      "chain": 10,
+      "step": 8,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.reserve is not a function"
+    },
+    {
+      "goal": 81,
+      "chain": 1,
+      "step": 9,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.remove is not a function"
+    },
+    {
+      "goal": 82,
+      "chain": 2,
+      "step": 9,
+      "file": "q2_table.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI printed ['All tests passed.'] | ---------------------------------------------------\r\nRan 5 tests in 0.001s\r\n\r\nOK"
+    },
+    {
+      "goal": 83,
+      "chain": 3,
+      "step": 9,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": true,
+      "why": "load: Missing expected exception (Error): Invalid start or end time"
+    },
+    {
+      "goal": 84,
+      "chain": 4,
+      "step": 9,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 85,
+      "chain": 5,
+      "step": 9,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: unsupported operand type(s) for -: 'float' and 'Clock'"
+    },
+    {
+      "goal": 86,
+      "chain": 6,
+      "step": 9,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'dict' object has no attribute 'split'"
+    },
+    {
+      "goal": 87,
+      "chain": 7,
+      "step": 9,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: buffer.text is not a function"
+    },
+    {
+      "goal": 88,
+      "chain": 8,
+      "step": 9,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: ValueError: Unknown unit"
+    },
+    {
+      "goal": 89,
+      "chain": 9,
+      "step": 9,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "Enter did not apply the code: $0.00 | js error: Cannot read properties of null (reading 'textContent')"
+    },
+    {
+      "goal": 90,
+      "chain": 10,
+      "step": 9,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.remove is not a function"
+    },
+    {
+      "goal": 91,
+      "chain": 1,
+      "step": 10,
+      "file": "Q1_NOTES.md",
+      "asIs": false,
+      "impl": false,
+      "why": "notes miss remove, reserve, available, release, fulfil, lowStock, toJSON, fromJSON, history"
+    },
+    {
+      "goal": 92,
+      "chain": 2,
+      "step": 10,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 93,
+      "chain": 3,
+      "step": 10,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Missing expected exception (Error): Invalid start or end time"
+    },
+    {
+      "goal": 94,
+      "chain": 4,
+      "step": 10,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "compiled 1-{{#l}}{{.}}{{/l}}"
+    },
+    {
+      "goal": 95,
+      "chain": 5,
+      "step": 10,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: SlidingWindow.allow() takes 1 positional argument but 2 were given"
+    },
+    {
+      "goal": 96,
+      "chain": 6,
+      "step": 10,
+      "file": "q6_jpath.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 97,
+      "chain": 7,
+      "step": 10,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: buffer.text is not a function"
+    },
+    {
+      "goal": 98,
+      "chain": 8,
+      "step": 10,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI printed '' | me conversion\")\r\nValueError: Density must be provided for mass-volume conversion"
+    },
+    {
+      "goal": 99,
+      "chain": 9,
+      "step": 10,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "the discount did not survive a reload: $0.00 | js error: Cannot read properties of null (reading 'textContent')"
+    },
+    {
+      "goal": 100,
+      "chain": 10,
+      "step": 10,
+      "file": "Q_INDEX.md",
+      "asIs": false,
+      "impl": false,
+      "why": "Q_INDEX.md missing"
+    }
+  ]
+}

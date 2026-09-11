@@ -1,0 +1,907 @@
+{
+  "ws": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\measurements\\2026-09-11-setE\\data\\coder30b-sete\\workspace",
+  "asIs": 35,
+  "impl": 35,
+  "results": [
+    {
+      "goal": 1,
+      "chain": 1,
+      "step": 1,
+      "file": "q1_stock.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 2,
+      "chain": 2,
+      "step": 1,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 3,
+      "chain": 3,
+      "step": 1,
+      "file": "q3_calendar.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 4,
+      "chain": 4,
+      "step": 1,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 5,
+      "chain": 5,
+      "step": 1,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "refill at 1 per second"
+    },
+    {
+      "goal": 6,
+      "chain": 6,
+      "step": 1,
+      "file": "q6_jpath.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 7,
+      "chain": 7,
+      "step": 1,
+      "file": "q7_buffer.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 8,
+      "chain": 8,
+      "step": 1,
+      "file": "q8_units.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 9,
+      "chain": 9,
+      "step": 1,
+      "file": "q9_shop.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 10,
+      "chain": 10,
+      "step": 1,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: render is not a function"
+    },
+    {
+      "goal": 11,
+      "chain": 1,
+      "step": 2,
+      "file": "q1_stock.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 12,
+      "chain": 2,
+      "step": 2,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 13,
+      "chain": 3,
+      "step": 2,
+      "file": "q3_calendar.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 14,
+      "chain": 4,
+      "step": 2,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 15,
+      "chain": 5,
+      "step": 2,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: 'int' object is not callable"
+    },
+    {
+      "goal": 16,
+      "chain": 6,
+      "step": 2,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: KeyError: \"Path a.b.9 is invalid: 'Path a.b.9 is invalid: index 9 out of range'\""
+    },
+    {
+      "goal": 17,
+      "chain": 7,
+      "step": 2,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "first undo ab"
+    },
+    {
+      "goal": 18,
+      "chain": 8,
+      "step": 2,
+      "file": "q8_units.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 19,
+      "chain": 9,
+      "step": 2,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "empty total null"
+    },
+    {
+      "goal": 20,
+      "chain": 10,
+      "step": 2,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: render is not a function"
+    },
+    {
+      "goal": 21,
+      "chain": 1,
+      "step": 3,
+      "file": "q1_stock.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 22,
+      "chain": 2,
+      "step": 3,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 23,
+      "chain": 3,
+      "step": 3,
+      "file": "q3_calendar.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 24,
+      "chain": 4,
+      "step": 3,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 25,
+      "chain": 5,
+      "step": 3,
+      "file": "q5_limits.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 26,
+      "chain": 6,
+      "step": 3,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "past the end did not raise IndexError"
+    },
+    {
+      "goal": 27,
+      "chain": 7,
+      "step": 3,
+      "file": "q7_buffer.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 28,
+      "chain": 8,
+      "step": 3,
+      "file": "q8_units.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 29,
+      "chain": 9,
+      "step": 3,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "after + [\"Apple x2\"] null"
+    },
+    {
+      "goal": 30,
+      "chain": 10,
+      "step": 3,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: render is not a function"
+    },
+    {
+      "goal": 31,
+      "chain": 1,
+      "step": 4,
+      "file": "q1_stock.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 32,
+      "chain": 2,
+      "step": 4,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 33,
+      "chain": 3,
+      "step": 4,
+      "file": "q3_calendar.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 34,
+      "chain": 4,
+      "step": 4,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 35,
+      "chain": 5,
+      "step": 4,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "wait (0.4999956999963615, 1.4999947999895085)"
+    },
+    {
+      "goal": 36,
+      "chain": 6,
+      "step": 4,
+      "file": "q6_jpath.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 37,
+      "chain": 7,
+      "step": 4,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "overlapping matches"
+    },
+    {
+      "goal": 38,
+      "chain": 8,
+      "step": 4,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: 'NoneType' object is not subscriptable"
+    },
+    {
+      "goal": 39,
+      "chain": 9,
+      "step": 4,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "one \"50.00 cents\""
+    },
+    {
+      "goal": 40,
+      "chain": 10,
+      "step": 4,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: render is not a function"
+    },
+    {
+      "goal": 41,
+      "chain": 1,
+      "step": 5,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "after fulfil stock 5 available 5"
+    },
+    {
+      "goal": 42,
+      "chain": 2,
+      "step": 5,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 43,
+      "chain": 3,
+      "step": 5,
+      "file": "q3_calendar.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 44,
+      "chain": 4,
+      "step": 5,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 45,
+      "chain": 5,
+      "step": 5,
+      "file": "q5_limits.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 46,
+      "chain": 6,
+      "step": 5,
+      "file": "q6_jpath.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 47,
+      "chain": 7,
+      "step": 5,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "one undo did not revert all: a+b+c"
+    },
+    {
+      "goal": 48,
+      "chain": 8,
+      "step": 5,
+      "file": "q8_units.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 49,
+      "chain": 9,
+      "step": 5,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "an invalid code changed the total null"
+    },
+    {
+      "goal": 50,
+      "chain": 10,
+      "step": 5,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: render is not a function"
+    },
+    {
+      "goal": 51,
+      "chain": 1,
+      "step": 6,
+      "file": "q1_stock.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 52,
+      "chain": 2,
+      "step": 6,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 53,
+      "chain": 3,
+      "step": 6,
+      "file": "q3_calendar.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 54,
+      "chain": 4,
+      "step": 6,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 55,
+      "chain": 5,
+      "step": 6,
+      "file": "q5_limits.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 56,
+      "chain": 6,
+      "step": 6,
+      "file": "q6_jpath.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 57,
+      "chain": 7,
+      "step": 6,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Position out of bounds"
+    },
+    {
+      "goal": 58,
+      "chain": 8,
+      "step": 6,
+      "file": "q8_units.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 59,
+      "chain": 9,
+      "step": 6,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "after reload []"
+    },
+    {
+      "goal": 60,
+      "chain": 10,
+      "step": 6,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: render is not a function"
+    },
+    {
+      "goal": 61,
+      "chain": 1,
+      "step": 7,
+      "file": "q1_stock.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 62,
+      "chain": 2,
+      "step": 7,
+      "file": "q2_table.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 63,
+      "chain": 3,
+      "step": 7,
+      "file": "q3_calendar.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 64,
+      "chain": 4,
+      "step": 7,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "the unclosed error does not name alpha: r is not a function"
+    },
+    {
+      "goal": 65,
+      "chain": 5,
+      "step": 7,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'KeyedLimiter' object has no attribute 'stats'"
+    },
+    {
+      "goal": 66,
+      "chain": 6,
+      "step": 7,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'q6_jpath_mod' has no attribute 'flatten'"
+    },
+    {
+      "goal": 67,
+      "chain": 7,
+      "step": 7,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: b.wordAt is not a function"
+    },
+    {
+      "goal": 68,
+      "chain": 8,
+      "step": 7,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'q8_units_mod' has no attribute 'to_metric'"
+    },
+    {
+      "goal": 69,
+      "chain": 9,
+      "step": 7,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "the empty message is not shown at start"
+    },
+    {
+      "goal": 70,
+      "chain": 10,
+      "step": 7,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: render is not a function"
+    },
+    {
+      "goal": 71,
+      "chain": 1,
+      "step": 8,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.toJSON is not a function"
+    },
+    {
+      "goal": 72,
+      "chain": 2,
+      "step": 8,
+      "file": "q2_table.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'q2_table_mod' has no attribute 'join'"
+    },
+    {
+      "goal": 73,
+      "chain": 3,
+      "step": 8,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": false,
+      "why": "formatTime/parseTime not exported"
+    },
+    {
+      "goal": 74,
+      "chain": 4,
+      "step": 8,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 75,
+      "chain": 5,
+      "step": 8,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "bad constructor #0 did not raise ValueError"
+    },
+    {
+      "goal": 76,
+      "chain": 6,
+      "step": 8,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'q6_jpath_mod' has no attribute 'diff'"
+    },
+    {
+      "goal": 77,
+      "chain": 7,
+      "step": 8,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "maxUndo text "
+    },
+    {
+      "goal": 78,
+      "chain": 8,
+      "step": 8,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'q8_units_mod' has no attribute 'shopping_list'"
+    },
+    {
+      "goal": 79,
+      "chain": 9,
+      "step": 8,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "at $9.00 null"
+    },
+    {
+      "goal": 80,
+      "chain": 10,
+      "step": 8,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: render is not a function"
+    },
+    {
+      "goal": 81,
+      "chain": 1,
+      "step": 9,
+      "file": "q1_stock.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: w.history is not a function"
+    },
+    {
+      "goal": 82,
+      "chain": 2,
+      "step": 9,
+      "file": "q2_table.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI printed ['All tests passed!']"
+    },
+    {
+      "goal": 83,
+      "chain": 3,
+      "step": 9,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.toText is not a function"
+    },
+    {
+      "goal": 84,
+      "chain": 4,
+      "step": 9,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: r is not a function"
+    },
+    {
+      "goal": 85,
+      "chain": 5,
+      "step": 9,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'q5_limits_mod' has no attribute 'limited'"
+    },
+    {
+      "goal": 86,
+      "chain": 6,
+      "step": 9,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'list' object has no attribute 'split'"
+    },
+    {
+      "goal": 87,
+      "chain": 7,
+      "step": 9,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: b.toJSON is not a function"
+    },
+    {
+      "goal": 88,
+      "chain": 8,
+      "step": 9,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: convert() got an unexpected keyword argument 'density'"
+    },
+    {
+      "goal": 89,
+      "chain": 9,
+      "step": 9,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "Enter did not apply the code: null"
+    },
+    {
+      "goal": 90,
+      "chain": 10,
+      "step": 9,
+      "file": "q10_report.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: render is not a function"
+    },
+    {
+      "goal": 91,
+      "chain": 1,
+      "step": 10,
+      "file": "Q1_NOTES.md",
+      "asIs": false,
+      "impl": false,
+      "why": "Q1_NOTES.md missing"
+    },
+    {
+      "goal": 92,
+      "chain": 2,
+      "step": 10,
+      "file": "q2_table.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'q2_table_mod' has no attribute 'pivot'"
+    },
+    {
+      "goal": 93,
+      "chain": 3,
+      "step": 10,
+      "file": "q3_calendar.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.toText is not a function"
+    },
+    {
+      "goal": 94,
+      "chain": 4,
+      "step": 10,
+      "file": "q4_template.js",
+      "asIs": false,
+      "impl": false,
+      "why": "compile is not exported"
+    },
+    {
+      "goal": 95,
+      "chain": 5,
+      "step": 10,
+      "file": "q5_limits.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: SlidingWindow.allow() takes 1 positional argument but 2 were given"
+    },
+    {
+      "goal": 96,
+      "chain": 6,
+      "step": 10,
+      "file": "q6_jpath.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 'q6_jpath_mod' has no attribute 'merge'"
+    },
+    {
+      "goal": 97,
+      "chain": 7,
+      "step": 10,
+      "file": "q7_buffer.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: (intermediate value).stats is not a function"
+    },
+    {
+      "goal": 98,
+      "chain": 8,
+      "step": 10,
+      "file": "q8_units.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI printed \"All tests passed!\\r\\nparse_quantity('2 kg') = None\\r\\nparse_quantity('0.5 l') = None\\r\\nparse_quantity('3/4 cup') = None\\r\\nparse_quantity('1 1/2 c"
+    },
+    {
+      "goal": 99,
+      "chain": 9,
+      "step": 10,
+      "file": "q9_shop.html",
+      "asIs": false,
+      "impl": false,
+      "why": "the discount did not survive a reload: null"
+    },
+    {
+      "goal": 100,
+      "chain": 10,
+      "step": 10,
+      "file": "Q_INDEX.md",
+      "asIs": false,
+      "impl": false,
+      "why": "Q_INDEX.md missing"
+    }
+  ]
+}

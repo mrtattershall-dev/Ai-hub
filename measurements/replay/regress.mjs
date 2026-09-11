@@ -19,7 +19,7 @@ export async function main({ D, set, goalsFile, checker, label, finalChecks, out
   const goals = JSON.parse(readFileSync(goalsFile, 'utf8'));
   const onDisk = {};
   for (const m of log.matchAll(/^\s+(\d+)\s+(\S+)\s.*?(\S+)\s*$/gm)) onDisk[Number(m[1])] = `${m[2]} ${m[3]}`;
-  const runs = readdirSync(join(trial, 'runs')).map((f) => JSON.parse(readFileSync(join(trial, 'runs', f), 'utf8')))
+  const runs = readdirSync(join(trial, 'runs')).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(readFileSync(join(trial, 'runs', f), 'utf8')))
     .sort((a, b) => createdMs(a) - createdMs(b));
   for (const [i, r] of runs.entries()) if (String(r.goal || '').trim() !== goals[i].trim()) throw new Error(`run ${i + 1} is not goal ${i + 1}`);
   const rs = runStates(ws, runs);

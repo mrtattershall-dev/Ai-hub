@@ -1,0 +1,103 @@
+  1 PASS q1_stock.js    s1  
+  2 PASS q2_table.py    s1  
+  3 PASS q3_calendar.js s1  
+  4 fail q4_template.js s1  threw: r is not a function
+  5 fail q5_limits.py   s1  refill at 1 per second
+  6 PASS q6_jpath.py    s1  
+  7 PASS q7_buffer.js   s1  
+  8 PASS q8_units.py    s1  
+  9 PASS q9_shop.html   s1  
+ 10 fail q10_report.js  s1  load: render is not a function
+ 11 PASS q1_stock.js    s2  
+ 12 PASS q2_table.py    s2  
+ 13 PASS q3_calendar.js s2  
+ 14 fail q4_template.js s2  threw: r is not a function
+ 15 fail q5_limits.py   s2  threw: TypeError: 'int' object is not callable
+ 16 fail q6_jpath.py    s2  threw: KeyError: "Path a.b.9 is invalid: 'Path a.b.9 is invalid: index 9 out of range'"
+ 17 fail q7_buffer.js   s2  first undo ab
+ 18 PASS q8_units.py    s2  
+ 19 fail q9_shop.html   s2  empty total null
+ 20 fail q10_report.js  s2  load: render is not a function
+ 21 PASS q1_stock.js    s3  
+ 22 PASS q2_table.py    s3  
+ 23 PASS q3_calendar.js s3  
+ 24 fail q4_template.js s3  threw: r is not a function
+ 25 PASS q5_limits.py   s3  
+ 26 fail q6_jpath.py    s3  past the end did not raise IndexError
+ 27 PASS q7_buffer.js   s3  
+ 28 PASS q8_units.py    s3  
+ 29 fail q9_shop.html   s3  after + ["Apple x2"] null
+ 30 fail q10_report.js  s3  load: render is not a function
+ 31 PASS q1_stock.js    s4  
+ 32 PASS q2_table.py    s4  
+ 33 PASS q3_calendar.js s4  
+ 34 fail q4_template.js s4  threw: r is not a function
+ 35 fail q5_limits.py   s4  wait (0.4999956999963615, 1.4999947999895085)
+ 36 PASS q6_jpath.py    s4  
+ 37 fail q7_buffer.js   s4  overlapping matches
+ 38 fail q8_units.py    s4  threw: TypeError: 'NoneType' object is not subscriptable
+ 39 fail q9_shop.html   s4  one "50.00 cents"
+ 40 fail q10_report.js  s4  load: render is not a function
+ 41 fail q1_stock.js    s5  after fulfil stock 5 available 5
+ 42 PASS q2_table.py    s5  
+ 43 PASS q3_calendar.js s5  
+ 44 fail q4_template.js s5  threw: r is not a function
+ 45 PASS q5_limits.py   s5  
+ 46 PASS q6_jpath.py    s5  
+ 47 fail q7_buffer.js   s5  one undo did not revert all: a+b+c
+ 48 PASS q8_units.py    s5  
+ 49 fail q9_shop.html   s5  an invalid code changed the total null
+ 50 fail q10_report.js  s5  load: render is not a function
+ 51 PASS q1_stock.js    s6  
+ 52 PASS q2_table.py    s6  
+ 53 PASS q3_calendar.js s6  
+ 54 fail q4_template.js s6  threw: r is not a function
+ 55 PASS q5_limits.py   s6  
+ 56 PASS q6_jpath.py    s6  
+ 57 fail q7_buffer.js   s6  threw: Position out of bounds
+ 58 PASS q8_units.py    s6  
+ 59 fail q9_shop.html   s6  after reload []
+ 60 fail q10_report.js  s6  load: render is not a function
+ 61 PASS q1_stock.js    s7  
+ 62 PASS q2_table.py    s7  
+ 63 PASS q3_calendar.js s7  
+ 64 fail q4_template.js s7  the unclosed error does not name alpha: r is not a function
+ 65 fail q5_limits.py   s7  threw: AttributeError: 'KeyedLimiter' object has no attribute 'stats'
+ 66 fail q6_jpath.py    s7  threw: AttributeError: module 'q6_jpath_mod' has no attribute 'flatten'
+ 67 fail q7_buffer.js   s7  threw: b.wordAt is not a function
+ 68 fail q8_units.py    s7  threw: AttributeError: module 'q8_units_mod' has no attribute 'to_metric'
+ 69 fail q9_shop.html   s7  the empty message is not shown at start
+ 70 fail q10_report.js  s7  load: render is not a function
+ 71 fail q1_stock.js    s8  threw: w.toJSON is not a function
+ 72 fail q2_table.py    s8  threw: AttributeError: module 'q2_table_mod' has no attribute 'join'
+ 73 fail q3_calendar.js s8  formatTime/parseTime not exported
+ 74 fail q4_template.js s8  threw: r is not a function
+ 75 fail q5_limits.py   s8  bad constructor #0 did not raise ValueError
+ 76 fail q6_jpath.py    s8  threw: AttributeError: module 'q6_jpath_mod' has no attribute 'diff'
+ 77 fail q7_buffer.js   s8  maxUndo text 
+ 78 fail q8_units.py    s8  threw: AttributeError: module 'q8_units_mod' has no attribute 'shopping_list'
+ 79 fail q9_shop.html   s8  at $9.00 null
+ 80 fail q10_report.js  s8  load: render is not a function
+ 81 fail q1_stock.js    s9  threw: w.history is not a function
+ 82 fail q2_table.py    s9  CLI printed ['All tests passed!']
+ 83 fail q3_calendar.js s9  threw: c.toText is not a function
+ 84 fail q4_template.js s9  threw: r is not a function
+ 85 fail q5_limits.py   s9  threw: AttributeError: module 'q5_limits_mod' has no attribute 'limited'
+ 86 fail q6_jpath.py    s9  threw: AttributeError: 'list' object has no attribute 'split'
+ 87 fail q7_buffer.js   s9  threw: b.toJSON is not a function
+ 88 fail q8_units.py    s9  threw: TypeError: convert() got an unexpected keyword argument 'density'
+ 89 fail q9_shop.html   s9  Enter did not apply the code: null
+ 90 fail q10_report.js  s9  load: render is not a function
+ 91 fail Q1_NOTES.md    s10 Q1_NOTES.md missing
+ 92 fail q2_table.py    s10 threw: AttributeError: module 'q2_table_mod' has no attribute 'pivot'
+ 93 fail q3_calendar.js s10 threw: c.toText is not a function
+ 94 fail q4_template.js s10 compile is not exported
+ 95 fail q5_limits.py   s10 threw: TypeError: SlidingWindow.allow() takes 1 positional argument but 2 were given
+ 96 fail q6_jpath.py    s10 threw: AttributeError: module 'q6_jpath_mod' has no attribute 'merge'
+ 97 fail q7_buffer.js   s10 threw: (intermediate value).stats is not a function
+ 98 fail q8_units.py    s10 CLI printed "All tests passed!\r\nparse_quantity('2 kg') = None\r\nparse_quantity('0.5 l') = None\r\
+ 99 fail q9_shop.html   s10 the discount did not survive a reload: null
+100 fail Q_INDEX.md     s10 Q_INDEX.md missing
+
+per project (implementation correct): q1 6/10  q2 7/10  q3 7/10  q4 0/10  q5 3/10  q6 4/10  q7 2/10  q8 5/10  q9 1/10  q10 0/10
+done as asked 35/100 | implementation correct 35/100 (CT = correct code, own test broke it)
