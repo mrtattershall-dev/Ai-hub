@@ -89,6 +89,16 @@ async function runOne(g) {
     const deadline = Date.now() + 12 * 60000;
     while (Date.now() < deadline) {
       run = await api('/agent/' + s.runId).catch(() => null);
+      // Nobody answers approvals here. A scratch workspace's own git history is harmless, so
+      // commits/undos are approved; anything else is denied and the model carries on another way.
+      // (The Modal pilot cut 6 runs short parked on git_commit / run_command.)
+      if (run?.status === 'awaiting_approval' && run.pending) {
+        const ok = ['git_commit', 'git_undo'].includes(run.pending.tool);
+        await api(`/agent/${s.runId}/approve`, { method: 'POST', body: JSON.stringify({ approve: ok }) }).catch(() => null);
+        (rec.approvals = rec.approvals || []).push(`${run.pending.tool}:${ok ? 'approved' : 'denied'}`);
+        await sleep(1000);
+        continue;
+      }
       // Wait for teardown too: status flips before the syntax rollback finishes (trial35's lesson).
       if (run && TERMINAL.includes(run.status) && run.busy !== true) break;
       await sleep(3000);

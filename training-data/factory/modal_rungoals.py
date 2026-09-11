@@ -153,7 +153,12 @@ def goal_id(g: dict) -> str:
     return re.sub(r"[^\w.-]", "__", g["repo"]) + "__" + g["goal"]
 
 
-@app.function(image=image, cpu=2.0, memory=4096, timeout=60 * 20, retries=0, max_containers=20,
+# How many hubs at once. Match it to the model endpoint's GPU count: the vLLM server answers one
+# request at a time per container, so hubs beyond ~1.5x the GPUs only sit in line - billing CPU.
+MAX_HUBS = int(os.environ.get("RUNGOALS_MAX_HUBS", "20"))
+
+
+@app.function(image=image, cpu=2.0, memory=4096, timeout=60 * 20, retries=0, max_containers=MAX_HUBS,
               volumes={"/out": ws_vol})
 def run_goal(g: dict, base: str = "", model: str = "coder14b", label: str = "run", mock_script: list = None) -> dict:
     t0 = time.time()
@@ -201,6 +206,20 @@ def run_goal(g: dict, base: str = "", model: str = "coder14b", label: str = "run
                 run = _http(api + "/agent/" + s["runId"])
             except Exception:  # noqa: BLE001
                 run = None
+            if run and run.get("status") == "awaiting_approval" and run.get("pending"):
+                # Nobody answers approvals in a container, and the pilot cut 6 runs short here
+                # (git_commit, run_command "open index.html"). A scratch workspace's own git history
+                # is harmless, so commits/undos are approved; anything else is DENIED and the model
+                # has to carry on another way - what a human watching would most often do.
+                tool = (run.get("pending") or {}).get("tool")
+                ok = tool in ("git_commit", "git_undo")
+                try:
+                    _http(api + "/agent/" + s["runId"] + "/approve", {"approve": ok})
+                    rec.setdefault("approvals", []).append(f"{tool}:{'approved' if ok else 'denied'}")
+                except Exception:  # noqa: BLE001
+                    pass
+                time.sleep(1)
+                continue
             if run and run.get("status") in TERMINAL and run.get("busy") is not True:
                 break
             time.sleep(3)

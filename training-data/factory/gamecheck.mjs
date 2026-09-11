@@ -147,9 +147,13 @@ addEventListener('keydown',function(e){if(e.key==='p'||e.key==='P'){paused=!paus
     async check(o) {
       await sleep(1200);
       const read = () => o.page.evaluate(() => { const e = document.getElementById('fps'); if (!e) return null; const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return { text: e.textContent || '', visible: r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none', top: r.top, left: r.left }; });
-      const a = await read();
+      let a = await read();
       if (!a) return { pass: false, why: 'no element with id "fps"' };
-      const n = parseFloat((a.text.match(/\d+(\.\d+)?/) || [])[0]);
+      const num = (x) => parseFloat((((x && x.text) || '').match(/\d+(\.\d+)?/) || [])[0]);
+      // Read twice before failing: a counter that updates once a second may not have ticked at the
+      // first read. (Every pilot fps failure showed "0 FPS"; this rules out a timing race.)
+      if (!(num(a) >= 5)) { await sleep(1300); const b = await read(); if (b && num(b) > (num(a) || 0)) a = b; }
+      const n = num(a);
       const topLeft = a.top < 120 && a.left < 200;
       const ok = a.visible && topLeft && n >= 5 && n <= 240;
       return { pass: ok, why: `#fps "${a.text.trim().slice(0, 20)}" visible:${a.visible} top-left:${topLeft} value:${n}` };
@@ -187,7 +191,7 @@ window.requestAnimationFrame=function(cb){return raf(function(t){window.frameCou
       const v2 = await vis();
       const named = m.controls.filter((c) => CONTROL_WORDS[c].test(text));
       const ok = !v0 && v1 === true && !v2 && named.length > 0;
-      return { pass: ok, why: `hidden:${!v0} shown-on-click:${v1} hidden-again:${!v2} real controls named: ${named.join(', ') || 'none'} (game handles: ${m.controls.join(', ')})` };
+      return { pass: ok, why: `hidden:${!v0} shown-on-click:${v1} hidden-again:${!v2} real controls named: ${named.join(', ') || 'none'} (game handles: ${m.controls.join(', ')}) | panel text: "${text.trim().replace(/\s+/g, ' ').slice(0, 80)}"` };
     },
     ref: (m) => `(function(){function mk(){var b=document.createElement('button');b.id='help';b.textContent='Help';b.style.cssText='position:fixed;top:4px;right:4px;z-index:99999';
 var p=document.createElement('div');p.id='helpPanel';p.style.cssText='display:none;position:fixed;top:30px;right:4px;z-index:99999;background:#fff;color:#000;padding:6px';
@@ -198,8 +202,14 @@ if(document.body)mk();else addEventListener('DOMContentLoaded',mk);})();`,
   bg: {
     text: (m) => `In the EXISTING game in this workspace (it starts from ${m.entry}), change the page background colour around the game to #001133. Do not change anything else.`,
     async check(o) {
-      const c = await o.page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-      return { pass: c === 'rgb(0, 17, 51)', why: `body background ${c}` };
+      // The page's EFFECTIVE background: <body> if it paints one, else <html>. Setting the colour on
+      // <html> looks identical on screen; the pilot failed 4 such runs on a transparent <body>.
+      const c = await o.page.evaluate(() => {
+        const clear = (x) => !x || x === 'rgba(0, 0, 0, 0)' || x === 'transparent';
+        const b = getComputedStyle(document.body).backgroundColor;
+        return clear(b) ? getComputedStyle(document.documentElement).backgroundColor : b;
+      });
+      return { pass: c === 'rgb(0, 17, 51)', why: `page background ${c}` };
     },
     ref: () => `(function(){var s=document.createElement('style');s.textContent='html,body{background:#001133 !important}';document.head.appendChild(s);})();`,
   },
@@ -248,10 +258,13 @@ const GOALS_OUT = join(HERE, 'raw', 'game_goals.jsonl');
 if (mode === 'check') {
   const [dir, entry, goalId] = rest;
   const jsFiles = [];
-  (function walk(d) { for (const e of readdirSync(d)) { if (e === 'node_modules' || e === '.git') continue; const p = join(d, e); const st = statSync(p); if (st.isDirectory()) walk(p); else if (/\.m?js$/i.test(e)) jsFiles.push(relative(dir, p).split(sep).join('/')); } })(dir);
+  // Dangling symlinks are skipped: the pilot's grader died on one (ENOENT stat .../engine.d.ts).
+  (function walk(d) { for (const e of readdirSync(d)) { if (e === 'node_modules' || e === '.git') continue; const p = join(d, e); let st; try { st = statSync(p); } catch { continue; } if (st.isDirectory()) walk(p); else if (/\.m?js$/i.test(e)) jsFiles.push(relative(dir, p).split(sep).join('/')); } })(dir);
   const browser = await puppeteer.launch(launchOptions());
-  const v = await grade(browser, dir, entry, goalId, { entry, controls: controlsIn(dir, jsFiles) });
-  await browser.close();
+  // Always answer: one pilot check ran past 180 s and returned no verdict at all.
+  const v = await Promise.race([grade(browser, dir, entry, goalId, { entry, controls: controlsIn(dir, jsFiles) }),
+    sleep(150000).then(() => ({ pass: false, why: 'check timed out after 150s' }))]);
+  await Promise.race([browser.close().catch(() => {}), sleep(5000)]);
   console.log(JSON.stringify(v));
   process.exit(v.pass ? 0 : 1);
 }
