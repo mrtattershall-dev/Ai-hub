@@ -5,7 +5,7 @@
 # starts within 8 minutes of the cap; the app itself is stopped by a separate stopApp.mjs watchdog.
 set -u
 LABEL=$1; MODEL=$2; BASE=$3; CAP_MIN=$4
-D=C:/Users/tatte/Projects/ai-coding-hub/measurements/2026-09-11-setE
+D=${SETE_DIR:-C:/Users/tatte/Projects/ai-coding-hub/measurements/2026-09-11-setE}   # SETE_DIR: dry runs only
 STOP=$(node -e "console.log(Date.now() + ($CAP_MIN - 8) * 60000)")
 LOG="$D/$LABEL-setE.log"
 echo "$LABEL start $(date +%H:%M:%S); no new goals after $(node -e "console.log(new Date($STOP).toTimeString().slice(0,8))")" > "$D/$LABEL.status"
