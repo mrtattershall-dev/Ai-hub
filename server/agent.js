@@ -67,6 +67,8 @@ export const __toolPolicyTest = {
   // the model might emit is callable - without constructing a router, which would run
   // requeueOrphans() against the live work queue.
   hasTool: (name) => typeof tools[name] === 'function',
+  // Call a real tool by name, so a test can pin its behaviour against a real workspace.
+  callTool: (name, args) => tools[name](args),
   // The boundary-marker guard. A PURE function, so a test can pin it without constructing
   // a router or touching a workspace. Exported because the failure it prevents was silent:
   // the marker became a 22-byte stub and every later run measured a workspace whose module
@@ -277,7 +279,12 @@ const tools = {
       for (const name of readdirSync(dir).sort()) {
         if (name === 'node_modules' || name === '.git') continue;
         const fp = join(dir, name);
-        const isDir = statSync(fp).isDirectory();
+        // A file can vanish between readdirSync and statSync - python's py_compile writes
+        // __pycache__ through a temp file and renames it away. That ENOENT used to escape
+        // from here, and startRun builds its opening message with list_dir, so a fuzz run's
+        // /agent/start answered 500. Something that is no longer there is simply not listed.
+        let isDir;
+        try { isDir = statSync(fp).isDirectory(); } catch { continue; }
         out += `${prefix}${name}${isDir ? '/' : ''}\n`;
         if (isDir) out += walk(fp, prefix + '  ');
       }
@@ -336,7 +343,10 @@ const tools = {
         for (const name of readdirSync(dir)) {
           if (name === 'node_modules' || name === '.git') continue;
           const fp = join(dir, name), r = rel ? `${rel}/${name}` : name;
-          statSync(fp).isDirectory() ? walk(fp, r) : targets.push(r);
+          // Skip an entry that vanished mid-walk (see list_dir) rather than abandoning the
+          // whole search: the outer catch used to turn one __pycache__ temp into "no matches".
+          let st; try { st = statSync(fp); } catch { continue; }
+          st.isDirectory() ? walk(fp, r) : targets.push(r);
         }
       };
       try { walk(WORKSPACE); } catch {}
@@ -345,8 +355,11 @@ const tools = {
     for (const t of targets) {
       let full;
       try { full = safePath(t); } catch { continue; }
-      if (!existsSync(full) || statSync(full).isDirectory()) continue;
-      const lines = readFileSync(full, 'utf8').split('\n');
+      let lines;
+      try {
+        if (statSync(full).isDirectory()) continue;
+        lines = readFileSync(full, 'utf8').split('\n');
+      } catch { continue; }   // missing, or gone since the walk listed it
       for (let i = 0; i < lines.length && out.length < 60; i++) {
         if (re.test(lines[i])) out.push(`${t}:${i + 1}: ${lines[i].trim().slice(0, 150)}`);
       }
@@ -1700,7 +1713,8 @@ function slimForDisk(run) {
 function reapRuns() {
   try {
     const files = readdirSync(RUNS_DIR).filter((f) => f.endsWith('.json'))
-      .map((f) => ({ f, m: statSync(join(RUNS_DIR, f)).mtimeMs }))
+      .map((f) => { try { return { f, m: statSync(join(RUNS_DIR, f)).mtimeMs }; } catch { return null; } })
+      .filter(Boolean)            // a file removed mid-scan must not abort the whole reap
       .sort((a, b) => b.m - a.m);
     for (const { f } of files.slice(MAX_RUN_FILES)) {
       try { unlinkSync(join(RUNS_DIR, f)); } catch {}
@@ -3648,8 +3662,9 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
         if (name === 'node_modules' || name === '.git') continue;
         const fp = join(dir, name);
         const r = rel ? `${rel}/${name}` : name;
-        if (statSync(fp).isDirectory()) walk(fp, r);
-        else out.push({ path: r, size: statSync(fp).size });
+        let st; try { st = statSync(fp); } catch { continue; }   // vanished mid-walk (see list_dir)
+        if (st.isDirectory()) walk(fp, r);
+        else out.push({ path: r, size: st.size });
       }
     };
     walk(WORKSPACE);
