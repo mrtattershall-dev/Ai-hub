@@ -59,6 +59,7 @@ const peakTok = (r) => {
 // Imported, not defined here, so the training-corpus builder can filter on the SAME vocabulary this reports on without
 // importing THIS file - which is a script: it reads the index at top level and exits when there is none, so importing
 // it would have terminated the builder before it wrote a row. See finishVerdicts.mjs.
+import { UNVERIFIED } from './finishVerdicts.mjs';
 const verdictOf = (r) => (r.finishKind ? (UNVERIFIED.has(r.finishKind) ? r.finishKind : 'ok') : '?');
 
 const sum = (rs, f) => rs.reduce((a, r) => a + (f(r) || 0), 0);
