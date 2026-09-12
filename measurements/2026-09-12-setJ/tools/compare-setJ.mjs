@@ -108,12 +108,19 @@ for (const a of ARMS) {
   });
 }
 
+// targetOverRange() IS CALLED HERE. It was defined, documented as "the truncation rule fixed before any set J number
+// was visible", and then never invoked - so every arm was printed against the full-20 target no matter how many goals
+// it reached. The 14B reached 16 and was scored against 4 instead of 3, which flatters the fixes by a goal. Defining
+// a rule is not applying it; this line is the difference.
 console.log('  model                                     target    now    delta   attempted   predicted');
 for (const r of rows) {
   if (!r.present) { console.log('  ' + r.name.padEnd(40) + String(r.target).padStart(6) + '    (not finished yet)'); continue; }
-  const d = r.impl - r.target;
-  console.log('  ' + r.name.padEnd(40) + String(r.target).padStart(6) + String(r.impl).padStart(7)
-    + ('    ' + (d >= 0 ? '+' : '') + d).padEnd(9) + String(r.attempted).padStart(8) + '      ' + r.predict);
+  const ranged = r.attempted > 0 && r.attempted < N ? targetOverRange(r.label, r.attempted) : null;
+  const target = ranged ?? r.target;
+  const d = r.impl - target;
+  const note = ranged === null ? '' : `  (target over its ${r.attempted} reached goals, not ${N})`;
+  console.log('  ' + r.name.padEnd(40) + String(target).padStart(6) + String(r.impl).padStart(7)
+    + ('    ' + (d >= 0 ? '+' : '') + d).padEnd(9) + String(r.attempted).padStart(8) + '      ' + r.predict + note);
 }
 console.log('\n  Targets are each arm at its own goal-20 checkpoint, same goals, byte-identical checker.');
 console.log('  NOTE: 20 goals, one run per arm. Set H measured +/-1-2 spread over 54-59 goals, so noise here is');
