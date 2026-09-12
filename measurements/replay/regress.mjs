@@ -4,7 +4,7 @@
 // (runstates.mjs - no timing, no guessing). Each state is exported and scored with the set's hidden checks;
 // only goal i's own step is read from it. REGRESSED = implementation correct when written, not at the end.
 import { spawnSync } from 'node:child_process';
-import { readFileSync, readdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, mkdtempSync, rmSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { runStates, exportTree } from './runstates.mjs';
@@ -35,7 +35,19 @@ export async function main({ D, set, goalsFile, checker, label, finalChecks, out
       const base = mkdtempSync(join(tmpdir(), 'regr-')); const dir = join(base, 'ws');
       exportTree(ws, sha, dir);
       const o = join(base, 'res.json');
-      spawnSync(process.execPath, [checker, dir, '--out', o], { encoding: 'utf8', timeout: 900000, env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' } });
+      // The result of this spawn USED TO BE DISCARDED, and the readFileSync below then threw a bare ENOENT naming only a
+      // temp path. Set G, 2026-09-12: the checker failed on one exported end state, the whole analysis died, and it left
+      // coder30b-setg-regress.txt at 0 bytes with no 14b file at all - so the one number this rig exists to produce
+      // (worked-when-written vs works-at-the-end, i.e. whether the destruction is gone) was missing for hours while the
+      // job looked like it was still running. Never infer a child's success from the presence of its output file.
+      const ran = spawnSync(process.execPath, [checker, dir, '--out', o], { encoding: 'utf8', timeout: 900000, env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' } });
+      if (ran.error || ran.status !== 0 || !existsSync(o)) {
+        throw new Error(`the checker failed on end state ${String(sha).slice(0, 7)} (goal ${i + 1} of ${runs.length}), so this analysis has no number and must not report one.\n`
+          + `  exit=${ran.status} signal=${ran.signal || 'none'} spawnError=${ran.error ? ran.error.message : 'none'} wroteOut=${existsSync(o)}\n`
+          + `  tree kept for inspection: ${dir}\n`
+          + `  stderr: ${String(ran.stderr || '(empty)').slice(-1200)}\n`
+          + `  stdout: ${String(ran.stdout || '(empty)').slice(-400)}`);
+      }
       res = JSON.parse(readFileSync(o, 'utf8')).results; cache.set(sha, res); rmSync(base, { recursive: true, force: true });
     }
     const then = byGoal(res, i + 1), end = byGoal(finalRes, i + 1);
