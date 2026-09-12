@@ -20,7 +20,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 import { mirrorAgentCommand, mirrorAgentResult } from './terminal.js';
-import { ensureRepo, commitAll, diff as gitDiff, log as gitLog, undo as gitUndo, isDirty, showFile, fileHistory } from './workspaceGit.js';
+import { ensureRepo, commitAll, diff as gitDiff, log as gitLog, undo as gitUndo, isDirty, showFile, fileHistory, fileHistorySince } from './workspaceGit.js';
 import { classifyCommand, classifyPython, describeMode, MODE as APPROVAL_MODE } from './approvalPolicy.js';
 import * as ledger from './taskLedger.js';
 import * as visual from './visualCheck.js';
@@ -3745,6 +3745,20 @@ async function drive(loadDb, run) {
     // for languages quickCheck understands.
     if (['done', 'error', 'stopped'].includes(run.status)) {
       try {
+        // ── THE BOUND ───────────────────────────────────────────────────────────
+        // This run's OWN checkpoints, oldest first. The FIRST one holds the state from before this run's first
+        // mutating write - that is the PREVIOUS goal's result, not this one's. So installing it is not a repair: it
+        // deletes the goal and reports success. Measured on setE coder14b: 29 of 100 goals ended in a rollback, FOUR
+        // had <=1 checkpoint of their own and FOURTEEN had <=2, and `git log -25 -- <file>` reaches 9-12 GOALS back on
+        // exactly the long-lived files that matter - so the 25-commit cap was never a bound at all.
+        // Only versions this run itself produced (strictly newer than its first checkpoint) may be installed.
+        const ownShas = (run.steps || [])
+          .filter((s) => s.type === 'checkpoint')
+          .map((s) => (String(s.text || '').match(/checkpoint\s+([0-9a-f]{7,40})/i) || [])[1])
+          .filter(Boolean);
+        const floorSha = ownShas[0] || null;   // the run's first checkpoint = the boundary of this goal's own work
+        let touched = false;                   // did the repair change the tree? then it must be committed
+
         const files = readdirSync(WORKSPACE).filter((f) => /\.(c|m)?js$|\.py$/i.test(f));
         for (const f of files.slice(0, 40)) {
           if (!(await quickCheck(f))) continue;                 // parses fine - leave it alone
@@ -3759,26 +3773,90 @@ async function drive(loadDb, run) {
           // replayed output: the HEAD-only version found a broken file at HEAD, restored
           // nothing, and reported success - it would have repaired almost nothing in a real
           // run while looking like it worked.
-          let restored = false;
-          for (const sha of await fileHistory(WORKSPACE, f, 25).catch(() => [])) {
+          // Bound by ANCESTRY, not by position in this file's history. An earlier draft looked up the floor commit's
+          // INDEX via fileHistory() and sliced - but fileHistory runs `git log -- <file>`, so a checkpoint that
+          // committed only TASKS.md never appears there, findIndex returned -1, and the fallback walked the whole
+          // history UNBOUNDED: it restored a pre-goal version while reporting a bound. Ask git instead.
+          //
+          // And the floor is the checkpoint's PARENT, not the checkpoint. A checkpoint commits the state BEFORE the
+          // write it precedes - so when the tree was clean at this run's first write, commitAll commits nothing, NO
+          // checkpoint step is recorded, and the first RECORDED checkpoint contains this run's own first write.
+          // Excluding it refuses a legitimate repair: rollbackCarryover.test.mjs went 3/3 -> 0/3 on exactly that, its
+          // good a.js living at the floor commit itself. The parent is the state this run actually started from.
+          // No checkpoint at all means the run committed nothing of its own, so it has nothing of its own to restore.
+          // TWO CASES, and the difference is whether this run has any work to lose.
+          //
+          // The bound exists to stop the repair DELETING THIS RUN'S OWN WORK. If the run landed no mutating write at
+          // all, the breakage predates it, cannot be its doing, and restoring an older version takes nothing from it -
+          // that is the inherited-wreckage case the repair was built for (10 of 67 audited workspaces ended holding
+          // .js that does not parse, each one flagged at the time and left there). Refusing there would leave the next
+          // goal to fail on the same file, and it broke runLifecycle.test.mjs, whose fixture commits six broken
+          // versions BEFORE the run starts and whose run writes nothing.
+          //
+          // `landed` is the repeat guard's own predicate (agent.js ~2889), reused verbatim rather than restated, so
+          // the repair and the guard cannot drift apart on what counts as a write. The /^OK/ clause matters: a REFUSED
+          // write is not this run's work. Note a run with exactly ONE landed write has no recorded checkpoint either -
+          // its pre-write commitAll found a clean tree - so "no floor" alone would wrongly unbind precisely the case
+          // where a single uncommitted write is the only thing left to lose. Writes are the question; checkpoints are
+          // a proxy that fails exactly there.
+          const landedWrites = (run.steps || []).filter((s) => s.type === 'tool'
+            && /^(write_file|edit_file|append_file)$/.test(String(s.tool))
+            && /^OK/.test(String(s.result || ''))).length;
+          const candidates = landedWrites
+            ? (floorSha ? await fileHistorySince(WORKSPACE, f, `${floorSha}^`, 25).catch(() => []) : [])
+            : await fileHistory(WORKSPACE, f, 25).catch(() => []);
+          let restored = false, restoredFrom = null;
+          for (const sha of candidates) {
             const prev = await showFile(WORKSPACE, sha, f).catch(() => null);
             if (prev == null || prev === broken) continue;
             writeFileSync(full, prev, 'utf8');
-            if (!(await quickCheck(f))) { restored = true; break; }   // this one parses - keep it
+            if (!(await quickCheck(f))) { restored = true; restoredFrom = sha; break; }   // this one parses - keep it
             writeFileSync(full, broken, 'utf8');                      // no better; restore and keep looking
           }
           if (restored) {
+            touched = true;
             // Name what the rollback took away, and leave it for the next goal. Set D (Qwen3-Coder): the restored
             // version predated functions the run had just written - earliestStart in goal 43, ready() in goal 93 -
             // and nothing said so until the hidden checks at the end.
-            let lost = [];
-            try { lost = lostDefs(broken, readFileSync(full, 'utf8'), f); } catch { /* evidence only */ }
+            let lost = [], goneExports = [];
+            const now = readFileSync(full, 'utf8');
+            try { lost = lostDefs(broken, now, f); } catch { /* evidence only */ }
+            // lostExports too: defNames.js has had it since the live write guard needed it, but this path only ever
+            // reported definitions - so a restore that drops `module.exports = { render }` while render() stays
+            // defined said NOTHING. That exact shape cost setE goal 54 both q4 and q10.
+            try { goneExports = lostExports(broken, now, f); } catch { /* evidence only */ }
+            const removed = [...new Set([...lost, ...goneExports])];
+            // The note wording is load-bearing: rollbackCarryover.test.mjs, runLifecycle.test.mjs and
+            // setE/tools/fix-triggers.mjs all match on it. It stays exactly as it was; the error is added BESIDE it.
             pushStep(run, { type: 'note', text: `${f} did not parse at the end of the run — restored the last committed version that did.` + (lost.length ? ` That removed: ${lost.join(', ')}.` : '') });
-            if (lost.length) {
-              try { ledger.add(WORKSPACE, [`Re-add ${lost.slice(0, 6).join(', ')} to ${f} - lost when ${f} was rolled back at the end of a run because it did not parse`]); }
+            // A note is prose that nothing downstream reads as a failure. Record it as an error too, so the run index,
+            // the trace and any escalation can see that this run's work was repaired rather than simply finished.
+            pushStep(run, { type: 'error', text: `${f} did not parse at the end of the run — restored the version this run committed at ${String(restoredFrom).slice(0, 7)}.`
+              + (removed.length ? ` That removed: ${removed.join(', ')}.` : '') });
+            run.rolledBack = true;
+            (run.restoredFiles || (run.restoredFiles = [])).push({ file: f, from: String(restoredFrom).slice(0, 7), removed });
+            if (removed.length) {
+              try { ledger.add(WORKSPACE, [`Re-add ${removed.slice(0, 6).join(', ')} to ${f} - lost when ${f} was rolled back at the end of a run because it did not parse`]); }
               catch { /* the ledger is a helper, never a reason to fail the run */ }
             }
+          } else {
+            // NOTHING this run produced parses. The only parsing versions predate the goal, so restoring one would
+            // delete everything the goal wrote. Refuse, leave the file as the run left it, and SAY SO - previously
+            // this branch was silent, because the only record lived inside `if (restored)`. That silence is why set G's
+            // s3_matrix.js (2374 lines, unparseable) has no record of its failed restore anywhere.
+            pushStep(run, { type: 'error', text: `${f} does not parse and no version this run produced parses either, so it was left as the run left it rather than reaching back past this goal. This run did not finish cleanly.` });
+            run.repairRefused = true;
+            (run.unrepairedFiles || (run.unrepairedFiles = [])).push(f);
+            try { ledger.add(WORKSPACE, [`Fix ${f} - it does not parse, and the end-of-run repair refused to reach back past this goal to a version that predates it`]); }
+            catch { /* the ledger is a helper, never a reason to fail the run */ }
           }
+        }
+        // Whatever the repair did - restored, or refused and left it - COMMIT it. Left uncommitted, the next goal's
+        // checkpoint absorbs the change and runstates.mjs attributes it to that goal instead of this one, which is
+        // what the regression analysis reads to decide what each goal did.
+        if (touched || run.repairRefused) {
+          try { await commitAll(WORKSPACE, run.rolledBack ? 'end-of-run repair: restored the last version this run produced that parses' : 'end-of-run repair refused: left unparseable files as the run left them'); }
+          catch { /* a failed commit must not take the run down, but it is recorded above */ }
         }
       } catch { /* never let the repair take the run down */ }
     }
