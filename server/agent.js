@@ -305,14 +305,41 @@ function buildOutline(lines) {
     /^\s*(?:async\s+)?def\s+([A-Za-z_]\w*)\s*\(/,        // python def
     /^\s*class\s+([A-Za-z_]\w*)\s*[:(]/,                 // python class
   ];
+  // A CLASS METHOD IS A DECLARATION, and until 2026-09-12 none of the six patterns above could see one - they all
+  // anchor on function/class/const/def. So every class-based JS file mapped to its `class X {` line and NOTHING
+  // else. Archive-wide: 224 of 651 outline_file calls on a JS file returned a lone class name, on files up to 75
+  // lines - 34% of all JS orientation calls.
+  //
+  // Traced end to end on set J run 8e7cf9aa (14B, goal 11). Its FIRST move was outline_file on a 26-line
+  // s1_library.js and it was told "1 declarations / 1: class Library {". It then invented addBook's body, the
+  // duplicate guard correctly refused it, and its next three FINDs quoted a body that had never been in the file.
+  // Zero writes landed; the run still finished "Verified (node)". Checker: "threw: l.checkout is not a function".
+  // The system prompt sends the model here "Before EDITING, to find exactly which function you need to change and
+  // where it starts, so your FIND snippet matches one place" - so the tool the hub recommends for aiming an edit
+  // was the reason the edit could not be aimed.
+  //
+  // Same shape as defNames.js, which has ALWAYS returned addBook/copies/titles for this exact file - including its
+  // narrowing for quoted arguments, because `it('adds', function () {` is a CALL and listing it as a declaration is
+  // how defNames once refused a model's rewrite of its own test file. constructor IS listed here (defNames drops it
+  // as a keyword): this map exists for navigation, and "where does the constructor start" is a fair question.
+  const METHOD = /^[ \t]+(?:static[ \t]+)?(?:async[ \t]+)?(?:get[ \t]+|set[ \t]+)?\*?([A-Za-z_$][\w$]*)[ \t]*\(([^)\n]*)\)[ \t]*\{/;
+  const CONTROL_FLOW = new Set(['if', 'for', 'while', 'switch', 'catch', 'function', 'return', 'with', 'else', 'do', 'try', 'typeof', 'new', 'await', 'yield', 'super']);
   const out = [];
   for (let i = 0; i < lines.length; i++) {
-    for (const re of pats) {
-      if (re.test(lines[i])) { out.push(`${i + 1}: ${lines[i].trim().slice(0, 90)}`); break; }
+    let hit = false;
+    for (const re of pats) if (re.test(lines[i])) { hit = true; break; }
+    if (!hit) {
+      const m = lines[i].match(METHOD);
+      if (m && !CONTROL_FLOW.has(m[1]) && !/["'`]/.test(m[2])) hit = true;
     }
+    if (hit) out.push(`${i + 1}: ${lines[i].trim().slice(0, 90)}`);
   }
   return out;
 }
+
+// buildOutline is module-level and has no other way in, so outlineMap.test.mjs would otherwise have to re-implement
+// it and pin a COPY - which is how a test comes to pass while the shipped rule is broken. Exported for that test only.
+export const __outlineTest = { buildOutline };
 
 // ── Tools ────────────────────────────────────────────────────────────────────
 // THE WORKSPACE BOUNDARY MARKER IS NOT THE AGENT'S TO REWRITE.
