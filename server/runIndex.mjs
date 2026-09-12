@@ -56,7 +56,9 @@ const peakTok = (r) => {
 
 // The verdicts that mean "this finish was never verified". finishKind is written by agent.js at the moment the status
 // is (finishVerdict()); the values are its vocabulary, and a value this reader does not know is NOT treated as clean.
-const UNVERIFIED = new Set(['forced', 'auto_clean_tests', 'unverified']);
+// Imported, not defined here, so the training-corpus builder can filter on the SAME vocabulary this reports on without
+// importing THIS file - which is a script: it reads the index at top level and exits when there is none, so importing
+// it would have terminated the builder before it wrote a row. See finishVerdicts.mjs.
 const verdictOf = (r) => (r.finishKind ? (UNVERIFIED.has(r.finishKind) ? r.finishKind : 'ok') : '?');
 
 const sum = (rs, f) => rs.reduce((a, r) => a + (f(r) || 0), 0);

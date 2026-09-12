@@ -25,6 +25,11 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+// The ONE definition of "this finish was never verified", imported rather than copied so this filter and the run-index
+// report cannot drift apart. It comes from finishVerdicts.mjs, which is data only: importing runIndex.mjs directly
+// would have run its report AND, when no run-index.jsonl exists, called process.exit(0) - silently killing this
+// builder before it wrote a single row.
+import { UNVERIFIED } from '../../server/finishVerdicts.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -46,6 +51,7 @@ const rows = [];
 const skipped = {};
 const skip = (why) => { skipped[why] = (skipped[why] || 0) + 1; };
 let turns = 0;
+let noVerdict = 0;   // rows KEPT that predate finishKind - the size of the blind spot, not a skip
 for (const d of dirs) {
   const results = join(d, 'results.jsonl');
   if (!existsSync(results)) { console.error('no results.jsonl in ' + d); continue; }
@@ -62,6 +68,19 @@ for (const d of dirs) {
     const blocks = Math.max(rec.finishBlocks || 0, run.finishBlocks || 0,
       hist.filter((m) => m.role === 'user' && String(m.content || '').startsWith('Do NOT finish yet')).length);
     if (blocks > 0 || rec.forcedFinish) { skip('finish gate blocked ' + blocks + 'x'); continue; }
+    // A finish that was never VERIFIED must not become training data either, and blocks alone cannot see it. The
+    // test_web auto-finish (cleanTests >= 3) sets status 'done' from inside the tool handler and `break turn`s, so it
+    // never enters the finish branch: finishBlocks is 0, forcedFinish is false, and it bypassed the ledger gate, the
+    // plan-FILES gate, the re-test gate, the VISUAL check and the runtime verifier on the way. Measured in set G: of 42
+    // runs that ended 'done', 8 were caught by the blocks check above and exactly 1 took this route unseen. One row,
+    // but it is a row of unverified code labelled success, which is the thing this corpus must not teach.
+    // Read from both the result record and the run file: records written before finishKind landed have neither.
+    const verdict = rec.finishKind || run.finishKind || null;
+    if (verdict && UNVERIFIED.has(verdict)) { skip('finish was never verified (' + verdict + ')'); continue; }
+    // KEPT, not skipped - so it must not be counted in `skipped`, which prints as "left out". Absent means the row
+    // predates finishKind, which is unknown rather than unverified; dropping every such row would discard most of the
+    // existing corpus. Counted separately so the size of the blind spot is visible instead of being read as clean.
+    if (!verdict) noVerdict++;
     const errs = hist.filter(isToolError).length;
     if (errs > MAX_ERRS) { skip('more than ' + MAX_ERRS + ' tool errors'); continue; }
     const messages = hist.map((m) => ({ role: m.role, content: clean(m.content) }));
@@ -75,3 +94,4 @@ for (const d of dirs) {
 writeFileSync(OUT, rows.map((r) => JSON.stringify(r)).join('\n') + (rows.length ? '\n' : ''));
 console.log(`${rows.length} conversation(s), ${turns} assistant turn(s) -> ${OUT}`);
 console.log('left out:', JSON.stringify(skipped));
+if (noVerdict) console.log(`kept without a finish verdict (rows predating finishKind, unknown not verified): ${noVerdict}`);

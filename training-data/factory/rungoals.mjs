@@ -112,6 +112,12 @@ async function runOne(g) {
     // would teach pushing past the gate. The converter filters or trims on these.
     rec.finishBlocks = run?.finishBlocks ?? 0;
     rec.forcedFinish = rec.finishBlocks >= 3;
+    // Carry the hub's OWN verdict through rather than re-deriving a weaker one here. `finishBlocks >= 3` sees only the
+    // forced-finish route; the test_web auto-finish (cleanTests >= 3) sets status 'done' from inside the tool handler
+    // with finishBlocks === 0, so it looked identical to a clean finish to every reader downstream. agent.js stamps
+    // run.finishKind at the moment the status is decided; null here means the run predates that field, which is
+    // "unknown", not "verified".
+    rec.finishKind = run?.finishKind ?? null;
     // The hub's own run file holds the history - the thing training rows are made from.
     const runFile = join(dir, 'runs', s.runId + '.json');
     rec.runFile = existsSync(runFile) ? `${id}.run.json` : null;
