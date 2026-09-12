@@ -1,0 +1,3 @@
+  goals-H.json 1f29e971e72f9461 vs G/F 1f29e971e72f9461 
+  tools/checks-H.mjs ea0d8b53535313ef vs G/F ea0d8b53535313ef 
+  arm1 hub: worktree at main b07c72b, runtime server/ identical to dae46b2 (set G hub)
