@@ -742,6 +742,39 @@ const tools = {
     // again, because that line was also preceded by a blank. No extension could ever
     // win, so the run looped until the repeat guard killed it. The tool made the task
     // impossible and blamed the model.
+    // A TOLERANT MATCH IGNORED INDENTATION ON THE WAY IN; SPLICING REPLACE BACK VERBATIM CARRIES THE MODEL'S OWN
+    // INDENTATION INTO THE FILE. Set I (2026-09-12), goal 3, dense Qwen2.5-Coder-32B: the model wrote a 4-space class
+    // skeleton, sent a CORRECT edit to fill shape() in with its snippet at 2-space body indent, the exact matcher
+    // missed, and this splice put shape() back at the model's own depth - outside the class. The destructive-write
+    // guard then correctly refused a correct edit ("would have REMOVED ... shape"), the model tried inserting instead
+    // and hit "would have DUPLICATED ... shape (1 -> 2)", and four identical retries later the loop guard ended the
+    // run. The weaker MoE 30B scored that same goal. Tolerance about the INPUT must never become damage to the
+    // OUTPUT, so the replacement is re-indented to the region it replaced.
+    //
+    // Anchored on the MINIMUM indent across REPLACE's non-blank lines, not its first line, so the block's internal
+    // structure is preserved rather than flattened. Blank lines stay blank. An empty REPLACE (a deletion) is returned
+    // untouched, which is what emptyReplace.test.mjs pins.
+    // THE ANCHOR MUST BE THE FIRST NON-BLANK LINE OF THE MATCHED REGION, NOT ITS FIRST LINE. scanTolerant skips blank
+    // lines while matching but still anchors the region at i, so `start` frequently lands ON a blank line - in the set
+    // I goal 3 fixture it is line 4, the blank before `    shape() {`. Reading indentation from that blank line gives
+    // '', which equals REPLACE's own indent, and the re-indent silently becomes a no-op. Measured: the first version
+    // of this fix parsed, ran on both paths, and changed nothing at all.
+    const regionAnchor = (lines, from, to) => lines.slice(from, to + 1).find((l) => l.trim());
+
+    const reindentTo = (text, sampleLine) => {
+      const target = (String(sampleLine ?? '').match(/^[ \t]*/) || [''])[0];
+      const lines = String(text).split('\n');
+      const bodies = lines.filter((l) => l.trim());
+      if (!bodies.length) return String(text);
+      let own = null;
+      for (const l of bodies) {
+        const w = (l.match(/^[ \t]*/) || [''])[0];
+        if (own === null || w.length < own.length) own = w;
+      }
+      if (own === target) return String(text);
+      return lines.map((l) => (l.trim() ? target + l.slice(own.length) : l)).join('\n');
+    };
+
     const scanTolerant = (hay, needles) => {
       const at = [];
       for (let i = 0; i < hay.length; i++) {
@@ -761,14 +794,14 @@ const tools = {
     if (hits > 1 && occurrence) {
       if (occurrence < 1 || occurrence > hits) return `ERROR: OCCURRENCE: ${occurrence} but the snippet matches ${hits} places in ${path}.`;
       const m = where[occurrence - 1];
-      const out = [...fileLines.slice(0, m.start), replace, ...fileLines.slice(m.end + 1)].join('\n');
+      const out = [...fileLines.slice(0, m.start), reindentTo(replace, regionAnchor(fileLines, m.start, m.end)), ...fileLines.slice(m.end + 1)].join('\n');
       if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
       writeFileSync(full, out, 'utf8');
       return `OK: edited ${path} (occurrence ${occurrence} of ${hits}, matched ignoring indentation)`
         + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
     }
     if (hits === 1) {
-      const out = [...fileLines.slice(0, start), replace, ...fileLines.slice(end + 1)].join('\n');
+      const out = [...fileLines.slice(0, start), reindentTo(replace, regionAnchor(fileLines, start, end)), ...fileLines.slice(end + 1)].join('\n');
       if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
       writeFileSync(full, out, 'utf8');
       return `OK: edited ${path} (matched ignoring indentation)`

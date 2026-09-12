@@ -31,7 +31,10 @@
  * THE CONTRACT: an edit matched "ignoring indentation" must be re-indented TO the region it replaced, so tolerance
  * about the input never becomes damage to the output.
  *
- * Cases marked "(known)" are expected to fail until that lands.
+ * FIXED 2026-09-12 by reindentTo(), anchored on regionAnchor() - the first NON-BLANK line of the matched
+ * region, because scanTolerant skips blanks while matching but still anchors the region at i, so `start` can
+ * land on a blank line. The first version of the fix read indentation from that blank line, got "", and was a
+ * silent no-op: it parsed, ran on both paths, and changed nothing. All five cases now pass.
  */
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -127,14 +130,14 @@ await test('the premise: the tolerant path handled the edit (the exact matcher c
     'neither a tolerant edit nor a destructive refusal happened, so this fixture is not exercising the path:\n' + results(run).join('\n').slice(0, 300));
 });
 
-await test('(known) the edit is accepted, not refused as destructive', () => {
+await test('the edit is accepted, not refused as destructive', () => {
   const refused = results(run).filter((r) => /would have REMOVED/.test(r));
   assert.equal(refused.length, 0,
     'the tolerant splice de-indented shape() out of the class, so the destructive-write guard refused a CORRECT edit:\n'
     + refused[0]?.slice(0, 200));
 });
 
-await test('(known) shape() is still a member of the class afterwards', () => {
+await test('shape() is still a member of the class afterwards', () => {
   assert.ok(file(MJS) !== SKELETON, VACUOUS_MSG);
   const names = [...defNames(file('m.js'), 'm.js')];
   assert.ok(names.includes('shape'),
@@ -142,7 +145,7 @@ await test('(known) shape() is still a member of the class afterwards', () => {
     + 'file now:\n' + file('m.js'));
 });
 
-await test('(known) the replacement is indented to the region it replaced, not to the model\'s snippet', () => {
+await test('the replacement is indented to the region it replaced, not to the model\'s snippet', () => {
   assert.ok(file(MJS) !== SKELETON, VACUOUS_MSG);
   const line = file('m.js').split('\n').find((l) => /shape\(\)\s*\{/.test(l));
   assert.ok(line !== undefined, 'shape() line is gone entirely:\n' + file('m.js'));
@@ -158,7 +161,7 @@ await test('the file still parses (the whole point of not moving code between bl
 });
 
 hub.kill(); mock.close();
-const KNOWN_EXPECTED = 3;   // refusal, membership, indentation - all one defect at agent.js:764 and :771
+const KNOWN_EXPECTED = 0;   // FIXED 2026-09-12: reindentTo() + regionAnchor(), called from both tolerant splice sites
 console.log(`\n${passed} passed, ${failed} failed, ${known} known-open`);
 console.log(`KNOWN-OPEN: ${known} of ${KNOWN_EXPECTED} expected`);
 if (openCases.length) console.log('  still open: ' + openCases.join(' | '));

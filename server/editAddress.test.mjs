@@ -114,7 +114,13 @@ const s4b = await runGoal('Edit the second match, badly indented.', [write('u.js
 await test('OCCURRENCE also picks the second match when only the tolerant matcher sees it', () => {
   const r = String(s4b.filter((s) => s.tool === 'edit_file')[0]?.result || '');
   assert.match(r, /^OK: edited u\.js \(occurrence 2 of 2, matched ignoring indentation\)/, r.slice(0, 200));
-  assert.equal(file('u.js'), 'function a() {\n  return 0;\n}\nfunction b() {\nreturn 7;\n}');
+  // WAS 'function b() {\nreturn 7;\n}' - return 7; at COLUMN 0, inside a function body. That expectation had written
+  // the defect down as a requirement: a tolerant match ignores indentation on the way IN, and the splice then carried
+  // the caller's own indentation into the file. Set I (2026-09-12) goal 3 lost a goal to it - the splice lifted
+  // shape() out of its class and the destructive-write guard correctly refused a CORRECT edit. The contract now is
+  // that a replacement is re-indented TO the region it replaced, so a REPLACE sent at column 0 against a 2-space
+  // body lands at 2 spaces.
+  assert.equal(file('u.js'), 'function a() {\n  return 0;\n}\nfunction b() {\n  return 7;\n}');
 });
 
 // search_file scope
