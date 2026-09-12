@@ -620,6 +620,33 @@ const tools = {
     const full = safePath(path);
     if (!existsSync(full)) return `ERROR: file not found: ${path} (use write_file to create it)`;
 
+    // SAY WHAT CHANGED, NOT WHAT WAS ASKED FOR.
+    //
+    // All five write paths below answered with a sentence computed entirely from the REQUEST, so the answer read the
+    // same however the file came out. Measured in set G (2026-09-11), the base 14B: 363 edit_file calls, 241 with
+    // byte-identical arguments, 201 of those repeats writing to disk AGAIN on an identical "OK".
+    //   run 071d5478 sent `LINES: [67,68]` + empty REPLACE eleven times. Nine answered `(2 line(s) deleted)`
+    //   byte-identically while eighteen DIFFERENT lines went: the count is b-a+1, arithmetic on the request, and the
+    //   range addresses whatever has shifted into it.
+    //   run 33a9d81d sent one `FIND: "class Graph:"` whose REPLACE contained `class Graph:` twenty-six times and got
+    //   `OK: edited s6_graph.py.` every time, ending at 1987 lines with 28 `def __init__` and 33 `def nodes`.
+    // An answer that cannot change cannot tell a model its edit landed somewhere else. Both strings are already in
+    // memory, so this costs no I/O.
+    //
+    // `left` is how many times the caller's own FIND is still in the RESULT, which is the fact that explains the
+    // whole shape-B loop: a REPLACE containing its own FIND re-matches next time, so an identical resend duplicates
+    // the block instead of being the no-op the model thinks it is.
+    const changed = (was, now, snippet, left) => {
+      const before = was.split('\n').length, after = now.split('\n').length, d = after - before;
+      let s = `; now ${after} lines (${d === 0 ? 'same count' : (d > 0 ? '+' : '') + d})`;
+      if (snippet && left > 0) {
+        s += `; "${String(snippet).split('\n')[0].trim().slice(0, 60)}" still appears ${left} time${left === 1 ? '' : 's'}`
+          + ` in the file - your REPLACE put it back, so sending this same edit again would match it again and`
+          + ` duplicate what you just added. Read the file before editing it again`;
+      }
+      return s + '.';
+    };
+
     // LINES: a-b - address the text by the numbers read_file and outline_file already print, so an edit never
     // depends on reproducing the file's text exactly. Set E (2026-09-11): 65 of the two models' edits failed on
     // the FIND snippet (27 of them "matches N places"), and the usual workaround - rewriting the whole file -
@@ -635,7 +662,12 @@ const tools = {
       const out = [...srcLines.slice(0, a - 1), ...repl, ...srcLines.slice(b)].join('\n');
       if (out === src) return `NO CHANGE: lines ${a}-${b} of ${path} already read exactly like your REPLACE, so nothing was edited and whatever you were fixing is still there.`;
       writeFileSync(full, out, 'utf8');
-      return `OK: edited ${path} lines ${a}-${b} (${b - a + 1} line(s) ${repl.length ? 'replaced by ' + repl.length : 'deleted'}).`;
+      // The TEXT that went, not only how many lines: this is what makes two identical LINES requests answer
+      // differently, because the second one is addressing different text (run 071d5478 deleted nine different pairs).
+      const went = srcLines.slice(a - 1, b).filter((l) => l.trim()).slice(0, 2).map((l) => `"${l.trim().slice(0, 50)}"`).join(' / ');
+      return `OK: edited ${path} lines ${a}-${b} (${b - a + 1} line(s) ${repl.length ? 'replaced by ' + repl.length : 'deleted'})`
+        + (went ? `; ${repl.length ? 'replaced' : 'removed'}: ${went}` : '')
+        + changed(src, out);
     }
     if (find == null || find === '') {
       // SAY WHAT TO SEND, AND SHOW IT.
@@ -674,7 +706,7 @@ const tools = {
       const out = content.slice(0, at) + replace + content.slice(at + find.length);
       if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
       writeFileSync(full, out, 'utf8');
-      return `OK: edited ${path} (occurrence ${occurrence} of ${exact}).`;
+      return `OK: edited ${path} (occurrence ${occurrence} of ${exact})${changed(content, out, find, out.split(find).length - 1)}`;
     }
     // NO CHANGE IS NOT AN EDIT. Set E (2026-09-11), 14B goal 5: the model sent the SAME 13-line edit three times with
     // FIND identical to REPLACE; each time this said "OK: edited" plus a passing syntax check, so the model believed
@@ -684,7 +716,11 @@ const tools = {
     // the pattern is a plain string, so REPLACE text containing $& or $' was rewritten on its way to disk - the
     // matched text, or the whole rest of the file, spliced into the model's own code, answered with OK: edited.
     // A function replacement is handed the text verbatim. The other three write paths use slice/splice already.
-    if (exact === 1) { writeFileSync(full, content.replace(find, () => replace), 'utf8'); return `OK: edited ${path}.`; }
+    if (exact === 1) {
+      const out = content.replace(find, () => replace);
+      writeFileSync(full, out, 'utf8');
+      return `OK: edited ${path}${changed(content, out, find, out.split(find).length - 1)}`;
+    }
     // An ambiguous EXACT match falls through to the line-based path below, which computes
     // where each match is - the caller needs those positions to disambiguate.
 
@@ -2451,6 +2487,9 @@ function recordRunIndex(run) {
       id: run.id,
       goal: String(run.goal || '').slice(0, 160),
       status: run.status,
+      // HOW it reached that status. 'done' alone cannot tell a verified finish from a forced one or from the
+      // test_web auto-finish, and this file is the only forever record - see finishVerdict().
+      finishKind: finishVerdict(run),
       ms: Date.now() - (run.createdAt || Date.now()),
       calls: run.modelCalls || 0,
       steps: steps.length,
@@ -2478,6 +2517,36 @@ function recordRunIndex(run) {
   } catch { /* a record of the work must never break the work */ }
 }
 
+/**
+ * ONE HONEST VERDICT PER RUN, written into BOTH records that outlive it.
+ *
+ * A run could reach status 'done' without ever being verified, by two routes, and afterwards nothing told it apart
+ * from a clean success in either durable record: run-index.jsonl (the series kept forever to answer "is this getting
+ * better?") and traces.jsonl (the fine-tuning corpus). Measured on set G: all 8 runs with forcedFinish: true appear in
+ * traces as plain status "done", so unverified code entered the training corpus labelled as success.
+ *
+ * Neither record could be back-filled afterwards. forcedFinish lived only on the run JSON, which is capped at 40 in
+ * memory and 300 on disk and then reaped; route 2 set no marker at all. So the verdict has to be written at the same
+ * moment as the status, in a field a consumer can QUERY - not in prose a consumer would have to regex.
+ *
+ *   verified          the runtime verifier (or a Godot run) passed on the tree as it stands
+ *   screen_checked    a web run that passed the browser/visual check but was never run by the verifier
+ *   unverified        reached done through the finish gate holding neither of those
+ *   forced            route 1: the gate blocked 3x, stepped aside, and was never satisfied
+ *   auto_clean_tests  route 2: auto-finished inside the test_web handler on 3 clean tests, entering no gate at all
+ *   not_finished      the run did not end 'done'
+ *
+ * A route that knows what it is stamps run.finishKind itself and that wins; everything else is read off the evidence
+ * the run actually holds. Rows written before this landed have NO finishKind - absent means unknown, not verified.
+ */
+function finishVerdict(run) {
+  if (run.status !== 'done') return 'not_finished';
+  if (run.finishKind) return run.finishKind;
+  if (run.verified) return 'verified';
+  if (run.sawScreen) return 'screen_checked';
+  return 'unverified';
+}
+
 function saveTrace(run) {
   if (run.traced) return;
   run.traced = true;
@@ -2494,6 +2563,11 @@ function saveTrace(run) {
       .map(s => ({ tool: s.tool, path: s.args?.path, content: String(s.args?.content ?? s.args?.replace ?? '').slice(0, 30_000) }));
     const rec = {
       ts: Date.now(), id: run.id, status: run.status, goal: run.goal, plan: run.plan || null,
+      // TOP-LEVEL, not left to the steps. saveTrace maps steps to {type, tool, path}, so the UNVERIFIED note arrives
+      // as a bare {"type":"note"} with its text stripped - 2161 of 3303 rows in the live corpus have note steps and
+      // every one is text-free. A corpus consumer deciding what to train on must not have to regex prose, and
+      // unstripping the text would not help: a run with no note (route 2 had none) would still look clean.
+      finishKind: finishVerdict(run),
       // Who wrote it (stamped by noteModelCall) and who asked for it - so a training slice
       // can be cut by model, and supervisor-generated goals told apart from a human's.
       provider: run.provider || null, model: run.model || null, source: run.source || 'human',
@@ -3220,6 +3294,9 @@ async function drive(loadDb, run) {
         // run ended 'done'. The status stays 'done' (harnesses and the UI key on it); the run says plainly what it is.
         if ((run.finishBlocks || 0) >= 3) {
           run.forcedFinish = true;
+          // The note is for a human reading the run; finishKind is for the two records that outlive it. The note text
+          // is stripped out of the training trace and the run file is reaped, so the note alone recorded nothing.
+          run.finishKind = 'forced';
           pushStep(run, { type: 'note', text: `Finished UNVERIFIED: the finish gate blocked ${run.finishBlocks} times and was never satisfied.` });
         }
         run.status = 'done';
@@ -3557,6 +3634,13 @@ async function drive(loadDb, run) {
           feedback += `\n\n✅ The app loaded with NO errors. If it fulfills the goal, call finish NOW (ACTION: finish with a SUMMARY). Do NOT keep editing a working app.`;
           if (run.cleanTests >= 3) {
             pushStep(run, { type: 'tool', tool, args, thought, result });
+            // THIS ROUTE USED TO SET NO MARKER AT ALL. It finishes from inside the tool handler and `break turn`s, so
+            // the finish branch is never entered: no ledger gate, no plan-FILES gate, no re-test gate, no visual
+            // check, no runtime verifier. Whether that bypass is itself a defect is a separate question (open, with a
+            // reproduction in unverifiedFinishRecorded.test.mjs); what it must not do is look like a verified finish
+            // in the run index and the training corpus.
+            run.finishKind = 'auto_clean_tests';
+            pushStep(run, { type: 'note', text: `Finished UNVERIFIED: auto-finished on ${run.cleanTests} clean browser tests from inside test_web — the finish gate (ledger, plan files, visual check, runtime verifier) never ran.` });
             pushStep(run, { type: 'finish', thought: 'auto', summary: 'App passed browser tests with no errors (auto-finished after repeated clean tests).' });
             run.status = 'done';
             break turn;

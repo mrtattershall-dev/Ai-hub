@@ -54,6 +54,11 @@ const peakTok = (r) => {
   return t && typeof t.max === 'number' ? t.max : null;      // null, not the object
 };
 
+// The verdicts that mean "this finish was never verified". finishKind is written by agent.js at the moment the status
+// is (finishVerdict()); the values are its vocabulary, and a value this reader does not know is NOT treated as clean.
+const UNVERIFIED = new Set(['forced', 'auto_clean_tests', 'unverified']);
+const verdictOf = (r) => (r.finishKind ? (UNVERIFIED.has(r.finishKind) ? r.finishKind : 'ok') : '?');
+
 const sum = (rs, f) => rs.reduce((a, r) => a + (f(r) || 0), 0);
 const pct = (a, b) => (b ? (a / b * 100).toFixed(1) + '%' : '—');
 const agg = (rs) => {
@@ -65,6 +70,12 @@ const agg = (rs) => {
   return {
     n: rs.length, calls, errs, errRate: pct(errs, calls),
     done: pct(status.done || 0, rs.length),
+    // OF THE COMPLETED RUNS, HOW MANY WERE NEVER VERIFIED. "completed" on its own was the misleading number: a
+    // forced finish and a test_web auto-finish both land on 'done', and the series exists to answer whether this is
+    // getting better. Records written before finishKind landed have no verdict at all, so they are counted apart
+    // rather than assumed clean - see finishVerdict() in agent.js.
+    unverified: rs.filter((r) => UNVERIFIED.has(r.finishKind)).length,
+    noVerdict: rs.filter((r) => r.status === 'done' && !r.finishKind).length,
     // callsOf, not r.calls: one record missing the field sorts NaN into the middle of the
     // list and the median silently becomes NaN for the whole half.
     medCalls: rs.length ? [...rs].map(callsOf).sort((a, b) => a - b)[Math.floor(rs.length / 2)] : 0,
@@ -112,6 +123,10 @@ if (flag('trend')) {
   console.log(`\nOLDEST ${a.n} runs  ->  NEWEST ${b.n} runs\n`);
   const row = (label, x, y) => console.log(`  ${label.padEnd(22)} ${String(x).padStart(10)}  ->  ${String(y).padStart(10)}`);
   row('completed', a.done, b.done);
+  // "completed" went UP in set G while the work got worse, because a forced finish counts as completed. Read the two
+  // lines together or the trend is a lie.
+  row('of those, unverified', a.unverified, b.unverified);
+  row('  (no verdict recorded)', a.noVerdict, b.noVerdict);
   row('error rate (of calls)', a.errRate, b.errRate);
   row('median calls per run', a.medCalls, b.medCalls);
   row('avg peak tok/s', a.tok ?? '—', b.tok ?? '—');
@@ -121,7 +136,7 @@ if (flag('trend')) {
 
 const recent = runs.slice(-N);
 console.log(`\nlast ${recent.length} of ${runs.length} runs\n`);
-console.log('  when         status     calls  errs  tok/s   goal');
+console.log('  when         status    verdict            calls  errs  tok/s   goal');
 for (const r of recent) {
   // LOCAL time, not UTC. This file exists to correlate what happened - with the runner's
   // output, with a hub log, with what you remember doing - and toISOString() printed 15:37
@@ -134,10 +149,11 @@ for (const r of recent) {
   // has no .max, and Math.round(undefined) prints "NaN" in a column of real rates.
   const t = peakTok(r);
   const tok = t == null ? '—' : String(Math.round(t));
-  console.log(`  ${when}  ${String(r.status).padEnd(9)} ${String(callsOf(r)).padStart(5)} ${String(errorCountOf(r)).padStart(5)}  ${tok.padStart(5)}   ${String(r.goal).slice(0, 46)}`);
+  console.log(`  ${when}  ${String(r.status).padEnd(9)} ${verdictOf(r).padEnd(17)} ${String(callsOf(r)).padStart(5)} ${String(errorCountOf(r)).padStart(5)}  ${tok.padStart(5)}   ${String(r.goal).slice(0, 46)}`);
 }
 const a = agg(runs);
-console.log(`\ntotals: ${a.n} runs, ${a.calls} model calls, ${a.errs} failed steps (${a.errRate} of calls), ${a.done} completed`);
+console.log(`\ntotals: ${a.n} runs, ${a.calls} model calls, ${a.errs} failed steps (${a.errRate} of calls), ${a.done} completed`
+  + `, of which ${a.unverified} never verified` + (a.noVerdict ? ` (${a.noVerdict} predate the verdict field)` : ''));
 const all = new Map();
 for (const r of runs) for (const [k, v] of Object.entries(errorsOf(r))) all.set(k, (all.get(k) || 0) + (Number(v) || 0));
 if (all.size) {
