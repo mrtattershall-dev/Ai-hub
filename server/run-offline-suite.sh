@@ -14,6 +14,11 @@ WT=${1:-/c/Users/tatte/Projects/ai-coding-hub-hfix}
 LOG=${2:-/tmp/suite.log}
 cd "$WT" || exit 1
 : > "$LOG"
+# Say WHICH TREE this is testing, in the log itself. WT defaults to a DIFFERENT worktree than the one you are
+# standing in, so a suite run from the repo root silently tests somewhere else - and a green 84/84 from the wrong
+# commit looks exactly like a green run of your own work. 2026-09-12: that nearly sent two paid GPU arms out on a
+# suite that had never executed a line of the code in them.
+echo "SUITE TREE: $WT @ $(git -C "$WT" rev-parse --short HEAD 2>/dev/null || echo unknown)" " ($(ls "$WT"/server/*.test.mjs 2>/dev/null | grep -v '/real' | wc -l) test files)" >> "$LOG"
 
 # RETRY A 127 ONCE. Two files have now false-failed under load with exit 127 - shadowHint and teardownSettles - each
 # dying before printing a single line and each passing cleanly when run alone. A suite that reports a phantom failure is
