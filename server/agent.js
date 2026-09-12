@@ -788,6 +788,33 @@ const tools = {
       }
       return at;
     };
+    // preview() is defined HERE, above the tolerant edit paths, not beside the ambiguous-match refusal that used to be
+    // its only caller. It is a const arrow, so calling it from :798/:805 while it was declared further down was a
+    // temporal-dead-zone ReferenceError - and one of those paths sits inside a try that would have swallowed it.
+    const preview = (m) => {
+      const from = Math.max(0, m.start - 1);
+      const to = Math.min(fileLines.length - 1, m.end + 1);
+      return fileLines.slice(from, to + 1)
+        .map((l, k) => `      ${String(from + k + 1).padStart(4)}| ${l}`.slice(0, 130))
+        .join('\n');
+    };
+
+    // A NO-OP REFUSAL HAS TO SHOW WHAT THE REGION ACTUALLY CONTAINS.
+    //
+    // Set I (2026-09-12) goal 16, dense Qwen2.5-Coder-32B on s6_graph.py: the model had ALREADY landed its de-indent
+    // at call 14 ("OK: edited s6_graph.py; now 76 lines"). At calls 18-21 it re-sent the same edit four times and was
+    // told "NO CHANGE: your REPLACE is identical to what it would replace" each time. The hub was RIGHT every time -
+    // but the answer never showed the region, so the model could not tell "already applied" from "failed to apply",
+    // and the run died on the loop guard. Four of that run's five loop-guard deaths were refusal-retry loops.
+    //
+    // Saying the edit may have ALREADY LANDED is the part that ends the loop; the line numbers are what let a caller
+    // switch to LINES: a-b and stop matching altogether.
+    const noChangeAt = (p, m) => `NO CHANGE: your REPLACE is identical to what it would replace, so ${p} is exactly`
+      + ` as it was - nothing was edited.\nLines ${m.start + 1}-${m.end + 1} read like this NOW:\n${preview(m)}\n`
+      + `If that is already what you wanted, THE EDIT HAS ALREADY LANDED - nothing is wrong, move on to the next thing.`
+      + ` If it is not, change what is actually wrong there, or use LINES: ${m.start + 1}-${m.end + 1} to replace that`
+      + ` range directly. Do NOT resend this same edit; it will do nothing again.`;
+
     const where = scanTolerant(fileLines, findLines);
     const hits = where.length;
     const start = hits ? where[0].start : -1, end = hits ? where[0].end : -1;
@@ -795,14 +822,14 @@ const tools = {
       if (occurrence < 1 || occurrence > hits) return `ERROR: OCCURRENCE: ${occurrence} but the snippet matches ${hits} places in ${path}.`;
       const m = where[occurrence - 1];
       const out = [...fileLines.slice(0, m.start), reindentTo(replace, regionAnchor(fileLines, m.start, m.end)), ...fileLines.slice(m.end + 1)].join('\n');
-      if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
+      if (out === content) return noChangeAt(path, m);
       writeFileSync(full, out, 'utf8');
       return `OK: edited ${path} (occurrence ${occurrence} of ${hits}, matched ignoring indentation)`
         + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
     }
     if (hits === 1) {
       const out = [...fileLines.slice(0, start), reindentTo(replace, regionAnchor(fileLines, start, end)), ...fileLines.slice(end + 1)].join('\n');
-      if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
+      if (out === content) return noChangeAt(path, { start, end });
       writeFileSync(full, out, 'utf8');
       return `OK: edited ${path} (matched ignoring indentation)`
         + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
@@ -815,14 +842,6 @@ const tools = {
     // times and the run died on the repeat guard. The instruction was correct and
     // unusable - it named the problem while withholding the one fact needed to solve it,
     // which is WHERE the matches are. An error that a caller cannot act on is a loop.
-    const preview = (m) => {
-      const from = Math.max(0, m.start - 1);
-      const to = Math.min(fileLines.length - 1, m.end + 1);
-      return fileLines.slice(from, to + 1)
-        .map((l, k) => `      ${String(from + k + 1).padStart(4)}| ${l}`.slice(0, 130))
-        .join('\n');
-    };
-
     if (hits > 1) {
       const sites = where.slice(0, 4)
         .map((m, n) => `  match ${n + 1} - lines ${m.start + 1}-${m.end + 1}:\n${preview(m)}`)
