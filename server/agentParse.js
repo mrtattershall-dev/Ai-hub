@@ -201,7 +201,9 @@ function parseAction(text, lastPath) {
     if (!path) return null;   // refuse rather than invent a destination
     // REMOVE: <names> - the caller confirming a deletion the tool would otherwise refuse (see agent.js).
     const rmW = outside.match(/^[ \t]*REMOVE:[ \t]*([^\n]+)/im);
-    return { tool, thought, args: { path, content: stripLineNumberPrefixes(fenced ?? ''), ...(rmW ? { remove: rmW[1].trim() } : {}) } };
+    // DUPLICATE: <names> - the caller confirming a duplicate definition the tool would otherwise refuse (see agent.js).
+    const dupW = outside.match(/^[ \t]*DUPLICATE:[ \t]*([^\n]+)/im);
+    return { tool, thought, args: { path, content: stripLineNumberPrefixes(fenced ?? ''), ...(rmW ? { remove: rmW[1].trim() } : {}), ...(dupW ? { duplicate: dupW[1].trim() } : {}) } };
   }
   if (tool === 'edit_file') {
     // ACCEPT FIND/REPLACE WITH OR WITHOUT CODE FENCES.
@@ -253,7 +255,8 @@ function parseAction(text, lastPath) {
     const om = outside.match(/^[ \t]*OCCURRENCE:\s*(\d+)/im);
     return { tool, thought, args: { path: path || lastPath, find: stripLineNumberPrefixes(find), replace: stripLineNumberPrefixes(replace),
       ...(lm ? { lines: [+lm[1], +lm[2]] } : {}), ...(om ? { occurrence: +om[1] } : {}),
-      ...((outside.match(/^[ \t]*REMOVE:[ \t]*([^\n]+)/im) || [])[1] ? { remove: outside.match(/^[ \t]*REMOVE:[ \t]*([^\n]+)/im)[1].trim() } : {}) } };
+      ...((outside.match(/^[ \t]*REMOVE:[ \t]*([^\n]+)/im) || [])[1] ? { remove: outside.match(/^[ \t]*REMOVE:[ \t]*([^\n]+)/im)[1].trim() } : {}),
+      ...((outside.match(/^[ \t]*DUPLICATE:[ \t]*([^\n]+)/im) || [])[1] ? { duplicate: outside.match(/^[ \t]*DUPLICATE:[ \t]*([^\n]+)/im)[1].trim() } : {}) } };
   }
   if (tool === 'run_command') {
     const cmd = (text.match(/COMMAND:\s*(.+)/i)?.[1]?.trim()) || (fenced ? fenced.trim().split('\n')[0] : undefined);

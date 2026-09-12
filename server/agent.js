@@ -33,7 +33,7 @@ import { canonicalSummary } from './canonicalAssets.mjs';
 import { SYSTEM_PROMPT } from './agentPrompt.js';
 import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
-import { lostDefs, lostExports } from './defNames.js';
+import { lostDefs, lostExports, defCounts } from './defNames.js';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 
 /**
@@ -728,45 +728,51 @@ const tools = {
     const fileLines = content.split('\n');
     const findLines = find.split('\n').map(l => l.replace(/^\s*\d+:\s?/, '').trim()).filter(Boolean);
     if (!findLines.length) return `ERROR: the FIND snippet was not found in ${path}.`;
-    let start = -1, end = -1, hits = 0;
-    const where = [];
-    for (let i = 0; i < fileLines.length; i++) {
-      let fi = i, ki = 0;
-      while (fi < fileLines.length && ki < findLines.length) {
-        const t = fileLines[fi].trim();
-        if (t === '') { fi++; continue; }            // skip blank lines in the file
-        if (t === findLines[ki]) { fi++; ki++; } else break;
+    // The scan is a FUNCTION, not an inline loop, so the answer can re-run it on the RESULT and report whether the
+    // caller's snippet is still there. While it was inline, the two tolerant paths had no way to say what the edit
+    // left behind - the same silence that let set G's run 33a9d81d re-match and duplicate one block 26 times.
+    //
+    // Resume AFTER a match, not at the next line.
+    //
+    // Blank lines in the file are skipped while matching, so a search starting on a
+    // blank line and one starting on the first real line resolve to the SAME region -
+    // and counting both made a unique snippet look ambiguous. Measured 2026-09-10: the
+    // 32B was told "matches 2 places" for lines 25-28 and 26-28, which are one match;
+    // it correctly extended FIND with the preceding line and was told the same thing
+    // again, because that line was also preceded by a blank. No extension could ever
+    // win, so the run looped until the repeat guard killed it. The tool made the task
+    // impossible and blamed the model.
+    const scanTolerant = (hay, needles) => {
+      const at = [];
+      for (let i = 0; i < hay.length; i++) {
+        let fi = i, ki = 0;
+        while (fi < hay.length && ki < needles.length) {
+          const t = hay[fi].trim();
+          if (t === '') { fi++; continue; }            // skip blank lines in the file
+          if (t === needles[ki]) { fi++; ki++; } else break;
+        }
+        if (ki === needles.length) { at.push({ start: i, end: fi - 1 }); i = fi - 1; }
       }
-      if (ki === findLines.length) {
-        // Resume AFTER this match, not at the next line.
-        //
-        // Blank lines in the file are skipped while matching, so a search starting on a
-        // blank line and one starting on the first real line resolve to the SAME region -
-        // and counting both made a unique snippet look ambiguous. Measured 2026-09-10: the
-        // 32B was told "matches 2 places" for lines 25-28 and 26-28, which are one match;
-        // it correctly extended FIND with the preceding line and was told the same thing
-        // again, because that line was also preceded by a blank. No extension could ever
-        // win, so the run looped until the repeat guard killed it. The tool made the task
-        // impossible and blamed the model.
-        hits++;
-        where.push({ start: i, end: fi - 1 });
-        if (hits === 1) { start = i; end = fi - 1; }
-        i = fi - 1;
-      }
-    }
+      return at;
+    };
+    const where = scanTolerant(fileLines, findLines);
+    const hits = where.length;
+    const start = hits ? where[0].start : -1, end = hits ? where[0].end : -1;
     if (hits > 1 && occurrence) {
       if (occurrence < 1 || occurrence > hits) return `ERROR: OCCURRENCE: ${occurrence} but the snippet matches ${hits} places in ${path}.`;
       const m = where[occurrence - 1];
       const out = [...fileLines.slice(0, m.start), replace, ...fileLines.slice(m.end + 1)].join('\n');
       if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
       writeFileSync(full, out, 'utf8');
-      return `OK: edited ${path} (occurrence ${occurrence} of ${hits}, matched ignoring indentation).`;
+      return `OK: edited ${path} (occurrence ${occurrence} of ${hits}, matched ignoring indentation)`
+        + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
     }
     if (hits === 1) {
       const out = [...fileLines.slice(0, start), replace, ...fileLines.slice(end + 1)].join('\n');
       if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
       writeFileSync(full, out, 'utf8');
-      return `OK: edited ${path} (matched ignoring indentation).`;
+      return `OK: edited ${path} (matched ignoring indentation)`
+        + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
     }
 
     // A REFUSAL HAS TO HAND BACK SOMETHING TO ACT ON.
@@ -1555,6 +1561,18 @@ export const __godotToolTest = {
 //
 // run_python and run_command execute code and are NOT here.
 // web_search/web_fetch are read-only network reads with truncated output.
+// A MUTATING TOOL REPEATS ON ITS ARGUMENTS, NOT ON ITS ANSWER.
+//
+// The repeated-call detector compared ANSWERS, which is exactly wrong for the tool that needed it most. Now that
+// edit_file's answer encodes what actually changed, two identical calls produce DIFFERENT answers - so answer
+// equality would have switched the detector off for edit_file at the very moment its answer became honest. In
+// set G run 33a9d81d `repeatCalls: 25` was the ONLY thing that ever reacted to 26 identical corrupting edits, so
+// that would have removed the last guard standing. For a WRITE, re-sending the same arguments is the loop
+// whatever comes back: either it changed nothing, or - the set G bug - it changed something DIFFERENT from what
+// the caller meant. A read or a command is the opposite case (a changed answer there is progress), so those
+// still compare answers.
+const MUTATING_REPEAT = new Set(['write_file', 'edit_file', 'append_file']);
+
 const AUTO_TOOLS = new Set(['list_dir', 'read_file', 'search_file', 'outline_file', 'write_file', 'append_file', 'edit_file', 'test_web', 'web_search', 'web_fetch',
   // Reading history is as safe as reading a file. Committing and undoing change state,
   // so they stay gated.
@@ -3396,13 +3414,17 @@ async function drive(loadDb, run) {
       if (!run.callLog || typeof run.callLog !== 'object' || Array.isArray(run.callLog)) run.callLog = {};
       const seenBefore = run.callLog[callKey];
       const answer = String(result ?? '');
-      if (seenBefore !== undefined && seenBefore === answer) {
+      // See MUTATING_REPEAT: a write repeats on its ARGUMENTS. Keying this on answer equality is what would have
+      // silently switched the detector off for edit_file the moment edit_file's answer started telling the truth.
+      const byArgs = MUTATING_REPEAT.has(tool);
+      const changedAnswer = seenBefore !== undefined && seenBefore !== answer;
+      if (seenBefore !== undefined && (byArgs || seenBefore === answer)) {
         run.repeatCalls = (run.repeatCalls || 0) + 1;
         // The ones that FAILED, counted apart. The stuck-loop guard has to tell "this tool refused identically"
         // from "the model asked the same harmless question twice": a repeated read_file that succeeded is not a
         // tool refusing, and saying so would misreport the run and misdirect its repair.
         if (/^ERROR/.test(answer)) run.repeatFailures = (run.repeatFailures || 0) + 1;
-        result = answer + `\n\n⚠️ You already ran this exact ${tool} in this run and got exactly this answer. Nothing changed, so repeating it cannot help - do something different: a different file or range, a different action, or fix the problem the answer describes.`;
+        result = answer + `\n\n⚠️ You already ran this exact ${tool} in this run${changedAnswer ? ' - and it did something DIFFERENT this time, because the file is no longer what it was when you first sent it. Re-sending an edit that already landed edits the WRONG text: read the file, then address exactly what you mean to change (LINES: <a>-<b> is exact).' : ' and got exactly this answer. Nothing changed, so repeating it cannot help - do something different: a different file or range, a different action, or fix the problem the answer describes.'}`;
       }
       run.callLog[callKey] = answer;
       let syntaxNote = '';
@@ -3465,6 +3487,37 @@ async function drive(loadDb, run) {
                 + ` ${args.path} is UNCHANGED - nothing was written. Earlier steps depend on those, and the hidden checks score the final file.`
                 + `\nSend the whole file again WITH them (or use edit_file with LINES: <a>-<b> to change only the part you meant).`
                 + `\nIf you really do want them gone, repeat the same action and add a line: REMOVE: ${all.join(', ')}`;
+              syntaxNote = '';
+            }
+          } catch { /* never a reason to fail the step */ }
+        }
+        // SET G (2026-09-11): THE MIRROR IMAGE OF THE REFUSAL ABOVE. That one fires on REMOVAL, and the end-of-run
+        // reparse fires on UNPARSEABILITY; set G's corruption was the ADDITION of syntactically LEGAL duplicates.
+        // Run 33a9d81d sent one edit whose REPLACE contained its own FIND 26 times: s6_graph.py finished at 1987
+        // lines with 28 `def __init__` and 33 `def nodes` in ONE class, every call answered OK, and not one syntax
+        // check failed. lostDefs cannot see it (defNames returns a Set), and duplicateDecls.js is anchored at
+        // column 0 and deliberately exempts class methods, so nothing in the hub said a word. 50 of the 100 hidden
+        // checks were on files this corrupted (s1, s3, s4, s6, s10 each scored 0/10).
+        //
+        // countBefore >= 1 is what keeps it sound in both directions: a genuinely NEW definition has countBefore 0,
+        // and a rename or a move leaves the count at 1. Two classes legitimately sharing a method name is the known
+        // false positive, and DUPLICATE: <names> is the way past it - a refusal a caller cannot get past is a loop.
+        if (beforeSrc !== null && !/^ERROR/.test(String(result ?? ''))) {
+          try {
+            const after = readFileSync(safePath(args.path), 'utf8');
+            const okToDup = new Set(String(args.duplicate || '').split(',').map((x) => x.trim()).filter(Boolean));
+            const was = defCounts(beforeSrc, args.path), now = defCounts(after, args.path);
+            const dup = [...now].filter(([n, c]) => (was.get(n) || 0) >= 1 && c > was.get(n) && !okToDup.has(n));
+            if (dup.length) {
+              writeFileSync(safePath(args.path), beforeSrc, 'utf8');
+              run.duplicateRefused = (run.duplicateRefused || 0) + 1;
+              const names = dup.map(([n]) => n);
+              pushStep(run, { type: 'note', text: `${tool} ${args.path} refused: it would have duplicated ${names.join(', ')}` });
+              result = `ERROR: this ${tool} would have DUPLICATED ${dup.length} definition(s) ${args.path} already has: `
+                + dup.map(([n, c]) => `${n} (${was.get(n)} -> ${c})`).join(', ') + '.'
+                + ` ${args.path} is UNCHANGED - nothing was written. A duplicate definition is LEGAL, so no syntax check catches it: the LAST one silently wins and everything the earlier one did is gone.`
+                + `\nYour REPLACE contains definitions the file already has. Either make the REPLACE contain ONLY what is new, or address the existing block by number with LINES: <a>-<b> (read_file prints them) so it is REPLACED instead of added beside it.`
+                + `\nIf you really do mean two of them, repeat the same action and add a line: DUPLICATE: ${names.join(', ')}`;
               syntaxNote = '';
             }
           } catch { /* never a reason to fail the step */ }

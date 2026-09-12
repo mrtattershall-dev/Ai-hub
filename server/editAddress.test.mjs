@@ -132,7 +132,10 @@ const REWRITTEN = SRC.replace('  return 1;', '  return 2;');
 const s6 = await runGoal('Normal edit and rewrite.', [write('c.js', SRC), editFind('c.js', '  return 1;', '  return 3;'), rewrite('c.js', REWRITTEN), FINISH]);
 await test('a unique FIND still edits as before', () => {
   const r = String(s6.filter((s) => s.tool === 'edit_file')[0]?.result || '');
-  assert.match(r, /^OK: edited c\.js\.?$/, r.slice(0, 200));
+  // Was /^OK: edited c\.js\.?$/ - `$`-anchored with no `m` flag, so it asserted the answer said NOTHING about the
+  // file. That is the set G bug written down as a requirement (POST-SETG item 0-A): the answer now carries the
+  // resulting line count, and this edit replaces one line with one line, so the count is unchanged.
+  assert.match(r, /^OK: edited c\.js; now 5 lines \(same count\)\./, r.slice(0, 200));
 });
 await test('a whole-file rewrite with no FIND and no LINES still becomes write_file', () => {
   const w = s6.filter((s) => s.tool === 'write_file');

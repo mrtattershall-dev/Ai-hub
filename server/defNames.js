@@ -12,10 +12,18 @@
  */
 const JS_KEYWORDS = new Set(['if', 'for', 'while', 'switch', 'catch', 'function', 'return', 'with', 'else', 'do', 'try', 'typeof', 'new', 'await', 'yield', 'super', 'constructor']);
 
-export function defNames(src, path = '') {
+/**
+ * Every definition name the file declares, in file order, WITH its duplicates - the raw stream behind both
+ * defNames() and defCounts().
+ *
+ * It exists because a Set structurally cannot see the set G bug. `defNames` answers "is this name here?", so a file
+ * that gains a SECOND `__init__` looks identical to one that has always had one, and the destructive-write refusal
+ * (built on lostDefs) sees nothing to complain about. Counting is the same scan with the Set taken off the end.
+ */
+function defNameList(src, path = '') {
   const text = String(src || '');
-  const out = new Set();
-  const add = (n) => { if (n && !JS_KEYWORDS.has(n)) out.add(n); };
+  const out = [];
+  const add = (n) => { if (n && !JS_KEYWORDS.has(n)) out.push(n); };
   if (/\.py$/i.test(path)) {
     for (const m of text.matchAll(/^[ \t]*(?:async[ \t]+)?def[ \t]+([A-Za-z_]\w*)|^[ \t]*class[ \t]+([A-Za-z_]\w*)/gm)) add(m[1] || m[2]);
     return out;
@@ -29,6 +37,25 @@ export function defNames(src, path = '') {
   // class methods: an indented `name(args) {` line (optionally static/async/get/set)
   for (const m of text.matchAll(/^[ \t]+(?:static[ \t]+)?(?:async[ \t]+)?(?:get[ \t]+|set[ \t]+)?\*?([A-Za-z_$][\w$]*)[ \t]*\([^)\n]*\)[ \t]*\{/gm)) add(m[1]);
   return out;
+}
+
+export function defNames(src, path = '') {
+  return new Set(defNameList(src, path));
+}
+
+/**
+ * name -> how many times this file defines it.
+ *
+ * Set G (2026-09-11): s6_graph.py finished at 1987 lines with 28 `def __init__` and 33 `def nodes` inside ONE class,
+ * and nothing in the hub said a word. Duplicate methods are LEGAL, so no syntax check fires; `duplicateDecls.js`
+ * only looks at column 0 and deliberately exempts class methods; and `lostDefs` compares Sets, so a second copy of
+ * a name is invisible to it. A count is the one comparison that can see an ADDED duplicate, which is the mirror
+ * image of the removal the destructive-write refusal was built for.
+ */
+export function defCounts(src, path = '') {
+  const counts = new Map();
+  for (const n of defNameList(src, path)) counts.set(n, (counts.get(n) || 0) + 1);
+  return counts;
 }
 
 /** Names defined in `before` that are gone from `after` (sorted). */
