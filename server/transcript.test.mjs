@@ -3,7 +3,7 @@
  *
  *   node server/transcript.test.mjs
  *
- * run.history is a context window: pruneHistory drops old messages in place (MAX_HISTORY_MSGS = 16), so the run
+ * run.history is a context window: pruneHistory drops old messages in place once the TOKEN budget is spent, so the run
  * file cannot say what the model actually said. Set C lost 248 of Qwen3-Coder's 568 replies that way and 75 of
  * 120 recorded runs could not be replayed. This drives the real loop with a scripted mock through enough steps
  * to force pruning, then checks the transcript kept what the history lost:
@@ -64,7 +64,15 @@ const test = async (n, f) => { try { await f(); passed++; console.log(`  ok    $
 console.log('\nthe full transcript survives history pruning\n');
 if (!up) { console.error('  FAIL  the hub did not start\n' + rig.log.join('').slice(-800)); hub.kill(); mock.close(); process.exit(1); }
 
-const SCRIPT = Array.from({ length: 10 }, (_, i) => write(`t${i + 1}.js`, `module.exports = { n: ${i + 1}, tag: 'file-${i + 1}-${'x'.repeat(i)}' };`));
+// BIG ENOUGH THAT THE TOKEN BUDGET REALLY BINDS. These bodies used to be ~60 characters, which forced pruning only
+// because pruneHistory carried a 12-MESSAGE cap that fired regardless of size. That cap is gone (it was holding every
+// real run to the last six turns), so a script of ten tiny replies now fits the window comfortably and the premise
+// below correctly reports that it proves nothing. Ten ~5KB replies is ~12,600 est-tokens against a 9,011 budget.
+// Deliberately UNDER capMessage's per-message ceiling (budget/4 = ~9,000 chars): if a reply were capped instead of
+// dropped its text would change, and the premise - which compares exact strings - would pass on a truncation rather
+// than on the drop it exists to prove.
+const FILLER = 'x'.repeat(5000);
+const SCRIPT = Array.from({ length: 10 }, (_, i) => write(`t${i + 1}.js`, `module.exports = { n: ${i + 1}, tag: 'file-${i + 1}-${FILLER}' };`));
 rig.script = [...SCRIPT, finish('wrote ten files')];
 const st = await api('/agent/start', { method: 'POST', body: JSON.stringify({ goal: 'Create t1.js through t10.js, each exporting its number.' }) });
 let run = null;

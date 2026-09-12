@@ -163,10 +163,24 @@ const CMD_TIMEOUT_MS = 60_000;   // per shell command
 // cap for a 14B: KV cache ~4.5GB + ~9GB model + buffers ≈ 14.5GB (fits, tight). Enable
 // OLLAMA_KV_CACHE_TYPE=q8_0 server-side to halve the KV and run it comfortably. Drop
 // NUM_CTX to 8192 if you OOM; a 7B has room to spare either way.
-const NUM_CTX = parseInt(process.env.NUM_CTX, 10) || 24_576;
+// MUST NOT EXCEED WHAT THE SERVER ACTUALLY SERVES, and until 2026-09-12 it did. Every set H/I/J arm was deployed
+// with max_len=16384 while this default claimed 24,576, and contextTokensFor() hands the claim straight to
+// historyBudget(): 24,576 * 0.55 = 13,516 tokens of history, against a real window of 16,384 for history AND the
+// ledger block AND the reply. It was only ever survivable because the message-count cap in pruneHistory kept runs
+// at 38-70% of that budget by accident; removing that cap (as this commit does) makes the claim reachable, and a
+// reachable overlong prompt is a silent one - the CONTEXT_OVERFLOW recovery keys on an HTTP 400 that this backend
+// never returns, so ctxSquashes is 0 across all 835 set J calls. Matched to OPENAI_CTX_DEFAULT. Raise it by env
+// only alongside a server that really serves it.
+const NUM_CTX = parseInt(process.env.NUM_CTX, 10) || 16_384;
 const NUM_PREDICT = parseInt(process.env.NUM_PREDICT, 10) || -1; // -1 = generate until done; never truncate a long file mid-write
 const TEMPERATURE = 0.2;
 const MAX_HISTORY_MSGS = 16;     // keep recent context dense; older tool dumps are pruned
+// A BACKSTOP, not a working limit. pruneHistory admits recent messages until the TOKEN budget is spent; this exists
+// only so the array cannot grow without bound if a run somehow produces thousands of tiny messages. It is
+// deliberately an order of magnitude above the working window so that it never decides what the model remembers -
+// see pruneHistory, where a cap of exactly this kind sat inside the admission loop and silently held every run in
+// every measured set to the last six turns.
+const MAX_TAIL_MSGS = 200;
 
 // ── Workspace sandbox helpers ────────────────────────────────────────────────
 
@@ -2386,6 +2400,22 @@ function pruneHistory(run, budgetTokens, opts = {}) {
   // MESSAGES, whatever they weigh. Sixteen messages can be 200 tokens or 200,000, so this
   // was not a defence against overflow at all; it defended against message-count growth,
   // which was never a failure mode. Tokens are the only unit the backend charges in.
+  //
+  // THAT REPLACEMENT NEVER TOOK EFFECT - the third time this hub has had this exact shape, where the rule that was
+  // FIXED advises and the rule it superseded still decides. The count rule was rewritten as a `break` INSIDE the
+  // admission loop below, sitting next to the token test, where it always won first:
+  // MAX_HISTORY_MSGS - head.length - 1 = 12 messages = THE LAST SIX TURNS, whatever the budget says.
+  //
+  // Measured 2026-09-12 by replaying this function over all 835 set J model calls: it first fires at CALL 8 in every
+  // run of every arm, and the token budget was never the binding constraint once - final windows used 38-70% of
+  // their allowance while content was discarded on message count alone. historyWindow.test.mjs drives the shipped
+  // function and pins the shape: 40 small messages against a 20,000-token budget kept 16 of 43 while spending 645
+  // tokens - 3.2% of the allowance.
+  //
+  // The cost is the north-star failure itself. A 30-call run that remembers six turns re-reads what it already read
+  // and edits files it can no longer see: setI run de950b2d read s3_matrix.js twice, lost BOTH reads to this cap by
+  // call 25, then spent ten calls deleting what it believed was a stray brace - walking LINES: 52-53 down to 46-47,
+  // deleting a real line each time. The file went 55 lines to 47 and sub() is now a comment. Two goals.
   const perMsgCap = Math.max(400, Math.floor(budget / 4));
   const headTok = estimateTokens(head);
   const MIN_TAIL = 2;                       // the model must always see the latest result
@@ -2394,7 +2424,7 @@ function pruneHistory(run, budgetTokens, opts = {}) {
   for (let i = h.length - 1; i >= 0; i--) {
     const m = h[i];
     if (head.includes(m)) continue;
-    if (tail.length >= MAX_HISTORY_MSGS - head.length - 1) break;
+    if (tail.length >= MAX_TAIL_MSGS) break;   // backstop only - the budget test below is what decides
     const capped = capMessage(m, perMsgCap);
     const cost = estimateTokens([capped]);
     if (spent + cost > budget && tail.length >= MIN_TAIL) break;
