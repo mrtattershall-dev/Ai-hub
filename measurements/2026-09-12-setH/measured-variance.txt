@@ -1,0 +1,28 @@
+Set H measured run-to-run spread (identical hub, identical 100 goals, identical model)
+======================================================================================
+Captured 2026-09-12 from the two CONTROL arms against set G's arms on the same hub
+(server/agent.js md5 cf2336b17238 == dae46b2, verified by hash, not by commit label).
+
+  14B : set G  4/100 at 58 attempted  ->  set H  2/100 at 50 attempted    spread 2 points,  8 goals
+  30B : set G 29/100 at 78 attempted  ->  set H 30/100 at 59 attempted    spread 1 point,  19 goals
+
+THE TWO METRICS BEHAVE DIFFERENTLY, AND THIS IS THE POINT:
+  SCORE (implementation correct) is highly reproducible - the 30B moved ONE point across two runs.
+  GOALS ATTEMPTED is not - 19 fewer on a byte-identical configuration.
+
+CONSEQUENCES FOR READING THE FOUR-WAY COMPARISON:
+  - Prediction 3 (treatment attempts MORE goals) needs a margin well beyond 19 goals before it means
+    anything. A treatment arm attempting 10-15 more than its control is INSIDE the noise.
+  - The score comparison is on firm ground: a 2+ point move on the 30B is outside the measured spread.
+  - Prediction 4 (duplicated definitions) is the cleanest test of all, because it is countable and does
+    not depend on either noisy quantity.
+
+ALSO SETTLED: the checker is deterministic. The in-harness run and an independent offline recompute of
+the same 30B workspace both returned 30/100 with identical per-project splits. A score is a property of
+the workspace, not of run conditions.
+
+CONTROL BASELINE FOR PREDICTION 4:
+  coder14b-sethctl  10 files with duplicated definitions (s7_cache.js 1398 lines: size x28, has x27,
+                    keys x27, constructor x26; s3_matrix.js equals x28; s5_expr.js parseTerm x20)
+  coder30b-sethctl  none
+  => the duplication pathology is a 14B phenomenon; the 14B treatment arm is the decisive test.

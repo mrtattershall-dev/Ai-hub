@@ -1,0 +1,22 @@
+Set G duplicate-definition baseline - the 'before' for set H prediction 4
+Captured 2026-09-12 from the kept set G workspaces, using the same detector compare-setH.mjs uses.
+Written down here so the comparison has a reference that does not depend on a transient task output -
+the regression number was nearly lost exactly that way earlier tonight.
+
+coder14b-setg (the arm the fixes target):
+  s1_library.js    282 lines   dueDay x21, returnBook x2
+  s3_matrix.js    2375 lines   constructor x27, equals x27, sub x25, add x24
+  s6_graph.py     1988 lines   add_node x33, add_edge x33, nodes x33, neighbors x33, bfs x33
+  s8_grades.py     206 lines   add_assignment x3, record x3, score x3, __init__ x2, add_student x2
+
+coder30b-setg (milder, matching its better set G result):
+  s4_markdown.py   174 lines   replace_code x3, replace_strong x3, replace_em x3, replace_link x3
+  s6_graph.py      584 lines   shortest_path x2, dfs x2
+  s9_board.js      161 lines   updateCounts x2
+
+Ground truth cross-check (grep, independent of the detector): s6_graph.py 'def __init__' = 28;
+s3_matrix.js '^ *constructor(' = 27.
+
+PREDICTION 4: the treatment arms should show markedly less of this, or none. It is a countable check that does
+not require the score to move, which matters because set G's lesson was that the binding constraint can move
+while the score stays flat.

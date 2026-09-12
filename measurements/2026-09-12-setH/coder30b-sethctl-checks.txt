@@ -1,0 +1,103 @@
+  1 PASS s1_library.js  s1  
+  2 PASS s2_logs.py     s1  
+  3 PASS s3_matrix.js   s1  
+  4 fail s4_markdown.py s1  no result: 
+  5 fail s5_expr.js     s1  threw: Invalid expression at 5
+  6 fail s6_graph.py    s1  threw: TypeError: '<=' not supported between instances of 'str' and 'int'
+  7 PASS s7_cache.js    s1  
+  8 PASS s8_grades.py   s1  
+  9 PASS s9_board.html  s1  
+ 10 PASS s10_desk.js    s1  
+ 11 fail s1_library.js  s2  the same member twice did not throw
+ 12 PASS s2_logs.py     s2  
+ 13 PASS s3_matrix.js   s2  
+ 14 fail s4_markdown.py s2  no result: 
+ 15 fail s5_expr.js     s2  threw: Invalid expression at 8
+ 16 PASS s6_graph.py    s2  
+ 17 PASS s7_cache.js    s2  
+ 18 fail s8_grades.py   s2  an unknown student did not raise KeyError
+ 19 PASS s9_board.html  s2  
+ 20 fail s10_desk.js    s2  availability "1/1"
+ 21 fail s1_library.js  s3  threw: Cannot read properties of undefined (reading 'has')
+ 22 PASS s2_logs.py     s3  
+ 23 PASS s3_matrix.js   s3  
+ 24 fail s4_markdown.py s3  no result: 
+ 25 fail s5_expr.js     s3  threw: Invalid characters in expression at 1
+ 26 PASS s6_graph.py    s3  
+ 27 fail s7_cache.js    s3  keys ["b","c","a"]
+ 28 fail s8_grades.py   s3  threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'
+ 29 fail s9_board.html  s3  start ["","",""]
+ 30 PASS s10_desk.js    s3  
+ 31 fail s1_library.js  s4  threw: Cannot read properties of undefined (reading 'has')
+ 32 PASS s2_logs.py     s4  
+ 33 PASS s3_matrix.js   s4  
+ 34 fail s4_markdown.py s4  no result: 
+ 35 fail s5_expr.js     s4  threw: Invalid expression at 5
+ 36 fail s6_graph.py    s4  a chain has no cycle
+ 37 PASS s7_cache.js    s4  
+ 38 PASS s8_grades.py   s4  
+ 39 PASS s9_board.html  s4  
+ 40 fail s10_desk.js    s4  threw: makeLookup is not exported
+ 41 fail s1_library.js  s5  threw: l.dueDay is not a function
+ 42 PASS s2_logs.py     s5  
+ 43 PASS s3_matrix.js   s5  
+ 44 fail s4_markdown.py s5  no result: 
+ 45 fail s5_expr.js     s5  threw: Invalid characters in expression at 5
+ 46 PASS s6_graph.py    s5  
+ 47 PASS s7_cache.js    s5  
+ 48 fail s8_grades.py   s5  with only n scores nothing is dropped None
+ 49 fail s9_board.html  s5  after reload [["Aâ†â†’Ã—","Câ†â†’Ã—"],["Bâ†â†’Ã—"]]
+ 50 fail s10_desk.js    s5  threw: library.overdue is not a function
+ 51 fail s1_library.js  s6  threw: Cannot read properties of undefined (reading 'has')
+ 52 PASS s2_logs.py     s6  
+ 53 PASS s3_matrix.js   s6  
+ 54 fail s4_markdown.py s6  no result: 
+ 55 fail s5_expr.js     s6  "1 +": 2
+ 56 PASS s6_graph.py    s6  
+ 57 fail s7_cache.js    s6  stats {"hits":1,"misses":2,"evictions":1,"expirations":1}
+ 58 PASS s8_grades.py   s6  
+ 59 fail s9_board.html  s6  a 4th card got into Doing: ["A","B","C","D"]
+ 60 fail s10_desk.js    s6  threw: Cannot read properties of undefined (reading 'has')
+ 61 fail s1_library.js  s7  a 4th loan did not throw
+ 62 fail s2_logs.py     s7  threw: AttributeError: module 's2_logs_mod' has no attribute 'between'
+ 63 fail s3_matrix.js   s7  threw: a.inverse is not a function
+ 64 fail s4_markdown.py s7  no result: 
+ 65 fail s5_expr.js     s7  threw: tokenize is not exported
+ 66 fail s6_graph.py    s7  threw: AttributeError: 'Graph' object has no attribute 'reachable'
+ 67 fail s7_cache.js    s7  onEvict []
+ 68 fail s8_grades.py   s7  threw: AttributeError: 'Gradebook' object has no attribute 'curve'
+ 69 PASS s9_board.html  s7  
+ 70 fail s10_desk.js    s7  threw: canBorrow is not exported
+ 71 fail s1_library.js  s8  threw: Cannot read properties of undefined (reading 'has')
+ 72 fail s2_logs.py     s8  threw: AttributeError: module 's2_logs_mod' has no attribute 'sessions'
+ 73 fail s3_matrix.js   s8  threw: (intermediate value).solve is not a function
+ 74 fail s4_markdown.py s8  no result: 
+ 75 fail s5_expr.js     s8  threw: toRPN is not exported
+ 76 fail s6_graph.py    s8  threw: AttributeError: 'Graph' object has no attribute 'components'
+ 77 fail s7_cache.js    s8  threw: c.resize is not a function
+ 78 fail s8_grades.py   s8  threw: AttributeError: 'Gradebook' object has no attribute 'to_csv'
+ 79 fail s9_board.html  s8  threw: No element found for selector: #s9-filter
+ 80 fail s10_desk.js    s8  threw: snapshot is not exported
+ 81 fail s1_library.js  s9  threw: l.search is not a function
+ 82 fail s2_logs.py     s9  CLI --top 2 printed []
+ 83 fail s3_matrix.js   s9  toString "[object Object]"
+ 84 fail s4_markdown.py s9  no result: 
+ 85 fail s5_expr.js     s9  threw: compile is not exported
+ 86 fail s6_graph.py    s9  threw: AttributeError: 'Graph' object has no attribute 'to_dot'
+ 87 fail s7_cache.js    s9  threw: c.toJSON is not a function
+ 88 fail s8_grades.py   s9  threw: AttributeError: 'Gradebook' object has no attribute 'stats'
+ 89 fail s9_board.html  s9  a duplicate was added: ["deploy"]
+ 90 fail s10_desk.js    s9  threw: searchLines is not exported
+ 91 fail S1_NOTES.md    s10 S1_NOTES.md missing
+ 92 fail s2_logs.py     s10 threw: ValueError: Invalid log line format
+ 93 fail s3_matrix.js   s10 threw: X.fromString is not a function
+ 94 fail s4_markdown.py s10 no result: 
+ 95 fail s5_expr.js     s10 threw: Invalid characters in expression at 3
+ 96 fail s6_graph.py    s10 threw: AttributeError: type object 'Graph' has no attribute 'from_text'
+ 97 fail s7_cache.js    s10 threw: c.getOrSet is not a function
+ 98 fail s8_grades.py   s10 CLI header [['All tests passed!']]
+ 99 fail s9_board.html  s10 threw: No element found for selector: #s9-clear-done
+100 fail S_INDEX.md     s10 S_INDEX.md missing
+
+per project (implementation correct): s1 1/10  s2 6/10  s3 6/10  s4 0/10  s5 0/10  s6 4/10  s7 4/10  s8 3/10  s9 4/10  s10 2/10
+done as asked 30/100 | implementation correct 30/100 (CT = correct code, own test broke it)

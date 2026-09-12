@@ -1,0 +1,103 @@
+  1 fail s1_library.js  s1  load: Unexpected token '{'
+  2 fail s2_logs.py     s1  threw: ValueError: Line does not match the expected format
+  3 PASS s3_matrix.js   s1  
+  4 fail s4_markdown.py s1  load: SyntaxError: unterminated string literal (detected at line 18) (s4_markdown.py, line 18)
+  5 fail s5_expr.js     s1  "1 + 2 * 3" gave 33
+  6 fail s6_graph.py    s1  threw: AttributeError: 'function' object has no attribute 'add'
+  7 PASS s7_cache.js    s1  
+  8 fail s8_grades.py   s1  load: IndentationError: unexpected indent (s8_grades.py, line 16)
+  9 fail s9_board.html  s1  the input was not cleared
+ 10 fail s10_desk.js    s1  load: Unexpected token '{'
+ 11 fail s1_library.js  s2  load: Unexpected token '{'
+ 12 fail s2_logs.py     s2  parse_log []
+ 13 fail s3_matrix.js   s2  threw: a.add is not a function
+ 14 fail s4_markdown.py s2  load: SyntaxError: unterminated string literal (detected at line 18) (s4_markdown.py, line 18)
+ 15 fail s5_expr.js     s2  threw: Invalid operator
+ 16 fail s6_graph.py    s2  threw: AttributeError: 'Graph' object has no attribute 'bfs'
+ 17 PASS s7_cache.js    s2  
+ 18 fail s8_grades.py   s2  load: IndentationError: unexpected indent (s8_grades.py, line 16)
+ 19 fail s9_board.html  s2  threw: no card "A" in todo
+ 20 fail s10_desk.js    s2  load: Unexpected token '{'
+ 21 fail s1_library.js  s3  load: Unexpected token '{'
+ 22 fail s2_logs.py     s3  status_counts {}
+ 23 PASS s3_matrix.js   s3  
+ 24 fail s4_markdown.py s3  load: SyntaxError: unterminated string literal (detected at line 18) (s4_markdown.py, line 18)
+ 25 fail s5_expr.js     s3  "2^3" gave 2
+ 26 fail s6_graph.py    s3  threw: AttributeError: 'Graph' object has no attribute 'shortest_path'
+ 27 PASS s7_cache.js    s3  
+ 28 fail s8_grades.py   s3  load: IndentationError: unexpected indent (s8_grades.py, line 16)
+ 29 fail s9_board.html  s3  threw: no card "A" in todo
+ 30 fail s10_desk.js    s3  load: Unexpected token '{'
+ 31 fail s1_library.js  s4  load: Unexpected token '{'
+ 32 fail s2_logs.py     s4  top_paths []
+ 33 fail s3_matrix.js   s4  threw: X.identity is not a function
+ 34 fail s4_markdown.py s4  load: SyntaxError: unterminated string literal (detected at line 18) (s4_markdown.py, line 18)
+ 35 fail s5_expr.js     s4  variables
+ 36 fail s6_graph.py    s4  threw: AttributeError: 'Graph' object has no attribute 'has_cycle'
+ 37 PASS s7_cache.js    s4  
+ 38 fail s8_grades.py   s4  load: IndentationError: unexpected indent (s8_grades.py, line 16)
+ 39 fail s9_board.html  s4  threw: no card "A" in todo
+ 40 fail s10_desk.js    s4  load: Unexpected token '{'
+ 41 fail s1_library.js  s5  load: Unexpected token '{'
+ 42 fail s2_logs.py     s5  threw: ValueError: There must be at least one value
+ 43 PASS s3_matrix.js   s5  
+ 44 fail s4_markdown.py s5  load: SyntaxError: unterminated string literal (detected at line 18) (s4_markdown.py, line 18)
+ 45 fail s5_expr.js     s5  threw: Unknown variable: min
+ 46 fail s6_graph.py    s5  threw: AttributeError: 'function' object has no attribute 'add'
+ 47 fail s7_cache.js    s5  size counts expired entries: 3
+ 48 fail s8_grades.py   s5  load: IndentationError: unexpected indent (s8_grades.py, line 16)
+ 49 fail s9_board.html  s5  threw: no card "B" in todo
+ 50 fail s10_desk.js    s5  load: Unexpected token '{'
+ 51 fail s1_library.js  s6  load: Unexpected token '{'
+ 52 fail s2_logs.py     s6  threw: AttributeError: module 's2_logs_mod' has no attribute 'by_hour'
+ 53 fail s3_matrix.js   s6  threw: (intermediate value).determinant is not a function
+ 54 fail s4_markdown.py s6  load: SyntaxError: unterminated string literal (detected at line 18) (s4_markdown.py, line 18)
+ 55 fail s5_expr.js     s6  "2 + * 3": null
+ 56 fail s6_graph.py    s6  threw: AttributeError: 'Graph' object has no attribute 'remove_node'
+ 57 fail s7_cache.js    s6  threw: c.stats is not a function
+ 58 fail s8_grades.py   s6  load: IndentationError: unexpected indent (s8_grades.py, line 16)
+ 59 fail s9_board.html  s6  threw: no card "A" in todo
+ 60 fail s10_desk.js    s6  load: Unexpected token '{'
+ 61 fail s1_library.js  s7  load: Unexpected token '{'
+ 62 fail s2_logs.py     s7  threw: AttributeError: module 's2_logs_mod' has no attribute 'between'
+ 63 fail s3_matrix.js   s7  threw: a.inverse is not a function
+ 64 fail s4_markdown.py s7  load: SyntaxError: unterminated string literal (detected at line 18) (s4_markdown.py, line 18)
+ 65 fail s5_expr.js     s7  threw: tokenize is not exported
+ 66 fail s6_graph.py    s7  threw: AttributeError: 'Graph' object has no attribute 'reachable'
+ 67 fail s7_cache.js    s7  onEvict []
+ 68 fail s8_grades.py   s7  load: IndentationError: unexpected indent (s8_grades.py, line 16)
+ 69 fail s9_board.html  s7  Enter did not add: []
+ 70 fail s10_desk.js    s7  load: Unexpected token '{'
+ 71 fail s1_library.js  s8  load: Unexpected token '{'
+ 72 fail s2_logs.py     s8  threw: AttributeError: module 's2_logs_mod' has no attribute 'sessions'
+ 73 fail s3_matrix.js   s8  threw: (intermediate value).solve is not a function
+ 74 fail s4_markdown.py s8  load: SyntaxError: unterminated string literal (detected at line 18) (s4_markdown.py, line 18)
+ 75 fail s5_expr.js     s8  threw: toRPN is not exported
+ 76 fail s6_graph.py    s8  threw: AttributeError: 'function' object has no attribute 'add'
+ 77 fail s7_cache.js    s8  threw: c.resize is not a function
+ 78 fail s8_grades.py   s8  load: IndentationError: unexpected indent (s8_grades.py, line 16)
+ 79 fail s9_board.html  s8  threw: no card "Fix bug" in todo
+ 80 fail s10_desk.js    s8  load: Unexpected token '{'
+ 81 fail s1_library.js  s9  load: Unexpected token '{'
+ 82 fail s2_logs.py     s9  CLI --top 2 printed ['ValueError: Line does not match the expected format']
+ 83 fail s3_matrix.js   s9  toString "[object Object]"
+ 84 fail s4_markdown.py s9  load: SyntaxError: unterminated string literal (detected at line 18) (s4_markdown.py, line 18)
+ 85 fail s5_expr.js     s9  threw: compile is not exported
+ 86 fail s6_graph.py    s9  threw: AttributeError: 'function' object has no attribute 'add'
+ 87 fail s7_cache.js    s9  threw: c.toJSON is not a function
+ 88 fail s8_grades.py   s9  load: IndentationError: unexpected indent (s8_grades.py, line 16)
+ 89 fail s9_board.html  s9  threw: no card "Deploy" in todo
+ 90 fail s10_desk.js    s9  load: Unexpected token '{'
+ 91 fail S1_NOTES.md    s10 S1_NOTES.md missing
+ 92 fail s2_logs.py     s10 threw: ValueError: Line does not match the expected format
+ 93 fail s3_matrix.js   s10 threw: X.fromString is not a function
+ 94 fail s4_markdown.py s10 load: SyntaxError: unterminated string literal (detected at line 18) (s4_markdown.py, line 18)
+ 95 fail s5_expr.js     s10 "1 + 1 == 2" gave 3
+ 96 fail s6_graph.py    s10 threw: AttributeError: type object 'Graph' has no attribute 'from_text'
+ 97 fail s7_cache.js    s10 threw: c.getOrSet is not a function
+ 98 fail s8_grades.py   s10 load: IndentationError: unexpected indent (s8_grades.py, line 16)
+ 99 fail s9_board.html  s10 threw: no card "A" in todo
+100 fail S_INDEX.md     s10 S_INDEX.md missing
+
+per project (implementation correct): s1 0/10  s2 0/10  s3 3/10  s4 0/10  s5 0/10  s6 0/10  s7 4/10  s8 0/10  s9 0/10  s10 0/10
+done as asked 7/100 | implementation correct 7/100 (CT = correct code, own test broke it)

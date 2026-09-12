@@ -1,0 +1,104 @@
+  1 fail s1_library.js  s1  load: Unexpected token 'this'
+  2 fail s2_logs.py     s1  threw: ValueError: Invalid log line format
+  3 fail s3_matrix.js   s1  load: Unexpected token '{'
+  4 fail s4_markdown.py s1  load: SyntaxError: invalid syntax (s4_markdown.py, line 16)
+  5 fail s5_expr.js     s1  "1 +" did not throw
+  6 fail s6_graph.py    s1  threw: AttributeError: 'function' object has no attribute 'add'
+  7 fail s7_cache.js    s1  load: Unexpected token '{'
+  8 fail s8_grades.py   s1  threw: TypeError: '<=' not supported between instances of 'str' and 'int'
+  9 PASS s9_board.html  s1  
+ 10 fail s10_desk.js    s1  load: Unexpected token 'this'
+ 11 fail s1_library.js  s2  load: Unexpected token 'this'
+ 12 fail s2_logs.py     s2  threw: TypeError: list indices must be integers or slices, not str
+ 13 fail s3_matrix.js   s2  load: Unexpected token '{'
+ 14 fail s4_markdown.py s2  load: SyntaxError: invalid syntax (s4_markdown.py, line 16)
+ 15 fail s5_expr.js     s2  "-(2+3)*2" gave NaN
+ 16 fail s6_graph.py    s2  threw: AttributeError: 'function' object has no attribute 'add'
+ 17 fail s7_cache.js    s2  load: Unexpected token '{'
+ 18 PASS s8_grades.py   s2  
+ 19 fail s9_board.html  s2  threw: card A has no .s9-right button
+ 20 fail s10_desk.js    s2  load: Unexpected token 'this'
+ 21 fail s1_library.js  s3  load: Unexpected token 'this'
+ 22 fail s2_logs.py     s3  threw: TypeError: list indices must be integers or slices, not str
+ 23 fail s3_matrix.js   s3  load: Unexpected token '{'
+ 24 fail s4_markdown.py s3  load: SyntaxError: invalid syntax (s4_markdown.py, line 16)
+ 25 fail s5_expr.js     s3  "2^3" gave 2
+ 26 fail s6_graph.py    s3  threw: AttributeError: 'function' object has no attribute 'add'
+ 27 fail s7_cache.js    s3  load: Unexpected token '{'
+ 28 fail s8_grades.py   s3  threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'
+ 29 fail s9_board.html  s3  threw: card A has no .s9-right button
+ 30 fail s10_desk.js    s3  load: Unexpected token 'this'
+ 31 fail s1_library.js  s4  load: Unexpected token 'this'
+ 32 fail s2_logs.py     s4  threw: TypeError: list indices must be integers or slices, not str
+ 33 fail s3_matrix.js   s4  load: Unexpected token '{'
+ 34 fail s4_markdown.py s4  load: SyntaxError: invalid syntax (s4_markdown.py, line 16)
+ 35 fail s5_expr.js     s4  variables
+ 36 fail s6_graph.py    s4  threw: AttributeError: 'function' object has no attribute 'add'
+ 37 fail s7_cache.js    s4  load: Unexpected token '{'
+ 38 fail s8_grades.py   s4  threw: TypeError: Gradebook.add_assignment() takes 3 positional arguments but 4 were given
+ 39 fail s9_board.html  s4  threw: card A has no .s9-del button
+ 40 fail s10_desk.js    s4  load: Unexpected token 'this'
+ 41 fail s1_library.js  s5  load: Unexpected token 'this'
+ 42 fail s2_logs.py     s5  threw: AttributeError: module 's2_logs_mod' has no attribute 'percentile'
+ 43 fail s3_matrix.js   s5  load: Unexpected token '{'
+ 44 fail s4_markdown.py s5  load: SyntaxError: invalid syntax (s4_markdown.py, line 16)
+ 45 fail s5_expr.js     s5  "min(3, 1, 2)" gave NaN
+ 46 fail s6_graph.py    s5  threw: AttributeError: 'function' object has no attribute 'add'
+ 47 fail s7_cache.js    s5  load: Unexpected token '{'
+ 48 fail s8_grades.py   s5  threw: TypeError: Gradebook.add_assignment() takes 3 positional arguments but 4 were given
+ 49 fail s9_board.html  s5  threw: card B has no .s9-right button
+ 50 fail s10_desk.js    s5  load: Unexpected token 'this'
+ 51 fail s1_library.js  s6  load: Unexpected token 'this'
+ 52 fail s2_logs.py     s6  threw: AttributeError: module 's2_logs_mod' has no attribute 'by_hour'
+ 53 fail s3_matrix.js   s6  load: Unexpected token '{'
+ 54 fail s4_markdown.py s6  load: SyntaxError: invalid syntax (s4_markdown.py, line 16)
+ 55 fail s5_expr.js     s6  "2 + * 3": null
+ 56 fail s6_graph.py    s6  threw: AttributeError: 'function' object has no attribute 'add'
+ 57 fail s7_cache.js    s6  load: Unexpected token '{'
+ 58 fail s8_grades.py   s6  threw: AttributeError: 'Gradebook' object has no attribute 'set_missing_zero'
+ 59 fail s9_board.html  s6  threw: card A has no .s9-right button
+ 60 fail s10_desk.js    s6  load: Unexpected token 'this'
+ 61 fail s1_library.js  s7  load: Unexpected token 'this'
+ 62 fail s2_logs.py     s7  threw: AttributeError: module 's2_logs_mod' has no attribute 'between'
+ 63 fail s3_matrix.js   s7  load: Unexpected token '{'
+ 64 fail s4_markdown.py s7  load: SyntaxError: invalid syntax (s4_markdown.py, line 16)
+ 65 fail s5_expr.js     s7  threw: tokenize is not exported
+ 66 fail s6_graph.py    s7  threw: AttributeError: 'function' object has no attribute 'add'
+ 67 fail s7_cache.js    s7  load: Unexpected token '{'
+ 68 fail s8_grades.py   s7  threw: AttributeError: 'Gradebook' object has no attribute 'curve'
+ 69 fail s9_board.html  s7  Enter did not add: []
+ 70 fail s10_desk.js    s7  load: Unexpected token 'this'
+ 71 fail s1_library.js  s8  load: Unexpected token 'this'
+ 72 fail s2_logs.py     s8  threw: AttributeError: module 's2_logs_mod' has no attribute 'sessions'
+ 73 fail s3_matrix.js   s8  load: Unexpected token '{'
+ 74 fail s4_markdown.py s8  load: SyntaxError: invalid syntax (s4_markdown.py, line 16)
+ 75 fail s5_expr.js     s8  threw: toRPN is not exported
+ 76 fail s6_graph.py    s8  threw: AttributeError: 'function' object has no attribute 'add'
+ 77 fail s7_cache.js    s8  load: Unexpected token '{'
+ 78 fail s8_grades.py   s8  threw: AttributeError: 'Gradebook' object has no attribute 'to_csv'
+ 79 fail s9_board.html  s8  threw: card Fix bug has no .s9-right button
+ 80 fail s10_desk.js    s8  load: Unexpected token 'this'
+ 81 fail s1_library.js  s9  load: Unexpected token 'this'
+ 82 fail s2_logs.py     s9  CLI --top 2 printed [] | raise ValueError("Invalid log line format")
+ValueError: Invalid log line f
+ 83 fail s3_matrix.js   s9  load: Unexpected token '{'
+ 84 fail s4_markdown.py s9  load: SyntaxError: invalid syntax (s4_markdown.py, line 16)
+ 85 fail s5_expr.js     s9  threw: compile is not exported
+ 86 fail s6_graph.py    s9  threw: AttributeError: 'function' object has no attribute 'add'
+ 87 fail s7_cache.js    s9  load: Unexpected token '{'
+ 88 fail s8_grades.py   s9  threw: AttributeError: 'Gradebook' object has no attribute 'stats'
+ 89 fail s9_board.html  s9  threw: card Deploy has no .s9-right button
+ 90 fail s10_desk.js    s9  load: Unexpected token 'this'
+ 91 fail S1_NOTES.md    s10 S1_NOTES.md missing
+ 92 fail s2_logs.py     s10 threw: ValueError: not enough values to unpack (expected 2, got 1)
+ 93 fail s3_matrix.js   s10 load: Unexpected token '{'
+ 94 fail s4_markdown.py s10 load: SyntaxError: invalid syntax (s4_markdown.py, line 16)
+ 95 fail s5_expr.js     s10 "1 + 1 == 2" gave 2
+ 96 fail s6_graph.py    s10 threw: AttributeError: type object 'Graph' has no attribute 'from_text'
+ 97 fail s7_cache.js    s10 load: Unexpected token '{'
+ 98 fail s8_grades.py   s10 CLI header [["['Alice'", " 'Bob']"]]
+ 99 fail s9_board.html  s10 threw: card A has no .s9-right button
+100 fail S_INDEX.md     s10 S_INDEX.md missing
+
+per project (implementation correct): s1 0/10  s2 0/10  s3 0/10  s4 0/10  s5 0/10  s6 0/10  s7 0/10  s8 1/10  s9 1/10  s10 0/10
+done as asked 2/100 | implementation correct 2/100 (CT = correct code, own test broke it)
