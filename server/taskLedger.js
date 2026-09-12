@@ -228,20 +228,96 @@ export function add(workspace, titles) {
 }
 
 /**
- * Set a task's state. Accepts a number OR a substring of the title, because a small
- * model reliably produces one or the other but not always the one you asked for.
+ * Does `q` appear inside `title` at WORD BOUNDARIES? The last resort for a title match.
+ *
+ * `includes()` was the whole match rule, and a bare substring closes the wrong task: "ibrary.js with" matched
+ * "Create s1_library.js with the Library class" mid-word. A boundary check keeps the useful case (the model quotes a
+ * few whole words of the title) and drops the accidental one.
+ */
+function wordMatch(title, q) {
+  const isWord = (c) => c !== undefined && /\w/.test(c);
+  for (let k = title.indexOf(q); k !== -1; k = title.indexOf(q, k + 1)) {
+    const startsClean = !isWord(q[0]) || !isWord(title[k - 1]);
+    const endsClean = !isWord(q[q.length - 1]) || !isWord(title[k + q.length]);
+    if (startsClean && endsClean) return true;
+  }
+  return false;
+}
+
+/**
+ * Set a task's state.
+ *
+ * WHAT THIS ACCEPTS, AND WHY (set G, 2026-09-11 - measured in the kept run records, not inferred)
+ * ----------------------------------------------------------------------------------------------
+ * 44 real task_done calls across the two batteries. ZERO returned "no task matches". 43 of them closed a task left
+ * over from GOAL 1 while the model was working on an entirely different goal - 39 of 40 in the 30B battery all
+ * answering `OK: "HOW TO VERIFY: Run node s1_library.js ..." done`, and 4 of 4 in the 14B. A wrong close reports
+ * success and corrupts the goal-tracking the finish gate reads, which is the worst thing a ledger can do.
+ *
+ * Three separate defects produced that, and each is refused here:
+ *
+ *   1. parseInt IS PREFIX-GREEDY. `parseInt("1. Computes + - * / operations...", 10)` is 1, so a TITLE beginning with
+ *      a digit resolved as a POSITION (live: run 256f1ad4). A number now has to be the WHOLE string; anything else is
+ *      a title, including a title that starts with a digit.
+ *
+ *   2. A BARE NUMBER MEANS "MY FIRST TASK" TO THE MODEL and "global position 1" to the ledger. adopt() marks goal 1's
+ *      tasks carried but never removes them, so position 1 stayed goal 1's work for a whole battery; 39 of the 40 30B
+ *      calls sent "1". contextBlock() also hides aged carried tasks while read() keeps numbering globally, so the
+ *      model was closing a task it could not even see. A number may therefore no longer address a CARRIED task: that
+ *      is refused, and the leftover is named so it can still be closed deliberately BY TITLE if it really is meant.
+ *
+ *   3. NOTHING CHECKED WHETHER THE TASK WAS ALREADY DONE. Run 7afb8151 closed that task legitimately as its own; all
+ *      39 later calls re-closed an already-done task and were told "OK". A no-op reported as success is exactly the
+ *      silent-failure shape this repo keeps paying for, so closing a done task is now an error.
+ *
+ * Ambiguity is REFUSED rather than guessed, and the candidates are listed: guessing the first match is how a
+ * substring closed the wrong task. An exact title still wins outright - naming a task in full is the clearest signal
+ * a model can send, even when that title is also the prefix of a longer one.
+ *
+ * Every refusal returns before write(), so a rejected call leaves TASKS.md byte-for-byte unchanged.
  */
 export function mark(workspace, which, state) {
   const tasks = read(workspace);
   if (!tasks.length) return { ok: false, error: 'there are no tasks yet' };
+
+  const raw = String(which === null || which === undefined ? '' : which).trim();
+  if (!raw) return { ok: false, error: 'say WHICH task - the number task_list shows, or the task title' };
+
   let i = -1;
-  const n = parseInt(which, 10);
-  if (!Number.isNaN(n) && n >= 1 && n <= tasks.length) i = n - 1;
-  else {
-    const q = String(which || '').toLowerCase().trim();
-    if (q) i = tasks.findIndex((t) => t.title.toLowerCase().includes(q));
+  let byNumber = false;
+
+  if (/^\d+$/.test(raw)) {
+    const n = Number(raw);
+    if (n < 1 || n > tasks.length) {
+      return { ok: false, error: `there is no task ${n} - the ledger has ${tasks.length} task(s)` };
+    }
+    i = n - 1;
+    byNumber = true;
+  } else {
+    const q = raw.toLowerCase();
+    const lower = tasks.map((t) => t.title.toLowerCase());
+    let hits = tasks.filter((_, k) => lower[k] === q);
+    if (!hits.length) hits = tasks.filter((_, k) => lower[k].startsWith(q));
+    if (!hits.length) hits = tasks.filter((_, k) => wordMatch(lower[k], q));
+    if (!hits.length) return { ok: false, error: `no task matches "${raw}"` };
+    if (hits.length > 1) {
+      const names = hits.slice(0, 4).map((t) => `${tasks.indexOf(t) + 1}. ${t.title}`).join(' | ');
+      return { ok: false, error: `"${raw}" matches ${hits.length} tasks, so it is ambiguous - name one exactly: ${names}` };
+    }
+    i = tasks.indexOf(hits[0]);
   }
-  if (i < 0) return { ok: false, error: `no task matches "${which}"` };
+
+  const target = tasks[i];
+  if (byNumber && target.carried) {
+    return { ok: false,
+      error: `task ${i + 1} ("${target.title}") is left over from earlier work in this workspace, not part of this goal`
+        + ` - its number is not your own first task's number. If you really mean that task, give its title in full;`
+        + ` otherwise task_add the work this goal needs` };
+  }
+  if (state === 'done' && target.state === 'done') {
+    return { ok: false, error: `task ${i + 1} ("${target.title}") is already done - closing it again changes nothing` };
+  }
+
   // Starting a new task implicitly ends the previous one's "in progress" state, so
   // the ledger can never show two things being worked on at once.
   if (state === 'doing') tasks.forEach((t) => { if (t.state === 'doing') t.state = 'todo'; });

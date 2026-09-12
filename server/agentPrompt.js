@@ -191,10 +191,11 @@ TEXT:
 add collision detection between ball and paddle
 show the score in the corner
 
-task_done — mark a task finished. Do this the moment it works, not at the end. Give the NUMBER from task_list:
+task_done — mark a task finished. Do this the moment it works, not at the end. Give the NUMBER exactly as task_list shows it, or the task's title in full:
 THOUGHT: <why>
 ACTION: task_done
 WHICH: 3
+A number is read ONLY as a position, so send a title that happens to start with a digit ("1. Computes ...") as a title, not as a number. A task you have already closed cannot be closed again. A task left over from earlier work in this workspace must be named in full rather than numbered — its position is not your own first task's number. An ambiguous title is refused with the candidates listed, so pick one instead of guessing again.
 
 spawn_subtask — hand a self-contained piece of work to a fresh sub-agent. It sees the same files but starts with an empty context and reports back a summary. Use this when a piece is big enough that doing it here would crowd out everything else — NOT for small steps, which cost less done directly:
 THOUGHT: <why this is worth delegating>

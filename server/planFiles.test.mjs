@@ -75,16 +75,20 @@ await test('adopt() twice is a no-op the second time', () => {
   assert.deepEqual(ledger.adopt(ws, 'run-2'), { carried: 0, prior: 0 });
 });
 
+// A leftover is now addressed BY TITLE, not by position. Set G (2026-09-11) measured why: 43 of 44 real task_done
+// calls sent a bare number that landed on goal 1's carried task while the model worked on an unrelated goal, and each
+// was told "OK". taskLedger.mark() therefore refuses a NUMBER that resolves to a carried task and names it instead;
+// naming it in full still works, which is what these two cases do. What they assert is unchanged.
 await test('closing a LEFT-OVER task does not announce this goal complete (goal 9)', async () => {
-  const r = String(await T.callTool('task_done', { which: '3' }));
+  const r = String(await T.callTool('task_done', { which: 'add clear()' }));
   assert.match(r, /LEFT OVER from earlier work/, r.slice(0, 200));
   assert.doesNotMatch(r, /TASKS FOR THIS GOAL ARE COMPLETE/, 'the false "all done" is back: ' + r.slice(0, 200));
   assert.match(r, /no tasks of its own/, 'it should send the model to check the deliverables itself');
 });
 
 await test('the carried marker survives a later rewrite of the ledger', () => {
-  ledger.mark(ws, '1', 'todo');
-  ledger.mark(ws, '1', 'done');
+  ledger.mark(ws, 'write the stack', 'todo');
+  ledger.mark(ws, 'write the stack', 'done');
   assert.ok(ledger.read(ws).every((t) => t.carried));
 });
 
