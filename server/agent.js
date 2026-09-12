@@ -181,6 +181,13 @@ const MAX_HISTORY_MSGS = 16;     // keep recent context dense; older tool dumps 
 // see pruneHistory, where a cap of exactly this kind sat inside the admission loop and silently held every run in
 // every measured set to the last six turns.
 const MAX_TAIL_MSGS = 200;
+// A refused write hands the file back (see the choke point in drive()). Both numbers come from the records, not
+// from taste: across the archive a refused file is 81 lines at the median, 269 at p90 and 1842 at worst, so 6000
+// characters shows the whole of a typical one and truncates honestly beyond that; and a run has 2 refusals at the
+// median and 9 at most, with only 24 runs above four, so four hand-backs covers almost every run without letting a
+// pathological loop paste a file into the window nine times.
+const HANDBACK_CHARS = 6000;
+const HANDBACK_MAX = 4;
 
 // ── Workspace sandbox helpers ────────────────────────────────────────────────
 
@@ -3775,7 +3782,52 @@ async function drive(loadDb, run) {
         }
       }
 
-      let feedback = substituted || `TOOL RESULT (${tool}):\n${result}${syntaxNote}`;
+      // BACK TO STAGE ONE: a refused write hands back the FILE, not just a complaint.
+      //
+      // tatte, 2026-09-12: "it keeps trying to rewrite instead of taking a file and moving it down the line ... if
+      // it fails a scan it needs a manual scan, told why it failed, handed a new copy and try again. It can't get
+      // better if it doesn't know why it failed."
+      //
+      // Measured across the archive: 619 write/edit/append calls were REFUSED, and before its next write to that
+      // same file the model wrote again BLIND 314 times (51%), read the file first only 170 (27%), and abandoned
+      // the file altogether 135 times (22%). 54 runs hit 3+ consecutive refusals on one file. Half the time it is
+      // retrying from imagination, because the refusal hands back a sentence and the file stays unseen.
+      //
+      // The remedy was already here and wired to the wrong path. The ORIENT substitution below injects a file's
+      // real contents when a model repeats itself, and its own comment records why: advisory ("you already ran
+      // this") scored 0/5 productive, MECHANICAL (hand it what it needs) scored 5/5. But ORIENT is the READ-ONLY
+      // tools; mutating tools were excluded on purpose, so a refused EDIT - the moment the model is most lost -
+      // never got the copy. Traced case, set J run 8e7cf9aa: four refusals on s1_library.js, ZERO read_file calls
+      // in the entire run, zero writes landed, and a "Verified (node)" finish on a goal the checker failed.
+      //
+      // The numbering is `${n}: ${line}`, matching read_file, because agentParse.js's stripLineNumberPrefixes
+      // removes exactly that form (and the hint's `n| ` form) when a model copies lines back into a FIND. Inventing
+      // a third format would leave the prefixes in the model's FIND and manufacture a fresh miss.
+      //
+      // It rides on `feedback`, not on `result`: the run record and the training corpus keep the short refusal,
+      // and a `note` step says the copy was handed over - the same split the substitution uses.
+      let handedBack = '';
+      if (!substituted && MUTATING_REPEAT.has(tool) && /^ERROR/.test(String(result ?? '')) && args.path
+        && (run.handedBack || 0) < HANDBACK_MAX) {
+        try {
+          const all = readFileSync(safePath(args.path), 'utf8').split('\n');
+          let shown = all;
+          let numbered = all.map((l, i) => `${i + 1}: ${l}`).join('\n');
+          while (numbered.length > HANDBACK_CHARS && shown.length > 1) {
+            shown = shown.slice(0, Math.max(1, Math.floor(shown.length * 0.9)));
+            numbered = shown.map((l, i) => `${i + 1}: ${l}`).join('\n');
+          }
+          const cut = all.length - shown.length;
+          run.handedBack = (run.handedBack || 0) + 1;
+          handedBack = `\n\nHERE IS ${args.path} AS IT NOW READS`
+            + `${cut ? ` (lines 1-${shown.length} of ${all.length})` : ' (the whole file)'}:\n\`\`\`\n${numbered}\n\`\`\`\n`
+            + (cut ? `… ${cut} more line(s) below. read_file ${args.path} with OFFSET: ${shown.length + 1} for the rest — you do NOT have the whole file, so do not rewrite it from this.\n` : '')
+            + `(The hub is showing you this because your ${tool} was refused — you did not call read_file. Copy the lines you mean to change from ABOVE, exactly as they read, or address them with LINES: <a>-<b>. Do not rewrite the file from memory.)`;
+          pushStep(run, { type: 'note', text: `Refused ${tool} — handed ${args.path} back (${shown.length} of ${all.length} lines) so the next attempt is not blind.` });
+        } catch { /* unreadable or already gone — the plain refusal still stands */ }
+      }
+
+      let feedback = substituted || `TOOL RESULT (${tool}):\n${result}${syntaxNote}${handedBack}`;
 
       // Say so when we dropped the rest of a batch. Silence here is what created the loop:
       // the model got no signal that its 2nd..Nth actions never happened, so it re-sent the
