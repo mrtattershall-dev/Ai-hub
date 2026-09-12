@@ -1,42 +1,53 @@
-# Set G - set F's 100 goals again, on the tool-fixed hub (DRAFT - not pre-registered, not launched)
+# Set G - set F's 100 goals again, on the hardened hub (PRE-REGISTRATION, written before the window opens)
 
-tatte: "Yeah let's prep a g run".
+tatte: "Run a coder three run now then" and "Go ahead and do a 14 b too".
 
-**The design is an A/B with one variable.** Same 100 goals as set F (goals-G.json is a byte-identical copy of
-goals-F.json), same hidden checks (checks-G.mjs is a byte-identical copy of checks-F.mjs - checksums in
-prep-checksums.txt), same two models, same GPUs, same caps, same approval policy, same AGENT_BATCH_ACTIONS=0, a fresh
-empty workspace. **The only difference is the hub**: set F ran on main with the seven set-E fixes; set G runs on main
-with the g-fixes tool changes merged on top.
+**One variable.** Same 100 goals as set F (goals-G.json is byte-identical to goals-F.json), same hidden checks
+(checks-G.mjs byte-identical to checks-F.mjs - sha256 in prep-checksums.txt), same two models, same GPUs, same caps,
+same approval policy, same AGENT_BATCH_ACTIONS=0, a fresh empty workspace per model. **Only the hub differs**: set F
+ran on main at c92c2d1; set G runs on main at **dae46b2**, which adds twenty fixes made offline today, every one with a
+failing test written first and a mutant proving the test can see the fix.
 
-## What changed in the hub, and why (all measured, not guessed)
-Set E's recordings said the models lose their calls in the TOOLS, not in the advice:
-- 65 of 278 edit_file calls FAILED across 32 goal-runs (27 "matches N places", 32 "was not found", 6 malformed) -
-  89% of the base 14B's tool errors and 90% of Qwen3-Coder's. Set F live: the 14B failed 14 of its first 39 edits.
-- search_file answered "(no matches for template)" in a workspace holding q4_template.js, because PATH: . made a
-  directory the only target and directories are skipped.
-- The same tool called with the same arguments returned the same answer 155 times (14B) and 221 (Qwen3-Coder); the
-  stuck-loop guard only compares replies, so a loop made of identical CALLS was invisible.
+    models  coder3  = Qwen/Qwen3-Coder-30B-A3B-Instruct on H100, served as coder30b  (30B MoE, ~3B active)
+            14B     = the base 14B coder on A10G, served as coder14b
+    hub     main dae46b2 (4764bde + b60e6ef + dae46b2); the harness starts its own isolated hubs from main
+    cost    H100 ~95 min ~$7.0 + A10G ~95 min ~$1.6 = ~$8.6; running total after this ~$41.6
 
-g-fixes (branch, commits 1467016, 9eb907c/4cc60ff, 727d3bb - full suite and merge pending set F's window closing):
-1. `LINES: <a>-<b>` addresses an edit by the numbers read_file and outline_file already print - no FIND at all; an
-   empty REPLACE deletes those lines; a range outside the file says how long the file is and changes nothing.
-2. `OCCURRENCE: <n>` picks one of several matching places (the ambiguity error already lists them).
-3. The parser no longer turns a LINES edit into a whole-file rewrite - the shape that dropped q4_template.js's export.
-4. A directory path is a search SCOPE.
-5. A repeated identical call is named in the result.
-6. A dropped connection is retried after a wait that clears the measured dead window: 3 attempts, 15 s then 30 s.
-   (Set F lost four goals to the same shape - a very large reply, then every following connection refused. The
-   endpoint answered again after 9.6-12.8 s, while the old retries waited 2 s and 4 s, entirely inside that window.)
+## What changed in the hub since set F, and why (all measured, none guessed)
+Destruction, which cost set F a third of Qwen's working code (48 goals worked when written, 36 at the end, 16
+regressed): a write or edit that would remove definitions or exports the file already had is REFUSED and the file
+restored; `REMOVE: <names>` expresses a deliberate deletion. The parser no longer reads its fields from inside the
+fenced body, so a file mentioning `REMOVE:` cannot authorise its own deletion. `edit_file` writes replacement text
+literally instead of expanding `$&`/`$'`. `search_file` reads a query as text before treating it as a pattern.
+Honesty: `read_file` no longer presents a fragment as a whole file (its truncation notice used to be cut off by the
+truncation it announced). The loop-break substitution no longer hands over a blind 6,000-char prefix labelled as a
+`read_file` result - and it was UNREACHABLE since the repeat-notice merge, which this run is the first to exercise.
+`run_command`/`run_python` keep stderr and the EXIT line however large stdout is. The finish gate verifies the goal's
+OWN project (it could pass a goal on an unrelated leftover .js), a pass expires when the workspace changes, and a
+browser test that could not run banks no clean test.
+Progress: the stuck-loop guard no longer counts a repeat when work landed in between, keys on the whole reply rather
+than its first 2000 chars, and names the TOOL when a tool refused identically - set F lost 77 of the 14B's 100 goals to
+that guard after a median of six tool calls. A resumed run gets a fresh wall clock and no longer dies on its first
+tool call. A retried model call no longer costs a step.
 
-## Predictions (to be fixed before launch, with the checker and harness unchanged from set F)
-- edit_file failure rate falls from set F's rate (the 14B's was 36% at goal 39) to under 15%, because 42% of set E's
-  failures were ambiguity (OCCURRENCE settles those outright) and 49% were not-found (LINES removes the need to match).
-- The base 14B's repeat-guard stops fall below set F's.
-- Steps that work at the end: the 14B improves by at least 5 over its set F score; Qwen3-Coder by at least 3.
-- If the scores do NOT move while the edit failure rate does, that is the answer to the real question: the tools were
-  not the ceiling, the model is. Either way the run is decisive.
+## Predictions (fixed before the window; the run is decisive either way)
+1. **Qwen3-Coder (coder3)**: 36/100 on set F. Destruction removed should raise it; the stricter gate should not lower
+   the checks (they score the workspace, not the status). **Predict 42+/100.** The replay already proved the mechanism
+   fires: 10 destructive writes refused across 9 of these exact goals.
+2. **Base 14B**: 2/100 on set F, with 77 goals killed by the repeat guard at ~6 calls. **Predict 10+/100** - the floor
+   is that it survives past six calls; anything less means the guard was not the binding constraint.
+3. **Statuses will look WORSE while the work is better**: expect more `stopped`/UNVERIFIED and fewer false `done`,
+   because the gate now runs the goal's own project. The replay showed 22 of Qwen's `done`s were false. Judge this run
+   by the hidden checks, not by how many runs say `done`.
+4. **If the checks do NOT move while destruction demonstrably stops, that is the answer**: the tools were not the
+   ceiling and the model is. Either way this run settles it.
 
-## Cost, and the decision still open
-Same shape as set F: coder30b-setg H100 120/125 min (~$8.2) + coder14b-setg A10G 95/100 min (~$1.8), about $10.
-Set F already took the running total to about $33 against the original $30 cap, so set G needs tatte's explicit go on
-the spend. The laptop must be on AC with the keep-awake request held, and the offline fuzzer paused for the window.
+## The open question this run exists to answer
+Does a model USE the room the fixes create - resend a file complete after a refusal, and fix its project across the
+three gate blocks - or repeat itself into the loop guard? The offline replay cannot answer it: the mock cannot react.
+
+## Rules for the window
+Status file written before any GPU time so the watchdog is armed first (Rule 7a: stopApp.mjs only). Rule 3 identity
+proved against /api/health before a single goal runs. Laptop on AC with a keep-awake held. Fuzzer paused. Independent
+`python -m modal app list --json` at the close. Records kept per model: 100 run files, 100 transcripts, traces, run
+index, workspace git bundle.
