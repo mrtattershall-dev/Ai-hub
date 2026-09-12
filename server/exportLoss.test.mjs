@@ -9,8 +9,8 @@
  * q4 and all of q10 failed at the end.
  *   unit  exportNames reads the CommonJS and ESM forms; goal 54's before/after loses render; a file that never
  *         exported render (the 14B's q4) is not a loss
- *   hub   the goal-54 shape (export dropped by a rewrite) is named in what the model is sent next; writes that keep
- *         or restore the export add nothing
+ *   hub   the goal-54 shape (export dropped by a rewrite) is REFUSED by name - set F showed the warning alone did
+ *         not bring the export back - and writes that keep or restore the export are untouched
  */
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -102,8 +102,8 @@ await test('the premise: the four writes were answered', () => {
   assert.equal(writes, 4, 'writes: ' + writes + ' / status ' + run?.status);
   assert.ok(rig.news.length >= 5, 'model calls seen: ' + rig.news.length);
 });
-await test('the rewrite that dropped the export is named in what the model is sent next', () => {
-  assert.match(after(2), /REMOVED what q4\.js exported: render/, after(2).slice(0, 500));
+await test('the rewrite that dropped the export is refused, by name', () => {
+  assert.match(after(2), /would have REMOVED[^\n]*q4\.js already had: render/, after(2).slice(0, 500));
 });
 await test('writes that keep (or restore) the export add nothing about exports', () => {
   for (const k of [1, 3, 4]) assert.doesNotMatch(after(k), /exported:/, `after write ${k}: ` + after(k).slice(0, 300));

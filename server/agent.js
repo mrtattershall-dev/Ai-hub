@@ -392,7 +392,23 @@ const tools = {
     const more = shownEnd < total
       ? `\n... ${total - shownEnd} more lines below. Use read_file with OFFSET: ${shownEnd + 1} to continue, or search_file to jump to a symbol.`
       : '';
-    return `[${path} — lines ${start + 1}-${shownEnd} of ${total}]\n${numbered}${more}`.slice(0, 14_000);
+    // A truncation notice that is cut off by the truncation it announces is worse than no notice at all.
+    // Measured on this code: a 240-line file came back as 183 lines, ending mid-token, with NO notice, under a
+    // header that still read "lines 1-240 of 240" - because the notice was concatenated first and sliced away
+    // after. The model has no way to know it is holding part of a file, so it edits and sends back the part as
+    // the whole. Cut the BODY at a line boundary instead, and make the header and the notice say what was
+    // actually handed over.
+    const READ_MAX = 14_000;
+    const head = `[${path} — lines ${start + 1}-${shownEnd} of ${total}]\n`;
+    const whole = `${head}${numbered}${more}`;
+    if (whole.length <= READ_MAX) return whole;
+    let body = numbered.slice(0, Math.max(0, READ_MAX - head.length - 300));
+    const lastNl = body.lastIndexOf(`\n`);
+    if (lastNl > 0) body = body.slice(0, lastNl);          // whole lines only - never hand back half a token
+    const lastShown = start + (body ? body.split(`\n`).length : 0);
+    return `[${path} — lines ${start + 1}-${lastShown} of ${total}, cut to fit]\n${body}`
+      + `\n... ${total - lastShown} more lines below. Use read_file with OFFSET: ${lastShown + 1} to continue,`
+      + ` or search_file to jump to a symbol. You do NOT have the whole file - do not rewrite it from this.`;
   },
 
   // Find where a symbol/string lives in a big file (or across the workspace).
@@ -3163,14 +3179,19 @@ async function drive(loadDb, run) {
       // repeat guard only sees identical REPLIES, so a loop made of identical CALLS was invisible. Saying it costs
       // one sentence and is the only signal the model gets that this step changed nothing.
       const callKey = tool + ' ' + JSON.stringify(args || {});
-      run.callLog = run.callLog || new Map();
-      const seenBefore = run.callLog.get(callKey);
+      // A plain object, NOT a Map: this is persisted with the run and read back after a restart, and
+      // JSON.stringify(new Map()) is {} - which is truthy, so `|| new Map()` never repaired it. The first tool
+      // call of a resumed run threw, the throw was uncaught inside drive(), and the finally then ran with the
+      // status still 'running', so the rollback, the trace, the run-index line, the escalation and the repair
+      // goal were ALL skipped. The bug that hid the evidence for every other bug.
+      if (!run.callLog || typeof run.callLog !== 'object' || Array.isArray(run.callLog)) run.callLog = {};
+      const seenBefore = run.callLog[callKey];
       const answer = String(result ?? '');
       if (seenBefore !== undefined && seenBefore === answer) {
         run.repeatCalls = (run.repeatCalls || 0) + 1;
         result = answer + `\n\n⚠️ You already ran this exact ${tool} in this run and got exactly this answer. Nothing changed, so repeating it cannot help - do something different: a different file or range, a different action, or fix the problem the answer describes.`;
       }
-      run.callLog.set(callKey, answer);
+      run.callLog[callKey] = answer;
       let syntaxNote = '';
       // append_file is an edit too, and needs the same checks. It used to skip this whole
       // block, so an append that broke an existing file was never flagged to the model, an
@@ -3210,6 +3231,30 @@ async function drive(loadDb, run) {
         if (!err && /\.(py|c?js|mjs)$/i.test(args.path || '')) {
           try { syntaxNote += duplicateNote(readFileSync(safePath(args.path), 'utf8'), args.path); }
           catch { /* unreadable after the write - the syntax verdict above still stands */ }
+        }
+        // SET F (2026-09-11): WARNING WAS NOT ENOUGH. Goal 81 rewrote s1_library.js without titles, returnBook,
+        // getLoans, holds, overdue and pay; the hub said so; the code never came back, and since the checks score
+        // the final workspace, that one write erased eight earlier steps of the chain. 7 of 8 warnings across that
+        // run ended with the names still missing. So the write is now REFUSED and the file restored: the model can
+        // resend it complete, or say REMOVE: <names> when the deletion is meant.
+        if (beforeSrc !== null && !/^ERROR/.test(String(result ?? ''))) {
+          try {
+            const after = readFileSync(safePath(args.path), 'utf8');
+            const okToLose = new Set(String(args.remove || '').split(',').map((x) => x.trim()).filter(Boolean));
+            const lostNames = lostDefs(beforeSrc, after, args.path).filter((n) => !okToLose.has(n));
+            const lostExp = lostExports(beforeSrc, after, args.path).filter((n) => !okToLose.has(n));
+            const all = [...new Set([...lostNames, ...lostExp])];
+            if (all.length) {
+              writeFileSync(safePath(args.path), beforeSrc, 'utf8');
+              run.destructiveRefused = (run.destructiveRefused || 0) + 1;
+              pushStep(run, { type: 'note', text: `${tool} ${args.path} refused: it would have removed ${all.join(', ')}` });
+              result = `ERROR: this ${tool} would have REMOVED ${all.length} thing(s) ${args.path} already had: ${all.join(', ')}.`
+                + ` ${args.path} is UNCHANGED - nothing was written. Earlier steps depend on those, and the hidden checks score the final file.`
+                + `\nSend the whole file again WITH them (or use edit_file with LINES: <a>-<b> to change only the part you meant).`
+                + `\nIf you really do want them gone, repeat the same action and add a line: REMOVE: ${all.join(', ')}`;
+              syntaxNote = '';
+            }
+          } catch { /* never a reason to fail the step */ }
         }
         // Set D: Qwen3-Coder lost seven working functions to whole-file rewrites (add_days, is_weekend and
         // add_business_days in one; earliestStart and ready() inside the goals that added them), and nothing said so

@@ -139,7 +139,13 @@ function parseAction(text, lastPath) {
   const fenceM = text.match(/```([^\n]*)\n([\s\S]*?)```/);
   const fenceLang = fenceM ? fenceM[1].trim().toLowerCase() : '';
   const fenced = fenceM ? fenceM[2].replace(/\n$/, '') : undefined;
-  const pathM = text.match(/PATH:\s*(.+)/i);
+  // FIELDS ARE READ FROM HERE, NOT FROM `text`. A fenced block is the model's content: a file that contains the
+  // line REMOVE:, LINES:, OCCURRENCE: or ACTION: must not be able to change what the hub does with it. Measured:
+  // a markdown file documenting the REMOVE: convention handed itself permission to delete existing definitions,
+  // and the words "replace LINES: 10-14" in a THOUGHT turned a whole-file rewrite into a line deletion with the
+  // new code thrown away. FIND:/REPLACE: keep reading `text`, because their payloads are fenced by design.
+  const outside = text.replace(/```[\s\S]*?```/g, '\n');
+  const pathM = outside.match(/PATH:\s*(.+)/i);
   let path = pathM ? pathM[1].trim().replace(/[`"']/g, '') : undefined;
   // If no PATH was given, a filename mentioned in the text is a GUESS, not an instruction.
   //
@@ -193,7 +199,9 @@ function parseAction(text, lastPath) {
     if (fenced === undefined && replyWasTruncated(text)) return null;
     if (!path) path = lastPath || scavenged || langFile[fenceLang] || (fenceLang === 'html' ? 'index.html' : undefined);
     if (!path) return null;   // refuse rather than invent a destination
-    return { tool, thought, args: { path, content: stripLineNumberPrefixes(fenced ?? '') } };
+    // REMOVE: <names> - the caller confirming a deletion the tool would otherwise refuse (see agent.js).
+    const rmW = outside.match(/^[ \t]*REMOVE:[ \t]*([^\n]+)/im);
+    return { tool, thought, args: { path, content: stripLineNumberPrefixes(fenced ?? ''), ...(rmW ? { remove: rmW[1].trim() } : {}) } };
   }
   if (tool === 'edit_file') {
     // ACCEPT FIND/REPLACE WITH OR WITHOUT CODE FENCES.
@@ -236,15 +244,16 @@ function parseAction(text, lastPath) {
     // Only when FIND: is ENTIRELY ABSENT. If FIND: is there but malformed, the error
     // stands and now explains the shape - guessing at a half-written edit is how you
     // replace the wrong thing.
-    if (!find && fenced !== undefined && !/\bFIND:/i.test(text) && !/\bLINES:/i.test(text)) {
+    if (!find && fenced !== undefined && !/^[ \t]*FIND:/im.test(outside) && !/^[ \t]*LINES:/im.test(outside)) {
       return { tool: 'write_file', thought, args: { path: path || lastPath, content: stripLineNumberPrefixes(fenced) } };
     }
 
     // LINES: a-b addresses the edit by line number (no FIND needed); OCCURRENCE: n picks one of several matches.
-    const lm = text.match(/LINES:\s*(\d+)\s*-\s*(\d+)/i);
-    const om = text.match(/OCCURRENCE:\s*(\d+)/i);
+    const lm = outside.match(/^[ \t]*LINES:\s*(\d+)\s*-\s*(\d+)/im);
+    const om = outside.match(/^[ \t]*OCCURRENCE:\s*(\d+)/im);
     return { tool, thought, args: { path: path || lastPath, find: stripLineNumberPrefixes(find), replace: stripLineNumberPrefixes(replace),
-      ...(lm ? { lines: [+lm[1], +lm[2]] } : {}), ...(om ? { occurrence: +om[1] } : {}) } };
+      ...(lm ? { lines: [+lm[1], +lm[2]] } : {}), ...(om ? { occurrence: +om[1] } : {}),
+      ...((outside.match(/^[ \t]*REMOVE:[ \t]*([^\n]+)/im) || [])[1] ? { remove: outside.match(/^[ \t]*REMOVE:[ \t]*([^\n]+)/im)[1].trim() } : {}) } };
   }
   if (tool === 'run_command') {
     const cmd = (text.match(/COMMAND:\s*(.+)/i)?.[1]?.trim()) || (fenced ? fenced.trim().split('\n')[0] : undefined);

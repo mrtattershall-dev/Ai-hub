@@ -126,7 +126,10 @@ await test('search_file with PATH: . searches every file under it', () => {
 });
 
 // controls
-const s6 = await runGoal('Normal edit and rewrite.', [write('c.js', SRC), editFind('c.js', '  return 1;', '  return 3;'), rewrite('c.js', 'const only = 1;'), FINISH]);
+// The rewrite body keeps every name c.js already had: this control is about the PARSER turning a bodied edit_file
+// into write_file, and a body that dropped `one` would now (rightly) be refused as destructive.
+const REWRITTEN = SRC.replace('  return 1;', '  return 2;');
+const s6 = await runGoal('Normal edit and rewrite.', [write('c.js', SRC), editFind('c.js', '  return 1;', '  return 3;'), rewrite('c.js', REWRITTEN), FINISH]);
 await test('a unique FIND still edits as before', () => {
   const r = String(s6.filter((s) => s.tool === 'edit_file')[0]?.result || '');
   assert.match(r, /^OK: edited c\.js\.?$/, r.slice(0, 200));
@@ -134,7 +137,7 @@ await test('a unique FIND still edits as before', () => {
 await test('a whole-file rewrite with no FIND and no LINES still becomes write_file', () => {
   const w = s6.filter((s) => s.tool === 'write_file');
   assert.equal(w.length, 2, 'write_file calls: ' + w.length);
-  assert.equal(file('c.js'), 'const only = 1;');
+  assert.equal(file('c.js'), REWRITTEN);
 });
 
 hub.kill(); mock.close();

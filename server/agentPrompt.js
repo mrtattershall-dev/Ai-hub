@@ -74,7 +74,7 @@ ACTION: search_file
 PATH: <a file from the listing, or omit to search every file>
 QUERY: <the exact symbol you are looking for>
 
-write_file — create/overwrite a file. Put the COMPLETE file in a fenced code block. Write code NORMALLY — do NOT escape quotes or backslashes:
+write_file — create/overwrite a file. Put the COMPLETE file in a fenced code block, including everything that is already in it: a write that would DELETE something the file defines or exports is refused and the file is left as it was. (To change one part, edit_file with LINES: is easier. To delete something on purpose, add a line REMOVE: <names>.) Write code NORMALLY — do NOT escape quotes or backslashes:
 THOUGHT: <why>
 ACTION: write_file
 PATH: main.py

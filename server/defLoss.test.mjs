@@ -7,7 +7,9 @@
  * written correctly - add_days, is_weekend and add_business_days in one rewrite of r6_days.py; earliestStart and
  * ready() during the very goals that added them. Seven working functions, found missing only by the hidden checks
  * at the end. defNames.js compares the names before and after each write/edit; the tool result now says which
- * ones went.
+ * ones went. Set F (2026-09-11) then measured what the sentence was worth: 7 of 8 warnings ended with the names
+ * still missing, and one such write erased the credit for eight earlier steps of a chain. So the write is now
+ * REFUSED and the file restored - these loop tests assert that, not the old warning.
  *
  *   unit  JS functions / classes / methods / arrow consts and Python defs and classes are found; a reformat that
  *         keeps every name loses none; keywords are never names
@@ -17,7 +19,7 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -96,12 +98,15 @@ if (!up) { console.error('  FAIL  the hub did not start\n' + rig.log.join('').sl
 
 const PY_B = 'def add_days(s, n):\n    return s\n\n\ndef business_days_between(a, b):\n    return 0\n';
 const REWRITE = write('r6_days.py', PY_B, 'python');
-await test('loop: a rewrite that drops functions is answered with their names', async () => {
+const onDisk = (n) => readFileSync(join(dir, 'workspace', n), 'utf8').replace(/\r/g, '');
+await test('loop: a rewrite that drops functions is refused and names them', async () => {
   const { reqs } = await runGoal('Add business_days_between to the EXISTING r6_days.py.', [write('r6_days.py', PY_A, 'python'), REWRITE, FINISH]);
   const a = answerTo(reqs, REWRITE);
   assert.ok(a, 'the rewrite was never answered');
-  assert.match(a, /REMOVED 4 definition\(s\)/, a.slice(0, 300));
+  assert.match(a, /would have REMOVED 4 thing\(s\)/, a.slice(0, 300));
   for (const n of ['Store', 'delete', 'get', 'is_weekend']) assert.ok(a.includes(n), 'does not name ' + n);
+  // the point of the fix: the four are still there afterwards
+  for (const n of ['Store', 'def delete', 'def get', 'def is_weekend']) assert.ok(onDisk('r6_days.py').includes(n), 'lost ' + n + ' anyway');
 });
 const KEEP = write('k.js', JS_A.replace('return x;', 'return x + 0;'), 'javascript');
 await test('loop: a rewrite that keeps every name says nothing', async () => {
@@ -111,11 +116,12 @@ await test('loop: a rewrite that keeps every name says nothing', async () => {
   assert.ok(!/REMOVED/.test(a), 'a warning on a rewrite that lost nothing: ' + a.slice(0, 200));
 });
 const DEL = edit('e.js', '  history(n) {\n    return [];\n  }', '');
-await test('loop: an edit_file that deletes a method is caught', async () => {
+await test('loop: an edit_file that deletes a method is refused', async () => {
   const { reqs } = await runGoal('Clean up the EXISTING e.js.', [write('e.js', JS_A, 'javascript'), DEL, FINISH]);
   const a = answerTo(reqs, DEL);
   assert.ok(a, 'the edit was never answered');
-  assert.match(a, /REMOVED 1 definition\(s\)[^\n]*history/, a.slice(0, 300));
+  assert.match(a, /would have REMOVED 1 thing\(s\)[^\n]*history/, a.slice(0, 300));
+  assert.ok(onDisk('e.js').includes('history(n)'), 'history was deleted anyway');
 });
 
 hub.kill(); mock.close();
