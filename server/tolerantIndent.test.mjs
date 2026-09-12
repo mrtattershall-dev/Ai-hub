@@ -115,6 +115,8 @@ const SKELETON = [
 ].join('\n');
 const FIND = ['shape() {', '  // Shape logic will go here', '}'].join('\n');
 const REPLACE = ['shape() {', '  return [this.rows.length, this.rows[0].length];', '}'].join('\n');
+const MJS = 'm.js';
+const VACUOUS_MSG = 'VACUOUS: the edit never landed - m.js is still the untouched skeleton, so this assertion would pass with or without the re-indent fix. It is blocked by the destructive-write refusal, not satisfied by correct behaviour.';
 
 const run = await runGoal('Fill in the shape() stub in m.js.', [write('m.js', SKELETON), edit('m.js', FIND, REPLACE), finishN(1)]);
 
@@ -133,6 +135,7 @@ await test('(known) the edit is accepted, not refused as destructive', () => {
 });
 
 await test('(known) shape() is still a member of the class afterwards', () => {
+  assert.ok(file(MJS) !== SKELETON, VACUOUS_MSG);
   const names = [...defNames(file('m.js'), 'm.js')];
   assert.ok(names.includes('shape'),
     'shape() is no longer found as a definition - the tolerant splice moved it out of the class body.\n'
@@ -140,6 +143,7 @@ await test('(known) shape() is still a member of the class afterwards', () => {
 });
 
 await test('(known) the replacement is indented to the region it replaced, not to the model\'s snippet', () => {
+  assert.ok(file(MJS) !== SKELETON, VACUOUS_MSG);
   const line = file('m.js').split('\n').find((l) => /shape\(\)\s*\{/.test(l));
   assert.ok(line !== undefined, 'shape() line is gone entirely:\n' + file('m.js'));
   const indent = (line.match(/^(\s*)/) || [])[1] ?? '';
