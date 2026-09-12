@@ -20,6 +20,10 @@ cd "$WT" || exit 1
 # suite that had never executed a line of the code in them.
 echo "SUITE TREE: $WT @ $(git -C "$WT" rev-parse --short HEAD 2>/dev/null || echo unknown)" " ($(ls "$WT"/server/*.test.mjs 2>/dev/null | grep -v '/real' | wc -l) test files)" >> "$LOG"
 
+# A Puppeteer "Navigation timeout of N ms exceeded" is the SAME class: 2026-09-12, verifierInfra failed in the suite
+# with exit 1 while two paid GPU arms and another test run shared the machine, and passed 3/3 in isolation
+# moments later on the same commit. A timeout inside a test that otherwise runs produces exit 1 WITH output, so
+# it looked exactly like a genuine assertion failure and the 127 retry never fired.
 # RETRY A 127 ONCE. Two files have now false-failed under load with exit 127 - shadowHint and teardownSettles - each
 # dying before printing a single line and each passing cleanly when run alone. A suite that reports a phantom failure is
 # a silent failure of its own: it sends you chasing a bug that is not there, and next time it might mask a real one. A
@@ -33,7 +37,7 @@ for t in $(ls server/*.test.mjs | sed 's|server/||;s|\.test\.mjs||' | grep -v '^
   # failed" under load and then passed 14/14 alone, with exit 1 - so keying only on 127 would have sent me chasing
   # seven phantom regressions. Retrying on "nothing could reach the hub" costs one re-run and removes a whole class of
   # phantom. A file that fails for a real reason fails the retry too.
-  if [ "$code" -eq 127 ] || { [ "$code" -ne 0 ] && [ "$(tail -40 "$LOG" | grep -c 'fetch failed\|the hub did not start')" -gt 0 ]; }; then
+  if [ "$code" -eq 127 ] || { [ "$code" -ne 0 ] && [ "$(tail -40 "$LOG" | grep -c 'fetch failed\|the hub did not start\|Navigation timeout of')" -gt 0 ]; }; then
     echo "--- exit $code ($t) - load-artefact signature (127, or nothing could reach the hub); retrying once" >> "$LOG"
     node "server/$t.test.mjs" >> "$LOG" 2>&1
     code=$?

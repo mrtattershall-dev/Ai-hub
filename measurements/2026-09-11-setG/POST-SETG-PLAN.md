@@ -94,3 +94,22 @@ Assignments, in damage order:
 No GPU spend without explicit authorisation quoted in COORD. Never push (tatte's alone). The live hub is restarted only
 on tatte's word. Stops only via `stopApp.mjs`. Run one hub-spawning job at a time — CPU contention produced three
 phantom test failures in one session, and a flaky suite is a silent failure of its own.
+
+## Added 2026-09-12 during wave 1 (these are MY bugs, not the hub's, and they cost measurement)
+
+13. **The regression rig discards its child's exit status** - measurements/replay/regress.mjs parsed the checker's
+    --out file without checking spawnSync, so a checker failure became a bare ENOENT, killed the whole analysis, and
+    left a 0-byte .txt. HARDENED (names sha, goal, exit, signal, stderr, keeps the tree). Still TO DO: re-run both
+    labels - 55 distinct end states for coder14b-setg and 76 for coder30b-setg, 131 export+check passes - and find out
+    which state actually fails. Eliminated already: the goal-order assertion (0 mismatches both labels) and the first
+    exported end state (checker exit 0, node_modules and package.json present, res.json written).
+
+14. **Multi-agent launches must use WORKTREE ISOLATION.** Wave 1's two fix agents share one checkout, so branch
+    switches carry each other's uncommitted edits. No tool in this build can message a running subagent, so the only
+    remedies are reconcile-by-hand or stop-and-lose-work. Every later wave gets its own worktree.
+
+15. **Before trusting any red-first reproduction, prove the code under test RAN.** rollbackBounded reported green over
+    four goals because its breaking write was refused by the destructive-write guard, so the end-of-run repair never
+    executed. Check each new fixture against the guards that already exist (destructive-write refusal, marker refusal,
+    the 3-identical-replies stop, the repeated-call notice, the step budget, the end-of-run reparse) and say which one
+    would intercept it. A fixture that cannot reach its target is green forever.

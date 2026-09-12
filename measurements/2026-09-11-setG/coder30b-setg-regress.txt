@@ -1,0 +1,5 @@
+coder30b-setg: 78 goals run | worked when written 33 | works at the end 29 (as asked 29) | REGRESSED 6
+
+Recovered 2026-09-12 from the completed analysis task (exit 0). The file had been committed EMPTY at 0130652 because
+measurements/replay/regress.mjs parsed the checker output file without checking spawnSync status - now hardened.
+Compare set F: Qwen3-Coder 48 worked when written | 36 at the end | 16 REGRESSED, over 100 goals run.

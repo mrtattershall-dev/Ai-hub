@@ -1,0 +1,4 @@
+coder14b-setg: 58 goals run | worked when written 6 | works at the end 4 (as asked 4) | REGRESSED 2
+
+Recovered 2026-09-12 from the completed analysis task (exit 0). No such file existed before.
+Compare set F: base 14B 4 worked when written | 2 at the end | 3 REGRESSED.
