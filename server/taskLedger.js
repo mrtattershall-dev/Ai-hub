@@ -322,7 +322,17 @@ export function mark(workspace, which, state) {
   // the ledger can never show two things being worked on at once.
   if (state === 'doing') tasks.forEach((t) => { if (t.state === 'doing') t.state = 'todo'; });
   tasks[i].state = state;
-  write(workspace, tasks);
+  // PRESERVE the plan marker, exactly as adopt() does at :157. write()'s third argument defaults to false, so this call
+  // used to erase <!-- seeded-from-plan --> the first time any task was ticked off - and that marker IS the storage for
+  // isPlanSeeded(). The finish gate reads it at agent.js:3170: while it is set, open plan tasks are REPORTED as
+  // proposals; once it is gone, blocked(...) fires and the run cannot finish. So making progress silently turned the
+  // gate from advisory into binding, reinstating the exact failure that branch was written to prevent - a free model
+  // handed 15 plan tasks spent 10 steps closing them, and three scripted runs ended 'stopped' instead of 'done', one of
+  // them stopping the supervisor firing at all. Set G reaches this shape: ZERO task_add calls across 136 runs (so add()
+  // never cleared it) and 44 task_done calls (so mark() did).
+  // NOT `true`: add() clears the marker deliberately at :226, and its own pristinePlan check at :196 depends on that.
+  // Read BEFORE the write - isPlanSeeded() reads the file and write() is about to replace it.
+  write(workspace, tasks, isPlanSeeded(workspace));
   return { ok: true, task: tasks[i], n: i + 1 };
 }
 
