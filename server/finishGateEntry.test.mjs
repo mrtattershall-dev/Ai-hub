@@ -29,9 +29,10 @@ import { join } from 'node:path';
 import { detectKind, verify } from './verifyProject.js';
 
 let passed = 0, failed = 0, known = 0;
+const openCases = [];
 const test = async (n, f) => {
   try { await f(); passed++; console.log(`  ok    ${n}`); }
-  catch (e) { if (/\(known\)/.test(n)) { known++; console.log(`  KNOWN ${n}\n        ${e.message.split('\n')[0]}`); } else { failed++; console.error(`  FAIL  ${n}\n        ${e.message}`); } }
+  catch (e) { if (/\(known\)/.test(n)) { known++; openCases.push(n.replace(/^\(known\) /, '')); console.log(`  KNOWN ${n}\n        ${e.message.split('\n')[0]}`); } else { failed++; console.error(`  FAIL  ${n}\n        ${e.message}`); } }
 };
 console.log('\nthe finish gate judges the goal\'s own project\n');
 
@@ -95,5 +96,17 @@ await test('control: a real web project is still detected as web', () => {
   assert.equal(detectKind(webReal).kind, 'web');
 });
 
+const KNOWN_EXPECTED = 3;   // bugs known open today; see the header for what and why
 console.log(`\n${passed} passed, ${failed} failed, ${known} known-open`);
+// The one line the suite runner greps, so a green file can never hide an open bug in the summary.
+console.log(`KNOWN-OPEN: ${known} of ${KNOWN_EXPECTED} expected`);
+if (openCases.length) console.log('  still open: ' + openCases.join(' | '));
+// A count that DROPS means a case labelled "(known)" now passes - the label is a lie and the test is claiming
+// a bug is open that is not. A count that RISES means a new failure hid behind the label. Both fail the file.
+if (known !== KNOWN_EXPECTED) {
+  console.error(`  FAIL  known-open count changed: ${known}, expected ${KNOWN_EXPECTED}`
+    + (known > KNOWN_EXPECTED ? ' - a NEW failure is hiding behind the "(known)" label'
+      : ' - a "(known)" case now PASSES; fix the expectation and the header, or drop the label'));
+  failed++;
+}
 process.exit(failed ? 1 : 0);

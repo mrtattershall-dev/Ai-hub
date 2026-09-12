@@ -318,13 +318,37 @@ function buildOutline(lines) {
 // The prompt already asks the model not to do this and the model does it anyway; that is
 // the advisory-vs-mechanical lesson one level down. Only a guard can hold it.
 const MARKER = 'package.json';
+// A cheap fingerprint of the workspace's source files, so a verification pass can be tied to the state that
+// actually passed. Name, size and mtime are enough - any write the model makes changes at least one of them.
+function workspaceStamp() {
+  try {
+    const out = [];
+    const walk = (dir, rel = '') => {
+      for (const name of readdirSync(dir)) {
+        if (name === 'node_modules' || name === '.git' || name === '__pycache__') continue;
+        const fp = join(dir, name), r = rel ? `${rel}/${name}` : name;
+        let st; try { st = statSync(fp); } catch { continue; }
+        if (st.isDirectory()) walk(fp, r);
+        else if (/\.(c?js|mjs|py|html?|css|json|md|gd)$/i.test(name)) out.push(`${r}:${st.size}:${Math.floor(st.mtimeMs)}`);
+      }
+    };
+    walk(WORKSPACE);
+    return out.sort().join('|');
+  } catch { return String(Date.now()); }   // unreadable: never claim it matches an earlier pass
+}
+
 function markerRefusal(path, tool) {
   // No regex here on purpose: an escaped backslash class kept getting mangled in transit,
   // and a guard that silently stops matching is worse than no guard. Split on both
   // separators, drop '.' segments, so './package.json' and '.\package.json' both
   // normalise to 'package.json'. The test caught './' slipping through.
   const rel = String(path || '').split(String.fromCharCode(92)).join('/').split('/').filter((x) => x && x !== '.').join('/');
-  if (rel !== MARKER) return null;
+  // ALSO compare what will actually be written. The spelling-based check caught ./package.json but not
+  // sub/../package.json, which safePath's resolve() collapses to exactly the marker - so the guard and the writer
+  // disagreed about the same path and the traversal form went through reporting OK. Resolve both and compare.
+  let resolvedHit = false;
+  try { resolvedHit = safePath(path) === safePath(MARKER); } catch { resolvedHit = false; }
+  if (rel !== MARKER && !resolvedHit) return null;
   return `ERROR: ${MARKER} is the workspace boundary marker and ${tool} may not change it.
 `
     + `It is NOT a normal file: it stops npm and node from treating the hub's own project as this workspace.
@@ -415,9 +439,14 @@ const tools = {
   // Returns "path:line: text" so the model can then read_file a range and edit it.
   search_file({ path, query }) {
     if (!query) return 'ERROR: missing QUERY to search for.';
-    let re;
-    try { re = new RegExp(query, 'i'); }
-    catch { re = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); }
+    // LITERAL FIRST, pattern second. `new RegExp(query)` accepted queries that are valid regex but mean something
+    // else, and answered "(no matches)" for text plainly in the file: arr[0] needs "arr0", sum(a, b) is a capture
+    // group, a+b is one-or-more "a", and cfg.mode also matches cfg_mode. A confident empty answer from an
+    // orientation tool is how a model concludes the code is gone and rewrites the whole file.
+    const literalRe = new RegExp(String(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    let patternRe = null;
+    try { patternRe = new RegExp(query, 'i'); } catch { patternRe = null; }   // unusable as a pattern: literal only
+    let re = literalRe;
     const targets = [];
     // A DIRECTORY PATH IS A SCOPE, NOT A FILE. Set E (2026-09-11): Qwen3-Coder searched the workspace for
     // "template" with PATH: . and was told "(no matches)" - in a workspace holding q4_template.js. "." is
@@ -439,7 +468,10 @@ const tools = {
       };
       try { walk(scope ? safePath(scope) : WORKSPACE, scope && scope !== '.' ? scope.replace(/[/]+$/, '') : ''); } catch {}
     }
-    const out = [];
+    // The scan, as a function: the same loop has to run twice when the literal reading finds nothing.
+    let out = [];
+    const scan = () => {
+    out = [];
     for (const t of targets) {
       let full;
       try { full = safePath(t); } catch { continue; }
@@ -453,9 +485,20 @@ const tools = {
       }
       if (out.length >= 60) break;
     }
+    };
+    scan();
+    // Nothing matched as text. Before giving the empty answer that makes a model rewrite a file it believes is
+    // missing, try the query as the pattern it might have been meant as.
+    let readAsPattern = false;
+    if (!out.length && patternRe && String(patternRe) !== String(literalRe)) {
+      re = patternRe;
+      scan();
+      readAsPattern = out.length > 0;
+    }
     return out.length
-      ? out.join('\n') + (out.length >= 60 ? '\n... more matches — refine QUERY.' : '')
-      : `(no matches for "${query}")`;
+      ? (readAsPattern ? `(no literal match for "${query}" - read as a pattern)\n` : '')
+        + out.join('\n') + (out.length >= 60 ? '\n... more matches — refine QUERY.' : '')
+      : `(no matches for "${query}" - tried it as text and as a pattern)`;
   },
 
   // Compact MAP of a big file — every function/class/top-level const + its line
@@ -530,6 +573,9 @@ const tools = {
    * file with the work missing.
    */
   async append_file({ path, content = '' }) {
+    // The marker guard belongs on EVERY route that writes. append_file had none, and it is auto-approved and is
+    // what the hub suggests when a FIND misses - so the easiest write in the tool set was the unguarded one.
+    { const r = markerRefusal(path, 'append_file'); if (r) return r; }
     const full = safePath(path);
     if (!content) return `ERROR: append_file needs CONTENT — put the lines to add in a fenced code block.`;
     if (!existsSync(full)) {
@@ -634,7 +680,11 @@ const tools = {
     // FIND identical to REPLACE; each time this said "OK: edited" plus a passing syntax check, so the model believed
     // it had fixed the failing assert and repeated itself until the repeat guard ended the goal.
     if (find === replace) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
-    if (exact === 1) { writeFileSync(full, content.replace(find, replace), 'utf8'); return `OK: edited ${path}.`; }
+    // `() => replace` and not `replace`: String.replace interprets $-patterns in a string replacement even when
+    // the pattern is a plain string, so REPLACE text containing $& or $' was rewritten on its way to disk - the
+    // matched text, or the whole rest of the file, spliced into the model's own code, answered with OK: edited.
+    // A function replacement is handed the text verbatim. The other three write paths use slice/splice already.
+    if (exact === 1) { writeFileSync(full, content.replace(find, () => replace), 'utf8'); return `OK: edited ${path}.`; }
     // An ambiguous EXACT match falls through to the line-based path below, which computes
     // where each match is - the caller needs those positions to disambiguate.
 
@@ -955,14 +1005,32 @@ const tools = {
       // byte stream. Mirroring gives visibility without costing reliability.
       mirrorAgentCommand('run_command', cmd);
       exec(cmd, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true }, (err, stdout, stderr) => {
+        // TRIM THE MIDDLE, NEVER THE ENDS. This used to build the whole string and then slice(0, 8_000) from
+        // the FRONT, so a command printing more than 8k of stdout and then failing handed the model a wall of
+        // passing lines with no STDERR, no EXIT line, and no sign anything was missing. batchStepFailed decides
+        // failure by the result ENDING in a non-zero EXIT, so the batch read it as a pass too, and
+        // withAssertEvidence saw a truncated traceback. stdout is the only part that gets large and the least
+        // load-bearing; the exit code and stderr are the whole point.
+        const trimMid = (text, keep) => {
+          const t = String(text);
+          if (t.length <= keep) return t;
+          const head = Math.floor(keep * 0.35), tail = keep - head;
+          return t.slice(0, head)
+            + `\n… [${t.length - keep} of ${t.length} characters of stdout trimmed from the middle -`
+            + ` narrow the command, or write the output to a file, if you need them] …\n`
+            + t.slice(-tail);
+        };
         const out = [
-          stdout && `STDOUT:\n${stdout}`,
-          stderr && `STDERR:\n${stderr}`,
+          stdout && `STDOUT:\n${trimMid(stdout, 6_000)}`,
+          stderr && `STDERR:\n${trimMid(stderr, 1_500)}`,
           err && err.killed && `(timed out after ${CMD_TIMEOUT_MS / 1000}s)`,
           `EXIT: ${err ? (err.code ?? 1) : 0}`,
         ].filter(Boolean).join('\n');
         mirrorAgentResult(out, !err);
-        res(out.slice(0, 8_000));
+        // No front-slice: `out` is already bounded by the per-section trims above, and cutting here is what
+        // removed the exit code in the first place. A final guard keeps a pathological case bounded while still
+        // preserving the tail, which is where the verdict lives.
+        res(out.length <= 9_000 ? out : out.slice(0, 3_000) + `\n… [trimmed] …\n` + out.slice(-5_800));
       });
     });
   },
@@ -984,14 +1052,32 @@ const tools = {
       // was not, which made the agent look like it did half its work invisibly.
       mirrorAgentCommand('run_python', target);
       exec(`python "${full}"`, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true }, (err, stdout, stderr) => {
+        // TRIM THE MIDDLE, NEVER THE ENDS. This used to build the whole string and then slice(0, 8_000) from
+        // the FRONT, so a command printing more than 8k of stdout and then failing handed the model a wall of
+        // passing lines with no STDERR, no EXIT line, and no sign anything was missing. batchStepFailed decides
+        // failure by the result ENDING in a non-zero EXIT, so the batch read it as a pass too, and
+        // withAssertEvidence saw a truncated traceback. stdout is the only part that gets large and the least
+        // load-bearing; the exit code and stderr are the whole point.
+        const trimMid = (text, keep) => {
+          const t = String(text);
+          if (t.length <= keep) return t;
+          const head = Math.floor(keep * 0.35), tail = keep - head;
+          return t.slice(0, head)
+            + `\n… [${t.length - keep} of ${t.length} characters of stdout trimmed from the middle -`
+            + ` narrow the command, or write the output to a file, if you need them] …\n`
+            + t.slice(-tail);
+        };
         const out = [
-          stdout && `STDOUT:\n${stdout}`,
-          stderr && `STDERR:\n${stderr}`,
+          stdout && `STDOUT:\n${trimMid(stdout, 6_000)}`,
+          stderr && `STDERR:\n${trimMid(stderr, 1_500)}`,
           err && err.killed && `(timed out after ${CMD_TIMEOUT_MS / 1000}s)`,
           `EXIT: ${err ? (err.code ?? 1) : 0}`,
         ].filter(Boolean).join('\n');
         mirrorAgentResult(out, !err);
-        res(out.slice(0, 8_000));
+        // No front-slice: `out` is already bounded by the per-section trims above, and cutting here is what
+        // removed the exit code in the first place. A final guard keeps a pathological case bounded while still
+        // preserving the tail, which is where the verdict lives.
+        res(out.length <= 9_000 ? out : out.slice(0, 3_000) + `\n… [trimmed] …\n` + out.slice(-5_800));
       });
     });
   },
@@ -3075,7 +3161,8 @@ async function drive(loadDb, run) {
           }
 
           // 4. everything else: it has to actually RUN
-          if ((!hasWeb || !run.touchedWeb) && !run.verified) {
+          // Not verified, OR the workspace has changed since the pass (run.verifiedAt).
+          if ((!hasWeb || !run.touchedWeb) && (!run.verified || run.verifiedAt !== workspaceStamp())) {
             // Same rule: only mark verified once it actually verifies.
             try {
               // A Godot project is graded by RUNNING it, not by parsing it.
@@ -3117,7 +3204,10 @@ async function drive(loadDb, run) {
                     `Do NOT finish yet — the project does not run:\n\n${verifier.format(v)}\n\nFix these, then finish.`);
                   continue turn;
                 }
+                // Remember WHAT passed, not merely that something did: the gate blocks up to three times by design,
+                // so a bare boolean let a model break the entry file after a pass and finish on the old verdict.
                 run.verified = true;    // passed — do not pay for it again
+                run.verifiedAt = workspaceStamp();
                 pushStep(run, { type: 'note', text: `Verified (${v.kind}): ${v.evidence.join('; ')}` });
               }
             } catch { /* verification is evidence, not a gate that can hang a run */ }
@@ -3216,6 +3306,10 @@ async function drive(loadDb, run) {
       // Qwen3-Coder - a file re-read unchanged, a command re-run to the same failure, an edit re-applied. The
       // repeat guard only sees identical REPLIES, so a loop made of identical CALLS was invisible. Saying it costs
       // one sentence and is the only signal the model gets that this step changed nothing.
+      // `rawAnswer` is what the TOOL returned, before anything the hub appends. Signatures and duplicate detection
+      // must key on this: the repeat NOTICE below used to change `result`, which silently made the mechanical
+      // loop-break downstream unreachable - a decorating fix disabling an acting one.
+      let rawAnswer = String(result ?? '');
       const callKey = tool + ' ' + JSON.stringify(args || {});
       // A plain object, NOT a Map: this is persisted with the run and read back after a restart, and
       // JSON.stringify(new Map()) is {} - which is truthy, so `|| new Map()` never repaired it. The first tool
@@ -3364,7 +3458,10 @@ async function drive(loadDb, run) {
       // traces caught both looping. Mutating tools stay out on principle - a second
       // write_file is a real action and must never be swapped out from under the model.
       const ORIENT = new Set(['list_dir', 'outline_file', 'search_file', 'list_assets', 'task_list']);
-      const sig = `${tool}|${JSON.stringify(args || {})}|${String(result).slice(0, 800)}`;
+      // NOT String(result): the repeated-call notice is appended to `result` upstream, and keying on that made this
+      // duplicate check - and so the whole substitution below - impossible to trigger. Measured before this fix:
+      // two identical list_dir calls produced two DIFFERENT signatures and no substitution.
+      const sig = `${tool}|${JSON.stringify(args || {})}|${rawAnswer.slice(0, 800)}`;
       run.resultSigs = run.resultSigs || [];
       const duplicate = run.resultSigs.includes(sig);
       run.resultSigs.push(sig);
@@ -3385,10 +3482,27 @@ async function drive(loadDb, run) {
         }
         if (target) {
           try {
-            const src = readFileSync(join(WORKSPACE, target), 'utf8').slice(0, 6000);
+            // safePath, not join: `target` is scavenged by regex from run.goal, and a goal naming ../../hub.json
+            // would otherwise be read from outside the workspace straight into the model's context.
+            const whole = readFileSync(safePath(target), 'utf8');
+            // Numbered, and honest about what it is. This used to hand over a blind 6,000-character prefix
+            // labelled as a read_file result, with no notice and "you now have what you need" underneath - so a
+            // file longer than that was beheaded and presented as complete, at the one moment the model is
+            // already lost. Line numbers also let it come back with LINES: instead of guessing at a FIND.
+            const allLines = whole.split(`\n`);
+            let shown = allLines, cut = 0;
+            let numbered = allLines.map((l, i) => `${i + 1}: ${l}`).join(`\n`);
+            if (numbered.length > 6000) {
+              while (numbered.length > 6000 && shown.length > 1) {
+                shown = shown.slice(0, Math.max(1, Math.floor(shown.length * 0.9)));
+                numbered = shown.map((l, i) => `${i + 1}: ${l}`).join(`\n`);
+              }
+              cut = allLines.length - shown.length;
+            }
             run.escalations = (run.escalations || 0) + 1;
-            substituted = `TOOL RESULT (read_file ${target}):\n\`\`\`\n${src}\n\`\`\`\n\n`
-              + `(You called ${tool} twice with the same arguments and got the same answer, so it was replaced with the contents of ${target}. You now have what you need — do the work.)`;
+            substituted = `THE HUB IS SHOWING YOU ${target}${cut ? ` (lines 1-${shown.length} of ${allLines.length})` : ' (the whole file)'}:\n\`\`\`\n${numbered}\n\`\`\`\n`
+              + (cut ? `… ${cut} more line(s) below. read_file ${target} with OFFSET: ${shown.length + 1} for the rest - you do NOT have the whole file, so do not rewrite it from this.\n` : '')
+              + `\n(You called ${tool} twice with the same arguments and got the same answer, so the hub showed you ${target} instead. This is not a tool result - you did not call read_file.)`;
             run.justSubstituted = true;   // buys the model one pardon from the repetition guard
             pushStep(run, { type: 'note', text: `Repeated ${tool} returned nothing new — substituted the contents of ${target}.` });
           } catch { /* unreadable file - leave it to the normal result */ }
@@ -3409,8 +3523,14 @@ async function drive(loadDb, run) {
       if (tool === 'test_web') {
         // The page the agent browser-tests is the page it is working on.
         if (args.path && /\.html?$/i.test(args.path) && existsSync(join(WORKSPACE, normPage(args.path)))) run.webPage = normPage(args.path);
+        // A test that could not RUN is not a test that passed. test_web answers its own failures with
+        // "ERROR: puppeteer is not installed ..." and "ERROR loading the page: ...", and neither carries
+        // [JS ERROR], [console.error] or [HTTP N] - so a browser that would not start was banked as a clean page,
+        // cleared the re-test flag, and three of them auto-finished the run as "App passed browser tests with no
+        // errors". batchStepFailed honours the ERROR convention a few lines below; this path never asked.
+        const webFailed = /^\s*ERROR\b/.test(String(result ?? ''));
         const hasErr = /\[JS ERROR\]|\[console\.error\]|\[HTTP \d/.test(result);
-        run.needsTest = hasErr;
+        run.needsTest = hasErr || webFailed;   // could not test => it still needs testing
         if (hasErr) {
           // signature of the JS error (digits stripped) to detect the SAME bug recurring
           const sig = (result.match(/\[JS ERROR\][^\n]*/)?.[0] || '').replace(/\d+/g, '').slice(0, 80);
@@ -3424,6 +3544,12 @@ async function drive(loadDb, run) {
           if (run.sameErr >= 2) {
             feedback += `\n\n⚠️ This is the SAME error ${run.sameErr + 1} times. STOP rewriting the same file the same way. A null element means EITHER (a) your <script> runs before the DOM exists — move it to the very END of <body> or add defer; OR (b) an id used in your JS does not exist in index.html. READ index.html, then fix the <script> placement and make every getElementById id match a real element.`;
           }
+        } else if (webFailed) {
+          // The browser never looked at the page. Say so, and count nothing: this is the branch that used to bank
+          // a "clean test" on a tool error, and three of those ended the run as done.
+          feedback += `\n\n⚠️ That browser test did NOT run: ${String(result).split(`\n`)[0]}`
+            + ` Nothing about the page was checked, so it is not evidence that the app works. Fix the cause, or say`
+            + ` in your finish SUMMARY that the browser is unavailable - do not treat this as a passing test.`;
         } else {
           // clean test — nudge it to FINISH instead of endlessly re-editing a working app
           run.sameErr = 0; run.lastErrSig = null;
