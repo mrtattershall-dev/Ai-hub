@@ -3555,7 +3555,15 @@ async function drive(loadDb, run) {
               run.destructiveRefused = (run.destructiveRefused || 0) + 1;
               pushStep(run, { type: 'note', text: `${tool} ${args.path} refused: it would have removed ${all.join(', ')}` });
               result = `ERROR: this ${tool} would have REMOVED ${all.length} thing(s) ${args.path} already had: ${all.join(', ')}.`
-                + ` ${args.path} is UNCHANGED - nothing was written. Earlier steps depend on those, and the hidden checks score the final file.`
+                // "Earlier steps depend on those" WAS A LIE THE GUARD COULD NOT CHECK. It has no workspace file list
+                // in scope and never looked for a caller. Measured across set J: it fired 10 times and the claim was
+                // untrue on ALL TEN - getNumber/getNumberEnd/getNumberStart x4, assert x2, parse_line x4, none of
+                // them called anywhere in the body being written. One of those runs (c75eab5e) then spent its whole
+                // 30-call budget fighting the refusal and died. State what the guard actually knows - that the names
+                // were there and are now gone, and that the hidden checks score the final file - and stop asserting
+                // a dependency it cannot see.
+                + ` ${args.path} is UNCHANGED - nothing was written. The hidden checks score the FINAL file, so a name that`
+                + ` disappears here is gone for every later goal that needs it.`
                 + `\nSend the whole file again WITH them (or use edit_file with LINES: <a>-<b> to change only the part you meant).`
                 + `\nIf you really do want them gone, repeat the same action and add a line: REMOVE: ${all.join(', ')}`;
               syntaxNote = '';

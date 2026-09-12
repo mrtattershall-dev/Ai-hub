@@ -35,7 +35,23 @@ function defNameList(src, path = '') {
   // const/let/var name = (args) => ... | name = function
   for (const m of text.matchAll(/^[ \t]*(?:export[ \t]+)?(?:const|let|var)[ \t]+([A-Za-z_$][\w$]*)[ \t]*=[ \t]*(?:async[ \t]*)?(?:function\b|\([^)\n]*\)[ \t]*=>|[A-Za-z_$][\w$]*[ \t]*=>)/gm)) add(m[1]);
   // class methods: an indented `name(args) {` line (optionally static/async/get/set)
-  for (const m of text.matchAll(/^[ \t]+(?:static[ \t]+)?(?:async[ \t]+)?(?:get[ \t]+|set[ \t]+)?\*?([A-Za-z_$][\w$]*)[ \t]*\([^)\n]*\)[ \t]*\{/gm)) add(m[1]);
+  //
+  // A QUOTED ARGUMENT MEANS THIS IS A CALL, NOT A DEFINITION. `it('adds', function () {` and
+  // `describe('Library', function() {` have exactly the shape of a method, so every test callback in a mocha file
+  // was being recorded as a definition - and then `lostDefs` refused the model's rewrite of its own test file for
+  // "removing" them. Set J: two of ten destructive refusals were this, both on test_s7_cache.js.
+  // Measured before narrowing: across 42 JS files from sets I and J, 40 indented `name(args) {` lines carry a quote
+  // in the argument list, and every one is either an `if (...)` (already dropped by JS_KEYWORDS) or a
+  // describe/it/test callback. No real method in the corpus takes a quoted argument, so this costs nothing.
+  //
+  // KNOWN LIMIT, deliberately not fixed: `assert(x) {` inside a function body is lexically identical to a method in
+  // a class body - same shape, plain identifier argument - and only the ENCLOSING BLOCK distinguishes them. This is
+  // a line scanner with no block context, so separating those needs scope tracking. That is a rewrite of a function
+  // four call sites depend on, for a rarer case that cost wasted calls rather than goals. Left as it is, on purpose.
+  for (const m of text.matchAll(/^[ \t]+(?:static[ \t]+)?(?:async[ \t]+)?(?:get[ \t]+|set[ \t]+)?\*?([A-Za-z_$][\w$]*)[ \t]*\(([^)\n]*)\)[ \t]*\{/gm)) {
+    if (/["'`]/.test(m[2])) continue;
+    add(m[1]);
+  }
   return out;
 }
 
