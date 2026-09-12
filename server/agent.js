@@ -2747,6 +2747,7 @@ async function drive(loadDb, run) {
             pruneHistory(run, tighter, { force: true });
             pushStep(run, { type: 'note', text: `Context overflow — history squashed ${before} → ${run.history.length} messages (~${tighter} tok) and retrying.` });
             run.abort = null;
+            run.modelCalls--;   // the rejected attempt produced no assistant turn - do not bill it as a step
             continue;
           }
           run.status = 'error';
@@ -2759,6 +2760,7 @@ async function drive(loadDb, run) {
           pushStep(run, { type: 'note', text: `The model connection dropped (${String(e.message).slice(0, 120)}) - nothing ran; waiting ${Math.round(CONN_RETRY_MS * run.connRetries / 1000)}s and retrying the same call (${run.connRetries}/${CONN_RETRIES}).` });
           await new Promise((r) => setTimeout(r, CONN_RETRY_MS * run.connRetries));
           if (run.status !== 'running') break;     // stopped during the wait
+          run.modelCalls--;   // nothing was delivered, so the step is refunded (the wait above is not)
           continue;
         }
         if (isConnError(e)) {                        // tunnel/Ollama unreachable — pause (resumable), don't kill
@@ -2787,11 +2789,28 @@ async function drive(loadDb, run) {
       //
       // Now: remember a window of recent responses and stop when the same one comes
       // back too often, regardless of what sat between.
-      const norm = raw.replace(/\s+/g, ' ').trim().slice(0, 2000);
+      // A key over the WHOLE reply, not its first 2000 characters. Measured: three different large writes that
+      // shared a preamble collided on the truncated key, the guard called them identical, and the third write
+      // never landed. Length plus a cheap hash keeps the window small and cannot collide on a shared prefix.
+      const collapsed = raw.replace(/\s+/g, ' ').trim();
+      let keyHash = 5381;
+      for (let i = 0; i < collapsed.length; i++) keyHash = ((keyHash * 33) ^ collapsed.charCodeAt(i)) >>> 0;
+      const norm = collapsed.length + ':' + keyHash.toString(36);
+      // How much work has actually LANDED. Nothing cleared this window on a productive step - ctxSquashes and
+      // connRetries are both reset a few lines above, this was not - so read_file, write, read_file, write,
+      // read_file counted as three identical replies and the run was stopped for "not making progress" having
+      // written two files. A repeat with work between it and its twin is not a loop.
+      const landed = (run.steps || []).filter((s) => s.type === 'tool'
+        && /^(write_file|edit_file|append_file)$/.test(String(s.tool))
+        && /^OK/.test(String(s.result || ''))).length;
       run.recent = run.recent || [];
+      run.recentAt = run.recentAt || [];   // work landed at the time of each remembered reply
       run.recent.push(norm);
-      if (run.recent.length > 8) run.recent.shift();
-      const seenTimes = run.recent.filter((r) => r === norm).length;
+      run.recentAt.push(landed);
+      if (run.recent.length > 8) { run.recent.shift(); run.recentAt.shift(); }
+      // A run resumed from disk may hold recent without recentAt; undefined !== landed, so repeats simply do not
+      // count for one window. That fails OPEN - a genuine loop dies one window later - which is the safe side.
+      const seenTimes = run.recent.filter((r, i) => r === norm && run.recentAt[i] === landed).length;
       // FORGIVE ONE REPEAT AFTER A SUBSTITUTION.
       //
       // The guard was firing at the exact moment the loop-break took effect. Substitution
@@ -2802,11 +2821,23 @@ async function drive(loadDb, run) {
       // and only for a repeat that came after one, so a genuine dead loop still dies at 4.
       if (seenTimes >= 3 && run.justSubstituted) {
         run.justSubstituted = false;
+        run.recentAt = run.recent.map((r, i) => (r === norm ? null : run.recentAt[i])).filter((x) => x !== null).concat([landed]);
         run.recent = run.recent.filter((r) => r !== norm).concat([norm]);
         pushStep(run, { type: 'note', text: 'Repeat pardoned once: the model had just been handed new information and had not had a turn to use it.' });
       } else if (seenTimes >= 3) {
         run.status = 'stopped';
-        pushStep(run, { type: 'error', text: `Stopped: the model produced the same response ${seenTimes} times in the last ${run.recent.length} steps without making progress.` });
+        // WHO repeated? This guard keys on the model's REPLY, but three identical replies after three identical
+        // TOOL refusals is a tool that cannot be used, not a model that cannot think - and set F stopped 77 of 100
+        // goals with the second message while the first was true. run.repeatCalls already counts identical calls
+        // that returned identical answers: the loop had the evidence and never used it. The wording matters
+        // because the reason derived from it picks the repair goal handed to the retry.
+        // ONE identical failure is already the evidence. This guard runs on the model's reply, BEFORE that turn's
+        // tool call, so on the third identical reply only two calls have been made and only one can have been
+        // recorded as a repeat - requiring two put the honest message permanently out of reach.
+        const toolLoop = (run.repeatFailures || 0) >= 1;
+        pushStep(run, { type: 'error', text: toolLoop
+          ? `Stopped: the same tool call returned the identical answer ${(run.repeatCalls || 0) + 1} times - the tool refused every time, so nothing the model asked for had any effect.`
+          : `Stopped: the model produced the same response ${seenTimes} times in the last ${run.recent.length} steps without making progress.` });
         break;
       }
 
@@ -3073,7 +3104,14 @@ async function drive(loadDb, run) {
               }
 
               if (!run.verified) {
-                const v = await verifier.verify(WORKSPACE);
+                // Verify the code THIS GOAL is about. The verify_project TOOL got this fix in set E (see the
+                // comment at verify_project above): in a workspace holding ten projects it reported
+                // "`node q1_stock.js` ran and exited cleanly" for a goal about q8_units.py. The GATE was left
+                // calling verify() with no entry at all, so the deciding path kept the bug the advisory path
+                // had fixed - it could pass a goal on the strength of a leftover file from another goal.
+                // Reproduced in finishGateEntry.test.mjs before this change.
+                const goalEntry = ledger.namedFiles(run.goal || '').find((f) => /\.(py|c?js|mjs)$/i.test(f) && existsSync(join(WORKSPACE, f)));
+                const v = await verifier.verify(WORKSPACE, { entry: goalEntry });
                 if (!v.ok) {
                   blocked(`Project does not run (${v.kind}) — not finished.`,
                     `Do NOT finish yet — the project does not run:\n\n${verifier.format(v)}\n\nFix these, then finish.`);
@@ -3189,6 +3227,10 @@ async function drive(loadDb, run) {
       const answer = String(result ?? '');
       if (seenBefore !== undefined && seenBefore === answer) {
         run.repeatCalls = (run.repeatCalls || 0) + 1;
+        // The ones that FAILED, counted apart. The stuck-loop guard has to tell "this tool refused identically"
+        // from "the model asked the same harmless question twice": a repeated read_file that succeeded is not a
+        // tool refusing, and saying so would misreport the run and misdirect its repair.
+        if (/^ERROR/.test(answer)) run.repeatFailures = (run.repeatFailures || 0) + 1;
         result = answer + `\n\n⚠️ You already ran this exact ${tool} in this run and got exactly this answer. Nothing changed, so repeating it cannot help - do something different: a different file or range, a different action, or fix the problem the answer describes.`;
       }
       run.callLog[callKey] = answer;
@@ -3493,6 +3535,7 @@ async function drive(loadDb, run) {
       const last = [...run.steps].reverse().find((s) => s.type === 'error');
       const text = (last && last.text) || '';
       const reason = /budget/i.test(text) ? 'budget'
+        : /identical answer/i.test(text) ? 'tool_loop'
         : /same response/i.test(text) ? 'loop'
         : /could not be parsed/i.test(text) ? 'parse'
         : /Same error persisted/i.test(text) ? 'same_error'
@@ -3669,6 +3712,7 @@ function completedQueueIds() {
 export function repairGoalFor(item, { reason = 'error', detail = '' } = {}) {
   if (!item || item.repairOf) return null;
   const why = { budget: 'it ran out of budget', loop: 'it repeated itself and got stuck',
+    tool_loop: 'a tool kept returning the identical answer, so nothing it tried had any effect - the tool was the problem, not the plan',
     parse: 'its reply could not be parsed', same_error: 'the same error kept coming back',
     tunnel: 'its connection dropped' }[reason] || 'it errored';
   const snippet = String(detail || '').trim().slice(0, 400);
@@ -4222,6 +4266,12 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     if (run.busy || run.status === 'running') return res.status(409).json({ error: 'run is already active' });
     if (run.status === 'awaiting_approval') return res.status(409).json({ error: 'run is awaiting command approval — use approve' });
     if (run.status === 'done') return res.status(409).json({ error: 'run already finished' });
+    // A fresh wall-clock budget, for the same reason the follow-up route gets one: the minutes a run spent
+    // interrupted are not minutes it spent working. Without this, resuming a run that was paused longer
+    // than AGENT_MAX_MINUTES stops it instantly with zero turns taken, reports "ran out of time budget",
+    // and queues a repair that starts the work over. Measured in budgetAccounting.test.mjs. The STEP
+    // budget is untouched - those calls really were spent - and createdAt still records the true start.
+    run.budgetStart = Date.now();
     run.status = 'running';
     pushStep(run, { type: 'note', text: 'Resumed.' });
     driveDetached(loadDb, run);

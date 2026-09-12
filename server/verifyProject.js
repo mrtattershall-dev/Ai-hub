@@ -145,7 +145,11 @@ export async function verify(workspace, { entry } = {}) {
   const { files, pkg } = detected;
   // An ENTRY decides the language. Set E (2026-09-11): a workspace holding ten projects had package.json (the
   // workspace marker), so every check was "node" - a .py entry would have run under node.
-  if (entry && ['node', 'python', 'unknown'].includes(kind)) {
+  // 'web' is in this list too: a workspace that has held several goals keeps every index.html ever written, and
+  // without this ONE stale page pins kind:'web' for good - the web branch returns early having proved only that
+  // the file exists, so every later Python or Node goal in that workspace is 'verified' without being run. A
+  // real web goal names no .py/.js entry, so it still takes the web path.
+  if (entry && ['node', 'python', 'unknown', 'web'].includes(kind)) {
     if (/\.py$/i.test(entry)) kind = 'python';
     else if (/\.(c|m)?js$/i.test(entry)) kind = 'node';
   }
