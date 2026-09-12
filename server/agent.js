@@ -2051,10 +2051,31 @@ const runs = new Map();
 // leak for a hub that is meant to stay running for days. Evict finished runs oldest
 // first, and never evict one that is still running or waiting on a human.
 const MAX_RUNS = parseInt(process.env.AGENT_MAX_RUNS || '40', 10);
+
+/**
+ * The statuses that still have work in them, and must therefore never be evicted.
+ *
+ * 'interrupted' was missing, and that is the whole of bug 11. loadRuns() flips every mid-flight run to
+ * 'interrupted' precisely so the UI and the supervisor can resume it - and then evicted it, in the same loop, one
+ * line later. The restart that exists to RESTORE resumable work was what discarded it. In a 100-goal battery the
+ * file count passes 40 early and stays there, so this was certain on the live hub, not probable (start-hub.bat
+ * sets no AGENT_MAX_RUNS). It never showed in set F/G because the measurement harness sets AGENT_MAX_RUNS=1000.
+ *
+ * Eviction is a MEMORY-PRESSURE optimisation. Dropping a finished run costs a lookup that getRun() serves from
+ * disk; dropping a resumable one destroys unfinished work that nothing else will ever pick up - the supervisor
+ * resumes by enumerating runs.values(), so a run it cannot see is a goal that is silently never continued.
+ *
+ * When resumable runs alone outnumber MAX_RUNS the cap simply yields: the loop below has nothing left it is
+ * allowed to drop and the map runs over. That is the intended trade. A cap that starts deleting live work to
+ * defend a number is the same bug with a higher threshold, and memory here is bounded by how much work is
+ * genuinely unfinished - which the supervisor drains one run at a time.
+ */
+const RESUMABLE_STATUS = new Set(['running', 'awaiting_approval', 'interrupted']);
+
 function evictOldRuns() {
   if (runs.size <= MAX_RUNS) return;
   const finished = [...runs.values()]
-    .filter(r => r.status !== 'running' && r.status !== 'awaiting_approval')
+    .filter(r => !RESUMABLE_STATUS.has(r.status))
     .sort((a, b) => a.createdAt - b.createdAt);
   let over = runs.size - MAX_RUNS;
   for (const r of finished) {
@@ -2183,10 +2204,53 @@ function loadRuns() {
         run.busy = false; run.abort = null;
         if (['running', 'awaiting_approval'].includes(run.status)) run.status = 'interrupted';
         runs.set(run.id, run);
+        // Evicting HERE, after each insert, and not once after the whole read. It looks like the wrong place, and
+        // the audit for bug 11 called it one, on the grounds that readdirSync order is not createdAt order - but
+        // measurement disagrees. Dropping the oldest finished run whenever the map is over the cap is the standard
+        // streaming top-k, and it is order-INdependent: 200,000 randomised trials over shuffled read orders, ages,
+        // statuses and caps found ZERO disagreements between this and evicting once at the end. Moving it out
+        // would also undo the boot-time memory bound reapRuns() documents - this way the map never exceeds the cap
+        // by more than one during the read, instead of holding every run file (up to MAX_RUN_FILES) at once.
+        //
+        // The one input where placement DOES change the outcome is a run file with no createdAt: `a.createdAt -
+        // b.createdAt` is then NaN, the comparator is incoherent, and eviction picks arbitrary victims either way
+        // (the same trials disagreed on ~7% of those). That is a separate defect and is not fixed here.
         evictOldRuns();
       } catch {}
     }
   } catch {}
+}
+
+/**
+ * A run by id: memory first, then the checkpoint on disk.
+ *
+ * All five lookups were a bare `runs.get()`, so an evicted run was *recorded but unreachable* - its file sat in
+ * agent-runs/ holding every step, while GET /:id, resume, follow-up and stop all answered 404. Eviction is about
+ * memory, not about forgetting, and being able to come back to a run is the point of persisting one at all.
+ *
+ * Rehydrating into the map is deliberate rather than returning a detached copy: resume/approve/stop mutate the run
+ * and then driveDetached() it, and a copy would take its next step against an object no other caller can see -
+ * two live views of one run, which is worse than the 404. The next evictOldRuns() bounds the map again, and this
+ * run, being old, is first in line: it can always come back the same way.
+ *
+ * A 'running' status on disk means the process died mid-flight, exactly as at boot, so it is corrected to
+ * 'interrupted' here too. Restoring it as 'running' would make activeTopLevelRun() report the workspace lock held
+ * by a run with no loop behind it, and nothing would ever start again.
+ */
+function getRun(id) {
+  const live = runs.get(id);
+  if (live) return live;
+  // The id becomes a filename on the next line. Real ids are randomUUID(); anything carrying a dot or a path
+  // separator is not an id and must never be allowed to name a file.
+  if (!/^[A-Za-z0-9_-]{1,120}$/.test(String(id ?? ''))) return undefined;
+  try {
+    const run = JSON.parse(readFileSync(join(RUNS_DIR, `${id}.json`), 'utf8'));
+    if (!run || run.id !== id) return undefined;   // a file whose contents disagree with its name is not evidence
+    run.busy = false; run.abort = null;
+    if (['running', 'awaiting_approval'].includes(run.status)) run.status = 'interrupted';
+    runs.set(run.id, run);
+    return run;
+  } catch { return undefined; }   // missing, truncated or unreadable - all "no such run" to a caller
 }
 
 // A model call that failed because the tunnel/Ollama is unreachable — NOT a real
@@ -4563,7 +4627,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
 
   // Poll run state (client strips the heavy history field).
   router.get('/:id', (req, res) => {
-    const run = runs.get(req.params.id);
+    const run = getRun(req.params.id);
     if (!run) return res.status(404).json({ error: 'run not found' });
     // busy IS reported: a terminal status with busy still set means teardown (the syntax
     // rollback) is in progress, and the workspace is not yet in its final state.
@@ -4573,7 +4637,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
 
   // Approve or reject a pending run_command, then resume.
   router.post('/:id/approve', async (req, res) => {
-    const run = runs.get(req.params.id);
+    const run = getRun(req.params.id);
     if (!run) return res.status(404).json({ error: 'run not found' });
     if (run.status !== 'awaiting_approval' || !run.pending) {
       return res.status(409).json({ error: 'nothing awaiting approval' });
@@ -4602,7 +4666,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
   // by a server restart). drive() replays from run.history, so it picks up exactly
   // where it left off. Point the Ollama tunnel at the new URL in Settings first.
   router.post('/:id/resume', (req, res) => {
-    const run = runs.get(req.params.id);
+    const run = getRun(req.params.id);
     if (!run) return res.status(404).json({ error: 'run not found' });
     if (run.busy || run.status === 'running') return res.status(409).json({ error: 'run is already active' });
     if (run.status === 'awaiting_approval') return res.status(409).json({ error: 'run is awaiting command approval — use approve' });
@@ -4626,7 +4690,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
   // The workspace listing is refreshed first so the model edits the REAL current
   // files (ground truth), never its memory of them.
   router.post('/:id/followup', (req, res) => {
-    const run = runs.get(req.params.id);
+    const run = getRun(req.params.id);
     if (!run) return res.status(404).json({ error: 'run not found' });
     const instruction = (req.body?.goal || req.body?.instruction || '').trim();
     if (!instruction) return res.status(400).json({ error: 'instruction required' });
@@ -4667,7 +4731,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
 
   // Stop a run — flip status and abort any in-flight model call immediately.
   router.post('/:id/stop', (req, res) => {
-    const run = runs.get(req.params.id);
+    const run = getRun(req.params.id);
     if (!run) return res.status(404).json({ error: 'run not found' });
     run.status = 'stopped';
     run.pending = null;
