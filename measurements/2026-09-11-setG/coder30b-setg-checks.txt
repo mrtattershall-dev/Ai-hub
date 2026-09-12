@@ -1,0 +1,103 @@
+  1 fail s1_library.js  s1  load: Member Alice already has book 978-0134685991
+  2 PASS s2_logs.py     s1  
+  3 fail s3_matrix.js   s1  load: [x].transpose is not a function
+  4 fail s4_markdown.py s1  two paragraphs '<p>line one</p>\n<p>line two</p>\n<p></p>\n<p>next</p>'
+  5 fail s5_expr.js     s1  load: Assertion failed: Invalid expression
+  6 PASS s6_graph.py    s1  
+  7 PASS s7_cache.js    s1  
+  8 PASS s8_grades.py   s1  
+  9 PASS s9_board.html  s1  
+ 10 fail s10_desk.js    s1  load: Member Alice already has book 978-0134685991
+ 11 fail s1_library.js  s2  load: Member Alice already has book 978-0134685991
+ 12 PASS s2_logs.py     s2  
+ 13 fail s3_matrix.js   s2  load: [x].transpose is not a function
+ 14 fail s4_markdown.py s2  headings '<p># Title</p>\n<p>text under it</p>\n<p>## Sub</p>\n<p></p>\n<p>### Small</p>'
+ 15 fail s5_expr.js     s2  load: Assertion failed: Invalid expression
+ 16 PASS s6_graph.py    s2  
+ 17 PASS s7_cache.js    s2  
+ 18 PASS s8_grades.py   s2  
+ 19 PASS s9_board.html  s2  
+ 20 fail s10_desk.js    s2  load: Member Alice already has book 978-0134685991
+ 21 fail s1_library.js  s3  load: Member Alice already has book 978-0134685991
+ 22 PASS s2_logs.py     s3  
+ 23 fail s3_matrix.js   s3  load: [x].transpose is not a function
+ 24 fail s4_markdown.py s3  in a heading '<p># A <strong>big</strong> deal</p>'
+ 25 fail s5_expr.js     s3  load: Assertion failed: Invalid expression
+ 26 PASS s6_graph.py    s3  
+ 27 PASS s7_cache.js    s3  
+ 28 fail s8_grades.py   s3  threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'
+ 29 PASS s9_board.html  s3  
+ 30 fail s10_desk.js    s3  load: Member Alice already has book 978-0134685991
+ 31 fail s1_library.js  s4  load: Member Alice already has book 978-0134685991
+ 32 PASS s2_logs.py     s4  
+ 33 fail s3_matrix.js   s4  load: [x].transpose is not a function
+ 34 fail s4_markdown.py s4  inline code '<p>use <code>a<strong>b</strong> &lt; c</code> here</p>'
+ 35 fail s5_expr.js     s4  load: Assertion failed: Invalid expression
+ 36 PASS s6_graph.py    s4  
+ 37 PASS s7_cache.js    s4  
+ 38 PASS s8_grades.py   s4  
+ 39 PASS s9_board.html  s4  
+ 40 fail s10_desk.js    s4  load: Member Alice already has book 978-0134685991
+ 41 fail s1_library.js  s5  load: Member Alice already has book 978-0134685991
+ 42 PASS s2_logs.py     s5  
+ 43 fail s3_matrix.js   s5  load: [x].transpose is not a function
+ 44 PASS s4_markdown.py s5  
+ 45 fail s5_expr.js     s5  load: Assertion failed: Invalid expression
+ 46 PASS s6_graph.py    s5  
+ 47 PASS s7_cache.js    s5  
+ 48 fail s8_grades.py   s5  threw: TypeError: '>' not supported between instances of 'list' and 'int'
+ 49 fail s9_board.html  s5  after reload [["Aâ†â†’Ã—","Câ†â†’Ã—"],["Bâ†â†’Ã—"]]
+ 50 fail s10_desk.js    s5  load: Member Alice already has book 978-0134685991
+ 51 fail s1_library.js  s6  load: Member Alice already has book 978-0134685991
+ 52 PASS s2_logs.py     s6  
+ 53 fail s3_matrix.js   s6  load: [x].transpose is not a function
+ 54 fail s4_markdown.py s6  list '<ul><li>one</li><li><strong>two</strong></li></ul>\n<p></p>\n<p>after</p>'
+ 55 fail s5_expr.js     s6  load: Assertion failed: Invalid expression
+ 56 fail s6_graph.py    s6  threw: AttributeError: 'Graph' object has no attribute 'remove_node'
+ 57 fail s7_cache.js    s6  stats {"hits":1,"misses":2,"evictions":1,"expirations":1}
+ 58 PASS s8_grades.py   s6  
+ 59 fail s9_board.html  s6  a 4th card got into Doing: ["A","B","C","D"]
+ 60 fail s10_desk.js    s6  load: Member Alice already has book 978-0134685991
+ 61 fail s1_library.js  s7  load: Member Alice already has book 978-0134685991
+ 62 PASS s2_logs.py     s7  
+ 63 fail s3_matrix.js   s7  load: [x].transpose is not a function
+ 64 fail s4_markdown.py s7  both kinds '<ul><li>a</li></ul>\n<p></p>\n<ol><li>b</li></ol>'
+ 65 fail s5_expr.js     s7  load: Assertion failed: Invalid expression
+ 66 fail s6_graph.py    s7  threw: AttributeError: 'Graph' object has no attribute 'reachable'
+ 67 fail s7_cache.js    s7  clear []
+ 68 PASS s8_grades.py   s7  
+ 69 PASS s9_board.html  s7  
+ 70 fail s10_desk.js    s7  load: Member Alice already has book 978-0134685991
+ 71 fail s1_library.js  s8  load: Member Alice already has book 978-0134685991
+ 72 fail s2_logs.py     s8  sessions {'1.1.1.1': 4, '2.2.2.2': 1}
+ 73 fail s3_matrix.js   s8  load: [x].transpose is not a function
+ 74 fail s4_markdown.py s8  code block '<p>before</p>\n<p></p>\n<p>```</p>\n<p>x = 1 < 2</p>\n<p>  <em>not em</em></p>\n<p>```</
+ 75 fail s5_expr.js     s8  load: Assertion failed: Invalid expression
+ 76 fail s6_graph.py    s8  threw: AttributeError: 'Graph' object has no attribute 'components'
+ 77 PASS s7_cache.js    s8  
+ 78 fail s8_grades.py   s8  to_csv 'student,hw1,hw2,percent,letter\nann,10,9,63.33,D\nbob,,5,50.00,F\ncy,,,,-'
+ 79 fail s9_board.html  s8  threw: No element found for selector: #s9-filter
+ 80 fail s10_desk.js    s8  load: Member Alice already has book 978-0134685991
+ 81 fail s1_library.js  s9  load: Member Alice already has book 978-0134685991
+ 82 fail s2_logs.py     s9  CLI --top 2 printed ['All tests passed!']
+ 83 fail s3_matrix.js   s9  load: [x].transpose is not a function
+ 84 fail s4_markdown.py s9  blockquote '<p>> quoted <strong>text</strong></p>\n<p>> # Head</p>\n<p></p>\n<p>plain</p>'
+ 85 fail s5_expr.js     s9  load: Assertion failed: Invalid expression
+ 86 fail s6_graph.py    s9  threw: AttributeError: 'Graph' object has no attribute 'to_dot'
+ 87 fail s7_cache.js    s9  threw: c.toJSON is not a function
+ 88 fail s8_grades.py   s9  threw: AttributeError: 'Gradebook' object has no attribute 'stats'
+ 89 fail s9_board.html  s9  a duplicate was added: ["deploy"]
+ 90 fail s10_desk.js    s9  load: Member Alice already has book 978-0134685991
+ 91 fail S1_NOTES.md    s10 S1_NOTES.md missing
+ 92 fail s2_logs.py     s10 threw: ValueError: Invalid log line format
+ 93 fail s3_matrix.js   s10 load: [x].transpose is not a function
+ 94 fail s4_markdown.py s10 threw: AttributeError: module 's4_markdown_mod' has no attribute 'toc'
+ 95 fail s5_expr.js     s10 load: Assertion failed: Invalid expression
+ 96 fail s6_graph.py    s10 threw: AttributeError: type object 'Graph' has no attribute 'from_text'
+ 97 fail s7_cache.js    s10 threw: c.getOrSet is not a function
+ 98 fail s8_grades.py   s10 CLI header []
+ 99 fail s9_board.html  s10 threw: No element found for selector: #s9-clear-done
+100 fail S_INDEX.md     s10 S_INDEX.md missing
+
+per project (implementation correct): s1 0/10  s2 7/10  s3 0/10  s4 1/10  s5 0/10  s6 5/10  s7 6/10  s8 5/10  s9 5/10  s10 0/10
+done as asked 29/100 | implementation correct 29/100 (CT = correct code, own test broke it)

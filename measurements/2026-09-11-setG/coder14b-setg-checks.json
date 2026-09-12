@@ -1,0 +1,907 @@
+{
+  "ws": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\measurements\\2026-09-11-setG\\data\\coder14b-setg\\workspace",
+  "asIs": 4,
+  "impl": 4,
+  "results": [
+    {
+      "goal": 1,
+      "chain": 1,
+      "step": 1,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 2,
+      "chain": 2,
+      "step": 1,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'NoneType' object has no attribute 'get'"
+    },
+    {
+      "goal": 3,
+      "chain": 3,
+      "step": 1,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '{'"
+    },
+    {
+      "goal": 4,
+      "chain": 4,
+      "step": 1,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "load: IndentationError: unexpected indent (s4_markdown.py, line 213)"
+    },
+    {
+      "goal": 5,
+      "chain": 5,
+      "step": 1,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid operator"
+    },
+    {
+      "goal": 6,
+      "chain": 6,
+      "step": 1,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 7,
+      "chain": 7,
+      "step": 1,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 8,
+      "chain": 8,
+      "step": 1,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "score"
+    },
+    {
+      "goal": 9,
+      "chain": 9,
+      "step": 1,
+      "file": "s9_board.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 10,
+      "chain": 10,
+      "step": 1,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 11,
+      "chain": 1,
+      "step": 2,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 12,
+      "chain": 2,
+      "step": 2,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: 'NoneType' object is not iterable"
+    },
+    {
+      "goal": 13,
+      "chain": 3,
+      "step": 2,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '{'"
+    },
+    {
+      "goal": 14,
+      "chain": 4,
+      "step": 2,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "load: IndentationError: unexpected indent (s4_markdown.py, line 213)"
+    },
+    {
+      "goal": 15,
+      "chain": 5,
+      "step": 2,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid number"
+    },
+    {
+      "goal": 16,
+      "chain": 6,
+      "step": 2,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 17,
+      "chain": 7,
+      "step": 2,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 18,
+      "chain": 8,
+      "step": 2,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Gradebook' object has no attribute 'percent'"
+    },
+    {
+      "goal": 19,
+      "chain": 9,
+      "step": 2,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: card A has no .s9-right button"
+    },
+    {
+      "goal": 20,
+      "chain": 10,
+      "step": 2,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 21,
+      "chain": 1,
+      "step": 3,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 22,
+      "chain": 2,
+      "step": 3,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "status_counts None"
+    },
+    {
+      "goal": 23,
+      "chain": 3,
+      "step": 3,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '{'"
+    },
+    {
+      "goal": 24,
+      "chain": 4,
+      "step": 3,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "load: IndentationError: unexpected indent (s4_markdown.py, line 213)"
+    },
+    {
+      "goal": 25,
+      "chain": 5,
+      "step": 3,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid operator"
+    },
+    {
+      "goal": 26,
+      "chain": 6,
+      "step": 3,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 27,
+      "chain": 7,
+      "step": 3,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.keys is not a function"
+    },
+    {
+      "goal": 28,
+      "chain": 8,
+      "step": 3,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'"
+    },
+    {
+      "goal": 29,
+      "chain": 9,
+      "step": 3,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: card A has no .s9-right button"
+    },
+    {
+      "goal": 30,
+      "chain": 10,
+      "step": 3,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 31,
+      "chain": 1,
+      "step": 4,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 32,
+      "chain": 2,
+      "step": 4,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: 'NoneType' object is not iterable"
+    },
+    {
+      "goal": 33,
+      "chain": 3,
+      "step": 4,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '{'"
+    },
+    {
+      "goal": 34,
+      "chain": 4,
+      "step": 4,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "load: IndentationError: unexpected indent (s4_markdown.py, line 213)"
+    },
+    {
+      "goal": 35,
+      "chain": 5,
+      "step": 4,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid number"
+    },
+    {
+      "goal": 36,
+      "chain": 6,
+      "step": 4,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 37,
+      "chain": 7,
+      "step": 4,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 38,
+      "chain": 8,
+      "step": 4,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.add_assignment() takes 3 positional arguments but 4 were given"
+    },
+    {
+      "goal": 39,
+      "chain": 9,
+      "step": 4,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: card A has no .s9-del button"
+    },
+    {
+      "goal": 40,
+      "chain": 10,
+      "step": 4,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 41,
+      "chain": 1,
+      "step": 5,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 42,
+      "chain": 2,
+      "step": 5,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "percentile [None, None, None, None, None]"
+    },
+    {
+      "goal": 43,
+      "chain": 3,
+      "step": 5,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '{'"
+    },
+    {
+      "goal": 44,
+      "chain": 4,
+      "step": 5,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "load: IndentationError: unexpected indent (s4_markdown.py, line 213)"
+    },
+    {
+      "goal": 45,
+      "chain": 5,
+      "step": 5,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid number"
+    },
+    {
+      "goal": 46,
+      "chain": 6,
+      "step": 5,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 47,
+      "chain": 7,
+      "step": 5,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "size counts expired entries: 3"
+    },
+    {
+      "goal": 48,
+      "chain": 8,
+      "step": 5,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.add_assignment() takes 3 positional arguments but 4 were given"
+    },
+    {
+      "goal": 49,
+      "chain": 9,
+      "step": 5,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: card B has no .s9-right button"
+    },
+    {
+      "goal": 50,
+      "chain": 10,
+      "step": 5,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 51,
+      "chain": 1,
+      "step": 6,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 52,
+      "chain": 2,
+      "step": 6,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: 'NoneType' object is not iterable"
+    },
+    {
+      "goal": 53,
+      "chain": 3,
+      "step": 6,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '{'"
+    },
+    {
+      "goal": 54,
+      "chain": 4,
+      "step": 6,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "load: IndentationError: unexpected indent (s4_markdown.py, line 213)"
+    },
+    {
+      "goal": 55,
+      "chain": 5,
+      "step": 6,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "\"2 + * 3\": \"Invalid operator\""
+    },
+    {
+      "goal": 56,
+      "chain": 6,
+      "step": 6,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 57,
+      "chain": 7,
+      "step": 6,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.stats is not a function"
+    },
+    {
+      "goal": 58,
+      "chain": 8,
+      "step": 6,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Gradebook' object has no attribute 'percent'"
+    },
+    {
+      "goal": 59,
+      "chain": 9,
+      "step": 6,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: card A has no .s9-right button"
+    },
+    {
+      "goal": 60,
+      "chain": 10,
+      "step": 6,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 61,
+      "chain": 1,
+      "step": 7,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 62,
+      "chain": 2,
+      "step": 7,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 's2_logs_mod' has no attribute 'between'"
+    },
+    {
+      "goal": 63,
+      "chain": 3,
+      "step": 7,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '{'"
+    },
+    {
+      "goal": 64,
+      "chain": 4,
+      "step": 7,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "load: IndentationError: unexpected indent (s4_markdown.py, line 213)"
+    },
+    {
+      "goal": 65,
+      "chain": 5,
+      "step": 7,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: tokenize is not exported"
+    },
+    {
+      "goal": 66,
+      "chain": 6,
+      "step": 7,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 67,
+      "chain": 7,
+      "step": 7,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "onEvict []"
+    },
+    {
+      "goal": 68,
+      "chain": 8,
+      "step": 7,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Gradebook' object has no attribute 'curve'"
+    },
+    {
+      "goal": 69,
+      "chain": 9,
+      "step": 7,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "Enter did not add: []"
+    },
+    {
+      "goal": 70,
+      "chain": 10,
+      "step": 7,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 71,
+      "chain": 1,
+      "step": 8,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 72,
+      "chain": 2,
+      "step": 8,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 's2_logs_mod' has no attribute 'sessions'"
+    },
+    {
+      "goal": 73,
+      "chain": 3,
+      "step": 8,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '{'"
+    },
+    {
+      "goal": 74,
+      "chain": 4,
+      "step": 8,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "load: IndentationError: unexpected indent (s4_markdown.py, line 213)"
+    },
+    {
+      "goal": 75,
+      "chain": 5,
+      "step": 8,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: toRPN is not exported"
+    },
+    {
+      "goal": 76,
+      "chain": 6,
+      "step": 8,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 77,
+      "chain": 7,
+      "step": 8,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.resize is not a function"
+    },
+    {
+      "goal": 78,
+      "chain": 8,
+      "step": 8,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Gradebook' object has no attribute 'to_csv'"
+    },
+    {
+      "goal": 79,
+      "chain": 9,
+      "step": 8,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: card Fix bug has no .s9-right button"
+    },
+    {
+      "goal": 80,
+      "chain": 10,
+      "step": 8,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 81,
+      "chain": 1,
+      "step": 9,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 82,
+      "chain": 2,
+      "step": 9,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI --top 2 printed ['All tests passed.']"
+    },
+    {
+      "goal": 83,
+      "chain": 3,
+      "step": 9,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '{'"
+    },
+    {
+      "goal": 84,
+      "chain": 4,
+      "step": 9,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "load: IndentationError: unexpected indent (s4_markdown.py, line 213)"
+    },
+    {
+      "goal": 85,
+      "chain": 5,
+      "step": 9,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: compile is not exported"
+    },
+    {
+      "goal": 86,
+      "chain": 6,
+      "step": 9,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 87,
+      "chain": 7,
+      "step": 9,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.toJSON is not a function"
+    },
+    {
+      "goal": 88,
+      "chain": 8,
+      "step": 9,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Gradebook' object has no attribute 'stats'"
+    },
+    {
+      "goal": 89,
+      "chain": 9,
+      "step": 9,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: card Deploy has no .s9-right button"
+    },
+    {
+      "goal": 90,
+      "chain": 10,
+      "step": 9,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '.'"
+    },
+    {
+      "goal": 91,
+      "chain": 1,
+      "step": 10,
+      "file": "S1_NOTES.md",
+      "asIs": false,
+      "impl": false,
+      "why": "S1_NOTES.md missing"
+    },
+    {
+      "goal": 92,
+      "chain": 2,
+      "step": 10,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'NoneType' object has no attribute 'get'"
+    },
+    {
+      "goal": 93,
+      "chain": 3,
+      "step": 10,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Unexpected token '{'"
+    },
+    {
+      "goal": 94,
+      "chain": 4,
+      "step": 10,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "load: IndentationError: unexpected indent (s4_markdown.py, line 213)"
+    },
+    {
+      "goal": 95,
+      "chain": 5,
+      "step": 10,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid operator"
+    },
+    {
+      "goal": 96,
+      "chain": 6,
+      "step": 10,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: type object 'Graph' has no attribute 'from_text'"
+    },
+    {
+      "goal": 97,
+      "chain": 7,
+      "step": 10,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.getOrSet is not a function"
+    },
+    {
+      "goal": 98,
+      "chain": 8,
+      "step": 10,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI header [['All tests passed']]"
+    },
+    {
+      "goal": 99,
+      "chain": 9,
+      "step": 10,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: card A has no .s9-right button"
+    },
+    {
+      "goal": 100,
+      "chain": 10,
+      "step": 10,
+      "file": "S_INDEX.md",
+      "asIs": false,
+      "impl": false,
+      "why": "S_INDEX.md missing"
+    }
+  ]
+}

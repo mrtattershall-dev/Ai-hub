@@ -110,6 +110,13 @@ async function replay(s) {
     discardNudges: asked.filter((a) => /were DISCARDED/.test(a)).length,
     gateBlocks: asked.filter((a) => /Do NOT finish yet/.test(a)).length,
     defLossWarnings: asked.filter((a) => /REMOVED \d+ definition/.test(a)).length,
+    // h-fixes: the same damage is now REFUSED rather than narrated, and the refusal uses different words - so the
+    // old defLossWarnings pattern reads 0 on that arm and would look like the problem vanished. Count both.
+    destructiveRefused: asked.filter((a) => /would have REMOVED \d+ thing\(s\)/.test(a)).length,
+    refusedNamed: [...new Set(asked.flatMap((a) => [...a.matchAll(/would have REMOVED \d+ thing\(s\) (\S+) already had: ([^.]+)\./g)].map((m) => `${m[1]}: ${m[2]}`)))],
+    refusedNotes: steps.filter((x) => /refused: it would have removed/.test(String(x.text || ''))).length,
+    // and the guard's new, honest stop: the TOOL refused identically, rather than 'the model repeated itself'.
+    toolLoopStops: steps.filter((x) => /returned the identical answer/.test(String(x.text || ''))).length,
     defLossNamed: [...new Set(asked.flatMap((a) => [...a.matchAll(/had before: ([^.]+)\./g)].map((m) => m[1])))],
     // The set-E fixes (f-fixes): what each one told the model during the replay.
     noChangeEdits: asked.filter((a) => /NO CHANGE: your REPLACE/.test(a)).length,
@@ -128,6 +135,6 @@ async function replay(s) {
 
 for (const s of scen) {
   const r = await replay(s);
-  console.log(`${r.id} | ${r.error ? 'ERROR ' + r.error : `status ${r.status} (was ${r.original.status}) | finishBlocks ${r.finishBlocks} (was ${r.original.finishBlocks}) | forcedFinish ${r.forcedFinish} | served ${r.served}/${r.recorded}${r.exhausted ? ' EXHAUSTED x' + r.exhausted : ''} | discard nudges ${r.discardNudges} | gate blocks ${r.gateBlocks} | no-change ${r.noChangeEdits} | shadow ${r.shadowHints} | ledger hidden ${r.ledgerHidden} | stale shown ${r.staleShown} | verify ${r.verifyDetected.join('/') || '-'} | conn retries ${r.connRetries}`}`);
+  console.log(`${r.id} | ${r.error ? 'ERROR ' + r.error : `status ${r.status} (was ${r.original.status}) | finishBlocks ${r.finishBlocks} (was ${r.original.finishBlocks}) | forcedFinish ${r.forcedFinish} | served ${r.served}/${r.recorded}${r.exhausted ? ' EXHAUSTED x' + r.exhausted : ''} | discard nudges ${r.discardNudges} | gate blocks ${r.gateBlocks} | no-change ${r.noChangeEdits} | shadow ${r.shadowHints} | ledger hidden ${r.ledgerHidden} | stale shown ${r.staleShown} | verify ${r.verifyDetected.join('/') || '-'} | conn retries ${r.connRetries} | refused ${r.destructiveRefused} | tool-loop stops ${r.toolLoopStops}`}`);
   if (OUT) appendFileSync(OUT, JSON.stringify(r) + '\n');
 }

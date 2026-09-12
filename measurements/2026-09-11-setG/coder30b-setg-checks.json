@@ -1,0 +1,907 @@
+{
+  "ws": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\measurements\\2026-09-11-setG\\data\\coder30b-setg\\workspace",
+  "asIs": 29,
+  "impl": 29,
+  "results": [
+    {
+      "goal": 1,
+      "chain": 1,
+      "step": 1,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 2,
+      "chain": 2,
+      "step": 1,
+      "file": "s2_logs.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 3,
+      "chain": 3,
+      "step": 1,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: [x].transpose is not a function"
+    },
+    {
+      "goal": 4,
+      "chain": 4,
+      "step": 1,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "two paragraphs '<p>line one</p>\\n<p>line two</p>\\n<p></p>\\n<p>next</p>'"
+    },
+    {
+      "goal": 5,
+      "chain": 5,
+      "step": 1,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Assertion failed: Invalid expression"
+    },
+    {
+      "goal": 6,
+      "chain": 6,
+      "step": 1,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 7,
+      "chain": 7,
+      "step": 1,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 8,
+      "chain": 8,
+      "step": 1,
+      "file": "s8_grades.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 9,
+      "chain": 9,
+      "step": 1,
+      "file": "s9_board.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 10,
+      "chain": 10,
+      "step": 1,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 11,
+      "chain": 1,
+      "step": 2,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 12,
+      "chain": 2,
+      "step": 2,
+      "file": "s2_logs.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 13,
+      "chain": 3,
+      "step": 2,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: [x].transpose is not a function"
+    },
+    {
+      "goal": 14,
+      "chain": 4,
+      "step": 2,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "headings '<p># Title</p>\\n<p>text under it</p>\\n<p>## Sub</p>\\n<p></p>\\n<p>### Small</p>'"
+    },
+    {
+      "goal": 15,
+      "chain": 5,
+      "step": 2,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Assertion failed: Invalid expression"
+    },
+    {
+      "goal": 16,
+      "chain": 6,
+      "step": 2,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 17,
+      "chain": 7,
+      "step": 2,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 18,
+      "chain": 8,
+      "step": 2,
+      "file": "s8_grades.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 19,
+      "chain": 9,
+      "step": 2,
+      "file": "s9_board.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 20,
+      "chain": 10,
+      "step": 2,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 21,
+      "chain": 1,
+      "step": 3,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 22,
+      "chain": 2,
+      "step": 3,
+      "file": "s2_logs.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 23,
+      "chain": 3,
+      "step": 3,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: [x].transpose is not a function"
+    },
+    {
+      "goal": 24,
+      "chain": 4,
+      "step": 3,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "in a heading '<p># A <strong>big</strong> deal</p>'"
+    },
+    {
+      "goal": 25,
+      "chain": 5,
+      "step": 3,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Assertion failed: Invalid expression"
+    },
+    {
+      "goal": 26,
+      "chain": 6,
+      "step": 3,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 27,
+      "chain": 7,
+      "step": 3,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 28,
+      "chain": 8,
+      "step": 3,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'"
+    },
+    {
+      "goal": 29,
+      "chain": 9,
+      "step": 3,
+      "file": "s9_board.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 30,
+      "chain": 10,
+      "step": 3,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 31,
+      "chain": 1,
+      "step": 4,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 32,
+      "chain": 2,
+      "step": 4,
+      "file": "s2_logs.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 33,
+      "chain": 3,
+      "step": 4,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: [x].transpose is not a function"
+    },
+    {
+      "goal": 34,
+      "chain": 4,
+      "step": 4,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "inline code '<p>use <code>a<strong>b</strong> &lt; c</code> here</p>'"
+    },
+    {
+      "goal": 35,
+      "chain": 5,
+      "step": 4,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Assertion failed: Invalid expression"
+    },
+    {
+      "goal": 36,
+      "chain": 6,
+      "step": 4,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 37,
+      "chain": 7,
+      "step": 4,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 38,
+      "chain": 8,
+      "step": 4,
+      "file": "s8_grades.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 39,
+      "chain": 9,
+      "step": 4,
+      "file": "s9_board.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 40,
+      "chain": 10,
+      "step": 4,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 41,
+      "chain": 1,
+      "step": 5,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 42,
+      "chain": 2,
+      "step": 5,
+      "file": "s2_logs.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 43,
+      "chain": 3,
+      "step": 5,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: [x].transpose is not a function"
+    },
+    {
+      "goal": 44,
+      "chain": 4,
+      "step": 5,
+      "file": "s4_markdown.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 45,
+      "chain": 5,
+      "step": 5,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Assertion failed: Invalid expression"
+    },
+    {
+      "goal": 46,
+      "chain": 6,
+      "step": 5,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 47,
+      "chain": 7,
+      "step": 5,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 48,
+      "chain": 8,
+      "step": 5,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: '>' not supported between instances of 'list' and 'int'"
+    },
+    {
+      "goal": 49,
+      "chain": 9,
+      "step": 5,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "after reload [[\"Aâ†â†’Ã—\",\"Câ†â†’Ã—\"],[\"Bâ†â†’Ã—\"]]"
+    },
+    {
+      "goal": 50,
+      "chain": 10,
+      "step": 5,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 51,
+      "chain": 1,
+      "step": 6,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 52,
+      "chain": 2,
+      "step": 6,
+      "file": "s2_logs.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 53,
+      "chain": 3,
+      "step": 6,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: [x].transpose is not a function"
+    },
+    {
+      "goal": 54,
+      "chain": 4,
+      "step": 6,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "list '<ul><li>one</li><li><strong>two</strong></li></ul>\\n<p></p>\\n<p>after</p>'"
+    },
+    {
+      "goal": 55,
+      "chain": 5,
+      "step": 6,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Assertion failed: Invalid expression"
+    },
+    {
+      "goal": 56,
+      "chain": 6,
+      "step": 6,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Graph' object has no attribute 'remove_node'"
+    },
+    {
+      "goal": 57,
+      "chain": 7,
+      "step": 6,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "stats {\"hits\":1,\"misses\":2,\"evictions\":1,\"expirations\":1}"
+    },
+    {
+      "goal": 58,
+      "chain": 8,
+      "step": 6,
+      "file": "s8_grades.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 59,
+      "chain": 9,
+      "step": 6,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "a 4th card got into Doing: [\"A\",\"B\",\"C\",\"D\"]"
+    },
+    {
+      "goal": 60,
+      "chain": 10,
+      "step": 6,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 61,
+      "chain": 1,
+      "step": 7,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 62,
+      "chain": 2,
+      "step": 7,
+      "file": "s2_logs.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 63,
+      "chain": 3,
+      "step": 7,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: [x].transpose is not a function"
+    },
+    {
+      "goal": 64,
+      "chain": 4,
+      "step": 7,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "both kinds '<ul><li>a</li></ul>\\n<p></p>\\n<ol><li>b</li></ol>'"
+    },
+    {
+      "goal": 65,
+      "chain": 5,
+      "step": 7,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Assertion failed: Invalid expression"
+    },
+    {
+      "goal": 66,
+      "chain": 6,
+      "step": 7,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Graph' object has no attribute 'reachable'"
+    },
+    {
+      "goal": 67,
+      "chain": 7,
+      "step": 7,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "clear []"
+    },
+    {
+      "goal": 68,
+      "chain": 8,
+      "step": 7,
+      "file": "s8_grades.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 69,
+      "chain": 9,
+      "step": 7,
+      "file": "s9_board.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 70,
+      "chain": 10,
+      "step": 7,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 71,
+      "chain": 1,
+      "step": 8,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 72,
+      "chain": 2,
+      "step": 8,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "sessions {'1.1.1.1': 4, '2.2.2.2': 1}"
+    },
+    {
+      "goal": 73,
+      "chain": 3,
+      "step": 8,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: [x].transpose is not a function"
+    },
+    {
+      "goal": 74,
+      "chain": 4,
+      "step": 8,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "code block '<p>before</p>\\n<p></p>\\n<p>```</p>\\n<p>x = 1 < 2</p>\\n<p>  <em>not em</em></p>\\n<p>```</p>\\n<p></p>\\n<p>after</p>'"
+    },
+    {
+      "goal": 75,
+      "chain": 5,
+      "step": 8,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Assertion failed: Invalid expression"
+    },
+    {
+      "goal": 76,
+      "chain": 6,
+      "step": 8,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Graph' object has no attribute 'components'"
+    },
+    {
+      "goal": 77,
+      "chain": 7,
+      "step": 8,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 78,
+      "chain": 8,
+      "step": 8,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "to_csv 'student,hw1,hw2,percent,letter\\nann,10,9,63.33,D\\nbob,,5,50.00,F\\ncy,,,,-'"
+    },
+    {
+      "goal": 79,
+      "chain": 9,
+      "step": 8,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: No element found for selector: #s9-filter"
+    },
+    {
+      "goal": 80,
+      "chain": 10,
+      "step": 8,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 81,
+      "chain": 1,
+      "step": 9,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 82,
+      "chain": 2,
+      "step": 9,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI --top 2 printed ['All tests passed!']"
+    },
+    {
+      "goal": 83,
+      "chain": 3,
+      "step": 9,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: [x].transpose is not a function"
+    },
+    {
+      "goal": 84,
+      "chain": 4,
+      "step": 9,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "blockquote '<p>> quoted <strong>text</strong></p>\\n<p>> # Head</p>\\n<p></p>\\n<p>plain</p>'"
+    },
+    {
+      "goal": 85,
+      "chain": 5,
+      "step": 9,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Assertion failed: Invalid expression"
+    },
+    {
+      "goal": 86,
+      "chain": 6,
+      "step": 9,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Graph' object has no attribute 'to_dot'"
+    },
+    {
+      "goal": 87,
+      "chain": 7,
+      "step": 9,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.toJSON is not a function"
+    },
+    {
+      "goal": 88,
+      "chain": 8,
+      "step": 9,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Gradebook' object has no attribute 'stats'"
+    },
+    {
+      "goal": 89,
+      "chain": 9,
+      "step": 9,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "a duplicate was added: [\"deploy\"]"
+    },
+    {
+      "goal": 90,
+      "chain": 10,
+      "step": 9,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Member Alice already has book 978-0134685991"
+    },
+    {
+      "goal": 91,
+      "chain": 1,
+      "step": 10,
+      "file": "S1_NOTES.md",
+      "asIs": false,
+      "impl": false,
+      "why": "S1_NOTES.md missing"
+    },
+    {
+      "goal": 92,
+      "chain": 2,
+      "step": 10,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: ValueError: Invalid log line format"
+    },
+    {
+      "goal": 93,
+      "chain": 3,
+      "step": 10,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: [x].transpose is not a function"
+    },
+    {
+      "goal": 94,
+      "chain": 4,
+      "step": 10,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 's4_markdown_mod' has no attribute 'toc'"
+    },
+    {
+      "goal": 95,
+      "chain": 5,
+      "step": 10,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "load: Assertion failed: Invalid expression"
+    },
+    {
+      "goal": 96,
+      "chain": 6,
+      "step": 10,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: type object 'Graph' has no attribute 'from_text'"
+    },
+    {
+      "goal": 97,
+      "chain": 7,
+      "step": 10,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.getOrSet is not a function"
+    },
+    {
+      "goal": 98,
+      "chain": 8,
+      "step": 10,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI header []"
+    },
+    {
+      "goal": 99,
+      "chain": 9,
+      "step": 10,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: No element found for selector: #s9-clear-done"
+    },
+    {
+      "goal": 100,
+      "chain": 10,
+      "step": 10,
+      "file": "S_INDEX.md",
+      "asIs": false,
+      "impl": false,
+      "why": "S_INDEX.md missing"
+    }
+  ]
+}

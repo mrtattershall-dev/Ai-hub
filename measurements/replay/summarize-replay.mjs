@@ -12,7 +12,9 @@ const COUNTERS = [
   ['exportLossWarnings', 'dropped-export warnings'],
   ['shadowHints', 'hidden-method hints'],
   ['connRetries', 'dropped-connection retries'],
-  ['defLossWarnings', 'definition-loss warnings'],
+  ['defLossWarnings', 'definition-loss warnings (the OLD advisory wording)'],
+  ['destructiveRefused', 'destructive writes REFUSED and the file restored'],
+  ['toolLoopStops', 'runs stopped naming the TOOL, not the model'],
   ['gateBlocks', 'finish-gate blocks'],
   ['discardNudges', 'multi-action discard nudges'],
 ];

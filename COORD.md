@@ -4155,7 +4155,9 @@ D and E".
       coder14b-setf 18:23:38 ("stopped, and confirmed by the app list"), coder30b-setf 18:42:00; independent re-list
       18:42: both stopped, 0 tasks. GPU: A10G 16:55 -> 18:23 (~88 min, ~$1.6) + H100 16:55 -> 18:42 (~107 min, ~$7.0)
       = ~$8.6. Running total: ~$31.9 (tatte raised the $30 cap by choosing both models).
-      Results (hidden checks on the final workspaces): base 14B 2/100 (22 goals 'done'), Qwen3-Coder 32/100 (71 'done').
+      Results (hidden checks on the final workspaces): base 14B 2/100 (22 goals 'done'), Qwen3-Coder 36/100 (71 'done').
+      (36, not the 32 first written here: 32 was trialF's rough on-disk heuristic over the workspace; the hidden
+      checks - checks-F.mjs, both asIs and impl - say 36/100, and the per-project lines agree. The 14B's 2 stands.)
       Records complete for BOTH: 100 run files + 100 transcripts each, traces, git bundles. The 14B failed 96 of its 203
       edit_file calls (47%); 26 were ambiguity and 64 were "not found" on a file it had already read in that run - so
       90 of 96 (94%) are addressable by the g-fixes addressing modes. 34 no-op edits were named by the set-E fix.
@@ -4163,3 +4165,652 @@ D and E".
       rewrite guard, search scope, the repeated-identical-call notice, and a connection retry that waits past the
       measured 9.6-12.8 s dead window. Full suite on the branch: 72 files, only the three real* tests skipped (no live
       MODEL_BASE). The LIVE hub was NOT restarted - it runs the old code until tatte says restart.
+    [offline hardening, Session A] NO FURTHER GPU SPEND until the hub is materially better. tatte: "Let's just run
+      offline fake model for like 3 hours and just really make it perfect. Then after we get it better, we can then pay
+      for a rerun. We need the hub better before we pay more money. Multiple edits and multiple deep checks. All the
+      problems have been deeper and silent deep in the code. Like at the beginning of creating this app deep." Set G
+      stays prepared and UNLAUNCHED. Everything this session is free: the replay rig, the fuzzer, targeted tests, and
+      read-only audits of every tool path in parallel.
+      h-fixes (worktree ~/Projects/ai-coding-hub-hfix, branched from c92c2d1): a write or edit that would REMOVE
+      definitions or exports the file ALREADY HAD is now REFUSED and the file restored byte-for-byte; the model is told
+      what it would have lost and can resend the file complete, or say REMOVE: <names> to delete on purpose. Set F is
+      the evidence that a warning was not enough: 7 of Qwen3-Coder's 8 definition-loss warnings ended with the names
+      still missing, and goal 81's rewrite of s1_library.js dropped titles, returnBook, getLoans, holds, overdue and pay
+      - which, because the hidden checks score the FINAL workspace, erased the credit for eight earlier steps of that
+      chain in one call. destructiveWrite.test 8/8. defLoss, exportLoss and editAddress asserted the OLD contract (a
+      destructive rewrite permitted, plus a sentence) and were rewritten to the refusal one; they pass. Full suite
+      running, mutants next - the refusal is not claimed as proven until a mutant that disables it fails those tests.
+      Replay corpus for the session: 200 scenarios rebuilt from set F's records (100 per model, 8.6 MB + 14.9 MB of
+      real replies), so every candidate fix can be re-run against what the models actually said, for nothing.
+      PRE-REGISTERED before the replay runs (predict-refusals.cjs over the 200 recordings, using the hub's own
+      defNames.js): the refusal must fire at least 2 times in 2 goals for the base 14B, saving 21 names, and at least
+      9 times in 9 goals for Qwen3-Coder, saving 23. Named in advance: 14B g082 (s2_logs.py: between, by_hour,
+      percentile, sessions and both its tests) and g098 (s8_grades.py: the whole Gradebook class and 14 of its methods
+      in ONE write); Qwen g025, g042, g043, g047, g066, g081, g090, g092, g094. g081 is the goal that motivated the fix
+      and it falls out of the recording independently - s1_library.js losing titles, returnBook, getLoans, holds,
+      overdue, pay and Library itself. This is a FLOOR: only whole-file writes are simulated (edit_file FIND/REPLACE
+      and LINES deletions are not), so the replay may legitimately show more, but fewer would mean the fix does not
+      fire where the recordings say it must.
+      Also measured while scanning: the 14B produced 24 whole-file writes across 100 goals against Qwen's 113 - it
+      never got far enough to write much, which fits the 77 goals the repeat guard killed after about six tool calls.
+    [offline hardening, Session A] DEEP AUDIT ROUND 1 - five read-only audits of the hub in parallel (tool
+      implementations, run loop and guards, ledger/checkpoints/persistence, verify+run_command, reply parser). Two are
+      back and both found things older and worse than anything the nudges ever addressed. Only findings I re-verified
+      in the code myself are recorded here; the rest are being checked one at a time before any of them is called real.
+      VERIFIED - run.callLog is a Map, and a Map does not survive being written to disk. I added it last session
+      (5cd6923, the repeated-identical-call notice). persist() -> slimForDisk() keeps the field; JSON.stringify of a
+      Map is {}; loadRuns() restores the object verbatim and rehydrates nothing; and `run.callLog || new Map()` does
+      NOT save it, because {} is truthy. So the FIRST tool call of any run resumed after a hub restart throws
+      "run.callLog.get is not a function". The throw is uncaught inside drive(), so the finally block runs while the
+      status is still 'running' - which means every terminal-status gate fails closed: no syntax rollback, no trace
+      row, no run-index line, no escalation, and no repair goal spliced into the queue. The queue item is released and
+      the goal looks like it was never attempted. The one bug that destroys the evidence needed to diagnose the others.
+      Set E lost a run to exactly this shape (a battery sleep mid-run, then resume).
+      VERIFIED - the end-of-run syntax rollback walks up to 25 commits back through a file's history (agent.js:3437,
+      fileHistory(..., 25)) and keeps the FIRST version that merely parses. The deep search was deliberate and is
+      justified in the comment (a HEAD-only version repaired almost nothing), but nothing bounds how far back it may
+      go, and nothing re-commits the result. In an interleaved chain a parse failure at goal 12 can therefore restore
+      a version from before goals 8-11 and delete that work from the file the remaining goals depend on. It does name
+      what it removed (lostDefs) and adds a Re-add task - but that task is carried, and the AGED scope only shows a
+      carried task when the next goal's text literally names the same file, so in an interleaved set the repair
+      instruction is replaced by a count. Needs a decision, not just a patch.
+      Also reported and queued for verification: the repeat guard is 3-identical-in-8 with a window nothing clears on a
+      productive step, keyed on the first 2000 chars of a whitespace-collapsed reply (so two different large writes can
+      count as identical), and unparseable replies enter that window BEFORE the parse-failure check - which would make
+      "produced the same response 3 times" the reported cause of failures that are nothing of the kind, and is the
+      leading explanation for set F's 77 of 100 goals killed after about six tool calls. Retries (context squash and
+      connection drop) each increment modelCalls, so "ran out of step budget" can be reported after fewer real turns;
+      the time budget counts time spent PAUSED, so resuming an interrupted run can kill it with zero turns executed.
+      A forced UNVERIFIED finish is written to run-index.jsonl and traces.jsonl as a clean 'done' - unverified code
+      entering the training corpus labelled success - and a cleanTests>=3 auto-finish skips the finish gate entirely
+      with no marker at all. Each of these gets its own test before it gets a fix.
+      ROUND 2 LANDED on h-fixes (offline, no spend). Four more silent bugs, each reproduced before it was touched:
+      1. read_file built [header][body][... N more lines below] and then sliced the WHOLE string to 14,000 chars, so
+         the truncation deleted its own warning. Measured: a 240-line file came back as 183 lines, the last one cut
+         mid-token, no notice, under a header still reading "lines 1-240 of 240". That is the read-then-rewrite path:
+         the model edits what it has and sends the part back as the whole file. Now the BODY is cut at a line
+         boundary, the header names the lines actually included, and the notice always survives and says where to
+         continue from. readTruncation.test 6/6.
+      2. run.callLog was a Map (mine, from 5cd6923). Written to disk it is {}, which is truthy, so the first tool call
+         of any run resumed after a restart threw, uncaught, inside drive() - and the finally then ran with the status
+         still 'running', skipping the rollback, the trace, the run-index line, the escalation and the repair goal.
+         Proven end to end: killed a hub mid-run, restarted, resumed - the run died and left NO index line. Now a
+         plain object, which survives the round trip. resumeAfterRestart.test 7/7, including the repeat notice firing
+         on an identical read_file either side of the restart, which is the thing only a persisted log can do.
+      3. The parser read its fields from the WHOLE reply, fenced content included. A file that merely documented the
+         convention ("add a line REMOVE: total, subtotal") handed itself permission to delete those definitions -
+         defeating the set-F refusal outright - and "I will replace LINES: 10-14" in a THOUGHT turned a whole-file
+         rewrite into a line deletion with the new code discarded. Fields now come from outside fenced blocks, and
+         LINES/OCCURRENCE/REMOVE must appear as fields at the start of a line, not as phrases. ACTION is deliberately
+         left alone: some models fence their entire action block, and the cost of ignoring a fenced LINES:/REMOVE: is
+         a refusal or a plain rewrite, never a deletion. parserFields.test 12/12, five of them controls.
+      4. In flight: a fenced FIND: with NO REPLACE: anywhere parsed to replace:'' and silently deleted the snippet,
+         answering OK: edited. The bare form was already safe - its pattern requires a following REPLACE: - so this
+         was an asymmetry, not a policy. Deliberate deletion (LINES: with an empty REPLACE) must keep working.
+      Mutants for all of these are written and run after the full suite; nothing here is called proven until a mutant
+      that disables each fix makes its test fail. Suite on h-fixes before round 2: 70 green, and the only failures the
+      three real* tests that require a live GPU endpoint.
+      THE NUMBER THAT REFRAMES SET F, and a correction to my own headline. Per-goal regression analysis (regress-F,
+      checks replayed against the commit where each goal's work landed, not just the final workspace):
+        Qwen3-Coder  48 worked when written | 36 work at the end | 16 REGRESSED
+        base 14B      4 worked when written |  2 work at the end |  3 REGRESSED
+      A THIRD of everything Qwen got working was destroyed by a later step. That is the answer to "we should be at
+      70 and we are not": the model earned 48 and the hub handed back 36. The 14B's problem is the opposite and
+      worse - it almost never got far enough to write anything, which fits the 77 goals the repeat guard killed after
+      about six tool calls. The regression failure texts are destruction signatures: l.titles is not a function,
+      library.getLoans is not a function, module 's2_logs_mod' has no attribute 'between'.
+      CORRECTION to today's emphasis: of those 16 regressions only ONE (goal 42) is a goal my pre-registered scan
+      named as a whole-file-rewrite casualty. So the destructive-write refusal - the fix I led with - addresses a
+      small slice of the real destruction, not the bulk of it. The other 15 are concentrated in s2_logs.py (5),
+      s1_library.js (3), s4_markdown.py (3), s10_desk.js (3) and must be attributed before anything else is claimed
+      about them: the candidates are the edit_file paths (a FIND with no REPLACE deleting the snippet, OCCURRENCE
+      indexing a different match than the one the model was shown, the tolerant matcher replacing whole lines and
+      discarding indentation), read_file truncation followed by a rewrite from the part, and the end-of-run rollback
+      walking back up to 25 commits. who-destroyed-it.cjs is written to settle it from the workspace git history -
+      find the commit where each missing name disappeared and read what the hub said it was doing at the time.
+      CORRECTING THE CORRECTION ABOVE (the "only 1 of 16" line is wrong - it compared two different indices).
+      Attribution from the workspace git history (who-destroyed-it.cjs over the 30B bundle, 366 commits):
+      s1_library.js lost titles, overdue and daysLate to ONE call - a write_file whose thought reads "I need to
+      rewrite the entire s1_library.js file properly" - on the goal "Add search(text) and removeBook(isbn) to the
+      EXISTING Library". That goal is number 81: the same goal the pre-registered prediction scan named, and the one
+      that motivated the destructive-write refusal. It shows up in the regression report as goals 1 and 41 because
+      the prediction scan indexes by WHERE THE DESTRUCTION HAPPENS while the regression report indexes by WHOSE
+      CREDIT IS LOST. Comparing the two sets directly was my error; the fix does target the real event. The rewrite
+      deleted 242 of 547 lines and six working methods (returnBook, pay, holds, getLoans, titles, overdue) while
+      adding the two the goal asked for - a model told to ADD to an EXISTING class.
+      Method note, worth keeping: a checkpoint is committed BEFORE a tool runs, so a commit saying "before X" holds
+      the state the tool BEFORE X produced. The LAST GOOD commit names the call that destroyed the work, not the
+      first bad one. Reading the wrong end of that blamed an append_file for a write_file's rewrite, and I published
+      that here before checking it - retracted. The audit's separate claim that append_file lacks the workspace
+      marker guard is independent of this and is still to be verified on its own.
+      HONEST BOUND on what destruction explains: only 6 of the 16 regressions name an identifier at runtime at all.
+      Of those, 3 are real removals (2 by write_file on goal 81, 1 by an edit_file whose thought was "fix the syntax
+      error in the regex pattern", which removed `between` from s2_logs.py), 2 still have the name present at the end
+      (so they failed for behavioural reasons), and 1 never had it. The other 10 name nothing and are UNATTRIBUTED:
+      "regressed" is not the same as "destroyed", and a later edit changing behaviour without removing a name would
+      look identical in the report. Attributing those needs a diff-based pass over the working commit versus the
+      final file. OPEN - not guessed at here.
+      ROUND 2 COMMITTED on h-fixes as 4764bde, and every fix is now PROVEN rather than asserted: 8 of 8 mutants
+      caught, both sources restored byte-for-byte afterwards. Destructive-write set 3/3 (remove the file-restore ->
+      3 tests fail; disable the refusal -> 4 fail; ignore REMOVE: -> 1 fails). Round 2 5/5 (read_file's line-boundary
+      cut -> 1; read_file's honest header -> 2; callLog reset each step -> the cross-restart repeat notice fails;
+      fields read from the whole reply -> 5; LINES/REMOVE accepted as phrases -> 1). Tests: destructiveWrite 8/8,
+      readTruncation 6/6, resumeAfterRestart 7/7, parserFields 17/17, emptyReplace 8/8, defLoss 6/6, exportLoss 7/7,
+      editAddress 9/9. Full offline suite 71 green, only the three real* tests failing (they need a live endpoint).
+      NOT pushed and the live hub NOT restarted - both are tatte's call.
+      TWO METHOD LESSONS from this round, worth more than the patches:
+      1. I patched agent.js to satisfy a control I had written myself (a LINES deletion with an empty REPLACE treated
+         as always deliberate) and it broke a guarantee another test already proved - that an edit deleting a method is
+         refused. The test was the thing that was wrong. A line range is not evidence the caller knows a method lives
+         there, least of all while read_file was handing out numbers for a file it had only partly shown. Rule now: a
+         LINES deletion that removes no name works; one that would remove a definition or export needs REMOVE:.
+      2. Two parser mutants first read ESCAPED. The tests were fine; my EXPECTATION lists named fixtures the mutated
+         rule never reaches - a comment-prefixed REMOVE: and a mid-line OCCURRENCE: are caught by the anchoring rule,
+         not by reading fields outside the fences, and the prose-LINES case is caught by the rewrite conversion before
+         any line range is read. Probing the mutated parser directly found the shapes that DO isolate each rule: a
+         line-START field inside the fenced body, and prose LINES: alongside a real FIND/REPLACE pair. The second of
+         those is the more dangerous shape in practice - it silently turns a two-line surgical edit into a fourteen-
+         line deletion - and it existed unnoticed until a mutant escaped. Mutants earn their cost exactly here.
+      STILL OPEN, in the order the evidence ranks them: the repeat guard (3-identical-in-8, keyed on the first 2000
+      chars of a whitespace-collapsed reply, never cleared by a productive step, and no pardon when the TOOL failed
+      three times - the leading explanation for 77 of 100 goals killed after about six calls); retries charging the
+      step budget; the time budget counting time spent PAUSED, so resuming an interrupted run can kill it with zero
+      turns executed; forced and cleanTests>=3 finishes recorded as clean 'done' in run-index.jsonl and in the
+      training traces; the finish gate calling verify() with no entry so it can verify an unrelated leftover .js; and
+      the boundary-marker package.json making detectKind answer 'node' for every workspace, which means a pure-Python
+      goal can never satisfy the gate. Each gets a reproduction before a fix, as above.
+      FINISH GATE REPRODUCED (finishGateEntry.test.mjs on h-fixes, 5 known-open + 3 controls green, no hub needed).
+      Not inferred from the audit - run against the real verifyProject:
+        - a Python-only workspace is detected as 'node', because the hub writes a package.json boundary marker into
+          every workspace and detectKind checks package.json BEFORE .py (verifyProject.js:105-119);
+        - verify(workspace) with NO entry - which is exactly how the finish gate calls it (agent.js:3060, versus the
+          verify_project TOOL at 1241-1246 which does resolve an entry) - passes a goal whose Python crashes, on the
+          evidence "`node q1_stock.js` ran and exited cleanly". A true sentence about a file from another goal.
+        - an explicit entry: 'main.py' is IGNORED when a stale index.html is present, because the override is gated on
+          ['node','python','unknown'] and excludes 'web' (verifyProject.js:146). One leftover index.html from any
+          earlier goal disables runtime verification for every later goal in that workspace.
+      The controls pass: given an entry and no index.html, the same machinery reports the Python crash correctly. So
+      the verifier is sound and the GATE is what is wrong - it never tells it which file the goal is about.
+      Consequence for set F, and a candidate explanation for a large share of the Python failures: such a goal can
+      never satisfy the gate, so it blocks three times and is then force-finished as 'done' - recorded in
+      run-index.jsonl and in the training traces as a clean finish. Fix is two small changes (resolve an entry in the
+      gate the way the tool does; let an explicit entry override 'web'), held until the running suite releases
+      agent.js. Reproduction first, then the fix, then a mutant - same order as everything else today.
+      REPEAT GUARD AND BUDGET REPRODUCED (h-fixes, offline, no spend). Both now fail on purpose, which is what makes
+      the next fixes measurable:
+        repeatGuardFairness.test.mjs - all three mechanisms confirmed against a real hub. A run that wrote two files
+        between repeats is stopped as stuck; three DIFFERENT large writes collide on the 2000-char normalised key and
+        the third never lands; and - the set F shape - three identical FAILING edit_file calls produce "Stopped: the
+        model produced the same response 3 times in the last 4 steps without making progress". The TOOL refused three
+        times and the run blames the model. run.recent is never cleared by a productive step, while ctxSquashes and
+        connRetries are both reset two lines earlier in the same loop, and the pardon requires justSubstituted, which
+        only the orientation-tool substitution sets - never a failing edit.
+        budgetAccounting.test.mjs - a run interrupted and then resumed is "stopped for a 90-minute budget it spent
+        asleep", with modelCalls still 0: killed before taking a single turn, then a repair goal starts the work over
+        from nothing. budgetStart is written at run creation, sub-task creation and the follow-up route only - never
+        by POST /:id/resume. This is exactly how set E lost a run to a battery sleep.
+        NOT yet established: whether a retried model call is charged a step. My first fixture measured the wrong run
+        (the drop injection parks the run as 'interrupted' rather than finishing, because the hub treats a dropped
+        socket as resumable), and the corrected assertion has not been confirmed. Claiming it either way would be
+        guessing - it stays open.
+      FINISH GATE, HALF FIXED and honestly half not. The 'web' override landed: an explicit entry now beats a stale
+      index.html, and the two cases about that flipped green. The entry-resolution half CANNOT be proven by
+      finishGateEntry.test.mjs, because that test calls verifyProject directly while the fix lives in the gate inside
+      agent.js - a unit test on the verifier says nothing about what the gate hands it. finishGateGoalEntry.test.mjs
+      drives a real run to finish in a mixed workspace to close that gap. Until it passes, the entry-resolution half
+      is written but unproven, and is not counted.
+      detectKind still answers 'node' for a Python-only workspace (the boundary-marker package.json is checked before
+      .py). Neither change touches that, and the test records it as open rather than quietly passing.
+      FINISH GATE NOW FULLY PROVEN, and the retry question is no longer open.
+      finishGateGoalEntry.test.mjs (a REAL run driven to finish, because the entry-resolution fix lives in the gate
+      inside agent.js and a unit test on verifyProject structurally cannot reach it) is 4/4: a goal whose own Python
+      crashes is BLOCKED instead of being finished on a passing leftover q1_stock.js from another goal; the block reads
+      "Project does not run (python)" - the goal's own language, not the stranger's; finishBlocks increments; and the
+      control, where the goal's own code runs, still finishes cleanly. With the two stale-index.html cases from
+      finishGateEntry.test.mjs already green, both halves of the gate fix are proven. detectKind still answers 'node'
+      for a Python-only workspace (the boundary marker is checked before .py) and the test records that as open.
+      Worth noting about the test, not the code: blocked() splits its arguments - the reason becomes a step, the
+      instruction (which carries verifier.format and names the failing file) goes into run.history, and GET /agent/:id
+      destructures history out of the response on purpose. So a test driving the API can never see that text; asserting
+      on it was my error, and the assertion now checks what is actually observable.
+      RESUME BUDGET FIXED AND PROVEN: POST /:id/resume now sets a fresh run.budgetStart, exactly as the follow-up route
+      already did and for the reason its own comment gives. Both budgetAccounting cases flipped green - a resumed run
+      is no longer stopped for a 90-minute budget it spent asleep, and it takes at least one turn. createdAt is
+      untouched, so the true start is still recorded, and the STEP budget is deliberately unchanged: those calls were
+      really spent. This is the set E battery-sleep failure closed.
+      RETRIES ARE CHARGED AS STEPS - now MEASURED, where an hour ago I recorded it as unproven and refused to claim it.
+      A fixture that finally discriminates (drop only a real turn, never the planner call, and count what the mock
+      actually answered) reports modelCalls 4 against 3 answered calls: the dropped attempt was billed. So a flapping
+      tunnel spends a run's step budget on calls that produced no assistant turn, and the run is then stopped with
+      "ran out of step budget" - the wrong diagnosis, which queues the wrong repair. The fix (refund the step when a
+      turn is abandoned before any reply arrived) is written but NOT yet applied: my first attempt anchored on a
+      recovery-path shape that does not exist in the file and correctly refused to write anything.
+      REPEAT GUARD REPRODUCTION IS CLEAN (3 passed, 4 known-open): punished for progress, the 2000-char key collision
+      losing the third of three different large writes, and three identical FAILING edit_file calls reported as
+      "the model produced the same response 3 times ... without making progress". The 77-of-100 killer is fully pinned
+      and the fix can now be measured against it.
+      MAIN-ARM REPLAY BASELINE COMPLETE: all 200 set F recordings replayed through current main, free, in ~43 min
+      (14B arm 19:37, 30B arm 20:20). 0 errors. This is the A/B baseline the h-fixes arm gets measured against, and it
+      already answers three things on its own.
+      1. THE CONNECTION-RETRY FIX IS CONFIRMED ON REAL RECORDINGS, at no cost. Six of Qwen3-Coder's goals change status
+         when its own recorded words are replayed through the fixed hub: interrupted -> done for g038, g044, g054,
+         g072, g098, and stopped -> done for g041. Those are the goals set F lost to dropped connections - the ones
+         where the endpoint recovered after 9.6-12.8 s while the old retry waited 2 s and 4 s. A paid run found the
+         bug; a free replay proves the patch. (One 14B goal also changes, g005 interrupted -> done.)
+      2. THE 14B's LEDGER IS DROWNING: leftover tasks were hidden from the per-call ledger in ALL 100 of its goals -
+         705 turns' worth - against 31 scenarios/205 where they were still shown. Qwen: 9 scenarios/169 hidden. This is
+         the AGED-scope trade the ledger audit flagged: a carried task is shown only when the next goal's text names
+         the same file, so in an interleaved set the one line that would repair earlier damage is replaced by a count.
+         Not yet a fix - it is a deliberate design choice whose cost is now measured, and it needs a decision.
+      3. THE POPULATION THE REFUSAL WILL CONVERT: 10 definition-loss warnings across 9 Qwen goals plus 2 dropped-export
+         warnings, and 3 def-loss warnings for the 14B. That matches the floor pre-registered before any of this ran
+         (>=9 goals for Qwen, >=2 for the 14B), which is the first independent check that the prediction scan and the
+         replay are measuring the same events.
+      Also visible and worth a look later: 34 of Qwen's scenarios produced 95 multi-action discard nudges - replies
+      carrying more than one ACTION, with everything after the first silently dropped (batch mode is off by design for
+      these measurements). 4 NO CHANGE edits (14B 16 scenarios/34). One 30B scenario (g089) ends with no status at all.
+      6 of Qwen's and 1 of the 14B's replays ran past the end of their recording (EXHAUSTED), which means the fixed hub
+      asked for more turns than the model originally gave - itself a difference worth reading rather than a fault.
+      ROUND 3 PROVEN AND COMMITTED on h-fixes: 7 of 7 mutants caught, both sources restored byte-for-byte, all four
+      baselines clean (finishGateGoalEntry 4/4, budgetAccounting 5/5, repeatGuardFairness 9/9, finishGateEntry 5 with
+      its 3 deliberate opens). Full offline suite 78 green, 0 failures. NOT pushed, live hub NOT restarted.
+      The five fixes: the finish gate resolves the goal's own entry (proven by a REAL run, because a unit test on
+      verifyProject cannot see inside the gate); an explicit entry overrides a stale index.html; a resumed run gets a
+      fresh wall clock; an abandoned turn refunds its step; and the stuck-loop guard on all three counts - whole-reply
+      key, a window that no longer counts a repeat when work landed between, and a tool loop named as a tool loop with
+      its own repair sentence.
+      ONE MUTANT ESCAPED FIRST, and it is the most useful thing in this round. Reverting the repeat key to a 2000-char
+      slice broke NOTHING: the window fix independently rescued that fixture, because those three big writes SUCCEED,
+      so `landed` moves between them and the guard stays quiet whether the keys collide or not. Two of my own fixes
+      overlapped, which left the key fix unpinned - it could have been deleted and no test would have noticed. Fixed by
+      building the fixture only the key can protect: three replies whose >2000-char preamble differs ONLY past 2000
+      characters, driving repeated read_file so nothing counts as work landing. That is also the shape that matters in
+      practice - a model iterating on a large file whose writes keep failing - and it existed untested until a mutant
+      escaped. Second time this session that mutation testing found a hole in my tests rather than in the code.
+      MY OWN TOOLING HAS THE BUG WE ARE HUNTING. tatte: "Remember silent failures." A test case labelled "(known)"
+      prints KNOWN, the file still exits 0, and the suite counts it green - so a suite can report a clean run over
+      documented failures, and a NEW failure landing in such a case would be invisible. Currently it hides exactly 3
+      cases, all deliberate (finishGateEntry's detectKind and no-entry traps), so nothing unknown is masked today. Next
+      change: the runner counts known-open cases in its summary, and treats two things as hard failures - a "(known)"
+      case that starts PASSING (the label is now a lie) and any NEW case appearing under that label.
+      REPLAY A/B LAUNCHED: the h-fixes arm over the same 200 recordings, one variable changed, against the main-arm
+      baseline already on disk. The prediction stands as pre-registered: the refusal must fire at least 2 times in 2
+      goals for the 14B and 9 in 9 for Qwen3-Coder, and main's arm independently showed 10 definition-loss warnings in
+      9 Qwen goals plus 2 dropped-export warnings - the population that should now become refusals.
+      THE A/B COULD NOT HAVE ANSWERED ITS OWN QUESTION - caught at 24 of 200, not at 200. replay-run.mjs derives every
+      counter by regexing what the hub SAID to the model, and its defLossWarnings pattern is /REMOVED \d+ definition/ -
+      the OLD advisory wording. The refusal says "would have REMOVED N thing(s) <path> already had: ...". So the
+      h-fixes arm would have reported defLossWarnings 0, which reads as "the problem went away" when the truth is "the
+      warnings became refusals". A misleading zero in the single measurement launched to test the refusal, and exactly
+      the silent-failure shape tatte told me to keep in mind. Fixed additively: destructiveRefused + refusedNamed +
+      refusedNotes, and toolLoopStops for the guard's new honest stop, all registered in the summarizer and printed per
+      scenario. The arm was killed and restarted rather than left to finish, because a counter never computed cannot be
+      recovered by re-summarising - about two minutes of replay against a worthless 45.
+      ALSO CORRECTED, for the record: patch-empty-replace.cjs was WRITTEN and never APPLIED, and that was right. The
+      "fenced FIND with no REPLACE silently deletes" bug turned out to be already stopped by the destructive-write
+      refusal (which notices the definition would disappear and restores the file), so the only thing the patch would
+      have changed was the wording of a refusal that already happens. emptyReplace.test.mjs passes 8/8 on that path.
+      grep confirms no `noReplace` plumbing exists in agent.js or agentParse.js - so nothing is half-applied and no fix
+      is missing. Noting it because a scratchpad patch that was deliberately dropped looks identical, later, to one that
+      was forgotten.
+      A SILENT FAILURE IN MY OWN PROCESS CONTROL, worth recording because it cost two rounds of cleanup. TaskStop
+      reported "Successfully stopped task" for the replay arm, and the work kept running: it stopped the wrapper but not
+      the shell loop, so when I then killed the coder14b child by PID the loop treated that as "finished" and spawned
+      the coder30b arm - a new writer appending to the same results file I had just deleted. A success message over work
+      that did not stop, which is the same shape as everything else found today. Two further lessons from the cleanup:
+      killing by a command-line PATTERN is dangerous (matching 'replay-hfix' hit three bash.exe processes, one of them
+      my own shell, which aborted the command mid-way and left the job half-cleaned); and after killing anything that
+      appends, re-check for RESPAWNS before deleting output, not after. The right sequence, used in the end: kill the
+      shells, then kill each arm by explicit PID, then re-verify nothing is alive, then delete the partial files.
+      Clean state confirmed before the restart: no replay-run process, no setF-*-hfix.jsonl, and both main-arm baselines
+      untouched at 100 lines each. The arm is now restarted on the patched counters, so the pre-registered prediction
+      (the refusal fires at least 2 times in 2 goals for the 14B and 9 in 9 for Qwen3-Coder) is finally measurable.
+      OFFLINE TESTING CONTINUES (tatte: "Keep testing the offline"). Two more silent failures, one already fixed and
+      mutant-proven, one under test:
+      FIXED - edit_file's unique-FIND path interpreted the model's REPLACE text instead of writing it. It was the only
+      one of the four write paths using String.replace with a string replacement, which expands $-patterns even when
+      the pattern is a plain string; the LINES path, the occurrence path and the tolerant path all use slice/splice and
+      were never affected - a bug, not a convention. Measured reds before the fix: "X$&Y" became "XHOOKY"; "KEPT$'"
+      spliced the whole rest of the file back in, duplicating it; and the canonical regex-escaping line
+      s.replace(/[.*+?]/g, '\$&') was written to disk as '\TOKEN' - the model's own code silently rewritten, answered
+      with OK: edited. Fixed by passing a function replacement (`() => replace`), which disables $-handling entirely.
+      replacementLiteral.test 6/6 with two controls; 1/1 mutant caught (put the string replacement back -> exactly the
+      three cases fail). Silent because the tool says OK, no diff is shown, and .md/.html/.css/.json have no syntax
+      check and no definition guard - so the cases that SURVIVE are the ones nothing looks at.
+      UNDER TEST - search_file compiles QUERY as a regex and only falls back to escaping when the regex is INVALID. So
+      a query that is valid regex but means something else silently misses text that is plainly there: arr[0] needs
+      "arr0", sum(a, b) is a capture group, a+b is one-or-more 'a', and cfg.mode also matches cfg_mode. The answer is a
+      confident "(no matches for ...)" from an ORIENTATION tool, which is the documented route from "the code isn't
+      there" to a whole-file rewrite. Note this is the SECOND cause of that same symptom - the first (a directory path
+      becoming the only target) was fixed in g-fixes, so the symptom reading as closed is itself a hazard. The fix is
+      deliberately not written yet: naive always-escaping would break genuine regex queries, so it waits on the reds.
+      REPLAY A/B IN FLIGHT on the patched counters: 132 of 200, already showing 5 destructive writes REFUSED and 29
+      runs stopped naming the TOOL rather than blaming the model - both on the models' own recorded words, for nothing.
+      All four "(known)"-convention files re-verified after the tooling change: finishGateEntry 5 passed + 3 open by
+      design, budgetAccounting 5, finishGateGoalEntry 4, repeatGuardFairness 9, every one printing its KNOWN-OPEN line.
+      SEARCH FIXED (searchLiteral.test 7/7, mutants running). search_file compiled QUERY as a regex and only fell back
+      to escaping when the regex was INVALID, so a query that is valid regex but means something else silently missed
+      text that was plainly there. Measured reds: "arr[0]", "sum(a, b)" and "a+b" all answered "(no matches)" against a
+      file whose first three lines contain exactly those strings, and "cfg.mode" matched cfg_mode - a different
+      identifier. Fixed by reading the query as TEXT first and as a pattern only if the literal pass finds nothing
+      anywhere, with the answer saying which reading produced the hits and the empty answer saying both were tried.
+      Always-escaping would have been the other kind of wrong: the tool does support a real pattern query.
+      Two fixture lessons, both from writing the mutants BEFORE trusting the fix:
+      - the fix has two halves and the first version of the test only pinned one. Disabling the pattern fallback left
+        every case passing, so I added a query that can only work as a pattern ("function \w+Handler" against two
+        handler functions). That is the third time today a mutant found a hole in my tests rather than in the code -
+        after the repeat-key overlap and the two parser expectation lists.
+      - I wrote mutant B expecting it to ESCAPE and nearly recorded that as a known limitation. Closing the hole was
+        strictly better than documenting it, and took one fixture.
+      REPLAY A/B, Qwen arm in progress (146 of 200): destructive writes REFUSED is now 7 across 7 distinct goals, with
+      29 runs stopped naming the TOOL rather than blaming the model. The pre-registered floor was 2 goals for the 14B
+      and 9 for Qwen3-Coder; the 14B arm produced 5 refusals in 5 goals, already above its floor, and Qwen's half is
+      what the remaining scenarios settle. Both counters exist only because the counter gap was caught at 24/200 - the
+      old defLossWarnings pattern would have reported 0 refusals on this arm and read as "the problem went away".
+      MARKER GUARD FIXED (markerGuardBypass.test 7/7, 2/2 mutants caught). package.json is the workspace boundary
+      marker - it stops npm and node treating the hub's own checkout as the project, and the system prompt asserts
+      "this workspace is CommonJS" as a fact built on it. Two holes, both reproduced with the damage visible on disk
+      before the fix: append_file had NO guard at all (markerRefusal was called from write_file and edit_file only) and
+      answered "OK: appended 24 bytes to package.json", leaving it invalid JSON; and a traversal path slipped past,
+      because the guard compared the SPELLING - dropping '.' segments, so './package.json' was caught but
+      'sub/../package.json' was not - while safePath's resolve() collapsed it to exactly the marker. That one reported
+      "OK: wrote 17 bytes" and left the marker as {"type":"module"} - the production failure the guard exists to stop,
+      which had already happened in two of four audited run workspaces. Fixed by comparing RESOLVED paths (so the guard
+      sees what the writer will write) and putting the guard on append_file - which is auto-approved and is the tool
+      the hub steers a model toward when a FIND misses, i.e. the easiest write in the tool set was the unguarded one.
+      A TEST-ISOLATION NOTE, since the mutant harness surfaced it: mutant A also broke an assertion belonging to the
+      traversal half. Not entanglement in the fix - mutant B broke only traversal cases - but my test shares one
+      workspace across cases, so the append's corruption is still there when later cases read the marker. Each half is
+      still pinned by a case unique to it, so the verdicts stand; recording it because a shared-state test can later
+      report a failure in the wrong place, which is its own quiet way of being wrong.
+      OFFLINE TALLY: fifteen fixes, every one with a red reproduced first and a mutant that makes its test fail again.
+      Twelve committed (4764bde, b60e6ef); three pending a full-suite run - the $& literal replacement, search
+      literal-first, and this marker guard. Replay A/B at 155/200, holding at 8 refusals across 8 goals.
+      REPLAY A/B RESULT - THE PRE-REGISTERED PREDICTION IS MET EXACTLY. Same 200 recordings, same mock, same
+      approvals; the only variable is the hub. (The Qwen arm wedged at 94 of 100 - its process had no child hub and no
+      CPU movement for 7 minutes - so it was killed and summarised over 100 + 94. The refusal counts below were already
+      complete.)
+        base 14B     definition-loss warnings 3 -> 0   destructive writes REFUSED 0 -> 3, in 3 goals   (floor was >=2)
+        Qwen3-Coder  definition-loss warnings 10 -> 0  destructive writes REFUSED 0 -> 10, in 9 goals  (floor was >=9)
+                     dropped-export warnings 2 -> 0 (folded into the refusals)
+      One for one: the warnings did not vanish, they became refusals, on the models' own recorded words, for nothing.
+      Also 29 of the 14B's runs now stop naming the TOOL instead of blaming the model (Qwen 1 - it was not the one
+      looping on failing edits), and the 14B's six connection-drop goals still convert interrupted -> done.
+      AND A RESULT I AM NOT CALLING GOOD YET. Finish-gate blocks went 1 -> 23 scenarios (14B) and 1 -> 30 (Qwen), and
+      22 of Qwen's goals that ended 'done' now end 'stopped'. The cause is clearly the entry-resolution fix:
+      verify_project detected goes from python x2 to python x26 on that arm, i.e. the gate is finally RUNNING the
+      Python those goals were about instead of an unrelated leftover .js. Since Qwen only scored 36/100 on the hidden
+      checks, most of those 'done' runs were false - so the likely reading is that the gate stopped lying. But that is
+      an inference, and in a replay the mock cannot react, so a block becomes EXHAUSTED and then 'stopped'; in a live
+      run it would be three chances to fix, then a forced finish MARKED unverified. Spot-checking individual scenarios
+      before this is written up as a win. What the A/B proves today is narrower and still worth having: the hub no
+      longer records a false 'done', and the destructive writes that erased a third of Qwen's working code are refused.
+      SPOT-CHECK: THE GATE IS RIGHT, and it exposed an interaction I caused. All three 'done -> stopped' scenarios
+      sampled (Qwen g016, g022; 14B g088) show the same sequence: verify python, three "Project does not run (python) -
+      not finished." blocks, then "Stopped: the model produced the same response 3 times". So the gate is running the
+      Python those goals were about and correctly finding it broken - the 22 lost 'done's were false, and that half of
+      the fix is vindicated by the evidence rather than by inference.
+      The interaction, recorded as an open QUESTION and not a defect: a gate that blocks three times hands the repeat
+      guard three identical replies, so a run whose model answers a block by repeating itself dies to the loop guard
+      before it reaches the gate's own 3-block forced finish (which would at least be MARKED unverified). In the replay
+      the mock cannot react, so this is exactly what happens every time - which means the replay CANNOT tell me whether
+      a live model would fix the file instead. Only a paid run answers that, and it is now a specific question rather
+      than a hope: does the model use the three blocks?
+      GATE FIXES, one proven and one not yet: a test_web result beginning with ERROR now banks no clean test and leaves
+      needsTest set (proven - measured cleanTests 2 with needsTest false before, 0 and true after; the run never even
+      reached the 3-clean auto-finish because the tool-loop guard added earlier today stopped it first, one fix masking
+      another, which is why the assertion had to move from the outcome to the bookkeeping). The verification pass is now
+      tied to a workspace fingerprint (run.verifiedAt) so it expires when any source file changes - the code is in, but
+      its fixture does not yet demonstrate the case, so it stays labelled OPEN rather than counted as done.
+      Two gate defects from the audit remain deliberately UNFIXED because neither has a reproduction yet: a failed
+      visual inspection falls through both the visual and the runtime gate, and one bare catch around the verification
+      block turns any throw into a silent pass. Both read straight off the source; neither gets a patch before a test.
+      A REGRESSION I INTRODUCED, FOUND BY A TEST THAT COULD NOT FIRE - and it is the most instructive thing today.
+      substitutionHonesty.test.mjs was written to check that the loop-break substitution does not present a 6,000-char
+      fragment as a whole file. Its premise failed: no substitution happened at all. Cause, confirmed at line level: the
+      repeated-identical-call NOTICE (merged in g-fixes) appends a sentence to `result` at agent.js:3324, and the
+      substitution computes its duplicate signature from `result` 133 lines later at :3457. So on the second identical
+      orientation call the signature contained the notice, `duplicate` was false, and the MECHANICAL loop-break - the
+      thing that actually hands the model the goal's file - had been unreachable ever since that notice was merged.
+      Measured: two identical list_dir calls, resultSigs 2, escalations undefined, no substitution. A fix that DECORATES
+      a result silently disabled a fix that ACTS on one. That is the advisory-over-mechanical trap one level up, and it
+      was invisible because nothing tested the mechanical path. Fixed by keying duplicate detection on the tool's own
+      undecorated answer (`rawAnswer`), so the notice and the substitution coexist.
+      Two patch-hazard lessons from the same stretch, both of which left agent.js UNPARSEABLE: a patch script must not
+      build a generated template literal by concatenating pieces across source lines (the first piece lost its closing
+      backtick, so the continuation parsed as an identifier), and a repair script must never be written through a
+      heredoc (\n collapses and ${...} mangles, so the repair anchor matched nothing). The working method: read the exact
+      bytes back as JSON, then repair line-by-line matching on escape-free substrings, with the script written via the
+      editor rather than a heredoc.
+      GATE FIXES NOW BOTH PROVEN: gateSoundness 8/8, zero open. The cached-pass half is genuinely exercised - the
+      rewritten fixture uses an open ledger task to force a real second finish attempt after the entry is broken, and
+      the pass is not reused. COMMAND OUTPUT FIXED: stdout is trimmed in the MIDDLE with the sizes announced, while
+      stderr and the EXIT line always survive, at both run_command and run_python; commandOutputTail 6/6 from 3 reds.
+      Suite: 80 green with two failures, both accounted for - gateSoundness's stale expected-open count (now corrected)
+      and teardownSettles exit 127, which passes 5/5 alone. That is the SECOND file to false-fail under load, so the
+      runner needs a retry-on-127 before its results can be trusted; a flaky suite is a silent failure of its own.
+      THREE STALE MATCHERS IN ONE FILE, and the lesson is sharper than the bugs. substitutionHonesty asserted on
+      remembered wording three times running: it looked for the sentence "it was replaced with the contents of" (which
+      the fix reworded, so the premise failed on an empty string and BOTH verdicts became meaningless - one passing
+      vacuously), and then for "trimmed/truncated/of N characters" when the honest notice speaks in LINES
+      ("(lines 1-102 of 301)", "199 more line(s) below"). A working fix read as a live bug. Matchers now key on things a
+      fix cannot reword: the target filename plus a fence to find the message, a line-range header or a more-lines
+      notice to judge it. A matcher that goes stale when the code improves is a test that quietly stops testing.
+      AND A MUTANT THAT COULD NEVER FIRE, caught by running it. The command-output fix has two halves: trim stdout in
+      the middle, and never cut the assembled result from the front. A mutant restoring the old front-slice ESCAPED -
+      and had to, because the per-section caps (stdout 6,000, stderr 1,500) keep the result near 6.2k, so an 8,000-char
+      front-cut removes nothing. Measured: result length 6209. The property that actually protects the verdict is the
+      ORDER - whatever is trimmed, stderr and EXIT come after it - so the test now pins the order directly and the
+      mutant moves the EXIT line to the front instead. A second mutant in that harness had ESCAPED for a worse reason:
+      my mutation left agent.js unparseable, so its verdict meant nothing; the harness now parse-checks every mutation
+      and says so. commandOutputTail 7/7.
+      SUBSTITUTION: both honesty halves fixed (numbered lines, a line-range header, an explicit "you do NOT have the
+      whole file" with the read_file OFFSET to continue, and no more impersonating a read_file result) on top of the
+      reachability fix. Its premise is now the regression guard for the mechanical path, and mutants-substitution.cjs
+      includes a mutant that reverts the signature to the decorated result specifically to make that guard fire.
+      ROUND 4 MUTANTS, all caught: command output 2/2 (the order mutant now fires where the front-slice mutant could
+      not, and the harness parse-checks every mutation after one of mine left agent.js unparseable and reported ESCAPED
+      for that reason), substitution 3/3 including the REGRESSION GUARD - reverting the duplicate signature to the
+      notice-decorated result makes the premise fail, so the unreachable-loop-break bug cannot come back unnoticed -
+      and the gate 1/1. Sources restored byte-for-byte after every run.
+      Worth noting how often the KNOWN-OPEN guard now appears in the "noticed by" lists: it fires inside mutant runs as
+      well as suite runs, catching "a NEW failure is hiding behind the (known) label" in five separate mutants. The
+      tooling change earns its place - it is the only thing that makes a documented-but-open bug impossible to confuse
+      with a passing one.
+      OFFLINE TALLY: twenty fixes now, every one red-first and mutant-proven. Twelve committed (4764bde, b60e6ef); eight
+      pending a clean suite - $& literal replacement, search literal-first, the marker guard on all three write routes,
+      two gate fixes, the command-output trim, substitution reachability and substitution honesty - with seven new test
+      files and the (known)-non-silent tooling change. Suite running under the retry-on-127 runner.
+      STILL OPEN, unchanged and deliberately unpatched until each has a reproduction: detectKind answering 'node' for
+      every workspace (the boundary marker is checked before .py); the end-of-run rollback walking up to 25 commits;
+      non-JS/PY files having no destructive-write guard at all; forced and cleanTests>=3 finishes recorded as clean
+      'done' in run-index.jsonl and the training traces; OCCURRENCE numbering disagreeing with the candidate list the
+      model was shown; CRLF forcing every multi-line exact FIND onto the tolerant path; the read_file MAP branch
+      truncating its own instruction; ledger task_done resolving by unstable number or unanchored substring; run files
+      written non-atomically; boot-time queue pruning stranding chained goals; interrupted runs being evictable; and the
+      two gate defects with no fixture yet (a failed visual inspection skipping both gates, and the bare catch around
+      verification turning a throw into a silent pass).
+    [GPU AUTHORISATION, Session A] tatte: "Run a coder three run now then" - given directly after I reported that
+      reliability and measurement honesty are proven but NO score improvement has been demonstrated, and that the only
+      way to answer "does the model use the extra room" is a paid run. Recorded verbatim per the deploy rule before
+      anything is deployed. This supersedes the earlier "We need the hub better before we pay more money" for this run.
+      Pre-launch conditions I am holding to, in order, because starting the GPU clock on an unready harness is the
+      expensive mistake: (1) the eight pending fixes committed and the full suite clean, so the run exercises the
+      hardened hub rather than this morning's; (2) set G's pre-registration updated to name the exact hub state and
+      committed BEFORE the window opens; (3) fuzzer paused, AC confirmed, keep-awake held; (4) the Rule 3 identity line
+      from /api/health captured into this ledger the moment the endpoint answers; (5) a watchdog that stops the app
+      only via stopApp.mjs, and an independent re-list with `python -m modal app list --json` at the close.
+      tatte: "Go ahead and do a 14 b too" - so this is the same two-model shape as set F, which makes it the right
+      comparison: identical goals, identical checker, identical caps, one variable (the hub). "coder three" resolved
+      from the deploy log of the 2026-09-11-coder3 measurement: MYCODER_BASE=Qwen/Qwen3-Coder-30B-A3B-Instruct on H100,
+      served as coder30b - a 30B mixture-of-experts with ~3B ACTIVE parameters, which is where "only uses 3 billion"
+      comes from. It is the same model that scored 36/100 on set F and 34/40 hand-graded, NOT a 3B dense model, so this
+      is an H100 window (~$7 for 95 min by set F's ledger) plus an A10G for the 14B (~$1.6). About $8.6, taking the
+      running total to roughly $41.6.
+      SUITE #6's two failures were BOTH phantoms, and finding that out changed the runner: hostileModel failed all seven
+      of its cases with "fetch failed" and batchActions reported "run never ended" plus damage - and alone they pass
+      14/14 and 15/15, exit 0. Neither was exit 127, so the retry rule I added an hour ago would not have caught them.
+      It now also retries when a file fails with nothing able to reach the hub, which is the signature of a hub that
+      never came up under load. Three phantom failures in one session is a measurement problem, not bad luck.
+    [set G window OPEN, Session A] Both arms deployed 22:35 against main dae46b2 (the twenty offline fixes; sixteen
+      probed present in main after the fast-forward merge). Pre-registration committed FIRST at 9afb8d0, before any GPU
+      time, naming both models, the costs and four falsifiable predictions.
+        coder30b-setg  Qwen/Qwen3-Coder-30B-A3B-Instruct  H100  served coder30b  (this is "coder three": 30B MoE, ~3B
+                       active - resolved from the earlier measurement's own deploy log, not assumed)
+        coder14b-setg  Qwen/Qwen2.5-Coder-14B-Instruct-AWQ  A10G  served coder14b  (id taken from set F's proven
+                       identity line, not guessed)
+      App URLs: coder30b-setg-server-web.modal.run (deployed 22:35:37), coder14b-setg (deploying 22:35:55). Status files
+      written before any GPU time so the watchdogs are armed first, per Rule 7a - stops ONLY via stopApp.mjs.
+      Cap 95 min per arm, no new goals in the last 8; expected close ~00:10. Cost model from set F's ledger: H100 ~$7.0
+      + A10G ~$1.6 = ~$8.6, taking the running total to about $41.6.
+      Environment: laptop on AC (BatteryStatus 2), keep-awake re-armed 22:26 for 3h so it covers the whole window (set E
+      was lost to a battery sleep), fuzzer STOPPED for the duration - CPU contention produced three phantom test
+      failures earlier today and would corrupt a paid measurement. `python -m modal app list --json` showed 0 apps
+      before deploying, so there was no stale app burning time.
+      Every remaining offline reproduction is deliberately NOT started while these run, for the same contention reason.
+      Identity lines (Rule 3) recorded below as each endpoint answers; the launch script refuses to run a single goal
+      until /api/health names the exact HF model.
+      IDENTITY PROVED (Rule 3), both arms, before any goal ran - the launch script refuses to start otherwise:
+        coder30b-setg  {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+        coder14b-setg  {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+      Goals start: coder30b 22:39:18, coder14b 22:39:24 (deploy 22:35, so ~4 min of load for the 30B). No new goals
+      after 00:06 either arm; watchdogs armed 22:36:47 / 22:36:50 at a 110-minute backstop, stopping ONLY via
+      stopApp.mjs. Both endpoints answered on the first health try, so nothing idled between deploy and first goal.
+      The run exercises main dae46b2 - the twenty offline fixes - against set F's own 100 goals and byte-identical
+      checks, with the pre-registration and its four predictions committed beforehand at 9afb8d0.
+      MID-WINDOW, 22:56 (~18 min of goals): coder30b 20/100 (18 done, 2 stopped), coder14b 14/100 (7 done, 7 stopped).
+      Two early signals, neither claimed as a result - the hidden checks settle this, not the statuses:
+        - the 14B is spending 30 calls / 60 steps on a goal instead of dying at about six, which is what the repeat-guard
+          fix was for. Set F killed 77 of its 100 goals that way.
+        - the 30B's done rate is running HIGHER than I predicted, not lower, despite the stricter gate.
+      A CAVEAT TO RECORD NOW so the number is not misread later: at 14 goals in 18 minutes the 14B projects to roughly
+      45-50 goals by the 00:06 cut, not 100. Its score must be reported BOTH ways - out of goals attempted and out of
+      100 - or a truncated arm will read as a collapse. Set F's 14B completed all 100 because it died early on most of
+      them; running longer per goal is the intended change and it costs coverage.
+      CLOSE-CHECK RECIPE, fixed now rather than during shutdown: `python -m modal app list --json` returns entries keyed
+      app_id / description / state / tasks / created_at / stopped_at. The app NAME is `description`; proof of stopping is
+      state not 'deployed' AND stopped_at non-null. My first parser read Name/State and printed "undefined", which would
+      have made the shutdown proof unreadable at exactly the wrong moment.
+      CORRECTION, and the best news of the window. I reported "0 refusals, 0 tool-loop stops" from the harness summary
+      log - wrong file. That evidence lives in the run files, and in the first ~20 minutes of paid time:
+        coder30b (trial35-Pezwpm, 23 runs so far): 8 run files carry a destructive-write REFUSAL, 10 carry the honest
+                 loop-break substitution.
+        coder14b (trial35-KTS2wY, 15 runs so far): 2 tool-loop stops (the guard naming the TOOL, not the model), 6
+                 substitutions.
+      So three of today's fixes are demonstrably firing on live goals, not just on replayed recordings - including the
+      substitution, which had been UNREACHABLE since the repeat-notice merge and is therefore doing work in this run that
+      it has not done in any previous set. The wrong-file grep is worth noting because it points the dangerous way: it
+      would have had me doubting a mechanism that was working.
+      THE REFUSAL, AS THE MODEL ACTUALLY SAW IT (live, 30B, ~20 min in) - not a string coincidence:
+        "ERROR: this write_file would have REMOVED 6 thing(s) s7_cache_fixed.js already had: Cache, get, has, runTests,
+         set, size. s7_cache_fixed.js is UNCHANGED - nothing was written."
+        and the same on s6_graph.py: Graph, __init__, add_edge, add_node, neighbors, nodes.
+      That is precisely set F's failure mode - a rewrite dropping a whole class and its methods - blocked at the moment
+      it happens instead of narrated afterwards. The substitution is handing over NUMBERED lines under an honest header
+      ("THE HUB IS SHOWING YOU s6_graph.py (the whole file)"), and the 14B's guard now says "the same tool call returned
+      the identical answer 5 times - the tool refused every time, so nothing the model asked for had any effect" in
+      place of "the model produced the same response 3 times".
+      ONE THING TO WATCH IN THE SCORING, flagged now rather than discovered later: the refusal fired on
+      s7_cache_fixed.js. A "_fixed" suffix means the model wrote a PARALLEL file instead of editing the original - its
+      own avoidance behaviour, and the hidden checks score the named file, so a goal can lose points with nothing having
+      been destroyed. If the checks come in flat while refusals are firing, this is the first thing to look at: the fix
+      stopped the destruction and the model routed around the edit.
+      MID-WINDOW, 23:19 (40 min of goals): coder30b 42/100 (27 done, 15 stopped), coder14b 27/100 (7 done, 20 stopped).
+      Mechanisms firing at scale, counted in the run files: 30B 12 refusals, 16 substitutions, 10 gate blocks in 43 runs;
+      14B 12 substitutions, 6 tool-loop stops, 2 gate blocks in 28 runs. Destruction is being blocked repeatedly on live
+      goals, and the substitution - unreachable in every previous set - is working in both arms.
+      THE CONCERN, stated while it is still a concern and not a conclusion: the 14B's done count has not moved from 7
+      since 22:56 while it burned 13 more goals, so it is surviving past six calls (the guard fix works) and converting
+      that room into 'stopped' rather than into finished work. That matches the pre-registered warning that statuses
+      would look worse, but it is NOT evidence the checks will be better, and the checks are the only thing that settles
+      it. If its checks land near set F's 2/100 while refusals and substitutions fire, the honest reading is that the
+      repeat guard was never the 14B's binding constraint and the model is the ceiling - which is exactly what
+      prediction 4 in the pre-registration said the run would settle either way.
+      Two counts read 0 and are recorded as UNCONFIRMED rather than absent, after today's wrong-file grep: command-output
+      trims (0 in both arms - these goals run small scripts, so plausibly never >6,000 chars of stdout) and 30B tool-loop
+      stops (0 - its edits are landing, unlike the 14B's). Neither is suspicious; neither is proven.
+      Pace: 30B projects to ~100 goals by the 00:06 cut, 14B to ~55. The 14B's score gets reported both ways.
+      WHY THE 14B's RUNS STOP - the distinction that decides whether today's guard fix helped it, and it did:
+        4 of 20  "ran out of step budget (30 model calls)"  <- still working when the cap ended
+        6 of 20  "the same tool call returned the identical answer 2/3/5/7 times - the tool refused every time"
+        9 of 20  "the model produced the same response 3 times in the last 6-8 steps"  (the reply-repeat path)
+      Mean depth on stopped runs: 24.4 steps / 13.5 model calls. Set F's 14B died at a MEDIAN of about 6 calls with 77
+      of 100 goals killed by that guard. So the fix more than doubled how far this model gets before dying, and a
+      quarter of its stops are now the 30-call budget rather than a guard - i.e. the binding constraint has MOVED from
+      the guard to the step budget. That is the clearest single confirmation in this run that the offline work was
+      aimed at the right thing.
+      TWO FOLLOW-UPS this exposes, for the post-run list rather than mid-window:
+        - the 30-call step budget is now the 14B's binding constraint. Raising it is not automatically right: a model
+          that needs 40 calls for a 10-minute goal may be thrashing. Decide from the transcripts of those 4 runs.
+        - 9 stops still come from the reply-repeat path where no tool refused. Check whether those are genuine dead
+          loops or cases where the `landed` progress counter failed to register work - the second would be a gap in
+          today's fix, and the run files hold the answer for free.
+      THE BUDGET-EXHAUSTED 14B RUNS ARE NOT THRASHING - and this is the sharpest finding of the window. All three
+      sampled: modelCalls 30 (the cap), 27 / 25 / 28 SUCCESSFUL writes-or-edits, 0-1 tool errors, and the last six tool
+      calls in every case edit_file(ok). Goals like "Add shortest_path(a, b) to the EXISTING Graph" and "Add add(other)
+      and sub(other) to the EXISTING Matrix".
+      So: the repeat guard is not killing them (the `landed` counter is registering progress), the tools are not failing
+      them (no errors), and the binding constraint is purely the 30-call cap. They were plausibly near done when it hit.
+      That also makes the 9 remaining "same response 3 times" stops more likely to be genuine model loops than a gap in
+      today's fix - tools are succeeding too freely for progress to be going unnoticed. To confirm from the run files
+      after the window, not assumed now.
+      BUT RAISING AGENT_MAX_STEPS IS PROBABLY THE WRONG FIX, and this is the candidate finding to chase offline: 25-28
+      successful edits for a goal that asks for TWO methods means the model is editing in tiny increments instead of
+      converging. More budget just buys more small edits. The question is whether the HUB is provoking that - the
+      one-action-per-reply rule, the NO CHANGE answer, the repeated-call notice, or the finish gate's feedback - in which
+      case the cause is ours again, not the model's. That goes on the post-run list above the step budget itself.
+      Progress 23:21: coder30b 44/100 (28 done, 16 stopped), coder14b 28/100 (7 done, 21 stopped). Both apps deployed,
+      tasks 1, stopped_at null - correct mid-run, read through the corrected app-list fields.
+      A GAP IN TODAY'S OWN WORK, found by this run and verified before being claimed. The 14B fired the
+      repeated-identical-call NOTICE 142 times across 21 of 29 goals: 113 of those on edit_file, and 133 of the 142
+      repeated the IMMEDIATELY PREVIOUS call verbatim. Median edit size is 919 chars with only 33 of 164 under 80, so
+      this is not a model nibbling in one-line increments - it is the same substantial edit sent twice in a row, getting
+      the identical answer, being told "you already ran this exact call", and doing it again. Each repeat costs a model
+      call, and four goals died at exactly the 30-call cap with 25-28 SUCCESSFUL edits and no tool errors.
+      WHY IT IS MINE: repeatFailures counts only identical repeats whose answer was an ERROR - a deliberate choice today
+      so that a repeated successful read_file would not be slandered as "the tool refused". The unforeseen consequence is
+      that an identical repeated SUCCESSFUL call is now unbounded: the notice fires forever and nothing stops it. The
+      honest attribution and the BOUND are two different jobs and I gave the bound only to the failing case.
+      Likely right shape, to be reproduced offline before any patch: a bounded escalation on any identical back-to-back
+      call regardless of whether it succeeded - notice, then substitute (the mechanical loop-break now works), then stop
+      - while keeping the tool-refused wording only for the ERROR case. This goes at the top of the post-run list, above
+      the step budget, because raising the budget would just buy more repeats.
+      Progress 23:22: coder30b 44/100 (28 done, 16 stopped), coder14b 29/100 (7 done, 22 stopped).
+      THE TWO MODELS HIT THE SAME WALL BY DIFFERENT ROUTES - and the wall is the 30-call budget, not destruction.
+        coder30b, 73 goals: 38 budget-exhausted, and ALL 38 of its stops are "ran out of step budget (30 model calls)".
+                  Not one guard kill. 291 successful writes/edits, 66 tool errors. Repeated-call notices 209 across 57
+                  goals, but only 44 verbatim back-to-back, and the spread is read_file 70, run_command 68, run_python
+                  28, edit_file only 8. So it is RE-READING and RE-RUNNING, not re-editing: it spends its calls on
+                  re-orientation and runs out.
+        coder14b, 52 goals: notices 142 across 21 goals, 113 on edit_file, 133 verbatim back-to-back. It re-sends the
+                  same successful EDIT. Median edit 919 chars, 25-28 successful edits per budget-exhausted run.
+      Same root, two shapes: the repeated-identical-call notice is ADVISORY and nothing escalates, so an identical call
+      that SUCCEEDS can repeat without bound and each repeat costs a model call. The 14B spends that on edits, the 30B on
+      reads and command re-runs. Two fixes, one cause - and it is the advisory-vs-mechanical lesson landing on a fix I
+      made today, because I gave the bound only to the ERROR case.
+      MY PREDICTIONS ARE PROBABLY WRONG, said before the checks land rather than after: 34 done of 72 (30B) and 8 of 51
+      (14B) make 42+/100 and 10+/100 unlikely. If so the reason is the step budget, not destruction - destruction is
+      demonstrably blocked (20 refusals in the 30B arm, 4 in the 14B's, 54 substitutions between them). That is a better
+      problem than set F's, but the prediction about WHERE the binding constraint would sit after the fixes was wrong,
+      and the pre-registration's fourth clause covers it: the run is decisive either way.
+    [set G CLOSED, Session A] Both apps stopped 00:07:48 and PROVEN stopped by an independent `modal app list --json`
+      (state stopped, stopped_at set, "all stopped"). Window 22:35 -> 00:07, ~92 min each: H100 ~$6.7 + A10G ~$1.5 =
+      ~$8.2. Running total ~$40.1.
+      RESULTS, against the predictions committed at 9afb8d0 BEFORE the window - both predictions FAILED:
+        coder30b (coder3)  set F 36/100  ->  set G 29/100   [predicted 42+]   78 of 100 goals attempted
+        coder14b           set F  2/100  ->  set G  4/100   [predicted 10+]   58 of 100 goals attempted
+      THE DENOMINATOR IS THE STORY, and it is not a rescue of the prediction - it is a different result. Neither arm
+      finished the set, because goals now run far longer. Per goal ATTEMPTED:
+        coder30b  36% (36/100) -> 37% (29/78)   FLAT
+        coder14b   2% (2/100)  -> 6.9% (4/58)   about 3.5x better
+      So: the destruction fixes did not raise the 30B at all, lifted the 14B substantially, and cost BOTH models
+      coverage. The step budget ate what the destruction fixes saved. Every mechanism fired - 24 refusals across the two
+      arms, 54 substitutions, honest tool-loop attribution, 24 gate blocks - and the 30B's score still did not move,
+      because its 30 calls now go on re-reading files and re-running commands instead of on destroyed work.
+      Prediction 4 of the pre-registration said the run would be decisive either way. It was: the tools were not the
+      30B's ceiling, and neither is the model - the BUDGET is, and the budget is being spent on unbounded identical
+      repeats, which is a bug I introduced today by bounding only the ERROR case. That is now items 0, 0b and 0c of the
+      post-run plan, ahead of everything else.
+      Records kept: 78 run files + 78 transcripts (30B), 58 + 58 (14B), plus traces, run index and workspace bundles.
+      Fuzzer still paused; restarting after the regression analysis, which is the measurement that says whether the
+      refusals actually preserved work (worked-when-written vs works-at-the-end).
