@@ -784,7 +784,18 @@ const tools = {
           if (t === '') { fi++; continue; }            // skip blank lines in the file
           if (t === needles[ki]) { fi++; ki++; } else break;
         }
-        if (ki === needles.length) { at.push({ start: i, end: fi - 1 }); i = fi - 1; }
+        // THE REGION STARTS WHERE FIND ACTUALLY MATCHED, NOT AT THE LOOP INDEX. Blank lines are skipped while
+        // matching (above), but `i` is the scan's starting point, which for a match preceded by blanks is the FIRST
+        // BLANK LINE. Recording that as the region start makes the splice delete a separator the caller never named:
+        // class members end up glued together. It also defeats noChangeAt - a swallowed blank guarantees
+        // out !== content, so resending an edit that already landed answers "OK: edited" instead of
+        // "THE EDIT HAS ALREADY LANDED", which is the exact case that refusal exists for.
+        if (ki === needles.length) {
+          let s = i;
+          while (s < fi && hay[s].trim() === '') s++;
+          at.push({ start: s, end: fi - 1 });
+          i = fi - 1;
+        }
       }
       return at;
     };
@@ -3441,7 +3452,15 @@ async function drive(loadDb, run) {
       if (tool === 'spawn_subtask') { args.depth = (run.depth || 0) + 1; _activeRun = run; }
       // The file as it was BEFORE this write/edit, so a write that silently drops definitions can say so (defNames.js).
       let beforeSrc = null;
-      if ((tool === 'write_file' || tool === 'edit_file') && args.path && /\.(py|c?js|mjs)$/i.test(args.path)) {
+      // append_file BELONGS HERE. Every write guard downstream gates on `beforeSrc !== null` - the destructive-write
+      // refusal (:3531), the DUPLICATE refusal (:3561) and both loss warnings (:3582, :3595) - so leaving append out
+      // made all four unreachable for the one write tool the system prompt calls "the easiest and safest way to
+      // extend a file". Set J, run 17cc6854: 26 appends to s8_grades.py left `add_assignment` defined TWENTY-THREE
+      // times, 826 -> 8973 bytes, with zero refusals, while defCounts would have refused on the first repeat.
+      // Tested here rather than via the `appended` flag at :3488, which is not yet in scope - this is the only point
+      // where the pre-write content still exists.
+      if ((tool === 'write_file' || tool === 'edit_file' || tool === 'append_file')
+        && args.path && /\.(py|c?js|mjs)$/i.test(args.path)) {
         try { beforeSrc = readFileSync(safePath(args.path), 'utf8'); } catch { /* a new file */ }
       }
       let result;
