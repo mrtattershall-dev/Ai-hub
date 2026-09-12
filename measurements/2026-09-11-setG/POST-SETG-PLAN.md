@@ -23,6 +23,20 @@ Each agent gets ONE item, and the same contract that produced the twenty fixes s
 FIRST (a failing test, not a reading), then fix, then a mutant per independent half proving the test can see it. No fix
 ships unpinned; no test may report green over a documented failure (`KNOWN-OPEN` convention).
 
+Assignments, in damage order (reordered after the repeat audit found corruption, not just waste):
+
+0-A. **`edit_file` does not tell the truth about what it wrote, and repeated edits CORRUPT files. This is first.**
+   Verified directly in the kept set G workspaces, not taken on report: `s6_graph.py` 1987 lines with 28
+   `def __init__` and 33 `def nodes` in ONE class; `s3_matrix.js` 2374 lines, the largest file in either workspace;
+   `s1_library.js` with `returnBook` declared twice. Mechanism: 180 of the 14B's 212 repeated `edit_file` calls
+   wrote to disk again, because the success string is invariant of the outcome. The `LINES` path answers
+   `OK: edited X lines 67-68 (2 line(s) deleted)` no matter which lines now occupy that range, and a `FIND` whose
+   `REPLACE` contains the `FIND` text re-matches on the next call and duplicates the block. The destructive-write
+   refusal cannot see any of this, because duplication REMOVES nothing - it is the mirror image of the bug that
+   refusal was built for. Fix shape: the answer must encode what changed (new line count, or a hash, or a one-line
+   diff summary), and an edit that would leave a DUPLICATE of a definition the file already has must be refused.
+   **Bounding the repeat alone is not enough: it saves budget and leaves the corruption.**
+
 Assignments, in damage order:
 
 0. **An identical back-to-back call that SUCCEEDS is unbounded — found live in set G, and it is mine.** The 14B fired

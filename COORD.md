@@ -4814,3 +4814,30 @@ D and E".
       Records kept: 78 run files + 78 transcripts (30B), 58 + 58 (14B), plus traces, run index and workspace bundles.
       Fuzzer still paused; restarting after the regression analysis, which is the measurement that says whether the
       refusals actually preserved work (worked-when-written vs works-at-the-end).
+      CORRECTIONS TO MY OWN SET G NUMBERS, from a recount over the run JSONs - mine were undercounts, and the audited
+      figures are larger in every case:
+        14B: notices 142 -> 279 across 47 goals; verbatim back-to-back 133 -> 265; on edit_file 113 -> 212; budget
+             exhaustions 4 -> 9; goals 52 -> 58.
+        30B: notices 209 -> 228 across 61 goals; goals 73 -> 78; budget stops 38 -> 44 - and still ALL of them budget,
+             not one guard kill.
+        And "24 gate blocks" was wrong as stated: 24 was the number of RUNS containing a block; the run files sum to 45
+        blocks (6 + 39).
+      Headline: 39.2% of the 14B's 712 model calls returned a byte-identical answer, and 264 of its 279 repeats
+      SUCCEEDED - so repeatFailures, which only counts ERROR repeats, saw 15 of 279.
+      AND THE CORRUPTION, WHICH IS WORSE THAN THE WASTED BUDGET - verified directly in the kept workspaces, not taken on
+      report: 180 of the 14B's 212 repeated edit_file calls WROTE TO DISK AGAIN, because edit_file's success string does
+      not encode what it did. The LINES path answers "OK: edited X lines 67-68 (2 line(s) deleted)" no matter which lines
+      now occupy that range; a FIND whose REPLACE contains the FIND text re-matches and duplicates the block. Measured in
+      data/coder14b-setg/workspace:
+        s6_graph.py   1987 lines, 28 `def __init__`, 33 `def nodes` in ONE class
+        s3_matrix.js  2374 lines - the largest file in either workspace
+        s1_library.js returnBook declared twice
+      The 30B's workspace is comparatively clean (s6_graph.py 583 lines, one __init__), which fits its repeats being
+      reads and command re-runs rather than edits.
+      SO THE 14B's 4/100 IS NOT MAINLY COVERAGE LOSS - its files were inflated into nonsense by repeated edits that each
+      answered OK, and the destructive-write refusal cannot see it because duplication REMOVES nothing. That reorders the
+      fix list: making edit_file tell the truth about what it wrote comes BEFORE bounding the repeat, because bounding
+      the step count alone leaves the corruption in place.
+      Also found in passing: the follow-up reset clears recent/parseLog/finishBlocks/cleanTests/verified/sawScreen but
+      NOT callLog/repeatCalls/repeatFailures/resultSigs/escalations - so a follow-up's first legitimate re-read is
+      flagged as a repeat with its substitution budget already spent.
