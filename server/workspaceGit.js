@@ -188,6 +188,28 @@ export async function fileHistory(workspace, relPath, n = 25) {
   return r.ok && r.out ? r.out.split('\n').map((s) => s.trim()).filter(Boolean) : [];
 }
 
+/**
+ * The commits that touched one file AFTER `sinceSha`, newest first. Empty when `sinceSha` is missing or malformed.
+ *
+ * This is what bounds the end-of-run repair to the goal being repaired. The obvious implementation - find the floor
+ * commit's INDEX in fileHistory() and slice - is wrong, and wrong in the worst direction. fileHistory runs
+ * `git log -- <file>`, so a checkpoint that committed only TASKS.md or ESCALATIONS.md never appears in that file's
+ * history at all; the lookup returns -1, and any "fall back to the full history" branch then walks UNBOUNDED. A bound
+ * whose failure mode is no bound is worse than none, because it reads as safe. Ancestry is the actual question, so it
+ * is asked of git directly: `<since>..HEAD` is exactly "commits reachable from HEAD but not from the floor".
+ */
+export async function fileHistorySince(workspace, relPath, sinceSha, n = 25) {
+  await ensureRepo(workspace);
+  const clean = String(relPath || '').split('\\').join('/').replace(/^\.\//, '');
+  if (!clean || clean.startsWith('..')) return [];
+  // A trailing `^` is allowed and expected: the caller passes the PARENT of a checkpoint, because a checkpoint commits
+  // the state BEFORE the write it precedes - see the caller's comment for why the checkpoint itself is the wrong floor.
+  const since = String(sinceSha || '').trim();
+  if (!/^[0-9a-f]{7,40}\^?$/i.test(since)) return [];   // no usable floor means no candidates, never "everything"
+  const r = await git(workspace, ['log', `-${n}`, '--format=%H', `${since}..HEAD`, '--', clean]);
+  return r.ok && r.out ? r.out.split('\n').map((s) => s.trim()).filter(Boolean) : [];
+}
+
 /** Recent history, newest first. */
 export async function log(workspace, n = 15) {
   await ensureRepo(workspace);
