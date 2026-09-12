@@ -1,0 +1,103 @@
+  1 fail s1_library.js  s1  copies 1.5 did not throw
+  2 PASS s2_logs.py     s1  
+  3 PASS s3_matrix.js   s1  
+  4 PASS s4_markdown.py s1  
+  5 fail s5_expr.js     s1  "2 3" did not throw
+  6 fail s6_graph.py    s1  threw: TypeError: '<=' not supported between instances of 'str' and 'int'
+  7 PASS s7_cache.js    s1  
+  8 fail s8_grades.py   s1  load: AttributeError: 'Gradebook' object has no attribute 'percent'
+  9 PASS s9_board.html  s1  
+ 10 fail s10_desk.js    s1  threw: shelfLine is not exported
+ 11 PASS s1_library.js  s2  
+ 12 fail s2_logs.py     s2  parse_log []
+ 13 PASS s3_matrix.js   s2  
+ 14 PASS s4_markdown.py s2  
+ 15 fail s5_expr.js     s2  threw: Cannot parse expression: (1+2)*(3+4)
+ 16 fail s6_graph.py    s2  threw: TypeError: unsupported operand type(s) for -: 'list' and 'set'
+ 17 PASS s7_cache.js    s2  
+ 18 fail s8_grades.py   s2  load: AttributeError: 'Gradebook' object has no attribute 'percent'
+ 19 fail s9_board.html  s2  threw: card A has no .s9-right button
+ 20 fail s10_desk.js    s2  threw: availability is not exported
+ 21 fail s1_library.js  s3  threw: l.loans is not a function
+ 22 fail s2_logs.py     s3  threw: AttributeError: module 's2_logs_mod' has no attribute 'status_counts'
+ 23 fail s3_matrix.js   s3  threw: a.mul is not a function
+ 24 fail s4_markdown.py s3  emphasis '<p>**bold** and *it*</p>'
+ 25 fail s5_expr.js     s3  threw: Cannot parse expression: 2^3
+ 26 fail s6_graph.py    s3  threw: AttributeError: 'Graph' object has no attribute 'shortest_path'
+ 27 fail s7_cache.js    s3  threw: c.keys is not a function
+ 28 fail s8_grades.py   s3  load: AttributeError: 'Gradebook' object has no attribute 'percent'
+ 29 fail s9_board.html  s3  start [null,null,null]
+ 30 fail s10_desk.js    s3  threw: memberLine is not exported
+ 31 fail s1_library.js  s4  threw: l.placeHold is not a function
+ 32 fail s2_logs.py     s4  threw: AttributeError: module 's2_logs_mod' has no attribute 'top_paths'
+ 33 fail s3_matrix.js   s4  threw: a.transpose is not a function
+ 34 fail s4_markdown.py s4  inline code '<p>use `a**b** &lt; c` here</p>'
+ 35 fail s5_expr.js     s4  threw: Cannot parse expression: x*2+y
+ 36 fail s6_graph.py    s4  threw: AttributeError: 'Graph' object has no attribute 'has_cycle'
+ 37 fail s7_cache.js    s4  threw: c.peek is not a function
+ 38 fail s8_grades.py   s4  load: AttributeError: 'Gradebook' object has no attribute 'percent'
+ 39 fail s9_board.html  s4  threw: card A has no .s9-del button
+ 40 fail s10_desk.js    s4  threw: makeLookup is not exported
+ 41 fail s1_library.js  s5  threw: l.dueDay is not a function
+ 42 fail s2_logs.py     s5  threw: AttributeError: module 's2_logs_mod' has no attribute 'percentile'
+ 43 fail s3_matrix.js   s5  threw: a.equals is not a function
+ 44 fail s4_markdown.py s5  link '<p>see [the docs](http://x.org/a?b=1) now</p>'
+ 45 fail s5_expr.js     s5  threw: Cannot parse expression: min(3,1,2)
+ 46 fail s6_graph.py    s5  threw: AttributeError: 'Graph' object has no attribute 'topo_order'
+ 47 fail s7_cache.js    s5  size counts expired entries: 3
+ 48 fail s8_grades.py   s5  load: AttributeError: 'Gradebook' object has no attribute 'percent'
+ 49 fail s9_board.html  s5  threw: card B has no .s9-right button
+ 50 fail s10_desk.js    s5  threw: overdueLines is not exported
+ 51 fail s1_library.js  s6  threw: l.returnBook is not a function
+ 52 fail s2_logs.py     s6  threw: AttributeError: module 's2_logs_mod' has no attribute 'by_hour'
+ 53 fail s3_matrix.js   s6  threw: (intermediate value).determinant is not a function
+ 54 fail s4_markdown.py s6  list '<p>- one - **two**</p>\n<p>after</p>'
+ 55 fail s5_expr.js     s6  "2 + * 3": "Cannot parse expression: 2+*3"
+ 56 fail s6_graph.py    s6  threw: AttributeError: 'Graph' object has no attribute 'remove_node'
+ 57 fail s7_cache.js    s6  threw: c.stats is not a function
+ 58 fail s8_grades.py   s6  load: AttributeError: 'Gradebook' object has no attribute 'percent'
+ 59 fail s9_board.html  s6  threw: card A has no .s9-right button
+ 60 fail s10_desk.js    s6  threw: l.returnBook is not a function
+ 61 fail s1_library.js  s7  a 4th loan did not throw
+ 62 fail s2_logs.py     s7  threw: AttributeError: module 's2_logs_mod' has no attribute 'between'
+ 63 fail s3_matrix.js   s7  threw: a.inverse is not a function
+ 64 fail s4_markdown.py s7  ordered list '<p>1. first 2. second 10. tenth</p>'
+ 65 fail s5_expr.js     s7  threw: tokenize is not exported
+ 66 fail s6_graph.py    s7  threw: AttributeError: 'Graph' object has no attribute 'reachable'
+ 67 fail s7_cache.js    s7  onEvict []
+ 68 fail s8_grades.py   s7  load: AttributeError: 'Gradebook' object has no attribute 'percent'
+ 69 fail s9_board.html  s7  Enter did not add: []
+ 70 fail s10_desk.js    s7  threw: canBorrow is not exported
+ 71 fail s1_library.js  s8  threw: l.placeHold is not a function
+ 72 fail s2_logs.py     s8  threw: AttributeError: module 's2_logs_mod' has no attribute 'sessions'
+ 73 fail s3_matrix.js   s8  threw: (intermediate value).solve is not a function
+ 74 fail s4_markdown.py s8  code block '<p>before</p>\n<p>``` x = 1 &lt; 2   *not em* ```</p>\n<p>after</p>'
+ 75 fail s5_expr.js     s8  threw: toRPN is not exported
+ 76 fail s6_graph.py    s8  threw: AttributeError: 'Graph' object has no attribute 'components'
+ 77 fail s7_cache.js    s8  threw: c.resize is not a function
+ 78 fail s8_grades.py   s8  load: AttributeError: 'Gradebook' object has no attribute 'percent'
+ 79 fail s9_board.html  s8  threw: card Fix bug has no .s9-right button
+ 80 fail s10_desk.js    s8  threw: snapshot is not exported
+ 81 fail s1_library.js  s9  threw: l.search is not a function
+ 82 fail s2_logs.py     s9  CLI --top 2 printed []
+ 83 fail s3_matrix.js   s9  toString "[object Object]"
+ 84 fail s4_markdown.py s9  blockquote '<p>&gt; quoted **text** &gt; # Head</p>\n<p>plain</p>'
+ 85 fail s5_expr.js     s9  threw: compile is not exported
+ 86 fail s6_graph.py    s9  threw: AttributeError: 'Graph' object has no attribute 'to_dot'
+ 87 fail s7_cache.js    s9  threw: c.toJSON is not a function
+ 88 fail s8_grades.py   s9  load: AttributeError: 'Gradebook' object has no attribute 'percent'
+ 89 fail s9_board.html  s9  threw: card Deploy has no .s9-right button
+ 90 fail s10_desk.js    s9  threw: searchLines is not exported
+ 91 fail S1_NOTES.md    s10 S1_NOTES.md missing
+ 92 fail s2_logs.py     s10 threw: ValueError: Line does not match the expected format
+ 93 fail s3_matrix.js   s10 threw: X.fromString is not a function
+ 94 fail s4_markdown.py s10 threw: AttributeError: module 's4_markdown_mod' has no attribute 'toc'
+ 95 fail s5_expr.js     s10 threw: Cannot parse expression: 1+1==2
+ 96 fail s6_graph.py    s10 threw: AttributeError: type object 'Graph' has no attribute 'from_text'
+ 97 fail s7_cache.js    s10 threw: c.getOrSet is not a function
+ 98 fail s8_grades.py   s10 load: AttributeError: 'Gradebook' object has no attribute 'percent'
+ 99 fail s9_board.html  s10 threw: card A has no .s9-right button
+100 fail S_INDEX.md     s10 S_INDEX.md missing
+
+per project (implementation correct): s1 1/10  s2 1/10  s3 2/10  s4 2/10  s5 0/10  s6 0/10  s7 2/10  s8 0/10  s9 1/10  s10 0/10
+done as asked 9/100 | implementation correct 9/100 (CT = correct code, own test broke it)

@@ -1,5 +1,5 @@
 #!/bin/bash
-# launch-G.sh <app> <hf-model> <gpu> <served-name>
+# launch-J.sh <app> <hf-model> <gpu> <served-name>
 # Deploys <app>, proves identity (Rule 3: /api/health must name <hf-model>), then runs set J.
 # The status file is written FIRST so the watchdog (stopApp.mjs only, Rule 7a) is armed before any
 # GPU time; a failed deploy or identity check marks ALL DONE so the watchdog still stops the app.

@@ -1,132 +1,162 @@
 /**
- * compare-setJ.mjs - dense 32B vs the MoE 30B on the SAME first twenty goals, same hub, same checker.
+ * compare-setJ.mjs - three models, one hub, twenty goals: did the two fixes move the number?
  *
  *   node tools/compare-setJ.mjs
  *
- * Set H answered "is the hub a ceiling?" (yes, and it is now lower: 49% -> 70% per goal attempted on the 30B).
- * Set I asks the next question: of the ~30% still failing, how much is the MODEL?
+ * Set I answered "is it us or the model?" with THE MODEL - a dense 32B scored 6/20 where a ~3B-active MoE scored
+ * 15/20. But it also produced two hub defects with a measured cost. Set J asks the narrower question: with
+ * reindentTo()/regionAnchor() and noChangeAt() in place, does the score move?
  *
- * The comparison is only meaningful on the goals both runs actually reached, so everything here is computed over
- * goals 1-20 for BOTH arms, never over a 100-goal denominator.
+ * Every number here is computed over goals 1-20 only, and every target was re-scored at that arm's OWN goal-20
+ * checkpoint (rebuilt from its workspace.bundle), because the checker scores the FINAL workspace and the set H arms
+ * ran 100 goals. Comparing against a 100-goal-final score would have flattered the fixes.
  */
-import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const I = join(HERE, '..');                                  // set J
-const H = join(I, '..', '2026-09-12-setH');                  // set H, for the MoE arm
+const J = join(HERE, '..');
 const N = 20;
 
 const readJson = (p) => { try { return JSON.parse(readFileSync(p, 'utf8')); } catch { return null; } };
-const first20 = (checks) => (checks?.results || []).filter((r) => r.goal <= N);
 
-/** Duplicated definitions, same detector as compare-setH.mjs (noise names excluded, `constructor` deliberately kept). */
-const NOISE = /^(if|for|while|switch|catch|return|else|do|try|with|it|describe|test|expect|before|after|beforeEach|afterEach|beforeAll|afterAll)$/;
-const PATS = [
-  /^[ \t]*def[ \t]+([A-Za-z_]\w*)[ \t]*\(/gm,
-  /^[ \t]*(?:async[ \t]+)?function[ \t]+([A-Za-z_$][\w$]*)[ \t]*\(/gm,
-  /^[ \t]+(?:async[ \t]+)?([A-Za-z_$][\w$]*)[ \t]*\([^)]*\)[ \t]*\{/gm,
-  /^[ \t]*class[ \t]+([A-Za-z_$][\w$]*)/gm,
+/** TRUNCATION RULE, fixed before any set J number was visible (see COORD): an arm is scored over the goals it
+ *  ACTUALLY REACHED, and its target is recomputed over that SAME range from the baseline arm own per-goal
+ *  results. Comparing a truncated arm against a 20-goal target would understate it. */
+//
+// The baselines are the CHECKPOINT RECONSTRUCTIONS, not the -checks.json files on disk. Those files hold
+// FINAL-workspace scores measured after 100 goals had been applied (14B 3/20, MoE 14/20); the pre-registered
+// targets were re-scored at each arm's own goal-20 checkpoint (14B 4/20 @ 42ebd75, MoE 15/20 @ 064e062) and are
+// one goal HIGHER on two of three arms. Reading the on-disk files would have compared against a baseline that is
+// too low, i.e. would have flattered the fixes - the direction to be most suspicious of.
+//
+// Per-goal correctness of each baseline arm at its own goal-20 state, goal 1..20:
+const BASELINE_BY_GOAL = {
+  // REGENERATED from workspace.bundle @ 42ebd75, not typed. The hand-typed version totalled 4/20 correctly but had
+  // the wrong POSITIONS, undercounting by a goal at n=5,7,8 - i.e. in the direction that flatters the fixes.
+  'coder14b-setj': [0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],   // 4/20 @ 42ebd75
+  'coder30b-setj': [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0],   // 15/20 @ 064e062
+  'coder32b-setj': [0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],   // 6/20, set I's own 20
+};
+const targetOverRange = (label, n) => {
+  const a = BASELINE_BY_GOAL[label];
+  if (!a || !n) return null;
+  return a.slice(0, Math.min(n, a.length)).reduce((s, v) => s + v, 0);
+};
+
+/** Pre-registered in README.md BEFORE the window. DO NOT edit these to match the result. */
+const ARMS = [
+  { label: 'coder14b-setj', name: '14B  (Qwen2.5-Coder-14B-Instruct-AWQ)', hw: 'A10G', target: 4, from: 'set H @ 42ebd75', predict: '>=7' },
+  { label: 'coder30b-setj', name: 'coder3 (Qwen3-Coder-30B-A3B, ~3B act)', hw: 'H100', target: 15, from: 'set H @ 064e062', predict: '15-17' },
+  { label: 'coder32b-setj', name: 'dense 32B (Qwen2.5-Coder-32B)', hw: 'H100', target: 6, from: 'set I, own 20', predict: '7-10' },
 ];
-function dupes(wsDir) {
-  if (!existsSync(wsDir)) return null;
-  const out = [];
-  for (const f of readdirSync(wsDir)) {
-    if (!/\.(c|m)?js$|\.py$/i.test(f)) continue;
-    let src = '';
-    try { if (statSync(join(wsDir, f)).isFile()) src = readFileSync(join(wsDir, f), 'utf8'); } catch { continue; }
-    const c = new Map();
-    for (const re of PATS) for (const m of src.matchAll(re)) { if (!NOISE.test(m[1])) c.set(m[1], (c.get(m[1]) || 0) + 1); }
-    const d = [...c.entries()].filter(([, n]) => n > 1).sort((a, b) => b[1] - a[1]);
-    if (d.length) out.push({ file: f, lines: src.split('\n').length, d: d.slice(0, 4) });
-  }
-  return out;
-}
 
-/** How each run ended, from its own records - so "no better" can be attributed to the budget rather than the model. */
+/** How each run ENDED - set I's real discriminator. Budget exhaustion is a budget result, not a capability one. */
 function endings(runsDir) {
   if (!existsSync(runsDir)) return null;
-  const c = { budget: 0, loop: 0, clean: 0, other: 0 };
-  let n = 0;
+  const c = { n: 0, budget: 0, loop: 0, clean: 0, other: 0 };
   for (const f of readdirSync(runsDir).filter((x) => x.endsWith('.json') && !x.includes('transcript'))) {
-    let j; try { j = JSON.parse(readFileSync(join(runsDir, f), 'utf8')); } catch { continue; }
-    n++;
+    let j;
+    try { j = JSON.parse(readFileSync(join(runsDir, f), 'utf8')); } catch { continue; }
+    c.n++;
     const e = (j.steps || []).filter((s) => s.type === 'error').map((s) => String(s.text || '')).join(' ');
     if (/step budget/i.test(e)) c.budget++;
-    else if (/same response|identical answer/i.test(e)) c.loop++;
+    else if (/same response|same tool call|identical/i.test(e)) c.loop++;
     else if (!e) c.clean++;
     else c.other++;
   }
-  return { n, ...c };
+  return c;
 }
 
-const arms = [
-  { label: 'coder30b-sethfix', name: 'MoE 30B  (Qwen3-Coder-30B-A3B, ~3B active)', dir: H },
-  { label: 'coder32b-seti',    name: 'dense 32B (Qwen2.5-Coder-32B)',              dir: I },
-];
-
-console.log('\n═══ SET I — dense 32B vs MoE 30B, goals 1-20, identical hub and checker ═══\n');
-const rows = [];
-for (const a of arms) {
-  const checks = readJson(join(a.dir, `${a.label}-checks.json`));
-  const r = first20(checks);
-  const log = join(a.dir, `${a.label}-set${a.dir === I ? 'I' : 'H'}.log`);
-  const attempted = existsSync(log)
-    ? [...readFileSync(log, 'utf8').matchAll(/^\s+(\d+)\s+(done|stopped|error|interrupted|failed)\s/gm)].filter((m) => Number(m[1]) <= N).length : 0;
-  rows.push({ ...a, present: !!checks, n: r.length, impl: r.filter((x) => x.impl).length, attempted,
-    dupes: dupes(join(a.dir, 'data', a.label, 'workspace')), ends: endings(join(a.dir, 'runs', a.label, 'runs')), results: r });
-}
-
-console.log('  model                                        attempted(1-20)  correct  rate');
-for (const r of rows) {
-  if (!r.present) { console.log(`  ${r.name.padEnd(44)} (not finished yet)`); continue; }
-  const rate = r.attempted ? Math.round((100 * r.impl) / r.attempted) + '%' : '-';
-  console.log(`  ${r.name.padEnd(44)} ${String(r.attempted).padStart(13)}  ${String(r.impl).padStart(7)}  ${rate.padStart(5)}`);
-}
-
-const moe = rows[0], dense = rows[1];
-if (moe.present && dense.present) {
-  const d = dense.impl - moe.impl;
-  console.log(`\n─── PREDICTION 1: dense beats the MoE on these twenty ───`);
-  console.log(`  MoE ${moe.impl}/${moe.attempted}  ->  dense ${dense.impl}/${dense.attempted}   (${d >= 0 ? '+' : ''}${d})`);
-  console.log(`  pre-registered: 16+/20 -> ${dense.impl >= 16 ? 'MET' : 'NOT met'}`);
-  console.log('  NOTE: 20 goals is a small denominator. Set H measured +/-1-2 score spread over 54-59 goals, so the');
-  console.log('        proportional noise here is LARGER. A 1-2 goal difference means nothing; only a clear margin counts.');
-
-  console.log(`\n─── PREDICTION 2: does it repeat a defect across both passes of a project? ───`);
-  console.log('  (the MoE lost 5 goals to one undefined _escape_html and 4 to one missing .s9-right button)');
-  for (const r of rows) {
-    const byFile = {};
-    for (const x of r.results.filter((y) => !y.impl)) {
-      const k = String(x.file || '?');
-      (byFile[k] = byFile[k] || []).push(String(x.why || '').slice(0, 58));
+/** Did the two fixes actually fire? Their signatures are visible in the tool results the model was shown. */
+function fixSignals(runsDir) {
+  if (!existsSync(runsDir)) return null;
+  const s = { alreadyLanded: 0, noChange: 0, destructive: 0, duplicated: 0, tolerant: 0 };
+  for (const f of readdirSync(runsDir).filter((x) => x.endsWith('.json') && !x.includes('transcript'))) {
+    let j;
+    try { j = JSON.parse(readFileSync(join(runsDir, f), 'utf8')); } catch { continue; }
+    for (const st of (j.steps || [])) {
+      if (st.type !== 'tool') continue;
+      const r = String(st.result || '');
+      if (/ALREADY HAVE LANDED|ALREADY LANDED/i.test(r)) s.alreadyLanded++;
+      if (/^NO CHANGE/.test(r)) s.noChange++;
+      if (/would have REMOVED/.test(r)) s.destructive++;
+      if (/would have DUPLICATED/.test(r)) s.duplicated++;
+      if (/matched ignoring indentation/.test(r)) s.tolerant++;
     }
-    const repeats = Object.entries(byFile).filter(([, v]) => v.length > 1);
-    console.log(`  ${r.name}:`);
-    if (!repeats.length) console.log('      no project failed on BOTH passes');
-    for (const [f, v] of repeats) console.log(`      ${f} failed twice: ${v.join(' | ')}`);
   }
-
-  console.log(`\n─── Attribution: was it cut off, or did it get it wrong? ───`);
-  for (const r of rows) {
-    const e = r.ends;
-    if (!e) { console.log(`  ${r.name}: no records`); continue; }
-    console.log(`  ${r.name}: ${e.n} runs — ${e.budget} hit the step budget, ${e.loop} loop-guard, ${e.clean} clean`);
-  }
-  console.log('  A model that hits the 30-call budget was cut off mid-work; that is a BUDGET result, not a capability one.');
-
-  console.log(`\n─── PREDICTION 4 carried over: duplicated definitions ───`);
-  for (const r of rows) {
-    if (!r.dupes) { console.log(`  ${r.name}: no workspace`); continue; }
-    if (!r.dupes.length) { console.log(`  ${r.name}: none`); continue; }
-    console.log(`  ${r.name}: ${r.dupes.length} file(s)`);
-    for (const x of r.dupes.slice(0, 3)) console.log(`      ${x.file} (${x.lines} lines): ${x.d.map(([n, c]) => n + ' x' + c).join(', ')}`);
-  }
-
-  console.log('\n─── What this CANNOT settle ───');
-  console.log('  Twenty goals give each project two passes, so compounding barely has room to appear. A good score here');
-  console.log('  shows competence at single steps, not that the model survives 100 interleaved goals.');
-  console.log('  If the dense model scores the same, the remaining failures are NOT raw capability, and the work belongs');
-  console.log('  in self-verification (run the file after writing; refuse a finish whose own imports do not resolve).\n');
+  return s;
 }
+
+console.log('\n=== SET J - three models, one patched hub, goals 1-20 ===');
+console.log('    serving ai-coding-hub-indent @ 3d7a080, agent.js md5 d53b1f230cb0');
+console.log('    fixes: reindentTo()+regionAnchor() (tolerant edits re-indent to the region they replaced)');
+console.log('           and noChangeAt() (a no-op refusal shows the region, and says it may ALREADY HAVE LANDED)\n');
+
+const rows = [];
+for (const a of ARMS) {
+  const checks = readJson(join(J, a.label + '-checks.json'));
+  const r = (checks?.results || []).filter((x) => x.goal <= N);
+  const log = join(J, a.label + '-setJ.log');
+  const attempted = existsSync(log)
+    ? [...readFileSync(log, 'utf8').matchAll(/^\s+(\d+)\s+(done|stopped|error|interrupted|failed)\s/gm)].filter((m) => Number(m[1]) <= N).length
+    : 0;
+  rows.push({
+    ...a, present: !!checks, results: r, impl: r.filter((x) => x.impl).length, attempted,
+    ends: endings(join(J, 'runs', a.label, 'runs')), sig: fixSignals(join(J, 'runs', a.label, 'runs')),
+  });
+}
+
+console.log('  model                                     target    now    delta   attempted   predicted');
+for (const r of rows) {
+  if (!r.present) { console.log('  ' + r.name.padEnd(40) + String(r.target).padStart(6) + '    (not finished yet)'); continue; }
+  const d = r.impl - r.target;
+  console.log('  ' + r.name.padEnd(40) + String(r.target).padStart(6) + String(r.impl).padStart(7)
+    + ('    ' + (d >= 0 ? '+' : '') + d).padEnd(9) + String(r.attempted).padStart(8) + '      ' + r.predict);
+}
+console.log('\n  Targets are each arm at its own goal-20 checkpoint, same goals, byte-identical checker.');
+console.log('  NOTE: 20 goals, one run per arm. Set H measured +/-1-2 spread over 54-59 goals, so noise here is');
+console.log('        proportionally LARGER. A 1-2 goal move means nothing; only a clear margin counts.');
+
+console.log('\n--- Did the fixes FIRE? (their signatures in what the model was actually shown) ---');
+for (const r of rows) {
+  if (!r.sig) { console.log('  ' + r.name + ': no records'); continue; }
+  const s = r.sig;
+  console.log('  ' + r.name + ':');
+  console.log('      tolerant edits ' + s.tolerant + '   NO CHANGE refusals ' + s.noChange
+    + '  (carrying the "already landed" wording: ' + s.alreadyLanded + ')');
+  console.log('      destructive refusals ' + s.destructive + '   duplicate refusals ' + s.duplicated);
+}
+console.log('  A fix that never fired cannot explain a change either way - check this BEFORE attributing anything.');
+
+console.log('\n--- How each run ENDED (set I real discriminator) ---');
+for (const r of rows) {
+  const e = r.ends;
+  if (!e) { console.log('  ' + r.name + ': no records'); continue; }
+  console.log('  ' + r.name.padEnd(40) + e.n + ' runs - budget ' + e.budget + ', loop-guard ' + e.loop
+    + ', clean ' + e.clean + ', other ' + e.other);
+}
+console.log('  Set H/I first-20 baseline: 14B 0 budget / 13 loop, MoE 0 / 1, dense 2 / 5.');
+console.log('  Prediction 1 rests on this: the 14B lost 13 of 20 to the loop guard, and noChangeAt targets exactly that.');
+
+console.log('\n--- Per pass: creating vs extending ---');
+for (const r of rows) {
+  if (!r.present) continue;
+  const a = r.results.filter((x) => x.goal <= 10 && x.impl).length;
+  const b = r.results.filter((x) => x.goal > 10 && x.impl).length;
+  console.log('  ' + r.name.padEnd(40) + 'create ' + a + '/10   extend ' + b + '/10');
+}
+console.log('  Set I dense was 4/10 then 2/10 - worse at BOTH, collapsing on the second pass. This is where');
+console.log('  compounding shows, and it is the north-star behaviour: does earlier work survive later goals?');
+
+console.log('\n--- Repeated defects across both passes of one project ---');
+for (const r of rows) {
+  if (!r.present) continue;
+  const byFile = {};
+  for (const x of r.results.filter((y) => !y.impl)) (byFile[String(x.file || '?')] ||= []).push(String(x.why || '').slice(0, 52));
+  const rep = Object.entries(byFile).filter(([, v]) => v.length > 1);
+  console.log('  ' + r.name + ': ' + (rep.length ? rep.length + ' project(s) failed twice' : 'none failed both passes'));
+  for (const [f, v] of rep) console.log('      ' + f + ': ' + v.join(' | '));
+}
+console.log('  Set I: dense 5 projects failed both passes, MoE 1.\n');
