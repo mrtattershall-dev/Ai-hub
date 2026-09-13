@@ -89,3 +89,57 @@ was written by someone measuring a 14B, validated before any model ran (refs 100
 scores the FINAL workspace, and re-runs every project with the model's own asserts neutralised so a lenient
 self-test cannot buy a pass. It was re-verified at 10/10 on the reference implementations on this machine today.
 That is ground truth I did not author, on goals I did not choose.
+
+---
+
+## ADDENDUM, written 2026-09-13 after the first attempt died (predictions above are UNCHANGED)
+
+The pre-registration above says T4 and it is left standing, wrong hardware and all, because editing a
+pre-registration after seeing a failure destroys the only thing it is for. What actually happened:
+
+**Attempt 1 (T4 16GB, max_len 16384) died.** It served two 4-token probes in 0.42s, so I declared the
+endpoint good and fired 100 goals carrying 5,000-7,000-token prompts. vLLM raised `EngineDeadError` and
+every subsequent request returned HTTP 500 in ~0.3s. **`/api/health` kept returning `{"ok":true}` over a
+dead engine** - it reports the configuration it was launched with, not whether the engine is alive. That
+is the silent-failure class again: the instrument answered OK while the thing it measures was gone.
+
+Six goals were spent before I stopped it. They are preserved in `t4-dead/` and **excluded from scoring**:
+
+    1  stopped       10 steps  4 calls  301s   s1_library.js:runs FN-MISSING(book,owns)
+    2  interrupted    2 steps  0 calls    3s   s2_logs.py:MISSING
+    3  stopped        9 steps  1 call   521s   s3_matrix.js:MISSING      <- 521s for ONE call = the engine dying
+    4  stopped        6 steps  4 calls   24s   s4_markdown.py:THROWS FN-MISSING(paragraphs)
+    5  interrupted    6 steps  2 calls  151s   s5_expr.js:MISSING
+    6  interrupted    6 steps  2 calls  157s   s6_graph.py:MISSING
+
+Goal 3 is the clearest artefact of the outage: nine steps, one model call, 521 seconds. None of these six
+measure the model; they measure a dead GPU, so the relaunch restarts at goal 1.
+
+**I miscounted this twice, so the count itself is recorded here.** I first reported two contaminated goals,
+then four, and the truth is six. Both wrong numbers came from reading `rows.json`, which the harness flushes
+incrementally and which lost its tail when the run was killed: it holds 4 rows where `trial.log` holds 6.
+**`trial.log` is the record; `rows.json` is a derived summary that can silently be short.** Anyone scoring
+this run later should count goal rows in the log, not entries in the JSON. The monitor armed for the live run
+is what surfaced goals 5 and 6 - it was validated by replaying it against this very log, which is the only
+reason the miscount was caught before it was committed.
+
+**Attempt 2 (this run): L4 24GB, max_len 8192, gpu_frac 0.85, min_containers 1, max_containers 2.**
+
+The lesson is one line: **a 4-token probe does not validate an endpoint that will receive 7,000-token
+prompts.** So this time the endpoint was proven with the real thing before firing - a 37,095-char prompt
+(the largest shape set H produces) with an 800-token budget:
+
+    cold first call        123s   (container start, not prefill)
+    same call, repeated    2.3s, 1.8s        64-token budget
+    same call, 800 tokens  3.7s, 4.2s        complete code, closing fence, not truncated
+
+A short call immediately after the big ones returned in 0.76s, which is what separates prefill cost from
+container state. Per-call latency on the L4 is therefore ~4s, not 123s.
+
+**Confound 1 is now sharper, not weaker.** The served artefact is full-precision `Qwen2.5-1.5B-Instruct`
+on vLLM; every local ladder number came from Ollama's quantised `qwen2.5:1.5b`. Different weights. This run
+is comparable to the banked 14B/30B arms on goals and checker, and NOT comparable to tonight's ladder.
+
+**Confound 4 stands and now has a number.** The GPU answers in ~4s but the hub, tool dispatch and
+verification subprocesses run on this laptop's 8 cores, sequentially. Wall-clock will be dominated by the
+laptop and by the 8-minute-per-goal cap, not by the card.
