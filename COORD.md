@@ -6995,3 +6995,25 @@ the set-H comparison moves to GPU rather than a preference for speed.
            Local shim on :11500 stopped by port-identified PID before the run, so a GPU result cannot
            be silently served by local Ollama.
     STOP   python -m modal app stop qwen15b-seth-1p5b --yes   -> expect "stopped, 0 tasks"
+
+### T4 run ABORTED — vLLM EngineCore died, and /api/health lied about it
+First 100-goal GPU attempt stopped after 2 goals. Sequence:
+  goal 1  stopped, 10 steps, 4 calls, 301s -> s1_library.js written, FN-MISSING(book,owns). A REAL result.
+  goal 2  interrupted, 2 steps, 0 calls, 3s -> "the model is unreachable". NOT a model failure.
+Cause: `vllm.v1.engine.exceptions.EngineDeadError: EngineCore encountered an issue`, HTTP 500 in ~0.3s
+on every subsequent call. The engine LOADED fine and served two 4-token probes at 0.42s, then died on
+the first real agent prompt.
+
+THE INSTRUMENT LIED, and this is the part worth keeping: with the engine dead, /api/health still
+returned {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-1.5B-Instruct","gpu":"T4"}. It reports
+CONFIGURATION, not liveness. trialH.mjs's preflight exists precisely to refuse an endpoint whose
+identity is unverified - and it would have green-lit this corpse. Same class as every other instrument
+fault this session: a check that reports something other than what it measured.
+
+MY ERROR, named: I validated the endpoint with a FOUR-TOKEN prompt and then launched 100 goals whose
+prompts measure 4,848-6,992 tokens. I tested the input that could not expose the defect - the exact
+lesson this session has been learning all night, failed on my own infrastructure.
+
+FIX: L4 24GB instead of T4 16GB, max_model_len 8192 instead of 16384 (still above the 6,992-token
+worst case plus generation), gpu_memory_utilization 0.85 instead of 0.90, min_containers=1 for the run
+window so no goal dies to a cold start. Before relaunching: a ~6k-token prompt must succeed.
