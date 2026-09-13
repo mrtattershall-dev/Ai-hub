@@ -6965,3 +6965,19 @@ tatte's words, verbatim, as the authorisation:
     dispatch and verification subprocesses stay local, and @modal.concurrent(max_inputs=1) is
     deliberate (vLLM's offline LLM class is not thread-safe), so concurrency means N containers
     billing in parallel. 100 goals lands near an hour, not 13 minutes.
+
+### Local set-H attempt ABANDONED, 2026-09-13 08:30-08:40 — third llama-server wedge of the session
+Ran trialH.mjs against local Ollama (qwen2.5:1.5b) on set-H project s3. Result: NO MEASUREMENT.
+The run file read `status: running, modelCalls: 0, steps: 0` and had not been written for 397s,
+while llama-server (PID 23900, started 08:27:24) had burned 2,309s of CPU in ~10 minutes of wall
+time. modelCalls=0 is decisive: the planner call was issued and NO model call ever completed. The
+workspace held only TASKS.md and package.json - s3_matrix.js was never written.
+
+Third wedge today with the identical signature (rising CPU, zero output, `ollama ps` eventually
+reading "Stopping..."): the first had accumulated 8.25 HOURS of CPU before I found it; the second
+2,274s in 9 minutes; this one 2,309s in 10. Each time it presented as "the run is slow" and each
+time I nearly read it as a model result. The tell that works: check run.modelCalls, not elapsed time.
+
+Cleared by `Stop-Process -Id <pid>` (named target, never a pattern kill). Load 65% -> 21%.
+CONSEQUENCE: local long-run measurement on this box is unreliable, which is the practical reason
+the set-H comparison moves to GPU rather than a preference for speed.
