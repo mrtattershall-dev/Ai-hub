@@ -313,3 +313,40 @@ recorded prompts is ~34 KB — roughly half. The margin is real; the gate is sim
 **What to judge this run against:** tatte 18/100; mine >= 7/100 and < 30/100. Arms: 14B 2/7, 30B 30/39,
 refs 100/100. Infrastructure-lost goals will be reported separately from model failures, with the
 distinguishing evidence (recorded reply length) named for each.
+
+### Repetition collapse, QUANTIFIED at max_len 16384 (first 6 goals of attempt 4)
+
+    1  stopped   4 calls   21s   s1_library.js  FN-MISSING(book,owns)
+    2  stopped   6 calls  226s   s2_logs.py     THROWS FN-MISSING(time,status,bytes,seconds)   <- file WRITTEN
+    3  stopped   5 calls   36s   s3_matrix.js   MISSING
+    4  stopped   5 calls  557s   s4_markdown.py THROWS FN-MISSING(paragraphs)                  <- file WRITTEN
+    5  stopped   2 calls  509s   s5_expr.js     MISSING
+    6  stopped   4 calls   12s   s6_graph.py    MISSING
+
+Measured throughput, from vLLM's own counters: **~60 tok/s output** (54.55-63.82 observed). Collapsed replies,
+by character count: 26,267 / 28,231 / 27,908 / 62,465 / 41,925 / 28,076 / 26,415 / 27,322.
+
+The arithmetic closes exactly, which is how we know these goals died of generation and not of an outage:
+
+    goal 5  three collapses  118,604 chars ~ 29,650 tok / 60 tok/s ~ 494s   (observed 509s)
+    goal 4  four  collapses  123,738 chars ~ 30,900 tok / 60 tok/s ~ 515s   (observed 557s)
+
+**My 16384 prediction was half right, and the wrong half matters.** I predicted a collapse would cost
+~120-250s and leave the goal survivable. Per collapse that holds - and goal 2 survived one, at 226s, and still
+wrote its file. What I got wrong was assuming ONE collapse per goal. They repeat: 3 and 4 times in goals 5
+and 4. Bounding the window bounds each collapse, not how many occur.
+
+**The plan call collapses too, and it is invisible in `calls`.** Goal 5's row reads `2 calls` while THREE of
+its replies collapsed - the 62,465-char one was the PLANNER reply, and the planner is not counted in
+`modelCalls`. Any diagnosis keyed on the `calls` column will undercount this.
+
+**3 of 6 goals affected, but there is real signal underneath.** Goals 2 and 4 wrote files with content
+(`THROWS FN-MISSING(...)` = file present, function absent). The 1.5B is producing code and then losing its
+budget to repetition, which is a different failure from "cannot write the code".
+
+**Decision: the run continues UNTOUCHED.** Changing sampling now would be the fifth serving change today, would
+void a pre-registered comparison, and would hand the 1.5B a `repetition_penalty` the 14B/30B arms never had.
+That is the NEXT arm, run separately and reported as its own number.
+
+**Revised ETA: ~6.3 hours** at the measured 227s/goal (6 goals in 22.7 min), not the 1.5-3 hours estimated
+from the first two goals. ~$5 of L4 time.
