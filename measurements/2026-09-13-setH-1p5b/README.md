@@ -195,3 +195,19 @@ response is counted as a FAIL rather than an absence of errors.
 
 Density, measured rather than assumed: real hub prompts are **~2.47 chars/token**. `chars/4` - the estimate
 that produced the 8192 sizing - overstates capacity by ~60% on this content.
+
+### tatte's prediction, made blind during attempt 3
+
+At 2026-09-13 14:2x UTC, with attempt 3 running and **1 goals scored**, tatte called it:
+
+> "I think we're gonna hit 18 out of 100"
+
+**18/100.** Logged here before any score existed, so it is judged the same way as mine. For reference, the
+predictions already standing:
+
+    tatte           18/100
+    mine            >= 7/100 (at or above the 14B treatment arm) AND < 30/100 (below the 30B control)
+    banked arms     14B 2 control / 7 treatment | 30B 30 control / 39 treatment | refs 100/100
+
+tatte's 18 sits inside my band but is a far sharper call - a point estimate against my 23-point range. If the
+result lands at 18 +/- 2 his number is the better prediction and mine was hedged.
