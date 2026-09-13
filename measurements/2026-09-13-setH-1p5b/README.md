@@ -198,7 +198,7 @@ that produced the 8192 sizing - overstates capacity by ~60% on this content.
 
 ### tatte's prediction, made blind during attempt 3
 
-At 2026-09-13 14:2x UTC, with attempt 3 running and **1 goals scored**, tatte called it:
+At 2026-09-13 14:2x UTC, with attempt 3 running, **1 goal completed** (goal 1) and no score computed - `checks-H.mjs` runs only at the end, tatte called it:
 
 > "I think we're gonna hit 18 out of 100"
 
