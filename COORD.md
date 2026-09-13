@@ -6945,3 +6945,23 @@ NOTE FOR WHOEVER IS NEXT — two things that are NOT mine but need owning:
 3. LEVEL NUMBERING COLLIDES ACROSS THE TWO LADDERS: gateLoop's LEVELS[4] is the two-file goal, while
    qwen15bRun's REQUIRES[4] is the removeBook/addBook-KEPT goal. Different env vars (GATE_LEVEL vs
    RUN_LEVEL) so nothing breaks, but "level 4" now means two different things in one repo.
+
+## GPU WINDOW — 1.5B vs set H, session a8160f8c, 2026-09-13
+tatte's words, verbatim, as the authorisation:
+    "Use the cheapest gpu that makes 13 hours like 13 minutes"
+    "I know I just want it faster"
+    "You have my permission to run it when it's ready"
+
+    app     qwen15b-seth-1p5b      (distinct name - deploying under an existing name REPLACES it)
+    model   Qwen/Qwen2.5-1.5B-Instruct on T4, vLLM
+    stop    python -m modal app stop qwen15b-seth-1p5b --yes   -> confirm "stopped, 0 tasks"
+            (the plain form prompts [y/N] and aborts non-interactively; that overran a window ~5 min once)
+    power   AC confirmed, 100% - never on battery
+    pre-reg measurements/2026-09-13-setH-1p5b/README.md, committed BEFORE the window
+    status  NOT YET DEPLOYED. Gated on the local s3 run finishing so two hubs do not contend
+            for one Ollama on an 8-core machine already at ~67% load.
+
+    HONEST EXPECTATION, corrected before spending: not 60x. The GPU serves tokens; the hub, tool
+    dispatch and verification subprocesses stay local, and @modal.concurrent(max_inputs=1) is
+    deliberate (vLLM's offline LLM class is not thread-safe), so concurrency means N containers
+    billing in parallel. 100 goals lands near an hour, not 13 minutes.
