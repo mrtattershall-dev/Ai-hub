@@ -193,7 +193,7 @@ that did not exist, curl sent an empty body, and the server returned `200` with 
 as a pass. Every request in the table above asserts its file is non-empty before sending, and an empty
 response is counted as a FAIL rather than an absence of errors.
 
-Density, measured rather than assumed: real hub prompts are **~2.47 chars/token**. `chars/4` - the estimate
+Density (SUPERSEDED - see the CORRECTION section below; the real figure is > 3.78 chars/token): `chars/4` - the estimate
 that produced the 8192 sizing - overstates capacity by ~60% on this content.
 
 ### tatte's prediction, made blind during attempt 3
@@ -261,3 +261,26 @@ attempt 2). 16384 matches the hub and is also this deploy file's own default.
 these same sampling defaults. Adding a penalty now would hand the 1.5B a correction the arms never got and
 break the only thing that makes this comparison meaningful. Configuring sampling per the model card is the
 obvious NEXT experiment, run as its own arm - not smuggled into this one.
+
+### CORRECTION: the "~2.47 chars/token" figure above is WRONG
+
+I derived it by pairing a 21,157-char prompt recovered from a transcript with the 8,357-token count in the
+Modal error. **Those are not the same request.** The prompt I recovered was the largest one that had a
+recorded REPLY; the request that actually failed never produced a reply, so it is not in the transcript at
+all. I paired a character count with a token count from a different request and then sized three rounds of
+validation on the result.
+
+Measured instead of inferred: a **61,894-char** prompt was accepted and generated at `max_len 16384`, so
+density is **> 3.78 chars/token** — not 2.47. Every token estimate earlier in this file that was computed as
+`chars / 2.47` overstates tokens by roughly 55% and should be read as a loose upper bound only.
+
+**The oversize control is unreachable on this transport, and that is itself the answer.** Pushing a request
+body past ~64 KB fails with `curl` exit 18 (`CURLE_PARTIAL_FILE`) before vLLM ever sees the prompt — which is
+why three earlier "tests" returned `http=200` with `bytes=0` and no output file, and why I nearly logged them
+as passes for a third time. So I cannot construct a request that exceeds 16384 tokens. But the property the
+control was meant to protect holds by a wider margin than the control could have shown: the largest REAL hub
+prompt across 62 recorded prompts is ~8,532 tokens (~34 KB), roughly **half** the largest body proven to fit
+and generate.
+
+**Lesson, stated plainly:** always capture the transfer's exit code. `http=200` with an empty body is not a
+pass, and `grep` finding no error inside a file that was never created is not evidence of success.
