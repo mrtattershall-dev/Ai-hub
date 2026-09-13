@@ -491,3 +491,51 @@ changed what the model produces; these two changes only fix the harness's bookke
 **Residual risk, stated:** `MODEL_TIMEOUT_S=1800` means one pathological call could still exceed even the
 30-minute deadline and park a run again. I found no hub endpoint to drain a parked run, so the cascade is made
 RARE and VISIBLE rather than eliminated.
+
+### Hypothesis sharpened by tatte, 2026-09-13 (this supersedes the loose framing above)
+
+tatte, verbatim:
+
+> "A better version is: a well-trained 1.5B coder may contain much of the same procedural coding knowledge as
+> a 32B model, while having much less capacity to reliably retrieve, combine, and maintain that knowledge under
+> pressure. Context length is one constraint, but parameter count affects much more than memory span."
+
+> "Where your idea gets genuinely interesting is if the benchmark eventually shows the 1.5B reaching close to
+> the 32B when you externally compensate for those weaknesses—good harness, iterative execution, constrained
+> outputs, retrieval, task decomposition, larger external memory, retries, etc."
+
+This is a better hypothesis than the one this file was pre-registered against, and the earlier phrasing
+("as capable, the difference is context/understanding") should be read as superseded. **Context window is NOT
+the operative constraint**, and this run's own failures show it:
+
+    "export tokenize, toRPN and compile"          a spec that fits in a few dozen tokens - all three missing
+    add_edge() takes 3 positional arguments but 4  signature not preserved across an edit
+    L is not a constructor                          file runs; the requested API shape is not there
+    3/10 identical-goal reproducibility             same goals, same config, two runs, outcomes flip BOTH ways
+
+None of those are memory-span failures. They are failures to hold a small specification intact while doing
+something else - exactly the "retrieve, combine, maintain under pressure" axis.
+
+**We already hold one data point where scaffolding closes the gap completely.** Earlier the same day, on the
+gate ladder: qwen2.5:1.5b scored 36/36 on level 1 under ONE-PROMPT-PER-GATE, and failed the same level under
+the monolithic prompt - same model, same task, same machine. That is an existence proof that external
+structure can substitute for parameters in a narrow domain, which is the strong form of the thesis.
+
+### Metrics this run will report (per tatte's list), and what is NOT computable
+
+Computable for the 1.5B from what is already recorded:
+
+    pass rate                  checks-H.mjs (asIs + impl with own asserts neutralised)
+    attempts per pass          trialH rows carry `calls` (= run.modelCalls) per goal
+    tokens per successful task  hub records run.callStats[] = {ms, tokPerSec, outTok, promptTok, attempts}
+    wall-clock / GPU cost      per-goal `secs`, plus Modal container-seconds
+    run-to-run reproducibility  THREE independent runs now exist on identical goals+config (17, 11, and this)
+
+**NOT computable for the 30B/14B arms: their per-goal rows are not on disk.** Only the banked aggregate scores
+survive (14B 2/7, 30B 30/39). So `attempts per pass`, `tokens per pass` and reproducibility CANNOT be compared
+against the arms from existing data.
+
+**Therefore the strong experiment tatte describes - "1.5B + harness vs 32B + same harness" - is not what this
+run measures.** Two gaps: (1) no per-goal arm data, and (2) Confound 2 already on record - the arms ran hub
+`eaa70c1`, this runs a later hub with a patched trialH. Closing it requires re-running the 30B on THIS harness,
+which needs a bigger GPU (the 30B wants ~80GB; L4 cannot hold it) and is a separate spend decision.
