@@ -270,12 +270,12 @@ recorded REPLY; the request that actually failed never produced a reply, so it i
 all. I paired a character count with a token count from a different request and then sized three rounds of
 validation on the result.
 
-Measured instead of inferred: a **61,894-char** prompt was accepted and generated at `max_len 16384`, so
-density is **> 3.78 chars/token** — not 2.47. Every token estimate earlier in this file that was computed as
+Measured instead of inferred: a **66,021-char** prompt was accepted and generated at `max_len 16384`, so
+density is **> 4.03 chars/token** — not 2.47 (66,021 chars also fit; the transport wall, not the model, stops anything larger). Every token estimate earlier in this file that was computed as
 `chars / 2.47` overstates tokens by roughly 55% and should be read as a loose upper bound only.
 
 **The oversize control is unreachable on this transport, and that is itself the answer.** Pushing a request
-body past ~64 KB fails with `curl` exit 18 (`CURLE_PARTIAL_FILE`) before vLLM ever sees the prompt — which is
+body past ~68 KB fails (measured: 67,846 B generates, 69,990 B dies) with `curl` exit 18 (`CURLE_PARTIAL_FILE`) before vLLM ever sees the prompt — which is
 why three earlier "tests" returned `http=200` with `bytes=0` and no output file, and why I nearly logged them
 as passes for a third time. So I cannot construct a request that exceeds 16384 tokens. But the property the
 control was meant to protect holds by a wider margin than the control could have shown: the largest REAL hub
