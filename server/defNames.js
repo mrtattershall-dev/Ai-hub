@@ -109,6 +109,23 @@ export function exportNames(src, path = '') {
       if (/^[A-Za-z_$][\w$]*$/.test(k)) out.add(k);
     }
   }
+  // TWO NAMED SHAPES THIS MISSED, found 2026-09-13 by probing every form rather than reading the list.
+  // The bare-identifier pattern above matches `module.exports = add;` but NOT these, because a function
+  // keyword and a body follow instead of a name at end-of-line:
+  //     module.exports = function add(a, b) { ... }
+  //     module.exports = class Library { ... }
+  // Both are ordinary, valid, NAMED CommonJS exports, and the cost landed on BOTH directions of the
+  // warning agent.js shows after every write (via lostExports):
+  //   rewriting TO that shape read as "this write REMOVED add"  -> a false warning about correct code
+  //   rewriting FROM it read as no loss at all                  -> a real export loss went unreported
+  // That is the too-narrow direction which already manufactured a false 0/5 today, and
+  // verifyExportsGoal.test.mjs separately pins that this shape IS a valid export.
+  //
+  // ANONYMOUS AND ARROW FORMS ARE LEFT ALONE ON PURPOSE - `module.exports = function (a, b) {}` and
+  // `module.exports = (a, b) => ...` have no name to report, and inventing one would be a checker
+  // making things up. Pinned as must-stay-empty in exportNamesShapes.test.mjs.
+  for (const m of text.matchAll(/module\.exports\s*=\s*(?:async\s+)?function\*?\s+([A-Za-z_$][\w$]*)/g)) out.add(m[1]);
+  for (const m of text.matchAll(/module\.exports\s*=\s*class\s+([A-Za-z_$][\w$]*)/g)) out.add(m[1]);
   return out;
 }
 

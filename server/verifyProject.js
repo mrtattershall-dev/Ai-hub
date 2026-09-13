@@ -139,7 +139,65 @@ async function syntaxSweep(workspace, files) {
  * Run the project and see whether it works.
  * Returns { ok, kind, evidence, problems[] } - `ok:false` blocks finishing.
  */
-export async function verify(workspace, { entry } = {}) {
+/**
+ * Run in a CHILD node, against the file the goal is about, to answer one question: is NAME actually
+ * exported? Kept as a string because it must execute in the workspace's own module resolution, not in
+ * the hub's - the workspace decides whether a .js file is CommonJS or ESM, and this process cannot.
+ *
+ * import() rather than require(), so a .mjs entry and a "type":"module" workspace read the same way.
+ * A regex over the source text would be cheaper and would also accept a file that cannot actually
+ * load; this project has already been bitten by a checker that read text instead of running it.
+ *
+ * Three shapes all count as exporting NAME, because all three are things ordinary code does:
+ *     export function add / module.exports = { add }   -> a named key on the namespace
+ *     module.exports = function add                    -> the default IS the function
+ *     module.exports = { add }, seen through import()  -> default is the object holding it
+ *
+ * Exit codes are the channel: 0 exported, 3 loaded but absent, 4 could not load at all. 3 and 4 are
+ * different failures and the model needs to be told which one it has.
+ */
+const EXPORT_PROBE = `
+const { pathToFileURL } = require("node:url");
+const { resolve } = require("node:path");
+const want = process.argv[2];
+import(pathToFileURL(resolve(process.cwd(), process.argv[1])).href).then((m) => {
+  const d = m && m.default;
+  const has = (o) => !!o && (typeof o === "object" || typeof o === "function") && want in o && o[want] !== undefined;
+  process.exit(has(m) || (typeof d === "function" && d.name === want) || has(d) ? 0 : 3);
+}).catch((e) => { console.error(String((e && e.message) || e)); process.exit(4); });
+`;
+
+/**
+ * The name a goal says must be EXPORTED, or null when it does not say so clearly.
+ *
+ * "verified" has meant "it parses and it ran without crashing". Measured 2026-09-13 against a real hub
+ * run: the goal "Create add.js exporting a function add(a, b)" was satisfied by
+ *     function add(a, b) { return a + b; }
+ * which passes `node --check`, runs, exits 0 - and exports NOTHING (require() returns {}). The run was
+ * stamped verified:true and finished clean, so the model was TOLD it had succeeded. That matters more
+ * than an ordinary miss: a model handed "verified" has no reason to keep working.
+ *
+ * Two orderings occur in real goal text, putting the name on opposite sides of the keyword:
+ *     "exporting a function add(a, b)"   -> after
+ *     "exporting a Library class"        -> before
+ * Anything it cannot read confidently yields null and the check does not run at all. A verifier that
+ * INVENTS a requirement is worse than one that misses it - a false failure blocks correct work and
+ * teaches the model to fight the gate. Proven against seven goal strings before being wired in,
+ * including three that must yield nothing.
+ */
+export function exportedName(goal) {
+  const g = String(goal || '');
+  if (!/\bexport(s|ing|ed)?\b/i.test(g)) return null;
+  const after = g.match(/\bexport(?:s|ing|ed)?\s+(?:an?\s+)?(?:function|class|const|object)\s+([A-Za-z_$][\w$]*)/i);
+  if (after) return after[1];
+  const before = g.match(/\bexport(?:s|ing|ed)?\s+(?:an?\s+)?([A-Za-z_$][\w$]*)\s+(?:function|class|object)\b/i);
+  if (before) return before[1];
+  const bare = g.match(/\bexport(?:s|ing|ed)?\s+(?:an?\s+)?([A-Za-z_$][\w$]*)\b/i);
+  if (bare && !/^(a|an|the|it|them|this|that|and|to|from)$/i.test(bare[1])) return bare[1];
+  return null;
+}
+
+export async function verify(workspace, { entry, goal } = {}) {
   const detected = detectKind(workspace);
   let { kind } = detected;
   const { files, pkg } = detected;
@@ -205,6 +263,24 @@ export async function verify(workspace, { entry } = {}) {
         if (r.timedOut) evidence.push(`\`node ${cand}\` started and kept running (killed at the timeout, which is what a server should do)`);
         else if (r.ok) evidence.push(`\`node ${cand}\` ran and exited cleanly`);
         else problems.push(`\`node ${cand}\` crashed (exit ${r.code}):\n    ${(r.err || r.out).split('\n').slice(0, 8).join('\n    ').slice(0, 800)}`);
+
+        // "verified" has to mean the GOAL was met, not merely that the file ran. See exportedName() above:
+        // a real run was stamped verified for a file that parses, runs, exits 0 - and exports nothing.
+        // Probed ONLY when the file ran cleanly. Importing a server that stays up would hang to the
+        // timeout and then report a missing export that is really a listening socket - a false failure
+        // here is worse than the miss, because it blocks correct work.
+        const want = exportedName(goal);
+        if (want && r.ok && !r.timedOut) {
+          const p = await sh('node', ['-e', EXPORT_PROBE, cand, want], workspace, 15_000);
+          if (p.code === 3) {
+            problems.push(`\`${cand}\` does not export \`${want}\`, which the goal asks for - loading the file yields no such value. Add an export, e.g. \`module.exports = { ${want} };\``);
+          } else if (p.code === 4) {
+            problems.push(`\`${cand}\` could not be loaded as a module, so its export of \`${want}\` cannot be confirmed:\n    ${(p.err || p.out).split('\n').slice(0, 4).join('\n    ').slice(0, 400)}`);
+          } else if (p.ok) {
+            evidence.push(`\`${cand}\` exports \`${want}\`, as the goal asks`);
+          }
+          // A probe that timed out claims NOTHING either way - no problem, no evidence.
+        }
       }
     }
     return { ok: !problems.length, kind, evidence, problems };

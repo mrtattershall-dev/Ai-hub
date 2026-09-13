@@ -169,7 +169,15 @@ const SCRIPTS = {
   // The control: real work, marked on the ledger, verified, then finished.
   happy: [
     'THOUGHT: Recording what this build needs.\nACTION: task_add\nTEXT:\nwrite the calculator module\nverify it runs',
-    'THOUGHT: Writing the module.\nACTION: write_file\nPATH: calc.js\n```javascript\nfunction add(a, b) { return a + b; }\nif (add(2, 2) !== 4) throw new Error("FAIL: add");\nconsole.log("PASS - add works");\n```',
+    // module.exports ADDED 2026-09-13. The goal is "Create counter.js exporting add(a,b), then verify
+    // it runs", and this script wrote a file that defines add and exports NOTHING. It passed only while
+    // verify_project's check was "does it parse and run" - both true of a file that exports nothing.
+    // Once the finish gate started asking whether the goal's named export actually exists, this fixture
+    // blocked the gate twice, the script re-sent `finish` (a fixed script repeats its last reply), and
+    // the REPLY-repeat guard stopped the run on the third identical finish - before the finishBlocks>=3
+    // forced-finish escape could end it 'done'. So the suite went 9/0 -> 8/1 on a correct gate.
+    // The fixture was wrong, not the gate: `calc.js` genuinely did not satisfy "exporting add(a,b)".
+    'THOUGHT: Writing the module.\nACTION: write_file\nPATH: calc.js\n```javascript\nfunction add(a, b) { return a + b; }\nif (add(2, 2) !== 4) throw new Error("FAIL: add");\nconsole.log("PASS - add works");\nmodule.exports = { add };\n```',
     'THOUGHT: Module written.\nACTION: task_done\nWHICH: 1',
     'THOUGHT: Proving it actually runs.\nACTION: verify_project',
     'THOUGHT: It runs.\nACTION: task_done\nWHICH: 2',

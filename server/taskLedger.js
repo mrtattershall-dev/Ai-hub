@@ -323,7 +323,26 @@ export function contextBlock(workspace, goal = null) {
   const off = hidden ? `\n  (${hidden} task(s) left over from earlier goals about other work are not shown - TASKS.md still has them)` : '';
   return `TASK LEDGER (TASKS.md — ${done.length}/${tasks.length} done)\n`
     + `Remaining:\n${lines.join('\n')}${more}${off}\n`
-    + `Mark a task done as soon as it works (ACTION: task_done). When every task is done, finish.`;
+    // NO LITERAL DISPATCH SYNTAX IN INJECTED CONTEXT. This line used to read "(ACTION: task_done)"
+    // and that one parenthesis made it a loaded gun.
+    //
+    // withLedger() appends this block to EVERY model call, and parseAction matches
+    // /ACTION:\s*([a-z_]+)/i ANYWHERE in a reply - it cannot tell an action the model CHOSE from one
+    // sitting inside prose the hub itself wrote. So any model that echoes its context hands the hub
+    // its own instruction back as a command.
+    //
+    // Measured 2026-09-12 on a real run, qwen2.5:1.5b, goal "create add.js". Its first loop reply
+    // echoed the BUILD PLAN, this ledger block and the asset block back verbatim. The hub parsed the
+    // echoed line as ACTION: task_done with no WHICH and answered `no task matches ""` - then did it
+    // again on the next turn. Two turns, 433 seconds, 1,440 output tokens, nothing moved, and the
+    // prompt grew 4,809 -> 5,551 tokens as the errors fed back in. Echoing is a known small-model
+    // behaviour, not a freak: the engine's own live_loop.js records a 1B "copying the A|B|C
+    // placeholder literally" from exactly this kind of block.
+    //
+    // TWO CAUSES, and this fixes the one that is OURS: the model echoes (its weakness) and the hub
+    // plants executable-looking syntax in a reminder (our defect). The SYSTEM PROMPT is where
+    // dispatch syntax is taught; a per-call reminder only needs to name the tool.
+    + `Mark a task done as soon as it works - use the task_done tool with the task's number. When every task is done, finish.`;
 }
 
 /**

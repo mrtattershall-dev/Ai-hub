@@ -127,8 +127,31 @@ await test('the loop answers a cut-off reply with "CUT OFF", writes no 0-byte fi
     await new Promise((r) => setTimeout(r, 300));
   }
   reqs = rig.requests;
-  const after = (() => { for (const r of reqs) { const i = r.messages.findIndex((m) => m.role === 'assistant' && m.content === REAL); if (i !== -1 && r.messages[i + 1]) return String(r.messages[i + 1].content); } return null; })();
-  assert.ok(after, 'the cut-off reply was never answered');
+  // ANCHOR ON A PREFIX, NOT ON FULL EQUALITY - and say which failure it is.
+  //
+  // This lookup used to require m.content === REAL, and it could never match. Measured 2026-09-13:
+  // pruneHistory caps the stored turn to 8,948 chars. The earlier investigation ([52]) concluded the
+  // reply "survived pruneHistory BYTE-IDENTICALLY" and refuted the brittle-matcher hypothesis - but it
+  // measured the reply ALONE (7,762 tok <= the 9,011 budget, so pruneHistory early-exits). In the LIVE
+  // history the same turn sits beside the ~16.3k-char system prompt, the goal, the plan, the CUT OFF
+  // answer and the 2,051-char asset block: 12,539 tok against 9,011, so the early exit does NOT fire,
+  // capMessage runs at perMsgCap 2,252 tok = 9,008 chars, and exact equality is impossible.
+  // [52] was wrong about its INPUT, not its arithmetic. The hub was right the whole time.
+  //
+  // All three behaviours this test names were already correct: it answered with CUT OFF, wrote no
+  // 0-byte file, and the next complete write landed. Only the lookup was broken - so the two failures
+  // are now distinguished, because "never answered" and "answered but unrecognisable" need opposite fixes.
+  const PREFIX = REAL.slice(0, 400);
+  const found = (() => {
+    for (const r of reqs) {
+      const i = r.messages.findIndex((m) => m.role === 'assistant' && String(m.content || '').startsWith(PREFIX));
+      if (i !== -1) return { present: true, next: r.messages[i + 1] ? String(r.messages[i + 1].content) : null };
+    }
+    return { present: false, next: null };
+  })();
+  assert.ok(found.present, 'the cut-off reply never reached the model history at all (not a matcher problem)');
+  const after = found.next;
+  assert.ok(after, 'the cut-off reply is in the history but nothing follows it - it was never answered');
   assert.match(after, /CUT OFF/, 'answered, but not told it was cut off: ' + after.slice(0, 160));
   const zeroWrite = run.steps.some((st) => st.type === 'tool' && /wrote 0 bytes/.test(String(st.result || '')));
   assert.ok(!zeroWrite, 'a 0-byte write still happened');

@@ -317,9 +317,30 @@ await test('OFF: exactly one action per turn - the rest dropped with the nudge, 
   assert.equal(batchNotes(out.run).length, 0, 'batch bookkeeping ran with the flag OFF');
 });
 
-await test('OFF: the nudge still counts raw ACTION: headers (unchanged)', async () => {
+// REWRITTEN 2026-09-12. This test was called "the nudge still counts raw ACTION: headers
+// (unchanged)" and asserted that a stray ACTION: line inside ONE edit is reported as a second,
+// discarded action. That was a SCOPE guard for the batch work - "my opt-in feature did not disturb
+// the default path" - and it ended up being the last thing pinning a defect in place.
+//
+// The defect: `dropped` read `!BATCH_ACTIONS ? extraActions : ...`, so the accurate counter
+// (parseActions) was wired to the OPT-IN path and the naive ACTION-header regex stayed the DEFAULT.
+// The comment beside it even explained why the regex is wrong - a stray ACTION: line in the middle
+// of one edit_file, 5 of the 102 real multi-action replies - and then used it anyway.
+//
+// It is not cosmetic. The nudge says "ONLY THE FIRST was executed - the other N were DISCARDED and
+// did NOT happen" and tells the model to resend. Say that about an edit that fully applied and the
+// model resends a landed edit, which is how the repeat guard gets fed.
+//
+// So OFF now asserts what ON already asserted twelve lines up: the edit applied, and nothing claims
+// an action that never existed. The genuine multi-action case above ("OFF: exactly one action per
+// turn") is untouched and still demands "the other 2 were DISCARDED" - that is the control proving
+// this change narrowed a FALSE claim rather than blunting a true one.
+await test('OFF: a stray ACTION: line inside one edit is not reported as a dropped action', async () => {
   const out = await runGoal(off, 'Export sub from s7.js too.', [R.strayBase, R.strayEdit]); offRuns.push(out);
-  assert.match(answerTo(out.reqs, R.strayEdit), /You sent 2 actions in one response/);
+  const fb = answerTo(out.reqs, R.strayEdit);
+  assert.match(fb, /TOOL RESULT \(edit_file\):\nOK/, `the edit should have applied:\n${String(fb).slice(0, 300)}`);
+  assert.doesNotMatch(fb, /DISCARDED/, 'the nudge reports an action that never existed');
+  assert.match(readFileSync(join(off.ws, 's7.js'), 'utf8'), /module\.exports = \{ add, sub \}/);
 });
 
 await test(`OFF: ${Math.min(30, served.length)} real multi-action replies, one action per turn`, async () => {
