@@ -284,3 +284,32 @@ and generate.
 
 **Lesson, stated plainly:** always capture the transfer's exit code. `http=200` with an empty body is not a
 pass, and `grep` finding no error inside a file that was never created is not evidence of success.
+
+### Attempt 4 — launched 2026-09-13 14:49:09 UTC (config recorded before any result)
+
+    endpoint   L4 24GB, max_len 16384, gpu_frac 0.85, min_containers 1, max_containers 2
+    verified   /api/health {"gpu":"L4","max_len":16384} AND trial.log's own ENDPOINT line
+    workspace  trial35-oBCvBP (fresh)      hub 41bc7f58c162f6dcdba3fc06d87b6b0014c98d08
+    caps       AGENT_MAX_STEPS=30, AGENT_MAX_MINUTES=8, AGENT_BATCH_ACTIONS=0
+    artefacts  goals 1f29e971e72f9461 | checks ea0d8b53535313ef  (unchanged, byte-identical to the arms)
+
+**Why 16384 and not something larger or smaller.** `agent.js:174` declares `NUM_CTX = 16_384`, so the hub
+already assumes a 16K window; `pruneHistory` bounds prompts against a token budget derived from it
+(`agent.js:2547`). 8192 truncates real prompts (that was attempt 2). 32768 hands the model more room to run
+away than the hub expects, and since `_opts()` makes max-new-tokens equal to the context window, a wider
+window directly multiplies the cost of a repetition collapse (that was attempt 3).
+
+**`repetition_penalty` is deliberately NOT set.** The 14B and 30B arms were served by this same file with
+these same sampling defaults (temperature + top_p only). Adding a penalty here would give the 1.5B a
+correction the arms never received. A configured-sampling run is the next experiment, as its own arm.
+
+**The oversize control was UNREACHABLE, not passed — stated honestly.** I wanted a prompt exceeding 16384
+tokens to prove the limit sits where I think. I could not build one: request bodies past ~68 KB die in
+transport (`curl` exit 18) before vLLM sees them — 67,846 B generates, 69,990 B does not. So the bracket has
+two passes (8,351- and 12,361-char-estimated prompts, both generated) and **no failing control**. What can be
+claimed instead is a bound: 66,021 chars generate fine at 16384, while the largest real hub prompt across 62
+recorded prompts is ~34 KB — roughly half. The margin is real; the gate is simply not constructible here.
+
+**What to judge this run against:** tatte 18/100; mine >= 7/100 and < 30/100. Arms: 14B 2/7, 30B 30/39,
+refs 100/100. Infrastructure-lost goals will be reported separately from model failures, with the
+distinguishing evidence (recorded reply length) named for each.
