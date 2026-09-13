@@ -539,3 +539,54 @@ against the arms from existing data.
 run measures.** Two gaps: (1) no per-goal arm data, and (2) Confound 2 already on record - the arms ran hub
 `eaa70c1`, this runs a later hub with a patched trialH. Closing it requires re-running the 30B on THIS harness,
 which needs a bigger GPU (the 30B wants ~80GB; L4 cannot hold it) and is a separate spend decision.
+
+### CORRECTION: the arms' per-goal data DOES exist, and here is the comparison table
+
+The section above says the arms' per-goal rows are "not on disk" and that "only the banked aggregate scores
+survive". **Both statements are wrong.** They are in `scratchpad/setH-rows-backup/` as
+`<arm>-rows.json` (per-goal `n,status,steps,calls,err,grd,secs,disk,good,forcedFinish`) plus
+`<arm>-checks.json` (100 per-goal `asIs/impl/why`). I concluded absence from a narrow scan that never opened
+the directory.
+
+I also first computed failure modes from `scratchpad/base/coder30b-sethfix.json` (16/100) and
+`base/coder14b-sethfix.json` (4/100). **Those are not the arms' results** - they are later re-scores of COPIED
+workspaces and score lower because the copies lost files. The authoritative files reproduce the banked numbers
+exactly: 14B ctl 2, 14B fix 7, 30B ctl 30, 30B fix 39. A mismatch against the banked figures is what caught it.
+
+**All four arms attempted far fewer than 100 goals.** This reframes every "/100" figure:
+
+    arm             attempted  passes  conv%   calls/goal   CALLS PER PASS   s/goal   SECS PER PASS
+    14B control         49       2       4%       14.2         348.5         110s       2692s
+    14B treatment       51       7      14%       10.2          74.3         103s        753s
+    30B control         58      30      52%       21.0          40.6          93s        179s
+    30B treatment       53      39      74%       20.1          27.3          98s        134s
+
+**CALLS PER PASS is the sharpest discriminator, and it is exactly the axis tatte predicted.** The 30B needs
+27.3 model calls per passing step; the 14B needs 74.3 - **2.7x the inference for the same outcome** - and the
+unpatched 14B needs 348.5. Wall clock per pass: 134s vs 753s vs 2692s. The models are not simply "better and
+worse": the smaller one reaches a pass at several times the compute, which is the "similar reachable capability,
+very different single-pass competence" shape.
+
+Note the direction of `calls/goal`: the 30B spends MORE calls per goal (20-21) than the 14B (10-14), yet far
+fewer per PASS. The 14B is not being throttled - it is terminating early and often.
+
+**FAILURE MODES (my categorisation of the checker's own `why` strings, not the checker's labels):**
+
+    arm             INTERFACE: API absent   wrong behaviour   ran but threw
+    14B control            22%                   61%              14%
+    14B treatment          28%                   58%              14%
+    30B control            37%                   41%              21%
+    30B treatment          62%                   21%              16%
+
+**This complicates the hypothesis in a useful way.** Interface failure - "wrote the code, the requested API is
+not there" - is **not** a small-model signature. It is 62% of the BEST arm's residual failures and only 28% of
+the 14B's. As a model improves it stops producing wrong behaviour, and what remains concentrates in interface
+contract. So "maintaining the exact interface contract" is the LAST thing to go at every size measured here,
+not a distinguishing 1.5B weakness.
+
+What IS so far distinctive to the 1.5B is **repetition collapse**, which neither the 14B nor the 30B exhibits
+in any of these four arms.
+
+**Still not computable for the arms:** tokens per successful task (rows carry `calls`, not token counts), and
+true run-to-run reproducibility (control and treatment are different hubs, not repeats; the `.0224`/`.0312`
+files are mid-run snapshots of the same runs, not independent replicates).
