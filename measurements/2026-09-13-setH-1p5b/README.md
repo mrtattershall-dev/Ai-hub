@@ -350,3 +350,62 @@ That is the NEXT arm, run separately and reported as its own number.
 
 **Revised ETA: ~6.3 hours** at the measured 227s/goal (6 goals in 22.7 min), not the 1.5-3 hours estimated
 from the first two goals. ~$5 of L4 time.
+
+### Attempt 4 run 1 ended at goal 17 — I corrupted it by editing the driver WHILE IT WAS RUNNING
+
+    goal  status   calls  secs   on disk
+     1   stopped     4     21   s1_library.js:runs FN-MISSING(book,owns)
+     2   stopped     6    226   s2_logs.py:THROWS FN-MISSING(time,status,bytes,seconds)
+     3   stopped     5     36   s3_matrix.js:MISSING
+     4   stopped     5    557   s4_markdown.py:THROWS FN-MISSING(paragraphs)
+     5   stopped     2    509   s5_expr.js:MISSING
+     6   stopped     4     12   s6_graph.py:MISSING
+     7   stopped     4    593   s7_cache.js:runs FN-MISSING(Cache)
+     8   stopped     6    274   s8_grades.py:MISSING
+     9   stopped     4    572   s9_board.html:ok s9_board.js:MISSING
+    10   stopped     7    307   s10_desk.js:MISSING s1_library.js:runs s7_cache.js:runs
+    11   stopped     4    560   s1_library.js:runs FN-MISSING(checkout,available)
+    12   stopped     4    524   s2_logs.py:THROWS FN-MISSING(parse_log,bad_lines)
+    13   stopped     6     72   s3_matrix.js:runs                       <- CLEAN PASS on disk
+    14   stopped     4     15   s4_markdown.py:THROWS
+    15   stopped     4    518   s5_expr.js:MISSING
+    16   stopped     3     36   s6_graph.py:MISSING
+    17   running     2    602   s7_cache.js:runs FN-MISSING(delete,clear)
+
+16 complete, mean 302s, 9 of 16 over 250s. Preserved in `a4-run1-17goals/`; the workspace with the actual
+files is `trial35-oBCvBP`.
+
+**What I did wrong.** I launched the run at 09:49:09 and then edited `drive.sh` afterwards to fix a mangled
+comment block. **Bash reads a script incrementally by byte offset.** My rewrite added 6 lines above the
+command region, so when `node trialH.mjs` (line 53) finished, bash resumed at a shifted offset and executed
+the invocation again — truncating `trial.log` (`> "$SP/trial.log"`) and starting a fresh workspace
+`trial35-mzdCHX`. Run 1 ended ~11:19; run 2 began 11:19:46. **Never edit a shell script that is currently
+executing.**
+
+Two checks of mine failed to catch it:
+
+  * `bash -n drive.sh` returned OK, so I called the file clean. **`bash -n` checks SYNTAX, not whether a word
+    resolves to a command.** The corrupted comment produced `line 48: lama.: command not found` at runtime —
+    non-fatal, so the run proceeded and the error scrolled past in the driver's output unread.
+  * I read an empty `grep` for rows 11+ as "my regex is wrong" rather than "the file was truncated". The log
+    had in fact been reset to a bare header. Silence is not success — again.
+
+**UNEXPLAINED, and recorded as such:** why run 1's `trialH` stopped at goal 17 instead of continuing to 100.
+The offset-shift explains the RE-LAUNCH, not the original process ending. I am not inventing a cause for it.
+
+### CONFIRMED HUB DEFECT: sub-task calls bypass the call_loop guard
+
+Goal 17 spent 602s with `modelCalls=1` on the parent. Its step breakdown:
+`{plan:1, checkpoint:1, subtask_start:1, subtask_step:40, subtask_done:1, tool:1}` — a single
+`spawn_subtask` whose sub-agent ran **40 steps in 270s, of which 39 were the byte-identical
+`↳ edit_file s7_cache.js`** (2 distinct step texts across 40 steps).
+
+The `call_loop` stop added earlier today keys on `run.callLog` / `run.callRepeats` (agent.js:3743-3785) of the
+run whose loop is executing. `spawn_subtask` delegates to `runSubtask(goal, depth, _activeRun)` with its own
+`sub` object, and the parent receives only a **display-only** `subtask_step` line (agent.js:2988). Grepping
+the subtask path for any repeat/loop/budget guard returns **nothing**. So a sub-agent can repeat one
+SUCCEEDING call 39 times and nothing stops it.
+
+This is the house pattern again — detect-but-don't-act — reappearing inside the feature built to fix it. The
+guard is real and fires at the top level (it stopped goal 3 of attempt 3); it simply does not reach one level
+down.
