@@ -246,7 +246,27 @@ export function mark(workspace, which, state) {
   // the ledger can never show two things being worked on at once.
   if (state === 'doing') tasks.forEach((t) => { if (t.state === 'doing') t.state = 'todo'; });
   tasks[i].state = state;
-  write(workspace, tasks);
+  // CARRY THE PLAN MARKER THROUGH, or closing a task arms the finish gate against the run.
+  //
+  // write()'s third parameter defaults to false, and this call used to omit it - so PLAN_MARK was erased from
+  // TASKS.md by task_done, and isPlanSeeded() is a substring search, so it was gone for the life of the workspace.
+  // The finish gate reads exactly that marker to decide whether plan tasks BIND:
+  //
+  //     const advisory = ledger.isPlanSeeded(WORKSPACE);
+  //     if (!advisory && p.total && p.remainingOwn > 0) { blocked(...); continue turn; }
+  //
+  // so the sequence was: the plan seeds N tasks (advisory, finishing allowed) -> the model closes ONE, exactly as the
+  // system prompt instructs -> the marker is gone -> the remaining N-1 become commitments -> the run burns its three
+  // finish blocks on entries the planner proposed and the agent never chose. Proven in a temp workspace: seed three,
+  // mark one done, and isPlanSeeded flips true -> false while remainingOwn is still 2.
+  //
+  // That is the bug the gate's own comment says it was built to prevent ("a free model was handed 15 plan tasks and
+  // spent 10 steps closing them; three separate scripted tests ended `stopped` instead of `done`"). The fix was
+  // applied to the gate and not to the one writer that destroys its input.
+  //
+  // add() erasing the marker stays correct and is pinned by planAdvisory.test.mjs: its contract is that the agent's
+  // own list supersedes a pristine plan, and it reads the marker before writing. adopt() already does this.
+  write(workspace, tasks, isPlanSeeded(workspace));
   return { ok: true, task: tasks[i], n: i + 1 };
 }
 
