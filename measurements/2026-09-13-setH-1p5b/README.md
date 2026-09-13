@@ -211,3 +211,53 @@ predictions already standing:
 
 tatte's 18 sits inside my band but is a far sharper call - a point estimate against my 23-point range. If the
 result lands at 18 +/- 2 his number is the better prediction and mine was hedged.
+
+### Attempt 3 (max_len 32768) STOPPED at goal 6 - and it produced the session's real finding
+
+Rows before stopping (preserved in `l4-32768-runaway/`):
+
+    1  stopped   6 steps   4 calls    30s   s1_library.js:runs FN-MISSING(book,owns)
+    2  stopped   4 steps   1 call    485s   s2_logs.py:MISSING
+    3  stopped  12 steps   7 calls    18s   s3_matrix.js:MISSING
+    4  stopped  10 steps   5 calls    66s   s4_markdown.py:MISSING
+    5  stopped   3 steps   1 call    488s   s5_expr.js:MISSING
+    6  stopped  11 steps   5 calls    12s   s6_graph.py:MISSING
+
+**THE FINDING: the 1.5B's dominant failure is degenerate repetition collapse, and it generates until the
+context window is exhausted.** The recorded replies:
+
+    goal 5   71,152 chars   `assert(evaluate("10/2") === 5);` repeated to the end of the window
+    goal 2  133,289 chars   `- Verify that the script is ...`  repeated to the end of the window
+
+Modal logged the matching request: `POST /api/chat -> 200 OK (duration: 478.5 s, execution: 478.4 s)`. A
+SUCCESSFUL request, 478 seconds of GPU execution. Nothing was down.
+
+**Why a bad turn became a dead goal.** `modal_serve_vllm.py` `_opts()` line 227: Ollama's `num_predict: -1`
+(what `agent.js:175` sends, meaning "never truncate a long file mid-write") is translated to
+`npred = MAX_LEN`. So generation is capped by the CONTEXT WINDOW, never by `DEFAULT_MAX_NEW=3072`. Raising
+max_len 8192 -> 32768 therefore quadrupled the cost of every collapse, ~126s -> ~478s, which is exactly what
+turns a recoverable bad turn into a goal killed by `AGENT_MAX_MINUTES=8`. The dead goals' own records say so:
+
+    goal 2: plan -> "Could not parse an action" -> Stopped: ran out of time budget (8 min)
+    goal 5: plan -> outline_file               -> Stopped: ran out of time budget (8 min)
+
+**I called goals 2 and 5 "infrastructure loss" twice before reading these records.** They were not. My
+monitor's "high seconds + <=1 model call" alarm labelled them ENGINE DEATH, which is a false positive: the
+engine was healthy and generating the whole time. The keepalive log is what broke the theory - zero anomalies
+during goal 5's 488 seconds, i.e. the server answered MY pings in under 2s while the hub's call ran on.
+
+**Same root cause as the Qwen3-Coder lesson already in this project's notes: sampling was never configured.**
+`_params()` sets `temperature` and `top_p` only. There is **no `repetition_penalty`**. Qwen2.5-Instruct's
+model card recommends temp 0.7 / top_p 0.8 / top_k 20 / repetition_penalty 1.05; this serves temp 0.2 and
+top_p 0.95 with no penalty and no top_k. The hub's loop guard has been fighting a sampling problem that was
+never set.
+
+**Decision, and the reason it is deliberately conservative.** Attempt 4 sets **max_len 16384** - which is not
+a guess: `agent.js:174` declares `NUM_CTX = 16_384`, so the hub already believes it has a 16K window. 32768
+hands the model more room to run away than the hub expects; 8192 is less than its real prompts need (that was
+attempt 2). 16384 matches the hub and is also this deploy file's own default.
+
+**`repetition_penalty` is deliberately NOT added.** The 14B and 30B arms were served by this same file with
+these same sampling defaults. Adding a penalty now would hand the 1.5B a correction the arms never got and
+break the only thing that makes this comparison meaningful. Configuring sampling per the model card is the
+obvious NEXT experiment, run as its own arm - not smuggled into this one.
