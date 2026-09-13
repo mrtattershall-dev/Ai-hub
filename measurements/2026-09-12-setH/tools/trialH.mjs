@@ -122,9 +122,27 @@ for (let i = 0; i < GOALS.length; i++) {
   }
   const t0 = Date.now();
   const s = await api('/agent/start', { method: 'POST', body: JSON.stringify({ goal }) }).catch((e) => ({ error: e.message }));
-  if (!s.runId) { console.log(`  ${String(i + 1).padStart(2)}  START FAILED ${JSON.stringify(s).slice(0, 60)}`); continue; }
+  if (!s.runId) {
+    // LOUD, 2026-09-13: a START FAILED carrying busy:true means a PREVIOUS goal parked a run and THIS goal
+    // never executed. Silently continuing turned that into 89 invisible non-runs scored as model failures.
+    const parked = !!(s && (s.busy || /already working in this workspace/.test(String(s.error || ""))));
+    const tag = parked ? " (PARKED RUN - goal never executed, NOT a model failure)" : "";
+    console.log(`  ${String(i + 1).padStart(2)}  START FAILED${tag} ${JSON.stringify(s).slice(0, 80)}`);
+    rows.push({ n: i + 1, runId: null, status: parked ? "never_started_parked" : "never_started",
+      steps: 0, calls: 0, err: 0, grd: 0, secs: 0, disk: "GOAL NEVER RAN", good: false, forcedFinish: false });
+    continue;
+  }
   let run = null;
-  const deadline = Date.now() + 10 * 60000;
+  // DEADLINE RAISED 10 -> 30 min, 2026-09-13. At 10 min this harness ABANDONED a still-running goal and
+  // moved on, leaving the run ACTIVE in the hub - so every later /agent/start was refused 409 and goals
+  // 12-100 never ran (11 rows out of a 100-iteration loop, 57.7 min wall, scored a meaningless 0/100).
+  // The run always terminates on its own: agent.js:3190 checks budgetExhausted at the top of every turn,
+  // so once a long call returns AGENT_MAX_MINUTES ends it. The harness gave up ~380s too early.
+  // Sizing: a full 16384-token repetition collapse at the observed FLOOR of 16.7 tok/s is ~981s, and
+  // MODEL_TIMEOUT_S=1800 bounds any single call. 30 min clears the 8-min budget + one worst-case call.
+  // Only reachable for a model producing >10-min goals; no 14B/30B arm goal exceeded 600s, so this is a
+  // no-op for them and the comparison holds in substance even though the file hash changes.
+  const deadline = Date.now() + 30 * 60000;
   while (Date.now() < deadline) {
     run = await api('/agent/' + s.runId).catch(() => null);
     // Wait for teardown too: the status flips before the syntax rollback finishes, and the hub

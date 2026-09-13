@@ -21,7 +21,7 @@ checker, neither authored for this model.
     model    Qwen/Qwen2.5-1.5B-Instruct, served by vLLM on T4, as qwen15b
     goals    measurements/2026-09-12-setH/goals-H.json        sha256 1f29e971e72f9461...  (byte-identical to set H)
     checks   measurements/2026-09-12-setH/tools/checks-H.mjs  sha256 ea0d8b53535313ef...  (byte-identical to set H)
-    harness  measurements/2026-09-12-setH/tools/trialH.mjs    sha256 a27980f8949a6dbd...
+    harness  measurements/2026-09-12-setH/tools/trialH.mjs    sha256 1538be4d0eb2cd83 (PATCHED 2026-09-13; was a27980f8949a6dbd)...
     neutral  measurements/2026-09-12-setH/tools/neutral.cjs   sha256 86fa0d1f3202c19e...
     caps     AGENT_MAX_STEPS=30, AGENT_MAX_MINUTES=8, AGENT_BATCH_ACTIONS=0, supervisor off, fresh workspace
     hub      29b08ef5c49d (this worktree) — NOT the arms' hub, see Confound 2
@@ -460,3 +460,34 @@ here rather than the hash being quietly re-pinned.
     s1_library.js threw: L is not a constructor
 
 These are export-shape and signature failures on written, running code - not an inability to produce code.
+
+### Harness patched: `trialH.mjs` a27980f8949a6dbd -> 1538be4d0eb2cd83
+
+Two changes, both harness-side. **Neither alters what the model does or how work is scored.**
+
+1. **Per-goal deadline 10 -> 30 min** (`:127`). At 10 minutes the harness abandoned a still-running goal and
+   moved on, leaving the run ACTIVE in the hub, so every later `/agent/start` was refused 409. The run always
+   terminates on its own — `agent.js:3190` evaluates `budgetExhausted` at the top of every turn, so once a long
+   call returns `AGENT_MAX_MINUTES` ends it. The harness was giving up ~380s too early. Sizing: a full
+   16384-token collapse at the observed FLOOR of 16.7 tok/s is ~981s; `MODEL_TIMEOUT_S=1800` bounds one call.
+2. **A goal that never started now RECORDS A ROW** (`status: never_started_parked`, `disk: GOAL NEVER RAN`).
+   Previously `:125` logged `START FAILED` and `continue`d, so 89 never-executed goals left no trace and were
+   scored as model failures.
+
+Verified by `tools/parkedRunPredicate.test.mjs` — 9/9, including four NEGATIVE controls (hub down, HTTP 500,
+empty object, undefined) that must NOT be tagged parked. That direction matters: mislabelling a real failure
+as "never ran" would inflate the model's score, so the test is built to catch that specifically.
+
+**On comparability.** The pin existed so this run is byte-identical to the 14B/30B arms. It no longer is. The
+justification is that both changes are only reachable for a model that produces >10-minute goals, and **no arm
+goal ever exceeded 600s** — so the patched branches are unreachable for them and the fix is a behavioural
+no-op on the arms' data. The original is preserved at `scratchpad/trialH.mjs.pinned-a27980f8`. This is recorded
+rather than the hash being quietly re-pinned.
+
+**What is NOT changed, deliberately:** no `repetition_penalty`, no `max_new` cap, no sampling change. The arms
+ran these defaults and the 1.5B will too. Capping generation would have been the easier fix and would have
+changed what the model produces; these two changes only fix the harness's bookkeeping.
+
+**Residual risk, stated:** `MODEL_TIMEOUT_S=1800` means one pathological call could still exceed even the
+30-minute deadline and park a run again. I found no hub endpoint to drain a parked run, so the cascade is made
+RARE and VISIBLE rather than eliminated.
