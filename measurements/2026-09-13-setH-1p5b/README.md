@@ -409,3 +409,54 @@ SUCCEEDING call 39 times and nothing stops it.
 This is the house pattern again — detect-but-don't-act — reappearing inside the feature built to fix it. The
 guard is real and fires at the top level (it stopped goal 3 of attempt 3); it simply does not reach one level
 down.
+
+### ROOT CAUSE: one slow goal poisons every goal after it — and `0/100` is NOT a score
+
+Attempt 4 run 3 ended with `checks-H.mjs` reporting **0/100**. That number must not be quoted as the 1.5B's
+result. **Only 11 of the 100 goals ever ran.** The other 89 failures are `missing <file>` for work never
+attempted.
+
+What actually happened, from the trial's own output:
+
+    11  running   1 call  602s  s1_library.js:runs FN-MISSING(available)
+    ...
+    88  START FAILED {"error":"a run is already working in this workspace (running)"}
+    ...
+    100 START FAILED {"error":"a run is already working in this workspace (running)"}
+    --- summary ---
+    goals run : 11      wall clock : 57.7 min      total model calls : 50
+
+The trial did NOT stop at goal 11 — it completed all 100 iterations in 57.7 minutes. `trialH.mjs:125` logs
+`START FAILED` and `continue`s **without recording a row**, so 100 iterations produced 11 rows.
+
+**The chain.** A repetition collapse generates up to ~16k tokens. At the run's observed **minimum of 16.7
+tok/s** (max 65.2), that is ~950s inside a SINGLE model call. `AGENT_MAX_MINUTES=8` cannot fire mid-call —
+the budget is checked between steps. `trialH.mjs:127` sets a 600s per-goal deadline; it expired first, so the
+harness recorded the row as `running` and moved to the next goal **while the run was still active in the
+hub**. From then on every `/agent/start` was refused 409, and goals 12-100 died instantly.
+
+**This explains both truncations with one mechanism**: run 1 stopped at goal 17, run 3 at goal 11, each with a
+`running` row at ~602s. It supersedes the "UNEXPLAINED" note recorded earlier — the driver-edit byte-offset
+bug explained the RE-LAUNCH, never the ending.
+
+**Why the arms never hit it:** no 14B or 30B goal ever exceeded 600s, so the branch was never entered. The
+harness has an undiagnosed ceiling that only a model producing >600s goals can reach.
+
+**The harness already knows about this bug class.** `trialH.mjs:135`: *"Without this one parked run held the
+workspace and every later goal failed to start (set D, 14B, goal 9: 'open')."* That was fixed for
+`awaiting_approval` — a parked run is drained by answering its approval. The deadline-expiry path was never
+given the same treatment, so it parks a run and abandons it.
+
+**On the pinned hash.** `trialH.mjs` is pinned at `a27980f8949a6dbd` so this is byte-comparable to the arms.
+Fixing this changes that hash. The fix only alters behaviour in a branch the arms never entered (no arm goal
+exceeded 600s), so it is a no-op for them and preserves comparability in substance. That argument is recorded
+here rather than the hash being quietly re-pinned.
+
+**Real signal from the 11 goals that did run** (files that exist and execute):
+
+    s5_expr.js    threw: tokenize is not exported / toRPN is not exported / compile is not exported
+    s6_graph.py   AttributeError: 'Graph' has no attribute 'reachable' / 'components'
+    s6_graph.py   add_edge() takes 3 positional arguments but 4 were given
+    s1_library.js threw: L is not a constructor
+
+These are export-shape and signature failures on written, running code - not an inability to produce code.
