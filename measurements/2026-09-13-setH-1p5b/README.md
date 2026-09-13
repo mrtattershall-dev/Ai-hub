@@ -115,15 +115,39 @@ Six goals were spent before I stopped it. They are preserved in `t4-dead/` and *
 Goal 3 is the clearest artefact of the outage: nine steps, one model call, 521 seconds. None of these six
 measure the model; they measure a dead GPU, so the relaunch restarts at goal 1.
 
-**I miscounted this twice, so the count itself is recorded here.** I first reported two contaminated goals,
-then four, and the truth is six. Both wrong numbers came from reading `rows.json`, which the harness flushes
-incrementally and which lost its tail when the run was killed: it holds 4 rows where `trial.log` holds 6.
-**`trial.log` is the record; `rows.json` is a derived summary that can silently be short.** Anyone scoring
-this run later should count goal rows in the log, not entries in the JSON. The monitor armed for the live run
-is what surfaced goals 5 and 6 - it was validated by replaying it against this very log, which is the only
-reason the miscount was caught before it was committed.
+**CORRECTION, same day.** An earlier version of this file explained the 4-vs-6 row mismatch between
+`rows.json` and `trial.log` as incremental flushing that "lost its tail". **That was wrong.** The real cause:
+**the T4 driver was never actually stopped.** It was still running 26 minutes later (node PID 17328, started
+08:42:33), grinding goals against a dead endpoint. When its log was moved to `t4-dead/`, the live process kept
+appending through the moved file handle - reaching 6 rows - while `rows.json` stayed frozen at the 4 rows it
+held at move time. Nothing was lost by flushing; a run I believed dead was alive and still writing.
 
-**Attempt 2 (this run): L4 24GB, max_len 8192, gpu_frac 0.85, min_containers 1, max_containers 2.**
+I diagnosed a plausible file-I/O quirk when the fact was an unkilled process. The check that would have caught
+it immediately is the one I skipped: list the processes. It also means the laptop was running TWO concurrent
+harnesses against the same 8 cores, which is the CPU-starvation confound that corrupted a timing comparison
+earlier in this same session.
+
+**Attempt 2 (L4 24GB, max_len 8192) ALSO FAILED - 3 of 5 goals lost, 60%.** Root cause, from the
+container's own log:
+
+    ValueError: The decoder prompt (length 8357) is longer than the maximum model length of 8192.
+
+**I set max_len too low.** The hub's prompts pass 8192 by the second goal, and set H's 10-step projects grow
+from there. Each oversized call errored; the hub reads that as a dropped connection and retries the SAME
+oversized prompt three times (30s, 45s), so every affected goal died after ~150s with status `interrupted`.
+That is why the loss was systematic rather than random, and why goals 1 and 4 survived - their prompts were
+still small.
+
+**My validation of that endpoint was worthless, and precisely why is worth recording.** I "proved" it with a
+37,095-character prompt that returned 200, and argued: if the real token count were over 8192 vLLM would
+refuse, it did not, therefore the headroom is genuine. The first half is sound; the conclusion inverts it. I
+proved my PROBE was under the limit, then treated that as proof the HUB's prompts were - validating with a
+stand-in smaller than the thing it stood for, with `chars/4` hiding the difference. I also tested streaming
+only with tiny prompts and large prompts only without streaming, never the combination the hub actually uses.
+
+**Attempt 3 (this run): L4 24GB, max_len 32768, gpu_frac 0.85, min_containers 1, max_containers 2.**
+32768 is the model's native context. KV cost is ~28 KB/token, so a full 32768-token sequence is ~0.92 GB
+against ~20.4 GB available - 8192 was a T4-era number carried onto a card with 50% more memory for no reason.
 
 The lesson is one line: **a 4-token probe does not validate an endpoint that will receive 7,000-token
 prompts.** So this time the endpoint was proven with the real thing before firing - a 37,095-char prompt
