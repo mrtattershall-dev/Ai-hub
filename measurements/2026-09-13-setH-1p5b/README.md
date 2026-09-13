@@ -590,3 +590,51 @@ in any of these four arms.
 **Still not computable for the arms:** tokens per successful task (rows carry `calls`, not token counts), and
 true run-to-run reproducibility (control and treatment are different hubs, not repeats; the `.0224`/`.0312`
 files are mid-run snapshots of the same runs, not independent replicates).
+
+### CORRECTION: this run is NOT per-gate. It is the SAME monolith the arms ran.
+
+tatte reasoned that the historical 14B/30B numbers are unclean because the arms ran a monolithic prompt while
+the 1.5B now gets one focused prompt per gate. **That premise is false, and it came from my own loose
+summarising.** Verified:
+
+    gateLoop/gateIndex imported by index.js, agent.js or trialH.mjs : NOTHING
+    agent.js:33    import { SYSTEM_PROMPT } from './agentPrompt.js'
+    agent.js:2918, 4783    { role: 'system', content: SYSTEM_PROMPT }    <- one 298-line monolith
+    systemPromptFor wired into the hub : NEVER  (the [68] item, deprioritised)
+
+`gateLoop.mjs` is a STANDALONE program sharing no code path with the hub. The per-gate architecture exists and
+works, and **has never been connected to set H.** Consequences:
+
+  * This run is **1.5B + monolithic harness** - the same architecture as the arms. The remaining difference is
+    hub VERSION (arms on `eaa70c1`; this on a later hub with patched `trialH`), already logged as Confound 2.
+  * So `30B = 39/53` IS a fair architectural comparator after all, and the arms' low scores remain evidence
+    about model-under-monolith rather than artefacts of a different agent design.
+
+### Scope of the 36/36 gate result - weaker than I implied
+
+I cited it as an existence proof for externalised cognition. Its actual scope:
+
+  * `gateLoop.mjs` is a **4-rung ladder** (add.js; s1_library.js; s2_stack.js; math.js+main.js), not 100 goals.
+  * **I wrote every proof.** The file's own header says the only honest phrasing is *"same model, same goal,
+    same proof, fewer guards, different prompting."*
+  * The 36/36 was **level 1** - `add.js` - across wordings and temperatures. Rung 4 (two files that must
+    agree) reached 10/10. That is suggestive, not a result across a varied set.
+
+So tatte's **Hypothesis C (externalised cognition substitutes for orchestration capacity)** is plausible and
+worth testing, but **my data does not yet strongly support it** and I should not have said it did. Nothing in
+this run tests C at all.
+
+### What the killer experiment actually requires
+
+"1.5B, 14B and 30B on an identical individual-gate harness, identical goals, multiple seeds" needs:
+
+  1. A gate harness covering set H's 100 goals. `gateLoop.mjs` has **4 hand-built rungs**; the gate definitions
+     and per-gate proofs for 100 goals do not exist and are real work.
+  2. Gate proofs NOT authored by me, or the 1.5B's score measures my answer key (the stated flaw in the ladder).
+  3. A 30B on the same harness: ~80GB, so not an L4 - a separate spend decision.
+
+### Goal overlap IS computable, and will be reported
+
+Arm per-goal results are keyed `chain/step/file` with an `impl` boolean, in identical order across arms, so
+`solved-by-X ∩ solved-by-Y` is directly computable - for the arms today and for the 1.5B when this run scores.
+That is the comparison tatte asked for, and it is available on the monolithic architecture without new spend.
