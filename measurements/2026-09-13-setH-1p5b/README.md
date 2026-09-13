@@ -167,3 +167,31 @@ is comparable to the banked 14B/30B arms on goals and checker, and NOT comparabl
 **Confound 4 stands and now has a number.** The GPU answers in ~4s but the hub, tool dispatch and
 verification subprocesses run on this laptop's 8 cores, sequentially. Wall-clock will be dominated by the
 laptop and by the 8-minute-per-goal cap, not by the card.
+
+### Attempt 3 validation (recorded BEFORE any result exists)
+
+Endpoint under test reported `{"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-1.5B-Instruct","gpu":"L4",
+"max_len":32768}`, served by a NEW app (`ap-ej5f7Z9r...`, 09:14) after the 8192 app (`ap-uoxn3ae...`, 08:51)
+was stopped and confirmed at **0 tasks** - so no stale container could answer.
+
+All three sent with `stream:true`, the path the hub actually uses:
+
+    test         prompt                                    result
+    realprompt   20,628 chars ~ 8,351 tokens (REAL,        200, 3.9s, real build plan
+                 recovered from a run transcript - the
+                 size that was failing at 8192)
+    over2        41,261 chars ~ 16,704 tokens              200, 3.1s
+    over3        61,894 chars ~ 25,058 tokens              200, 3.0s
+
+**Why this is evidence and the previous validations were not.** `over2` and `over3` exceed 8192 tokens BY
+CONSTRUCTION, so on the old endpoint they had to fail; passing is therefore informative. Attempt 2's check
+could not have failed - it used a synthetic prompt that was under the limit - which is why it passed while
+the endpoint was broken. A test that has never been shown to fail is not yet evidence.
+
+Two of my "tests" during this repair also silently tested NOTHING: a filename substitution produced a path
+that did not exist, curl sent an empty body, and the server returned `200` with `bytes=0`. I nearly read that
+as a pass. Every request in the table above asserts its file is non-empty before sending, and an empty
+response is counted as a FAIL rather than an absence of errors.
+
+Density, measured rather than assumed: real hub prompts are **~2.47 chars/token**. `chars/4` - the estimate
+that produced the 8192 sizing - overstates capacity by ~60% on this content.
