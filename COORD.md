@@ -6981,3 +6981,17 @@ time I nearly read it as a model result. The tell that works: check run.modelCal
 Cleared by `Stop-Process -Id <pid>` (named target, never a pattern kill). Load 65% -> 21%.
 CONSEQUENCE: local long-run measurement on this box is unreliable, which is the practical reason
 the set-H comparison moves to GPU rather than a preference for speed.
+
+    08:47  qwen15b-seth-1p5b  T4  DEPLOYED   "You have my permission to run it when it's ready"
+           app id   ap-RiJWIPNb7Qp5NNwPj4i9zC
+           url      https://mr-tattershall--qwen15b-seth-1p5b-server-web.modal.run
+           verified /api/health -> {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-1.5B-Instruct",
+                    "gpu":"T4","max_len":16384,"lora":null} ; /api/tags -> qwen15b
+           min_containers=0 (idle is free), max_containers=4, cold start measured at 133s
+           FIRST ATTEMPT FAILED on a Windows console encoding fault, NOT on anything real: the image
+           built, then Modal's CLI raised UnicodeEncodeError printing U+2713 to a cp1252 console.
+           Checked immediately whether an app had gone live anyway - it read "stopped, 0 tasks", so
+           nothing billed. Retried with PYTHONUTF8=1 and it deployed in 1.9s.
+           Local shim on :11500 stopped by port-identified PID before the run, so a GPU result cannot
+           be silently served by local Ollama.
+    STOP   python -m modal app stop qwen15b-seth-1p5b --yes   -> expect "stopped, 0 tasks"
