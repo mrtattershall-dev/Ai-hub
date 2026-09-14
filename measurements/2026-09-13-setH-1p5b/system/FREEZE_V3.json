@@ -1,0 +1,24 @@
+{
+  "kind": "v3_deltas",
+  "frozen_at": "2026-09-14T13:34:38.642Z",
+  "builds_on": {
+    "v2_commit": "68ab72c",
+    "seed_commit": "77eed90",
+    "results_commit": "8bfeaf4"
+  },
+  "deltas": [
+    "MULTI_MEMBER_LOCALIZED_INSERTION",
+    "SAFE_BEHAVIOURAL_REPLACEMENT"
+  ],
+  "v2_modules_unchanged": true,
+  "code": {
+    "multiInsert.mjs": "b48f309750e681871a6c3f7abbe194f8177b43bd0b1f8b771b57aa0b41bad534",
+    "safeReplace.mjs": "a4d9efc8b100954b04c08d61603a9dc63dd485c688bacb9d548661abe2aec283",
+    "regression.mjs": "a5d5c8be2a8237682f6ed6e3f9d537096383effa42f3437914ae3200b9ab6dae"
+  },
+  "fixtures": {
+    "multiInsert": 30,
+    "safeReplace": 32,
+    "total_all_suites": 288
+  }
+}
