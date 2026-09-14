@@ -767,3 +767,64 @@ so the effective N is the number of GOALS, never the number of attempts.
 Rung 2 must hand back OBSERVATIONS and leave the causal inference to the model. My large-file message
 violated that - it ended "which is correct - only the RETURNED VALUE is wrong", which is rung 3. The
 `three-exports` message stayed clean (runtime exports vs required names, no causal claim).
+
+## Reach x conversion: what the historical /100 scores actually conflate
+
+Every set-H arm was REACH-LIMITED inside an ~90 minute window, not quality-limited:
+
+    arm             attempted  calls/goal  secs/goal  wall clock  passes  conditional conversion
+    14B control        49/100     14.2       110s       90 min       2          4%
+    14B treatment      51/100     10.2       103s       88 min       7         14%
+    30B control        58/100     21.0        93s       89 min      30         52%
+    30B treatment      53/100     20.1        98s       87 min      39         74%
+
+At ~98s/goal, 100 goals needs ~163 minutes. They had ~88. So a published `/100` conflates two
+quantities:
+
+    score = reach x conditional conversion        e.g. 30B fix: 0.53 x 0.736 = 0.39
+
+**Both terms depend on model AND architecture: S(M,A) = R(M,A) x C(M,A).** Neither belongs solely to
+one. Tonight is direct evidence that CONVERSION moves with architecture: the same 1.5B made ZERO
+top-level `edit_file` calls under the monolith and scored 12/12 (`delete()`) and 8/8 (`has()`) under
+narrow gates. That is not extra reach; it is a changed probability of converting an attempted task
+into correct behaviour.
+
+**WITHDRAWN: "conversion is a model property and it doesn't move", and the conclusion drawn from it
+("gating widens the absolute 14B-vs-30B gap from 32 to 60").** That follows only if gating affects
+reach alone, which is precisely what has not been measured. Gated conversion could rise sharply for
+the weaker model, for the stronger one, for both, or for neither.
+
+**The 74/100 projection is a reference scenario, not a forecast.** It means: *if the 47 unreached
+goals had the same conditional success probability as the 53 reached ones, the expected score would
+be ~74.* The attempted set is NOT a random sample - set H chains are ordered and later steps depend
+on earlier ones, so the unreached tail is probably harder.
+
+**And "throughput is orchestration" is too strong.** Goal seconds decompose as
+`T_goal = T_model_inference + T_agent_overhead`, and the available rows carry `calls` and `secs` but
+no token counts, so the split cannot be recovered from this data. 20 calls/goal makes orchestration
+cost likely, but cutting 20 calls to 5 does not automatically yield 4x if gated calls carry richer
+context and run longer.
+
+### The table the 100-goal gated experiment must fill
+
+    model   architecture   reach   conditional conversion   score   calls/success   time/success
+    1.5B    gated            ?              ?                 ?           ?              ?
+    14B     gated            ?              ?                 ?           ?              ?
+    30B     gated            ?              ?                 ?           ?              ?
+
+Compared against the monolithic arms above, that answers three separable questions instead of one:
+does gating improve REACH (near-certain, but measure it); does gating improve CONVERSION (tonight
+says it can, where orchestration/integration was the failure source); and does model scale still
+dominate once both are optimised.
+
+### The research question, restated
+
+Not "is a 1.5B equivalent to a 30B" - the historical arms already make literal parity unlikely. The
+question worth the GPU is:
+
+> How much of the apparent capability gap between coding models is intrinsic competence, and how much
+> is the larger model's ability to SURVIVE an architecture that forces it to internally perform
+> navigation, memory, coordination, integration, repair and tool-protocol management?
+
+A gated 1.5B landing far below a gated 30B is not a failed experiment. It measures what parameters
+actually buy once the orchestration tax is stripped out.
