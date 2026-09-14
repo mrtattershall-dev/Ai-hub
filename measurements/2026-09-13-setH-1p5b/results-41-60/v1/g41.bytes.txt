@@ -1,0 +1,41 @@
+const Library = {};
+
+Library.checkout = (isbn, member, day = 0) => {
+  if (!this.loans[isbn]) {
+    this.loans[isbn] = { member, dueDate: day + 14 };
+  } else {
+    console.log(`Loan already exists for ISBN ${isbn}`);
+  }
+};
+
+Library.returnBook = (isbn, member, day = 0) => {
+  if (!this.loans[isbn]) {
+    console.log(`No loan found for ISBN ${isbn}`);
+  } else {
+    this.loans[isbn].dueDate = day + 14;
+    delete this.loans[isbn];
+  }
+};
+
+Library.dueDay = (isbn, member) => {
+  if (!this.loans[isbn]) {
+    console.log(`No loan found for ISBN ${isbn}`);
+    return null;
+  } else {
+    const dueDate = this.loans[isbn].dueDate;
+    const daysLate = day - dueDate + 14;
+    return { isbn, member, daysLate };
+  }
+};
+
+Library.overdue = (today) => {
+  const overdueLoans = [];
+  for (const isbn in this.loans) {
+    if (this.loans[isbn].dueDate > today) {
+      overdueLoans.push(this.dueDay(isbn));
+    }
+  }
+  return overdueLoans.sort((a, b) => b.daysLate - a.daysLate);
+};
+
+module.exports = Library;

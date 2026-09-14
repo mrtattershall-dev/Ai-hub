@@ -1,0 +1,7 @@
+```javascript
+// s5_expr.js
+
+function evaluate() {
+    // Your implementation here
+}
+```

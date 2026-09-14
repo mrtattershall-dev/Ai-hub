@@ -1,0 +1,16 @@
+entries, p):
+    """Find the value that is in the p-th percentile of entries."""
+    sorted_entries = sorted(entries)
+    n = len(sorted_entries)
+    index = int(p * (n - 1))
+    return sorted_entries[index]
+
+# Check the correctness of the percentile function with some test cases.
+def test_percentile():
+    assert percentile([1, 2, 3, 4], 0.5) == 2
+    assert percentile([10, 20, 30, 40, 50], 0.2) == 20
+    assert percentile([-1, -2, -3, -4, -5], 0.9) == -3
+    print("All test cases passed!")
+
+# Run the test function to verify that the percentile function works correctly.
+test_percentile()

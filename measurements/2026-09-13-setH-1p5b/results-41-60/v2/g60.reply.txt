@@ -1,0 +1,9 @@
+library, overdueLines) {
+  if (overdueLines.length === 0) return 'Fine report: no overdue items.';
+  const lines = overdueLines.map(function(item) {
+    const { isbn } = item;
+    const answer = availability(library, isbn);
+    return `Overdue: ${isbn} (${answer})`;
+  });
+  return `Fine report: ${lines.join(', ')}`;
+}

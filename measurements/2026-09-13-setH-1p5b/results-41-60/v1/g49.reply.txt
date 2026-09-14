@@ -1,0 +1,74 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Board</title>
+    <style>
+        .card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="board"></div>
+
+    <script src="s9_board.js"></script>
+</body>
+</html>
+```
+
+```javascript
+// s9_board.js
+document.addEventListener('DOMContentLoaded', () => {
+    const board = document.getElementById('board');
+    let cards = [];
+
+    // Load cards from localStorage if available
+    if (localStorage.getItem('s9-board')) {
+        cards = JSON.parse(localStorage.getItem('s9-board'));
+    }
+
+    // Create and append cards to the board
+    cards.forEach(cardData => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.textContent = cardData.text;
+        board.appendChild(card);
+    });
+
+    // Save cards to localStorage when a new card is added or removed
+    function saveCards() {
+        localStorage.setItem('s9-board', JSON.stringify(cards));
+    }
+
+    // Event listener for adding a new card
+    document.getElementById('add-card').addEventListener('click', () => {
+        const text = prompt('Enter the text of the new card:');
+        if (text) {
+            cards.push({ text });
+            saveCards();
+            const newCard = document.createElement('div');
+            newCard.className = 'card';
+            newCard.textContent = text;
+            board.appendChild(newCard);
+        }
+    });
+
+    // Event listener for removing a card
+    board.addEventListener('click', (event) => {
+        if (event.target.classList.contains('card')) {
+            const index = cards.indexOf(event.target.dataset.cardIndex);
+            if (index !== -1) {
+                cards.splice(index, 1);
+                saveCards();
+                event.target.remove();
+            }
+        }
+    });
+});
+```

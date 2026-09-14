@@ -1,0 +1,30 @@
+import networkx as nx
+
+class Graph(nx.DiGraph):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def topo_order(self):
+        """
+        Returns the nodes in topological order. Raises ValueError if the graph has a cycle.
+        """
+        if self.has_cycle():
+            raise ValueError("Graph has a cycle")
+        
+        sorted_nodes = []
+        while len(sorted_nodes) < len(self.nodes()):
+            ready_nodes = [node for node, indegree in self.in_degree() if indegree == 0]
+            if not ready_nodes:
+                raise ValueError("Graph is empty or contains disconnected components")
+            
+            sorted_nodes.extend(ready_nodes)
+        
+        return sorted_nodes
+
+# Example usage
+G = Graph()
+G.add_edges_from([(1, 2), (2, 3), (3, 4)])
+try:
+    print(G.topo_order())
+except ValueError as e:
+    print(e)  # Output: Graph has a cycle

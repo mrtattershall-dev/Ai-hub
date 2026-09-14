@@ -1,0 +1,59 @@
+```python
+import csv
+from datetime import datetime, timedelta
+
+# Load logs from a CSV file (replace 'logs.csv' with your actual log file)
+def load_logs():
+    logs = []
+    with open('logs.csv', mode='r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            logs.append(row)
+    return logs
+
+# Process logs to calculate total bytes per hour
+def process_logs(logs):
+    by_hour = {}
+    current_date = None
+    total_bytes = 0
+    
+    for log in logs:
+        # Parse the time field (assume it's in 'YYYY-MM-DD HH:MM' format)
+        timestamp = datetime.strptime(log['time'], '%Y-%m-%d %H:%M')
+        
+        if not current_date or current_date != timestamp.date():
+            if current_date is not None:
+                by_hour[current_date.strftime('%Y-%m-%d')] = total_bytes
+            current_date = timestamp.date()
+            total_bytes = 0
+        
+        # Convert bytes to MB for readability
+        log['bytes'] /= (1024 * 1024)
+        
+        # Add the bytes to the total for this hour
+        total_bytes += log['bytes']
+    
+    if current_date is not None:
+        by_hour[current_date.strftime('%Y-%m-%d')] = total_bytes
+    
+    return by_hour
+
+# Export the results to a CSV file
+def export_results(by_hour):
+    with open('by_hour.csv', mode='w', newline='') as file:
+        fieldnames = ['YYYY-MM-DD HH', 'total_bytes']
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        
+        for date, bytes in by_hour.items():
+            writer.writerow({'YYYY-MM-DD HH': date, 'total_bytes': f'{bytes:.2f} MB'})
+
+# Main function to run the script
+def main():
+    logs = load_logs()
+    by_hour = process_logs(logs)
+    export_results(by_hour)
+
+if __name__ == "__main__":
+    main()
+```

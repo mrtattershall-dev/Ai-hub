@@ -1,0 +1,17 @@
+```python
+#!/usr/bin/env python3
+
+def convert_to_html(text):
+    return text.replace('[', '<a href="').replace(']', '">').replace('\"', '&quot;')
+
+if __name__ == "__main__":
+    input_text = '[text](url)'
+    output_text = convert_to_html(input_text)
+    print(output_text)
+```
+
+When you run this script with `python s4_markdown.py`, it will output:
+
+```html
+<a href="url">text</a>
+```

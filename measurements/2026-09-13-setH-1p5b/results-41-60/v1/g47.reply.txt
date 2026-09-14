@@ -1,0 +1,18 @@
+```javascript
+const { Cache } = require('./cache');
+
+// Create a new cache with a capacity of 10 and a TTL of 30 seconds
+const myCache = new Cache(10, { ttl: 30 * 1000 });
+
+// Set some key-value pairs in the cache
+myCache.set('key1', 'value1');
+myCache.set('key2', 'value2');
+
+// Access values from the cache
+console.log(myCache.get('key1')); // Output: value1
+
+// The cache should expire after 30 seconds
+setTimeout(() => {
+  console.log(myCache.get('key1')); // Output: undefined
+}, 30 * 1000);
+```

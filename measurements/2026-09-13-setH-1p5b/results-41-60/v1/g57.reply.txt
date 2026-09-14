@@ -1,0 +1,37 @@
+```javascript
+const cache = {};
+
+function get(key) {
+  if (cache[key]) {
+    return { hits: 1, misses: 0, evictions: 0, expirations: 0 };
+  } else {
+    const entry = { key: key, value: Math.random() };
+    cache[key] = entry;
+    return { hits: 0, misses: 1, evictions: 0, expirations: 0 };
+  }
+}
+
+function stats() {
+  let hits = 0;
+  let misses = 0;
+  let evictions = 0;
+  let expirations = 0;
+
+  for (const key in cache) {
+    if (cache.hasOwnProperty(key)) {
+      const entry = cache[key];
+      if (entry.expiry && Date.now() > entry.expiry) {
+        expirations++;
+        delete cache[key];
+      } else {
+        hits++;
+      }
+      misses--;
+    }
+  }
+
+  return { hits, misses, evictions, expirations };
+}
+
+module.exports = Cache;
+```

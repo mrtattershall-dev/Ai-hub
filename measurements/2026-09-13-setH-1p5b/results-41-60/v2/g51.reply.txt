@@ -1,0 +1,4 @@
+member) {
+    // TODO: implement the fines logic based on the loans by member.
+    return 0;
+  }

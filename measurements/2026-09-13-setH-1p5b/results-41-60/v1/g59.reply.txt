@@ -1,0 +1,33 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S9 Board</title>
+    <style>
+        #s9-msg {
+            color: red;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="s9-board">
+        <!-- Existing cards -->
+        <div class="card">1</div>
+        <div class="card">2</div>
+        <div class="card">3</div>
+
+        <!-- New card element -->
+        <div class="card new-card">4</div>
+
+        <button id="new-card-btn" onclick="addCard()">Add Card</button>
+
+        <div id="s9-msg"></div>
+    </div>
+
+    <script src="s9_board.js"></script>
+</body>
+</html>
+```

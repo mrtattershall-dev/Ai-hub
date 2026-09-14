@@ -1,0 +1,91 @@
+  arms v1 + v2   goals 41-60
+  per-goal isolation: each goal starts from a fresh pristine canonical seed
+  out C:\Users\tatte\AppData\Local\Temp\run4160-aVj7bn
+
+  [v1 41] s1_library.js   WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v1 42] s2_logs.py      WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: missing_export
+         | repair refused: deterministic export repair is JS-only; in Python the name is simply absent
+  [v1 43] s3_matrix.js    WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: no_body
+  [v1 44] s4_markdown.py  WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=fail  VERIFIED=no
+        kind: missing_export
+         | repair refused: deterministic export repair is JS-only; in Python the name is simply absent | probe: threw: AttributeError: module 's4_markdown' ha
+  [v1 45] s5_expr.js      WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=fail  VERIFIED=no
+        kind: missing_export
+         | repair refused: evaluate is not declared at top level - nothing to export | probe: new function behaviour: case 0 gave ERR, wanted 1
+  [v1 46] s6_graph.py     WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: load_error
+         | no repair route for load_error
+  [v1 47] s7_cache.js     WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: load_error
+         | no repair route for load_error
+  [v1 48] s8_grades.py    WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: execution_contamination
+         | no repair route for execution_contamination
+  [v1 49] s9_board.html   WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=PASS  probe=fail  VERIFIED=no
+         | probe: threw: Error: failed to find element matching selector "#s9-new"
+  [v1 50] s10_desk.js     WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: load_error
+         | no repair route for load_error
+  [v1 51] s1_library.js   WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v1 52] s2_logs.py      WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: missing_export
+         | repair refused: deterministic export repair is JS-only; in Python the name is simply absent
+  [v1 53] s3_matrix.js    WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v1 54] s4_markdown.py  WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=PASS  probe=fail  VERIFIED=no
+         | probe: list not rendered on one line: <p></p></ul>
+  [v1 55] s5_expr.js      WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=PASS  probe=fail  VERIFIED=no
+         | probe: '2 + * 3' message lacks 'at 4': Result: 12
+  [v1 56] s6_graph.py     WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: load_error
+         | no repair route for load_error
+  [v1 57] s7_cache.js     WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: load_error
+         | no repair route for load_error
+  [v1 58] s8_grades.py    WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: load_error
+         | no repair route for load_error
+  [v1 59] s9_board.html   WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=PASS  probe=fail  VERIFIED=no
+         | probe: threw: Error: failed to find element matching selector "#s9-new"
+  [v1 60] s10_desk.js     WHOLE_FILE_FALLBACK  whole_file     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: missing_export
+         | repair refused: fineReport is not declared at top level - nothing to export
+  [v2 41] s1_library.js   FIM_ELIGIBLE         add_method     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: missing_member
+         | no repair route for missing_member
+  [v2 42] s2_logs.py      FIM_ELIGIBLE         add_function   calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: load_error
+         | no repair route for load_error
+  [v2 43] s3_matrix.js    FIM_ELIGIBLE         add_method     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 44] s4_markdown.py  WHOLE_FILE_FALLBACK  content_edit   calls=1  contract=fail  probe=fail  VERIFIED=no
+        kind: missing_export
+         | repair refused: deterministic export repair is JS-only; in Python the name is simply absent | probe: threw: AttributeError: module 's4_markdown' ha
+  [v2 45] s5_expr.js      WHOLE_FILE_FALLBACK  content_edit   calls=1  contract=PASS  probe=fail  VERIFIED=no
+         | probe: new function behaviour: case 0 gave undefined, wanted 1
+  [v2 46] s6_graph.py     FIM_ELIGIBLE         add_method     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 47] s7_cache.js     WHOLE_FILE_FALLBACK  content_edit   calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 48] s8_grades.py    FIM_ELIGIBLE         add_method     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 49] s9_board.html   WHOLE_FILE_FALLBACK  content_edit   calls=1  contract=fail  probe=fail  VERIFIED=no
+        kind: dead_ref
+         | no repair route for dead_ref | probe: threw: Error: failed to find element matching selector "#s9-new"
+  [v2 50] s10_desk.js     FIM_ELIGIBLE         add_function   calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 51] s1_library.js   FIM_ELIGIBLE         add_method     calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: missing_member
+         | no repair route for missing_member
+  [v2 52] s2_logs.py      FIM_ELIGIBLE         add_function   calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 53] s3_matrix.js    FIM_ELIGIBLE         add_method     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 54] s4_markdown.py  WHOLE_FILE_FALLBACK  content_edit   calls=1  contract=fail  probe=-  VERIFIED=no
+        kind: dependency_firewall
+        rejected before writing: NEW_DEP_UNRESOLVED_EXTERNAL:markdown
+  [v2 55] s5_expr.js      WHOLE_FILE_FALLBACK  content_edit   calls=1  contract=PASS  probe=fail  VERIFIED=no
+         | probe: '2 + * 3' message lacks 'at 4': Expression is invalid
+  [v2 56] s6_graph.py     FIM_ELIGIBLE         add_method     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 57] s7_cache.js     FIM_ELIGIBLE         add_method     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 58] s8_grades.py    FIM_ELIGIBLE         add_method     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 59] s9_board.html   WHOLE_FILE_FALLBACK  content_edit   calls=1  contract=PASS  probe=fail  VERIFIED=no
+         | probe: threw: Error: failed to find element matching selector "#s9-new"
+  [v2 60] s10_desk.js     FIM_ELIGIBLE         add_function   calls=1  contract=PASS  probe=-  VERIFIED=YES
+
+  RAW = C:\Users\tatte\AppData\Local\Temp\run4160-aVj7bn
+  rows preserved per arm; aggregates are computed by analyse4160.mjs, not here.

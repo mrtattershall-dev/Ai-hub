@@ -1,0 +1,28 @@
+import networkx as nx
+
+class S6Graph(nx.Graph):
+    def remove_node(self, n):
+        if n not in self.nodes():
+            raise KeyError(f"Unknown node: {n}")
+        
+        # Remove the node from the graph
+        self.remove_node(n)
+        
+        # Remove all edges connected to the node
+        for u, v in self.edges():
+            if u == n or v == n:
+                self.remove_edge(u, v)
+
+# Example usage:
+G = S6Graph()
+G.add_node('A')
+G.add_node('B')
+G.add_edge('A', 'B')
+
+print(G.nodes())
+print(G.edges())
+
+G.remove_node('A')
+
+print(G.nodes())
+print(G.edges())

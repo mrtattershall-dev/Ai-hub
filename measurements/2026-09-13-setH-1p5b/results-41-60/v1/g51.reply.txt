@@ -1,0 +1,85 @@
+Sure, here's the entire `s1_library.js` file with the required modifications:
+
+```javascript
+const Library = {};
+
+// Function to return a book and calculate fines for late returns
+Library.returnBook = function(member, dueDate) {
+  const currentDate = new Date();
+  const daysLate = Math.ceil((currentDate - dueDate) / (24 * 60 * 60 * 1000));
+
+  // Calculate the fine based on the number of days late
+  let fine;
+  if (daysLate > 0) {
+    fine = daysLate * 25; // Fine is 25 cents per day late
+  } else {
+    fine = 0;
+  }
+
+  // Add the fine to the member's unpaid fines
+  member.unpaidFines += fine;
+
+  return fine;
+};
+
+// Function to get the total unpaid fines for a member
+Library.fines = function(member) {
+  return member.unpaidFines;
+};
+
+// Function to pay fines for a member
+Library.pay = function(member, cents) {
+  if (cents <= 0 || cents > member.unpaidFines) {
+    throw new Error('Invalid payment amount');
+  }
+
+  member.unpaidFines -= cents;
+};
+
+module.exports = Library;
+```
+
+### Explanation:
+1. **returnBook Function**:
+   - Calculates the number of days late by subtracting the due date from the current date.
+   - Determines the fine based on the number of days late (25 cents per day).
+   - Adds the fine to the member's unpaid fines.
+
+2. **fines Function**:
+   - Returns the total unpaid fines for a specific member.
+
+3. **pay Function**:
+   - Checks if the payment amount is valid and within the member's unpaid fines.
+   - If the payment amount is invalid, it throws an error.
+   - Otherwise, it subtracts the payment amount from the member's unpaid fines.
+
+### Usage Example:
+To use this library in your Node.js application, you would require it and call its methods as follows:
+
+```javascript
+const Library = require('./s1_library');
+
+// Create a new member with initial unpaid fine of 0
+const member = { name: 'John Doe', unpaidFines: 0 };
+
+// Return a book on time
+console.log(Library.returnBook(member, new Date())); // Output will be 0
+
+// Return a book late
+console.log(Library.returnBook(member, new Date(Date.now() - (7 * 24 * 60 * 60 * 1000)))); // Output will be 1875
+
+// Get the total unpaid fines
+console.log(Library.fines(member)); // Output will be 1875
+
+// Pay the fines
+Library.pay(member, 1875);
+console.log(Library.fines(member)); // Output will be 0
+
+try {
+  Library.pay(member, 2000); // This will throw an error
+} catch (error) {
+  console.error(error.message); // Output will be "Invalid payment amount"
+}
+```
+
+This setup ensures that the library functions correctly and handles errors gracefully.

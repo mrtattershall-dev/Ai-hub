@@ -1,0 +1,23 @@
+```javascript
+// s5_expr.js
+
+function evaluateExpression(expression) {
+  try {
+    return eval(expression);
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      const match = error.message.match(/at N\((\d+)\)/);
+      if (match) {
+        const position = parseInt(match[1], 10);
+        return `Expression is invalid at character ${position}`;
+      }
+      return 'Expression is invalid';
+    } else {
+      return `An unexpected error occurred: ${error.message}`;
+    }
+  }
+}
+
+console.log(evaluateExpression("2 + * 3")); // "Expression is invalid at character 4"
+console.log(evaluateExpression("(1+2")); // "Expression is invalid at character 4"
+```

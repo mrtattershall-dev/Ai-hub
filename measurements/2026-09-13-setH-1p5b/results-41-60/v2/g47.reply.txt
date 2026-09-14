@@ -1,0 +1,41 @@
+```javascript
+class Cache {
+  constructor(capacity, options = {}) {
+    this.capacity = capacity;
+    this.options = options;
+    this.items = {};
+    this.now = options.now || Date.now;
+  }
+
+  set(key, value, { ttl }) {
+    if (ttl) {
+      const expirationTime = this.now() + ttl;
+      this.items[key] = { ...value, expirationTime };
+    } else {
+      this.items[key] = value;
+    }
+  }
+
+  get(key) {
+    return this.items[key];
+  }
+
+  has(key) {
+    return key in this.items && this.items[key].expirationTime > this.now();
+  }
+
+  peek(key) {
+    return this.items[key];
+  }
+
+  size() {
+    return Object.keys(this.items).filter(key => this.items[key].expirationTime > this.now()).length;
+  }
+
+  keys() {
+    return Object.keys(this.items).filter(key => this.items[key].expirationTime > this.now());
+  }
+}
+
+module.exports = Cache;
+```

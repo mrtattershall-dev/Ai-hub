@@ -1,0 +1,27 @@
+# s4_markdown.py
+
+def to_html(markdown):
+    lines = markdown.split('\n')
+    html = ''
+    current_list = []
+    for line in lines:
+        if line.startswith('- '):
+            if current_list:
+                html += '</ul>\n'
+            current_list.append('<li>{}</li>'.format(line[2:]))
+        else:
+            if current_list:
+                html += '</ul>\n'
+            html += '<p>{}</p>'.format(line)
+    if current_list:
+        html += '</ul>\n'
+    return html
+
+# Example usage
+markdown = """
+- List item 1
+  - Sublist item 1.1
+  - Sublist item 1.2
+- List item 2
+"""
+print(to_html(markdown))

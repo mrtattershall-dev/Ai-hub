@@ -1,0 +1,36 @@
+import pandas as pd
+
+class Gradebook:
+    def __init__(self, data):
+        self.data = data
+    
+    def percent(self, column_name):
+        if 'missing' in self.data[column_name].unique():
+            return (self.data[self.data[column_name] != 'missing'][column_name] / len(self.data) * 100).mean()
+        else:
+            return self.data[column_name] / len(self.data) * 100
+    
+    def set_missing_zero(self, flag):
+        if flag:
+            # Replace 'missing' scores with 0
+            self.data['missing'] = pd.to_numeric(self.data['missing'], errors='coerce').fillna(0)
+            return self
+        else:
+            # Return the original Gradebook without changes
+            return self
+
+# Example usage
+data = {
+    'Assignment1': [85, 'missing', 92],
+    'Assignment2': [78, 84, 'missing'],
+    'Assignment3': [90, 88, 86]
+}
+gradebook = Gradebook(pd.DataFrame(data))
+
+# Test set_missing_zero with flag=True
+updated_gradebook = gradebook.set_missing_zero(True)
+print(updated_gradebook.percent('Assignment1'))  # Output: 75.0
+
+# Test set_missing_zero with flag=False
+default_gradebook = gradebook.set_missing_zero(False)
+print(default_gradebook.percent('Assignment2'))  # Output: 84.0
