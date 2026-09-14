@@ -43,9 +43,13 @@ const path = process.argv[2];
 const c = JSON.parse(process.argv[3]);
 let m;
 try { m = require(path); } catch (e) { console.log('LOADFAIL ' + String(e.message).split('\\n')[0]); process.exit(1); }
+// The direct-export binding comes from SOURCE, not from runtime .name. That is an incidental
+// property of functions and classes: it made module.exports = Library pass when Library was a
+// class and fail when Library was an object with identical semantics. That asymmetry cost
+// goal 21 a false failure on the 21-40 evaluation.
 const resolve = (n) => {
   if (m && Object.prototype.hasOwnProperty.call(m, n)) return m[n];
-  if (typeof m === 'function' && m.name === n) return m;
+  if (c.directBinding && n === c.directBinding) return m;
   return undefined;
 };
 const missingExports = [];
@@ -127,10 +131,20 @@ function sandboxOf(ws) {
 function htmlContract(ws, file, c) {
   // Static text analysis only - nothing is executed, so no isolation is needed here.
   const src = readFileSync(join(ws, file), 'utf8');
-  const missingIds = c.domIds.filter((id) => !new RegExp('id\\s*=\\s*["\u0027]' + id + '["\u0027]').test(src));
-  const missingClasses = c.domClasses.filter((k) => !src.includes(k));
   const refs = [...src.matchAll(/(?:src|href)\s*=\s*["\u0027]([^"\u0027]+)["\u0027]/g)].map((x) => x[1])
     .filter((u) => !/^(https?:|\/\/|#|data:|mailto:)/.test(u));
+
+  // A class named by the goal is created at RUNTIME, and goal 9 explicitly says "put the logic in
+  // s9_board.js" - so the token legitimately lives in the referenced script, not in the markup.
+  // Scanning only the html rejected a board that puppeteer had just proven correct, which is the
+  // same specificity failure as demanding s9-card be an id.
+  let searchable = src;
+  for (const u of refs) {
+    const p = join(ws, u.split(/[?#]/)[0]);
+    if (existsSync(p)) { try { searchable += '\n' + readFileSync(p, 'utf8'); } catch (e) { /* unreadable */ } }
+  }
+  const missingIds = c.domIds.filter((id) => !new RegExp('id\\s*=\\s*["\u0027]' + id + '["\u0027]').test(searchable));
+  const missingClasses = c.domClasses.filter((k) => !searchable.includes(k));
   const deadRefs = [...new Set(refs.filter((u) => !existsSync(join(ws, u.split(/[?#]/)[0]))))];
   const reasons = [];
   if (missingIds.length) reasons.push({ kind: 'missing_id', items: missingIds });
@@ -155,7 +169,13 @@ export function checkContract(ws, file, contract, opts = {}) {
   const probe = join(sb, isPy ? '_cc.py' : '_cc.js');
   writeFileSync(probe, isPy ? PY_PROBE : JS_PROBE, 'utf8');
   const before = snapshot(sb);
-  const payload = JSON.stringify({ moduleExports: contract.moduleExports, members: contract.members });
+  // `module.exports = X` binds the module to whatever X names. Identifier, named class expression
+  // and named function expression are all the same relationship; an object literal or a call is not
+  // a binding and yields null, so it cannot satisfy a named export.
+  const srcText = readFileSync(join(sb, file), 'utf8');
+  const bind = srcText.match(/module\.exports\s*=\s*(?:(?:class|function)\s+([A-Za-z_$][\w$]*)|([A-Za-z_$][\w$]*))\s*(?:;|\s|$)/m);
+  const directBinding = bind ? (bind[1] || bind[2]) : null;
+  const payload = JSON.stringify({ moduleExports: contract.moduleExports, members: contract.members, directBinding });
   const r = spawnSync(isPy ? 'python' : process.execPath, [probe, join(sb, file), payload],
     { cwd: sb, encoding: 'utf8', timeout: 30000 });
   const after = snapshot(sb);

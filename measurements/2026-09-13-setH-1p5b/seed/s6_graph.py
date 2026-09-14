@@ -1,0 +1,132 @@
+# CANONICAL REFERENCE - cumulative correct state after setH goals 6, 16, 26, 36.
+# Goal 46 (topo_order) and goal 56 (remove_node) are HELD OUT and deliberately not implemented.
+#
+#   goal  6  add_node, add_edge(a, b, weight=1) replacing an existing edge's weight,
+#            nodes() sorted, neighbors(a) sorted (b, weight) tuples
+#   goal 16  bfs(start) breadth-first, neighbours in sorted order, KeyError for unknown start
+#   goal 26  shortest_path(a, b) -> (cost, path) cheapest by weight, None when unreachable,
+#            (0, [a]) for a == a, KeyError for an unknown node
+#   goal 36  has_cycle() - a self-edge counts
+import heapq
+from collections import deque
+
+
+class Graph:
+    def __init__(self):
+        self._adj = {}
+
+    def add_node(self, n):
+        self._adj.setdefault(n, {})
+
+    def add_edge(self, a, b, weight=1):
+        if not isinstance(weight, (int, float)) or isinstance(weight, bool) or weight <= 0:
+            raise ValueError("weight must be a positive number")
+        self.add_node(a)
+        self.add_node(b)
+        self._adj[a][b] = weight
+
+    def nodes(self):
+        return sorted(self._adj)
+
+    def neighbors(self, a):
+        if a not in self._adj:
+            raise KeyError(a)
+        return sorted(self._adj[a].items())
+
+    def bfs(self, start):
+        if start not in self._adj:
+            raise KeyError(start)
+        seen = {start}
+        order = [start]
+        q = deque([start])
+        while q:
+            cur = q.popleft()
+            for nxt, _w in sorted(self._adj[cur].items()):
+                if nxt not in seen:
+                    seen.add(nxt)
+                    order.append(nxt)
+                    q.append(nxt)
+        return order
+
+    def shortest_path(self, a, b):
+        if a not in self._adj:
+            raise KeyError(a)
+        if b not in self._adj:
+            raise KeyError(b)
+        if a == b:
+            return (0, [a])
+        dist = {a: 0}
+        prev = {}
+        heap = [(0, a)]
+        done = set()
+        while heap:
+            d, cur = heapq.heappop(heap)
+            if cur in done:
+                continue
+            done.add(cur)
+            if cur == b:
+                path = [b]
+                while path[-1] != a:
+                    path.append(prev[path[-1]])
+                path.reverse()
+                return (d, path)
+            for nxt, w in sorted(self._adj[cur].items()):
+                nd = d + w
+                if nxt not in dist or nd < dist[nxt]:
+                    dist[nxt] = nd
+                    prev[nxt] = cur
+                    heapq.heappush(heap, (nd, nxt))
+        return None
+
+    def has_cycle(self):
+        WHITE, GREY, BLACK = 0, 1, 2
+        colour = {n: WHITE for n in self._adj}
+
+        def visit(n):
+            colour[n] = GREY
+            for nxt in self._adj[n]:
+                if colour.get(nxt, WHITE) == GREY:
+                    return True
+                if colour.get(nxt, WHITE) == WHITE and visit(nxt):
+                    return True
+            colour[n] = BLACK
+            return False
+
+        return any(colour[n] == WHITE and visit(n) for n in list(self._adj))
+
+
+if __name__ == "__main__":
+    g = Graph()
+    g.add_node("a")
+    g.add_node("a")
+    g.add_edge("a", "b", 2)
+    g.add_edge("a", "c")
+    g.add_edge("a", "b", 5)
+    assert g.nodes() == ["a", "b", "c"]
+    assert g.neighbors("a") == [("b", 5), ("c", 1)]
+    try:
+        g.add_edge("a", "b", 0)
+        raise AssertionError("expected ValueError")
+    except ValueError:
+        pass
+    assert g.bfs("a") == ["a", "b", "c"]
+    try:
+        g.bfs("zz")
+        raise AssertionError("expected KeyError")
+    except KeyError:
+        pass
+    g2 = Graph()
+    g2.add_edge("a", "b", 1)
+    g2.add_edge("b", "d", 1)
+    g2.add_edge("a", "d", 5)
+    assert g2.shortest_path("a", "d") == (2, ["a", "b", "d"])
+    assert g2.shortest_path("a", "a") == (0, ["a"])
+    g2.add_node("z")
+    assert g2.shortest_path("a", "z") is None
+    assert g2.has_cycle() is False
+    g2.add_edge("d", "a", 1)
+    assert g2.has_cycle() is True
+    g3 = Graph()
+    g3.add_edge("s", "s", 1)
+    assert g3.has_cycle() is True
+    print("ok")

@@ -85,6 +85,15 @@ export function deriveContract(goal) {
     if (CLASS_RE.test(target)) {
       // "Add checkout(isbn, member) and available(isbn) to the EXISTING Library in s1_library.js"
       addExport(target);
+      // Two things that look like member names and are not:
+      //   * the owner itself, picked up from a CONSTRUCTOR call - "new Cache(capacity, ...)"
+      //   * keys of an options object - goal 47's "{ ttl, now }" describes a caller-supplied clock,
+      //     and deriving Cache.now would demand a method the goal never asked for.
+      const optionKeys = new Set();
+      for (const b of g.match(/\{[^{}]*\}/g) || []) {
+        for (const k of b.match(/[A-Za-z_$][\w$]*/g) || []) optionKeys.add(k);
+      }
+      headNames = headNames.filter((n) => n !== target && !optionKeys.has(n));
       // "and a static identity(n)" is not an instance method, and the rendering should say so.
       // Plain substring test rather than a built regex - the name is already a bare identifier.
       headNames.forEach((n) => addMember(target, n,
