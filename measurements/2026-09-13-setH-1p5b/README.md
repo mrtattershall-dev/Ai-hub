@@ -638,3 +638,58 @@ this run tests C at all.
 Arm per-goal results are keyed `chain/step/file` with an `impl` boolean, in identical order across arms, so
 `solved-by-X ∩ solved-by-Y` is directly computable - for the arms today and for the 1.5B when this run scores.
 That is the comparison tatte asked for, and it is available on the monolithic architecture without new spend.
+
+### Step 3: runtime-grounded forensic audit — the shadowing hypothesis is DEAD, and a claim of mine is withdrawn
+
+**WITHDRAWN: "every arm was scored against a broken export check."** That was wrong. The authoritative
+`checks-H.mjs` contains **zero** references to `exportNames` or `defNames`. It scores by EXECUTION -
+`spawnSync` + `require()` + `typeof M[n] !== 'function'` (`checks-H.mjs:193, 253`). So the banked scores
+(14B 2/7, 30B 30/39) are runtime-grounded and completely unaffected by the `exportNames` defect.
+
+**The 62% interface-failure figure also stands.** It was computed by categorising the checker's own `why`
+strings, which are produced by executing the files - not by static analysis. The `exportNames` bug corrupted
+only the hub's IN-RUN guidance to the model (the missing-export note, `lostExports` refusals). Real, worth
+fixing, never a scoring defect.
+
+**Shadowed exports are essentially absent from the historical record.** Across 10 preserved workspaces and
+~139 JS files, exactly ONE file (in `coder14b-sethctl`) holds more than one top-level `module.exports =`:
+
+    coder14b-sethctl  10 js  >1 module.exports: 1        30B control     20 js  0
+    coder14b-sethfix  10 js  0                           30B treatment   17 js  0
+    (i32, j14, j30, j32, setH, setJ bundles)             all 0
+
+**Every historical "X is not exported" failure audited against Node itself — 20 of 20 were never written:**
+
+    arm            goal  file            want         runtime actually exports
+    14B ctl/fix    65/75/85  s5_expr.js  tokenize/toRPN/compile   evaluate
+    30B ctl/fix    65/75/85  s5_expr.js  tokenize/toRPN/compile   evaluate
+    30B ctl/fix    40..90    s10_desk.js makeLookup, canBorrow,   shelfLine|availability|memberLine|...
+                                         snapshot, searchLines
+
+Not shadowed, not mis-scored, and not "defined but unexported" - `definedInText` was false in all 20, so the
+requested function is absent from the file TEXT. The models did the early steps of each chain and never wrote
+the later ones. The checker was right every time.
+
+**So the 62% "code exists, API absent" category means: the FILE exists and exports OTHER things, while the
+specific requested function was never written.** That is a genuine capability/effort failure, not an artefact.
+
+**A probe artefact I caught mid-audit:** the first run labelled 11 of 20 `FILE WILL NOT LOAD`. False. Those
+modules PRINT on load (`s10_desk.js` is a CLI), so stdout began with their own output and a strict
+`startsWith('EXP ')` missed the marker. Scanning lines instead, all 20 load and answer. Had I reported the
+first pass, I would have published "the 30B's files do not even load" - the fifth apparatus-fault-as-finding
+of the day.
+
+### The 1.5B's shadowing is its OWN failure mode, and it is narrower than I claimed
+
+The three-export gate failure is NOT contract-retention. Dumping the bytes on 4 of 4 attempts showed the model
+produced **completely correct code** - all three functions, and `module.exports = { tokenize, toRPN, compile };`
+- while the ORIGINAL `module.exports = { tokenize };` survived below it, because the model's FIND spanned only
+the function it was extending.
+
+So my earlier "granularity boundary at three contracts" and the Mode A / Mode B reading are **both withdrawn**.
+The honest statement: the 1.5B held all three obligations long enough to implement them correctly, then failed
+at INTEGRATION - it did not remove the line its own change superseded. That is a much narrower weakness, and
+one a separate exports gate eliminates by construction.
+
+**The provisional 3/6 stays on record as provisional**, not deleted: it was measured with a runner that had a
+workspace bug, and the byte-level view of the same task shows correct code every time with a shadowed export.
