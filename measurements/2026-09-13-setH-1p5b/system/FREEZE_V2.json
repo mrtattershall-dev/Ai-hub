@@ -1,0 +1,162 @@
+{
+  "kind": "v2_architecture_freeze",
+  "frozen_at": "2026-09-14T12:49:13.220Z",
+  "provenance": {
+    "v1_commit": "a09e649",
+    "seed_commit": "77eed90",
+    "seed_bundle_sha": "29c4cf9e4004311f21ca86e464ef1b5ffc8ca1b01a998a1292565b8ded9649de",
+    "goal_set_sha": "1f29e971e72f9461f6326e0e861031926f771c334453bbdf4bfa2627673171a9",
+    "strata_sha": "efb496a8566931e70223f9e18b1b662dd894ba52b90399d1c26d7ad9adb69747"
+  },
+  "model": {
+    "tag": "qwen2.5-coder:1.5b",
+    "runtime": "ollama",
+    "ollama_version": "ollama version is 0.33.3",
+    "family": "qwen2",
+    "parameter_size": "1.5B",
+    "quantization_level": "Q4_K_M",
+    "context_length": 32768,
+    "block_count": 28,
+    "embedding_length": 1536,
+    "feed_forward_length": 8960,
+    "head_count": 12,
+    "head_count_kv": 2,
+    "rope_freq_base": 1000000,
+    "capabilities": [
+      "completion",
+      "tools",
+      "insert"
+    ]
+  },
+  "decoding": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "repeat_penalty": 1.1,
+    "repeat_last_n": 64,
+    "num_predict_whole_file": 2500,
+    "num_predict_fim": 600,
+    "note": "pinned explicitly on every call; backend defaults never relied on"
+  },
+  "endpoints": {
+    "whole_file": "/api/chat",
+    "fim": "/api/generate with prompt(prefix)+suffix"
+  },
+  "arms": {
+    "v1": "whole-file generation + v1-style deterministic repair",
+    "v2": "operation-specific FIM-first generation where localization is PROVEN safe, + dependency firewall + typed repair",
+    "shared_evaluator": "Both arms are scored by the SAME contract checker, execution isolation and behavioural oracles. The evaluator is not part of the intervention.",
+    "same_start_state": "Both arms begin from the identical canonical post-goal-40 seed (77eed90)."
+  },
+  "definitions": {
+    "VERIFIED_GOAL_PASS": "all applicable structural obligations pass AND the behavioural oracle passes when that goal has one. A behavioural-only goal never passes on loadability.",
+    "localization_policy": "FIM utilisation is NOT maximised. A false-negative localization costs a fallback; a false-positive can surgically corrupt the wrong code while looking clean. When uncertain, fall back.",
+    "dependency_policy": "A newly invented unresolved import does NOT justify generating that dependency. A missing artifact is generated only when the typed contract independently establishes it should exist."
+  },
+  "code": {
+    "contract.mjs": {
+      "sha256": "a1abfa4e2b1214f92f900006db2a2282ff7ccbacf2c9eff2ec167179ef755627",
+      "purpose": "typed contract derivation + human/prompt renderings"
+    },
+    "contractCheck.mjs": {
+      "sha256": "bed7958180a29cb4603c15cd4e7870cbfe61ab72c720704f70cee4da77c6ad37",
+      "purpose": "typed obligations, source-binding exports, referenced-JS DOM classes, execution isolation"
+    },
+    "_htmlcheck.mjs": {
+      "sha256": "2d60f888975439d09c6fed5314b3ffbb91a221f0a35eff0c468e62d71d3daae2",
+      "purpose": "html structural check"
+    },
+    "derive.mjs": {
+      "sha256": "ca373a028946437513a6604ee40c7cfe147859abdefea7547e3f2e30a91dfc60",
+      "purpose": "lead file / language / edit detection"
+    },
+    "operation.mjs": {
+      "sha256": "ea33af5db4d50171d19b1174f033337dd0f07c64178aeadaa72c03a603c77ebc",
+      "purpose": "operation planner + editSurface; comments and strings stripped before analysis"
+    },
+    "fimspan.mjs": {
+      "sha256": "dfdd1a47efd448b4e2826b201d6bb4a8ade0421fd0df0811ebbd408268b9b294",
+      "purpose": "add_method / add_function / replace_method spans with origPrefix/origSuffix"
+    },
+    "spanSafety.mjs": {
+      "sha256": "815b2391cd0585025abc89b8b7a128cc79e4418469383114096d5f92c79be8a6",
+      "purpose": "span validity -> preservation -> structural safety"
+    },
+    "deps.mjs": {
+      "sha256": "ec615b769324afbf201740e00f6db28a80d21b1d12e7a2315aec2d9a71ed9e96",
+      "purpose": "dependency firewall + load-side-effect classification"
+    },
+    "repairGates.mjs": {
+      "sha256": "25c4a927c2989d81df9e718dcb9f24b607289220ffae41b90bf1b4225c47c8c9",
+      "purpose": "failure classifier, deterministic transforms, explicit refusals"
+    },
+    "repairPipeline.mjs": {
+      "sha256": "c2c5a5ac799e066fda89264fa0b55a3b9620d9912486b43debe86afcd265b800",
+      "purpose": "repair routing, FIM repair, typed retry, rollback"
+    },
+    "probes.mjs": {
+      "sha256": "397769e6895f4e685185bb5adcde93c0f01c47f99f4361b11a67e351548bf9b5",
+      "purpose": "six behavioural oracles"
+    },
+    "probeBrowser.mjs": {
+      "sha256": "22054564c5f842a0c910feaa4066f879a18d3720d4751e1a5499900b30f15bb3",
+      "purpose": "isolated-storage puppeteer harness for the DOM oracles"
+    },
+    "arm.mjs": {
+      "sha256": "b5422b2d0a058803d4c69b81b4908d18d6fc8e0eabe6a626ac97cbd3d256e907",
+      "purpose": "the two arms; ONE shared evaluator"
+    }
+  },
+  "references": {
+    "ref/goal44/s4_markdown.py": "3774d7eb89a127c8d704f15245d5fba243cec66dcf362572c7d51ad104dfa3bd",
+    "ref/goal45/s5_expr.js": "bd02f84eac227ae06866c870e077f2403462793904410370b3920f31a3c18fcc",
+    "ref/goal49/s9_board.js": "e0c1f6f9ab4fa743aa469ba6424c97a0b8864a80c9c43262d3229cbfd5652e1d",
+    "ref/goal54/s4_markdown.py": "f774a493bf367834cb1834514355c3cfabc2b3059f405cb839ff1ecc2ad2ce75",
+    "ref/goal55/s5_expr.js": "e2d5395d078238b01964809689dcb497b627753de9c7de19aaf146b8142d17a6",
+    "ref/goal59/s9_board.html": "b30e767a50bd5291e29d331150273db66c3664f3c9daed4669e638d3e8de64ee",
+    "ref/goal59/s9_board.js": "4a803bbc1f2fa6f3331eca7428d4405a8dd34ca7f6a4c1d699f64a6b7ed8dd1e"
+  },
+  "fixtures": {
+    "contract.test.mjs": 24,
+    "isolation.test.mjs": 10,
+    "repairGates.test.mjs": 29,
+    "spec2check.test.mjs": 7,
+    "fimspan.test.mjs": 25,
+    "spanSafety.test.mjs": 15,
+    "operation.test.mjs": 14,
+    "seedProof.test.mjs": 64,
+    "probes.test.mjs": 18,
+    "boardProof.test.mjs": 20,
+    "total": 226
+  },
+  "strata_counts": {
+    "total": 20,
+    "FIM_ELIGIBLE": 13,
+    "WHOLE_FILE_FALLBACK": 7,
+    "by_operation": {
+      "add_method": 9,
+      "add_function": 4,
+      "content_edit": 7
+    },
+    "by_oracle": {
+      "STRUCTURAL": 13,
+      "STRUCTURAL_PLUS_BEHAVIORAL": 4,
+      "STRUCTURAL_WEAK_NO_OP_PASSES": 1,
+      "BEHAVIORAL_REQUIRED": 2
+    },
+    "by_fallback_reason": {
+      "BEHAVIORAL_DELTA_UNPROVEN": 5,
+      "NONLOCAL_EDIT": 2
+    },
+    "with_behavioural_probe": 6
+  },
+  "known_limitations": [
+    "replace_method is implemented and fixture-tested but deliberately NOT wired into the v2 planner. Its default action is destructive rather than additive, and a behaviour-changing replacement needs regression proofs to distinguish \"implemented the new feature\" from \"implemented it by deleting yesterday's feature\". Goals 44, 45, 54, 55 therefore fall back to whole-file generation in BOTH arms, diluting any v2 effect on 4 of 20 goals.",
+    "Preservation checks cannot detect a DUPLICATED method: duplication is insertion-only and loses no symbols. Only the downstream contract/load check catches it. The preservation layer is not claimed to prove more than it does.",
+    "Five goals carry oracle STRUCTURAL_WEAK_NO_OP_PASSES or weaker on the structural side; six of twenty have behavioural probes. The remaining structural-only goals could in principle be satisfied by code that is structurally right and behaviourally wrong.",
+    "The python seed modules are STRUCTURAL_VERIFIED_PLUS_SELF_ASSERTIONS, not BEHAVIORALLY_VERIFIED - they carry goal-derived assertions but no independent external suite like the JS half.",
+    "n=20 goals. This run can show mechanism; it cannot settle effect size.",
+    "Architecture efficacy only. Both arms start from a known-good predecessor, so this measures the edit itself, NOT sequential survival under accumulated self-inflicted damage."
+  ],
+  "holdout_rule": "No model output for goals 41-60 has been generated or inspected. If an instrument defect is found once the arms run, fix it, INVALIDATE that evaluation, and use a fresh held-out set rather than revising the system and continuing to count 41-60."
+}

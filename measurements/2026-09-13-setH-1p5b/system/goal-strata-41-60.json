@@ -1,0 +1,754 @@
+{
+  "provenance": {
+    "created_at": "2026-09-14T12:47:45.910Z",
+    "v1_commit": "a09e649",
+    "seed_commit": "77eed90",
+    "seed_bundle_sha": "29c4cf9e4004311f21ca86e464ef1b5ffc8ca1b01a998a1292565b8ded9649de",
+    "goal_set_sha": "1f29e971e72f9461f6326e0e861031926f771c334453bbdf4bfa2627673171a9",
+    "planner_sha": "ea33af5db4d50171d19b1174f033337dd0f07c64178aeadaa72c03a603c77ebc",
+    "contract_sha": "a1abfa4e2b1214f92f900006db2a2282ff7ccbacf2c9eff2ec167179ef755627",
+    "contract_check_sha": "bed7958180a29cb4603c15cd4e7870cbfe61ab72c720704f70cee4da77c6ad37",
+    "fimspan_sha": "dfdd1a47efd448b4e2826b201d6bb4a8ade0421fd0df0811ebbd408268b9b294",
+    "span_safety_sha": "815b2391cd0585025abc89b8b7a128cc79e4418469383114096d5f92c79be8a6",
+    "deps_sha": "ec615b769324afbf201740e00f6db28a80d21b1d12e7a2315aec2d9a71ed9e96",
+    "arm_sha": "b5422b2d0a058803d4c69b81b4908d18d6fc8e0eabe6a626ac97cbd3d256e907",
+    "probe_hashes": {
+      "probes.mjs": "397769e6895f4e685185bb5adcde93c0f01c47f99f4361b11a67e351548bf9b5",
+      "probeBrowser.mjs": "22054564c5f842a0c910feaa4066f879a18d3720d4751e1a5499900b30f15bb3",
+      "ref/goal44/s4_markdown.py": "3774d7eb89a127c8d704f15245d5fba243cec66dcf362572c7d51ad104dfa3bd",
+      "ref/goal45/s5_expr.js": "bd02f84eac227ae06866c870e077f2403462793904410370b3920f31a3c18fcc",
+      "ref/goal49/s9_board.js": "e0c1f6f9ab4fa743aa469ba6424c97a0b8864a80c9c43262d3229cbfd5652e1d",
+      "ref/goal54/s4_markdown.py": "f774a493bf367834cb1834514355c3cfabc2b3059f405cb839ff1ecc2ad2ce75",
+      "ref/goal55/s5_expr.js": "e2d5395d078238b01964809689dcb497b627753de9c7de19aaf146b8142d17a6",
+      "ref/goal59/s9_board.html": "b30e767a50bd5291e29d331150273db66c3664f3c9daed4669e638d3e8de64ee",
+      "ref/goal59/s9_board.js": "4a803bbc1f2fa6f3331eca7428d4405a8dd34ca7f6a4c1d699f64a6b7ed8dd1e"
+    },
+    "git_head_at_emit": "77eed90"
+  },
+  "rules": {
+    "derived_from": "goal text + frozen canonical seed + planner + behavioural oracles ONLY",
+    "model_output_consulted": false,
+    "note": "Labels are frozen BEFORE either arm generates. The planner is state-dependent, so each row records the predecessor source hash it was stratified against."
+  },
+  "counts": {
+    "total": 20,
+    "FIM_ELIGIBLE": 13,
+    "WHOLE_FILE_FALLBACK": 7,
+    "by_operation": {
+      "add_method": 9,
+      "add_function": 4,
+      "content_edit": 7
+    },
+    "by_oracle": {
+      "STRUCTURAL": 13,
+      "STRUCTURAL_PLUS_BEHAVIORAL": 4,
+      "STRUCTURAL_WEAK_NO_OP_PASSES": 1,
+      "BEHAVIORAL_REQUIRED": 2
+    },
+    "by_fallback_reason": {
+      "BEHAVIORAL_DELTA_UNPROVEN": 5,
+      "NONLOCAL_EDIT": 2
+    },
+    "with_behavioural_probe": 6
+  },
+  "goals": [
+    {
+      "goal": 41,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_method",
+      "lead": "s1_library.js",
+      "owner": "Library",
+      "members": [
+        "dueDay",
+        "overdue"
+      ],
+      "localization_reason": "2 member(s) absent from an existing Library",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Library"
+        ],
+        "members": [
+          {
+            "owner": "Library",
+            "kind": "instance_method",
+            "name": "checkout"
+          },
+          {
+            "owner": "Library",
+            "kind": "instance_method",
+            "name": "returnBook"
+          },
+          {
+            "owner": "Library",
+            "kind": "instance_method",
+            "name": "dueDay"
+          },
+          {
+            "owner": "Library",
+            "kind": "instance_method",
+            "name": "overdue"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": true,
+        "owner_unique": true,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "f2778de32196bfaf25f16e867774111682544aa42d39739dac8bd71f3d48f9ce"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 42,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_function",
+      "lead": "s2_logs.py",
+      "owner": null,
+      "members": [
+        "percentile"
+      ],
+      "localization_reason": "module-level percentile is absent from an existing artifact",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "percentile"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "e7d55308b58573b275831304ac296938f491ae2f04e3028d3125287fbf5c9d1c"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 43,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_method",
+      "lead": "s3_matrix.js",
+      "owner": "Matrix",
+      "members": [
+        "equals"
+      ],
+      "localization_reason": "1 member(s) absent from an existing Matrix",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Matrix"
+        ],
+        "members": [
+          {
+            "owner": "Matrix",
+            "kind": "instance_method",
+            "name": "equals"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": true,
+        "owner_unique": true,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "7454561c07c992d8daeeab74a8ce5deece9793a25d21b19a14ace7c3699da2c8"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 44,
+      "stratum": "WHOLE_FILE_FALLBACK",
+      "operation": "content_edit",
+      "lead": "s4_markdown.py",
+      "owner": null,
+      "members": [],
+      "localization_reason": null,
+      "fallback_reason_enum": "BEHAVIORAL_DELTA_UNPROVEN",
+      "fallback_reason_text": "contract already structurally satisfied - behaviour may still be wrong",
+      "oracle": "STRUCTURAL_PLUS_BEHAVIORAL",
+      "probe_id": "goal44.links",
+      "structural_contract": {
+        "moduleExports": [
+          "to_html"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": null,
+        "lead_exists": true,
+        "predecessor_source_sha256": "7db6b6d5fc3a2895e2de1a515ba5d6cba70da967278151b86ee2ea437c99c71e"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 45,
+      "stratum": "WHOLE_FILE_FALLBACK",
+      "operation": "content_edit",
+      "lead": "s5_expr.js",
+      "owner": null,
+      "members": [],
+      "localization_reason": null,
+      "fallback_reason_enum": "BEHAVIORAL_DELTA_UNPROVEN",
+      "fallback_reason_text": "contract already structurally satisfied - behaviour may still be wrong",
+      "oracle": "STRUCTURAL_PLUS_BEHAVIORAL",
+      "probe_id": "goal45.functions",
+      "structural_contract": {
+        "moduleExports": [
+          "evaluate"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": null,
+        "lead_exists": true,
+        "predecessor_source_sha256": "690a70292b9f100d1f56ff939e9130739472262dfde17cd006f24de88f3995fb"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 46,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_method",
+      "lead": "s6_graph.py",
+      "owner": "Graph",
+      "members": [
+        "topo_order"
+      ],
+      "localization_reason": "1 member(s) absent from an existing Graph",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Graph"
+        ],
+        "members": [
+          {
+            "owner": "Graph",
+            "kind": "instance_method",
+            "name": "topo_order"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": true,
+        "owner_unique": true,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "c5ea2eeb58851dd8837d4da8b6784e35bcef8f21ebc2ba39cffcb57cd3ec6373"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 47,
+      "stratum": "WHOLE_FILE_FALLBACK",
+      "operation": "content_edit",
+      "lead": "s7_cache.js",
+      "owner": null,
+      "members": [],
+      "localization_reason": null,
+      "fallback_reason_enum": "BEHAVIORAL_DELTA_UNPROVEN",
+      "fallback_reason_text": "contract already structurally satisfied - behaviour may still be wrong",
+      "oracle": "STRUCTURAL_WEAK_NO_OP_PASSES",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Cache"
+        ],
+        "members": [
+          {
+            "owner": "Cache",
+            "kind": "instance_method",
+            "name": "set"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": null,
+        "lead_exists": true,
+        "predecessor_source_sha256": "970f5bcafc0ebda89163f53f9d5e7db2584872e97f8a3bacabad3c1a05020226"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 48,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_method",
+      "lead": "s8_grades.py",
+      "owner": "Gradebook",
+      "members": [
+        "drop_lowest"
+      ],
+      "localization_reason": "1 member(s) absent from an existing Gradebook",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Gradebook"
+        ],
+        "members": [
+          {
+            "owner": "Gradebook",
+            "kind": "instance_method",
+            "name": "drop_lowest"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": true,
+        "owner_unique": true,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "aa6efd9a2b1b116d7da3ab399adbab8358b0fae61e7b89083d93fba7c07a14be"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 49,
+      "stratum": "WHOLE_FILE_FALLBACK",
+      "operation": "content_edit",
+      "lead": "s9_board.html",
+      "owner": null,
+      "members": [],
+      "localization_reason": null,
+      "fallback_reason_enum": "NONLOCAL_EDIT",
+      "fallback_reason_text": "markup goals have no member structure to localize",
+      "oracle": "BEHAVIORAL_REQUIRED",
+      "probe_id": "goal49.persistence",
+      "structural_contract": null,
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": null,
+        "lead_exists": true,
+        "predecessor_source_sha256": "65b24836117745772231b9f25e257bdc66170bcfeb5591a93fa7cc17117dae4c"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": [
+        "s9_board.js"
+      ]
+    },
+    {
+      "goal": 50,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_function",
+      "lead": "s10_desk.js",
+      "owner": null,
+      "members": [
+        "overdueLines"
+      ],
+      "localization_reason": "module-level overdueLines is absent from an existing artifact",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "overdueLines"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "4b618e7996185d02cf701149613ab3566b7357caf88dcf9e24f10cd672719e7b"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 51,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_method",
+      "lead": "s1_library.js",
+      "owner": "Library",
+      "members": [
+        "fines",
+        "pay"
+      ],
+      "localization_reason": "2 member(s) absent from an existing Library",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Library"
+        ],
+        "members": [
+          {
+            "owner": "Library",
+            "kind": "instance_method",
+            "name": "fines"
+          },
+          {
+            "owner": "Library",
+            "kind": "instance_method",
+            "name": "pay"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": true,
+        "owner_unique": true,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "f2778de32196bfaf25f16e867774111682544aa42d39739dac8bd71f3d48f9ce"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 52,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_function",
+      "lead": "s2_logs.py",
+      "owner": null,
+      "members": [
+        "by_hour"
+      ],
+      "localization_reason": "module-level by_hour is absent from an existing artifact",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "by_hour"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "e7d55308b58573b275831304ac296938f491ae2f04e3028d3125287fbf5c9d1c"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 53,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_method",
+      "lead": "s3_matrix.js",
+      "owner": "Matrix",
+      "members": [
+        "determinant"
+      ],
+      "localization_reason": "1 member(s) absent from an existing Matrix",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Matrix"
+        ],
+        "members": [
+          {
+            "owner": "Matrix",
+            "kind": "instance_method",
+            "name": "determinant"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": true,
+        "owner_unique": true,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "7454561c07c992d8daeeab74a8ce5deece9793a25d21b19a14ace7c3699da2c8"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 54,
+      "stratum": "WHOLE_FILE_FALLBACK",
+      "operation": "content_edit",
+      "lead": "s4_markdown.py",
+      "owner": null,
+      "members": [],
+      "localization_reason": null,
+      "fallback_reason_enum": "BEHAVIORAL_DELTA_UNPROVEN",
+      "fallback_reason_text": "contract already structurally satisfied - behaviour may still be wrong",
+      "oracle": "STRUCTURAL_PLUS_BEHAVIORAL",
+      "probe_id": "goal54.lists",
+      "structural_contract": {
+        "moduleExports": [
+          "to_html"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": null,
+        "lead_exists": true,
+        "predecessor_source_sha256": "7db6b6d5fc3a2895e2de1a515ba5d6cba70da967278151b86ee2ea437c99c71e"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 55,
+      "stratum": "WHOLE_FILE_FALLBACK",
+      "operation": "content_edit",
+      "lead": "s5_expr.js",
+      "owner": null,
+      "members": [],
+      "localization_reason": null,
+      "fallback_reason_enum": "BEHAVIORAL_DELTA_UNPROVEN",
+      "fallback_reason_text": "contract already structurally satisfied - behaviour may still be wrong",
+      "oracle": "BEHAVIORAL_REQUIRED",
+      "probe_id": "goal55.errorpos",
+      "structural_contract": null,
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": null,
+        "lead_exists": true,
+        "predecessor_source_sha256": "690a70292b9f100d1f56ff939e9130739472262dfde17cd006f24de88f3995fb"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 56,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_method",
+      "lead": "s6_graph.py",
+      "owner": "Graph",
+      "members": [
+        "remove_node"
+      ],
+      "localization_reason": "1 member(s) absent from an existing Graph",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Graph"
+        ],
+        "members": [
+          {
+            "owner": "Graph",
+            "kind": "instance_method",
+            "name": "remove_node"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": true,
+        "owner_unique": true,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "c5ea2eeb58851dd8837d4da8b6784e35bcef8f21ebc2ba39cffcb57cd3ec6373"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 57,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_method",
+      "lead": "s7_cache.js",
+      "owner": "Cache",
+      "members": [
+        "stats"
+      ],
+      "localization_reason": "1 member(s) absent from an existing Cache",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Cache"
+        ],
+        "members": [
+          {
+            "owner": "Cache",
+            "kind": "instance_method",
+            "name": "stats"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": true,
+        "owner_unique": true,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "970f5bcafc0ebda89163f53f9d5e7db2584872e97f8a3bacabad3c1a05020226"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 58,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_method",
+      "lead": "s8_grades.py",
+      "owner": "Gradebook",
+      "members": [
+        "set_missing_zero"
+      ],
+      "localization_reason": "1 member(s) absent from an existing Gradebook",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Gradebook"
+        ],
+        "members": [
+          {
+            "owner": "Gradebook",
+            "kind": "instance_method",
+            "name": "set_missing_zero"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": true,
+        "owner_unique": true,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "aa6efd9a2b1b116d7da3ab399adbab8358b0fae61e7b89083d93fba7c07a14be"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    },
+    {
+      "goal": 59,
+      "stratum": "WHOLE_FILE_FALLBACK",
+      "operation": "content_edit",
+      "lead": "s9_board.html",
+      "owner": null,
+      "members": [],
+      "localization_reason": null,
+      "fallback_reason_enum": "NONLOCAL_EDIT",
+      "fallback_reason_text": "markup goals have no member structure to localize",
+      "oracle": "STRUCTURAL_PLUS_BEHAVIORAL",
+      "probe_id": "goal59.doinglimit",
+      "structural_contract": {
+        "moduleExports": [],
+        "members": [],
+        "domIds": [
+          "s9-msg"
+        ],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": null,
+        "lead_exists": true,
+        "predecessor_source_sha256": "65b24836117745772231b9f25e257bdc66170bcfeb5591a93fa7cc17117dae4c"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": [
+        "s9_board.js"
+      ]
+    },
+    {
+      "goal": 60,
+      "stratum": "FIM_ELIGIBLE",
+      "operation": "add_function",
+      "lead": "s10_desk.js",
+      "owner": null,
+      "members": [
+        "fineReport"
+      ],
+      "localization_reason": "module-level fineReport is absent from an existing artifact",
+      "fallback_reason_enum": null,
+      "fallback_reason_text": null,
+      "oracle": "STRUCTURAL",
+      "probe_id": null,
+      "structural_contract": {
+        "moduleExports": [
+          "fineReport"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "owner_exists": null,
+        "owner_unique": null,
+        "member_absent": true,
+        "lead_exists": true,
+        "predecessor_source_sha256": "4b618e7996185d02cf701149613ab3566b7357caf88dcf9e24f10cd672719e7b"
+      },
+      "new_dependencies_authorized": false,
+      "new_artifacts_authorized": []
+    }
+  ]
+}
