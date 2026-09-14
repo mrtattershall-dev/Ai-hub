@@ -1350,3 +1350,136 @@ lessons were encoded, not generalization.
     3. FREEZE the repair rules
     4. evaluate on fresh held-out goals (21-40, contracts already audited)
     5. only then compare no-repair vs typed-repair conversion
+
+---
+
+# RESULT: v2 architecture on the untouched 41-60 holdout
+
+Commit chain: `6e7bd73` axes disentangled, `a09e649` v1 frozen, `77eed90` canonical seed proven,
+`68ab72c` v2 frozen, `9f66de3` analysis plan preregistered, `1b1faf7` per-trial start invariants,
+`8bfeaf4` results.
+
+Forty trials, both arms, identical model (`qwen2.5-coder:1.5b`, ollama 0.33.3, Q4_K_M, ctx 32768,
+decoding pinned), identical evaluator, identical canonical starting state. Every trial asserted its
+workspace hashed to the frozen seed `29c4cf9e4004311f` before generating; zero instrument errors.
+Raw replies and written bytes preserved before any aggregate was computed.
+
+## 1. Primary preregistered result
+
+    verified goal attainment, all 20 goals
+      v1  3/20        v2  11/20
+      discordant 12   v1 fail -> v2 pass [43,46,47,48,50,52,56,57,58,60]
+                      v1 pass -> v2 fail [41,51]
+      exact McNemar p = 0.0386
+
+    preregistered sensitivity, 19 goals, excluding weak-oracle goal 47
+      v1  3/19        v2  10/19
+      exact McNemar p = 0.0654      NOT significant
+
+**The primary result is statistically fragile.** It depends on a single goal whose oracle was
+labelled `STRUCTURAL_WEAK_NO_OP_PASSES` in the frozen strata - a no-op satisfies its structural
+contract. The sensitivity analysis was preregistered precisely so this could not be discovered
+afterwards and quietly omitted. At n=20 the primary endpoint is underpowered; it should be read as
+promising, not settled.
+
+## 2. Mechanism result (exploratory, but mechanistically stronger)
+
+Among the 17 goals v1 failed, split by the stratum frozen BEFORE either arm generated:
+
+    FIM_ELIGIBLE   rescued 9/10   (only goal 42 not rescued)
+    fallback       rescued 1/7    (only goal 47, the weak oracle)
+    Fisher exact two-sided p = 0.0037
+
+    excluding goal 47:   9/10 versus 0/6      p = 0.0009
+
+This cut was not the preregistered headline, so it is exploratory. It is nonetheless the more robust
+finding, and there is a revealing asymmetry: **goal 47 is simultaneously the only thing propping up
+the primary result (0.0386 -> 0.0654 without it) and the only thing weakening the mechanism result
+(0.0037 -> 0.0009 without it).** One goal with an acknowledged-weak oracle doing contradictory work
+in two analyses is a reasonable argument that the mechanism comparison is what will replicate.
+
+### The predicted interaction held
+
+    FIM_ELIGIBLE   13 goals   v1 3/13 -> v2 10/13    delta +7
+    fallback        7 goals   v1 0/7  -> v2  1/7     delta +1
+
+Separation is concentrated in the subset whose edit surface v2 actually changes. On those 13 goals
+the intervention visibly changed the thing it was designed to change:
+
+    whole-file rewrites   v1 12/13    v2 0/13
+    lines removed         v1 1068     v2 0
+    lines added           v1 311      v2 167
+    outside-span changes  v1 n/a      v2 0
+    span-safety rejections            v2 0
+
+v2 deleted ZERO lines across every localized edit, at identical model cost (20 calls per arm). The
+preservation layer never had to reject anything, because no localized edit ever damaged code outside
+its authorized span.
+
+### Stage decomposition
+
+                          v1      v2
+    body produced         95%    100%
+    loads                 65%     90%
+    structural contract   35%     70%
+    verified goal         15%     55%
+    behavioural goals      0%      0%
+
+Reach was the bottleneck two experiments ago and was fixed. Whole-file integration damage was the
+bottleneck after that, and localization has now attacked it. The next visible bottleneck is
+behavioural delta preservation.
+
+## 3. The behavioural null, stated precisely
+
+Behavioural probes passed **0/6 in BOTH arms**. Every verified pass in either arm came from a
+structural-only goal.
+
+**The correct statement is NOT "v2 does not help behavioural edits".** Four of those six goals
+(44, 45, 54, 55) route to whole-file fallback because `replace_method` was deliberately not wired
+in, and two more (49, 59) are markup/multi-artifact goals that fall back for the same conservatism.
+So **v2 was never applied to them** - they took the same path v1 took, and it failed for both.
+
+The experiment improved the layer it changed and left untouched the layer it did not. That is a
+coherent result rather than a mixed one, but it means the thesis is only established for localized
+STRUCTURAL edits. There is still no evidence either way about behavioural modification.
+
+## 4. Known v2 limitation - reported, not fixed
+
+`add_method` inserts only `members[0]`. The outcome split perfectly:
+
+    single-member add_method goals   7/7 PASSED   (43, 46, 48, 53, 56, 57, 58)
+    two-member add_method goals      0/2 PASSED   (41 dueDay+overdue, 51 fines+pay)
+
+**Both v1-pass -> v2-fail reversals are that one defect.** The reversal column is not random
+degradation and not a measurement problem; the holdout found a crisp architectural boundary. It was
+left in place rather than patched mid-experiment.
+
+### Design trap for the v3 fix, recorded before it is built
+
+Multi-member insertion is NOT "call FIM twice". Each insertion changes the file, so:
+
+  * the second span must be recomputed against the POST-FIRST-INSERTION source;
+  * the preservation audit must be re-baselined against that intermediate artifact.
+
+Comparing the second insertion against the stale original would make it appear to have deleted the
+first - a false preservation violation that would look exactly like model damage.
+
+## What this establishes, and what it does not
+
+**Established.** A 1.5B coder is substantially more reliable at localized structural edits when the
+environment identifies the operation and owner, localizes the insertion, uses native FIM, forbids
+unrelated edit surface, checks dependencies, isolates execution and applies typed repair. The model
+gained no parameters and no extra calls. It was given less freedom, and verified output rose from
+3/20 to 11/20.
+
+**Not established.** Altering existing behaviour while preserving old behaviour; non-local semantic
+change; browser-level application behaviour; survival across long sequential runs; any comparison
+against 7B/14B. A model-size comparison now would measure v2's structural lane against a larger
+model's everything, and the four `replace_method` goals would flatter the larger model for reasons
+unrelated to parameter count.
+
+## Scope of the claim
+
+n=20, one model, one machine, architecture efficacy only. Both arms began from a known-good
+predecessor, so this measures the edit itself and says nothing about sequential survival under
+accumulated self-inflicted damage - that remains a separate experiment.
