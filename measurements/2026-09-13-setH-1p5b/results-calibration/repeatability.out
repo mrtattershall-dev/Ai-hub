@@ -1,0 +1,98 @@
+  repeatability calibration: 8 cases x 8 independent unseeded repeats
+  development goals only; no holdout touched
+
+  [v2 62 repeat 1] PASS  
+  [v2 62 repeat 2] PASS  
+  [v2 62 repeat 3] PASS  
+  [v2 62 repeat 4] PASS  
+  [v2 62 repeat 5] PASS  
+  [v2 62 repeat 6] PASS  
+  [v2 62 repeat 7] PASS  
+  [v2 62 repeat 8] PASS  
+    -> STABLE_PASS  P(pass)=1  pairwise disagreement=0  syntax failures=0/0
+
+  [v2 63 repeat 1] PASS  
+  [v2 63 repeat 2] PASS  
+  [v2 63 repeat 3] PASS  
+  [v2 63 repeat 4] fail  load_error
+  [v2 63 repeat 5] fail  load_error
+  [v2 63 repeat 6] PASS  
+  [v2 63 repeat 7] PASS  
+  [v2 63 repeat 8] PASS  
+    -> STOCHASTIC  P(pass)=0.75  pairwise disagreement=0.429  syntax failures=2/2
+
+  [v2 66 repeat 1] PASS  
+  [v2 66 repeat 2] PASS  
+  [v2 66 repeat 3] fail  load_error
+  [v2 66 repeat 4] fail  load_error
+  [v2 66 repeat 5] PASS  
+  [v2 66 repeat 6] PASS  
+  [v2 66 repeat 7] PASS  
+  [v2 66 repeat 8] PASS  
+    -> STOCHASTIC  P(pass)=0.75  pairwise disagreement=0.429  syntax failures=2/2
+
+  [v2 72 repeat 1] PASS  
+  [v2 72 repeat 2] PASS  
+  [v2 72 repeat 3] PASS  
+  [v2 72 repeat 4] PASS  
+  [v2 72 repeat 5] PASS  
+  [v2 72 repeat 6] PASS  
+  [v2 72 repeat 7] fail  load_error
+  [v2 72 repeat 8] PASS  
+    -> STOCHASTIC  P(pass)=0.875  pairwise disagreement=0.25  syntax failures=1/1
+
+  [v2 75 repeat 1] fail  load_error
+  [v2 75 repeat 2] PASS  
+  [v2 75 repeat 3] fail  load_error
+  [v2 75 repeat 4] fail  load_error
+  [v2 75 repeat 5] fail  load_error
+  [v2 75 repeat 6] fail  load_error
+  [v2 75 repeat 7] fail  load_error
+  [v2 75 repeat 8] fail  load_error
+    -> STOCHASTIC  P(pass)=0.125  pairwise disagreement=0.25  syntax failures=7/7
+
+  [v3 71 repeat 1] fail  multi_member: final contract: missing_member
+  [v3 71 repeat 2] fail  multi_member: intermediate_does_not_load: lo
+  [v3 71 repeat 3] fail  multi_member: intermediate_does_not_load: lo
+  [v3 71 repeat 4] fail  multi_member: intermediate_does_not_load: lo
+  [v3 71 repeat 5] fail  multi_member: intermediate_does_not_load: lo
+  [v3 71 repeat 6] fail  multi_member: final contract: missing_member
+  [v3 71 repeat 7] fail  multi_member: final contract: missing_member
+  [v3 71 repeat 8] fail  multi_member: intermediate_does_not_load: lo
+    -> STABLE_FAIL  P(pass)=0  pairwise disagreement=0  syntax failures=5/8
+
+  [v3 64 repeat 1] fail  safe_replace
+  [v3 64 repeat 2] fail  safe_replace
+  [v3 64 repeat 3] fail  safe_replace
+  [v3 64 repeat 4] fail  safe_replace
+  [v3 64 repeat 5] fail  safe_replace
+  [v3 64 repeat 6] fail  safe_replace
+  [v3 64 repeat 7] fail  safe_replace
+  [v3 64 repeat 8] fail  safe_replace
+    -> STABLE_FAIL  P(pass)=0  pairwise disagreement=0  syntax failures=0/8
+
+  [v3 74 repeat 1] fail  safe_replace
+  [v3 74 repeat 2] fail  safe_replace
+  [v3 74 repeat 3] fail  safe_replace
+  [v3 74 repeat 4] fail  safe_replace
+  [v3 74 repeat 5] fail  safe_replace
+  [v3 74 repeat 6] fail  safe_replace
+  [v3 74 repeat 7] fail  safe_replace
+  [v3 74 repeat 8] fail  safe_replace
+    -> STABLE_FAIL  P(pass)=0  pairwise disagreement=0  syntax failures=0/8
+
+===== CALIBRATION SUMMARY =====
+  goal arm  route                          P(pass)  disagree  stability
+  62   v2  add_function                   1        0         STABLE_PASS
+  63   v2  add_method                     0.75     0.429     STOCHASTIC
+  66   v2  add_method                     0.75     0.429     STOCHASTIC
+  72   v2  add_function                   0.875    0.25      STOCHASTIC
+  75   v2  add_function                   0.125    0.25      STOCHASTIC
+  71   v3  multi_member_insertion         0        0         STABLE_FAIL
+  64   v3  safe_behavioural_replacement   0        0         STABLE_FAIL
+  74   v3  safe_behavioural_replacement   0        0         STABLE_FAIL
+
+  STABLE_PASS 1   STOCHASTIC 4   STABLE_FAIL 3   of 8
+  mean pairwise disagreement among stochastic goals: 0.340
+
+  RAW = C:\Users\tatte\AppData\Local\Temp\repeat-slnhvS
