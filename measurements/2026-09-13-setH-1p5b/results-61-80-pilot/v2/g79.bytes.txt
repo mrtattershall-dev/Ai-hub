@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S9 Board</title>
+    <style>
+        .card {
+            display: block;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>S9 Board</h1>
+    <input type="text" id="s9-filter" placeholder="Filter cards...">
+    <div class="card" data-text="Apple">Apple</div>
+    <div class="card" data-text="Banana">Banana</div>
+    <div class="card" data-text="Cherry">Cherry</div>
+
+    <script src="s9_board.js"></script>
+</body>
+</html>

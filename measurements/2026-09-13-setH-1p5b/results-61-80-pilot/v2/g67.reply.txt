@@ -1,0 +1,74 @@
+```javascript
+const assert = require('assert');
+
+function createCache(capacity, onEvict) {
+  let items = {};
+  let size = 0;
+  let oldestKey;
+
+  function get(key) {
+    if (items[key]) {
+      items[key].lastAccessed = Date.now();
+      return items[key];
+    }
+    return null;
+  }
+
+  function set(key, value) {
+    items[key] = { ...value, lastAccessed: Date.now() };
+    size++;
+    if (size > capacity) {
+      deleteOldestItem();
+    }
+  }
+
+  function delete(key) {
+    if (items[key]) {
+      delete items[key];
+      size--;
+      onEvict && onEvict(key, items[key], 'deleted');
+    }
+  }
+
+  function clear() {
+    items = {};
+    size = 0;
+    oldestKey = null;
+  }
+
+  function getOldestItem() {
+    if (oldestKey) {
+      delete items[oldestKey];
+      size--;
+      onEvict && onEvict(oldestKey, items[oldestKey], 'lru');
+    }
+  }
+
+  function setOldestItem(key) {
+    oldestKey = key;
+  }
+
+  return {
+    get,
+    set,
+    delete,
+    clear
+  };
+}
+
+const cache = createCache(2, (key, value, reason) => {
+  console.log(`Evicted: ${key} - Reason: ${reason}`);
+});
+
+cache.set('a', { id: 1 });
+assert.deepStrictEqual(cache.get('a'), { id: 1 });
+
+cache.set('b', { id: 2 });
+assert.deepStrictEqual(cache.get('b'), { id: 2 });
+
+cache.delete('a');
+assert.strictEqual(cache.get('a'), null);
+
+cache.clear();
+assert.deepStrictEqual(cache.items, {});
+```

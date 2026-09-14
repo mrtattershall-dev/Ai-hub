@@ -1,0 +1,7 @@
+entries):
+    out = {}
+    for e in entries:
+        if e["ip"] not in out:
+            out[e["ip"]] = []
+        out[e["ip"]].append(e)
+    return out

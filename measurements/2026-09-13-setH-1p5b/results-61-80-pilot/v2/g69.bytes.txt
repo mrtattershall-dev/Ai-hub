@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S9 Board</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .card {
+            padding: 20px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        .input-container {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>S9 Board</h1>
+    <div id="cards"></div>
+    <form id="new-card-form">
+        <label for="s9-new">New Card:</label>
+        <input type="text" id="s9-new" name="s9-new">
+        <button type="submit">Add Card</button>
+    </form>
+
+    <script src="s9_board.js"></script>
+</body>
+</html>

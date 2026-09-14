@@ -1,0 +1,51 @@
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+class Library {
+  constructor() {
+    this.items = [];
+  }
+
+  addItem(item) {
+    this.items.push(item);
+  }
+
+  toJSON() {
+    return JSON.stringify(this.items);
+  }
+
+  fromJSON(jsonString) {
+    try {
+      return new Library(JSON.parse(jsonString));
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+      return null;
+    }
+  }
+}
+
+class S10Desk {
+  constructor() {
+    this.cache = {};
+  }
+
+  snapshot(library, key) {
+    const jsonString = library.toJSON();
+    fs.writeFileSync(path.join(__dirname, 'cache', `${key}.json`), jsonString);
+    return jsonString;
+  }
+
+  restore(cache, key) {
+    try {
+      const jsonString = fs.readFileSync(path.join(__dirname, 'cache', `${key}.json`), 'utf8');
+      return Library.fromJSON(jsonString);
+    } catch (error) {
+      console.error('Error restoring from cache:', error);
+      return null;
+    }
+  }
+}
+
+module.exports = S10Desk;
+```

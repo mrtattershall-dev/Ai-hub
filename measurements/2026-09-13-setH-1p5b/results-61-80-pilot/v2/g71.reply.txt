@@ -1,0 +1,3 @@
+) {
+    return { books: [...this.books.values()].map((b) => b.title), loansByIsbn: [...this.loansByIsbn.entries()] };
+  }

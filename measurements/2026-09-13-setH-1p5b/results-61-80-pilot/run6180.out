@@ -1,0 +1,65 @@
+  PILOT  arms v2 + v3   goals 61-80
+  canonical post-60 seed 2cafbeed0314275b  (asserted per trial)
+  out C:\Users\tatte\AppData\Local\Temp\run6180-BNixCJ
+
+  [v2 61] s1_library.js   content_edit                   calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 62] s2_logs.py      add_function                   calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 63] s3_matrix.js    add_method                     calls=1  contract=fail  probe=-  VERIFIED=no
+         | no repair route for load_error
+  [v2 64] s4_markdown.py  content_edit                   calls=1  contract=fail  probe=-  VERIFIED=no
+        rejected before writing: NEW_DEP_UNRESOLVED_EXTERNAL:markdown
+  [v2 65] s5_expr.js      content_edit                   calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 66] s6_graph.py     add_method                     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 67] s7_cache.js     content_edit                   calls=1  contract=fail  probe=-  VERIFIED=no
+         | no repair route for load_error
+  [v2 68] s8_grades.py    add_method                     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 69] s9_board.html   content_edit                   calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 70] s10_desk.js     add_function                   calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 71] s1_library.js   add_method                     calls=1  contract=fail  probe=-  VERIFIED=no
+         | no repair route for missing_member
+  [v2 72] s2_logs.py      add_function                   calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 73] s3_matrix.js    add_method                     calls=1  contract=fail  probe=-  VERIFIED=no
+         | no repair route for load_error
+  [v2 74] s4_markdown.py  content_edit                   calls=1  contract=fail  probe=-  VERIFIED=no
+        rejected before writing: NEW_DEP_UNRESOLVED_EXTERNAL:markdown
+  [v2 75] s5_expr.js      add_function                   calls=1  contract=fail  probe=-  VERIFIED=no
+         | no repair route for load_error
+  [v2 76] s6_graph.py     add_method                     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 77] s7_cache.js     add_method                     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 78] s8_grades.py    add_method                     calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 79] s9_board.html   content_edit                   calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v2 80] s10_desk.js     content_edit                   calls=1  contract=fail  probe=-  VERIFIED=no
+         | repair refused: expected exactly one missing export, got 2
+  [v3 61] s1_library.js   delegated_to_v2                calls=1  contract=fail  probe=-  VERIFIED=no
+        rejected before writing: NEW_DEP_UNRESOLVED_LOCAL:./library
+  [v3 62] s2_logs.py      delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 63] s3_matrix.js    delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 64] s4_markdown.py  safe_behavioural_replacement   calls=1  contract=fail  probe=-  VERIFIED=no
+        old regression before=true after=null  delta=null  rollback=true
+        does not load after replacement: load_error ["SyntaxError: f-string: single '}' is not allowed (s4_markdown.py, l
+  [v3 65] s5_expr.js      delegated_to_v2                calls=1  contract=fail  probe=-  VERIFIED=no
+         | repair refused: tokenize is not declared at top level - nothing to export
+  [v3 66] s6_graph.py     delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 67] s7_cache.js     delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 68] s8_grades.py    delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 69] s9_board.html   delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 70] s10_desk.js     delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 71] s1_library.js   multi_member_insertion         calls=2  contract=fail  probe=-  VERIFIED=no
+        members 1/2  rollback=true
+        intermediate_does_not_load: load_error ["Unexpected token '.'"]
+  [v3 72] s2_logs.py      delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 73] s3_matrix.js    delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 74] s4_markdown.py  safe_behavioural_replacement   calls=1  contract=fail  probe=-  VERIFIED=no
+        old regression before=true after=false  delta=null  rollback=true
+        OLD BEHAVIOUR BROKE: REGFAIL 'a\nb' threw list index out of range | 'a\n\nb' threw list index out of range | '1 < 2 & 3 > 0' threw list inde
+  [v3 75] s5_expr.js      delegated_to_v2                calls=1  contract=fail  probe=-  VERIFIED=no
+         | no repair route for load_error
+  [v3 76] s6_graph.py     delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 77] s7_cache.js     delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 78] s8_grades.py    delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 79] s9_board.html   delegated_to_v2                calls=1  contract=PASS  probe=-  VERIFIED=YES
+  [v3 80] s10_desk.js     multi_member_insertion         calls=2  contract=fail  probe=-  VERIFIED=no
+        members 1/2  rollback=true
+        earlier_member_lost: missing_export ["snapshot","restore"] missing_member ["null.snapshot (
+
+  RAW = C:\Users\tatte\AppData\Local\Temp\run6180-BNixCJ

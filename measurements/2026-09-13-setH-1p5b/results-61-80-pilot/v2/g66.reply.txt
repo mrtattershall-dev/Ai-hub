@@ -1,0 +1,17 @@
+, a):
+        seen = set()
+        q = deque([a])
+        while q:
+            cur = q.popleft()
+            if cur in seen:
+                continue
+            seen.add(cur)
+            for nxt, _w in sorted(self._adj[cur].items()):
+                if nxt not in seen:
+                    q.append(nxt)
+        return seen
+
+    def is_reachable(self, a, b):
+        if a not in self._adj or b not in self._adj:
+            raise ValueError("a or b must be in the graph")
+        return len(self.reachable(a) & self.reachable(b)) > 0

@@ -1,0 +1,44 @@
+// s5_expr.js
+
+function tokenize(expr) {
+  const tokens = [];
+  let i = 0;
+  const len = expr.length;
+
+  while (i < len) {
+    if (expr[i] === '(' || expr[i] === ')') {
+      tokens.push({ type: 'lparen', value: expr[i] });
+      i++;
+    } else if (expr[i] === ',') {
+      tokens.push({ type: 'comma', value: expr[i] });
+      i++;
+    } else if (/\d/.test(expr[i])) {
+      let number = '';
+      while (i < len && /\d/.test(expr[i])) {
+        number += expr[i];
+        i++;
+      }
+      tokens.push({ type: 'num', value: parseFloat(number) });
+    } else if (/^[+-]?[a-zA-Z_][0-9A-Za-z_$]*$/.test(expr.slice(i))) {
+      let name = '';
+      while (i < len && /^[a-zA-Z_][0-9A-Za-z_$]*$/.test(expr.slice(i))) {
+        name += expr[i];
+        i++;
+      }
+      tokens.push({ type: 'name', value: name });
+    } else if (/^[+-]?[*/]/.test(expr.slice(i))) {
+      let op = '';
+      while (i < len && /^[+-]?[*/]/.test(expr.slice(i))) {
+        op += expr[i];
+        i++;
+      }
+      tokens.push({ type: 'op', value: op });
+    } else {
+      throw new Error(`Unknown character: ${expr[i]}`);
+    }
+  }
+
+  return tokens;
+}
+
+module.exports = tokenize;

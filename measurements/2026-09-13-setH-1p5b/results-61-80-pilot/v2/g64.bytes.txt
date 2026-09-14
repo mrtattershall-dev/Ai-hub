@@ -1,0 +1,17 @@
+import markdown
+
+# Your existing s4_markdown.py content here
+
+def to_html(markdown_text):
+    # Convert Markdown text to HTML using the markdown library
+    html = markdown.markdown(markdown_text)
+    return html
+
+# Example usage of to_html function
+markdown_input = """
+1. First item
+2. Second item
+3. Third item
+"""
+html_output = to_html(markdown_input)
+print(html_output)

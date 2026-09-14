@@ -1,0 +1,9 @@
+capacity) {
+    if (Number.isInteger(capacity) && capacity > 0) {
+      this.capacity = capacity;
+      this.m.clear();
+      for (const key of [...this.keys()].reverse()) {
+        this.set(key, this.get(key), { ttl: null });
+      }
+    } else throw new Error('capacity must be a positive integer');
+  }
