@@ -19,6 +19,7 @@
 // repaired while it runs.
 import { runGoal } from './arm.mjs';
 import { mkdtempSync, writeFileSync, readFileSync, readdirSync, statSync, copyFileSync, mkdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -32,11 +33,30 @@ const LAST = Number(process.env.LAST || 60);
 const OUT = mkdtempSync(join(tmpdir(), 'run4160-'));
 const seedFiles = readdirSync(SEED).filter((f) => statSync(join(SEED, f)).isFile()).sort();
 
+// The canonical bundle hash, recomputed here so every trial can assert it started from THIS world.
+const bundleHashOf = (dir, files) => {
+  const h = createHash('sha256');
+  for (const f of files) h.update(f).update('\0').update(readFileSync(join(dir, f)));
+  return h.digest('hex');
+};
+const CANONICAL_SHA = bundleHashOf(SEED, seedFiles);
+
+// THREE INVARIANTS, asserted per trial rather than assumed:
+//   1. before every trial the workspace hashes EXACTLY to the canonical seed
+//   2. v1 and v2 therefore receive byte-identical starting workspaces (both equal the canonical)
+//   3. nothing carries forward between goals - fresh directory, and __pycache__ / generated
+//      artifacts / browser storage from a previous trial cannot exist because the directory is new
 function freshWorkspace() {
   const ws = mkdtempSync(join(tmpdir(), 'goalws-'));
   writeFileSync(join(ws, 'package.json'), JSON.stringify({ name: 'ws', version: '1.0.0', type: 'commonjs' }, null, 2), 'utf8');
   for (const f of seedFiles) copyFileSync(join(SEED, f), join(ws, f));
-  return ws;
+
+  const present = readdirSync(ws).filter((f) => statSync(join(ws, f)).isFile()).sort();
+  const extra = present.filter((f) => f !== 'package.json' && !seedFiles.includes(f));
+  if (extra.length) throw new Error('INSTRUMENT: residue in a fresh workspace: ' + extra.join(','));
+  const got = bundleHashOf(ws, seedFiles);
+  if (got !== CANONICAL_SHA) throw new Error('INSTRUMENT: workspace does not hash to the canonical seed');
+  return { ws, startSha: got };
 }
 
 console.log('  arms ' + ARMS.join(' + ') + '   goals ' + FIRST + '-' + LAST);
@@ -49,7 +69,7 @@ for (const arm of ARMS) {
   mkdirSync(dir, { recursive: true });
   const rows = [];
   for (let g = FIRST; g <= LAST; g++) {
-    const ws = freshWorkspace();
+    const { ws, startSha } = freshWorkspace();
     let rec;
     try {
       rec = await runGoal({ arm, ws, goalIndex: g - 1, goals: GOALS });
@@ -63,6 +83,9 @@ for (const arm of ARMS) {
     delete slim.raw_reply;
     delete slim.candidate_bytes;
     slim.workspace = ws;
+    // Every row carries the world it started from, so a later analysis can PROVE each result
+    // originated from the frozen canonical seed rather than from inherited state.
+    slim.start_seed_bundle_sha = startSha;
     rows.push(slim);
     writeFileSync(join(dir, 'rows.json'), JSON.stringify(rows, null, 2), 'utf8');
 
