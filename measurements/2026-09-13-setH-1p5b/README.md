@@ -901,3 +901,452 @@ baseline far less stable than the initial 4/4 suggested - so the effect SIZE is 
 **what the sentence suppresses is still unknown**: file emission, collapse probability, protocol
 compliance, or coding quality after a valid artifact exists. The mechanical endpoints above are what
 will separate those.
+
+
+---
+
+## 2026-09-14 - the orchestration layer costs the model twice, and the instrument was wrong first
+
+### The instrument defects came first, and every one of them moved a number
+
+The specialisation-at-fixed-scale run (qwen2.5:1.5b vs qwen2.5-coder:1.5b, same ollama build, same
+Q4_K_M, same 986MB, same goals, decoding pinned to Qwen's shipped config) reported coder 5/10
+contract vs general 1/10. Dumping the workspace bytes before interpreting it found four defects:
+
+1. **A checker branch that cannot fail.** `loadCheck` returned `{ok:true}` for html/md, and
+   `deriveGate` returns no exports for goal 9 - and `[].every(...)` is `true`. Goal 9 was credited
+   loads AND contract for free. The artifact it credited references `<script src="s9_board.js">`
+   for a file the model never wrote and omits the required `s9-card` class. It scored the maximum.
+2. **One workspace shared by both arms.** The second model overwrote the first, so the losing arm's
+   artifacts were unrecoverable at analysis time.
+3. **Raw replies discarded.** The runner kept `reply.length`. The short failures could not be read.
+4. **Wrong path scored as silence.** The general model wrote goal 5's `evaluate` to `script.js` -
+   6,220 bytes of real work - and `existsSync(lead)` scored it as having produced nothing.
+
+The product checker `checks-H.mjs` was audited for the same class and is **clean**: it starts an
+HTTP server and drives the page through puppeteer across eight behavioural steps including
+localStorage persistence and WIP limits. The defect was in the scratch harness only; no published
+`/100` was inflated by it.
+
+Rebuilt with per-arm workspaces, replies written to disk **before** scoring, a real structural check
+for html, and wrong-path as its own outcome. The html check was pinned by a control suite of 7 -
+including a **positive** control that caught the replacement check being too strict (it demanded
+`s9-card` be an `id`, when the goal text says `<li class="s9-card">`). A checker tightened without a
+positive control trades free passes for false failures.
+
+### The corrected run did not replicate its predecessor
+
+    model                 stable  protocol  emitted  wrongPath  loads  contract
+    qwen2.5:1.5b          8/10    7/10      6/10     1          2/10   2/10
+    qwen2.5-coder:1.5b    10/10   2/10      2/10     0          1/10   1/10
+
+The coder's protocol rate went **5/10 -> 2/10** with nothing changed upstream of `parseAction`.
+Pure sampling on a bimodal phenomenon. Under content-only scoring both models land on 3/10. **The
+"code specialisation is 5x better" reading of the first run is gone.** No per-model topology story
+survives one N=10 run.
+
+### Cost 1 - DISCARD: the harness threw away finished, working files
+
+Re-scoring identical preserved replies with the harness supplying tool and path:
+
+    qwen2.5-coder:1.5b   contract  1/10 -> 3/10     rescued goals 1, 6
+    qwen2.5:1.5b         contract  2/10 -> 3/10     rescued goal 8
+    rescued 3, lost 0 across 20 replies    exact McNemar p = 0.25 - NOT significant
+
+Those bodies were extracted and executed: they **load and meet their export contract**. They scored
+zero because the model wrote `ACTION: create_file` (twice) and `ACTION: Write`, or emitted no
+`PATH:` line. Other invented tool names seen: `assert_all`, `include`, `define`, `export`.
+
+The mechanism is readable in the bytes, so *why* is established; *how often* is not.
+
+### Cost 2 - SUPPRESSION: the protocol stops the file being attempted at all
+
+Three prompt shapes, paired by goal, qwen2.5-coder:1.5b:
+
+    A  THOUGHT / ACTION / PATH / fenced body     body produced  4/10   loads 1   contract 1/10
+    B          ACTION / PATH / fenced body       body produced  2/10   loads 1   contract 1/10
+    C  fenced body only (harness supplies both)  body produced 10/10   loads 7   contract 5/10
+
+    endpoint = a code body was produced at all (upstream of any parsing)
+    A vs C   4/10 -> 10/10   6 discordant, 6 rescued, 0 reversed   exact McNemar p = 0.031
+    B vs C   2/10 -> 10/10   8 discordant, 8 rescued, 0 reversed   exact McNemar p = 0.0078
+
+In A and B the model emits a header and stops - **seven of B's ten replies were 35-39 characters**.
+The orchestration tax was **0 in all three cells here**: no tool invention occurred, so cost 1 did
+not fire at all this run. Both costs are real; which dominates varies run to run.
+
+**The contract endpoint (1/10 -> 5/10) is p = 0.219 and is NOT significant.** What is established is
+that the model attempts, and delivers a loading file, far more often.
+
+**Removing THOUGHT made it worse (4/10 -> 2/10 bodies, p = 0.625).** That was the stated hypothesis
+and it is unsupported. Cell C also BROKE one goal that passed under full protocol (goal 3).
+
+### What content-only does NOT fix: every residual failure is a dropped obligation
+
+Cell C's five remaining failures, by inspection of the bytes:
+
+    goal 1   Library class correct       module.exports: 0        export obligation dropped
+    goal 3   Matrix class correct        module.exports: 0        export obligation dropped
+    goal 5   evaluate correct, exported  assert used 4x, require: 0   require obligation dropped
+    goal 10  correct, exported           assert used 4x, never required   same
+    goal 9   page correct                references a file it never wrote
+
+**Not one is an implementation error.** Goals 1 and 3 end with demo code (`const matrix = new
+Matrix(...); console.log(...)`) - the model wrote a script to run rather than a module to export,
+despite the prompt stating `it must export: Matrix`. Goal 5's text says "Include asserts that all
+pass, then run it with node"; the model complied and never required the module, and `assert` is not
+a Node global.
+
+This is the contract-load hypothesis appearing unprompted: implementation competence is intact, and
+what degrades is the Nth obligation.
+
+### The token budget was never binding
+
+Longest reply 1,918 chars against a ~8,750-char budget (22%). Every stop was the model ending its
+own turn. Raising `num_predict` cannot fix any failure in this corpus - the template can.
+
+### Measurement rules this establishes
+
+* Record the chain stage by stage: **generated -> body detectable -> parser accepts -> written ->
+  loads -> contract**. Report two bottom lines - *harness-observed* (what the architecture achieves)
+  and *artifact-available* (what the bytes achieve with orchestration supplied). The gap is the
+  harness's own tax.
+* Before concluding anything about a model from a low score, re-score its preserved replies
+  content-only.
+* Preserve raw replies BEFORE scoring, one workspace per arm, and ask of every endpoint: *what input
+  makes this FALSE?* If there is no such input, it is not an endpoint.
+
+### Replication at N=20: the protocol cuts REACH, not CONVERSION
+
+Cells A and C rerun on 20 goals, qwen2.5-coder:1.5b, paired:
+
+                            body produced   loads    contract
+    A  full protocol            8/20          4        4/20
+    C  content only            20/20         13       12/20
+
+Decomposed the way score has to be decomposed here - score = reach x conditional conversion:
+
+    REACH        a body produced at all      8/20 -> 20/20
+                 12 discordant, 12 rescued, 0 reversed     exact McNemar p = 0.0005
+
+    CONVERSION   contract GIVEN a body       5/8 (62.5%)  vs  12/20 (60.0%)
+                 Fisher exact two-sided                              p = 1.000
+
+**The protocol cuts reach. No change in conditional conversion was DETECTED** - which is not the
+same claim. See the common-support correction below: the 62.5% vs 60.0% comparison was between
+differently-selected denominators and should not be read as equivalence. This is the
+same shape as the flat ~73% conversion recorded across 20+ hub fixes, one layer down: what moves is
+reach, never quality.
+
+The contract endpoints are significant at this N (observed p = 0.021, artifact-available p = 0.039)
+but they are **less informative than the decomposition**, because artifact-available is still gated
+on a body existing and therefore mostly re-measures reach. The clean quality comparison is the
+conditional one, and it shows nothing.
+
+The DISCARD cost fired once more: cell A goal 6, `ACTION: define_graph`, with a body that scored
+`E L C` under artifact-available. That is a fourth verified working artifact lost to a tool name.
+Tax = 1 in cell A, 0 in cell C.
+
+### Correction: "no residual failure is an implementation error" does NOT generalize
+
+That held for cell C on goals 1-10 and fails at N=20. Cell C's residual failures now include
+genuine logic bugs - `Invalid regular expression: Range out of order in character class`,
+`ValueError: invalid literal for int() with base 10`, and a hallucinated npm dependency
+(`Cannot find module 'memory-cache'`) - alongside the dropped-obligation pattern (a missing
+`module.exports`, a missing `require`, an html page referencing a file it never wrote). The first
+ten goals were simply the easier ones. The dropped-obligation class is real; it is not the whole
+residual.
+
+### Correction: conditional conversion, restricted to the COMMON SUPPORT
+
+The earlier comparison - full-protocol 5/8 (62.5%) vs content-only 12/20 (60.0%), Fisher p = 1.0 -
+had two defects, both raised by tatte and both real:
+
+1. **Fisher p = 1.0 does not establish equivalence.** It establishes that no difference was
+   detected. On these denominators the test has almost no power.
+2. **The denominators are SELECTED DIFFERENTLY.** The full-protocol arm produced bodies on 8 of 20
+   goals; content-only on all 20. The extra 12 bodies plausibly come from a harder subset - exactly
+   the goals orchestration prevented the other arm from attempting. The two rates describe different
+   goal populations.
+
+Recomputed from the preserved replies, restricted to goals where BOTH arms produced a body, paired:
+
+    N=20 run, common support n=8  [goals 3,4,6,7,9,12,14,19]
+        full protocol 5/8    content-only 5/8
+        both 4  neither 2  discordant 2 (content-only rescued 1, broke 1)   McNemar p = 1.000
+
+    N=10 run, common support n=4  [goals 3,4,9,10]
+        full protocol 1/4    content-only 1/4
+        both 0  neither 2  discordant 2 (content-only rescued 1, broke 1)   McNemar p = 1.000
+
+    pooled        6/12 vs 6/12    4 discordant, 2 each way                  McNemar p = 1.000
+
+Symmetric in both runs independently. This removes the selection problem - both columns describe the
+same goals - and it still cannot establish equivalence at this N. The honest statement is:
+
+> Under the current ONE-SHOT implementation condition, removing deterministic orchestration changed
+> reach dramatically (8/20 to 20/20, 12 discordant, 0 reversed, p = 0.0005) and produced no evidence
+> of improved conditional correctness on the goals both conditions reached.
+
+That survives even if a repair loop later moves conversion substantially.
+
+### Retraction: "a genuine model property that no harness cleverness will close"
+
+Written about the ~60% conditional conversion. It was unsupported at the time and an experiment that
+could falsify it was already running. A repair loop IS harness architecture; so are prompt
+decomposition, proof feedback, constrained edits and retries. The claim is withdrawn and replaced by
+the bounded statement above.
+
+### What the benchmark was actually collapsing
+
+Four distinct quantities behind one score:
+
+    reach                 did the model attempt the artifact at all
+    implementation        was the code correct once attempted
+    harness preservation  did the rig keep what the model produced
+    evaluator validity    could the checker have failed, and could it have passed
+
+In paired trials, removing deterministic orchestration doubled artifact reach from 8/20 to 20/20
+with **no reversed pairs**, while one-shot conditional correctness showed no detected improvement.
+Separately, the harness was observed discarding at least four contract-satisfying implementations
+solely because the model emitted an unrecognized action label (`create_file` x2, `Write`,
+`define_graph` - each body extracted, executed, and verified to load and meet its export contract).
+And evaluator defects were shown capable of BOTH directions: false passes (`[].every()` on an empty
+requirement list; an unhandled file type returning ok:true) and false failures (demanding `s9-card`
+be an id when the goal specifies it as a class).
+
+The illustration is the two zeroes:
+
+    correct protocol + stub implementation        throw new Error('Not implemented yet')
+    wrong protocol label + correct implementation  ACTION: create_file, complete working class
+
+Same score. Opposite engineering problem.
+
+### The evaluator rule this yields
+
+Every negative assertion needs a demonstrated FAILURE witness; every tightened checker needs a
+demonstrated POSITIVE witness.
+
+    known-bad  -> must fail
+    known-good -> must pass
+
+The `[].every()` and unhandled-type `ok:true` defects violated the first. The s9-card id/class
+mistake violated the second. Either control alone would have missed one of them.
+
+---
+
+## QUARANTINE: every conversion number above this line is void
+
+The contract generator that produced those runs mis-specified 7 of 20 goals, and it did not merely
+mis-score the output - **it changed what the model was told to build.** `deriveGate` flattened
+
+    "Add delete(key) and clear() to the EXISTING Cache in s7_cache.js"
+
+into `wants = ["Cache", "delete", "clear"]`, discarding ownership. That flat list was rendered into
+the PROMPT as "it must export: Cache, delete, clear", so the model wrote `function delete(key)` - a
+SyntaxError, `delete` being a reserved word - and the same flat list was then used to score it.
+
+**The prompt and the evaluator agreed with each other and both disagreed with the goal.** That is
+treatment contamination, not a scoring error, so the affected results are VOID rather than
+understated: once the apparatus alters the treatment, equal contamination across arms cannot be
+assumed.
+
+### What re-scoring the preserved artifacts showed
+
+    cell C, N=20    published passes: 1,2,3,4,6,7,8,12,13,15,16,20
+                    corrected passes: 1,2,3,4,6,7,8,12,15,20
+
+    FALSE PASS (scored correct, actually wrong):  goals 13, 16
+    FALSE FAIL (scored wrong, actually correct):  none
+
+The error ran in the direction that INFLATES. Goals 13 and 16 were credited because the model
+exported `add`/`sub`/`bfs` at module level exactly as the prompt demanded, and the checker looked for
+them there. Goal 11 is the cleanest specimen: the model wrote correct methods AND obeyed the export
+instruction -
+
+    class Library { checkout(isbn, member) {...}  available(isbn) {...} }
+    module.exports = { Library, checkout, available };     // ReferenceError at load
+
+- a correct implementation inside a file that cannot be imported, broken by the instruction.
+
+    three-way split under the corrected contract   PASS   PROMPT_HARMED   GENUINE   NO_BODY
+      A  full protocol                               4          0            4        12
+      C  content only                               10          3            7         0
+      repair run, turn 1                            11          3            6         0
+
+PROMPT_HARMED goals cannot be fixed by re-scoring; they need rerunning.
+
+### What SURVIVES the quarantine
+
+**Reach.** `NO_BODY` 12 in A versus 0 in C is the same 8/20 -> 20/20 result, and the contract plays
+no part in whether a body was produced. The reach finding stands as recorded.
+
+**The repair null is uninterpretable** and is withdrawn, not merely weakened: the repair gate was
+asked to fix goals whose pass criterion was wrong, and in one case to fix damage the prompt caused.
+
+### The apparatus built to prevent a repeat
+
+  * `contract.mjs` - typed derivation: `{moduleExports, members:[{owner, kind, name}], domIds,
+    domClasses}`. Ownership survives. It emits a SEPARATE human-readable rendering (what a person
+    checks) and prompt rendering (what the model is told), so one heuristic no longer silently
+    defines both the instruction and the evaluator.
+  * `contractCheck.mjs` - module exports and class members verified as different obligations, each
+    failure returning a DISTINCT rejection kind, so a repair gate can be typed on the reason.
+  * `contract.test.mjs` - 15/15, both witnesses, including the regression case the old checker
+    rejected. Writing the fixtures immediately exposed two more derivation bugs: prose `"a book
+    (adding"` was being read as a method `book`, and a stopword list was silently deleting the real
+    method `add` from goal 13.
+
+Rendering the contract in English before running anything is what caught those. The rendering step
+is not documentation - it is the test.
+
+---
+
+## CLEAN BASELINE - corrected contract, corrected prompts, fresh samples
+
+qwen2.5-coder:1.5b, 20 goals, paired, same serving config / decoding / token budget / checker.
+Only the orchestration wrapper differs between cells. Contract sentence identical in both.
+
+                      REACH    parser    CONTRACT PASS
+    A  full protocol   9/20      9/20         5/20
+    C  content only   20/20     20/20        14/20
+
+    REACH       11 discordant, 11 rescued, 0 reversed      exact McNemar p = 0.0010
+    CONVERSION  common support n=9:  A 5/9   C 4/9
+                5 discordant (C rescued 2, broke 3)        exact McNemar p = 1.000
+
+**Reach replicates for the third independent time, now under an instrument we trust:**
+
+    4/10 -> 10/10   p = 0.031     (old apparatus)
+    8/20 -> 20/20   p = 0.0005    (old apparatus)
+    9/20 -> 20/20   p = 0.0010    (corrected contract AND corrected prompts)
+
+Zero reversals in all three. The prediction stated before the run was ~8/20 -> 20/20; the corrected
+prompt is longer and names methods explicitly, and it did not suppress attempts.
+
+**Conversion is the third consecutive null.** The discordance is not symmetric this time - C broke 3
+and rescued 2, if anything favouring the full protocol - but p = 1.000. "No difference detected",
+never equivalence. The common support is selected on cell A's reach set, a limitation the paired
+design contains but does not remove.
+
+### The residual has a shape now, not a count
+
+    A   no_body 11    load_error 3   dead_ref 1
+    C   missing_export 3   missing_member 2   dead_ref 2   load_error 1   missing_class 1
+
+Cell C's six failures by inspection of the preserved bytes:
+
+  * **goals 3, 11** - no export statement at all; both files end in demo code (`testMatrix()`,
+    `library.checkout()`). Dropped-obligation class. ONE LINE each, mechanically repairable.
+  * **goals 9, 19** - dead ref to `s9_board.js`, a second file never written. Missing-artifact
+    class: route to a write gate, not to a repair gate.
+  * **goal 10** - `describe is not defined`; the model wrote a test file against a framework global.
+  * **goal 20** - NEW FAILURE CLASS, see below.
+
+### New failure class: the model writes a program that rewrites the program
+
+Goal 20 asks to add `availability(...)` to the EXISTING s10_desk.js and export it. The answer was:
+
+    const fs = require('fs');
+    let data = fs.readFileSync('./s10_desk.js', 'utf8');
+    data += `
+    exports.availability = (library, isbn) => {
+      return 'available/copies';      // hardcoded stub, inside a string
+    };
+    `;
+    fs.writeFileSync('./s10_desk.js', data, 'utf8');
+
+`exports.availability` is inside a template literal and never executes, so `missing_export` is the
+correct verdict. Two consequences worth recording:
+
+  1. It is protocol-valid, loads without error, and exports nothing - invisible to any check that
+     stops at "does it load".
+  2. **Loading it OVERWROTE the file under test.** The workspace copy is corrupt and only the
+     separately-preserved `.bytes` file is ground truth. Preserving bytes before scoring is what
+     made this case readable at all - the same rule that was learned the hard way earlier tonight.
+
+A load check executes model-written code with filesystem access inside the workspace. That is
+inherent to executing an artifact, but this is the first observed instance of a generated file
+actually mutating the workspace during evaluation.
+
+### Triage for the repair pipeline, now on a contract worth building on
+
+Of six residual failures: two are one-line mechanical fixes (append the export), two need a SECOND
+artifact generated rather than a repair, and two are genuine misreadings of the task. Only the first
+group should ever reach a deterministic repair gate; the second belongs to generation; the third is
+where a narrow model gate earns its place.
+
+---
+
+## Execution isolation, and the held-out contract audit
+
+**Execution contamination is now a named, tested failure class.** The canonical workspace is never
+the cwd of generated code: every check copies the workspace to a disposable sandbox, runs there under
+a 30s timeout, and hashes every file before and after. Mutation is reported as its own rejection kind
+rather than absorbed. Ten witnesses, all passing, using goal 20's REAL bytes as the adversarial
+specimen - including that a bystander artifact survives, that an artifact deleting a NEIGHBOUR cannot
+reach the canonical workspace, and that an infinite loop is bounded by the timeout.
+
+**The held-out set was audited before use, and the rendering caught three more derivation defects**
+on goals 21-40, exactly as it had on 1-20:
+
+    [29] "s9_board.html must export s9"   phantom export from "the EXISTING s9 board"; a page is not a module
+    [31] missed placeHold, holds          head is prose, the API is after the colon
+    [35] no contract at all               same shape: evaluate(expr, vars = {})
+    [38] missed add_assignment, set_weight
+
+Fixed, plus static-method enforcement ("a static identity(n)" is NOT satisfied by an instance
+method - recording the kind without enforcing it would readmit the false-pass class). **24/24
+fixtures**, both witnesses on every branch. Contracts are validated across goals 1-40.
+
+## FIM is native, and it is this model's training objective
+
+    ollama show qwen2.5-coder:1.5b
+      Capabilities: completion, tools, INSERT
+      28 blocks, 1536 hidden, 8960 FFN, 12 Q heads, 2 KV heads, RoPE 1e6, 32768 ctx, Q4_K_M
+
+FIM is reachable through /api/generate with prompt (prefix) + suffix. A live probe asking only for a
+missing method body returned **78 characters**, correct, clean stop. Assembled and EXECUTED: contract
+passes, delete('a') true, delete('zz') false, size 1, clear() leaves 0, no contamination.
+**N=1 - a feasibility proof, not a result.**
+
+Qwen2.5-Coder was trained with explicit FIM and repository-level objectives (fim_prefix, fim_middle,
+fim_suffix, repo_name, file_sep). So "here is the surrounding code, return the missing piece" IS the
+training objective, while "here is the whole file and the error, return the corrected whole file" is
+not - the most plausible explanation yet for the whole-file repair gate returning BYTE-IDENTICAL
+replies on 8 of 10 goals. At temperature 0.7, copying a file handed straight back is the dominant
+continuation. The localized-repair gate will use FIM, never whole-file regeneration.
+
+### Model facts to state correctly
+
+  * Q4_K_M is MIXED quantization, ~5.1 effective bits/param (Q4_K most matrices, Q6_K embeddings and
+    some V/down projections, F32 norms). Not "4-bit".
+  * 32,768 is the NATIVE context. 131,072 needs YaRN and is a DIFFERENT experimental condition.
+  * Qwen3-Coder-30B-A3B is MoE: ~30.5B stored, ~3.3B ACTIVE per token - about 2.14x this model's
+    active parameters, not 20x. The dense 14B is ~9.5x total, ~10x non-embedding.
+  * Published 1.5B-Instruct scores move substantially with the harness (HumanEval 70.7 vs 64.6;
+    MBPP 69.2 vs 51.0 in a later standardized re-evaluation). The apparatus moves public benchmark
+    numbers for identical weights - the same finding this log documents from the inside.
+
+### Bookkeeping corrections
+
+  * The three reach runs contain **29** one-way discordant pairs (6 + 12 + 11), not 30.
+  * They are **three separate replications**, not independent ones - goals and model conditions are
+    reused across runs, so statistical independence is not established.
+  * System-level endpoint on the clean baseline: contract pass A 5/20 vs C 14/20 decomposes to
+    both 2, A-only 3, C-only 12, neither 3 - exact McNemar **p = 0.0352**. The defensible reading:
+    *removing orchestration significantly improved system-level contract attainment, attributable
+    primarily to increased reach rather than any detected increase in conditional artifact quality*,
+    since the common-support comparison (5/9 vs 4/9, p = 1.000) argues directly against the latter.
+
+### Protocol for the repair work, frozen before any of it is built
+
+The six residual failures are the **development** set, not the test set. They have been inspected and
+the architecture designed around their shapes; reporting uplift on them would measure how well their
+lessons were encoded, not generalization.
+
+    1. harden execution isolation                     DONE
+    2. build typed repair machinery on the six        <- next
+    3. FREEZE the repair rules
+    4. evaluate on fresh held-out goals (21-40, contracts already audited)
+    5. only then compare no-repair vs typed-repair conversion
