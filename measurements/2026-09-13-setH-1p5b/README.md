@@ -828,3 +828,76 @@ question worth the GPU is:
 
 A gated 1.5B landing far below a gated 30B is not a failed experiment. It measures what parameters
 actually buy once the orchestration tax is stripped out.
+
+## CONFOUNDS IN THE MODEL AXIS - the "1.5B vs 14B vs 30B" comparison cannot answer a size question
+
+Identified 2026-09-14, and it invalidates the framing this whole file was built on.
+
+**The three arms differ in at least six ways at once:**
+
+    cell    model                        params        specialised  generation  serving
+    small   Qwen2.5-1.5B-Instruct        1.5B dense    NO (general)  Qwen2.5     ollama Q4_K_M, CPU
+    mid     Qwen2.5-Coder-14B-Instruct   14B dense     yes (coder)   Qwen2.5     AWQ on A10G
+    large   Qwen3-Coder-30B-A3B          30.5B MoE,    yes (coder)   Qwen3       vLLM on H100
+                                         ~3.3B ACTIVE
+
+So the axis varies parameter count, architecture (dense vs mixture-of-experts), training generation,
+code specialisation, quantisation AND serving stack simultaneously. Every "model size" statement in
+this file is therefore a statement about a bundle of six differences.
+
+**The specialisation confound is the sharpest.** Tonight's local model is `qwen2.5:1.5b` =
+Qwen2.5-1.5B-**INSTRUCT**, a GENERAL model, compared against two CODE-SPECIALISED models. That
+understates the small cell, and nothing in this project's notes had flagged it.
+
+**And the MoE point matters for the "30B" label**: ~3.3B parameters are active per token, so the
+large cell is not simply "20x the small cell".
+
+### The restructured program: one factor per experiment
+
+    SPECIALISATION  Qwen2.5-1.5B-Instruct  vs  Qwen2.5-Coder-1.5B-Instruct
+                    same ollama build, same Q4_K_M, same ~986MB, same harness, same pinned decoding.
+                    Asks what coder specialisation buys AT FIXED SCALE. Cleanest comparison available
+                    and it costs nothing - both run locally.
+
+    SCALE           Qwen2.5-Coder-1.5B  vs  Qwen2.5-Coder-14B
+                    same family and specialisation; needs matched serving and quantisation policy.
+                    This is the closest thing to a size effect this project can measure.
+
+    ARCHITECTURE    Qwen3-Coder-30B-A3B as its own FAMILY cell, not the top of a size axis.
+
+    ORCHESTRATION   monolithic  vs  narrow-gated  vs  narrow-gated + proof feedback,
+                    crossed with the above.
+
+### Dependent variables stay decomposed, never collapsed into one score
+
+    generation stable -> protocol valid -> artifact emitted -> artifact integrated
+      -> proof executed -> proof passed
+
+That is what lets the write-up say WHERE scale, specialisation, decoding and orchestration each
+enter the failure chain, instead of asserting that small models can or cannot code.
+
+### Decoding must be PINNED, never inferred
+
+Ollama's `/api/show` returns no parameter block for this model. I inferred from that that ollama's
+library default `repeat_penalty 1.1` was active. **That inference is not safe** - ollama's runtime
+default is documented as 1.0 (disabled), and an empty parameter block does not prove any Hugging
+Face generation setting was imported. The effective penalty for tonight's runs is therefore UNKNOWN.
+Every cell from here pins temperature, top_p, top_k, repeat_penalty and repeat_last_n explicitly.
+
+The separate, still-true point: `modal_serve_vllm.py`'s `_params()` sends temperature and top_p ONLY
+- no penalty, no top_k - and that is the path the GPU set-H runs used, where 71k- and 133k-character
+repetition collapses were recorded.
+
+### The suppressor sentence, with defensible wording
+
+    "Keep it short and complete - a long answer risks being cut off before the end."
+
+    without the sentence   7/12 produced a file
+    with the sentence      0/12
+
+Across 24 trials, adding the sentence was associated with 0/12 successes versus 7/12 without it.
+These were sequential small-N runs from the same setup, and protocol-collapse variability made the
+baseline far less stable than the initial 4/4 suggested - so the effect SIZE is not established, and
+**what the sentence suppresses is still unknown**: file emission, collapse probability, protocol
+compliance, or coding quality after a valid artifact exists. The mechanical endpoints above are what
+will separate those.
