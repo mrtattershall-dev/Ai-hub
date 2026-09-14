@@ -1,0 +1,36 @@
+{
+  "kind": "preregistered_analysis_amendment",
+  "amends": "goal-strata-61-80.json",
+  "strata_sha_unchanged": "6a7aa3afc697abe08f9795f0",
+  "recorded_before": "any model output for goals 61-80",
+  "designation": "The 61-80 evaluation is prospectively designated a PILOT because the preregistered audit identified only three informative v3-treatment cases. It may provide mechanism evidence but is NOT powered to estimate the v3 treatment effect. Goal 80 remains part of system-level scoring but is EXCLUDED from the multi-member mechanism analysis because its prerequisite is absent by construction under isolated per-goal evaluation.",
+  "GOAL80": {
+    "label": "HARD_DEPENDENCY_UNINFORMATIVE_FOR_A",
+    "reason": "snapshot() calls library.toJSON() and restore() calls Library.fromJSON, both of which are goal 71 and therefore absent from the frozen post-60 world. Under the preregistered per-goal-isolation design neither arm can achieve it.",
+    "discovered": "from goal text during the pre-inference audit, before any model output existed",
+    "in_system_level_all_20": true,
+    "in_prediction_A_denominator": false
+  },
+  "informative_mechanism_cases": {
+    "A_multi_member": [71],
+    "B_safe_behavioural_replacement": [64, 74],
+    "C_unchanged": "the remaining 16 goals plus goal 80"
+  },
+  "analysis_restrictions": {
+    "no_significance_for_A_or_B": "At n=1 and n=2 a p-value would be meaningless and must not be computed or advertised.",
+    "questions_are_mechanistic_only": [
+      "Did goal 71 actually enter v3's sequential multi-member path?",
+      "Did v2 fail goal 71 in the way its frozen limitation predicts (only members[0] inserted)?",
+      "Did v3 complete BOTH members, with each span re-baselined on the previous success?",
+      "Did goals 64 and 74 actually enter safe behavioural replacement?",
+      "Did the old-behaviour regression stay green across the replacement?",
+      "Did the requested new delta pass?",
+      "Did rollback work byte-for-byte where either half failed?",
+      "Did the non-treatment goals remain approximately unchanged between arms?"
+    ],
+    "interpretation_if_all_three_succeed": "prospective mechanism evidence, NOT a population effect estimate",
+    "interpretation_if_all_three_fail": "the development fixtures did not transfer to real model inference - equally valuable",
+    "pooling_prohibition": "After this run, 61-80 become PILOT/development data. They must NOT later be pooled into a confirmatory v3 result as though they had not been inspected."
+  },
+  "next_step_if_underpowered": "Audit 81-100 after building and proving a canonical post-80 world. If that range also lacks enough v3-treatment goals, do NOT force the original 100-goal sequence to answer a question it was not designed to answer - build a fresh benchmark sampling the architecture's claimed lanes (multi-member transactions, single-span behavioural evolution, ordinary localized additions, unsupported multi-site changes), with task generation and evaluation independent of model output."
+}
