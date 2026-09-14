@@ -1,0 +1,159 @@
+# CANONICAL REFERENCE - cumulative correct state after setH goals 1-60 for this file.
+# Goals 61+ are HELD OUT and deliberately not implemented.
+#
+#   goal  8  add_student, add_assignment, record, score
+#   goal 18  percent(student)
+#   goal 28  module-level letter(percent) and Gradebook.report()
+#   goal 38  categories: add_assignment(..., category="default"), set_weight(category, weight);
+#            percent becomes a weighted average over the categories the student has scores in
+#   goal 48  drop_lowest(category, n) - percent() ignores the n lowest scores BY PERCENTAGE in that
+#            category, but ONLY when the student has MORE THAN n scores there
+#   goal 58  set_missing_zero(flag) - when True, percent() counts EVERY assignment, a missing score
+#            as 0 points; the default False keeps the existing behaviour
+#
+# CROSS-GOAL NOTE: 48 and 58 interact. With missing-zero on, a missing assignment becomes a real
+# 0% score and is therefore itself eligible to be dropped by drop_lowest.
+
+
+def letter(percent):
+    if percent >= 90:
+        return "A"
+    if percent >= 80:
+        return "B"
+    if percent >= 70:
+        return "C"
+    if percent >= 60:
+        return "D"
+    return "F"
+
+
+class Gradebook:
+    def __init__(self):
+        self._students = []
+        self._assignments = {}     # name -> {"max": float, "category": str}
+        self._scores = {}          # (student, assignment) -> points
+        self._weights = {}         # category -> weight
+        self._drop = {}            # category -> n
+        self._missing_zero = False
+
+    def add_student(self, name):
+        if name in self._students:
+            raise ValueError("student already exists")
+        self._students.append(name)
+
+    def add_assignment(self, name, max_points, category="default"):
+        if name in self._assignments:
+            raise ValueError("assignment already exists")
+        if not isinstance(max_points, (int, float)) or isinstance(max_points, bool) or max_points <= 0:
+            raise ValueError("max_points must be a positive number")
+        self._assignments[name] = {"max": max_points, "category": category}
+
+    def set_weight(self, category, weight):
+        if not isinstance(weight, (int, float)) or isinstance(weight, bool) or weight <= 0:
+            raise ValueError("weight must be a positive number")
+        self._weights[category] = weight
+
+    def drop_lowest(self, category, n):
+        if not isinstance(n, int) or isinstance(n, bool) or n < 0:
+            raise ValueError("n must be a non-negative integer")
+        self._drop[category] = n
+
+    def set_missing_zero(self, flag):
+        self._missing_zero = bool(flag)
+
+    def record(self, student, assignment, points):
+        if student not in self._students:
+            raise KeyError(student)
+        if assignment not in self._assignments:
+            raise KeyError(assignment)
+        top = self._assignments[assignment]["max"]
+        if not isinstance(points, (int, float)) or isinstance(points, bool) or points < 0 or points > top:
+            raise ValueError("points must be between 0 and max_points")
+        self._scores[(student, assignment)] = points
+
+    def score(self, student, assignment):
+        return self._scores.get((student, assignment))
+
+    def percent(self, student):
+        if student not in self._students:
+            raise KeyError(student)
+
+        # Which assignments count: only the scored ones, or every assignment when missing-zero is on.
+        by_cat = {}
+        for name, meta in self._assignments.items():
+            pts = self._scores.get((student, name))
+            if pts is None:
+                if not self._missing_zero:
+                    continue
+                pts = 0
+            by_cat.setdefault(meta["category"], []).append((pts, meta["max"]))
+        if not by_cat:
+            return None
+
+        weighted = 0.0
+        total_weight = 0.0
+        for cat, pairs in by_cat.items():
+            n = self._drop.get(cat, 0)
+            # goal 48: drop only when the student has MORE THAN n scores in that category.
+            if n > 0 and len(pairs) > n:
+                pairs = sorted(pairs, key=lambda pm: pm[0] / pm[1])[n:]
+            got = sum(p for p, _m in pairs)
+            top = sum(m for _p, m in pairs)
+            if top == 0:
+                continue
+            w = self._weights.get(cat, 1)
+            weighted += w * (got / top * 100.0)
+            total_weight += w
+        if total_weight == 0:
+            return None
+        return round(weighted / total_weight, 2)
+
+    def report(self):
+        out = []
+        for s in sorted(self._students):
+            p = self.percent(s)
+            out.append((s, p, "-" if p is None else letter(p)))
+        return out
+
+
+if __name__ == "__main__":
+    g = Gradebook()
+    g.add_student("ann")
+    g.add_assignment("hw1", 10)
+    g.record("ann", "hw1", 9)
+    assert g.score("ann", "hw1") == 9
+    assert g.percent("ann") == 90.0
+    g.add_student("bob")
+    assert g.percent("bob") is None
+    assert g.report() == [("ann", 90.0, "A"), ("bob", None, "-")]
+    assert letter(89.99) == "B" and letter(59) == "F"
+
+    w = Gradebook()
+    w.add_student("cat")
+    w.add_assignment("e1", 100, "exam")
+    w.add_assignment("q1", 10, "quiz")
+    w.set_weight("exam", 3)
+    w.record("cat", "e1", 80)
+    w.record("cat", "q1", 10)
+    assert w.percent("cat") == round((3 * 80 + 1 * 100) / 4, 2)
+
+    d = Gradebook()
+    d.add_student("dee")
+    for i, mx in enumerate([10, 10, 10], start=1):
+        d.add_assignment("q%d" % i, mx, "quiz")
+    d.record("dee", "q1", 2)
+    d.record("dee", "q2", 9)
+    d.record("dee", "q3", 10)
+    assert d.percent("dee") == round(21 / 30 * 100, 2)
+    d.drop_lowest("quiz", 1)
+    assert d.percent("dee") == round(19 / 20 * 100, 2)
+
+    m = Gradebook()
+    m.add_student("eve")
+    m.add_assignment("a1", 10)
+    m.add_assignment("a2", 10)
+    m.record("eve", "a1", 10)
+    assert m.percent("eve") == 100.0
+    m.set_missing_zero(True)
+    assert m.percent("eve") == 50.0
+    print("ok")
