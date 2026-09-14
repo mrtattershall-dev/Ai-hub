@@ -639,10 +639,32 @@ const tools = {
       : `(no declarations found — use read_file with LINES or search_file)`;
   },
 
-  write_file({ path, content = '' }) {
+  write_file({ path, content = '', empty }) {
     { const r = markerRefusal(path, 'write_file'); if (r) return r; }
     const full = safePath(path);
     mkdirSync(dirname(full), { recursive: true });
+    // AN EMPTY WRITE IS NOT A SUCCESS. Measured 2026-09-13 while building the per-gate harness:
+    // qwen2.5:1.5b emitted a bare fence immediately followed by its own ```language fence, so the
+    // parser read the empty FIRST pair as the content and this answered `OK: wrote 0 bytes to
+    // s4_markdown.py`. Three files in one run landed at 0 bytes with the tool reporting success,
+    // and the gate above then said "missing to_html" - a misleading label for "nothing arrived".
+    //
+    // The destructive guard below cannot catch it: it only runs when the file ALREADY exists, and
+    // even then requires before.length > 400 - so creating an empty file, or emptying a small one,
+    // both sail through. Same family as exportNames reporting phantom exports and /api/health
+    // answering ok over a dead engine: the instrument says fine while the work is gone.
+    //
+    // Narrow, and with the escape hatch this file uses elsewhere (REMOVE:, DUPLICATE:) so a caller
+    // who genuinely wants an empty file is never stuck against a refusal it cannot get past.
+    if (!String(content).trim() && !empty) {
+      const had = existsSync(full) ? Buffer.byteLength(readFileSync(full, 'utf8')) : 0;
+      return `ERROR: refusing to write an EMPTY file to ${path}`
+        + (had ? ` - it has ${had} bytes and they would be lost.` : '.')
+        + ` Nothing was written.`
+        + `\nThis usually means the content did not arrive: put the WHOLE file inside ONE fenced code block,`
+        + ` and do not open a second fence inside it.`
+        + `\nIf you really do want ${path} to be empty, repeat the same action and add a line: EMPTY: yes`;
+    }
     // DO NOT LET A FRAGMENT DESTROY WORKING CODE.
     //
     // Measured 2026-09-10: mid-build, the 32B wrote 158 bytes of English prose about a
@@ -2985,7 +3007,14 @@ async function runSubtask(goal, depth, parent) {
     catch (e) { result = `ERROR: ${e.message}`; }
     finally { _toolGoal = prevGoal; _activeRun = prevRun; }
     if (tool === 'write_file' || tool === 'edit_file') { sub.lastPath = args.path; done.push(`${tool} ${args.path}`); }
-    if (parent) pushStep(parent, { type: 'subtask_step', tool, args, text: `  ↳ ${tool} ${args.path || args.cmd || ''}`.slice(0, 160) });
+    // RECORD THE RESULT, 2026-09-13. This pushed tool+args+text and NOT `result`, so every sub-task tool
+    // outcome was discarded while the sub-agent kept it in its own history one line below. Measured cost:
+    // 147 sub-task tool calls in one night with no recorded outcome, 39 of them edit_file - so the question
+    // "why can the model not edit files" was unanswerable for delegated work. Truncated because a
+    // repetition collapse can make a single result 130,000 chars.
+    if (parent) pushStep(parent, { type: 'subtask_step', tool, args,
+      result: String(result ?? '').slice(0, 400),
+      text: `  ↳ ${tool} ${args.path || args.cmd || ''}`.slice(0, 160) });
     sub.history.push({ role: 'user', content: `TOOL RESULT (${tool}):\n${result}` });
   }
 
