@@ -693,3 +693,77 @@ one a separate exports gate eliminates by construction.
 
 **The provisional 3/6 stays on record as provisional**, not deleted: it was measured with a runner that had a
 workspace bug, and the byte-level view of the same task shows correct code every time with a shadowed export.
+
+## Gate experiments, 2026-09-13 evening: what is DEMONSTRATED vs what is UNRESOLVED
+
+All local (Ollama `qwen2.5:1.5b`, temp 0.2), zero GPU cost. Real `parseAction` and real `edit_file`
+from `agent.js` via `__toolPolicyTest`. Every proof validated in BOTH directions before use: it must
+fail on the untouched file with the expected exit code AND pass on hand-written correct code.
+
+### THE NOISE FLOOR, measured by accident and decisive
+
+`guarded pass@1` is the first attempt, before any feedback exists - the prompt is byte-identical
+across feedback conditions, and the concrete proofs were verified to make identical pass/fail
+decisions. It **cannot** be affected by the feedback manipulation. It moved **0/8 -> 3/8** between
+two arms anyway.
+
+So at N=8, differences of one, two, even three successes are not interpretable as treatment effects
+in this setup. That demotes several comparisons made earlier tonight to DESCRIPTIVE observations:
+v3->v4 "statefulness helps" (1/8 -> 2/8), v4->v5 (2/8 -> 3/8), and the `intent@1` swing (4/8 -> 7/8)
+which was already withdrawn.
+
+### DEMONSTRATED (existence proofs and deterministic facts)
+
+  * A 1.5B performs tightly-scoped JS edits cleanly. `delete()` gate 12/12 and `has()` gate 8/8 on
+    executed behavioural proofs, with neighbouring behaviour preserved.
+  * Whitespace-tolerant matching rescues patch-location imprecision. The `has()` gate passed 8/8
+    behaviourally while only 2/8 matched exactly - strong coding competence, weak location precision.
+  * **Proof feedback can produce successful self-repair.** THREE directly observed
+    `landed-but-failed -> PASS` transitions with state retained. This proves the mechanism CAN work.
+    It does NOT establish how often, nor that statefulness raises success probability.
+  * Persistent state both preserves useful partial work AND compounds damage: transition traces show
+    `r0 -> r1 -> r1 -> r2` (stall then complete) and `r1 -> r1D` (valid partial then damaged).
+  * Deterministic guards demonstrably PREVENT destructive edits (rollback on `lostDefs`/`lostExports`
+    and on duplicate definitions). No successful recovery has yet been causally attributed to a guard
+    refusal - these are not homogeneous trials, so the claim is "not observed", not "cannot happen".
+  * The Python gate produces a consistent WRONG-TARGET substitution: asked to ADD `degree`, the model
+    rewrites the existing `neighbors` instead, 8 of 8, pass@8 = 0. Strong local evidence of a failure
+    MODE; "the model cannot do it" would need broader sampling or a changed scaffold.
+  * The large-file semantic defect enters a repeated fixed point: 8 goals, all failing, retries
+    largely reproducing an equivalent edit (`clear()` returning `this.items.length` AFTER clearing).
+    The 21 retries are NESTED in 8 goals - effective independent N is ~8, not 21.
+  * `exportNames()` was objectively wrong and is fixed. This is deterministic software evidence, not
+    model sampling: old implementation fails 5 of 13 cases, fixed implementation agrees with the Node
+    runtime, 95 regression tests across 10 files stay green. It did NOT contaminate authoritative
+    historical scoring - `checks-H.mjs` imports only node builtins and is byte-identical.
+
+### UNRESOLVED (effect sizes this setup cannot resolve)
+
+  * Whether stateful repair beats stateless resampling.
+  * Whether concrete counterexamples beat generic feedback.
+  * Whether longer feedback alone helps (the concrete arm changed specificity AND length together).
+  * How much "restore last-known-BEST state" would add over "continue from latest".
+  * How any of this compares with 14B/30B under identical scaffolding.
+
+### DESIGN CORRECTION for the 100-goal harness: pair the goals
+
+Do not compare arms as independent proportions. Run the SAME goals under each condition and record
+the per-goal outcome pair, then count DISCORDANT pairs:
+
+    A fail / B pass      vs      A pass / B fail
+
+Each goal acts as its own control, which buys substantially more power than comparing `41/100` with
+`55/100` - and it is the only comparison that separates "the scaffold caused this" from "this run
+sampled a luckier sequence". Clustering matters too: transitions and retries are nested inside goals,
+so the effective N is the number of GOALS, never the number of attempts.
+
+### The rung ladder for feedback content (only rung 2 attempted, and imperfectly)
+
+    1  generic failure          "the behaviour check still fails"
+    2  concrete observed values "called with items.length === 3; returned 0; afterward length === 0"
+    3  explicit diagnosis       "the later module.exports shadows the earlier one"
+    4  explicit repair          "save the length before clearing"
+
+Rung 2 must hand back OBSERVATIONS and leave the causal inference to the model. My large-file message
+violated that - it ended "which is correct - only the RETURNED VALUE is wrong", which is rung 3. The
+`three-exports` message stayed clean (runtime exports vs required names, no causal claim).
