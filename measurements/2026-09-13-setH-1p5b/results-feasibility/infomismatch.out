@@ -1,0 +1,48 @@
+  INFORMATION AUDIT - was the disambiguating evidence in the prompt?
+  looking for, verbatim:  assert to_html("a\nb") == "<p>a b</p>"
+
+===== 1.5B condition A =====
+  g64 s1    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s2    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s3    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s4    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s5    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s6    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s7    assertion visible in its own prompt: YES   outcome: did-not-load
+  g64 s8    assertion visible in its own prompt: YES   outcome: broke-something-else
+  g74 s1    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s2    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s3    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s4    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s5    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s6    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s7    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s8    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  ---- visible 16/16   violated-this 14/16   VISIBLE AND VIOLATED 14/16   unevaluable (did not load) 1
+
+===== 7B coder condition A =====
+  g64 s1    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s2    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s3    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s4    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s5    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s6    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s7    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g64 s8    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s1    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s2    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s3    assertion visible in its own prompt: YES   outcome: did-not-load
+  g74 s4    assertion visible in its own prompt: YES   outcome: did-not-load
+  g74 s5    assertion visible in its own prompt: YES   outcome: did-not-load
+  g74 s6    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s7    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  g74 s8    assertion visible in its own prompt: YES   outcome: VIOLATED-this
+  ---- visible 16/16   violated-this 13/16   VISIBLE AND VIOLATED 13/16   unevaluable (did not load) 3
+
+===== VERDICT =====
+  1.5B condition A      visible 16/16   visible AND violated 14/16   unevaluable 1
+  7B coder condition A  visible 16/16   visible AND violated 13/16   unevaluable 3
+
+  The assertion is present, verbatim, in every prompt, and is contradicted by the output.
+  This is NOT an information mismatch: the evidence distinguishing the reference from the
+  wrong topology was printed in the model's own context and was not used.

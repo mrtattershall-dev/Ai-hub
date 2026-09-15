@@ -267,6 +267,13 @@ async function runB({ goal, seed, useReference }) {
         step.bound_stopped_by = b.stoppedBy;
         step.bound_dropped_lines = b.droppedLines;
         step.bound_trimmed_bytes = snippet.length - b.text.length;
+        // The bound is a FUNCTION OF PREDECESSOR STATE (redeclares_existing consults the current
+        // source). A replay that re-derives it is therefore changing the treatment as well as the
+        // context, which is not a counterfactual. Freeze all three so replay consumes the bound
+        // snippet VERBATIM: no rebinding, no normalisation, no second interpretation.
+        step.raw_model_reply = snippet;
+        step.bound_snippet = b.text;
+        step.bound_against_state_hash = short(cur);
         snippet = b.text;
       }
       Object.assign(step, { wire_id: out.wire_id, eval_count: out.eval_count, done_reason: out.done_reason,

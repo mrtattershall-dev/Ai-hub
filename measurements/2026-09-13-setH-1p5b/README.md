@@ -2695,3 +2695,68 @@ that distinction at the API boundary.
 If the larger rows behave like these two, the result stops being a prompting trick and becomes evidence
 that architecture can substitute for some amount of model capability - and that some failures attributed
 to model intelligence are failures in how the system asks a model to alter stateful code.
+
+
+## INFORMATION AUDIT: the evidence was in the prompt and was not used
+
+Condition A shows a repeated wrong topology across both sizes - `to_html("a\nb")` rendering as
+`'<p>a</p>\n<p>b</p>'` instead of `'<p>a b</p>'`. Either the evidence distinguishing those is absent
+from the prompt (an information mismatch, i.e. another apparatus defect) or it is present and unused
+(a statement about the model). Settled by looking for the assertion verbatim:
+
+                              assertion visible   visible AND violated   unevaluable (did not load)
+    1.5B condition A               16/16                 14/16                     1
+    7B coder condition A           16/16                 13/16                     3
+
+`assert to_html("a\nb") == "<p>a b</p>"` appears **verbatim in every prompt at both sizes** and is
+contradicted by the output. **Not an information mismatch.** The model had the exact discriminating
+evidence in its own context.
+
+### My first version of this audit was vacuous, and the failure mode matters
+
+It rebuilt each candidate file and ran python against the visible asserts. When a rebuilt module failed
+to import, no comparison ran and the violation counter stayed at zero - so it reported **"0 of 160
+visible assertions violated"** for trajectories whose regression demonstrably failed. A checker branch
+that cannot fail, the same class as the `[].every()` defect. It was caught only because 0/160 contradicted
+results already on disk.
+
+The replacement asks only what it needs, from data that already exists: is the assertion in the prompt
+text, and did the run record that behaviour failing. It distinguishes three outcomes - `preserved`,
+`VIOLATED-this`, `did-not-load` - so a load failure can never again be silently scored as "no
+violation". `unevaluable` is reported separately rather than folded into either side.
+
+## TABLE CORRECTION: under STRICT, preservation-given-completion is 1.0 by construction
+
+tatte flagged that "1.5B 6/16 vs 7B 1/16 localized preservation" invites reading as "the 1.5B preserved
+six times better". It is worse than a labelling problem - the conditional version of that number is
+**definitionally 100%** in a STRICT run, because STRICT aborts any chain that breaks preservation. So it
+cannot be evidence of anything.
+
+    condition B3 (STRICT)          1.5B        7B coder
+    chains completing all sites    6/16        1/16      <- all attempted chains; THIS is the number
+    preserved | completed          6/6         1/1       <- 1.0 by construction; NOT evidence
+    verified (old+delta+load)      0/16        1/16
+
+The reportable quantity for a STRICT run is the **completion rate**, and preservation must be quoted
+only for non-STRICT runs where it can actually vary.
+
+On completion, the 1.5B is ahead here (6/16 vs 1/16), which is counterintuitive and which I am not going
+to dress up. n=16 per model, and the 7B's goal-64 chains died on `anchor_ambiguous` and preservation
+breaks rather than on syntax. It could easily be noise at this panel size, and the 7B's single verified
+pass is the only end-to-end success in the whole sequence. Both facts go in the record; neither is a
+story yet.
+
+## Where this leaves the search
+
+Progressively removed as explanations for DELTA=0:
+
+    stale-state contamination            157/157 continuity transitions hold
+    shared replay mutation               step-1 re-derivation exact 64/64
+    unrepresentable deltas               reference-only sites give old=true delta=true, both goals
+    post-failure continuation            STRICT, 0 leaks in both STRICT runs
+    counterfactual-treatment contamination  found (state-dependent bound, 1/16) and now frozen in trace
+    information mismatch                 the discriminating assertion is visible 32/32 and violated 27/32
+
+What remains is not "there is probably another harness bug". It is a limitation of local generative
+inference under accumulated behavioural constraints - which is now the interesting object of study
+rather than the thing obscuring it.
