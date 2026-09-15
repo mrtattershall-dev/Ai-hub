@@ -7042,3 +7042,22 @@ This is a SIDE CONTROL and does not change the project objective, which remains 
 qwen2.5-coder-1.5b agentically correct by engineering the environment around it. tatte had
 previously asked for no larger-model comparisons; this request explicitly overrides that for
 this one measurement.
+
+## 2026-09-15  GPU window: EXPERIMENT GATE-POLICY (7B as substrate)
+
+Authorised by tatte, verbatim:
+
+> "using a fresh 7B batch is completely legitimate if 7B produces enough verified chains to
+> give the endpoint metric sensitivity. You would not be testing whether 7B is better than
+> 1.5B. You would be using 7B as an experimental substrate where both successes and failures
+> exist"
+
+Scope: redeploy `modal-serve/modal_ollama_7b.py` (one A10G), run the B3 apparatus with
+`GATE=shadow` on goals 64 and 74, seeds 101-124 (48 chains), then
+`modal app stop qwen-7b-control --yes`. Estimated ~1 hour of A10G, roughly $1.
+
+Preconditions: on AC; modal authenticated; weights pulled in-container so nothing local is
+uploaded; scaledown_window 5 min; min_containers 0.
+
+This window serves the GATE-POLICY question ONLY. It is not a model comparison and does not
+touch the 1.5B capability programme, which remains the project objective.
