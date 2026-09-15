@@ -73,3 +73,4 @@ server/variance-index.jsonl
 server/yolo-index.jsonl
 server/agent-queue.json.prerestart
 server/cycle1-mixed-index.jsonl
+modal-serve/__pycache__/

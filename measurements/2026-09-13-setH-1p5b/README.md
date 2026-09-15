@@ -2596,3 +2596,102 @@ survive it:
   2. the localized+bounded route produced the only verified behavioural edit anywhere in this
      sequence;
   3. the general 7B cannot use this architecture at all, because it ships no FIM weights.
+
+## STATE-CONTINUITY AUDIT: is the experiment measuring the chain it claims to?
+
+Five notions of "current program state" exist in this apparatus - the candidate after a model edit, the
+reference/oracle file, the state the next anchor resolves against, the state the preservation probe
+reads, and the state the 2x2 replay reconstructs. If one advances differently, every local result looks
+legitimate while the measured causal chain is the wrong one. tatte's invariant: output(site N) ==
+input(site N+1) for every branch claiming continuity.
+
+                              B1        B2        B3       7B B3
+    1 chain continuity       15/15     59/59     47/47     36/36     holds everywhere
+    2 no state past a dead     2 LEAKS  11 LEAKS  holds     holds
+      step
+    3 replay re-derives       16/16     16/16     16/16     16/16     exact
+      step 1 exactly
+    4 bound state-INdependent   n/a     16/16     16/16     15/16     one exception
+    5 delta representable     goal 64 old=true delta=true | goal 74 old=true delta=true
+
+### 1, 3 and 5: the big suspects are cleared
+
+**No stale-state bug.** Every transition that claimed to advance did advance: output(N) hashes equal
+input(N+1) in 157 transitions across four runs. **The replay is faithful** - re-deriving step 1's
+snippet from the reply bytes reproduces the recorded byte count 64/64 times, so the counterfactual
+operates on the snippets the run actually used, not on reconstructions. And **delta representability is
+now asserted rather than assumed**: applying only the reference snippets at only the exposed sites gives
+old=true and delta=true for both goals, so "the sites cannot express the delta" is excluded as an
+explanation for DELTA=0.
+
+### 2: the leaks are the pre-STRICT gap, independently confirmed and quantified
+
+    B1   2 leaks     B2   11 leaks     B3   0     7B B3   0
+
+These are the runs where a preservation break did not abort. I had found and disclosed that gap by hand;
+this invariant catches it mechanically and puts a number on it - **11 of B2's transitions were built on
+already-broken state**. STRICT closes it completely: zero leaks in both STRICT runs.
+
+Consequence for B2's record, stated precisely: the FIRST failing site is unaffected (the leak point IS
+the first break), so B2's causal verdicts stand. What is not trustworthy is anything about what happened
+at sites AFTER that point, because those ran on corrupt predecessor state.
+
+### 4: a genuinely subtle finding - the bound is state-dependent
+
+    7B B3  g64 s35   original-source bound 295B   vs   patched-source bound 122B
+
+The bound's redeclares_existing rule consults the current source, so truncation can differ when
+predecessors differ. For that trajectory the replay's case (b) applies a **different snippet** than the
+run did, which means (b) is not "the same snippet on better predecessors" and does not isolate
+predecessor state. 1 of 16 here; it invalidates that trajectory's quadrant assignment rather than the
+method. Recorded as a limitation of the replay's isolation claim. The fix is to freeze each step's bound
+decision at generation time and replay the frozen text.
+
+## WORDING CORRECTION to the 7B write-up
+
+I wrote "that failure was never about model size". That overreaches. What the evidence supports is:
+
+> The 1.5B to 7B capacity increase does not resolve it, and the failure reproduces with the same
+> topology - the same plausible-but-wrong paragraph semantics - after roughly a 5x parameter increase.
+
+A 14B, 30B or frontier model could still cross the reconstruction threshold. If those reproduce the same
+failure signature the size explanation gets seriously boxed in, but that is a claim for the filled-in
+table, not for this cell.
+
+### The claim that IS defensible now
+
+> Across 1.5B and 7B, whole-function reconstruction repeatedly destroys previously accumulated
+> behaviour, while preservation-oriented localized editing retains those behaviours and, at 7B, has
+> produced at least one fully verified novel change.
+
+B3's verified case crosses an epistemic boundary the earlier runs did not: old kept AND delta AND
+verified means the architecture is not merely a better failure detector. At least once it navigated
+accumulated constraints and added behaviour without regression. Proof of existence, n=1.
+
+## DESIGN NOTE: localized editing is not FIM
+
+The current implementation equates them because insert is the transport, which is why qwen2.5:7b
+produced no score rather than a poor one. Conceptually the edit protocol should be the abstraction and
+FIM one connector among several:
+
+    FIM          -> constrained splice
+    chat         -> structured patch
+    tool model   -> edit operation
+    diff model   -> validated diff
+
+Then a non-FIM model participates in the same experimental treatment without changing the conceptual
+condition, and the general-vs-coder question becomes answerable on the real architecture instead of on a
+whole-file substitute. The intelligence and the transport are separate concerns, and this experiment hit
+that distinction at the API boundary.
+
+## The table to fill
+
+    size    replacement verified   localized verified   replacement preservation   localized preservation
+    1.5B            0/16                  0/16              0/16                      6/16 old-kept
+    7B              0/16                  1/16              0/16                      1/16
+    14B              -                      -                 -                         -
+    30B              -                      -                 -                         -
+
+If the larger rows behave like these two, the result stops being a prompting trick and becomes evidence
+that architecture can substitute for some amount of model capability - and that some failures attributed
+to model intelligence are failures in how the system asks a model to alter stateful code.

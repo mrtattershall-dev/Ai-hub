@@ -1,0 +1,43 @@
+===== b1-run  (16 trajectories) =====
+  1 chain continuity      15/15 transitions hold
+  LEAK   g64 s13  site 2 was dead (loads=true oldreg=false) yet site 3 ran
+  LEAK   g64 s16  site 2 was dead (loads=true oldreg=false) yet site 3 ran
+  2 no state past a dead step  2 LEAKS
+  3 replay re-derives step 1 exactly  16/16
+  4 bound is state-INdependent  0/0
+
+===== b2-run  (16 trajectories) =====
+  1 chain continuity      59/59 transitions hold
+  LEAK   g64 s21  site 5 was dead (loads=true oldreg=false) yet site 6 ran
+  LEAK   g64 s21  site 6 was dead (loads=true oldreg=false) yet site 7 ran
+  LEAK   g64 s23  site 6 was dead (loads=true oldreg=false) yet site 7 ran
+  LEAK   g64 s24  site 6 was dead (loads=true oldreg=false) yet site 7 ran
+  LEAK   g64 s27  site 6 was dead (loads=true oldreg=false) yet site 7 ran
+  LEAK   g74 s21  site 2 was dead (loads=true oldreg=false) yet site 3 ran
+  LEAK   g74 s22  site 2 was dead (loads=true oldreg=false) yet site 3 ran
+  LEAK   g74 s24  site 2 was dead (loads=true oldreg=false) yet site 3 ran
+  LEAK   g74 s25  site 2 was dead (loads=true oldreg=false) yet site 3 ran
+  LEAK   g74 s26  site 2 was dead (loads=true oldreg=false) yet site 3 ran
+  LEAK   g74 s27  site 2 was dead (loads=true oldreg=false) yet site 3 ran
+  2 no state past a dead step  11 LEAKS
+  3 replay re-derives step 1 exactly  16/16
+  4 bound is state-INdependent  16/16
+
+===== b3-run  (16 trajectories) =====
+  1 chain continuity      47/47 transitions hold
+  2 no state past a dead step  holds
+  3 replay re-derives step 1 exactly  16/16
+  4 bound is state-INdependent  16/16
+
+===== B3  (16 trajectories) =====
+  1 chain continuity      36/36 transitions hold
+  2 no state past a dead step  holds
+  3 replay re-derives step 1 exactly  16/16
+  STATE-DEPENDENT BOUND  g64 s35  original-source bound 295B vs patched-source bound 122B
+  4 bound is state-INdependent  15/16   <-- (b) does not isolate predecessor state for these
+
+===== 5 delta representability (no model) =====
+  goal 64  reference-only sites: old=true  delta=true   -> the exposed sites ARE sufficient
+  goal 74  reference-only sites: old=true  delta=true   -> the exposed sites ARE sufficient
+
+  3 INVARIANT GROUP(S) FAILED
