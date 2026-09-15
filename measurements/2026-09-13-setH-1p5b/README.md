@@ -2174,3 +2174,67 @@ that passes every known-bad test.
 
 D2 was written while looking at B1's trajectories, so THIS run on fresh seeds is what decides whether
 it generalises. If B2 succeeds only on the seeds D2 was tuned against, that is a negative result.
+
+
+## FROZEN: the four outcomes B2 can produce, written while it runs
+
+Fixed now so the result cannot be narrated afterwards. D2 was designed after seeing B1, so only the
+fresh 21-28 panel can distinguish a general boundary mechanism from a clever rescue of B1's particular
+trajectories.
+
+    1  B2 completes whole goals on fresh seeds
+       Strong support for the narrow core claim: the 1.5B can execute the semantic change when
+       planning, localization, specification, preservation and generation BOUNDARIES are all
+       externalized. Not "Legasus proven" - the edit plan is still oracle-supplied.
+
+    2  early sites improve, whole transactions still fail
+       The principle holds locally but some later operation carries an unresolved burden. Response:
+       inspect the FIRST FAILING SITE. Do not redesign anything else.
+
+    3  D2 stops the run-on but the content becomes wrong
+       Boundary control is real and content generation is the remaining capability bottleneck. This is
+       the first outcome in the whole sequence that would license a capability statement, and only
+       because four apparatus defects would by then have been removed.
+
+    4  B2 looks essentially like B1
+       The step-1 rescue did not generalize and D2 was overfit developmentally. Report it as a negative
+       result; do not re-tune D2 on the 21-28 panel, because that would just move the overfitting.
+
+## A finding that stands independently of B2: the interface, not the model
+
+Four apparent model-capability failures in this sequence were failures of the interface between the
+model and the harness:
+
+    1  no instruction channel on the behavioural route     the task was never stated
+    2  goals 64 and 74 sent a byte-identical prompt        two goals, one question; passing both was
+                                                           arithmetically impossible
+    3  a zero-width FIM hole in a complete program         the honest answer was EOT, and the model
+                                                           gave it
+    4  no boundary on generation authority                 the right first statement, then 2400 bytes
+                                                           of unauthorized material
+
+**All four were found by reading actual request and reply bytes. None was found by reading harness code,
+and none was visible in an aggregate score.** That is no longer incidental; it is a repeatable pattern
+in this project. A harness can make a capable local behaviour invisible by asking the wrong question,
+hiding the task, destroying the context the task refers to, or granting too much generation authority -
+and each failure mode produces output that looks exactly like the model being incapable.
+
+### The sharpest of the four, as an architectural principle
+
+14 of 31 B1 steps continued **my own instruction-comment format** as a pattern - generating further
+lines like `# AT THIS POINT WRITE ONLY THIS: declare a function named flush_para ...`. The model was
+doing precisely what an autoregressive/FIM model is trained to do: continue the pattern in front of it.
+
+So the requirement is not "instruct the model better". It is:
+
+> Shape the context so that the desired code fragment is the NATURAL CONTINUATION, and place everything
+> beyond that fragment outside the model's authority.
+
+Those are two distinct obligations - one on the prompt geometry, one on the harness's write authority -
+and B0 versus B1 versus B2 separates them. B0 failed the first (nothing needed continuing). B1 satisfied
+the first and failed the second (continuation never stopped). B2 tests whether satisfying both is
+sufficient.
+
+This also reframes what the earlier v2 success was. `def between(` worked not because it was a good
+instruction - it is barely an instruction at all - but because it made the wanted code the only natural
+continuation. The same property, arrived at by accident rather than design.
