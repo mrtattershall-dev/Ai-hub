@@ -1763,3 +1763,38 @@ the source hash before and after every insertion, the selected site and its orac
 result, old regression and new delta at every step, the abort point, rollback status and whether
 restoration was byte-exact, and the final artifact hash. No summaries without bytes - the rule this
 whole line of work exists because I broke it once.
+
+## AMENDMENT to the preregistration, written before results (tatte, 2026-09-14)
+
+### What B's oracle actually supplies - four things, not two
+
+I described B as handing over "localization and decomposition". That undercounts it. The oracle
+supplies **location + decomposition + ORDERING + local intent**, and ordering is genuine information,
+not bookkeeping: site 2 defines `flush_ol` and site 3 calls it, so site 2 must precede site 3. The
+reference control's `LR` at every intermediate is exactly what proves the supplied order is a valid
+one, and a different order would have produced a spurious mid-sequence failure.
+
+So if B works, the precise claim is:
+
+> Given a correct multi-site EDIT PLAN - ordered insertion sites plus a local intent for each - can
+> the 1.5B synthesize the required snippets while the preservation gates keep the program valid?
+
+That is still a very useful feasibility question. But it means a v4 would have to solve more than
+"find the insertion points". It would have to derive an **edit plan**: the sites, their dependencies
+and order, and a small semantic instruction per site. Stating it now so a later reader cannot quietly
+shrink the remaining problem to site-finding.
+
+### A loophole closed before the numbers exist
+
+Because the reference control proves that every intermediate state under this oracle plan both loads
+AND keeps the old regression green, a model-generated snippet that fails an intermediate check is a
+**genuine snippet failure**, not an artifact of the harness demanding transiently-invalid states. This
+disposes of the objection in advance rather than after seeing which way the result went - the same
+objection that, left open, would have made a B failure unfalsifiable.
+
+### Why A remaining near zero while B works would be a strong result
+
+Not "shorter prompts help". It would mean the model can perform the behavioural change once the
+harness stops forcing it to reconstruct already-correct code, and instead presents the task at the
+granularity the model can reliably execute. The distinction matters because the first reading suggests
+prompt tuning and the second identifies the unit of work as the lever.
