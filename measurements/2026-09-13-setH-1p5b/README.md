@@ -1798,3 +1798,92 @@ Not "shorter prompts help". It would mean the model can perform the behavioural 
 harness stops forcing it to reconstruct already-correct code, and instead presents the task at the
 granularity the model can reliably execute. The distinction matters because the first reading suggests
 prompt tuning and the second identifies the unit of work as the lever.
+
+## B0 QUARANTINED, and the route-selection criterion fixed BEFORE the probe runs
+
+### Withdrawing an overreach of mine, immediately
+
+I wrote that condition A showed "the defect that matters is deleting the implementation, not only the
+missing instruction". That is not established. A establishes one thing only:
+
+> Restoring the instruction channel ALONE is insufficient - whole-function replacement with the exact
+> goal text supplied is still 0/8.
+
+The stronger causal claim - that keeping the existing implementation visible unlocks the model -
+belongs to a valid B experiment, and B has not produced one yet. tatte's correction; accepted.
+
+### B0 ORACLE_LOCALIZATION_FEASIBILITY - APPARATUS-INVALID, not interpretable as capability
+
+    goal 64, seeds 1-8   sites completed 0,0,0,3,0,0,0,0 of 7
+                         6/8 aborted with an EMPTY snippet at site 1
+
+A zero-width FIM hole between two already-complete statements is a poor match to the model's infill
+objective. It is shown a perfectly valid prefix/suffix pair and often concludes, reasonably, that
+nothing belongs there; one seed echoed the instruction comment back instead. **This is another
+apparatus defect, not evidence against oracle localization.** B0 is frozen and quarantined, and its
+counts are never to be cited as model capability.
+
+Seed 4 is the informative exception: it completed 3 of 7 sites before failing at site 4. The
+transactional machinery is therefore not fundamentally incompatible with model-generated snippets. The
+defect is specifically about how reliably the generator recognises that a completion is required.
+
+### The state of evidence, stated precisely
+
+    original v3   VOID                   the model never received the requested behaviour
+    A             VALID                  behaviour specified, implementation removed        -> 0/8
+    B0            INVALID/NON-IDENTIFYING implementation visible, but the FIM formulation
+                                          frequently tells the model no completion is needed
+    B1            pending                 implementation visible, behaviour specified,
+                                          completion genuinely demanded, only local snippets
+
+### ROUTE-SELECTION CRITERION - fixed now, before the probe is run
+
+Written in advance so the route cannot be chosen by looking at which one produced the nicest code.
+Probe: goal 64, sites 1 and 5 (a one-line declaration and the substantive branch), seeds 1-4, so
+**8 trials per route**.
+
+    RESPONSIVE = the reply is non-empty AND does not echo the instruction text.
+    ELIGIBLE   = RESPONSIVE on at least 6 of 8 trials.
+    CHOICE     = among ELIGIBLE routes, the highest count of candidates that LOAD.
+    TIE-BREAK  = prefer V2_indent_primer, because it keeps the model in its native FIM objective and
+                 adds no semantic information beyond the indentation the site already implies.
+    IF NO ROUTE IS ELIGIBLE - report that and do NOT run B1. A third apparatus iteration would then be
+                 the finding, and the honest conclusion would be that this model cannot be driven to
+                 fill an insertion point by any of these three formulations.
+
+RESPONSIVE deliberately does not include correctness. The probe decides whether a route can make the
+generator produce a snippet at all; whether the snippet is right is what B1 measures.
+
+### B1, frozen before it runs
+
+    generation route      the probe's winner under the criterion above
+    seed panel            11-18, FRESH - never used to choose the route, so the route is not selected
+                          on the same stochastic trajectories used to evaluate it
+    oracle sites          unchanged
+    site order            unchanged
+    local intent          unchanged
+    transactional gates   unchanged - re-anchor per step, each intermediate must load, any failure
+                          rolls back to source_0 byte-exactly
+    goals                 64 and 74, reported separately, never pooled
+
+The reference control R and the known-bad MUTATE_SITE witness are re-run against the chosen route
+before B1 is read, because a route change is a harness change and the controls belong to the harness,
+not to the condition.
+
+### The result B1 could produce, and what it would license
+
+If B1 works while A stays at 0/8:
+
+> The model can implement the behavioural extension when the existing behaviour remains physically
+> intact and the harness decomposes the change into small explicit insertions, but cannot reliably
+> reconstruct the whole function even when given the same behavioural instruction.
+
+That would be direct experimental justification for the next architecture. It would still NOT show
+that a system can derive the edit plan - sites, order and per-site intent are all oracle-supplied.
+
+### What this whole sequence has actually been
+
+Three apparatus defects found in a row - no instruction channel, colliding prompts, and a generation
+route mismatched to the model's training objective - each of which first presented as a model-capability
+result. The work is debugging the interface between the model's training objective and the
+architecture, not the model. Every one of them was caught by dumping bytes, and none by reading code.
