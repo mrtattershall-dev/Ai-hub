@@ -1,0 +1,19 @@
+) {
+    const [r, c] = this.shape();
+    if (r !== c) throw new Error('not square');
+    const a = this.rows.map((row) => row.slice());
+    const inv = Matrix.identity(r);
+    for (let i = 0; i < r; i++) {
+      let pivot = i;
+      for (let k = i + 1; k < r; k++) if (Math.abs(a[k][i]) > Math.abs(a[pivot][i])) pivot = k;
+      if (Math.abs(a[pivot][i]) < 1e-14) return null;
+      if (pivot !== i) { const tmp = a[i]; a[i] = a[pivot]; a[pivot] = tmp; det = -det; }
+      det *= a[i][i];
+      for (let k = i + 1; k < r; k++) {
+        const f = a[k][i] / a[i][i];
+        for (let j = i; j < r; j++) a[k][j] -= f * a[i][j];
+      }
+      inv.rows[i] = a[i].map((v) => v / det);
+    }
+    return inv;
+  }

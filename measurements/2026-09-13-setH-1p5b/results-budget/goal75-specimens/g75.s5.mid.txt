@@ -1,0 +1,42 @@
+expr) {
+  const text = String(expr);
+  const toks = tokenize(text);
+
+  let out = [];
+  let p = 0;
+  const peek = () => toks[p];
+  const where = () => (toks[p] ? toks[p].at : text.length);
+  const bad = (what) => new Error(what + ' at ' + where());
+
+  function isOp(t) { return ['+', '-', '*', '/', '^'].includes(t); }
+  function isParen(tk) { return tk && (tk.t === '(' || tk.t === ')'); }
+
+  while (p < toks.length) {
+    const tk = toks[p++];
+    if (!tk) throw bad('unexpected end of input');
+    if (isOp(tk.t)) out.push(tk.v);
+    else if (tk.t === '(') { eat('('); out.push('('); }
+    else if (tk.t === ')') { eat(')'); while (out[out.length - 1] !== '(') out.pop(); }
+    else if (isNumber(tk.t)) { out.push(tk.v); }
+    else if (tk.t === 'name') {
+      if (peek() && peek().t === '(') {
+        const fn = FUNCS[tk.v];
+        if (!fn) throw new Error('unknown function ' + tk.v + ' at ' + tk.at);
+        eat('(');
+        const args = [additive()];
+        while (peek() && peek().t === ',') { eat(','); args.push(additive()); }
+        eat(')');
+        out.push(fn(...args));
+      } else {
+        if (!Object.prototype.hasOwnProperty.call(vars, tk.v)) {
+          throw new Error('unknown name ' + tk.v + ' at ' + tk.at);
+        }
+        out.push(vars[tk.v]);
+      }
+    } else {
+      throw bad('cannot parse');
+    }
+  }
+
+  return out.join(' ');
+}
