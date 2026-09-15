@@ -7017,3 +7017,28 @@ lesson this session has been learning all night, failed on my own infrastructure
 FIX: L4 24GB instead of T4 16GB, max_model_len 8192 instead of 16384 (still above the 6,992-token
 worst case plus generation), gpu_memory_utilization 0.85 instead of 0.90, min_containers=1 for the run
 window so no goal dies to a cold start. Before relaunching: a ~6k-token prompt must succeed.
+
+## 2026-09-14  GPU window: qwen2.5-coder:7b side control (Modal)
+
+Authorised by tatte, verbatim:
+
+> "Do me a favor. For shits and giggles can you rent a gpu and cpu to run 7b on modal and
+> tell me how it scores on 7b"
+
+Scope: serve `qwen2.5-coder:7b` on one A10G via `modal-serve/modal_ollama_7b.py`, point the
+EXISTING feasibility harness at it, run condition A (seeds 1-8) and the B3 apparatus
+(seeds 31-38) on goals 64 and 74, then `modal app stop qwen-7b-control --yes`.
+
+Preconditions checked before deploying:
+  * on AC, not battery (Win32_Battery BatteryStatus = 2)
+  * modal authenticated (~/.modal.toml present)
+  * weights pulled INSIDE the container - nothing from this laptop is uploaded, so
+    server/hub.json and every other local secret stays local
+  * scaledown_window 5 min, min_containers 0 - one measurement, not a service
+  * app stop uses --yes (it prompts and aborts without it, which cost 5 over-cap minutes
+    on 2026-09-10)
+
+This is a SIDE CONTROL and does not change the project objective, which remains making
+qwen2.5-coder-1.5b agentically correct by engineering the environment around it. tatte had
+previously asked for no larger-model comparisons; this request explicitly overrides that for
+this one measurement.
