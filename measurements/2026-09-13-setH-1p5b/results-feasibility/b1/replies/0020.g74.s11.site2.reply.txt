@@ -1,0 +1,22 @@
+# AT THIS POINT WRITE ONLY THIS: handle fenced code blocks before every other line rule, using the `fence` variable: while inside a fence, a line whose stripped value is ``` emits the collected lines as one escaped <pre><code> block with their line breaks preserved and leaves the fence, and any other line is collected verbatim, continuing either way; while not inside a fence, a line whose stripped value is ``` closes any open paragraph and unordered list and enters a fence; do not alter the existing branches
+        if fence:
+            if line.strip() == "":
+                flush_code()
+                flush_list()
+                continue
+            elif line.strip().startswith("```"):
+                if codes or links:
+                    flush_code()
+                    flush_link()
+                fence = None
+                continue
+            else:
+                codes.append(_escape(line))
+                continue
+
+        if line.startswith("```"):
+            fence = line.strip()[3:]
+            current.clear()
+            items.clear()
+            continue
+

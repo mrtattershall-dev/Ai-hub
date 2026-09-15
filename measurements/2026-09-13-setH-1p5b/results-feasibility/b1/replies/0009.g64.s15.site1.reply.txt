@@ -1,0 +1,2 @@
+# AT THIS POINT WRITE ONLY THIS: declare a separate paragraph accumulator named `para`, initialised to an empty list; do not modify or redeclare `current`
+    

@@ -2050,3 +2050,72 @@ derive the plan.
 The primer-assembly check exists because the chosen route makes the harness re-add the site
 indentation to whatever the model returns. A control that never exercised that assembly step would not
 be a control for this apparatus.
+
+## RESULT B1: the intent fix worked on CONTENT and exposed a missing STOP CONDITION
+
+Route `indent_primer`, intent set `b1`, fresh seeds 11-18, goals 64 and 74 reported separately.
+
+    goal 64   VERIFIED 0/8   chains reached the end 0/8
+    goal 74   VERIFIED 0/8   chains reached the end 1/8 (seed 11: old behaviour KEPT, delta wrong)
+
+    steps attempted 31   EMPTY SNIPPETS 0 (B0: 6 of 26)   echoed instruction 14/31   hit the 600-cap 9/31
+    per-site load-after   site 1  11/16      site 2  4/11      site 3  1/4
+
+### What the amendment fixed
+
+Naming the identifier worked. Site 1 now writes `ol_items = []` and `fence = None` instead of copying
+the neighbouring `items = []`. The B0 neighbour-imitation is gone, and so are the empty snippets that
+made B0 uninterpretable. Both of the previous apparatus defects are closed.
+
+### The defect underneath
+
+The model emits the correct first statement and then **does not stop**. It continues into invented
+helpers (`flush_code()`), re-declarations of code already in the file (`def flush_para():`), or - most
+tellingly - more lines in my own instruction-comment format:
+
+    # AT THIS POINT WRITE ONLY THIS: declare a function named `flush_para`, which does not modify ...
+
+14 of 31 steps echoed instruction text. **My instruction format taught the model to keep writing
+instructions.** That is the same lesson as the earlier prompt-suppressor finding, from the other
+direction: prompt text has large unintended effects, and a comment block invites more comment blocks.
+
+`fence = None` - a 17-byte answer - arrived once inside a 2430-byte run-on that hit the token cap.
+
+### Is the content right and only the length wrong? Yes.
+
+Post-hoc over preserved bytes, STEP 1 ONLY - every seed of a goal shares the step-1 prompt, so the
+comparison is clean, whereas later steps were conditioned on what the previous step actually produced
+and cannot be reconstructed counterfactually. No new inference.
+
+                          goal 64 step 1                    goal 74 step 1
+    raw                 8/8 load, 8/8 old kept, 4/8 exact   3/8 load, 3/8 old kept, 2/8 exact
+    D1 oracle-length    8/8 load, 8/8 old kept, 6/8 exact   8/8 load, 8/8 old kept, 7/8 exact
+    D2 deterministic    8/8 load, 8/8 old kept, 6/8 exact   8/8 load, 8/8 old kept, 6/8 exact
+
+`exact` means byte-identical to the reference patch snippet. D1 truncates to the reference's line count
+- it uses the answer's length, so it is NOT implementable and exists only to separate "wrong content"
+from "right content that ran on". D2 uses no oracle information: stop at the first line that dedents
+below the site indentation, reproduces a structural line already in the source, or looks like an
+instruction comment.
+
+**D2 recovers step 1 completely - 16/16 load and keep old behaviour, 12/16 byte-identical to the
+reference - and D2 is as good as D1.** An implementable bound captures essentially everything perfect
+length control would buy.
+
+### Status: B1 is a valid result about the apparatus, not yet a capability verdict
+
+0/16 verified is real and is not being hidden. But the binding constraint it identifies is a missing
+site boundary, with a deterministic remedy that needs no help from the model. Calling B1 "the 1.5B
+cannot execute an edit plan" would repeat the mistake this whole sequence has been correcting.
+
+**D2 was written while looking at these trajectories.** It is therefore developmental, and any gain
+must be re-measured on a FRESH seed panel before it counts as a result. That is B2.
+
+### The defect ledger so far - four in a row, each first presenting as model capability
+
+    1  no instruction channel on the behavioural route          found by dumping wire bytes
+    2  goals 64 and 74 sent a byte-identical prompt             found by hashing prompts
+    3  zero-width FIM hole invites a legitimate EOT             found by preserving empty replies
+    4  no stop condition at the site boundary                   found by preserving over-long replies
+
+None was found by reading harness code. All four were found by keeping the bytes.

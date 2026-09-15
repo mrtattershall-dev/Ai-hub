@@ -1,0 +1,4 @@
+# AT THIS POINT WRITE ONLY THIS: declare a separate paragraph accumulator named `current`, initialised to an empty list; do not modify or redeclare `current`
+    ol_items = []
+    current = []
+    items = []

@@ -1,0 +1,13 @@
+if fence is not None:
+            if line.strip() == "":
+                continue
+            elif line.startswith("```"):
+                if fence is not None:
+                    blocks.append("<pre><code>" + "\n".join(items) + "</code></pre>")
+                else:
+                    current.append(line)
+                fence = "```"
+            else:
+                items.append(line)
+        else:
+    
