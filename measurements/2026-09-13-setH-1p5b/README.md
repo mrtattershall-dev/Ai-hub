@@ -3177,3 +3177,165 @@ as a null result instead of as "graded authority admits more chains".
     GATE-POLICY experiment           NULL - undefined endpoint, unsuitable substrate
     reference / harness              2/2, so the apparatus can express the target
     generator viability here         0/48, which is what made policy evaluation impossible
+
+
+## SUBSTRATE QUALIFICATION: benchmark TOPOLOGY, not difficulty, is the binding constraint
+
+A gate-policy benchmark needs two properties at once:
+
+    (a) multi-step transaction structure   - or there is no chain for a budget to govern
+    (b) non-degenerate outcome variance    - or there is nothing to preserve and nothing to intercept
+
+Set H supplies one or the other, not both.
+
+    goal 67   4/8 verified   route delegated_to_v2         chain length 1   variance EXCELLENT, no chain
+    goal 71   see below      route multi_member_insertion  chain length 2   chain present, variance poor
+    goal 80   EXCLUDED       requires Library.toJSON / fromJSON, owned by goal 71
+
+**Goal 67 is the clean demonstration.** 4 pass, 4 fail - dead-centre variance, exactly the distribution a
+policy laboratory wants - and a single insertion, so there is no transaction for an authority policy to
+act on. Statistically ideal, structurally useless for this question.
+
+### The defensible claim
+
+> Under the measured configuration, Set H contains no demonstrated multi-site lane with enough outcome
+> variance to support a practical gate-policy experiment.
+
+NOT "cannot host it at any sample size". Eight draws cannot establish a mathematical zero, and the
+temptation to state the stronger version is exactly the overreach this log keeps having to correct.
+
+### A candidate-screen error of mine, same root as the others
+
+I selected goal 67 as multi-site by counting `members + exports = 3` from the contract. But `onEvict` is
+an options-object KEY, which contract.mjs deliberately excludes from members - so only one member is
+genuinely new, and the planner correctly routes it to `delegated_to_v2`. Contract cardinality is a
+SYNTACTIC PROXY for transaction structure and it is not reliable. "67 is multi-site" was assumed, never
+established, by the same crude count that produced two earlier false positives in the runnability
+checker.
+
+The fix is metadata that declares structure rather than inviting inference:
+
+    goal:
+      operations:  [add member A, add member B, modify branch C]
+      dependencies: op2 requires op1
+      chain_length: 3
+      route: multi_site_transaction
+
+### THE METHODOLOGICAL FINDING
+
+**Benchmark difficulty is not sufficient. Benchmark TOPOLOGY has to match the subsystem under test.**
+
+A single-shot coding benchmark can measure generation quality. It cannot validate a transaction-aware
+authority policy even at a perfect 50/50 pass rate, because there is no transaction. Goal 67 demonstrates
+that as cleanly as it can be demonstrated: maximal statistical sensitivity, zero structural relevance.
+
+This is why the GATE-POLICY window was unanswerable, and no sample size would have rescued it.
+
+### What replaces it - and what NOT to do
+
+The wrong move is to split goal 67 by hand until p lands near 0.5. That manufactures a task around
+behaviour already observed, and whatever the gate then "validates" would be partly an artifact of the
+construction.
+
+Use 67 as a DIFFICULTY TEMPLATE instead, and build a small family where:
+
+    each local operation is comparable in complexity to 67's
+    each goal genuinely requires 2-3 distinct sites
+    operations carry at least one real dependency/order relation
+    every operation is NECESSARY for the final behavioural delta
+    reference implementations and negative witnesses exist BEFORE any inference
+    no hidden cross-goal prerequisites exist          (checked by the ownership invariant, not prose)
+    transaction structure is DECLARED, not inferred
+    a subset is reserved completely untouched
+
+Then locate the intermediate-difficulty band on a development subset, freeze the construction procedure,
+and only afterwards expose the held-out subset.
+
+### The runnability checker this produced, and what it cost
+
+    attempt 1   any absent referenced symbol         excluded 67, 71, 80    2 false positives
+    attempt 2   absent and not in contract           excluded 67, 80        1 false positive
+    attempt 3   declared table                       correct but one-off and unauditable
+    attempt 4   ownership model + 4 witnesses        correct and checkable
+
+The invariant that finally worked: **a goal is isolated-runnable iff every referenced-but-absent symbol
+is either introduced by that same goal or explicitly authorised as external.** A missing symbol is a
+DELIVERABLE or a PREREQUISITE, and conflating them turns the point of the task into a blocker.
+
+Four witnesses, the third being the non-vacuity guard - a checker that simply blacklisted every goal in
+the ownership table would pass the first two and fail it:
+
+    SELF-OWNED MISSING    goal 71, toJSON/fromJSON absent          runnable    ok
+    CROSS-GOAL MISSING    goal 80 from post-60                     refused     ok
+    CROSS-GOAL PRESENT    goal 80 on a predecessor containing them runnable    ok
+    SELF-OWNED OPTION     goal 67, onEvict options key             runnable    ok
+
+Goal 80's dependency was already recorded in the 61-80 preregistration as
+`HARD_DEPENDENCY_UNINFORMATIVE_FOR_A`, and I still nearly re-ran it into a stable zero that would have
+read as model difficulty. **A fact recorded in prose but not encoded as a check will be rediscovered the
+expensive way.**
+
+## QUALIFICATION RESULT
+
+    goal 67   4/8 verified   multi-site false   does not qualify (single-site)
+    goal 71   0/8 verified   multi-site true    does not qualify (too few successes)
+    goal 80   EXCLUDED       requires toJSON/fromJSON, owned by goal 71
+
+    STAGE 2 IS NOT AUTHORISED.
+
+## ARCHITECTURE FINDING: an undeclared EXCLUSIVE OWNERSHIP invariant
+
+The data does not have two storage homes. **The control flow has two potential semantic owners.**
+
+    16:    for line in str(text).split("\n"):
+    20:            continue          blank line claims the line
+    24:            continue          "- " branch claims the line
+    31:            continue          heading claims the line
+    32:        current.append(line.strip())      UNCONDITIONAL fall-through owner
+
+`continue` is the ownership-transfer primitive. A branch that CONSUMES the line without terminating the
+iteration leaves the fall-through owner to consume it as well, and the input is processed twice - which
+is the entire `<p>a a b b</p>` signature. The rule is invisible unless the loop is read as a whole,
+which is exactly what a model generating one local snippet cannot do.
+
+This explains why the same failure recurred across two model sizes, three generation routes and every
+apparatus revision. **It is a property of the code shape, not of the model.**
+
+### Derived, not written by me
+
+`ownership.mjs` computes it statically from the source, the way `scope.mjs` computes scope:
+
+    iteration variable   line
+    fall-through owner   current.append(line.strip())
+    exclusive branches   3, all terminating
+    invariant            exactly one owner may consume each line
+
+and generates the clause an edit contract should carry:
+
+> This branch claims ownership of `line`. End the iteration with `continue` after handling it, or
+> `current.append(line.strip())` will consume the same line a second time.
+
+Witnesses: the correct reference patch adds a TERMINATING branch (4 exclusive, 0 non-terminating, no
+violation reported); the real `a a b b` snippet leaves two copies of the fall-through statement live.
+
+### What this upgrades
+
+`duplicate_accumulation` stops being a pattern detector and becomes a principled check:
+
+    before   "this code looks suspicious - it repeats a statement"
+    after    "two execution paths can both claim the same semantic input"
+
+The second is derivable from control flow, defensible, and explains itself to the generator. The gate is
+frozen, so this lands in the NEXT gate version rather than being retrofitted into results already
+reported.
+
+### Two independent findings from this stage
+
+    BENCHMARK      Set H contains no demonstrated multi-site lane with enough outcome variance to
+                   support a practical gate-policy experiment, under the measured configuration.
+    ARCHITECTURE   Recurring duplication failures arise from an undeclared exclusive-ownership
+                   invariant in the target loop, and that invariant is statically derivable.
+
+The second is likely the more durable. It moves the design from "tell the model which nearby code not to
+copy" to "derive the program's semantic ownership rules and state them in the edit contract" - the same
+migration from oracle prose to computed fact that scope facts already went through.
