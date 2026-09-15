@@ -1570,3 +1570,105 @@ A failure is only attributed to the model once the trajectory is shown to have t
 without reaching the cap. "Did not load" is a location, not a cause. Every probe preserves bytes,
 token count, `done_reason` and the state before repair, so a wrong causal story can be corrected
 from the record instead of re-run from scratch.
+
+# VOID: the v3 behavioural result measured the apparatus, not the model
+
+Written 2026-09-14, the same day as the budget freeze above, which this partly overturns. The budget
+test correctly established that the v3 behavioural failures were NOT cut off by the generation cap.
+It did not establish WHY they failed, and the causal story I attached to it - "the model solves an
+easier problem than the one the existing function already solved" - was wrong in the same way the
+calibration's failure taxonomy was wrong. I inspected the exact bytes sent to the model and found two
+defects, either of which is sufficient on its own to void the measurement.
+
+## Defect 1: the goal text never reaches the model on this route
+
+    replaceBehaviour({ ..., fimFn: async (p, s) => fim(p, s), ... })
+    async function fim(prefix, suffix) { ... body: { prompt: prefix, suffix, ... } }
+
+Prefix and suffix are the ONLY inputs. There is no instruction channel on the
+`safe_behavioural_replacement` route. The model was never told to add ordered lists, and never told
+to add fenced code blocks.
+
+## Defect 2: the two goals send a BYTE-IDENTICAL prompt
+
+Goals 64 and 74 target the same function in the same file, so they produce the same span:
+
+    goal 64   prefix sha256 fb9fb8a812919466 (2174B)   suffix sha256 4d1d0de022b4bf7c (699B)
+    goal 74   prefix sha256 fb9fb8a812919466 (2174B)   suffix sha256 4d1d0de022b4bf7c (699B)
+
+One prompt, two different held-out behaviours, scored against two different probes. **Passing both
+was arithmetically impossible.** No model of any size could have satisfied both.
+
+## What the model actually saw
+
+`spanReplaceFunction` deletes the entire function body - 954 bytes, 37 lines containing paragraph
+joining, escaping, headings, emphasis, inline code, links and unordered lists. None of it appears in
+the prefix or the suffix: `flush_para`, `flush_list` and the hyphen-space list branch are all absent.
+What remains is `_escape`, `_inline`, `_is_heading`, the line `def to_html(`, and ten asserts.
+
+The nearest thing to an instruction in that prompt is the seed's own header line:
+
+    # Goals 61+ are HELD OUT and deliberately not implemented.
+
+So the model's only hint about the task is a sentence stating that the task is not implemented. Given
+`def to_html(` and ten asserts, a plausible simple markdown renderer is a REASONABLE completion of
+the prompt it actually received. The outputs stop looking like failure to preserve a complex function
+and start looking like correct behaviour on a different question.
+
+**The architecture erased the implementation whose behaviour had to be preserved, did not say what to
+add, and then tested whether the erased behaviour survived.** The regression suite was protecting
+information the generator was never given.
+
+## What survives and what does not
+
+**VOID - measured the apparatus.** The 0/4 behavioural result on the v3 treatment goals, the 0/12 in
+the budget test, and any statement of the form "the 1.5B cannot do behavioural edits" or "whole-
+function semantic work is too difficult for a 1.5B". The treatment never delivered the task.
+
+**STILL TRUSTED - unaffected by this.** The old-behaviour regression gate, which did its job 12/12:
+it refused every bad reconstruction and rolled back rather than letting it become authoritative. Full
+rollback, span-boundary preservation and the baseline-must-pass-first refusal all behaved exactly as
+designed under a generator that was being fed an impossible prompt. The v2 structural result (3/20 to
+11/20) is on a different route and is untouched. So is the budget finding itself: these failures did
+terminate on `stop` without hitting the cap.
+
+## PROVEN: the held-out behaviour is expressible as a PURE INSERTION
+
+Function-level confinement was already established - a correct implementation fits inside `to_html`.
+That is what justified replacement. The stronger property was never tested, and it holds. Reference
+patches, hand-written, expressed as anchored insertions with every anchor required to occur exactly
+once, no model involved (`results-void-v3-behavioural/localdelta.mjs`):
+
+                                                 goal 64      goal 74
+      insertion sites                                  7            3
+      existing lines DELETED or MODIFIED               0            0
+      original to_html surviving byte-identical    37/37        37/37
+      new lines the model must write                  16           15
+      OLD regression suite                          PASS         PASS
+      NEW delta probe                               PASS         PASS
+
+Zero existing lines need to change. Whole-function replacement deletes 954 bytes in order to add 15.
+Because the correct edit is insertion-only, the v2/v3 insertion preservation audit applies to it
+directly - `insertionOnly` and `survivingSymbols` become usable again, which they are not for a
+replacement.
+
+## The corrected progression
+
+    v2    do not regenerate the whole FILE       - keep the file, localize the edit
+    v3    do not regenerate unrelated behaviour  - verify old behaviour after the edit
+    next  do not DELETE the behaviour to be preserved, and SAY WHAT TO ADD
+          - keep the existing body visible, generate only the new branch, and put the goal in the
+            prompt
+
+Two separate corrections are needed, not one. Restoring the body without adding an instruction
+channel still cannot work: the model would see the code but still not know which of ordered lists or
+fenced code blocks to add. A test that varies only body visibility would fail for the second reason
+and be misread as evidence against localization, so it must not be run on its own.
+
+## Process note
+
+Both defects were found by dumping the exact bytes sent to the model rather than by reading the
+harness code, and the same inspection would have caught them before the pilot ran. Every generation
+route must now be able to print its complete prompt, and a route whose prompt does not vary with the
+goal text is an instrument failure to be asserted against, not something to be discovered afterwards
+from output that looks like model error.
