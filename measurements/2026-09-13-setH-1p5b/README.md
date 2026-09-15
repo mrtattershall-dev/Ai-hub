@@ -3393,3 +3393,77 @@ global information the model was expected to infer and could not.
 The migration that keeps recurring is from oracle prose to computed fact - scope facts, then the
 generation boundary, then loop ownership. That ratio, not the pass rate, is the honest measure of
 whether this is an architecture or a demonstration.
+
+
+## CORRECTED STANDING SUMMARY (supersedes the attribution line above)
+
+An earlier line in this file reads "the last line is now harder to attribute to apparatus error than at
+any earlier point in this sequence". **That was written before the ownership invariant was found, and it
+is now stale.** The target loop carries an undeclared exclusive-ownership rule that the edit plan does
+not yet encode, so another plan-specification defect is outstanding. Corrected, at tatte's wording:
+
+> **1.5B behavioural delta: still undemonstrated. Current failures have moved substantially downstream,
+> but model capability has not yet been isolated from remaining plan/ownership-specification defects.**
+
+Until a run encodes the ownership fact explicitly, the remaining behavioural failures cannot be cleanly
+assigned to the model. The count of eliminated apparatus explanations is large; it is not complete, and
+"we eliminated many" is not "we eliminated all".
+
+## TWO AXES, not one: the defects separate into two different boundaries
+
+I wrote that the seven defects were "one boundary drawn wrong, seven times". That over-unifies. Two of
+them were never burdens placed on the model at all - they were failures of my measurement:
+
+    WRONG MODEL/SYSTEM BOUNDARY          information or authority that should have been explicit in
+                                         the system, implicitly delegated to the model
+      missing instruction channel
+      colliding prompts for two goals
+      FIM geometry with nothing to continue
+      unbounded generation authority
+      under-specified semantic contrast
+      undeclared ownership invariant
+
+    WRONG MEASUREMENT BOUNDARY           claims the instrument could not actually observe
+      unreachable reference insertion site
+      probe unable to expose it
+      vacuous endpoint metrics (0 viable chains, 0/0 sensitivity)
+      control and model records conflated by a log grep
+
+The separation matters because this project is producing two architectures at once:
+
+    Legasus                constrains the MODEL so it owns only genuinely generative decisions
+    LegaLabs / LegaVerify  constrains the EXPERIMENT so only observable claims get made
+
+Both have now caught defects the other could not.
+
+## THE ORACLE -> COMPUTED LEDGER
+
+Every successful migration removes hidden human intelligence from the system. This is arguably the
+project's most important metric, because it is the difference between an architecture and a
+demonstration:
+
+    MIGRATED (human -> computed)      scope facts            scope.mjs
+                                      generation boundary    boundToSite
+                                      ownership invariant    ownership.mjs
+
+    STILL ORACLE                      site selection
+                                      site ordering and dependencies
+                                      local semantic intent
+
+**That remaining list is the v4 planner specification.** Not a wish list - the exact three things that
+must become computed for the architecture to stand without a human in the loop.
+
+## Where the research actually stands
+
+    1.5B LOCAL EXECUTOR hypothesis           strong evidence
+    AUTONOMOUS BEHAVIOURAL EVOLUTION         not demonstrated
+    the next research problem                automatically convert global program semantics into
+                                             explicit local edit contracts, WITHOUT smuggling the
+                                             solution into the planner
+
+That last clause is the whole difficulty. A planner that encodes the answer is an oracle wearing a
+different hat, and the ownership derivation is the first honest example of the alternative: a global
+semantic fact computed from the program itself, stated to the model as a local constraint.
+
+The position is better than "we have not got the 1.5B to pass yet". It is increasingly "we know why it
+has not, and each reason has been either fixed or named".
