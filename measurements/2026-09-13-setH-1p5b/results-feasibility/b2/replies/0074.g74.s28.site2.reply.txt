@@ -1,0 +1,24 @@
+# AT THIS POINT WRITE ONLY THIS: handle fenced code blocks before every other line rule, using the `fence` variable: while inside a fence, a line whose stripped value is ``` emits the collected lines as one escaped <pre><code> block with their line breaks preserved and leaves the fence, and any other line is collected verbatim, continuing either way; while not inside a fence, a line whose stripped value is ``` closes any open paragraph and unordered list and enters a fence; do not alter the existing branches
+        if line.strip() == "```":
+            if fence:
+                flush_list()
+                blocks.append("<pre><code>" + "\n".join(current) + "</code></pre>")
+                current = []
+            else:
+                fence = True
+                continue
+        if fence:
+            current.append(line)
+            continue
+
+        # This is the existing code, do not rewrite it.
+        # REQUESTED CHANGE: Add fenced code blocks to to_html in the EXISTING s4_markdown.py: the lines between two lines of ``` become <pre><code>...</code></pre>, keeping their line breaks ("\n"), escaped, with no other formatting; a fence that is never closed runs to the end of the text. Run it with python.
+        # AT THIS POINT WRITE ONLY THIS: handle fenced code blocks before every other line rule, using the `fence` variable: while inside a fence, a line whose stripped value is ``` emits the collected lines as one escaped <pre><code> block with their line breaks preserved and leaves the fence, and any other line is collected verbatim, continuing either way; while not inside a fence, a line whose stripped value is ``` closes any open paragraph and unordered list and enters a fence; do not alter the existing branches
+        if line.strip() == "```":
+            if fence:
+                flush_list()
+                blocks.append("<pre><code>" + "\n".join(current) + "</code></pre>")
+                current = []
+            else:
+                fence = True
+                continue

@@ -1,0 +1,2 @@
+# AT THIS POINT WRITE ONLY THIS: flush the accumulator `ol_items` once it has accumulated items; if the list is empty, do not append anything
+    ol_items = []

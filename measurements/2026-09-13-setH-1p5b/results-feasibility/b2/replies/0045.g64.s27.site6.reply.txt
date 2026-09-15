@@ -1,0 +1,55 @@
+flush_ol()
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+import re
+
+_CODE = "\x00CODE%d\x00"
+_LINK = "\x00LINK%d\x00"
+
+
+def _escape(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _inline(text):
+    codes = []
+    links = []
+
+    def take_code(m):
+        codes.append("<code>" + _escape(m.group(1)) + "</code>")
+        return _CODE % (len(codes) - 1)
+
+    text = re.sub(r"`([^`]*)`", take_code, text)
+
+    def take_link(m):
+        label = _escape(m.group(1))
+        url = _escape(m.group(2)).replace('"', "&quot;")
+        links.append('<a href="' + url + '">' + label + "</a>")
+        return _LINK % (len(links) - 1)
+
+    text = re.sub(r"\[([^\]]*)\]\(([^)]*)\)", take_link, text)
+
+    text = _escape(text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
+    text = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<

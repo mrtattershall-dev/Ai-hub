@@ -1,0 +1,5 @@
+# AT THIS POINT WRITE ONLY THIS: call `flush_list()` here and nothing else, so a blank line also closes an open unordered list
+        if line.startswith("1."):
+            flush_ol()
+            ol_items.append(line[2:].strip())
+            continue

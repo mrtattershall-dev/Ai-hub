@@ -1,0 +1,7 @@
+# AT THIS POINT WRITE ONLY THIS: add a new branch for unordered lists: when the line starts with any other character, close any open paragraph and any open ordered list, append the text to `items`, and continue; do not alter the existing branches
+        elif re.match(r"^\d+\.\s", line):
+            flush_para()
+            ol_items.append(line[2:].strip())
+            continue
+        # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+        # REQUESTED CHANGE: Add unordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with any other character, close any open paragraph and any open ordered list, append the text to `items`, and continue; do not alter the existing branches

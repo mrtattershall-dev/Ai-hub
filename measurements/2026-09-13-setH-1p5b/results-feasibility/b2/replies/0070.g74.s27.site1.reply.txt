@@ -1,0 +1,11 @@
+fence = None
+
+    def flush_code():
+        if codes:
+            blocks.append("<pre>" + "\n".join(_inline(c) for c in codes) + "</pre>")
+            del codes[:]
+
+    def flush_link():
+        if links:
+            blocks.append("<a href=\"" + _escape(links.pop(0)) + "\">" + _escape(links.pop(0)) + "</a>")
+            del links[:]

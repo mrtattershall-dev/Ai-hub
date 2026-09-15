@@ -1,0 +1,21 @@
+# END OF EXISTING - do not repeat or rewrite it.
+        if line.startswith("1. "):
+            flush_para()
+            flush_list()
+            ol_items.append(line[2:].strip())
+            continue
+        # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+        # REQUESTED CHANGE: Add unordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a number, a dot and a space ("1. ") become <ul><li>...</li>...</ul>, written like the ordered lists. Run it with python.
+        # AT THIS POINT WRITE ONLY THIS: add a new branch for unordered-list items: when the line starts with a number, a dot and a space, close any open paragraph and any open ordered list, append the item text after the marker to `items`, and continue; do not alter the existing branches
+         # END OF EXISTING - do not repeat or rewrite it.
+        if line.startswith("   "):
+            flush_list()
+            items.append(line[4:].strip())
+            continue
+        # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+        # REQUESTED CHANGE: Add bullet lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with four spaces become <ul><li>...</li>...</ul>, written like the ordered lists. Run it with python.
+        # AT THIS POINT WRITE ONLY THIS: add a new branch for unordered-list items: when the line starts with four spaces, close any open paragraph and any open ordered list, append the item text after the marker to `items`, and continue; do not alter the existing branches
+         # END OF EXISTING - do not repeat or rewrite it.
+        if _is_heading(line):
+            flush_para()
+    

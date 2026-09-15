@@ -1,0 +1,13 @@
+def flush_ol():
+        if ol_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")
+            del ol_items[:]
+
+    def flush_headline(level, body):
+        blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+
+    def flush_list_item(line):
+        items.append(line.strip())
+
+    def flush_ol_item(line):
+        ol_items.append(line.strip())

@@ -1,0 +1,94 @@
+  COUNTERFACTUAL REPLAY - preserved snippets only, no model calls
+
+  g64 s21   boundary at site 5 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g64 s22   boundary at site 5 (LOAD_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g64 s23   boundary at site 6 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g64 s24   boundary at site 6 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g64 s25   boundary at site 6 (LOAD_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g64 s26   DELTA_INCOMPLETE
+  g64 s27   boundary at site 6 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g64 s28   boundary at site 5 (LOAD_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g74 s21   boundary at site 2 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g74 s22   boundary at site 2 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g74 s23   DELTA_INCOMPLETE
+  g74 s24   boundary at site 2 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g74 s25   boundary at site 2 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g74 s26   boundary at site 2 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g74 s27   boundary at site 2 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g74 s28   DELTA_INCOMPLETE
+
+===== CAUSAL TALLY =====
+  13x  LOCAL_SNIPPET_DEFECT
+  3x  DELTA_INCOMPLETE
+
+===== ENDPOINT EQUIVALENCE vs CAUSAL EQUIVALENCE =====
+  DIVERGENT    64 | REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted '<p>a b</p>' | '
+      seed 21  depth 7  boundary site 5  LOCAL_SNIPPET_DEFECT
+      seed 23  depth 7  boundary site 6  LOCAL_SNIPPET_DEFECT
+      seed 24  depth 7  boundary site 6  LOCAL_SNIPPET_DEFECT
+      seed 27  depth 7  boundary site 6  LOCAL_SNIPPET_DEFECT
+  same cause   64 | site 5 does not load: load_error ["IndentationError: expec
+      seed 22  depth 4  boundary site 5  LOCAL_SNIPPET_DEFECT
+      seed 28  depth 4  boundary site 5  LOCAL_SNIPPET_DEFECT
+  same cause   74 | REGFAIL 'a\nb' -> '<p>a a b b</p>' wanted '<p>a b</p>' | '
+      seed 21  depth 3  boundary site 2  LOCAL_SNIPPET_DEFECT
+      seed 22  depth 3  boundary site 2  LOCAL_SNIPPET_DEFECT
+      seed 24  depth 3  boundary site 2  LOCAL_SNIPPET_DEFECT
+      seed 27  depth 3  boundary site 2  LOCAL_SNIPPET_DEFECT
+
+  1 endpoint signature(s) reached by DIFFERENT causes. An endpoint is not a diagnosis.
+
+  FIRST_FAILING_SITE is the earliest causal BOUNDARY, not a proof that the site is bad.
+  Only (b) implicates the snippet itself; (c) failing points the burden upstream of k.

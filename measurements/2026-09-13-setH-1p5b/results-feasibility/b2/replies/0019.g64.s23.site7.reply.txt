@@ -1,0 +1,2 @@
+if ol_items:
+        blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")

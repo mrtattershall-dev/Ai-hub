@@ -1,0 +1,76 @@
+if fence:
+            if line.strip() == "```":
+                if codes or items:
+                    flush_code()
+                    flush_list()
+                fence = None
+            else:
+                lines.append(line)
+        elif code:
+            lines.append(line)
+        elif items:
+            lines.append(line)
+        elif fence is None and line.startswith("```"):
+            fence = line.strip()
+            continue
+        elif fence is not None and not line.startswith("```"):
+            lines.append(line)
+        else:
+            if current:
+                flush_list()
+            flush_code()
+            flush_para()
+            blocks.append(_inline(line))
+    return "\n".join(blocks)
+
+
+def to_html_old(text):
+    codes = []
+    links = []
+
+    def take_code(m):
+        codes.append("<code>" + _escape(m.group(1)) + "</code>")
+        return _CODE % (len(codes) - 1)
+
+    text = re.sub(r"`([^`]*)`", take_code, text)
+
+    def take_link(m):
+        label = _escape(m.group(1))
+        url = _escape(m.group(2)).replace('"', "&quot;")
+        links.append('<a href="' + url + '">' + label + "</a>")
+        return _LINK % (len(links) - 1)
+
+    text = re.sub(r"\[([^\]]*)\]\(([^)]*)\)", take_link, text)
+
+    text = _escape(text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
+    text = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<em>\1</em>", text)
+
+    for i, c in enumerate(codes):
+        text = text.replace(_CODE % i, c)
+    for i, a in enumerate(links):
+        text = text.replace(_LINK % i, a)
+    return text
+
+
+def to_html_old(text):
+    codes = []
+    links = []
+
+    def take_code(m):
+        codes.append("<code>" + _escape(m.group(1)) + "</code>")
+        return _CODE % (len(codes) - 1)
+
+    text = re.sub(r"`([^`]*)`", take_code, text)
+
+    def take_link(m):
+        label = _escape(m.group(1))
+        url = _escape(m.group(2)).replace('"', "&quot;")
+        links.append('<a href="' + url + '">' + label + "</a>")
+        return _LINK % (len(links) - 1)
+
+    text = re.sub(r"\[([^\]]*)\]\(([^)]*)\)", take_link, text)
+
+    text = _escape(text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
+    text = re.sub(r"(?<!\*)\*([^*]+)\*(

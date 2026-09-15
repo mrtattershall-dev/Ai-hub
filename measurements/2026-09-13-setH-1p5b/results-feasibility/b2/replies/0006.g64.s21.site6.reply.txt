@@ -1,0 +1,5 @@
+if h:
+            flush_ol()
+        elif len(items) > 0:
+            ol_items.append("<p>" + _inline(" ".join(items)) + "</p>")
+            items = []

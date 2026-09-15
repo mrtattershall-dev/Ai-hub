@@ -1,0 +1,62 @@
+  FIRST-FAILING-SITE ANALYSIS   (preserved data, no new inference)
+
+  g64 s21  [GGGGRRR]    7/7   FIRST_FAILING_SITE=5 (OLD_REGRESSION)
+        site 5 intent: add a new branch for ordered-list items: when the line starts with a number, a dot and a space, 
+        it wrote:         # AT THIS POINT WRITE ONLY THIS: close any open paragraph and any open unordered list, a
+        bound stopped by: dedent_below_site  (dropped 30 lines, 1427 bytes)
+  g64 s22  [GGGGX]      4/7   FIRST_FAILING_SITE=5 (LOAD)
+  g64 s23  [GGGGGRR]    7/7   FIRST_FAILING_SITE=6 (OLD_REGRESSION)
+        site 6 intent: call `flush_ol()` here and nothing else, so any other kind of line closes an open ordered list
+        it wrote:         if h:\n            flush_para()\n            level, body = h\n            blocks.append(
+        bound stopped by: dedent_below_site  (dropped 32 lines, 1463 bytes)
+  g64 s24  [GGGGGRR]    7/7   FIRST_FAILING_SITE=6 (OLD_REGRESSION)
+        site 6 intent: call `flush_ol()` here and nothing else, so any other kind of line closes an open ordered list
+        it wrote:         if h:\n            flush_block()\n            level, body = h\n            blocks.append
+        bound stopped by: dedent_below_site  (dropped 51 lines, 1520 bytes)
+  g64 s25  [GGGGGX]     5/7   FIRST_FAILING_SITE=6 (LOAD)
+  g64 s26  [GGGGGGG]    7/7   PLAN_COMPLETED_DELTA_WRONG
+  g64 s27  [GGGGGRR]    7/7   FIRST_FAILING_SITE=6 (OLD_REGRESSION)
+        site 6 intent: call `flush_ol()` here and nothing else, so any other kind of line closes an open ordered list
+        it wrote:         flush_ol()\n        if h:\n            flush_para()\n            level, body = h\n      
+        bound stopped by: dedent_below_site  (dropped 48 lines, 1573 bytes)
+  g64 s28  [GGGGX]      4/7   FIRST_FAILING_SITE=5 (LOAD)
+  g74 s21  [GRR]        3/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fenced code blocks before every other line rule, using the `fence` variable: while inside
+        it wrote:         if fence:\n            if line.strip() == "```":\n                if items or current:\n
+        bound stopped by: dedent_below_site  (dropped 31 lines, 1553 bytes)
+  g74 s22  [GRR]        3/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fenced code blocks before every other line rule, using the `fence` variable: while inside
+        it wrote:         if fence:\n            if line.strip() == "":\n                blocks.append("\n".join(c
+        bound stopped by: dedent_below_site  (dropped 44 lines, 1591 bytes)
+  g74 s23  [GGG]        3/3   PLAN_COMPLETED_DELTA_WRONG
+  g74 s24  [GRR]        3/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fenced code blocks before every other line rule, using the `fence` variable: while inside
+        it wrote:         # AT THIS POINT WRITE ONLY THIS: handle fenced code blocks before every other line rule,
+  g74 s25  [GRR]        3/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fenced code blocks before every other line rule, using the `fence` variable: while inside
+        it wrote:         if fence:\n            if line.strip() == "```":\n                if codes or items:\n  
+        bound stopped by: dedent_below_site  (dropped 53 lines, 1524 bytes)
+  g74 s26  [GRR]        3/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fenced code blocks before every other line rule, using the `fence` variable: while inside
+        it wrote:         if fence:\n            if line.strip() == "":\n                flush_code()\n           
+  g74 s27  [GRR]        3/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fenced code blocks before every other line rule, using the `fence` variable: while inside
+        it wrote:         if line.strip() == "":\n            flush_code()\n            flush_link()\n            
+        bound stopped by: dedent_below_site  (dropped 19 lines, 995 bytes)
+  g74 s28  [GGG]        3/3   PLAN_COMPLETED_DELTA_WRONG
+
+  legend  G = loads and old behaviour green   R = loads but old behaviour broke   X = does not load
+
+===== VERDICT TALLY =====
+  10x  FIRST_FAILING_SITE=k (OLD_REGRESSION)
+  3x  FIRST_FAILING_SITE=k (LOAD)
+  3x  PLAN_COMPLETED_DELTA_WRONG
+
+  where the chain first breaks, by site:
+    site 2  6 trajectories
+    site 5  3 trajectories
+    site 6  4 trajectories
+
+  transaction depth (sites completed) per goal:
+    g64  4 4 5 7 7 7 7 7   max 7
+    g74  3 3 3 3 3 3 3 3   max 3

@@ -1,0 +1,8 @@
+if line.startswith("\n"):
+            flush_list()
+        elif re.match(r"^\d+\.\s*", line):
+            flush_ol()
+            ol_items.append(line[2:].strip())
+            continue
+        if current:
+    

@@ -1,0 +1,2 @@
+if fence:
+        blocks.append("<pre><code>" + "\n".join(current) + "</code></pre>")

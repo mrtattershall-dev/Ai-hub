@@ -1,0 +1,23 @@
+if fence:
+            if line.strip() == "":
+                flush_code()
+                continue
+            elif line.startswith("```"):
+                if fence:
+                    flush_code()
+                    break
+                else:
+                    fence = "CODE"
+            elif line.endswith("```"):
+                if fence != "CODE":
+                    raise ValueError(f"Unclosed fence: {line}")
+                flush_code()
+                fence = None
+        elif current:
+            if line.startswith("- "):
+                flush_list()
+                items.append(line[2:].strip())
+            else:
+                flush_para()
+                blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+                del current[:]

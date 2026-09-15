@@ -2238,3 +2238,99 @@ sufficient.
 This also reframes what the earlier v2 success was. `def between(` worked not because it was a good
 instruction - it is barely an instruction at all - but because it made the wanted code the only natural
 continuation. The same property, arrived at by accident rather than design.
+
+
+## RESULT B2: the boundary generalised, and the next defect is mine again
+
+Route `indent_primer`, intent set `b1`, BOUND `d2`, fresh seeds 21-28, goals reported separately.
+
+    goal 64   loads 5/8   OLD KEPT 1/8   NEW DELTA 0/8   VERIFIED 0/8
+    goal 74   loads 8/8   OLD KEPT 2/8   NEW DELTA 0/8   VERIFIED 0/8
+    rollbacks 16/16 byte-exact      reference control 2/2      bound no-op on reference 10/10
+
+### A metric of mine that overstated progress, corrected before it is quoted
+
+The harness aborts a transaction only when an intermediate fails to LOAD. A preservation break is
+recorded and the chain CONTINUES, so later sites get built on a state that already violates the old
+behaviour. v3's `multiInsert` required earlier members to survive; for these B conditions I required
+only that the file load. That is a gap in the apparatus, and it inflates any "sites completed" figure.
+
+                             depth (loaded)        HEALTHY depth (load AND preserve)
+    B1 goal 64               1 1 1 1 1 2 2 2       1 1 1 1 1 1 1 2
+    B2 goal 64               4 4 5 7 7 7 7 7       4 4 4 5 5 5 5 7
+    B1 goal 74               0 0 0 0 0 1 1 3       0 0 0 0 0 1 1 3
+    B2 goal 74               3 3 3 3 3 3 3 3       1 1 1 1 1 1 3 3
+
+**Goal 64's improvement is real and large**: median healthy depth 1 -> 5, max 2 -> 7. **Goal 74's is
+modest**: median 1 -> 1, with 2 of 8 reaching full depth. My interim claim that "every goal-74 chain
+completes" was wrong in the way that matters - they completed in the loading sense while 6 of 8 had
+already broken preservation at site 2.
+
+### The causal profile, from the 2x2 counterfactual replay
+
+    13x LOCAL_SNIPPET_DEFECT      3x DELTA_INCOMPLETE
+     0x UPSTREAM_DEFECT           0x CROSS_SITE_INTERACTION      0x MULTIPLE_DEFECTS
+
+Every counterfactual failure is local: the snippet fails even when transplanted onto reference
+predecessors, and swapping it for the reference rescues the chain. **The oracle edit plan is exonerated**
+- which the reference control already implied and the replay now confirms independently. No
+compositional defects at all.
+
+### Endpoint equivalence does NOT imply causal equivalence - demonstrated, not assumed
+
+Four goal-64 trajectories produce the BYTE-IDENTICAL failure `'a\nb' -> '<p>a a b b</p>'`:
+
+    seed 21   healthy depth 7   earliest causal boundary site 5
+    seed 23   healthy depth 7   earliest causal boundary site 6
+    seed 24   healthy depth 7   earliest causal boundary site 6
+    seed 27   healthy depth 7   earliest causal boundary site 6
+
+Same observable endpoint, different causal site. Goal 74's four identical endpoints all break at site 2
+and DO share a cause. So an endpoint signature is sometimes a diagnosis and sometimes not, and there is
+no way to tell which without the replay. This retrospectively justifies building it.
+
+### What the model actually writes - the fifth apparatus defect, and it is mine
+
+    seed 21   if fence: ... else: current.append(line.strip())
+    seed 22   blocks.append("\n".join(codes + links))
+    seed 23   codes.append(line)
+
+`current` already accumulates every line four lines further down, so seed 21's added `else` makes every
+line accumulate TWICE - that is the whole `a a b b` signature. And `codes` and `links` are not variables
+of `to_html` at all: **they are locals of the neighbouring `_inline` function**, visible in the prompt.
+
+This is B0's neighbour-imitation failure returning at the BODY level. The b1 amendment named the
+identifier to create and the neighbour not to redeclare, but only for the one-line DECLARATION sites.
+For the multi-line body sites the intent says "do not alter the existing branches" - and the model did
+not alter them. It ADDED a redundant branch that shadows them, which the instruction never forbade.
+
+So the b1 amendment was applied incompletely, by me. A sufficient intent for a body site has to say
+that every case the new code does not handle must fall through to the existing code untouched, and
+which identifiers are in scope. That is apparatus, not capability.
+
+### Against the frozen four outcomes
+
+Closest to outcome 2 - "early sites improve, whole transactions still fail; inspect the first failing
+site, redesign nothing else" - and explicitly **NOT outcome 3**. Outcome 3 would license a capability
+statement, and it is not licensed: the content errors trace to an under-specified instruction rather
+than to failed algorithmic competence. The model is doing something quite reasonable in context, which
+is reusing names and patterns it can see.
+
+D2 itself is vindicated on fresh seeds: empty snippets gone, run-ons bounded, healthy depth up sharply
+on goal 64, and the bound proven to be a no-op on all 10 reference sites so the gain is not bought by
+mutilating correct code.
+
+### The honest open question, which is now a design question rather than an experimental one
+
+Five apparatus defects have been found in a row, and each fix revealed the next one. That sequence
+could in principle continue indefinitely, so the interesting question is no longer "is there another
+apparatus defect" but:
+
+> How much specification must the harness supply before a 1.5B can execute a behavioural edit, and is
+> that quantity something a real system could produce without a human writing it per site?
+
+Each amendment so far has moved work from the model to the plan: locations, order, indentation,
+identifiers, and now scope-and-fall-through. If the plan has to specify that much, the architecture's
+hard problem is generating the plan, and the generator's role shrinks toward transcription. That is a
+finding about where the difficulty lives, and it is worth stating plainly rather than discovering after
+three more amendments.

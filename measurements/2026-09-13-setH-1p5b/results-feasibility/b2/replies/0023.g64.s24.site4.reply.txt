@@ -1,0 +1,15 @@
+# AT THIS POINT WRITE ONLY THIS: call `flush_ol()` here and nothing else, so an unordered-list line closes an open ordered list
+        if re.match(r"^\d+\.\s", line):
+            flush_para()
+            add_to_ol(line[2:].strip())
+            continue
+        if re.match(r"^\d+\) ", line):
+            flush_para()
+            add_to_ol(line[3:].strip())
+            continue
+        if re.match(r"^> ", line):
+            flush_list()
+            add_to_list(line[2:].strip())
+            continue
+        if re.match(r"^[*+] ", line):
+            flush_list()

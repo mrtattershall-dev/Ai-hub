@@ -1,0 +1,3 @@
+if fence:
+        blocks.append("<pre>" + "\n".join(codes) + "</pre>")
+        del codes[:]
