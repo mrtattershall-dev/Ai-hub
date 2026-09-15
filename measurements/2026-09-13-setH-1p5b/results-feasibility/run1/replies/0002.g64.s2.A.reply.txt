@@ -1,0 +1,25 @@
+text):
+    lines = text.split("\n")
+
+    blocks = []
+    for line in lines:
+        if _is_heading(line):
+            blocks.append((line, None))
+        elif re.match(r"^\s*\d+\.\s", line):
+            blocks[-1] = (None, line)
+        else:
+            if not blocks or not blocks[-1][0]:
+                blocks.append(("", line))
+            else:
+                blocks[-1] = (blocks[-1][0], blocks[-1][1] + "\n" + line)
+
+    html = []
+    for block in blocks:
+        text, heading = block
+        if heading:
+            heading = _inline(heading)
+            html.append(f"<h{len(heading)}>{heading}</h{len(heading)}>")
+        elif text:
+            text = _inline(text)
+            html.append(f"<p>{text}</p>")
+    return "\n".join(html)

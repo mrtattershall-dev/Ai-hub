@@ -1,0 +1,9 @@
+        if fenced_code_block:
+            if line.strip() == "```":
+                blocks.append("<pre><code>" + "\n".join(fenced_code_block) + "</code></pre>")
+                del fenced_code_block[:]
+            else:
+                fenced_code_block.append(line)
+        elif current or items:
+            flush_list()
+        # This is the actual rule that handles the lines: if it's not a blank line and doesn't start with '-', we're starting a new paragraph.

@@ -1,0 +1,26 @@
+    # and when inside a fence, collect the lines into a list. This will allow us to detect
+    # fenced code blocks, and also to keep their line breaks (\n) escaped, with no other formatting.
+    # We can then process these blocks separately from the rest of the text. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collected lines
+    # and when inside a fence, collect the lines into a list. This will allow us to detect
+    # fenced code blocks, and also to keep their line breaks (\n) escaped, with no other formatting.
+    # We can then process these blocks separately from the rest of the text. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collected lines
+    # and when inside a fence, collect the lines into a list. This will allow us to detect
+    # fenced code blocks, and also to keep their line breaks (\n) escaped, with no other formatting.
+    # We can then process these blocks separately from the rest of the text. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collected lines
+    # and when inside a fence, collect the lines into a list. This will allow us to detect
+    # fenced code blocks, and also to keep their line breaks (\n) escaped, with no other formatting.
+    # We can then process these blocks separately from the rest of the text. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collected lines
+    # and when inside a fence, collect the lines into a list. This will allow us to detect
+    # fenced code blocks, and also to keep their line breaks (\n) escaped, with no other formatting.
+    # We can then process these blocks separately from the rest of the text. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collected lines
+    # and when inside a fence, collect the lines into a list. This will allow us to detect
+    # fenced code blocks, and also to keep their line breaks (\n) escaped, with no other formatting.
+    # We can then process these blocks separately from the rest of the text. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collected lines
+    # and when inside a fence, collect the lines into a list. This will allow us to detect
+    #

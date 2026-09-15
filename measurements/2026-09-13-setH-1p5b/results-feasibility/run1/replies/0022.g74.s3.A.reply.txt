@@ -1,0 +1,25 @@
+text):
+    lines = text.split("\n")
+
+    def _process_line(line):
+        if line.startswith("#"):
+            heading, content = _is_heading(line)
+            return f"<h{heading}>{content}</h{heading}>\n"
+        elif re.match(r"^\s*\d+\.\s", line):
+            list_item = "\n".join(_inline(line[5:]))
+            return f"<ul><li>{list_item}</li></ul>"
+        elif re.match(r"^- ", line):
+            list_item = _inline(line[2:])
+            return f"<ul><li>{list_item}</li></ul>"
+        else:
+            content = _inline(line)
+            if content.startswith("<p>"):
+                content = content[3:-4]
+            if content.endswith("</p>"):
+                content = content[:-4]
+            return f"<p>{content}</p>"
+
+    html = ""
+    for line in lines:
+        html += _process_line(line) + "\n"
+    return html.strip()

@@ -1,0 +1,48 @@
+text):
+    lines = text.split("\n")
+
+    blocks = []
+    for line in lines:
+        if _is_heading(line):
+            level, title = _is_heading(line)
+            blocks.append(f"<h{level}>{title}</h{level}>")
+        elif re.match(r"\s*\*.*?\*", line):  # emphasis
+            blocks.append(_inline(line))
+        elif re.match(r"`.*`", line):  # code span
+            blocks.append(_inline(line))
+        elif re.match(r"^\- ", line):
+            items = []
+            while lines and re.match(r"^- ", lines[0]):
+                item = _inline(lines.pop(0)).strip()
+                if item:
+                    items.append(item)
+            blocks.extend(["<ul><li>" + "</li><li>".join(items) + "</li></ul>"])
+        else:  # normal paragraph
+            blocks.append(_inline(line))
+
+    return "\n".join(blocks)
+
+
+def to_markdown(text):
+    lines = text.split("\n")
+
+    blocks = []
+    for line in lines:
+        if _is_heading(line):
+            level, title = _is_heading(line)
+            blocks.append(f"#{level} {title}")
+        elif re.match(r"\s*\*.*?\*", line):  # emphasis
+            blocks.append(_inline(line))
+        elif re.match(r"`.*`", line):  # code span
+            blocks.append(_inline(line))
+        elif re.match(r"^\- ", line):
+            items = []
+            while lines and re.match(r"^- ", lines[0]):
+                item = _inline(lines.pop(0)).strip()
+                if item:
+                    items.append(item)
+            blocks.extend(["- " + item for item in items])
+        else:  # normal paragraph
+            blocks.append(_inline(line))
+
+    return "\n".join(blocks)

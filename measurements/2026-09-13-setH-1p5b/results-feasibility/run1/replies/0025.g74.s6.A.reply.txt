@@ -1,0 +1,26 @@
+lines):
+    text = ""
+    headings = []
+    for line in lines:
+        if _is_heading(line):
+            heading, content = _is_heading(line)
+            headings.append((heading, content))
+            text += "\n"
+        else:
+            text += "\n" + _inline(line) + "\n"
+
+    output = "<html><body>"
+    for heading, content in headings:
+        if heading == 1:
+            output += '<h1>' + content + '</h1>'
+        elif heading == 2:
+            output += '<h2>' + content + '</h2>'
+        elif heading == 3:
+            output += '<h3>' + content + '</h3>'
+
+    # Add fenced code blocks
+    text = re.sub(r"```(.*)```", r"<pre><code>\1</code></pre>", text)
+
+    output += text
+    output += "</body></html>"
+    return output

@@ -1,0 +1,67 @@
+s):
+    result = []
+    in_block = False
+    code_count = 0
+    link_count = 0
+
+    for line in s.split("\n"):
+        if not in_block:
+            # Check for a heading first.
+            heading_info = _is_heading(line)
+            if heading_info:
+                level, text = heading_info
+                result.append(f"<h{level}>{text}</h{level}>")
+                continue
+
+            # If there's no heading, we're looking at normal text.
+            # Split it into paragraphs based on consecutive blank lines.
+            if not re.match(r"\s*$", line):
+                if code_count > 0:
+                    result.append(f"<pre><code>{line}</code></pre>")
+                else:
+                    result.append("<p>" + _inline(line) + "</p>")
+        else:
+            # Inside a block, we need to handle fenced code and links.
+            if re.match(r"^```", line):
+                in_block = True
+                code_count += 1
+                continue
+            elif re.match(r"^\`\`$", line):
+                in_block = False
+                code_count -= 1
+                continue
+
+            # Handle links inside the block.
+            link_info = _is_heading(line)
+            if link_info:
+                level, text = link_info
+                result.append(f"<h{level}>{text}</h{level}>")
+                continue
+
+            # Handle code inside the block.
+            if re.match(r"^```", line):
+                in_block = True
+                code_count += 1
+                continue
+            elif re.match(r"^\`\`$", line):
+                in_block = False
+                code_count -= 1
+                continue
+
+            if link_count > 0:
+                result.append(f"<a href=\"http://x/a\">{line}</a>")
+            else:
+                result.append("<pre><code>" + _escape(line) + "</code></pre>")
+
+        # Check for consecutive "- " lines.
+        if re.match(r"^- ", line):
+            if code_count > 0:
+                result.append(f"<ul><li>{_inline(line)}</li></ul>")
+            else:
+                result.append("<p>" + _inline(line) + "</p>")
+        elif in_block and not re.match(r"^```", line):
+            in_block = False
+            code_count -= 1
+            continue
+
+    return "\n".join(result)

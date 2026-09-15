@@ -1887,3 +1887,67 @@ Three apparatus defects found in a row - no instruction channel, colliding promp
 route mismatched to the model's training objective - each of which first presented as a model-capability
 result. The work is debugging the interface between the model's training objective and the
 architecture, not the model. Every one of them was caught by dumping bytes, and none by reading code.
+
+## RESULT A: instruction alone does not rescue whole-function replacement (VALID, n=16)
+
+Goals 64 and 74, seeds 1-8 each, the v3 replacement route with the exact goal text supplied through a
+real instruction channel. Reported separately below the pooled line because the two goals share a file
+and a function and are not independent.
+
+    condition A   trials 16   VERIFIED 0/16   loads 15/16   OLD BEHAVIOUR KEPT 0/16
+                  goal 64     VERIFIED 0/8    loads 7/8     old kept 0/8
+                  goal 74     VERIFIED 0/8    loads 8/8     old kept 0/8
+                  output tokens min/median/max 81 / 244 / 1800   hit the cap 1/16
+
+**The code is almost always valid and the behaviour is always wrong.** 15 of 16 load. Zero preserve the
+old behaviour. This is not a truncation artifact: one trial reached the 1800-token cap, the median is
+244 tokens, and the rest terminate on `stop`.
+
+Every seed invents a different renderer, which is the signature of reconstruction rather than editing:
+
+    s2  'a\nb' -> '<h1>a</h1>\n<h1>b</h1>'
+    s3  'a\nb' -> '<p>a</p><p>b</p>'
+    s4  'a\nb' -> '<p>\na\n</p>\nb\n</p>'
+    s5  'a\nb' -> '<p>a</p><ul><li>b</li></ul>'
+    s6  'a\nb' -> '<html><body>a\n\n\nb\n</body></html>'
+    s8  raises Invalid heading level
+
+### The specific behaviour that dies
+
+14 of 16 trials lose **paragraph line-joining** - `to_html("a\nb") == "<p>a b</p>"` - which is goal 4,
+the oldest and most foundational behaviour in the file. The model reconstructs the recent, salient
+features and drops the one that everything else is layered on. An aggregate pass rate would hide this
+completely; it is visible only because the regression suite asserts each accumulated behaviour
+separately. That is an argument for per-behaviour regression suites over a single end-to-end check.
+
+### What this licenses, and what it does not
+
+**Licensed.** Restoring the instruction channel ALONE is insufficient. The missing channel was a real
+apparatus defect, and correcting only it leaves whole-function replacement at 0/16. The model now
+demonstrably knows what was requested and still reconstructs the function instead of preserving its
+accumulated semantics.
+
+**Not licensed.** Any claim that keeping the implementation visible would fix it. That is B1's to earn.
+A is a result about replacement, not evidence about localization.
+
+## B0 data, recorded for the quarantine file rather than for interpretation
+
+    sites completed   g64: 0 0 0 3 0 0 0 0 of 7      g74: 0 3 1 1 1 1 1 0 of 3
+    reached the end of the plan   1/16
+    per-STEP empty snippets       6 of 26 steps attempted
+    abort reasons   6x empty snippet | 4x site 2 load error | 3x site 1 load error
+                    1x site 4 load error | 1x anchor_ambiguous | 1x delta failed
+
+Two details worth keeping, neither of them a capability claim:
+
+  * the single trial that reached the end of its plan (goal 74, seed 2) **kept the old behaviour**
+    while adding a wrong fenced-code implementation. A never managed that in 16 tries. Suggestive of
+    the v4 thesis, and no more than suggestive - n=1, in a condition frozen as apparatus-invalid.
+  * `anchor_ambiguous (3 occurrences)` fired once: a model snippet duplicated text and made a LATER
+    site's anchor non-unique. The transactional harness caught it and rolled back rather than editing
+    an ambiguous location. That is the re-anchoring requirement doing its job for a reason I had not
+    anticipated - I expected anchors to go missing, not to multiply.
+
+### Integrity
+
+    rollbacks 32/32 byte-exact        reference control 2/2 verified

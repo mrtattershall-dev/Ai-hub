@@ -1,0 +1,1 @@
+    # At this point write ONLY THIS: a fence that was never closed must still be emitted at the end of the input

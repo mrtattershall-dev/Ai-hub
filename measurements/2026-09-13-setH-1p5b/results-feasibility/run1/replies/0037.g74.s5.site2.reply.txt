@@ -1,0 +1,21 @@
+        # and then emits the collected lines.
+        if fenced_code_block_state:
+            if line.startswith('```'):
+                blocks.append("\n".join(fenced_code_block_state))
+                fenced_code_block_state = None
+            else:
+                current.append(line.strip())
+        elif line.startswith('```'):
+            blocks.append("\n".join(fenced_code_block_state))
+            fenced_code_block_state = [line.strip()]
+        elif fenced_code_block_state:
+            blocks.append("\n".join(fenced_code_block_state) + "\n" + line)
+            fenced_code_block_state = None
+        elif current:
+            flush_para()
+            if line.startswith("- "):
+                items.append(line[2:].strip())
+            else:
+                blocks.append("<p>" + _inline(line.strip()) + "</p>")
+        else:
+    

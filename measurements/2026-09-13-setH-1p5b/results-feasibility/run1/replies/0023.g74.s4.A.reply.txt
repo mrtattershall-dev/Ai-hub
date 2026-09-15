@@ -1,0 +1,30 @@
+text):
+    lines = text.split("\n")
+
+    html = ""
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if _is_heading(line):
+            level, title = _is_heading(line)
+            html += f"<h{level}>{title}</h{level}>\n"
+            i += 1
+        elif line.strip() == "":
+            # Blank line block
+            html += "<p>\n"
+            while i < len(lines) and lines[i].strip() == "":
+                html += "\n"
+                i += 1
+            html += "</p>\n"
+        else:
+            # Regular paragraph-like line
+            if i + 2 < len(lines):
+                if lines[i + 1] == "```" and lines[i + 2] == "```":
+                    code = "".join(lines[i + 3:i]).strip()
+                    html += "<pre><code>" + _escape(code) + "</code></pre>\n"
+                    i += 4
+            else:
+                html += f"<p>{_inline(line)}</p>\n"
+            i += 1
+
+    return html.strip()

@@ -1,0 +1,22 @@
+text):
+    lines = text.split("\n")
+
+    # Process the header block
+    for i, line in enumerate(lines):
+        if _is_heading(line):
+            level, heading_text = _is_heading(line)
+            lines[i] = f"<h{level}>{heading_text}</h{level}>"
+            break
+
+    # Process the inline text blocks
+    for i, line in enumerate(lines):
+        lines[i] = _inline(line)
+
+    # Process the code blocks
+    for i, line in enumerate(lines):
+        if line.startswith("```"):
+            code_block = "\n".join(lines[i + 1:i + 5])
+            lines[i] = f"<pre><code>{code_block}</code></pre>"
+            break
+
+    return "\n".join(lines)

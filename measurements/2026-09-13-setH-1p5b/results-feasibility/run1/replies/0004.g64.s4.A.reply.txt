@@ -1,0 +1,29 @@
+lines):
+    html = []
+    in_block = False
+    heading_level = 0
+
+    for line in lines:
+        if re.match(r"\n", line):
+            continue
+
+        if not in_block and _is_heading(line):
+            html.append(f"<h{heading_level}>{line[1:]}</h{heading_level}>")
+            heading_level = max(heading_level, len(_is_heading(line)[0]))
+            in_block = True
+            continue
+
+        # Handle ordered lists
+        if re.match(r"^\d+\.\s", line):
+            html.append(f"<ol><li>{line[2:]}</li></ol>")
+            continue
+
+        text = _inline(line)
+        if not in_block:
+            html.append("<p>")
+            in_block = True
+        html.append(text)
+        if in_block:
+            html.append("</p>")
+
+    return "\n".join(html)
