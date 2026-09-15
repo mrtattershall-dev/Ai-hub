@@ -9,6 +9,18 @@ section 3 are deliberate: they make later filling-in visibly prospective rather 
 Evidence lives in `measurements/2026-09-13-setH-1p5b/README.md` and the raw bytes under
 `results-*/`. Where a number appears here it is quoted from there, not recomputed.
 
+**Vocabulary is defined in [`LEGASUS.md`](LEGASUS.md)** — Legasus, LegaCore, LegaGate, LegaVerify,
+LegaParse, LegaLabs, LegaEngine. This document uses those terms; the historical measurement log does not,
+and is not rewritten to.
+
+Mapping this document's layers onto the named components:
+
+    0B DETERMINISTIC LAYER   -> LegaParse (facts) + LegaVerify (proofs, rollback)
+    PLANNER LAYER            -> LegaCore
+    AUTHORITY / ROUTING      -> LegaGate
+    GENERATIVE LAYER         -> the model, as executor
+    MEASUREMENT DISCIPLINE   -> LegaLabs
+
 ---
 
 ## 1. What is already earned
