@@ -49,6 +49,14 @@ const SEEDS = (process.env.SEEDS || '1,2,3,4,5,6,7,8').split(',').map(Number);
 const CONDS = (process.env.CONDS || 'R,A,B').split(',');
 const NPRED_A = Number(process.env.NPRED_A || 1800);
 const NPRED_B = Number(process.env.NPRED_B || 600);
+// ROUTE: 'zero_width' is B0's formulation, frozen as apparatus-invalid. 'indent_primer' is the route
+// the three-way probe selected under its preregistered criterion - the prefix ends with the site's
+// indentation, so stopping is not a valid continuation, and no semantic content is added beyond the
+// indentation the site already implies.
+const ROUTE = process.env.ROUTE || 'zero_width';
+// INTENT: 'b0' is the original per-site intent; 'b1' is the disambiguated set, which names the
+// identifier to create and the neighbouring identifier NOT to touch. See the B1 amendment.
+const INTENT = process.env.INTENT || 'b0';
 const DECODE = { temperature: 0.7, top_p: 0.8, top_k: 20, repeat_penalty: 1.1, repeat_last_n: 64 };
 
 const OUT = process.env.OUTDIR || mkdtempSync(join(tmpdir(), 'feas-'));
@@ -131,12 +139,15 @@ async function runB({ goal, seed, useReference }) {
   const source0 = readFileSync(path, 'utf8');
   const rec = { goal, seed, condition: useReference ? 'R_reference_control' : 'B_oracle_localized_insertion',
     label: useReference ? 'NO MODEL' : 'ORACLE_LOCALIZATION_FEASIBILITY',
+    route: ROUTE, intent_set: INTENT,
     sites_total: spec.sites.length, source0_sha: sha(source0), steps: [], aborted_at: null, why: '' };
 
   let cur = source0;
   for (let i = 0; i < spec.sites.length; i++) {
     const site = spec.sites[i];
-    const step = { site_index: i + 1, purpose: site.purpose, indent: site.indent,
+    const purpose = (INTENT === 'b1' && site.purpose_b1) ? site.purpose_b1 : site.purpose;
+    const ind = ' '.repeat(site.indent);
+    const step = { site_index: i + 1, purpose, intent_set: INTENT, route: ROUTE, indent: site.indent,
       source_sha_before: short(cur), anchor_found: false };
     const loc = locate(cur, site);
     if (!loc.ok) {
@@ -155,14 +166,27 @@ async function runB({ goal, seed, useReference }) {
       // apparatus that accepts everything would also report 7/7. MUTATE_SITE=n corrupts exactly that
       // site, and the run MUST abort there and roll back byte-exactly.
       if (Number(process.env.MUTATE_SITE || 0) === i + 1) {
-        snippet = ' '.repeat(site.indent) + 'if True(  # deliberately broken by MUTATE_SITE\n';
+        snippet = ind + 'if True(  # deliberately broken by MUTATE_SITE\n';
         step.source = 'MUTATED';
+      }
+      // Under the indent-primer route the harness re-adds the site indentation to whatever comes back,
+      // because the prompt consumed it. The control must exercise that SAME assembly path or it is not
+      // a control for this apparatus: the reference snippet is de-indented and re-assembled, and the
+      // result must equal the reference byte for byte.
+      if (ROUTE === 'indent_primer' && step.source === 'reference') {
+        const deIndented = snippet.startsWith(ind) ? snippet.slice(ind.length)
+          : snippet.replace(new RegExp('^\\n' + ind), '\n');
+        const reassembled = snippet.startsWith(ind) ? ind + deIndented : snippet;
+        step.primer_assembly_lossless = reassembled === snippet;
+        snippet = reassembled;
       }
       step.generated_bytes = snippet.length;
     } else {
-      const genPrefix = loc.before + instructionB(goalText, site.purpose, site.indent);
+      const genPrefix = loc.before + instructionB(goalText, purpose, site.indent)
+        + (ROUTE === 'indent_primer' ? ind : '');
       const out = await callModel('g' + goal + '.s' + seed + '.site' + (i + 1), genPrefix, loc.after, seed, NPRED_B);
-      snippet = out.text;
+      snippet = ROUTE === 'indent_primer' ? ind + out.text : out.text;
+      step.echoed_instruction = /EXISTING and AUTHORITATIVE|REQUESTED CHANGE|AT THIS POINT WRITE ONLY/i.test(snippet);
       Object.assign(step, { wire_id: out.wire_id, eval_count: out.eval_count, done_reason: out.done_reason,
         hit_cap: out.hit_cap, transport_error: out.transport_error, generated_bytes: snippet.length,
         ends_with_newline: /\n$/.test(snippet), snippet_head: snippet.slice(0, 140).replace(/\n/g, '\\n') });

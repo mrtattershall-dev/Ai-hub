@@ -1,0 +1,5 @@
+# AT THIS POINT WRITE ONLY THIS: add a new line in the accumulator list for each block
+    # AT THIS POINT WRITE ONLY THIS: when an empty line is encountered, flush the current paragraph and list items to the blocks list
+    # AT THIS POINT WRITE ONLY THIS: when a heading is encountered, flush the current paragraph and list items to the blocks list
+    # AT THIS POINT WRITE ONLY THIS: when an ordered list item is encountered, add it to the items list
+    # AT THIS POINT WRITE ONLY THIS: at the end of the text, flush any remaining paragraphs and list items to the blocks list

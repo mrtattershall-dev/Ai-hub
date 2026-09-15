@@ -1951,3 +1951,102 @@ Two details worth keeping, neither of them a capability claim:
 ### Integrity
 
     rollbacks 32/32 byte-exact        reference control 2/2 verified
+
+## ROUTE SELECTION, and B1 frozen before it runs
+
+### The route probe (developmental, goal 64, sites 1 and 5, seeds 1-4, 8 trials per route)
+
+    route              n   responsive(as-run)  responsive(echo-fixed)  echoed  loads  oldKept
+    V1_comment_only    8   5/8                 4/8                     2       4      4
+    V2_indent_primer   8   8/8                 6/8                     2       6      4
+    V3_chat            8   7/8                 7/8                     1       1      1
+
+    ELIGIBLE (>= 6/8 responsive):  V2_indent_primer, V3_chat
+    CHOSEN:                        V2_indent_primer - most candidates that LOAD (6 vs 1)
+
+**An instrument bug in my own criterion, and why it did not matter.** The preregistered definition of
+RESPONSIVE is "non-empty AND does not echo the instruction", but I implemented `echo` as only three of
+the instruction's phrases and omitted `AT THIS POINT WRITE ONLY THIS`. A 584-byte reply that began with
+exactly that phrase scored `echo=false`. The definition did not change; its implementation was
+incomplete, so it is fixed and both countings are shown above. **The winner is the same under both**,
+and V1 fails the eligibility bar under both. The bug existed and was not decision-relevant. Recomputed
+over the preserved replies with no new inference - the second time today that preserving bytes removed
+the need to re-run anything.
+
+**V3_chat is not rescued.** Its snippets come back with no leading indentation despite being told the
+column, so 7 of 8 are responsive and only 1 loads. The frozen rule already prices that in. Adding
+deterministic re-indentation would be a DIFFERENT route (V3b) needing its own developmental validation,
+not a cleanup applied to the route the probe selected.
+
+### The site-1 finding, which is not about the route at all
+
+All three interfaces converge on copying the neighbouring line instead of following the intent:
+
+    existing line      items = []
+    oracle intent      "declare the accumulator list for ordered-list items, beside the existing
+                        items list"
+    V1 s1              items = []            loads, old kept - harmless duplicate, wrong content
+    V2 s2              items.append("")      loads, old BROKEN
+    V2 s3              items.append([])      loads, old BROKEN
+    V3 s1-s3           items = []            no indentation at all, does not load
+    V3 s4              items = []            loads, old kept
+
+Not irrational. "An accumulator list beside the existing items list" does not uniquely determine a new
+identifier - the reference implementation knows it is `ol_items`, the prompt never said so. Three
+different interfaces producing the same neighbour-imitation is early evidence that **local context can
+overpower a weak local instruction for this model**. And the inversion is the tell: the SUBSTANTIVE
+branch at site 5 was generated correctly by some seeds (V1 s4 and V2 s2, ~70 bytes, loads, old
+behaviour kept) while the trivial one-line declaration failed everywhere. Difficulty did not predict
+failure; specification quality did.
+
+### AMENDMENT before B1: the oracle intent must uniquely specify what to create
+
+Sending a knowingly underdetermined local instruction into the supposedly oracle-assisted condition
+would mean a later failure could not be attributed to the model. So B's oracle assistance is widened,
+transparently, and the definition is restated in full. **B supplies:**
+
+    insertion locations
+    insertion order
+    required indentation and context
+    local semantic intent
+    required local IDENTIFIERS wherever they are needed to make the edit uniquely specified
+
+Both intent sets are kept in the apparatus - `purpose` (B0) and `purpose_b1` - so the change is visible
+rather than retrofitted. Example:
+
+    b0   declare the accumulator list for ordered-list items, beside the existing items list
+    b1   declare a separate ordered-list accumulator named `ol_items`, initialised to an empty list;
+         do not modify or redeclare `items`
+
+The intents name the identifier to create and the neighbour NOT to touch. They do not dictate the code:
+site 2 says "mirror the existing flush_list but emit an <ol> block from ol_items", not the expression.
+
+This makes the eventual claim NARROWER and cleaner. B1 tests whether the 1.5B can EXECUTE a correct,
+unambiguous edit plan - not whether it can resolve an ambiguous one, and not whether any system could
+derive the plan.
+
+### B1, frozen
+
+    condition             B1_oracle_localized_insertion
+    generation route      indent_primer, selected by the frozen criterion above
+    oracle intent set     b1 (identifier-disambiguated)
+    seed panel            11-18, FRESH - never used to select the route, so the route is not judged on
+                          the trajectories that chose it
+    goals                 64 and 74, reported separately, never pooled
+    sites, order          unchanged from the proven reference patch
+    transactional gates   unchanged - re-anchor against source_{n-1} every step, each intermediate must
+                          load, any failure rolls back to source_0 byte-exactly
+    num_predict           600, hit_cap recorded
+
+### Controls re-run against the EXACT B1 apparatus, because a route change is a harness change
+
+    reference control R             goal 64  7/7 sites, intermediates [LR x7]   VERIFIED
+                                    goal 74  3/3 sites, intermediates [LR x3]   VERIFIED
+    primer assembly lossless        10/10 sites - the reference snippet de-indented and re-assembled
+                                    through the primer path is byte-identical to the reference
+    known-bad witness               MUTATE_SITE=1 aborts at 1 (0/7), =5 aborts at 5 (4/7),
+                                    =7 aborts at 7 (6/7), rollback byte-exact each time
+
+The primer-assembly check exists because the chosen route makes the harness re-add the site
+indentation to whatever the model returns. A control that never exercised that assembly step would not
+be a control for this apparatus.

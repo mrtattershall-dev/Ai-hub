@@ -1,0 +1,4 @@
+    # and then in the existing s4_markdown.py: add this block after the "flush_list" line:
+    # if len(items) > 0:
+    #     blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+    #     del items[:]

@@ -1,0 +1,6 @@
+if re.match(r"^\d+\.\s", line):
+            flush_para()
+            items.append(line[2:].strip())
+            continue
+        if current:
+    

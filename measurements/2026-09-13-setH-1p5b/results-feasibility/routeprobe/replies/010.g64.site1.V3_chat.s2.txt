@@ -1,0 +1,5 @@
+```python
+items = []
+```
+
+This line inserts an empty list `items` after the declaration of `current` in the function `to_html`. This list will be used to store the ordered list items and will be flushed to HTML when it becomes complete, similar to how unordered lists are handled.

@@ -1,0 +1,6 @@
+```python
+if line.startswith("1. "):
+    flush_list()
+    items.append(line[3:].strip())
+```
+The new branch: a line starting with a number, a dot and a space is an ordered-list item; close any paragraph and unordered list, collect the text after the marker, and continue
