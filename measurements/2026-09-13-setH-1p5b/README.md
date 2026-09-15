@@ -2565,3 +2565,34 @@ FIM weights** - a real constraint on the design, and one that no benchmark numbe
 Running `CONDS=A` printed `reference control: 0/0 <-- READ NOTHING ELSE UNTIL FIXED`, which reads as a
 failed control rather than an un-requested one. The warning now fires only when R was actually
 requested. A frightening message with no defect behind it is its own kind of wrong.
+
+### General vs coder at 7B, whole-file chat route (goal 64 only; goal 74 INVALID)
+
+The general model cannot do FIM, so the only route both support is whole-file generation over
+`/api/chat`. Not comparable to conditions A or B - different route, whole file rather than a span.
+
+    qwen2.5-coder:7b   goal 64   loads 3/3   OLD KEPT 3/3   DELTA 0/3   VERIFIED 0/3
+    qwen2.5:7b         goal 64   loads 3/3   OLD KEPT 1/3   DELTA 0/3   VERIFIED 0/3
+
+**Goal 74 on this route is VOID, and the defect is mine.** Goal 74 is the FENCED CODE BLOCK goal, so a
+correct generated file legitimately contains a triple-backtick fence - which terminates my
+fence-delimited code-block extractor. The coder's goal-74 replies contain 5 fences and my extractor
+captured **0 bytes**, scoring 0/3 for a reason that has nothing to do with the model. A delimiter that
+also appears in the payload is not a delimiter. The general model's goal-74 numbers are void for the
+same reason even though they happened to extract.
+
+On the one valid cell, the specialisation shows up in **preservation, not in the delta**: the coder
+keeps every existing behaviour 3/3 while the general model keeps it 1/3, and neither implements the
+requested change even once. Consistent with the project's earlier general-vs-coder finding, and n=3.
+
+### What the GPU window cost and produced
+
+One A10G, deployed and stopped the same hour, `modal app stop --yes` verified (state `stopped`,
+0 tasks, endpoint 404). Two models pulled into one container on a shared volume. The findings that
+survive it:
+
+  1. whole-function replacement fails identically at 1.5B and 7B, in the same place, for the same
+     reason - so that failure is task shape, not capacity;
+  2. the localized+bounded route produced the only verified behavioural edit anywhere in this
+     sequence;
+  3. the general 7B cannot use this architecture at all, because it ships no FIM weights.
