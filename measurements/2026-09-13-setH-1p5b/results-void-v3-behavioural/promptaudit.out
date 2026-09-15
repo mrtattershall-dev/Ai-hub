@@ -1,0 +1,72 @@
+  INSTRUMENT AUDIT - no model tokens spent; stub on port 49902
+  goals 61-80   arms v2 + v3
+
+  [v2 61 ] content_edit                   calls=1  chat:6c6a222002b46805/2500
+  [v2 62 ] add_function                   calls=1  fim:8bd1edd5f48cb4ca/600
+  [v2 63 ] add_method                     calls=1  fim:b0f12b050e113ddf/600
+  [v2 64 ] content_edit                   calls=1  chat:c37d65c750d5ea1b/2500
+  [v2 65 ] content_edit                   calls=1  chat:fee4e59536e91b68/2500
+  [v2 66 ] add_method                     calls=1  fim:380474c0eeac39ed/600
+  [v2 67 ] content_edit                   calls=1  chat:33ceef43814ee5be/2500
+  [v2 68 ] add_method                     calls=1  fim:b0e78d406f3431b5/600
+  [v2 69 ] content_edit                   calls=1  chat:c2b7f016a8bb557f/2500
+  [v2 70 ] add_function                   calls=1  fim:1597b6e7fffe036c/600
+  [v2 71 ] add_method                     calls=1  fim:0e9300ca9a04bf2f/600
+  [v2 72 ] add_function                   calls=1  fim:554d78541fca04a9/600
+  [v2 73 ] add_method                     calls=1  fim:6b2a9264fbcb0fd6/600
+  [v2 74 ] content_edit                   calls=1  chat:59e5caa26dcbced1/2500
+  [v2 75 ] add_function                   calls=1  fim:8f39ed86eab1f755/600
+  [v2 76 ] add_method                     calls=1  fim:87b32f66f8a93075/600
+  [v2 77 ] add_method                     calls=1  fim:fb89c0e6cfb40502/600
+  [v2 78 ] add_method                     calls=1  fim:e5e50b7ecdefd018/600
+  [v2 79 ] content_edit                   calls=1  chat:a45a537dc72689e0/2500
+  [v2 80 ] content_edit                   calls=1  chat:535b090f445e4af1/2500
+
+  [v3 61 ] delegated_to_v2                calls=1  chat:6c6a222002b46805/2500
+  [v3 62 ] delegated_to_v2                calls=1  fim:8bd1edd5f48cb4ca/600
+  [v3 63 ] delegated_to_v2                calls=1  fim:b0f12b050e113ddf/600
+  [v3 64 ] safe_behavioural_replacement   calls=1  fim:9e2cc65132a30dad/900
+  [v3 65 ] delegated_to_v2                calls=1  chat:fee4e59536e91b68/2500
+  [v3 66 ] delegated_to_v2                calls=1  fim:380474c0eeac39ed/600
+  [v3 67 ] delegated_to_v2                calls=1  chat:33ceef43814ee5be/2500
+  [v3 68 ] delegated_to_v2                calls=1  fim:b0e78d406f3431b5/600
+  [v3 69 ] delegated_to_v2                calls=1  chat:c2b7f016a8bb557f/2500
+  [v3 70 ] delegated_to_v2                calls=1  fim:1597b6e7fffe036c/600
+  [v3 71 ] multi_member_insertion         calls=1  fim:0e9300ca9a04bf2f/900
+  [v3 72 ] delegated_to_v2                calls=1  fim:554d78541fca04a9/600
+  [v3 73 ] delegated_to_v2                calls=1  fim:6b2a9264fbcb0fd6/600
+  [v3 74 ] safe_behavioural_replacement   calls=1  fim:9e2cc65132a30dad/900
+  [v3 75 ] delegated_to_v2                calls=1  fim:8f39ed86eab1f755/600
+  [v3 76 ] delegated_to_v2                calls=1  fim:87b32f66f8a93075/600
+  [v3 77 ] delegated_to_v2                calls=1  fim:fb89c0e6cfb40502/600
+  [v3 78 ] delegated_to_v2                calls=1  fim:e5e50b7ecdefd018/600
+  [v3 79 ] delegated_to_v2                calls=1  chat:a45a537dc72689e0/2500
+  [v3 80 ] multi_member_insertion         calls=1  fim:ae60fa535b9f1134/900
+
+===== COLLISIONS: two goals whose prompts are byte-identical =====
+  INSTRUMENT FAILURE  v3  route safe_behavioural_replacement  prompt 9e2cc65132a30dad  shared by goals 64, 74
+
+===== SIGNAL: does the prompt say what THIS goal wants? =====
+  NO SIGNAL  v3 goal 64  route safe_behavioural_replacement
+             goal text in prompt: no
+             contract identifiers: to_html  -- all already in s4_markdown.py: to_html
+             so nothing in the prompt distinguishes this goal from any other goal targeting the same symbol
+  NO SIGNAL  v3 goal 74  route safe_behavioural_replacement
+             goal text in prompt: no
+             contract identifiers: to_html  -- all already in s4_markdown.py: to_html
+             so nothing in the prompt distinguishes this goal from any other goal targeting the same symbol
+
+  witnesses:  goal 62 (known-good, must be SIGNAL) = SIGNAL  OK   |  goals 64/74 (known-bad, must be NO SIGNAL) = NO SIGNAL  OK
+
+===== SUMMARY =====
+  prompt collisions      1   <-- INSTRUMENT FAILURE
+  goals with no signal   2/40   <-- INSTRUMENT FAILURE
+  routes exercised:
+    v2 add_function                         4
+    v2 add_method                           8
+    v2 content_edit                         8
+    v3 delegated_to_v2                      16
+    v3 multi_member_insertion               2
+    v3 safe_behavioural_replacement         2
+
+  RAW = C:\Users\tatte\AppData\Local\Temp\promptaudit-wQNKU3
