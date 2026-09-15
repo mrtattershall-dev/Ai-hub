@@ -57,6 +57,32 @@ const ROUTE = process.env.ROUTE || 'zero_width';
 // INTENT: 'b0' is the original per-site intent; 'b1' is the disambiguated set, which names the
 // identifier to create and the neighbouring identifier NOT to touch. See the B1 amendment.
 const INTENT = process.env.INTENT || 'b0';
+// BOUND: 'none' accepts whatever the generator emits. 'd2' bounds the snippet to the site, which B1
+// showed is the binding constraint - the model writes the correct first statement and then runs on into
+// invented helpers, re-declarations of existing code, and more lines in the instruction's own comment
+// format. Uses NO oracle information. The instruction text is deliberately left unchanged so that B2
+// isolates this one variable.
+const BOUND = process.env.BOUND || 'none';
+
+const indentOf = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
+function boundToSite(snippet, indent, src) {
+  const structural = new Set(src.split('\n').map((l) => l.trim()).filter((l) => l.length > 3));
+  const lines = snippet.split('\n');
+  const keep = [];
+  let stoppedBy = null;
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    const t = l.trim();
+    if (i > 0) {
+      if (t && indentOf(l) < indent) { stoppedBy = 'dedent_below_site'; break; }
+      if (/^#/.test(t) && /WRITE ONLY|REQUESTED CHANGE|AUTHORITATIVE|MARKER/i.test(t)) { stoppedBy = 'instruction_echo'; break; }
+      if (/^(def|for|while|class)\b/.test(t) && structural.has(t)) { stoppedBy = 'redeclares_existing'; break; }
+    }
+    keep.push(l);
+  }
+  while (keep.length && !keep[keep.length - 1].trim()) keep.pop();
+  return { text: keep.join('\n') + '\n', stoppedBy, droppedLines: lines.length - keep.length };
+}
 const DECODE = { temperature: 0.7, top_p: 0.8, top_k: 20, repeat_penalty: 1.1, repeat_last_n: 64 };
 
 const OUT = process.env.OUTDIR || mkdtempSync(join(tmpdir(), 'feas-'));
@@ -180,6 +206,14 @@ async function runB({ goal, seed, useReference }) {
         step.primer_assembly_lossless = reassembled === snippet;
         snippet = reassembled;
       }
+      // The bound must be a NO-OP on a known-good snippet. A bound that also truncates correct code
+      // would raise the pass rate by mutilating the reference, and the control is the only thing that
+      // can tell those two apart.
+      if (BOUND === 'd2' && step.source === 'reference') {
+        const b = boundToSite(snippet, site.indent, cur);
+        step.bound_is_noop_on_reference = b.text.replace(/\s+$/, '') === snippet.replace(/\s+$/, '');
+        step.bound_stopped_by = b.stoppedBy;
+      }
       step.generated_bytes = snippet.length;
     } else {
       const genPrefix = loc.before + instructionB(goalText, purpose, site.indent)
@@ -187,6 +221,14 @@ async function runB({ goal, seed, useReference }) {
       const out = await callModel('g' + goal + '.s' + seed + '.site' + (i + 1), genPrefix, loc.after, seed, NPRED_B);
       snippet = ROUTE === 'indent_primer' ? ind + out.text : out.text;
       step.echoed_instruction = /EXISTING and AUTHORITATIVE|REQUESTED CHANGE|AT THIS POINT WRITE ONLY/i.test(snippet);
+      step.raw_snippet_bytes = snippet.length;
+      if (BOUND === 'd2') {
+        const b = boundToSite(snippet, site.indent, cur);
+        step.bound_stopped_by = b.stoppedBy;
+        step.bound_dropped_lines = b.droppedLines;
+        step.bound_trimmed_bytes = snippet.length - b.text.length;
+        snippet = b.text;
+      }
       Object.assign(step, { wire_id: out.wire_id, eval_count: out.eval_count, done_reason: out.done_reason,
         hit_cap: out.hit_cap, transport_error: out.transport_error, generated_bytes: snippet.length,
         ends_with_newline: /\n$/.test(snippet), snippet_head: snippet.slice(0, 140).replace(/\n/g, '\\n') });

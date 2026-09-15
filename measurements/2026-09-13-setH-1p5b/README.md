@@ -2119,3 +2119,58 @@ must be re-measured on a FRESH seed panel before it counts as a result. That is 
     4  no stop condition at the site boundary                   found by preserving over-long replies
 
 None was found by reading harness code. All four were found by keeping the bytes.
+
+## B2 frozen before running: one variable, the site boundary
+
+B1 identified a missing stop condition as the binding constraint. B2 adds exactly that and nothing
+else.
+
+    condition           B2_bounded_oracle_localized_insertion
+    changed from B1     BOUND=d2 only
+    unchanged           route indent_primer, intent set b1, sites, order, indentation, transactional
+                        gates, num_predict 600, and THE INSTRUCTION TEXT
+    seed panel          21-28, FRESH - not the panel that chose the route (1-4) and not B1's (11-18)
+    goals               64 and 74, reported separately, never pooled
+
+The instruction text is deliberately left alone even though B1 showed it teaches the model to write
+more instruction comments (14 of 31 steps echoed it). Changing the wording AND adding the bound in one
+step would leave neither attributable. The bound already stops at an instruction-echo line, so the
+echo's effect is absorbed rather than hidden; rewording is a separate later variable if it is still
+needed.
+
+### The bound, stated exactly - no oracle information
+
+Truncate the snippet at the first line that
+
+    dedents below the site indentation            (left the site)
+    looks like an instruction comment             (continuing the prompt's own format)
+    re-declares a structural line already in the  (def/for/while/class already in source_{n-1})
+      source
+
+then strip trailing blank lines. Nothing here consults the reference patch or the expected length.
+
+### Controls re-run against the B2 apparatus
+
+    reference control R         goal 64 7/7 [LR x7] VERIFIED   goal 74 3/3 [LR x3] VERIFIED
+    bound is a NO-OP on the     10/10 sites unchanged
+      reference
+    primer assembly lossless    10/10 sites
+    known-bad witness           MUTATE_SITE=2 aborts at 2 (1/7), =5 aborts at 5 (4/7), rollback
+                                byte-exact
+
+The no-op check is the one that matters most here. A bound that truncated correct code as well as
+run-on would raise the pass rate by mutilating the reference, and this control is the only thing that
+distinguishes "stops the run-on" from "trims everything". It is the same trap as an over-strict checker
+that passes every known-bad test.
+
+### Preregistered reading
+
+    B2 works while A stays 0/16     the model can EXECUTE a correct, unambiguous, bounded edit plan;
+                                    the remaining research problem is deriving the plan
+    B2 still fails at the same      the bound was not the constraint either; report the next mechanism
+      sites                         rather than another count
+    B2 fails at LATER sites         progress is real but the chain length is the limit - worth
+      than B1                       measuring per-site survival rather than per-goal pass
+
+D2 was written while looking at B1's trajectories, so THIS run on fresh seeds is what decides whether
+it generalises. If B2 succeeds only on the seeds D2 was tuned against, that is a negative result.
