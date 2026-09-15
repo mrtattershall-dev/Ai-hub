@@ -2403,3 +2403,68 @@ could fill; a field only I can write is an oracle in disguise. `scopeFacts` corr
 `links` - the two names B2 actually misused - as locals of `_inline`, and two of its own defects were
 caught by asking what it must NOT forbid: it initially called `text` foreign (it is `to_html`'s own
 parameter) and `i` foreign (the correct `flush_ol` writes `for i in ol_items`).
+
+
+## B3 frozen and running: fresh seeds 31-38
+
+    B2
+    + corrected goal-64 oracle (site 3 anchored BEFORE the continue, so it is reachable)
+    + strengthened probe64 (assertion H: a blank line must close an open ordered list)
+    + STRICT - abort on load OR preservation failure
+    + semantic-contrast plan (owns / not-available-here / sole fallthrough)
+    + DERIVED in-scope and out-of-scope identifiers
+    = B3            seeds 31-38, goals 64 and 74 reported separately, never pooled
+
+Everything else is unchanged: route `indent_primer`, bound `d2`, `num_predict` 600, the same oracle
+sites and order, byte-exact rollback.
+
+### The refusal gate is deliberately NOT in this run
+
+It would change WHICH operations reach the model at all, so a B3 improvement could no longer be
+attributed between "better semantic specification" and "difficult sites filtered out before
+generation". It matters for the architecture; it is not needed for the current question, which is now
+narrow:
+
+> Once generation is bounded and the local contract states semantic contrasts, scope and preserved
+> fall-through, does the 1.5B execute the behavioural transaction more successfully?
+
+### Historical records are NOT retroactively corrected
+
+B0, B1 and B2 stand as experiments under the apparatus they actually ran on. One qualification is
+recorded rather than applied backwards: **any claim that depended specifically on site 3 being a
+semantically exercised operation is not trustworthy under the old apparatus**, because that insertion
+was unreachable. Endpoint counts are unaffected (0 remains 0); per-site mechanism claims about site 3
+are not.
+
+### What defect 6 actually was, in general terms
+
+    reference says PASS
+    probe says PASS
+    the specification says FAIL
+
+The reference implementation and its oracle agreed with each other because both missed the same
+behaviour - the self-confirming evaluator, in a new costume. It was exposed by a NEGATIVE witness
+asking whether a supposedly meaningful site could influence execution at all. Positive controls could
+never have found it: they only ever asked the reference to pass.
+
+### The information split this run establishes
+
+    ORACLE / human            what behaviour this local operation owns
+    DETERMINISTICALLY DERIVED which names exist here, which belong to other functions, where
+                             generation may occur, where it must stop
+
+The second category is computed by `scope.mjs` and `boundToSite`. The more that moves from the first
+column to the second, the less intelligence is being supplied by hand - and that ratio, not the pass
+rate, is the honest measure of whether this is an architecture or an oracle demonstration.
+
+### Next experiment, after B3 is interpreted
+
+The refusal gate, with its own positive and negative witnesses:
+
+    PASS    target unique, scope known, required identifiers resolved, existing owner and fallthrough
+            known, boundary derivable
+    REFUSE  ambiguous target, unresolved identifier, ambiguous ownership, conflicting transitions,
+            unknown scope, edit not expressible in the allowed local operations
+
+The trap to design against is the one already met twice: a gate that refuses everything passes every
+known-bad test. It needs a proven known-good plan that it must NOT refuse.
