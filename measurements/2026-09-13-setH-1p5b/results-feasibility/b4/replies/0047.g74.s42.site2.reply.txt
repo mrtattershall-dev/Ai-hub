@@ -1,0 +1,24 @@
+if line.strip() == "```":
+            if codes:
+                blocks.append("<pre><code>" + "\n".join(codes) + "</code></pre>")
+                del codes[:]
+            elif links:
+                blocks.append("<pre><code>" + "\n".join(links) + "</code></pre>")
+                del links[:]
+            else:
+                current.append(line.strip())
+        elif line.strip() == "```":
+            if codes:
+                text = "".join(codes)
+                codes.clear()
+                text = _inline(text)
+                blocks.append("<pre><code>" + text + "</code></pre>")
+            elif links:
+                text = "".join(links)
+                links.clear()
+                text = _inline(text)
+                blocks.append("<pre><code>" + text + "</code></pre>")
+            else:
+                current.append(line.strip())
+        else:
+    

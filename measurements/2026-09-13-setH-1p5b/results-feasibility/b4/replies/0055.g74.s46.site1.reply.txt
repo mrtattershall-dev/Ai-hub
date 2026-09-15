@@ -1,0 +1,64 @@
+# NOT AVAILABLE HERE: take_code, take_link, url
+    codes = []
+    label = None
+    links = []
+    m = None
+
+    def take_code(m):
+        codes.append("<code>" + _escape(m.group(1)) + "</code>")
+        return _CODE % (len(codes) - 1)
+
+    text = re.sub(r"`([^`]*)`", take_code, text)
+
+    def take_link(m):
+        label = _escape(m.group(1))
+        url = _escape(m.group(2)).replace('"', "&quot;")
+        links.append('<a href="' + url + '">' + label + "</a>")
+        return _LINK % (len(links) - 1)
+
+    text = re.sub(r"\[([^\]]*)\]\(([^)]*)\)", take_link, text)
+
+    def url(m):
+        return _escape(m.group(1)).replace('"', "&quot;")
+
+    # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+    # REQUESTED CHANGE: Add fenced code blocks to to_html in the EXISTING s4_markdown.py: the lines between two lines of ``` become <pre><code>...</code></pre>, keeping their line breaks ("\n"), escaped, with no other formatting; a fence that is never closed runs to the end of the text. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collected lines
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    # NOT AVAILABLE HERE: take_code, take_link, url
+
+    def flush_para():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            continue
+        if line.startswith("- "):
+            flush_para()
+            items.append(line[2:].strip())
+            continue
+        flush_list()
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to

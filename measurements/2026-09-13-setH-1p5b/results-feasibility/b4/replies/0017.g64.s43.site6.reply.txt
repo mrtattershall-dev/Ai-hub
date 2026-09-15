@@ -1,0 +1,57 @@
+# NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+        if h and items:
+            flush_list()
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+def to_html(text):
+    blocks = []
+    current = []
+    items = []
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+    def flush_para():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+    def flush_code():
+        if codes:
+            blocks.append("<code>" + _inline(" ".join(codes)) + "</code>")
+            del codes[:]
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+            continue
+        if line.startswith("- "):
+            flush_para()
+            # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+            items.append("\n".join(items))
+            items.clear()
+            continue
+            items.append(line[2:].strip())
+            continue
+        if line.startswith("# "):
+            flush_para()
+        flush_list()
+        h = _is_heading(line)
+        # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+        # REQUESTED CHANGE: Add ordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a number, a dot and a space ("1. ") become <ol><li>...</li>...</ol>, written like the unordered lists. Run it with python.
+        # AT THIS POINT WRITE ONLY THIS: any other kind of line must close an open ordered list
+        # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+        if h and items:
+            flush_list()
+            blocks.append("<ol

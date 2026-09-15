@@ -1,0 +1,23 @@
+if line.strip() == "```":
+            if m:
+                blocks.append("<pre>" + "\n".join(codes) + "</pre>")
+                del codes[:]
+            m = line
+            continue
+
+        if m and line.startswith("```"):
+            blocks.append("<pre>" + "\n".join(codes) + "\n</pre>")
+            del codes[:]
+
+            codes.clear()
+            links.clear()
+
+            items.clear()
+
+            # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): take_code, take_link, url
+            m = None
+
+        if m:
+            codes.append(line)
+        else:
+    

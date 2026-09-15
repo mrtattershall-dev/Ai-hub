@@ -1,0 +1,4 @@
+# AT THIS POINT WRITE ONLY THIS: define the following functions:
+    # flush_para() - write all current lines as <p> with inline formatting
+    # flush_list() - write all current items in a list, one per line, with inline formatting
+    # define _is_heading(line) - return None if not a heading, otherwise a tuple (level, body), where level is 1, 2, or 3 and body is the text of the heading

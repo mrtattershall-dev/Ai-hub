@@ -2935,3 +2935,92 @@ If an 11% per-step harmless refusal rate were roughly independent across seven s
 would be about 0.89^7 = 44%. A gate can therefore look strong as a step classifier and still remove more
 than half of all viable transactions. Admission rate, verified-among-admitted, and verified-chains-
 destroyed are the quantities that expose that; step-level discrimination alone cannot.
+
+
+## RESULT: the frozen gate on unseen trajectories (B4, seeds 41-48, 1.5B)
+
+Every frozen file verified byte-identical to its preregistered hash before the analyser was run, so the
+provenance chain held: rules frozen -> endpoint frozen -> analyser frozen -> unseen inference ->
+decisions recorded -> labels revealed.
+
+### Step level: the classifier GENERALIZED
+
+    FROZEN gate      development   harmful 25/43 = 58.1%   harmless 16/141 = 11.3%
+                     unseen        harmful  6/9  = 66.7%   harmless   7/52 = 13.5%
+
+A NUMERICAL CORRECTION to my own earlier prose, which tatte caught. I wrote "30/43 (58%)". Those belong
+to different gates:
+
+    DISCARDED pre-fix gate         harmful 30/43 = 69.8%   harmless 61/141 = 43.3%
+
+The pre-fix version refused more harmful steps AND four times as many harmless ones, and it destroyed the
+only verified trajectory. Quoting 30/43 as the development benchmark would flatter a disqualified gate. The
+authoritative development figures for the frozen rules are 25/43 and 16/141.
+
+### Chain level: the POLICY failed
+
+    chains attempted              16
+    verified, ungated             0/16
+    chains killed by the gate     13        (81% kill rate)
+    chains admitted                3
+    viable chains destroyed        0        <- VACUOUS, see below
+    doomed chains stopped at or before their first break   7/16
+
+A 13.5% per-step harmless refusal rate killed **81% of chains**. Independent compounding over seven sites
+would predict roughly 0.865^7 = 36% survival; the observed 19% is worse, because refusals are correlated
+by trajectory and code shape rather than independent. The independence estimate understates the damage.
+
+### The frozen finding
+
+> The frozen structural gate generalized as a step-level discriminator on unseen trajectories, but hard
+> per-step vetoing is unsuitable for multi-step transactions, because modest false-refusal rates compound
+> into severe chain attrition.
+
+That is an architectural result about the POLICY, not about the classifier. A gate that wrongly refuses
+one step in eight is perfectly usable for a single decision and catastrophic when seven consecutive
+admissions are required.
+
+### "0 viable chains destroyed" has NO SENSITIVITY here, and must not be reported as a success
+
+There were zero verified chains in this batch, so there was nothing viable to destroy. The metric passed
+while demonstrating nothing - the sixth instance of the vacuous-pass pattern in this line of work. The
+frozen analyser was written to detect exactly this and refused to promote the step-level number into the
+endpoint slot:
+
+    No verified chain in this batch, so chain-level precision cannot improve. Read the step-level
+    discrimination and the early-stopping figure instead, and say so.
+
+The only real evidence that the gate does not cost successes remains the single development case (7B B3
+g74 s34, all three steps admitted). One case is not a control - which is the lesson that broke the first
+gate, and it has not yet been answered for the second.
+
+### What the next gate should be
+
+Not `suspicious -> KILL`. The gate should manage AUTHORITY rather than deny it:
+
+    low risk        admit
+    moderate risk   admit under tighter verification, an alternate route, or a retry
+    high risk       consume a chain-level RISK BUDGET, or escalate
+    proven unsafe   refuse
+
+A chain-level budget is the specific missing mechanism: per-step vetoes cannot see that they are the
+fourth refusal in a seven-site transaction.
+
+### The underlying run, separately
+
+    goal 64 preserved through all 7 sites     B3 2/8 -> B4 3/8
+    goal 74 preserved through all 3 sites     B4 1/8
+    requested delta                           0/16
+
+Preservation continues to improve across B2 -> B3 -> B4 while delta attainment stays at zero. Those are
+now clearly separable quantities, which is the useful part even with the endpoint still at zero.
+
+### Standing after this batch
+
+    LegaGate classifier                promising, prospectively replicated
+    hard-veto chain policy             failed
+    preservation architecture          still improving
+    1.5B behavioural delta completion  still not demonstrated
+
+The last line is now harder to attribute to apparatus error than at any earlier point in this sequence,
+which is where the experiment was supposed to end up.

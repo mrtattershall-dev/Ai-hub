@@ -1,0 +1,8 @@
+# NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+    def flush_code():
+        if codes:
+            blocks.append("<code>" + _inline(" ".join(codes)) + "</code>")
+            del codes[:]
+
+    # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.

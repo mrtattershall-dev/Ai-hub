@@ -1,0 +1,4 @@
+if items and not current:
+                flush_ol()
+            if items and len(items) > 1:
+                flush_list()

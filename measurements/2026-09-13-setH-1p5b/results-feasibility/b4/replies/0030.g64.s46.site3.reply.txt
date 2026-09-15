@@ -1,0 +1,11 @@
+# AT THIS POINT WRITE ONLY THIS: a heading line must close an open ordered list
+            # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+        if line.startswith("#"):
+            flush_para()
+            level, body = _is_heading(line)
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        if line.startswith("1. "):
+            flush_list()
+            items.append(line[2:].strip())

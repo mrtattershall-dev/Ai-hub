@@ -1,0 +1,19 @@
+if line.startswith("```"):
+            if m:
+                codes.append("\n".join(links) + "\n" + "".join(codes))
+            current = []
+            links, codes = [], []
+            m = None
+            take_code, take_link, url = None, None, None
+        elif line.endswith("```"):
+            flush_para()
+            flush_list()
+            if len(codes):
+                codes.append("\n".join(links) + "\n" + "".join(codes))
+                links, codes = [], []
+            current = []
+        else:
+            take_code = lambda m: _CODE % (len(codes) - 1)
+            take_link = lambda m: _LINK % (len(links) - 1)
+            url = re.escape(m.group(2)).replace('"', "&quot;")
+    

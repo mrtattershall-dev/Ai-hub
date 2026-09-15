@@ -1,0 +1,22 @@
+# AT THIS POINT WRITE ONLY THIS: define a flush function for paragraphs, mirroring flush_para but emitting <p>
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    def flush_para():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    # AT THIS POINT WRITE ONLY THIS: define a flush function for paragraphs, mirroring flush_para but emitting <p>
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]
+
+    # AT THIS POINT WRITE ONLY THIS: define a flush function for paragraphs, mirroring flush_para but emitting <p>
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]

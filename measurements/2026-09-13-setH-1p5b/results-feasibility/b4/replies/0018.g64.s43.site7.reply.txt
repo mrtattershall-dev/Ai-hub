@@ -1,0 +1,4 @@
+if items:
+        flush_list()
+        blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+        del items[:]

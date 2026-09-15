@@ -1,0 +1,17 @@
+===== 1.5B B4 unseen seeds 41-48  (16 chains) =====
+  --- step level (unseen) ---
+    harmful steps refused   6/9   (67%)
+    harmless steps refused  7/52   (13%)
+    flagged UNCERTAIN       0   (steps with no verdict recorded: 3)
+  --- chain level (the primary endpoint) ---
+    chains attempted                 16
+    verified, ungated                0/16   precision 0.000
+    chains killed by the gate        13
+    chains admitted                  3
+    verified among admitted          0/3   precision 0.000
+    VIABLE CHAINS DESTROYED          0   (none - the gate cost no success)
+    doomed chains stopped at or before their first break  7/16
+  --- verdict ---
+    No verified chain in this batch, so chain-level precision cannot improve. Read the
+    step-level discrimination and the early-stopping figure instead, and say so.
+
