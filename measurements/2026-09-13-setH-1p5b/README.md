@@ -2334,3 +2334,72 @@ identifiers, and now scope-and-fall-through. If the plan has to specify that muc
 hard problem is generating the plan, and the generator's role shrinks toward transcription. That is a
 finding about where the difficulty lives, and it is worth stating plainly rather than discovering after
 three more amendments.
+
+
+## DEFECT 6, in the reference itself: a dead insertion site the probe could not see
+
+Found while building a known-bad witness for the STRICT invariant, not by looking for it.
+
+`MUTATE_PRESERVE=3` inserts `current.append("ZZZ")` - valid Python that must corrupt paragraph
+accumulation - and the transaction still verified 7/7. That is only possible if the insertion never
+executes.
+
+    site 3 anchor was:  '            flush_list()\n            continue\n'
+
+The anchor ENDED with `continue`, so everything inserted there landed after it at the same
+indentation. **Unreachable.** Which makes the reference patch's own `flush_ol()` at site 3 dead too:
+
+    reference patch, "1. a\n\n2. b"  ->  '<ol><li>a</li><li>b</li></ol>'
+                          expected   ->  '<ol><li>a</li></ol>\n<ol><li>b</li></ol>'
+
+**So the "PROVEN reference patch" was not a correct implementation of goal 64**, and `probe64` never fed
+a blank-line-separated ordered list - the only input that can expose it. This is the lenient-proof
+failure, sitting inside the artifact every other result in this sequence was validated against.
+
+### Fixed
+
+    anchor      now '            flush_list()\n' alone, so the insertion lands BEFORE the continue
+    probe64     new assertion H: to_html("1. a\n\n2. b") must be two separate <ol> blocks
+    witnesses   before the fix H is False and the probe fails; after the fix H is True and the
+                reference verifies 7/7 with every intermediate green
+
+### Consequences, stated rather than buried
+
+  * The **expressibility proof stands for what it measured** - the edit is insertion-only and leaves
+    37/37 lines byte-identical - but "the reference implements goal 64" was false until now.
+  * **No earlier result is inflated by it.** Goal 64's delta was 0/8 in every B condition, and a
+    stricter probe cannot raise a zero. The direction of the error is safe, which is luck, not design.
+  * **Site 3's snippet content never mattered** in B0/B1/B2. Any trajectory was filling a site that
+    could not affect the outcome, and could not be penalised for getting it wrong.
+  * The reference control was **passing while validating against a lenient oracle** - exactly the
+    failure mode the two-witness rule exists to prevent, and it survived because I only ever asked the
+    reference to pass, never asked what input could make it fail.
+
+### Why STRICT needed its own witness
+
+The existing `MUTATE_SITE` witness inserts broken syntax, which the LOAD check catches first, so it
+could never reach the preservation-abort branch. A fixture stopped by a different guard reports green
+forever. `MUTATE_PRESERVE` inserts valid code that breaks behaviour, and it now aborts at exactly the
+mutated site:
+
+    MUTATE_PRESERVE=3  STRICT=1   steps 3/7  [LR LR L-]  aborted: site 3 broke old behaviour
+    MUTATE_PRESERVE=6  STRICT=1   steps 6/7  [LR LR LR LR LR L-]  aborted: site 6 broke old behaviour
+    MUTATE_PRESERVE=3  STRICT=0   runs to completion - which is what B2 was doing
+
+That last line is the point: it demonstrates directly that the pre-STRICT harness carried on past a
+preservation break, which is why B2's "sites completed" needed correcting by hand.
+
+## Apparatus changes now in place for the next round
+
+    STRICT=1            abort the transaction on a preservation break, not only a load failure, so
+                        transaction depth IS healthy depth by construction
+    INTENT=b2           the semantic-contrast block: what already owns the responsibility, which
+                        identifiers are NOT available here, and that unhandled cases must fall through
+                        to the existing code unchanged
+    scope.mjs           the in/out-of-scope lists are DERIVED from the source, not hand-written
+
+The derivation matters more than the wording. A field a planner can compute is a field a real system
+could fill; a field only I can write is an oracle in disguise. `scopeFacts` correctly flags `codes` and
+`links` - the two names B2 actually misused - as locals of `_inline`, and two of its own defects were
+caught by asking what it must NOT forbid: it initially called `text` foreign (it is `to_html`'s own
+parameter) and `i` foreign (the correct `flush_ol` writes `for i in ol_items`).

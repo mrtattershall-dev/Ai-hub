@@ -34,7 +34,11 @@ export const SITES = {
         purpose_b1: 'define a nested function named `flush_ol` that mirrors the existing `flush_list` but emits an <ol> block from `ol_items` instead of a <ul> from `items`, and clears `ol_items` afterwards; do not modify `flush_list`',
         reference: '\n    def flush_ol():\n        if ol_items:\n            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")\n            del ol_items[:]\n' },
 
-      { anchor: '            flush_list()\n            continue\n', indent: 12,
+      // ANCHOR CORRECTED. It used to end with `continue`, so everything inserted here landed AFTER the
+      // continue at the same indentation: unreachable. The reference patch still passed both suites
+      // because probe64 never fed a blank-line-separated ordered list, which is the only input that can
+      // expose it. Anchoring on flush_list() alone puts the insertion BEFORE the continue.
+      { anchor: '            flush_list()\n', indent: 12,
         purpose: 'a blank line must also close an open ordered list',
         purpose_b1: 'call `flush_ol()` here and nothing else, so a blank line also closes an open ordered list',
         reference: '            flush_ol()\n' },
@@ -46,6 +50,8 @@ export const SITES = {
 
       { anchor: '            items.append(line[2:].strip())\n            continue\n', indent: 8,
         purpose: 'the new branch: a line starting with a number, a dot and a space is an ordered-list item; close any paragraph and unordered list, collect the text after the marker, and continue',
+        owns: 'ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop, and unordered-list lines by the existing startswith branch',
+        soleFallthrough: true,
         purpose_b1: 'add a new branch for ordered-list items: when the line starts with a number, a dot and a space, close any open paragraph and any open unordered list, append the item text after the marker to `ol_items`, and continue; do not alter the existing branches',
         reference: '        m_ol = re.match(r"^\\d+\\. (.*)$", line)\n        if m_ol:\n            flush_para()\n            flush_list()\n            ol_items.append(m_ol.group(1).strip())\n            continue\n' },
 
@@ -72,6 +78,8 @@ export const SITES = {
 
       { anchor: '    for line in str(text).split("\\n"):\n', indent: 8,
         purpose: 'handle fences before every other line rule: while inside a fence, a closing ' + FENCE + ' line emits <pre><code> with the collected lines joined by newlines and escaped, otherwise the line is collected verbatim; when not inside a fence, a ' + FENCE + ' line closes any open paragraph and list and opens one',
+        owns: 'ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists already have their own branches',
+        soleFallthrough: true,
         purpose_b1: 'handle fenced code blocks before every other line rule, using the `fence` variable: while inside a fence, a line whose stripped value is ' + FENCE + ' emits the collected lines as one escaped <pre><code> block with their line breaks preserved and leaves the fence, and any other line is collected verbatim, continuing either way; while not inside a fence, a line whose stripped value is ' + FENCE + ' closes any open paragraph and unordered list and enters a fence; do not alter the existing branches',
         reference: '        if fence is not None:\n'
           + '            if line.strip() == "' + FENCE + '":\n'

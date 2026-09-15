@@ -1,0 +1,16 @@
+  site-3 insertion preceded by `continue` in the same block: false
+single list    '<ol><li>a</li><li>b</li></ol>'
+blank-separated '<ol><li>a</li></ol>\n<ol><li>b</li></ol>'
+expected        '<ol><li>a</li></ol>\n<ol><li>b</li></ol>'
+CORRECT         True
+
+  does probe64 test any blank-line-separated ordered list? false
+  probe64 inputs:
+    "1. one\\\\n2. two"
+    "1. **b** x"
+    "3. only"
+    "1. a\\\\n\\\\n2. b"
+    "not 1. a list"
+    "- u"
+    "a\\\\nb"
+    "# T"

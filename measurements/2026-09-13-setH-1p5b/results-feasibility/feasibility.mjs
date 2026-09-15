@@ -39,6 +39,7 @@ import { regressionFor } from './regression.mjs';
 import { probe60For } from './probes60.mjs';
 import { checkContract } from './contractCheck.mjs';
 import { deriveContract } from './contract.mjs';
+import { scopeFacts } from './scope.mjs';
 
 const HERE = new URL('.', import.meta.url).pathname.replace(/^\//, '');
 const GOALS = JSON.parse(readFileSync('C:/Users/tatte/Projects/ai-coding-hub-indent/measurements/2026-09-12-setH/goals-H.json', 'utf8'));
@@ -63,6 +64,8 @@ const INTENT = process.env.INTENT || 'b0';
 // format. Uses NO oracle information. The instruction text is deliberately left unchanged so that B2
 // isolates this one variable.
 const BOUND = process.env.BOUND || 'none';
+// STRICT: abort the transaction on a preservation break, not only on a load failure.
+const STRICT = process.env.STRICT === '1';
 
 const indentOf = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
 function boundToSite(snippet, indent, src) {
@@ -133,11 +136,36 @@ async function callModel(tag, prefix, suffix, seed, npred) {
 
 // The instruction channel. It must separate immutable existing context from the requested delta -
 // the model is no longer expected to infer its job from an identifier such as `between(`.
-function instructionB(goalText, purpose, indent) {
+function instructionB(goalText, purpose, indent, contrast) {
   const p = ' '.repeat(indent);
   return p + '# The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.\n'
     + p + '# REQUESTED CHANGE: ' + goalText + '\n'
-    + p + '# AT THIS POINT WRITE ONLY THIS: ' + purpose + '\n';
+    + p + '# AT THIS POINT WRITE ONLY THIS: ' + purpose + '\n'
+    + (contrast || '');
+}
+
+// THE SEMANTIC CONTRAST BLOCK (intent set b2). B2's failures were not bad algorithms - they were the
+// model filling in a locally plausible continuation by imitating neighbouring state, because the plan
+// said what to ADD without saying what already OWNS that responsibility. Twice now: at the declaration
+// level (items = [] copied instead of ol_items created) and at the body level (an added else that
+// duplicates the existing accumulator, plus codes/links borrowed from _inline).
+//
+// The in/out-of-scope lists are DERIVED from the source, not written by me - see scope.mjs. That
+// distinction is the point: a field a planner can compute is a field a real system could fill, whereas
+// a field only I can write is an oracle in disguise. `owns` remains oracle prose, and is marked as such.
+function contrastBlock(src, fn, site, indent, createdNames) {
+  const p = ' '.repeat(indent);
+  const f = scopeFacts(src, fn, createdNames);
+  let out = '';
+  if (site.owns) out += p + '# ALREADY HANDLED ELSEWHERE - do not add a second path for it: ' + site.owns + '\n';
+  if (f && f.outOfScope.length) {
+    out += p + '# NOT AVAILABLE HERE (they are locals of other functions, not of ' + fn + '): '
+      + f.outOfScope.join(', ') + '\n';
+  }
+  if (site.soleFallthrough) {
+    out += p + '# Any line this code does not handle must fall through to the EXISTING code unchanged.\n';
+  }
+  return out;
 }
 function instructionA(goalText) {
   return '# The functions above are EXISTING and must keep working exactly as they do now.\n'
@@ -195,6 +223,14 @@ async function runB({ goal, seed, useReference }) {
         snippet = ind + 'if True(  # deliberately broken by MUTATE_SITE\n';
         step.source = 'MUTATED';
       }
+      // A SEPARATE witness for STRICT. The syntax mutation above is caught by the LOAD check, which
+      // runs first, so it can never exercise the preservation abort - a fixture stopped by a different
+      // guard reports green forever. This one is valid Python that loads cleanly and corrupts the old
+      // behaviour, which is the only input that reaches the STRICT branch.
+      if (Number(process.env.MUTATE_PRESERVE || 0) === i + 1) {
+        snippet = ind + 'current.append("ZZZ")  # valid code, breaks old behaviour, by MUTATE_PRESERVE\n';
+        step.source = 'MUTATED';
+      }
       // Under the indent-primer route the harness re-adds the site indentation to whatever comes back,
       // because the prompt consumed it. The control must exercise that SAME assembly path or it is not
       // a control for this apparatus: the reference snippet is de-indented and re-assembled, and the
@@ -216,7 +252,11 @@ async function runB({ goal, seed, useReference }) {
       }
       step.generated_bytes = snippet.length;
     } else {
-      const genPrefix = loc.before + instructionB(goalText, purpose, site.indent)
+      const created = [].concat(spec.sites.map((x) => (x.purpose_b1 || '').match(/named `([A-Za-z_]\w*)`/))
+        .filter(Boolean).map((m) => m[1]));
+      const contrast = INTENT === 'b2' ? contrastBlock(cur, spec.fn, site, site.indent, created) : '';
+      step.contrast_lines = contrast ? contrast.trimEnd().split(String.fromCharCode(10)).length : 0;
+      const genPrefix = loc.before + instructionB(goalText, purpose, site.indent, contrast)
         + (ROUTE === 'indent_primer' ? ind : '');
       const out = await callModel('g' + goal + '.s' + seed + '.site' + (i + 1), genPrefix, loc.after, seed, NPRED_B);
       snippet = ROUTE === 'indent_primer' ? ind + out.text : out.text;
@@ -259,6 +299,15 @@ async function runB({ goal, seed, useReference }) {
     rec.steps.push(step);
 
     if (!ev.loads) { rec.aborted_at = i + 1; rec.why = 'site ' + (i + 1) + ' does not load: ' + ev.loadMsg; break; }
+    // STRICT transactional semantics, matching multiInsert: a broken intermediate must never become the
+    // predecessor state for the next edit. Without this the chain continues past a preservation break
+    // and "sites completed" counts steps that merely LOADED - which inflated B2's depth figure until I
+    // recomputed healthy depth by hand. With it, transaction depth IS healthy depth by construction.
+    if (STRICT && ev.regression === false) {
+      rec.aborted_at = i + 1;
+      rec.why = 'site ' + (i + 1) + ' broke old behaviour: ' + String(ev.regressionWhy).slice(0, 80);
+      break;
+    }
     cur = candidate;
   }
 
