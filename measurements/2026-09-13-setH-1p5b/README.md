@@ -2901,3 +2901,37 @@ n=16 chains, 2 development goals, one model. No significance test.
 
 The third is new, and it is only new while it stays STATIC and PRE-COMMIT. The moment it needs to
 execute the candidate it collapses into the verifier.
+
+
+### ANALYSER FROZEN TOO, before any outcome was read
+
+The measurement code has the same immutability requirement as the classifier - this harness has produced
+five vacuous-evaluator defects, and an analyser written after seeing the numbers is exactly how a sixth
+would arrive.
+
+    gateyield.mjs   69784b3120a7c13d31bdd6d391e83c22d239f613972092056faab0b9ff879934
+    gateeval.mjs    da62364798158bdec68134a23926d58e3658ab784e17b5460af93dfde4b0e723
+
+Provenance for this experiment, in order and each step recorded before the next began:
+
+    rules frozen -> endpoint frozen -> analyser frozen -> unseen inference -> gate decisions
+    recorded -> outcome labels revealed
+
+### BOUNDARY on what shadow gating can support
+
+Shadow gating estimates **first-refusal filtering**, not the behaviour of a fully enforced gated agent.
+Under live enforcement a refusal at site 3 means sites 4-7 are never generated, so nothing here can say
+what a recovery or replan policy would have produced instead. The claim this experiment can support is
+therefore exactly:
+
+> Given the trajectories actually generated, would a frozen static gate have filtered failing
+> transactions before commit without filtering successful ones?
+
+That is a narrower question than "does gating improve an agent", and it is the one being asked.
+
+### Why the chain-level endpoint is not a formality
+
+If an 11% per-step harmless refusal rate were roughly independent across seven sites, chain survival
+would be about 0.89^7 = 44%. A gate can therefore look strong as a step classifier and still remove more
+than half of all viable transactions. Admission rate, verified-among-admitted, and verified-chains-
+destroyed are the quantities that expose that; step-level discrimination alone cannot.
