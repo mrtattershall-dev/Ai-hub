@@ -2830,3 +2830,74 @@ rejects or skips everything. The recurring hidden failure class here has never b
 Five instances in one line of work. The rule is not "add a positive control" - it is that the positive
 control must be **broad enough that the rule under test actually fires on it**, and the suite must fail
 loudly when it does not.
+
+
+## GATE EVALUATION preregistered: the 141-step set is now DEVELOPMENT data
+
+The gate's rules were changed after seeing exactly how they failed on the B2/B3/7B trajectories, so
+those 184 steps are a development set and cannot serve as its evaluation. What they established still
+stands, stated at its correct strength:
+
+> A purely static pre-commit gate can distinguish harmful from harmless proposed edits substantially
+> better than chance (58% vs 11%) while admitting the only known verified trajectory.
+
+The second clause carries the weight. The original 13/13 witness score became worthless the moment a
+real trajectory exposed the missing scope distinction; surviving all three steps of 7B B3 g74 s34 is the
+first evidence the gate is not merely learning "reject suspicious-looking code".
+
+### RULES FROZEN. Hashes recorded before the unseen batch was generated.
+
+    refusalgate.mjs   3e4a9fd8ccd2855e5e40d5f3e0a14bd4
+    scope.mjs         8bb6fcff83ea39d909f93cb991cc2a97
+    oraclesites.mjs   d9c7c939354e143b83ed5f373c5d3b05
+    probes60.mjs      (recorded in results-feasibility/gate-prereg.out)
+
+No rule is touched again before the evaluation is read. If the frozen gate underperforms, that is the
+result.
+
+### Design: shadow gating, so both arms are paired on identical trajectories
+
+`GATE=shadow` records the gate's verdict at every step and does NOT act on it. The run is therefore
+exactly B3, and enforcement is simulated afterwards by killing each chain at its first REFUSE - which is
+what an enforcing gate would do. One run yields the ungated outcome AND the counterfactual, on the same
+trajectories, with no second inference pass and no cross-arm sampling noise.
+
+The gate may not change what the model sees or what is committed in this mode, or the arms stop being
+paired.
+
+### PRIMARY ENDPOINT - harder than step-level discrimination
+
+Step-level false refusal compounds across a multi-site transaction: a gate can look excellent per edit
+and still strangle end-to-end throughput. 11% per step over 7 sites is a large chain-level loss. So:
+
+    ungated precision   verified / chains attempted
+    gated precision     verified / chains ADMITTED (survived to the end without a REFUSE)
+    viable destroyed    chains that were verified and contained a REFUSE     <- MUST BE 0
+    chains killed       chains containing at least one REFUSE
+
+Gating cannot raise the absolute number of verified chains - it can only remove chains - so the endpoint
+is whether it raises **verified per executed chain** while destroying no viable chain.
+
+### Preregistered readings
+
+    harmful interception holds near 58%, harmless near 11%, 0 viable destroyed
+        the development-set result generalises; model failures carry detectable structural signatures
+        BEFORE execution, and this is a component LegaVerify could be built around
+    discrimination collapses toward chance
+        the rules were fitted to the development trajectories; report it as overfitting
+    any viable chain destroyed
+        disqualifying at this stage regardless of interception rate - the gate's whole justification is
+        that it does not cost successes
+    chain-level precision does not improve despite good step-level numbers
+        false refusals compound; the gate needs a chain-level budget rather than per-step veto
+
+n=16 chains, 2 development goals, one model. No significance test.
+
+### The three mechanisms are now genuinely distinct
+
+    STRICT      you already broke something - stop
+    verifier    here is whether the resulting behaviour is actually correct
+    gate        before you touch state, there is already structural evidence this edit is unsafe
+
+The third is new, and it is only new while it stays STATIC and PRE-COMMIT. The moment it needs to
+execute the candidate it collapses into the verifier.

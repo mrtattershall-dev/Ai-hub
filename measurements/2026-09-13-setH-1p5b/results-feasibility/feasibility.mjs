@@ -40,6 +40,7 @@ import { probe60For } from './probes60.mjs';
 import { checkContract } from './contractCheck.mjs';
 import { deriveContract } from './contract.mjs';
 import { scopeFacts } from './scope.mjs';
+import { gateSnippet } from './refusalgate.mjs';
 
 const HERE = new URL('.', import.meta.url).pathname.replace(/^\//, '');
 const GOALS = JSON.parse(readFileSync('C:/Users/tatte/Projects/ai-coding-hub-indent/measurements/2026-09-12-setH/goals-H.json', 'utf8'));
@@ -66,6 +67,12 @@ const INTENT = process.env.INTENT || 'b0';
 const BOUND = process.env.BOUND || 'none';
 // STRICT: abort the transaction on a preservation break, not only on a load failure.
 const STRICT = process.env.STRICT === '1';
+// GATE: 'off' | 'shadow'. SHADOW records the FROZEN refusal gate's verdict at every step WITHOUT acting
+// on it, so one run yields both the ungated outcome and the counterfactual "what would gating have
+// done", paired on identical trajectories. Enforcement is then simulated by killing a chain at its
+// first REFUSE - exactly what an enforcing gate would do. In shadow mode the gate may not change what
+// the model sees or what gets committed, or the two arms stop being paired.
+const GATE = process.env.GATE || 'off';
 
 const indentOf = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
 function boundToSite(snippet, indent, src) {
@@ -289,6 +296,13 @@ async function runB({ goal, seed, useReference }) {
       }
     }
 
+    if (GATE !== 'off') {
+      const createdG = spec.sites.map((x) => (x.purpose_b1 || '').match(/named `([A-Za-z_]\w*)`/))
+        .filter(Boolean).map((m) => m[1]);
+      const g = gateSnippet(cur, snippet, spec, site, createdG);
+      step.gate_verdict = g.verdict;
+      step.gate_reasons = g.reasons.map((x) => x.kind + (x.detail ? '(' + x.detail + ')' : ''));
+    }
     const candidate = loc.before + snippet + loc.after;
     // Insertion-only holds by construction here: the surrounding bytes are spliced, never rewritten.
     step.insertion_only_by_construction = true;
