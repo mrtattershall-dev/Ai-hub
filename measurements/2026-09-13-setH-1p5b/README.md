@@ -3095,3 +3095,85 @@ of the difference rather than an argument about it.
 
 The remaining problem is no longer "add another guard". It is a sequential-control problem with named
 parts: risk accumulation, escalation, retry, and commit authority over multiple dependent edits.
+
+
+## GATE-POLICY: NULL RESULT - the substrate was unsuitable, so the policy question was not tested
+
+All frozen files verified byte-identical to their preregistered hashes before the analyser ran.
+
+> **The experiment did not test the primary policy question, because the sampled trajectory
+> distribution contained zero viable model chains.**
+
+Neither "budget 2 lost" nor "hard veto won" is supported. With 0/48 verified there is no
+cost-of-refusal signal to trade against harmful interception, and that trade IS the question.
+
+    EXPERIMENT GATE-POLICY   7B coder, seeds 101-124, 48 chains, 150 steps
+    verified model chains    0/48
+
+    policy            admitted   verified PRESERVED   verified DESTROYED   doomed stopped   steps run
+    HARD_VETO         21/48      0/0                  0                    27/48            136/150
+    FROZEN_BUDGET_2   39/48      0/0                  0                     9/48            140/150
+
+The two policies demonstrably behave differently - the veto stops three times as many doomed chains
+while admitting half as many. That is descriptive only. The missing quantity is exactly the decisive
+one: how many viable chains each policy sacrifices.
+
+### An instrument error I made and reported before checking
+
+I told tatte "2 verified" from `grep -c 'VERIFIED$'` over the run log. Those two matches were the
+**REFERENCE CONTROL** lines - `REFERENCE VERIFIED` - not model chains. The truth was 0.
+
+**Control records and experimental records must be distinguishable by FIELD, never by matching a
+string.** Fixed: every record now carries `record_kind: 'control' | 'experimental'` and
+`generator: 'reference' | 'model'`, and the control's log token is `REFERENCE_CONTROL_OK`, which no
+outcome grep can match. Standing rule added: outcomes are read from `rows.json`, never grepped from a
+log.
+
+### The power error, quantified
+
+I designed an endpoint-sensitive experiment around a rate I had observed exactly once (1 verified chain
+in 16) and treated it as an estimate. With 0/48 now observed, the rule of three puts the 95% upper bound
+on the verified rate at 6.25%, and:
+
+    at p = 6.3%   chains needed for >= 8 verified with 90% confidence:  186
+    at p = 25%                                                          45
+    at p = 50%                                                          21
+
+This run spent 48 chains and about an hour of A10G. The conservative bound demands roughly **four times
+that** on a lane where the generator is 0/48. A single success is not a rate.
+
+### SUBSTRATE QUALIFICATION - the phase that should have come first
+
+    Stage 1  small pilot: estimate the verified-chain rate and the failure mix
+    Stage 2  launch the policy comparison ONLY if viability clears a minimum fixed BEFORE the pilot
+    else     stop and declare the substrate unsuitable
+
+The minimum must be stated probabilistically, not as a hope: choose N such that, under the conservative
+end of the pilot's viable-rate estimate, the probability of observing fewer than X verified chains is
+acceptably low. "Hopefully two" is not a design.
+
+### The cheaper substrate this points to
+
+A policy laboratory does not need the hardest semantic tasks. It needs a distribution containing BOTH
+naturally successful trajectories the gate could destroy AND naturally doomed ones it could beneficially
+stop. The earlier repeatability calibration already identified goals at intermediate difficulty -
+p(pass) around 0.875, 0.75, 0.125 - which are far better suited than a lane where the generator is 0/48.
+At p = 0.5 the requirement drops from 186 chains to 21.
+
+Selection must come from that PRIOR calibration evidence, be frozen, and then be run on fresh seeds -
+never chosen by looking at the new outputs.
+
+### What counts as a success in this run
+
+The frozen analyser refused, twice, to convert throughput and interception numbers into an endpoint
+claim when sensitivity was zero - once on B4 and once here. That is the project's own verification
+discipline applied to its research rather than to generated code, and it is the reason this is written up
+as a null result instead of as "graded authority admits more chains".
+
+### Standing
+
+    LegaGate classifier              still promising (66.7% / 13.5% prospective, unseen)
+    graded authority                 plausible, unvalidated
+    GATE-POLICY experiment           NULL - undefined endpoint, unsuitable substrate
+    reference / harness              2/2, so the apparatus can express the target
+    generator viability here         0/48, which is what made policy evaluation impossible

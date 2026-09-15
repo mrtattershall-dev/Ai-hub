@@ -200,6 +200,12 @@ async function runB({ goal, seed, useReference }) {
   const source0 = readFileSync(path, 'utf8');
   const rec = { goal, seed, condition: useReference ? 'R_reference_control' : 'B_oracle_localized_insertion',
     label: useReference ? 'NO MODEL' : 'ORACLE_LOCALIZATION_FEASIBILITY',
+    // TYPED RECORDS. A naive grep for /VERIFIED$/ over the log counted the two REFERENCE CONTROL lines
+    // as model successes, and I reported "2 verified" when the truth was 0. Control records and
+    // experimental records must be distinguishable by FIELD, never by matching a string, and outcomes
+    // must be read from rows.json rather than grepped from a log.
+    record_kind: useReference ? 'control' : 'experimental',
+    generator: useReference ? 'reference' : 'model',
     route: ROUTE, intent_set: INTENT,
     sites_total: spec.sites.length, source0_sha: sha(source0), steps: [], aborted_at: null, why: '' };
 
@@ -410,7 +416,7 @@ if (CONDS.includes('R')) {
     const inter = r.steps.map((s) => (s.loads_after ? 'L' : 'x') + (s.old_regression_after ? 'R' : '-')).join(' ');
     console.log('  goal ' + goal + '  steps ' + r.steps_completed + '/' + r.sites_total
       + '  intermediates [' + inter + ']  old=' + r.final_old_regression + '  delta=' + r.final_new_delta
-      + '  ' + (r.verified ? 'REFERENCE VERIFIED' : 'CONTROL BROKEN: ' + r.why));
+      + '  ' + (r.verified ? 'REFERENCE_CONTROL_OK' : 'CONTROL BROKEN: ' + r.why));
   }
   console.log('');
 }

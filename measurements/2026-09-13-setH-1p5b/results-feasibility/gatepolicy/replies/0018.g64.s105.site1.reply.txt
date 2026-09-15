@@ -1,0 +1,54 @@
+# REQUESTED CHANGE: Add ordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a number, a dot and a space ("1. ") become <ol><li>...</li>...</ol>, written like the unordered lists. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: declare the accumulator list for ordered-list items, beside the existing items list
+    ol_items = []  # Declare this new variable
+
+    def take_ordered_list_item(m):
+        num = m.group(1)
+        item_text = _inline(m.group(2).strip())
+        ol_items.append(item_text)  # Add item to the ordered list accumulator
+        return ""
+
+    def flush_ordered_list():
+        if ol_items:
+            blocks.append("<ol>" + "".join(f"<li>{item}</li>" for item in ol_items) + "</ol>")
+            del ol_items[:]  # Clear the accumulator
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            flush_ordered_list()  # Flush ordered list when a blank line is encountered
+            continue
+        m = re.match(r"(\d+)\. (.*)", line)  # Match number followed by dot and space
+        if m:
+            flush_para()
+            flush_list()
+            flush_ordered_list()  # Flush any existing lists before starting an ordered list
+            ol_items.append(line[m.end():].strip())  # Add the first item to the accumulator
+            continue
+        if line.startswith("- "):
+            flush_para()
+            items.append(line[2:].strip())
+            continue
+        flush_list()
+        flush_ordered_list()  # Flush any existing lists before starting a new paragraph
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    flush_ordered_list()  # Flush any remaining items before returning the result
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p

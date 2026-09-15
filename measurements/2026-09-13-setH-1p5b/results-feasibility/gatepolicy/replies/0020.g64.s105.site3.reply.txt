@@ -1,0 +1,13 @@
+flush_ol()
+            blocks.append("<p></p>")
+        elif re.match(r"^[0-9]+ \.", line):
+            flush_para()
+            items.append(line[2:].strip())
+            continue
+        if line.startswith("# "):
+            flush_para()
+            h = _is_heading(line)
+            if h:
+                level, body = h
+                blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+    

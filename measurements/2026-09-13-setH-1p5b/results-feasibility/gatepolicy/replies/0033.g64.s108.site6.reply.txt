@@ -1,0 +1,6 @@
+if line.startswith("1. "):
+            flush_ol()
+            ol_items.append(line[3:].strip())
+        else:
+            flush_ol()  # Close the ordered list if any other kind of line is encountered
+        # END OF REQUESTED CHANGE

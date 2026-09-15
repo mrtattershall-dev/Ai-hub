@@ -1,0 +1,13 @@
+flush_ol_list()
+            blocks.append("<p></p>")
+            continue
+        if line.startswith("1. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        # Add a blank line to close an open ordered list
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            flush_ol_list()
+            blocks.append("<p></p>")

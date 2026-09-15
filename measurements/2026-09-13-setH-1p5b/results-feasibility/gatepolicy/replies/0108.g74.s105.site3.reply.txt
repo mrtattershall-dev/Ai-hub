@@ -1,0 +1,3 @@
+if fenced_code_block:
+        blocks.append("<pre><code>" + "\n".join(_escape(l) for l in fenced_code_block) + "</code></pre>")
+    # END REQUESTED CHANGE

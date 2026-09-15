@@ -1,0 +1,2 @@
+if fenced_code_block:
+        blocks.append("<pre><code>" + "\n".join(fenced_code_block) + "</code></pre>")

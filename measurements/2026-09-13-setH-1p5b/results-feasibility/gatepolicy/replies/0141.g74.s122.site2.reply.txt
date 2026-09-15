@@ -1,0 +1,38 @@
+if fenced_code_block:
+            if line.strip() == "```":
+                end_fence()
+                continue
+            fenced_code_block.append(line)
+        elif line.strip() == "```":
+            start_fence()
+            continue
+        flush_para()
+        flush_list()
+
+        # If you get here, it's not a fence or a special case.
+        # Handle the normal case of adding lines to the current paragraph.
+
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+
+
+# This code is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+# REQUESTED CHANGE: Add fenced code blocks to to_html in the EXISTING s4_markdown.py: the lines between two lines of ``` become <pre><code>...</code></pre>, keeping their line breaks ("\n"), escaped, with no other formatting; a fence that is never closed runs to the end of the text. Run it with python.
+# AT THIS POINT WRITE ONLY THIS: handle fences before every other line rule: while inside a fence, a closing ``` line emits <pre><code> with the collected lines joined by newlines and escaped, otherwise the line is collected verbatim; when not inside a fence, a ``` line closes any open paragraph and list and opens one
+# ALREADY HANDLED ELSEWHERE - do not add a second path for it: ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists already have their own branches
+# NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links

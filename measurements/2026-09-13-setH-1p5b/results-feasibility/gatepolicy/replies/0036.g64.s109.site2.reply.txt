@@ -1,0 +1,49 @@
+def flush_ordered_list():  # ADD THIS FUNCTION
+        if ordered_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ordered_items) + "</ol>")
+            del ordered_items[:]  # Clear the list of ordered items after flushing
+
+    for line in text.split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            flush_ordered_list()  # Flush any remaining ordered list items
+            continue
+        if line.startswith("- "):
+            flush_para()
+            items.append(line[2:].strip())
+            continue
+        if re.match(r"^\d+\. ", line):  # Check for ordered list item (e.g., "1. ")
+            flush_para()
+            ordered_items.append(line[3:].strip())  # Extract the content after number and dot
+            continue
+        flush_list()
+        flush_ordered_list()  # Flush any remaining ordered list items before processing new block
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    flush_ordered_list()  # Flush any remaining ordered list items at the end of processing
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    assert to_html("1. first\n2. second") == "<ol><li>first</li><li>second</li></ol>"  # ADD THIS ASSERTION
+    print("ok")
+
+#

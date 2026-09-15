@@ -1,0 +1,50 @@
+fenced_code_block = None  # Declare the fenced-code-block state here
+
+    def flush_para():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            continue
+        if line.startswith("- "):
+            flush_para()
+            items.append(line[2:].strip())
+            continue
+        flush_list()
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+
+Please note that I have declared the `fenced_code_block` state as `None` when not inside a fence, otherwise the list of collected lines. However, I haven't added any code to handle the actual detection and processing of fenced code blocks yet. That's because you asked me to only write this part, not the entire implementation.

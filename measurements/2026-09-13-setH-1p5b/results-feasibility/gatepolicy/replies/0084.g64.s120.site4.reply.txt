@@ -1,0 +1,70 @@
+# AN ORDERED LIST MUST BE OPEN
+            # AN UNORDERED-LIST LINE IS COMING
+            # AN UNORDERED-LIST LINE MUST CLOSE THE OPEN ORDERED-LIST
+            flush_ordered_list()  # Close the open ordered list
+            items.append(line[2:].strip())  # Add the unordered-list line to the list
+            continue
+        if re.match(r"^\d+\. ", line):  # Check for an ordered list item
+            flush_para()
+            flush_unordered_list()  # Close any open unordered list
+            ol_items.append(line[3:].strip())  # Add the ordered list item to the accumulator
+            continue
+        if items:  # If an unordered list is open
+            flush_ordered_list()  # Close it
+        flush_para()
+        if line.startswith("**"):
+            current.extend(line.strip()[2:-2].split())
+        elif line.startswith("*"):
+            current.append(line.strip()[1:])
+        else:
+            current.append(line.strip())
+
+    return "\n".join(blocks)
+
+
+# New function for ordered lists
+def to_html(text):
+    blocks = []
+    current = []
+    items = []
+    ol_items = []  # Declare accumulator for ordered list items
+
+    def flush_para():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]
+
+    def flush_ordered_list():  # New function for ordered lists
+        if ol_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")
+            del ol_items[:]  # Clear the accumulator
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            flush_ordered_list()  # Close any open ordered list
+            continue
+        if line.startswith("- "):
+            flush_para()
+            items.append(line[2:].strip())
+        elif re.match(r"^\d+\. ", line):  # Check for an ordered list item
+            flush_para()
+            flush_unordered_list()  # Close any open unordered list
+            ol_items.append(line[3:].strip())  # Add the ordered list item to the accumulator
+        else:
+            flush_ordered_list()  # Close any open ordered list
+            current.append(line.strip())
+
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 

@@ -1,0 +1,45 @@
+flush_para()
+        flush_ordered_list()  # Flush any existing ordered list before starting a new one
+        items.append(line[2:].strip())  # Add the line to the unordered list
+        continue
+
+        m = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+
+    flush_para()
+    flush_list()
+    flush_ordered_list()  # Flush any remaining ordered list at the end of the text
+
+    return "\n".join(blocks)
+
+
+# Example usage:
+if __name__ == "__main__":
+    markdown_text = """
+# Title
+1. First item in an ordered list
+2. Second item
+**b** and *i*
+a `* b * c` d
+see [docs](http://x/a)
+- one
+- two
+"""
+    print(to_html(markdown_text))
+
+```
+The output of the above code should be:
+
+```html
+<h1>Title</h1>
+<ol><li>First item in an ordered list</li><li>Second item</li></ol>
+<p><strong>b</strong> and <em>i</em></p>
+<p>a * b * c d</p>
+<p>see <a href="http://x/a">docs</a></p>
+<ul><li>one</li><li>two</li></ul>
+```

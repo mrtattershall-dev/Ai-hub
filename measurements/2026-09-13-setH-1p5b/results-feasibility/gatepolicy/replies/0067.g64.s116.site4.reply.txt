@@ -1,0 +1,41 @@
+if ordered_items:
+                flush_ordered_list()
+            ordered_items.append(line[2:].strip())
+        elif re.match(r"^\d+\. ", line):  # Check if the line starts with a number, followed by a dot and a space
+            flush_para()  # Flush any accumulated paragraph text
+            if items:  # If there are unordered list items
+                flush_list()  # Add them to blocks as an unordered list
+            ordered_items.append(line[2:].strip())  # Add the line content (excluding the number, dot and space) to the ordered list accumulator
+        else:
+            flush_ordered_list()
+            current.append(line.strip())
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+
+### Explanation of Changes:
+
+1. **Handling Ordered Lists**: Added a new condition to check if the line starts with a number followed by a dot and a space (`^\d+\. `). If it does, it treats that as an ordered list item.
+
+2. **Flushing Current Paragraphs**: Before appending an ordered list item, it flushes any accumulated paragraph text using `flush_para()`.
+
+3. **Handling Unordered Lists**: The existing code for unordered lists remains unchanged. It continues to handle lines starting with `- ` and appends them to the `items` list.
+
+4. **Flushing Ordered List at Paragraph End**: Before appending a new paragraph, it checks if there are any ordered list items (`if ordered_items`). If so, it flushes them as an ordered list using `flush_ordered_list()`.
+
+5. **Flushing Unordered List at Paragraph End

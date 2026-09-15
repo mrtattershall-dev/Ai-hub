@@ -1,0 +1,52 @@
+if items:  # If an unordered list is open
+                flush_ordered_list()  # Close it
+            ol_items.append(line.strip())  # Add the line to the ordered list accumulator
+            continue
+
+        if re.match(r"^\d+\. ", line):  # Check for ordered list item
+            flush_para()
+            ol_items.append(line[2:].strip())  # Add the line to the ordered list accumulator
+            continue
+
+        if line.startswith("1. "):
+            flush_ordered_list()  # Close any open unordered list
+            ol_items.append(line[3:].strip())  # Start a new ordered list with this item
+            continue
+
+        if items:  # If an unordered list is open
+            flush_ordered_list()  # Close it
+        ol_items = []  # Clear the accumulator for ordered lists
+
+        if line.startswith("- "):
+            flush_para()
+            items.append(line[2:].strip())
+            continue
+        flush_list()
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    flush_ordered_list()  # Ensure any remaining ordered list is closed
+
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+
+# This solution adds support for ordered lists to the existing Markdown parser. The new function `flush_ordered_list` is added to close any open unordered list before starting a new one, and an accumulator `ol_items` is used

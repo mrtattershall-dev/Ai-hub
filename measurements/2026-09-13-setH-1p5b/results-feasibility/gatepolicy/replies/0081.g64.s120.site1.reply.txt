@@ -1,0 +1,56 @@
+# CODE ACCUMULATOR FOR ordered-list items
+    ol_items = []  # Declare accumulator for ordered list items
+
+    def flush_para():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]
+        # FLUSH ORDERED LIST
+        if ol_items:  # Check if ordered list has items to flush
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")  # Convert and add the ordered list to blocks
+            del ol_items[:]  # Clear the accumulator after flushing
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            continue
+        # Handle ordered lists here, before checking other conditions
+        m = re.match(r"(\d+\.) (.*)", line)  # Match lines starting with a number, a dot and a space
+        if m:
+            flush_para()  # Flush any pending paragraph
+            ol_items.append(m.group(2).strip())  # Add the content of the ordered list item to the accumulator
+            continue
+
+        if line.startswith("- "):
+            flush_para()
+            items.append(line[2:].strip())
+            continue
+        flush_list()
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert

@@ -1,0 +1,13 @@
+# END OF REQUESTED CHANGE
+            if ol_items:
+                flush_ol()
+            items.append(line[2:].strip())
+        elif re.match(r"^\d+\. ", line):
+            flush_para()
+            # BEGIN ADDED CODE
+            flush_list()  # Ensure unordered list is closed before starting an ordered list
+            # END ADDED CODE
+            ol_items.append(line[3:].strip())  # Adjust index from 2 to 3
+        else:
+            flush_ol()  # Ensure ordered list is closed if present
+            flush_list()

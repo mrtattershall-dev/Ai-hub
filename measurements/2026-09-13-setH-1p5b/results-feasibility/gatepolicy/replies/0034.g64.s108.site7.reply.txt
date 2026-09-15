@@ -1,0 +1,1 @@
+flush_ol()  # Flush the ordered list if it's still open

@@ -1,0 +1,18 @@
+if fenced_code_block is None:
+            if line.startswith("```"):
+                if current or items:
+                    flush_para()
+                    flush_list()
+                fenced_code_block = []
+            else:
+                current.append(line.strip())
+        elif line == "```":
+            blocks.append("<pre><code>" + "\n".join(fenced_code_block) + "</code></pre>")
+            fenced_code_block = None
+        else:
+            fenced_code_block.append(line)
+
+    if fenced_code_block is not None:
+        blocks.append("<pre><code>" + "\n".join(fenced_code_block) + "</code></pre>")
+
+    # END CODE
