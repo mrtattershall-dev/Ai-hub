@@ -1,0 +1,12 @@
+--- MUTATE_SITE=1 ---
+  goal 64  steps 0/7  intermediates [x-]  old=null  delta=null  CONTROL BROKEN: site 1 does not load: load_error ["SyntaxError: '(' was never closed (s4_markdown.py, line 64)"]
+  rollbacks byte-exact: 1/1
+--- MUTATE_SITE=3 ---
+  goal 64  steps 2/7  intermediates [LR LR x-]  old=null  delta=null  CONTROL BROKEN: site 3 does not load: load_error ["SyntaxError: '(' was never closed (s4_markdown.py, line 86)"]
+  rollbacks byte-exact: 1/1
+--- MUTATE_SITE=5 ---
+  goal 64  steps 4/7  intermediates [LR LR LR LR x-]  old=null  delta=null  CONTROL BROKEN: site 5 does not load: load_error ["SyntaxError: '(' was never closed (s4_markdown.py, line 92)"]
+  rollbacks byte-exact: 1/1
+--- MUTATE_SITE=7 ---
+  goal 64  steps 6/7  intermediates [LR LR LR LR LR LR x-]  old=null  delta=null  CONTROL BROKEN: site 7 does not load: load_error ["SyntaxError: '(' was never closed (s4_markdown.py, line 109)"]
+  rollbacks byte-exact: 1/1

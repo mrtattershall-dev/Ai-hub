@@ -1672,3 +1672,94 @@ harness code, and the same inspection would have caught them before the pilot ra
 route must now be able to print its complete prompt, and a route whose prompt does not vary with the
 goal text is an instrument failure to be asserted against, not something to be discovered afterwards
 from output that looks like model error.
+
+# PREREGISTRATION: behaviour-localization feasibility (written before the run, results not yet seen)
+
+Development goals only. **This is not v4 and it is not v4 performance.** It exists to decide whether v4
+is worth building at all, by separating two apparatus defects from model capability. tatte's framing:
+"Do the minimal corrected mechanism experiment first. Do not build v4 yet."
+
+## The question
+
+The v3 behavioural lane was not weak, it was **non-identifying** - no goal text reached the model and
+goals 64 and 74 sent a byte-identical prompt. So nothing is yet known about capability. The cheaper
+question, before any site-selection machinery:
+
+> When the 1.5B is actually told what behaviour to add, and the working implementation stays visible,
+> can it produce the required local deltas at all?
+
+## Conditions - goals 64 and 74, seeds 1-8 fixed, one shared evaluator
+
+    R  reference_control            no model. The proven reference snippets applied at the oracle
+                                    sites, stepwise, through the same transactional harness.
+    A  instruction_only             whole-function replacement exactly as v3 does it, PLUS the actual
+                                    goal text. Isolates: was instruction starvation ALONE enough to
+                                    explain the nonsense renderer?
+    B  oracle_localized_insertion   existing to_html stays byte-identical and visible, goal text
+                                    supplied, insertion sites supplied from the proven reference
+                                    patch, model generates only the inserted snippets.
+
+`num_predict` 1800 for A (proven non-binding at this task) and 600 for B; `hit_cap` recorded either
+way so a cap can never again be mistaken for a semantic failure.
+
+## What B is, stated so it cannot be over-read later
+
+Labelled **ORACLE_LOCALIZATION_FEASIBILITY**. The oracle supplies three things per site: the anchor,
+the indentation, and one line of intent. It never supplies the code. So B answers "given correct
+localization AND correct decomposition, can the model write the snippets?" and says **nothing** about
+whether a system could derive those sites. Deriving them is the entire research question v4 would
+exist to answer, and only if B shows life.
+
+## The instruction channel
+
+Not the raw goal appended somewhere decorative. The prompt must separate immutable existing context
+from the requested delta, because the model is no longer expected to infer its job from an identifier
+like `between(`. For B, at the insertion point and at its indentation:
+
+    # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+    # REQUESTED CHANGE: <exact goal text>
+    # AT THIS POINT WRITE ONLY THIS: <oracle site intent>
+
+For A the wording necessarily differs, because A's design deletes the body: keep EVERY existing
+behaviour AND add the requested change. The instruction lives only in the generation prompt; the
+candidate file is assembled from the ORIGINAL prefix, so both conditions write files shaped exactly
+as v3 would have shaped them and the preservation audit is unchanged.
+
+## Transactional, for the reason already learned the hard way
+
+Every site is re-anchored against `source_{n-1}`, never pre-computed against the original - the same
+trap recorded before v3 was built. Each intermediate must load. Any failure rolls the whole goal back
+to `source_0`, and the rollback is asserted byte-exact rather than assumed.
+
+## PREREGISTERED READINGS - fixed now, so the result cannot be narrated afterwards
+
+    A succeeds            instruction starvation was a major cause on its own, and whole-function
+                          replacement is less hopeless than it looked.
+    A poor, B works       strong support for the v4 thesis: preserve the existing implementation,
+                          expose the requested behaviour, minimise generated semantic surface.
+    both fail             building a site selector is PREMATURE - even perfect localization does not
+                          unlock the model, and the bottleneck is elsewhere.
+    both succeed          both defects mattered; v4 needs both corrections, not one.
+
+## Gating rule
+
+If condition R does not verify both goals, **no other number in this run may be read**. A control that
+only ever passes proves nothing either, so R also runs a known-bad witness: `MUTATE_SITE=n` corrupts
+exactly site n and the run must abort at n with a byte-exact rollback.
+
+## Denominators and what will not be claimed
+
+n=8 seeds on 2 development goals, one model, one machine. No significance test on A versus B: this is
+a mechanism check with a tiny fixed panel, and the two goals are the same file and the same function,
+so they are not independent. Per-goal counts will be reported separately and not pooled into a rate.
+No held-out evaluation is touched. Whatever the outcome, the frozen v2 and v3 results are not restated
+on the strength of it.
+
+## Everything preserved
+
+Per run and per step: goal, condition, seed, the exact wire request JSON, the raw reply bytes, output
+token count, `done_reason`, `hit_cap`, generated byte count, whether the snippet ends in a newline,
+the source hash before and after every insertion, the selected site and its oracle intent, the load
+result, old regression and new delta at every step, the abort point, rollback status and whether
+restoration was byte-exact, and the final artifact hash. No summaries without bytes - the rule this
+whole line of work exists because I broke it once.
