@@ -1483,3 +1483,90 @@ unrelated to parameter count.
 n=20, one model, one machine, architecture efficacy only. Both arms began from a known-good
 predecessor, so this measures the edit itself and says nothing about sequential survival under
 accumulated self-inflicted damage - that remains a separate experiment.
+
+# FROZEN: what the repeatability calibration may and may not be cited for
+
+Written 2026-09-14 after the budget investigation. The calibration (`ce7909a`, 8 independent
+unseeded repeats on 8 development goals) is frozen here BEFORE its numbers get reused, because the
+budget test showed that one of its failure explanations was wrong. Its pass/fail measurements are
+unaffected; its causal story is not.
+
+## TRUSTED - cite these
+
+  * **pass/fail per repeat** and the empirical **P(pass)** per goal
+  * **run-to-run disagreement** on repeated identical setups
+  * the **STABLE_PASS / STOCHASTIC / STABLE_FAIL** classification
+  * **goal 75 = 1/8** as the measured performance of the frozen `num_predict=600` configuration.
+    This number does NOT change in light of anything below. It is what that configuration did.
+
+## NOT CURRENTLY TRUSTED - do not cite these
+
+  * the **exact cause of any individual failed trajectory**
+  * the claim that **"12/12 v2 failures were syntax/load errors"** in the sense I used it. The LABEL
+    is literally accurate - those trajectories did fail to load. What is wrong is the reading I put
+    on it: I attributed them to the model emitting invalid code, and the budget test proved that at
+    least some were the harness truncating valid code the model was still writing.
+  * any conclusion built on those failure labels, including "the observed failure mass is
+    pre-semantic" as an explanation of WHY rather than a description of WHERE it stopped.
+
+**Why the causal story was lost:** that run recorded failure kinds and not bytes. My own
+preserve-first rule, broken in the one run whose entire purpose was diagnosis. Every probe written
+afterwards writes each reply to disk before classifying it.
+
+## What the budget test settled
+
+Same goal, same source, same prompt, same decoding, same seeds - only `num_predict` varies.
+
+**Goal 75 was the harness.**
+
+    seed 2   n=600   600 tok   stop=length  CAP   loads=false  -> load_error
+             n=900   629 tok   stop=stop          loads=true   -> PASS
+    seed 4   n=600   600 tok   stop=length  CAP   loads=false  -> load_error
+             n=900   632 tok   stop=stop          loads=true   -> PASS
+
+    n=600   PASS 0/2, hit cap 2/2        n=900   PASS 2/2, hit cap 0/2
+
+The model needed 629-632 tokens. `arm.mjs` caps FIM at 600. It was cut off roughly 5% from the end
+of a solution it had already chosen; allowed to finish, the file loads and the only remaining gap is
+the missing export, which the deterministic repair closes.
+
+**Goals 64 and 74 were NOT the harness.** 900 vs 1800 tokens, three seeds each:
+
+    hit cap 0/12     terminated on 'stop' 12/12     loads 12/12
+    old-regression green 0/12     delta 0/12
+    seeds 2 and 3 produced BYTE-IDENTICAL output at both budgets
+
+The generated `to_html` loads and implements a different, simpler renderer:
+
+    'a\nb'  ->  'a\nb\n'                              no paragraph wrapping at all
+    'a\nb'  ->  '<html><body>\na\nb\n</body></html>'   invented document scaffold
+    'a\nb'  ->  '<p>a\n\n\nb'                          no line joining, unclosed tag
+
+Asked to regenerate a whole function, the model solves an EASIER problem than the one the existing
+function already solved - discarding paragraph joining, escaping, headings, emphasis, inline code,
+links and lists. The old-behaviour regression gate caught this 12/12. More budget cannot fix it; the
+unit of work is wrong. **The v3 conclusion therefore stands unchanged, and every v3 behavioural
+failure is completed-but-wrong rather than cut off.**
+
+**Goal 71 was not the harness either** - its FIM outputs were 120 and 139 bytes, far under any cap.
+
+## Two harness defects disclosed, not discovered by a test that was looking for them
+
+**1. `spanAddFunction` inserts without exporting.** It places the function correctly and never adds
+it to `module.exports`, so every `add_function` goal whose contract requires an export fails on
+`missing_export` until the deterministic repair fires. Traced end-to-end: route deterministic,
+repair applied, contract PASS. The repair masked it completely - the defect is invisible in every
+aggregate number because it is always immediately corrected.
+
+**2. The arms used different FIM budgets.** `arm.mjs` 600, `arm3.mjs` 900. On the four v3-treatment
+goals in the 61-80 pilot the arms differed by more than their two declared deltas. The direction
+runs AGAINST v3 - the better-resourced arm still lost - so this does not rescue the v3 result, but
+the comparison was not as clean as reported, and arms must never differ on anything but the deltas
+under test. Any future arm comparison asserts budget equality as an instrument invariant.
+
+## Consequence for how failures get classified from here on
+
+A failure is only attributed to the model once the trajectory is shown to have terminated on `stop`
+without reaching the cap. "Did not load" is a location, not a cause. Every probe preserves bytes,
+token count, `done_reason` and the state before repair, so a wrong causal story can be corrected
+from the record instead of re-run from scratch.
