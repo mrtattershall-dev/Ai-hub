@@ -3024,3 +3024,74 @@ now clearly separable quantities, which is the useful part even with the endpoin
 
 The last line is now harder to attribute to apparatus error than at any earlier point in this sequence,
 which is where the experiment was supposed to end up.
+
+## RISK ESTIMATION separated from AUTHORITY POLICY
+
+B4 showed the frozen gate is a useful discriminator with a broken policy: every negative prediction was
+terminal, so a one-in-eight false-refusal rate killed 81% of seven-site chains. Splitting the two layers:
+
+    RISK ESTIMATION   what does this step look like?                    the frozen gate, unchanged
+    AUTHORITY POLICY  what to do about it GIVEN THE WHOLE CHAIN'S STATE new, needs chain context
+
+Risk mapping, fixed from what each defect DOES rather than how often it appeared:
+
+    unsafe    out_of_scope_identifier            statically certain runtime failure   terminal
+    high      duplicate_accumulation,            statically demonstrable behavioural  cost 2
+              redeclares_existing                damage
+    moderate  instruction_echo, empty_snippet    correlated with failure, not itself  cost 1
+                                                 harmful
+    low       no flags                                                                cost 0
+
+A chain is refused when cumulative cost exceeds its budget, so the fourth questionable step in a
+seven-site transaction is not the same event as the first - which a per-step classifier cannot know.
+
+### An apparatus gap that limits this analysis, stated plainly
+
+**The development runs carry NO recorded gate verdicts.** Shadow gating was added for B4 only, so B2, B3
+and the 7B run cannot serve as a tuning set for the policy. There is therefore no development set on
+which to choose a budget, and the sweep below is on the holdout. Lesson: shadow-record every new
+decision layer from its first run, so a later policy has something to be tuned on that is not the
+evaluation set.
+
+### Exploratory sweep (on B4 - so the BUDGET VALUE IS NOT VALIDATED)
+
+    16 chains, 0 verified
+    budget 0    admitted  2/16   harmful stopped 7/9   harmless killed 33/52   <- hard veto
+    budget 1    admitted  3/16   harmful stopped 7/9   harmless killed 20/52
+    budget 2    admitted  7/16   harmful stopped 6/9   harmless killed 11/52
+    budget 3    admitted  9/16   harmful stopped 4/9   harmless killed  9/52
+    budget 6    admitted 11/16   harmful stopped 4/9   harmless killed  7/52
+    budget Inf  admitted 11/16   harmful stopped 4/9   harmless killed  7/52   <- unsafe-only
+
+**The graded policy dominates the hard veto on this batch.** Budget 2 holds harmful interception at 6/9
+while cutting harmless step-kills from 33 to 11 and raising chain admission from 2/16 to 7/16 - the same
+interception at 3.5x the throughput. That is the shape the separation predicted.
+
+Two honest caveats:
+
+  * **`budget=2` was chosen by looking at the holdout.** It is a hypothesis, not a validated setting. The
+    next batch must run with it fixed in advance.
+  * **"verified among admitted" and "viable destroyed" have no sensitivity here**, because the batch
+    contains no verified chains. Zeros in those columns demonstrate nothing, and the analyser says so.
+
+Note that budget 0 here is STRICTER than B4's own hard veto (2/16 admitted vs 3/16), because the risk
+mapping treats `instruction_echo` and `empty_snippet` as costed while the gate's REFUSE verdict did not.
+The two are not the same policy and are not conflated.
+
+### The discarded gate is a textbook negative control for this idea
+
+It caught MORE harmful steps than the frozen one (69.8% vs 58.1%) and was strictly worse as a system:
+43.3% harmless refusal, and it destroyed the only verified trajectory in the entire sequence. Local
+classification accuracy is not sequential decision quality, and this project now has a concrete instance
+of the difference rather than an argument about it.
+
+### Where this leaves the architecture
+
+    LegaGate risk estimation    prospectively replicated (66.7% harmful / 13.5% harmless, unseen)
+    hard-veto policy            failed
+    graded authority policy     promising, parameter not yet validated
+    preservation                still improving (g64 2/8 -> 3/8 through all seven sites)
+    1.5B behavioural delta      still not demonstrated
+
+The remaining problem is no longer "add another guard". It is a sequential-control problem with named
+parts: risk accumulation, escalation, retry, and commit authority over multiple dependent edits.
