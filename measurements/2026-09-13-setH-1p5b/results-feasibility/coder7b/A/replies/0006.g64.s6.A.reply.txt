@@ -1,0 +1,31 @@
+markdown):
+    lines = markdown.split("\n")
+
+    in_list = False
+    list_items = []
+    html_lines = []
+
+    for line in lines:
+        heading = _is_heading(line)
+        if heading:
+            if in_list:
+                html_lines.append("<ol>" + "".join(list_items) + "</ol>")
+                in_list = False
+                list_items = []
+            html_lines.append(f"<h{heading[0]}>{_inline(heading[1])}</h{heading[0]}>")
+        elif line.startswith("- "):
+            if not in_list:
+                in_list = True
+                html_lines.append("<ol>")
+            list_items.append("<li>" + _inline(line[2:]) + "</li>")
+        else:
+            if in_list:
+                html_lines.append("<ol>" + "".join(list_items) + "</ol>")
+                in_list = False
+                list_items = []
+            html_lines.append("<p>" + _inline(line) + "</p>")
+
+    if in_list:
+        html_lines.append("<ol>" + "".join(list_items) + "</ol>")
+
+    return "\n".join(html_lines)

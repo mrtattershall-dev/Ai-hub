@@ -1,0 +1,66 @@
+if items:
+                blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+                del items[:]
+            # END OF REQUESTED CHANGE
+        elif line.startswith("1. "):
+            flush_para()
+            if items:
+                blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+                del items[:]
+            items.append(line[3:].strip())
+            continue
+        # END OF REQUESTED CHANGE
+        elif line.startswith("1. "):
+            flush_para()
+            if items:
+                blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+                del items[:]
+            items.append(line[3:].strip())
+            continue
+        # END OF REQUESTED CHANGE
+        elif line.startswith("1. "):
+            flush_para()
+            if items:
+                blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+                del items[:]
+            items.append(line[3:].strip())
+            continue
+        # END OF REQUESTED CHANGE
+        elif line.startswith("1. "):
+            flush_para()
+            if items:
+                blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+                del items[:]
+            items.append(line[3:].strip())
+            continue
+        # END OF REQUESTED CHANGE
+        elif line.startswith("1. "):
+            flush_para()
+            if items:
+                blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+                del items[:]
+            items.append(line[3:].strip())
+            continue
+        # END OF REQUESTED CHANGE
+        elif line.startswith("1. "):
+            flush_para()
+            if items:
+                blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+                del items[:]
+            items.append(line[3:].strip())
+            continue
+        # END OF REQUESTED CHANGE
+        elif line.startswith("1. "):
+            flush_para()
+            if items:
+                blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+                del items[:]
+            items.append(line[3:].strip())
+            continue
+        # END OF REQUESTED CHANGE
+        elif line.startswith("1. "):
+            flush_para()
+            if items:
+                blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+                del items[:]
+            items.append(line[3:].

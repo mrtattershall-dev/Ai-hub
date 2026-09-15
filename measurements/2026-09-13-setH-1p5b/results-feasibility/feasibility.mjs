@@ -424,9 +424,16 @@ for (const goal of CASES) {
       + '   VERIFIED ' + r.filter((x) => x.verified).length + '/' + r.length);
   }
 }
+// The gating warning must only fire when R was actually REQUESTED. Running CONDS=A printed
+// "reference control: 0/0 <-- READ NOTHING ELSE UNTIL FIXED", which looks like a failed control rather
+// than an un-requested one - a scary message with no defect behind it is its own kind of wrong.
 const ctl = rows.filter((x) => x.condition === 'R_reference_control');
-console.log('\n  reference control: ' + ctl.filter((x) => x.verified).length + '/' + ctl.length
-  + (ctl.length && ctl.every((x) => x.verified) ? '  (harness and site order sound)' : '  <-- READ NOTHING ELSE UNTIL FIXED'));
+if (!CONDS.includes('R')) {
+  console.log('\n  reference control: not requested in this run (CONDS=' + CONDS.join(',') + ')');
+} else {
+  console.log('\n  reference control: ' + ctl.filter((x) => x.verified).length + '/' + ctl.length
+    + (ctl.length && ctl.every((x) => x.verified) ? '  (harness and site order sound)' : '  <-- READ NOTHING ELSE UNTIL FIXED'));
+}
 const rb = rows.filter((x) => x.rollback);
 console.log('  rollbacks byte-exact: ' + rb.filter((x) => x.restored_byte_exact).length + '/' + rb.length);
 console.log('\n  RAW = ' + OUT);

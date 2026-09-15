@@ -1,0 +1,6 @@
+continue
+        if line.startswith("#"):
+            flush_para()
+            flush_list()
+            level, body = _is_heading(line)
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))

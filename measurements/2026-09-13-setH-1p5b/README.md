@@ -2495,3 +2495,73 @@ match and a difference cannot be blamed on the infill format.
                              negative result available here
 
 n=8 per goal per condition, one model, one machine. No significance test.
+
+## RESULT B3 (1.5B) and the 7B side control
+
+### B3 on qwen2.5-coder:1.5b, fresh seeds 31-38
+
+    goal 64   completed 2/8   OLD KEPT 2/8   DELTA 0/8   VERIFIED 0/8
+    goal 74   completed 4/8   OLD KEPT 4/8   DELTA 0/8   VERIFIED 0/8
+    rollbacks 16/16 byte-exact    reference control 2/2
+
+STRICT changed the shape as designed. B2 had goal 74 "completing" 8/8 while only 2/8 preserved
+behaviour; B3 turns those broken completions into honest aborts, so **every chain that completes has
+preserved every accumulated behaviour**. On the metric that survives both apparatuses - old behaviour
+kept - it doubled on both goals: 1/8 -> 2/8 and 2/8 -> 4/8. Delta remains 0/16.
+
+Two things argue AGAINST crediting the contrast block much:
+
+  * **`codes` still appeared** despite the block naming it out-of-scope. Naming foreign identifiers did
+    not stop the model reaching for them.
+  * **`anchor_ambiguous (2 occurrences)` at site 5** on three goal-64 seeds: an earlier snippet
+    duplicated text and made a later anchor non-unique, so the harness refused rather than editing an
+    ambiguous location. Those chains died on plan integrity, not snippet quality.
+
+### The causal taxonomy's fourth quadrant earned its place
+
+    B3 (1.5B)   6x DELTA_INCOMPLETE   5x MULTIPLE_DEFECTS   2x LOCAL_SNIPPET_DEFECT   3x aborted
+
+`MULTIPLE_DEFECTS` - the site-k snippet AND the upstream state independently defective - fires 5 times
+here and fired 0 times in B1 and B2. Added at tatte's insistence before these results existed; without
+it all five would have been labelled local or upstream depending only on which counterfactual was
+inspected first, and there is no honest single-site attribution to make for them.
+
+### SIDE CONTROL: the same harness on qwen2.5-coder:7b (one A10G, Modal)
+
+    condition A   goal 64  loads 8/8  OLD KEPT 0/8  VERIFIED 0/8
+                  goal 74  loads 5/8  OLD KEPT 0/8  VERIFIED 0/8
+    condition B3  goal 64  completed 0/8  OLD KEPT 0/8  VERIFIED 0/8
+                  goal 74  completed 1/8  OLD KEPT 1/8  VERIFIED 1/8
+
+**Whole-function replacement fails at 7B exactly as at 1.5B: 0/16 verified, 0/16 preserving old
+behaviour, at BOTH sizes.** And it fails the same way - seven of eight goal-64 seeds return
+
+    'a\nb' -> '<p>a</p>\n<p>b</p>'    wanted '<p>a b</p>'
+
+losing paragraph line-joining, goal 4, the oldest behaviour in the file, which the 1.5B lost in 14 of
+16. **That failure was never about model size.** It is the task shape: delete a working implementation,
+then ask for it back from ten asserts.
+
+The localized route produced **the first verified end-to-end behavioural edit in this entire sequence** -
+goal 74 seed 34 on the 7B: 3/3 sites, loads, old behaviour kept, delta passed. One out of sixteen, so
+this is existence, not reliability.
+
+Against the preregistered readings this is **"7B passes B but not A"**: the architecture does real work
+at both sizes, since the route that localizes and bounds produced the only success anywhere while the
+route that reconstructs produced none at either size. It is emphatically NOT "the gap is mostly size".
+
+### The general 7B cannot run this harness at all
+
+    qwen2.5:7b         capabilities ["completion","tools"]            -> no insert
+    qwen2.5-coder:7b   capabilities ["completion","tools","insert"]   -> FIM works
+
+ollama refuses the request outright: `registry.ollama.ai/library/qwen2.5:7b does not support insert`.
+Conditions A and B are both `/api/generate` with a suffix, so the general model produces no score
+rather than a poor one. **This whole localized-edit architecture is available only to models shipping
+FIM weights** - a real constraint on the design, and one that no benchmark number would have surfaced.
+
+### An apparatus nit, fixed
+
+Running `CONDS=A` printed `reference control: 0/0 <-- READ NOTHING ELSE UNTIL FIXED`, which reads as a
+failed control rather than an un-requested one. The warning now fires only when R was actually
+requested. A frightening message with no defect behind it is its own kind of wrong.

@@ -1,0 +1,69 @@
+  FIRST-FAILING-SITE ANALYSIS   (preserved data, no new inference)
+
+  g64 s31  [GGGGR]      5/7   FIRST_FAILING_SITE=5 (OLD_REGRESSION)
+        site 5 intent: the new branch: a line starting with a number, a dot and a space is an ordered-list item; close 
+        it wrote:         # END OF REQUESTED CHANGE\n\n        flush_para()\n
+  g64 s32  [GGGGGR]     6/7   FIRST_FAILING_SITE=6 (OLD_REGRESSION)
+        site 6 intent: any other kind of line must close an open ordered list
+        it wrote:         # BEGIN SOLUTION\n        if items:\n            flush_list()\n        # END SOLUTION\n 
+        bound stopped by: dedent_below_site  (dropped 30 lines, 1648 bytes)
+  g64 s33  [GGGG?]      4/7   aborted: site 5: anchor_ambiguous (2 occurrences)
+  g64 s34  [GGGGGR]     6/7   FIRST_FAILING_SITE=6 (OLD_REGRESSION)
+        site 6 intent: any other kind of line must close an open ordered list
+        it wrote:         if line.startswith("1. "):\n            flush_para()\n            if items:\n           
+        bound stopped by: dedent_below_site  (dropped 53 lines, 1561 bytes)
+  g64 s35  [GGR]        3/7   FIRST_FAILING_SITE=3 (OLD_REGRESSION)
+        site 3 intent: a blank line must also close an open ordered list
+        it wrote:             # END SOLUTION\n            blocks.append("<p></p>")\n
+        bound stopped by: dedent_below_site  (dropped 44 lines, 2119 bytes)
+  g64 s36  [GGR]        3/7   FIRST_FAILING_SITE=3 (OLD_REGRESSION)
+        site 3 intent: a blank line must also close an open ordered list
+        it wrote:             # END OF NOT AVAILABLE HERE\n            # BEGIN NEW CODE\n            flush_ordered
+        bound stopped by: dedent_below_site  (dropped 13 lines, 410 bytes)
+  g64 s37  [GGGG?]      4/7   aborted: site 5: anchor_ambiguous (2 occurrences)
+  g64 s38  [GGGG?]      4/7   aborted: site 5: anchor_ambiguous (2 occurrences)
+  g74 s31  [GR]         2/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fences before every other line rule: while inside a fence, a closing ``` line emits <pre>
+        it wrote:         if fenced_code_block is None and line.startswith("```"):\n            fenced_code_block 
+        bound stopped by: dedent_below_site  (dropped 20 lines, 788 bytes)
+  g74 s32  [X]          0/3   FIRST_FAILING_SITE=1 (LOAD)
+  g74 s33  [GR]         2/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fences before every other line rule: while inside a fence, a closing ``` line emits <pre>
+        it wrote:         if fenced_code_block is not None:\n            if line.strip() == "```":\n              
+        bound stopped by: dedent_below_site  (dropped 26 lines, 1443 bytes)
+  g74 s34  [GGG]        3/3   VERIFIED
+  g74 s35  [GR]         2/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fences before every other line rule: while inside a fence, a closing ``` line emits <pre>
+        it wrote:         if fenced_code_block is None:\n            if line.startswith("```"):\n                f
+        bound stopped by: dedent_below_site  (dropped 18 lines, 765 bytes)
+  g74 s36  [R]          1/3   FIRST_FAILING_SITE=1 (OLD_REGRESSION)
+        site 1 intent: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collect
+        it wrote:     fenced_code_block = None\n    for line in text.split("\n"):\n        if line.strip() == "":\
+        bound stopped by: dedent_below_site  (dropped 17 lines, 722 bytes)
+  g74 s37  [R]          1/3   FIRST_FAILING_SITE=1 (OLD_REGRESSION)
+        site 1 intent: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collect
+        it wrote:     fenced_code_block = None  # Declare the fenced-code-block state\n    for line in text.split(
+        bound stopped by: dedent_below_site  (dropped 16 lines, 882 bytes)
+  g74 s38  [GR]         2/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fences before every other line rule: while inside a fence, a closing ``` line emits <pre>
+        it wrote:         # END CODE ADDED FOR FENCED CODE BLOCKS\n        if line.startswith("```"):\n           
+        bound stopped by: dedent_below_site  (dropped 37 lines, 1079 bytes)
+
+  legend  G = loads and old behaviour green   R = loads but old behaviour broke   X = does not load
+
+===== VERDICT TALLY =====
+  11x  FIRST_FAILING_SITE=k (OLD_REGRESSION)
+  3x  aborted
+  1x  FIRST_FAILING_SITE=k (LOAD)
+  1x  VERIFIED
+
+  where the chain first breaks, by site:
+    site 1  3 trajectories
+    site 2  4 trajectories
+    site 3  2 trajectories
+    site 5  1 trajectory
+    site 6  2 trajectories
+
+  transaction depth (sites completed) per goal:
+    g64  3 3 4 4 4 5 6 6   max 6
+    g74  0 1 1 2 2 2 2 3   max 3

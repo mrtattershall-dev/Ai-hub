@@ -1,0 +1,8 @@
+# AT THIS POINT WRITE ONLY THIS: handle heading lines: while at the beginning of a line starting with a #, emit <h1>... or <h2>... or <h3>...; otherwise collect the rest verbatim
+        # ALREADY HANDLED ELSEWHERE - do not add a second path for it: ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists already have their own branches
+        # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+        # Any line this code does not handle must fall through to the EXISTING code unchanged.
+        # AT THIS POINT WRITE ONLY THIS: handle unordered list lines: while at the beginning of a line starting with "-", collect the rest verbatim
+        # ALREADY HANDLED ELSEWHERE - do not add a second path for it: ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists already have their own branches
+        # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+        # Any line this code does not handle must fall through to the EXISTING code unchanged.

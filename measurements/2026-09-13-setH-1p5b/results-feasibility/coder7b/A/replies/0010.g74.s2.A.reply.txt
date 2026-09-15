@@ -1,0 +1,35 @@
+text):
+    lines = text.split("\n")
+
+    html = []
+    in_code_block = False
+    code_lines = []
+
+    for line in lines:
+        if line.strip() == "```":
+            if in_code_block:
+                html.append("<pre><code>")
+                for cline in code_lines:
+                    html.append(_escape(cline))
+                html.append("</code></pre>")
+                code_lines = []
+            else:
+                in_code_block = True
+        elif in_code_block:
+            code_lines.append(line)
+        else:
+            if _is_heading(line):
+                level, title = _is_heading(line)
+                html.append("<h%d>%s</h%d>" % (level, title, level))
+            elif line.strip() == "":
+                html.append("<p></p>")
+            else:
+                html.append("<p>" + _inline(line) + "</p>")
+
+    if in_code_block:
+        html.append("<pre><code>")
+        for cline in code_lines:
+            html.append(_escape(cline))
+        html.append("</code></pre>")
+
+    return "\n".join(html)

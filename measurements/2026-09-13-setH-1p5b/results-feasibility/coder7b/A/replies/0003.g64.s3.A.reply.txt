@@ -1,0 +1,27 @@
+text):
+    lines = text.split("\n")
+    html = []
+    ul = []
+
+    def flush_ul():
+        if ul:
+            html.append("<ol>" + "".join(ul) + "</ol>")
+            ul.clear()
+
+    for line in lines:
+        heading = _is_heading(line)
+        if heading:
+            flush_ul()
+            html.append(f'<h{heading[0]}>{_inline(heading[1])}</h{heading[0]}>')
+        elif re.match(r"^\d+ \.", line):
+            flush_ul()
+            ul.append(f"<li>{_inline(re.sub(r'^\d+ \.', '', line))}</li>")
+        else:
+            if ul:
+                html.append("<ul>" + "".join(ul) + "</ul>")
+                ul.clear()
+            html.append(f"<p>{_inline(line)}</p>")
+
+    flush_ul()
+
+    return "\n".join(html)

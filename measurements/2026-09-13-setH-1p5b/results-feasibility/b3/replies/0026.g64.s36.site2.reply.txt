@@ -1,0 +1,20 @@
+# REQUESTED CHANGE: Add a flush function for codes, mirroring flush_list but emitting <code>
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    # REQUESTED CHANGE: Add a flush function for links, mirroring flush_list but emitting <a href="url">label</a>
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+    def flush_codes():
+        if codes:
+            blocks.append("<pre><code>" + _inline(" ".join(codes)) + "</code></pre>")
+            del codes[:]
+
+    def flush_links():
+        if links:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in links) + "</ul>")
+            del links[:]
+
+    def take_code(m):
+        codes.append("<code>" + _escape(m.group(1)) + "</code>")
+        return _CODE % (len(codes) - 1)
+
+    text = re.sub(r"`([^`]*)`", take_code, text)

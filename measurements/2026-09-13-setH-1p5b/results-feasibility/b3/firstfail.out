@@ -1,0 +1,54 @@
+  FIRST-FAILING-SITE ANALYSIS   (preserved data, no new inference)
+
+  g64 s31  [GGGGR]      5/7   FIRST_FAILING_SITE=5 (OLD_REGRESSION)
+        site 5 intent: the new branch: a line starting with a number, a dot and a space is an ordered-list item; close 
+        it wrote:         # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label,
+        bound stopped by: dedent_below_site  (dropped 36 lines, 1797 bytes)
+  g64 s32  [GGGG?]      4/7   aborted: site 5: anchor_ambiguous (2 occurrences)
+  g64 s33  [GGGGGGG]    7/7   PLAN_COMPLETED_DELTA_WRONG
+  g64 s34  [GGGGGR]     6/7   FIRST_FAILING_SITE=6 (OLD_REGRESSION)
+        site 6 intent: any other kind of line must close an open ordered list
+        it wrote:         if h:\n            flush_para()\n            level, body = h\n            blocks.append(
+        bound stopped by: dedent_below_site  (dropped 59 lines, 2285 bytes)
+  g64 s35  [GR]         2/7   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: define a flush function for ordered lists, mirroring flush_list but emitting <ol>
+        it wrote:     def flush():\n        if current:\n            blocks.append(_inline(" ".join(current)))\n  
+  g64 s36  [GGGG?]      4/7   aborted: site 5: anchor_ambiguous (2 occurrences)
+  g64 s37  [GGGG?]      4/7   aborted: site 5: anchor_ambiguous (2 occurrences)
+  g64 s38  [GGGGGGG]    7/7   PLAN_COMPLETED_DELTA_WRONG
+  g74 s31  [GGR]        3/3   FIRST_FAILING_SITE=3 (OLD_REGRESSION)
+        site 3 intent: a fence that was never closed must still be emitted at the end of the input
+        it wrote:     if codes:\n        blocks.append("<pre><code>")\n        for c in codes:\n            blocks
+  g74 s32  [GGG]        3/3   PLAN_COMPLETED_DELTA_WRONG
+  g74 s33  [GR]         2/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fences before every other line rule: while inside a fence, a closing ``` line emits <pre>
+        it wrote:         if line.strip() == "":\n            flush_para()\n            flush_list()\n            
+        bound stopped by: dedent_below_site  (dropped 28 lines, 958 bytes)
+  g74 s34  [GR]         2/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fences before every other line rule: while inside a fence, a closing ``` line emits <pre>
+        it wrote:         # AT THIS POINT WRITE ONLY THIS: handle ordinary text: the current list and paragraph br
+        bound stopped by: instruction_echo  (dropped 5 lines, 430 bytes)
+  g74 s35  [GGG]        3/3   PLAN_COMPLETED_DELTA_WRONG
+  g74 s36  [GGG]        3/3   PLAN_COMPLETED_DELTA_WRONG
+  g74 s37  [GGG]        3/3   PLAN_COMPLETED_DELTA_WRONG
+  g74 s38  [GR]         2/3   FIRST_FAILING_SITE=2 (OLD_REGRESSION)
+        site 2 intent: handle fences before every other line rule: while inside a fence, a closing ``` line emits <pre>
+        it wrote:         if line.strip() == "":\n            flush_para()\n            continue\n        if line.
+        bound stopped by: dedent_below_site  (dropped 22 lines, 817 bytes)
+
+  legend  G = loads and old behaviour green   R = loads but old behaviour broke   X = does not load
+
+===== VERDICT TALLY =====
+  7x  FIRST_FAILING_SITE=k (OLD_REGRESSION)
+  6x  PLAN_COMPLETED_DELTA_WRONG
+  3x  aborted
+
+  where the chain first breaks, by site:
+    site 2  4 trajectories
+    site 3  1 trajectory
+    site 5  1 trajectory
+    site 6  1 trajectory
+
+  transaction depth (sites completed) per goal:
+    g64  2 4 4 4 5 6 7 7   max 7
+    g74  2 2 2 3 3 3 3 3   max 3

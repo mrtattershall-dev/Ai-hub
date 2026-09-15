@@ -1,0 +1,4 @@
+def flush_ordered_list():
+        if items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+            del items[:]

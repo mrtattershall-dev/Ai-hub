@@ -1,0 +1,13 @@
+text):
+    lines = text.split("\n")
+
+    html = []
+    for line in lines:
+        if (level, title) := _is_heading(line):
+            html.append(f"<h{level}>{title}</h{level}>")
+        elif line.strip() == "":
+            html.append("<p>")
+        else:
+            html.append("<p>" + _inline(line) + "</p>")
+
+    return "\n".join(html)

@@ -1,0 +1,28 @@
+text):
+    lines = text.split("\n")
+    in_code_block = False
+    code_block_lines = []
+
+    def flush_code_block():
+        nonlocal in_code_block, code_block_lines
+        if in_code_block:
+            lines.insert(lines.index("\n".join(code_block_lines)), "<pre><code>")
+            lines.insert(lines.index("\n".join(code_block_lines)) + 2, "</code></pre>")
+            in_code_block = False
+            code_block_lines.clear()
+
+    for i, line in enumerate(lines):
+        if re.match(r"^```", line):
+            if in_code_block:
+                flush_code_block()
+            else:
+                in_code_block = True
+                code_block_lines.append(line)
+        elif in_code_block:
+            code_block_lines.append(line.strip())
+        else:
+            lines[i] = _inline(line)
+
+    flush_code_block()
+
+    return "\n".join(lines)

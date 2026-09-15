@@ -1,0 +1,36 @@
+# NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+        # AT THIS POINT WRITE ONLY THIS: if line is empty or starts with a blank line, flush current and open new paragraph/list
+        # ALREADY HANDLED ELSEWHERE - do not add a second path for it: ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists already have their own branches
+        # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+        if line.startswith("```"):
+            if codes:
+                blocks.append("<pre><code>\n".join(codes) + "\n</code></pre>")
+                del codes[:]
+            elif links:
+                blocks.append("<pre><code>\n".join(links) + "\n</code></pre>")
+                del links[:]
+
+            # AT THIS POINT WRITE ONLY THIS: close any open paragraph and list
+            # ALREADY HANDLED ELSEWHERE - do not add a second path for it: ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists already have their own branches
+            # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+            if items:
+                blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+                del items[:]
+
+            # AT THIS POINT WRITE ONLY THIS: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collected lines
+            # ALREADY HANDLED ELSEWHERE - do not add a second path for it: ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists already have their own branches
+            # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+            blocks.append("<pre><code>")
+        elif line.endswith("```"):
+            if codes:
+                blocks.append("<pre><code>\n".join(codes) + "\n</code></pre>")
+                del codes[:]
+            elif links:
+                blocks.append("<pre><code>\n".join(links) + "\n</code></pre>")
+                del links[:]
+
+            # AT THIS POINT WRITE ONLY THIS: close any open paragraph and list
+            # ALREADY HANDLED ELSEWHERE - do not add a second path for it: ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists

@@ -1,0 +1,40 @@
+markdown):
+    lines = markdown.split("\n")
+
+    html = []
+    code_block = None
+
+    for line in lines:
+        if code_block is not None:
+            if line.strip() != "```":
+                html.append(_escape(line))
+            else:
+                html.append("</code></pre>")
+                code_block = None
+            continue
+
+        heading = _is_heading(line)
+        if heading:
+            level, text = heading
+            html.append(f"<h{level}>{text}</h{level}>")
+            continue
+
+        if line.strip() == "":
+            html.append("<p>")
+            continue
+
+        if line.strip().startswith("```"):
+            html.append("<pre><code>")
+            code_block = True
+            continue
+
+        html.append("<p>" + _inline(line))
+
+    if code_block:
+        html.append("</code></pre>")
+
+    for i, p in enumerate(html):
+        if p.startswith("<p>") and p.endswith("</p>"):
+            html[i] = "<p>" + _escape(p[3:-4]).replace("\n", " ") + "</p>"
+
+    return "\n".join(html)

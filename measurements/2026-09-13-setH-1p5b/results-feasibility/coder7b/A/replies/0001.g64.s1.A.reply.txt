@@ -1,0 +1,34 @@
+markdown):  # markdown is a string containing the markdown text
+    lines = markdown.splitlines()
+    in_list = False
+    list_items = []
+    html = []
+
+    def close_list():
+        nonlocal in_list, list_items
+        if list_items:
+            html.append("<ol>")
+            for item in list_items:
+                html.append(f"<li>{item}</li>")
+            html.append("</ol>")
+            list_items = []
+            in_list = False
+
+    for line in lines:
+        heading = _is_heading(line)
+        if heading:
+            close_list()
+            html.append(f'<h{heading[0]}>{_inline(heading[1])}</h{heading[0]}>')
+        elif re.match(r"^\d+ \.", line):
+            close_list()
+            in_list = True
+            list_items.append(_inline(line.split(" ", 2)[2]))
+        else:
+            if in_list:
+                list_items[-1] += " " + _inline(line)
+            else:
+                html.append(f"<p>{_inline(line)}</p>")
+
+    close_list()
+
+    return "\n".join(html)  # the returned value should be a string containing the HTML output

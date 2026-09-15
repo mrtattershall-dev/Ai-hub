@@ -1,0 +1,8 @@
+# AT THIS POINT WRITE ONLY THIS: the existing code continues as is, including the flush_list and flush_para calls
+        # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+    if current:
+        flush_para()
+        flush_list()
+
+    if items:

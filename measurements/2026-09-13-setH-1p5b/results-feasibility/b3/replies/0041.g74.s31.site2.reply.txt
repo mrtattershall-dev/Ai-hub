@@ -1,0 +1,69 @@
+# AT THIS POINT WRITE ONLY THIS: handle the lines that are not inside any fence: a blank line ends the current paragraph and list; all other lines are collected verbatim
+        # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+        if line.strip() == "```":
+            if items:
+                flush_list()
+            codes = []
+            labels = []
+            links = []
+            m = None
+            take_code = lambda x: _CODE % (len(codes) - 1)
+            take_link = lambda x: _LINK % (len(links) - 1)
+
+            def handle_code(m):
+                codes.append("<code>" + _escape(m.group(1)) + "</code>")
+                return _CODE % (len(codes) - 1)
+
+            text = re.sub(r"`([^`]*)`", handle_code, text)
+        elif line.strip() == "```":
+            if labels:
+                flush_list()
+            codes = []
+            labels = []
+            links = []
+            m = None
+            take_code = lambda x: _CODE % (len(codes) - 1)
+            take_link = lambda x: _LINK % (len(links) - 1)
+
+            def handle_code(m):
+                codes.append("<code>" + _escape(m.group(1)) + "</code>")
+                return _CODE % (len(codes) - 1)
+
+            text = re.sub(r"`([^`]*)`", handle_code, text)
+        elif line.strip() == "```":
+            if links:
+                flush_list()
+            codes = []
+            labels = []
+            links = []
+            m = None
+            take_code = lambda x: _CODE % (len(codes) - 1)
+            take_link = lambda x: _LINK % (len(links) - 1)
+
+            def handle_code(m):
+                codes.append("<code>" + _escape(m.group(1)) + "</code>")
+                return _CODE % (len(codes) - 1)
+
+            text = re.sub(r"`([^`]*)`", handle_code, text)
+        elif line.strip() == "```":
+            if labels:
+                flush_list()
+            codes = []
+            labels = []
+            links = []
+            m = None
+            take_code = lambda x: _CODE % (len(codes) - 1)
+            take_link = lambda x: _LINK % (len(links) - 1)
+
+            def handle_code(m):
+                codes.append("<code>" + _escape(m.group(1)) + "</code>")
+                return _CODE % (len(codes) - 1)
+
+            text = re.sub(r"`([^`]*)`", handle_code, text)
+        elif line.strip() == "```":
+            if labels:
+                flush_list()
+            codes = []
+            labels = []
+           

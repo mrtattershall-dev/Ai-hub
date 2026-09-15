@@ -1,0 +1,28 @@
+markdown):
+    lines = markdown.split("\n")
+
+    in_list = False
+    list_items = []
+
+    for line in lines:
+        heading = _is_heading(line)
+        if heading:
+            if in_list:
+                yield "<ol>" + "\n".join(list(map(_inline, list_items))) + "</ol>"
+                in_list = False
+                list_items = []
+            yield "<h%d>%s</h%d>" % heading
+        elif line.startswith("1. "):
+            if not in_list:
+                yield "<ol>"
+                in_list = True
+            list_items.append(line[3:])
+        else:
+            if in_list:
+                yield "<ol>" + "\n".join(list(map(_inline, list_items))) + "</ol>"
+                in_list = False
+                list_items = []
+            yield "<p>%s</p>" % _inline(line)
+
+    if in_list:
+        yield "<ol>" + "\n".join(list(map(_inline, list_items))) + "</ol>"

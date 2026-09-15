@@ -1,0 +1,44 @@
+text):
+    text = "\n" + text.strip() + "\n"
+    result = []
+    in_paragraph = False
+    current_list_type = None
+    current_list_items = []
+
+    for line in text.split("\n"):
+        if line.startswith("# "):
+            level, heading_text = _is_heading(line)
+            if in_paragraph:
+                result.append("</p>")
+                in_paragraph = False
+            if current_list_type:
+                result.append(f"</{current_list_type}>")
+                current_list_type = None
+                current_list_items.clear()
+            result.append(f"<h{level}>{_inline(heading_text)}</h{level}>")
+        elif line.startswith("- "):
+            if not in_paragraph and current_list_type != "ol":
+                result.append("<ul>")
+                current_list_type = "ul"
+            item_text = line[2:].strip()
+            current_list_items.append(_inline(item_text))
+        else:
+            if current_list_type:
+                result.append(f"</{current_list_type}>")
+                current_list_type = None
+                current_list_items.clear()
+            if in_paragraph:
+                result.append("</p>")
+                in_paragraph = False
+            if line.strip():
+                in_paragraph = True
+                result.append("<p>" + _inline(line) + "</p>")
+
+    if in_paragraph:
+        result.append("</p>")
+    if current_list_type:
+        result.append(f"</{current_list_type}>")
+        current_list_type = None
+        current_list_items.clear()
+
+    return "".join(result).strip()

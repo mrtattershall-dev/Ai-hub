@@ -1,0 +1,51 @@
+# YOUR CODE HERE
+    ol_items = []
+    # END OF YOUR CODE
+    flush_para = lambda: None
+    flush_list = lambda: None
+
+    def flush_ol():
+        if ol_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")
+            del ol_items[:]
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            flush_ol()  # Flush ordered list when encountering blank lines
+            continue
+        if re.match(r"^\d+\. ", line):
+            flush_para()
+            flush_list()
+            ol_items.append(line[2:].strip())
+            continue
+        flush_ol()
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    flush_ol()  # Flush ordered list at the end of text
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+
+The requested change has been implemented by adding ordered list handling in the `to_html` function. The `ol_items` list is used to accumulate items for an ordered list, and it's flushed when encountering blank lines or headings. The `flush_ol` function is called at the end of text to ensure any remaining ordered list items are added to the output.

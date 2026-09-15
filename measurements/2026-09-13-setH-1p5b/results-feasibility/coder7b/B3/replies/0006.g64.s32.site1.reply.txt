@@ -1,0 +1,5 @@
+# BEGIN SOLUTION
+    ol_items = []
+    # END SOLUTION
+    flush_para = lambda: None  # Dummy function, replace with actual implementation if needed.
+    flush_list = lambda: None  # Dummy function, replace with actual implementation if needed.

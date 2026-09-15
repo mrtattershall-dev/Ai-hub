@@ -1,0 +1,20 @@
+# END OF NOT AVAILABLE HERE
+            # BEGIN NEW CODE
+            flush_ordered_list()  # Flush any open ordered list before starting a new paragraph
+            blocks.append("<p>")
+            current = []
+            continue
+            # END NEW CODE
+        if line.startswith("1. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        flush_ordered_list()
+        if line.startswith("#"):
+            flush_para()
+            h = _is_heading(line)
+            if h:
+                flush_para()
+                level, body = h
+                blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+    

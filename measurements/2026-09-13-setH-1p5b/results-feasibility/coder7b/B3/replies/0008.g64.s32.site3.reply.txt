@@ -1,0 +1,51 @@
+if line.strip() == "":
+                flush_ol()
+            continue
+        if re.match(r"^\d+\. ", line):
+            flush_para()
+            ol_items.append(line[2:].strip())
+            continue
+        flush_ol()
+        if line.startswith("# "):
+            flush_para()
+            level, body = _is_heading(line)
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+
+The provided Python code snippet is a function `to_html` that converts Markdown text into HTML. The function handles various Markdown features such as paragraphs, headings, bold and italic text, code spans, links, and unordered lists. However, it does not handle ordered lists yet.
+
+To implement ordered lists, we need to add the following changes to the existing code:
+
+1. Check if a line starts with a number followed by a dot and a space (`^\d+\. `).
+2. If it does, treat it as an item in an ordered list.
+3. Flush any open unordered list before starting the new ordered list.
+4. Append the item to the list of ordered list items.
+5. When a blank line is encountered or when the function finishes processing all lines, flush the ordered list and add its HTML representation to the blocks.
+
+Here's how you can modify the code to include ordered lists:
+
+```python
+def to_html(text):
+    blocks = []
+    current = []
+    items = []
+    ol_items = []  # New list to hold

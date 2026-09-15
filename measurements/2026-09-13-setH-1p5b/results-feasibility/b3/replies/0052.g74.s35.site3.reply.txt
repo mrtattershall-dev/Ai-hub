@@ -1,0 +1,5 @@
+# NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    if current:
+        blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+    if items:
+        blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")

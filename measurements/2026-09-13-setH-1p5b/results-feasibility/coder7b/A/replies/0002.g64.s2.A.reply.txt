@@ -1,0 +1,30 @@
+text):
+    lines = text.split("\n")
+    html = []
+    in_list = False
+    list_items = []
+
+    for line in lines:
+        heading = _is_heading(line)
+        if heading is not None:
+            if in_list:
+                html.append("<ol>" + "\n".join(list(map(_inline, list_items))) + "</ol>")
+                list_items = []
+                in_list = False
+            html.append("<h" + str(heading[0]) + ">" + _inline(heading[1]) + "</h" + str(heading[0]) + ">")
+        elif re.match(r"^\d+ \.", line):
+            if not in_list:
+                html.append("<ol>")
+                in_list = True
+            list_items.append(line[3:])
+        else:
+            if in_list:
+                html.append("<ol>" + "\n".join(list(map(_inline, list_items))) + "</ol>")
+                list_items = []
+                in_list = False
+            html.append("<p>" + _inline(line) + "</p>")
+
+    if in_list:
+        html.append("<ol>" + "\n".join(list(map(_inline, list_items))) + "</ol>")
+
+    return "\n".join(html)
