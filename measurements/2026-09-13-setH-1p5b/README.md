@@ -3339,3 +3339,57 @@ reported.
 The second is likely the more durable. It moves the design from "tell the model which nearby code not to
 copy" to "derive the program's semantic ownership rules and state them in the edit contract" - the same
 migration from oracle prose to computed fact that scope facts already went through.
+
+
+## THE THESIS, SHARPENED (tatte, 2026-09-15)
+
+The founding framing at the top of this file is refined by its author, and the refinement is a claim
+about ACCESSIBLE CAPABILITY rather than about training data:
+
+> "1.5B isn't trained only on code clips. But its most reliable usable capability behaves like a local
+> code-pattern engine, while whole-program engineering exceeds its reliable coordination capacity."
+
+Qwen2.5-Coder-1.5B was trained on whole files, repository-level context, FIM and general text. It has
+seen complete programs. What the experiments in this file bear on is not what it was shown but what it
+can be relied on to do:
+
+    reliably accessible    "after this signature, this body follows", "inside this branch, this
+                           statement makes sense", "given this prefix and suffix, this fragment belongs"
+    exceeds coordination   hold a 1000-line program, infer seven accumulated constraints, preserve all
+                           of them, add a feature at three sites, and stop at exactly the right
+                           boundaries
+
+### What this file's evidence says about that claim
+
+**Supporting.** Whole-function reconstruction fails identically at 1.5B and 7B - 0/16 verified and 0/16
+preserving old behaviour at BOTH sizes - and fails the same way, losing paragraph line-joining in 14/16
+and 13/16. A roughly 5x parameter increase did not buy the coordination that task needs. That is
+evidence the deficit is not simply "more parameters, better coding".
+
+**Supporting, and the sharper instance.** The six-line ordered-list BRANCH was generated correctly by
+some seeds while the one-line `ol_items = []` DECLARATION failed on every route. Difficulty did not
+predict failure. The branch mapped cleanly onto a learned coding pattern; the declaration required
+resolving an ambiguity the environment had not specified ("an accumulator beside the existing items
+list" never says the identifier is `ol_items`). That is what a local pattern engine looks like from
+outside.
+
+**Not yet supporting.** The 1.5B remains 0/16 on the localized behavioural delta while the 7B produced
+1/16. n=1, and no claim rests on it.
+
+**Orthogonal, and worth keeping.** `qwen2.5:7b` cannot run this architecture at all - no FIM weights -
+while `qwen2.5-coder:7b` can. For this design, specialisation is a harder constraint than size.
+
+### What it implies for the division of labour
+
+    Legasus     understand project state, derive ownership, choose sites, order changes, specify
+                constraints, preserve existing code, decide boundaries, verify behaviour, roll back
+    1.5B        write this little piece
+
+Every apparatus defect found in this file is an instance of the boundary being drawn in the wrong place:
+no instruction channel, colliding prompts, a hole with nothing to continue, unbounded write authority,
+an under-specified body intent, an unreachable site, and an undeclared ownership invariant. Each one was
+global information the model was expected to infer and could not.
+
+The migration that keeps recurring is from oracle prose to computed fact - scope facts, then the
+generation boundary, then loop ownership. That ratio, not the pass rate, is the honest measure of
+whether this is an architecture or a demonstration.
