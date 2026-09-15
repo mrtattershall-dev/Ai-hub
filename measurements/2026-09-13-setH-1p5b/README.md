@@ -2468,3 +2468,30 @@ The refusal gate, with its own positive and negative witnesses:
 
 The trap to design against is the one already met twice: a gate that refuses everything passes every
 known-bad test. It needs a proven known-good plan that it must NOT refuse.
+
+## SIDE CONTROL, preregistered: the same harness pointed at qwen2.5-coder:7b
+
+tatte-authorised, permissive, and explicitly a control. **The project objective is unchanged** - this
+does not become a size comparison, and no frozen 1.5B result is restated on the strength of it.
+
+    served       qwen2.5-coder:7b, one A10G on Modal, ollama, weights pulled in-container
+    harness      IDENTICAL - same oracle sites, order, contrast block, bound, STRICT, probes
+    conditions   A  whole-function replacement + goal text, seeds 1-8   (1.5B scored 0/16)
+                 B3 bounded contrast-plan insertion, seeds 31-38        (1.5B scored 0/16)
+    goals        64 and 74, reported separately, never pooled
+
+Same family as the model under test, so the tokenizer, FIM special tokens and training objective
+match and a difference cannot be blamed on the infill format.
+
+### What it can and cannot tell us, fixed in advance
+
+    7B passes A and B        the remaining gap is mostly size, and the apparatus is closer to
+                             scaffolding-for-a-1.5B than to a general architecture
+    7B passes B but not A    the architecture is doing real work at BOTH sizes - localization and
+                             bounding help whoever is generating, which strengthens the design
+    7B fails both            the harness or the task decomposition is still wrong, not the model,
+                             and the 1.5B's 0/16 was never about 1.5B
+    7B passes A but not B    my apparatus actively HURTS a stronger generator - the most useful
+                             negative result available here
+
+n=8 per goal per condition, one model, one machine. No significance test.
