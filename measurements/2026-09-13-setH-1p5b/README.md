@@ -2760,3 +2760,73 @@ Progressively removed as explanations for DELTA=0:
 What remains is not "there is probably another harness bug". It is a limitation of local generative
 inference under accumulated behavioural constraints - which is now the interesting object of study
 rather than the thing obscuring it.
+
+## THE REFUSAL GATE as a classifier experiment
+
+Two levels, both using only information available AT GENERATION TIME - no load result, no regression
+result, no probe. If catching these defects needed execution, the gate would be the verifier with extra
+steps and could not run before a state commit.
+
+    PLAN LEVEL      anchor absent / anchor ambiguous / site unreachable / scope not derivable
+    SNIPPET LEVEL   out-of-scope identifier / duplicate accumulation / redeclaration
+                    instruction echo -> FLAGGED, not fatal
+                    empty snippet    -> UNCERTAIN, not unsafe
+
+### The witness suite passed 13/13 while the gate was broken
+
+First version: known-good 8/8 admitted, known-bad 5/5 refused, adversarial near-miss isolated, non-
+vacuity "holds". Then it met recorded data:
+
+    FALSE REFUSAL ON THE ONLY VERIFIED TRAJECTORY
+    7B B3 g74 s34 site 3  ->  REFUSE (duplicate_accumulation)
+
+**It would have destroyed the only end-to-end success in this entire sequence.** The cause was precise:
+my positive witness covered goal 64 only. Goal 74's reference legitimately emits the same
+`blocks.append(...)` twice - once when a fence closes, once at end-of-input - in mutually exclusive
+branches, and my rule flagged any verbatim-repeated append.
+
+**One known-good example is not a control.** The non-vacuity invariant was satisfied and still useless,
+because it was satisfied on the one goal whose reference happened not to exercise the rule.
+
+### Two fixes, both narrowing rather than loosening
+
+  * `duplicate_accumulation` now requires the insertion point to be INSIDE the loop that contains the
+    identical statement. The `a a b b` defect is a duplicate running in the same loop ITERATION; an
+    append outside that loop cannot double-count a line.
+  * `instruction_echo` is no longer fatal. The recorded trajectories show echoed comment text loading
+    and preserving behaviour perfectly well, and treating it as unsafe caused most false refusals. It is
+    a quality signal, not a corruption risk. UNSAFE and UNCERTAIN have to stay distinct or the gate
+    optimises toward zero throughput.
+
+### Where it lands, on 184 recorded steps it had never seen
+
+    the only verified trajectory        3/3 sites ADMITTED - survives
+    harmful steps refused pre-commit    25/43    (58%)
+    harmless steps wrongly refused      16/141   (11%)
+    admitted overall                    143/184
+      refused by kind   41x duplicate_accumulation   8x out_of_scope_identifier
+
+A 58%-vs-11% split is real discrimination - roughly 5x - and it is the first quantity in this project
+that would be commercially useful before generation reliability improves: selective execution turns an
+unreliable generator into a more reliable system. It is not good enough to ship, and 42% of harmful steps
+still get through.
+
+One metric artifact to note rather than leave misleading: the echo witness sits in the `negative` group
+but now expects ADMIT, so the suite's own summary prints "false admissions 1". That is the deliberate
+downgrade, not a miss.
+
+## THE PERMANENT INVARIANT this session earned
+
+Every evaluator in this harness must have a positive-control path that FAILS THE TEST if the evaluator
+rejects or skips everything. The recurring hidden failure class here has never been bad output - it is
+**evaluators that can succeed without demonstrating anything**:
+
+    `[].every()` returned true for an empty contract                     -> vacuous pass
+    an unhandled artifact type returned ok:true                          -> vacuous pass
+    MUTATE_SITE could not reach the STRICT branch (load check first)     -> vacuous control
+    the info audit scored 0/160 violations for files that never imported -> vacuous audit
+    the gate's non-vacuity witness covered one goal of two              -> vacuous invariant
+
+Five instances in one line of work. The rule is not "add a positive control" - it is that the positive
+control must be **broad enough that the rule under test actually fires on it**, and the suite must fail
+loudly when it does not.
