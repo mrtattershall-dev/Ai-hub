@@ -37,6 +37,25 @@ Two manifestations of one Legasus principle:
 
 > **A component should know the limits of the authority its evidence earns.**
 
+Stated across the whole stack, these stop being separate engineering problems:
+
+    LegaParse    must not invent sites it cannot justify
+    LegaGate     must not convert uncertainty directly into veto
+    the model    must not write beyond the boundary it was granted
+    LegaVerify   must not certify behaviour its probes cannot observe
+
+**Abstention is a first-class correctness behaviour, not weakness.**
+
+### The conceptual shift worth preserving
+
+    earlier   failure meant "the model did the wrong thing"
+    now       failure can mean "the architecture granted authority without sufficient evidence"
+
+Every apparatus defect in the measurement log re-reads as the second kind. The model was penalised
+throughout for exercising authority its evidence did not earn — writing past a site boundary, claiming a
+line another branch owned, reaching for an identifier from a neighbouring scope — while the architecture
+was asking it to self-limit on information it was never given.
+
 ---
 
 ## Ordered plan
@@ -235,6 +254,45 @@ validation.
 The procedure is **re-frozen at twelve rules**. The audit trail matters more than the count: rule 12 was
 added because of goals 64 and 74, **not** because of any outcome on the new substrate, which did not
 exist.
+
+### CONSTRUCTION FREEZE — AMENDMENT B
+
+> **Amendment B, before task authorship.** Two disciplines added: applicability class must not be
+> confounded with difficulty, and each task must carry a frozen local evidence package that the model
+> never sees. **No substrate task had yet been authored when this amendment was made.**
+
+13. **Applicability class must not be confounded with difficulty.** "Analogy-bearing" must not become a
+    synonym for *easy*, nor "no valid analogue" for *hard*. Both classes are represented across
+    **similar transaction lengths and structural complexity**. Their eventual model success rates may
+    differ naturally; their *authored* difficulty must not differ systematically. Otherwise the
+    substrate cannot distinguish "site selection did not apply" from "the task was harder".
+
+14. **Each task is frozen with its own local evidence package, before any model generation**, containing:
+
+        declared operation topology          operations, chain_length
+        dependency edges                     which operation requires which
+        reference implementation             authored from the goal text alone
+        no-op failure proof                  the delta probe fails on the unmodified source
+        single-operation-omitted failures    the delta probe fails for EACH operation removed
+        preservation probes                  accumulated behaviour that must survive
+        analogue classification              analogy-bearing or not, WITH its justification
+
+    **The model sees only the task contract. It never sees the construction metadata.** Topology,
+    dependency edges, the reference implementation and the classification are evaluation instruments,
+    not inputs.
+
+The procedure is **re-frozen at fourteen rules**.
+
+### The analysis matrix this makes possible
+
+                            analogy-bearing     no valid analogue
+    multi-site viable             ?                    ?
+    multi-site doomed             ?                    ?
+
+The cells are not required to fill evenly. The point is that the substrate can reveal **whether
+site-selection applicability and model-generation difficulty are independent** — a question Set H could
+not even pose, because applicability and difficulty were perfectly confounded there (the one lane with
+variance had one site).
 
 ---
 
