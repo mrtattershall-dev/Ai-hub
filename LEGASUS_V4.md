@@ -331,3 +331,40 @@ From the experimental log, because they are what makes results here trustworthy 
   * qualify the substrate before evaluating anything endpoint-sensitive
   * a metric with zero sensitivity is reported as such, never promoted into an endpoint claim
   * corrections are recorded forward; historical results are not retroactively edited
+
+### CONSTRUCTION FREEZE — AMENDMENT C
+
+> **Amendment C, before task authorship.** The specification/evaluation boundary is made physical, and
+> the authoring hazard is recorded as temporal rather than technical. **No substrate task had yet been
+> authored when this amendment was made.**
+
+15. **Author the entire family, seal every evidence package, verify class/complexity matching, freeze
+    the substrate — and only then let the model or the applicability detector see any of it.** Running
+    generations during authoring would let task 7 be unconsciously shaped by tasks 1-6 without anyone
+    deciding to tune anything.
+
+The procedure is **re-frozen at fifteen rules**. Schema in
+[`legasus/legalabs/substrate/SCHEMA.md`](legasus/legalabs/substrate/SCHEMA.md), enforced by
+`validate-task.mjs`.
+
+### Permanent LegaLabs doctrine
+
+> **Specification tells the system what must become true. Evaluation knows how you established that it
+> became true. These are not the same artifact.**
+
+Not a substrate-local rule. The contaminated-contract defect happened because one artifact fed both the
+prompt and the checker, and its results were quarantined as VOID. The boundary is now physical —
+`task.json` and `source/` are prompt-visible, `evidence/` never is — and mechanically enforced, including
+a **substring-leakage check**: no identifier introduced by the reference implementation may appear in the
+prompt-visible contract. That check catches the defect this project actually suffered, which no schema
+key-list would have caught.
+
+### The authority rule, stated across the stack
+
+    LegaParse    earns authority to NOMINATE sites
+    LegaCore     earns authority to ORDER them
+    the model    earns authority to FILL a bounded hole
+    LegaGate     MODULATES that authority when evidence is uncertain
+    LegaVerify   alone earns authority to COMMIT
+
+> **No component gets more authority than its evidence justifies.**
