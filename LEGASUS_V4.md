@@ -26,6 +26,23 @@ The scoreboard v4 moves:
 
 ## Ordered plan
 
+    1A  build the transaction substrate under the frozen construction rules
+    1B  develop the site selector against the historical 64/74 challenge
+            |
+            v  FREEZE THE SELECTOR
+    2   evaluate the frozen selector prospectively on the untouched substrate
+    3   derive ordering and dependencies
+    4   derive local semantic intent
+    5   rerun 1.5B behavioural generation with a fully derived contract
+    6   run the scale curve
+
+1A and 1B proceed in parallel and do not compete: the selector is developed against sites that already
+existed, while the substrate is authored without reference to selector behaviour. The selector is frozen
+before it ever sees the substrate.
+
+**Step 5 remains the decisive experiment. Everything before it exists to remove reasons the result could
+still be attributed to hidden human or oracle work.**
+
 ### 1. Build a dedicated transaction substrate
 
 Set H failed the gate-policy experiment because it never provided the combination LegaGate needs:
@@ -43,6 +60,37 @@ The planner derives candidate locations from symbols, ownership, control flow, r
 requested behaviour. Success is proven by a containment property, not by a pass rate:
 
 > the derived candidate set CONTAINS the reference site, without the reference site having been supplied
+
+#### Evidence chain — two different questions, two different sets
+
+    HISTORICAL DEVELOPMENT SET   goals 64 and 74, taken TOGETHER
+      question: can a general computation recover sites that were established independently, before
+                that computation existed?
+      status:   their reference sites predate the deriver by weeks, so they cannot have been authored
+                to suit it. But once the deriver is tuned against them they are DEVELOPMENT DATA, not
+                final holdout evidence.
+
+    PROSPECTIVE VALIDATION SET   the new transaction substrate
+      question: does the FROZEN computation generalize to tasks it was not tuned on?
+      status:   construction procedure frozen before authorship; selector frozen before evaluation;
+                tasks NOT changed in response to selector behaviour.
+
+**Do not split 64 into "tune" and 74 into "holdout".** They share a file, a function and a development
+history; treating one as a holdout for the other would not be convincing. They are one historical
+development challenge.
+
+#### LOCKED ENDPOINT — fixed before implementation
+
+    report   recall                      reference sites recovered / reference sites
+             precision                   reference sites / candidates proposed
+             exact candidate-set match   candidates == reference set, no more and no less
+             inflation ratio             candidates proposed / reference sites
+
+    failure  a trivial superset does NOT count as success
+             "every line" is an EXPLICIT FAILURE, not a degenerate pass
+
+Recall alone is satisfiable by proposing everything, which is why precision and the inflation ratio are
+reported alongside it and why the degenerate case is named as a failure in advance.
 
 ### 3. Operation topology
 
