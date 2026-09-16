@@ -17,10 +17,25 @@ the capability of the architecture.
 
 The scoreboard v4 moves:
 
-    COMPUTED                          STILL ORACLE
-    [x] scope facts                   [ ] site selection          <- v4 target
-    [x] generation boundaries         [ ] site ordering / dependencies
-    [x] ownership invariants          [ ] local semantic intent
+    COMPUTED                          PARTIAL                     STILL ORACLE
+    [x] scope facts                   [~] site selection          [ ] site ordering / dependencies
+    [x] generation boundaries             derived for             [ ] local semantic intent
+    [x] ownership invariants              analogy-specified
+                                          tasks; abstention
+                                          required elsewhere
+
+`[~]` rather than `[x]` is deliberate. One class of site-selection oracle has been replaced by
+computation, and a principled boundary around that computation has been found. Claiming the whole field
+migrated would be false.
+
+### The pattern both components are converging on
+
+    LegaGate   uncertainty should alter AUTHORITY, not automatically become failure
+    LegaParse  absence of analytical justification should produce ABSTENTION, not a confident guess
+
+Two manifestations of one Legasus principle:
+
+> **A component should know the limits of the authority its evidence earns.**
 
 ---
 
@@ -92,6 +107,54 @@ development challenge.
 Recall alone is satisfiable by proposing everything, which is why precision and the inflation ratio are
 reported alongside it and why the degenerate case is named as a failure in advance.
 
+#### What the goal-64 result does and does not establish
+
+**Established, narrowly:**
+
+> For an **analogy-specified task**, a site set can be derived computationally from the relationship
+> named in the task and the references in the source.
+
+**Not established:** that LegaParse can derive sites for arbitrary behavioural changes.
+
+The narrower claim is the honest one, and the 64/74 split makes the result *more* useful than a
+suspicious 2/2 would have been, because it locates the boundary of applicability. The division of labour
+is legitimate — the goal text specifies **which relation matters**, the code determines **where that
+relation manifests**, and no anchor is supplied:
+
+    task: new feature analogous to unordered lists
+        -> resolve analogue: unordered-list state, operations, references
+        -> source analysis: positions at which the analogous feature participates
+        -> candidate edit sites
+
+Goal 74 exposes the complementary operation the selector was missing entirely:
+
+    task requests feature
+        -> can LegaParse establish a valid structural analogue?
+             yes -> derive sites
+             no  -> ABSTAIN (insufficient structural basis)
+
+#### PREREGISTERED ENDPOINT for the applicability detector
+
+Fixed before implementation, as with the selector itself. The detector returns
+`APPLICABLE(candidate_set)` or `ABSTAIN(reason)`, and three groups are reported **separately**:
+
+    APPLICABILITY
+      true-apply rate      on tasks possessing the supported relation
+      false-apply rate     on tasks WITHOUT that relation      <- goal 74's failure mode
+      abstention rate
+
+    SITE QUALITY, conditional on APPLY
+      recall, precision, exact candidate-set match, inflation ratio
+
+    SYSTEM COVERAGE
+      fraction of ALL tasks for which the method both applies AND returns an acceptable site set
+
+**System coverage exists to block the obvious new cheat:** a planner that achieves beautiful precision by
+refusing nearly everything. Conditional site quality alone would reward exactly that.
+
+Goal 74 motivated the detector, so goal 74 is **development evidence for it too**. The real test is the
+untouched substrate.
+
 ### 3. Operation topology
 
 Once sites are known, compute whether the edit is one operation or a transaction, which operations
@@ -154,6 +217,24 @@ to produce them.
     before the held-out subset is opened.
 11. Reference implementations are authored **from the goal text**, not from any model output observed
     while writing them.
+
+### CONSTRUCTION FREEZE — AMENDMENT A
+
+> **Amendment A, before task authorship.** Prospective site-selection work exposed a substrate-design
+> bias not anticipated in the original freeze. The substrate must contain both analogy-bearing and
+> non-analogy tasks. **No substrate task had yet been authored when this amendment was made.**
+
+The bias: goal 64's site derivation succeeded because its text says *"written like the unordered lists"*.
+That phrase carries the relation the deriver consumes. A substrate composed only of analogy-bearing
+tasks would make the selector look stronger than it is, and the bias would be invisible until after
+validation.
+
+12. The substrate contains **both analogy-bearing and non-analogy tasks**, deliberately represented.
+    Their individual outcomes are still not tuned — rule 9 continues to apply.
+
+The procedure is **re-frozen at twelve rules**. The audit trail matters more than the count: rule 12 was
+added because of goals 64 and 74, **not** because of any outcome on the new substrate, which did not
+exist.
 
 ---
 
