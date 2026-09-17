@@ -1,0 +1,24 @@
+class Roster:
+    def __init__(self):
+        self._active = []
+        self._waiting = []
+
+    def join(self, name):
+        if name not in self._active:
+            self._active.append(name)
+
+    def active_count(self):
+        return len(self._active)
+
+    def is_active(self, name):
+        return name in self._active
+
+    def wait(self, name):
+        if name not in self._waiting:
+            self._waiting.append(name)
+
+    def waiting_count(self):
+        return len(self._waiting)
+
+    def is_waiting(self, name):
+        return name in self._waiting

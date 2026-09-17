@@ -1,0 +1,30 @@
+--- op op1 after: "# Path helpers.\n"
+
+MAX_HOPS = 16
+
+--- op op2 after: "):\n    return str(p).strip().strip(\"/\")\n"
+
+
+class PathCycle(Exception):
+    pass
+
+--- op op3 after: "    return left + \"/\" + right\n"
+
+
+def resolve(links, start):
+    seen = set()
+    cur = start
+    hops = 0
+    while cur in links:
+        if cur in seen or hops >= MAX_HOPS:
+            raise PathCycle(cur)
+        seen.add(cur)
+        cur = links[cur]
+        hops += 1
+    return cur
+
+--- op op4 after: "   return len(c.split(\"/\")) if c else 0\n"
+
+
+def resolve_all(links, starts):
+    return [resolve(links, s) for s in starts]

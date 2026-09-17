@@ -1,0 +1,84 @@
+{
+  "task_id": "d03",
+  "analogy_class": "no_supported_analogy",
+  "analogy_justification": "every helper in this file is a single-step transformation of its arguments and none of them repeats until a fixed point or signals failure, so bounded resolution with a raised error has no structural relation here to parallel",
+  "transaction": {
+    "operation_count": 4,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the bound the new behaviour is specified against",
+        "site_hint": "# Path helpers.\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the failure signal the new behaviour raises",
+        "site_hint": " clean(p):\n    return str(p).strip().strip(\"/\")\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the resolution loop, using the bound and the failure signal",
+        "site_hint": "    return left + \"/\" + right\n"
+      },
+      {
+        "id": "op4",
+        "intent": "the batch form over the resolution loop",
+        "site_hint": "    return len(c.split(\"/\")) if c else 0\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op3"
+      ],
+      [
+        "op2",
+        "op3"
+      ],
+      [
+        "op3",
+        "op4"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3",
+        "op4"
+      ]
+    ],
+    "transaction_length": 4
+  },
+  "complexity": {
+    "structural_class": "novel-control-feature",
+    "affected_region_lines": 27
+  },
+  "reference": {
+    "source_hash": "fd27e21a1bcb36228750108eb00e022fe5605f6c81ee484e4345762464960958",
+    "reference_hash": "3109ea327cd7d519f00b51e550949447a92e27644e7dca943de66a0528d34bdf",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3",
+      "op4"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

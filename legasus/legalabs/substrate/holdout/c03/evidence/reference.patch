@@ -1,0 +1,13 @@
+--- op op1 after: "EVENT_TYPES = [\"click\", \"key\""
+, "scroll"
+--- op op2 after: "\"key\": \"key press\""
+, "scroll": "scroll wheel"
+--- op op3 after: "  return EVENT_LABELS.get(t, \"unknown\")\n"
+
+
+def _render_scroll(e):
+    return "scroll " + str(e.get("delta", 0))
+
+--- op op4 after: "== \"key\":\n        return _render_key(e)\n"
+    if t == "scroll":
+        return _render_scroll(e)

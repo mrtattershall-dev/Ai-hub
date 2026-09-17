@@ -1,0 +1,72 @@
+{
+  "task_id": "c02",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing score tracking as the relation to parallel; that feature has a declaration, a recorder, a per-key reader and an aggregate over all keys, and the new feature occupies the same four positions",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the parallel accumulator",
+        "site_hint": "        self._scores = {}\n"
+      },
+      {
+        "id": "op2",
+        "intent": "recorder and per-key reader for the parallel accumulator",
+        "site_hint": "t):\n        return self._scores.get(student, 0)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "aggregate over the parallel accumulator",
+        "site_hint": "d(self._scores), key=lambda s: self._scores[s])\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 15
+  },
+  "reference": {
+    "source_hash": "6228492b24e9588f3255bc77c4f95ba9ca5345e8cf399b6e0950a0eaf43a1987",
+    "reference_hash": "d4031d9acda782718bc66d5c5c484040278a6b8aca7ea565e394b17110d99774",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

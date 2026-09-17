@@ -1,0 +1,12 @@
+{
+  "task_id": "c03",
+  "goal": "Add a scroll event type to the EXISTING events.py: a scroll event carries a delta and renders as the word scroll, a space, and the delta, using 0 when the event does not carry one. The type must be accepted by valid_types, rendered by render, and labelled \"scroll wheel\" by label. The click and key event types must keep working exactly as they do now. Run it with python.",
+  "lead": "events.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the scroll event type is written the same way as the existing key event type",
+  "interface": [
+    "scroll",
+    "delta"
+  ]
+}

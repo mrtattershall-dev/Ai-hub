@@ -1,0 +1,76 @@
+{
+  "task_id": "d02",
+  "analogy_class": "no_supported_analogy",
+  "analogy_justification": "every decision in this function is made about one piece in isolation and the loop carries nothing from one iteration to the next, so a token that spans several pieces has no structural relation here to parallel",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the state carried between iterations",
+        "site_hint": "    out = []\n"
+      },
+      {
+        "id": "op2",
+        "intent": "open, continue and close a span, using that state",
+        "site_hint": "        if not piece:\n            continue\n"
+      },
+      {
+        "id": "op3",
+        "intent": "emit a span that the input never closed",
+        "site_hint": "        out.append(piece)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ],
+      [
+        "op2",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "novel-control-feature",
+    "affected_region_lines": 15
+  },
+  "reference": {
+    "source_hash": "5a215c047018de6ac865ec70c7359c0ca826283b9affecf1a7c5a481d48aacb8",
+    "reference_hash": "de7f48e3ec39bf7f6d07b097903883203748290db75af7a0eb1c57089cdbf0d4",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

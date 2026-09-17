@@ -1,0 +1,80 @@
+{
+  "task_id": "c03",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing key event type as the relation to parallel; that type participates in the valid-type list, the label map, its own renderer and a branch of the dispatcher, and the requested type occupies the same four positions",
+  "transaction": {
+    "operation_count": 4,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "admit the new type in the valid-type list",
+        "site_hint": "EVENT_TYPES = [\"click\", \"key\""
+      },
+      {
+        "id": "op2",
+        "intent": "label the new type",
+        "site_hint": "\"key\": \"key press\""
+      },
+      {
+        "id": "op3",
+        "intent": "the renderer for the new type",
+        "site_hint": "l(t):\n    return EVENT_LABELS.get(t, \"unknown\")\n"
+      },
+      {
+        "id": "op4",
+        "intent": "the branch that routes the new type to its renderer",
+        "site_hint": "   if t == \"key\":\n        return _render_key(e)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op3",
+        "op4"
+      ],
+      [
+        "op1",
+        "op4"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3",
+        "op4"
+      ]
+    ],
+    "transaction_length": 4
+  },
+  "complexity": {
+    "structural_class": "parallel-variant-feature",
+    "affected_region_lines": 10
+  },
+  "reference": {
+    "source_hash": "ac62593494f45b64627554aeb6137faf6670ca2b44a81060b3f6bb20f77eaf5d",
+    "reference_hash": "c1402b84e1077063c4b00705924bc4dd44b00db71d56a4d3b38df0fae096585f",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3",
+      "op4"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

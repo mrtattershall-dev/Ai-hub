@@ -1,0 +1,8 @@
+{
+  "task_id": "d02",
+  "goal": "Add quoted spans to the EXISTING split_tokens in tokens.py: a piece that opens with a double quote starts a span that continues until a piece that closes with a double quote, and the whole span becomes one token with the surrounding quotes removed. A span that is never closed still becomes one token at the end of the input. Unquoted input must split exactly as it does now. Run it with python.",
+  "lead": "tokens.py",
+  "language": "py",
+  "run_with": "python",
+  "interface": []
+}

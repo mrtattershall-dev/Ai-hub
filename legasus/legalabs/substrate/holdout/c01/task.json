@@ -1,0 +1,13 @@
+{
+  "task_id": "c01",
+  "goal": "Add a waitlist to the EXISTING Roster in roster.py: wait(name) puts a name on the waitlist without repeating it, waiting_count() returns how many names are on it, and is_waiting(name) reports whether a name is on it. Keep join, active_count and is_active working exactly as they do now, and keep the two lists separate. Run it with python.",
+  "lead": "roster.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the waitlist works the same way as the existing active list",
+  "interface": [
+    "wait",
+    "waiting_count",
+    "is_waiting"
+  ]
+}

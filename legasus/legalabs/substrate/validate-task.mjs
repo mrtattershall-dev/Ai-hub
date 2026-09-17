@@ -89,7 +89,15 @@ export function validateTask(dir) {
         note('interface', '"' + d + '" is declared as interface but the goal never asks for it');
       }
     }
-    const patchText = readFileSync(patchPath, 'utf8');
+    // THE PATCH'S OWN SERIALIZATION IS NOT IMPLEMENTATION CONTENT. Each op is written with a header
+    // line - `--- op op1 after: "<anchor>"` - and the scanner was reading those headers as if the
+    // reference had written them. The format word "after" then counted as an introduced identifier, so
+    // any goal containing the ordinary English word "after" was refused for leakage. That refusal looks
+    // exactly like a badly authored task and would have been "fixed" by rewording a perfectly good goal.
+    // Header lines carry only the format's own words plus quoted SOURCE text, so dropping them removes
+    // no identifier the reference actually introduced - which the ol_items positive control still proves.
+    const patchText = readFileSync(patchPath, 'utf8')
+      .split(String.fromCharCode(10)).filter((l) => !/^--- op /.test(l)).join(String.fromCharCode(10));
     const introduced = [...implementationTokens(patchText)].filter((t) => !new RegExp('\\b' + t + '\\b').test(src));
     const leaked = introduced.filter((t) => !declared.has(t) && new RegExp('\\b' + t + '\\b').test(taskText));
     for (const t of leaked) {
