@@ -309,3 +309,61 @@ be reported alongside the match, or "equivalent" quietly stops meaning much.
 **The historical result is not rewritten.** a03 remains 3/4 and coverage 2/6 under the exact-coordinate
 metric that was in force when it was measured. Rescoring under the new metric is a separate, explicitly
 named number - and the scoring rule must be frozen before the next holdout exists.
+
+---
+
+## FROZEN: the two-axis scoring model
+
+Frozen before the next holdout exists. Two questions the single flag was collapsing:
+
+    is the proposed position semantically legal?   ->  POSITION RESULT, categorical
+    how much did the analysis narrow the search?   ->  SELECTIVITY, continuous
+
+    POSITION RESULT     EXACT | EQUIVALENT | INVALID
+    SELECTIVITY         1 - legal_boundaries / parent_boundaries
+    INFORMATION GAIN    log2(parent_boundaries / legal_boundaries)   in bits
+
+A boundary is a position whose structural parent matches the operation's, so the denominator is the
+search space the analysis actually faced rather than a raw line count.
+
+**No third "WEAK_EQUIVALENT" state**, deliberately. That would need an arbitrary cutoff - is 90% of the
+parent weak? 70%? - and the threshold would become the thing people optimise around. Semantic validity
+stays categorical; selectivity stays continuous; neither needs a line drawn through it.
+
+### Measured
+
+    task                result       legal/parent   selectivity   info gain
+    a03 new formatter   EQUIVALENT   26/26          0.000         0.00 bits
+    branch in loop      EQUIVALENT    6/7           0.143         0.22 bits
+
+a03: semantically valid, and the analysis supplied **no narrowing information**. Both facts reported
+together, so nobody can read "equivalent" as "site selection nailed it" and nobody can call a valid
+placement wrong for differing from the reference.
+
+### A property of the denominator, stated rather than left to inflate later
+
+Selectivity is measured **relative to the parent region**, so it excludes the information contributed by
+identifying the parent. The branch case scores only 0.22 bits because, once you know it belongs in that
+loop, the constraint removes one boundary - most of the narrowing happened when the loop was selected.
+A whole-file denominator would credit that and report a much larger number.
+
+The parent-relative denominator is the conservative choice and it is what is frozen. Anyone quoting a
+larger figure later must say which denominator they used.
+
+### Legal region vs canonical realization
+
+    legal region            a PROGRAM FACT        "this helper may go anywhere at module scope"
+    canonical realization   an ENGINEERING CHOICE  "place it immediately before the first dependent
+                                                    construct"
+
+Exactly analogous to ordering: there can be several legal topological orders, and LegaCore may pick one
+deterministically without claiming the others are wrong. `canonicalRealization` implements the
+convention and reports the region it came from, so the convention never gets mistaken for a constraint.
+
+### Two coverage concepts, kept separate
+
+    SEMANTIC COVERAGE     could LegaParse derive a legal site/region at all?
+    INFORMATIVE COVERAGE  how much uncertainty did that derivation remove?
+
+The second is not binarized. "This helper can go anywhere at module scope" is genuine program knowledge:
+it tells LegaCore it need not care which boundary is chosen.

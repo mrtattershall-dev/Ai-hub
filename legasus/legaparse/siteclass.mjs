@@ -151,13 +151,76 @@ export function siteEquivalent(src, op, posA, posB) {
           : 'same legal region and same structural parent' + (r.bounds.length ? ' (' + r.bounds.join('; ') + ')' : '') };
 }
 
-// Both metrics, never collapsed into one.
+// TWO ORTHOGONAL AXES. The old single flag collapsed two independent questions:
+//
+//     is the proposed position semantically legal?      -> categorical
+//     how much did the analysis narrow the search?      -> continuous
+//
+// For a03 the answers are YES and ALMOST NONE, which is a completely different situation from YES and
+// HIGH. A third "WEAK_EQUIVALENT" state would need an arbitrary cutoff - is 90% of the parent weak? 70%?
+// - and that threshold would itself become something to optimise around. Selectivity has no cutoff.
+//
+// Counting BOUNDARIES rather than lines: a candidate boundary is a position whose structural parent
+// matches the operation's, so the denominator is the search space the analysis actually faced.
+function boundaries(src, lo, hi, indent, parentLine) {
+  const lines = src.split(NL);
+  let n = 0;
+  for (let i = Math.max(0, lo); i <= Math.min(hi, lines.length - 1); i++) {
+    const p = structuralParent(src, i, indent);
+    if ((p ? p.line : -1) === parentLine) n++;
+  }
+  return n;
+}
+
 export function scorePosition(src, op, derived, reference) {
   const eq = siteEquivalent(src, op, derived, reference);
+  const lines = src.split(NL);
+  const indent = op.indent === undefined ? 0 : op.indent;
+  const pr = parentRange(lines, op.parent_scope);
+  const parentLine = (structuralParent(src, reference, indent) || { line: -1 }).line;
+
+  let selectivity = null;
+  let infoGain = null;
+  let parentN = null;
+  let legalN = null;
+  if (eq.region.ok && pr) {
+    parentN = boundaries(src, pr.lo, pr.hi, indent, parentLine);
+    legalN = boundaries(src, eq.region.lo, eq.region.hi, indent, parentLine);
+    if (parentN > 0 && legalN > 0) {
+      selectivity = 1 - legalN / parentN;
+      infoGain = Math.log2(parentN / legalN);
+    }
+  }
+
+  // SEMANTIC VALIDITY is categorical; SELECTIVITY is continuous. Reported side by side so nobody can
+  // read "equivalent" as "site selection nailed it" when the analysis contributed no narrowing - and
+  // nobody can call a semantically valid placement wrong because it differs from the reference.
+  const position_result = derived === reference ? 'EXACT' : (eq.equivalent ? 'EQUIVALENT' : 'INVALID');
   return {
+    position_result,
     EXACT_POSITION_MATCH: derived === reference,
     SITE_EQUIVALENCE_MATCH: eq.equivalent,
-    region: eq.region.ok ? [eq.region.lo, eq.region.hi] : null,
+    legal_region: eq.region.ok ? [eq.region.lo, eq.region.hi] : null,
+    parent_region: pr ? [pr.lo, pr.hi] : null,
+    parent_boundaries: parentN,
+    legal_boundaries: legalN,
+    selectivity,
+    information_gain_bits: infoGain,
+    interpretation: position_result === 'INVALID' ? eq.why
+      : selectivity === null ? 'valid; selectivity not computable'
+        : selectivity === 0 ? 'position is semantically valid, but site analysis supplied no narrowing information'
+          : 'position is semantically valid; analysis removed ' + infoGain.toFixed(2) + ' bits of placement uncertainty',
     why: eq.why,
   };
+}
+
+// The legal region is a PROGRAM FACT. Choosing one point inside it is an ENGINEERING CONVENTION, exactly
+// as choosing one legal topological order is. LegaCore may realize a site deterministically without
+// claiming the other positions were wrong.
+export function canonicalRealization(src, op) {
+  const r = legalRegion(src, op);
+  if (!r.ok) return { ok: false, why: r.why };
+  return { ok: true, line: r.hi,
+    convention: 'last legal boundary: immediately before the first construct that depends on the result',
+    legal_region: [r.lo, r.hi] };
 }
