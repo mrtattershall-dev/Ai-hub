@@ -3689,3 +3689,88 @@ result is only correct because the scorer itself was written that way.
 
 Worth keeping separately: the bug surfaced *because a favourable number was distrusted*. Had the probe
 agreed with the scorer, nothing would have been checked.
+
+---
+
+# v5 VERDICT — corrected headline
+
+The previous section reported the axes correctly and framed them badly. 12/12 is not the headline, and
+"four of five" understates what the fifth one means.
+
+> **v5 FAILED its preregistered milestone.** The criterion was a conjunction of five axes. Four
+> passed; site-region information gain remained positive for only 1 of 19 operations, so the
+> conjunction did not hold.
+
+Subsequent architecture work may establish that this information properly belongs to transaction
+topology in LegaCore rather than to LegaParse. **That would not alter the v5 result.** The criterion
+was frozen before the run; reinterpreting it afterwards to convert a failure into a success would
+destroy the exact discipline that produced every real finding in this log. The v5 number stands
+permanently as recorded:
+
+    LegaParse intrinsic gain:  1/19 positive
+
+## The honest headline
+
+> Clause-level evidence authority eliminated the observed concern-laundering failures, and an explicit
+> operation-requirements layer reduced candidate inflation to 1.00 on the sealed development family;
+> prospective validation of the post-family lexicons remains outstanding.
+
+## What moved, per subsystem
+
+    concern identity          substantially improved
+    evidence authority        working on this family
+    operation requirements    substantially improved
+    candidate inflation       1.33 -> 1.00
+    placement legality        excellent      19/19 exact or equivalent
+    placement narrowing       essentially absent
+
+LegaParse is becoming good at deciding **what deserves authority**. It is still doing almost nothing
+to decide **where inside an already-resolved structural parent that authority should materialize**.
+That distinction is now empirical rather than philosophical, which is the actual gain from this run.
+
+## Evidence strength, split by subsystem
+
+The seal proves the tasks were not changed to accommodate the implementation. **It does not prove the
+implementation was not adapted to the tasks.** Those are different claims and this run supports them
+unequally.
+
+| Component | Designed | Evidence standing |
+|---|---|---|
+| Provenance architecture — authority table, exclusion-not-weight | **before** the family (`1013abf` < `f8e1e53`) | prospective |
+| Requirements layer — concept | with the family, before implementation | mixed |
+| Preservation predicates (`clauses.mjs`) | **after** the seal, tasks visible | development only |
+| Operation-kind predicates (`selectv3.mjs`) | **after** the seal, tasks visible | development only |
+
+So **median inflation 1.00 is excellent development evidence, not clean prospective generalization
+evidence.** The lexicons were reasoned against these tasks while being chosen.
+
+## What the third family is for
+
+Not another 12/12. It exists to answer three separable questions:
+
+    do the frozen relation/provenance rules generalize?
+    do the frozen operation-requirement predicates generalize?
+    does candidate inflation stay near 1.00 without the tasks having been seen first?
+
+If those survive blind tasks, the jump from v2 becomes hard to dismiss.
+
+## The most encouraging part is not the score
+
+    Board.unpin   excluded   REMOVE     the requested behaviour asks for no REMOVE operation
+    ALIASES       excluded   REGISTRY   no operation named in the requested behaviour reads it
+
+This is qualitatively different from a selector merely **failing to notice** `unpin`. LegaParse saw a
+relevant participant and **withheld authority for a witnessed reason**. Same for `ALIASES`: it
+participates in the concern, and no requested operation requires a path that reads it.
+
+That is exactly the participation-versus-requirement distinction the milestone set out to build. If it
+survives blind tasks, it is the substantive improvement — not the 12/12.
+
+## Apparatus hazard promoted from rule to mechanism
+
+Heredoc backslash-eating has now occurred four times, and the bug's shape is the worst available: the
+resulting JavaScript stays **syntactically valid** while silently changing meaning, so it reports OK
+while the work is wrong. No new experimental rule was added. Instead the tooling was made hostile to
+it: `legasus/legalabs/escape-guard.mjs` scans for the corruption signature — a lone backslash escape
+whose escaped character is a regex metacharacter and not a JS one, inside a quoted string literal —
+with six witnesses including two positive controls, and a clean scan over 30 files.

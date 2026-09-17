@@ -180,6 +180,24 @@ different event from having analytically preferred it. **Precision is unresolved
 something about where a concern lives and still hands LegaCore roughly twice the authority the
 reference needed.
 
+### v5 status, stated as the freeze recorded it
+
+v5 **failed** its preregistered milestone. Four of five axes passed; site-region information gain was
+positive for 1 of 19 operations, so the conjunction did not hold. Later work may show that information
+belongs to transaction topology in LegaCore rather than LegaParse; that would not alter the v5 result.
+
+    concern identity          substantially improved
+    evidence authority        working on the sealed family
+    operation requirements    substantially improved
+    candidate inflation       1.33 -> 1.00
+    placement legality        19/19 exact or equivalent
+    placement narrowing       essentially absent      1/19
+
+LegaParse is becoming good at deciding WHAT deserves authority, and still does almost nothing to
+decide WHERE inside an already-resolved parent that authority materializes. Evidence standing splits
+by subsystem: the provenance architecture predates its test family and is prospective; the clause and
+operation-kind lexicons were written with the sealed tasks visible and are development evidence only.
+
 The remaining fields are the current LegaCore planner problem. Success means converting them into
 general computed structure **without encoding the desired implementation directly**.
 
