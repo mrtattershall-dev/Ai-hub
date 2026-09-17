@@ -50,15 +50,34 @@ function definedAt(lines, sym) {
   return last;
 }
 
-// The first line at which a provided symbol is consumed, which the definition must precede.
-function firstUse(lines, sym, excludeDef = true) {
+// The first EXECUTION-TIME use of a symbol, which a definition must precede. Returns null when no such
+// use exists, so "no constraint" stays distinguishable from "the constraint happens to be EOF".
+//
+// A textual mention is NOT a dependency. Python resolves a name when the enclosing function RUNS, not
+// when its body is parsed, so this is legal:
+//
+//     def use_it():  return helper()
+//     def helper():  return 42
+//
+// Treating any mention as a bound manufactures false dependencies - it made one of this file's own
+// REJECT witnesses reject a perfectly legal placement. Only a use that executes at import time, i.e. at
+// module level outside any def, bounds a module-level definition.
+function existingFirstUse(lines, sym) {
   const use = new RegExp('\\b' + sym + '\\s*\\(|\\b' + sym + '\\b');
   const def = new RegExp('^\\s*(?:def\\s+' + sym + '\\b|(?:self\\.)?' + sym + '\\s*=(?!=))');
+  // Track whether a line sits inside a def/class body; those run later, not at import.
+  let bodyOf = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (excludeDef && def.test(lines[i])) continue;
-    if (use.test(lines[i])) return i;
+    const l = lines[i];
+    if (!l.trim()) continue;
+    const head = l.match(/^(\s*)(?:def|class)\b/);
+    if (head) { bodyOf = head[1].length; continue; }
+    if (bodyOf >= 0 && ind(l) > bodyOf) continue;      // deferred: inside a def/class body
+    if (ind(l) <= bodyOf) bodyOf = -1;
+    if (def.test(l)) continue;
+    if (use.test(l)) return i;
   }
-  return lines.length;
+  return null;
 }
 
 // A terminator ends reachability for anything placed after it within the same block.
@@ -90,8 +109,11 @@ export function legalRegion(src, op) {
     if (d >= 0 && d + 1 > lo) { lo = d + 1; bounds.push('after `' + sym + '` is defined at line ' + d); }
   }
   for (const sym of op.provides || []) {
-    const u = firstUse(lines, sym);
-    if (u - 1 < hi) { hi = u - 1; bounds.push('before `' + sym + '` is first used at line ' + u); }
+    // null means NO existing execution-time consumer imposes an upper bound. That is a current-program
+    // fact, not a failure to find one: the remaining constraint, if any, comes from TRANSACTION topology
+    // (another planned operation consuming this artifact), which LegaParse deliberately does not know.
+    const u = existingFirstUse(lines, sym);
+    if (u !== null && u - 1 < hi) { hi = u - 1; bounds.push('before `' + sym + '` is first used at import time, line ' + u); }
   }
   // Reachability: a branch must precede the fall-through owner, and nothing may sit after a terminator
   // in the same block.

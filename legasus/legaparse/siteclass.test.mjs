@@ -22,6 +22,21 @@ const MOD = L(
   '    return helper_a(v)',         // 9
 );
 
+// The same module, but with an IMPORT-TIME use: `RESULT = helper_a(1)` runs when the module loads, so a
+// definition placed after it genuinely fails. This is the difference a textual-mention rule cannot see.
+const MOD_EXEC = L(
+  'BASE = 1',                       // 0
+  '',                               // 1
+  'def helper_a(v):',               // 2
+  '    return v + BASE',            // 3
+  '',                               // 4
+  'def helper_b(v):',               // 5
+  '    return v * 2',               // 6
+  '',                               // 7
+  'RESULT = helper_a(1)',           // 8
+  'OTHER = helper_b(2)',            // 9
+);
+
 // A loop with guarded branches and a fall-through owner.
 const LOOP = L(
   'def run(items):',                // 0
@@ -60,8 +75,14 @@ const cases = [
   { name: 'REJECT  crosses a required definition/use dependency (before BASE exists)',
     src: MOD, op: { parent_scope: 'module', kind: 'sibling_def', requires: ['BASE'], provides: ['helper_c'] },
     a: 4, b: 0, expect: false },
-  { name: 'REJECT  placed after the provided symbol is already consumed',
-    src: MOD, op: { parent_scope: 'module', kind: 'sibling_def', requires: [], provides: ['helper_a'] },
+  // This witness was WRONG and the code was right. It asserted that a module-level def must precede a
+  // mention of it inside `consume`'s body - but Python resolves the name when consume() RUNS, so both
+  // placements are legal. A textual mention is not a dependency. Replaced by the two real cases:
+  { name: 'ADMIT   definition after a DEFERRED mention (resolved at call time, not at parse time)',
+    src: MOD, op: { parent_scope: 'module', kind: 'sibling_def', requires: [], provides: ['helper_a'], indent: 0 },
+    a: 1, b: 9, expect: true },
+  { name: 'REJECT  placed after an IMPORT-TIME use, which really does execute first',
+    src: MOD_EXEC, op: { parent_scope: 'module', kind: 'sibling_def', requires: [], provides: ['helper_a'], indent: 0 },
     a: 1, b: 9, expect: false },
   { name: 'REJECT  moves past a terminator, changing reachability',
     src: LOOP, op: { parent_scope: 'run', kind: 'statement', requires: ['out'], provides: [], indent: 8 },

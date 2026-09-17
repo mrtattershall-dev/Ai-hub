@@ -367,3 +367,65 @@ convention and reports the region it came from, so the convention never gets mis
 
 The second is not binarized. "This helper can go anywhere at module scope" is genuine program knowledge:
 it tells LegaCore it need not care which boundary is chosen.
+
+---
+
+## Abstraction-defect sweep: three kinds of fact, kept separate
+
+The sweep asked whether the implementation ever conflates:
+
+    1  CURRENT PROGRAM FACT    scope, parent, ownership, reads/writes, existing control flow
+    2  TRANSACTION FACT        operation B requires an artifact produced by operation A
+    3  ENGINEERING CHOICE      among legal alternatives, place it here
+
+### a03's unbounded region is NOT a LegaParse defect
+
+`firstUse` returning "no bound" for `_fmt_date` is the correct current-program answer: the symbol does
+not exist and nothing consumes it, so the whole module really is legal **at this stage of analysis**.
+The remaining constraint comes from TRANSACTION topology - another planned operation dispatching to it -
+which LegaParse deliberately does not know. Teaching the parser to anticipate future operations would
+drag site selection into ordering and smuggle oracle knowledge back in.
+
+So a03's 0.00 bits reads as: *current-program structure contributes no additional placement information;
+transaction topology must supply the rest.* That is useful output, not a failure.
+
+The three layers, now explicit:
+
+    INTRINSIC LEGAL REGION        from the current program only
+       intersect
+    TRANSACTION-CONSTRAINED       requirements created by other planned operations   (LegaCore, later)
+       then
+    CANONICAL REALIZATION         one deterministic boundary from what remains
+
+### Absence of constraint is now distinguishable from a constraint at EOF
+
+`existingFirstUse` returns **null** when nothing bounds the symbol, instead of silently returning
+`lines.length`. "No existing consumer imposes a bound" and "the bound happens to be the end of file" are
+different facts and were being represented identically.
+
+### A defect the sweep found — in a witness, not the code
+
+One REJECT witness asserted that a module-level definition must precede a mention of it inside another
+function's body. **That is false in Python**: a name is resolved when the enclosing function RUNS, so
+
+    def use_it():  return helper()
+    def helper():  return 42
+
+is legal, and both placements are equivalent. The witness was manufacturing a false dependency from a
+textual mention, and the code was right to reject it.
+
+Fixed by distinguishing DEFERRED mentions from IMPORT-TIME uses, and the single bad witness became two
+good ones:
+
+    ADMIT    definition after a DEFERRED mention (resolved at call time)
+    REJECT   definition after an IMPORT-TIME use (`RESULT = helper_a(1)` really does execute first)
+
+Nine witnesses, four ADMIT, five REJECT, all passing.
+
+### One conflation still open, recorded not fixed
+
+`edgesFor` derives dependency edges among the EXISTING concern's participants, and those edges are then
+used to reason about the ORDER of the NEW operations. The transfer is an inference - "the new feature's
+parts depend on each other the way the existing feature's parts do" - not a program fact about
+operations that do not exist yet. It is sound for parallel-feature tasks and should be labelled as a
+transaction-level inference rather than a parse-level fact when LegaCore consumes it.
