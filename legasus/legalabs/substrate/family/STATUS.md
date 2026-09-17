@@ -1,20 +1,30 @@
-# Transaction substrate family — STATUS: INCOMPLETE, NOT SEALED
+# Transaction substrate family — SEALED
 
-**Do not run anything against this family.** Rule 15 requires the entire family authored, validated and
-sealed before the model or the applicability detector sees any of it. Four tasks remain.
+Six tasks, authored under the fifteen frozen construction rules, validated, and sealed.
 
-    ops   analogy_specified          no_supported_analogy
-     2    a01 weighted tallies  ok   b01 undo via snapshot  ok
-     3    a02 (not authored)         b02 (not authored)
-     4    a03 (not authored)         b03 (not authored)
+    ops   analogy_specified        no_supported_analogy
+     2    a01 weighted tallies     b01 snapshot/undo
+     3    a02 hourly buckets       b02 continuation lines
+     4    a03 date column          b03 nested comments
 
-Authored so far, with every witness proven by execution rather than asserted:
+Rule 13 holds on real data: both classes have n=3, mean operation_count 3.00, range 2-4, gap 0.00.
+Applicability class is not confounded with authored complexity.
 
-    a01  analogy_specified     ops 2  noop fails delta, both omissions fail delta, reference preserves + passes
-    b01  no_supported_analogy  ops 2  noop fails delta, both omissions fail delta, reference preserves + passes
+Every witness proven by EXECUTION at authoring time, never asserted: the no-op fails the delta, each
+single-operation-omitted variant fails the delta, and the reference both preserves accumulated behaviour
+and passes the delta.
 
-Rule 13 currently holds trivially (one task per class, both at 2 operations). It becomes a real check once
-the 3- and 4-operation pairs exist.
+`MANIFEST.sealed.json` records three hashes per task - task.json, source/, evidence/ - taken before any
+model generation or applicability detection ran against this family.
 
-No `MANIFEST.sealed.json` exists, deliberately. Sealing a partial family would assert `pre_generation`
-over a set that is still growing, which is exactly the claim the seal is supposed to make checkable.
+## Before any run
+
+    node seal.mjs verify ./family
+
+## What may be shown to a system under test
+
+    task.json    and    source/          yes
+    evidence/                            NEVER
+
+No task may be edited in response to any outcome. If the family turns out degenerate, that is a finding
+about the construction procedure, recorded at family level (rule 9).

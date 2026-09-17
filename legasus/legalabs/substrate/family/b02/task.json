@@ -1,0 +1,8 @@
+{
+  "task_id": "b02",
+  "goal": "Add line continuation to parse_config in the EXISTING config.py: a line whose stripped text ends with three dots continues onto the next line, with the dots removed and the two joined before the line is interpreted. Blank lines, comment lines and ordinary key/value lines must keep working exactly as they do now. Run it with python.",
+  "lead": "config.py",
+  "language": "py",
+  "run_with": "python",
+  "interface": []
+}

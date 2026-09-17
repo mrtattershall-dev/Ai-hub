@@ -1,0 +1,23 @@
+def _marker(s, i, a, b):
+    return i + 1 < len(s) and s[i] == a and s[i + 1] == b
+
+
+def tokens(text):
+    out = []
+    s = str(text)
+    i = 0
+    while i < len(s):
+        c = s[i]
+        if c.isspace():
+            i += 1
+            continue
+        if c.isdigit():
+            j = i
+            while j < len(s) and s[j].isdigit():
+                j += 1
+            out.append(("num", s[i:j]))
+            i = j
+            continue
+        out.append(("sym", c))
+        i += 1
+    return out

@@ -1,0 +1,76 @@
+{
+  "task_id": "b02",
+  "analogy_class": "no_supported_analogy",
+  "analogy_justification": "every existing rule in this parser decides about one line in isolation and nothing carries state between iterations, so there is no structural relation for a multi-line continuation to parallel",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the buffer that carries text between iterations",
+        "site_hint": "    result = {}\n"
+      },
+      {
+        "id": "op2",
+        "intent": "join any carried text onto the current line before it is interpreted",
+        "site_hint": "        line = raw.strip()\n"
+      },
+      {
+        "id": "op3",
+        "intent": "detect the continuation marker and carry the line forward instead of interpreting it",
+        "site_hint": "e or line.startswith(\"#\"):\n            continue\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ],
+      [
+        "op3",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "novel-state-feature",
+    "affected_region_lines": 10
+  },
+  "reference": {
+    "source_hash": "e2fd739758721a726ff7222de0ff3a93ff3c10b6a96a3748998b70796bff8eb8",
+    "reference_hash": "af57fe5af39f294caafb6e943249fc73427e7f4beb5212fb2c1d94adb43bdf97",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

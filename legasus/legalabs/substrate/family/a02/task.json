@@ -1,0 +1,14 @@
+{
+  "task_id": "a02",
+  "goal": "Add hourly tracking to the EXISTING Metrics in metrics.py: record_hour(hour, n) accumulates a count for an hour, hour_total(hour) returns the count for an hour and 0 when there is none, and busiest_hour() returns the hour with the highest count, or None when nothing has been recorded. Keep the daily tracking working exactly as it does now. Run it with python.",
+  "lead": "metrics.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the hourly tracking works the same way as the existing daily tracking",
+  "interface": [
+    "record_hour",
+    "hour_total",
+    "busiest_hour",
+    "hour"
+  ]
+}

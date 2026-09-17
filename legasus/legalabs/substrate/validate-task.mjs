@@ -23,12 +23,20 @@ const FORBIDDEN_IN_TASK = [
 
 const STOP = new Set(['self', 'return', 'None', 'True', 'False', 'else', 'elif', 'def', 'for', 'while',
   'in', 'if', 'and', 'or', 'not', 'the', 'with', 'from', 'import', 'class', 'this', 'const', 'let', 'var',
-  'function', 'new', 'null', 'true', 'false']);
+  'function', 'new', 'null', 'true', 'false',
+  // language keywords: they appear in any implementation and in ordinary English, so they can never
+  // distinguish a leak from a legitimately worded goal
+  'raise', 'break', 'elif', 'try', 'except', 'pass', 'lambda', 'assert', 'yield', 'global', 'await',
+  'async', 'throw', 'catch', 'typeof', 'delete', 'export', 'default', 'extends', 'super']);
 
 // Distinctive tokens of an implementation: identifiers it introduces that a task specification would
 // have no reason to contain verbatim.
 function implementationTokens(patch) {
   const out = new Set();
+  // String literals are stripped first. An error message is prose, not an implementation identifier,
+  // and scanning it flagged the ordinary English word "comment" as a leak from a goal that is ABOUT
+  // comments. Identifiers live in code, not in message text.
+  patch = patch.replace(/"[^"]*"|'[^']*'/g, '""');
   for (const m of patch.matchAll(/\b([A-Za-z_][A-Za-z0-9_]{3,})\b/g)) {
     const t = m[1];
     if (!STOP.has(t)) out.add(t);

@@ -1,0 +1,17 @@
+--- op op1 after: "        self._daily = {}\n"
+        self._hourly = {}
+
+--- op op2 after: "aily[day] = self._daily.get(day, 0) + n\n"
+
+    def record_hour(self, hour, n):
+        self._hourly[hour] = self._hourly.get(hour, 0) + n
+
+--- op op3 after: "._daily), key=lambda d: self._daily[d])\n"
+
+    def hour_total(self, hour):
+        return self._hourly.get(hour, 0)
+
+    def busiest_hour(self):
+        if not self._hourly:
+            return None
+        return max(sorted(self._hourly), key=lambda h: self._hourly[h])

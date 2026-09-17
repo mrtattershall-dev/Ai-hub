@@ -1,0 +1,88 @@
+{
+  "task_id": "b03",
+  "analogy_class": "no_supported_analogy",
+  "analogy_justification": "the scanner advances one character at a time and holds no state across iterations; nesting requires a depth counter and two-character lookahead, neither of which appears anywhere in the file, so there is no structural relation to parallel",
+  "transaction": {
+    "operation_count": 4,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the nesting depth the new behaviour needs",
+        "site_hint": "    i = 0\n"
+      },
+      {
+        "id": "op2",
+        "intent": "while inside a comment, track nesting and consume without emitting",
+        "site_hint": "        c = s[i]\n"
+      },
+      {
+        "id": "op3",
+        "intent": "enter a comment when the opening marker appears outside one",
+        "site_hint": "pace():\n            i += 1\n            continue\n"
+      },
+      {
+        "id": "op4",
+        "intent": "reject input that ends while still inside a comment",
+        "site_hint": "        out.append((\"sym\", c))\n        i += 1\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ],
+      [
+        "op3",
+        "op2"
+      ],
+      [
+        "op1",
+        "op4"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3",
+        "op4"
+      ]
+    ],
+    "transaction_length": 4
+  },
+  "complexity": {
+    "structural_class": "novel-state-feature",
+    "affected_region_lines": 21
+  },
+  "reference": {
+    "source_hash": "40248344964c26f98582943dea7028f05d3ce24a005fcd992b2153f6b95330cd",
+    "reference_hash": "76512c1d2742715751934bc77f8b39f1e31b91a986cd060d468905621411ab76",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3",
+      "op4"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

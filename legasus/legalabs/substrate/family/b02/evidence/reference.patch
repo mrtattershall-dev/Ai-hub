@@ -1,0 +1,12 @@
+--- op op1 after: "    result = {}\n"
+    pending = ""
+
+--- op op2 after: "        line = raw.strip()\n"
+        if pending:
+            line = pending + line
+            pending = ""
+
+--- op op3 after: "e.startswith(\"#\"):\n            continue\n"
+        if line.endswith("..."):
+            pending = line[:-3]
+            continue
