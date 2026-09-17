@@ -212,3 +212,68 @@ coverage into misses.
 gain, but if the honest answer for these program shapes is that current-program structure does not
 narrow placement, the gain belongs to transaction topology in LegaCore and not here. That result would
 be a finding, not a failure — and it must be reported as the former rather than engineered away.
+
+---
+
+## Amendment A — the evidence authority table
+
+*Added after the v2 baseline, before any v5 code. It EXTENDS the provenance tiers and relaxes
+nothing: every constraint in the frozen rules still binds, and two sources that were implicit are now
+named. Recorded as an amendment rather than an edit so the freeze stays honest.*
+
+The baseline's worst result was not 2/6 coverage. It was that **v2 confidently resolved the wrong
+concern using evidence from a clause that was never authorised to nominate one.** Ambiguity can
+abstain; this cannot. `state:_hits`, `state:_items` and `state:SCALE` are structurally real concerns —
+LegaParse is not hallucinating them. The architecture simply let preservation text vote on the
+question *"what existing behaviour is the requested change analogous to?"*, and it has no standing to.
+
+That is **evidence laundering**: text acquiring an authority it was never granted by passing through a
+representation that does not record where it came from.
+
+| Source | May do | May NOT do |
+|---|---|---|
+| **RELATION clause** | nominate an analogue / concern; disambiguate competing concerns | — |
+| **DELTA clause** | determine what new behaviour must exist; derive which concern roles require modification | nominate a concern |
+| **PRESERVATION clause** | constrain allowed changes; identify behaviour that must remain | **never** nominate the target concern |
+| **PROGRAM FACTS** | confirm the named concern exists; derive participants, roles, ownership, dependencies, legal regions | nominate a concern absent a relation |
+| **REFERENCE / evidence package** | scoring only | **zero** planning authority |
+
+> **Evidence has both content and authority. Two pieces of text can contain the same identifier and
+> still be allowed to influence completely different decisions.**
+
+### The pipeline this implies
+
+    named relation
+      -> resolve ONE concern                        (relation authority only)
+    requested delta
+      -> which ROLES of this concern must change?   (delta authority only)
+      -> required participants
+         + excluded participants, each with a reason
+      -> legal regions / witnessed dependencies
+
+The question stops being *"where does this concern participate?"* and becomes **"which participation
+points are causally necessary for this delta?"** That is the precision layer, and it attacks e05
+without learning anything about e05.
+
+`reason_not_required` is what stops a selector becoming artificially precise by dropping participants
+until the candidate set is small. **Every omission needs evidence too.**
+
+### Implementation is exactly two stages
+
+1. **Provenance-preserving resolution.** Relation / delta / preservation evidence stays separate all
+   the way through concern resolution. No merged haystack anywhere downstream.
+2. **Operation requirements.** Given the resolved concern, use the delta plus the witnessed roles to
+   decide which participants require modification, with positive reasons for inclusion AND exclusion.
+
+Nothing else. Then re-run the same frozen scorer.
+
+### Prediction recorded before the run
+
+Stages 1 and 2 touch resolution and participant selection. They do **not** touch `siteclass.mjs`,
+where information gain is computed as `log2(parent_boundaries / legal_boundaries)` — a statement about
+where *within* a parent a site may sit, not about which participants matter. **I therefore expect the
+information-gain target to remain unmet at roughly 0.00 bits**, and expect four of the five targets to
+be reachable.
+
+Recording this now so it is a prediction rather than an excuse. If gain does move, the model of what
+these two stages do is wrong and that is worth more than the metric.

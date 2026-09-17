@@ -3612,3 +3612,80 @@ defect isolated on purpose, and it is the half of v5 that provenance work cannot
     ambiguous          2     e01, e06 - the c03 defect, twice
     inflation median   1.33  best case 1.00 on a task that should not have applied at all
     positive gain      0/13
+
+---
+
+# v5 RESULT on the sealed provenance family
+
+Same scorer, same sealed family, selector passed as an argument so baseline and treatment cannot be
+measured by different code.
+
+    axis                          v2 baseline      v5        target
+    non-overreach                 5/6              6/6       >= 5/6        MET
+    coverage (right concern)      2/6              6/6       >= 4/6        MET
+    median candidate inflation    1.33             1.00      <= 1.25       MET
+    exact or equivalent          13/13            19/19      >= 80%        MET
+    information gain positive     0/13             1/19      > half        NOT MET
+
+    position results: EXACT 17   EQUIVALENT 2   INVALID 0
+    every decision correct: 12/12
+
+Both wrong-concern resolutions are gone. `state:_hits` and `state:_items` no longer win, because the
+clauses that named them now have no authority to nominate. f02's false apply is gone for a stated
+reason - *"a relation that names nothing in the program is not a relation the program supports"* - and
+e01/e06, which are the c03 shape, now resolve instead of abstaining.
+
+## The exclusions, which were the actual deliverable
+
+    e05  REQUIRED  Board.pin        WRITE   the requested behaviour asks for a WRITE operation,
+                                            witnessed by a list append on the symbol
+         REQUIRED  Board.pin_count  COUNT   ... asks for a COUNT operation, witnessed by a len() read
+         REQUIRED  Board.__init__   OWNER   new state must be declared before any required operation uses it
+         excluded  Board.unpin      REMOVE  the requested behaviour asks for no REMOVE operation
+         excluded  Board.pin_report RENDER  the requested behaviour asks for no RENDER operation
+
+    e06  excluded  ALIASES          REGISTRY  no operation named in the requested behaviour reads
+                                              ALIASES (read only by resolve_alias)
+
+Inflation fell from 1.67 to 1.00 on e05, and from participation-shaped to requirement-shaped generally.
+
+## Information gain: predicted before the run, and unmoved
+
+The v5 amendment recorded, before this ran, that stages 1 and 2 do not touch `siteclass.mjs`, where
+gain is log2(parent_boundaries / legal_boundaries) - a statement about where *within* a parent a site
+may sit, not about which participants matter. 18 of 19 operations returned exactly 0.00 bits. The one
+that did not is e01 op4, at 0.26 bits, where the new branch requires `k` and must follow its binding.
+
+So the milestone's conjunction is **not met**: four of five. Nothing here narrows *within* a region,
+and on these program shapes the honest reading is that current-program structure has little placement
+information to give. That belongs to transaction topology in LegaCore, and it is a finding rather than
+something to engineer away in the parser.
+
+## What this run does NOT establish
+
+The **architecture** predates the family (commit `1013abf` precedes `f8e1e53`): the authority table,
+preservation-excluded-rather-than-down-weighted, requirement-derived-from-the-delta. Those results are
+prospective.
+
+The **lexicons are not**. The preservation predicates in `clauses.mjs` and the operation-kind
+predicates in `selectv3.mjs` were written after the family was sealed, with its tasks visible, and
+were reasoned against them while being chosen. **Median inflation 1.00 is therefore not a clean
+prospective measurement of the requirements layer.** A third family, authored blind after this freeze,
+is what would make it one.
+
+That distinction is the a03 lesson applied forward instead of discovered afterwards.
+
+## A scorer bug caught by distrusting a good number
+
+The headline said 1/19 positive gain; a quick probe said 0/19. Chasing the disagreement showed **the
+probe was wrong, not the scorer**. Written through a shell heredoc, its doubled-backslash regex
+arrived on disk with single backslashes, and in a single-quoted JS string a backslash-s is just an
+s. The regex became "^s*", matched nothing, `requires` was always empty, and every legal region looked
+unbounded.
+
+**This is the fourth occurrence of heredoc backslash-eating in this project.** The standing rule was
+violated again: JS containing regexes is written with a file writer, never through a heredoc. The
+result is only correct because the scorer itself was written that way.
+
+Worth keeping separately: the bug surfaced *because a favourable number was distrusted*. Had the probe
+agreed with the scorer, nothing would have been checked.

@@ -1,0 +1,22 @@
+LegaParse v5 SELECTOR, frozen after the provenance-family run and before any further family exists.
+
+WHAT IS FROZEN: clause segmentation with recorded provenance, resolution on RELATION evidence alone,
+and the operation-requirements layer with witnessed reasons for inclusion AND exclusion.
+
+WHAT THIS RUN DID AND DID NOT ESTABLISH, stated on the freeze itself so it travels with the hashes:
+
+  The ARCHITECTURE was specified before the family existed (commit 1013abf precedes f8e1e53): the
+  authority table, preservation-excluded-not-down-weighted, and requirement-derived-from-the-delta.
+  Its results are a prospective test of that architecture.
+
+  The LEXICONS were not. The preservation predicates in clauses.mjs and the operation-kind predicates
+  in selectv3.mjs were written after the family was sealed, with its contents visible, and were
+  reasoned against its tasks while being chosen. Median inflation 1.00 is therefore NOT a clean
+  prospective measurement of the requirements layer. A third family, authored blind after this freeze,
+  is what would make it one.
+
+  This is the a03 lesson applied forward rather than after the fact.
+
+legasus/legaparse/clauses.mjs        5de810a16483a2a04ba3336fff75398c9fddc7a31c370a770d310650cf9e0bf3
+legasus/legaparse/selectv3.mjs       3ff241de3af2ad11725de87aa67cb9f6789a47f17f5f26b53826fab850b5b713
+legasus/legalabs/substrate/run-provenance.mjs 96b3cc737d8a4e7c05ef9f73288a7fcee7908dafc634f6ce6f67f0d9929ae386
