@@ -3549,3 +3549,66 @@ agrees with it measures the tuning.
 2. The scorer computed a reference line of -1 for any anchor that stops mid-line (c03 inserts inside a
    list literal). It assumed every anchor was newline-terminated. That was a scorer bug reported as a
    selector input, and it is fixed; c03's references are [0,2,14,26].
+
+---
+
+# v2 BASELINE on the sealed provenance family (12 tasks)
+
+Run before any v5 code exists, with the v5 targets already committed, so the bar could not be set to
+the gap. Six expected APPLY, six expected ABSTAIN; a degenerate selector scores 6/12 either way.
+
+    non-overreach                     5/6      target >= 5/6     MET
+    coverage (right concern)          2/6      target >= 4/6     not met
+    median candidate inflation        1.33     target <= 1.25    not met
+    information gain positive         0/13     target > half     not met
+    exact or equivalent              13/13     target >= 80%     MET
+
+## The two results that matter
+
+**v2 resolves the WRONG CONCERN on e02 and e03, and a decision-only metric would have scored both as
+successes.** e02 was built so the distractor outscores the target: the hit feature has four namable
+parts and appears only in the preservation clause, the names list has fewer and is what the relation
+points at. v2 resolved `state:_hits`. e03 the same, resolving `state:_items` instead of
+`state:_coupons`. This is not a tie the selector failed to break — it is a confident wrong answer,
+reached on evidence drawn entirely from a clause that names things *because they are not the target*.
+
+**f02 is a FALSE APPLY.** The relation names `mean`, a pure function that is no precedent for
+accumulation across calls. v2 applied anyway, resolving `state:SCALE` — a concern reachable only
+through the preservation clause's mention of `scaled`.
+
+## A correction to the v4 holdout write-up
+
+I reported v4's non-overreach as **3/3**, and it is now clear that number was weaker than it read.
+All three no-analogue tasks in that family had **no relation clause at all**, so every one of them
+abstained at `ABSTAIN_NO_RELATION` before resolution was ever attempted. The result demonstrated that
+the selector does not invent a relation. It did **not** demonstrate that the selector declines a
+relation that is present but false, because the family contained no such case.
+
+The first family to contain one (f02) shows it does not decline it.
+
+**This is the a03 lesson a second time, and I did not apply it when writing that section.** a03 scored
+a win on a disambiguation mechanism it never exercised; the d-tasks scored a win on a relation-
+rejection mechanism they never exercised. The standing rule now has two instances behind it: *a
+passing control proves the mechanism ran only if the input could have made it fail.*
+
+The honest restatement of the v4 result is: **the selector did not invent relations where none were
+stated (3/3), and its behaviour on false relations was untested.**
+
+## The inflation control fired exactly as designed
+
+e05 applied, resolved the right concern, and still nominated five sites where three are required —
+the pin feature holds an owner, two mutators and two readers, while the delta names an appender and a
+count. The concern is right and the address is wrong. This is the participation-is-not-requirement
+defect isolated on purpose, and it is the half of v5 that provenance work cannot touch.
+
+    e05   concern state:_pins   CORRECT
+          sites [2,5,9,12,15]   refs [2,5,12]   inflation 1.67   required 3
+
+## What v5 must beat
+
+    coverage           2/6   e04 and e05 only
+    wrong concern      2     e02, e03 - the expensive failure
+    false apply        1     f02
+    ambiguous          2     e01, e06 - the c03 defect, twice
+    inflation median   1.33  best case 1.00 on a task that should not have applied at all
+    positive gain      0/13
