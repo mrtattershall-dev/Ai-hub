@@ -164,7 +164,18 @@ export function selectSites(task, src) {
     participants: ps.map((p) => ({ id: id(p), unit: p.unit, role: p.role,
       witness: p.witness.rule, line: p.witness.line, lines: p.lines })),
     edges,
-    // The projected site is the END of each witness extent - where a new sibling belongs.
-    sites: [...new Set(ps.flatMap((p) => p.witnesses.map((w) => (w.site === undefined ? w.line : w.site))))].sort((a, b) => a - b),
+    // EDGES HOLD OVER THE EXISTING FEATURE'S PARTICIPANTS. They are current program facts: each cites
+    // specific lines that a reader can check. Transferring them to the NEW operations - "the new
+    // feature's parts depend on each other the way the existing feature's parts do" - is an
+    // INFERENCE about a transaction whose operations do not exist yet. It is sound for the
+    // parallel-feature tasks this was developed on and it is not a parse-level fact, so LegaCore must
+    // read it as the former. Saying so here is the whole point; the alternative is that the inference
+    // arrives downstream wearing the authority of derived program structure.
+    edge_scope: 'edges are facts about the EXISTING concern; applying them to the new operations is a '
+      + 'TRANSACTION-LEVEL INFERENCE, not a program fact',
+    // The projected site is the END of each witness extent. That boundary is an ENGINEERING CHOICE
+    // carried on the witness, not the observation itself - see `realized` in concernkinds.mjs.
+    site_basis: 'ENGINEERING_CHOICE: a new sibling belongs after the witnessed construct ends',
+    sites: [...new Set(ps.flatMap((p) => p.witnesses.map((w) => (w.realization ? w.realization.line : w.line))))].sort((a, b) => a - b),
   };
 }

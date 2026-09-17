@@ -429,3 +429,57 @@ used to reason about the ORDER of the NEW operations. The transfer is an inferen
 parts depend on each other the way the existing feature's parts do" - not a program fact about
 operations that do not exist yet. It is sound for parallel-feature tasks and should be labelled as a
 transaction-level inference rather than a parse-level fact when LegaCore consumes it.
+
+---
+
+## Sweep results, run against the six substrate sources rather than asserted
+
+Three suspects. Each was checked on real data, because "I read the code and it looks fine" is how the
+last several defects survived.
+
+### SUSPECT A — an engineering choice riding inside an evidence object. REAL, fixed.
+
+A witness carried `line` (the program really does write the symbol here) and `site` (a new sibling
+would go after the extent) as two peer fields. The first is checkable; the second is merely
+defensible, and nothing in the shape said so. On the six sources the two values differ at **4 of 41
+witnesses**, so the convention was doing real work while dressed as an observation.
+
+Fixed by splitting them:
+
+    line          fact_kind CURRENT_PROGRAM_FACT
+    realization   fact_kind ENGINEERING_CHOICE + the rule it applied
+
+The rename touches a field the selector reads, and the old reader had a silent fallback
+(`w.site === undefined ? w.line : w.site`) that would have degraded quietly rather than failed. So
+old and new trees were loaded side by side and compared: **6 of 6 tasks identical** in decision,
+resolved concern and sites. Labels changed; behaviour did not.
+
+### SUSPECT B — strongest-role summarization. UNDETERMINED, labelled, not fixed.
+
+A unit whose witnesses support several roles is reported under the strongest one, so a unit that both
+binds and reads the symbol shows as OWNER and its CONSUMER witness vanishes from `role`. The full list
+survives in `witnesses`, so nothing is destroyed - but `role` alone is a convention, not the unit's
+complete relationship.
+
+The first measurement said **0 of 36 participants** collapsed, which reads as clean. It is not:
+
+    participants with 1 witness    35
+    participants with 2+ witnesses  1   <- only these could expose a collapse
+
+The test could fire at most once and did not. **Zero observed collapses is not evidence of
+correctness here**; it is an underpowered test reporting its own inability to fire. Recorded as
+UNDETERMINED and settled by a source containing a genuine read-and-write unit, not by re-reading this
+number.
+
+### SUSPECT C — transaction inference presented as program structure. REAL, labelled.
+
+`edgesFor` derives edges over the EXISTING concern's participants. Those edges are current program
+facts and cite checkable lines. Applying them to the NEW operations - "the new feature's parts depend
+on each other the way the existing feature's parts do" - is an inference about a transaction whose
+operations do not exist yet. Sound for parallel-feature tasks, and not a parse-level fact. The output
+now says so in `edge_scope`, so the inference cannot arrive downstream wearing the authority of
+derived program structure.
+
+### Freeze
+
+`LEGAPARSE.frozen` seals eight files. a03 stands at EQUIVALENT, 0.00 bits.

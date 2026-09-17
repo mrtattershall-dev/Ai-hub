@@ -1,0 +1,22 @@
+LegaParse SELECTOR, frozen before the holdout that tests it.
+
+WHAT IS FROZEN: relation extraction, concern resolution, role projection, subgraph emission, site
+semantics and the two-axis score. No file below may change before the prospective run; if one must,
+the run is a new preregistration, not a continuation of this one.
+
+CONDITION OF THE FREEZE: the abstraction-defect sweep found no UNLABELLED conflation of the three
+fact kinds remaining. One convention (strongest-role summarization) is labelled and UNDETERMINED on
+real data - see CONCERNS.md. It is not a known-wrong fact; it is an unsettled one.
+
+a03 stands at EQUIVALENT, 0.00 bits. That is the honest reading: the current program constrains the
+placement no further, and the remaining constraint belongs to transaction topology, which this
+component deliberately does not know.
+
+legasus/legaparse/selectv2.mjs           0e28f455f216852b7b562d746662c42ef0b7eb85657f854806eeb5b5e07a4ca7
+legasus/legaparse/concernkinds.mjs       f79f507e91a1b25ca9fc3d9c17834d9312af7578f175d5f9b20cece3332f83b0
+legasus/legaparse/concerns.mjs           b23c871aae58bca84c513d5c13c7c3d92fc656f2ccded4491ffe51d0af5ec632
+legasus/legaparse/siteclass.mjs          f3cb89a1a440a5df2d7cf2da27dfe75268036103eed118c095e565faba9cfe47
+legasus/legaparse/siteclass.test.mjs     713851d3b797fd022c2be1dd72273cd634fe4ec1a297efb1af2f31ed7f253f54
+legasus/legaparse/scope.mjs              8bb6fcff83ea39d909f93cb991cc2a974ce6c0b27657e204abfda3d72899b55e
+legasus/legaparse/ownership.mjs          15166abf30c149a51d5c5f6a8be14e4aa42ed22c1ae458aae4c22f758f784082
+legasus/legaparse/applicability.mjs      e3d66dd7ba4a07c66ac253f9484b8ad5b7870d56ba7affa7eb62d05290b60b28

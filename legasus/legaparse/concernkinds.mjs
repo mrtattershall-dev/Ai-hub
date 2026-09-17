@@ -37,6 +37,22 @@ export function extentEnd(lines, i) {
 const NL = String.fromCharCode(10);
 const ESC = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+// A WITNESS CARRIES TWO DIFFERENT KINDS OF CLAIM and they used to share one object under one name.
+//
+//   line          CURRENT PROGRAM FACT   the program really does write/read the symbol here
+//   realization   ENGINEERING CHOICE     given that fact, a new sibling would go after the extent
+//
+// Storing the second as a bare `site` field made a decision look like an observation. It is not
+// wrong - "after the construct ends" is a sound convention - but a downstream reader could not tell
+// that it was choosing something rather than reporting something, and the two have different
+// authority: the fact is checkable, the convention is merely defensible. On the six substrate
+// sources the two values differ at 4 of 41 witnesses, so the convention is doing real work.
+function realized(lines, i, end) {
+  return { line: end === undefined ? extentEnd(lines, i) : end,
+    fact_kind: 'ENGINEERING_CHOICE',
+    rule: 'a new sibling belongs after the witnessed construct ends' };
+}
+
 // ---- deterministic role rules. Each returns a witness or null; the FIRST match decides the role, so
 // the ordering is itself part of the specification.
 const ROLE_RULES = [
@@ -89,10 +105,17 @@ export function stateConcerns(src) {
       for (const i of idxs) {
         if (!new RegExp('(?:self\\.)?\\b' + b + '\\b').test(lines[i])) continue;
         const c = classify(lines[i], b);
-        if (c) witnesses.push({ line: i, role: c.role, rule: c.rule, site: extentEnd(lines, i), text: lines[i].trim().slice(0, 72) });
+        if (c) witnesses.push({ line: i, role: c.role, rule: c.rule, fact_kind: 'CURRENT_PROGRAM_FACT', realization: realized(lines, i), text: lines[i].trim().slice(0, 72) });
       }
       if (!witnesses.length) continue;
-      // The unit's role is the strongest role any of its witnesses supports.
+      // The unit's role is the strongest role any of its witnesses supports. THIS IS A SUMMARIZATION
+      // CONVENTION, not a program fact: a unit that both binds and reads the symbol is reported as
+      // OWNER and its CONSUMER witness disappears from `role`. The full list stays in `witnesses`, so
+      // nothing is destroyed, but `role` alone must not be read as the unit's complete relationship.
+      // Status on real data: UNDETERMINED. 35 of 36 participants across the six substrate sources hold
+      // exactly one witness, so a collapse could only have been exposed once and was not. Zero
+      // observed collapses is therefore not evidence of correctness - the test barely had the chance
+      // to fire, and a source with a genuine read-and-write unit is needed to settle it.
       const rank = { OWNER: 3, MUTATOR: 2, CONSUMER: 1 };
       const best = witnesses.reduce((a, w) => (rank[w.role] > rank[a.role] ? w : a), witnesses[0]);
       participants.push({ unit: u.qual, kind: u.kind, role: best.role, witness: best,
@@ -137,12 +160,12 @@ export function variantConcerns(src) {
       const witnesses = [];
       for (const i of idxs) {
         const line = lines[i];
-        if (inCollection.test(line)) witnesses.push({ line: i, role: 'REGISTRY', rule: 'literal listed in a collection', site: extentEnd(lines, i), text: line.trim().slice(0, 72) });
-        else if (inTest.test(line)) witnesses.push({ line: i, role: 'DISPATCH', rule: 'literal compared in a branch test', site: extentEnd(lines, i), text: line.trim().slice(0, 72) });
+        if (inCollection.test(line)) witnesses.push({ line: i, role: 'REGISTRY', rule: 'literal listed in a collection', fact_kind: 'CURRENT_PROGRAM_FACT', realization: realized(lines, i), text: line.trim().slice(0, 72) });
+        else if (inTest.test(line)) witnesses.push({ line: i, role: 'DISPATCH', rule: 'literal compared in a branch test', fact_kind: 'CURRENT_PROGRAM_FACT', realization: realized(lines, i), text: line.trim().slice(0, 72) });
       }
       // A unit whose NAME carries the variant handles it, regardless of where the literal appears.
       if (u.kind === 'def' && new RegExp('_?' + L + '\\b', 'i').test(u.name)) {
-        witnesses.push({ line: u.start, role: 'HANDLER', rule: 'unit name carries the variant', site: u.end, text: lines[u.start].trim().slice(0, 72) });
+        witnesses.push({ line: u.start, role: 'HANDLER', rule: 'unit name carries the variant', fact_kind: 'CURRENT_PROGRAM_FACT', realization: realized(lines, u.start, u.end), text: lines[u.start].trim().slice(0, 72) });
       }
       if (!witnesses.length) continue;
       // MULTIPLICITY IS PRESERVED. Each independently witnessed occurrence is its own participant;
