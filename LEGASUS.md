@@ -159,12 +159,28 @@ evolution remains undemonstrated.** Both halves of that sentence matter.
 The difference between an architecture and a demonstration is how much human intelligence has been
 removed from the loop. This is the scoreboard.
 
-    COMPUTED                          STILL ORACLE
-    [x] scope facts                   [ ] site selection
-    [x] generation boundaries         [ ] site ordering and dependencies
-    [x] ownership invariants          [ ] local semantic intent
+    COMPUTED                          PARTIAL                     STILL ORACLE
+    [x] scope facts                   [~] site selection          [ ] site ordering / dependencies
+    [x] generation boundaries                                     [ ] local semantic intent
+    [x] ownership invariants
 
-The three remaining fields are the current LegaCore planner problem. Success means converting them into
+`[~]` is measured, not aspirational. Site selection has been run ONCE prospectively against a sealed
+family the selector had never seen:
+
+    no-analogue non-overreach      3/3 abstained        supported; small sample, not a rate claim
+    positive applicability         2/3 applied
+    exact reference positions      5 of 5 scored operations
+    candidate precision            NOT established      2/4 and 3/5 - an overcomplete region
+    informative narrowing          effectively absent   0.00 bits throughout
+    open representation defect     relation provenance collapse (see LEGASUS_V5.md)
+
+Two of those must not be read generously. **Exactness is not narrowing**: five positions matched the
+reference while the analysis contributed zero bits, and landing on the reference position is a
+different event from having analytically preferred it. **Precision is unresolved**: LegaParse knows
+something about where a concern lives and still hands LegaCore roughly twice the authority the
+reference needed.
+
+The remaining fields are the current LegaCore planner problem. Success means converting them into
 general computed structure **without encoding the desired implementation directly**.
 
 ---
