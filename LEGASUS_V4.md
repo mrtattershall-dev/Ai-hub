@@ -368,3 +368,63 @@ key-list would have caught.
     LegaVerify   alone earns authority to COMMIT
 
 > **No component gets more authority than its evidence justifies.**
+
+---
+
+## RESULT: frozen detector on the sealed substrate — site selection does NOT migrate
+
+Seal verified INTACT and the detector verified byte-identical to `DETECTOR.frozen` before the numbers
+were read. The detector saw `task.json` and `source/` only.
+
+    a01  applicable   ABSTAIN  target=null          no feature group resolved
+    a02  applicable   ABSTAIN  target=null          no feature group resolved
+    a03  applicable   ABSTAIN  target=valid_types   no feature group resolved
+    b01  no-analogue  ABSTAIN  target=null          names no relation      CORRECT
+    b02  no-analogue  ABSTAIN  target=parse_config  names no relation      CORRECT
+    b03  no-analogue  ABSTAIN  target=tokens        names no relation      CORRECT
+
+    true-apply 0/3    false-apply 0/3    abstention 6/6
+    site quality      UNDEFINED - applied to nothing, no sensitivity
+    system coverage   0/6
+
+### What holds
+
+**The abstention mechanism works.** `false-apply 0/3`: the detector never overreached on a task lacking
+a supported relation, which is precisely the goal-74 failure it was built to prevent. Refusal is
+functioning as a first-class behaviour.
+
+### What fails
+
+**System coverage 0/6. Site selection has NOT moved from `[~]` toward `[x]`.** A component that applies
+to nothing is useless regardless of its conditional precision, which is why that metric was preregistered.
+
+**Root cause, found prospectively:** `featureGroups` analyses a single module-level function body. Goals
+64 and 74 were exactly that shape (`to_html`). None of the six substrate tasks are — a01 and a02 are
+class-based, and a03's feature spans module level plus three functions. **The derivation principle was
+developed on one structural shape and does not generalize beyond it.**
+
+### A confound in my own construction procedure, disclosed
+
+Rule 13 matched the two classes on **operation count** but not on **structural shape**. The analogy
+tasks skew class-based and module-spanning; two of three non-analogy tasks are single-function. So
+"abstains on all analogy tasks" is partly a shape effect rather than purely an applicability effect, and
+the true-apply rate of 0/3 cannot be cleanly attributed.
+
+This is a gap in the construction procedure, not in the tasks. Per rule 9 no task is edited in response.
+A future amendment should match structural shape across classes as well as operation count — recorded
+here rather than applied, because the family is sealed and the amendment would be post-outcome.
+
+### What is NOT done in response
+
+The detector is not modified. No case is added for class bodies or module-spanning features. Per the
+frozen plan, a failure on a class is evidence about the limits of the derivation principle, and fitting
+a second heuristic to these six would destroy the only prospective evidence the substrate can provide.
+
+### Scoreboard, unchanged
+
+    COMPUTED                  PARTIAL                              STILL ORACLE
+    [x] scope facts           [~] site selection                   [ ] site ordering / dependencies
+    [x] generation boundaries      derived for single-function      [ ] local semantic intent
+    [x] ownership invariants       analogy tasks; abstains
+                                   correctly elsewhere; applies
+                                   to 0/6 of the sealed substrate
