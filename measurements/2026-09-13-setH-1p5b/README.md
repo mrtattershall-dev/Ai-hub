@@ -3813,8 +3813,9 @@ bits.
     participant selection   0.74 and 0.32 bits     on the two inflation controls
     position selection      0.22 bits mean         CEILING across all 26 narrowable operations
 
-**Participant selection carried more information than position selection is even capable of carrying
-here.** That reframes what the v5 failure meant: 1/19 was not mainly LegaParse being weak at placement:
+**Participant selection carried information of the same order as a substantial fraction of everything
+position selection has to offer here.** These are different information spaces - which participant
+versus where inside a parent - so this is a comparison of magnitude, not a share of one total. That reframes what the v5 failure meant: 1/19 was not mainly LegaParse being weak at placement:
 these programs barely constrain placement at all, and most of the 18 zeros are correct answers.
 
 **The v6 target is not being changed in response to this.** Its criterion — realized gain on at least
@@ -3856,3 +3857,73 @@ node died on EPIPE, and the shell reported the pipeline's exit code — 0, from 
 stopped a quarter of the way through with no error and no summary. Partial output plus exit 0 is
 exactly the silent-failure shape this project tracks: run long sweeps to a file, never through a
 head/tail pipe.
+
+---
+
+# LegaCore constraint derivation — first run
+
+    operations scored          33   (narrowable 26, intra-line 5 excluded)
+    RECOVERED                  26   narrowed, and every removed boundary really fails
+    missed                      0
+    OVER-CONSTRAINT             0   removed a boundary that actually passes
+    correct zero                7   position-independent and left alone
+    witnesses that replayed    33/33
+
+    PRIMARY    26 of 26 narrowable          (v6 target: >= 15 of 26)
+    SECONDARY  93.8% realized available information   (5.46 of 5.82 bits)   DIAGNOSTIC ONLY
+    STYLE      canonical_realization fired on 19 operations and narrowed 0
+
+Set equality is established rather than assumed: the scorer proves every removed boundary is one that
+genuinely fails, and the derived region size equals the executable passing set on all 26, so the
+derived and true constrained regions are the same set.
+
+## Standing: DEVELOPMENT EVIDENCE ONLY
+
+**`ownership_boundary` was written after diagnosing e05 op2's failure in this very family.** The rule
+it encodes is a general semantic fact — a sibling-level construct inserted inside a deeper body
+terminates that body and orphans the rest — but I looked at the observed failure before writing it.
+That is the same standing as the v5 lexicons, and v6 construction rule 5 says so explicitly.
+
+**26/26 on the data that shaped the rule is not a prospective result.** A family authored blind after
+this freeze is what would make it one.
+
+## The result rests on one rule
+
+    ownership_boundary       23 operations
+    control_flow_boundary     3 operations    the dispatch-branch reachability cases
+    symbol_availability       0 operations    NEVER FIRED - completely untested
+
+A third of the constraint vocabulary carried nothing, and `symbol_availability` has no evidence behind
+it at all. Reporting "three constraint kinds" would overstate what ran.
+
+## The previous run said 4/26, and it was void
+
+The first scoring run reported 4 recovered and 25 over-constraint. It was wrong, and the cause is the
+ledger's recurring shape: **the scorer and the ground-truth prover each rebuilt the patch blocks
+separately**, normalizing trailing newlines differently —
+
+    prover   .replace(/^\n/, '').replace(/\n+$/, NL)
+    scorer   .replace(/^\n/, '')
+
+— so the two texts differed, every line number shifted, and the run compared misaligned positions
+while producing entirely plausible numbers. Two reconstructions of one artifact that must agree, with
+nothing enforcing agreement.
+
+**Fixed structurally, not carefully:** `reconstruct()` and `baseFor()` are exported once and both
+consumers call them. The ground truth now records `base_lines`, and the scorer **refuses to score** on
+a mismatch rather than emitting a number.
+
+It was caught because a diagnostic disagreed with the scorer — the same way the v5 gain discrepancy
+was caught. Two runs in a row, a disagreement between two views of one number has been the thing that
+found a real defect.
+
+## A third escaping incident, and a known blind spot in the guard
+
+The refactor itself was corrupted: `\n` passed through a heredoc *and* Python's own unescaping became
+a literal newline inside a regex literal. **`escape-guard.mjs` would not have caught it** — it scans
+string literals, and this was a regex literal.
+
+That blind spot is acceptable and should be recorded as understood rather than fixed blindly: a raw
+newline inside a regex literal is a **syntax error**, so the interpreter catches it loudly. The silent
+case is the string literal, which is what the guard covers. The normalization is now built with
+`new RegExp('^' + NL)` from character codes so nothing escape-shaped passes through a shell again.

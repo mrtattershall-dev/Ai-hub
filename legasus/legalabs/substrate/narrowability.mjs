@@ -33,7 +33,7 @@ const ind = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
 
 // Apply operations by anchor, re-anchored against the current text at each step - the same discipline
 // the transaction harness uses, for the same reason.
-function applyByAnchor(src, ops) {
+export function applyByAnchor(src, ops) {
   let cur = src;
   for (const op of ops) {
     const n = cur.split(op.anchor).length - 1;
@@ -81,12 +81,42 @@ function candidates(text, refPos, indent) {
   return out;
 }
 
-export function proveTask(dir) {
+// ONE RECONSTRUCTION, USED BY EVERY CONSUMER.
+//
+// The scorer used to rebuild the patch blocks itself, normalizing trailing newlines differently from
+// this file. The texts then differed, every line number shifted, and position comparisons between
+// derived constraints and this ground truth were silently misaligned - invalidating an entire scoring
+// run that looked completely plausible.
+//
+// Two reconstructions of one artifact that MUST agree, with nothing enforcing agreement, is the same
+// hazard shape as the rest of the ledger. The fix is not to copy the normalization more carefully; it
+// is to have exactly one of it.
+export function reconstruct(dir) {
   const task = JSON.parse(readFileSync(join(dir, 'task.json'), 'utf8'));
   const oracle = JSON.parse(readFileSync(join(dir, 'evidence', 'oracle.json'), 'utf8'));
   const srcName = readdirSync(join(dir, 'source'))[0];
   const src = readFileSync(join(dir, 'source', srcName), 'utf8');
   const lang = task.language || 'py';
+  const patch = readFileSync(join(dir, 'evidence', 'reference.patch'), 'utf8');
+  // Built from character codes rather than escape sequences. Every time this normalization has passed
+  // through a shell it has arrived corrupted, and a regex literal broken this way is not always a
+  // syntax error - it can silently change meaning instead.
+  const LEAD = new RegExp('^' + NL);
+  const TRAIL = new RegExp(NL + '+$');
+  const blocks = patch.split(/^--- op .*$/m).slice(1).map((b) => b.replace(LEAD, '').replace(TRAIL, NL));
+  const full = oracle.transaction.operations.map((o, i) => ({ id: o.id, anchor: o.site_hint, code: blocks[i] }));
+  return { task, oracle, srcName, src, lang, full };
+}
+
+// The text an operation is placed into: the source with every OTHER operation already applied. This is
+// the coordinate system every candidate position is numbered against.
+export function baseFor(recon, k) {
+  return applyByAnchor(recon.src, recon.full.filter((_, j) => j !== k));
+}
+
+export function proveTask(dir) {
+  const recon = reconstruct(dir);
+  const { task, oracle, srcName, src, lang } = recon;
   // Probes live as files under evidence/probes, not inside the oracle JSON.
   const pdir = join(dir, 'evidence', 'probes');
   const ext = lang === 'py' ? '.py' : '.js';
@@ -96,10 +126,7 @@ export function proveTask(dir) {
   const ops = oracle.transaction.operations;
   if (!delta) return { id: task.task_id, error: 'oracle carries no delta probe' };
 
-  // Reference code per operation, recovered from the sealed patch.
-  const patch = readFileSync(join(dir, 'evidence', 'reference.patch'), 'utf8');
-  const blocks = patch.split(/^--- op .*$/m).slice(1).map((b) => b.replace(/^\n/, '').replace(/\n+$/, NL));
-  const full = ops.map((o, i) => ({ id: o.id, anchor: o.site_hint, code: blocks[i] }));
+  const full = recon.full;
 
   // Sanity: the reference itself must pass, or nothing below means anything.
   const ref = applyByAnchor(src, full);
@@ -145,6 +172,7 @@ export function proveTask(dir) {
     }
     const narrowable = passing.length > 0 && passing.length < cands.length;
     rows.push({ op: full[k].id, ref_position: refPos,
+      base_lines: base.split(NL).length,
       candidates: cands.length, candidate_positions: cands,
       failing_positions: cands.filter((p) => !passing.includes(p)),
       passing: passing.length, passing_positions: passing,
@@ -160,11 +188,14 @@ export function proveTask(dir) {
 const isMain = process.argv[1] && process.argv[1].endsWith('narrowability.mjs');
 if (isMain) {
   const FAM = process.argv[2] || './provenance';
+  const JSONOUT = process.argv[3] || null;         // optional: dump full per-position ground truth
+  const dump = [];
   let narrowable = 0; let independent = 0; let broken = 0; let totalMax = 0; let intra = 0;
   for (const d of readdirSync(FAM).sort()) {
     if (!existsSync(join(FAM, d, 'task.json'))) continue;
     const r = proveTask(join(FAM, d));
     if (r.error) { console.log('  ' + d + '  ERROR ' + r.error); continue; }
+    dump.push({ task: d, rows: r.rows });
     for (const row of r.rows) {
       if (row.error) { console.log('  ' + d + ' ' + row.op + '  ERROR ' + row.error); broken++; continue; }
       const kind = row.intra_line ? 'INTRA-LINE '
@@ -190,6 +221,10 @@ if (isMain) {
   console.log('  untestable                ' + broken + '   no candidate passes: instrument or probe, not program');
   if (narrowable) console.log('  mean max derivable gain   ' + (totalMax / narrowable).toFixed(2) + ' bits');
   console.log('');
+  if (JSONOUT) {
+    writeFileSync(JSONOUT, JSON.stringify(dump, null, 1), 'utf8');
+    console.log('  per-position ground truth written to ' + JSONOUT);
+  }
   console.log('  No planner produced any of this. It is what the program and its probes actually do,');
   console.log('  so LegaCore cannot be rewarded for narrowing past it - those positions really fail.');
 }

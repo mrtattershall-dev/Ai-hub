@@ -127,6 +127,35 @@ empty, end-of-file — before trusting any number it produces.
 
 ---
 
+## 9. Two reconstructions of one artifact — MECHANIZED
+
+A scorer and the ground-truth prover each rebuilt the same patch blocks from the same file, and
+normalized trailing newlines differently. The two texts then disagreed, every line number shifted, and
+an entire scoring run compared misaligned positions — reporting 4 of 26 recovered when the truth was
+26 of 26. Nothing failed. The numbers looked reasonable in both directions.
+
+**Mechanism:** one exported `reconstruct()` / `baseFor()` that every consumer calls, plus an alignment
+assertion — the ground truth records `base_lines` and the scorer **refuses to score** on a mismatch
+rather than producing a number.
+
+**Rule it replaces:** "normalize carefully in both places" is not a rule, it is a wish. If two pieces
+of code must agree on a derived artifact, there is one implementation of it.
+
+---
+
+## Known blind spot in hazard 1's mechanism
+
+`escape-guard.mjs` scans **string literals** and not **regex literals**. A newline escape that passed
+through a heredoc and a second layer of unescaping landed as a raw newline inside a regex literal, and
+the guard did not see it.
+
+This is recorded as understood rather than patched: a raw newline in a regex literal is a **syntax
+error**, so the interpreter catches it immediately and loudly. The silent case — valid code with
+changed meaning — is the string literal, which the guard covers. Extending it to regex literals would
+add false positives for no safety gain.
+
+---
+
 ## The pattern behind all of them
 
 Every one of these produced **output that looked like a result**. None threw. The costly failures in
