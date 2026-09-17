@@ -19,6 +19,21 @@
 //    A role without a witness is not admissible.
 import { units } from './concerns.mjs';
 
+// The syntactic extent of the construct a witness sits on: a def or a branch runs to the last line more
+// indented than its header. A plain statement's extent is itself. A new sibling belongs AFTER the extent.
+export function extentEnd(lines, i) {
+  const ind = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
+  if (!/^\s*(?:def|class|if|elif|else|for|while|try|except|with)\b/.test(lines[i] || '')) return i;
+  const base = ind(lines[i]);
+  let end = i;
+  for (let j = i + 1; j < lines.length; j++) {
+    if (!lines[j].trim()) continue;
+    if (ind(lines[j]) <= base) break;
+    end = j;
+  }
+  return end;
+}
+
 const NL = String.fromCharCode(10);
 const ESC = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -74,7 +89,7 @@ export function stateConcerns(src) {
       for (const i of idxs) {
         if (!new RegExp('(?:self\\.)?\\b' + b + '\\b').test(lines[i])) continue;
         const c = classify(lines[i], b);
-        if (c) witnesses.push({ line: i, role: c.role, rule: c.rule, text: lines[i].trim().slice(0, 72) });
+        if (c) witnesses.push({ line: i, role: c.role, rule: c.rule, site: extentEnd(lines, i), text: lines[i].trim().slice(0, 72) });
       }
       if (!witnesses.length) continue;
       // The unit's role is the strongest role any of its witnesses supports.
@@ -122,17 +137,21 @@ export function variantConcerns(src) {
       const witnesses = [];
       for (const i of idxs) {
         const line = lines[i];
-        if (inCollection.test(line)) witnesses.push({ line: i, role: 'REGISTRY', rule: 'literal listed in a collection', text: line.trim().slice(0, 72) });
-        else if (inTest.test(line)) witnesses.push({ line: i, role: 'DISPATCH', rule: 'literal compared in a branch test', text: line.trim().slice(0, 72) });
+        if (inCollection.test(line)) witnesses.push({ line: i, role: 'REGISTRY', rule: 'literal listed in a collection', site: extentEnd(lines, i), text: line.trim().slice(0, 72) });
+        else if (inTest.test(line)) witnesses.push({ line: i, role: 'DISPATCH', rule: 'literal compared in a branch test', site: extentEnd(lines, i), text: line.trim().slice(0, 72) });
       }
       // A unit whose NAME carries the variant handles it, regardless of where the literal appears.
       if (u.kind === 'def' && new RegExp('_?' + L + '\\b', 'i').test(u.name)) {
-        witnesses.push({ line: u.start, role: 'HANDLER', rule: 'unit name carries the variant', text: lines[u.start].trim().slice(0, 72) });
+        witnesses.push({ line: u.start, role: 'HANDLER', rule: 'unit name carries the variant', site: u.end, text: lines[u.start].trim().slice(0, 72) });
       }
       if (!witnesses.length) continue;
-      participants.push({ unit: u.qual, kind: u.kind, role: witnesses[0].role, witness: witnesses[0],
-        witnesses, lines: witnesses.map((w) => w.line),
-        lastLine: witnesses[witnesses.length - 1].line, unitStart: u.start, unitEnd: u.end });
+      // MULTIPLICITY IS PRESERVED. Each independently witnessed occurrence is its own participant;
+      // one unit may participate at several sites in the same role. Compressing to one-per-unit is what
+      // lost a03's second registry entry, and the compression is not recoverable downstream.
+      for (const w of witnesses) {
+        participants.push({ unit: u.qual, kind: u.kind, role: w.role, witness: w, witnesses: [w],
+          lines: [w.line], lastLine: w.line, unitStart: u.start, unitEnd: u.end });
+      }
     }
     const roles = new Set(participants.map((p) => p.role));
     // A real variant participates in at least two DIFFERENT roles - otherwise it is just a repeated

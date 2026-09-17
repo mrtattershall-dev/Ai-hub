@@ -60,16 +60,47 @@ function resolve(concerns, relText, goal) {
 // Dependency edges derived from WITNESSED ROLES, not from source position.
 //   every non-OWNER participant depends on the OWNER   - state must exist before it is written or read
 //   DISPATCH depends on HANDLER                        - the branch calls the handler
-export function edgesFor(participants) {
+// EDGES MUST BE WITNESSED, not assumed from role labels.
+//
+// "all NON_OWNER depends on OWNER" and "all DISPATCH depends on HANDLER" are heuristics that happen to
+// produce reasonable topologies on development tasks. An edge is a claim about the program, so it needs
+// the same evidentiary standard as a role: a specific fact, at specific lines, that a later reader can
+// check. An edge whose witness cannot be established is NOT emitted.
+export function edgesFor(participants, src, concern) {
+  const lines = String(src || '').split(String.fromCharCode(10));
   const edges = [];
+  const sym = concern && concern.symbol ? String(concern.symbol) : null;
   const owners = participants.filter((p) => p.role === 'OWNER');
   const handlers = participants.filter((p) => p.role === 'HANDLER');
+
   for (const p of participants) {
-    for (const o of owners) {
-      if (o !== p) edges.push({ from: id(o), to: id(p), why: 'state must be declared before it is ' + (p.role === 'MUTATOR' ? 'written' : 'read') });
+    // OWNER -> MUTATOR / CONSUMER. Witness: the dependent line actually accesses the symbol the owner
+    // binds. Verified against the source, not inferred from the pair of labels.
+    if (p.role !== 'OWNER' && sym) {
+      const line = lines[p.witness ? p.witness.line : p.line] || '';
+      const accesses = new RegExp('(?:self\\.)?\\b' + sym.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(line);
+      if (accesses) {
+        for (const o of owners) {
+          if (o === p) continue;
+          edges.push({ from: id(o), to: id(p),
+            dependency_kind: 'state-before-use',
+            dependency_witness: 'line ' + p.witness.line + ' accesses `' + sym + '`, bound at line ' + o.witness.line });
+        }
+      }
     }
+    // HANDLER -> DISPATCH. Witness: the dispatch branch body actually invokes the handler unit. If the
+    // branch never calls it, there is no dependency to assert.
     if (p.role === 'DISPATCH') {
-      for (const h of handlers) edges.push({ from: id(h), to: id(p), why: 'the dispatch branch calls the handler' });
+      for (const h of handlers) {
+        const hname = String(h.unit).split('.').pop();
+        const start = p.witness.line;
+        const body = lines.slice(start, start + 4).join(' ');
+        if (new RegExp('\\b' + hname.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\(').test(body)) {
+          edges.push({ from: id(h), to: id(p),
+            dependency_kind: 'handler-before-dispatch',
+            dependency_witness: 'the branch at line ' + start + ' invokes `' + hname + '`, defined at line ' + h.witness.line });
+        }
+      }
     }
   }
   return edges;
@@ -125,7 +156,7 @@ export function selectSites(task, src) {
       resolution_witness: r.candidates.map((c) => c.concern.symbol) };
   }
   const ps = r.concern.participants;
-  const edges = edgesFor(ps);
+  const edges = edgesFor(ps, src, r.concern);
   return { ...base,
     decision: 'APPLY',
     resolved_concern: r.concern.kind + ':' + r.concern.symbol,
@@ -133,6 +164,7 @@ export function selectSites(task, src) {
     participants: ps.map((p) => ({ id: id(p), unit: p.unit, role: p.role,
       witness: p.witness.rule, line: p.witness.line, lines: p.lines })),
     edges,
-    sites: [...new Set(ps.flatMap((p) => p.witnesses.map((w) => w.line)))].sort((a, b) => a - b),
+    // The projected site is the END of each witness extent - where a new sibling belongs.
+    sites: [...new Set(ps.flatMap((p) => p.witnesses.map((w) => (w.site === undefined ? w.line : w.site))))].sort((a, b) => a - b),
   };
 }

@@ -194,3 +194,60 @@ Coverage is 2/6 because a03's set, while perfectly sized, misses two of its four
 If LegaParse derives WHY each site participates, that explanation is where much of the ordering
 information already lives. The roles and edges above are not a bonus output; they are the input to the
 next migration.
+
+---
+
+## Multiplicity, extents, and witnessed edges
+
+Three general rules added, none of them a task-specific case:
+
+  * **participant multiplicity** — a participant is every independently witnessed occurrence performing
+    a role, not one representative per role/unit. One unit may participate at several sites in the same
+    role; compressing them is not recoverable downstream.
+  * **extent projection** — a participant occupies a syntactic EXTENT, not a point. A new sibling belongs
+    AFTER that extent ends (after a def's body, after a branch's body), not on the existing construct's
+    header line.
+  * **witnessed dependency edges** — every edge carries `dependency_kind` and `dependency_witness`, and
+    an edge whose witness cannot be established is NOT emitted:
+
+        state-before-use          line N accesses `sym`, bound at line M
+        handler-before-dispatch   the branch at line N invokes `h`, defined at line M
+
+    "all NON_OWNER depends on OWNER" is a heuristic that happens to produce reasonable topologies on
+    development tasks. An edge is a claim about the program and needs the same evidentiary standard as a
+    role, so LegaCore's future ordering computation sorts witnessed dependencies rather than role labels.
+
+### Development numbers (spent evidence, NOT validation)
+
+    a01  APPLY  recall 2/2   sites [2,5,8,11]    refs [3,12]
+    a02  APPLY  recall 3/3   sites [2,5,8,12,13] refs [3,6,14]
+    a03  APPLY  recall 3/4   sites [0,2,8,22]    refs [0,2,11,23]
+    b01/b02/b03  ABSTAIN_NO_RELATION, all correct and correctly reasoned
+
+    applied 3/6    pooled recall 8/9 = 0.889    COVERAGE 2/6
+
+### A silent defect, and how it was found
+
+`extentEnd` was non-functional from the moment it was written: its regex read `/^s*(?:def|class|...)/`
+instead of `/^\s*(?:def|class|...)\b/`, because the backslashes were eaten passing through
+shell-embedded JavaScript. It matched nothing and silently returned the input line, so the projection
+rule was never in effect while appearing to be.
+
+**I guessed at a03's cause twice before looking at the data.** Both guesses were plausible and both were
+wrong; printing the source with line numbers next to the reference and derived sites found it in one
+step. The instrument was reporting a number the whole time, which is what made guessing feel reasonable.
+
+### The remaining a03 miss is a SCORING question, not obviously a defect
+
+    derived site 8    after `_fmt_quoted`'s extent
+    reference   11    after `label`'s body
+
+Both are legal positions for a new module-level def. The reference's choice is an authoring accident,
+exactly like the reference patch's operation SEQUENCE being one legal order among several.
+
+**Recorded, not fixed.** Widening the tolerance until a03 scores 4/4 would be fitting to the holdout.
+Site equivalence needs the same treatment ordering got — a definition of when two positions are
+interchangeable, fixed BEFORE the next prospective run — and that definition must not be written by
+looking at which positions a03 happens to need.
+
+Until it exists, a03 is scored as 3/4 and coverage as 2/6.
