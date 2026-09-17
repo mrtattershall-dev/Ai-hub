@@ -67,3 +67,56 @@ Both are missing generality, not missing special cases. Neither is fixed by nami
 
 Coverage remains the critical metric. A cautious parser that abstains beautifully has not migrated
 anything.
+
+---
+
+## Concern KINDS with role witnesses (`concernkinds.mjs`)
+
+Every role now carries a deterministic witness naming the syntactic fact that produced it, so a role is
+an auditable claim rather than a label:
+
+    OWNER     binding assignment to the symbol
+    MUTATOR   indexed assignment into the symbol / mutating method call on it
+    CONSUMER  reference to the symbol with no write on the line
+    REGISTRY  literal listed in a collection
+    DISPATCH  literal compared in a branch test
+    HANDLER   unit name carries the variant
+
+Two kinds were added as KINDS, not cases. Nothing in the module knows about columns, comments, tallies
+or stacks:
+
+  * **variant / dispatch concerns** - a literal a program treats as a case. Admitted only when it
+    participates in at least two DIFFERENT roles, which keeps ordinary repeated strings out.
+  * **function-local state** - unified with attribute and module state. For local scope the participants
+    are per-WITNESS, because the whole concern lives inside one unit and unit-level counting could never
+    reach two.
+
+### Three further general defects found and fixed
+
+  * local symbols leaked across units: b03's loop index `i` matched another function's parameter `i` and
+    fabricated a concern out of a coincidence. A local name is now confined to its declaring unit.
+  * local concerns were discarded entirely, because one unit cannot be two participants.
+  * one candidate per unit lost a unit participating at several lines - a03's module holds both the
+    registry and the label map.
+
+### A number that must NOT be banked
+
+    pooled recall 13/18 = 0.722    inflation 1.61x     (v1: 0/18.  first concern graph: 8/18)
+
+**This is not the metric, and it overstates.** Concern SELECTION is currently "the concern with the most
+participants", which is task-free. On b03 that picks `state:i` - a loop index - and recovers 4/4 by
+coincidence. Recall bought by an unrelated symbol is luck, and reported alone it would read as progress.
+
+The selection rule is not a ranking heuristic to tune. **The concern must be chosen by the task's named
+relation**, which is applicability's job - and b03 names no relation, so it should abstain and contribute
+nothing at all.
+
+### Order of remaining work
+
+    1  applicability selects the concern from the named relation, or abstains with its reason
+    2  candidate sites project from the selected concern's participant roles
+    3  FREEZE and hash
+    4  author a NEW holdout, sealed before the selector sees it
+    5  report coverage, true/false-apply, recall, precision, exact match, inflation
+
+Until step 1, any recall figure is measuring the wrong thing.
