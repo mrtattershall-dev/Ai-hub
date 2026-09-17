@@ -251,3 +251,61 @@ interchangeable, fixed BEFORE the next prospective run — and that definition m
 looking at which positions a03 happens to need.
 
 Until it exists, a03 is scored as 3/4 and coverage as 2/6.
+
+---
+
+## Site semantics: a site is a legal REGION, not a line (`siteclass.mjs`)
+
+> Two candidate positions are SITE-EQUIVALENT for an operation when placing that operation at either
+> position gives it the same structural parent, satisfies the same prerequisite/dependency constraints,
+> grants the same scope visibility, preserves the same ownership and control-flow invariants, and does
+> not change the externally observable semantics relevant to the contract.
+
+**Anti-cheat:** `legalRegion` takes the program and the OPERATION'S REQUIREMENTS. It never sees the
+selector's proposed position, so the class cannot be widened after the fact until the answer fits.
+
+**Two metrics, never collapsed:**
+
+    EXACT_POSITION_MATCH      derived boundary == reference boundary
+    SITE_EQUIVALENCE_MATCH    derived boundary lies in the same legal region
+
+Reporting only the second would hide that a03 was placed differently; reporting only the first pretends
+textual identity is semantic correctness. This mirrors the ordering rule exactly: the reference sequence
+is one legal topological order, and the reference position is one legal member of a site class.
+
+### Witnesses — 8, both directions
+
+    ADMIT   sibling def at two interchangeable module boundaries
+    ADMIT   branch sibling at two boundaries inside one legal region
+    ADMIT   after the last line of a body, at the outer indent == after that body
+    REJECT  crosses a scope boundary (inside helper_a vs module body)
+    REJECT  crosses a required definition/use dependency
+    REJECT  placed after the provided symbol is already consumed
+    REJECT  moves past a terminator, changing reachability
+    REJECT  branch placed after the fall-through owner never runs
+
+**Structural-parent identity had to become its own predicate.** A range check alone called positions
+equivalent that belonged to different blocks - line 10 of a function is numerically inside a loop's legal
+range and structurally in the function body. The terminator witness now rejects with
+`different structural parent: for x in items: vs def run(items):` rather than by numeric luck.
+
+**One of my own witnesses was mislabelled.** I wrote "crosses a scope boundary" for a case that was
+actually an ADMIT: inserting after the last line of `helper_a`'s body *at module indent* IS the position
+after that body. A real scope witness needs the insertion INDENT to differ, not just the line. It is now
+both - an ADMIT for the boundary case and a REJECT for the genuine scope crossing.
+
+### a03 rescored, with the caveat that matters
+
+    derived 8   reference 11
+    EXACT_POSITION_MATCH     false
+    SITE_EQUIVALENCE_MATCH   true
+    legal region             [0,25]  = the entire module
+
+The equivalence is genuine: `_fmt_date` has no prerequisites and no existing consumer, so nothing bounds
+it and any module-level position is legal. But **a region spanning the whole parent is a weak
+equivalence claim**, very different from the branch case where the region was [2,8]. Region WIDTH should
+be reported alongside the match, or "equivalent" quietly stops meaning much.
+
+**The historical result is not rewritten.** a03 remains 3/4 and coverage 2/6 under the exact-coordinate
+metric that was in force when it was measured. Rescoring under the new metric is a separate, explicitly
+named number - and the scoring rule must be frozen before the next holdout exists.
