@@ -90,3 +90,32 @@ substrate — and only then let the model or the applicability detector see any 
 
 Running generations while authoring would let task 7 be unconsciously shaped by what happened on tasks
 1-6, without anyone deciding to tune anything. The hazard is temporal, not technical.
+
+## Sealing
+
+Rule 14 asserts `sealing.pre_generation`. An assertion is a claim; a hash is evidence. `seal.mjs`
+produces `MANIFEST.sealed.json` with three separate hashes per task:
+
+    task_sha       task.json     what the model is allowed to see
+    source_sha     source/       the starting program, also prompt-visible
+    evidence_sha   evidence/     what the model must never see
+
+Kept separate so a later audit can show the CONTRACT was unchanged even if the evaluator gained a probe
+— and, more importantly, detect the reverse.
+
+    node seal.mjs seal   <familyDir>     # author -> validate -> SEAL
+    node seal.mjs verify <familyDir>     # before and after any run
+
+Verified by `seal.test.mjs` against six mutation classes: contract edited, source edited, evidence
+edited, task added, task removed, and an untouched family that must still verify.
+
+## The sequence, once authoring begins
+
+    author all tasks
+      -> run validate-task.mjs
+      -> seal.mjs seal
+      -> freeze the substrate
+      -> freeze the applicability detector
+      -> only then run anything
+
+No peeking, no tuning, no "small cleanup" after the first outputs.
