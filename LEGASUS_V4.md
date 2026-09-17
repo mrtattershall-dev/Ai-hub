@@ -428,3 +428,92 @@ a second heuristic to these six would destroy the only prospective evidence the 
     [x] ownership invariants       analogy tasks; abstains
                                    correctly elsewhere; applies
                                    to 0/6 of the sealed substrate
+
+### Wording correction to the result above
+
+"The abstention mechanism works" overstates it. The positive side never became observable, so the honest
+decomposition is:
+
+    specificity / non-overreach   supported prospectively      0/3 false applies
+    positive applicability        NOT demonstrated prospectively 0/3 true applies
+    site quality                  unmeasurable - no APPLY cases
+    system coverage               0/6
+    oracle migration              NO
+
+The detector as a whole is **not validated**. All three analogy tasks fell outside the structural domain
+the implementation can analyse, so what was learned is about coverage, not about positive discrimination.
+
+The most useful sentence from the run:
+
+> **The analogy principle generalized semantically farther than the implementation generalized
+> structurally.**
+
+Goals 64 and 74 taught `featureGroups` to reason about analogous behaviour inside one module-level
+function body. The prospective family asked for the same reasoning across classes, methods and
+module-spanning state. The concept may still be sound; the implementation boundary was narrower than I
+knew.
+
+### Why the negative result is trustworthy
+
+    detector hash before the runner fix  ==  detector hash after the runner fix
+
+Verified against `DETECTOR.frozen` before any number was read. The protection is not "I only touched
+plumbing" as a claim - it is that the component under test is demonstrably byte-identical across the
+fix, so the negative result cannot be explained by post-outcome modification of the thing being measured.
+
+---
+
+## MILESTONE: LegaParse Site Selection v2
+
+**Rationale for staying on site selection rather than moving to ordering.** Site selection is upstream of
+everything else:
+
+    global request -> WHICH code participates?  <- site selection
+                   -> HOW are those related?    <- ordering / dependencies
+                   -> WHAT must happen there?   <- semantic intent
+                   -> model fills bounded holes
+
+Deriving ordering perfectly while locations remain hand-supplied leaves a human oracle sitting at the
+entrance to the pipeline. And "what parts of this program participate in this behaviour?" is the
+canonical case for the project's own thesis - symbols, scopes, call graphs, data flow, ownership and
+references are exactly where deterministic software should beat a 1.5B guessing from context. **If
+Legasus cannot eventually compute site selection, that is a ceiling on the architecture, not a missing
+convenience.**
+
+So: force the problem, do not force the result.
+
+### Success condition
+
+> **Site Selection v2 succeeds when candidate sites are derived from PROGRAM-LEVEL STRUCTURAL ROLES
+> rather than a single-function feature-group assumption, while retaining calibrated abstention.**
+
+What the negative result actually says is that the abstraction is wrong. `featureGroups` assumes a
+feature lives inside one function. Real features do not: they live across a class's constructor and
+methods, module state and several functions, producer/consumer pairs, parser state and its output path,
+an entry point and its persistence path.
+
+The replacement is a program-level concern graph - definitions, reads, writes, calls, branches, state
+ownership, data flow - from which the structural ROLES participating in a concern are identified, and
+candidate sites follow from the roles. That generalizes across classes and module-level functions
+without being taught the answer to any particular task.
+
+### Metrics unchanged
+
+coverage, true-apply, false-apply, recall, precision, exact-set match, candidate inflation. **Coverage
+remains the critical one**, or the outcome is the world's most cautious parser saying "I don't know"
+beautifully.
+
+### Status of the six sealed tasks: SPENT
+
+Their prospective result is permanently frozen as *v1 applicability/site selector: 0/6 coverage*. From
+this point they are **development and challenge data** - inspectable, debuggable, witness material. They
+may never again be presented as fresh validation. A new holdout is authored only after v2 is frozen.
+
+### What is explicitly forbidden
+
+    if class:            ...
+    if nested comments:  ...
+    if date column:      ...
+
+Any per-task special case fits the holdout and destroys the evidence. v2 must earn `[x]`; `[~]` is not
+moved by decree.
