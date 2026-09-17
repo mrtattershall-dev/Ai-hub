@@ -120,3 +120,77 @@ nothing at all.
     5  report coverage, true/false-apply, recall, precision, exact match, inflation
 
 Until step 1, any recall figure is measuring the wrong thing.
+
+---
+
+## Site Selection v2 pipeline (`selectv2.mjs`)
+
+    task text
+       -> RELATION EXTRACTION       "the same way as X" / "written like X" / analogy field
+          no supported relation     -> ABSTAIN_NO_RELATION
+       -> CONCERN RESOLUTION        map the named relation onto the concern graph
+          none                      -> ABSTAIN_UNRESOLVED
+          ambiguous                 -> ABSTAIN_AMBIGUOUS
+       -> ROLE PROJECTION           OWNER / MUTATOR / CONSUMER / REGISTRY / HANDLER / DISPATCH
+       -> participants + edges + candidate sites
+
+**No fallback to "best concern".** If relation resolution fails, selection fails. Ranking concerns by
+size is task-free and let a loop index nominate sites and score 4/4 by coincidence; removing the fallback
+kills that at the right level, because `i` has no evidentiary relationship to the request and so never
+earns authority to nominate anything.
+
+### Informed abstention is now distinguishable from blindness
+
+    b03   decision        ABSTAIN_NO_RELATION
+          graph_visible   true
+          concerns_found  ["state:i", "state:out"]
+          named_relation  none
+
+versus v1's `graph_visible: false, decision: ABSTAIN`. Both produce zero sites; only one of them knows
+why. The audit record carries `graph_visible`, `concerns_found`, `named_relation`, `relation_source`,
+`resolved_concern`, `resolution_witness` and `decision`, so correct-abstention-for-the-wrong-reason is
+visible in the evidence rather than hidden behind an identical metric.
+
+### The output is a SUBGRAPH, not a list
+
+`sites = [A,B,C,D]` throws away what LegaCore needs next. A site set can be entirely correct and the
+transaction still fail because the sequence is wrong - this project has already seen a technically
+correct insertion placed after a `continue` and be dead. So v2 returns participants with roles and
+witnesses, plus dependency edges derived from those roles:
+
+    every non-OWNER participant depends on the OWNER    state must exist before it is written or read
+    DISPATCH depends on HANDLER                         the branch calls the handler
+
+Legal orders are topological orders of that graph - 6, 8 and 3 of them on a01/a02/a03. **Source order is
+not the rule.** A helper may have to exist before its caller, state before its mutation.
+
+### Ordering anti-cheat, fixed now rather than when ordering is tested
+
+> Ordering is scored as *"did LegaCore produce a LEGAL TOPOLOGICAL ORDER of the derived dependency
+> graph"*, never as *"did it reproduce the reference sequence"*.
+
+The reference patch's authoring sequence is one legal order among several. Treating it as THE order
+would smuggle the authoring accident in as a new oracle.
+
+### Development numbers on spent evidence — NOT validation
+
+    a01  APPLY   recall 2/2   precision 0.50   inflation 2.00x
+    a02  APPLY   recall 3/3   precision 0.60   inflation 1.67x
+    a03  APPLY   recall 2/4   precision 0.50   inflation 1.00x
+    b01  ABSTAIN_NO_RELATION   correct
+    b02  ABSTAIN_NO_RELATION   correct
+    b03  ABSTAIN_NO_RELATION   correct
+
+    applied 3/6    pooled recall 7/9 = 0.778    inflation 1.44x    system coverage 2/6
+
+Every abstention is now correct AND correctly reasoned; every APPLY resolved the concern the task
+actually names - a03 selects `variant:quoted` over the spurious `state:out` that size-ranking preferred.
+Coverage is 2/6 because a03's set, while perfectly sized, misses two of its four reference lines.
+
+## The scoreboard is not three independent boxes
+
+    site selection  --feeds-->  ordering / dependencies  --feeds-->  local semantic intent
+
+If LegaParse derives WHY each site participates, that explanation is where much of the ordering
+information already lives. The roles and edges above are not a bonus output; they are the input to the
+next migration.
