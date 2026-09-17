@@ -1,0 +1,60 @@
+{
+  "task_id": "b01",
+  "analogy_class": "no_supported_analogy",
+  "analogy_justification": "no existing feature in this file retains prior state - push, pop, peek and size are all single-step operations over one list - so there is no structural relation for the requested history behaviour to parallel",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the history the new behaviour needs",
+        "site_hint": "        self._items = []\n"
+      },
+      {
+        "id": "op2",
+        "intent": "mark and restore, using that history",
+        "site_hint": "def size(self):\n        return len(self._items)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "novel-state-feature",
+    "affected_region_lines": 10
+  },
+  "reference": {
+    "source_hash": "011f616ab0c74b1784495073f1a55dd015ac6d9f7fb312c17114d212e62b7df4",
+    "reference_hash": "52e75001c00f3843d69633b5ee987185edc6124c60e1955a11e6cf9d5cf8ee37",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

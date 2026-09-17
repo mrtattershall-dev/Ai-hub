@@ -9,7 +9,7 @@
 // prompt-visible contract. That catches the failure this project actually suffered, which no schema
 // key-list would have caught.
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, basename } from 'node:path';
 
 const ALLOWED_TASK_KEYS = new Set(['task_id', 'goal', 'lead', 'language', 'run_with', 'analogy', 'interface']);
 const FORBIDDEN_IN_TASK = [
@@ -65,10 +65,27 @@ export function validateTask(dir) {
     const patch = readFileSync(patchPath, 'utf8');
     const src = readdirSync(join(dir, 'source'))
       .map((f) => readFileSync(join(dir, 'source', f), 'utf8')).join('\n');
-    const introduced = [...implementationTokens(patch)].filter((t) => !new RegExp('\\b' + t + '\\b').test(src));
-    const leaked = introduced.filter((t) => new RegExp('\\b' + t + '\\b').test(taskText));
+    // REQUESTED API vs INVENTED INTERNAL DETAIL. The first version of this check flagged add_weighted,
+    // snapshot and undo - the deliverables the task legitimately requests. A specification MUST be able
+    // to name the API it asks for; what it must not name is an identifier the reference INVENTED that
+    // the task never requested (_weights, _marks, ol_items).
+    //
+    // So the contract declares its requested interface, and leakage is measured against that. This is the
+    // deliverable-versus-prerequisite distinction one level down, and it was caught by the checker firing
+    // on legitimately authored tasks rather than by inspection.
+    const declared = new Set(Array.isArray(task.interface) ? task.interface : []);
+    for (const d of declared) {
+      // An interface cannot be used as a laundering channel for private names.
+      if (/^_/.test(d)) note('interface', '"' + d + '" is private and cannot be declared as interface');
+      if (!new RegExp('\\b' + d.replace(/[^\w]/g, '') + '\\b').test(String(task.goal || ''))) {
+        note('interface', '"' + d + '" is declared as interface but the goal never asks for it');
+      }
+    }
+    const patchText = readFileSync(patchPath, 'utf8');
+    const introduced = [...implementationTokens(patchText)].filter((t) => !new RegExp('\\b' + t + '\\b').test(src));
+    const leaked = introduced.filter((t) => !declared.has(t) && new RegExp('\\b' + t + '\\b').test(taskText));
     for (const t of leaked) {
-      note('leakage', '"' + t + '" is introduced by the reference and appears in task.json');
+      note('leakage', '"' + t + '" is introduced by the reference, is not declared interface, and appears in task.json');
     }
   }
 
@@ -104,7 +121,10 @@ export function validateTask(dir) {
 }
 
 // ---- CLI: validate every task under a family directory, and check class/complexity matching (rule 13)
-const dir = process.argv[2];
+// CLI only when run directly. Executing at module scope meant importing this file ran its CLI - which
+// swallowed author.mjs's output and would silently mislead any future importer.
+const isMain = process.argv[1] ? import.meta.url.endsWith(basename(process.argv[1])) : false;
+const dir = isMain ? process.argv[2] : null;
 if (dir && existsSync(dir)) {
   const tasks = readdirSync(dir).filter((d) => existsSync(join(dir, d, 'task.json'))).sort();
   if (!tasks.length) { console.log('  no tasks authored yet under ' + dir); process.exit(0); }

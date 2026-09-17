@@ -14,7 +14,7 @@
 // probe, or - more importantly - detect the reverse.
 import { readFileSync, readdirSync, statSync, writeFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { join } from 'node:path';
+import { join, basename } from 'node:path';
 import { execSync } from 'node:child_process';
 
 const sha = (b) => createHash('sha256').update(b).digest('hex');
@@ -82,7 +82,10 @@ export function verifyFamily(familyDir, manifestPath) {
 }
 
 // ---- CLI
-const [cmd, dir, manifest] = process.argv.slice(2);
+// CLI only when run directly. Executing at module scope meant importing this file ran its CLI - which
+// swallowed author.mjs's output and would silently mislead any future importer.
+const isMain = process.argv[1] ? import.meta.url.endsWith(basename(process.argv[1])) : false;
+const [cmd, dir, manifest] = isMain ? process.argv.slice(2) : [];
 if (cmd === 'seal' && dir) {
   const m = sealFamily(dir);
   const out = manifest || join(dir, 'MANIFEST.sealed.json');

@@ -1,0 +1,14 @@
+{
+  "task_id": "a01",
+  "goal": "Add weighted counting to the EXISTING Tally in tally.py: add_weighted(key, amount) records an amount rather than a single occurrence, weighted_count(key) returns the recorded amount for a key and 0 when there is none, and weighted_total() returns the sum over all keys. Keep the plain counts working exactly as they do now. Run it with python.",
+  "lead": "tally.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the weighted counts work the same way as the existing plain counts",
+  "interface": [
+    "add_weighted",
+    "weighted_count",
+    "weighted_total",
+    "amount"
+  ]
+}
