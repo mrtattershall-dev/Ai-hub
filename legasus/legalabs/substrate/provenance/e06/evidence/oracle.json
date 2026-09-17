@@ -1,0 +1,80 @@
+{
+  "task_id": "e06",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing csv format as the relation to parallel; that format occupies the format list, the label map, the alias map, its own dumper and a branch of the dispatcher, while the requested delta names acceptance, a label and production only, so it occupies a strict subset of those positions",
+  "transaction": {
+    "operation_count": 4,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "admit the new format in the format list",
+        "site_hint": "FORMATS = [\"json\", \"csv\""
+      },
+      {
+        "id": "op2",
+        "intent": "label the new format",
+        "site_hint": "\"csv\": \"comma separated\""
+      },
+      {
+        "id": "op3",
+        "intent": "the dumper for the new format",
+        "site_hint": "(f):\n    return FORMAT_LABELS.get(f, \"unknown\")\n"
+      },
+      {
+        "id": "op4",
+        "intent": "the branch that routes the new format to its dumper",
+        "site_hint": "if fmt == \"csv\":\n        return _dump_csv(rows)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op3",
+        "op4"
+      ],
+      [
+        "op1",
+        "op4"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3",
+        "op4"
+      ]
+    ],
+    "transaction_length": 4
+  },
+  "complexity": {
+    "structural_class": "parallel-variant-feature",
+    "affected_region_lines": 10
+  },
+  "reference": {
+    "source_hash": "7e0f6eed18b761be4b285d67e42dad9b8a64a9818aa7fc439307076f0519788c",
+    "reference_hash": "40e858305b8c5f3be25ac66e935b4bc349583fb97829bf1cd69afd89c1cfaa23",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3",
+      "op4"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

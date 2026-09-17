@@ -1,0 +1,22 @@
+class Library:
+    def __init__(self):
+        self._borrowed = {}
+        self._reserved = {}
+
+    def borrow(self, title, n):
+        self._borrowed[title] = self._borrowed.get(title, 0) + n
+
+    def borrowed_count(self, title):
+        return self._borrowed.get(title, 0)
+
+    def reserve(self, title, n):
+        self._reserved[title] = self._reserved.get(title, 0) + n
+
+    def reserved_count(self, title):
+        return self._reserved.get(title, 0)
+
+    def total_borrowed(self):
+        return sum(self._borrowed.values())
+
+    def total_reserved(self):
+        return sum(self._reserved.values())

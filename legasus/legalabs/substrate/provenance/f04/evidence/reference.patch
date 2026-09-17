@@ -1,0 +1,18 @@
+--- op op1 after: "# Temperature helpers.\n"
+
+_READINGS = []
+
+--- op op2 after: "c(f):\n    return (f - 32.0) * 5.0 / 9.0\n"
+
+
+def record_c(c):
+    _READINGS.append(c)
+    return c
+
+--- op op3 after: " floor_c(c):\n    return max(-273.15, c)\n"
+
+
+def extremes():
+    if not _READINGS:
+        return None
+    return (min(_READINGS), max(_READINGS))

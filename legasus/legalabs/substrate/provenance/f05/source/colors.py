@@ -1,0 +1,14 @@
+# Colour helpers.
+
+
+def to_rgb(h):
+    v = str(h).lstrip("#")
+    return (int(v[0:2], 16), int(v[2:4], 16), int(v[4:6], 16))
+
+
+def luminance(rgb):
+    return (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000.0
+
+
+def is_dark(h):
+    return luminance(to_rgb(h)) < 128

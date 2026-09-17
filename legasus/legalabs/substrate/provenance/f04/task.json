@@ -1,0 +1,11 @@
+{
+  "task_id": "f04",
+  "goal": "Add extremes tracking to the EXISTING temps.py: record_c(c) records a celsius reading and returns it, and extremes() returns a (lowest, highest) pair over everything recorded so far, or None when nothing has been recorded. Keep to_f, to_c and floor_c working exactly as they do now. Run it with python.",
+  "lead": "temps.py",
+  "language": "py",
+  "run_with": "python",
+  "interface": [
+    "record_c",
+    "extremes"
+  ]
+}

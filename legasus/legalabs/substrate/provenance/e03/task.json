@@ -1,0 +1,12 @@
+{
+  "task_id": "e03",
+  "goal": "Add a gift list to the EXISTING Cart in cart.py: add_gift(sku) appends a gift and gift_count() returns how many have been added. Keep add_item and item_count working exactly as they do now. Run it with python.",
+  "lead": "cart.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the gift list works the same way as the existing coupons list",
+  "interface": [
+    "add_gift",
+    "gift_count"
+  ]
+}

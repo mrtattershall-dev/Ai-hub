@@ -27,7 +27,21 @@ const STOP = new Set(['self', 'return', 'None', 'True', 'False', 'else', 'elif',
   // language keywords: they appear in any implementation and in ordinary English, so they can never
   // distinguish a leak from a legitimately worded goal
   'raise', 'break', 'elif', 'try', 'except', 'pass', 'lambda', 'assert', 'yield', 'global', 'await',
-  'async', 'throw', 'catch', 'typeof', 'delete', 'export', 'default', 'extends', 'super']);
+  'async', 'throw', 'catch', 'typeof', 'delete', 'export', 'default', 'extends', 'super',
+  // LANGUAGE BUILTINS ARE NOT IDENTIFIERS THE REFERENCE INTRODUCED. `return list(_LOG)` made `list`
+  // count as an invented name purely because the source happened not to use it, and the goal - which
+  // has to say "returns a new list" to specify the copy - was then refused for leakage. Declaring
+  // `list` as interface would be laundering: it is not part of the requested API, it is the language.
+  //
+  // SCOPE, kept deliberately narrow: builtin FUNCTIONS and TYPES, invoked by their own name. METHOD
+  // names (append, join, split, push, replace) are NOT here even though they are equally "language",
+  // because a task genuinely can request a method called push or join, and stopping those would blind
+  // the guard to a real deliverable leak. Nor are count, index, items, keys, values, size or total.
+  // The guard's worth is its strictness; this buys back exactly the false positives and no more.
+  'list', 'dict', 'tuple', 'bool', 'float', 'bytes', 'frozenset', 'sorted', 'reversed', 'range',
+  'print', 'isinstance', 'enumerate', 'getattr', 'setattr', 'hasattr', 'repr', 'abs', 'round',
+  'Exception', 'AssertionError', 'TypeError', 'ValueError', 'KeyError',
+  'Array', 'Object', 'String', 'Number', 'Boolean', 'Math', 'JSON', 'Promise', 'Symbol', 'console']);
 
 // Distinctive tokens of an implementation: identifiers it introduces that a task specification would
 // have no reason to contain verbatim.

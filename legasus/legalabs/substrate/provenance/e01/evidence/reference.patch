@@ -1,0 +1,13 @@
+--- op op1 after: "SHAPE_KINDS = [\"circle\", \"square\""
+, "rect"
+--- op op2 after: "\"square\": \"four equal sides\""
+, "rect": "four right angles"
+--- op op3 after: "  return SHAPE_LABELS.get(k, \"unknown\")\n"
+
+
+def _area_rect(s):
+    return s.get("w", 0) * s.get("h", 0)
+
+--- op op4 after: "square\":\n        return _area_square(s)\n"
+    if k == "rect":
+        return _area_rect(s)

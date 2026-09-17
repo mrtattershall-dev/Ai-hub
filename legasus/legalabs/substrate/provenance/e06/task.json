@@ -1,0 +1,11 @@
+{
+  "task_id": "e06",
+  "goal": "Add a tsv format to the EXISTING report.py: dumping tsv joins the cells of each row with a tab and the rows with a newline. The format must be accepted by valid_formats, labelled \"tab separated\" by label, and produced by dump. The json and csv formats must keep working exactly as they do now. Run it with python.",
+  "lead": "report.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the tsv format is written the same way as the existing csv format",
+  "interface": [
+    "tsv"
+  ]
+}

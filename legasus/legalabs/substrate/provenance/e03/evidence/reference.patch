@@ -1,0 +1,10 @@
+--- op op1 after: "        self._coupons = []\n"
+        self._gifts = []
+
+--- op op2 after: "elf):\n        return len(self._coupons)\n"
+
+    def add_gift(self, sku):
+        self._gifts.append(sku)
+
+    def gift_count(self):
+        return len(self._gifts)

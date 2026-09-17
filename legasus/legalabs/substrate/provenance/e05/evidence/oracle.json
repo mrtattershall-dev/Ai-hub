@@ -1,0 +1,72 @@
+{
+  "task_id": "e05",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing pins list as the relation to parallel; that feature declares state and has two mutators and two readers, while the requested delta names only an appender and a count, so it occupies a strict subset of those positions",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the parallel list",
+        "site_hint": "        self._pins = []\n"
+      },
+      {
+        "id": "op2",
+        "intent": "appender for the parallel list",
+        "site_hint": "in(self, item):\n        self._pins.append(item)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "count for the parallel list",
+        "site_hint": "pin_count(self):\n        return len(self._pins)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 10
+  },
+  "reference": {
+    "source_hash": "49db308064be0ae323934b3d4700475c1edbf35b545d2e35b8569e293f0f84e4",
+    "reference_hash": "855290fc0fd41c7e31ee8e39ba0eb24988b6c65c44fbea4a1fd260239f30614d",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

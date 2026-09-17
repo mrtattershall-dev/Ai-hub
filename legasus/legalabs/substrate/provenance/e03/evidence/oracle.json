@@ -1,0 +1,60 @@
+{
+  "task_id": "e03",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing coupons list as the relation to parallel; that feature has a declaration, an appender and a count, and the new feature occupies the same three positions",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the parallel list",
+        "site_hint": "        self._coupons = []\n"
+      },
+      {
+        "id": "op2",
+        "intent": "appender and count for the parallel list",
+        "site_hint": "_count(self):\n        return len(self._coupons)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 9
+  },
+  "reference": {
+    "source_hash": "ec559a053c7ba0895ff99968fe40bc443e6299a9f680a3c9a246e44536e64786",
+    "reference_hash": "f152c4a5e61d12eb3cdb612dadc060af20485dcd4cf4b2a03a78a5d5e5c6185f",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

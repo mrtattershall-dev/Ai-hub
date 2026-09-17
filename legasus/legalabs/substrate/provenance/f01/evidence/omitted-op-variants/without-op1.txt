@@ -1,0 +1,27 @@
+CHANNELS = ["email", "sms"]
+
+
+def _send_email(msg):
+    return "email: " + str(msg)
+
+
+def _send_sms(msg):
+    return "sms: " + str(msg)
+
+
+def valid_channels(cs):
+    return all(c in CHANNELS for c in cs)
+
+
+def _send_push(msg):
+    return "push: " + str(msg)
+
+
+def send(channel, msg):
+    if channel == "email":
+        return _send_email(msg)
+    if channel == "sms":
+        return _send_sms(msg)
+    if channel == "push":
+        return _send_push(msg)
+    return "dropped"

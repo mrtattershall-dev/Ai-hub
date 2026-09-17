@@ -1,0 +1,12 @@
+{
+  "task_id": "f05",
+  "goal": "Add a named colour registry to the EXISTING colors.py: name_color(name, h) records a hex colour under a name, and lookup(name) returns the hex recorded for that name, or None when nothing was recorded under it. Keep to_rgb, luminance and is_dark working exactly as they do now. Run it with python.",
+  "lead": "colors.py",
+  "language": "py",
+  "run_with": "python",
+  "interface": [
+    "name_color",
+    "lookup",
+    "name"
+  ]
+}

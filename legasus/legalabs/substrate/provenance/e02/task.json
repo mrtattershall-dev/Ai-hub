@@ -1,0 +1,14 @@
+{
+  "task_id": "e02",
+  "goal": "Add a role list to the EXISTING Session in session.py: add_role(role) appends a role, role_count() returns how many have been added, and has_role(role) reports whether one is present. Keep record_hit, hit_count and total_hits working exactly as they do now, and keep add_name and name_count working exactly as they do now. Run it with python.",
+  "lead": "session.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the role list works the same way as the existing names list",
+  "interface": [
+    "add_role",
+    "role_count",
+    "has_role",
+    "role"
+  ]
+}

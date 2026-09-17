@@ -1,0 +1,13 @@
+{
+  "task_id": "e04",
+  "goal": "Add reservations to the EXISTING Library in library.py: reserve(title, n) records n reservations for a title, reserved_count(title) returns the number recorded for that title and 0 when there is none, and total_reserved() returns the sum over all titles. Keep the borrowing working exactly as it does now. Run it with python.",
+  "lead": "library.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the reservations work the same way as the existing borrowing",
+  "interface": [
+    "reserve",
+    "reserved_count",
+    "total_reserved"
+  ]
+}

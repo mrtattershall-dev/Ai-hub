@@ -1,0 +1,72 @@
+{
+  "task_id": "e02",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing names list as the relation to parallel; that feature has a declaration, an appender and a count, and the new feature occupies the same positions with a membership test added",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the parallel list",
+        "site_hint": "        self._names = []\n"
+      },
+      {
+        "id": "op2",
+        "intent": "appender and count for the parallel list",
+        "site_hint": "me_count(self):\n        return len(self._names)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "membership test for the parallel list",
+        "site_hint": "e(self, name):\n        self._names.append(name)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 13
+  },
+  "reference": {
+    "source_hash": "deb933fa61936ac1368e9bd0b3476540a965740f6e95732454e0c6195bdd1e9c",
+    "reference_hash": "ee6f43cdd78d6bd58db38460e25df8848b17f526f5364caae87662c2c4e430b2",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

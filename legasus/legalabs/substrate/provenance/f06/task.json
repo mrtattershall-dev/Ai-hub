@@ -1,0 +1,12 @@
+{
+  "task_id": "f06",
+  "goal": "Add a bounded log to the EXISTING audit.py: record(e) appends an event and returns it, keeping only the most recent MAX_LOG events, and history() returns the events kept so far as a new list that callers may modify without affecting the log. Set MAX_LOG to 50. Keep fmt_event, is_error and summary working exactly as they do now. Run it with python.",
+  "lead": "audit.py",
+  "language": "py",
+  "run_with": "python",
+  "interface": [
+    "record",
+    "history",
+    "MAX_LOG"
+  ]
+}

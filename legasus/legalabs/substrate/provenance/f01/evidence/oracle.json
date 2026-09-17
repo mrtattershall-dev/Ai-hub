@@ -1,0 +1,72 @@
+{
+  "task_id": "f01",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names two existing channels as the relation to parallel, and both are equally good structural precedents; the relation therefore identifies a shape but not a unique concern, and no clause in the task distinguishes them",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "admit the new channel in the valid-channel list",
+        "site_hint": "CHANNELS = [\"email\", \"sms\""
+      },
+      {
+        "id": "op2",
+        "intent": "the sender for the new channel",
+        "site_hint": "(cs):\n    return all(c in CHANNELS for c in cs)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the branch that routes the new channel to its sender",
+        "site_hint": "channel == \"sms\":\n        return _send_sms(msg)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op2",
+        "op3"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-variant-feature",
+    "affected_region_lines": 9
+  },
+  "reference": {
+    "source_hash": "97ba8cc68dc044cc2b159e674a9218441536125a66c6a6e04cf9ed18a0af8f07",
+    "reference_hash": "8b71db9ed070da37fb0c42b33a4fee4791bb5e852e185a08bb4408969505c005",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

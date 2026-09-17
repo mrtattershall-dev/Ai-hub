@@ -1,0 +1,28 @@
+SHAPE_KINDS = ["circle", "square"]
+
+SHAPE_LABELS = {"circle": "round shape", "square": "four equal sides"}
+
+
+def _area_circle(s):
+    return 3.14159 * s.get("r", 0) * s.get("r", 0)
+
+
+def _area_square(s):
+    return s.get("side", 0) * s.get("side", 0)
+
+
+def describe(k):
+    return SHAPE_LABELS.get(k, "unknown")
+
+
+def valid_kinds(kinds):
+    return all(k in SHAPE_KINDS for k in kinds)
+
+
+def area(s):
+    k = s.get("kind")
+    if k == "circle":
+        return _area_circle(s)
+    if k == "square":
+        return _area_square(s)
+    return 0

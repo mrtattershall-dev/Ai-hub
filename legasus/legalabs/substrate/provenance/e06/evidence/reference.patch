@@ -1,0 +1,13 @@
+--- op op1 after: "FORMATS = [\"json\", \"csv\""
+, "tsv"
+--- op op2 after: "\"csv\": \"comma separated\""
+, "tsv": "tab separated"
+--- op op3 after: " return FORMAT_LABELS.get(f, \"unknown\")\n"
+
+
+def _dump_tsv(rows):
+    return "\n".join("\t".join(str(c) for c in r) for r in rows)
+
+--- op op4 after: "= \"csv\":\n        return _dump_csv(rows)\n"
+    if fmt == "tsv":
+        return _dump_tsv(rows)

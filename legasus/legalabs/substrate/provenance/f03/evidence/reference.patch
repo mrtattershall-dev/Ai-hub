@@ -1,0 +1,26 @@
+--- op op1 after: "# Small matrix helpers.\n"
+
+MAX_DIM = 64
+
+--- op op2 after: " return (len(m), len(m[0]) if m else 0)\n"
+
+
+class ShapeError(Exception):
+    pass
+
+--- op op3 after: "def row(m, i):\n    return list(m[i])\n"
+
+
+def checked(m):
+    widths = set(len(r) for r in m)
+    if len(widths) > 1:
+        raise ShapeError("ragged")
+    if len(m) > MAX_DIM or (widths and max(widths) > MAX_DIM):
+        raise ShapeError("too big")
+    return m
+
+--- op op4 after: "col(m, j):\n    return [r[j] for r in m]\n"
+
+
+def checked_all(ms):
+    return [checked(m) for m in ms]
