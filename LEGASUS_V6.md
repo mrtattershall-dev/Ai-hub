@@ -162,3 +162,92 @@ Prospective validation of the v5 lexicons. A third family, authored blind after 
 separately answer whether the relation/provenance rules generalize, whether the operation-requirement
 predicates generalize, and whether candidate inflation stays near 1.00 on tasks never seen. Until then
 median inflation 1.00 is development evidence.
+
+---
+
+## Amendment A — a secondary diagnostic, and what the denominator revealed
+
+*Added after the narrowability sweep, before any v6 code. The PRIMARY criterion is unchanged: realized
+gain on at least 15 narrowable operations, with position-independent operations left at 0 bits. The
+ceiling turning out small is not a reason to rescue a frozen bar.*
+
+### The primary criterion, restated against the proven denominator
+
+    15 of 26 independently proven positional constraints recovered
+     0 bits on all 7 position-independent operations
+     no narrowing from any forbidden (style / canonical) witness
+
+15/26 is the challenge already agreed to. It stands.
+
+### Secondary, descriptive only: realized available information
+
+A count can pass while extracting almost nothing:
+
+    15 x 0.09-bit trivial constraints    while missing eleven 0.5-bit ones
+    or
+    nearly all the available structure
+
+So alongside the frozen count, v6 reports a weighted ratio. **This is a diagnostic, not an endpoint,
+and it cannot be substituted for the primary criterion in any summary.**
+
+    realized available information  =  sum(bits actually derived) / sum(max derivable bits)
+
+The denominator is fixed by the sweep and recorded now so it cannot drift:
+
+    total available positional information   5.82 bits
+    across                                   26 narrowable operations, 12 tasks
+    mean                                     0.224 bits    largest single operation 0.58 bits
+
+### What the sweep actually revealed: the information is unevenly distributed
+
+    WHICH PARTICIPANT MUST CHANGE      potentially a lot     e05 0.74 bits, e06 0.32 bits
+    WHERE INSIDE THAT PARENT           very little           0.224 bits mean, 5.82 bits TOTAL
+
+v5's requirement-based participant pruning, on **two tasks**, recovered 1.06 bits — **18% of all the
+positional information that exists in the entire twelve-task family.**
+
+The architecture had been overweighting the least informative half of "where". The corrected
+decomposition:
+
+    task
+      -> concern
+        -> required participants          <- the BIG narrowing step
+          -> transaction dependencies     <- ordering / topology
+            -> legal structural region
+              -> small positional constraint     usually a few tenths of a bit
+                -> canonical realization
+
+This changes the **interpretation** of v5's 1/19 without changing its verdict. v5 still failed its
+frozen conjunction. But there is now executable evidence that most of those zero-gain placements were
+not failures to understand the program — **there was very little positional information available to
+recover.**
+
+### The central localization finding
+
+> **The difficult part of localization is determining which semantic participants require
+> modification, not choosing an exact textual insertion boundary once those participants are known.**
+
+It explains why candidate inflation mattered so much, why the ownership graph mattered, and why exact
+line matching kept generating strange measurement questions. And it says what the model actually needs
+from Legasus, which is not a magic line:
+
+> *"This is the correct participant, this is its role, these are its dependencies, this is your legal
+> region, and you have no authority outside it."*
+
+Canonical realization can absorb much of the remaining arbitrariness, because on this evidence the
+remaining arbitrariness is genuinely small.
+
+### "Site" is not one kind of thing
+
+The 0-of-27 nonsense came from forcing every operation into one line-boundary coordinate system. At
+least four kinds exist and they do not share coordinates:
+
+| Kind | Coordinate system |
+|---|---|
+| `STRUCTURAL_INSERTION` | between statements, members or branches — a line boundary |
+| `EXPRESSION_EDIT` | inside an existing AST expression — fixed by the expression |
+| `REPLACEMENT_REGION` | an existing construct or span — start and end |
+| `TRANSACTION_PARTICIPANT` | a semantic program unit that must change — not textual at all |
+
+v6 reports narrowing per kind and never averages across them. The `INTRA_LINE` exclusion in the
+narrowability prover is the first instance of this distinction being forced by data.

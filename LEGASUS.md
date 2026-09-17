@@ -198,6 +198,27 @@ decide WHERE inside an already-resolved parent that authority materializes. Evid
 by subsystem: the provenance architecture predates its test family and is prospective; the clause and
 operation-kind lexicons were written with the sealed tasks visible and are development evidence only.
 
+### The central localization finding
+
+Proven by execution over the sealed provenance family, sweeping every operation across every line
+boundary in its structural parent and running the delta and preservation probes at each:
+
+    WHICH PARTICIPANT MUST CHANGE     potentially a lot     e05 0.74 bits, e06 0.32 bits
+    WHERE INSIDE THAT PARENT          very little           0.224 bits mean, 5.82 bits TOTAL
+                                                            across 26 narrowable operations, 12 tasks
+
+v5's requirement-based participant pruning, on TWO tasks, recovered 18% of ALL the positional
+information that exists in the entire family.
+
+> **The difficult part of localization is determining which semantic participants require
+> modification, not choosing an exact textual insertion boundary once those participants are known.**
+
+This explains why candidate inflation mattered so much, why the ownership graph mattered, and why
+exact line matching kept producing strange measurement questions. What the model needs from Legasus is
+not a magic line: *"this is the correct participant, this is its role, these are its dependencies,
+this is your legal region, and you have no authority outside it."* Canonical realization can absorb
+the rest, because the rest is measurably small.
+
 The remaining fields are the current LegaCore planner problem. Success means converting them into
 general computed structure **without encoding the desired implementation directly**.
 
