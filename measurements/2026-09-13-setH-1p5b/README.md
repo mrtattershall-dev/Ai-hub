@@ -3774,3 +3774,85 @@ while the work is wrong. No new experimental rule was added. Instead the tooling
 it: `legasus/legalabs/escape-guard.mjs` scans for the corruption signature — a lone backslash escape
 whose escaped character is a regex metacharacter and not a JS one, inside a quoted string literal —
 with six witnesses including two positive controls, and a clean scan over 30 files.
+
+---
+
+# NARROWABILITY, proven by execution — the v6 denominator
+
+v6 scores realized gain over "independently narrowable operations". If that denominator is my
+judgement, the measurement is circular: the system gets credit for finding constraints I decided
+existed. So it is defined operationally and proven by running code, before any v6 implementation:
+
+> An operation is **NARROWABLE** when at least one position inside its structural parent BREAKS the
+> transaction. The positions that still pass are its true constrained region, and the maximum honestly
+> derivable gain is `log2(candidates / passing)`.
+
+Swept over the sealed provenance family: every operation, every line boundary sharing its structural
+parent, delta and preservation probes run at each.
+
+    operations                38
+    NARROWABLE                26     <- the v6 denominator
+    position-independent       7     0 bits is the CORRECT answer for these
+    intra-line                 5     position fixed by the expression, not a line boundary
+    untestable                 0
+    mean max derivable gain    0.22 bits
+
+No planner produced any of this. LegaCore cannot be rewarded for narrowing past it, because the
+excluded positions genuinely fail.
+
+## The ceiling is LOW, and that is the finding
+
+Per-operation maxima run from 0.09 to 0.58 bits. Typically only one to three of roughly twenty
+candidate positions break anything. **Even a perfect LegaCore buys about 0.22 bits per operation at
+the position level on this substrate.**
+
+Set against what v5 already achieved one level up: requirement-based participant pruning took e05 from
+five candidate sites to three and e06 from five to four — `log2(5/3) = 0.74` and `log2(5/4) = 0.32`
+bits.
+
+    participant selection   0.74 and 0.32 bits     on the two inflation controls
+    position selection      0.22 bits mean         CEILING across all 26 narrowable operations
+
+**Participant selection carried more information than position selection is even capable of carrying
+here.** That reframes what the v5 failure meant: 1/19 was not mainly LegaParse being weak at placement:
+these programs barely constrain placement at all, and most of the 18 zeros are correct answers.
+
+**The v6 target is not being changed in response to this.** Its criterion — realized gain on at least
+15 narrowable operations, with position-independent ones left at 0 — was frozen before this sweep and
+stands. What is now known is its feasibility: 26 narrowable operations exist, so 15 is reachable in
+count, while the bits each one carries are small. Moving a bar after seeing the data is the exact
+failure the v5 verdict was corrected to avoid.
+
+## Position-independence is not one thing
+
+Of the 7 position-independent operations, 4 had only one or two candidate positions at all. "No choice
+existed" and "many choices, all valid" both correctly yield 0 bits, and they are different situations.
+A denominator that merges them would overstate how much genuine freedom the substrate contains.
+
+## Verified real, not assumed
+
+`e05 op2` has exactly one failing position, and it is a genuine semantic break: inserting the new
+method at class indent part-way through `__init__` ends the constructor early, so `self._drafts = []`
+lands outside the method and every later access fails. That is an ownership-region violation, not an
+artifact of how the prover splices text.
+
+The remaining failures sit at region ends, consistent with reachability, but **they were not
+individually diagnosed** — the spot-check indexed the original source while candidate positions are
+numbered against the with-other-operations text, so it could not name those lines. Recorded as
+unverified rather than described as if it had been checked.
+
+## Two instrument defects found while building this
+
+**Intra-line operations were being reported as a property of the program.** `e01 op1` inserts
+`, "rect"` inside a list literal. The first prover swept line boundaries for it, produced a syntax
+error at all 27 candidates, and printed "0 of 27 passing" — which reads as an extremely constrained
+operation and is really the instrument using the wrong search space. Such operations now form their own
+category, excluded from the denominator: their position is fixed by the expression they edit. Counting
+them would inflate the denominator with operations whose placement was never in question — the same
+denominator error the goal-coupling audit caught earlier in this log.
+
+**A truncated run reported success.** The first sweep was piped through `head -8`; the pipe closed,
+node died on EPIPE, and the shell reported the pipeline's exit code — 0, from `head`. The output
+stopped a quarter of the way through with no error and no summary. Partial output plus exit 0 is
+exactly the silent-failure shape this project tracks: run long sweeps to a file, never through a
+head/tail pipe.
