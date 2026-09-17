@@ -3467,3 +3467,85 @@ semantic fact computed from the program itself, stated to the model as a local c
 
 The position is better than "we have not got the 1.5B to pass yet". It is increasingly "we know why it
 has not, and each reason has been either fixed or named".
+
+---
+
+# PROSPECTIVE RUN: frozen LegaParse selector on the sealed holdout
+
+The six development tasks are spent. Six new ones (c01-c03 analogy, d01-d03 no-analogue, matched at
+2/3/4 operations, disjoint domains) were authored blind, sealed, and committed BEFORE the selector was
+run against them. The seal is verified at the top of every scoring run and the run refuses to score a
+broken seal.
+
+    seal intact: 6 tasks byte-identical to 2026-09-17T18:51:51Z
+
+## Result
+
+    coverage           2/6 tasks applied
+      on analogy       2/3     TRUE APPLY   - these have a relation to resolve
+      on no-analogue   0/3     FALSE APPLY  - these have none, so applying would be an error
+    position result    EXACT 5   EQUIVALENT 0   INVALID 0   (of 5 scored operations)
+    information gain   mean 0.00 bits over 5 operations
+
+    c01  APPLY   state:_active   refs [2,12]     sites [2,6,9,12]     recall 2/2  precision 2/4
+    c02  APPLY   state:_scores   refs [2,8,13]   sites [2,5,8,12,13]  recall 3/3  precision 3/5
+    c03  ABSTAIN_AMBIGUOUS
+    d01  ABSTAIN_NO_RELATION
+    d02  ABSTAIN_NO_RELATION
+    d03  ABSTAIN_NO_RELATION
+
+## What this does and does not establish
+
+**Established, and it is the first time prospectively:** on unseen substrate the selector applied to
+no task lacking an analogue. Specificity was previously demonstrated only on tasks the selector had
+been built against. Where it applied, every reference position was recovered exactly - 5 of 5
+operations EXACT, none INVALID.
+
+**Not established:** precision. Both applying tasks nominated roughly twice as many sites as the
+reference used (2/4 and 3/5), so the selector still hands LegaCore a superset and something
+downstream must reject the extras. And coverage is 2 of 3 on the class it is supposed to serve.
+
+**Information gain is 0.00 bits everywhere.** Every placement was semantically right and none of them
+was narrowed by site analysis: for these operations the legal region and the parent region contain the
+same candidate boundaries, so there was nothing to narrow. That is the a03 reading generalizing, not a
+new failure - but it does mean the current selector's value is in WHICH CONCERN it resolves, not in
+where inside that concern it places anything.
+
+## The defect the holdout exposed, and why development could not have found it
+
+c03 abstained AMBIGUOUS. The diagnosis, measured rather than guessed:
+
+    c03   relation: "the scroll event type is written the same way as the existing key event type"
+        2  variant:click   ["click","render"]
+        2  variant:key     ["key","render"]
+        -> tied at 2
+        relation text alone:  variant:click=[]   variant:key=["key"]
+
+The information needed to break the tie was present and was discarded. `resolve()` concatenates the
+named relation with the whole goal into ONE haystack, so `key` - which appears in the phrase that
+names the relation - counts exactly as much as `click`, which appears only in the goal's preservation
+clause ("the click and key event types must keep working"). Evidence from the relation and evidence
+from an incidental mention are made indistinguishable by the representation.
+
+**a03 passed this shape on the development set for a reason that was not disambiguation.** Its
+source defines a handler for `quoted` and none for `plain`, so `variant:plain` never entered the graph
+at all and there was no competitor to tie with. The development task scored a win on a mechanism it
+never exercised. This is precisely what a holdout is for, and it landed on the first prospective run.
+
+The fix belongs to v5 and is representational, not a threshold: relation-sourced evidence and
+goal-sourced evidence are different kinds of evidence and must be carried separately. **The selector
+is not being edited to make c03 pass** - this run is spent, and a selector tuned until the holdout
+agrees with it measures the tuning.
+
+## Apparatus defects found while building this, both fixed
+
+1. The leakage scanner read the patch's OWN serialization as implementation content. Op headers are
+   written `--- op op1 after: "<anchor>"`, so the format word `after` counted as an identifier the
+   reference introduced, and d01 - whose goal legitimately says "after normalization" - was refused.
+   A refusal like that is indistinguishable from a badly authored task, and the natural response is to
+   reword a good goal to appease the checker. Fixed by dropping header lines before tokenizing; the
+   ol_items positive control still refuses and all six sealed development tasks still validate.
+
+2. The scorer computed a reference line of -1 for any anchor that stops mid-line (c03 inserts inside a
+   list literal). It assumed every anchor was newline-terminated. That was a scorer bug reported as a
+   selector input, and it is fixed; c03's references are [0,2,14,26].
