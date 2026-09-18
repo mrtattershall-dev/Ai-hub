@@ -1,0 +1,648 @@
+[
+ {
+  "task": "j01",
+  "rows": [
+   {
+    "op": "op1",
+    "ref_position": 2,
+    "base_lines": 17,
+    "candidates": 1,
+    "candidate_positions": [
+     2
+    ],
+    "failing_positions": [],
+    "passing": 1,
+    "passing_positions": [
+     2
+    ],
+    "narrowable": false,
+    "max_gain_bits": 0,
+    "note": "position-independent: every candidate passes, 0 bits is correct"
+   },
+   {
+    "op": "op2",
+    "ref_position": 13,
+    "base_lines": 16,
+    "candidates": 2,
+    "candidate_positions": [
+     13,
+     14
+    ],
+    "failing_positions": [
+     14
+    ],
+    "passing": 1,
+    "passing_positions": [
+     13
+    ],
+    "narrowable": true,
+    "max_gain_bits": 1,
+    "note": null
+   },
+   {
+    "op": "op3",
+    "ref_position": 6,
+    "base_lines": 15,
+    "candidates": 8,
+    "candidate_positions": [
+     2,
+     3,
+     4,
+     6,
+     7,
+     10,
+     12,
+     13
+    ],
+    "failing_positions": [
+     2,
+     10
+    ],
+    "passing": 6,
+    "passing_positions": [
+     3,
+     4,
+     6,
+     7,
+     12,
+     13
+    ],
+    "narrowable": true,
+    "max_gain_bits": 0.41503749927884376,
+    "note": null
+   }
+  ]
+ },
+ {
+  "task": "j02",
+  "rows": [
+   {
+    "op": "op1",
+    "ref_position": 0,
+    "base_lines": 18,
+    "candidates": 14,
+    "candidate_positions": [
+     0,
+     1,
+     2,
+     4,
+     6,
+     7,
+     8,
+     9,
+     10,
+     12,
+     13,
+     14,
+     16,
+     17
+    ],
+    "failing_positions": [
+     4,
+     6,
+     7
+    ],
+    "passing": 11,
+    "passing_positions": [
+     0,
+     1,
+     2,
+     8,
+     9,
+     10,
+     12,
+     13,
+     14,
+     16,
+     17
+    ],
+    "narrowable": true,
+    "max_gain_bits": 0.3479233034203068,
+    "note": null
+   },
+   {
+    "op": "op2",
+    "ref_position": 8,
+    "base_lines": 19,
+    "candidates": 3,
+    "candidate_positions": [
+     6,
+     8,
+     9
+    ],
+    "failing_positions": [
+     6,
+     9
+    ],
+    "passing": 1,
+    "passing_positions": [
+     8
+    ],
+    "narrowable": true,
+    "max_gain_bits": 1.584962500721156,
+    "note": null
+   },
+   {
+    "op": "op3",
+    "ref_position": 14,
+    "base_lines": 16,
+    "candidates": 13,
+    "candidate_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     6,
+     8,
+     9,
+     10,
+     11,
+     12,
+     14,
+     15
+    ],
+    "failing_positions": [
+     6,
+     8,
+     9
+    ],
+    "passing": 10,
+    "passing_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     10,
+     11,
+     12,
+     14,
+     15
+    ],
+    "narrowable": true,
+    "max_gain_bits": 0.3785116232537299,
+    "note": null
+   }
+  ]
+ },
+ {
+  "task": "j03",
+  "rows": [
+   {
+    "op": "op1",
+    "ref_position": 15,
+    "base_lines": 17,
+    "candidates": 15,
+    "candidate_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     15,
+     16
+    ],
+    "failing_positions": [
+     2,
+     3,
+     4
+    ],
+    "passing": 12,
+    "passing_positions": [
+     0,
+     1,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     15,
+     16
+    ],
+    "narrowable": true,
+    "max_gain_bits": 0.32192809488736235,
+    "note": null
+   },
+   {
+    "op": "op2",
+    "ref_position": 7,
+    "base_lines": 17,
+    "candidates": 15,
+    "candidate_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     15,
+     16
+    ],
+    "failing_positions": [
+     2,
+     3,
+     4
+    ],
+    "passing": 12,
+    "passing_positions": [
+     0,
+     1,
+     5,
+     6,
+     7,
+     8,
+     9,
+     11,
+     12,
+     13,
+     15,
+     16
+    ],
+    "narrowable": true,
+    "max_gain_bits": 0.32192809488736235,
+    "note": null
+   }
+  ]
+ },
+ {
+  "task": "j04",
+  "rows": [
+   {
+    "op": "op1",
+    "ref_position": 17,
+    "base_lines": 19,
+    "candidates": 15,
+    "candidate_positions": [
+     0,
+     1,
+     3,
+     4,
+     5,
+     6,
+     7,
+     9,
+     10,
+     11,
+     13,
+     14,
+     15,
+     17,
+     18
+    ],
+    "failing_positions": [
+     0,
+     1,
+     3,
+     4
+    ],
+    "passing": 11,
+    "passing_positions": [
+     5,
+     6,
+     7,
+     9,
+     10,
+     11,
+     13,
+     14,
+     15,
+     17,
+     18
+    ],
+    "narrowable": true,
+    "max_gain_bits": 0.44745897697122117,
+    "note": null
+   },
+   {
+    "op": "op2",
+    "ref_position": 0,
+    "base_lines": 19,
+    "candidates": 16,
+    "candidate_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     14,
+     15,
+     16,
+     17,
+     18
+    ],
+    "failing_positions": [],
+    "passing": 16,
+    "passing_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     14,
+     15,
+     16,
+     17,
+     18
+    ],
+    "narrowable": false,
+    "max_gain_bits": 0,
+    "note": "position-independent: every candidate passes, 0 bits is correct"
+   },
+   {
+    "op": "op3",
+    "ref_position": 9,
+    "base_lines": 18,
+    "candidates": 15,
+    "candidate_positions": [
+     0,
+     1,
+     3,
+     4,
+     5,
+     6,
+     7,
+     9,
+     10,
+     11,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "failing_positions": [],
+    "passing": 15,
+    "passing_positions": [
+     0,
+     1,
+     3,
+     4,
+     5,
+     6,
+     7,
+     9,
+     10,
+     11,
+     13,
+     14,
+     15,
+     16,
+     17
+    ],
+    "narrowable": false,
+    "max_gain_bits": 0,
+    "note": "position-independent: every candidate passes, 0 bits is correct"
+   }
+  ]
+ },
+ {
+  "task": "j05",
+  "rows": [
+   {
+    "op": "op1",
+    "ref_position": 2,
+    "base_lines": 18,
+    "candidates": 15,
+    "candidate_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     8,
+     9,
+     10,
+     12,
+     13,
+     14,
+     16,
+     17
+    ],
+    "failing_positions": [
+     0,
+     1
+    ],
+    "passing": 13,
+    "passing_positions": [
+     2,
+     3,
+     4,
+     5,
+     6,
+     8,
+     9,
+     10,
+     12,
+     13,
+     14,
+     16,
+     17
+    ],
+    "narrowable": true,
+    "max_gain_bits": 0.20645087746742624,
+    "note": null
+   },
+   {
+    "op": "op2",
+    "ref_position": 14,
+    "base_lines": 16,
+    "candidates": 14,
+    "candidate_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     14,
+     15
+    ],
+    "failing_positions": [],
+    "passing": 14,
+    "passing_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     14,
+     15
+    ],
+    "narrowable": false,
+    "max_gain_bits": 0,
+    "note": "position-independent: every candidate passes, 0 bits is correct"
+   },
+   {
+    "op": "op3",
+    "ref_position": 6,
+    "base_lines": 16,
+    "candidates": 14,
+    "candidate_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     14,
+     15
+    ],
+    "failing_positions": [],
+    "passing": 14,
+    "passing_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     14,
+     15
+    ],
+    "narrowable": false,
+    "max_gain_bits": 0,
+    "note": "position-independent: every candidate passes, 0 bits is correct"
+   }
+  ]
+ },
+ {
+  "task": "j06",
+  "rows": [
+   {
+    "op": "op1",
+    "ref_position": 4,
+    "base_lines": 14,
+    "candidates": 12,
+    "candidate_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     8,
+     9,
+     10,
+     12,
+     13
+    ],
+    "failing_positions": [
+     0,
+     1
+    ],
+    "passing": 10,
+    "passing_positions": [
+     2,
+     3,
+     4,
+     5,
+     6,
+     8,
+     9,
+     10,
+     12,
+     13
+    ],
+    "narrowable": true,
+    "max_gain_bits": 0.2630344058337938,
+    "note": null
+   },
+   {
+    "op": "op2",
+    "ref_position": 10,
+    "base_lines": 12,
+    "candidates": 11,
+    "candidate_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11
+    ],
+    "failing_positions": [],
+    "passing": 11,
+    "passing_positions": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11
+    ],
+    "narrowable": false,
+    "max_gain_bits": 0,
+    "note": "position-independent: every candidate passes, 0 bits is correct"
+   }
+  ]
+ }
+]

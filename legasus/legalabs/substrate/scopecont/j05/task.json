@@ -1,0 +1,13 @@
+{
+  "task_id": "j05",
+  "goal": "Add pattern counting to the EXISTING patterns.py: TOTAL holds the number of patterns when the module is imported, first() returns the first pattern, and described() returns the label followed by the total. Keep PATTERNS, LABEL and size working exactly as they do now. Run it with python.",
+  "lead": "patterns.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the total is assembled the same way as the existing size helper",
+  "interface": [
+    "TOTAL",
+    "first",
+    "described"
+  ]
+}

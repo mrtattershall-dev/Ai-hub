@@ -1,0 +1,15 @@
+--- op op1 after: "def label():\n    return PREFIX\n"
+
+
+BANNER = PREFIX + "-"
+
+--- op op2 after: "# Messaging.\n"
+
+def banner():
+    return BANNER
+
+--- op op3 after: "   return str(channel) + \":\" + str(msg)\n"
+
+
+def loud():
+    return banner().upper()

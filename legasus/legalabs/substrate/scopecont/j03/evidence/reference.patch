@@ -1,0 +1,11 @@
+--- op op1 after: " known(name):\n    return name in COLORS\n"
+
+
+def pick(name):
+    return name if known(name) else DEFAULT
+
+--- op op2 after: "DEFAULT = \"red\"\n"
+
+
+def safe(name):
+    return pick(name) == DEFAULT

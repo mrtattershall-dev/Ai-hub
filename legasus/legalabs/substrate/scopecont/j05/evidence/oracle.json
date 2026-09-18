@@ -1,0 +1,68 @@
+{
+  "task_id": "j05",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing size helper as the relation to parallel; that feature reads the shared collection at module level, and the new values occupy the same position",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the total, bound at import time",
+        "site_hint": "PATTERNS = [\"a[b\", \"c)d\"]\n"
+      },
+      {
+        "id": "op2",
+        "intent": "a reader over the collection",
+        "site_hint": "def size():\n    return len(PATTERNS)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "a reader over the label and the total",
+        "site_hint": "LABEL = \"see ] here\"\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 13
+  },
+  "reference": {
+    "source_hash": "650d2195536244880f95b2aaee91a2e4b4eb16c57db03a766a356afe09781cd8",
+    "reference_hash": "ee19df5d85544f7033e1a7810a77ba7ed79390a6f417eb249090b6b17b71b6cd",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

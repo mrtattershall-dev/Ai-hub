@@ -1,0 +1,72 @@
+{
+  "task_id": "j01",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing routes table as the relation to parallel; that feature has a declaration, a recorder and a reader, and the new feature occupies the same positions",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the parallel table",
+        "site_hint": "        self._routes = {}\n"
+      },
+      {
+        "id": "op2",
+        "intent": "a branch inside resolve, using that unit PARAMETER",
+        "site_hint": "._routes:\n            return self._routes[path]\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the recorder for the parallel table",
+        "site_hint": " handler):\n        self._routes[path] = handler\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 9
+  },
+  "reference": {
+    "source_hash": "db9e8a1b25f2f253bbeff3741b7a1a9e7c3c55f476807518544a2b73c10e4f68",
+    "reference_hash": "6e3d7b2e5c4ae238d2bc12c5d63c02e794c3bb95070d05d1ed9202b334fdaea4",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

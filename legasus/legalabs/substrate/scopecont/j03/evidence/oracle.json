@@ -1,0 +1,60 @@
+{
+  "task_id": "j03",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing known check as the relation to parallel; that feature is a module-level function reading the shared collection, and the new functions occupy the same position",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the fallback lookup",
+        "site_hint": "def known(name):\n    return name in COLORS\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the reader over it",
+        "site_hint": "DEFAULT = \"red\"\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 10
+  },
+  "reference": {
+    "source_hash": "2213f5b8fea536f351a877bea49ae117525e95b461ba194a073343dfb253325d",
+    "reference_hash": "3b5af2bc966b24e90583293cd84231cd36f4c4e4386667d8f68ac6e5a9a3e49e",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

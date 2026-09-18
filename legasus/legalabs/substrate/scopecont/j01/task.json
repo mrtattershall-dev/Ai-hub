@@ -1,0 +1,13 @@
+{
+  "task_id": "j01",
+  "goal": "Add aliasing to the EXISTING Router in router.py: alias(frm, to) records that one path stands for another, and resolve must return the handler registered for the target when the requested path is an alias. Keep add and direct resolution working exactly as they do now. Run it with python.",
+  "lead": "router.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the alias table works the same way as the existing routes table",
+  "interface": [
+    "alias",
+    "frm",
+    "to"
+  ]
+}

@@ -1,0 +1,15 @@
+--- op op1 after: "PATTERNS = [\"a[b\", \"c)d\"]\n"
+
+TOTAL = len(PATTERNS)
+
+--- op op2 after: "def size():\n    return len(PATTERNS)\n"
+
+
+def first():
+    return PATTERNS[0]
+
+--- op op3 after: "LABEL = \"see ] here\"\n"
+
+
+def described():
+    return LABEL + str(TOTAL)

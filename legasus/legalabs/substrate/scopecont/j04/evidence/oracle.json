@@ -1,0 +1,72 @@
+{
+  "task_id": "j04",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing prefix label as the relation to parallel; that feature is a module constant read by a function, and the new value occupies the same position",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "a module-level statement requiring a name that is ALSO a function parameter",
+        "site_hint": "def label():\n    return PREFIX\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the accessor",
+        "site_hint": "# Messaging.\n"
+      },
+      {
+        "id": "op3",
+        "intent": "a second reader over the same value",
+        "site_hint": " msg):\n    return str(channel) + \":\" + str(msg)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op2",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 13
+  },
+  "reference": {
+    "source_hash": "da11ee3d3737619e1d516adf2f0666ce0a81307bd6754575f862e6f65f8e24de",
+    "reference_hash": "bb169b7ffd9826f9b9d096fa65937b1fd584e92461d6b388d64c9a1fa581afb6",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

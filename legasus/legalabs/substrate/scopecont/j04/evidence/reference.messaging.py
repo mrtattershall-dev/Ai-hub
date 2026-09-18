@@ -1,0 +1,21 @@
+# Messaging.
+
+def banner():
+    return BANNER
+
+PREFIX = "msg"
+
+
+def send(channel, msg):
+    return str(channel) + ":" + str(msg)
+
+
+def loud():
+    return banner().upper()
+
+
+def label():
+    return PREFIX
+
+
+BANNER = PREFIX + "-"
