@@ -7133,3 +7133,7 @@ prediction that R3 falls sharply and the statement that a smooth decline would f
 
 R0 and R5 are NOT re-run - they are measured history. R4 is DEFERRED with a recorded reason: this task
 has one operation, and running R4 here would confound rung with task.
+
+**WINDOW #3 CLOSED.** Stopped with `--yes`, verified. Under five minutes. R2 20/20, R3 10/20 with the
+failure mode turning SEMANTIC, R1 VOID as a rung (prompt-format confound, with a real bound-inversion
+finding inside it). Recorded in `measurements/2026-09-18-ladder-1p5b/`.

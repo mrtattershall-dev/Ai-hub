@@ -1,0 +1,11 @@
+  RULE 3 ok: endpoint names qwen2.5-coder:1.5b
+  rungs R1, R2, R3   samples 10   temperature 0.6
+
+  R1 case A   verified 0/10   unauth 10   no-op 0   scope 0   semantic 0   loaderr 0   variance 1
+  R1 case B   verified 1/10   unauth 7   no-op 1   scope 1   semantic 2   loaderr 0   variance 4
+  R2 case A   verified 10/10   unauth 0   no-op 0   scope 0   semantic 0   loaderr 0   variance 1
+  R2 case B   verified 10/10   unauth 0   no-op 0   scope 0   semantic 0   loaderr 0   variance 1
+  R3 case A   verified 3/10   unauth 0   no-op 0   scope 1   semantic 6   loaderr 0   variance 4
+  R3 case B   verified 7/10   unauth 0   no-op 0   scope 0   semantic 1   loaderr 0   variance 6
+
+  written -> measurements/2026-09-18-ladder-1p5b/RESULT.json
