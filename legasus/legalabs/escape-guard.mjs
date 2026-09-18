@@ -87,6 +87,39 @@ export function scan(src, file) {
   return hits;
 }
 
+// ---- THE BLIND SPOT, CLOSED. Occurrence five, and in a tool the ledger had not met.
+//
+// `scan` above walks quoted string literals, and the comment at the top of this file records regex
+// LITERALS as a documented blind spot, accepted because a corrupted regex literal usually fails
+// loudly. It does not always. Writing this project's own window ladder through a PYTHON heredoc
+// collapsed `\b` inside two regex literals into a raw backspace character (0x08) - and `\b` is a valid
+// Python escape, so nothing warned. The regexes stayed syntactically valid, silently stopped matching,
+// and the ladder measured every line as its own statement: a wrong number, no error, exactly the shape
+// this ledger exists for.
+//
+// A raw control character in source is never an intention. Checking for one directly catches the
+// corruption wherever it lands - string literal, regex literal, template or comment - without this
+// guard having to understand which context it is in.
+const CONTROL_ALLOWED = new Set([9, 10, 13]);   // tab, LF, CR
+
+export function scanControlChars(src, file) {
+  const hits = [];
+  let line = 1;
+  for (let i = 0; i < src.length; i++) {
+    const c = src.charCodeAt(i);
+    if (c === 10) { line++; continue; }
+    if (c >= 32 || CONTROL_ALLOWED.has(c)) continue;
+    const near = src.slice(Math.max(0, i - 40), i + 40);
+    let shown = '';
+    for (const ch of near) shown += ch.charCodeAt(0) < 32 ? '?' : ch;
+    hits.push({ file, line, escape: 'U+' + c.toString(16).toUpperCase().padStart(4, '0'),
+      text: shown,
+      why: 'a raw control character in source is always a collapsed escape, never an intention' });
+  }
+  return hits;
+}
+
 export function scanFile(path) {
-  return scan(readFileSync(path, 'utf8'), path);
+  const src = readFileSync(path, 'utf8');
+  return [...scan(src, path), ...scanControlChars(src, path)];
 }

@@ -14,7 +14,7 @@ three, and occurrence four still happened. Each entry therefore carries its stat
 
 ## 1. Heredoc backslash-eating — MECHANIZED
 
-**Occurrences: 4.** A shell heredoc collapses doubled backslashes, so JS written that way lands with
+**Occurrences: 5.** A shell heredoc collapses doubled backslashes, so JS written that way lands with
 `'\\s'` turned into `'\s'`. In a JS string literal `\s` is simply `s`: the file stays **syntactically
 valid**, the regex silently changes meaning, and the program returns a plausible wrong answer with no
 error anywhere.
@@ -33,8 +33,24 @@ node legasus/legalabs/escape-guard.test.mjs
 Six witnesses, two of them positive controls, so a scanner that flags everything fails the clean cases
 and one that flags nothing fails the corrupted ones.
 
+**FIFTH occurrence, 2026-09-18, and in a tool this entry had not met.** A PYTHON heredoc, not a shell
+one. Python treats backslash-b as a valid escape - it is a backspace - so a regex ending in a word
+boundary, written into the file through that heredoc, landed as a regex containing a RAW BACKSPACE
+(0x08). No warning from Python, no syntax error from JS, the regex simply stopped matching - and the
+visibility ladder counted every source line as its own statement, producing a wrong window size with
+nothing reporting it. The existing scan missed it because a regex literal was this guard's
+DOCUMENTED blind spot.
+
+**Mechanism extended, and the blind spot is closed:** `scanControlChars` flags any raw control
+character outside tab/LF/CR, anywhere in a file — string literal, regex literal, template or comment —
+without needing to know which context it is in, because a raw control character in source is never an
+intention. Proven both directions: a synthetic corrupted regex literal is CAUGHT, clean source with a
+real `\w` and a template literal is ADMITTED. Sweep of all 85 `.mjs` files in `legasus/`: clean.
+
 **Standing rule it replaces:** JS containing a regex is written with a file writer, never a heredoc —
-*including one-off probes*, which is exactly where the discipline slipped every time.
+*including one-off probes*, which is exactly where the discipline slipped every time. The fifth
+occurrence adds: this applies to PYTHON heredocs too, and Python eats a different set of escapes than
+the shell does.
 
 ---
 

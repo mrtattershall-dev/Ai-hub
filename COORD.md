@@ -7153,3 +7153,13 @@ verify with `modal app list`.
 Q1 prediction FALSIFIED: R3P 8/20 = R3 8/20 exactly. What changed is the failure character - R3
 committed 12 wrong programs, R3P committed none and refused 12 (semantic 9 -> 0, p=0.0012; commit
 precision 8/20 -> 8/8, p=0.0084). Q2 confirmed: FMT_ENG 17/20 vs FMT_BOUND 6/20, p=0.0011.
+
+## STANDING GPU AUTHORITY
+
+tatte, 2026-09-18, verbatim:
+
+> Use the t4 as needed
+
+Read as standing authorization for T4 windows on this line of work. The discipline does NOT relax:
+preregistration committed before the window, AC power confirmed, 30-minute cap, stop with 
+and verify, Rule 3 before any generation.
