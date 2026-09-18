@@ -7161,5 +7161,5 @@ tatte, 2026-09-18, verbatim:
 > Use the t4 as needed
 
 Read as standing authorization for T4 windows on this line of work. The discipline does NOT relax:
-preregistration committed before the window, AC power confirmed, 30-minute cap, stop with 
-and verify, Rule 3 before any generation.
+preregistration committed before the window, AC power confirmed, 30-minute cap, stop with the
+explicit yes flag and verify with the app list, Rule 3 before any generation.
