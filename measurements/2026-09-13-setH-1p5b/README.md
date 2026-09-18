@@ -3927,3 +3927,81 @@ That blind spot is acceptable and should be recorded as understood rather than f
 newline inside a regex literal is a **syntax error**, so the interpreter catches it loudly. The silent
 case is the string literal, which is what the guard covers. The normalization is now built with
 `new RegExp('^' + NL)` from character codes so nothing escape-shaped passes through a shell again.
+
+---
+
+# PROSPECTIVE constraint generalization — per kind
+
+Six tasks authored from semantic situations frozen in Amendment B, sealed before any deriver saw them,
+denominator established by the executable prover and committed before scoring.
+
+    ownership_boundary      PASS / PASS
+    control_flow_boundary   PASS / PASS
+    symbol_availability     FAIL / pass      <- the kind with zero prior evidence
+
+    operations scored        16   (narrowable 8)
+    RECOVERED                 6
+    missed                    1
+    OVER-CONSTRAINT           1
+    correct zero              8   position-independent, left alone
+    witnesses replayed      16/16
+    realized available info  54.8%   (3.86 of 7.05 bits)   DIAGNOSTIC ONLY
+    style control            fired on 13 operations, narrowed 0
+
+## What generalized
+
+**`ownership_boundary`.** Fired on four operations across an unseen nesting shape — a multi-line loop
+body inside a method — with zero over-constraint, and fired **zero times** on g02, where all three
+operations are position-independent with 17 of 17 candidates passing. It recovered 1.18 of 1.18 bits
+available. The rule with the strongest development evidence holds prospectively.
+
+**`control_flow_boundary`.** Fired on g03's real same-region terminator and **zero times** on g04,
+whose returns all sit inside function bodies at a different structural parent. That is precisely the
+discrimination the frozen situation demanded. It is not complete: on g03 op1 it recovered 0.58 of 1.58
+bits, narrowing to 2 positions where execution permits only 1. Under-narrowing is not over-constraint
+and costs no correctness, but it is visible and should not be described as a clean pass on magnitude.
+
+## What did not
+
+**`symbol_availability` failed its positive case**, and it is the kind that had never been exercised
+at all. Two distinct defects, both diagnosed and neither fixed — no deriver is edited after this
+family exists:
+
+**1. An off-by-one in the forbidden range.** The rule forbids positions from `i - 1` where `i` is the
+import-time use. Inserting *after* line `i - 1` places the definition at line `i`, which is *before*
+the use and perfectly legal. Exactly one boundary was wrongly removed on g05 op1, which matches.
+
+**2. It only models symbols an operation PROVIDES.** g05 op2 is `DEFAULTS.update(_timeouts())` — a
+bare statement that defines nothing. Its real constraint is that it must follow both `DEFAULTS` and
+`_timeouts`, which is a claim about what the operation *requires*, not what it provides. The deriver
+has no such rule, so it derived nothing at all and left all 17 candidates standing where execution
+permits 8. That is a missing constraint kind, not a broken one.
+
+**The negative half passed.** On g06 — where the only mention of the new helper sits inside
+`describe`'s body, resolved when `describe` runs — `symbol_availability` fired zero times and all
+three operations correctly stayed at 0 bits. The deferred-mention trap this project fell into once
+before did not catch it.
+
+## Standing, stated precisely
+
+This is **not an open-world benchmark of arbitrary software.** It is a prospective generalization test
+of three preregistered semantic constraint kinds. That narrower description is the stronger one: when
+something failed, it named which claim failed.
+
+    v6 primary endpoint (>= 15 of 26 on the family it was frozen against)   MET, development evidence
+    prospective generalization, per kind                                    2 of 3 kinds pass both halves
+
+The v6 primary number is **not** re-baselined against this family's 8 narrowable operations. It was
+frozen against the provenance family and stays there.
+
+Realized information fell from 93.8% on development to 54.8% here. That gap is the honest measure of
+how much of the development result was the rules being general versus the rules having been shaped by
+the data — and it is exactly the quantity this family existed to produce.
+
+## One of my own expectations was wrong
+
+I described g04 as a case where nothing should be narrowable. Execution says both its operations are
+narrowable, 17 candidates to 13. It remains a valid control-flow negative — the pass criterion was
+always "`control_flow_boundary` fires on zero operations", not "nothing narrows" — and it turned into
+an incidental second ownership case, which `ownership_boundary` handled with zero over-constraint.
+Recorded rather than quietly reframed.

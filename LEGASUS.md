@@ -207,8 +207,11 @@ boundary in its structural parent and running the delta and preservation probes 
     WHERE INSIDE THAT PARENT          very little           0.224 bits mean, 5.82 bits TOTAL
                                                             across 26 narrowable operations, 12 tasks
 
-v5's requirement-based participant pruning, on TWO tasks, recovered 18% of ALL the positional
-information that exists in the entire family.
+These are DIFFERENT INFORMATION SPACES and the comparison is one of magnitude, not of share.
+Participant pruning on only e05/e06 yielded 1.06 bits of localization information - equal in magnitude
+to 18% of the entire family's 5.82-bit positional-narrowing capacity. A small amount of semantic
+participant selection therefore carries information on the same order as a substantial fraction of
+everything exact placement has to offer.
 
 > **The difficult part of localization is determining which semantic participants require
 > modification, not choosing an exact textual insertion boundary once those participants are known.**
@@ -218,6 +221,23 @@ exact line matching kept producing strange measurement questions. What the model
 not a magic line: *"this is the correct participant, this is its role, these are its dependencies,
 this is your legal region, and you have no authority outside it."* Canonical realization can absorb
 the rest, because the rest is measurably small.
+
+### LegaCore constraint derivation, per kind
+
+Development recovery was 26 of 26 narrowable operations at 93.8% of available positional information.
+A prospective family, authored from situations frozen in advance and sealed before any deriver saw it,
+splits that by claim:
+
+    ownership_boundary      PASS / PASS     generalized; zero over-constraint on both halves
+    control_flow_boundary   PASS / PASS     right discrimination; under-narrows on magnitude
+    symbol_availability     FAIL / pass     an off-by-one, and it models only PROVIDED symbols,
+                                            never what an operation REQUIRES
+
+    6 of 8 narrowable recovered, 1 missed, 1 over-constraint, 8 correct zeros, 16/16 witnesses replayed
+    realized available information  54.8% prospective against 93.8% development
+
+That 93.8% -> 54.8% gap is the honest measure of how much of the development result was the rules
+being general rather than the rules having been shaped by the data.
 
 The remaining fields are the current LegaCore planner problem. Success means converting them into
 general computed structure **without encoding the desired implementation directly**.
