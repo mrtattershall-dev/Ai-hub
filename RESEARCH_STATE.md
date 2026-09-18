@@ -95,18 +95,21 @@ wrong about what it measured - it was measuring a system with two correctable de
 
 ## Next gates, determined by evidence rather than preference
 
-1. ~~THREE-operation transactions~~ DONE - and the verifier still never fired, which the ABLATION resolved. Next axes below.
-0. **~~superseded~~** — R4 passed at two operations with zero probe failures, which means
-   the transaction verifier HAS NO LIVE CATCH yet. Within a two-operation family the composition can
-   only go wrong if the ordering does, and Legasus owns ordering. Three operations give more ordering
-   relations and the first realistic chance for a model-produced domain to differ from the requested
-   one, which is the only way an authorized fragment can break a transaction.
-2. **Structural preservation in the loop** — `structure.mjs` and Narrowability V2 exist but no
-   generation family verifies structure alongside behaviour.
-3. **Two parameters** — `requestedBehaviour` declines a generic subject unless the unit has exactly one
-   parameter, which is correct and is also a hard stop on broadening. Extending it is a `DECIDE`
-   revision, not an edit.
-4. **A 24GB card for 32B** — needs its own authorization; the standing grant is T4.
+1. **Ablate `CONSTRAIN`, offline.** The ordering ablation cost nothing and produced the largest
+   separation in the project. `CONSTRAIN`'s value has only ever been shown by accident — an envelope
+   defect that suppressed yield. The direct question is whether it is REDUNDANT with `PROVE`: take
+   every refused raw output already on disk, force-assemble whatever can be assembled, and run the
+   contract probes. Three outcomes, each meaning something different:
+   refused-and-would-fail-`PROVE` (redundant but cheap), refused-and-would-PASS-`PROVE`
+   (over-constraining — hazard 3e), refused-and-unassemblable (doing what `PROVE` structurally cannot).
+2. **A mostly-disjoint transaction family.** The ordering ablation used nested cases, where ordering
+   matters most. A family where most pairs are disjoint should show a much SMALLER ablation effect, and
+   if it does not, the effect is not about ordering at all.
+3. **Structural preservation in the loop.** `structure.mjs` and Narrowability V2 exist; no generation
+   family verifies structure alongside behaviour.
+4. **Two parameters.** `requestedBehaviour` correctly declines a generic subject unless the unit has
+   exactly one parameter. Extending it is a `DECIDE` revision, not an edit.
+5. **A 24GB card for 32B** — needs its own authorization; the standing grant is T4.
 
 ## Standing rules
 
