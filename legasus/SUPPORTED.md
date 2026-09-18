@@ -89,6 +89,29 @@ can provide a symbol"* rather than another chance to redesign.
 
 ---
 
+## Ground truth is relative to the observable contract
+
+The executable sweep is not ground truth simpliciter. It is **ground truth relative to the observable
+contract**, and when that contract is incomplete, execution gives a false reading of legality.
+
+`j01:op3` proved it: inserting a class-level `def` there ends `resolve` early and re-parents its
+remaining statements, and the sealed probes never call the damaged path. Narrowability V1 therefore
+recorded the position as passing, and a correct structural rule scored as an over-constraint.
+
+    NARROWABILITY V1    parse/load + executable probes                     historical, frozen
+    NARROWABILITY V2    + independent structural-preservation channel      families authored after it
+
+Both channels must agree for a position to be legal. The structural channel is deliberately built from
+observed parent chains and reachability, with no arithmetic borrowed from `ownership_boundary` — a rule
+that defines its own oracle proves nothing.
+
+This is why LegaVerify eventually needs both kinds of preservation:
+
+    BEHAVIOURAL   what externally happens
+    STRUCTURAL    what existing program structure was not authorized to change
+
+Neither substitutes for the other.
+
 ## Conformance
 
 `legasus/legalabs/conformance.mjs` checks these properties mechanically across every sealed family. A
