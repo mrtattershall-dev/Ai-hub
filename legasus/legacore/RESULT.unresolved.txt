@@ -1,0 +1,27 @@
+  missed          i01:op1      cand  19  truth-passes  13  derived  19  gain 0.00/0.55
+  CORRECT-0       i01:op2      cand  18  truth-passes  18  derived  18  gain 0.00/0.00
+  RECOVERED       i02:op1      cand  19  truth-passes  13  derived  13  gain 0.55/0.55  [symbol_availability]
+  CORRECT-0       i02:op2      cand  18  truth-passes  18  derived  18  gain 0.00/0.00
+
+  ---- PER CONSTRAINT KIND (the aggregate is reported after this, not instead of it)
+
+  symbol_availability  [provider arrives by import]
+    ----  UNRESOLVED       i01  narrowable 1/2  this kind fired on 0 op(s)  over-constraint 0  bits 0.00/0.55
+
+  symbol_availability  [provider is a module constant]
+    ----  RESOLVED-CONTROL i02  narrowable 1/2  this kind fired on 1 op(s)  over-constraint 0  bits 0.55/0.55
+          kinds that narrowed: symbol_availability
+
+  ---- LegaCore constraint derivation, against executable ground truth
+  operations scored          4   (narrowable 2)
+  RECOVERED                  1   narrowed, and every removed boundary really fails
+  missed                     1   narrowable, nothing derived
+  OVER-CONSTRAINT            0   removed a boundary that actually passes
+  correct zero               2   position-independent and left alone
+  witnesses that replayed    4/4
+
+  PRIMARY   recovered 1 of 2 narrowable   (v6 target: >= 15 of 26)
+  SECONDARY realized available information 50.0%   (0.55 of 1.09 bits)   DIAGNOSTIC ONLY
+
+  STYLE CONTROL  canonical_realization fired on 2 operation(s) and narrowed 0.
+  A style constraint that narrows anything is a milestone failure regardless of score.

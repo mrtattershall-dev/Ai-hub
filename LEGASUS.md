@@ -171,7 +171,14 @@ requiring several providers, and the existing-versus-planned provider distinctio
 14 independently narrowable operations with zero over-constraint and 100% of available positional
 information, and with ownership and control-flow rules not overreaching on their negatives.
 
-It is `[~]` and not `[x]` because the unresolved-provider path is still untested, and because semantic
+The unresolved-provider path is now prospectively tested too, on a surgical pair built so that nothing
+else could produce the result: identical files apart from one line, identical executable constraints,
+and opposite outcomes. The import-provided case narrowed nothing, over-constrained nothing, and
+reported `requirement_complete: false` with `math` named as unresolved; the module-constant control
+recovered fully with the provider labelled `existing_definition`.
+
+It is `[~]` and not `[x]` because unresolved requirements are DECLARED rather than RESOLVED - the
+import case still leaves six boundaries standing that execution rejects - and because semantic
 precedence is untouched.
 
 `[~]` is measured, not aspirational. Site selection has been run ONCE prospectively against a sealed

@@ -4163,3 +4163,66 @@ exists precisely so one rule cannot hide behind another was itself hiding tasks.
 Fixed to group by case, and labels that are neither positive nor negative (`UNRESOLVED`,
 `RESOLVED-CONTROL`) now print without a pass/fail verdict, because what they establish is not "did the
 rule fire" but "was the path exercised at all". Aggregate and per-operation rows were unaffected.
+
+---
+
+# The unresolved-provider path, prospectively tested at last
+
+Two tasks authored after revision 3 was frozen, identical apart from one line, with the unresolved
+requirement designed to be the ONLY mechanism capable of producing the expected narrowing.
+
+    ground truth   i01 op1   19 candidates, 13 pass, 0.55 bits
+                   i02 op1   19 candidates, 13 pass, 0.55 bits      identical
+
+    result         i01 op1   MISSED      derived 19 of 19    0.00 / 0.55 bits
+                   i02 op1   RECOVERED   derived 13 of 13    0.55 / 0.55 bits
+
+    over-constraint 0        witnesses replayed 4/4
+
+Same executable constraints, opposite outcomes, one variable. **The control fired.**
+
+## And the miss is declared rather than hidden
+
+    i01   TAU = math.pi * 2
+          immediate   ["math"]
+          resolved    []
+          unresolved  [{ symbol: "math", reason: "no supported provider representation" }]
+          requirement_complete = false
+
+    i02   TAU = PI * 2
+          resolved    [{ symbol: "PI", provider: "existing_definition", line: 6 }]
+          unresolved  []
+          requirement_complete = true
+
+This is the distinction that did not exist two revisions ago:
+
+> **"I derived no dependency" is now separable from "I could not resolve a dependency I know exists."**
+
+On i01 the deriver narrowed nothing, over-constrained nothing, and stated exactly which symbol defeated
+it. On h07 the same deficiency was present and produced a *correct region* with no indication anything
+was missing. The behaviour has not improved — `math` is still unresolvable — but the **account** has,
+and the account is what authority should be granted against.
+
+## What this does and does not establish
+
+**Established prospectively:** the unresolved path does not manufacture ordering, does not
+over-constrain, and reports its own incompleteness. The pair was built so that nothing else could
+produce the result, which is the path-sensitivity requirement h07 failed.
+
+**Not established:** that unresolved requirements are *handled*. They are not — i01 leaves 6 boundaries
+standing that execution rejects. Resolving import-provided symbols is unimplemented, and the honest
+statement is that the system now knows what it does not know.
+
+**Sample size:** two tasks, two narrowable operations. This is a mechanism check on one path, not a
+rate. It can show the path behaves correctly when exercised, and it does.
+
+## Scoreboard position
+
+    [x] scope facts
+    [x] generation boundaries
+    [x] ownership invariants
+    [~] site selection
+    [~] ordering / dependencies     five dependency situations prospectively generalized;
+                                    unresolved providers now prospectively tested and DECLARED,
+                                    not yet resolved
+    [ ] local semantic intent       guard precedence, named by g03 and untouched
