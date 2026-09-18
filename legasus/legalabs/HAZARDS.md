@@ -162,6 +162,18 @@ an entire scoring run compared misaligned positions — reporting 4 of 26 recove
 assertion — the ground truth records `base_lines` and the scorer **refuses to score** on a mismatch
 rather than producing a number.
 
+**SECOND occurrence, 2026-09-18.** The conformance audit reported seven over-constraints the scorer
+reported as clean. The deriver was not at fault: the audit built the operation's `parentRange` as the
+whole file while the scorer computed the enclosing unit, so `control_flow_boundary` scanned past the
+operation's real block and found a terminator belonging to a different function. Plausible numbers in
+both directions, again.
+
+Fixed by `opcontext.mjs`: one `buildContext()` every consumer calls, and the scorer's local copy
+DELETED rather than left unused, because a stale duplicate is what invites the next consumer to copy
+the wrong one. It also surfaced a property worth stating in the contract - `control_flow_boundary` is
+sound only RELATIVE to a correct parent range, which is an input the deriver trusts and no consumer
+may improvise.
+
 **Rule it replaces:** "normalize carefully in both places" is not a rule, it is a wish. If two pieces
 of code must agree on a derived artifact, there is one implementation of it.
 

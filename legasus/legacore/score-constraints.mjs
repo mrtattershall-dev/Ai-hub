@@ -23,6 +23,7 @@ const { constrain, verify } = await import(DERIVER);
 // looking completely plausible. `base_lines` is asserted below so a future divergence fails loudly
 // instead of producing a number.
 import { reconstruct, baseFor } from '../legalabs/substrate/narrowability.mjs';
+import { buildContext } from './opcontext.mjs';
 
 const NL = String.fromCharCode(10);
 const ind = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
@@ -41,23 +42,9 @@ const EXP = existsSync(join(SUB, 'EXPECTED.json'))
   ? JSON.parse(readFileSync(join(SUB, 'EXPECTED.json'), 'utf8')) : { tasks: [] };
 const KIND = new Map((EXP.tasks || []).filter((t) => t.kind).map((t) => [t.id, t]));
 
-// The parent range an operation sits in, by indentation - the same notion the candidate sweep used.
-function parentRangeFor(src, refPos, indent) {
-  const lines = src.split(NL);
-  if (indent === 0) return { lo: 0, hi: lines.length - 1 };
-  for (let i = refPos; i >= 0; i--) {
-    const m = lines[i].match(/^(\s*)(?:def|class)\b/);
-    if (!m || m[1].length >= indent) continue;
-    let end = i;
-    for (let j = i + 1; j < lines.length; j++) {
-      if (!lines[j].trim()) continue;
-      if (ind(lines[j]) <= m[1].length) break;
-      end = j;
-    }
-    return { lo: i + 1, hi: end };
-  }
-  return { lo: 0, hi: lines.length - 1 };
-}
+// The local copy of parentRangeFor that used to live here is DELETED, not merely unused. A stale
+// duplicate of a derived-artifact computation is precisely hazard 9, and leaving one in place invites
+// the next consumer to copy the wrong one.
 
 let opsSeen = 0; let recovered = 0; let over = 0; let clean0 = 0; let missed = 0;
 let bitsDerived = 0; let bitsAvailable = 0;
@@ -90,18 +77,11 @@ for (const t of GT) {
       process.exitCode = 1;
       continue;
     }
-    const code = blocks[k] || '';
-    const indent = ind(code.split(NL).find((l) => l.trim()) || '');
-    const provides = [];
-    for (const m of code.matchAll(/^\s*(?:def|class)\s+(\w+)/gm)) provides.push(m[1]);
-    for (const m of code.matchAll(/^([A-Za-z_]\w*)\s*=(?!=)/gm)) provides.push(m[1]);
-    const siblingKind = /^\s*def\b/m.test(code) ? 'def' : null;
-
-    // `origin` is the UNMODIFIED source, so a provider found in `base` can be classified as a current
-    // program fact or as one that exists only because another planned operation creates it.
-    const ctx = { src: base, origin: recon.src, code, indent, provides, siblingKind,
-      operation_id: t.task + ':' + row.op,
-      parentRange: parentRangeFor(base, row.ref_position, indent) };
+    // ONE context builder, shared with the conformance audit. `origin` is the UNMODIFIED source, so a
+    // provider found in `base` can be classified as a current program fact or as one that exists only
+    // because another planned operation creates it.
+    const ctx = buildContext(recon, k, base, row, t.task);
+    const code = ctx.code;
 
     const res = constrain(ctx, row.candidate_positions);
     const rep = verify(ctx, res.chain);

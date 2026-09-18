@@ -1,0 +1,13 @@
+  CONFORMANCE AUDIT against legasus/SUPPORTED.md
+  families 4   operations audited 75
+
+  ok    WITNESSED           every narrowing carries a witness
+  ok    REPLAYABLE          every witness re-derives its own claim
+  ok    NO OVER-CONSTRAINT  every removed boundary genuinely fails
+  ok    STYLE ZERO          style never narrows and never claims gain
+  ok    ACCOUNTED           every immediate requirement is resolved or declared unresolved
+  ok    NO SHADOWED LOSS    no stoplisted token is actually bound in the program
+  ok    UNSUPPORTED VISIBLE unsupported forms never report a complete account
+  ok    ALIGNMENT           ground truth and derivation share one text
+
+  A standard that is only written down is a reminder. This runs it.
