@@ -111,6 +111,20 @@ correct implementation cannot satisfy is measuring the reporter.
 
 ---
 
+## 3c. JSON silently inverting an unbounded domain — RULE ONLY, caught before use
+
+`JSON.stringify({ lo: -Infinity })` yields `null`, and `-5 > null` is `false`. An unbounded domain
+round-tripped through JSON therefore INVERTS: `n < 10` stops matching negative numbers, with no error
+anywhere.
+
+Found while reading a test's own output before anything depended on it - nothing serialised a domain
+yet, and gate 12D is where it would first have bitten.
+
+**Rule:** any value that can be infinite is encoded explicitly on the way out and decoded on the way
+back, with a round-trip witness. JSON's defaults are not a safe representation for a numeric domain.
+
+---
+
 ## 4. A checker reading its own file format — RULE ONLY
 
 The leakage scanner treated the patch serializer's own header lines — `--- op op1 after: "<anchor>"` —

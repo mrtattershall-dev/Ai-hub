@@ -1,0 +1,17 @@
+  ok    SHARED  both cases extract the SAME requested domain   {"kind":"interval","variable":"n","lo":null,"hi":10,"loOpen":true,"hiOpen":true}
+  ok    SHARED  both cases produce the SAME overlap output   SATISFIABLE witness 0
+  ok    CASE A  preserved zero outranks new small   PRECEDENCE existing behaviour > requested behaviour
+  ok    CASE B  new small outranks previously-zero   PRECEDENCE requested behaviour > existing behaviour
+  ok    MUST DISTINGUISH  opposite intent gives OPPOSITE precedence
+  ok    NO OVERLAP  disjoint domains need no precedence   DISJOINT -> NO_PRECEDENCE_NEEDED
+  ok    AMBIGUOUS  overlap with no statement either way is declared, not guessed   SATISFIABLE -> AMBIGUOUS_INTENT
+  ok    UNKNOWN OVERLAP  declines rather than ordering
+  ok    NO SOURCE ORDER  case B wins for the NEW behaviour over the same program that case A preserves
+  ok    NO LEAKAGE  case A reason names no site, order or branch shape   the specification explicitly preserves the existing behaviour (matched: 
+  ok    NO LEAKAGE  case B reason names no site, order or branch shape   the specification states that the new behaviour claims inputs the existi
+
+  all witnesses pass
+  Non-vacuity: 2 cases must yield PRECEDENCE in OPPOSITE directions,
+  and 3 must yield NO_PRECEDENCE_NEEDED or AMBIGUOUS_INTENT. A deriver
+  that always declared ambiguity fails both precedence cases; one that always ordered
+  fails the disjoint and ambiguous ones.
