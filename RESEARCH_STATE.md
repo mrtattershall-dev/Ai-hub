@@ -58,6 +58,9 @@ READMEs hold the detail; commit messages hold the reasoning.
     contract probes      derived from the obligation; audit REFUSES an insufficient set
     dense equivalence    a surviving mutant is only a failure if a 605-input sweep says it differs
     conformance P1-P8    witnessed, replayable, no over-constraint, channel complete
+    authority envelope   ONE opinion, with an ADMIT list of legal realizations and a refuse list
+
+Every stage that can REJECT needs an ADMIT list of legal realizations, not only a refuse list.
 
 Three controls are mandatory per family: **can the apparatus express a pass / a failure / can the model
 obtain the facts.** A fourth where relevant: **is the endpoint reachable at all.**

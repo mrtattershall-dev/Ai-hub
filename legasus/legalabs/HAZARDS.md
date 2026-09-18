@@ -158,6 +158,39 @@ node --test legasus/legalabs/sufficiency.test.mjs
 
 ---
 
+## 3e. The apparatus penalizing a LEGAL realization - MECHANIZED at PROVE and at CONSTRAIN
+
+**Occurrences: 2, and the second cost a whole cell block.** A contract admits more than one
+implementation. Any stage that rejects one of them is measuring itself, and it does so INVISIBLY until
+a model happens to prefer the style being rejected.
+
+    at PROVE       `n <= 10` survives the probes on S_STRADDLE and is genuinely CORRECT - the preserved
+                   guard absorbs the off-by-one, so it is unreachable. Counting it as a probe-set gap
+                   would have driven a "fix" that rejects a correct answer. Caught by a control before
+                   the window opened.
+
+    at CONSTRAIN   the 14B writes `elif n < 10:` where smaller models write `if`. After a returning
+                   branch these are equivalent. The envelope accepted only `if` and refused 54 of 60
+                   outputs on one shape, which read as a catastrophic model failure - 6/60 against the
+                   7B's 48/60, p = 2.7e-15 - and was entirely the apparatus. Caught only in the RESULT.
+
+**Why the second one hid:** the acceptor was internally inconsistent. The normalizer split one-line
+`if` AND `elif`, the condition extractor read `(?:el)?if`, and only the acceptor insisted on `if`.
+Three functions, two opinions, and the disagreement is invisible while every model prefers the same
+keyword.
+
+**Mechanism:** `legasus/legagate/envelope.mjs` is the single authority envelope, and
+`envelope.test.mjs` is the anti-oracle control it never had - **ten fragments that must be ADMITTED**,
+all legal realizations differing only in surface, and six that must be REFUSED, with negative controls
+in both directions so neither list can become vacuous. `PROVE` has had its equivalent since window 10
+(two legal realizations must pass) plus a dense 605-input equivalence sweep to adjudicate survivors.
+
+**Rule:** every stage that can REJECT needs an admit list of legal realizations, not only a refuse list
+of violations. A stage with only a refuse list is tested against what it should stop and never against
+what it must let through.
+
+---
+
 ## 3b. Reporting code that cannot express what it is measuring — RULE ONLY
 
 **Occurrences: 5.** Five times a report marked a working rule as failed because the report could not
