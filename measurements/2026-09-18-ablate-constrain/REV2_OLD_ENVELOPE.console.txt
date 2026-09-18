@@ -1,0 +1,27 @@
+  ABLATING CONSTRAIN, revision 2 - rejection authority removed, NOTHING repaired
+  no GPU time: every refused output replayed is already on disk
+
+  FUNCTIONAL DECOMPOSITION of 89 refusals
+    A  interface protection    47   the proposal does not load unchanged; PROVE cannot be pointed at it
+    B  cheap early rejection    4   PROVE rejects it too; the gate saved an assembly and a run
+    C- SCOPE (correct refusal)   3   satisfies the contract by TOUCHING A FIXED LINE - authority it was not granted
+    C  FALSE REJECTION         32   satisfies the contract AND stayed inside its authority - the only defect category
+    C- weak false rejection     0   passes the probes but the dense sweep disagrees somewhere
+    D  undetermined             3   not evaluable without changing the proposal
+
+    not exactly one guard and one return   A  25  B   4  Cscope   0  Csem  32  Cweak   0  D   0
+    repeated a fixed line                  A  22  B   0  Cscope   1  Csem   0  Cweak   0  D   0
+    returned a function                    A   0  B   0  Cscope   2  Csem   0  Cweak   0  D   3
+
+  C-SCOPE - correct by content, refused for taking authority it was not granted:
+        1x  returned a function :: def classify(n): if n > 5: return "big" elif n < 10: return 
+        1x  returned a function :: def classify(n): if n > 5: return "big" if n < 10: return "s
+        1x  repeated a fixed line :: if n > 5: return "big" else: return "small"
+
+  CATEGORY C - THE DEFECT: refused, inside its authority, and satisfies the contract:
+       21x  not exactly one guard and one return :: elif n < 10: return "small"
+        7x  not exactly one guard and one return :: elif n > 100: return "big"
+        4x  not exactly one guard and one return :: return "small"
+
+  A is the only category where CONSTRAIN is doing something PROVE structurally cannot.
+  B is cost. C is a defect. There is no single percentage that says all three.
