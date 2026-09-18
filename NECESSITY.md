@@ -54,12 +54,21 @@ stages that shape the candidate pool from the stages that judge it.
     14B         80          79        72             7                     0            80
     TOTAL      233         229       145            86                     0           233
 
-Both blind policies fail for their predicted and OPPOSITE reasons. But BLIND_TOP survives 145 times,
-and the diagnostic says why: it survives EXACTLY when the model wrote a self-defending guard
-() - 145 OK / 2 FAIL against 0 OK / 86 FAIL for plain guards, p = 1.7e-62. So part
-of what OBSERVE protects against is absorbed by the model, and how often depends on capacity (26% at
-1.5B, 90% at 14B). Without OBSERVE, correctness becomes contingent on a stylistic choice the
-architecture does not control.
+Both blind policies fail for their predicted and OPPOSITE reasons. But `BLIND_TOP` survives 145 times,
+and the diagnostic says why: it survives **exactly when the model wrote a self-defending guard** —
+`n < 10 and n != 3` rather than plain `n < 10`.
+
+    self-defending guard    OK 145    FAIL  2
+    plain guard             OK   0    FAIL 86        p = 1.7e-62
+
+So part of what `OBSERVE` protects against is absorbed by the model's realization strategy, and how
+often depends on capacity — 26% of the time at 1.5B, 90% at 14B. **Without `OBSERVE`, correctness
+becomes contingent on a stylistic choice the architecture does not control.** That is a sharper
+statement of necessity than a score gap: the derivation removes a dependency on the model that would
+otherwise stay invisible while capacity happened to be high enough to hide it.
+
+The substitution runs **one way only**. A self-defending guard rescues a bad placement; no placement
+rescues a guard whose domain is wrong.
 
 ### The earlier family, and why it could not separate it
 

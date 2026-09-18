@@ -14,7 +14,7 @@ three, and occurrence four still happened. Each entry therefore carries its stat
 
 ## 1. Heredoc backslash-eating — MECHANIZED
 
-**Occurrences: 8.** A shell heredoc collapses doubled backslashes, so JS written that way lands with
+**Occurrences: 9.** A shell heredoc collapses doubled backslashes, so JS written that way lands with
 `'\\s'` turned into `'\s'`. In a JS string literal `\s` is simply `s`: the file stays **syntactically
 valid**, the regex silently changes meaning, and the program returns a plausible wrong answer with no
 error anywhere.
@@ -64,7 +64,12 @@ rendering. A derivation that yields undefined and is interpolated anyway becomes
 error, lost work.
 
 **Standing rule it replaces:** JS containing a regex is written with a file writer, never a heredoc —
-*including one-off probes*, which is exactly where the discipline slipped every time. Occurrences SEVEN
+*including one-off probes*, which is exactly where the discipline slipped every time. OCCURRENCE NINE was a MARKDOWN write, not code: a necessity-table section written through a
+shell-quoted node -e, whose backtick span was executed as a command substitution and silently deleted
+the example it contained. The sentence stayed fluent, the commit was already made, and the only
+diagnostic was a shell line reading "10: No such file or directory" - noise, unless you know to look.
+escape-guard scans .mjs files and has never scanned a markdown write, because markdown was not where
+the discipline was expected to slip. Occurrences SEVEN
 and EIGHT were both one-off probes - an invisible sentinel written by hand, and a Python heredoc eating
 the escapes out of a regex it was fixing. The fifth
 occurrence adds: this applies to PYTHON heredocs too, and Python eats a different set of escapes than
