@@ -215,3 +215,40 @@ it, recorded for a later single-variable test, not a finding.
 3. The open question moved to the delta: two of three observed authorization leaks are the same
    misreading of the word *"other"*. That is now the cheapest available experiment and it is about how
    Legasus phrases the requested behaviour — the same model-facing-representation surface, one layer up.
+
+---
+
+## ANNOTATION — the interaction claim above is overstated, by the exact error this document corrected
+
+This document called the interaction *"the strongest structural claim in this line of work"* on the
+strength of five arms being flat at `W1` while four moved at `FULL`. **"Significant here and not
+significant there" is not a test that the two differ**, and that is the same mistake — reading a null
+too hard — that this document had just corrected in window 7.
+
+A direct test was built (`legasus/legalabs/interaction.mjs`, a logistic likelihood-ratio test of the
+window x arm term, whose negative control is large main effects with equal odds ratios) and run on
+these cells:
+
+    window 8   OFF vs NEUTRAL          DiD 0.225   chi2(1) 1.98   p = 0.16
+    window 8   OFF vs FACT             DiD 0.275   chi2(1) 1.81   p = 0.18
+    window 8   OFF vs any sentence     DiD 0.269   chi2(1) 3.11   p = 0.078
+    window 7   OFF vs FACT             DiD 0.450   chi2(1) 7.03   p = 0.008
+
+    pooled 7+8 OFF vs FACT             DiD 0.362   chi2(1) 7.85   p = 0.0051
+    pooled 7+8 OFF vs any sentence     DiD 0.287   chi2(1) 7.80   p = 0.0052
+    pooled 7+8 OFF vs NEUTRAL          DiD 0.188   chi2(1) 3.17   p = 0.075
+
+**Window 8's own data does not establish the interaction.** Window 7's does, and the pooled
+byte-identical replicates do, for `FACT` and for any-sentence — but not for `NEUTRAL` alone.
+
+So the corrected statement is:
+
+> The interaction between window size and added wording is supported by the pooled replicates for
+> obligation-shaped wording (p = 0.005) and for added wording in general (p = 0.005). It is **not**
+> established for inert wording alone (p = 0.075), and no single window establishes it.
+
+The arm-level results above stand exactly as recorded. What does not stand is the inference that a
+flat `W1` plus a moved `FULL` was itself evidence of a difference between them.
+
+`measurements/2026-09-18-deltawording-1p5b/` carries this as a **preregistered primary endpoint** with
+its own test, so the next statement about it is prospective rather than assembled afterwards.
