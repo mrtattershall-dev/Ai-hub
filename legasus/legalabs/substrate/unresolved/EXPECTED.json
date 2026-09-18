@@ -1,0 +1,13 @@
+{
+  "note": "The surgical unresolved-provider pair. Authored AFTER revision 3 was frozen. Two files identical apart from one line, so any difference in the deriver's output is attributable to exactly one variable: whether the provider arrives through `import math` or through the module constant `PI`.",
+  "path_sensitivity": "h07 failed as a control because a co-occurring resolvable requirement produced the same region on its own. Here `import math` sits DEEP IN THE FILE, after two module-level constants, and op1 has exactly ONE immediate requirement. The boundaries above the import are ordinary module-level positions: no body encloses them so ownership_boundary cannot remove them, no terminator precedes them at module indent so control_flow_boundary cannot, and there is no second symbol to constrain them. The unresolved requirement is therefore the ONLY mechanism capable of producing the expected narrowing.",
+  "tasks": [
+    { "id": "i01", "ops": 2, "kind": "symbol_availability", "half": "UNRESOLVED", "case": "provider arrives by import",
+      "situation": "TAU = math.pi * 2 - the sole immediate requirement is `math`, bound by an import statement the provider search does not recognise",
+      "expect": "the positions above the import MUST survive, so op1 is expected to MISS part of the true narrowing. It must NOT over-constrain, and requirement_resolution must report `math` as unresolved with requirement_complete=false. A miss here is the honest outcome; a full recovery would mean the control is masked again." },
+    { "id": "i02", "ops": 2, "kind": "symbol_availability", "half": "RESOLVED-CONTROL", "case": "provider is a module constant",
+      "situation": "TAU = PI * 2 - identical file and identical topology, but PI is a module-level assignment",
+      "expect": "full recovery of the same narrowing, with requirement_complete=true and PI labelled existing_definition" }
+  ],
+  "discriminator": "i01 and i02 impose the same executable constraints. If i02 recovers and i01 does not, the gap is the unresolved-provider path and nothing else. If BOTH recover fully, the control is masked again and must be redesigned rather than reported."
+}

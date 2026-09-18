@@ -1,0 +1,9 @@
+--- op op1 after: "RADIUS = 2\n"
+
+TAU = math.pi * 2
+
+--- op op2 after: "def box():\n    return WIDTH * HEIGHT\n"
+
+
+def tau():
+    return TAU

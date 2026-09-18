@@ -1,0 +1,12 @@
+{
+  "task_id": "i02",
+  "goal": "Add a tau constant to the EXISTING geolocalconst.py: TAU must hold two times PI when the module is imported, and tau() returns it. Keep WIDTH, HEIGHT, RADIUS, area and box working exactly as they do now. Run it with python.",
+  "lead": "geolocalconst.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the tau constant is assembled the same way as the existing area computation",
+  "interface": [
+    "TAU",
+    "tau"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "sealed_at": "2026-09-18T05:01:19.186Z",
+  "sealed_at_commit": "9e9dcb81e472d3b905f0962fdbb8e6a94ba5bef4",
+  "pre_generation": true,
+  "note": "Sealed BEFORE any model generation or applicability detection ran against this family. Rule 15: author all, validate, seal, freeze, and only then let anything see it.",
+  "tasks": [
+    {
+      "task_id": "i01",
+      "task_sha": "caa4ba88c3c7fce18dc2a4af5b988107adb3094842ecbc4a3e2bc973411da9ec",
+      "source_sha": "f8085402c50161c96be7b0654a759d103f0f0c5c024da8366f8b6d8c9f4a5b5d",
+      "evidence_sha": "18d320dc19f32209b450c182d0c46d7bc1f6f6ef73733078ff64b027bebefa0f"
+    },
+    {
+      "task_id": "i02",
+      "task_sha": "f88858a7b954f6980f4655d2af1dc105ffab5c3c02a529ed19bd58b08cc28eef",
+      "source_sha": "7d501dad2490d614a018f33e02296c7f364b6e71551d701349f59b3d6ad4ae11",
+      "evidence_sha": "dd386e676104ca42587e7f81177090cb40a784535c5efa22dc9df42654c7da32"
+    }
+  ]
+}
