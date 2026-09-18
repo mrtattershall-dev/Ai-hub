@@ -1,0 +1,62 @@
+  S_UPPER     req n < 10    pres n == 3   overlap SATISFIABLE winner existing   probes 16
+  S_LOWER     req n > 100   pres n == 200 overlap SATISFIABLE winner existing   probes 13
+  S_IVAL      req n < 10    pres n < 0    overlap SATISFIABLE winner existing   probes 13
+  S_STRADDLE/SILENT NOTE: `if n <= 10:` is a LEGAL realization here (605 inputs agree with the contract) - the preserved guard makes it unreachable, so it is not a mutant on this shape
+  S_STRADDLE  req n < 10    pres n > 5    overlap SATISFIABLE winner existing   probes 13
+  S_STRADDLE/NEGATED NOTE: `if n <= 10:` is a LEGAL realization here (605 inputs agree with the contract) - the preserved guard makes it unreachable, so it is not a mutant on this shape
+  S_STRADDLE/EXTENT NOTE: `if n <= 10:` is a LEGAL realization here (605 inputs agree with the contract) - the preserved guard makes it unreachable, so it is not a mutant on this shape
+  controls ok: every shape poses a real precedence question, both renderings plan identically, two legal realizations pass the contract probes and three mutants die
+  RULE 3 ok: qwen2.5-coder:1.5b, qwen2.5-coder:7b, qwen2.5-coder:14b
+  12 cells x 3 models   samples 20
+
+  qwen2.5-coder:1.5b   S_UPPER    SILENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   S_UPPER    NEGATED     authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   S_UPPER    EXTENT      authorized 20/20   verified 19   PRIMARY too-narrow  1   too-wide 0   P(c|auth) 0.95
+  qwen2.5-coder:1.5b   S_LOWER    SILENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   S_LOWER    NEGATED     authorized 18/20   verified 18   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   S_LOWER    EXTENT      authorized 19/20   verified 19   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   S_IVAL     SILENT      authorized 15/20   verified 14   PRIMARY too-narrow  1   too-wide 0   P(c|auth) 0.93
+  qwen2.5-coder:1.5b   S_IVAL     NEGATED     authorized 17/20   verified 17   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   S_IVAL     EXTENT      authorized 16/20   verified 16   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   S_STRADDLE SILENT      authorized 17/20   verified 17   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   S_STRADDLE NEGATED     authorized 17/20   verified 17   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   S_STRADDLE EXTENT      authorized 17/20   verified 16   PRIMARY too-narrow  1   too-wide 0   P(c|auth) 0.94
+  qwen2.5-coder:7b     S_UPPER    SILENT      authorized 20/20   verified 19   PRIMARY too-narrow  1   too-wide 0   P(c|auth) 0.95
+  qwen2.5-coder:7b     S_UPPER    NEGATED     authorized 20/20   verified 17   PRIMARY too-narrow  3   too-wide 0   P(c|auth) 0.85
+  qwen2.5-coder:7b     S_UPPER    EXTENT      authorized 20/20   verified 19   PRIMARY too-narrow  1   too-wide 0   P(c|auth) 0.95
+  qwen2.5-coder:7b     S_LOWER    SILENT      authorized 20/20   verified  5   PRIMARY too-narrow 15   too-wide 0   P(c|auth) 0.25
+  qwen2.5-coder:7b     S_LOWER    NEGATED     authorized 20/20   verified 10   PRIMARY too-narrow 10   too-wide 0   P(c|auth) 0.50
+  qwen2.5-coder:7b     S_LOWER    EXTENT      authorized 20/20   verified 18   PRIMARY too-narrow  2   too-wide 0   P(c|auth) 0.90
+  qwen2.5-coder:7b     S_IVAL     SILENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:7b     S_IVAL     NEGATED     authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:7b     S_IVAL     EXTENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:7b     S_STRADDLE SILENT      authorized 19/20   verified 18   PRIMARY too-narrow  1   too-wide 0   P(c|auth) 0.95
+  qwen2.5-coder:7b     S_STRADDLE NEGATED     authorized 20/20   verified 18   PRIMARY too-narrow  2   too-wide 0   P(c|auth) 0.90
+  qwen2.5-coder:7b     S_STRADDLE EXTENT      authorized 17/20   verified 16   PRIMARY too-narrow  1   too-wide 0   P(c|auth) 0.94
+  qwen2.5-coder:14b    S_UPPER    SILENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_UPPER    NEGATED     authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_UPPER    EXTENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_LOWER    SILENT      authorized 20/20   verified  3   PRIMARY too-narrow 17   too-wide 0   P(c|auth) 0.15
+  qwen2.5-coder:14b    S_LOWER    NEGATED     authorized 20/20   verified 13   PRIMARY too-narrow  7   too-wide 0   P(c|auth) 0.65
+  qwen2.5-coder:14b    S_LOWER    EXTENT      authorized 20/20   verified 19   PRIMARY too-narrow  1   too-wide 0   P(c|auth) 0.95
+  qwen2.5-coder:14b    S_IVAL     SILENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_IVAL     NEGATED     authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_IVAL     EXTENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_STRADDLE SILENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_STRADDLE NEGATED     authorized 20/20   verified 16   PRIMARY too-narrow  4   too-wide 0   P(c|auth) 0.80
+  qwen2.5-coder:14b    S_STRADDLE EXTENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+
+  qwen2.5-coder:1.5b    proposal-yield 0.900   authorization-precision 0.986   verification-rate 0.887
+      SILENT    PRIMARY too-narrow  1/80   too-wide 0   authorized 72   verified 71
+      NEGATED   PRIMARY too-narrow  0/80   too-wide 0   authorized 72   verified 72
+      EXTENT    PRIMARY too-narrow  2/80   too-wide 0   authorized 72   verified 70
+  qwen2.5-coder:7b      proposal-yield 0.983   authorization-precision 0.847   verification-rate 0.833
+      SILENT    PRIMARY too-narrow 17/80   too-wide 0   authorized 79   verified 62
+      NEGATED   PRIMARY too-narrow 15/80   too-wide 0   authorized 80   verified 65
+      EXTENT    PRIMARY too-narrow  4/80   too-wide 0   authorized 77   verified 73
+  qwen2.5-coder:14b     proposal-yield 1.000   authorization-precision 0.879   verification-rate 0.879
+      SILENT    PRIMARY too-narrow 17/80   too-wide 0   authorized 80   verified 63
+      NEGATED   PRIMARY too-narrow 11/80   too-wide 0   authorized 80   verified 69
+      EXTENT    PRIMARY too-narrow  1/80   too-wide 0   authorized 80   verified 79
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.openend2.json

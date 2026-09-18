@@ -38,6 +38,7 @@ READMEs hold the detail; commit messages hold the reasoning.
 | The pipeline generalizes across contract shape at 1.5B | 98 authorized, 98 verified, four shapes, machine-generated probes |
 | State an open end RELATIONALLY; naming its absence is inert | 7B too-narrow 16/80 -> 1/80, p = 1.3e-4; NEGATED vs SILENT p = 1.000 |
 | The renderer can repair a CAPACITY-INDUCED failure mode | invented bounds: 0 at 1.5B, 18/133 at 7B, removed by rendering alone |
+| A gate with only a REFUSE list silently suppresses yield everywhere | admitting elif raised yield for all three models, 1.5B p = 8.4e-8 |
 
 ## Dead, and staying dead
 
@@ -77,11 +78,14 @@ may change repository state.
 
 ## Best configuration measured
 
-    7B + EXTENT rendering    yield 0.900   authorization precision 0.986   verified 0.888
-    1.5B + EXTENT            yield 0.725   authorization precision 1.000   verified 0.725
+    14B + EXTENT    yield 1.000   precision 0.988   verified 0.988   [0.933, 0.998]
+    7B  + EXTENT    yield 0.963   precision 0.948   verified 0.913
+    1.5B + NEGATED  yield 0.900   precision 1.000   verified 0.900
 
-The first configuration where capacity is straightforwardly worth having: the renderer bought back the
-precision capacity was costing, without giving up the yield capacity was buying.
+Two deterministic decisions - one rendering phrase and one authority-envelope rule - moved a FIXED 14B
+from 0.625 to 0.988 end to end. This INVERTS the scale window: with both defects corrected, capacity is
+straightforwardly worth having and the 14B is best on every column at once. The scale window was not
+wrong about what it measured - it was measuring a system with two correctable defects in it.
 
 ## Next gates, determined by evidence rather than preference
 
