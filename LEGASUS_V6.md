@@ -322,3 +322,66 @@ merely having been made green.
 Rule 5 still binds: the family is authored and sealed before any change to the derivers, and any rule
 written with the tasks visible yields development evidence only. No deriver is edited after this
 family exists — if one must change, that is a new preregistration, not a continuation.
+
+---
+
+## Amendment C — the boundary g03 exposed, and the next blind family
+
+*Revision 2 is frozen. g01-g06 are spent as development data. This fixes the construction procedure
+for the family that would make revision 2's result prospective, written before any task exists.*
+
+### Each component is learning what it does NOT own
+
+    LegaParse                  what exists? who owns it? who reads and writes it?
+                               where are the legal regions?
+
+    LegaCore                   what does each operation PROVIDE?
+                               what does it REQUIRE, and WHEN is that requirement evaluated?
+                               what depends on what? what transaction order is legal?
+
+    SEMANTIC INTENT            when two valid behaviours OVERLAP, which one should win?
+    still unresolved
+
+g03 is the cleanest example the project has produced of the third row. Inserting `if n < 10` after the
+negative branch is *reachable*, *correctly ordered*, *legally placed*, and *wrong* — because
+`classify(0)` must answer `"zero"` rather than `"small"`. Guard precedence is not a placement fact and
+not a dependency fact. Turning that miss into another control-flow heuristic would have made the
+number prettier and blurred the architecture.
+
+    WHERE?              increasingly computed
+    WHAT BEFORE WHAT?   increasingly computed
+    WHAT SHOULD WIN?    the frontier
+
+### The claim the next family would support
+
+If the requirement model generalizes prospectively, the honest statement becomes:
+
+> **A nontrivial class of site ordering and dependency constraints can be derived automatically from
+> witnessed program and operation semantics, rather than supplied by a human plan.**
+
+Not "ordering is solved". An honest migration of part of the second oracle field.
+
+### Case types the family must contain, each with both halves
+
+| # | Case | Must |
+|---|---|---|
+| 1 | provider → **immediate** consumer | order them |
+| 2 | provider → **deferred** function-body consumer | NOT order them |
+| 3 | default argument / decorator / class body | treat as a **definition-time** requirement |
+| 4 | a bare statement requiring **several** providers | order after all of them |
+| 5 | existing-program provider **vs** planned-operation provider | distinguish the two sources |
+| 6 | **unresolved** requirement | abstain and expose the unresolved dependency, never invent ordering |
+
+Case 6 is the one with no precedent in any existing family: a requirement whose provider is nowhere —
+not in the program, not in the transaction. The rule today silently derives nothing. Silence and
+"there is no constraint" are different answers, and the family must be able to tell them apart.
+
+Case 5 matters because the two sources carry different authority. A provider already in the program is
+a CURRENT PROGRAM FACT; a provider that only exists because another planned operation creates it is a
+TRANSACTION FACT. Collapsing them is the same error the v4 sweep found in `edgesFor`.
+
+### Rules carried forward
+
+Authored blind from semantic situations, sealed before any deriver changes, narrowability established
+by the executable prover and committed before scoring, reported per kind before any aggregate, and a
+style control that must narrow nothing. No deriver is edited after the family exists.

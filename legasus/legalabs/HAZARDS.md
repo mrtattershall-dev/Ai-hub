@@ -156,6 +156,18 @@ add false positives for no safety gain.
 
 ---
 
+## 10. A shell builtin truncating a message while the command succeeds — RULE ONLY
+
+`git commit -m "$(printf '...93.8%%...')"` - printf aborted on the percent sign, emitted only the text
+before it, and **git committed the truncated message and exited 0**. The files were correct; the record
+was cut off mid-sentence. Same silent shape as hazard 2: the job reports success while part of the
+work is gone.
+
+**Rule:** commit messages and any other multi-paragraph text go to a file and are passed with `-F`.
+Never build them with `printf` in a command substitution.
+
+---
+
 ## A PERMANENT LegaLabs rule, promoted out of hazard 9
 
 > **Any artifact whose coordinates are compared across components must have exactly one canonical
