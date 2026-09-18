@@ -63,9 +63,16 @@ evidence the selector declines false relations; all three tasks had **no relatio
 each abstained before resolution was attempted. The first family containing a genuine false relation
 showed the selector applies to it.
 
+**THIRD occurrence, 2026-09-18.** A task built to test an UNRESOLVED requirement recovered fully -
+but only because a second, resolvable requirement in the same operation produced the same region on
+its own. The unresolved symbol was silently dropped exactly as predicted, and the task could not tell
+that apart from success. The two halves of the pair printed identical figures, which is the signature.
+
 **Rule:** a passing control proves a mechanism ran only if the input could have made it fail. For any
 selection, disambiguation or ranking step, name the RIVAL in each case and confirm at least one case
-has one.
+has one. For a control testing a FALLBACK or FAILURE path, confirm the path under test is the ONLY
+thing that can produce the result - a co-occurring mechanism that subsumes it makes the control
+vacuous no matter how the number looks.
 
 ---
 

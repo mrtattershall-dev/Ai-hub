@@ -4086,3 +4086,80 @@ intent**, which is still an oracle field.
 
 No rule was added for it. The position was inspected first, the missing fact was named, and it was
 assigned to the layer that owns it rather than approximated in the layer that happened to be running.
+
+---
+
+# PROSPECTIVE: revision 2's requirement model on the requirements family
+
+Eight tasks authored blind from the case types Amendment C froze, sealed before the run, denominator
+established by the executable prover and committed before scoring. Revision 2 was frozen beforehand.
+
+    operations scored        22   (narrowable 14)
+    RECOVERED                14
+    missed                    0
+    OVER-CONSTRAINT           0
+    correct zero              8
+    witnesses replayed      22/22
+    realized available info  100.0%   (10.48 of 10.48 bits)
+    style control            fired on 17 operations, narrowed 0
+
+Per case:
+
+    PASS  provider -> IMMEDIATE consumer        h01   2/2 narrowable, fired on 2,  1.32/1.32 bits
+    PASS  provider -> DEFERRED body consumer    h02   0/2 narrowable, fired on 0,  correct silence
+    PASS  definition-time requirement           h03   3/3 narrowable, fired on 3,  2.08/2.08 bits
+    PASS  same shape, body reference            h04   0/3 narrowable, fired on 0,  correct silence
+    PASS  bare statement, TWO providers         h05   3/3 narrowable, fired on 5,  2.14/2.14 bits
+    PASS  EXISTING vs PLANNED provider          h06   2/3 narrowable, fired on 3,  1.53/1.53 bits
+    ----  requirement the rule cannot resolve   h07   see below
+    ----  the same shape, fully resolvable      h08   see below
+
+**Five case types generalized prospectively**, including the definition-time/body-reference pair that
+turns on one bit of Python semantics, and the bare statement that provides nothing and still carries
+the largest single constraint in the family at 1.68 bits.
+
+## Case 6 did NOT fire, and 14/14 must not be read as covering it
+
+I preregistered h07 to MISS, because `math` arrives through `import math` and the provider search does
+not recognise import statements. It recovered fully instead — and the reason is not that the
+unresolved path works:
+
+    h07 op2   TAU = _round2(2 * math.pi)
+              requires_immediate  ["_round2", "math"]
+              constrained symbols ["_round2"]     SILENTLY UNRESOLVED ["math"]
+              truth passes 5 of 14   derived 5
+
+    h08 op2   TAU = _round2(2 * PI)
+              constrained symbols ["_round2", "PI"]   SILENTLY UNRESOLVED []
+              truth passes 5 of 14   derived 5
+
+`_round2` is defined after `import math`, so the constraint "must follow `_round2`" already implies
+"must follow the import". **The unresolved requirement was never needed**, and h07 and h08 produce
+identical figures (1.71/1.71 bits) — which is precisely the signature of a path that contributed
+nothing.
+
+**This is the third occurrence of a control that could not fire**, after a03's absent rival and the v4
+holdout's absent false relation. The design error is mine and is specific: I placed the resolvable
+provider *later in the file* than the unresolved one, so the resolvable constraint subsumes it. To
+exercise case 6 the unresolved provider must be the **only binding constraint** — an operation whose
+sole immediate requirement is import-provided, with the import sited so that positions before it are
+genuinely illegal.
+
+So the honest statement is:
+
+> Revision 2's requirement model generalizes prospectively across five case types. The
+> unresolved-requirement path remains **untested**, and `math` was silently dropped exactly as
+> predicted — the family simply could not tell that apart from success.
+
+`14/14` and `100%` are real numbers about the fourteen narrowable operations. They are not evidence
+about case 6.
+
+## A reporting defect the result exposed
+
+The per-kind table keyed on `kind` alone. All eight tasks test `symbol_availability`, so the map kept
+only the **last** POSITIVE and the **last** NEGATIVE and silently dropped six tasks. The table that
+exists precisely so one rule cannot hide behind another was itself hiding tasks.
+
+Fixed to group by case, and labels that are neither positive nor negative (`UNRESOLVED`,
+`RESOLVED-CONTROL`) now print without a pass/fail verdict, because what they establish is not "did the
+rule fire" but "was the path exercised at all". Aggregate and per-operation rows were unaffected.

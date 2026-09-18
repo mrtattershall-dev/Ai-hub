@@ -152,12 +152,18 @@ const narrowableOps = rows.filter((r) => r.narrowable).length;
 if (KIND.size) {
   console.log('');
   console.log('  ---- PER CONSTRAINT KIND (the aggregate is reported after this, not instead of it)');
+  // GROUP BY CASE, NOT BY KIND. Keying on `kind` alone collapsed eight tasks that all test
+  // `symbol_availability` into one row pair, silently keeping only the last POSITIVE and the last
+  // NEGATIVE and dropping six tasks from the table. The aggregate and per-operation rows were
+  // unaffected, but the per-kind table - the thing that exists precisely so one rule cannot hide
+  // behind another - was itself hiding tasks.
   const byKind = new Map();
   for (const [id, spec] of KIND) {
-    if (!byKind.has(spec.kind)) byKind.set(spec.kind, { POSITIVE: null, NEGATIVE: null });
+    const group = spec.kind + (spec.case ? '  [' + spec.case + ']' : '');
+    if (!byKind.has(group)) byKind.set(group, {});
     const rs = rows.filter((r) => r.task === id);
     const fired = rs.flatMap((r) => r.kinds);
-    byKind.get(spec.kind)[spec.half] = {
+    byKind.get(group)[spec.half] = {
       id,
       narrowable: rs.filter((r) => r.narrowable).length,
       ops: rs.length,
@@ -171,12 +177,15 @@ if (KIND.size) {
   for (const [kind, halves] of byKind) {
     console.log('');
     console.log('  ' + kind);
-    for (const half of ['POSITIVE', 'NEGATIVE']) {
+    for (const half of Object.keys(halves)) {
       const h = halves[half];
       if (!h) continue;
       // A positive case must fire its own kind. A negative case must NOT, and must not over-constrain.
-      const ok = half === 'POSITIVE' ? (h.firedOwn > 0 && h.over === 0) : (h.firedOwn === 0 && h.over === 0);
-      console.log('    ' + (ok ? 'PASS  ' : 'FAIL  ') + half.padEnd(9) + h.id
+      // Other labels (UNRESOLVED, RESOLVED-CONTROL) are reported without a pass/fail verdict, because
+      // what they establish is not "did the rule fire" but "was the path exercised at all".
+      const ok = half === 'POSITIVE' ? (h.firedOwn > 0 && h.over === 0)
+        : half === 'NEGATIVE' ? (h.firedOwn === 0 && h.over === 0) : null;
+      console.log('    ' + (ok === null ? '----  ' : ok ? 'PASS  ' : 'FAIL  ') + half.padEnd(17) + h.id
         + '  narrowable ' + h.narrowable + '/' + h.ops
         + '  this kind fired on ' + h.firedOwn + ' op(s)'
         + '  over-constraint ' + h.over
