@@ -28,7 +28,7 @@ left to look like a preregistration written before the result it responds to.
 | `OBSERVE` | **Load-bearing — robustness independence** | derived 229/233; blind-top 145/233 failing 86x PRESERVATION_BROKEN; blind-bottom **0/233** failing 233x NEW_DEAD. Earlier top-heavy family could not separate it: derived 624/692 == blind-bottom 624/692 |
 | `DECIDE` | **Load-bearing** | same 105 transactions: derived order 105/105, presentation order **0/105**, every failure a named dead operation |
 | `RENDER` | **Causal, requires regeneration** | semantic plan held fixed; `EXTENT` vs `SILENT` moved authorization precision 0.775 → 0.986 at 7B and 0.677 → 0.969 at 14B |
-| `PROPOSE` | Stochastic backend | yield and realization strategy depend on model and rendering; correctness of the composition does not |
+| `PROPOSE` | **Substitutable stochastic backend — no necessity claim, by design** | swapping 1.5B → 7B → 14B changes proposal yield, realization strategy and failure distribution while the downstream authority semantics stay fixed. A necessity result for any particular model would contradict the architecture rather than support it |
 | `CONSTRAIN` | **Load-bearing as interface protection** | of 28 refusals: 14 do not load unchanged, 1 is a case `PROVE` would also catch, 6 exceed granted authority, 2 in-scope equivalents, 5 undetermined |
 | `PROVE` | **Independent backstop** | 14 well-formed authorization leaks across families, every one rejected by execution before persistence |
 | `COMMIT` | **Load-bearing for atomicity** | complete transaction persists the verified candidate; op2 failing returns the surface byte-for-byte to S0; with rollback ablated the independently correct op1 PERSISTS as unauthorized partial state |
@@ -59,9 +59,17 @@ is the whole claim: *a locally correct change is still wrong to persist when it 
 transaction that did not complete.* Without that, rollback would only be saying "we removed the broken
 thing".
 
-**A limitation, documented rather than discovered later:** the manifest and the rollback see only the
-**declared writable surface**. A file created outside it is invisible to both. The surface is a promise
-the caller makes, and `COMMIT` cannot check that the promise was kept.
+**An interface contract, not a caveat.** The manifest and the rollback see only the **declared writable
+surface**. A file created outside it is invisible to both — it will not appear in the state comparison
+and it will not be removed by a restore.
+
+    COMMIT guarantees atomicity over the declared writable surface, and only over it.
+
+That is a boundary with an owner: **completeness of the surface is an upstream obligation.** `COMMIT`
+can atomically restore everything it was told exists; it cannot prove the caller told it everything.
+Hiding that would make the atomicity claim broader than the mechanism. Stating it makes the obligation
+assignable — and a test asserts the limitation explicitly, so it is documented behaviour rather than
+something a later family discovers the hard way.
 
 **The frozen boundary:** `PROVE` decides whether a candidate deserves persistence; `COMMIT` decides
 whether persistence is atomic. `COMMIT` never computes a verdict — a test asserts it asks exactly once
