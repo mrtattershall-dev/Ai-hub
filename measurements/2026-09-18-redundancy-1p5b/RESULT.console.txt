@@ -1,0 +1,25 @@
+  controls ok: sufficiency holds, the endpoint is reachable, perfect verifies, inversion and off-by-one are accepted and still fail, and the arms differ by exactly one sentence
+  RULE 3 ok: endpoint names qwen2.5-coder:1.5b
+  arms OFF, FACT, NEUTRAL   windows W1, FULL   samples 20   temperature 0.6
+
+  W1   OFF     case A   PRIMARY repeated-fixed  1/20   verified 11/20   whole-fn 0   other-shape 8   P(correct|committed) 1.00
+  W1   OFF     case B   PRIMARY repeated-fixed  4/20   verified 14/20   whole-fn 0   other-shape 2   P(correct|committed) 1.00
+  W1   FACT    case A   PRIMARY repeated-fixed  0/20   verified 16/20   whole-fn 0   other-shape 4   P(correct|committed) 1.00
+  W1   FACT    case B   PRIMARY repeated-fixed  4/20   verified 11/20   whole-fn 0   other-shape 5   P(correct|committed) 1.00
+  W1   NEUTRAL case A   PRIMARY repeated-fixed  0/20   verified 13/20   whole-fn 0   other-shape 7   P(correct|committed) 1.00
+  W1   NEUTRAL case B   PRIMARY repeated-fixed  2/20   verified 12/20   whole-fn 0   other-shape 6   P(correct|committed) 1.00
+  FULL OFF     case A   PRIMARY repeated-fixed  1/20   verified 18/20   whole-fn 0   other-shape 1   P(correct|committed) 1.00
+  FULL OFF     case B   PRIMARY repeated-fixed  4/20   verified 16/20   whole-fn 0   other-shape 0   P(correct|committed) 1.00
+  FULL FACT    case A   PRIMARY repeated-fixed 10/20   verified  7/20   whole-fn 1   other-shape 1   P(correct|committed) 0.88
+  FULL FACT    case B   PRIMARY repeated-fixed 12/20   verified  6/20   whole-fn 0   other-shape 2   P(correct|committed) 1.00
+  FULL NEUTRAL case A   PRIMARY repeated-fixed  7/20   verified  9/20   whole-fn 1   other-shape 2   P(correct|committed) 0.90
+  FULL NEUTRAL case B   PRIMARY repeated-fixed  3/20   verified 16/20   whole-fn 0   other-shape 1   P(correct|committed) 1.00
+
+  POOLED W1   OFF     repeated-fixed  5/40   verified 25/40
+  POOLED W1   FACT    repeated-fixed  4/40   verified 27/40
+  POOLED W1   NEUTRAL repeated-fixed  2/40   verified 25/40
+  POOLED FULL OFF     repeated-fixed  5/40   verified 34/40
+  POOLED FULL FACT    repeated-fixed 22/40   verified 13/40
+  POOLED FULL NEUTRAL repeated-fixed 10/40   verified 25/40
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.redundancy.json

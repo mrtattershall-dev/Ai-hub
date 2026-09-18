@@ -89,3 +89,118 @@ No "best window" is claimed, and none is implied by anything below.
 Same T4 app under tatte's standing authorization recorded in `COORD.md`. `scaledown_window` 5 minutes,
 `min_containers` 0, hard 30-minute cap, AC power confirmed, stop with `--yes` and verify.
 **Rule 3** before any generation.
+
+---
+
+# RESULT — the redundant sentence
+
+Rule 3 verified. All four controls passed, plus the arm-diff assertion that the arms differ by exactly
+one line. GPU window 10:36:24Z to ~10:42Z, stopped and verified: eight `legasus-1p5b` rows, **zero**
+not `stopped`.
+
+    window  arm      PRIMARY repeated-fixed   verified   P(correct | authorized)
+    W1      OFF            5/40                25/40           1.00
+    W1      FACT           4/40                27/40           1.00
+    W1      NEUTRAL        2/40                25/40           1.00
+    FULL    OFF            5/40                34/40           1.00
+    FULL    FACT          22/40                13/40           0.94
+    FULL    NEUTRAL       10/40                25/40           0.95
+
+## I preregistered the null. The null is dead.
+
+    PRIMARY ENDPOINT, repeated-a-fixed-line, at FULL
+      OFF   5/40  ->  FACT    22/40      p = 1.1e-4
+      OFF   5/40  ->  NEUTRAL 10/40      p = 0.25
+      FACT 22/40  vs  NEUTRAL 10/40      p = 0.012
+
+**One redundant sentence quadrupled the rate at which the model reproduced code it was explicitly
+forbidden to touch**, and took the verified rate from 34/40 to 13/40 (p = 3.1e-6). The sentence added
+**zero semantic information**: at `FULL` the window already shows `def classify(n):`.
+
+The three-arm design earns its keep. `NEUTRAL` — an equally true, equally long, equally inert program
+fact — moved the endpoint only a little and not significantly (p = 0.25), while `FACT` moved it far
+beyond `NEUTRAL` (p = 0.012). So this is **not** simply "one more sentence". Sentence count may
+contribute; obligation-shaped wording contributes much more.
+
+> More explicit instruction is not more usable instruction. A redundant constraint changed completion
+> behaviour while adding nothing a reader would call information.
+
+## The effect is an interaction, not a property of the sentence
+
+    W1 (one statement either side)     OFF 5/40   FACT 4/40    p = 1.00
+    FULL (the whole function)          OFF 5/40   FACT 22/40   p = 1.1e-4
+
+**The same sentence is harmless in a small window and destructive in a large one.** Whatever is
+happening is not "the sentence is bad"; it is the sentence interacting with how much fixed code is in
+front of it. That is consistent with the visibility family's finding that context affords *reproduction*
+— the redundant sentence appears to amplify an affordance the large window already carries, rather than
+creating one.
+
+This also retires the cross-run 6/60 → 23/60 observation properly: the controlled version confirms an
+effect of the same size and direction, and localizes it to the window where it exists.
+
+## THE 87/87 STREAK IS BROKEN, AND THIS IS THE MOST IMPORTANT LINE IN THE RESULT
+
+Preregistered: *"if commit integrity does not stay at 1.00, that is the most important line in the
+result regardless of the primary endpoint."* It did not.
+
+    authorized outputs, this family    151
+    of those, verified                 149        P(correct | authorized) = 0.987
+
+Two authorized outputs were wrong, both at `FULL`, and both are worth reading:
+
+    if n > 0: return "small"          FULL/FACT/A       classify(50) -> "small", classify(10) -> "small"
+    if n > 10: return "very large"    FULL/NEUTRAL/A    classify(50) -> "very large", delta never made
+
+The first is the **bound inversion** the `FMT_BOUND` arm found, appearing here for the first time
+inside a well-formed fragment. The second invents a result outside the declared vocabulary.
+
+### What this does and does not overturn
+
+**It does not mean a wrong program reached the repository.** Both were caught by the behavioural
+verifier — that is what `verified: false` means — so the layered gate held. What leaked is the
+**authorization boundary on its own**.
+
+That distinction was blurred in how I have been reporting this, and it needs to be sharp:
+
+    P(correct | AUTHORIZED)   the shape gate alone       236/238 across all families = 0.992
+    P(correct | VERIFIED)     shape gate + execution     no failure observed in any family
+
+The claim worth protecting is therefore narrower and better founded than "87/87":
+
+> Across five families the authorization boundary admitted 238 outputs and 236 were correct; the two
+> that were not were rejected downstream by execution verification. Authorization is a strong filter
+> and **not** a sufficient one, which is exactly why LegaVerify exists as a separate layer.
+
+An earlier version of this claim would have read as though authorization alone were sufficient. 151
+more samples show it is not. That is the streak breaking usefully.
+
+## Secondary observations
+
+- `W1` is flat on everything: 25, 27, 25 verified; 5, 4, 2 repeated-fixed. Nothing the sentence does
+  survives a small window.
+- `FULL/OFF` at 34/40 is the best generation rate any arm has produced in this task family.
+- Whole-function emissions: 2 across 240 generations, both at `FULL`. The visibility family's finding
+  that context suppresses invention holds at four times the sample.
+
+## Honest limits
+
+- One task family, one function, one model, one temperature.
+- `NEUTRAL` is one sentence, not a class. "Obligation-shaped wording" is a hypothesis about *why* it
+  differs from `FACT`, not something this design measures; a proper test varies wording along a
+  declared dimension with several exemplars per level.
+- The two commit failures are n = 2. The *rate* is not well estimated; that authorization alone can
+  leak is now established, its frequency is not.
+- Case asymmetries remain larger than some arm differences and remain unexplained.
+
+## What this changes
+
+1. **Model-facing rendering is now a measured design surface, not a style question.** Two independent
+   results point the same way: render the relation rather than bound metadata (6/20 → 17/20), and do
+   not add obligations the window already carries (34/40 → 13/40). Both are decisions Legasus makes
+   deterministically, which means both are fixable in the architecture rather than in the model.
+2. **`P(correct | authorized)` and `P(correct | verified)` are separate metrics from here on**, and no
+   result may quote one while meaning the other.
+3. The next question is whether the `FACT`/`NEUTRAL` gap is really about obligation shape or about the
+   sentence naming an identifier that appears in the answer. That is a single-variable test: a sentence
+   naming an identifier that does *not* appear in the answer.

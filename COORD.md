@@ -7177,3 +7177,11 @@ repair and 14/20 after (p=1.000), while the repair demonstrably worked - the mod
 supplied name correctly inside the function it invents. Context presence, not information,
 suppresses the affordance. Commit integrity 36/36 this family, 87/87 cumulative, 1.00 in all eight
 cells. Next controlled test is the redundant sentence, not another window size.
+
+**WINDOW #7 CLOSED.** 10:36:24Z to ~10:42Z, 8 rows, 0 not stopped. I PREREGISTERED THE NULL AND
+THE NULL IS DEAD: at FULL, one redundant sentence took repeated-a-fixed-line refusals from 5/40 to
+22/40 (p=1.1e-4) and verified from 34/40 to 13/40 (p=3.1e-6), while adding zero semantic information.
+NEUTRAL moved it far less (10/40, p=0.25 against OFF; p=0.012 against FACT), so it is not merely one
+more sentence. At W1 the same sentence does nothing at all - the effect is an INTERACTION with window
+size. AND THE 87/87 STREAK BROKE: 149/151 authorized outputs correct, both failures caught downstream
+by execution. P(correct|authorized) and P(correct|verified) are separate metrics from here on.
