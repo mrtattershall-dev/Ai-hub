@@ -35,6 +35,9 @@ READMEs hold the detail; commit messages hold the reasoning.
 | Larger models make **different** errors, not fewer | 14B's leaks are 17/18 compound guards like `0 < n < 10` |
 | A probe set built on one model's failures ratifies another's | without two probes the 14B scores 239/240 and looks best |
 | Contract-derived probes catch what luck provided | replay: 31/31 of the leaks a pre-luck probe set would have passed |
+| The pipeline generalizes across contract shape at 1.5B | 98 authorized, 98 verified, four shapes, machine-generated probes |
+| State an open end RELATIONALLY; naming its absence is inert | 7B too-narrow 16/80 -> 1/80, p = 1.3e-4; NEGATED vs SILENT p = 1.000 |
+| The renderer can repair a CAPACITY-INDUCED failure mode | invented bounds: 0 at 1.5B, 18/133 at 7B, removed by rendering alone |
 
 ## Dead, and staying dead
 
@@ -69,10 +72,13 @@ obtain the facts.** A fourth where relevant: **is the endpoint reachable at all.
 A refusal is not a wrong commit. An authorized proposal is not a correct one. Only a verified proposal
 may change repository state.
 
-## Current gate
+## Best configuration measured
 
-`measurements/2026-09-18-shapes-1p5b-7b/` — four contract shapes (`S_UPPER`, `S_LOWER`, `S_IVAL`,
-`S_STRADDLE`), contract-derived verification, 1.5B and 7B.
+    7B + EXTENT rendering    yield 0.900   authorization precision 0.986   verified 0.888
+    1.5B + EXTENT            yield 0.725   authorization precision 1.000   verified 0.725
+
+The first configuration where capacity is straightforwardly worth having: the renderer bought back the
+precision capacity was costing, without giving up the yield capacity was buying.
 
 ## Next gates, determined by evidence rather than preference
 
