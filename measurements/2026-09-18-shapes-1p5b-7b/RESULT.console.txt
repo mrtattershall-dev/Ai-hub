@@ -1,0 +1,39 @@
+  S_UPPER     req n < 10    pres n == 3   overlap SATISFIABLE winner existing   probes 16
+  S_LOWER     req n > 100   pres n == 200 overlap SATISFIABLE winner existing   probes 13
+  S_IVAL      req n < 10    pres n < 0    overlap SATISFIABLE winner existing   probes 13
+  S_STRADDLE/IMPLICIT NOTE: `if n <= 10:` is a LEGAL realization here (605 inputs agree with the contract) - the preserved guard makes it unreachable, so it is not a mutant on this shape
+  S_STRADDLE  req n < 10    pres n > 5    overlap SATISFIABLE winner existing   probes 13
+  S_STRADDLE/RELATIONAL NOTE: `if n <= 10:` is a LEGAL realization here (605 inputs agree with the contract) - the preserved guard makes it unreachable, so it is not a mutant on this shape
+  controls ok: every shape poses a real precedence question, both renderings plan identically, two legal realizations pass the contract probes and three mutants die
+  RULE 3 ok: qwen2.5-coder:1.5b, qwen2.5-coder:7b
+  8 cells x 2 models   samples 20
+
+  qwen2.5-coder:1.5b   S_UPPER    IMPLICIT    authorized 13/20   verified 13   P(c|auth) 1.00   distinct guards 4
+  qwen2.5-coder:1.5b   S_UPPER    RELATIONAL  authorized 17/20   verified 17   P(c|auth) 1.00   distinct guards 2
+  qwen2.5-coder:1.5b   S_LOWER    IMPLICIT    authorized 10/20   verified 10   P(c|auth) 1.00   distinct guards 3
+  qwen2.5-coder:1.5b   S_LOWER    RELATIONAL  authorized 17/20   verified 17   P(c|auth) 1.00   distinct guards 2
+  qwen2.5-coder:1.5b   S_IVAL     IMPLICIT    authorized 14/20   verified 14   P(c|auth) 1.00   distinct guards 3
+  qwen2.5-coder:1.5b   S_IVAL     RELATIONAL  authorized 11/20   verified 11   P(c|auth) 1.00   distinct guards 2
+  qwen2.5-coder:1.5b   S_STRADDLE IMPLICIT    authorized  8/20   verified  8   P(c|auth) 1.00   distinct guards 3
+  qwen2.5-coder:1.5b   S_STRADDLE RELATIONAL  authorized  8/20   verified  8   P(c|auth) 1.00   distinct guards 2
+  qwen2.5-coder:7b     S_UPPER    IMPLICIT    authorized 19/20   verified 17   P(c|auth) 0.89   distinct guards 3
+  qwen2.5-coder:7b     S_UPPER    RELATIONAL  authorized 19/20   verified 17   P(c|auth) 0.89   distinct guards 3
+  qwen2.5-coder:7b     S_LOWER    IMPLICIT    authorized 17/20   verified 16   P(c|auth) 0.94   distinct guards 4
+  qwen2.5-coder:7b     S_LOWER    RELATIONAL  authorized 20/20   verified 11   P(c|auth) 0.55   distinct guards 3
+  qwen2.5-coder:7b     S_IVAL     IMPLICIT    authorized 19/20   verified 19   P(c|auth) 1.00   distinct guards 4
+  qwen2.5-coder:7b     S_IVAL     RELATIONAL  authorized 20/20   verified 20   P(c|auth) 1.00   distinct guards 3
+  qwen2.5-coder:7b     S_STRADDLE IMPLICIT    authorized  7/20   verified  3   P(c|auth) 0.43   distinct guards 5
+  qwen2.5-coder:7b     S_STRADDLE RELATIONAL  authorized 12/20   verified 12   P(c|auth) 1.00   distinct guards 2
+
+  qwen2.5-coder:1.5b    proposal-yield 0.613   authorization-precision 1.000   verification-rate 0.613
+      S_UPPER     verified 30/40   by rendering IMPLICIT 13  RELATIONAL 17
+      S_LOWER     verified 27/40   by rendering IMPLICIT 10  RELATIONAL 17
+      S_IVAL      verified 25/40   by rendering IMPLICIT 14  RELATIONAL 11
+      S_STRADDLE  verified 16/40   by rendering IMPLICIT 8  RELATIONAL 8
+  qwen2.5-coder:7b      proposal-yield 0.831   authorization-precision 0.865   verification-rate 0.719
+      S_UPPER     verified 34/40   by rendering IMPLICIT 17  RELATIONAL 17
+      S_LOWER     verified 27/40   by rendering IMPLICIT 16  RELATIONAL 11
+      S_IVAL      verified 39/40   by rendering IMPLICIT 19  RELATIONAL 20
+      S_STRADDLE  verified 15/40   by rendering IMPLICIT 3  RELATIONAL 12
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.shapes.json
