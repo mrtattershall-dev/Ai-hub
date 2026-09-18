@@ -1,0 +1,403 @@
+{
+ "model": "qwen2.5-coder:1.5b",
+ "temperature": 0.6,
+ "samples": 10,
+ "arms": {
+  "BASELINE": {
+   "A": {
+    "conforms": 3,
+    "parsed": 10,
+    "of": 10,
+    "distinct_conforming_shapes": 2,
+    "rows": [
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "large",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" if n < 10: return \"small\" return \"large\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "large",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" if n < 10: return \"small\" return \"large\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": true,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" return \"small\" if n < 10 else \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "large",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" if n < 10: return \"small\" return \"large\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": true,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" if n < 10: return \"small\" return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "large",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" if n < 10: return \"small\" return \"large\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "large",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" elif n < 10: return \"small\" else: return \"large\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "small",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"small\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": true,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" return \"small\" if n < 10 else \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "large",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" elif n < 10: return \"small\" else: return \"large\""
+     }
+    ]
+   },
+   "B": {
+    "conforms": 2,
+    "parsed": 10,
+    "of": 10,
+    "distinct_conforming_shapes": 2,
+    "rows": [
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "small",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"small\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" if n < 10: return \"small\" return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "large",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" elif n < 10: return \"small\" else: return \"large\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "large",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" elif n < 10: return \"small\" else: return \"large\""
+     },
+     {
+      "parsed": true,
+      "contested": "small",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": true,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n < 10: return \"small\" return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "small",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": true,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n < 10: return \"small\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "small",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" return \"small\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "small",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"small\""
+     }
+    ]
+   }
+  },
+  "CONTRACT": {
+   "A": {
+    "conforms": 2,
+    "parsed": 10,
+    "of": 10,
+    "distinct_conforming_shapes": 2,
+    "rows": [
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "large",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" elif n >= 10: return \"large\" return \"small\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "small",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n < 10: return \"small\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": true,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" if n < 10: return \"small\" return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": true,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" elif n < 10: return \"small\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     }
+    ]
+   },
+   "B": {
+    "conforms": 1,
+    "parsed": 10,
+    "of": 10,
+    "distinct_conforming_shapes": 1,
+    "rows": [
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "small",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"small\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "large",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" if n < 10: return \"small\" return \"large\""
+     },
+     {
+      "parsed": true,
+      "contested": "small",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": true,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n < 10: return \"small\" return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "small",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"small\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "positive",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" elif n == 0: return \"zero\" else: return \"positive\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "small",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" return \"small\""
+     },
+     {
+      "parsed": true,
+      "contested": "zero",
+      "small": "small",
+      "neg": "negative",
+      "pos": "positive",
+      "conforms": false,
+      "shape": "def classify(n): if n < 0: return \"negative\" if n == 0: return \"zero\" elif n < 10: return \"small\" else: return \"positive\""
+     }
+    ]
+   }
+  }
+ }
+}

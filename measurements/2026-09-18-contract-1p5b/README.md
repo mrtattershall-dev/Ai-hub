@@ -71,3 +71,73 @@ prompts and aborts non-interactively without `--yes`, which cost five over-cap m
 AC power confirmed before the window (BatteryStatus 2, 98%).
 
 **Rule 3:** `/api/health` must name the exact model before any generation runs.
+
+---
+
+# RESULT — contract vs baseline on Qwen2.5-Coder-1.5B, Modal T4
+
+Rule 3 verified before any generation: the endpoint named `qwen2.5-coder:1.5b`, Q4_K_M, 32K context.
+Leakage scan clean on both contract prompts. 10 samples per arm per case, temperature 0.6, identical
+source / model / temperature / token budget across arms. GPU window ~10 minutes, stopped and verified.
+
+    arm        case A        case B        parsed
+    BASELINE   3/10          2/10          10/10
+    CONTRACT   2/10          1/10          10/10
+
+## The preregistered verdict: NULL
+
+The preregistration named this outcome in advance — *"both arms conform on case B at similar rates →
+the contracts did not help here."* 2 against 1 at n=10 is noise. **The contracts did not improve this
+model on this task**, and the CONTRACT arm is nominally lower rather than higher.
+
+No endpoint is reinterpreted. This is the result.
+
+## What actually went wrong is not precedence
+
+Every output parsed. The dominant failures are in neither arm's favour and have nothing to do with the
+thing the contracts represent:
+
+    SCOPE CREEP          def classify(n): ... if n < 10: return "small"  return "large"
+                         6/10 BASELINE-A. A new behaviour nobody requested, replacing the
+                         preserved "positive".
+
+    DELTA NEVER MADE     def classify(n): if n < 0 ... elif n == 0 ... else: return "positive"
+                         6/10 CONTRACT-A. Valid Python, the original semantics, the requested
+                         change simply absent.
+
+    GUARD SWALLOWS       pos=small — the new predicate captured inputs it should not have.
+
+Precedence was almost never the deciding factor. `contested=zero` dominates **both arms and both
+cases**, which is the source-order default: appending after the existing zero check. In case B, where
+the contract states outright *"On inputs where both apply, the result must be 'small'"*, only 1 of 10
+CONTRACT samples produced it — against 2 of 10 for BASELINE.
+
+**So the ruling was communicated and not acted on.** The contract was leakage-clean and differed from
+case A by exactly one sentence, verified before the window opened. The model did not use it.
+
+## The honest reading
+
+For a 1.5B at this task, **representing intent is not the binding constraint**. Basic obligation-
+following is: keeping scope, and making the requested change at all. A contract cannot help a model
+that adds an unrequested `"large"` branch or returns the original function unchanged.
+
+That does not retire the contracts — it says this experiment cannot see their value, because a prior
+failure mode dominates. The v7 machinery stands on its own witnesses, where it is tested directly and
+passes.
+
+One hypothesis worth naming and NOT claiming: the CONTRACT package is abstract prose about
+obligations, and the 1.5B may act less reliably on it than on a direct imperative. `small=positive`
+appears 6/10 in CONTRACT-A and 0/10 in BASELINE-A, which is suggestive. At n=10 it is a hypothesis for
+a future arm, not a finding.
+
+## Power, stated as preregistered
+
+40 generations. A mechanism check, not a rate estimate — a rule-of-three bound near 26% on a clean
+0/10. A one-or-two sample difference is inconclusive and is reported as such. The *failure-mode tally*
+is the part of this run worth keeping, and it is qualitative.
+
+## What this costs the roadmap
+
+The next useful experiment is not another contract arm. It is whether the 1.5B can be held to scope at
+all — and that is what LegaGate and the bounded-authority work exist for. The model needs the
+obligation enforced, not merely stated.

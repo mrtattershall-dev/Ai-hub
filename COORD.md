@@ -7086,3 +7086,7 @@ uploaded). Stop with `modal app stop --yes` and verify with `modal app list` - t
 and aborts non-interactively without it, which cost five over-cap minutes on 2026-09-10.
 
 **Rule 3 still binds:** `/api/health` must name the exact model before any goal runs.
+
+**WINDOW CLOSED.** `modal app stop legasus-1p5b --yes`, verified `stopped` via `modal app list`.
+Roughly ten minutes on a T4. Result recorded in `measurements/2026-09-18-contract-1p5b/` — NULL on the
+preregistered primary, with a qualitative failure-mode finding that is the part worth keeping.
