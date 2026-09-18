@@ -204,3 +204,29 @@ more samples show it is not. That is the streak breaking usefully.
 3. The next question is whether the `FACT`/`NEUTRAL` gap is really about obligation shape or about the
    sentence naming an identifier that appears in the answer. That is a single-variable test: a sentence
    naming an identifier that does *not* appear in the answer.
+
+---
+
+## ANNOTATION, added after a better-powered follow-up — the numbers above stand, one inference does not
+
+`measurements/2026-09-18-idnaming-1p5b/` ran the same `OFF`, `FACT` and `NEUTRAL` conditions at `FULL`,
+byte-identical, with three further arms. Two things changed.
+
+**Corrected.** This document concluded *"this is NOT simply one more sentence"* from `NEUTRAL` sitting
+at 10/40 against `OFF` 5/40, p = 0.25. **That read a null as evidence of no effect at a sample that
+could not have shown one.** The follow-up put `NEUTRAL` at 14/40 against `OFF` 5/40, p = 0.034, and
+pooling the byte-identical replicates gives 24/80 against 10/80, p = 0.011.
+
+    ANY extra sentence raises reproduction of forbidden code      NEUTRAL pooled, p = 0.011
+    AN OBLIGATION-SHAPED one raises it further                    FACT over NEUTRAL pooled, p = 0.0098
+
+Both are real. This document had the second and missed the first, so its design rule was too narrow:
+the rule is *do not add sentences a model-facing prompt's window already answers*, whatever they say —
+not merely *avoid obligation-shaped ones*.
+
+**Replicated and strengthened.** The headline effect and the interaction both held. `FACT` at `FULL`
+19/40 against this document's 22/40; `OFF` 5/40 against 5/40; and `W1` stayed flat across **five**
+sentences, not two. The claim that the effect of wording is a property of the wording *together with*
+the code surface beside it is now the best-supported structural result in this line.
+
+Nothing above is rescored. The tables, the p-values and the preregistration stand as recorded.

@@ -7185,3 +7185,11 @@ NEUTRAL moved it far less (10/40, p=0.25 against OFF; p=0.012 against FACT), so 
 more sentence. At W1 the same sentence does nothing at all - the effect is an INTERACTION with window
 size. AND THE 87/87 STREAK BROKE: 149/151 authorized outputs correct, both failures caught downstream
 by execution. P(correct|authorized) and P(correct|verified) are separate metrics from here on.
+
+**WINDOW #8 CLOSED.** 10:58:30Z to ~11:04Z, 6 rows, 0 not stopped. ALL FOUR sentence arms moved at
+FULL - FACT 19/40, TARGET_ID 18/40, NONTARGET_ID 15/40, NEUTRAL 14/40 against OFF 5/40 - and the two
+identifier arms are indistinguishable from each other and from the no-identifier one. The direct
+readout agrees: naming the function did not pull its name into the output. WINDOW 7 IS CORRECTED:
+its NEUTRAL null was underpowered. Pooled byte-identical replicates show BOTH effects - any sentence
+moves it (p=0.011) and an obligation-shaped one moves it further (p=0.0098). W1 flat across five
+sentences. Cumulative P(correct|authorized) 460/463.
