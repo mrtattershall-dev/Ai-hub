@@ -45,6 +45,8 @@ READMEs hold the detail; commit messages hold the reasoning.
 | T3: three operations, same result | 105 assembled, 105 verified, P(correct|assembled) 1.000 at every capacity |
 | DECIDE ordering is LOAD-BEARING, by ablation | same fragments re-assembled in presentation order: 105/105 -> 0/105, every failure a DEAD OPERATION |
 | Models do not get the domain wrong when RENDER states it | 343 authorized T3 fragments, ZERO with a domain other than requested |
+| CONSTRAIN adds COST, not safety, against a contract-derived verifier | 25 of 28 refusals would have been caught by PROVE anyway; 0 over-constraint |
+| Ablation finds defects it was not built to find | it rediscovered the elif over-constraint blind: 45 correct programs discarded under the old envelope |
 
 ## Dead, and staying dead
 
