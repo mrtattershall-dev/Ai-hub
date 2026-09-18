@@ -251,7 +251,9 @@ function control() {
     const T = p.req.domain.hi !== undefined && Number.isFinite(p.req.domain.hi)
       ? p.req.domain.hi : p.req.domain.lo;
     const mutants = [
-      ['inverted', s.correct.replace('<', '').replace('>', '<').replace('', '>')],
+      // A two-step swap needs a placeholder. It must be ORDINARY TEXT: the first version used a raw
+      // U+0001 as the sentinel, which is invisible, and escape-guard refused the file for it.
+      ['inverted', s.correct.replace('<', '@@').replace('>', '<').replace('@@', '>')],
       ['invented lower bound', 'if 0 < n < ' + T + ':'],
       ['off by one', s.correct.replace('<', '<=').replace(/>(?!=)/, '>=')],
     ];
