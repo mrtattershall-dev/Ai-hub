@@ -117,4 +117,68 @@ export function reachability({ requested, order, preserved, preservedWins }) {
   return { allReachable: dead.length === 0, dead };
 }
 
+// ---------------------------------------------------------------------------------------------
+// REACHABILITY BY EXECUTION, and why the planned version above is not enough.
+//
+// `reachability` asks the PLAN whether an operation can fire: it takes the requested domains and the
+// committed order, and never sees the emitted program. That makes its verdict a pure function of
+// (plan, order) - identical for every model and every realization of the same plan.
+//
+// It therefore REJECTS A LEGITIMATE ALTERNATIVE. Assemble this in an order the plan calls wrong:
+//
+//     if n == 3:              return "three"
+//     if n < 10 and n >= 0:   return "low"        a SELF-DEFENDING realization
+//     if n > 100:             return "high"
+//     if n < 0:               return "micro"
+//
+// Executed, every requested behaviour fires and there is no dead code in the program. The planned
+// check calls `micro` dead anyway, because the plan says n<0 is inside n<10 and `low` came first.
+// The model wrote code that carved out the domain it would otherwise have shadowed, and the verifier
+// cannot see it.
+//
+//     ANYTHING WITH THE AUTHORITY TO REJECT MUST PROVE THAT IT CAN ADMIT LEGITIMATE ALTERNATIVES.
+//
+// So deadness is asked of the ARTIFACT instead: an operation is dead when no probe input actually
+// produces its result. That is the property the defect was ever about - an operation that can never
+// fire - and it is realization-agnostic by construction.
+//
+// The planned version is KEPT, not deleted. It is the right thing to ask of a PLAN, and the gap
+// between the two is itself a measurement: plan-dead but execution-alive is exactly a self-defending
+// realization, and counting those is how the rescue rate gets measured at all.
+
+// The instrument can only attribute an observed result to an operation if the labels distinguish them.
+// It refuses rather than guesses - two operations sharing a result value, or a requested result that
+// the untouched program already produces, would both make "this op fired" unattributable.
+export function auditResultLabels({ requested, originalResults = [] }) {
+  const problems = [];
+  const seen = new Map();
+  for (const r of requested) {
+    if (!r.result) { problems.push('operation ' + r.id + ' has no result label to observe'); continue; }
+    if (seen.has(r.result)) {
+      problems.push('operations ' + seen.get(r.result) + ' and ' + r.id + ' share the result ' + r.result
+        + ', so an observation cannot be attributed to either');
+    }
+    seen.set(r.result, r.id);
+    if (originalResults.includes(r.result)) {
+      problems.push('operation ' + r.id + ' returns ' + r.result + ', which the untouched program'
+        + ' already produces, so observing it proves nothing');
+    }
+  }
+  return { ok: problems.length === 0, problems };
+}
+
+// Deadness as a property of the EMITTED PROGRAM.
+//
+//   requested   the operations, each carrying the result label it is supposed to produce
+//   observed    the set of results the assembled program actually returned over the probe inputs
+//
+// An operation is dead when its label never appears. Nothing here consults the order or the domains,
+// which is the entire point: a realization that defends itself is admitted, and one that is genuinely
+// shadowed is still caught because a shadowed branch cannot produce its result for any input.
+export function reachabilityExecuted({ requested, observed }) {
+  const have = observed instanceof Set ? observed : new Set(observed);
+  const dead = requested.filter((r) => !have.has(r.result)).map((r) => r.id);
+  return { allReachable: dead.length === 0, dead, basis: 'EXECUTED' };
+}
+
 export { contractProbes, containsPoint, NL };
