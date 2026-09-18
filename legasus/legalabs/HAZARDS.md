@@ -109,6 +109,39 @@ exists" because h07 had a rival - it just had a second mechanism that reached th
 
 ---
 
+## 3d. An apparatus control proves the ASSEMBLER, not the PROMPT - MECHANIZED
+
+**Occurrences: 1, and it cost a whole rung.** Every arm of the visibility ladder passed its apparatus
+control: feed a perfect fragment, it assembles, it verifies, so the arm can reach 10/10 if the model
+cooperates. The `W0` arm passed that control and then scored **0/20**.
+
+The reason was not the model. With zero source lines visible, `W0`'s prompt never says the parameter is
+called `n` - the delta says "values below 10" - so the model wrote `value < 10`, `size < 10`, and whole
+functions named `get_size` to hang them on. It could not have produced the fragment the control fed.
+
+    an apparatus control proves the ASSEMBLER works
+    it says nothing about whether the PROMPT is sufficient
+
+Two different questions, and this project had a mechanism for only one.
+
+**Mechanism:** `sufficiency.mjs` - every identifier the expected output depends on must be obtainable
+from the prompt as a whole word. String contents are values, not facts; Python keywords and builtins
+need no source. Proven on the REAL prompts replayed byte-for-byte: it rejects `W0` naming `n` as the
+missing fact, and admits `W1`. A substring test is explicitly refused, since "function" contains an `n`
+and would have called `W0` sufficient.
+
+```bash
+node --test legasus/legalabs/sufficiency.test.mjs
+```
+
+**Rule:** every family runs three controls, not two.
+
+    can the apparatus express a pass?        assembler control
+    can the apparatus express a failure?     inversion / off-by-one control
+    can the model obtain the facts?          sufficiency control
+
+---
+
 ## 3b. Reporting code that cannot express what it is measuring — RULE ONLY
 
 **Occurrences: 5.** Five times a report marked a working rule as failed because the report could not

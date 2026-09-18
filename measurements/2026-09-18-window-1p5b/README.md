@@ -116,3 +116,119 @@ reported as inconclusive. The `W0` vs `FULL` contrast is the one this sample can
 Same T4 app, `scaledown_window` 5 minutes, `min_containers` 0, hard 30-minute cap. Stop with
 `modal app stop --yes` and verify with `modal app list`. AC power confirmed before the window.
 **Rule 3:** the endpoint must name the exact model before any generation runs.
+
+---
+
+# RESULT — the visibility ladder
+
+Rule 3 verified. All eight arm/case controls passed all three halves offline before the window. GPU
+window 10:11:18Z to ~10:16Z, stopped and verified: six `legasus-1p5b` rows, **zero** not `stopped`.
+
+    arm   case  units  lines  verified  refused  whole-fn  P(correct)  P(correct|committed)
+    W0    A       0      0      0/10       9        8         0.00          0.00
+    W0    B       0      0      0/10       8        6         0.00          0.00
+    W1    A       2      4      7/10       3        0         0.70          1.00
+    W1    B       2      4      6/10       4        0         0.60          1.00
+    W2    A       4      8      4/10       6        0         0.40          1.00
+    W2    B       4      8      9/10       1        0         0.90          1.00
+    FULL  A       9     16      8/10       2        0         0.80          1.00
+    FULL  B       9     16      9/10       1        0         0.90          1.00
+
+## The prediction is falsified, and in the opposite direction
+
+I predicted refusals would **fall** as the window narrowed, with `W0` refusing least.
+
+    W0    17/20 refused        the narrowest window refused the MOST
+    W1     7/20 refused
+    W2     7/20 refused
+    FULL   3/20 refused        the widest window refused the LEAST
+
+> Reducing the visible source surface did not reduce refusals. Removing it entirely destroyed the arm.
+
+And the mechanism the ladder was built to chase inverted with it. Ladder 2's motivating observation was
+that showing a whole function invites a whole function back. Across 80 generations here:
+
+    whole-function emissions at W0 (no source shown)     14
+    whole-function emissions at W1, W2 and FULL           0
+
+**Completion affordance was strongest where there was no function to complete.** Shown nothing, the
+model invented one — `def get_size(size):`, `def get_small_or_large(n):`. Shown the actual function, it
+never once returned a function. The affordance hypothesis is not merely unsupported; the data point
+that motivated it did not reproduce on a longer function.
+
+## W0 is void as a rung, and the reason is an apparatus defect rather than a model limit
+
+`W0`'s three authorized outputs all failed to load:
+
+    if value < 10: return "small"        NameError: name 'value' is not defined
+
+With zero source lines visible, **the prompt never says the parameter is called `n`.** The delta says
+"values below 10". So the model guessed `value`, `size`, and function names to hang them on.
+
+`W0` therefore did not remove *visible-source load*. It removed a **CURRENT PROGRAM FACT that Legasus
+holds and failed to render** — the same shape as every other finding in this project, where the
+apparatus is the variable and the model is constant. It cannot be reported as a point on the
+visibility axis, exactly as ladder 1's `R1` could not be reported as a point on the responsibility
+axis.
+
+### The control that should have caught it, and could not
+
+Every arm passed its apparatus control: feed a perfect fragment, it assembles, it verifies, so the arm
+can reach 10/10 if the model cooperates. `W0` passed that and scored 0/20.
+
+> **An apparatus control proves the ASSEMBLER works. It says nothing about whether the PROMPT is
+> sufficient.**
+
+Those are different questions and this project had a mechanism for only one of them. `sufficiency.mjs`
+is the other: every identifier the expected output depends on must be obtainable from the prompt. It is
+proven on the real prompts, replayed byte-for-byte — it **rejects `W0`, naming `n` as the missing
+fact, and admits `W1`** — and it is a required control for every family after this one.
+
+## What held, at a much larger sample: commit integrity
+
+    authorized outputs at W1, W2 and FULL     43
+    of those, verified                        43        P(correct | committed) = 1.00
+
+Every single thing the system committed was correct, at every rung where the model had the facts it
+needed. With ladder 2's `R3P` 8/8 that is **51 of 51**.
+
+Acceptance moved a lot across these rungs. Commit integrity did not move at all. That is the two-axis
+picture doing exactly what it was separated out to do — and it is the half of ladder 2's finding that
+survives contact with a different function, a longer window and four times the sample.
+
+## Visibility is not the constraint in this range
+
+Excluding the void rung, verified rates are 13/20, 13/20 and 17/20 across a window that grows from two
+statements to nine. Against a cell noise of about ±2 at n = 10, that is flat-to-slightly-rising, with
+`FULL` the best arm.
+
+The one suggestive detail is `W2` case A: 4/10, with **4 refusals for repeating a fixed line**, against
+0 such refusals at `FULL` case A. A mid-sized window showing several guards but not the whole function
+may invite echoing one. It is a 4-sample gap against ±2 noise and a non-monotone one, so it is recorded
+as suggestive and nothing more.
+
+## Honest limits
+
+- **`W0` is void.** Re-running it with the parameter name rendered is a separate, clean experiment, and
+  it is the interesting one: it would ask whether zero visible source is *sufficient* once the facts
+  are supplied.
+- **The `W2`/`FULL` case-A asymmetry is not separable from noise** at this sample.
+- **One function, one operation, one task.** `BLOCK` was omitted before the run with its reason
+  recorded; `R4` remains deferred.
+- Absolute rates are **not** comparable to ladder 2's, by design — a longer function was required for
+  the window to have range at all.
+
+## What this changes
+
+Two things, and neither is the thing I predicted.
+
+1. **The next experiment is not about visibility.** It is `W0` repaired — the slot alone, with the
+   parameter name supplied as the program fact it is. If that returns to ceiling, the floor of this
+   system is *no visible source at all*, which is a far stronger claim than anything the ladder was
+   built to test, and the whole visibility axis collapses into a fact-sufficiency question.
+2. **Prompt sufficiency joins the mandatory controls**, beside the assembler control and the
+   can-this-fail control. Three questions, three mechanisms:
+
+        can the apparatus express a pass?        assembler control
+        can the apparatus express a failure?     inversion / off-by-one control
+        can the model obtain the facts?          sufficiency control      <- new, and this run is why

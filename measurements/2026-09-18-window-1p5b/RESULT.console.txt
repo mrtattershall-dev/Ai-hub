@@ -1,0 +1,39 @@
+  omitted rung BLOCK: enclosing block == function body for a flat guard sequence; differs from FULL by one line
+  controls ok: every arm verifies a perfect fragment, and accepts-but-fails both the inversion and the off-by-one; no prompt leaks
+  RULE 3 ok: endpoint names qwen2.5-coder:1.5b
+  arms W0, W1, W2, FULL   samples 10   temperature 0.6
+
+Traceback (most recent call last):
+  File "C:\Users\tatte\AppData\Local\Temp\win-vVlguv\p.py", line 3, in <module>
+    print("delta=" + str(impl.classify(5)))
+                         ~~~~~~~~~~~~~^^^
+  File "C:\Users\tatte\AppData\Local\Temp\win-vVlguv\impl.py", line 10, in classify
+    if value < 10:
+       ^^^^^
+NameError: name 'value' is not defined. Did you mean: 'False'?
+  W0    case A  units 0 lines  0   verified  0/10   refused  9 (whole-fn 8)   P(correct) 0.00   P(correct|committed) 0.00   semantic 0   boundary 0   preserv 0   var 2
+Traceback (most recent call last):
+  File "C:\Users\tatte\AppData\Local\Temp\win-OELYPv\p.py", line 2, in <module>
+    print("contested=" + str(impl.classify(0)))
+                             ~~~~~~~~~~~~~^^^
+  File "C:\Users\tatte\AppData\Local\Temp\win-OELYPv\impl.py", line 8, in classify
+    if value < 10:
+       ^^^^^
+NameError: name 'value' is not defined. Did you mean: 'False'?
+Traceback (most recent call last):
+  File "C:\Users\tatte\AppData\Local\Temp\win-XAVFkj\p.py", line 2, in <module>
+    print("contested=" + str(impl.classify(0)))
+                             ~~~~~~~~~~~~~^^^
+  File "C:\Users\tatte\AppData\Local\Temp\win-XAVFkj\impl.py", line 8, in classify
+    if value < 10:
+       ^^^^^
+NameError: name 'value' is not defined. Did you mean: 'False'?
+  W0    case B  units 0 lines  0   verified  0/10   refused  8 (whole-fn 6)   P(correct) 0.00   P(correct|committed) 0.00   semantic 0   boundary 0   preserv 0   var 2
+  W1    case A  units 2 lines  4   verified  7/10   refused  3 (whole-fn 0)   P(correct) 0.70   P(correct|committed) 1.00   semantic 0   boundary 0   preserv 0   var 2
+  W1    case B  units 2 lines  4   verified  6/10   refused  4 (whole-fn 0)   P(correct) 0.60   P(correct|committed) 1.00   semantic 0   boundary 0   preserv 0   var 2
+  W2    case A  units 4 lines  8   verified  4/10   refused  6 (whole-fn 0)   P(correct) 0.40   P(correct|committed) 1.00   semantic 0   boundary 0   preserv 0   var 2
+  W2    case B  units 4 lines  8   verified  9/10   refused  1 (whole-fn 0)   P(correct) 0.90   P(correct|committed) 1.00   semantic 0   boundary 0   preserv 0   var 2
+  FULL  case A  units 9 lines 16   verified  8/10   refused  2 (whole-fn 0)   P(correct) 0.80   P(correct|committed) 1.00   semantic 0   boundary 0   preserv 0   var 2
+  FULL  case B  units 9 lines 16   verified  9/10   refused  1 (whole-fn 0)   P(correct) 0.90   P(correct|committed) 1.00   semantic 0   boundary 0   preserv 0   var 2
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.window.json

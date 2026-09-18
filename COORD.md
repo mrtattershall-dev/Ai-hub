@@ -7163,3 +7163,10 @@ tatte, 2026-09-18, verbatim:
 Read as standing authorization for T4 windows on this line of work. The discipline does NOT relax:
 preregistration committed before the window, AC power confirmed, 30-minute cap, stop with the
 explicit yes flag and verify with the app list, Rule 3 before any generation.
+
+**WINDOW #5 CLOSED.** 10:11:18Z to ~10:16Z, stopped and verified: 6 legasus rows, 0 not stopped.
+Prediction FALSIFIED in the OPPOSITE direction - W0 (no source) refused 17/20 and FULL refused 3/20.
+Whole-function emissions: 14 at W0, ZERO everywhere else, so completion affordance was strongest
+where there was no function to complete. W0 is VOID as a rung: with no source line the prompt never
+names the parameter, so the model wrote `value < 10`. Commit integrity 43/43 at every rung that had
+the facts - 51/51 with R3P. New mandatory control: sufficiency.
