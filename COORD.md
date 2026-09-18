@@ -7137,3 +7137,14 @@ has one operation, and running R4 here would confound rung with task.
 **WINDOW #3 CLOSED.** Stopped with `--yes`, verified. Under five minutes. R2 20/20, R3 10/20 with the
 failure mode turning SEMANTIC, R1 VOID as a rung (prompt-format confound, with a real bound-inversion
 finding inside it). Recorded in `measurements/2026-09-18-ladder-1p5b/`.
+
+## WINDOW #4 — ladder 2 (R2 / R3 / R3P / FMT_BOUND / FMT_ENG)
+
+Authorization, tatte's words verbatim. Their first message arrived truncated as "I give you permission
+to"; I refused to bill a GPU on an incomplete sentence and asked. The answer:
+
+> Confirm
+
+AC power confirmed (PowerOnline True). Same T4 app `legasus-1p5b`, scaledown 5 min, min_containers 0,
+hard 30-minute cap. Preregistration committed at 8091d4a BEFORE this window. Stop with `--yes` and
+verify with `modal app list`.
