@@ -114,3 +114,61 @@ export function orderRequested(a, b) {
 }
 
 export { NL };
+
+// ---- N OPERATIONS. R4 ordered pairs; a transaction of three or more needs a partial order.
+//
+// THE STRUCTURE: strict containment is a partial order, so the operations form a DAG and any
+// topological sort of it is legal. Where two operations are incomparable AND disjoint, their relative
+// position is an ENGINEERING CHOICE - both orders leave both reachable. Where two are incomparable and
+// INTERSECT, the specification has not said which wins on the shared inputs, and the WHOLE transaction
+// is undetermined: there is no order that is derivable, so Legasus must decline rather than pick.
+//
+// ONE UNDETERMINED PAIR POISONS THE TRANSACTION. That is deliberate. A transaction is committed or it
+// is not; shipping the determinable part and leaving the ambiguous part out would be a different change
+// from the one that was requested, decided by the apparatus rather than by the specification.
+export function orderTransaction(reqs) {
+  if (reqs.length < 2) return { status: 'ORDERED', order: reqs.map((r) => r.id), pairs: [] };
+  const pairs = [];
+  const contains = new Map();       // id -> Set of ids strictly inside it
+  for (const r of reqs) contains.set(r.id, new Set());
+
+  for (let i = 0; i < reqs.length; i++) {
+    for (let j = i + 1; j < reqs.length; j++) {
+      const a = reqs[i]; const b = reqs[j];
+      const rel = orderRequested(a, b);
+      pairs.push({ a: a.id, b: b.id, status: rel.status, first: rel.first, witness: rel.witness });
+      if (rel.status === 'UNDETERMINED') {
+        return { status: 'UNDETERMINED', order: null, pairs,
+          blocking: { a: a.id, b: b.id, witness: rel.witness },
+          reason: a.id + ' and ' + b.id + ' intersect without containment, so no order over the'
+            + ' transaction is derivable; committing part of it would be a different change from the'
+            + ' one requested, chosen by the apparatus' };
+      }
+      if (rel.status === 'ORDERED') {
+        const outer = rel.first === a.id ? b.id : a.id;
+        const inner = rel.first;
+        contains.get(outer).add(inner);
+      }
+    }
+  }
+
+  // Topological sort: an operation may be placed once everything strictly inside it is already placed.
+  const placed = [];
+  const remaining = new Set(reqs.map((r) => r.id));
+  const basis = [];
+  while (remaining.size) {
+    const ready = [...remaining].filter((id) => [...contains.get(id)].every((c) => placed.includes(c)));
+    if (!ready.length) {
+      return { status: 'UNDETERMINED', order: null, pairs,
+        reason: 'the containment relation is cyclic, which means the containment test is wrong rather'
+          + ' than the specification being ambiguous' };
+    }
+    // Several ready at once means they are mutually incomparable and disjoint: both orders legal.
+    if (ready.length > 1) basis.push({ tie: ready.slice(), resolved_by: 'ENGINEERING_CHOICE' });
+    const next = ready.sort()[0];
+    placed.push(next);
+    remaining.delete(next);
+  }
+  return { status: 'ORDERED', order: placed, pairs, ties: basis,
+    orderBasis: basis.length ? 'DERIVED_WITH_ENGINEERING_CHOICE' : 'DERIVED' };
+}

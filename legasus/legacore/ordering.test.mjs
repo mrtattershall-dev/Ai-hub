@@ -119,3 +119,71 @@ test('an unmodelled domain is never ordered', () => {
     { id: 'b', domain: below(10), result: 'B' });
   assert.notEqual(r.status, 'ORDERED');
 });
+
+// ---- N OPERATIONS. The pair tests above establish the relation; these establish the sort.
+import { orderTransaction } from './ordering.mjs';
+
+const op = (id, domain, result) => ({ id, domain, result });
+
+test('THREE NESTED: the sort is innermost first', () => {
+  const r = orderTransaction([
+    op('mid', below(100), 'mid'), op('micro', below(0), 'micro'), op('low', below(10), 'low')]);
+  assert.equal(r.status, 'ORDERED');
+  assert.deepEqual(r.order, ['micro', 'low', 'mid']);
+  assert.equal(r.orderBasis, 'DERIVED', 'fully nested leaves no tie to break');
+});
+
+test('THREE NESTED: the sort does not depend on presentation order', () => {
+  const a = orderTransaction([op('micro', below(0), 'm'), op('low', below(10), 'l'), op('mid', below(100), 'd')]);
+  const b = orderTransaction([op('mid', below(100), 'd'), op('low', below(10), 'l'), op('micro', below(0), 'm')]);
+  assert.deepEqual(a.order, b.order);
+});
+
+test('MIXED: a disjoint operation is placed by ENGINEERING CHOICE, and the label says so', () => {
+  const r = orderTransaction([
+    op('micro', below(0), 'm'), op('low', below(10), 'l'), op('big', above(100), 'b')]);
+  assert.equal(r.status, 'ORDERED');
+  assert.ok(r.order.indexOf('micro') < r.order.indexOf('low'), 'the derived constraint must hold');
+  assert.equal(r.orderBasis, 'DERIVED_WITH_ENGINEERING_CHOICE');
+  assert.ok(r.ties.length > 0, 'the tie must be recorded rather than silently resolved');
+});
+
+test('ONE UNDETERMINED PAIR POISONS THE WHOLE TRANSACTION', () => {
+  const r = orderTransaction([
+    op('micro', below(0), 'm'), op('low', below(10), 'l'), op('plus', above(0), 'p')]);
+  assert.equal(r.status, 'UNDETERMINED');
+  assert.equal(r.order, null);
+  assert.ok(r.blocking, 'it must name WHICH pair blocked it');
+  assert.match(r.reason, /different change from the one requested/,
+    'and say why partial commitment is not an option');
+});
+
+test('every operation appears exactly once in the order', () => {
+  const ids = ['micro', 'low', 'mid'];
+  const r = orderTransaction([op('mid', below(100), 'd'), op('micro', below(0), 'm'), op('low', below(10), 'l')]);
+  assert.deepEqual([...r.order].sort(), [...ids].sort());
+  assert.equal(new Set(r.order).size, r.order.length);
+});
+
+test('NEGATIVE CONTROL: a sorter that returns presentation order fails the nested case', () => {
+  const presented = [op('mid', below(100), 'd'), op('micro', below(0), 'm'), op('low', below(10), 'l')];
+  const naive = presented.map((x) => x.id);
+  assert.deepEqual(naive, ['mid', 'micro', 'low']);
+  assert.notDeepEqual(orderTransaction(presented).order, naive,
+    'the real sorter must disagree with presentation order, or it is not sorting');
+});
+
+test('NEGATIVE CONTROL: a sorter that never declines fails the undetermined case', () => {
+  const always = () => ({ status: 'ORDERED', order: ['a', 'b', 'c'] });
+  const undeterminable = [op('micro', below(0), 'm'), op('low', below(10), 'l'), op('plus', above(0), 'p')];
+  assert.equal(always().status, 'ORDERED');
+  assert.equal(orderTransaction(undeterminable).status, 'UNDETERMINED');
+});
+
+test('the pairwise relations are reported, so the order can be audited rather than trusted', () => {
+  const r = orderTransaction([op('micro', below(0), 'm'), op('low', below(10), 'l'), op('mid', below(100), 'd')]);
+  assert.equal(r.pairs.length, 3, 'every pair of three operations');
+  assert.ok(r.pairs.every((p) => p.status === 'ORDERED'));
+  assert.ok(r.pairs.every((p) => p.witness && Number.isFinite(p.witness.input)),
+    'each derived relation carries a witness input');
+});
