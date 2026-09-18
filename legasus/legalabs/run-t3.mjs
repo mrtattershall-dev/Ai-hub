@@ -268,7 +268,11 @@ console.log('  ' + CELLS.length + ' transaction cases x ' + MODELS.length + ' mo
 console.log('');
 
 const results = { models: MODELS, samples: SAMPLES, temperature: TEMPERATURE,
-  undetermined_not_generated: CASES.T_UNDETERMINED.why, cells: {} };
+  // Named by lookup rather than hard-coded: the first version carried R4's case name into T3 and
+  // crashed at results construction, after Rule 3 and before any generation. No tokens were spent, and
+  // the fix is to stop spelling a case name twice.
+  undetermined_not_generated: Object.entries(CASES).filter(([, c]) => c.generate === false)
+    .map(([k, c]) => k + ': ' + c.why), cells: {} };
 for (const MODEL of MODELS) {
   for (const key of CELLS) {
     const p = planCase(key);
