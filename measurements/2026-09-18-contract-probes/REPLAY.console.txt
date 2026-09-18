@@ -1,0 +1,17 @@
+  REPLAY of the scale experiment through CONTRACT-DERIVED probes
+  no GPU time: every output replayed is already on disk
+
+  qwen2.5-coder:1.5b    authorized 210   hand-built probes passed 205   contract probes passed 205   newly caught   0
+      counterfactual: the hand-built set WITHOUT its two lucky probes would have passed 0 wrong programs;
+                       the contract-derived set catches 0 of those 
+  qwen2.5-coder:7b      authorized 227   hand-built probes passed 182   contract probes passed 182   newly caught   0
+      counterfactual: the hand-built set WITHOUT its two lucky probes would have passed 14 wrong programs;
+                       the contract-derived set catches 14 of those (100%)
+  qwen2.5-coder:14b     authorized 240   hand-built probes passed 222   contract probes passed 222   newly caught   0
+      counterfactual: the hand-built set WITHOUT its two lucky probes would have passed 17 wrong programs;
+                       the contract-derived set catches 17 of those (100%)
+
+  A realization that passes the hand-built set and fails the contract set is a semantic
+  error nobody had to anticipate. A realization that passes BOTH is correct under an
+  obligation-derived oracle, which is a stronger statement than passing a probe set that
+  was written by looking at what models had already got wrong.
