@@ -7061,3 +7061,28 @@ uploaded; scaledown_window 5 min; min_containers 0.
 
 This window serves the GATE-POLICY question ONLY. It is not a model comparison and does not
 touch the 1.5B capability programme, which remains the project objective.
+
+---
+
+## 2026-09-18  GPU WINDOW CLAIM — Qwen2.5-Coder-1.5B on Modal T4
+
+**Authorization, tatte's words verbatim:**
+
+> "Okay let's rerun 1.5b coder on modal with a t4. You have permission to rent it."
+
+**Pre-flight, all three gates cleared before any spend:**
+
+    AC power          BatteryStatus 2 (on AC), charge 98%   - never start a GPU window on battery
+    COORD claim       this entry
+    preregistration   committed before the run, see measurements/
+
+**What is being run.** The 1.5B has been measured before on the hub monolith and scored badly. Every
+one of those runs predates the three contracts this session built, so the comparison is not "is the
+model better" - it is whether representing WHERE / WHAT-BEFORE-WHAT / WHAT-SHOULD-WIN changes what the
+same model can do. The model is unchanged. The apparatus is the variable.
+
+**Cost discipline.** T4, scaledown window 5 minutes, weights pulled in-container (nothing local
+uploaded). Stop with `modal app stop --yes` and verify with `modal app list` - the stop command prompts
+and aborts non-interactively without it, which cost five over-cap minutes on 2026-09-10.
+
+**Rule 3 still binds:** `/api/health` must name the exact model before any goal runs.
