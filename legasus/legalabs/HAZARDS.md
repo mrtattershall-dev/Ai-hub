@@ -156,6 +156,17 @@ add false positives for no safety gain.
 
 ---
 
+## A PERMANENT LegaLabs rule, promoted out of hazard 9
+
+> **Any artifact whose coordinates are compared across components must have exactly one canonical
+> reconstruction implementation, and scoring must REFUSE TO PROCEED if the representations disagree.**
+
+Keeping two parsers synchronized by discipline is not a control. The alignment assertion is, because it
+converts a silent misalignment into a loud refusal. This applies to any future component that compares
+positions, spans, hashes or ids against an artifact another component derived.
+
+---
+
 ## The pattern behind all of them
 
 Every one of these produced **output that looked like a result**. None threw. The costly failures in

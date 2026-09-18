@@ -203,8 +203,11 @@ The denominator is fixed by the sweep and recorded now so it cannot drift:
     WHICH PARTICIPANT MUST CHANGE      potentially a lot     e05 0.74 bits, e06 0.32 bits
     WHERE INSIDE THAT PARENT           very little           0.224 bits mean, 5.82 bits TOTAL
 
-v5's requirement-based participant pruning, on **two tasks**, recovered 1.06 bits — **18% of all the
-positional information that exists in the entire twelve-task family.**
+These are **different information spaces**, so this is a comparison of magnitude and not of share.
+Participant pruning on only e05/e06 yielded **1.06 bits of localization information — equal in
+magnitude to 18% of the entire family's 5.82-bit positional-narrowing capacity.** A small amount of
+semantic participant selection carries information on the same order as a substantial fraction of
+everything exact placement has to offer.
 
 The architecture had been overweighting the least informative half of "where". The corrected
 decomposition:
@@ -251,3 +254,71 @@ least four kinds exist and they do not share coordinates:
 
 v6 reports narrowing per kind and never averages across them. The `INTRA_LINE` exclusion in the
 narrowability prover is the first instance of this distinction being forced by data.
+
+---
+
+## Amendment B — the constraint-generalization family, procedure frozen before authorship
+
+*The v6 endpoints are unchanged. This fixes HOW the prospective family is built, written before a
+single task exists so the construction cannot be shaped by what the implementation happens to do.*
+
+### Why "more tasks" would be the wrong family
+
+Development evidence is asymmetric, and an aggregate hides that:
+
+    ownership_boundary      23/26   strong development evidence, not prospective
+    control_flow_boundary    3/26   development evidence
+    symbol_availability      0/26   mechanism exists, effectively UNTESTED
+
+Another aggregate 26/26 could be produced entirely by `ownership_boundary` while the other two rules
+are wrong. The family must let each rule generalize **or fail visibly on its own**.
+
+### The construction principle
+
+> **Author around independently stated SEMANTIC SITUATIONS, never around the implementation of a rule.**
+
+A task built by reading `ownership_boundary`'s code and constructing input it handles measures the
+code. A task built by stating "inserting here orphans the remainder of a body" and then writing a
+program where that is true measures the claim.
+
+### Every kind gets both halves
+
+Each constraint kind gets a case where it SHOULD fire and a case where firing would be WRONG. The
+negative halves are the point: a rule that narrows when it should not is over-constraint, and
+over-constraint removes a model's authority on a claim the program does not support.
+
+| Kind | Must fire | Must NOT fire |
+|---|---|---|
+| `ownership_boundary` | an unseen nesting shape where insertion genuinely orphans the remainder of a body | a superficially similar shape where nothing is orphaned |
+| `control_flow_boundary` | a real terminator in the same region at the insertion indent | a terminator at a DIFFERENT structural parent, which constrains nothing |
+| `symbol_availability` | genuine import-time consumption, where ordering really matters | a deferred reference inside a function body, where textual order must NOT become a dependency |
+
+The `symbol_availability` negative is the one this project has already got wrong once, in a witness it
+wrote itself: a textual mention is not a dependency, because Python resolves a name when the enclosing
+function RUNS. That failure mode gets an explicit task.
+
+### Reporting: per kind, not only in aggregate
+
+Narrowability is established by execution on the new family independently, then reported as:
+
+    recovered / independently narrowable        per kind AND total
+    over-constraint count                       per kind AND total
+    correct position-independent zeros
+    witness replay
+    realized available information              diagnostic only
+    style-control narrowing                     must be 0
+
+**If `ownership_boundary` generalizes and `symbol_availability` fails, the aggregate must not hide it.**
+
+### What would count as the migration actually happening
+
+If the blind family comes back near the development result — and in particular if all three kinds
+survive both their positive and their negative cases — then ordering- and dependency-derived narrowing
+has moved from oracle knowledge into executable architecture, rather than the development family
+merely having been made green.
+
+### Standing rules carried in
+
+Rule 5 still binds: the family is authored and sealed before any change to the derivers, and any rule
+written with the tasks visible yields development evidence only. No deriver is edited after this
+family exists — if one must change, that is a new preregistration, not a continuation.
