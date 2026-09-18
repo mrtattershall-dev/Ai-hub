@@ -239,6 +239,32 @@ splits that by claim:
 That 93.8% -> 54.8% gap is the honest measure of how much of the development result was the rules
 being general rather than the rules having been shaped by the data.
 
+### The fact layers, corrected
+
+An operation is not characterised only by what it CREATES. It also has NEEDS, and that was the missing
+half of transaction topology:
+
+    LegaParse    CURRENT PROGRAM FACTS
+                   scope, parents, ownership, reads/writes, existing control flow
+
+    LegaCore     OPERATION FACTS
+                   provides
+                   requires_immediate     loaded when the operation itself executes
+                   requires_deferred      resolved when some function later RUNS - narrows nothing
+                 TRANSACTION FACTS
+                   provider -> consumer
+                   ownership dependency
+                   control-flow dependency
+
+Execution PHASE is first-class because Python evaluates parts of one construct at different times - a
+default argument and a decorator run at definition time, a method body does not - and a rule that
+ignores the distinction either manufactures dependencies or misses real ones.
+
+Revision 2 recovers 8 of 8 narrowable operations on the generalization family at 85.8% of available
+information, with zero over-constraint and no regression on the earlier family. That is DEVELOPMENT
+evidence: those tasks diagnosed the defects it fixes. The frozen deriver's prospective result stands
+unchanged at symbol_availability FAIL/pass.
+
 The remaining fields are the current LegaCore planner problem. Success means converting them into
 general computed structure **without encoding the desired implementation directly**.
 

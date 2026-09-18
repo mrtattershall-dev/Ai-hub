@@ -4005,3 +4005,84 @@ narrowable, 17 candidates to 13. It remains a valid control-flow negative — th
 always "`control_flow_boundary` fires on zero operations", not "nothing narrows" — and it turned into
 an incidental second ownership case, which `ownership_boundary` handled with zero over-constraint.
 Recorded rather than quietly reframed.
+
+---
+
+# LegaCore revision 2 — operation facts and execution phase
+
+`constraints.mjs` is NOT edited. It keeps the prospective result it earned. This is a new revision, and
+g01-g06 are now development data for it.
+
+    family          deriver          recovered   over   realized info   kinds passing both halves
+    generalization  frozen           6 of 8       1      54.8%          2 of 3
+    generalization  revision 2       8 of 8       0      85.8%          3 of 3
+    provenance      frozen          26 of 26      0      93.8%          -
+    provenance      revision 2      26 of 26      0      93.8%          -   no regression, identical
+
+## Two general concepts, not two patches
+
+**Boundaries replace "after line N".** The off-by-one was not a typo: it is what happens when positions
+are "after line N" and every consumer does its own arithmetic. Insertion points are now boundaries
+between lines, and `beforeLine`/`afterLine` live in one file. A provider required by an import-time use
+on line `i` is legal at any boundary `<= beforeLine(i)` — and `Bi` itself is legal, which is exactly
+the boundary the old arithmetic discarded.
+
+**Operations have requirements, not only products.** The old rule modelled only what an operation
+PROVIDES, so `DEFAULTS.update(_timeouts())` — which defines nothing — was invisible and derived no
+constraint where execution permits 8 of 17 positions. The concept it lacked:
+
+> **An operation can impose ordering because of what it CONSUMES, even when it provides nothing.**
+
+Requirements carry an execution PHASE, so a deferred body reference cannot become an ordering
+dependency by accident:
+
+    operation:
+      provides            [...]
+      requires_immediate  [...]    loaded when the operation itself executes
+      requires_deferred   [...]    resolved when some function later RUNS - narrows NOTHING
+
+Deferred requirements are emitted into the audit with `gain_bits: 0` and a replay that FAILS if they
+ever narrowed anything, so the project's old mistake — treating a textual mention as a dependency —
+is now a checked property rather than a remembered rule.
+
+## Standing, split by component
+
+**The phase concept has independent standing.** Ten synthetic witnesses were written before the
+revision ran against any family, including MUST DISTINGUISH pairs where the same symbol in the same
+textual shape has a different phase:
+
+    class A:  x = helper()                    IMMEDIATE - a class body executes on definition
+    class A:
+        def f(self): return helper()          DEFERRED  - a method body does not
+    def f(x=helper()):                        IMMEDIATE - defaults evaluate at definition time
+    @register(helper)                         IMMEDIATE - decorators run at definition time
+
+Those witnesses caught three real defects before any family was touched: parameters and locals were
+being reported as requirements, and names bound inside a `class` body were being reported as
+module-level products.
+
+**The revision's score is development evidence.** g01-g06 diagnosed the two defects and revision 2 was
+written against those diagnoses. 8/8 on the family that shaped it is not a prospective result, exactly
+as 26/26 was not. A new blind family is what would make it one.
+
+**The frozen deriver's prospective result stands unchanged**: `symbol_availability` FAIL/pass.
+
+## The residual gap is not a missing constraint kind
+
+Revision 2 recovers 6.05 of 7.05 available bits. The entire 1.00-bit shortfall is `g03 op1`:
+
+    0    def classify(n):
+    1        if n < 0:
+    2 FAIL       return "negative"      <- LegaCore keeps this; execution rejects it
+    3        if n == 0:
+    4 PASS       return "zero"
+    5 FAIL       return "positive"      <- correctly removed, unreachable
+
+Inserting `if n < 10: return "small"` after line 2 places it BEFORE the `n == 0` test, so
+`classify(0)` returns `"small"` where the contract requires `"zero"`. That is **guard precedence
+between overlapping conditions** — which inputs should get which answer. It is not reachability, and
+it is not derivable from program structure or transaction topology. It belongs to **local semantic
+intent**, which is still an oracle field.
+
+No rule was added for it. The position was inspected first, the missing fact was named, and it was
+assigned to the layer that owns it rather than approximated in the layer that happened to be running.

@@ -13,7 +13,10 @@
 // planned operations only.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { constrain, verify } from './constraints.mjs';
+// The deriver revision is selectable so the frozen one and the revision can be scored by IDENTICAL
+// code. A scorer rewritten between two arms measures the rewrite.
+const DERIVER = process.argv[3] || './constraints.mjs';
+const { constrain, verify } = await import(DERIVER);
 // The SAME reconstruction the ground truth was built with. This scorer used to rebuild the patch
 // blocks itself and normalized trailing newlines differently, so its text and the ground truth's text
 // disagreed, every line number shifted, and an entire scoring run compared misaligned positions while
@@ -94,7 +97,7 @@ for (const t of GT) {
     for (const m of code.matchAll(/^([A-Za-z_]\w*)\s*=(?!=)/gm)) provides.push(m[1]);
     const siblingKind = /^\s*def\b/m.test(code) ? 'def' : null;
 
-    const ctx = { src: base, indent, provides, siblingKind,
+    const ctx = { src: base, code, indent, provides, siblingKind,
       operation_id: t.task + ':' + row.op,
       parentRange: parentRangeFor(base, row.ref_position, indent) };
 
