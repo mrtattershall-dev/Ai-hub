@@ -1,0 +1,3374 @@
+{
+ "models": [
+  "qwen2.5-coder:1.5b",
+  "qwen2.5-coder:7b",
+  "qwen2.5-coder:14b"
+ ],
+ "samples": 20,
+ "temperature": 0.6,
+ "undetermined_not_generated": [
+  "T3_UNDETERMINED: low and plus intersect without containment, so no order over the transaction is derivable; committing the determinable part would be a different change from the one requested, chosen by the apparatus"
+ ],
+ "cells": {
+  "qwen2.5-coder:1.5b|T3_NESTED": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "case": "T3_NESTED",
+   "order": [
+    "micro",
+    "low",
+    "mid"
+   ],
+   "orderBasis": "DERIVED",
+   "seconds": 104.477,
+   "op_yield": 0.85,
+   "assembled": 12,
+   "verified": 12,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": false,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "mid": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "mid": {
+       "authorized": false,
+       "reason": "repeated a fixed line",
+       "condition": "n == 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "mid": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|T3_MIXED": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "case": "T3_MIXED",
+   "order": [
+    "high",
+    "micro",
+    "low"
+   ],
+   "orderBasis": "DERIVED_WITH_ENGINEERING_CHOICE",
+   "seconds": 24.041,
+   "op_yield": 0.8666666666666667,
+   "assembled": 13,
+   "verified": 13,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": false,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n < 0"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "low": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "low": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n < 0"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n < 0"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n < 0"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|T3_NESTED": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "case": "T3_NESTED",
+   "order": [
+    "micro",
+    "low",
+    "mid"
+   ],
+   "orderBasis": "DERIVED",
+   "seconds": 52.76,
+   "op_yield": 1,
+   "assembled": 20,
+   "verified": 20,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|T3_MIXED": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "case": "T3_MIXED",
+   "order": [
+    "high",
+    "micro",
+    "low"
+   ],
+   "orderBasis": "DERIVED_WITH_ENGINEERING_CHOICE",
+   "seconds": 44.22,
+   "op_yield": 1,
+   "assembled": 20,
+   "verified": 20,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|T3_NESTED": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "case": "T3_NESTED",
+   "order": [
+    "micro",
+    "low",
+    "mid"
+   ],
+   "orderBasis": "DERIVED",
+   "seconds": 95.05,
+   "op_yield": 1,
+   "assembled": 20,
+   "verified": 20,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "mid": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 100 and n != 3"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "mid": "if n < 100 and n != 3: return \"mid\"",
+      "micro": "if n < 0: return \"micro\"",
+      "low": "if n < 10 and n != 3: return \"low\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|T3_MIXED": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "case": "T3_MIXED",
+   "order": [
+    "high",
+    "micro",
+    "low"
+   ],
+   "orderBasis": "DERIVED_WITH_ENGINEERING_CHOICE",
+   "seconds": 80.875,
+   "op_yield": 1,
+   "assembled": 20,
+   "verified": 20,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "low": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "high": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      },
+      "micro": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "low": "if n < 10 and n != 3: return \"low\"",
+      "high": "if n > 100: return \"high\"",
+      "micro": "if n < 0: return \"micro\""
+     }
+    }
+   ]
+  }
+ }
+}

@@ -41,7 +41,10 @@ READMEs hold the detail; commit messages hold the reasoning.
 | A gate with only a REFUSE list silently suppresses yield everywhere | admitting elif raised yield for all three models, 1.5B p = 8.4e-8 |
 | R4: multi-operation correctness is ARCHITECTURAL | 162 assembled, 162 verified, P(correct|assembled) 1.000 at every capacity, model never saw the other operation |
 | Order is derived from domains, not presentation | T_CONTAIN and T_REVERSE identical at all three models |
-| Transaction yield is the SQUARE of operation yield | 1.5B op-yield 0.833, predicted 0.694, observed 0.700 |
+| Transaction yield is the SQUARE of operation yield | 1.5B op-yield 0.833, predicted 0.694, observed 0.700; cubed at three ops, 0.632 predicted vs 0.625 |
+| T3: three operations, same result | 105 assembled, 105 verified, P(correct|assembled) 1.000 at every capacity |
+| DECIDE ordering is LOAD-BEARING, by ablation | same fragments re-assembled in presentation order: 105/105 -> 0/105, every failure a DEAD OPERATION |
+| Models do not get the domain wrong when RENDER states it | 343 authorized T3 fragments, ZERO with a domain other than requested |
 
 ## Dead, and staying dead
 
@@ -92,7 +95,8 @@ wrong about what it measured - it was measuring a system with two correctable de
 
 ## Next gates, determined by evidence rather than preference
 
-1. **THREE-operation transactions** — R4 passed at two operations with zero probe failures, which means
+1. ~~THREE-operation transactions~~ DONE - and the verifier still never fired, which the ABLATION resolved. Next axes below.
+0. **~~superseded~~** — R4 passed at two operations with zero probe failures, which means
    the transaction verifier HAS NO LIVE CATCH yet. Within a two-operation family the composition can
    only go wrong if the ordering does, and Legasus owns ordering. Three operations give more ordering
    relations and the first realistic chance for a model-produced domain to differ from the requested
