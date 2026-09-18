@@ -7170,3 +7170,10 @@ Whole-function emissions: 14 at W0, ZERO everywhere else, so completion affordan
 where there was no function to complete. W0 is VOID as a rung: with no source line the prompt never
 names the parameter, so the model wrote `value < 10`. Commit integrity 43/43 at every rung that had
 the facts - 51/51 with R3P. New mandatory control: sufficiency.
+
+**WINDOW #6 CLOSED.** 10:21:57Z to ~10:25Z, stopped and verified: 7 rows, 0 not stopped.
+Preregistered discrimination DECISIVE: whole-function emission at W0 was 14/20 before the fact
+repair and 14/20 after (p=1.000), while the repair demonstrably worked - the model now uses the
+supplied name correctly inside the function it invents. Context presence, not information,
+suppresses the affordance. Commit integrity 36/36 this family, 87/87 cumulative, 1.00 in all eight
+cells. Next controlled test is the redundant sentence, not another window size.
