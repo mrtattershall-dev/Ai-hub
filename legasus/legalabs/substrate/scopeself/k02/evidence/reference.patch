@@ -1,0 +1,9 @@
+--- op op1 after: "def size():\n    return len(values)\n"
+
+
+TOTAL = sum(values)
+
+--- op op2 after: "# Statistics.\n"
+
+def total():
+    return TOTAL

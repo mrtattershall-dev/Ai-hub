@@ -1,0 +1,9 @@
+--- op op1 after: "TOTAL = 5\n"
+
+TOTAL = TOTAL + 1
+
+--- op op2 after: "def total():\n    return TOTAL\n"
+
+
+def bumped():
+    return TOTAL

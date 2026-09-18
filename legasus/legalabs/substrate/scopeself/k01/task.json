@@ -1,0 +1,14 @@
+{
+  "task_id": "k01",
+  "goal": "Add default values to the EXISTING Cache in cache.py: put(key, value) stores a value, and get must fall back to a registered default for the requested key before returning None. default(key, value) registers that default. Keep direct hits working exactly as they do now. Run it with python.",
+  "lead": "cache.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the defaults table works the same way as the existing store",
+  "interface": [
+    "put",
+    "default",
+    "key",
+    "value"
+  ]
+}

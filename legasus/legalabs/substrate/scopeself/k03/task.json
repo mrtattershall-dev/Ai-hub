@@ -1,0 +1,11 @@
+{
+  "task_id": "k03",
+  "goal": "Add an increment to the EXISTING running.py: TOTAL must be one greater than its starting value when the module is imported, and bumped() returns the resulting value. Keep total working exactly as it does now. Run it with python.",
+  "lead": "running.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the increment is applied the same way as the existing total is declared",
+  "interface": [
+    "bumped"
+  ]
+}

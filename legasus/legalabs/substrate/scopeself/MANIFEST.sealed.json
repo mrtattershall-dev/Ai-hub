@@ -1,0 +1,32 @@
+{
+  "sealed_at": "2026-09-18T07:11:25.414Z",
+  "sealed_at_commit": "cd2cbd600e2b4d6f04a5b6a02c85955fccad9fb7",
+  "pre_generation": true,
+  "note": "Sealed BEFORE any model generation or applicability detection ran against this family. Rule 15: author all, validate, seal, freeze, and only then let anything see it.",
+  "tasks": [
+    {
+      "task_id": "k01",
+      "task_sha": "22c1784578ce02dfa505c24e836f666709094df75a92daaec366d2d4ebf1c829",
+      "source_sha": "c93e034ab2dff024ac578b637c50944b16299e101e299ad501bf352b389fe293",
+      "evidence_sha": "ea937513ed0d1d46c032937e971d2c2dccf481b5c8a4e1b4dd725cb61c74ed5f"
+    },
+    {
+      "task_id": "k02",
+      "task_sha": "4aab9c4db69c7cd9ac84c78b39ca13e204e23a736346d6a3c0688f10fcc17d80",
+      "source_sha": "a4e68a2efcb86190659a474326aa944154528538cd636f5507af2650181b0a0e",
+      "evidence_sha": "bc05342442050a763bda48bdd5614073ce58f50324d0d19a1b72f00233dd64df"
+    },
+    {
+      "task_id": "k03",
+      "task_sha": "794a102b832e6de4b160b3be92c6347578666e8ee29dce07508887285ac65cc6",
+      "source_sha": "f55da9a9fb6829e20ced770a4de7fbc6d4b1d447c01c39adfe0d1e9a183d9b47",
+      "evidence_sha": "55853a9851b013e15c07f8e976484f028179a9f4010173723e72449ca622bee0"
+    },
+    {
+      "task_id": "k04",
+      "task_sha": "760a40a7f1c8b19175288ed101addf398fea28832b372d8de4e9e7aa8789891c",
+      "source_sha": "086c2540639d3fc956adba696147da499a9e2e789295b69eb16c83dbf312505a",
+      "evidence_sha": "a3a564318349ec76b4a1becdaebe1612265fb6076b9b74988616a515ef241f3f"
+    }
+  ]
+}

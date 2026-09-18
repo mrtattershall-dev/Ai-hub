@@ -1,0 +1,60 @@
+{
+  "task_id": "k03",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing total declaration as the relation to parallel; that feature is a module constant read by a function, and the new behaviour occupies the same position over the same name",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "a SELF-REFERENTIAL binding: the new value is computed from the old one",
+        "site_hint": "TOTAL = 5\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the accessor",
+        "site_hint": "def total():\n    return TOTAL\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 8
+  },
+  "reference": {
+    "source_hash": "45cf70d21445f30653f08b31e3f8bd899020fbc3e44b873632479e9cc4a82e79",
+    "reference_hash": "3ad653ebbf4b3b3947b663233845931d33d5f0b13c7ec3bda9d26af697798f81",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

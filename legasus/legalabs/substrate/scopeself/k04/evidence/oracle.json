@@ -1,0 +1,60 @@
+{
+  "task_id": "k04",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing step declaration as the relation to parallel; that feature is a module constant read by a function, and the new value occupies the same position",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "a FRESH binding computed from another name, not from itself",
+        "site_hint": "STEP = 4\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the accessor",
+        "site_hint": "def step():\n    return STEP\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 8
+  },
+  "reference": {
+    "source_hash": "8a397ec13da1d9e5c743fc84e2d6b53226fabac86caf6df632cee0d03d426f9d",
+    "reference_hash": "5306492f866607a4ea930bc289fbe19d19417e4f615ef3e4c1ca6213c250e2e8",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}
