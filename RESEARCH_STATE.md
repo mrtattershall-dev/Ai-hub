@@ -39,6 +39,9 @@ READMEs hold the detail; commit messages hold the reasoning.
 | State an open end RELATIONALLY; naming its absence is inert | 7B too-narrow 16/80 -> 1/80, p = 1.3e-4; NEGATED vs SILENT p = 1.000 |
 | The renderer can repair a CAPACITY-INDUCED failure mode | invented bounds: 0 at 1.5B, 18/133 at 7B, removed by rendering alone |
 | A gate with only a REFUSE list silently suppresses yield everywhere | admitting elif raised yield for all three models, 1.5B p = 8.4e-8 |
+| R4: multi-operation correctness is ARCHITECTURAL | 162 assembled, 162 verified, P(correct|assembled) 1.000 at every capacity, model never saw the other operation |
+| Order is derived from domains, not presentation | T_CONTAIN and T_REVERSE identical at all three models |
+| Transaction yield is the SQUARE of operation yield | 1.5B op-yield 0.833, predicted 0.694, observed 0.700 |
 
 ## Dead, and staying dead
 
@@ -89,9 +92,11 @@ wrong about what it measured - it was measuring a system with two correctable de
 
 ## Next gates, determined by evidence rather than preference
 
-1. **Multi-operation transactions** — every family so far has one operation. `R4` has been deferred
-   four times for want of a multi-operation family; LegaCore already models provider/consumer edges and
-   legal topological orders, so the apparatus exists and the family does not.
+1. **THREE-operation transactions** — R4 passed at two operations with zero probe failures, which means
+   the transaction verifier HAS NO LIVE CATCH yet. Within a two-operation family the composition can
+   only go wrong if the ordering does, and Legasus owns ordering. Three operations give more ordering
+   relations and the first realistic chance for a model-produced domain to differ from the requested
+   one, which is the only way an authorized fragment can break a transaction.
 2. **Structural preservation in the loop** — `structure.mjs` and Narrowability V2 exist but no
    generation family verifies structure alongside behaviour.
 3. **Two parameters** — `requestedBehaviour` declines a generic subject unless the unit has exactly one

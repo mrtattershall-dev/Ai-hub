@@ -1,0 +1,23 @@
+  T_CONTAIN      ORDERED      order tiny then small   basis DERIVED   witness n=-1
+  T_REVERSE      ORDERED      order tiny then small   basis DERIVED   witness n=-1
+  T_DISJOINT     DISJOINT     order tiny then big   basis ENGINEERING_CHOICE
+  T_UNDETERMINED UNDETERMINED NO GENERATION   witness n=1
+  controls ok: orders derived as expected, each prompt isolated from the other operation, both realizations verify, the reversed composition fails where ordering is derived and passes where both orders are legal
+  RULE 3 ok: qwen2.5-coder:1.5b, qwen2.5-coder:7b, qwen2.5-coder:14b
+  3 transaction cases x 3 models   samples 20
+
+  qwen2.5-coder:1.5b   T_CONTAIN     op-yield 0.775   assembled 13/20   verified 13   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:1.5b   T_REVERSE     op-yield 0.825   assembled 13/20   verified 13   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:1.5b   T_DISJOINT    op-yield 0.900   assembled 16/20   verified 16   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:7b     T_CONTAIN     op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:7b     T_REVERSE     op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:7b     T_DISJOINT    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:14b    T_CONTAIN     op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:14b    T_REVERSE     op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:14b    T_DISJOINT    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+
+  qwen2.5-coder:1.5b    transaction yield 0.700   P(correct|assembled) 1.000   verified end-to-end 0.700   sec/verified 6.5
+  qwen2.5-coder:7b      transaction yield 1.000   P(correct|assembled) 1.000   verified end-to-end 1.000   sec/verified 2.5
+  qwen2.5-coder:14b     transaction yield 1.000   P(correct|assembled) 1.000   verified end-to-end 1.000   sec/verified 3.7
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.r4.json

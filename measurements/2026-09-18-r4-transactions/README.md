@@ -98,3 +98,83 @@ does not extend.
 
 T4 under standing authorization. `scaledown_window` 5 min, AC confirmed, stop with `--yes` and verify.
 **Rule 3** checks every model before any generation.
+
+---
+
+# RESULT — R4: multi-operation transactions
+
+GPU window stopped and verified: one `legasus` row, `stopped`, 0 containers.
+
+    model   case          op-yield   assembled   verified   P(correct|assembled)   dead-op   probe-fail
+    1.5B    T_CONTAIN      0.775      13/20        13             1.000              0          0
+    1.5B    T_REVERSE      0.825      13/20        13             1.000              0          0
+    1.5B    T_DISJOINT     0.900      16/20        16             1.000              0          0
+    7B      all three      1.000      20/20        20             1.000              0          0
+    14B     all three      1.000      20/20        20             1.000              0          0
+
+    transaction yield    1.5B 0.700    7B 1.000    14B 1.000
+    P(correct|assembled) 162 assembled, 162 verified — 1.0000 at every capacity
+    sec/verified         1.5B 6.5      7B 2.5      14B 3.7
+
+## Every prediction confirmed, including the one that could have broken the architecture
+
+**`T_CONTAIN` and `T_REVERSE` are indistinguishable** — 13/13, 20/20, 20/20 at each capacity. The order
+is derived from the domains; presentation order does not reach `DECIDE`.
+
+**`P(correct | assembled)` is 1.000 and flat across capacity.** This was the architectural claim and
+the most consequential thing that could have failed: a drop with capacity would have meant transaction
+correctness leaks back into the model. It does not. **Every transaction Legasus assembled was correct,
+at every model size, with the model never having seen the other operation.**
+
+**Dead operations: zero, everywhere.** `ordering.mjs` and its reachability check agree.
+
+**Transaction yield is the square of operation yield**, as predicted mechanically: the 1.5B averaged
+0.833 per operation, and 0.833² = 0.694 against 0.700 observed. Capacity buys transaction yield exactly
+by buying operation yield, and nothing else.
+
+## What the raw artifacts show that the summary does not
+
+**The anti-oracle property held live, not only in controls.** The `small` operation was realized two
+different ways — `n < 10` 34 times and `n < 10 and n != 3` 75 times — and **both were assembled and
+both verified**. A verifier scoring reference-form similarity would have rejected 34 correct
+transactions or 75 of them, depending which form it had been taught.
+
+**`CONSTRAIN` refused the model's actual failure mode.** Sixteen outputs echoed the preserved guard —
+`if n == 3:` — and every one was refused as *repeated a fixed line*. That is the whole shortfall in the
+1.5B's operation yield, and it is the envelope doing its job rather than a semantic failure reaching
+the verifier.
+
+## The honest limit, and it is the important one
+
+**The transaction probes never fired in anger.** 162 assembled, 162 verified, zero probe failures and
+zero dead operations. They are proven by their own unit tests — which demonstrate a fragment-level
+checker passes the broken composition and they do not — but in this family they have **no live catch**.
+
+The reason is structural rather than lucky: the composition can only go wrong if the *ordering* goes
+wrong, and Legasus owns ordering, so within this family it cannot. A fragment that is individually
+authorized can still break a transaction only by having a **different domain than the one requested** —
+if `tiny` came back as `n < 100` instead of `n < 0`, it would contain `small`, and the derived order
+would make `small` dead. No model produced such a fragment here: `tiny` was `n < 0` 175 times out of
+180, `big` was `n > 100` 57 out of 60.
+
+> A perfect score on this family is a statement about *this* family. The verifier that would catch the
+> interesting failure has not yet had to.
+
+## Other limits
+
+- Two operations. Both insert at the same point.
+- Only the easy ordering relations were generated. `T_UNDETERMINED` is correctly refused and therefore
+  contributes no generation data — by design, and it means the refusal path has no live exercise either.
+- `tiny` and `big` were essentially monolithic realizations; diversity lived entirely in `small`.
+
+## What this changes
+
+1. **Multi-operation correctness is architectural, in this family.** Every assembled transaction was
+   correct at every capacity, and the model could not have known the composition.
+2. **The next gate is operation count**, and the reason is the limit above rather than a wish for
+   difficulty: three operations give more ordering relations, more chances for a model-produced domain
+   to differ from the requested one, and the first realistic opportunity for the transaction verifier
+   to catch something live.
+3. `sec/verified` is now a usable number: 2.5 at 7B against 6.5 at 1.5B. The 7B is **cheaper per
+   verified transaction** than the 1.5B despite being larger, because the 1.5B's refusals are wasted
+   generations.
