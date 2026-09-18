@@ -23,9 +23,20 @@ import { reconstruct, baseFor } from '../legalabs/substrate/narrowability.mjs';
 
 const NL = String.fromCharCode(10);
 const ind = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
-const SUB = 'C:/Users/tatte/Projects/ai-coding-hub-indent/legasus/legalabs/substrate/provenance';
+const ROOT = 'C:/Users/tatte/Projects/ai-coding-hub-indent/legasus/legalabs/substrate/';
+const SUB = ROOT + (process.argv[2] || 'provenance');
 
 const GT = JSON.parse(readFileSync(join(SUB, 'GROUNDTRUTH.json'), 'utf8'));
+
+// PER-KIND EXPECTATIONS. Each task in the generalization family preregisters WHICH constraint kind it
+// tests and whether that kind SHOULD or SHOULD NOT fire. Reporting per kind is the point: an aggregate
+// can be carried entirely by one rule while the others are wrong.
+//
+// This is a REPORTING change made before the run. The scoring rule - gain counts only if every removed
+// boundary genuinely fails - is untouched.
+const EXP = existsSync(join(SUB, 'EXPECTED.json'))
+  ? JSON.parse(readFileSync(join(SUB, 'EXPECTED.json'), 'utf8')) : { tasks: [] };
+const KIND = new Map((EXP.tasks || []).filter((t) => t.kind).map((t) => [t.id, t]));
 
 // The parent range an operation sits in, by indentation - the same notion the candidate sweep used.
 function parentRangeFor(src, refPos, indent) {
@@ -114,7 +125,7 @@ for (const t of GT) {
     else if (verdict === 'CORRECT-0') clean0++;
     else missed++;
 
-    rows.push({ op: ctx.operation_id, verdict, narrowable: row.narrowable,
+    rows.push({ task: t.task, op: ctx.operation_id, verdict, narrowable: row.narrowable,
       cand: row.candidates, truth: row.passing, derived: res.constrained,
       gained, maxBits, wrongly: wrongly.length,
       kinds: res.chain.filter((c) => (c.removed_positions || []).length).map((c) => c.kind) });
@@ -132,6 +143,46 @@ for (const r of rows) {
 }
 
 const narrowableOps = rows.filter((r) => r.narrowable).length;
+
+// ---- PER KIND FIRST. The aggregate comes after, because an aggregate can be carried entirely by one
+// rule while the others are wrong - which is exactly the state this family was built to resolve.
+if (KIND.size) {
+  console.log('');
+  console.log('  ---- PER CONSTRAINT KIND (the aggregate is reported after this, not instead of it)');
+  const byKind = new Map();
+  for (const [id, spec] of KIND) {
+    if (!byKind.has(spec.kind)) byKind.set(spec.kind, { POSITIVE: null, NEGATIVE: null });
+    const rs = rows.filter((r) => r.task === id);
+    const fired = rs.flatMap((r) => r.kinds);
+    byKind.get(spec.kind)[spec.half] = {
+      id,
+      narrowable: rs.filter((r) => r.narrowable).length,
+      ops: rs.length,
+      firedOwn: fired.filter((k) => k === spec.kind).length,
+      firedAny: [...new Set(fired)],
+      over: rs.filter((r) => r.wrongly > 0).length,
+      bits: rs.reduce((a, r) => a + r.gained, 0),
+      avail: rs.reduce((a, r) => a + r.maxBits, 0),
+    };
+  }
+  for (const [kind, halves] of byKind) {
+    console.log('');
+    console.log('  ' + kind);
+    for (const half of ['POSITIVE', 'NEGATIVE']) {
+      const h = halves[half];
+      if (!h) continue;
+      // A positive case must fire its own kind. A negative case must NOT, and must not over-constrain.
+      const ok = half === 'POSITIVE' ? (h.firedOwn > 0 && h.over === 0) : (h.firedOwn === 0 && h.over === 0);
+      console.log('    ' + (ok ? 'PASS  ' : 'FAIL  ') + half.padEnd(9) + h.id
+        + '  narrowable ' + h.narrowable + '/' + h.ops
+        + '  this kind fired on ' + h.firedOwn + ' op(s)'
+        + '  over-constraint ' + h.over
+        + '  bits ' + h.bits.toFixed(2) + '/' + h.avail.toFixed(2));
+      if (h.firedAny.length) console.log('          kinds that narrowed: ' + h.firedAny.join(', '));
+    }
+  }
+}
+
 console.log('');
 console.log('  ---- LegaCore constraint derivation, against executable ground truth');
 console.log('  operations scored          ' + opsSeen + '   (narrowable ' + narrowableOps + ')');
