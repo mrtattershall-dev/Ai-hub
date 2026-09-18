@@ -90,19 +90,31 @@ rejection of vacuous proof conditions.
 
 > **ATTEMPT AUTHORITY != COMMIT AUTHORITY.** A model may try what it may not commit.
 
-**This is no longer a slogan. It is a measured property, and it is the project's most robust empirical
-claim.** Across three preregistered families, two different functions and two window regimes, using a
-1.5B that fails the same task outright when given whole-function authority:
+**This is no longer a slogan. It is a measured property.** Across five preregistered families, two
+different functions and several window regimes, using a 1.5B that fails the same task outright when
+given whole-function authority:
 
-    committed outputs   87
-    correct             87        P(correct | committed) = 1.00
-                                  one-sided 95% lower bound 0.966
+    authorized outputs   238
+    correct              236       P(correct | AUTHORIZED) = 0.992
 
-Two quantities are tracked separately, because a single pass rate cannot tell them apart — 8 correct
-with 12 corruptions and 8 correct with 12 refusals score identically and are not the same system:
+**The two that were wrong were rejected downstream by execution verification**, so no incorrect program
+reached a repository in any family. That is the whole point of keeping the layers distinct, and it is
+why these are two metrics and never one:
 
-    GENERATION CAPABILITY   P(correct attempt)       swung from 0.20 to 0.90 across cells
-    COMMIT INTEGRITY        P(correct | committed)   did not move once
+    P(correct | AUTHORIZED)   the shape and scope gate, alone
+    P(correct | VERIFIED)     that gate plus behavioural execution
+
+The first ran at 1.00 for 87 consecutive outputs and then leaked twice in the next 151 — once as
+`if n > 0: return "small"`, which destroys a preserved behaviour while being perfectly well-formed.
+**Authorization is a strong filter and not a sufficient one.** No result may quote one of these metrics
+while meaning the other.
+
+Two capability quantities are likewise tracked separately, because a single pass rate cannot tell them
+apart — 8 correct with 12 corruptions and 8 correct with 12 refusals score identically and are not the
+same system:
+
+    GENERATION CAPABILITY   P(correct attempt)          swung from 0.20 to 0.90 across cells
+    COMMIT INTEGRITY        P(correct | authorized)     0.992 across every one of them
 
 Bounding the model did **not** raise generation capability — ladder 2 measured that directly, `R3` and
 `R3P` both landing at 8/20, p = 1.000. It converted destructive commits into refusals. For an
