@@ -7115,3 +7115,21 @@ as history, and re-running them would invite quietly replacing a null with a luc
 cases against CONTRACT's 2/10 and 1/10 - but the model emitted the identical two-line fragment 20/20
 times and the prompt contains that fragment, so the result is about the SYSTEM and not about the model.
 Recorded in `measurements/2026-09-18-bounded-1p5b/`.
+
+---
+
+## 2026-09-18  GPU WINDOW CLAIM #3 — the responsibility ladder
+
+**Authorization, tatte's words verbatim:**
+
+> "Now you want the dose-response curve."
+> "I'd freeze a ladder before another GPU run and reveal one missing responsibility at a time while
+> keeping everything else identical."
+> "the next experiment can tell you how much intelligence Legasus actually has to leave inside the
+> 1.5B before the system breaks."
+
+Same T4 app, same 5-minute scaledown. AC re-checked. Preregistration committed first, including the
+prediction that R3 falls sharply and the statement that a smooth decline would falsify it.
+
+R0 and R5 are NOT re-run - they are measured history. R4 is DEFERRED with a recorded reason: this task
+has one operation, and running R4 here would confound rung with task.
