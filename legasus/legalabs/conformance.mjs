@@ -22,12 +22,29 @@
 //                          exactly the kind this audit exists to catch.
 //   P7  UNSUPPORTED VISIBLE an operation that depends on a declared-unsupported form must NOT report
 //                          requirement_complete: true
+//   P8  CHANNEL COMPLETE   every removed boundary fails on AT LEAST ONE channel - behavioural or
+//                          structural - and the audit says which one answered
+//
+// P3 AND P8 ARE DELIBERATELY BOTH HERE, AND P8 DOES NOT RESCUE P3.
+//
+// `failing_positions` means different things in different families. V1 ground truth is behavioural
+// only, so a position that executes fine while re-parenting existing statements is sealed as passing,
+// and a correct structural rule that removes it scores as an over-constraint. `scopecont/j01:op3` is
+// exactly that, and LEGACORE_REV6.frozen records it as an open failure with the remedy named: stronger
+// probes, NEVER a weaker rule.
+//
+// P8 is that stronger probe, run now instead of waiting for a future family. It adjudicates each
+// removal on both channels and records which one answered. P3 keeps its frozen meaning and keeps
+// failing, because a recorded failure that disappears the moment its adjudication improves is not a
+// fix - it is a score obtained by changing the rule after seeing the result. Two properties, two
+// verdicts, both visible.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { constrain, verify } from '../legacore/constraints6.mjs';
 import { operationFacts } from '../legacore/opfacts.mjs';
 import { buildContext } from '../legacore/opcontext.mjs';
 import { reconstruct, baseFor } from './substrate/narrowability.mjs';
+import { adjudicateRemoval, oracleVersion } from './adjudicate.mjs';
 
 const NL = String.fromCharCode(10);
 const ind = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
@@ -54,6 +71,7 @@ const problems = [];
 const note = (p, fam, op, detail) => problems.push({ property: p, family: fam, op, detail });
 let opsAudited = 0;
 let famAudited = 0;
+const adjudications = [];
 
 for (const fam of families) {
   const dir = ROOT + fam;
@@ -90,11 +108,19 @@ for (const fam of families) {
       }
       // P2
       for (const r of rep.results) if (!r.replayed) note('P2', fam, id, r.kind + ': ' + r.why);
-      // P3
+      // P3 - the frozen property, behavioural ground truth, unchanged.
+      // P8 - the same removals, adjudicated on both channels, reported separately.
       const failing = new Set(row.failing_positions || []);
       for (const c of res.chain) {
         for (const p of (c.removed_positions || [])) {
-          if (!failing.has(p)) note('P3', fam, id, c.kind + ' removed boundary after line ' + p + ', which executes fine');
+          if (failing.has(p)) continue;
+          note('P3', fam, id, c.kind + ' removed boundary after line ' + p + ', which executes fine');
+          const a = adjudicateRemoval({ base, code, position: p, row });
+          adjudications.push({ fam, id, kind: c.kind, position: p, ...a });
+          if (a.verdict === 'over_constraint') {
+            note('P8', fam, id, c.kind + ' removed boundary after line ' + p
+              + ', legal on BOTH channels (' + a.oracle + ' seal, ' + a.channel + ')');
+          }
         }
       }
       // P4
@@ -144,9 +170,10 @@ const NAMES = {
   P5: 'ACCOUNTED           every immediate requirement is resolved or declared unresolved',
   P6: 'NO SHADOWED LOSS    no stoplisted token is actually bound in the program',
   P7: 'UNSUPPORTED VISIBLE unsupported forms never report a complete account',
+  P8: 'CHANNEL COMPLETE    every removed boundary fails on at least one channel',
   ALIGNMENT: 'ALIGNMENT           ground truth and derivation share one text',
 };
-for (const key of ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'ALIGNMENT']) {
+for (const key of ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'ALIGNMENT']) {
   const n = byProp.get(key) || 0;
   console.log('  ' + (n ? 'FAIL  ' : 'ok    ') + NAMES[key] + (n ? '   ' + n + ' violation(s)' : ''));
 }
@@ -157,6 +184,20 @@ if (problems.length) {
   }
   if (problems.length > 30) console.log('    ... ' + (problems.length - 30) + ' more');
   process.exitCode = 1;
+}
+if (adjudications.length) {
+  console.log('');
+  console.log('  ADJUDICATION of every P3 removal, on both channels. A V1 seal could not see');
+  console.log('  structural destruction, so the structural channel is run live for those - and the');
+  console.log('  verdict carries the witness it produced, never a bare assertion.');
+  for (const a of adjudications) {
+    console.log('    ' + a.fam + '/' + a.id + '  ' + a.kind + ' after line ' + a.position);
+    console.log('      ' + a.verdict.toUpperCase() + '  via ' + a.channel + ' (' + a.oracle + ' seal): ' + a.why);
+    for (const w of (a.witness || [])) {
+      console.log('      witness: ' + w.kind + '  `' + w.statement + '`'
+        + (w.was ? '  was under ' + JSON.stringify(w.was) + ' now ' + JSON.stringify(w.now) : ''));
+    }
+  }
 }
 console.log('');
 console.log('  A standard that is only written down is a reminder. This runs it.');

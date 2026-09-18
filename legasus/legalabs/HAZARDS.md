@@ -95,7 +95,7 @@ exists" because h07 had a rival - it just had a second mechanism that reached th
 
 ## 3b. Reporting code that cannot express what it is measuring — RULE ONLY
 
-**Occurrences: 4.** Four times a report marked a working rule as failed because the report could not
+**Occurrences: 5.** Five times a report marked a working rule as failed because the report could not
 represent the thing under test.
 
     inventory      counted a kind as "fired" only when it NARROWED, so the three rules whose
@@ -105,9 +105,20 @@ represent the thing under test.
                    symbol_availability constraint, so the report hunted a kind never emitted
     account        k04's negative is "DOUBLE must not require itself" - not expressible as
                    "this kind did not fire", since symbol_availability legitimately fires for STEP
+    P3 / oracle    `failing_positions` is BEHAVIOURAL in V1 families and BOTH CHANNELS in V2 ones,
+                   and the conformance audit had no way to say which it was reading. A structural
+                   rule that correctly removes a position which executes fine therefore scored as an
+                   over-constraint, and the audit could not distinguish that from a real one
 
 **Rule:** before trusting a FAIL, check that the report can represent a PASS. A criterion that a
 correct implementation cannot satisfy is measuring the reporter.
+
+**And the corollary the fifth occurrence added.** The fix must not be the recorded failure quietly
+becoming a pass. P3 keeps its frozen behavioural meaning and keeps failing on `scopecont/j01:op3`;
+the new adjudication is a SEPARATE property, `P8 CHANNEL COMPLETE`, reporting which channel answered
+and carrying the witness. A recorded failure that disappears the moment its adjudication improves is
+a score obtained by changing the rule after seeing the result, which is the one thing this project's
+marching orders forbid outright. Add the instrument; never retire the record.
 
 ---
 

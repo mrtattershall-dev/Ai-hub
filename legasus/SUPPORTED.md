@@ -117,3 +117,14 @@ Neither substitutes for the other.
 `legasus/legalabs/conformance.mjs` checks these properties mechanically across every sealed family. A
 standard that is only written down is a reminder; this ledger has four occurrences proving reminders
 fail.
+
+**Two properties adjudicate removals, and they are not redundant.** `P3 NO OVER-CONSTRAINT` reads the
+family's sealed `failing_positions`, which is behavioural-only for every family authored before V2.
+`P8 CHANNEL COMPLETE` adjudicates the same removals on both channels, running the structural channel
+live where the seal could not see it, and reports which channel answered plus the witness it produced.
+
+P8 is the "stronger probes" remedy `LEGACORE_REV6.frozen` named for `scopecont/j01:op3`, delivered
+without weakening `ownership_boundary` and without rewriting sealed ground truth: the oracle version is
+derived from the row's shape. P3's recorded failure on that operation **stands**. A recorded failure
+that vanishes the moment its adjudication improves would be a score obtained by changing the rule after
+seeing the result.
