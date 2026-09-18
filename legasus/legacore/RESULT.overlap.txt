@@ -1,0 +1,18 @@
+  ok    SATISFIABLE  a point inside an open interval   -> SATISFIABLE witness 0
+  ok    SATISFIABLE  a point ON a closed bound   -> SATISFIABLE witness 10
+  ok    SATISFIABLE  two open intervals that genuinely overlap   -> SATISFIABLE witness 4
+  ok    SATISFIABLE  an interval against the universe   -> SATISFIABLE witness 9
+  ok    DISJOINT  intervals far apart   -> DISJOINT
+  ok    DISJOINT  a point just outside an open bound   -> DISJOINT
+  ok    DISJOINT  adjacent intervals sharing only an excluded endpoint   -> DISJOINT
+  ok    DISJOINT  a point against its own complement   -> DISJOINT
+  ok    UNKNOWN  an unmodelled domain on the left   -> UNKNOWN
+  ok    UNKNOWN  an unmodelled domain on the right   -> UNKNOWN
+  ok    UNKNOWN  domains over different variables   -> UNKNOWN
+  ok    INVARIANT  identical domains give byte-identical overlap output - 12B cannot see intent
+
+  all 12 witnesses pass
+  Non-vacuity: 4 SATISFIABLE, 4 DISJOINT, 3 UNKNOWN.
+  A checker answering SATISFIABLE always fails the disjoint cases; one answering DISJOINT
+  always fails the satisfiable ones; one collapsing UNKNOWN into DISJOINT fails the three
+  that must stay undecided.
