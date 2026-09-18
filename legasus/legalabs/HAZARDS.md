@@ -14,7 +14,7 @@ three, and occurrence four still happened. Each entry therefore carries its stat
 
 ## 1. Heredoc backslash-eating — MECHANIZED
 
-**Occurrences: 6.** A shell heredoc collapses doubled backslashes, so JS written that way lands with
+**Occurrences: 8.** A shell heredoc collapses doubled backslashes, so JS written that way lands with
 `'\\s'` turned into `'\s'`. In a JS string literal `\s` is simply `s`: the file stays **syntactically
 valid**, the regex silently changes meaning, and the program returns a plausible wrong answer with no
 error anywhere.
@@ -64,7 +64,9 @@ rendering. A derivation that yields undefined and is interpolated anyway becomes
 error, lost work.
 
 **Standing rule it replaces:** JS containing a regex is written with a file writer, never a heredoc —
-*including one-off probes*, which is exactly where the discipline slipped every time. The fifth
+*including one-off probes*, which is exactly where the discipline slipped every time. Occurrences SEVEN
+and EIGHT were both one-off probes - an invisible sentinel written by hand, and a Python heredoc eating
+the escapes out of a regex it was fixing. The fifth
 occurrence adds: this applies to PYTHON heredocs too, and Python eats a different set of escapes than
 the shell does.
 
@@ -155,6 +157,32 @@ node --test legasus/legalabs/sufficiency.test.mjs
     can the apparatus express a pass?        assembler control
     can the apparatus express a failure?     inversion / off-by-one control
     can the model obtain the facts?          sufficiency control
+
+---
+
+## 3f. An ablation that REPAIRS the proposal is not an ablation - RULE ONLY
+
+**Occurrences: 1, and it reached the opposite conclusion.** Ablating a component means removing its
+authority, not making the pipeline work without it. The first CONSTRAIN ablation extracted a guard and
+a return from anywhere inside each refused output - including from inside a returned function - and
+assembled that. It was measuring
+
+    CONSTRAIN OFF + repair machinery
+
+which is a different configuration, and a more flattering one, because repair does for free exactly
+what the removed component was there to make unnecessary. It concluded CONSTRAIN was largely redundant
+with the verifier. The corrected version concluded the opposite: half of all refusals do not load at
+all unchanged, so the verifier could not have been pointed at them.
+
+**A second defect rode in on the first.** The corrected version's DECODER ate leading indentation - the
+fence pattern consumed the first line's spaces - so a four-space guard arrived at column zero, could
+not enter a function body, and sixty-one refusals were classified unassemblable for a reason that was
+entirely the decoder. It was caught by ASSEMBLING ONE CASE BY HAND AND RUNNING IT, not by reasoning
+about the counts.
+
+**Rule:** before an ablation is believed, write down what counts as DECODING and what counts as REPAIR,
+freeze it, and then assemble one case of each category by hand and run it. A category decomposition is
+only as good as the assembly underneath it, and the way to check an assembly is to run it.
 
 ---
 
