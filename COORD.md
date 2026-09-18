@@ -7110,3 +7110,8 @@ and the declared non-win outcome.
 
 Only the BOUNDED arm is generated. BASELINE and CONTRACT are NOT re-run - their recorded figures stand
 as history, and re-running them would invite quietly replacing a null with a luckier sample.
+
+**WINDOW #2 CLOSED.** Stopped with `--yes`, verified. Under five minutes. BOUNDED arm 10/10 on both
+cases against CONTRACT's 2/10 and 1/10 - but the model emitted the identical two-line fragment 20/20
+times and the prompt contains that fragment, so the result is about the SYSTEM and not about the model.
+Recorded in `measurements/2026-09-18-bounded-1p5b/`.

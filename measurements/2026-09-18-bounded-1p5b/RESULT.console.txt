@@ -1,0 +1,7 @@
+  RULE 3 ok: endpoint names qwen2.5-coder:1.5b
+  case A  ruling: existing behaviour > requested behaviour   ENGINEERING_CHOICE: immediately after the guard that outranks it
+    conforms 10/10   authorized 10   delta 10   preserved 10   precedence 10   scope-violation 0
+  case B  ruling: requested behaviour > existing behaviour   ENGINEERING_CHOICE: immediately before the guard whose behaviour it outranks
+    conforms 10/10   authorized 10   delta 10   preserved 10   precedence 10   scope-violation 0
+
+  written -> measurements/2026-09-18-bounded-1p5b/RESULT.json

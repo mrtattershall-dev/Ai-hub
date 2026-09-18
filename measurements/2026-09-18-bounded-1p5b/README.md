@@ -85,3 +85,85 @@ shape. It is preserved as an observation and is not the design of this experimen
 T4, weights in-container, `scaledown_window` 5 minutes, `min_containers` 0, hard 30-minute cap. Stop
 with `modal app stop --yes` and verify with `modal app list`. AC power confirmed before the window.
 **Rule 3:** the endpoint must name the exact model before any generation runs.
+
+---
+
+# RESULT — bounded authority, Qwen2.5-Coder-1.5B on Modal T4
+
+Rule 3 verified before generation. Assembly control verified offline before the window. Same model,
+same temperature, same endpoint as the previous run. GPU window under five minutes, stopped and
+verified.
+
+    arm        case A     case B     what the model was responsible for
+    BASELINE    3/10       2/10      rewrite the whole function from a task statement
+    CONTRACT    2/10       1/10      rewrite the whole function, given the semantic contract
+    BOUNDED   10/10      10/10      write one guard and its return
+
+    BOUNDED detail, both cases:  authorized 10/10   delta 10/10   preserved 10/10
+                                 precedence 10/10   scope violations 0
+
+The preregistered prediction was that bounded generation should reduce no-op and scope-creep failures.
+Both went to zero.
+
+## The finding is about the SYSTEM, and the caveat is not optional
+
+The model produced **the identical fragment 20 times out of 20**:
+
+    if n < 10:
+        return "small"
+
+and the bounded prompt says *"it must produce "small" when n < 10"*. That fragment is close to a
+transcription of its own instruction.
+
+> **This is not evidence that the 1.5B became better at anything.** It is evidence that the system
+> succeeds when the model's residual job is small enough to be reliable.
+
+Stating it the other way would be the most tempting misreading available, and it would be false.
+
+## What IS strong, and is the actual result
+
+**Case A and case B received byte-identical prompts.** Same condition, same value, same two lines back
+from the model. Every difference in the finished program came from Legasus:
+
+    case A   ruling: existing > requested   ->  placed after the zero guard   ->  classify(0) == "zero"
+    case B   ruling: requested > existing   ->  placed before the zero guard  ->  classify(0) == "small"
+
+**The model contributed nothing to the semantic distinction, and the distinction was still correct in
+both directions, ten times out of ten.** Intent was derived from the specification by 12C, converted to
+a position mechanically, and executed without the model being told - or needing to understand - which
+behaviour wins.
+
+That is the thing the previous run showed prose could not achieve: the same ruling, stated to the model
+in words, produced it 1 time in 10.
+
+## The failure that moved
+
+    scope creep      6/10 -> 0/10      no unrequested behaviour can be added: unauthorized output is
+                                        refused, not repaired
+    no-op            6/10 -> 0/10      the model cannot return the function unchanged, because it is
+                                        never given the function
+    source-order     dominant -> n/a    placement is not the model's decision
+
+Each disappeared because the authority to commit it was removed, not because the model improved.
+
+## Honest limits
+
+- **The fragment task is near-transcription.** A stronger arm would require a fragment the prompt does
+  not contain - a condition the model must derive, or a value it must compute. Until that runs, this
+  measures reliability at a trivial residual job.
+- **20 generations.** A mechanism check. The effect is large enough to read (3/20 against 20/20 on the
+  same end goal) and the sample is still small.
+- **Zero variance is itself a signal to distrust.** 20 identical outputs at temperature 0.6 means the
+  task left nothing to vary, which is consistent with transcription.
+- `BASELINE` and `CONTRACT` were **not re-run**. Their recorded figures stand as history.
+
+## Where this leaves the thesis
+
+The bottleneck named after the previous run - *model execution of the bounded obligation* - is not
+where the system now fails, because the obligation was made small enough that execution is not in
+question. The open question moved rather than closed:
+
+> How much residual generation can the model be given before reliability collapses again?
+
+That is a dose-response question, and it is the next experiment: widen the fragment step by step -
+condition stated, then condition derived, then value computed - and find where 10/10 breaks.
