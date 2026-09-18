@@ -97,7 +97,9 @@ for (const t of GT) {
     for (const m of code.matchAll(/^([A-Za-z_]\w*)\s*=(?!=)/gm)) provides.push(m[1]);
     const siblingKind = /^\s*def\b/m.test(code) ? 'def' : null;
 
-    const ctx = { src: base, code, indent, provides, siblingKind,
+    // `origin` is the UNMODIFIED source, so a provider found in `base` can be classified as a current
+    // program fact or as one that exists only because another planned operation creates it.
+    const ctx = { src: base, origin: recon.src, code, indent, provides, siblingKind,
       operation_id: t.task + ':' + row.op,
       parentRange: parentRangeFor(base, row.ref_position, indent) };
 

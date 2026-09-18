@@ -1,0 +1,25 @@
+LegaCore CONSTRAINT DERIVATION revision 3, frozen BEFORE the surgical pair that tests it.
+
+WHAT CHANGED: nothing about which constraints are derived. Revision 3 reproduces revision 2 exactly
+on all three existing families - requirements, generalization and provenance, identical counts. What
+it adds is the ACCOUNT:
+
+    requirement_resolution.resolved     [{ symbol, provider: existing_definition | planned_operation }]
+    requirement_resolution.unresolved   [{ symbol, reason }]
+    constraint_status.requirement_complete
+
+WHY: h07 derived the correct region while silently dropping `math`, because a co-occurring resolvable
+requirement already implied the same ordering. Behavioural success concealed an incomplete proof, and
+nothing in the output could say so. Constraint sufficiency and requirement completeness are separate
+properties.
+
+WITNESSED: completeness.test.mjs shows h07 at region 5/5 with requirement_complete=false and
+unresolved ["math"], against h08 - the same program apart from how its provider arrives - at
+complete=true. The difference is attributable to exactly one thing.
+
+STANDING: development. h07 diagnosed the gap this revision reports. The surgical pair authored after
+this freeze is what would make the unresolved path prospectively tested, and it must be built so the
+unresolved requirement is the ONLY mechanism capable of producing the expected narrowing.
+
+legasus/legacore/constraints3.mjs         67d7320c44345541a5a7ecff22851a42cdc2b6f9ce07c93b4f8a2828b839de07
+legasus/legacore/completeness.test.mjs    0cadfc02564ce470717a1eb16d32507e03bfc39f5d9d18c4175833d63e5ac592
