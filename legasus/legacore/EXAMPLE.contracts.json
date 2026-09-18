@@ -1,0 +1,83 @@
+{
+ "CASE_A": {
+  "contract_version": "semantic-intent/1",
+  "behaviors": {
+   "existing": {
+    "domain": {
+     "kind": "point",
+     "variable": "n",
+     "value": 0
+    },
+    "result": "\"zero\""
+   },
+   "requested": {
+    "domain": {
+     "kind": "interval",
+     "variable": "n",
+     "lower": {
+      "kind": "negative_infinity"
+     },
+     "upper": {
+      "kind": "finite",
+      "value": 10,
+      "inclusive": false
+     }
+    },
+    "result": "\"small\""
+   }
+  },
+  "overlap": {
+   "status": "SATISFIABLE",
+   "witness": 0
+  },
+  "precedence": {
+   "winner": "existing",
+   "loser": "requested",
+   "scope": "overlap"
+  },
+  "evidence_used": [
+   "preservation_contract",
+   "domain_relation:exception"
+  ]
+ },
+ "CASE_B": {
+  "contract_version": "semantic-intent/1",
+  "behaviors": {
+   "existing": {
+    "domain": {
+     "kind": "point",
+     "variable": "n",
+     "value": 0
+    },
+    "result": "\"zero\""
+   },
+   "requested": {
+    "domain": {
+     "kind": "interval",
+     "variable": "n",
+     "lower": {
+      "kind": "negative_infinity"
+     },
+     "upper": {
+      "kind": "finite",
+      "value": 10,
+      "inclusive": false
+     }
+    },
+    "result": "\"small\""
+   }
+  },
+  "overlap": {
+   "status": "SATISFIABLE",
+   "witness": 0
+  },
+  "precedence": {
+   "winner": "requested",
+   "loser": "existing",
+   "scope": "overlap"
+  },
+  "evidence_used": [
+   "requested_delta:override"
+  ]
+ }
+}

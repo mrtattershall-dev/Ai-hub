@@ -159,10 +159,17 @@ evolution remains undemonstrated.** Both halves of that sentence matter.
 The difference between an architecture and a demonstration is how much human intelligence has been
 removed from the loop. This is the scoreboard.
 
-    COMPUTED                      PARTIAL                          STILL ORACLE
-    [x] scope facts               [~] site selection               [ ] local semantic intent
+    COMPUTED                      PARTIAL
+    [x] scope facts               [~] site selection
     [x] generation boundaries     [~] ordering / dependencies
-    [x] ownership invariants
+    [x] ownership invariants      [~] local semantic intent
+
+`local semantic intent` moves from `[ ]` to `[~]`. Semantic intent is now ISOLATED: over one program,
+with identical extracted predicates, identical overlap and an identical witness input, two
+specifications produce OPPOSITE precedence. The difference cannot be explained by site, source order,
+ownership, dependencies or control flow, because every one of those is asserted identical inside the
+test. It is `[~]` and not `[x]` because this is mechanism evidence on a hand-built pair, not
+prospective generalization on a sealed family.
 
 `ordering / dependencies` moves to `[~]` on prospective evidence: revision 2's requirement model
 generalized across five exercised dependency situations on a family authored blind and sealed before
