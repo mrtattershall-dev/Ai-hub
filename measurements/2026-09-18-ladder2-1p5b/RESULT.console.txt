@@ -1,0 +1,16 @@
+  controls ok: every arm reaches 10/10 with a perfect model, and still fails with a wrong one; no prompt leaks
+  RULE 3 ok: endpoint names qwen2.5-coder:1.5b
+  arms R2, R3, R3P, FMT_BOUND, FMT_ENG   samples 10   temperature 0.6
+
+  R2        case A   verified 10/10   unauth 0   no-op 0   scope 0   semantic 0   loaderr 0   variance 1
+  R2        case B   verified 10/10   unauth 0   no-op 0   scope 0   semantic 0   loaderr 0   variance 1
+  R3        case A   verified 1/10   unauth 0   no-op 0   scope 0   semantic 9   loaderr 0   variance 4
+  R3        case B   verified 7/10   unauth 0   no-op 0   scope 0   semantic 0   loaderr 0   variance 5
+  R3P       case A   verified 6/10   unauth 4   no-op 0   scope 0   semantic 0   loaderr 0   variance 2
+  R3P       case B   verified 2/10   unauth 8   no-op 0   scope 0   semantic 0   loaderr 0   variance 2
+  FMT_BOUND case A   verified 3/10   unauth 4   no-op 3   scope 0   semantic 0   loaderr 0   variance 3
+  FMT_BOUND case B   verified 3/10   unauth 4   no-op 1   scope 0   semantic 3   loaderr 0   variance 6
+  FMT_ENG   case A   verified 9/10   unauth 1   no-op 0   scope 0   semantic 0   loaderr 0   variance 2
+  FMT_ENG   case B   verified 8/10   unauth 2   no-op 0   scope 0   semantic 0   loaderr 0   variance 2
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.ladder2.json

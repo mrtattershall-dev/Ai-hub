@@ -7148,3 +7148,8 @@ to"; I refused to bill a GPU on an incomplete sentence and asked. The answer:
 AC power confirmed (PowerOnline True). Same T4 app `legasus-1p5b`, scaledown 5 min, min_containers 0,
 hard 30-minute cap. Preregistration committed at 8091d4a BEFORE this window. Stop with `--yes` and
 verify with `modal app list`.
+
+**WINDOW #4 CLOSED.** 09:32:58Z to ~09:37Z, under five minutes, stopped with `--yes` and verified.
+Q1 prediction FALSIFIED: R3P 8/20 = R3 8/20 exactly. What changed is the failure character - R3
+committed 12 wrong programs, R3P committed none and refused 12 (semantic 9 -> 0, p=0.0012; commit
+precision 8/20 -> 8/8, p=0.0084). Q2 confirmed: FMT_ENG 17/20 vs FMT_BOUND 6/20, p=0.0011.
