@@ -1,0 +1,11 @@
+{
+  "task_id": "h01",
+  "goal": "Add a bonus value to the EXISTING bootstrap.py: a helper supplies the bonus 5, and BONUS must hold that value when the module is imported. Keep BASE and total working exactly as they do now. Run it with python.",
+  "lead": "bootstrap.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the bonus value is assembled the same way as the existing base value",
+  "interface": [
+    "BONUS"
+  ]
+}

@@ -1,0 +1,19 @@
+# Geometry.
+
+def tau():
+    return TAU
+
+import math
+
+RADIUS = 2
+
+
+def _round2(v):
+    return round(v, 2)
+
+
+def area():
+    return math.pi * RADIUS * RADIUS
+
+
+TAU = _round2(2 * math.pi)

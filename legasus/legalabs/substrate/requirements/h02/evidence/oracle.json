@@ -1,0 +1,60 @@
+{
+  "task_id": "h02",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing plain helper as the relation to parallel; that feature is a module-level function transforming the text, and the new helpers occupy the same position",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the helper that shout already refers to",
+        "site_hint": "def plain(s):\n    return str(s).strip()\n"
+      },
+      {
+        "id": "op2",
+        "intent": "a function built on the existing shout",
+        "site_hint": "def shout(s):\n    return _emph(s).upper()\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 10
+  },
+  "reference": {
+    "source_hash": "70627690e043874478f775fd44c9f489238aafa54a4e446625b80beaf8fedde9",
+    "reference_hash": "19553809bc7fe75beba18da22bf8ecfbf5df21667aaf9a48500a85c4a0e77092",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

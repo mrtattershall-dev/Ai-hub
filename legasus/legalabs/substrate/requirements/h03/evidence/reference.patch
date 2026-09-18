@@ -1,0 +1,17 @@
+--- op op1 after: "WIDTH = 8\n"
+
+
+def _dash():
+    return "-"
+
+--- op op2 after: " pad(s):\n    return str(s).ljust(WIDTH)\n"
+
+
+def rule(n, ch=_dash()):
+    return ch * n
+
+--- op op3 after: "def trim(s):\n    return str(s).strip()\n"
+
+
+def rule_width(ch=_dash()):
+    return ch * WIDTH

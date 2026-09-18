@@ -1,0 +1,17 @@
+--- op op1 after: "CONFIG = {\"a\": 1}\n"
+
+
+def _extra():
+    return {"b": 2}
+
+--- op op2 after: "def get(k):\n    return CONFIG.get(k)\n"
+
+
+def _more():
+    return {"c": 3}
+
+--- op op3 after: "def names():\n    return sorted(CONFIG)\n"
+
+
+CONFIG.update(_extra())
+CONFIG.update(_more())

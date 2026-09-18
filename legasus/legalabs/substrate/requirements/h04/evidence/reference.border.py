@@ -1,0 +1,18 @@
+# Border drawing.
+
+def star_thick():
+    return star(THICK)
+
+THICK = 3
+
+
+def _mark():
+    return "*"
+
+
+def line(n):
+    return "-" * n
+
+
+def star(n):
+    return _mark() * n

@@ -1,0 +1,11 @@
+--- op op1 after: "def plain(s):\n    return str(s).strip()\n"
+
+
+def _emph(s):
+    return str(s) + "!"
+
+--- op op2 after: "f shout(s):\n    return _emph(s).upper()\n"
+
+
+def shout_twice(s):
+    return shout(s) + shout(s)

@@ -1,0 +1,56 @@
+{
+  "sealed_at": "2026-09-18T04:47:35.196Z",
+  "sealed_at_commit": "9109a9cd79fbf3f50a04e2b107d5b20a130d83ab",
+  "pre_generation": true,
+  "note": "Sealed BEFORE any model generation or applicability detection ran against this family. Rule 15: author all, validate, seal, freeze, and only then let anything see it.",
+  "tasks": [
+    {
+      "task_id": "h01",
+      "task_sha": "b84681534c18abc667dc4672954e13c07c751d98e9ed2c78e496421e9fd8b53c",
+      "source_sha": "15e909943fd0b4121b05365d1cd1514ac4a04455ef8d5f8f5a6f611d379c8233",
+      "evidence_sha": "244efd3e83b06b5bc1ac608c66fb59538c5c9224499af33d048b52c53c0d39cf"
+    },
+    {
+      "task_id": "h02",
+      "task_sha": "8f835e044f20f83621f4e270a75849d3fd0db5dd6329179542f4b8af7107e47f",
+      "source_sha": "e6c200e4d0ea542d770ba277b51e925793953ceefb8a0c9ca107ba02f2cc2482",
+      "evidence_sha": "6de8a693aa95dfa58a26de57697eb51a9fd93d4ba02f70de0a38142d699ed574"
+    },
+    {
+      "task_id": "h03",
+      "task_sha": "3d4760b79b874336b1ad2170f8e96922d8cbdeba98c67968da202cc05ae36a47",
+      "source_sha": "dce3686c89708db0d6451bd3edc87db5f0976dad2737f4c0aef9d941b91f37a2",
+      "evidence_sha": "bffe4301f583d19c56c4683b03633bec1e701785954ac56728921f0dc979040e"
+    },
+    {
+      "task_id": "h04",
+      "task_sha": "8dd289ed34858e267d8b33a3f40726d1f5cfb05e57c4159ba93da0745d98a715",
+      "source_sha": "399c059843d7954906887637ccb833da282c7db13add2fc35e181cfb67d2a107",
+      "evidence_sha": "9eebb8527b379e4d1d09f5d91f3e980fc722575c8790cff1fa5fa8f557a5f2b8"
+    },
+    {
+      "task_id": "h05",
+      "task_sha": "3a61ab4c04862663a70255f905180ba31745bc6c714a696756c36fb681fc3ea2",
+      "source_sha": "14a8cce8a77832115441b4ba8fec628f8cd629228dc3da98f8b349e5d33e2575",
+      "evidence_sha": "d8ab43164c959954af9bea4fdb84b1bb77747e6f14a5ee2b908d6c602b644137"
+    },
+    {
+      "task_id": "h06",
+      "task_sha": "38b24ce82dc6468f02d9244c6a2a9477092f9be271af895c1a6109b190c05c42",
+      "source_sha": "9b123a6beacc43732f08c9d00afe168344497986d97744cf3999f16ffe583fd8",
+      "evidence_sha": "56da2df6c7cb17f81cd16e163d0a482fa83ed8ae1e7db8c22bc9f53c529d7fb0"
+    },
+    {
+      "task_id": "h07",
+      "task_sha": "87c119179cce12fdb2de9b1c9b55ea22ec8f855912df034d4f24d07b6ac67183",
+      "source_sha": "c1abe7003b4d54b5cca57c785d85a45e3aa4c0ec85622f1644bdbc603f8831b1",
+      "evidence_sha": "eab614430ee4ee2e32af0b05a60411b20c2d0821295d95ceba0b736437ae41ab"
+    },
+    {
+      "task_id": "h08",
+      "task_sha": "14c27634d53ec658fb3f789d318e11fbadf44284f6c38130a2270b3f7ed8f8ee",
+      "source_sha": "f8be30c6f3de26809cda1733d9a1c62c1a43af25a1c698e00467e9422c44881d",
+      "evidence_sha": "2a6464c5cd5246564d73db73d2cc03af95d0255d7ab43867a3adcbb851e3916f"
+    }
+  ]
+}

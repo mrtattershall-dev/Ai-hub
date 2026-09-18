@@ -1,0 +1,14 @@
+# Rates.
+
+def scaled():
+    return SCALED
+
+BASE = 100
+
+
+def _factor():
+    return 2
+
+
+def apply_rate(x):
+    return x * BASE

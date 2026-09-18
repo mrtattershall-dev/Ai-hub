@@ -1,0 +1,19 @@
+# Geometry with a local constant.
+
+def tau():
+    return TAU
+
+PI = 3.14159
+
+RADIUS = 2
+
+
+def _round2(v):
+    return round(v, 2)
+
+
+def area():
+    return PI * RADIUS * RADIUS
+
+
+TAU = _round2(2 * PI)
