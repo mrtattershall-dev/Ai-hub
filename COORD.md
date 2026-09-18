@@ -7090,3 +7090,23 @@ and aborts non-interactively without it, which cost five over-cap minutes on 202
 **WINDOW CLOSED.** `modal app stop legasus-1p5b --yes`, verified `stopped` via `modal app list`.
 Roughly ten minutes on a T4. Result recorded in `measurements/2026-09-18-contract-1p5b/` — NULL on the
 preregistered primary, with a qualitative failure-mode finding that is the part worth keeping.
+
+---
+
+## 2026-09-18  GPU WINDOW CLAIM #2 — bounded-authority arm, same T4 app
+
+**Authorization, tatte's words verbatim.** The grant:
+
+> "Okay let's rerun 1.5b coder on modal with a t4. You have permission to rent it."
+
+and the request for this specific experiment:
+
+> "That is the experiment I want now."
+> "Not a smarter prompt. Less authority."
+
+**Same app** (`legasus-1p5b`), same T4, same 5-minute scaledown. AC power re-checked before the window.
+Preregistration committed first at `measurements/2026-09-18-bounded-1p5b/`, including the prediction
+and the declared non-win outcome.
+
+Only the BOUNDED arm is generated. BASELINE and CONTRACT are NOT re-run - their recorded figures stand
+as history, and re-running them would invite quietly replacing a null with a luckier sample.
