@@ -81,3 +81,82 @@ whether it holds across what models actually produce.
 
 T4 under standing authorization. `scaledown_window` 5 min, AC confirmed, stop with `--yes` and verify.
 **Rule 3** checks every model before any generation.
+
+---
+
+# RESULT — the middle family: OBSERVE earns its row, and the mechanism is not what I predicted
+
+GPU window stopped and verified: one `legasus` row, `stopped`, 0 containers.
+
+    model   authorized   DERIVED   BLIND_TOP  (preservation-broken)   BLIND_BOTTOM  (new-dead)
+    1.5B        73          73        19            54                     0            73
+    7B          80          77        54            25                     0            80
+    14B         80          79        72             7                     0            80
+    TOTAL      233         229       145            86                     0           233
+
+    DERIVED 229/233 vs BLIND_TOP 145/233      p = 9.8e-26
+    DERIVED 229/233 vs BLIND_BOTTOM 0/233     p = 3.6e-131
+
+## The criterion is met
+
+> *Derived placement must outperform both structure-blind extremes on the same recorded fragments, with
+> each blind policy failing for its predicted and opposite reason.*
+
+    BLIND_BOTTOM   fails 233 of 233, and every single failure is NEW_DEAD
+    BLIND_TOP      fails  88 of 233, and 86 of those are PRESERVATION_BROKEN
+    DERIVED        fails   4 of 233, none of them a placement failure
+
+The two blind policies fail for **opposite** reasons, exactly as the geometry predicts, and the
+derivation beats both. **`OBSERVE` earns its row in `NECESSITY.md`.**
+
+The four `DERIVED` failures are fragment errors — invented lower bounds like `0 < n < 10 and n != 3` —
+which fail at *any* placement. No placement failure occurred at the derived site.
+
+## My prediction about BLIND_TOP is falsified, and the falsification is the finding
+
+I predicted `BLIND_TOP` would be *near zero*. It is 145 of 233, and it **improves with capacity**:
+19/73 at 1.5B, 54/80 at 7B, 72/80 at 14B (1.5B vs 14B, p = 1.2e-16).
+
+The diagnostic is almost perfectly clean:
+
+    BLIND_TOP outcome by whether the emitted guard carries its own exclusion
+
+      self-defending    `n < 10 and n != 3`,  `n < 20 and n != 12`,  `0 <= n < 50`
+                        OK 145    FAIL   2
+      plain             `n < 10`,  `n < 20`,  `n < 50`
+                        OK   0    FAIL  86                          p = 1.7e-62
+
+> `BLIND_TOP` survives **exactly when the model wrote a guard that defends itself**, and fails whenever
+> it wrote a plain one.
+
+The two self-defending failures are `0 < n < 10 and n != 3` and `1 <= n < 10 and n != 3` — invented
+lower bounds, wrong at every placement, not placement failures.
+
+## What that actually means, and it is stronger than "necessary"
+
+Placement derived from the program is necessary — `BLIND_BOTTOM` is 0 for 233. But **part of what that
+derivation protects against can be absorbed by the model's realization strategy**, and whether it is
+absorbed is a property of `RENDER` and capacity, not of the placement policy.
+
+This is the exclusion-predicate result from the rendering windows reappearing in a new role. There,
+naming the exclusion in the specification made the model write `n != 3` into its guard. Here, that same
+habit is what lets a structure-blind top insertion survive.
+
+> Without `OBSERVE`, correctness becomes **contingent on a stylistic choice the architecture does not
+> control** — one the 1.5B makes 26% of the time and the 14B 90% of the time.
+
+That is a sharper statement of necessity than a bare score gap. The derivation does not merely help;
+it removes a dependency on the model that would otherwise be invisible while capacity happened to be
+high enough to hide it.
+
+## What this changes
+
+1. **`OBSERVE` moves from "not established" to load-bearing**, on a family built specifically to be
+   able to falsify it, with the failure modes separating as predicted.
+2. **A new interaction is measured**: `RENDER` choices that induce self-defending guards partially
+   substitute for `OBSERVE`'s placement. Two stages previously treated as independent are not, and the
+   substitution runs one way only — a self-defending guard rescues a bad placement, but no placement
+   rescues a guard whose domain is wrong.
+3. **The previous family's null is explained rather than excused.** `BLIND_BOTTOM` tied the derivation
+   there because the preserved behaviour sat at the top in every shape. Here it is 0 for 233. The
+   earlier entry was a statement about that geometry, and the table said so.

@@ -1,0 +1,27 @@
+  C1                   A n == 3    B n < 100   req n < 10     region 2..2 UNIQUE  top 0 bottom 4
+  C2                   A n == 12   B n < 200   req n < 20     region 2..2 UNIQUE  top 0 bottom 4
+  C3                   A n < 0     B n < 500   req n < 50     region 2..2 UNIQUE  top 0 bottom 4
+  C4                   A n == 3    B n < 100   req n < 10     region 4..4 UNIQUE  top 0 bottom 6
+  C5_NO_UNIQUE_MIDDLE  A n == 3    B n > 100   req n < 10     region 2..4 OPEN  top 0 bottom 4
+  controls ok: DECIDE fixes A > NEW > B in every case, the legal region is a unique middle, neither blind policy coincides with it, both realizations verify there, and each blind policy fails for its own predicted and opposite reason
+  RULE 3 ok: qwen2.5-coder:1.5b, qwen2.5-coder:7b, qwen2.5-coder:14b
+  4 cases x 3 models   samples 20
+
+  qwen2.5-coder:1.5b   C1    authorized 18/20   DERIVED ok 18   TOP ok  4 (preservation-broken 14)   BOTTOM ok  0 (new-dead 18)
+  qwen2.5-coder:1.5b   C2    authorized 19/20   DERIVED ok 19   TOP ok 10 (preservation-broken 9)   BOTTOM ok  0 (new-dead 19)
+  qwen2.5-coder:1.5b   C3    authorized 17/20   DERIVED ok 17   TOP ok  1 (preservation-broken 16)   BOTTOM ok  0 (new-dead 17)
+  qwen2.5-coder:1.5b   C4    authorized 19/20   DERIVED ok 19   TOP ok  4 (preservation-broken 15)   BOTTOM ok  0 (new-dead 19)
+  qwen2.5-coder:7b     C1    authorized 20/20   DERIVED ok 17   TOP ok 16 (preservation-broken 3)   BOTTOM ok  0 (new-dead 20)
+  qwen2.5-coder:7b     C2    authorized 20/20   DERIVED ok 20   TOP ok 19 (preservation-broken 1)   BOTTOM ok  0 (new-dead 20)
+  qwen2.5-coder:7b     C3    authorized 20/20   DERIVED ok 20   TOP ok  0 (preservation-broken 20)   BOTTOM ok  0 (new-dead 20)
+  qwen2.5-coder:7b     C4    authorized 20/20   DERIVED ok 20   TOP ok 19 (preservation-broken 1)   BOTTOM ok  0 (new-dead 20)
+  qwen2.5-coder:14b    C1    authorized 20/20   DERIVED ok 20   TOP ok 20 (preservation-broken 0)   BOTTOM ok  0 (new-dead 20)
+  qwen2.5-coder:14b    C2    authorized 20/20   DERIVED ok 20   TOP ok 20 (preservation-broken 0)   BOTTOM ok  0 (new-dead 20)
+  qwen2.5-coder:14b    C3    authorized 20/20   DERIVED ok 20   TOP ok 13 (preservation-broken 7)   BOTTOM ok  0 (new-dead 20)
+  qwen2.5-coder:14b    C4    authorized 20/20   DERIVED ok 19   TOP ok 19 (preservation-broken 0)   BOTTOM ok  0 (new-dead 20)
+
+  qwen2.5-coder:1.5b    authorized 73   DERIVED 73   BLIND_TOP 19 (preservation-broken 54)   BLIND_BOTTOM 0 (new-dead 73)
+  qwen2.5-coder:7b      authorized 80   DERIVED 77   BLIND_TOP 54 (preservation-broken 25)   BLIND_BOTTOM 0 (new-dead 80)
+  qwen2.5-coder:14b     authorized 80   DERIVED 79   BLIND_TOP 72 (preservation-broken 7)   BLIND_BOTTOM 0 (new-dead 80)
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.middle.json

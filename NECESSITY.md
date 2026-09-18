@@ -25,7 +25,7 @@ left to look like a preregistration written before the result it responds to.
 
 | Stage | Status | Evidence |
 |---|---|---|
-| `OBSERVE` | **Not established in this family** | derived placement 624/692; observation-blind *top* insertion 295/692; observation-blind *bottom* insertion **624/692 — identical to derived** |
+| `OBSERVE` | **Load-bearing** (middle family) | derived 229/233; blind-top 145/233 failing 86x PRESERVATION_BROKEN; blind-bottom **0/233** failing 233x NEW_DEAD. Earlier top-heavy family could not separate it: derived 624/692 == blind-bottom 624/692 |
 | `DECIDE` | **Load-bearing** | same 105 transactions: derived order 105/105, presentation order **0/105**, every failure a named dead operation |
 | `RENDER` | **Causal, requires regeneration** | semantic plan held fixed; `EXTENT` vs `SILENT` moved authorization precision 0.775 → 0.986 at 7B and 0.677 → 0.969 at 14B |
 | `PROPOSE` | Stochastic backend | yield and realization strategy depend on model and rendering; correctness of the composition does not |
@@ -44,7 +44,25 @@ stages that shape the candidate pool from the stages that judge it.
 
 ---
 
-## OBSERVE — why the entry says "not established"
+## OBSERVE — first not established, then earned
+
+### The middle family settled it
+
+    model   authorized   DERIVED   BLIND_TOP  (preservation-broken)   BLIND_BOTTOM  (new-dead)
+    1.5B        73          73        19            54                     0            73
+    7B          80          77        54            25                     0            80
+    14B         80          79        72             7                     0            80
+    TOTAL      233         229       145            86                     0           233
+
+Both blind policies fail for their predicted and OPPOSITE reasons. But BLIND_TOP survives 145 times,
+and the diagnostic says why: it survives EXACTLY when the model wrote a self-defending guard
+() - 145 OK / 2 FAIL against 0 OK / 86 FAIL for plain guards, p = 1.7e-62. So part
+of what OBSERVE protects against is absorbed by the model, and how often depends on capacity (26% at
+1.5B, 90% at 14B). Without OBSERVE, correctness becomes contingent on a stylistic choice the
+architecture does not control.
+
+### The earlier family, and why it could not separate it
+
 
     shape        fragments   DERIVED   BLIND_TOP   BLIND_BOTTOM
     S_UPPER         180        174        113          174
