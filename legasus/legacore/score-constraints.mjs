@@ -113,7 +113,12 @@ for (const t of GT) {
     rows.push({ task: t.task, op: ctx.operation_id, verdict, narrowable: row.narrowable,
       cand: row.candidates, truth: row.passing, derived: res.constrained,
       gained, maxBits, wrongly: wrongly.length,
-      kinds: res.chain.filter((c) => (c.removed_positions || []).length).map((c) => c.kind) });
+      kinds: res.chain.filter((c) => (c.removed_positions || []).length).map((c) => c.kind),
+      // EMITTED is a different fact from NARROWED. A rule whose correctness is its SILENCE -
+      // scope_availability, deferred_requirement, unresolved_requirement, canonical_realization -
+      // never narrows, so scoring it by narrowing marks every correct result a failure. That is
+      // exactly what happened to j01 and j02, whose scope resolution was right.
+      emitted: res.chain.map((c) => c.kind) });
   }
 }
 
@@ -145,11 +150,18 @@ if (KIND.size) {
     if (!byKind.has(group)) byKind.set(group, {});
     const rs = rows.filter((r) => r.task === id);
     const fired = rs.flatMap((r) => r.kinds);
+    const emitted = rs.flatMap((r) => r.emitted || []);
+    // Kinds that resolve an account without narrowing are judged on EMISSION; kinds that exist to
+    // narrow are judged on narrowing.
+    const SILENT = ['scope_availability', 'deferred_requirement', 'unresolved_requirement',
+      'canonical_realization'];
+    const silent = SILENT.includes(spec.kind);
     byKind.get(group)[spec.half] = {
       id,
       narrowable: rs.filter((r) => r.narrowable).length,
       ops: rs.length,
-      firedOwn: fired.filter((k) => k === spec.kind).length,
+      firedOwn: (silent ? emitted : fired).filter((k) => k === spec.kind).length,
+      judged_on: silent ? 'emission (this kind narrows nothing by design)' : 'narrowing',
       firedAny: [...new Set(fired)],
       over: rs.filter((r) => r.wrongly > 0).length,
       bits: rs.reduce((a, r) => a + r.gained, 0),
@@ -169,7 +181,7 @@ if (KIND.size) {
         : half === 'NEGATIVE' ? (h.firedOwn === 0 && h.over === 0) : null;
       console.log('    ' + (ok === null ? '----  ' : ok ? 'PASS  ' : 'FAIL  ') + half.padEnd(17) + h.id
         + '  narrowable ' + h.narrowable + '/' + h.ops
-        + '  this kind fired on ' + h.firedOwn + ' op(s)'
+        + '  this kind fired on ' + h.firedOwn + ' op(s) [' + h.judged_on + ']'
         + '  over-constraint ' + h.over
         + '  bits ' + h.bits.toFixed(2) + '/' + h.avail.toFixed(2));
       if (h.firedAny.length) console.log('          kinds that narrowed: ' + h.firedAny.join(', '));

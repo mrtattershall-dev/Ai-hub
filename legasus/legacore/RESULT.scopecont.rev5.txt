@@ -1,0 +1,56 @@
+  CORRECT-0       j01:op1      cand   1  truth-passes   1  derived   1  gain 0.00/0.00
+  RECOVERED       j01:op2      cand   2  truth-passes   1  derived   1  gain 1.00/1.00  [control_flow_boundary]
+  OVER-CONSTRAINT j01:op3      cand   8  truth-passes   6  derived   5  gain 0.00/0.42  WRONGLY REMOVED 1  [ownership_boundary]
+  RECOVERED       j02:op1      cand  14  truth-passes  11  derived  11  gain 0.35/0.35  [ownership_boundary]
+  RECOVERED       j02:op2      cand   3  truth-passes   1  derived   2  gain 0.58/1.58  [control_flow_boundary]
+  RECOVERED       j02:op3      cand  13  truth-passes  10  derived  10  gain 0.38/0.38  [ownership_boundary]
+  RECOVERED       j03:op1      cand  15  truth-passes  12  derived  12  gain 0.32/0.32  [expression_continuation]
+  RECOVERED       j03:op2      cand  15  truth-passes  12  derived  12  gain 0.32/0.32  [expression_continuation]
+  RECOVERED       j04:op1      cand  15  truth-passes  11  derived  11  gain 0.45/0.45  [symbol_availability]
+  CORRECT-0       j04:op2      cand  16  truth-passes  16  derived  16  gain 0.00/0.00
+  CORRECT-0       j04:op3      cand  15  truth-passes  15  derived  15  gain 0.00/0.00
+  RECOVERED       j05:op1      cand  15  truth-passes  13  derived  13  gain 0.21/0.21  [symbol_availability]
+  CORRECT-0       j05:op2      cand  14  truth-passes  14  derived  14  gain 0.00/0.00
+  CORRECT-0       j05:op3      cand  14  truth-passes  14  derived  14  gain 0.00/0.00
+  RECOVERED       j06:op1      cand  12  truth-passes  10  derived  10  gain 0.26/0.26  [symbol_availability]
+  CORRECT-0       j06:op2      cand  11  truth-passes  11  derived  11  gain 0.00/0.00
+
+  ---- PER CONSTRAINT KIND (the aggregate is reported after this, not instead of it)
+
+  scope_availability  [parameter of the enclosing unit]
+    FAIL  POSITIVE         j01  narrowable 2/3  this kind fired on 1 op(s) [emission (this kind narrows nothing by design)]  over-constraint 1  bits 1.00/1.42
+          kinds that narrowed: control_flow_boundary, ownership_boundary
+
+  scope_availability  [local of the enclosing unit, beside a planned provider]
+    FAIL  POSITIVE         j02  narrowable 3/3  this kind fired on 0 op(s) [emission (this kind narrows nothing by design)]  over-constraint 0  bits 1.31/2.31
+          kinds that narrowed: ownership_boundary, control_flow_boundary
+
+  expression_continuation  [hand-written multi-line literal]
+    PASS  POSITIVE         j03  narrowable 2/2  this kind fired on 2 op(s) [narrowing]  over-constraint 0  bits 0.64/0.64
+          kinds that narrowed: expression_continuation
+
+  scope_availability  [module-level op using a name that is ALSO a function parameter]
+    PASS  NEGATIVE         j04  narrowable 1/3  this kind fired on 0 op(s) [emission (this kind narrows nothing by design)]  over-constraint 0  bits 0.45/0.45
+          kinds that narrowed: symbol_availability
+
+  expression_continuation  [brackets inside strings and comments]
+    PASS  NEGATIVE         j05  narrowable 1/3  this kind fired on 0 op(s) [narrowing]  over-constraint 0  bits 0.21/0.21
+          kinds that narrowed: symbol_availability
+
+  expression_continuation  [balanced literals and nested calls on one line]
+    PASS  NEGATIVE         j06  narrowable 1/2  this kind fired on 0 op(s) [narrowing]  over-constraint 0  bits 0.26/0.26
+          kinds that narrowed: symbol_availability
+
+  ---- LegaCore constraint derivation, against executable ground truth
+  operations scored          16   (narrowable 10)
+  RECOVERED                  9   narrowed, and every removed boundary really fails
+  missed                     0   narrowable, nothing derived
+  OVER-CONSTRAINT            1   removed a boundary that actually passes
+  correct zero               6   position-independent and left alone
+  witnesses that replayed    16/16
+
+  PRIMARY   recovered 9 of 10 narrowable   (v6 target: >= 15 of 26)
+  SECONDARY realized available information 73.2%   (3.87 of 5.29 bits)   DIAGNOSTIC ONLY
+
+  STYLE CONTROL  canonical_realization fired on 9 operation(s) and narrowed 0.
+  A style constraint that narrows anything is a milestone failure regardless of score.

@@ -6,10 +6,10 @@
   ---- PER CONSTRAINT KIND (the aggregate is reported after this, not instead of it)
 
   symbol_availability  [provider arrives by import]
-    ----  UNRESOLVED       i01  narrowable 1/2  this kind fired on 0 op(s)  over-constraint 0  bits 0.00/0.55
+    ----  UNRESOLVED       i01  narrowable 1/2  this kind fired on 0 op(s) [narrowing]  over-constraint 0  bits 0.00/0.55
 
   symbol_availability  [provider is a module constant]
-    ----  RESOLVED-CONTROL i02  narrowable 1/2  this kind fired on 1 op(s)  over-constraint 0  bits 0.55/0.55
+    ----  RESOLVED-CONTROL i02  narrowable 1/2  this kind fired on 1 op(s) [narrowing]  over-constraint 0  bits 0.55/0.55
           kinds that narrowed: symbol_availability
 
   ---- LegaCore constraint derivation, against executable ground truth

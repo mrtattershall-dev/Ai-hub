@@ -24,33 +24,33 @@
   ---- PER CONSTRAINT KIND (the aggregate is reported after this, not instead of it)
 
   symbol_availability  [provider -> IMMEDIATE consumer]
-    PASS  POSITIVE         h01  narrowable 2/2  this kind fired on 2 op(s)  over-constraint 0  bits 1.32/1.32
+    PASS  POSITIVE         h01  narrowable 2/2  this kind fired on 2 op(s) [narrowing]  over-constraint 0  bits 1.32/1.32
           kinds that narrowed: symbol_availability
 
   symbol_availability  [provider -> DEFERRED body consumer]
-    PASS  NEGATIVE         h02  narrowable 0/2  this kind fired on 0 op(s)  over-constraint 0  bits 0.00/0.00
+    PASS  NEGATIVE         h02  narrowable 0/2  this kind fired on 0 op(s) [narrowing]  over-constraint 0  bits 0.00/0.00
 
   symbol_availability  [definition-time requirement]
-    PASS  POSITIVE         h03  narrowable 3/3  this kind fired on 3 op(s)  over-constraint 0  bits 2.08/2.08
+    PASS  POSITIVE         h03  narrowable 3/3  this kind fired on 3 op(s) [narrowing]  over-constraint 0  bits 2.08/2.08
           kinds that narrowed: symbol_availability
 
   symbol_availability  [same shape, body reference]
-    PASS  NEGATIVE         h04  narrowable 0/3  this kind fired on 0 op(s)  over-constraint 0  bits 0.00/0.00
+    PASS  NEGATIVE         h04  narrowable 0/3  this kind fired on 0 op(s) [narrowing]  over-constraint 0  bits 0.00/0.00
 
   symbol_availability  [bare statement, TWO providers]
-    PASS  POSITIVE         h05  narrowable 3/3  this kind fired on 5 op(s)  over-constraint 0  bits 2.14/2.14
+    PASS  POSITIVE         h05  narrowable 3/3  this kind fired on 5 op(s) [narrowing]  over-constraint 0  bits 2.14/2.14
           kinds that narrowed: symbol_availability
 
   symbol_availability  [EXISTING vs PLANNED provider]
-    PASS  POSITIVE         h06  narrowable 2/3  this kind fired on 3 op(s)  over-constraint 0  bits 1.53/1.53
+    PASS  POSITIVE         h06  narrowable 2/3  this kind fired on 3 op(s) [narrowing]  over-constraint 0  bits 1.53/1.53
           kinds that narrowed: symbol_availability
 
   symbol_availability  [requirement the rule cannot resolve]
-    ----  UNRESOLVED       h07  narrowable 2/3  this kind fired on 2 op(s)  over-constraint 0  bits 1.71/1.71
+    ----  UNRESOLVED       h07  narrowable 2/3  this kind fired on 2 op(s) [narrowing]  over-constraint 0  bits 1.71/1.71
           kinds that narrowed: symbol_availability
 
   symbol_availability  [the same shape, fully resolvable]
-    ----  RESOLVED-CONTROL h08  narrowable 2/3  this kind fired on 2 op(s)  over-constraint 0  bits 1.71/1.71
+    ----  RESOLVED-CONTROL h08  narrowable 2/3  this kind fired on 2 op(s) [narrowing]  over-constraint 0  bits 1.71/1.71
           kinds that narrowed: symbol_availability
 
   ---- LegaCore constraint derivation, against executable ground truth
