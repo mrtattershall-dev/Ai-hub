@@ -7193,3 +7193,11 @@ readout agrees: naming the function did not pull its name into the output. WINDO
 its NEUTRAL null was underpowered. Pooled byte-identical replicates show BOTH effects - any sentence
 moves it (p=0.011) and an obligation-shaped one moves it further (p=0.0098). W1 flat across five
 sentences. Cumulative P(correct|authorized) 460/463.
+
+**WINDOW #9 CLOSED.** 11:15:44Z to ~11:24Z, 6 rows, 0 not stopped. E1 RETIRED: the "other"
+hypothesis is dead - OTHER produced ZERO n>0 conditions in 80 samples, the outcome preregistered as
+more likely. E2 FAILED PROSPECTIVELY: the window x wording interaction is p=0.38, so it is NOT
+established - one window showed it, two did not, and the pooled significance rested on the one.
+The MAIN effect survives (p=0.018). What replaced both: delta phrasing moves the verified rate 12
+points out of 80 between equally valid English sentences, and the RELATIONAL phrasing is best.
+Cumulative P(correct|authorized) 731/736.
