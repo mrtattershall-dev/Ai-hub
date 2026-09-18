@@ -187,7 +187,7 @@ marching orders forbid outright. Add the instrument; never retire the record.
 
 ---
 
-## 3c. JSON silently inverting an unbounded domain — RULE ONLY, caught before use
+## 3c. JSON silently inverting an unbounded domain - MECHANIZED after it was finally used
 
 `JSON.stringify({ lo: -Infinity })` yields `null`, and `-5 > null` is `false`. An unbounded domain
 round-tripped through JSON therefore INVERTS: `n < 10` stops matching negative numbers, with no error
@@ -195,6 +195,21 @@ anywhere.
 
 Found while reading a test's own output before anything depended on it - nothing serialised a domain
 yet, and gate 12D is where it would first have bitten.
+
+**SECOND occurrence, 2026-09-18, and this time it was USED.** This entry said "caught before use".
+It has now been used. `parseCondition` returns lo: -Infinity for `n < 10`; JSON.stringify turns that
+into null; and LegaVerify's contract-probe generator tested `lo === -Infinity` to decide whether to emit
+DEEP INTERIOR probes. A domain that had been through a file or a saved artifact arrived with lo: null,
+the deep probes never fired, and the probe set silently dropped from four negative probes to one -
+losing exactly the probes that kill an invented lower bound like `0 < n < 10`.
+
+Measured before repair, not supposed: live domain 4 negative probes, round-tripped 1.
+
+**Mechanism:** `normalizeDomain` treats null and undefined as unbounded at every entry point, and
+`auditProbeSet` REFUSES to return a probe set that lacks a deep probe into an end the contract left
+open - a weaker probe set is now an exception rather than a quieter answer. Witnessed both ways: a
+round-tripped domain produces the identical probe set and still kills `0 < n < 10`, and a deliberately
+truncated probe set is reported.
 
 **Rule:** any value that can be infinite is encoded explicitly on the way out and decoded on the way
 back, with a round-trip witness. JSON's defaults are not a safe representation for a numeric domain.

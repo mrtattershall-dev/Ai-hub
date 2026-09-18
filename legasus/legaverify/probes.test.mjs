@@ -13,7 +13,8 @@
 // `0 < n < 10`, which is included precisely because it is the one a regression-style probe set missed.
 import test from 'node:test';
 import assert from 'node:assert';
-import { contractProbes, probeValues, checkProbes, containsPoint } from './probes.mjs';
+import { contractProbes, probeValues, checkProbes, containsPoint, auditProbeSet,
+  normalizeDomain } from './probes.mjs';
 
 // The window-11 task family, as a pure function of the program's semantics.
 // classify: n == P -> label; n > 10000 -> enormous; n > 1000 -> huge; n > 100 -> large; else other.
@@ -146,4 +147,44 @@ test('containsPoint handles each domain kind', () => {
   assert.ok(!containsPoint({ kind: 'interval', lo: -Infinity, hi: 10, loOpen: true, hiOpen: true }, 10));
   assert.ok(containsPoint({ kind: 'interval', lo: -Infinity, hi: 10, loOpen: true, hiOpen: false }, 10));
   assert.ok(!containsPoint({ kind: 'unmodelled', text: 'x' }, 1));
+});
+
+// ---- APPARATUS DEFECT, found while broadening and repaired with controls.
+//
+// An unbounded end survives as `null` through JSON. The check `lo === -Infinity` was then false, the
+// deep-interior probes never fired, and the probe set silently dropped from four negative probes to
+// one - losing exactly the probes that kill an invented lower bound. Measured, not supposed.
+
+test('DEFECT REPAIRED: a JSON round trip must not weaken the probe set', () => {
+  const live = { kind: 'interval', variable: 'n', lo: -Infinity, hi: 10, loOpen: true, hiOpen: true };
+  const roundTripped = JSON.parse(JSON.stringify(live));
+  assert.equal(roundTripped.lo, null, 'the round trip must actually produce null, or this proves nothing');
+  assert.deepEqual(probeValues({ requested: roundTripped }), probeValues({ requested: live }));
+});
+
+test('a round-tripped domain still kills the invented lower bound', () => {
+  const roundTripped = JSON.parse(JSON.stringify(
+    { kind: 'interval', variable: 'n', lo: -Infinity, hi: 10, loOpen: true, hiOpen: true }));
+  const c = { requested: roundTripped, requestedResult: 'small',
+    preserved: { kind: 'point', variable: 'n', value: 3 }, preservedWins: true, existing: [] };
+  const probes = contractProbes(c, makeOriginal(3, 'three'));
+  const r = checkProbes(probes, realize(3, 'three', (n) => n > 0 && n < 10));
+  assert.ok(!r.passed, '`0 < n < 10` survived a probe set built from a round-tripped domain');
+});
+
+test('an insufficient probe set is a LOUD failure, never a quiet one', () => {
+  // The audit is what turns silent weakening into an exception. Prove it can fire.
+  const gaps = auditProbeSet(
+    { kind: 'interval', lo: -Infinity, hi: 10, loOpen: true, hiOpen: true },
+    [8, 9, 10, 11]);
+  assert.equal(gaps.length, 1, 'a probe set with no deep negative probe must be reported');
+  assert.match(gaps[0], /unbounded below/);
+  assert.equal(auditProbeSet({ kind: 'interval', lo: -Infinity, hi: 10, loOpen: true, hiOpen: true },
+    probeValues({ requested: { kind: 'interval', lo: -Infinity, hi: 10, loOpen: true, hiOpen: true } })).length, 0);
+});
+
+test('an unbounded ABOVE domain is probed far upward too', () => {
+  const d = { kind: 'interval', variable: 'n', lo: 100, hi: Infinity, loOpen: true, hiOpen: true };
+  const vs = probeValues({ requested: d });
+  assert.ok(vs.some((v) => v >= 200), 'no probe far above the lower bound: ' + JSON.stringify(vs));
 });

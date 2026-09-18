@@ -46,7 +46,44 @@ function deepInterior(hi) {
   return [hi - 2, hi - 10, hi - 100, hi - 10000, hi - 1000000];
 }
 
+// AN UNBOUNDED END SURVIVES AS `null` THROUGH JSON, AND THAT SILENTLY WEAKENS THIS MODULE.
+//
+// `parseCondition` returns lo: -Infinity for `n < 10`. JSON.stringify turns that into null, so a
+// domain that has been through a file, a wire or a saved artifact arrives with lo: null. The check
+// `lo === -Infinity` is then false, the deep-interior probes never fire, and the probe set drops from
+// four negative probes to one - losing exactly the probes that kill an invented lower bound.
+//
+// Measured, not supposed: live domain 4 negative probes, round-tripped 1.
+//
+// This is hazard 3c in the ledger, which was recorded as "caught before use". It has now been used.
+// Both the normalization and the audit below exist because a weaker probe set must never be a silent
+// outcome - the whole point of this module is that a wrong realization has nowhere to hide.
+export function normalizeDomain(d) {
+  if (!d || d.kind !== 'interval') return d;
+  const lo = d.lo === null || d.lo === undefined ? -Infinity : d.lo;
+  const hi = d.hi === null || d.hi === undefined ? Infinity : d.hi;
+  return { ...d, lo, hi };
+}
+
+// Does this probe set actually interrogate the ends the contract left open? An unbounded end with no
+// probe far into it is a probe set that cannot see an invented bound, and returning one quietly is the
+// failure mode this module was written to end.
+export function auditProbeSet(requested, values) {
+  const d = normalizeDomain(requested);
+  const problems = [];
+  if (d && d.kind === 'interval') {
+    if (d.lo === -Infinity && d.hi !== Infinity) {
+      if (!values.some((v) => v <= d.hi - 100)) problems.push('unbounded below, but no probe 100 or more beneath the upper bound');
+    }
+    if (d.hi === Infinity && d.lo !== -Infinity) {
+      if (!values.some((v) => v >= d.lo + 100)) problems.push('unbounded above, but no probe 100 or more beyond the lower bound');
+    }
+  }
+  return problems;
+}
+
 export function containsPoint(domain, v) {
+  domain = normalizeDomain(domain);
   if (!domain) return false;
   switch (domain.kind) {
     case 'point': return v === domain.value;
@@ -63,6 +100,8 @@ export function containsPoint(domain, v) {
 
 // The probe VALUES, derived only from the shape of the contract.
 export function probeValues({ requested, existing = [] }) {
+  requested = normalizeDomain(requested);
+  existing = existing.map((b) => ({ ...b, domain: normalizeDomain(b.domain) }));
   const vs = new Set(UNIVERSAL);
   const add = (v) => { if (Number.isFinite(v)) vs.add(v); };
 
@@ -93,7 +132,13 @@ export function probeValues({ requested, existing = [] }) {
       if (d.hi !== Infinity) triple(d.hi).forEach(add);
     }
   }
-  return [...vs].sort((a, b) => a - b);
+  const out = [...vs].sort((a, b) => a - b);
+  const gaps = auditProbeSet(requested, out);
+  if (gaps.length) {
+    throw new Error('probe set is insufficient for the contract: ' + gaps.join('; ')
+      + ' - refusing to return a probe set that cannot see an invented bound');
+  }
+  return out;
 }
 
 // The EXPECTATION for each value, from the contract plus the current program.
