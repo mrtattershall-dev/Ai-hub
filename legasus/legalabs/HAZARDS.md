@@ -14,7 +14,7 @@ three, and occurrence four still happened. Each entry therefore carries its stat
 
 ## 1. Heredoc backslash-eating — MECHANIZED
 
-**Occurrences: 5.** A shell heredoc collapses doubled backslashes, so JS written that way lands with
+**Occurrences: 6.** A shell heredoc collapses doubled backslashes, so JS written that way lands with
 `'\\s'` turned into `'\s'`. In a JS string literal `\s` is simply `s`: the file stays **syntactically
 valid**, the regex silently changes meaning, and the program returns a plausible wrong answer with no
 error anywhere.
@@ -46,6 +46,22 @@ character outside tab/LF/CR, anywhere in a file — string literal, regex litera
 without needing to know which context it is in, because a raw control character in source is never an
 intention. Proven both directions: a synthetic corrupted regex literal is CAUGHT, clean source with a
 real `\w` and a template literal is ADMITTED. Sweep of all 85 `.mjs` files in `legasus/`: clean.
+
+**SIXTH occurrence, same day, third delivery mechanism.** A shell-quoted `node -e` this time. The
+escapes in a regex literal collapsed into ORDINARY CHARACTERS rather than control characters, so the
+regex stayed syntactically valid, matched nothing, and the derived parameter name came out undefined.
+The prompt then read "The function takes one parameter, named undefined." Neither scan sees this:
+scanControlChars finds no control character, and the string-literal scan does not walk regex literals.
+
+**What caught it, and the rule that generalizes:** the SUFFICIENCY control, which had been built
+fifteen minutes earlier for an unrelated reason and reported that the prompt never supplies the
+parameter. A guard built for one failure caught another because both are the same underlying shape -
+a fact the apparatus believes it rendered and did not.
+
+**New sub-rule, mechanized per-site:** every DERIVED fact rendered into a prompt asserts itself before
+rendering. A derivation that yields undefined and is interpolated anyway becomes the string
+"undefined" in the prompt, which is this project’s signature silent failure - plausible output, no
+error, lost work.
 
 **Standing rule it replaces:** JS containing a regex is written with a file writer, never a heredoc —
 *including one-off probes*, which is exactly where the discipline slipped every time. The fifth
