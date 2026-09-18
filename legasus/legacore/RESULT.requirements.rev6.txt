@@ -1,0 +1,68 @@
+  RECOVERED       h01:op1      cand  10  truth-passes   8  derived   8  gain 0.32/0.32  [symbol_availability]
+  RECOVERED       h01:op2      cand  10  truth-passes   5  derived   5  gain 1.00/1.00  [symbol_availability]
+  CORRECT-0       h02:op1      cand  11  truth-passes  11  derived  11  gain 0.00/0.00
+  CORRECT-0       h02:op2      cand  11  truth-passes  11  derived  11  gain 0.00/0.00
+  RECOVERED       h03:op1      cand  16  truth-passes   8  derived   8  gain 1.00/1.00  [symbol_availability]
+  RECOVERED       h03:op2      cand  16  truth-passes  11  derived  11  gain 0.54/0.54  [symbol_availability]
+  RECOVERED       h03:op3      cand  16  truth-passes  11  derived  11  gain 0.54/0.54  [symbol_availability]
+  CORRECT-0       h04:op1      cand  12  truth-passes  12  derived  12  gain 0.00/0.00
+  CORRECT-0       h04:op2      cand  12  truth-passes  12  derived  12  gain 0.00/0.00
+  CORRECT-0       h04:op3      cand  13  truth-passes  13  derived  13  gain 0.00/0.00
+  RECOVERED       h05:op1      cand  17  truth-passes  14  derived  14  gain 0.28/0.28  [symbol_availability]
+  RECOVERED       h05:op2      cand  17  truth-passes  15  derived  15  gain 0.18/0.18  [symbol_availability]
+  RECOVERED       h05:op3      cand  16  truth-passes   5  derived   5  gain 1.68/1.68  [symbol_availability]
+  RECOVERED       h06:op1      cand  12  truth-passes  10  derived  10  gain 0.26/0.26  [symbol_availability]
+  RECOVERED       h06:op2      cand  12  truth-passes   5  derived   5  gain 1.26/1.26  [symbol_availability]
+  CORRECT-0       h06:op3      cand  13  truth-passes  13  derived  13  gain 0.00/0.00
+  RECOVERED       h07:op1      cand  14  truth-passes  12  derived  12  gain 0.22/0.22  [symbol_availability]
+  RECOVERED       h07:op2      cand  14  truth-passes   5  derived   5  gain 1.49/1.49  [symbol_availability]
+  CORRECT-0       h07:op3      cand  15  truth-passes  15  derived  15  gain 0.00/0.00
+  RECOVERED       h08:op1      cand  14  truth-passes  12  derived  12  gain 0.22/0.22  [symbol_availability]
+  RECOVERED       h08:op2      cand  14  truth-passes   5  derived   5  gain 1.49/1.49  [symbol_availability]
+  CORRECT-0       h08:op3      cand  15  truth-passes  15  derived  15  gain 0.00/0.00
+
+  ---- PER CONSTRAINT KIND (the aggregate is reported after this, not instead of it)
+
+  symbol_availability  [provider -> IMMEDIATE consumer]
+    PASS  POSITIVE         h01  narrowable 2/2  this kind fired on 2 op(s) [narrowing]  over-constraint 0  bits 1.32/1.32
+          kinds that narrowed: symbol_availability
+
+  symbol_availability  [provider -> DEFERRED body consumer]
+    PASS  NEGATIVE         h02  narrowable 0/2  this kind fired on 0 op(s) [narrowing]  over-constraint 0  bits 0.00/0.00
+
+  symbol_availability  [definition-time requirement]
+    PASS  POSITIVE         h03  narrowable 3/3  this kind fired on 3 op(s) [narrowing]  over-constraint 0  bits 2.08/2.08
+          kinds that narrowed: symbol_availability
+
+  symbol_availability  [same shape, body reference]
+    PASS  NEGATIVE         h04  narrowable 0/3  this kind fired on 0 op(s) [narrowing]  over-constraint 0  bits 0.00/0.00
+
+  symbol_availability  [bare statement, TWO providers]
+    PASS  POSITIVE         h05  narrowable 3/3  this kind fired on 5 op(s) [narrowing]  over-constraint 0  bits 2.14/2.14
+          kinds that narrowed: symbol_availability
+
+  symbol_availability  [EXISTING vs PLANNED provider]
+    PASS  POSITIVE         h06  narrowable 2/3  this kind fired on 3 op(s) [narrowing]  over-constraint 0  bits 1.53/1.53
+          kinds that narrowed: symbol_availability
+
+  symbol_availability  [requirement the rule cannot resolve]
+    ----  UNRESOLVED       h07  narrowable 2/3  this kind fired on 2 op(s) [narrowing]  over-constraint 0  bits 1.71/1.71
+          kinds that narrowed: symbol_availability
+
+  symbol_availability  [the same shape, fully resolvable]
+    ----  RESOLVED-CONTROL h08  narrowable 2/3  this kind fired on 2 op(s) [narrowing]  over-constraint 0  bits 1.71/1.71
+          kinds that narrowed: symbol_availability
+
+  ---- LegaCore constraint derivation, against executable ground truth
+  operations scored          22   (narrowable 14)
+  RECOVERED                  14   narrowed, and every removed boundary really fails
+  missed                     0   narrowable, nothing derived
+  OVER-CONSTRAINT            0   removed a boundary that actually passes
+  correct zero               8   position-independent and left alone
+  witnesses that replayed    22/22
+
+  PRIMARY   recovered 14 of 14 narrowable   (v6 target: >= 15 of 26)
+  SECONDARY realized available information 100.0%   (10.48 of 10.48 bits)   DIAGNOSTIC ONLY
+
+  STYLE CONTROL  canonical_realization fired on 17 operation(s) and narrowed 0.
+  A style constraint that narrows anything is a milestone failure regardless of score.

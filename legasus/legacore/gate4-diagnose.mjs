@@ -5,7 +5,7 @@
 // be semantic intent; this one gets the same treatment before anything is built.
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { constrain } from './constraints5.mjs';
+import { constrain } from './constraints6.mjs';
 import { buildContext } from './opcontext.mjs';
 import { reconstruct, baseFor } from '../legalabs/substrate/narrowability.mjs';
 

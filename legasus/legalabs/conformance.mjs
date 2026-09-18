@@ -24,7 +24,7 @@
 //                          requirement_complete: true
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { constrain, verify } from '../legacore/constraints5.mjs';
+import { constrain, verify } from '../legacore/constraints6.mjs';
 import { operationFacts } from '../legacore/opfacts.mjs';
 import { buildContext } from '../legacore/opcontext.mjs';
 import { reconstruct, baseFor } from './substrate/narrowability.mjs';
@@ -34,7 +34,7 @@ const ind = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
 const ROOT = 'C:/Users/tatte/Projects/ai-coding-hub-indent/legasus/legalabs/substrate/';
 const FAMILIES = process.argv.slice(2);
 const families = FAMILIES.length ? FAMILIES
-  : ['family', 'holdout', 'provenance', 'generalization', 'requirements', 'unresolved'];
+  : ['family', 'holdout', 'provenance', 'generalization', 'requirements', 'unresolved', 'scopecont'];
 
 // Declared-unsupported provider forms, detected in the text an operation is placed into.
 const UNSUPPORTED = [
