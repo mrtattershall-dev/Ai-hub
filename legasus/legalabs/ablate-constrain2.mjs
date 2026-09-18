@@ -33,8 +33,22 @@
 //                 `classify` and happens to be right. Refusing it is CONSTRAIN doing its job: the
 //                 envelope bounds the KIND of attempt, and a rewrite is a different kind even when
 //                 its content is correct.
-//     C_SEMANTIC  the proposal stayed inside the granted authority AND satisfies the contract.
-//                 THIS is empirical over-constraint, and it is the only one of the two that is a defect.
+//     C_IN_SCOPE_EQUIVALENT  the proposal stayed inside the granted authority AND satisfies the
+//                 contract. Deliberately NOT called a defect: it is semantically equivalent, and
+//                 whether it is AUTHORIZED depends on what the envelope promises. Two different
+//                 promises give opposite verdicts on the same candidate:
+//
+//                   "admit every semantically equivalent implementation"
+//                       -> these are false refusals and the envelope is wrong
+//                   "admit only bounded conditional-write fragments whose correctness does not depend
+//                    on undocumented absorption by the surrounding code"
+//                       -> refusing them is a conservative AUTHORITY POLICY and the envelope is right
+//
+//                 Recording it as a defect would quietly push CONSTRAIN toward becoming a second
+//                 semantic oracle in order to maximize its admission rate, which is the opposite of
+//                 what it is for. Truth and authority stay separate:
+//                   allowed by the semantic contract?  YES, measured
+//                   allowed by the authority policy?   UNRESOLVED, policy-dependent
 //   D APPARATUS-UNDETERMINED     cannot be evaluated without changing the proposal or relying on
 //                            unsupported semantics - a truncated raw, for instance
 //
@@ -164,7 +178,7 @@ function denseAgrees(p, program) {
   return true;
 }
 
-const cat = { A: 0, B: 0, C_SEMANTIC: 0, C_SCOPE: 0, C_WEAK: 0, D: 0 };
+const cat = { A: 0, B: 0, C_IN_SCOPE_EQUIVALENT: 0, C_SCOPE: 0, C_WEAK: 0, D: 0 };
 const byReason = {};
 const cExamples = {};
 const sExamples = {};
@@ -178,7 +192,7 @@ for (const f of FILES) {
     for (const row of cell.rows || []) {
       if (row.authorized !== false) continue;
       const reason = row.reason || 'unknown';
-      const b = byReason[reason] = byReason[reason] || { A: 0, B: 0, C_SEMANTIC: 0, C_SCOPE: 0, C_WEAK: 0, D: 0 };
+      const b = byReason[reason] = byReason[reason] || { A: 0, B: 0, C_IN_SCOPE_EQUIVALENT: 0, C_SCOPE: 0, C_WEAK: 0, D: 0 };
       const raw = row.raw || '';
       if (raw.length >= 139) { cat.D++; b.D++; continue; }      // truncated on the way to disk
       const proposal = decode(raw);
@@ -197,12 +211,12 @@ for (const f of FILES) {
       const touchesFixed = proposal.split(NL).some((l) => fixed.has(l.trim()));
       const k = reason + ' :: ' + proposal.replace(/\s+/g, ' ').trim().slice(0, 60);
       if (touchesFixed) { cat.C_SCOPE++; b.C_SCOPE++; sExamples[k] = (sExamples[k] || 0) + 1; }
-      else { cat.C_SEMANTIC++; b.C_SEMANTIC++; cExamples[k] = (cExamples[k] || 0) + 1; }
+      else { cat.C_IN_SCOPE_EQUIVALENT++; b.C_IN_SCOPE_EQUIVALENT++; cExamples[k] = (cExamples[k] || 0) + 1; }
     }
   }
 }
 
-const total = cat.A + cat.B + cat.C_SEMANTIC + cat.C_SCOPE + cat.C_WEAK + cat.D;
+const total = cat.A + cat.B + cat.C_IN_SCOPE_EQUIVALENT + cat.C_SCOPE + cat.C_WEAK + cat.D;
 console.log('  ABLATING CONSTRAIN, revision 2 - rejection authority removed, NOTHING repaired');
 console.log('  no GPU time: every refused output replayed is already on disk');
 console.log('');
@@ -213,18 +227,18 @@ console.log('    B  cheap early rejection  ' + String(cat.B).padStart(3)
   + '   PROVE rejects it too; the gate saved an assembly and a run');
 console.log('    C- SCOPE (correct refusal) ' + String(cat.C_SCOPE).padStart(3)
   + '   satisfies the contract by TOUCHING A FIXED LINE - authority it was not granted');
-console.log('    C  FALSE REJECTION        ' + String(cat.C_SEMANTIC).padStart(3)
-  + '   satisfies the contract AND stayed inside its authority - the only defect category');
+console.log('    C  IN-SCOPE EQUIVALENT    ' + String(cat.C_IN_SCOPE_EQUIVALENT).padStart(3)
+  + '   semantically equivalent, inside its authority - POLICY-DEPENDENT, not a defect');
 console.log('    C- weak false rejection   ' + String(cat.C_WEAK).padStart(3)
   + '   passes the probes but the dense sweep disagrees somewhere');
 console.log('    D  undetermined           ' + String(cat.D).padStart(3)
   + '   not evaluable without changing the proposal');
 console.log('');
 for (const [reason, b] of Object.entries(byReason).sort((x, y) =>
-  (y[1].A + y[1].B + y[1].C_SCOPE + y[1].C_SEMANTIC + y[1].C_WEAK + y[1].D)
-  - (x[1].A + x[1].B + x[1].C_SCOPE + x[1].C_SEMANTIC + x[1].C_WEAK + x[1].D))) {
+  (y[1].A + y[1].B + y[1].C_SCOPE + y[1].C_IN_SCOPE_EQUIVALENT + y[1].C_WEAK + y[1].D)
+  - (x[1].A + x[1].B + x[1].C_SCOPE + x[1].C_IN_SCOPE_EQUIVALENT + x[1].C_WEAK + x[1].D))) {
   console.log('    ' + reason.padEnd(38) + ' A ' + String(b.A).padStart(3) + '  B ' + String(b.B).padStart(3)
-    + '  Cscope ' + String(b.C_SCOPE).padStart(3) + '  Csem ' + String(b.C_SEMANTIC).padStart(3)
+    + '  Cscope ' + String(b.C_SCOPE).padStart(3) + '  Csem ' + String(b.C_IN_SCOPE_EQUIVALENT).padStart(3)
     + '  Cweak ' + String(b.C_WEAK).padStart(3) + '  D ' + String(b.D).padStart(3));
 }
 if (cat.C_SCOPE) {
@@ -234,13 +248,14 @@ if (cat.C_SCOPE) {
     console.log('      ' + String(n).padStart(3) + 'x  ' + k);
   }
 }
-if (cat.C_SEMANTIC) {
+if (cat.C_IN_SCOPE_EQUIVALENT) {
   console.log('');
-  console.log('  CATEGORY C - THE DEFECT: refused, inside its authority, and satisfies the contract:');
+  console.log('  CATEGORY C - in-scope equivalents: refused, inside authority, satisfy the contract.');
+  console.log('  Whether these SHOULD be admitted is an authority-policy question, not a truth question:');
   for (const [k, n] of Object.entries(cExamples).sort((a, b2) => b2[1] - a[1]).slice(0, 10)) {
     console.log('      ' + String(n).padStart(3) + 'x  ' + k);
   }
 }
 console.log('');
 console.log('  A is the only category where CONSTRAIN is doing something PROVE structurally cannot.');
-console.log('  B is cost. C is a defect. There is no single percentage that says all three.');
+console.log('  B is cost. C is policy. There is no single percentage that says all three.');
