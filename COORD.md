@@ -7209,3 +7209,13 @@ ZERO QUIRK: IMPLICIT produced ZERO exclusion predicates in 160 samples across fo
 reason is in the refusal column as preregistered: IMPLICIT reproduces fixed lines 27/160 against
 0 and 3. Rendering also moves the LEAK rate - 7 of 9 leaks in IMPLICIT, p=0.0039, all caught by
 execution. Authorization precision 385/394 this family, 1116/1130 across eight.
+
+**WINDOW #11 CLOSED.** 12:31:42Z to ~12:46Z, every legasus app row reads stopped. THE
+ARCHITECTURAL PREDICTION IS FALSIFIED: authorization precision is NOT flat across capacity -
+0.976 / 0.802 / 0.925 for 1.5b / 7b / 14b, all pairwise significant, and the 14B is WORSE than the
+1.5B (p=0.017). Proposal yield behaved as predicted, 0.875 / 0.946 / 1.000 with the 14B refused
+zero times in 240. THE FINDING THAT MATTERS MOST: 17 of the 14B's 18 leaks were caught by the
+NEIGHBOUR probes ALONE - probes that exist only because a control caught a hole before window 10.
+Without them the 14B scores 239/240 and looks best in every column. A probe set built against a
+small model's failure modes silently ratifies a larger model's more sophisticated mistakes.
+RENDER generalizes and strengthens: IMPLICIT 0 at every capacity, RELATIONAL 13/63/56 per 80.
