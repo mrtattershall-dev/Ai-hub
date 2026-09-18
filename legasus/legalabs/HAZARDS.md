@@ -12,7 +12,7 @@ three, and occurrence four still happened. Each entry therefore carries its stat
 
 ---
 
-## 1. Heredoc backslash-eating — MECHANIZED
+## 1. Heredoc backslash-eating - MECHANIZED IN CODE AND, AS OF OCCURRENCE NINE, IN PROSE — MECHANIZED
 
 **Occurrences: 9.** A shell heredoc collapses doubled backslashes, so JS written that way lands with
 `'\\s'` turned into `'\s'`. In a JS string literal `\s` is simply `s`: the file stays **syntactically
@@ -62,6 +62,17 @@ a fact the apparatus believes it rendered and did not.
 rendering. A derivation that yields undefined and is interpolated anyway becomes the string
 "undefined" in the prompt, which is this project’s signature silent failure - plausible output, no
 error, lost work.
+
+**Mechanism extended to text artifacts:** `text-guard.mjs` scans prose for raw control characters,
+unquoted shell stderr, an odd document-wide backtick count, empty inline spans, and the bare empty
+parentheses occurrence nine left behind. Its first version flagged 25 things and all 25 were false
+positives, because it checked backtick balance per line and this project's prose wraps spans across
+lines. The repair was not tuning - it was replacing invented admit cases with ones taken verbatim from
+the real corpus. 114 tracked markdown files now sweep to zero.
+
+```bash
+node --test legasus/legalabs/text-guard.test.mjs
+```
 
 **Standing rule it replaces:** JS containing a regex is written with a file writer, never a heredoc —
 *including one-off probes*, which is exactly where the discipline slipped every time. OCCURRENCE NINE was a MARKDOWN write, not code: a necessity-table section written through a
