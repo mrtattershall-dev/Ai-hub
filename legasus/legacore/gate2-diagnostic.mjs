@@ -13,13 +13,20 @@
 // They are listed separately so the distinction stays visible rather than being buried in a total.
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { constrain, verify } from './constraints3.mjs';
+import { constrain, verify } from './constraints4.mjs';
 import { buildContext } from './opcontext.mjs';
 import { reconstruct, baseFor } from '../legalabs/substrate/narrowability.mjs';
 
 const NL = String.fromCharCode(10);
 const ROOT = 'C:/Users/tatte/Projects/ai-coding-hub-indent/legasus/legalabs/substrate/';
 const FAMS = ['provenance', 'generalization', 'requirements', 'unresolved'];
+
+// DECLARED SEMANTIC-INTENT CASES. Read from one committed register rather than hard-coded here, so
+// the justification travels with the classification. A residual listed there is NOT a structural
+// defect and must not be counted as one - and an entry without a stated reason is an excuse.
+const SI = JSON.parse(readFileSync(
+  'C:/Users/tatte/Projects/ai-coding-hub-indent/legasus/SEMANTIC_INTENT.json', 'utf8'));
+const isSemanticIntent = (fam, op) => SI.cases.find((c) => c.family === fam && c.op === op);
 
 const findings = [];
 const add = (cls, fam, op, detail, extra) => findings.push({ class: cls, fam, op, detail, ...extra });
@@ -108,8 +115,11 @@ for (const fam of FAMS) {
         // residual is not automatically a structural defect - g03's was semantic intent.
         const survivors = res.region.filter((p) => failing.has(p));
         const lines = base.split(NL);
-        add('A-UNDER-NARROWED', fam, id,
-          'narrowed honestly but incompletely while claiming completeness; survivors that really fail: '
+        const si = isSemanticIntent(fam, id);
+        add(si ? 'S-SEMANTIC-INTENT' : 'A-UNDER-NARROWED', fam, id,
+          (si ? 'residual is ' + si.kind + ': ' + si.ambiguous_input + '. '
+            : 'narrowed honestly but incompletely while claiming completeness; ')
+          + 'survivors that really fail: '
           + survivors.map((p) => p + ' ' + JSON.stringify((lines[p] || '').trim().slice(0, 34))).join('  '),
           { got_bits: +got.toFixed(2), available_bits: +row.max_gain_bits.toFixed(2) });
       }
@@ -131,6 +141,7 @@ for (const f of findings) {
       + f.available_bits + ' bits available]' : ''));
 }
 console.log('');
-console.log('  A-* are supported-capability failures. U-* are the architecture correctly declaring a');
+console.log('  A-* are supported-capability failures. S-* sit at the semantic-intent boundary and are');
+console.log('  NOT structural defects. U-* are the architecture correctly declaring a');
 console.log('  gap and are NOT counted against supported capability. B-* are correct outcomes resting');
 console.log('  on an incomplete proof - the class a suite checking only outcomes cannot see.');
