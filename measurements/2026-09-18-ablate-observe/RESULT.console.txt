@@ -1,0 +1,12 @@
+  ABLATING OBSERVE - derived placement against two OBSERVATION-BLIND policies
+  no GPU time: the same recorded fragments, three placements each
+
+  S_UPPER     fragments 180   DERIVED(after line 2) 174   BLIND_TOP(after 0) 113   BLIND_BOTTOM(after 4) 174
+  S_LOWER     fragments 177   DERIVED(after line 2) 125   BLIND_TOP(after 0)  64   BLIND_BOTTOM(after 4) 125
+  S_IVAL      fragments 168   DERIVED(after line 2) 167   BLIND_TOP(after 0)  88   BLIND_BOTTOM(after 4) 167
+  S_STRADDLE  fragments 167   DERIVED(after line 2) 158   BLIND_TOP(after 0)  30   BLIND_BOTTOM(after 2) 158
+
+  TOTAL 692 fragments    DERIVED 624    BLIND_TOP 295    BLIND_BOTTOM 624
+
+  A component is not proven necessary because good results occurred while it was enabled.
+  It is proven load-bearing when removing ONLY that component causes the predicted failure.

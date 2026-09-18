@@ -47,6 +47,8 @@ READMEs hold the detail; commit messages hold the reasoning.
 | Models do not get the domain wrong when RENDER states it | 343 authorized T3 fragments, ZERO with a domain other than requested |
 | CONSTRAIN provides INTERFACE PROTECTION, not semantic redundancy | corrected ablation: 14 of 28 refusals do not load unchanged; only 1 of 28 is a case PROVE would also catch |
 | An ablation that REPAIRS the proposal is not an ablation | revision 1 measured CONSTRAIN OFF + repair and reached the opposite conclusion; void |
+| OBSERVE is NOT established in this family | derived 624/692, blind-top 295/692, blind-BOTTOM 624/692 - identical to derived |
+| The necessity table is a first-class artifact | NECESSITY.md - what happens when each stage alone is removed |
 | Ablation finds defects it was not built to find | it rediscovered the elif over-constraint blind: 45 correct programs discarded under the old envelope |
 
 ## Dead, and staying dead
