@@ -14,6 +14,13 @@ hazard 3f.
 
 ---
 
+## A note on commit order
+
+The OBSERVE ablation RESULT (commit 7eaa1c2) landed in git AFTER the middle-family preregistration
+(7de80d9) that cites it, because the result commit was queued behind a long-running job. The data was
+observed and the analysis written first; only the commit is out of order. Recorded here rather than
+left to look like a preregistration written before the result it responds to.
+
 ## The table
 
 | Stage | Status | Evidence |
