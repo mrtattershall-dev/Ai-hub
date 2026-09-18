@@ -90,6 +90,32 @@ rejection of vacuous proof conditions.
 
 > **ATTEMPT AUTHORITY != COMMIT AUTHORITY.** A model may try what it may not commit.
 
+**This is no longer a slogan. It is a measured property, and it is the project's most robust empirical
+claim.** Across three preregistered families, two different functions and two window regimes, using a
+1.5B that fails the same task outright when given whole-function authority:
+
+    committed outputs   87
+    correct             87        P(correct | committed) = 1.00
+                                  one-sided 95% lower bound 0.966
+
+Two quantities are tracked separately, because a single pass rate cannot tell them apart — 8 correct
+with 12 corruptions and 8 correct with 12 refusals score identically and are not the same system:
+
+    GENERATION CAPABILITY   P(correct attempt)       swung from 0.20 to 0.90 across cells
+    COMMIT INTEGRITY        P(correct | committed)   did not move once
+
+Bounding the model did **not** raise generation capability — ladder 2 measured that directly, `R3` and
+`R3P` both landing at 8/20, p = 1.000. It converted destructive commits into refusals. For an
+autonomous system permitted to retry those are not the same failure, and any metric that calls them
+equal is measuring the wrong thing.
+
+**Model-facing representation is part of the architecture, not prompt cosmetics.** Internal
+representation optimises for correctness and proof; what reaches the model optimises for executable
+meaning. The same domain rendered as bound metadata scored 6/20 against 17/20 rendered as a relation,
+p = 0.001, with prompt layout held fixed — and the model implemented "no lower bound" as `n > 0`, a
+field that exists to say a constraint is *absent* read as a constraint. `renderDomain` in
+`assemble.mjs` is therefore load-bearing.
+
 LegaVerify is what protects accumulated legacy behaviour.
 
 ### LegaParse — deterministic program analysis
