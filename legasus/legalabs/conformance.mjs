@@ -24,7 +24,7 @@
 //                          requirement_complete: true
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { constrain, verify } from '../legacore/constraints4.mjs';
+import { constrain, verify } from '../legacore/constraints5.mjs';
 import { operationFacts } from '../legacore/opfacts.mjs';
 import { buildContext } from '../legacore/opcontext.mjs';
 import { reconstruct, baseFor } from './substrate/narrowability.mjs';

@@ -13,7 +13,7 @@
 // They are listed separately so the distinction stays visible rather than being buried in a total.
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { constrain, verify } from './constraints4.mjs';
+import { constrain, verify } from './constraints5.mjs';
 import { buildContext } from './opcontext.mjs';
 import { reconstruct, baseFor } from '../legalabs/substrate/narrowability.mjs';
 

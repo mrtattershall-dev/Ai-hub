@@ -1,0 +1,37 @@
+LegaCore CONSTRAINT DERIVATION revision 5, frozen. THE SUPPORTED CORE IS PERFECT BY THE GATE-N
+DEFINITION, on the four families with executable ground truth.
+
+    supported-capability failures (A-*)        0
+    over-constraint                            0
+    silent unresolved paths                    0
+    witness replay                             100%  (75 operations)
+    conformance properties                     8 of 8
+    synthetic witness suites                   7 of 7
+
+    provenance      26/26 narrowable   100.0% of available positional information
+    requirements    14/14 narrowable   100.0%
+    generalization   8/8  narrowable    85.8%   residual is DECLARED semantic intent
+    unresolved       1/2  narrowable    50.0%   residual is DECLARED unsupported (import provider)
+
+WHAT REMAINS IS DECLARED, NOT HIDDEN:
+    S-SEMANTIC-INTENT  generalization/g03:op1   guard precedence - classify(0) satisfies both
+                                                `n == 0` and `n < 10`. No structural rule reaches it.
+    U-INCOMPLETE       requirements/h07:op2     correct region, `math` unresolved by design
+    U-DECLARED         unresolved/i01:op1       narrowable, nothing derived, declared incomplete
+
+CHANGE IN THIS REVISION: `expression_continuation`. A position inside an unclosed bracket is not an
+insertion boundary at all - a CURRENT_PROGRAM_FACT that `bodies()` could not see, since it models
+compound statements and knows nothing of a statement continued across lines.
+
+STANDING: development. The defect was found on the provenance family. Its nine synthetic witnesses
+were written first and six are NEGATIVE - balanced brackets, a bracket inside a string, an unbalanced
+bracket inside a string, a bracket in a comment, an escaped quote, and a compound statement - because
+a depth counter blind to strings or comments would find phantom brackets in ordinary code and remove
+legal positions, which is over-constraint and worse than the miss it replaces.
+
+DECLARED LIMIT: triple-quoted strings are not modelled. No substrate family contains one, and adding
+untested state would be code claiming authority it has not earned.
+
+legasus/legacore/constraints5.mjs           f2999b4c822552ab92f8d9d551d053d4ad3402342798d59acc2e556f58027097
+legasus/legacore/continuation.mjs           e74d05a322d079a20dcf0a96b711f6a2ac569cbe82ab7cf9d885bc35c4fca1b7
+legasus/legacore/continuation.test.mjs      25bdfcc353fb8e28c74df58ad22ce7e9283bfad204d9711eb5847c7864f346f1

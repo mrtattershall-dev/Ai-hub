@@ -1,13 +1,9 @@
   GATE 2 DIAGNOSTIC - supported-core imperfections
 
-    3  A-UNDER-NARROWED
     1  S-SEMANTIC-INTENT
     1  U-DECLARED-UNSUPPORTED
     1  U-INCOMPLETE-BY-DESIGN
 
-  A-UNDER-NARROWED        provenance/e01:op3          narrowed honestly but incompletely while claiming completeness; survivors that really fail: 0 "SHAPE_KINDS = [\"circle\", \"square\","  3 "SHAPE_LABELS = {\"circle\": \"round s"   [0.25 of 0.4 bits available]
-  A-UNDER-NARROWED        provenance/e06:op3          narrowed honestly but incompletely while claiming completeness; survivors that really fail: 0 "FORMATS = [\"json\", \"csv\", \"tsv\""  3 "FORMAT_LABELS = {\"json\": \"JSON\", \""   [0.16 of 0.27 bits available]
-  A-UNDER-NARROWED        provenance/f01:op2          narrowed honestly but incompletely while claiming completeness; survivors that really fail: 0 "CHANNELS = [\"email\", \"sms\", \"push\""   [0.26 of 0.36 bits available]
   S-SEMANTIC-INTENT       generalization/g03:op1      residual is guard_precedence: classify(0) satisfies both conditions. survivors that really fail: 2 "return \"negative\""   [0.58 of 1.58 bits available]
   U-INCOMPLETE-BY-DESIGN  requirements/h07:op2        correct region, incomplete for a DECLARED-UNSUPPORTED reason: math
   U-DECLARED-UNSUPPORTED  unresolved/i01:op1          narrowable and nothing derived, but declared incomplete: math   [0.5474877953024933 bits available]
