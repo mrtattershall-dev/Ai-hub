@@ -76,6 +76,23 @@ vacuous no matter how the number looks.
 
 ---
 
+### The pattern behind all three occurrences
+
+    a03    the competitor concern was absent
+    v4     the false-relation case was absent
+    h07    the unresolved requirement was MASKED by a co-occurring resolvable one
+
+All three are one thing: **a negative or fallback mechanism was declared tested, while another path
+made the expected outcome achievable without exercising it.**
+
+> **For a test of fallback, refusal, unresolved or negative behaviour, prove BEFOREHAND that the target
+> mechanism is NECESSARY to obtain the expected outcome.**
+
+That is a path-sensitivity requirement for controls, and it is stronger than "make sure a rival
+exists" because h07 had a rival - it just had a second mechanism that reached the same answer first.
+
+---
+
 ## 4. A checker reading its own file format — RULE ONLY
 
 The leakage scanner treated the patch serializer's own header lines — `--- op op1 after: "<anchor>"` —

@@ -159,10 +159,20 @@ evolution remains undemonstrated.** Both halves of that sentence matter.
 The difference between an architecture and a demonstration is how much human intelligence has been
 removed from the loop. This is the scoreboard.
 
-    COMPUTED                          PARTIAL                     STILL ORACLE
-    [x] scope facts                   [~] site selection          [ ] site ordering / dependencies
-    [x] generation boundaries                                     [ ] local semantic intent
+    COMPUTED                      PARTIAL                          STILL ORACLE
+    [x] scope facts               [~] site selection               [ ] local semantic intent
+    [x] generation boundaries     [~] ordering / dependencies
     [x] ownership invariants
+
+`ordering / dependencies` moves to `[~]` on prospective evidence: revision 2's requirement model
+generalized across five exercised dependency situations on a family authored blind and sealed before
+the run - immediate consumers, deferred body consumers, definition-time defaults, bare statements
+requiring several providers, and the existing-versus-planned provider distinction - recovering 14 of
+14 independently narrowable operations with zero over-constraint and 100% of available positional
+information, and with ownership and control-flow rules not overreaching on their negatives.
+
+It is `[~]` and not `[x]` because the unresolved-provider path is still untested, and because semantic
+precedence is untouched.
 
 `[~]` is measured, not aspirational. Site selection has been run ONCE prospectively against a sealed
 family the selector had never seen:
@@ -238,6 +248,29 @@ splits that by claim:
 
 That 93.8% -> 54.8% gap is the honest measure of how much of the development result was the rules
 being general rather than the rules having been shaped by the data.
+
+### Constraint sufficiency and requirement completeness are separate properties
+
+h07 produced the RIGHT ANSWER for an incomplete reason. Its operation required `_round2` and `math`;
+only `_round2` resolved, `math` was silently dropped, and `_round2`'s position already implied the
+import's - so the derived region was correct while the dependency account was not.
+
+> **A correct patch is not equivalent to a complete justification for the authority granted to produce
+> it.** Behavioural success can conceal an incomplete proof.
+
+So the two properties are recorded separately, and silent omission is made impossible:
+
+    requirement_resolution:
+      resolved:    [{ symbol, provider: existing_definition | planned_operation, line }]
+      unresolved:  [{ symbol, reason }]
+    constraint_status:
+      requirement_complete: false
+
+Even when another constraint happens to subsume a missing one, LegaCore can then say *"I reached the
+same legal region, but I do not possess a complete dependency account."* The open concept is exactly:
+
+> **"I derived no dependency" must be distinguishable from "I could not resolve a dependency I know
+> exists."**
 
 ### The fact layers, corrected
 
