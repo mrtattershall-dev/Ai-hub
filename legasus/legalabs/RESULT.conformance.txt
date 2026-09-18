@@ -1,5 +1,5 @@
   CONFORMANCE AUDIT against legasus/SUPPORTED.md
-  families 5   operations audited 91
+  families 6   operations audited 99
 
   ok    WITNESSED           every narrowing carries a witness
   ok    REPLAYABLE          every witness re-derives its own claim

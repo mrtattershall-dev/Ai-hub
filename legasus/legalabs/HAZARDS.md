@@ -93,6 +93,24 @@ exists" because h07 had a rival - it just had a second mechanism that reached th
 
 ---
 
+## 3b. Reporting code that cannot express what it is measuring — RULE ONLY
+
+**Occurrences: 4.** Four times a report marked a working rule as failed because the report could not
+represent the thing under test.
+
+    inventory      counted a kind as "fired" only when it NARROWED, so the three rules whose
+                   correctness IS their silence read as untested
+    scorer         same criterion, same consequence, on j01 and j02
+    emitted_as     a declared `kind` names a MECHANISM; self-reference is implemented by a
+                   symbol_availability constraint, so the report hunted a kind never emitted
+    account        k04's negative is "DOUBLE must not require itself" - not expressible as
+                   "this kind did not fire", since symbol_availability legitimately fires for STEP
+
+**Rule:** before trusting a FAIL, check that the report can represent a PASS. A criterion that a
+correct implementation cannot satisfy is measuring the reporter.
+
+---
+
 ## 4. A checker reading its own file format — RULE ONLY
 
 The leakage scanner treated the patch serializer's own header lines — `--- op op1 after: "<anchor>"` —

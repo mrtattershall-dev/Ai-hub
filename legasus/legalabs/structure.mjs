@@ -13,14 +13,21 @@
 // candidate insertion. Nothing here knows what an operation is, what a constraint is, or why anyone
 // wanted to insert something.
 //
-// IDENTITY UNDER LINE SHIFT. An insertion renumbers every line below it, so a statement cannot be
-// identified by line number. It is identified by its trimmed text plus its occurrence index among
-// identical texts - stable under insertion, and sufficient to detect a statement that changed parent
-// even when several statements read the same.
+// IDENTITY IS BY LINE PROVENANCE, NOT BY TEXT.
 //
-// DECLARED LIMIT: two structurally distinct statements with identical text and identical parent chains
-// are indistinguishable to this signature. That is a real ambiguity, not a hidden one, and it makes the
-// checker conservative in the safe direction - it may miss a violation, never invent one.
+// The first version identified statements by trimmed text plus occurrence index. That INVENTED a
+// violation on its first real family: k03:op2 inserts code containing `return TOTAL`, a line the
+// program already had, so the inserted copy took occurrence index 0 and the pre-existing statement was
+// compared against it - reporting a re-parenting that never happened, on seven positions.
+//
+// The earlier comment claimed this identity was "conservative in the safe direction - it may miss a
+// violation, never invent one". That was simply wrong, and an inserted duplicate is the ordinary case
+// rather than an exotic one.
+//
+// An insertion has an exact known shape: a block of `count` lines placed after line `pos`. So the map
+// from after-index to before-index is exact - lines at or before `pos` are themselves, lines after the
+// block are shifted back by `count`, and the block itself is new. Comparison uses that map and needs no
+// guessing at all.
 const NL = String.fromCharCode(10);
 const ind = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
 const HEADER = /^\s*(?:def|class|if|elif|else|for|while|try|except|finally|with)\b/;
@@ -31,26 +38,22 @@ const TERMINATOR = /^\s*(?:return|continue|break|raise)\b/;
 export function structureSignature(text) {
   const lines = text.split(NL);
   const stack = [];              // { indent, header }
-  const sig = new Map();         // key -> { parents, reachable }
-  const seen = new Map();        // trimmed text -> count, for occurrence indices
+  const sig = new Map();         // LINE INDEX -> { text, parents, reachable }
   const blockTerminated = [];    // parallel to stack: has this block already terminated?
   let topTerminated = false;
 
-  for (const raw of lines) {
+  for (let li = 0; li < lines.length; li++) {
+    const raw = lines[li];
     if (!raw.trim()) continue;
     const col = ind(raw);
     while (stack.length && col <= stack[stack.length - 1].indent) {
       stack.pop();
       blockTerminated.pop();
     }
-    const trimmed = raw.trim();
-    const n = (seen.get(trimmed) || 0);
-    seen.set(trimmed, n + 1);
-    const key = trimmed + '#' + n;
-
     const depth = stack.length;
     const terminatedHere = depth ? blockTerminated[depth - 1] : topTerminated;
-    sig.set(key, {
+    sig.set(li, {
+      text: raw.trim(),
       parents: stack.map((s) => s.header),
       reachable: !terminatedHere,
     });
@@ -59,32 +62,42 @@ export function structureSignature(text) {
       if (depth) blockTerminated[depth - 1] = true; else topTerminated = true;
     }
     if (HEADER.test(raw)) {
-      stack.push({ indent: col, header: trimmed });
+      stack.push({ indent: col, header: raw.trim() });
       blockTerminated.push(false);
     }
   }
   return sig;
 }
 
-// Compare two signatures over the statements PRE-EXISTING in `before`. Statements the operation adds
-// are not checked - an operation is allowed to add structure.
-export function structurePreserved(before, after) {
+// Compare the structure of PRE-EXISTING statements before and after an insertion.
+//
+// `insertion` is { pos, count }: a block of `count` lines placed immediately after line `pos` of
+// `before`. Given that, the after-index of any pre-existing line is exact, so no statement is ever
+// compared against an inserted line that happens to read the same.
+//
+// Without `insertion` the comparison falls back to matching by line index, which is correct only when
+// the texts have the same shape; callers that insert MUST pass it.
+export function structurePreserved(before, after, insertion) {
   const a = structureSignature(before);
   const b = structureSignature(after);
+  const map = (i) => {
+    if (!insertion) return i;
+    return i <= insertion.pos ? i : i + insertion.count;
+  };
   const violations = [];
-  for (const [key, was] of a) {
-    const now = b.get(key);
-    if (!now) {
-      violations.push({ statement: key.split('#')[0], kind: 'vanished',
-        detail: 'a pre-existing statement is no longer present with the same text' });
+  for (const [li, was] of a) {
+    const now = b.get(map(li));
+    if (!now || now.text !== was.text) {
+      violations.push({ statement: was.text, kind: 'vanished',
+        detail: 'a pre-existing statement is not where the insertion map says it should be' });
       continue;
     }
     if (JSON.stringify(now.parents) !== JSON.stringify(was.parents)) {
-      violations.push({ statement: key.split('#')[0], kind: 're_parented',
+      violations.push({ statement: was.text, kind: 're_parented',
         was: was.parents, now: now.parents,
         detail: 'a pre-existing statement changed structural parent' });
     } else if (was.reachable && !now.reachable) {
-      violations.push({ statement: key.split('#')[0], kind: 'unreachable',
+      violations.push({ statement: was.text, kind: 'unreachable',
         detail: 'a pre-existing reachable statement is now behind a terminator in its block' });
     }
   }

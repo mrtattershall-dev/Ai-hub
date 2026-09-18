@@ -38,7 +38,8 @@ console.log('');
 let disagree = 0;
 for (const p of row.passing_positions) {
   const after = insertAfter(base, p, code);
-  const r = structurePreserved(base, after);
+  const blockLines = (code.endsWith(NL) ? code.slice(0, -1) : code).split(NL).length;
+  const r = structurePreserved(base, after, { pos: p, count: blockLines });
   if (!r.preserved) {
     disagree++;
     console.log('  position ' + String(p).padStart(3) + '  V1 PASS  /  V2 STRUCTURAL VIOLATION');

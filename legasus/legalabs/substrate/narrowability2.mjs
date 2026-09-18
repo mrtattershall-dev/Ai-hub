@@ -93,7 +93,11 @@ export function proveTaskV2(dir) {
       const behavioural = runProbe(lang, srcName, text, delta)
         && (!preserve || runProbe(lang, srcName, text, preserve));
       if (!behavioural) continue;
-      const structural = structurePreserved(base, text);
+      // The insertion map is exact and must be passed: without it a pre-existing statement can be
+      // compared against an inserted line that happens to read the same, which invented seven
+      // violations on this oracle's first family.
+      const blockLines = (full[k].code.endsWith(NL) ? full[k].code.slice(0, -1) : full[k].code).split(NL).length;
+      const structural = structurePreserved(base, text, { pos: p, count: blockLines });
       if (structural.preserved) passing.push(p);
       else behaviouralOnly.push({ position: p, violations: structural.violations.slice(0, 2) });
     }

@@ -2,19 +2,54 @@
   "note": "Prospective standing for exactly two rules: scope_availability and self-referential bindings. Authored blind under Narrowability V2, whose structural channel is active from the first denominator. Not a re-proof of revision 6.",
   "oracle_version": "V2 - behavioural AND structural preservation, both required",
   "tasks": [
-    { "id": "k01", "ops": 2, "kind": "scope_availability", "half": "POSITIVE", "case": "requirement is an enclosing parameter",
+    {
+      "id": "k01",
+      "ops": 2,
+      "kind": "scope_availability",
+      "half": "POSITIVE",
+      "case": "requirement is an enclosing parameter",
       "situation": "op2 is a branch inside get(self, key) whose code uses `key`",
-      "expect": "`key` resolves as enclosing_scope, narrows nothing, requirement_complete true" },
-    { "id": "k02", "ops": 2, "kind": "scope_availability", "half": "NEGATIVE", "case": "similarly named symbol NOT in scope",
+      "expect": "`key` resolves as enclosing_scope, narrows nothing, requirement_complete true"
+    },
+    {
+      "id": "k02",
+      "ops": 2,
+      "kind": "scope_availability",
+      "half": "NEGATIVE",
+      "case": "similarly named symbol NOT in scope",
       "situation": "the module binds `values`; a function has the parameter `value`. op1 is `TOTAL = sum(values)` at MODULE level",
-      "expect": "`values` resolves as the MODULE binding and DOES order against it. A resolver that walks upward until something looks close would claim enclosing scope and silently lose that constraint" },
-    { "id": "k03", "ops": 2, "kind": "self_referential_binding", "half": "POSITIVE", "case": "the new value is computed from the old",
+      "expect": "`values` resolves as the MODULE binding and DOES order against it. A resolver that walks upward until something looks close would claim enclosing scope and silently lose that constraint"
+    },
+    {
+      "id": "k03",
+      "ops": 2,
+      "kind": "self_referential_binding",
+      "half": "POSITIVE",
+      "case": "the new value is computed from the old",
       "situation": "op1 is `TOTAL = TOTAL + 1` at module level",
-      "expect": "the READ of TOTAL survives as an immediate requirement and orders op1 after the original binding" },
-    { "id": "k04", "ops": 2, "kind": "self_referential_binding", "half": "NEGATIVE", "case": "fresh binding from another name",
+      "expect": "the READ of TOTAL survives as an immediate requirement and orders op1 after the original binding",
+      "emitted_as": "symbol_availability",
+      "mechanism_note": "the self-reference is a REQUIREMENT-EXTRACTION mechanism; it surfaces as a symbol_availability constraint on the self-read symbol, so the report must be told which emitted kind implements it",
+      "expect_required": [
+        "TOTAL"
+      ]
+    },
+    {
+      "id": "k04",
+      "ops": 2,
+      "kind": "self_referential_binding",
+      "half": "NEGATIVE",
+      "case": "fresh binding from another name",
       "situation": "op1 is `DOUBLE = STEP * 2` at module level",
-      "expect": "DOUBLE must NOT acquire a requirement on itself. Only STEP is required. A rule that added the target unconditionally would order every assignment against its own name" }
+      "expect": "DOUBLE must NOT acquire a requirement on itself. Only STEP is required. A rule that added the target unconditionally would order every assignment against its own name",
+      "emitted_as": "symbol_availability",
+      "mechanism_note": "this negative is an assertion about the RESOLUTION ACCOUNT, not about which kinds fired: symbol_availability correctly fires here for STEP. The claim is that DOUBLE must never appear among the requirements of the operation that binds it.",
+      "expect_not_required": [
+        "DOUBLE"
+      ]
+    }
   ],
   "matching": "every task has 2 operations, so transaction size explains nothing",
-  "prior_standing": "scope_availability and self-referential bindings both have DEVELOPMENT standing only, from the provenance and scopecont families that diagnosed them. Their synthetic witnesses (7 each, dominated by negatives) predate their implementations."
+  "prior_standing": "scope_availability and self-referential bindings both have DEVELOPMENT standing only, from the provenance and scopecont families that diagnosed them. Their synthetic witnesses (7 each, dominated by negatives) predate their implementations.",
+  "reporting_note": "A declared `kind` is a MECHANISM under test. Some mechanisms are implemented by a differently-named emitted constraint, so an entry may carry `emitted_as`. Without it the report looks for a kind that is never emitted and marks a working rule FAIL - which happened here, the third instance of that reporting class after the inventory and the zero-narrowing criterion. Some negatives are claims about the resolution account rather than about kind emission - k04 asserts that DOUBLE never appears as a requirement of the operation binding it, while symbol_availability legitimately fires for STEP. Those use expect_required / expect_not_required."
 }

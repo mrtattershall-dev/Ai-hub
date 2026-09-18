@@ -110,7 +110,12 @@ for (const t of GT) {
     else if (verdict === 'CORRECT-0') clean0++;
     else missed++;
 
-    rows.push({ task: t.task, op: ctx.operation_id, verdict, narrowable: row.narrowable,
+    // The resolution ACCOUNT, so an expectation can assert about requirements rather than about which
+    // kinds fired. k04's negative - DOUBLE must never require itself - is not expressible as "this kind
+    // did not fire", because symbol_availability legitimately fires there for STEP.
+    const requiredSyms = [...res.requirement_resolution.resolved.map((r) => r.symbol),
+      ...res.requirement_resolution.unresolved.map((r) => r.symbol)];
+    rows.push({ task: t.task, op: ctx.operation_id, verdict, narrowable: row.narrowable, requiredSyms,
       cand: row.candidates, truth: row.passing, derived: res.constrained,
       gained, maxBits, wrongly: wrongly.length,
       kinds: res.chain.filter((c) => (c.removed_positions || []).length).map((c) => c.kind),
@@ -155,17 +160,25 @@ if (KIND.size) {
     // narrow are judged on narrowing.
     const SILENT = ['scope_availability', 'deferred_requirement', 'unresolved_requirement',
       'canonical_realization'];
-    const silent = SILENT.includes(spec.kind);
+    // A declared `kind` names the MECHANISM under test. When a differently-named constraint implements
+    // it, the expectation says so with `emitted_as`; otherwise the report hunts for a kind that is
+    // never emitted and marks a working rule FAIL.
+    const target = spec.emitted_as || spec.kind;
+    const silent = SILENT.includes(target);
     byKind.get(group)[spec.half] = {
       id,
       narrowable: rs.filter((r) => r.narrowable).length,
       ops: rs.length,
-      firedOwn: (silent ? emitted : fired).filter((k) => k === spec.kind).length,
+      firedOwn: (silent ? emitted : fired).filter((k) => k === target).length,
       judged_on: silent ? 'emission (this kind narrows nothing by design)' : 'narrowing',
       firedAny: [...new Set(fired)],
       over: rs.filter((r) => r.wrongly > 0).length,
       bits: rs.reduce((a, r) => a + r.gained, 0),
       avail: rs.reduce((a, r) => a + r.maxBits, 0),
+      // carried so the printing loop can evaluate account-level expectations without reaching back
+      // into this scope - the kind of cross-scope reach that produced a ReferenceError here once
+      requires: [...new Set(rs.flatMap((r) => r.requiredSyms || []))],
+      spec,
     };
   }
   for (const [kind, halves] of byKind) {
@@ -177,12 +190,21 @@ if (KIND.size) {
       // A positive case must fire its own kind. A negative case must NOT, and must not over-constrain.
       // Other labels (UNRESOLVED, RESOLVED-CONTROL) are reported without a pass/fail verdict, because
       // what they establish is not "did the rule fire" but "was the path exercised at all".
-      const ok = half === 'POSITIVE' ? (h.firedOwn > 0 && h.over === 0)
-        : half === 'NEGATIVE' ? (h.firedOwn === 0 && h.over === 0) : null;
+      // Account-level expectations take precedence when declared: they are a stronger and more
+      // specific claim than "did this kind fire".
+      const req = new Set(h.requires || []);
+      const sp = h.spec || {};
+      const mustHave = (sp.expect_required || []).every((sym) => req.has(sym));
+      const mustLack = (sp.expect_not_required || []).every((sym) => !req.has(sym));
+      const accountDeclared = (sp.expect_required || sp.expect_not_required) ? true : false;
+      const ok = accountDeclared ? (mustHave && mustLack && h.over === 0)
+        : half === 'POSITIVE' ? (h.firedOwn > 0 && h.over === 0)
+          : half === 'NEGATIVE' ? (h.firedOwn === 0 && h.over === 0) : null;
       console.log('    ' + (ok === null ? '----  ' : ok ? 'PASS  ' : 'FAIL  ') + half.padEnd(17) + h.id
         + '  narrowable ' + h.narrowable + '/' + h.ops
         + '  this kind fired on ' + h.firedOwn + ' op(s) [' + h.judged_on + ']'
         + '  over-constraint ' + h.over
+        + (accountDeclared ? '  [account: requires ' + JSON.stringify([...req]) + ']' : '')
         + '  bits ' + h.bits.toFixed(2) + '/' + h.avail.toFixed(2));
       if (h.firedAny.length) console.log('          kinds that narrowed: ' + h.firedAny.join(', '));
     }

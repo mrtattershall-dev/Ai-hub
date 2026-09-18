@@ -49,6 +49,7 @@ const cases = [
       '    def size(self):',
       '        return len(self._routes)',
     ),
+    insertion: { pos: 3, count: 3 },
     preserved: false,
   },
   {
@@ -61,6 +62,7 @@ const cases = [
       '    return "small"',
       '    return "positive"',
     ),
+    insertion: { pos: 2, count: 1 },
     preserved: false,
   },
   {
@@ -81,6 +83,7 @@ const cases = [
       '    def size(self):',
       '        return len(self._routes)',
     ),
+    insertion: { pos: 0, count: 3 },
     preserved: true,
   },
   {
@@ -94,6 +97,7 @@ const cases = [
       '        return "negative"',
       '    return "positive"',
     ),
+    insertion: { pos: 0, count: 2 },
     preserved: true,
   },
   {
@@ -104,7 +108,7 @@ const cases = [
 
 let fail = 0;
 for (const c of cases) {
-  const r = structurePreserved(c.before, c.after);
+  const r = structurePreserved(c.before, c.after, c.insertion);
   const ok = r.preserved === c.preserved;
   if (!ok) fail++;
   console.log('  ' + (ok ? 'ok  ' : 'FAIL') + '  ' + c.name);

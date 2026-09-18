@@ -187,136 +187,22 @@
      8,
      9
     ],
-    "failing_positions": [
+    "failing_positions": [],
+    "passing": 9,
+    "passing_positions": [
      0,
      1,
      2,
      3,
      4,
      5,
-     6
-    ],
-    "passing": 2,
-    "passing_positions": [
+     6,
      8,
      9
     ],
-    "structural_only_failures": [
-     {
-      "position": 0,
-      "violations": [
-       {
-        "statement": "return TOTAL",
-        "kind": "re_parented",
-        "was": [
-         "def total():"
-        ],
-        "now": [
-         "def bumped():"
-        ],
-        "detail": "a pre-existing statement changed structural parent"
-       }
-      ]
-     },
-     {
-      "position": 1,
-      "violations": [
-       {
-        "statement": "return TOTAL",
-        "kind": "re_parented",
-        "was": [
-         "def total():"
-        ],
-        "now": [
-         "def bumped():"
-        ],
-        "detail": "a pre-existing statement changed structural parent"
-       }
-      ]
-     },
-     {
-      "position": 2,
-      "violations": [
-       {
-        "statement": "return TOTAL",
-        "kind": "re_parented",
-        "was": [
-         "def total():"
-        ],
-        "now": [
-         "def bumped():"
-        ],
-        "detail": "a pre-existing statement changed structural parent"
-       }
-      ]
-     },
-     {
-      "position": 3,
-      "violations": [
-       {
-        "statement": "return TOTAL",
-        "kind": "re_parented",
-        "was": [
-         "def total():"
-        ],
-        "now": [
-         "def bumped():"
-        ],
-        "detail": "a pre-existing statement changed structural parent"
-       }
-      ]
-     },
-     {
-      "position": 4,
-      "violations": [
-       {
-        "statement": "return TOTAL",
-        "kind": "re_parented",
-        "was": [
-         "def total():"
-        ],
-        "now": [
-         "def bumped():"
-        ],
-        "detail": "a pre-existing statement changed structural parent"
-       }
-      ]
-     },
-     {
-      "position": 5,
-      "violations": [
-       {
-        "statement": "return TOTAL",
-        "kind": "re_parented",
-        "was": [
-         "def total():"
-        ],
-        "now": [
-         "def bumped():"
-        ],
-        "detail": "a pre-existing statement changed structural parent"
-       }
-      ]
-     },
-     {
-      "position": 6,
-      "violations": [
-       {
-        "statement": "return TOTAL",
-        "kind": "re_parented",
-        "was": [
-         "def total():"
-        ],
-        "now": [
-         "def bumped():"
-        ],
-        "detail": "a pre-existing statement changed structural parent"
-       }
-      ]
-     }
-    ],
-    "narrowable": true,
-    "max_gain_bits": 2.169925001442312,
+    "structural_only_failures": [],
+    "narrowable": false,
+    "max_gain_bits": 0,
     "oracle_version": "V2"
    }
   ]

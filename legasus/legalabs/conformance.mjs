@@ -34,7 +34,7 @@ const ind = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
 const ROOT = 'C:/Users/tatte/Projects/ai-coding-hub-indent/legasus/legalabs/substrate/';
 const FAMILIES = process.argv.slice(2);
 const families = FAMILIES.length ? FAMILIES
-  : ['family', 'holdout', 'provenance', 'generalization', 'requirements', 'unresolved', 'scopecont'];
+  : ['family', 'holdout', 'provenance', 'generalization', 'requirements', 'unresolved', 'scopecont', 'scopeself'];
 
 // Declared-unsupported provider forms, detected in the text an operation is placed into.
 const UNSUPPORTED = [
