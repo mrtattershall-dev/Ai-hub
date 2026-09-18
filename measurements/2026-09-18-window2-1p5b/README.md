@@ -197,3 +197,34 @@ to 0/4. It is recorded here as a hypothesis with a named next test, not as a fin
 3. **Commit integrity at 87/87 is now the project's most robust empirical claim** — stronger than any
    statement about what the model can generate, and it belongs in `LEGASUS.md` as a measured property
    of the authority boundary rather than a design intention.
+
+---
+
+## SCOPE OF THIS CONCLUSION — added after the result, restricting it, never extending it
+
+The conclusion this family supports, stated narrowly and canonically:
+
+> Within this task family, reducing source visibility does **not** monotonically improve reliable
+> generation. Instead, different visibility regimes induce **different unauthorized output modes**.
+
+No "best window" is claimed and none is implied. "Amount of context" is probably the wrong abstraction
+altogether; what the visible context **affords the model to emit** is the better one, and it is what the
+two opposing failure modes actually track:
+
+    no context      -> the model invents surrounding structure
+    more context    -> the model reproduces surrounding structure
+
+The cross-run repeated-fixed-line observation (6/60 against 23/60) remains **purely
+hypothesis-generating**. It crosses two runs that were never designed to be compared, and it is not
+cited as evidence here or anywhere else. Its controlled replacement is
+`measurements/2026-09-18-redundancy-1p5b/`.
+
+What this family does support at full strength is the invariance, not the curve:
+
+    P(correct attempt)       0.20 to 0.90 across cells
+    P(correct | committed)   1.00 in every cell
+
+The architecture claim is that the second is insensitive to the first — **model reliability is not
+repository reliability** — and it is the piece to protect. It does not prove universal safety. It shows
+the same pattern holding while the model's candidate-generation behaviour changed dramatically, which
+is the kind of invariance an architecture is supposed to create.
