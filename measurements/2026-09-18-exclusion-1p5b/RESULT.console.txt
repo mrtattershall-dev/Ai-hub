@@ -1,0 +1,24 @@
+  four tasks: T10_0 (below 10, preserve 0)   T10_3 (below 10, preserve 3)   T20_5 (below 20, preserve 5)   T0_N2 (below 0, preserve -2)
+  controls ok: identical plans per task, no leakage, sufficiency, BOTH realizations verify, three wrong fragments accepted-but-failing, classifier separates the three families
+  RULE 3 ok: endpoint names qwen2.5-coder:1.5b
+  12 cells   samples 40   temperature 0.6
+
+  T10_0  IMPLICIT         PRIMARY excludes-preserved  0/40   excludes-other  0   no-exclusion 40   verified 24   P(c|auth) 1.00
+  T10_0  NAMED_EXCLUSION  PRIMARY excludes-preserved  1/40   excludes-other  0   no-exclusion 36   verified 34   P(c|auth) 0.97
+  T10_0  RELATIONAL       PRIMARY excludes-preserved  3/40   excludes-other  0   no-exclusion 37   verified 35   P(c|auth) 1.00
+  T10_3  IMPLICIT         PRIMARY excludes-preserved  0/40   excludes-other  0   no-exclusion 38   verified 26   P(c|auth) 0.93
+  T10_3  NAMED_EXCLUSION  PRIMARY excludes-preserved  3/40   excludes-other  0   no-exclusion 37   verified 36   P(c|auth) 1.00
+  T10_3  RELATIONAL       PRIMARY excludes-preserved  6/40   excludes-other  0   no-exclusion 34   verified 37   P(c|auth) 1.00
+  T20_5  IMPLICIT         PRIMARY excludes-preserved  0/40   excludes-other  0   no-exclusion 39   verified 25   P(c|auth) 0.83
+  T20_5  NAMED_EXCLUSION  PRIMARY excludes-preserved  2/40   excludes-other  0   no-exclusion 38   verified 36   P(c|auth) 1.00
+  T20_5  RELATIONAL       PRIMARY excludes-preserved  6/40   excludes-other  0   no-exclusion 32   verified 33   P(c|auth) 0.97
+  T0_N2  IMPLICIT         PRIMARY excludes-preserved  0/40   excludes-other  0   no-exclusion 39   verified 36   P(c|auth) 1.00
+  T0_N2  NAMED_EXCLUSION  PRIMARY excludes-preserved  1/40   excludes-other  0   no-exclusion 37   verified 34   P(c|auth) 1.00
+  T0_N2  RELATIONAL       PRIMARY excludes-preserved  3/40   excludes-other  0   no-exclusion 37   verified 29   P(c|auth) 1.00
+
+  PRIMARY - excludes-preserved by rendering, pooled over the four tasks, per 160:
+     IMPLICIT         excludes-preserved   0   verified 111   per task 0/0/0/0
+     NAMED_EXCLUSION  excludes-preserved   7   verified 140   per task 1/3/2/1
+     RELATIONAL       excludes-preserved  18   verified 134   per task 3/6/6/3
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.exclusion.json

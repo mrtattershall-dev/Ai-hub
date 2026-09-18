@@ -99,3 +99,117 @@ sentence, and `renderDelta` is a narrower surface than the last two windows sugg
 Same T4 app under tatte's standing authorization in `COORD.md`. `scaledown_window` 5 minutes,
 `min_containers` 0, hard 30-minute cap, AC power confirmed, stop with `--yes` and verify. **Rule 3**
 before any generation.
+
+---
+
+# RESULT — the exclusion experiment
+
+Rule 3 verified. All controls passed, including the anti-oracle control that both realizations verify
+in all four tasks. GPU window 11:38:08Z to ~11:44Z, stopped and verified: six `legasus-1p5b` rows,
+**zero** not `stopped`.
+
+    task     preserve   rendering          excl-preserved  excl-other  verified  P(c|auth)
+    T10_0        0      IMPLICIT               0/40            0         24        1.00
+    T10_0        0      NAMED_EXCLUSION        1/40            0         34        0.97
+    T10_0        0      RELATIONAL             3/40            0         35        1.00
+    T10_3        3      IMPLICIT               0/40            0         26        0.93
+    T10_3        3      NAMED_EXCLUSION        3/40            0         36        1.00
+    T10_3        3      RELATIONAL             6/40            0         37        1.00
+    T20_5        5      IMPLICIT               0/40            0         25        0.83
+    T20_5        5      NAMED_EXCLUSION        2/40            0         36        1.00
+    T20_5        5      RELATIONAL             6/40            0         33        0.97
+    T0_N2       -2      IMPLICIT               0/40            0         36        1.00
+    T0_N2       -2      NAMED_EXCLUSION        1/40            0         34        1.00
+    T0_N2       -2      RELATIONAL             3/40            0         29        1.00
+
+## PRIMARY — the effect is general, and it is not about zero
+
+    excludes-preserved, pooled over four values, per 160
+      IMPLICIT           0      per task  0 / 0 / 0 / 0
+      NAMED_EXCLUSION    7      per task  1 / 3 / 2 / 1        vs IMPLICIT  p = 0.015
+      RELATIONAL        18      per task  3 / 6 / 6 / 3        vs IMPLICIT  p = 4.6e-6
+
+**`IMPLICIT` produced zero exclusion predicates in 160 samples across four different excluded values.**
+Both naming renderings produced them **for every value**, including the negative one. Monotone, and
+present in all four tasks rather than concentrated in the zero task.
+
+    excludes the WRONG value    0 out of 25 exclusions written
+
+When this model writes an exclusion it writes the right one. That was a separate family precisely
+because "wrote an exclusion" and "wrote the right exclusion" are different claims; here they coincide.
+
+> Naming the excluded value in the specification changes how the model realizes a contract whose plan,
+> required behaviour, placement and precedence are all held identical. `RENDER` is a real boundary, not
+> a zero-specific quirk.
+
+**The magnitude does not generalize, and that is an honest limit.** Window 9's relational sentence gave
+46/80 (58%); this one gives 18/160 (11%). The *direction* survived four values; the *size* is specific
+to the sentence. Per task, only the two middle tasks reach significance alone (p = 0.026 each); the
+pooled result carries the claim.
+
+## SECONDARY — verified rate differed, and I predicted it would not
+
+    verified per 160    IMPLICIT 111    NAMED 140    RELATIONAL 134
+                        IMPLICIT vs NAMED        p = 1.2e-4
+                        IMPLICIT vs RELATIONAL   p = 3.5e-3
+
+The preregistration said *"if it does differ, the reason has to be found in the refusal columns, not
+asserted."* It is there, and it is a single column:
+
+    refusals per 160         repeated-a-fixed-line   returned-a-function   other-shape
+      IMPLICIT                       27                     6                   9
+      NAMED_EXCLUSION                 0                     2                  17
+      RELATIONAL                      3                     7                  15
+
+    repeated-a-fixed-line   IMPLICIT 27 vs NAMED 0        p = 4.5e-9
+                            IMPLICIT 27 vs RELATIONAL 3   p = 3.2e-6
+
+**The implicit phrasing makes the model reproduce the fixed lines about nine times more often.** Same
+failure mode as windows 7 to 9, now driven by how the *delta* is worded rather than by an added
+sentence. "The remaining values below T" apparently sends the model looking at what it must remain
+remaining *from*.
+
+## The rendering also moves the authorization leak rate
+
+    authorization leaks    IMPLICIT  7 / 118 authorized
+                           others    2 / 276 authorized      p = 0.0039
+
+    T20_5 IMPLICIT   `if n > 20`  x3,  `if n >= 20`  x2      inversions
+    T10_3 IMPLICIT   `if n <= 10` x2                         off-by-one
+    T10_0 NAMED      `if n > 10`  x1
+    T20_5 RELATIONAL `if n > 20`  x1
+
+Seven of nine leaks are in `IMPLICIT`. The implicit rendering does not merely cause more refusals — it
+produces more **well-formed but semantically wrong** fragments, which is the class `LegaGate` cannot
+see and `LegaVerify` must catch. **All nine were caught by execution verification.**
+
+    AUTHORIZATION-LAYER SEMANTIC PRECISION   this family 385/394 = 0.977
+                                             eight families 1116/1130 = 0.988
+    VERIFICATION OUTCOME                     all 14 observed leaks rejected by execution
+    REPOSITORY STATE                         no observed leaked program committed
+
+The authorization-layer number fell this window, and it fell because a rendering choice made the model
+produce worse proposals. That is the layered design behaving exactly as described rather than a
+regression: **rendering quality shows up in authorization precision, and verification absorbs it.**
+
+## Honest limits
+
+- One sentence per rendering style. "Naming the excluded value induces an exclusion predicate" is
+  supported across four values but two sentences.
+- Per-task, only two of four tasks reach significance alone. The claim rests on the pooled result and
+  on the fact that `IMPLICIT` is exactly zero everywhere.
+- Exclusion rates are low in absolute terms — 11% at best — so this is a shift in realization
+  *tendency*, not a switch.
+- One model, one temperature, one window size, one program shape.
+
+## What this changes
+
+1. **`RENDER` is a compiler boundary, within this domain.** The same internal truth, deterministically
+   compiled three ways, produced different realization strategies, different refusal profiles, and
+   different authorization leak rates — with `OBSERVE` and `DECIDE` provably fixed by control.
+2. **The implicit phrasing is the one to avoid**, and for a reason now measured rather than aesthetic:
+   it costs 29 verified outputs per 160, drives nine times the fixed-line reproduction, and carries
+   seven of nine semantic leaks.
+3. The rendering rule that follows is concrete: **name what is excluded; do not gesture at it.**
+   Together with "render the relation, not the bound metadata" and "add nothing the window already
+   answers", `renderDelta` and `renderDomain` now have three measured rules between them.

@@ -7201,3 +7201,11 @@ established - one window showed it, two did not, and the pooled significance res
 The MAIN effect survives (p=0.018). What replaced both: delta phrasing moves the verified rate 12
 points out of 80 between equally valid English sentences, and the RELATIONAL phrasing is best.
 Cumulative P(correct|authorized) 731/736.
+
+**WINDOW #10 CLOSED.** 11:38:08Z to ~11:44Z, 6 rows, 0 not stopped. THE EFFECT IS GENERAL, NOT A
+ZERO QUIRK: IMPLICIT produced ZERO exclusion predicates in 160 samples across four excluded values
+(0, 3, 5, -2); NAMED 7/160 (p=0.015); RELATIONAL 18/160 (p=4.6e-6), present for every value. And
+0 of 25 exclusions named the wrong value. Verified rate DID differ against prediction, and the
+reason is in the refusal column as preregistered: IMPLICIT reproduces fixed lines 27/160 against
+0 and 3. Rendering also moves the LEAK rate - 7 of 9 leaks in IMPLICIT, p=0.0039, all caught by
+execution. Authorization precision 385/394 this family, 1116/1130 across eight.
