@@ -1,0 +1,14 @@
+--- op op1 after: "def _base():\n    return {\"retries\": 1}\n"
+
+
+def _timeouts():
+    return {"timeout": 30}
+
+--- op op2 after: "DEFAULTS = _base()\n"
+DEFAULTS.update(_timeouts())
+
+--- op op3 after: "et(name):\n    return DEFAULTS.get(name)\n"
+
+
+def timeout_of():
+    return DEFAULTS.get("timeout")

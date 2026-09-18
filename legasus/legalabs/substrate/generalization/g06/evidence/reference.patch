@@ -1,0 +1,17 @@
+--- op op1 after: "e(s):\n    return str(s).strip().upper()\n"
+
+
+def _suffix(s):
+    return "long" if len(str(s).strip()) > 5 else "short"
+
+--- op op2 after: "def plain(s):\n    return str(s).strip()\n"
+
+
+def suffix_of(s):
+    return _suffix(s)
+
+--- op op3 after: "   return title(s) + \" | \" + _suffix(s)\n"
+
+
+def blank(s):
+    return str(s).strip() == ""

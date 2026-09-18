@@ -1,0 +1,14 @@
+class Counter:
+    def __init__(self):
+        self._seen = {}
+
+    def scan(self, words):
+        for w in words:
+            key = str(w).strip().lower()
+            if not key:
+                continue
+            self._seen[key] = self._seen.get(key, 0) + 1
+        return len(self._seen)
+
+    def seen_count(self, w):
+        return self._seen.get(str(w).strip().lower(), 0)

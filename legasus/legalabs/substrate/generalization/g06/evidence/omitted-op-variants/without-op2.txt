@@ -1,0 +1,21 @@
+# Report formatting.
+
+
+def title(s):
+    return str(s).strip().upper()
+
+
+def _suffix(s):
+    return "long" if len(str(s).strip()) > 5 else "short"
+
+
+def describe(s):
+    return title(s) + " | " + _suffix(s)
+
+
+def blank(s):
+    return str(s).strip() == ""
+
+
+def plain(s):
+    return str(s).strip()

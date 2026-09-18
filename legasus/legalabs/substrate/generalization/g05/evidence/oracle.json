@@ -1,0 +1,72 @@
+{
+  "task_id": "g05",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing base defaults as the relation to parallel; that feature is a helper whose result is merged into DEFAULTS at import time and read through an accessor, and the new feature occupies the same positions",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the helper supplying the new default",
+        "site_hint": "def _base():\n    return {\"retries\": 1}\n"
+      },
+      {
+        "id": "op2",
+        "intent": "merge the new default at import time",
+        "site_hint": "DEFAULTS = _base()\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the accessor for the new default",
+        "site_hint": "def get(name):\n    return DEFAULTS.get(name)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op2",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 12
+  },
+  "reference": {
+    "source_hash": "8b5108e2b851b5190461b999bac5702ca0084c50046267d591aa8570852adbde",
+    "reference_hash": "fa2f0adddeb873027294c7af080ae79ec7fe65f2347a54e8a1292dd6eb4cef00",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

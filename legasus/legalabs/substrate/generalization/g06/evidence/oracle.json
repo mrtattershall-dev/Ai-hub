@@ -1,0 +1,68 @@
+{
+  "task_id": "g06",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing title helper as the relation to parallel; that feature is a module-level function transforming the stripped text, and the new helpers occupy the same position",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the helper that describe already refers to",
+        "site_hint": "def title(s):\n    return str(s).strip().upper()\n"
+      },
+      {
+        "id": "op2",
+        "intent": "a public accessor for the same value",
+        "site_hint": "def plain(s):\n    return str(s).strip()\n"
+      },
+      {
+        "id": "op3",
+        "intent": "an emptiness reader over the same stripped text",
+        "site_hint": "be(s):\n    return title(s) + \" | \" + _suffix(s)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 15
+  },
+  "reference": {
+    "source_hash": "aad327e6b3cefbb32cfde10ced7cef9c8f9c65e309e5b1c35d32b454b3af1b91",
+    "reference_hash": "005da050e6002261a084cbea190de83c0b398a7a5072cc3e00a0efb302adfb7a",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

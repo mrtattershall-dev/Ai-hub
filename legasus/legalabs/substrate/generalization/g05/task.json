@@ -1,0 +1,12 @@
+{
+  "task_id": "g05",
+  "goal": "Add timeout defaults to the EXISTING settings.py: a helper supplies a timeout of 30, that value must be present in DEFAULTS under the name \"timeout\" when the module is imported, and timeout_of() returns it. Keep the retries default and get working exactly as they do now. Run it with python.",
+  "lead": "settings.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the timeout default is assembled the same way as the existing base defaults",
+  "interface": [
+    "timeout",
+    "timeout_of"
+  ]
+}

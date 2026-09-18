@@ -1,0 +1,72 @@
+{
+  "task_id": "g01",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing seen counts as the relation to parallel; that feature has a declaration, a recorder and a reader, and the new feature occupies the same positions",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the parallel store",
+        "site_hint": "        self._seen = {}\n"
+      },
+      {
+        "id": "op2",
+        "intent": "recorder for the parallel store",
+        "site_hint": "        return len(self._seen)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "readers over the parallel store",
+        "site_hint": "eturn self._seen.get(str(w).strip().lower(), 0)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 13
+  },
+  "reference": {
+    "source_hash": "ed5d33fe92fa52ce8728cb811ea36ffb79eb8fb1e32d478fab6297d8b59ca0bd",
+    "reference_hash": "6b35ecae1c130a165cbda38aa2eb494e3faa8fa3df34e490944d59033ec818a5",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

@@ -1,0 +1,27 @@
+# Tiny registry.
+
+ITEMS = []
+
+
+def reset(items):
+    clear()
+    for x in items:
+        add(x)
+    return size()
+
+
+def add(x):
+    if x is None:
+        return False
+    ITEMS.append(x)
+    return True
+
+
+def size():
+    return len(ITEMS)
+
+
+def clear():
+    n = len(ITEMS)
+    del ITEMS[:]
+    return n

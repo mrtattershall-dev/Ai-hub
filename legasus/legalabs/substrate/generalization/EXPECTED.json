@@ -1,0 +1,26 @@
+{
+  "note": "Per-kind expectations for the constraint-generalization family. Written before any run and committed with the seal. Each constraint kind gets a case where it SHOULD fire and a case where firing would be WRONG, so a rule cannot pass by being uniformly aggressive or uniformly timid.",
+  "tasks": [
+    { "id": "g01", "ops": 3, "kind": "ownership_boundary", "half": "POSITIVE",
+      "situation": "a multi-line loop body inside a method; a sibling method inserted mid-loop ends the method and orphans the remaining loop lines",
+      "expect": "ownership_boundary fires and every boundary it removes genuinely fails" },
+    { "id": "g02", "ops": 3, "kind": "ownership_boundary", "half": "NEGATIVE",
+      "situation": "flat module-level functions only; nothing is nested deeper than a module-level insertion",
+      "expect": "ownership_boundary finds nothing to forbid; any narrowing is over-constraint" },
+    { "id": "g03", "ops": 2, "kind": "control_flow_boundary", "half": "POSITIVE",
+      "situation": "an early return at the insertion indent in the same region",
+      "expect": "control_flow_boundary fires; a branch after the return is unreachable" },
+    { "id": "g04", "ops": 2, "kind": "control_flow_boundary", "half": "NEGATIVE",
+      "situation": "every return sits inside a function body, at a structural parent that is not the module; the insertion is module-level",
+      "expect": "control_flow_boundary must NOT fire; a rule looking for a terminator anywhere will wrongly narrow" },
+    { "id": "g05", "ops": 3, "kind": "symbol_availability", "half": "POSITIVE",
+      "situation": "DEFAULTS is assembled at import time by calling helpers, so a helper defined after that line does not exist when it runs",
+      "expect": "symbol_availability fires; this kind has never been exercised before" },
+    { "id": "g06", "ops": 3, "kind": "symbol_availability", "half": "NEGATIVE",
+      "situation": "the only mention of the new helper is inside describe's body, resolved when describe RUNS, so module-level order is free",
+      "expect": "symbol_availability must NOT fire; a rule treating a textual mention as a dependency will remove boundaries that execute perfectly well" }
+  ],
+  "matching": "operation counts are {2,3,3} on both halves, so which half a task is in is not confounded with transaction size",
+  "reporting": "per kind AND in aggregate. If ownership_boundary generalizes and symbol_availability fails, the total must not hide it.",
+  "prior_standing": "ownership_boundary 23/26 development, control_flow_boundary 3/26 development, symbol_availability 0/26 - mechanism exists, never exercised."
+}

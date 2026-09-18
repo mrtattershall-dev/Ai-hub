@@ -1,0 +1,11 @@
+{
+  "task_id": "g03",
+  "goal": "Add a small-number case to the EXISTING classify.py: a positive number below 10 must be reported as \"small\" instead of \"positive\". Everything else must keep working exactly as it does now. Run it with python.",
+  "lead": "classify.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the small case is written the same way as the existing zero case",
+  "interface": [
+    "small"
+  ]
+}

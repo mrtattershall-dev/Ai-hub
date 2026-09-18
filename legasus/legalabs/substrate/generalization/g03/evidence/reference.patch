@@ -1,0 +1,9 @@
+--- op op1 after: "    if n == 0:\n        return \"zero\"\n"
+    if n < 10:
+        return "small"
+
+--- op op2 after: "    return \"positive\"\n"
+
+
+def is_small(n):
+    return classify(n) == "small"

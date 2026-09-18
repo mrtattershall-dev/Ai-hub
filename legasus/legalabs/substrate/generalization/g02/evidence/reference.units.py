@@ -1,0 +1,25 @@
+# Unit conversion helpers.
+
+
+def to_cm(inches):
+    return inches * 2.54
+
+
+def to_mm(inches):
+    return inches * 25.4
+
+
+def to_inches(cm):
+    return cm / 2.54
+
+
+def from_mm(mm):
+    return mm / 25.4
+
+
+def round_cm(inches):
+    return round(to_cm(inches), 1)
+
+
+def round_mm(inches):
+    return round(to_mm(inches), 1)
