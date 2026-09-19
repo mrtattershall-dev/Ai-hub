@@ -46,6 +46,8 @@ READMEs hold the detail; commit messages hold the reasoning.
 | DECIDE ordering is LOAD-BEARING, by ablation | same fragments re-assembled in presentation order: 105/105 -> 0/105, every failure a DEAD OPERATION |
 | DECIDE's cost is SPECIFIC to derived precedence | paired ablation over 0/1/2/3 violated edges: disjoint 0/54 broken, constrained 162/162 broken, p = 2.8e-52. The disjoint files really were rebuilt in a different order and verified anyway |
 | NO realization substitutes for DECIDE, at any capacity | 0/648 guards defended against a sibling operation. Defence against the fact the PROMPT NAMES scales 48% -> 78% -> 96% across 1.5B/7B/14B; against the unnamed one it is flat at ZERO. A realization can only defend against facts its own prompt names, and cross-operation precedence is a property of the TRANSACTION, not of any operation |
+| DOMAIN COLLAPSE: naming a sibling's domain makes the wider operation ADOPT it | 0/232 -> 127/239 (53.1%), p = 4.0e-48, confined to operations that contain a sibling (0/479 elsewhere). `low`, asked for n < 10, wrote n < 0 89 times. EXCLUSION never once occurred: 0 of 1429 guards. Capacity does not protect - 1.5B 73%, 7B 6%, 14B 80%, the largest model worst, non-monotonicity recorded as observed and NOT explained |
+| RENDER: stating more is not the same as stating what is DECIDABLE | adding a true fact the model cannot resolve is not neutral - it cost up to 95% of P(correct|assembled), and the damage landed in the HEALTHY arm |
 | A verdict computed from the PLAN is not a measurement | `reachability` never saw the emitted code, so its verdict was a pure function of (plan, order) and condemned self-defending realizations containing no dead code. Fixed by `reachabilityExecuted`; the planned version is KEPT, because the GAP between the two is what a self-defending realization looks like |
 | An ablation must not move its own expectations | probe expectations were recomputed from the presented order, so the broken program was graded against a broken expectation and the probes agreed by construction. That, with the analytic deadness term, fully explains the original `dead-op 105 / probe-fail 0` split |
 | Models do not get the domain wrong when RENDER states it | 343 authorized T3 fragments, ZERO with a domain other than requested |
@@ -62,6 +64,12 @@ READMEs hold the detail; commit messages hold the reasoning.
   The **main** effect survives (p = 0.018). Not established.
 - **"identifier naming primes copying"** — target vs non-target indistinguishable, p = 0.65.
 - **"authorization precision is capacity-invariant"** — falsified, and non-monotonically.
+- **"a realization can defend itself only against facts its own prompt names"** — proposed by the DECIDE
+  specificity family (it fit both OBSERVE's 145 substitutions and DECIDE's zero), tested directly, and
+  **falsified**. Naming the sibling facts produced 0 exclusions in 1429 guards and 53.1% DOMAIN COLLAPSE
+  instead. The missing thing was never the fact; it was the derivation over the facts.
+- **"the DECIDE dose-response is a gradient"** — preregistered, apparatus proven able to register it,
+  **not observed**. The response is a step. Preserved as a null, not repaired.
 - `R1` of ladder 1 (format confound) and `W0` of visibility rev 1 (missing program fact) are **void
   rungs**, recorded as such.
 

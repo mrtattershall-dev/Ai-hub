@@ -122,6 +122,39 @@ realization strategy substituting for the architecture 145 times, making correct
 and on capacity. Here the substitution is **structurally unavailable**, and a 9x parameter range does not
 begin to buy it while buying compliance with the named fact twice over.
 
+### Then the law was tested and it was wrong
+
+The obvious next move was to name the sibling facts and see whether defence appeared. It did not.
+**Exclusion — carving a sibling's domain out of your own — occurred 0 times in 1429 guards, in every
+condition and at every capacity.** What appeared instead was the opposite operation:
+
+    guards whose own domain CONTAINS a sibling's   EXCLUDED it   ADOPTED it
+    ISOLATED                        232                 0            0    0.0%
+    SIBLING_NAMED                   239                 0          127   53.1%     p = 4.0e-48
+
+**DOMAIN COLLAPSE.** Told that a narrower behaviour is requested inside its own domain, the wider
+operation *replaces its own domain with the sibling's*. `low`, asked for `n < 10`, wrote `n < 0` 89
+times. Never the reverse: `micro` wrote `n < 0` 235/235 in both conditions. The damage lands in the
+**healthy** arm, because the derived order places the narrow operation first and the collapsed guard is
+then unreachable — `P(correct|assembled)` fell from 1.000 to 0.050 at 14B on `E1`.
+
+Capacity does not protect: 1.5B 73%, 7B 6%, 14B 80%. The largest model is the most affected. That
+non-monotonicity is recorded as observed and **not explained**; one three-point curve does not earn a
+mechanism.
+
+> The missing thing was never the fact. Handing over `DECIDE`'s **inputs** without `DECIDE`'s
+> **conclusion** does not give the model a usable premise — it gives it an **ambiguity**, and the model
+> resolves that ambiguity by collapsing its own contract onto its neighbour's.
+
+Two overlapping domains do not by themselves say whether an operation should narrow itself, exclude the
+other, or do nothing. Choosing among those **is** `DECIDE`. So the stage is not a convenience supplying
+information the model lacks, and it is not work a larger model absorbs — handing over its inputs made
+every model worse and the largest model worst.
+
+It also sharpens what `RENDER` owes: **stating more is not the same as stating what is decidable.** A
+rendering that adds a true fact the model cannot resolve is not neutral. Here it cost up to 95% of
+correctness.
+
 ## The asymmetry, and it is a property of the architecture
 
 `OBSERVE`, `DECIDE`, `CONSTRAIN` and `PROVE` can be ablated **offline** on fixed artifacts: they

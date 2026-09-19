@@ -140,7 +140,59 @@ const RENDERS = ['ISOLATED', 'SIBLING_NAMED'];
 // Whatever is left is a defence, and the question this family asks is what it defends against.
 const OWN_COND = { micro: 'n < 0', low: 'n < 10', mid: 'n < 100', five: 'n == 5',
   fifty: 'n == 50', high: 'n > 100', plus: 'n > 0' };
-const isNamedFact = (clause) => /!=\s*3/.test(clause);
+const isNamedFact = (clause) => /!=\s*3/.test(clause);
+
+// WHICH OPERATIONS HAVE SOMETHING TO LOSE: those whose own domain strictly CONTAINS a sibling's. Only
+// they can either defend against the sibling or collapse onto it, so they are the denominator.
+const CONTAINS = { E0: {}, E1: { low: ['micro'] }, E2: { low: ['micro', 'five'] },
+  E3: { mid: ['low', 'micro'], low: ['micro'] } };
+
+// THE DISTINCTION THE FIRST VERSION OF THIS METRIC MISSED. It counted any clause that was not the
+// canonical own-domain as "sibling defence", so a simply WRONG guard - an operation that wrote n == 3 -
+// was scored as defending. That is not a defence metric at all. The two things that can actually happen
+// are opposite, and only one of them is what this family predicted:
+//
+//   EXCLUDED   the guard carves the sibling's domain OUT of its own      n < 10 and n >= 0
+//   ADOPTED    the guard REPLACES its own domain with the sibling's      n < 0, when n < 10 was asked
+//
+// An EXCLUSION carves something out: a lower bound, or a point removed. Word boundaries are written as
+// explicit digit lookaheads rather than the word-boundary escape, because this file was rewritten
+// through a shell twice and both times that escape arrived as a raw control character - hazard 1,
+// occurrences ten and eleven. This line is only ever edited with a file editor, never through a shell.
+const RE_EXCLUDES = />=\s*0|>\s*-1|!=\s*5(?![0-9])|!=\s*50(?![0-9])|n\s*>=?\s*[0-9]/;
+
+function siblingRelation(caseKey, id, condition) {
+  const owned = (CONTAINS[caseKey] || {})[id];
+  if (!owned || !condition) return null;
+  for (const sib of owned) {
+    const d = OWN_COND[sib];
+    if (condition === d || condition.startsWith(d + ' and')) return 'ADOPTED';
+  }
+  if (RE_EXCLUDES.test(condition)) return 'EXCLUDED';
+  return null;
+}
+
+function relationCounts(rows, caseKey, which) {
+  let n = 0;
+  for (const r of rows) {
+    for (const [id, o] of Object.entries(r.perOp || {})) {
+      if (!o || !o.condition) continue;
+      if (siblingRelation(caseKey, id, o.condition) === which) n++;
+    }
+  }
+  return n;
+}
+
+function eligibleGuards(rows, caseKey) {
+  let n = 0;
+  for (const r of rows) {
+    for (const [id, o] of Object.entries(r.perOp || {})) {
+      if (o && o.condition && (CONTAINS[caseKey] || {})[id]) n++;
+    }
+  }
+  return n;
+}
+
 function extraClauses(row) {
   const out = [];
   for (const [id, o] of Object.entries(row.perOp || {})) {
@@ -489,7 +541,10 @@ for (const MODEL of MODELS) {
       // split by WHAT THEY DEFEND AGAINST. n != 3 defends the preserved fact every prompt names; a
       // clause carving out a sibling's domain is the thing that was never once observed under ISOLATED.
       defence_named: rows.reduce((a, r) => a + extraClauses(r).filter(isNamedFact).length, 0),
-      defence_sibling: rows.reduce((a, r) => a + extraClauses(r).filter((x) => !isNamedFact(x)).length, 0),
+      // Only guards whose domain CONTAINS a sibling can defend or collapse; they are the denominator.
+      eligible_guards: eligibleGuards(rows, key),
+      sibling_excluded: relationCounts(rows, key, 'EXCLUDED'),
+      sibling_adopted: relationCounts(rows, key, 'ADOPTED'),
       sibling_clauses: [...new Set(rows.flatMap((r) => extraClauses(r).filter((x) => !isNamedFact(x))))],
       rescued: n((r) => r.rescued),
       refusals: rows.flatMap((r) => Object.values(r.perOp).filter((o) => !o.authorized).map((o) => o.reason)),
@@ -520,7 +575,8 @@ console.log('');
 for (const m of MODELS) {
   const ks = Object.keys(results.cells).filter((k) => k.startsWith(m + '|'));
   const S = (f) => ks.reduce((a, k) => a + f(results.cells[k]), 0);
-  const N = SAMPLES * CELLS.length;
+  // One cell per (render, case). Dividing by cases alone reported a yield of 2.000 in revision 1.
+  const N = SAMPLES * ks.length;
   console.log('  ' + m.padEnd(21) + ' transaction yield ' + (S((x) => x.assembled) / N).toFixed(3)
     + '   P(correct|assembled) ' + (S((x) => x.verified) / S((x) => x.assembled)).toFixed(3)
     + '   verified end-to-end ' + (S((x) => x.verified) / N).toFixed(3)
@@ -534,8 +590,9 @@ for (const m of MODELS) {
     const S = (f2) => ks.reduce((a, k) => a + f2(results.cells[k]), 0);
     const sibs = [...new Set(ks.flatMap((k) => results.cells[k].sibling_clauses))];
     console.log('    ' + m.padEnd(19) + R.padEnd(15)
-      + ' defends NAMED fact ' + String(S((x) => x.defence_named)).padStart(3)
-      + '   defends SIBLING ' + String(S((x) => x.defence_sibling)).padStart(3)
+      + ' guards that CONTAIN a sibling ' + String(S((x) => x.eligible_guards)).padStart(3)
+      + '   EXCLUDED it ' + String(S((x) => x.sibling_excluded)).padStart(3)
+      + '   ADOPTED it ' + String(S((x) => x.sibling_adopted)).padStart(3)
       + '   RESCUED ' + String(S((x) => x.rescued)).padStart(3)
       + '   op-yield ' + (S((x) => x.op_yield) / ks.length).toFixed(3)
       + (sibs.length ? '   clauses: ' + sibs.join(' | ') : ''));

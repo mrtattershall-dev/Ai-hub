@@ -14,7 +14,20 @@ three, and occurrence four still happened. Each entry therefore carries its stat
 
 ## 1. Heredoc backslash-eating - MECHANIZED IN CODE AND, AS OF OCCURRENCE NINE, IN PROSE — MECHANIZED
 
-**Occurrences: 9.** A shell heredoc collapses doubled backslashes, so JS written that way lands with
+**Occurrences: 11 — and occurrences TEN and ELEVEN were the first ever caught by the mechanism instead
+of by a human noticing.** A Python heredoc turned `\b` into a raw `U+0008` inside a regex in
+`run-decide-rendering.mjs`, and `escape-guard` failed the test run before the commit. Then **the repair
+introduced occurrence eleven**: writing the corrected line through `node -e` in the same shell collapsed
+the escapes again, and the second attempt stripped them entirely (`>=\s*0` arrived as `>=s*0`). The guard
+caught that too, and then caught the third attempt.
+
+That is the whole argument for mechanizing this, in one sitting: **knowing about the hazard, while
+actively repairing the hazard, was not enough to avoid re-introducing the hazard twice.** The rule is
+therefore absolute rather than advisory — a line containing a backslash escape is written with a **file
+editor**, never through any shell, not in a heredoc, not in `node -e`, not in `python -`. The repaired
+line now says so in a comment beside it, and its regex is a named constant so nothing has to re-type it.
+
+A shell heredoc collapses doubled backslashes, so JS written that way lands with
 `'\\s'` turned into `'\s'`. In a JS string literal `\s` is simply `s`: the file stays **syntactically
 valid**, the regex silently changes meaning, and the program returns a plausible wrong answer with no
 error anywhere.
@@ -441,6 +454,34 @@ measure something more flattering than the treatment.
 computed identically in both arms. Two requested behaviours whose domains are nested can only both be
 satisfied if the narrower wins where they overlap — that holds however the file is laid out, so the
 expectation may never be recomputed from the arm's own assembly.
+
+---
+
+## 13. A metric defined as "not the expected value" instead of as the property itself — MECHANIZED
+
+The rendering family's primary endpoint was *sibling defence*. It was implemented as **any clause that is
+not the canonical own-domain**, which is not the same thing at all: an operation that simply wrote the
+wrong guard (`n == 3`) scored as *defending against a sibling*. The console reported
+`defends SIBLING 44` in a condition where the true count was **zero**.
+
+The property has a direction, and the two directions are opposites:
+
+    EXCLUDED   the guard carves the sibling's domain OUT of its own     n < 10 and n >= 0
+    ADOPTED    the guard REPLACES its own domain with the sibling's     n < 0, when n < 10 was asked
+
+Defining the metric as "not the expected string" collapsed both of those — plus ordinary noise — into one
+number, and the number that mattered ran the *opposite* way from the label on it.
+
+**Mechanized:** `siblingRelation` returns `EXCLUDED`, `ADOPTED` or nothing, and the denominator is only
+guards whose domain actually contains a sibling. Replayed on the recorded rows it reproduces the hand
+analysis exactly.
+
+**Why it did no damage, and this is the point:** the conclusion came from reading the actual guard
+conditions, not from the summary line. The rule *inspect raw artifacts, not summaries* is what caught a
+metric that was confidently reporting the reverse of the truth.
+
+**Rule:** a metric must be defined as the property it claims to measure, with its direction explicit.
+"Different from what I expected" is not a measurement of anything.
 
 ---
 
