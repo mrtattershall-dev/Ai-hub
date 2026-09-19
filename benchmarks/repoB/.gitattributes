@@ -1,0 +1,3 @@
+# Repo B corpus is a byte-for-byte copy of a real installed package. Line endings are an OBSERVED
+# repository fact; git must not normalize them.
+benchmarks/repoB/pristine/** -text
