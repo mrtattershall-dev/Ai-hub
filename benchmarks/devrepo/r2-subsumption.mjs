@@ -56,8 +56,15 @@ for (const [id, rec] of Object.entries(RESULT.tasks)) {
   const struct = node({ kind: NODE.INTERPRETATION, proposition: 'the candidate is structurally admissible',
     scope: sc, basis: 'STRUCTURAL_GATE' });
   add(g, struct);
+  // THE ARTIFACT TRUNCATES ITS OWN EVIDENCE. run-arms.mjs records `code.slice(0, 400)`, so any candidate
+  // at exactly the cap is a PREFIX, not the model's output. A structural gate run over a prefix answers a
+  // question about a string that never existed. These decisions are INCONCLUSIVE, and calling them
+  // disagreements would be blaming r2 for my recording.
+  const truncated = !!L.code && L.code.length >= 400;
   let structDetail = 'not run';
-  if (!L.code) {
+  if (truncated) {
+    structDetail = 'TRUNCATED at 400 - inconclusive';
+  } else if (!L.code) {
     invalidate(g, struct.id, 'no candidate text was produced');
     structDetail = 'no candidate';
   } else if (task) {
@@ -80,13 +87,13 @@ for (const [id, rec] of Object.entries(RESULT.tasks)) {
       { id: ver.id, edge: EDGE.REQUIRES }] });
   add(g, commit);
 
+  if (truncated) invalidate(g, struct.id, 'the recorded candidate is a 400-character prefix');
   const e = entitled(g, commit.id, sc);
   const blame = e.problems.map((p) => (/envelope/.test(p.why) ? 'ENVELOPE'
     : /structurally admissible/.test(p.why) ? 'STRUCTURE'
       : /oracle/.test(p.why) ? 'VERIFICATION' : 'OTHER'));
-  total++;
-  if (e.ok === !!L.committed) agree++;
-  rows.push({ id, recorded: !!L.committed, graph: e.ok, derived: L.derivedEnvelope,
+  if (!truncated) { total++; if (e.ok === !!L.committed) agree++; }
+  rows.push({ id, recorded: !!L.committed, graph: e.ok, derived: L.derivedEnvelope, truncated,
     struct: structDetail, pass: !!(L.score && L.score.pass), blame: [...new Set(blame)].join('+') || '-' });
 }
 
@@ -96,12 +103,15 @@ console.log('  task  recorded  graph   envelope   oracle   structural gate (re-r
 for (const r of rows) {
   console.log('  ' + r.id.padEnd(6) + String(r.recorded).padEnd(10) + String(r.graph).padEnd(8)
     + String(r.derived).padEnd(11) + String(r.pass).padEnd(9) + r.struct.slice(0, 30).padEnd(31)
-    + r.blame + (r.recorded === r.graph ? '' : '   <-- MISMATCH'));
+    + r.blame + (r.truncated ? '   [INCONCLUSIVE: evidence truncated]'
+      : r.recorded === r.graph ? '' : '   <-- MISMATCH'));
 }
 console.log('');
+const nTrunc = rows.filter((r) => r.truncated).length;
 console.log('R1  reproduces the recorded commit decision : ' + agree + '/' + total
-  + (agree === total ? '   HELD' : '   FAILED'));
-const committed = rows.filter((r) => r.recorded).length;
+  + (agree === total ? '   HELD on complete evidence' : '   FAILED')
+  + '   (' + nTrunc + ' decisions excluded: the artifact recorded only a 400-char prefix)');
+const committed = rows.filter((r) => r.recorded && !r.truncated).length;
 console.log('R2  non-vacuity: ' + committed + ' committed, ' + (total - committed) + ' not. '
   + 'Blame is distributed across '
   + [...new Set(rows.filter((r) => !r.recorded).map((r) => r.blame))].join(' / '));

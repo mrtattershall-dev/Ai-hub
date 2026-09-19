@@ -30,6 +30,7 @@
 // The pristine SOURCE is never shown to either arm, and the scoring probe set is hidden from both.
 import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, copyFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { TASKS } from './tasks.mjs';
 import { ORACLE_PROBES } from './oracle-probes.mjs';
@@ -158,7 +159,7 @@ async function rawArm(task) {
     applied = true;
   }
   const s = score(dir, task);
-  return { arm: 'RAW', applied, committed: applied, code: code.slice(0, 600), score: s,
+  return { arm: 'RAW', applied, committed: applied, code, codeSha: createHash('sha256').update(code).digest('hex').slice(0, 16), codeLen: code.length, score: s,
     exactReconstruction: null };
 }
 
@@ -220,7 +221,7 @@ async function legasusArm(task) {
     return { arm: 'LEGASUS', refused: false, constrained: true, committed: false, operation,
       derivedEnvelope: env.envelope, inferenceSpent: true,
       refusal: 'CONSTRAIN_REJECTED', failedPredicates: gate.failed, passedPredicates: gate.passed,
-      why: gate.why, code: code.slice(0, 400), score: score(dir, task) };
+      why: gate.why, code, codeSha: createHash('sha256').update(code).digest('hex').slice(0, 16), codeLen: code.length, score: score(dir, task) };
   }
 
   const candidate = replaceFunction(before, task.fn, code);
@@ -234,7 +235,7 @@ async function legasusArm(task) {
     return { arm: 'LEGASUS', refused: false, committed: false, operation, inferenceSpent: true,
       derivedEnvelope: env.envelope, healthRejected: true, healthStatus: health.status,
       why: health.why, rolledBack: readFileSync(join(dir, mod), 'utf8') === before,
-      code: code.slice(0, 400), score: score(dir, task) };
+      code, codeSha: createHash('sha256').update(code).digest('hex').slice(0, 16), codeLen: code.length, score: score(dir, task) };
   }
 
   const proved = score(dir, task);
@@ -244,12 +245,12 @@ async function legasusArm(task) {
       derivedEnvelope: env.envelope, inferenceSpent: true,
       why: 'PROVE rejected the candidate; the repository was restored',
       rolledBack: readFileSync(join(dir, mod), 'utf8') === before,
-      code: code.slice(0, 400), score: score(dir, task), proveScore: proved };
+      code, codeSha: createHash('sha256').update(code).digest('hex').slice(0, 16), codeLen: code.length, score: score(dir, task), proveScore: proved };
   }
 
   const pristineFn = functionSource(readFileSync(join(PRISTINE, mod), 'utf8'), task.fn);
   return { arm: 'LEGASUS', refused: false, committed: true, operation, derivedEnvelope: env.envelope,
-    inferenceSpent: true, code: code.slice(0, 400), score: proved,
+    inferenceSpent: true, code, codeSha: createHash('sha256').update(code).digest('hex').slice(0, 16), codeLen: code.length, score: proved,
     exactReconstruction: pristineFn ? code.trim() === pristineFn.text.trim() : null };
 }
 
