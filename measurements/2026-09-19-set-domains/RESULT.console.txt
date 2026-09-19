@@ -17,3 +17,25 @@
 
   qwen2.5-coder:1.5b   S_DISJ        op-yield 1.000   assembled 20/20   verified  4   P(correct|assembled) 0.200   dead-op 2   probe-fail 14  ||  edges 0   DECIDE-OFF verified  4   broken  0/4
   qwen2.5-coder:1.5b   S_NEST        op-yield 0.950   assembled 18/20   verified  1   P(correct|assembled) 0.056   dead-op 0   probe-fail 17  ||  edges 1   DECIDE-OFF verified  0   broken  1/1
+  qwen2.5-coder:1.5b   S_MIX         op-yield 0.900   assembled 16/20   verified  1   P(correct|assembled) 0.063   dead-op 0   probe-fail 15  ||  edges 1   DECIDE-OFF verified  0   broken  1/1
+  qwen2.5-coder:1.5b   S_TRIPLE      op-yield 0.900   assembled 14/20   verified  2   P(correct|assembled) 0.143   dead-op 0   probe-fail 12  ||  edges 3   DECIDE-OFF verified  0   broken  2/2
+  qwen2.5-coder:7b     S_DISJ        op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 0   DECIDE-OFF verified 20   broken  0/20
+  qwen2.5-coder:7b     S_NEST        op-yield 1.000   assembled 20/20   verified  0   P(correct|assembled) 0.000   dead-op 0   probe-fail 20  ||  edges 1   DECIDE-OFF verified  0   broken  0/0
+  qwen2.5-coder:7b     S_MIX         op-yield 1.000   assembled 20/20   verified  0   P(correct|assembled) 0.000   dead-op 0   probe-fail 20  ||  edges 1   DECIDE-OFF verified  0   broken  0/0
+  qwen2.5-coder:7b     S_TRIPLE      op-yield 1.000   assembled 20/20   verified  0   P(correct|assembled) 0.000   dead-op 0   probe-fail 20  ||  edges 3   DECIDE-OFF verified  0   broken  0/0
+  qwen2.5-coder:14b    S_DISJ        op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 0   DECIDE-OFF verified 20   broken  0/20
+  qwen2.5-coder:14b    S_NEST        op-yield 1.000   assembled 20/20   verified 16   P(correct|assembled) 0.800   dead-op 0   probe-fail 4  ||  edges 1   DECIDE-OFF verified  0   broken 16/16
+  qwen2.5-coder:14b    S_MIX         op-yield 1.000   assembled 20/20   verified 12   P(correct|assembled) 0.600   dead-op 0   probe-fail 8  ||  edges 1   DECIDE-OFF verified  0   broken 12/12
+  qwen2.5-coder:14b    S_TRIPLE      op-yield 1.000   assembled 20/20   verified 11   P(correct|assembled) 0.550   dead-op 0   probe-fail 9  ||  edges 3   DECIDE-OFF verified  0   broken 11/11
+
+  qwen2.5-coder:1.5b    transaction yield 0.850   P(correct|assembled) 0.118   verified end-to-end 0.100   sec/verified 87.2
+  qwen2.5-coder:7b      transaction yield 1.000   P(correct|assembled) 0.250   verified end-to-end 0.250   sec/verified 18.9
+  qwen2.5-coder:14b     transaction yield 1.000   P(correct|assembled) 0.738   verified end-to-end 0.738   sec/verified 9.8
+
+  DOSE-RESPONSE  (paired: of the transactions DECIDE got right, how many the presented order broke)
+  S_DISJ violated edges 0   DECIDE ON  44   DECIDE OFF  44   broken by ablation   0/44   0%
+  S_NEST violated edges 1   DECIDE ON  17   DECIDE OFF   0   broken by ablation  17/17   100%
+  S_MIX violated edges 1   DECIDE ON  13   DECIDE OFF   0   broken by ablation  13/13   100%
+  S_TRIPLE violated edges 3   DECIDE ON  13   DECIDE OFF   0   broken by ablation  13/13   100%
+
+  written -> measurements/2026-09-19-set-domains/RESULT.json

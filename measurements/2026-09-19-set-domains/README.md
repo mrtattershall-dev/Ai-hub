@@ -98,3 +98,128 @@ had needed special-casing per domain kind would have been a design failure.
     samples      20 transactions per case per model
     temperature  0.6
     cases        S_DISJ, S_NEST, S_MIX, S_TRIPLE generate; S_UNDET refuses
+
+---
+
+# RESULT — the architecture generalized. The MODELS did not.
+
+**GPU stopped and verified (`legasus-scale`, state `stopped`, 0 tasks) before any of this was read.**
+**Every number below is generated from `RESULT.json`.**
+
+## The primary prediction is FALSIFIED
+
+    model   transaction yield   P(correct|assembled)   verified end-to-end
+    1.5B          0.850               0.118                 0.100
+    7B            1.000               0.250                 0.250
+    14B           1.000               0.738                 0.738
+
+I predicted `P(correct | assembled)` at or near `1.000`, matching `R4`'s 162/162 and `T3`'s 105/105 on
+intervals. It is nowhere near. On the stated endpoint, **the prediction failed.**
+
+    model   case       assembled   verified   dead-op   probe-fail
+    7B      S_DISJ       20/20        20         0          0
+    7B      S_NEST       20/20         0         0         20
+    7B      S_MIX        20/20         0         0         20
+    7B      S_TRIPLE     20/20         0         0         20
+
+The signature is specific: **`S_DISJ` is perfect at 7B and 14B; every case involving containment fails, on
+probes rather than on dead operations.**
+
+## But the mechanism is the models, and the verifier was exactly right
+
+Judged by **execution** — because the realizations include forms no parser here reads:
+
+    every realization denotes the requested set   87   verified 87   (100.0%)
+    at least one WRONG domain                   141   verified  0
+
+    ZERO LEAKS.   28 distinct guards, 0 failed to evaluate.
+
+`P(correct | verified)` is **1.000** and `P(verified | all realizations correct)` is **1.000**. The
+verifier accepted every correct realization and rejected every incorrect one, across five different
+algebras it was never told about.
+
+    106x  verified  64  correct        evens   n in [2, 4, 6, 8]
+      87x  verified   0  WRONG DOMAIN  mid2    4 <= n <= 6
+      54x  verified  13  correct        four    n == 4
+      45x  verified  43  correct        mid2    n == 4 or n == 6
+      34x  verified  31  correct        odds    n in [1, 5, 7]
+      28x  verified   0  WRONG DOMAIN  evens   n % 2 == 0
+      19x  verified   0  WRONG DOMAIN  mid2    n >= 4 and n <= 6
+      17x  verified   4  correct        evens   n in (2, 4, 6, 8)
+      14x  verified  10  correct        odds    n == 1 or n == 5 or n == 7
+      14x  verified   5  correct        evens   n == 2 or n == 4 or n == 6 or n == 8
+       6x  verified   0  WRONG DOMAIN  mid2    n == 4
+       6x  verified   0  WRONG DOMAIN  mid2    n == 4 or n == 5 or n == 6
+       4x  verified   0  WRONG DOMAIN  odds    n % 2 != 0
+
+The sub-100% rates on correct forms are not verifier error: a transaction verifies only when **every**
+operation in it is right, so a correct `evens` paired with a spanning-range `mid2` fails as it should.
+
+## The predicted failure mode appeared, and was caught every time
+
+Named in the preregistration before generation:
+
+> A set invites an error a range cannot: writing **the spanning range instead of the set**.
+
+    mid2 asked for {4, 6}    ->  4 <= n <= 6        87 times, 0 verified
+                             ->  n >= 4 and n <= 6  19 times, 0 verified
+                             ->  n in range(4, 7)    4 times, 0 verified
+
+**106 spanning-range realizations, none verified.** They satisfy every member and die at 5 — on the gap
+probes that exist because of this argument, with **no detector written for them**.
+
+## And one failure mode I did NOT predict, caught the same way
+
+    evens asked for {2, 4, 6, 8}  ->  n % 2 == 0     28 times, 0 verified
+    odds  asked for {1, 5, 7}     ->  n % 2 != 0      4 times, 0 verified
+
+The model inferred a **rule** from an enumeration and wrote modular arithmetic. `n % 2 == 0` admits 0, 10
+and -2; `n % 2 != 0` admits 3 and 9. This is a genuinely new algebra — not a wrong boundary, not a wrong
+spelling, a different mathematical object — and it was rejected 32 times out of 32 without anyone
+anticipating it.
+
+That is the successor to invented bounds, and the geometry is inverted:
+
+    invented bounds    correct interval  ->  model adds a boundary that was never specified
+    spanning range     correct sparse set -> model fills in values BETWEEN the members
+    inferred rule      correct sparse set -> model replaces the set with a PATTERN it generalizes
+
+Three unrelated error geometries, one verification principle: **specify the truth, and you do not have to
+anticipate the stupidity.**
+
+## The anti-oracle property holds on the new kind
+
+Four distinct correct algebras all verified: `n in [2, 4, 6, 8]`, `n in (2, 4, 6, 8)`,
+`n == 2 or n == 4 or n == 6 or n == 8`, and `n == 4` for the point. A verifier that accepted only the
+membership spelling would have been an oracle for a spelling rather than a check on meaning — and the
+or-chain is 43/45.
+
+`CONSTRAIN` admitted all of them, including the wrong ones, which is correct: the shapes are legal. Its
+op-yield stayed `1.000` at 7B and 14B. **All the work landed on `PROVE`, which is the division the
+architecture claims.**
+
+## What this does and does not establish
+
+**Established:** the pipeline's guarantees are properties of the domain model, not of integer intervals.
+Containment, disjointness and refusal-on-overlap all behaved correctly on a kind with no `lo`/`hi`;
+`S_UNDET` refused; `CONSTRAIN` needed no change; the ablation instrument registered PASS at 0 violated
+edges and FAIL at 1, 1 and 3 before any tokens were spent.
+
+**Not established, and stated plainly:** sets are *harder for these models* than intervals, and badly so
+at 1.5B and 7B. That is a `PROPOSE`-side fact, and under this architecture it shows up as a lower verified
+rate rather than as wrong code in the repository — which is exactly the trade the design exists to make.
+The honest one-line summary is **the architecture generalized and the models did not**, and the reason
+that sentence is available at all is that the two are measured separately.
+
+## An instrument defect in this family's own leak checker
+
+Its first version **reported ZERO LEAKS while every evaluation threw.** The recorded condition is stored
+without its `if` and colon, so every generated probe program was a syntax error, the result was `null`,
+the `continue` skipped it, and every transaction fell into the "all correct" bucket by default. It printed
+exactly the answer I was hoping for, and was caught only because Python's stderr was visible.
+
+It now **counts every evaluation and refuses to report at all if any failed** — "nothing was wrong" must
+not be indistinguishable from "nothing was checked". A second defect in the same script keyed the per-form
+table by condition alone, so `n == 4` written by `four` (correct) and by `mid2` (wrong) collapsed into one
+row and the table contradicted the aggregate above it. Both fixed; the aggregate was always computed
+per-operation and stands.
