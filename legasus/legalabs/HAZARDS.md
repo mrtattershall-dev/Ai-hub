@@ -485,6 +485,27 @@ metric that was confidently reporting the reverse of the truth.
 
 ---
 
+## A PERMANENT LegaLabs rule, promoted out of the rendering ladder
+
+> **JSON artifacts are authoritative. Console output is NON-EVIDENTIARY.**
+
+The console may show progress while a run is in flight. **No scientific conclusion is drawn from it**, and
+every number in a write-up is generated from the finalized artifact.
+
+One run produced two plausible wrong readings, neither of them a measurement error:
+
+- `padEnd(15)` cannot pad the 16-character label `SIBLING_RESOLVED`, so it ran into its case name,
+  `grep` stopped matching, and **an entire experimental condition appeared to be missing from the run**;
+- a greedy `sed` crossed logical record boundaries and reported `0.900` for a cell whose true value was
+  `0.000`, contradicting a correct earlier reading of the same cell.
+
+Both were **reporting** defects wearing the shape of measurements. The fix is structural rather than
+careful: `report-ladder.mjs` generates the summary **from the artifact**, so there is one reporting path
+instead of two that can disagree. This is the same lesson as the permanent rule below — duplicated
+reconstruction of one artifact has now cost this project three times.
+
+---
+
 ## A PERMANENT LegaLabs rule, promoted out of hazard 9
 
 > **Any artifact whose coordinates are compared across components must have exactly one canonical

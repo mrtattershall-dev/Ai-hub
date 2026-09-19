@@ -27,11 +27,54 @@ left to look like a preregistration written before the result it responds to.
 |---|---|---|
 | `OBSERVE` | **Load-bearing — robustness independence** | derived 229/233; blind-top 145/233 failing 86x PRESERVATION_BROKEN; blind-bottom **0/233** failing 233x NEW_DEAD. Earlier top-heavy family could not separate it: derived 624/692 == blind-bottom 624/692 |
 | `DECIDE` | **Load-bearing, and the cost is SPECIFIC** | same 105 transactions: derived 105/105, presented **0/105**. And the specificity family, paired on identical fragments: **disjoint 0/54 broken, constrained 162/162 broken** (p = 2.8e-52). No realization ever substituted — 0/648 guards defended against a sibling operation, at any capacity |
-| `RENDER` | **Causal, requires regeneration** | semantic plan held fixed; `EXTENT` vs `SILENT` moved authorization precision 0.775 → 0.986 at 7B and 0.677 → 0.969 at 14B |
+| `RENDER` | **Causal in BOTH directions, requires regeneration** | semantic plan held fixed; `EXTENT` vs `SILENT` moved authorization precision 0.775 → 0.986 at 7B and 0.677 → 0.969 at 14B. And it can do the same damage in reverse: naming a true but unresolved sibling fact caused `DOMAIN COLLAPSE` and took `P(correct\|assembled)` from 1.000 to 0.050. **A rendering is not neutral, and more is not better** |
 | `PROPOSE` | **Substitutable stochastic backend — no necessity claim, by design** | swapping 1.5B → 7B → 14B changes proposal yield, realization strategy and failure distribution while the downstream authority semantics stay fixed. A necessity result for any particular model would contradict the architecture rather than support it |
 | `CONSTRAIN` | **Load-bearing as interface protection** | of 28 refusals: 14 do not load unchanged, 1 is a case `PROVE` would also catch, 6 exceed granted authority, 2 in-scope equivalents, 5 undetermined |
-| `PROVE` | **Independent backstop** | 14 well-formed authorization leaks across families, every one rejected by execution before persistence |
+| `PROVE` | **Independent backstop** | 14 well-formed authorization leaks across families, every one rejected by execution before persistence. And the strongest case, which nobody designed: 110 transactions carrying the **wrong contract** (`DOMAIN COLLAPSE`) — `CONSTRAIN` refused 14, `PROVE` rejected 96, **leaked 0**, while `P(correct\|assembled)` fell to 0.050 |
 | `COMMIT` | **Load-bearing for atomicity** | complete transaction persists the verified candidate; op2 failing returns the surface byte-for-byte to S0; with rollback ablated the independently correct op1 PERSISTS as unauthorized partial state |
+
+## SEMANTIC LEAST PRIVILEGE — a first-class hypothesis, and it needs no capacity claim
+
+The rendering ladder separated what about a sibling fact is harmful:
+
+    condition          P(correct|assembled)   guards containing a sibling   captured
+    ISOLATED                 1.000                     237                   0   0.0%
+    SIBLING_EXISTS           0.996                     240                   0   0.0%
+    SIBLING_NAMED            0.550                     236                 125  53.0%
+    SIBLING_RESOLVED         0.772                     239                  68  28.5%
+
+**Being told other operations exist is harmless. Being told what they MEAN is what does the damage**
+(`p = 8.6e-49`). The hazard is foreign semantic content, not additional text.
+
+**CROSS-OBLIGATION CAPTURE:** an operation with domain `D_A`, shown another operation's domain `D_B`,
+begins implementing `D_B`. `low`, asked for `n < 10`, wrote `n < 0`. The defensive form the architecture
+originally predicted occurred **once in 952** eligible guards.
+
+Resolving the relationship repairs it **only above a capacity threshold** — a crossover interaction, with
+both directions significant:
+
+    P(correct|assembled)      1.5B       7B       14B
+    ISOLATED                 1.000     1.000     1.000
+    SIBLING_NAMED            0.328     0.925     0.338
+    SIBLING_RESOLVED         0.023     0.975     0.975      capture 66/80, 2/79, 0/80
+
+    1.5B   19/58 -> 1/43     p = 8.5e-5     significantly WORSE
+    14B    27/80 -> 78/80    p = 2.9e-19    cured, capture to ZERO
+
+The conclusion does not rest on any of that, though, which is what makes it solid: **`ISOLATED` is optimal
+at every capacity tested and no condition exposing foreign semantics beats it anywhere.** A dominance
+result, not a comparison of means.
+
+> Legasus may know everything — domains, containment, precedence, ownership, preservation, transaction
+> structure. Each `PROPOSE` call receives only the semantic facts required to discharge the authority it
+> was granted. **Composition knowledge belongs to `DECIDE`, not automatically to `PROPOSE`.**
+
+This reframes `R4`: proposing each operation in isolation was adopted as a simplification and now looks
+like **necessary isolation** — no model was ever given the chance to confuse semantic ownership. And it
+gives `RENDER` a second obligation mirroring the one `sufficiency.mjs` enforces:
+
+    SUFFICIENCY      does the prompt contain every fact required for the authorized operation?
+    NONINTERFERENCE  does it OMIT semantic facts belonging to other operations?
 
 ## The law that keeps emerging
 
