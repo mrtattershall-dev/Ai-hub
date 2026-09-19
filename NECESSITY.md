@@ -155,6 +155,22 @@ It also sharpens what `RENDER` owes: **stating more is not the same as stating w
 rendering that adds a true fact the model cannot resolve is not neutral. Here it cost up to 95% of
 correctness.
 
+### And it produced the best test of the whole architecture so far, by accident
+
+`DOMAIN COLLAPSE` was not designed — the rendering produced it. It is a failure mode no previous family
+had generated, because every earlier failure was a wrong *implementation* of the right contract, and this
+is the right implementation of the **wrong contract**.
+
+    transactions containing at least one collapsed contract
+    SIBLING_NAMED   110     CONSTRAIN refused  14    PROVE rejected  96    LEAKED  0
+
+**Zero leaks.** `P(correct | assembled)` fell as low as 0.050; `P(correct | verified)` stayed 1.000. The
+proposal source got dramatically worse in a new way and the commit guarantee did not move — which is the
+whole of `ATTEMPT AUTHORITY != COMMIT AUTHORITY`, tested under conditions nobody chose.
+
+It is not circular: the probes come from the **contract**, never from the proposal. A collapsed `low`
+fails because the contract requires an answer of `"low"` at `n = 5` and the program does not give one.
+
 ## The asymmetry, and it is a property of the architecture
 
 `OBSERVE`, `DECIDE`, `CONSTRAIN` and `PROVE` can be ablated **offline** on fixed artifacts: they

@@ -208,3 +208,31 @@ fact the model cannot resolve is not neutral — it is harmful, and here it cost
 **Neither touched the conclusion, because the conclusion came from the raw artifacts.** That is the whole
 reason the rule exists: the console summary said `defends SIBLING 44` under `ISOLATED`, which was false,
 and reading the actual guard conditions is what exposed it.
+
+## The unplanned adversarial test, and the result that matters most
+
+`DOMAIN COLLAPSE` was not designed. The rendering produced it, which makes it closer to a natural
+adversarial probe than a constructed one — and it is a failure mode **no previous family produced**:
+
+> every earlier failure was a wrong **implementation** of the right contract.
+> This is the right implementation of the **wrong contract**.
+
+So it is a direct test of `ATTEMPT AUTHORITY != COMMIT AUTHORITY` under conditions nobody chose:
+
+    transactions containing at least one collapsed contract
+    ISOLATED          0     CONSTRAIN refused   0   PROVE rejected   0   LEAKED  0
+    SIBLING_NAMED   110     CONSTRAIN refused  14   PROVE rejected  96   LEAKED  0
+
+**Zero leaks.** The proposal source got dramatically worse, in a new way, and the commit guarantee did
+not move at all. `P(correct | verified)` stayed 1.000 while `P(correct | assembled)` fell as low as
+0.050.
+
+This is not circular, and the reason is the property established earlier: the probes are derived from
+the **contract**, not from a reference implementation and not from what the model wrote. A collapsed
+`low` fails because the contract says something must answer `"low"` at `n = 5` and the program does not.
+The verifier never consulted the proposal to decide what correct means.
+
+The 96 `PROVE` rejections were reachability-by-execution — the mechanism repaired earlier in this same
+session. Worth stating plainly: the pre-repair version would also have caught these, because its defect
+was being **over**-strict rather than under-strict. What the repair bought is that the verdict is now a
+property of the emitted program, so this number means what it says.
