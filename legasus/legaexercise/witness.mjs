@@ -52,7 +52,8 @@ export const PROVENANCE = {
 // Run one invocation under a LINE tracer, recording every (module, function) entered and every line
 // executed inside the package. Line granularity is what makes SITE_NOT_REACHED observable rather than
 // inferred from a canary that failed to fire.
-export function observe({ rootDir, packageName, setup = [], invocation, timeoutMs = 30000 }) {
+export function observe({ rootDir, packageName, setup = [], invocation, namespaceModule = '',
+  timeoutMs = 30000 }) {
   const prog = [
     'import sys, json, os',
     'sys.path.insert(0, sys.argv[1])',
@@ -81,10 +82,17 @@ export function observe({ rootDir, packageName, setup = [], invocation, timeoutM
     '        lines.add(mod + ":" + str(frame.f_lineno))',
     '    return tracer',
     'ns = {}',
+    // THE REPOSITORY'S OWN NAMESPACE. A doctest runs with its module's globals, which is why an authored
+    // example can write Version("1.0a5") without importing anything. Reconstructing that namespace is how
+    // mined examples stay the repository's machine rather than becoming my reconstruction of it.
+    'nsmod = sys.argv[5] if len(sys.argv) > 5 else ""',
     'setup = json.loads(sys.argv[3])',
     'src = sys.argv[4]',
     'status = "OK"; rendered = None',
     'try:',
+    '    if nsmod:',
+    '        import importlib',
+    '        ns = dict(vars(importlib.import_module(nsmod)))',
     '    for line in setup:',
     '        exec(line, ns)',
     'except Exception as e:',
@@ -109,7 +117,7 @@ export function observe({ rootDir, packageName, setup = [], invocation, timeoutM
   ].join(NL);
   try {
     const raw = execFileSync('python',
-      ['-c', prog, rootDir, packageName, JSON.stringify(setup), invocation],
+      ['-c', prog, rootDir, packageName, JSON.stringify(setup), invocation, namespaceModule],
       { encoding: 'utf8', timeout: timeoutMs, stdio: ['ignore', 'pipe', 'pipe'],
         env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' } });
     return JSON.parse(raw);
@@ -123,9 +131,10 @@ export function observe({ rootDir, packageName, setup = [], invocation, timeoutM
 //   target  { module, callable, line }  the line is optional; without it only entry is judged
 //
 // The witness answers one question and records how it knows: CAN REALITY BE MADE TO TOUCH THIS CODE?
-export function witnessFor({ rootDir, packageName, setup, invocation, target, provenance }) {
-  const r = observe({ rootDir, packageName, setup, invocation });
-  const base = { target, invocation, setup, provenance, replayable: false };
+export function witnessFor({ rootDir, packageName, setup, invocation, target, provenance,
+  namespaceModule = '' }) {
+  const r = observe({ rootDir, packageName, setup, invocation, namespaceModule });
+  const base = { target, invocation, setup, provenance, namespaceModule, replayable: false };
   if (r === null) {
     return { ...base, state: WITNESS.UNOBSERVABLE,
       why: 'the invocation could not be run at all, so nothing is claimed' };
@@ -183,7 +192,7 @@ export const isValidExperiment = (w) => w && w.state === WITNESS.SITE_REACHED;
 // A witness must replay. One that worked once and cannot be reproduced is an anecdote.
 export function replay(w, { rootDir, packageName }) {
   const again = witnessFor({ rootDir, packageName, setup: w.setup, invocation: w.invocation,
-    target: w.target, provenance: w.provenance });
+    target: w.target, provenance: w.provenance, namespaceModule: w.namespaceModule });
   return { reproduced: again.state === w.state && again.value === w.value, state: again.state };
 }
 
