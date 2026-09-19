@@ -198,3 +198,62 @@ test('THERE IS NO INVERSE OPERATION — nothing in the API walks upward turning 
   const after = standing(g);
   assert.equal(after.ESTABLISHED, before.ESTABLISHED + 1, 'exactly one node changed colour');
 });
+
+// ---------------------------------------------------------------------------------------------------
+// ALGEBRA v2 — ALTERNATIVE justification. Added AFTER the shadow-graph experiment localised the gap, so
+// it carries the heaviest burden of proof in this file: it must admit a claim with one surviving
+// justification while refusing one with none, or it is a universal escape hatch.
+
+function alts() {
+  const g = graph();
+  const sc = scope({ repository: 'S1', implementation: 'fp:x' });
+  const j1 = node({ kind: NODE.OBSERVATION, proposition: 'execution A reached it', scope: sc,
+    basis: 'EXECUTION_WITNESS' });
+  const j2 = node({ kind: NODE.OBSERVATION, proposition: 'execution B reached it', scope: sc,
+    basis: 'EXECUTION_WITNESS' });
+  add(g, j1); add(g, j2);
+  const claim = node({ kind: NODE.CLAIM, proposition: 'the site is in the region', scope: sc,
+    basis: 'CONNECTIVITY',
+    supports: [{ id: j1.id, edge: EDGE.ANY_OF }, { id: j2.id, edge: EDGE.ANY_OF }] });
+  add(g, claim);
+  return { g, sc, j1, j2, claim };
+}
+
+test('ANY_OF — one surviving justification is enough, and ZERO is a refusal', () => {
+  const { g, sc, j1, j2, claim } = alts();
+  assert.equal(entitled(g, claim.id, sc).ok, true);
+  invalidate(g, j1.id, 'execution A observed the wrong copy');
+  assert.equal(entitled(g, claim.id, sc).ok, true, 'B still justifies it');
+  invalidate(g, j2.id, 'execution B observed the wrong copy');
+  const e = entitled(g, claim.id, sc);
+  assert.equal(e.ok, false, 'with no surviving alternative it must REFUSE, or ANY_OF is an escape hatch');
+  assert.ok(e.problems.some((p) => /no surviving alternative/.test(p.why)), JSON.stringify(e.problems));
+});
+
+test('INVALIDATION does not propagate through ANY_OF while an alternative survives', () => {
+  const { g, j1, j2, claim } = alts();
+  invalidate(g, j1.id, 'A was wrong');
+  assert.equal(g.nodes[claim.id].validity, VALIDITY.ESTABLISHED,
+    'losing one of two independent justifications does not unmake the claim');
+  invalidate(g, j2.id, 'B was wrong too');
+  assert.equal(g.nodes[claim.id].validity, VALIDITY.UNESTABLISHED,
+    'losing the LAST one does');
+});
+
+test('CIRCULAR JUSTIFICATION IS NOT JUSTIFICATION', () => {
+  // Two claims that justify each other and nothing else. A walk that treated a node already on its own
+  // path as established would let a cycle bootstrap itself into entitlement.
+  const g = graph();
+  const sc = scope({ repository: 'S1' });
+  const a = node({ kind: NODE.CLAIM, proposition: 'A', scope: sc, basis: 'X' });
+  add(g, a);
+  const b = node({ kind: NODE.CLAIM, proposition: 'B', scope: sc, basis: 'X',
+    supports: [{ id: a.id, edge: EDGE.SUPPORTS }] });
+  add(g, b);
+  // close the loop by hand: A now rests on B
+  g.nodes[a.id].supports = [{ id: b.id, edge: EDGE.SUPPORTS }];
+  g.dependents[b.id] = [a.id];
+  const e = entitled(g, a.id, sc);
+  assert.equal(e.ok, false);
+  assert.ok(e.problems.some((p) => /CIRCULAR JUSTIFICATION/.test(p.why)), JSON.stringify(e.problems));
+});

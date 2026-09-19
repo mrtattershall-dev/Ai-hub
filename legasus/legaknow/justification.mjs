@@ -43,6 +43,12 @@ export const EDGE = {
   REQUIRES: 'REQUIRES',           // obligation: conjunctive - every parent, at this scope
   GENERALIZES: 'GENERALIZES',     // obligation: carries its own authority; absorbs ONE dimension
   REFUTES: 'REFUTES',             // obligation: if the refuter is established, the target is INVALID
+  // ALTERNATIVE justification, added in v2 AFTER the shadow-graph experiment localised the gap: a claim
+  // may rest on several INDEPENDENT justifications and needs only one of them to survive. Conjunctive
+  // supports under-admitted exactly the 65 subjects that had more than one justifying execution.
+  // Obligation: AT LEAST ONE alternative must be entitled at this scope. Zero surviving alternatives is
+  // a refusal, not a pass - otherwise this edge would be a universal escape hatch.
+  ANY_OF: 'ANY_OF',
 };
 
 export const NODE = {
@@ -123,6 +129,12 @@ export function invalidate(g, id, why) {
     const cur = queue.shift();
     const c = g.nodes[cur];
     if (!c || c.validity === VALIDITY.UNESTABLISHED) continue;
+    // A node whose ANY_OF alternatives include one that is STILL ESTABLISHED has not lost its
+    // justification, so invalidation does not reach it. Propagation follows justification, not proximity.
+    const alts = c.supports.filter((sp) => sp.edge === EDGE.ANY_OF);
+    if (alts.length && alts.some((sp) => (g.nodes[sp.id] || {}).validity === VALIDITY.ESTABLISHED)) {
+      continue;
+    }
     c.validity = VALIDITY.UNESTABLISHED;
     c.why = 'an ancestor was invalidated: ' + why;
     touched.push(cur);
@@ -146,50 +158,54 @@ export function reestablish(g, id, { evidence, scope: sc }) {
 // THE ENTITLEMENT QUESTION. Walk the justification to its leaves: every ancestor must be ESTABLISHED, and
 // every ancestor's scope must cover what is being asked for.
 export function entitled(g, id, required = scope()) {
-  const seen = new Set();
-  const problems = [];
+  // `inProgress` carries the nodes on the CURRENT path. A claim reached again while it is still being
+  // evaluated is justifying itself through a cycle, and CIRCULAR JUSTIFICATION IS NOT JUSTIFICATION -
+  // that branch fails rather than succeeding by assumption.
   const path = [];
-  // A GENERALIZATION node is precisely the authority for asking its ancestors less than the consumer
-  // asked of it. Walking down through one RELAXES the requirement on the dimension it generalized - and
-  // only that dimension. Without this, a widening could never be used and `widen` would be decorative;
-  // with it applied to every dimension, `widen` would be a universal escape hatch. It is neither.
-  const walk = (cur, need) => {
-    const mark = cur + '@' + DIMENSIONS.map((d) => String(need[d])).join(',');
-    if (seen.has(mark)) return;
-    seen.add(mark);
+  const walk = (cur, need, inProgress) => {
     const n = g.nodes[cur];
-    if (!n) { problems.push({ id: cur, why: 'justification refers to a node that does not exist' }); return; }
+    if (!n) return [{ id: cur, why: 'justification refers to a node that does not exist' }];
+    if (inProgress.has(cur)) return [{ id: cur, why: 'CIRCULAR JUSTIFICATION at "' + n.proposition + '"' }];
     path.push(n.proposition);
+    const problems = [];
     if (n.validity !== VALIDITY.ESTABLISHED) {
       problems.push({ id: cur, why: n.proposition + ' is ' + n.validity + ': ' + (n.why || '') });
     }
     const c = covers(n.scope, need);
     if (!c.ok) {
-      problems.push({ id: cur, why: 'SCOPE INFLATION at "' + n.proposition + '" — ' + c.missing.join('; ') });
+      problems.push({ id: cur, why: 'SCOPE INFLATION at "' + n.proposition + '" - ' + c.missing.join('; ') });
     }
-    // REFUTES: an established refuter destroys the target, whatever its own justification says.
     for (const r of (g.refuters[cur] || [])) {
       const rn = g.nodes[r];
       if (rn && rn.validity === VALIDITY.ESTABLISHED) {
         problems.push({ id: cur, why: 'REFUTED by "' + rn.proposition + '"' });
       }
     }
-    for (const s of n.supports) {
-      if (s.edge === EDGE.REFUTES) continue;
-      // IDENTIFIES carries the non-aliasing obligation: an identity node that has not pinned the
-      // implementation dimension is not an identity, it is a name.
-      if (s.edge === EDGE.IDENTIFIES && (n.scope.implementation === null
+    const next = new Set(inProgress); next.add(cur);
+    const alternatives = [];
+    for (const sp of n.supports) {
+      if (sp.edge === EDGE.REFUTES) continue;
+      if (sp.edge === EDGE.IDENTIFIES && (n.scope.implementation === null
         || n.scope.implementation === undefined)) {
         problems.push({ id: cur, why: 'IDENTIFIES edge from "' + n.proposition
           + '" without a pinned implementation: that is a name, not an identity' });
       }
-      const next = (s.edge === EDGE.GENERALIZES && n.generalizedDimension)
+      const sub = (sp.edge === EDGE.GENERALIZES && n.generalizedDimension)
         ? { ...need, [n.generalizedDimension]: null }
         : need;
-      walk(s.id, next);
+      if (sp.edge === EDGE.ANY_OF) { alternatives.push({ sp, sub }); continue; }
+      problems.push(...walk(sp.id, sub, next));
     }
+    if (alternatives.length) {
+      const attempts = alternatives.map((a) => walk(a.sp.id, a.sub, next));
+      if (!attempts.some((p) => p.length === 0)) {
+        problems.push({ id: cur, why: 'no surviving alternative justification for "' + n.proposition
+          + '" (' + alternatives.length + ' tried)' });
+      }
+    }
+    return problems;
   };
-  walk(id, required);
+  const problems = walk(id, required, new Set());
   return { ok: problems.length === 0, problems, path };
 }
 
