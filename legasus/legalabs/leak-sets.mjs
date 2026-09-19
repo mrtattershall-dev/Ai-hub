@@ -14,6 +14,7 @@
 // A checker that cannot distinguish "nothing was wrong" from "nothing was checked" is not a checker.
 import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { makeTally, observed, unobservable, finding, conclude } from './nonvacuity.mjs';
 
 const FILE = process.argv[2] || 'measurements/2026-09-19-set-domains/RESULT.json';
 const NL = String.fromCharCode(10);
@@ -23,8 +24,14 @@ const WANT = { evens: [2, 4, 6, 8], mid2: [4, 6], four: [4], odds: [1, 5, 7] };
 const RANGE = [];
 for (let v = -20; v <= 20; v++) RANGE.push(v);
 
+// A FAULT INJECTION, so this script can demonstrate its own refusal rather than asserting it. Run with
+// --inject-unobservable and every evaluation fails: the run must then REFUSE to report, not print a clean
+// null. Without this, the non-vacuity wiring is a claim about a path nobody has exercised.
+const INJECT = process.argv.includes('--inject-unobservable');
+
 // Which values does this guard actually admit? Answered by running it.
 function denotes(cond) {
+  if (INJECT) throw new Error('injected: evaluation deliberately unavailable');
   const prog = ['def f(n):', '    if ' + cond + ':', '        return True', '    return False', '',
     'import json',
     'print(json.dumps([v for v in range(-20, 21) if f(v)]))'].join(NL);
@@ -34,7 +41,8 @@ function denotes(cond) {
 
 const r = JSON.parse(readFileSync(FILE, 'utf8'));
 const cache = new Map();
-let evaluated = 0; let failed = 0;
+// The non-vacuity law, mechanized rather than remembered: this tally is what makes a null meaningful.
+const tally = makeTally('set-domain leak check');
 const failures = [];
 let rightTotal = 0; let rightVerified = 0; let wrongTotal = 0; let wrongVerified = 0;
 const leaks = [];
@@ -48,8 +56,13 @@ for (const key of Object.keys(r.cells)) {
     for (const [id, o] of Object.entries(row.perOp || {})) {
       if (!o.condition || !WANT[id]) continue;
       if (!cache.has(o.condition)) {
-        try { cache.set(o.condition, denotes(o.condition)); evaluated++; } catch (e) {
-          cache.set(o.condition, 'FAILED'); failed++; failures.push(o.condition);
+        try {
+          cache.set(o.condition, denotes(o.condition));
+          observed(tally);
+        } catch (e) {
+          cache.set(o.condition, 'FAILED');
+          unobservable(tally, o.condition + '  ->  ' + String(e.message).split(String.fromCharCode(10))[0]);
+          failures.push(o.condition);
         }
       }
       const got = cache.get(o.condition);
@@ -66,20 +79,30 @@ for (const key of Object.keys(r.cells)) {
       if (wrong && anyWrong !== null) anyWrong = true;
     }
     if (anyWrong === null) continue;   // undecidable transaction, excluded and counted below
-    if (anyWrong) { wrongTotal++; if (row.verified) { wrongVerified++; leaks.push({ case: c.case, model: c.model, codes: row.codes }); } }
+    if (anyWrong) {
+      wrongTotal++;
+      if (row.verified) {
+        wrongVerified++; finding(tally);
+        leaks.push({ case: c.case, model: c.model, codes: row.codes });
+      }
+    }
     else { rightTotal++; if (row.verified) rightVerified++; }
   }
 }
 
 console.log('  SOURCE: ' + FILE);
 console.log('');
-console.log('  EVALUATION COVERAGE — reported before any conclusion');
-console.log('    distinct guards evaluated   ' + evaluated);
-console.log('    guards that FAILED to run   ' + failed);
-if (failed) {
+
+// COVERAGE FIRST, CONCLUSION SECOND. The other order invites reading a clean number before checking
+// whether it could have been dirty, which is exactly how this script's first version misled me.
+const verdict = conclude(tally, {
+  clean: 'ZERO LEAKS. Every wrong domain was rejected, and no detector was written for any of them.',
+  dirty: (n) => n + ' LEAK(S) - the gap-probe argument is wrong and must be withdrawn.',
+});
+console.log(verdict.text);
+if (!verdict.ok) {
   console.log('');
-  console.log('  REFUSING TO REPORT. ' + failed + ' guard(s) could not be evaluated, so "no leaks" would');
-  console.log('  be indistinguishable from "nothing was checked". Failing forms:');
+  console.log('  Failing forms:');
   for (const f of [...new Set(failures)].slice(0, 10)) console.log('    ' + f);
   process.exit(1);
 }
@@ -91,10 +114,6 @@ console.log('    every realization denotes the requested set   ' + rightTotal
   + (rightTotal ? '  (' + (100 * rightVerified / rightTotal).toFixed(1) + '%)' : ''));
 console.log('    at least one WRONG domain                    ' + wrongTotal
   + '   verified ' + wrongVerified);
-console.log('');
-console.log(wrongVerified === 0
-  ? '    ZERO LEAKS. Every wrong domain was rejected, and no detector was written for any of them.'
-  : '    ' + wrongVerified + ' LEAK(S) - the gap-probe argument is wrong and must be withdrawn.');
 
 console.log('');
 console.log('  BY FORM  (transactions containing it)');
