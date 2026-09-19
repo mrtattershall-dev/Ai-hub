@@ -123,9 +123,48 @@ function siblingParagraph(p, opId) {
     'You are writing ONLY the behaviour requested above. Do not write these.');
 }
 
+// Says other behaviours are coming, and names NONE of them. If the collapse needs the specific domain
+// to copy, this condition cannot produce it - which is what makes it the control that separates
+// "another operation exists" from "another operation covers n < 0".
+function existsParagraph(p, opId) {
+  const others = p.c.ops.filter((id) => id !== opId);
+  return L('There are ' + others.length + ' other behaviours requested for the same function. They are',
+    'being written separately and will be added to this same chain of conditions.',
+    'You are writing ONLY the behaviour requested above.');
+}
+
+// Names the siblings AND states the RESOLUTION: which of them is already handled before this line.
+//
+// This condition deliberately hands over DECIDE's CONCLUSION, which SIBLING_NAMED withheld. It is
+// therefore NOT a test of substitutability - that question was already answered, and answered badly.
+// It asks a different one: IS THE DAMAGE REPAIRABLE BY RENDERING? If stating the resolution restores
+// correctness, DOMAIN COLLAPSE is caused by an ambiguity and RENDER has a rule. If the damage survives,
+// sibling information is harmful in itself and RENDER has a stricter rule.
+function resolvedParagraph(p, opId) {
+  const others = p.c.ops.filter((id) => id !== opId);
+  const earlier = others.filter((id) => p.order.indexOf(id) < p.order.indexOf(opId));
+  const later = others.filter((id) => p.order.indexOf(id) > p.order.indexOf(opId));
+  const lines = ['These other behaviours are requested for the same function and are being written',
+    'separately:', ...others.map((id) => '    ' + OPS[id].delta), ''];
+  if (earlier.length) {
+    lines.push('Of those, the following are placed BEFORE your line and have already answered for',
+      'their values by the time your condition is reached, so you do not need to exclude them:',
+      ...earlier.map((id) => '    ' + OPS[id].delta));
+  }
+  if (later.length) {
+    lines.push('The following are placed AFTER your line:', ...later.map((id) => '    ' + OPS[id].delta));
+  }
+  lines.push('Write your own condition exactly as requested above. Do not narrow it to match another',
+    'behaviour, and do not write these other behaviours.');
+  return L(...lines);
+}
+
 function promptFor(p, opId, render) {
   const shown = L(...SRC_LINES.slice(0, INSERT_AFTER + 1), MARKER, ...SRC_LINES.slice(INSERT_AFTER + 1));
-  const sib = render === 'SIBLING_NAMED' ? [siblingParagraph(p, opId), ''] : [];
+  const para = render === 'SIBLING_NAMED' ? siblingParagraph(p, opId)
+    : render === 'SIBLING_EXISTS' ? existsParagraph(p, opId)
+      : render === 'SIBLING_RESOLVED' ? resolvedParagraph(p, opId) : null;
+  const sib = para ? [para, ''] : [];
   return L('Here is a Python function. Every line shown is FIXED: you may not change, repeat',
     'or remove any of it.', '', shown, '',
     'A new behaviour is requested:', '    ' + OPS[opId].delta, '',
@@ -134,7 +173,13 @@ function promptFor(p, opId, render) {
     'Do NOT repeat any fixed line. Do NOT write the whole function. Do NOT explain.');
 }
 
-const RENDERS = ['ISOLATED', 'SIBLING_NAMED'];
+// A ladder that isolates WHICH PART of the sibling information causes the collapse.
+//
+//   ISOLATED           nothing about siblings                       replication control, expect 0
+//   SIBLING_EXISTS     they exist, no domains named                 expect 0 - nothing to copy
+//   SIBLING_NAMED      their domains named, no resolution           replication of the collapse
+//   SIBLING_RESOLVED   their domains named AND resolved             the repair test
+const RENDERS = ['ISOLATED', 'SIBLING_EXISTS', 'SIBLING_NAMED', 'SIBLING_RESOLVED'];
 
 // Split a realized guard into clauses and drop the one matching the operation's OWN requested domain.
 // Whatever is left is a defence, and the question this family asks is what it defends against.
@@ -398,13 +443,32 @@ function control() {
     const p = planCase(key);
     let differ = 0;
     for (const id of CASES[key].ops) {
-      if (promptFor(p, id, 'ISOLATED') !== promptFor(p, id, 'SIBLING_NAMED')) differ++;
-      // the sibling paragraph must name every OTHER operation and must not name this one twice
-      const txt = promptFor(p, id, 'SIBLING_NAMED');
+      // ALL FOUR conditions must be pairwise distinct. Checking only two would let a level that
+      // silently renders the same text as its neighbour be reported as a separate condition.
+      const texts = RENDERS.map((R) => promptFor(p, id, R));
+      if (new Set(texts).size === RENDERS.length) differ++;
+      else {
+        console.log('      CONTROL FAIL ' + key + '/' + id + ': two conditions render identical text');
+        bad++;
+      }
+      // the sibling paragraph must name every OTHER operation, in both conditions that claim to name
+      for (const R of ['SIBLING_NAMED', 'SIBLING_RESOLVED']) {
+        const txt = promptFor(p, id, R);
+        for (const other of CASES[key].ops) {
+          if (other === id) continue;
+          if (!txt.includes(OPS[other].delta)) {
+            console.log('      CONTROL FAIL ' + key + '/' + id + '/' + R + ': sibling ' + other
+              + ' not named'); bad++;
+          }
+        }
+      }
+      // and SIBLING_EXISTS must name NONE of them, or it is not the control it claims to be
+      const ex = promptFor(p, id, 'SIBLING_EXISTS');
       for (const other of CASES[key].ops) {
         if (other === id) continue;
-        if (!txt.includes(OPS[other].delta)) {
-          console.log('      CONTROL FAIL ' + key + '/' + id + ': sibling ' + other + ' not named'); bad++;
+        if (ex.includes(OPS[other].delta)) {
+          console.log('      CONTROL FAIL ' + key + '/' + id + ': SIBLING_EXISTS named ' + other
+            + ', so it cannot separate existence from domain'); bad++;
         }
       }
     }
