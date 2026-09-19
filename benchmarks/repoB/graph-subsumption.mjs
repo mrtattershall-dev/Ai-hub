@@ -20,6 +20,22 @@ import { graph, add, node, invalidate, entitled, scope, NODE }
   from '../../legasus/legaknow/justification.mjs';
 
 const classified = JSON.parse(readFileSync('benchmarks/repoB/classified.json', 'utf8'));
+// THE GRAPH IS BUILT FROM RAW SWEEP EVIDENCE, NOT FROM THE CLASSIFICATION IT IS COMPARED AGAINST.
+// The first version of this file invalidated the witness node whenever `row.category !== SITE_REACHED`,
+// which made E1 true by construction - a dev-set win on an unexercised mechanism. What follows derives
+// site reachability from the traced sites themselves.
+//
+// HONEST LIMIT, STATED UP FRONT: the graph and the classifier consume the SAME evidence. This shows the
+// graph computes the same function of that evidence through a different mechanism - node validity plus an
+// entitlement walk, rather than inline conditionals. It is a re-implementation cross-check, NOT an
+// independent measurement, and a shared upstream error would survive it.
+const sweep = JSON.parse(readFileSync('benchmarks/repoB/sweep.json', 'utf8'));
+const reachedAt = new Set();
+for (const q of sweep.reachedQLines) {
+  const bar = q.indexOf('|'); const colon = q.lastIndexOf(':');
+  reachedAt.add(q.slice(0, bar) + ':' + q.slice(colon + 1));
+}
+const enteredNames = new Set(sweep.enteredFns);
 const REPO = 'repoB@pristine';
 const ENV = process.platform + '|python3';
 
@@ -45,8 +61,12 @@ for (const row of classified.rows) {
   const witness = node({ kind: NODE.OBSERVATION, proposition: 'the mutation site executes',
     scope: sc, basis: 'EXECUTION_WITNESS', supports: [corpus.id, tracer.id] });
   add(g, witness);
-  if (row.category !== 'SITE_REACHED') {
-    invalidate(g, witness.id, 'the site was ' + row.category);
+  const mod = row.file.replace(/\.py$/, '');
+  const siteRan = row.line !== undefined && reachedAt.has(mod + ':' + row.line);
+  const fnRan = enteredNames.has(mod + '.' + row.fn);
+  if (!siteRan) {
+    invalidate(g, witness.id, 'the site never executed under any mined witness ('
+      + (fnRan ? 'the function ran; this line did not' : 'the function never ran') + ')');
   }
 
   // LEGACORE's capability envelope speaks here, and it is a DIFFERENT authority over the same graph.
@@ -66,7 +86,7 @@ for (const row of classified.rows) {
   if (e.ok === layersSay) agreeVerdict++; else { disagreeVerdict++; mismatches.push({ site, e, row }); }
 
   if (!layersSay) {
-    const blamedWitness = e.problems.some((p) => /site executes/.test(p.why));
+    const blamedWitness = e.problems.some((p) => /never executed/.test(p.why));
     const blamedEnvelope = e.problems.some((p) => /r2 envelope/.test(p.why));
     const expectWitness = row.category !== 'SITE_REACHED';
     const expectEnvelope = !!row.method;

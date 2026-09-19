@@ -553,3 +553,70 @@ positions, spans, hashes or ids against an artifact another component derived.
 Every one of these produced **output that looked like a result**. None threw. The costly failures in
 this project do not crash; they report OK while the work is lost, which is why the response to a
 repeated hazard is a mechanism rather than another sentence in a document.
+
+---
+
+## Hazard 13 — EXECUTION IDENTITY ALIASING (four occurrences, recognised as one)
+
+**Symptom.** Evidence produced by one executable object satisfies a claim about a different one that
+happens to share a source coordinate, a name, or a file path.
+
+**Occurrences, which were mistaken for four unrelated bugs:**
+
+1. `from packaging.utils import ...` imported the **installed** package from site-packages while the
+   witness claimed to be measuring the corpus. Caught by a nonexistent-root control.
+2. `bisect.insort_right` was answered by the **C accelerator**; the Python source never ran, and a
+   mutation to it was inert while the public call kept succeeding.
+3. A macOS platform branch was read as *the source lacking authority* rather than *the path not being
+   exercised on this host*.
+4. The module code object's `def foo(` **statement** (executed at import) was indistinguishable from a
+   site inside `foo`, because both project onto `module:line`. Numerator and denominator were each
+   contaminated, in opposite directions.
+
+**The invariant, now mechanized in `legasus/legaexercise/pysite.mjs`:**
+
+> **EXECUTION_IDENTITY_NONALIASING — evidence belongs to the exact executable identity that produced it.
+> Similar source is not transferable authority.**
+
+Source coordinates describe **where** a site came from; the executable object establishes **what site it
+is**. Identity is a fingerprint over the executable object; `co_qualname` is descriptive metadata only,
+because names have already misled this project once.
+
+**Control:** `legasus/legaexercise/identity.test.mjs` builds one physical source line carrying two
+executable identities and asserts that under `(module, line)` they are indistinguishable while their
+fingerprints differ — plus both directions of the import/call asymmetry, and a lambda case.
+
+**Cost:** it silently compromised the *proof ancestry* of two published figures (21.9% observability, the
+25/43 connectivity split) without making either arithmetically wrong. Both survived recomputation
+(20.3%, 27/48) — but that could not be known without redoing them.
+
+---
+
+## Hazard 14 — FIXING A DENOMINATOR BY REASONING INSTEAD OF MEASURING
+
+Twice in one hour I derived a denominator correction from an argument about CPython rather than from
+observation, and both were wrong:
+
+1. "A function's `def` line is in `co_lines()` but can never emit a line event." Predicted 212 phantom
+   lines; **25 had actually been traced**.
+2. Re-tested under code-object identity: of 518 function `def` lines, **21 are emitted** — every one a
+   `<genexpr>`, whose first line genuinely executes.
+
+**Rule:** a denominator is an empirical claim about what the apparatus can observe. Derive it from
+observed traces, or state it as an assumption in the justification graph — never from a confident
+account of the runtime's internals.
+
+---
+
+## Hazard 15 — A REFUSAL THAT IS CORRECT FOR THE WRONG REASON
+
+Re-running the connectivity audit on corrected identities, prediction P3 (`tags` must NOT be admitted)
+reported HELD — while **every** subject in every module had fallen OUT, because entry points were passed
+in a different key space than the connectivity graph. The mechanism was dead and the prediction still
+passed.
+
+> **A correct refusal for the wrong reason proves the safety of the outcome, not the correctness of the
+> authority mechanism.**
+
+**Control:** every exclusion prediction must be paired with a live admission in the same run. P3 is only
+meaningful beside P1 showing `specifiers` at 60/60 IN_DOMAIN.
