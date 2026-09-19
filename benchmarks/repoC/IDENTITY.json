@@ -1,0 +1,114 @@
+{
+ "repo": "C",
+ "distribution": "pyparsing",
+ "version": "3.3.2",
+ "source_root": "C:/Users/tatte/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0/LocalCache/local-packages/Python313/site-packages/pyparsing",
+ "pristine": "benchmarks/repoC/pristine/pyparsing",
+ "files": 17,
+ "manifest_sha256": "98ebedf996d1331226865673fdc7ad9a6499b6e00992de51345c64b4801de420",
+ "crlf_files": 0,
+ "file_list": [
+  {
+   "path": "pyparsing/__init__.py",
+   "sha256": "08c1cce44cc9489825cfe3c2012bff9395b5e2d46486b09fe86488e0aacf2f6e",
+   "bytes": 13438,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/actions.py",
+   "sha256": "a435badd59168794ea47a00a38cc830a86c8d0917e42e05ce39008fa82240fcc",
+   "bytes": 8104,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/common.py",
+   "sha256": "4ac100cd7449ab60f71dd180e5744ffb0c36698d9cb42a52e446ee0da8252b52",
+   "bytes": 17205,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/core.py",
+   "sha256": "bf85898e2fb78559a54cd1d4d2284f463d689afbb74db97bcb4266bb39cf5446",
+   "bytes": 251832,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/exceptions.py",
+   "sha256": "66df7ebeb038b9357c2752252550b48254206a4c1104e61c0ec3774dfc2a41ea",
+   "bytes": 10981,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/helpers.py",
+   "sha256": "4d6bd4a3c9a7910cf8fe48e32544e5905fc2c2c853c74bd90e43f3776c855bd2",
+   "bytes": 41793,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/results.py",
+   "sha256": "944655c903d659aaf39f063f25fff6b7de07bc623b7950f367c812e297f47934",
+   "bytes": 27603,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/testing.py",
+   "sha256": "91cabab0b3f2036de1af00f3074345e57eb5286cf42110e39e139b0badbf98e9",
+   "bytes": 15452,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/unicode.py",
+   "sha256": "8e6b33a519dfca10905a5d9187ff78753fe5c5033a7782a249ff62bd8f5bfe6e",
+   "bytes": 10612,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/util.py",
+   "sha256": "54b22b72a221e70ea7f7eb760b3c11008b3f8f4750eff0166e7d9e688c851f15",
+   "bytes": 15997,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/warnings.py",
+   "sha256": "c1058d33b29a975d0e4011c7706f5281dc1a05e15b51eddf0c41777dc1c11c21",
+   "bytes": 357,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/ai/__init__.py",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/ai/show_best_practices/__init__.py",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/ai/show_best_practices/__main__.py",
+   "sha256": "c465da0aa0534d66716dd2cdcf91bdcba70c2b53e99bb6dc8156200f501c2a61",
+   "bytes": 49,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/diagram/__init__.py",
+   "sha256": "340b69d195a8937ec92754d5444bd9683e02ab3bc84094541ce0051e5fdaba80",
+   "bytes": 26929,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/tools/__init__.py",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "crlf": false
+  },
+  {
+   "path": "pyparsing/tools/cvt_pyparsing_pep8_names.py",
+   "sha256": "1fc0281dd62ceeb53c6b4451178ce3bab8c6ff167ca4e2d5061022d3e16054e6",
+   "bytes": 6389,
+   "crlf": false
+  }
+ ]
+}
