@@ -61,8 +61,12 @@ const failSet = (l) => new Set((l || []).filter((x) => x.outcome === 'OUTPUT_MIS
   || x.outcome === 'UNEXPECTED_EXCEPTION').map((x) => x.module + '|' + String(x.source).trim()));
 
 const candidates = JSON.parse(readFileSync('benchmarks/repoB/candidates.json', 'utf8'));
-const cells = { resolvedWithHistory: 0, resolvedNoHistory: 0,
-  unresolvedWithHistory: 0, unresolvedNoHistory: 0 };
+// UNKNOWN IS KEPT DISJOINT FROM ZERO. The first version of this script scored
+// `(prefixOf.get(k) || 0) > 0`, which turned "this example is not in my mined set at all" into "this
+// example has an empty prefix" - and then counted it as evidence for H2. That is LOSS OF PROVENANCE
+// INCREASING ENTITLEMENT, in the script written to test that very law.
+const cells = { resolvedWithHistory: 0, resolvedNoHistory: 0, resolvedUnknown: 0,
+  unresolvedWithHistory: 0, unresolvedNoHistory: 0, unresolvedUnknown: 0 };
 const detail = [];
 
 for (const c of candidates) {
@@ -86,9 +90,9 @@ for (const c of candidates) {
   const disagree = [...new Set([...D, ...M])].filter((k) => D.has(k) !== M.has(k));
   for (const k of disagree) {
     const resolved = (D.has(k) === S.has(k));          // does doctest's execution model fix this one?
-    const hist = (prefixOf.get(k) || 0) > 0;
-    const cell = (resolved ? 'resolved' : 'unresolved') + (hist ? 'WithHistory' : 'NoHistory');
-    cells[cell]++;
+    const p = prefixOf.get(k);
+    const bucket = p === undefined ? 'Unknown' : (p > 0 ? 'WithHistory' : 'NoHistory');
+    cells[(resolved ? 'resolved' : 'unresolved') + bucket]++;
     if (detail.length < 20) {
       detail.push({ k: k.slice(0, 62), prefix: prefixOf.get(k) ?? '?', resolved,
         mut: c.file + '/' + c.fn });
@@ -100,17 +104,29 @@ for (const c of candidates) {
 const total = Object.values(cells).reduce((a, b) => a + b, 0);
 console.log('disagreeing (example, mutation) pairs: ' + total);
 console.log('');
-console.log('                        prefix > 0    prefix == 0');
+console.log('                        prefix > 0    prefix == 0      prefix UNKNOWN');
 console.log('  MINE_SEQ resolves   ' + String(cells.resolvedWithHistory).padStart(10)
-  + String(cells.resolvedNoHistory).padStart(15));
+  + String(cells.resolvedNoHistory).padStart(15) + String(cells.resolvedUnknown).padStart(18));
 console.log('  MINE_SEQ does not   ' + String(cells.unresolvedWithHistory).padStart(10)
-  + String(cells.unresolvedNoHistory).padStart(15));
+  + String(cells.unresolvedNoHistory).padStart(15) + String(cells.unresolvedUnknown).padStart(18));
 console.log('');
-const h1 = cells.resolvedNoHistory === 0 && cells.resolvedWithHistory > 0;
+const h1 = cells.resolvedNoHistory === 0 && cells.resolvedUnknown === 0
+  && cells.resolvedWithHistory > 0;
+// H2 may ONLY be supported by cases whose prefix is actually KNOWN to be empty. An unknown prefix is not
+// evidence of an identical subject; it is an absence of evidence about the subject.
 const h2 = cells.unresolvedNoHistory > 0;
+const unknowns = cells.resolvedUnknown + cells.unresolvedUnknown;
 console.log('H1  everything the execution model fixes has a NON-EMPTY prefix : '
   + (h1 ? 'HELD' : 'FAILED'));
-console.log('H2  some residual has an EMPTY prefix - genuine disagreement    : '
+if (unknowns) {
+  console.log('');
+  console.log('  ' + unknowns + ' disagreeing pairs have an UNKNOWN prefix: the example is not in the'
+    + ' mined set at all.');
+  console.log('  They support NEITHER hypothesis. An unknown prefix is an absence of evidence about the'
+    + ' subject,');
+  console.log('  not evidence that the subject is identical.');
+}
+console.log('H2  some residual has a KNOWN-EMPTY prefix - genuine disagreement : '
   + (h2 ? 'HELD' : 'FAILED')
   + (cells.unresolvedNoHistory === 0 && cells.unresolvedWithHistory === 0
     ? '   (nothing residual at all)' : ''));
