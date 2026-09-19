@@ -33,7 +33,10 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { TASKS } from './tasks.mjs';
 import { ORACLE_PROBES } from './oracle-probes.mjs';
-import { applyMutation, runProbe, REFUSAL } from './admission.mjs';
+import { applyMutation, runProbe } from './admission.mjs';
+import { authorizeStructural, signatureOf } from '../../legasus/legagate/structural.mjs';
+import { healthGate } from '../../legasus/legaverify/health.mjs';
+import { assess, envelopeOfInstance, OPERATION, REFUSAL } from '../../legasus/legacore/capability.mjs';
 import { makeTally, observed, unobservable, conclude } from '../../legasus/legalabs/nonvacuity.mjs';
 
 const NL = String.fromCharCode(10);
@@ -163,32 +166,15 @@ async function rawArm(task) {
 //
 // The envelope is the FROZEN one: a repair to a single existing function whose source is runtime
 // authoritative. Everything else is refused, with the classification recorded.
-function canModel(task) {
-  if (task.unmodellable) {
-    return { ok: false, refusal: REFUSAL.SAFE_REFUSAL_UNSUPPORTED_OPERATION,
-      why: 'the requested property is not expressible as a behavioural contract over this unit' };
-  }
-  if (task.ambiguous) {
-    return { ok: false, refusal: REFUSAL.SAFE_REFUSAL_UNSUPPORTED_OPERATION,
-      why: 'the request does not determine an obligation; deriving one would be inventing the spec' };
-  }
-  if (task.inertEditSite) {
-    return { ok: false, refusal: REFUSAL.SAFE_REFUSAL_NONAUTHORITATIVE_SOURCE,
-      why: 'the apparent edit surface is shadowed at runtime, so editing it cannot change behaviour' };
-  }
-  if (task.extraModule) {
-    return { ok: false, refusal: REFUSAL.SAFE_REFUSAL_UNSUPPORTED_OPERATION,
-      why: 'creating a new module is outside the declared writable surface of this pipeline' };
-  }
-  if (task.addition) {
-    return { ok: false, refusal: REFUSAL.SAFE_REFUSAL_UNSUPPORTED_OPERATION,
-      why: 'adding a new function is not a repair of an existing behaviour' };
-  }
-  if (!task.fn && !task.module) {
-    return { ok: false, refusal: REFUSAL.SAFE_REFUSAL_UNKNOWN_RUNTIME_PROVENANCE,
-      why: 'the task names no unit, and locating one is not something this pipeline derives' };
-  }
-  return { ok: true };
+// GATE 3: classify the operation, then ask the capability contract BEFORE buying any inference.
+function operationOf(task) {
+  if (task.unmodellable) return OPERATION.CROSS_CUTTING_PROPERTY;
+  if (task.ambiguous) return OPERATION.UNDETERMINED_REQUEST;
+  if (task.extraModule) return OPERATION.MULTI_FILE_CHANGE;
+  if (task.addition) return OPERATION.FUNCTION_ADDITION;
+  if (task.mustNotChange) return OPERATION.PRESERVATION_CHECK;
+  if (!task.fn) return OPERATION.MULTI_FILE_CHANGE;
+  return OPERATION.BOUNDED_FUNCTION_BODY_EDIT;
 }
 
 async function legasusArm(task) {
@@ -196,59 +182,74 @@ async function legasusArm(task) {
   freshRepo(dir);
   if (!breakIt(dir, task)) return { arm: 'LEGASUS', error: 'mutation failed' };
 
-  const gate = canModel(task);
-  if (!gate.ok) {
-    const s = score(dir, task);   // state is whatever the mutation left: unchanged, uncommitted
-    return { arm: 'LEGASUS', refused: true, refusal: gate.refusal, why: gate.why,
-      committed: false, score: s };
+  const operation = operationOf(task);
+  // Runtime authority is an INSTANCE fact supplied by OBSERVE. The inert-edit-site task is the one place
+  // in this set where the source exists and does not run.
+  const runtimeAuthoritative = task.inertEditSite ? false : true;
+  const verdict = assess({ operation, runtimeAuthoritative });
+  const env = envelopeOfInstance({ operation, runtimeAuthoritative });
+
+  if (!verdict.admit) {
+    // Refused BEFORE a token was spent.
+    return { arm: 'LEGASUS', refused: true, refusal: verdict.refusal, operation,
+      derivedEnvelope: env.envelope, why: verdict.why, committed: false, inferenceSpent: false,
+      score: score(dir, task) };
   }
 
   const mod = task.module;
   const before = readFileSync(join(dir, mod), 'utf8');
   const shown = functionSource(before, task.fn);
   if (!shown) {
-    return { arm: 'LEGASUS', refused: true, refusal: REFUSAL.SAFE_REFUSAL_UNKNOWN_RUNTIME_PROVENANCE,
-      why: 'the named unit could not be located in the declared file', committed: false,
-      score: score(dir, task) };
+    return { arm: 'LEGASUS', refused: true, refusal: REFUSAL.UNKNOWN_RUNTIME_PROVENANCE, operation,
+      derivedEnvelope: env.envelope, why: 'the named unit could not be located', committed: false,
+      inferenceSpent: false, score: score(dir, task) };
   }
+  const signature = signatureOf(before, task.fn);
 
-  // RENDER: the minimal projection. One function, the task, nothing about the rest of the repository.
   const prompt = L('Here is one Python function from a module.', '', shown.text, '',
     'REQUIRED BEHAVIOUR: ' + task.statement, '',
     'Reply with the complete corrected function ' + task.fn + ' and nothing else.',
-    'Do not explain. Do not use markdown fences. Do not write any other function.');
+    'Do not explain. Do not use markdown fences. Do not write any other function or import.');
 
   const raw = await generate(prompt);
   const code = raw.replace(/^```[a-z]*\s*/i, '').replace(/```\s*$/, '').trim();
 
-  // CONSTRAIN: shape and scope. One function, the right name, nothing else.
-  const defs = (code.match(/^def\s+([A-Za-z_]\w*)/gm) || []);
-  if (defs.length !== 1 || !new RegExp('^def\\s+' + task.fn + '\\s*\\(').test(code)) {
-    return { arm: 'LEGASUS', refused: false, constrained: true, committed: false,
-      refusal: 'CONSTRAIN_REJECTED',
-      why: 'expected exactly one definition of ' + task.fn + ', saw ' + JSON.stringify(defs),
-      code: code.slice(0, 400), score: score(dir, task) };
+  // GATE 2: structural authority, with the diagnostic derived from the predicates that actually fired.
+  const gate = authorizeStructural(code, { fn: task.fn, signature });
+  if (!gate.ok) {
+    return { arm: 'LEGASUS', refused: false, constrained: true, committed: false, operation,
+      derivedEnvelope: env.envelope, inferenceSpent: true,
+      refusal: 'CONSTRAIN_REJECTED', failedPredicates: gate.failed, passedPredicates: gate.passed,
+      why: gate.why, code: code.slice(0, 400), score: score(dir, task) };
   }
 
-  // Assemble the candidate, but do NOT commit it yet.
   const candidate = replaceFunction(before, task.fn, code);
   writeFileSync(join(dir, mod), candidate, 'utf8');
 
-  // PROVE: execute the repository's behavioural contract.
-  const proved = score(dir, task);
-
-  if (!proved.pass) {
-    // COMMIT: atomic. The candidate is rolled back byte-for-byte.
+  // THE HEALTH FLOOR, beneath the semantic check: a candidate that cannot import is rejected before any
+  // behavioural question is asked, and a harness error can no longer be scored as a disagreement.
+  const health = healthGate(dir, MODULES);
+  if (!health.admit) {
     writeFileSync(join(dir, mod), before, 'utf8');
-    const after = score(dir, task);
-    return { arm: 'LEGASUS', refused: false, committed: false, provedFail: true,
+    return { arm: 'LEGASUS', refused: false, committed: false, operation, inferenceSpent: true,
+      derivedEnvelope: env.envelope, healthRejected: true, healthStatus: health.status,
+      why: health.why, rolledBack: readFileSync(join(dir, mod), 'utf8') === before,
+      code: code.slice(0, 400), score: score(dir, task) };
+  }
+
+  const proved = score(dir, task);
+  if (!proved.pass) {
+    writeFileSync(join(dir, mod), before, 'utf8');
+    return { arm: 'LEGASUS', refused: false, committed: false, provedFail: true, operation,
+      derivedEnvelope: env.envelope, inferenceSpent: true,
       why: 'PROVE rejected the candidate; the repository was restored',
       rolledBack: readFileSync(join(dir, mod), 'utf8') === before,
-      code: code.slice(0, 400), score: after, proveScore: proved };
+      code: code.slice(0, 400), score: score(dir, task), proveScore: proved };
   }
 
   const pristineFn = functionSource(readFileSync(join(PRISTINE, mod), 'utf8'), task.fn);
-  return { arm: 'LEGASUS', refused: false, committed: true, code: code.slice(0, 400), score: proved,
+  return { arm: 'LEGASUS', refused: false, committed: true, operation, derivedEnvelope: env.envelope,
+    inferenceSpent: true, code: code.slice(0, 400), score: proved,
     exactReconstruction: pristineFn ? code.trim() === pristineFn.text.trim() : null };
 }
 
@@ -274,7 +275,7 @@ for (const task of TASKS) {
     + (rs.pass ? 'PASS' : 'fail').padEnd(6) + String(rs.agree ?? '-') + '/' + String(rs.of ?? '-')
     + '   ||  LEGASUS ' + (leg.refused ? 'REFUSED' : leg.committed ? 'committed' : 'no-commit').padEnd(10)
     + (ls.pass ? 'PASS' : 'fail').padEnd(6) + String(ls.agree ?? '-') + '/' + String(ls.of ?? '-')
-    + (leg.refusal ? '  ' + leg.refusal : ''));
+    + (leg.refusal ? '  ' + leg.refusal : leg.healthRejected ? '  HEALTH:' + leg.healthStatus : ''));
 }
 
 writeFileSync(OUT, JSON.stringify(results, null, 1), 'utf8');
