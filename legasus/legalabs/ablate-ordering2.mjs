@@ -104,8 +104,16 @@ const SWEEP = (() => {
   return [...vs];
 })();
 
-function verify(reqs, order, codes) {
-  const probes = transactionProbes({ requested: reqs, order, preserved: PRESERVED,
+// THE SECOND HALF OF THE SAME DEFECT. The original ablation recomputed the probe EXPECTATIONS from the
+// presented order as well as assembling in it, so the broken program was graded against a broken
+// expectation and the probes agreed by construction. That is why probe-fail was 0 and the analytic
+// deadness term was the only thing left that could fire.
+//
+// Ground truth does not move with the treatment. Two requested behaviours whose domains are nested can
+// only both be satisfied if the narrower wins where they overlap, whatever order the file is written
+// in. So expectations are computed from the DERIVED order always; only the ASSEMBLY changes.
+function verify(reqs, derivedOrder, order, codes) {
+  const probes = transactionProbes({ requested: reqs, order: derivedOrder, preserved: PRESERVED,
     preservedWins: true, existing: [{ domain: PRESERVED }] }, original);
   const program = assemble(order, codes);
   const res = runProgram(program, probes.map((p) => p.input));
@@ -146,7 +154,7 @@ for (const [key, cell] of Object.entries(data.cells)) {
     if (!row.assembled || !row.codes) continue;
     t.assembled++;
     if (row.verified) t.derivedOk++;
-    const v = verify(reqs, presented, row.codes);
+    const v = verify(reqs, derived, presented, row.codes);
     if (v.verified) t.presentedOk++;
     if (v.verifiedPlanned) t.presentedOkPlanned++;
     const planDead = v.dead.length > 0;
