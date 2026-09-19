@@ -179,3 +179,34 @@ export function commit({ authority, action }) {
   return { committed: true, action, consumed: authority.ancestry,
     why: 'authority was consumed, not produced' };
 }
+
+// L6, THE OTHER HALF. Per-step non-widening stops amplification; it does not by itself establish that an
+// exercised authority traces to an independent root whose grant COVERS it. A chain can be locally valid
+// at every step and still be rooted in nothing.
+//
+//     Every exercised authority must have a continuous delegation path to an independent root whose grant
+//     covers that exact authority.
+//
+// Cycles may appear freely in this walk: they add no grant, so they cannot help. What is checked is
+// whether the path reaches OWNER at all, and whether the grant survives the whole way.
+export function tracesToIndependentRoot(t, need) {
+  if (!isAuthority(t)) {
+    return { ok: false, why: 'not an authority token' };
+  }
+  if (t.kind !== KIND.NORMATIVE) {
+    return { ok: false, why: 'epistemic authority is not permission and has no delegation root' };
+  }
+  const uncovered = (need || []).filter((g) => !t.grant.includes(g));
+  if (uncovered.length) {
+    return { ok: false, uncovered,
+      why: 'the exercised authority includes ' + uncovered.join(', ') + ' which this token does not hold' };
+  }
+  const rooted = t.ancestry.some((a) => a.via === 'DELEGATE' && a.from === 'OWNER');
+  if (!rooted) {
+    return { ok: false,
+      why: 'no step in the delegation ancestry originates at an independent root. Locally valid at every'
+        + ' step and rooted in nothing is exactly what a collusion cycle looks like from the inside.' };
+  }
+  return { ok: true, root: 'OWNER', path: t.ancestry.filter((a) => a.via === 'DELEGATE').length,
+    why: 'a continuous delegation path reaches an independent root whose grant covers this authority' };
+}
