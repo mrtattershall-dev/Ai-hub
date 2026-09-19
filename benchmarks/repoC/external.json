@@ -1,0 +1,912 @@
+[
+ {
+  "module": "pyparsing",
+  "source": "import pyparsing as pp",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing",
+  "source": "pp.show_best_practices()",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.actions",
+  "source": "quoted_string.parse_string(\"'Now is the Winter of our Discontent'\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.actions",
+  "source": "dequoted = quoted_string().set_parse_action(remove_quotes)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.actions",
+  "source": "dequoted.parse_string(\"'Now is the Winter of our Discontent'\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.actions",
+  "source": "num = Word(nums).set_parse_action(lambda toks: int(toks[0]))",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.actions",
+  "source": "na = one_of(\"N/A NA\").set_parse_action(replace_with(math.nan))",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.actions",
+  "source": "term = na | num",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.actions",
+  "source": "term[1, ...].parse_string(\"324 234 N/A 234\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "expr = Word(\"A\") + Word(\"B\") + Word(\"C\") + Word(\"D\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "expr",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "expr.streamline()",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "CaselessKeyword(\"CMD\")[1, ...].parse_string(\"cmd CMD Cmd10\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "CaselessLiteral(\"CMD\")[1, ...].parse_string(\"cmd CMD Cmd10\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "patt = CloseMatch(\"ATCATCGAATGGA\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "patt.parse_string(\"ATCATCGAAXGGA\")",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "patt.parse_string(\"ATCAXCGAAXGGA\")",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "patt.parse_string(\"ATCATCGAATGGA\")",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "patt = CloseMatch(\"ATCATCGAATGGA\", max_mismatches=2)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "patt.parse_string(\"ATCAXCGAAXGGA\")",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "real = Word(nums) + '.' + Word(nums)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(real.parse_string('3.1416'))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(real.parse_string('3. 1416'))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "real = Combine(Word(nums) + '.' + Word(nums))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(real.parse_string('3.1416'))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(real.parse_string('3. 1416'))",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "DelimitedList(Word(alphas)).parse_string(\"aa,bb,cc\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "DelimitedList(Word(hexnums), delim=':', combine=True\n).parse_string(\"AA:BB:CC:DD:EE\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "data_word = Word(alphas)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "label = data_word + FollowedBy(':')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "attr_expr = (\n    label + Suppress(':')\n    + OneOrMore(data_word, stop_on=label)\n      .set_parse_action(' '.join)\n)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "text = \"shape: SQUARE posn: upper left color: light blue texture: burlap\"",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(attr_expr[1, ...].parse_string(text).dump())",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "result = Dict(Group(attr_expr)[1, ...]).parse_string(text)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(result.dump())",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(result['shape'])",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(result.as_dict())",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "ident = Word(alphas)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "num = Word(nums)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "term = ident | num",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "func = ident + Opt(DelimitedList(term))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(func.parse_string(\"fn a, b, 100\"))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "func = ident + Group(Opt(DelimitedList(term)))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(func.parse_string(\"fn a, b, 100\"))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "Keyword(\"start\").parse_string(\"start\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "Keyword(\"start\").parse_string(\"starting\")",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "Keyword(\"start\").parse_string(\"starting\").debug()",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "number = Word(nums) | Combine(Word(nums) + '.' + Word(nums))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(number.search_string(\"123 3.1416 789\"))  # Fail!",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "number = Combine(Word(nums) + '.' + Word(nums)) | Word(nums)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(number.search_string(\"123 3.1416 789\"))  # Better",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "data_word = Word(alphas)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "label = data_word + FollowedBy(':')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "attr_expr = Group(\n    label + Suppress(':')\n    + OneOrMore(data_word).set_parse_action(' '.join))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "text = \"shape: SQUARE posn: upper left color: BLACK\"",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "attr_expr[1, ...].parse_string(text).pprint()",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "attr_expr = Group(\n    label + Suppress(':')\n    + OneOrMore(\n        data_word, stop_on=label).set_parse_action(' '.join))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "OneOrMore(attr_expr).parse_string(text).pprint()  # Better",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "(attr_expr * (1,)).parse_string(text).pprint()",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "Literal('abc').parse_string('abc')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "Literal('abc').parse_string('abcdef')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "Literal('abc').parse_string('ab')",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "integer = Word(nums).set_parse_action(lambda toks: int(toks[0]))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "year_int = integer.copy().add_condition(\n    lambda toks: toks[0] >= 2000,\n    message=\"Only support years 2000 and later\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "date_str = year_int + '/' + integer + '/' + integer",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "result = date_str.parse_string(\"1999/12/31\")",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "patt = Word(alphas)[...]",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(patt.parse_string('ablaj /* comment */ lskjd'))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "patt = Word(alphas)[...].ignore(c_style_comment)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(patt.parse_string('ablaj /* comment */ lskjd'))",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "integer = Word(nums)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "date_str = (\n    integer(\"year\") + '/'\n    + integer(\"month\") + '/'\n    + integer(\"day\")\n)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "date_str.parse_string(\"1999/12/31\")",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "ParserElement.inline_literals_using(Suppress)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "date_str = (\n    integer(\"year\") + '/'\n    + integer(\"month\") + '/'\n    + integer(\"day\")\n)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "date_str.parse_string(\"1999/12/31\")",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "ParserElement.inline_literals_using(Literal)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "expr = Word(nums)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "expr.matches(\"100\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "res = Word('a').parse_string('aaaaabaaa')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(res)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "res = Word('a').parse_string('aaaaabaaa', parse_all=True)",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "Word(alphas)[1, ...].parse_string(\"abc def\\nghi jkl\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "ParserElement.set_default_whitespace_chars(\" \\t\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "Word(alphas)[1, ...].parse_string(\"abc def\\nghi jkl\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "ParserElement.set_default_whitespace_chars(\" \\n\\t\\r\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "integer = Word(nums)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "integer.parse_string(\"ABC\")",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "integer.set_name(\"integer\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "integer.parse_string(\"ABC\")",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "label = pp.Word(pp.alphas)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "base = pp.Forward().suppress_warning(\n    pp.Diagnostics.warn_on_parse_using_empty_Forward)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "grammar = base | label",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(grammar.parse_string(\"x\"))",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "qs = QuotedString('\"')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(qs.search_string('lsjdf \"This is the quote\" sldjf'))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "complex_qs = QuotedString('{{', end_quote_char='}}')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(complex_qs.search_string(\n   'lsjdf {{This is the \"quote\"}} sldjf'))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "sql_qs = QuotedString('\"', esc_quote='\"\"')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(sql_qs.search_string(\n    'lsjdf \"This is the quote with \"\"embedded\"\" quotes\" sldjf'))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "source = \"a, b, c,d\"",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "wd = Word(alphas)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "wd_list1 = wd + (',' + wd)[...]",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(wd_list1.parse_string(source))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "wd_list2 = wd + (Suppress(',') + wd)[...]",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(wd_list2.parse_string(source))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "source = \"lead in START relevant text END trailing text\"",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "start_marker = Keyword(\"START\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "end_marker = Keyword(\"END\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "find_body = Suppress(...) + start_marker + ... + end_marker",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(find_body.parse_string(source))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "end_punc = \".\" | (\"!\" + Tag(\"enthusiastic\"))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "greeting = \"Hello,\" + Word(alphas) + end_punc",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "result = greeting.parse_string(\"Hello, World.\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(result.dump())",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "result = greeting.parse_string(\"Hello, World!\")",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.core",
+  "source": "print(result.dump())",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "counted_array(Word(alphas)).parse_string('2 ab cd ef')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "binary_constant = Word('01').set_parse_action(lambda t: int(t[0], 2))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "counted_array(Word(alphas), int_expr=binary_constant\n    ).parse_string('10 ab cd ef')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "ppc = pyparsing.common",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "count_with_metadata = ppc.integer + Word(alphas)(\"type\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "typed_array = counted_array(Word(alphanums),\n    int_expr=count_with_metadata)(\"items\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "result = typed_array.parse_string(\"3 bool True True False\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "print(result.dump())",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "text = \"shape: SQUARE posn: upper left color: light blue texture: burlap\"",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "data_word = Word(alphas)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "label = data_word + FollowedBy(':')",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "attr_expr = (\n   label\n   + Suppress(':')\n   + OneOrMore(data_word, stop_on=label)\n   .set_parse_action(' '.join))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "print(attr_expr[1, ...].parse_string(text).dump())",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "attr_label = label",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "attr_value = Suppress(':') + OneOrMore(data_word, stop_on=label\n  ).set_parse_action(' '.join)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "result = dict_of(attr_label, attr_value).parse_string(text)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "print(result.dump())",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "print(result['shape'])",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "print(result.shape)  # object attribute access works too",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.helpers",
+  "source": "print(result.as_dict())",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "numlist = Word(nums)[...]",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(numlist.parse_string(\"0 123 321\"))",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "def append_sum(tokens):\n    tokens.append(sum(map(int, tokens)))",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "numlist.add_parse_action(append_sum)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(numlist.parse_string(\"0 123 321\"))",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "integer = pp.Word(pp.nums)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "date_str = integer(\"year\") + '/' + integer(\"month\") + '/' + integer(\"day\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "result = date_str.parse_string('1999/12/31')",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "type(result)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "result",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "result_dict = result.as_dict()",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "type(result_dict)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "result_dict",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "import json",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(json.dumps(result))",
+  "outcome": "OUTPUT_MISMATCH"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(json.dumps(result.as_dict()))",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "patt = Word(alphas)[1, ...]",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "result = patt.parse_string(\"sldkj lsdkj sldkj\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "type(result)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(result)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "result_list = result.as_list()",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "type(result_list)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(result_list)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "integer = Word(nums)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "date_str = integer(\"year\") + '/' + integer(\"month\") + '/' + integer(\"day\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "result = date_str.parse_string(\"1999/12/31\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "result.get(\"year\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "result.get(\"hour\", \"not specified\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "result.get(\"hour\")",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "numlist = Word(nums)[...]",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(numlist.parse_string(\"0 123 321\"))",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "def insert_locn(locn, tokens):\n    tokens.insert(0, locn)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "numlist.add_parse_action(insert_locn)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(numlist.parse_string(\"0 123 321\"))",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "numlist = Word(nums)[...]",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(numlist.parse_string(\"0 123 321\"))",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "def remove_first(tokens):\n    tokens.pop(0)",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "numlist.add_parse_action(remove_first)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(numlist.parse_string(\"0 123 321\"))",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "label = Word(alphas)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "patt = label(\"LABEL\") + Word(nums)[1, ...]",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(patt.parse_string(\"AAB 123 321\").dump())",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "def remove_LABEL(tokens):\n    tokens.pop(\"LABEL\")\n    return tokens",
+  "outcome": "PASS"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "patt.add_parse_action(remove_LABEL)",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ },
+ {
+  "module": "pyparsing.results",
+  "source": "print(patt.parse_string(\"AAB 123 321\").dump())",
+  "outcome": "UNEXPECTED_EXCEPTION"
+ }
+]
