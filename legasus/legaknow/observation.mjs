@@ -125,3 +125,34 @@ export function admissibleAsPrimitive({ name, run, probes = [] }) {
 // histories are evaluating DIFFERENT SUBJECTS, and should be refused a comparison rather than scored as
 // disagreeing.
 export const OBSERVATION_DIMENSIONS = [...DIMENSIONS, 'history'];
+
+// TYPED NON-KNOWLEDGE. This is not three-valued logic with one UNKNOWN: the six non-evidential statuses
+// all block entitlement, but for DIFFERENT CAUSAL REASONS, and the work that would make knowing possible
+// differs for each. That is what makes them authoritative rather than merely descriptive - and it is the
+// test of the vocabulary, because two statuses that permit exactly the same downstream actions could be
+// safely merged.
+//
+// It also hands PURPOSE something it could not otherwise derive: an objective frontier does not have to
+// consist only of feature opportunities. It can contain EPISTEMIC opportunities - "this purpose-connected
+// claim is blocked specifically because its prerequisite is missing" is a justified next objective that
+// no model invented.
+export const REMEDIATION = {
+  [OBSERVABILITY.OBSERVED]: null,
+  [OBSERVABILITY.EMPTY_OBSERVED]: null,
+  [OBSERVABILITY.NOT_ATTEMPTED]: { kind: 'ATTEMPT_OBSERVATION',
+    why: 'nothing is wrong; the observation has simply never been made' },
+  [OBSERVABILITY.PRODUCER_FAILED]: { kind: 'REPAIR_OBSERVER',
+    why: 'the apparatus failed, which says nothing whatever about the subject' },
+  [OBSERVABILITY.SUBJECT_FAILED]: { kind: 'INSPECT_SUBJECT',
+    why: 'the subject failed before it could be observed, which IS information about the subject' },
+  [OBSERVABILITY.UNATTRIBUTABLE]: { kind: 'REPAIR_IDENTITY',
+    why: 'something was observed and cannot be bound to a subject; the identity mapping is the defect' },
+  [OBSERVABILITY.PREREQUISITE_MISSING]: { kind: 'ESTABLISH_PREREQUISITE',
+    why: 'the observation depends on state that does not currently exist' },
+  [OBSERVABILITY.DISCARDED]: { kind: 'REACQUIRE_EVIDENCE',
+    why: 'the evidence existed and the harness lost it; re-running is sufficient' },
+};
+
+// The consumer that makes the vocabulary load-bearing. A status with no remediation is either already
+// evidence, or a state whose distinctness this project has not yet justified.
+export const remediationFor = (status) => REMEDIATION[status] ?? undefined;
