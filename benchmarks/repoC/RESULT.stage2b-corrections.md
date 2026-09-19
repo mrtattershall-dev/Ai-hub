@@ -92,3 +92,19 @@ applies.
     the stdout-channel assumption was undocumented and unexercised by the development corpus
     UNOBSERVABLE never became an admission
     none of this is repaired; it belongs to r4, which requires Repo D
+
+## CORRECTION 8 — the consequence-calibration figure, stated as an epistemic state rather than an interval
+
+Written later as `49/57 +/- 1`, which implies symmetric statistical uncertainty. It is not that. Three
+external keys are ambiguous (the same `module|source` in two docstrings with different outcomes, resolved
+by a last-wins map), and exactly one member of the `SETUP_FAILED | PASS` cohort sits on one. Resolving
+that identity can only move the case from *wrong* to *correct*, never the reverse.
+
+The honest report is therefore not a ratio at all:
+
+    49  supported agreements
+     7  supported disagreements
+     1  UNRESOLVED ATTRIBUTION - identity collision, cannot support either classification
+
+Forcing the unattributable observation into a 57-case binary denominator is precisely what the algebra
+argues against: an observation that cannot be bound to a subject is not evidence about that subject.

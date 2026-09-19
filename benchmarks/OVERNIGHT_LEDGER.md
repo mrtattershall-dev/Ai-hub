@@ -224,3 +224,56 @@ Both are r4 work. Neither may be repaired in r3.
     than rebuilding it.
 
 ---
+## Entry 6 — r4: the external-producer boundary
+
+    objective    stop reenacting an authority Legasus can simply run
+    authority    delegated r4 development surface
+    start hash   0ea782e
+
+    THE ROOT OF THREE SEPARATE DEFECTS, and it was not "the doctest replay has bugs":
+
+        doctest truth              Legasus reconstruction
+        want = "integer\n"    ->   "integer"              information destroyed
+        example identity      ->   module|source          identity destroyed
+        failure semantics     ->   a local vocabulary     semantics approximated
+
+    LEGASUS HAD PLACED ITSELF INSIDE THE TRUTH-PRODUCING MECHANISM WHEN IT ONLY NEEDED TO BE AN EVIDENCE
+    CONSUMER.
+
+    INTERVENTION
+      legaexternal/producer.mjs   runs CPython doctest and records what it said. Identity is producer +
+                                  document + ordinal; SOURCE TEXT IS DESCRIPTION, NOT IDENTITY. No hash
+                                  is used as identity either - a hash faithfully identifies only the
+                                  fields chosen to hash, so hashing a coarse tuple would merely make the
+                                  coarseness look authoritative.
+      legaexternal/adapt.mjs      the Law-4 adapter. Declared mapping only; an unmapped native result
+                                  becomes UNKNOWN_MAPPING rather than the nearest familiar label.
+
+    NINE CONTROLS, ALL HOLDING
+      IDENTITY          identical source text in two docstrings stays two experiments, and the OLD key is
+                        asserted to collide, so the test demonstrates the defect it replaces
+      FIDELITY          native results and unstripped wants survive adaptation
+      NON-INVENTION     unmapped native -> UNKNOWN_MAPPING, with a positive control that mapped ones map
+      NON-INVENTION     mechanically, via illegalRefinement: the adapter cannot distinguish what the
+                        producer did not
+      NON-VACUITY       producer failure carries NO evidential force about the subject
+      RAW PRESERVATION  re-adaptation is deterministic AFTER THE SUBJECT IS DELETED, and a later
+                        vocabulary re-adapts the same observation without rerunning anything
+      CHANNEL ISOLATION a subject writing at import time cannot corrupt the producer report
+      VERSION/SCOPE     every claim records the producer semantics that established it
+      ADMIT CONTROL     collapsing OUTPUT_MISMATCH and UNEXPECTED_EXCEPTION into REFUTED is LEGAL because
+                        no consumer distinguishes them - and becomes ILLEGAL the moment one does
+
+    A VACUOUS TEST OF MY OWN, CAUGHT AND FIXED. The first channel test used a doctest example that
+    prints - but doctest CAPTURES example output itself, so the subject never touched fd 1 and the test
+    proved nothing (subjectBytes was 0). The corpus now writes at MODULE IMPORT time, which escapes
+    doctest's per-example capture, and the test asserts subjectBytes > 0 so it cannot silently go vacuous
+    again.
+
+    DOCTEST IS NOT AN ORACLE. A PASS establishes satisfaction of that example under that producer's
+    semantics - not general correctness, preservation, or project advancement. The scope recorded on each
+    claim is what bounds it.
+
+    NEXT OBJECTIVE comes from the ledger, not from another pyparsing discrepancy.
+
+---
