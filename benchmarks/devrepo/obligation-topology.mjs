@@ -96,7 +96,15 @@ const DESTRUCTIVE = {
 const PRESERVING = {
   ADDED_COMMENT: (c) => afterDefLine(c, '    # a comment that changes nothing'),
   BLANK_LINE: (c) => afterDefLine(c, ''),
+  // KEPT AS RECORDED IN RUN 1, AND IT IS NOT ACTUALLY PRESERVING. `textwrap.dedent` contains a backslash
+  // line continuation at its line 44, and whitespace after a continuation is a genuine Python syntax
+  // error. Both frozen r2 and the graph correctly refused it, and S3 held on that very case. The
+  // transform was mislabelled by me; the gates were right. That is specificity WORKING, and it stays in
+  // the file so the record is not quietly rewritten into a clean sweep.
   TRAILING_WHITESPACE: (c) => c.split(/\r?\n/).map((l) => (l.trim() ? l + '  ' : l)).join(NL),
+  // RUN 2 adds the transform I should have written: preserving BY CONSTRUCTION, skipping continuations.
+  TRAILING_WHITESPACE_SAFE: (c) => c.split(/\r?\n/)
+    .map((l) => (l.trim() && !l.trimEnd().endsWith(String.fromCharCode(92)) ? l + '  ' : l)).join(NL),
   PARENTHESIZED_RETURN: (c) => {
     const lines = c.split(/\r?\n/);
     const i = lines.findIndex((l) => /^\s+return \S.*[^:]$/.test(l) && !l.includes('#'));
@@ -134,6 +142,7 @@ function graphLost(code, ctx, sc) {
 
 const eq = (a, b) => a.length === b.length && [...a].sort().join() === [...b].sort().join();
 
+const perTransform = {};
 let s1ok = 0; let s1n = 0; let s2ok = 0; let s2n = 0; let s3ok = 0; let s3n = 0;
 const failures = [];
 const skipped = [];
@@ -156,7 +165,10 @@ for (const task of TASKS) {
     if (code === null) { skipped.push(task.id + '/' + name + ' (not applicable)'); continue; }
     const r2 = authorizeStructural(code, ctx);
     const gr = graphLost(code, ctx, sc);
-    s1n++; if (r2.ok && gr.ok) s1ok++;
+    s1n++;
+    const perT = perTransform[name] || (perTransform[name] = { ok: 0, n: 0 });
+    perT.n++;
+    if (r2.ok && gr.ok) { s1ok++; perT.ok++; }
     else failures.push({ task: task.id, name, kind: 'S1', r2: r2.failed, graph: gr.lost });
     s3n++; if (eq(r2.failed, gr.lost)) s3ok++;
     else failures.push({ task: task.id, name, kind: 'S3', r2: r2.failed, graph: gr.lost });
@@ -176,6 +188,9 @@ for (const task of TASKS) {
 
 console.log('S1  PRESERVING transformations still ADMITTED  : ' + s1ok + '/' + s1n
   + (s1ok === s1n ? '   HELD' : '   FAILED'));
+for (const [k, v] of Object.entries(perTransform)) {
+  console.log('      ' + k.padEnd(28) + v.ok + '/' + v.n + (v.ok === v.n ? '' : '   <-- see note in file'));
+}
 console.log('S2  DESTRUCTIVE lose EXACTLY the preregistered : ' + s2ok + '/' + s2n
   + (s2ok === s2n ? '   HELD' : '   FAILED'));
 console.log('S3  graph reason topology == r2 failed set     : ' + s3ok + '/' + s3n
