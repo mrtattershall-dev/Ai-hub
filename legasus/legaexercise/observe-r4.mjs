@@ -84,3 +84,63 @@ export function observeIsolated({ rootDir, packageName, setup = [], invocation,
 }
 
 export { NL };
+
+// r4 / V2 — THE EXECUTION MODEL BECOMES AN EXPLICIT, RECORDED COORDINATE.
+//
+// Repo C measured the defect precisely: r3's stated reason was right 57 of 57 times - a preceding example
+// really did fail - while the ENTAILMENT it drew was wrong 8 times. r3 concludes "this example cannot
+// become an experiment" because ITS model requires the reconstructed prefix to succeed. doctest runs every
+// example in a docstring in order over SHARED GLOBALS and carries on regardless, so those 8 ran and
+// passed.
+//
+//     A FAILED PREFIX BLOCKS THE EXAMPLE ONLY UNDER RECONSTRUCTION. THAT IS A PROPERTY OF THE MODEL,
+//     NOT OF THE SUBJECT.
+//
+// So the repair is not a smarter inference. It is to stop the model being an unrecorded assumption. Both
+// models are available, each result carries the model it was produced under, and the two are DIFFERENT
+// SUBJECTS - which is precisely what the `history` scope coordinate was admitted for. Comparing a
+// RECONSTRUCTED_PREFIX result with a SEQUENTIAL_SHARED one is a scope mismatch the algebra already
+// refuses, rather than a disagreement to be adjudicated.
+//
+// Per-example replayability is what the witness bank requires and is NOT abandoned; it is now one named
+// model among two rather than the only one.
+export const MODEL = {
+  RECONSTRUCTED_PREFIX: 'RECONSTRUCTED_PREFIX',
+  SEQUENTIAL_SHARED: 'SEQUENTIAL_SHARED',
+};
+
+// Run a whole docstring in doctest's own model: one namespace, every example attempted in order, a
+// failure never preventing the next. Built on the V1 isolated channel, so the two repairs compose.
+export function observeSequential({ rootDir, packageName, dotted, examples, timeoutMs = 120000 }) {
+  const body = [
+    'import sys, json, os, importlib',
+    'sys.path.insert(0, sys.argv[1])',
+    'spec = json.loads(sys.argv[2])',
+    'out = []',
+    'try:',
+    '    ns = dict(vars(importlib.import_module(spec["dotted"])))',
+    'except Exception as e:',
+    '    _emit({"model": "SEQUENTIAL_SHARED", "importFailed": type(e).__name__, "results": []})',
+    '    raise SystemExit(0)',
+    'for ex in spec["examples"]:',
+    '    status = "OK"; rendered = None',
+    '    try:',
+    '        try:',
+    '            value = eval(compile(ex, "<witness>", "eval"), ns)',
+    '        except SyntaxError:',
+    '            exec(compile(ex, "<witness>", "exec"), ns)',
+    '            value = None',
+    '        rendered = repr(value)',
+    '    except Exception as e:',
+    '        status = "RAISED:" + type(e).__name__',
+    '    out.append({"invocation": ex, "status": status, "value": rendered})',
+    '_emit({"model": "SEQUENTIAL_SHARED", "results": out})',
+  ].join(NL);
+  const r = runIsolated({ body, timeoutMs,
+    args: [rootDir, JSON.stringify({ dotted, examples })] });
+  if (r.protocol === null) {
+    return { model: MODEL.SEQUENTIAL_SHARED, unobservable: true,
+      why: r.parseError || r.threw || 'no protocol emitted', results: [] };
+  }
+  return { ...r.protocol, subjectBytes: r.subjectBytes };
+}

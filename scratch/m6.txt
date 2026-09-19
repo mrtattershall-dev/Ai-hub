@@ -1,0 +1,17 @@
+preregister W1/W2/W3: does an explicit execution model recover the 8 wrong entailments?
+
+r4 development. Repo C prospective numbers against legasus-freeze-r3 are unchanged.
+
+W1  the 8 cases r3 called SETUP_FAILED while the external verifier PASSED become OBSERVED under
+    SEQUENTIAL_SHARED. If not, the execution model is not the cause and the V2 diagnosis is wrong.
+W2  the 44 cases where BOTH reported failure STILL fail under SEQUENTIAL_SHARED. If the new model
+    rescues those too it is not modelling doctest, it is merely more permissive - a worse defect than
+    the one being repaired.
+W3  no example observable under RECONSTRUCTED_PREFIX becomes unobservable under the new model.
+
+W2 IS THE CONTROL THAT MATTERS. A model that turns every failure into a success satisfies W1 perfectly
+and is useless.
+
+Message-File: scratch/m6.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
