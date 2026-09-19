@@ -20,7 +20,7 @@
 //
 // UNKNOWN IS A REAL ANSWER. A pair this algebra cannot decide returns `UNKNOWN`, never a guess. An
 // architecture that refuses is recoverable; one that quietly picks is not.
-import { containsPoint, normalizeDomain } from './predicates.mjs';
+import { containsPoint, normalizeDomain, atomKindOf } from './predicates.mjs';
 
 export const RELATION = {
   EQUAL: 'EQUAL',
@@ -31,14 +31,59 @@ export const RELATION = {
   UNKNOWN: 'UNKNOWN',
 };
 
-const KNOWN = new Set(['interval', 'point', 'set', 'complement_point', 'universe']);
+const KNOWN = new Set(['interval', 'point', 'set', 'complement_point', 'universe', 'prefix', 'suffix']);
 const decidable = (d) => !!d && KNOWN.has(d.kind);
 
-// The values worth interrogating when comparing two domains. Bounds, members, and their neighbours,
-// because a relation between two domains is decided exactly at the places where one of them changes.
+// STRING WITNESSES, and none of the numeric machinery survives the move.
+//
+// There is no neighbour of "cat", no triple around "admin_", and no gap to probe between "cat" and "dog".
+// So the witnesses are constructed from the STRUCTURE of the domains being compared:
+//
+//   a set          each member, and each member extended, so "is it exactly this" is separable from
+//                  "does it merely start with this"
+//   a prefix p     p itself, p extended, and p with its last character removed - the three places where
+//                  membership changes
+//   a suffix q     q itself, q extended on the LEFT, and q with its first character removed
+//
+// AND THE CROSS PRODUCTS, which is the part that is easy to miss and fatal to omit. A prefix and a suffix
+// can OVERLAP - `startswith("a")` and `endswith("z")` share "az" - but neither domain generates "az" on
+// its own. Without p + q the algebra would report DISJOINT for a genuinely overlapping pair, which is the
+// same class of silent wrongness as the forked membership predicate.
+function stringWitnesses(domains) {
+  const vs = new Set(['', 'x', 'zzz']);
+  const prefixes = []; const suffixes = [];
+  for (const d of domains) {
+    if (!d) continue;
+    if (d.kind === 'set') {
+      for (const m of d.values) { vs.add(m); vs.add(m + 'x'); if (m.length > 1) vs.add(m.slice(0, -1)); }
+    } else if (d.kind === 'prefix') {
+      prefixes.push(d.prefix);
+      vs.add(d.prefix); vs.add(d.prefix + 'x');
+      if (d.prefix.length > 1) vs.add(d.prefix.slice(0, -1));
+    } else if (d.kind === 'suffix') {
+      suffixes.push(d.suffix);
+      vs.add(d.suffix); vs.add('x' + d.suffix);
+      if (d.suffix.length > 1) vs.add(d.suffix.slice(1));
+    }
+  }
+  for (const p of prefixes) {
+    for (const q of suffixes) vs.add(p + q);
+    // A string that starts with p and ends with something else, so containment stays separable.
+    vs.add(p + 'q');
+  }
+  return [...vs].sort();
+}
+
+// The values worth interrogating when comparing two domains. Bounds, members, and their neighbours for
+// numbers; structural variants and cross products for strings. A relation between two domains is decided
+// exactly at the places where one of them changes.
 export function witnessValues(a, b) {
+  const da = normalizeDomain(a); const db = normalizeDomain(b);
+  const kinds = [atomKindOf(da), atomKindOf(db)].filter(Boolean);
+  if (kinds.includes('string')) return stringWitnesses([da, db]);
+
   const vs = new Set([0, 1, -1]);
-  for (const d of [normalizeDomain(a), normalizeDomain(b)]) {
+  for (const d of [da, db]) {
     if (!d) continue;
     if (d.kind === 'point' || d.kind === 'complement_point') {
       for (const v of [d.value - 1, d.value, d.value + 1]) vs.add(v);
@@ -78,12 +123,45 @@ export function relate(a, b) {
     return { relation: RELATION.UNKNOWN,
       why: 'one of the domains is a kind the algebra does not model, so no relation is claimed' };
   }
+  // A numeric domain and a string domain have no relation this algebra can decide. Saying so is the
+  // correct answer; returning DISJOINT because no witness satisfies both would be a decided answer to a
+  // question that was never meaningful.
+  const ka = atomKindOf(a); const kb = atomKindOf(b);
+  if (ka && kb && ka !== kb) {
+    return { relation: RELATION.UNKNOWN,
+      why: 'one domain ranges over ' + ka + ' and the other over ' + kb
+        + ', so no containment or disjointness between them is meaningful' };
+  }
   const vs = witnessValues(a, b);
   const inA = vs.filter((v) => containsPoint(a, v));
   const inB = vs.filter((v) => containsPoint(b, v));
-  const both = vs.find((v) => containsPoint(a, v) && containsPoint(b, v));
-  const onlyA = vs.find((v) => containsPoint(a, v) && !containsPoint(b, v));
-  const onlyB = vs.find((v) => !containsPoint(a, v) && containsPoint(b, v));
+
+  // WHICH witness gets reported is not arbitrary. A shared value a million below the bound proves
+  // containment just as well as one beside it and teaches the reader nothing; the informative witness is
+  // the one CLOSEST TO WHERE MEMBERSHIP CHANGES. So candidates are ranked by distance to the nearest
+  // literal either domain names, and the nearest wins. For strings, shortest wins for the same reason.
+  const literals = [];
+  for (const d of [normalizeDomain(a), normalizeDomain(b)]) {
+    if (!d) continue;
+    if (d.kind === 'point' || d.kind === 'complement_point') literals.push(d.value);
+    else if (d.kind === 'set') for (const m of d.values) literals.push(m);
+    else if (d.kind === 'interval') for (const e of [d.lo, d.hi]) if (Number.isFinite(e)) literals.push(e);
+  }
+  const interest = (v) => {
+    if (typeof v === 'string') return v.length;
+    const nums = literals.filter((x) => typeof x === 'number');
+    if (!nums.length) return Math.abs(v);
+    return Math.min(...nums.map((x) => Math.abs(v - x)));
+  };
+  const nearest = (pred) => {
+    const cands = vs.filter(pred);
+    if (!cands.length) return undefined;
+    return cands.reduce((best, v) => (interest(v) < interest(best) ? v : best), cands[0]);
+  };
+
+  const both = nearest((v) => containsPoint(a, v) && containsPoint(b, v));
+  const onlyA = nearest((v) => containsPoint(a, v) && !containsPoint(b, v));
+  const onlyB = nearest((v) => !containsPoint(a, v) && containsPoint(b, v));
 
   if (!inA.length || !inB.length) {
     return { relation: RELATION.UNKNOWN,

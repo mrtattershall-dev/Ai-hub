@@ -25,6 +25,7 @@
 // DECIDE call every pair of sets DISJOINT while PROVE judged them correctly. Re-exported so existing
 // callers keep working, but there is only one implementation.
 import { NL, containsPoint } from './predicates.mjs';
+import { relate, RELATION } from './domain-algebra.mjs';
 
 const isInterval = (d) => d && d.kind === 'interval';
 const lo = (d) => (d.lo === null || d.lo === undefined ? -Infinity : d.lo);
@@ -97,41 +98,57 @@ export function strictlyContains(outer, inner) {
 //   DISJOINT     neither can shadow the other; both orders legal, so this is an ENGINEERING CHOICE
 //   UNDETERMINED domains intersect without containment; the specification has not said, and inventing
 //                an answer here would make LegaCore an oracle
+// DECIDE IS A CONSUMER OF THE DOMAIN ALGEBRA, not a second implementation of it.
+//
+// This function used to decide containment itself and then sweep the integers from -1000 to 1000 looking
+// for a shared value. Both were numeric assumptions hiding inside a stage whose claim is about DOMAINS:
+// the sweep cannot find a shared value between two string prefixes, and a hand-rolled containment test
+// has to learn every new kind separately. `relate()` knows all of them and returns a witness with each
+// answer, so DECIDE's job is only to turn a RELATION into an AUTHORITY decision:
+//
+//     CONTAINS / CONTAINED   a precedence edge - the narrower must be reachable first
+//     DISJOINT               no edge, and choosing an order is an ENGINEERING CHOICE
+//     EQUAL                  no edge is derivable, and none is needed
+//     OVERLAP                REFUSE - the specification has not said which wins on the shared inputs
+//     UNKNOWN                REFUSE - and say that it is the algebra declining, not the spec being vague
+//
+// The stages are allowed to disagree about AUTHORITY. They are not allowed to disagree about MATHEMATICS.
 export function orderRequested(a, b) {
-  const aContains = strictlyContains(a.domain, b.domain);
-  const bContains = strictlyContains(b.domain, a.domain);
+  const r = relate(a.domain, b.domain);
+  const w = r.witness || {};
 
-  if (aContains && bContains) {
-    return { status: 'UNDETERMINED', reason: 'each domain appears to contain the other, which means the'
-      + ' containment test is wrong rather than the specification being ambiguous' };
-  }
-  if (aContains) {
-    return { status: 'ORDERED', first: b.id, second: a.id,
-      reason: b.id + ' is strictly inside ' + a.id + ', so it must be reachable before the wider guard',
-      witness: { input: aContains.inside,
-        under_correct_order: b.result,
-        under_reversed_order: a.result,
-        why: 'this input satisfies both, so the reversed order silently loses ' + b.result } };
-  }
-  if (bContains) {
-    return { status: 'ORDERED', first: a.id, second: b.id,
-      reason: a.id + ' is strictly inside ' + b.id + ', so it must be reachable before the wider guard',
-      witness: { input: bContains.inside,
-        under_correct_order: a.result,
-        under_reversed_order: b.result,
-        why: 'this input satisfies both, so the reversed order silently loses ' + a.result } };
+  if (r.relation === RELATION.CONTAINS || r.relation === RELATION.CONTAINED) {
+    const contains = r.relation === RELATION.CONTAINS;
+    const inner = contains ? b : a;
+    const outer = contains ? a : b;
+    return { status: 'ORDERED', first: inner.id, second: outer.id,
+      reason: inner.id + ' is strictly inside ' + outer.id
+        + ', so it must be reachable before the wider guard',
+      witness: { input: w.shared,
+        under_correct_order: inner.result,
+        under_reversed_order: outer.result,
+        why: 'this input satisfies both, so the reversed order silently loses ' + inner.result } };
   }
 
-  // No containment. Do they overlap at all?
-  const probe = [];
-  for (let v = -1000; v <= 1000; v++) probe.push(v);
-  const shared = probe.find((v) => containsPoint(a.domain, v) && containsPoint(b.domain, v));
-  if (shared === undefined) {
-    return { status: 'DISJOINT',
+  if (r.relation === RELATION.DISJOINT) {
+    return { status: 'DISJOINT', witness: { inA: w.inA, inB: w.inB },
       reason: 'no input satisfies both, so neither can shadow the other and both orders are legal',
       note: 'choosing one is an ENGINEERING CHOICE and must be labelled as one' };
   }
-  return { status: 'UNDETERMINED', witness: { input: shared },
+
+  if (r.relation === RELATION.EQUAL) {
+    return { status: 'UNDETERMINED', witness: { input: w.shared },
+      reason: 'the domains are equivalent, so there is no containment to derive an order from; two'
+        + ' requested behaviours over the same domain are a specification conflict, not an ordering' };
+  }
+
+  if (r.relation === RELATION.UNKNOWN) {
+    return { status: 'UNDETERMINED',
+      reason: 'the domain algebra declines this pair: ' + r.why
+        + '. That is the algebra refusing, not the specification being ambiguous' };
+  }
+
+  return { status: 'UNDETERMINED', witness: { input: w.shared, onlyA: w.onlyA, onlyB: w.onlyB },
     reason: 'the domains intersect without containment, so the specification has not said which wins'
       + ' on the shared inputs; deriving an order here would be LegaCore acting as an oracle' };
 }

@@ -54,6 +54,8 @@ export function containsPoint(domain, v) {
       return okLo && okHi;
     }
     case 'set': return d.values.includes(v);
+    case 'prefix': return typeof v === 'string' && v.startsWith(d.prefix);
+    case 'suffix': return typeof v === 'string' && v.endsWith(d.suffix);
     default: return false;
   }
 }
@@ -128,9 +130,51 @@ export function parseCondition(text) {
       const values = [...new Set(raw.map(Number))].sort((x, y) => x - y);
       return { kind: 'set', variable: m[1], values };
     }
+    // ---- STRING ATOMS. The same `set` kind, with string members instead of numbers.
+    //
+    // This is where the assumption that atoms are NUMBERS gets tested. A set of strings has no
+    // arithmetic at all: no neighbours, no triple around a member, no gaps to probe between "cat" and
+    // "dog". Anything downstream that reached for a number will fail here rather than quietly agree.
+    if (raw.length && raw.every((x) => /^(["'])(?:(?!\1).)*\1$/.test(x))) {
+      const values = [...new Set(raw.map((x) => x.slice(1, -1)))].sort();
+      return { kind: 'set', variable: m[1], atom: 'string', values };
+    }
   }
 
+  // ---- PREFIX and SUFFIX domains. The relation that makes these worth having is CONTAINMENT WITH A
+  // COMPLETELY DIFFERENT IMPLEMENTATION:
+  //
+  //     startswith("a")  strictly contains  startswith("admin_")
+  //
+  // Every string beginning "admin_" begins "a", so narrow-before-broad is derivable - and there is no
+  // interval, no neighbouring integer, no `triple(v)` and no sparse-set gap anywhere in that reasoning.
+  // If `DECIDE` can still derive the precedence and `PROVE` can still validate it, the architecture is
+  // reasoning over semantic relations rather than over numeric convention.
+  m = t.match(/^([A-Za-z_]\w*)\s*\.\s*startswith\s*\(\s*(["'])((?:(?!\2).)*)\2\s*\)$/i);
+  if (m) return { kind: 'prefix', variable: m[1], atom: 'string', prefix: m[3] };
+
+  m = t.match(/^([A-Za-z_]\w*)\s*\.\s*endswith\s*\(\s*(["'])((?:(?!\2).)*)\2\s*\)$/i);
+  if (m) return { kind: 'suffix', variable: m[1], atom: 'string', suffix: m[3] };
+
+  m = t.match(/^([A-Za-z_]\w*)\s*==\s*(["'])((?:(?!\2).)*)\2$/);
+  if (m) return { kind: 'set', variable: m[1], atom: 'string', values: [m[3]] };
+
   return { kind: 'unmodelled', text: t };
+}
+
+// Which kind of atom does this domain range over? Comparing a numeric domain to a string one is not a
+// relation this algebra can decide, and saying so is the correct answer rather than a failure.
+export function atomKindOf(d) {
+  if (!d) return null;
+  if (d.atom === 'string') return 'string';
+  switch (d.kind) {
+    case 'interval': case 'point': case 'complement_point': return 'number';
+    case 'set': return d.values.every((v) => typeof v === 'number') ? 'number'
+      : d.values.every((v) => typeof v === 'string') ? 'string' : null;
+    case 'prefix': case 'suffix': return 'string';
+    case 'universe': return null;
+    default: return null;
+  }
 }
 
 // ---- EXISTING behaviours, read from the program.
