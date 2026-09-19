@@ -2,3 +2,5 @@
 .legasus/
 .admit/
 .validate/
+.gen/
+__pycache__/

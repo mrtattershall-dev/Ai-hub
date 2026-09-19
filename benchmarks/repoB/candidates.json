@@ -1,0 +1,934 @@
+[
+ {
+  "file": "dependency_groups.py",
+  "fn": "_parse_group",
+  "args": [
+   "self",
+   "group",
+   "errors"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "DependencyGroupResolver",
+  "anchorLF": "        if not isinstance(raw_group, Sequence):",
+  "replacement": "        if isinstance(raw_group, Sequence):",
+  "calls": []
+ },
+ {
+  "file": "direct_url.py",
+  "fn": "_from_dict",
+  "args": [
+   "cls",
+   "d"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "ArchiveInfo",
+  "anchorLF": "                if hashes[hash_algorithm] != hash_value:",
+  "replacement": "                if hashes[hash_algorithm] == hash_value:",
+  "calls": []
+ },
+ {
+  "file": "direct_url.py",
+  "fn": "_from_dict",
+  "args": [
+   "cls",
+   "d"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "DirectUrl",
+  "anchorLF": "        ) != 1:",
+  "replacement": "        ) == 1:",
+  "calls": []
+ },
+ {
+  "file": "markers.py",
+  "fn": "evaluate",
+  "args": [
+   "self",
+   "environment",
+   "context"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "Marker",
+  "anchorLF": "        if context == \"lock_file\":",
+  "replacement": "        if context != \"lock_file\":",
+  "calls": []
+ },
+ {
+  "file": "metadata.py",
+  "fn": "parse_email",
+  "args": [
+   "data"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": false,
+  "cls": null,
+  "anchorLF": "        if not valid_encoding:",
+  "replacement": "        if valid_encoding:",
+  "calls": [
+   "print(repr(m.parse_email(0)))",
+   "print(repr(m.parse_email(1)))",
+   "print(repr(m.parse_email(\"1.0\")))",
+   "print(repr(m.parse_email(\"foo\")))",
+   "print(repr(m.parse_email(\"1.2.3\")))",
+   "print(repr(m.parse_email([])))"
+  ]
+ },
+ {
+  "file": "metadata.py",
+  "fn": "_process_description_content_type",
+  "args": [
+   "self",
+   "value"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "_Validator",
+  "anchorLF": "        if charset != \"UTF-8\":",
+  "replacement": "        if charset == \"UTF-8\":",
+  "calls": []
+ },
+ {
+  "file": "metadata.py",
+  "fn": "_process_license_files",
+  "args": [
+   "self",
+   "value"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "_Validator",
+  "anchorLF": "            if pathlib.PureWindowsPath(path).as_posix() != path:",
+  "replacement": "            if pathlib.PureWindowsPath(path).as_posix() == path:",
+  "calls": []
+ },
+ {
+  "file": "metadata.py",
+  "fn": "_process_import_names",
+  "args": [
+   "self",
+   "value"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "_Validator",
+  "anchorLF": "                if not identifier.isidentifier():",
+  "replacement": "                if identifier.isidentifier():",
+  "calls": []
+ },
+ {
+  "file": "metadata.py",
+  "fn": "_write_metadata",
+  "args": [
+   "self",
+   "message"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "Metadata",
+  "anchorLF": "            if isinstance(validator, _Validator) and name != \"description\":",
+  "replacement": "            if isinstance(validator, _Validator) and name == \"description\":",
+  "calls": []
+ },
+ {
+  "file": "pylock.py",
+  "fn": "is_valid_pylock_path",
+  "args": [
+   "path"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": false,
+  "cls": null,
+  "anchorLF": "    return path.name == \"pylock.toml\" or bool(_PYLOCK_FILE_NAME_RE.match(path.name))",
+  "replacement": "    return path.name != \"pylock.toml\" or bool(_PYLOCK_FILE_NAME_RE.match(path.name))",
+  "calls": [
+   "print(repr(m.is_valid_pylock_path(0)))",
+   "print(repr(m.is_valid_pylock_path(1)))",
+   "print(repr(m.is_valid_pylock_path(\"1.0\")))",
+   "print(repr(m.is_valid_pylock_path(\"foo\")))",
+   "print(repr(m.is_valid_pylock_path(\"1.2.3\")))",
+   "print(repr(m.is_valid_pylock_path([])))"
+  ]
+ },
+ {
+  "file": "pylock.py",
+  "fn": "_from_dict",
+  "args": [
+   "cls",
+   "d"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "Package",
+  "anchorLF": "        if distributions > 0 and direct_urls > 0:",
+  "replacement": "        if distributions > 1 and direct_urls > 0:",
+  "calls": []
+ },
+ {
+  "file": "pylock.py",
+  "fn": "_from_dict",
+  "args": [
+   "cls",
+   "d"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "Pylock",
+  "anchorLF": "        if not Version(\"1\") <= pylock.lock_version < Version(\"2\"):",
+  "replacement": "        if Version(\"1\") <= pylock.lock_version < Version(\"2\"):",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_is_family",
+  "args": [
+   "self",
+   "other"
+  ],
+  "operator": "BOOLEAN_WEAKEN",
+  "why": "a conjunct dropped from a boolean return",
+  "method": true,
+  "cls": "_BoundaryVersion",
+  "anchorLF": "            return other.post == v.post and other.dev == v.dev",
+  "replacement": "            return other.post == v.post",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_get_spec_version",
+  "args": [
+   "self",
+   "version"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        if self._spec_version is not None and self._spec_version[0] == version:",
+  "replacement": "        if self._spec_version is not None and self._spec_version[0] != version:",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_to_ranges",
+  "args": [
+   "self"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        if op == \"===\":",
+  "replacement": "        if op != \"===\":",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_standard_ranges",
+  "args": [
+   "self",
+   "op",
+   "ver_str"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        if op == \">=\":",
+  "replacement": "        if op != \">=\":",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "prereleases",
+  "args": [
+   "self"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        if operator == \"!=\":",
+  "replacement": "        if operator != \"!=\":",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_canonical_spec",
+  "args": [
+   "self"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        if operator == \"===\" or version.endswith(\".*\"):",
+  "replacement": "        if operator != \"===\" or version.endswith(\".*\"):",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_compare_compatible",
+  "args": [
+   "self",
+   "prospective",
+   "spec"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        # is that ~=2.2 is equivalent to >=2.2,==2.*. This allows us to",
+  "replacement": "        # is that ~=2.2 is equivalent to >= 3.2,==2.*. This allows us to",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_compare_equal",
+  "args": [
+   "self",
+   "prospective",
+   "spec"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "            if not spec_version.local:",
+  "replacement": "            if spec_version.local:",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_compare_less_than_equal",
+  "args": [
+   "self",
+   "prospective",
+   "spec"
+  ],
+  "operator": "COMPARISON_FLIP",
+  "why": "a strict comparison relaxed or tightened",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        return _public_version(prospective) <= self._require_spec_version(spec)",
+  "replacement": "        return _public_version(prospective) < self._require_spec_version(spec)",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_compare_greater_than_equal",
+  "args": [
+   "self",
+   "prospective",
+   "spec"
+  ],
+  "operator": "COMPARISON_FLIP",
+  "why": "a strict comparison relaxed or tightened",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        return _public_version(prospective) >= self._require_spec_version(spec)",
+  "replacement": "        return _public_version(prospective) > self._require_spec_version(spec)",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_compare_less_than",
+  "args": [
+   "self",
+   "prospective",
+   "spec_str"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        if not prospective < spec:",
+  "replacement": "        if prospective < spec:",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_compare_greater_than",
+  "args": [
+   "self",
+   "prospective",
+   "spec_str"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        # equals V. So >1.0a1 must not match 1.0a1+local, but must still",
+  "replacement": "        # equals V. So > 2.0a1 must not match 1.0a1+local, but must still",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_compare_arbitrary",
+  "args": [
+   "self",
+   "prospective",
+   "spec"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        return str(prospective).lower() == str(spec).lower()",
+  "replacement": "        return str(prospective).lower() != str(spec).lower()",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "contains",
+  "args": [
+   "self",
+   "item",
+   "prereleases"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        >>> Specifier(\">=1.2.3\").contains(\"1.2.3\")",
+  "replacement": "        >>> Specifier(\">= 2.2.3\").contains(\"1.2.3\")",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "filter",
+  "args": [
+   "self",
+   "iterable",
+   "prereleases",
+   "key"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "Specifier",
+  "anchorLF": "        >>> list(Specifier(\">=1.2.3\").filter([\"1.2\", \"1.3\", \"1.5a1\"]))",
+  "replacement": "        >>> list(Specifier(\">= 2.2.3\").filter([\"1.2\", \"1.3\", \"1.5a1\"]))",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_canonical_specs",
+  "args": [
+   "self"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "SpecifierSet",
+  "anchorLF": "        if not self._canonicalized:",
+  "replacement": "        if self._canonicalized:",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_get_ranges",
+  "args": [
+   "self"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "SpecifierSet",
+  "anchorLF": "                if not result:",
+  "replacement": "                if result:",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "is_unsatisfiable",
+  "args": [
+   "self"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "SpecifierSet",
+  "anchorLF": "        >>> SpecifierSet(\">=2.0,<1.0\").is_unsatisfiable()",
+  "replacement": "        >>> SpecifierSet(\">= 3.0,<1.0\").is_unsatisfiable()",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_check_prerelease_only_ranges",
+  "args": [
+   "self"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "SpecifierSet",
+  "anchorLF": "            if nearest == upper.version and upper.inclusive:",
+  "replacement": "            if nearest != upper.version and upper.inclusive:",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_check_arbitrary_unsatisfiable",
+  "args": [
+   "self"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "SpecifierSet",
+  "anchorLF": "        if not arbitrary:",
+  "replacement": "        if arbitrary:",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "contains",
+  "args": [
+   "self",
+   "item",
+   "prereleases",
+   "installed"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "SpecifierSet",
+  "anchorLF": "        >>> SpecifierSet(\">=1.0.0,!=1.0.1\").contains(\"1.2.3\")",
+  "replacement": "        >>> SpecifierSet(\">= 2.0.0,!=1.0.1\").contains(\"1.2.3\")",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "filter",
+  "args": [
+   "self",
+   "iterable",
+   "prereleases",
+   "key"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "SpecifierSet",
+  "anchorLF": "        >>> list(SpecifierSet(\">=1.2.3\").filter([\"1.2\", \"1.3\", \"1.5a1\"]))",
+  "replacement": "        >>> list(SpecifierSet(\">= 2.2.3\").filter([\"1.2\", \"1.3\", \"1.5a1\"]))",
+  "calls": []
+ },
+ {
+  "file": "specifiers.py",
+  "fn": "_filter_versions",
+  "args": [
+   "self",
+   "iterable",
+   "key",
+   "prereleases"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "SpecifierSet",
+  "anchorLF": "                    op == \"===\" and str(item).lower() == ver.lower()",
+  "replacement": "                    op != \"===\" and str(item).lower() == ver.lower()",
+  "calls": []
+ },
+ {
+  "file": "tags.py",
+  "fn": "parse_tag",
+  "args": [
+   "tag"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": false,
+  "cls": null,
+  "anchorLF": "            if parts != sorted(parts):",
+  "replacement": "            if parts == sorted(parts):",
+  "calls": [
+   "print(repr(m.parse_tag(0)))",
+   "print(repr(m.parse_tag(1)))",
+   "print(repr(m.parse_tag(\"1.0\")))",
+   "print(repr(m.parse_tag(\"foo\")))",
+   "print(repr(m.parse_tag(\"1.2.3\")))",
+   "print(repr(m.parse_tag([])))"
+  ]
+ },
+ {
+  "file": "tags.py",
+  "fn": "cpython_tags",
+  "args": [
+   "python_version",
+   "abis",
+   "platforms"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": false,
+  "cls": null,
+  "anchorLF": "        abis = _cpython_abis(python_version, warn) if len(python_version) > 1 else []",
+  "replacement": "        abis = _cpython_abis(python_version, warn) if len(python_version) > 2 else []",
+  "calls": [
+   "print(repr(m.cpython_tags(0)))",
+   "print(repr(m.cpython_tags(1)))",
+   "print(repr(m.cpython_tags(\"1.0\")))",
+   "print(repr(m.cpython_tags(\"foo\")))",
+   "print(repr(m.cpython_tags(\"1.2.3\")))",
+   "print(repr(m.cpython_tags([])))"
+  ]
+ },
+ {
+  "file": "tags.py",
+  "fn": "generic_tags",
+  "args": [
+   "interpreter",
+   "abis",
+   "platforms"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": false,
+  "cls": null,
+  "anchorLF": "    if not interpreter:",
+  "replacement": "    if interpreter:",
+  "calls": [
+   "print(repr(m.generic_tags(0)))",
+   "print(repr(m.generic_tags(1)))",
+   "print(repr(m.generic_tags(\"1.0\")))",
+   "print(repr(m.generic_tags(\"foo\")))",
+   "print(repr(m.generic_tags(\"1.2.3\")))",
+   "print(repr(m.generic_tags([])))"
+  ]
+ },
+ {
+  "file": "tags.py",
+  "fn": "mac_platforms",
+  "args": [
+   "version",
+   "arch"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": false,
+  "cls": null,
+  "anchorLF": "        if version == (10, 16):",
+  "replacement": "        if version != (10, 16):",
+  "calls": [
+   "print(repr(m.mac_platforms(0)))",
+   "print(repr(m.mac_platforms(1)))",
+   "print(repr(m.mac_platforms(\"1.0\")))",
+   "print(repr(m.mac_platforms(\"foo\")))",
+   "print(repr(m.mac_platforms(\"1.2.3\")))",
+   "print(repr(m.mac_platforms([])))"
+  ]
+ },
+ {
+  "file": "tags.py",
+  "fn": "ios_platforms",
+  "args": [
+   "version",
+   "multiarch"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": false,
+  "cls": null,
+  "anchorLF": "    if version[0] < 12:",
+  "replacement": "    if version[0] < 13:",
+  "calls": [
+   "print(repr(m.ios_platforms(0)))",
+   "print(repr(m.ios_platforms(1)))",
+   "print(repr(m.ios_platforms(\"1.0\")))",
+   "print(repr(m.ios_platforms(\"foo\")))",
+   "print(repr(m.ios_platforms(\"1.2.3\")))",
+   "print(repr(m.ios_platforms([])))"
+  ]
+ },
+ {
+  "file": "tags.py",
+  "fn": "android_platforms",
+  "args": [
+   "api_level",
+   "abi"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": false,
+  "cls": null,
+  "anchorLF": "    if platform.system() != \"Android\" and (api_level is None or abi is None):",
+  "replacement": "    if platform.system() == \"Android\" and (api_level is None or abi is None):",
+  "calls": [
+   "print(repr(m.android_platforms(0)))",
+   "print(repr(m.android_platforms(1)))",
+   "print(repr(m.android_platforms(\"1.0\")))",
+   "print(repr(m.android_platforms(\"foo\")))",
+   "print(repr(m.android_platforms(\"1.2.3\")))",
+   "print(repr(m.android_platforms([])))"
+  ]
+ },
+ {
+  "file": "tags.py",
+  "fn": "platform_tags",
+  "args": [],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": false,
+  "cls": null,
+  "anchorLF": "    if platform.system() == \"Darwin\":",
+  "replacement": "    if platform.system() != \"Darwin\":",
+  "calls": [
+   "print(repr(m.platform_tags()))",
+   "print(repr(m.platform_tags()))",
+   "print(repr(m.platform_tags()))",
+   "print(repr(m.platform_tags()))",
+   "print(repr(m.platform_tags()))",
+   "print(repr(m.platform_tags()))"
+  ]
+ },
+ {
+  "file": "tags.py",
+  "fn": "sys_tags",
+  "args": [],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": false,
+  "cls": null,
+  "anchorLF": "    if interp_name == \"cp\":",
+  "replacement": "    if interp_name != \"cp\":",
+  "calls": [
+   "print(repr(m.sys_tags()))",
+   "print(repr(m.sys_tags()))",
+   "print(repr(m.sys_tags()))",
+   "print(repr(m.sys_tags()))",
+   "print(repr(m.sys_tags()))",
+   "print(repr(m.sys_tags()))"
+  ]
+ },
+ {
+  "file": "utils.py",
+  "fn": "parse_wheel_filename",
+  "args": [
+   "filename"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": false,
+  "cls": null,
+  "anchorLF": "    if not filename.endswith(\".whl\"):",
+  "replacement": "    if filename.endswith(\".whl\"):",
+  "calls": [
+   "print(repr(m.parse_wheel_filename(0)))",
+   "print(repr(m.parse_wheel_filename(1)))",
+   "print(repr(m.parse_wheel_filename(\"1.0\")))",
+   "print(repr(m.parse_wheel_filename(\"foo\")))",
+   "print(repr(m.parse_wheel_filename(\"1.2.3\")))",
+   "print(repr(m.parse_wheel_filename([])))"
+  ]
+ },
+ {
+  "file": "utils.py",
+  "fn": "parse_sdist_filename",
+  "args": [
+   "filename"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": false,
+  "cls": null,
+  "anchorLF": "    if not sep:",
+  "replacement": "    if sep:",
+  "calls": [
+   "print(repr(m.parse_sdist_filename(0)))",
+   "print(repr(m.parse_sdist_filename(1)))",
+   "print(repr(m.parse_sdist_filename(\"1.0\")))",
+   "print(repr(m.parse_sdist_filename(\"foo\")))",
+   "print(repr(m.parse_sdist_filename(\"1.2.3\")))",
+   "print(repr(m.parse_sdist_filename([])))"
+  ]
+ },
+ {
+  "file": "version.py",
+  "fn": "normalize_pre",
+  "args": [],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": false,
+  "cls": null,
+  "anchorLF": "    Returns a lowercase version of the string if not a known pre-release",
+  "replacement": "    Returns a lowercase version of the string if a known pre-release",
+  "calls": [
+   "print(repr(m.normalize_pre()))",
+   "print(repr(m.normalize_pre()))",
+   "print(repr(m.normalize_pre()))",
+   "print(repr(m.normalize_pre()))",
+   "print(repr(m.normalize_pre()))",
+   "print(repr(m.normalize_pre()))"
+  ]
+ },
+ {
+  "file": "version.py",
+  "fn": "major",
+  "args": [
+   "self"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "Version",
+  "anchorLF": "        return self.release[0] if len(self.release) >= 1 else 0",
+  "replacement": "        return self.release[0] if len(self.release) >= 2 else 0",
+  "calls": []
+ },
+ {
+  "file": "version.py",
+  "fn": "minor",
+  "args": [
+   "self"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "Version",
+  "anchorLF": "        return self.release[1] if len(self.release) >= 2 else 0",
+  "replacement": "        return self.release[1] if len(self.release) >= 3 else 0",
+  "calls": []
+ },
+ {
+  "file": "version.py",
+  "fn": "micro",
+  "args": [
+   "self"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "Version",
+  "anchorLF": "        return self.release[2] if len(self.release) >= 3 else 0",
+  "replacement": "        return self.release[2] if len(self.release) >= 4 else 0",
+  "calls": []
+ },
+ {
+  "file": "version.py",
+  "fn": "release",
+  "args": [
+   "self"
+  ],
+  "operator": "BOUNDARY_SHIFT",
+  "why": "a comparison boundary moved by one",
+  "method": true,
+  "cls": "_TrimmedRelease",
+  "anchorLF": "        while i > 1 and rel[i - 1] == 0:",
+  "replacement": "        while i > 2 and rel[i - 1] == 0:",
+  "calls": []
+ },
+ {
+  "file": "_elffile.py",
+  "fn": "interpreter",
+  "args": [
+   "self"
+  ],
+  "operator": "EQUALITY_FLIP",
+  "why": "an equality inverted",
+  "method": true,
+  "cls": "ELFFile",
+  "anchorLF": "            if data[self._p_idx[0]] != 3:  # Not PT_INTERP.",
+  "replacement": "            if data[self._p_idx[0]] == 3:  # Not PT_INTERP.",
+  "calls": []
+ },
+ {
+  "file": "_manylinux.py",
+  "fn": "platform_tags",
+  "args": [
+   "archs"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": false,
+  "cls": null,
+  "anchorLF": "    if not _have_compatible_abi(sys.executable, archs):",
+  "replacement": "    if _have_compatible_abi(sys.executable, archs):",
+  "calls": [
+   "print(repr(m.platform_tags(0)))",
+   "print(repr(m.platform_tags(1)))",
+   "print(repr(m.platform_tags(\"1.0\")))",
+   "print(repr(m.platform_tags(\"foo\")))",
+   "print(repr(m.platform_tags(\"1.2.3\")))",
+   "print(repr(m.platform_tags([])))"
+  ]
+ },
+ {
+  "file": "_parser.py",
+  "fn": "_restore_value",
+  "args": [
+   "self",
+   "value"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "Node",
+  "anchorLF": "        if not isinstance(value, str):",
+  "replacement": "        if isinstance(value, str):",
+  "calls": []
+ },
+ {
+  "file": "_tokenizer.py",
+  "fn": "check",
+  "args": [
+   "self",
+   "name"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "Tokenizer",
+  "anchorLF": "        if not peek:",
+  "replacement": "        if peek:",
+  "calls": []
+ },
+ {
+  "file": "_tokenizer.py",
+  "fn": "expect",
+  "args": [
+   "self",
+   "name"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "Tokenizer",
+  "anchorLF": "        if not self.check(name):",
+  "replacement": "        if self.check(name):",
+  "calls": []
+ },
+ {
+  "file": "_tokenizer.py",
+  "fn": "enclosing_tokens",
+  "args": [
+   "self",
+   "open_token",
+   "close_token"
+  ],
+  "operator": "NEGATION_DROP",
+  "why": "a not removed from a condition",
+  "method": true,
+  "cls": "Tokenizer",
+  "anchorLF": "        if not self.check(close_token):",
+  "replacement": "        if self.check(close_token):",
+  "calls": []
+ }
+]

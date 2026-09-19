@@ -1,4 +1,5 @@
-.raw/
-.legasus/
 .validate/
 .admit/
+.raw/
+.legasus/
+__pycache__/
