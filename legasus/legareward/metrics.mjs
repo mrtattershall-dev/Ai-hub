@@ -18,15 +18,47 @@
 // correctness depends on a specific surrounding arrangement.
 const NL = String.fromCharCode(10);
 
+// EVERY DIMENSION DECLARES A CLASS, and the class decides what authority it carries.
+//
+//     BEHAVIORAL   measured by EXECUTION against a real deployment variation or an independently
+//                  justified objective. These, and only these, may establish a dominance that PROMOTES.
+//     DESCRIPTIVE  true statements about the source text. Informative, reportable, and NEVER sufficient
+//                  on their own to replace a champion.
+//     POLICY       domain- or house-specific preference. None yet, and it will need an owner when it
+//                  arrives, because a policy dimension is an opinion with a name on it.
+//
+// THE ADMISSIBILITY RULE, which is what demoted most of this vector:
+//
+//     A quality dimension is admissible as BEHAVIORAL only when the environmental variation it measures
+//     corresponds to a real deployment variation or an independently justified objective.
+//
+// `worstCaseTests` is DESCRIPTIVE, not behavioral, and saying so costs something I would rather have
+// claimed: it is a static count of comparisons, not a measured runtime. Calling it behavioral because it
+// sounds like performance is exactly the move this classification exists to prevent. It becomes
+// behavioral the day it is measured by execution, and not before.
+export const CLASS = { BEHAVIORAL: 'BEHAVIORAL', DESCRIPTIVE: 'DESCRIPTIVE', POLICY: 'POLICY' };
+
 export const DIMENSIONS = {
-  changedChars: { polarity: 'lower', why: 'smaller changed surface is easier to review and revert' },
-  branchPoints: { polarity: 'lower', why: 'each added connective is another path to be wrong on' },
-  distinctLiterals: { polarity: 'lower', why: 'more literals is more specification restated in code' },
-  duplicatedTerms: { polarity: 'lower', why: 'a repeated subexpression is a second place to fix' },
-  worstCaseTests: { polarity: 'lower', why: 'comparisons evaluated on the worst input, a runtime proxy' },
-  placementRobustness: { polarity: 'higher',
-    why: 'legal placements the candidate stays CORRECT under, measured by execution rather than taste' },
+  changedChars: { class: CLASS.DESCRIPTIVE, polarity: 'lower',
+    why: 'smaller changed surface is easier to review and revert' },
+  branchPoints: { class: CLASS.DESCRIPTIVE, polarity: 'lower',
+    why: 'each added connective is another path to be wrong on' },
+  distinctLiterals: { class: CLASS.DESCRIPTIVE, polarity: 'lower',
+    why: 'more literals is more specification restated in code' },
+  duplicatedTerms: { class: CLASS.DESCRIPTIVE, polarity: 'lower',
+    why: 'a repeated subexpression is a second place to fix' },
+  worstCaseTests: { class: CLASS.DESCRIPTIVE, polarity: 'lower',
+    why: 'comparisons counted in the source - a runtime PROXY, not a measured runtime' },
+  placementRobustness: { class: CLASS.BEHAVIORAL, polarity: 'higher',
+    why: 'insertion positions at which the WHOLE CONTRACT still holds, measured by execution. Calibrated'
+      + ' against the middle family, which measured 0.651 for a self-defending guard against 0.470 for a'
+      + ' plain one, and controlled so that excluding a value no behaviour claims buys nothing' },
 };
+
+export const behavioralDimensions = () =>
+  Object.keys(DIMENSIONS).filter((d) => DIMENSIONS[d].class === CLASS.BEHAVIORAL);
+export const descriptiveDimensions = () =>
+  Object.keys(DIMENSIONS).filter((d) => DIMENSIONS[d].class === CLASS.DESCRIPTIVE);
 
 // Everything below is computed from the candidate text and from execution. Nothing consults a canonical
 // spelling, because a metric that rewards resembling the canonical form is an oracle for syntax.

@@ -6,7 +6,7 @@
 // required answer is often NO PREFERENCE rather than a winner.
 import test from 'node:test';
 import assert from 'node:assert';
-import { measure, DIMENSIONS } from './metrics.mjs';
+import { measure, DIMENSIONS, CLASS, behavioralDimensions, descriptiveDimensions } from './metrics.mjs';
 import { compare, mayReplaceChampion, paretoFrontier, VERDICT } from './dominance.mjs';
 
 const cand = (code, opts = {}) => ({
@@ -115,16 +115,45 @@ test('CORRECTNESS IS A PRECONDITION, not a dimension', () => {
   assert.equal(paretoFrontier([correct, wrong]).length, 1, 'unverified candidates are not on it at all');
 });
 
-test('a protected dimension blocks replacement even when everything else improves', () => {
+test('THE PROMOTION RULE — descriptive gains alone may NOT take the champion', () => {
+  // This test previously asserted the opposite, and the rule change is the point. With behavioral
+  // dimensions equal, a shorter and simpler candidate improves only DESCRIPTIVE dimensions. Four of the
+  // preference probe's seven dominances were exactly this shape, and letting them promote would have
+  // given a preference for a representation authority over the repository.
   const champion = cand('n < 10 and n != 3', { legal: 4, correct: 4 });
   const leaner = cand('n < 10', { legal: 4, correct: 4 });
-  // With equal robustness the leaner one genuinely dominates.
-  assert.equal(mayReplaceChampion(leaner, champion).replace, true);
-  // Drop its robustness and the protection must stop it, even though it is shorter and simpler.
-  const leanerFragile = cand('n < 10', { legal: 4, correct: 2 });
-  const m = mayReplaceChampion(leanerFragile, champion, { protectedDims: ['placementRobustness'] });
+  const m = mayReplaceChampion(leaner, champion);
+  assert.equal(m.replace, false, 'shorter is not grounds for promotion when nothing measured improved');
+  assert.equal(m.verdict, VERDICT.NO_PREFERENCE);
+  assert.equal(m.behavioralVerdict, VERDICT.EQUIVALENT);
+  // The descriptive view still SAYS the leaner one is smaller - it is reported, just not authoritative.
+  assert.equal(m.descriptiveVerdict, VERDICT.DOMINATES);
+});
+
+test('a protected dimension blocks replacement even when behavioral dimensions improve', () => {
+  const champion = cand('n < 10 and n != 3', { legal: 4, correct: 2 });
+  const fitter = cand('n < 10', { legal: 4, correct: 4 });
+  // It genuinely improves the behavioral dimension, so without protection it may promote.
+  assert.equal(mayReplaceChampion(fitter, champion).replace, true);
+  // Protecting that same dimension against being worsened does not block an improvement to it.
+  assert.equal(mayReplaceChampion(fitter, champion,
+    { protectedDims: ['placementRobustness'] }).replace, true);
+  // But a candidate that trades it away is stopped.
+  const fragile = cand('n < 10', { legal: 4, correct: 1 });
+  const m = mayReplaceChampion(fragile, champion, { protectedDims: ['placementRobustness'] });
   assert.equal(m.replace, false);
   assert.equal(m.verdict, VERDICT.NO_PREFERENCE);
+});
+
+test('only BEHAVIORAL dimensions may promote, and the classification is explicit', () => {
+  // A dimension is behavioral because its variation was measured against reality, not because it sounds
+  // like performance. worstCaseTests is a static count and is classified descriptive for that reason.
+  assert.deepEqual(behavioralDimensions(), ['placementRobustness']);
+  assert.ok(descriptiveDimensions().includes('worstCaseTests'),
+    'a runtime PROXY is descriptive until it is measured by execution');
+  for (const [name, d] of Object.entries(DIMENSIONS)) {
+    assert.ok(Object.values(CLASS).includes(d.class), name + ' must declare a class');
+  }
 });
 
 test('every dimension declares a polarity, or it is a preference smuggled in as a measurement', () => {

@@ -21,7 +21,7 @@
 // CORRECTNESS IS A PRECONDITION, NOT A DIMENSION. An incorrect candidate is not a worse point on the
 // frontier; it is not on the frontier at all. This module refuses to compare anything PROVE has not
 // already admitted.
-import { DIMENSIONS } from './metrics.mjs';
+import { DIMENSIONS, behavioralDimensions } from './metrics.mjs';
 
 export const VERDICT = {
   DOMINATES: 'DOMINATES',
@@ -68,25 +68,52 @@ export function compare(a, b, { dimensions = Object.keys(DIMENSIONS), protectedD
       + '. Ranking these would be taste presented as measurement' };
 }
 
-// May `candidate` replace `champion`? Deliberately conservative, and NO PREFERENCE means NO REPLACEMENT.
+// May `candidate` replace `champion`?
+//
+// THE PROMOTION RULE, and its whole point is to give NO PREFERENCE teeth instead of leaving it a
+// ceremonial option:
+//
+//     passes PROVE                                          precondition, checked by `compare`
+//     strictly improves a BEHAVIORAL dimension,
+//         worsens no behavioral dimension                   -> may replace
+//     only DESCRIPTIVE dimensions differ                    -> NO PREFERENCE
+//     behavioral objectives trade off                       -> NO PREFERENCE, retain both
+//
+// The preference probe is what forced this. Four of its seven dominances vanished once the two
+// spelling-sensitive dimensions were removed, which means most of the apparent quality signal was
+// "I like this representation better" - not something that should be able to take repository authority.
+// Descriptive dimensions stay measured and reported; they simply cannot promote on their own.
 export function mayReplaceChampion(candidate, champion, opts = {}) {
   const protectedDims = opts.protectedDims || [];
-  const r = compare(candidate, champion, opts);
-  if (r.verdict === VERDICT.DOMINATES) {
-    const harmed = protectedDims.filter((d) => {
-      const x = candidate.metrics[d]; const y = champion.metrics[d];
-      return x !== undefined && y !== undefined && x !== y && !better(d, x, y);
-    });
-    if (harmed.length) {
-      return { replace: false, verdict: r.verdict, harmed,
-        why: 'it improves other dimensions but worsens protected ' + harmed.join(', ') };
-    }
-    return { replace: true, verdict: r.verdict, why: r.why };
+  const behavioral = opts.behavioral || behavioralDimensions();
+  const full = compare(candidate, champion, opts);
+  if (full.verdict === VERDICT.INCOMPARABLE) {
+    return { replace: false, verdict: full.verdict, why: full.why };
   }
-  return { replace: false, verdict: r.verdict,
-    why: r.verdict === VERDICT.NO_PREFERENCE
-      ? 'no preference is establishable, so the champion stands and BOTH are retained'
-      : r.why };
+
+  // Promotion is decided on BEHAVIORAL dimensions alone.
+  const b = compare(candidate, champion, { ...opts, dimensions: behavioral });
+  if (b.verdict !== VERDICT.DOMINATES) {
+    const why = b.verdict === VERDICT.EQUIVALENT
+      ? 'the behavioral dimensions are identical; only descriptive ones differ, and a preference for a'
+        + ' representation is not grounds to take the champion'
+      : b.verdict === VERDICT.NO_PREFERENCE
+        ? 'the behavioral objectives trade off, so both are retained'
+        : 'it does not improve any behavioral dimension';
+    return { replace: false, verdict: VERDICT.NO_PREFERENCE, behavioralVerdict: b.verdict,
+      descriptiveVerdict: full.verdict, why };
+  }
+
+  const harmed = protectedDims.filter((d) => {
+    const x = candidate.metrics[d]; const y = champion.metrics[d];
+    return x !== undefined && y !== undefined && x !== y && !better(d, x, y);
+  });
+  if (harmed.length) {
+    return { replace: false, verdict: VERDICT.NO_PREFERENCE, harmed,
+      why: 'it improves behavioral dimensions but worsens protected ' + harmed.join(', ') };
+  }
+  return { replace: true, verdict: VERDICT.DOMINATES, behavioralVerdict: b.verdict,
+    improves: b.improves, why: b.why };
 }
 
 // The set of candidates nothing else dominates. Keeping a frontier rather than a winner is the whole
