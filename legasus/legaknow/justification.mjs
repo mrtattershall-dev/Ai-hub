@@ -68,7 +68,11 @@ export const VALIDITY = {
 // established for all values - which is almost never, and never by default.
 export const ANY = Symbol('ANY');
 
-export const DIMENSIONS = ['repository', 'environment', 'invocation', 'implementation'];
+// HISTORY was forced by the doctest experiment. An example that runs after two others is not an
+// assertion about the source alone: it is an assertion about SOURCE x EXECUTION HISTORY. Two systems
+// evaluating "the same example" under different histories are evaluating DIFFERENT SUBJECTS, and must be
+// refused a comparison rather than scored as disagreeing.
+export const DIMENSIONS = ['repository', 'environment', 'invocation', 'implementation', 'history'];
 
 export function scope(partial = {}) {
   const s = {};
