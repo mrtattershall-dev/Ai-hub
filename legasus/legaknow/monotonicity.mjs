@@ -128,3 +128,45 @@ export const ERASURES = {
   DROP_CRITERION: 'compare results judged under different criteria',
   UNKNOWN_TO_ZERO: 'treat a missing measurement as a measured zero',
 };
+
+// THE ADAPTER LAW — the mirror of law 1, and the one an external integration breaks first.
+//
+//     ADAPTERS MAY PRESERVE OR DISCARD DISTINCTIONS. THEY MAY NOT INVENT EVIDENTIAL DISTINCTIONS
+//     UNSUPPORTED BY THEIR SOURCE.
+//
+// An external system may expose only PASS / FAIL / ERROR while reality contains: the test never ran,
+// collection failed, a fixture failed, the subject crashed, an assertion failed, the observer crashed,
+// zero failures were observed. If its ERROR does not reveal whether the producer or the subject failed,
+// the adapter must yield UNATTRIBUTABLE - not its best guess. A best guess would mean Legasus GAINED
+// information during translation, which is law 1 running backwards.
+//
+// Two source states that the source itself cannot tell apart must not grant different permissions after
+// adaptation. This is illegalCompression with the quantifier flipped.
+export function illegalRefinement({ states, adapt, consumers }) {
+  const groups = new Map();
+  for (const s of states) {
+    const k = JSON.stringify(s.source);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(s);
+  }
+  const violations = [];
+  for (const [k, members] of groups) {
+    if (members.length < 2) continue;
+    for (let i = 0; i < members.length; i++) {
+      for (let j = i + 1; j < members.length; j++) {
+        const a = permissionsOf(adapt(members[i]), consumers);
+        const b = permissionsOf(adapt(members[j]), consumers);
+        for (let c = 0; c < consumers.length; c++) {
+          if (a[c].granted !== b[c].granted) {
+            violations.push({ source: k, a: members[i].name, b: members[j].name,
+              consumer: consumers[c].name,
+              why: 'the source reports ' + k + ' for both ' + members[i].name + ' and ' + members[j].name
+                + ', but the adapter grants different permission for ' + consumers[c].name
+                + '. The adapter INVENTED a distinction its source does not support.' });
+          }
+        }
+      }
+    }
+  }
+  return { ok: violations.length === 0, violations };
+}
