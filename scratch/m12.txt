@@ -1,0 +1,37 @@
+r4: concurrency envelope is PARALLEL_SAFE by PROCESS ISOLATION, with one attack recorded as vacuous
+
+Predictions frozen before the run, including my own prior. Overlap was WITNESSED rather than assumed -
+A saw B entered, B saw A entered, distinct pids - and without that mutual witness the outcome would have
+been OVERLAP_NOT_ESTABLISHED, which is not a pass.
+
+  PROTOCOL INTEGRITY      HELD   both subjects forging the other protocol WHILE overlapping
+  ATTRIBUTION             HELD   A bytes never appear in B record, or the reverse
+  NON-INTERFERENCE        HELD   hostile A cannot change B verdict (solo 42, concurrent 42)
+  POST-FAILURE ISOLATION  HELD   a crashing subject that closed fd 1 did not contaminate the next run
+
+VERDICT: PARALLEL_SAFE, and the REASON matters more than the verdict. Each observation receives its own
+process, so descriptor state is per-child and the subject causal authority over fd 1 never reaches
+another observation. THE ISOLATION UNIT IS THE PROCESS, NOT THE CALL - the OS boundary and the evidence
+boundary coincide, so the unit of isolation matches the unit of authority. No mutex is needed, and a
+mutex would not have helped if they had not coincided: it schedules access to a shared resource rather
+than repairing a trust-boundary mismatch.
+
+ONE ATTACK WAS VACUOUS AND IS RECORDED AS UNTESTED. The fork-with-inherited-descriptors attack was
+guarded by hasattr(os, "fork"), which is False on win32, so it silently skipped and proves nothing. The
+envelope EXCLUDES it.
+
+SCOPE: win32, CPython 3.13, cooperative-but-noisy threat model, one OS process per observation. Untested:
+POSIX fork and descriptor inheritance, concurrent observation from multiple host processes, descriptor
+exhaustion.
+
+The synchronous runIsolated cannot overlap at all; an async runner was added for the experiment because
+"cannot be tested" must never be recorded as "is safe". The serialization is incidental; the safety is
+process isolation.
+
+MY PRIOR WAS CORRECT AND THAT IS THE LEAST INTERESTING PART. The value is that the witness was strict
+enough to make a false prediction visible, three of four attacks genuinely executed, and the fourth was
+caught as vacuous rather than counted.
+
+Message-File: scratch/m12.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

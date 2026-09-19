@@ -277,3 +277,37 @@ Both are r4 work. Neither may be repaired in r3.
     NEXT OBJECTIVE comes from the ledger, not from another pyparsing discrepancy.
 
 ---
+## Entry 7 — r4: concurrency envelope
+
+    objective    establish the concurrency envelope of V1 isolation - the only open ledger item that
+                 threatens the authority of NEW r4 evidence
+    authority    delegated r4 development surface
+    start hash   c570437 (predictions frozen there, including my own prior)
+
+    OVERLAP WITNESSED, not assumed: A saw B entered, B saw A entered, distinct pids.
+
+    PROTOCOL INTEGRITY      HELD
+    ATTRIBUTION             HELD
+    NON-INTERFERENCE        HELD    solo 42, concurrent-with-hostile-A 42
+    POST-FAILURE ISOLATION  HELD
+
+    VERDICT  PARALLEL_SAFE because of PROCESS ISOLATION. THE ISOLATION UNIT IS THE PROCESS, NOT THE CALL.
+             The OS boundary and the evidence boundary coincide, so the unit of isolation matches the
+             unit of authority. No mutex needed - and a mutex would not have helped otherwise, since it
+             schedules access to a shared resource rather than repairing a trust-boundary mismatch.
+
+    ONE ATTACK WAS VACUOUS AND IS RECORDED AS UNTESTED. The fork/inherited-descriptor attack was guarded
+    by hasattr(os, "fork"), which is False on win32, so it silently skipped. The envelope EXCLUDES it.
+
+    SCOPE  win32, CPython 3.13, cooperative-but-noisy threat model, one OS process per observation.
+           Untested: POSIX fork and descriptor inheritance, concurrent observation from multiple host
+           processes, descriptor exhaustion.
+
+    The synchronous runIsolated cannot overlap at all; an async runner was added for the experiment
+    because "cannot be tested" must never be recorded as "is safe". The serialization is incidental; the
+    safety is process isolation.
+
+    next         ledger is clear of items that threaten new r4 evidence. Remaining open: retire or repair
+                 the replay path (2/5 naming), which is now a RETIREMENT candidate.
+
+---

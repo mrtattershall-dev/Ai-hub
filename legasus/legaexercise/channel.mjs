@@ -31,7 +31,7 @@
 // look exactly like the protocol, but is not assumed to hunt for and write to the observer's private
 // file. Defending against that is a different and larger problem, and pretending otherwise would be
 // claiming more than this buys.
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { readFileSync, rmSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -92,4 +92,34 @@ export function runIsolated({ body, args = [], cwd, timeoutMs = 60000, env = {} 
     subjectOut, subjectErr,
     subjectBytes: subjectOut.length + subjectErr.length,
   };
+}
+
+// ASYNC variant, added for the concurrency experiment. Genuine overlap is impossible to test through a
+// synchronous API, and "cannot be tested" must not be mistaken for "is safe".
+export function runIsolatedAsync({ body, args = [], cwd, timeoutMs = 60000, env = {} }) {
+  const dir = mkdtempSync(join(tmpdir(), 'chan-'));
+  const proto = join(dir, 'protocol.json');
+  const out = join(dir, 'subject.out');
+  const err = join(dir, 'subject.err');
+  const prog = ISOLATE_SRC + String.fromCharCode(10) + body;
+  return new Promise((resolve) => {
+    const child = spawn('python', ['-c', prog, ...args], {
+      cwd, stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, ...env, PYTHONDONTWRITEBYTECODE: '1',
+        LEGASUS_PROTOCOL: proto, LEGASUS_SUBJECT_OUT: out, LEGASUS_SUBJECT_ERR: err },
+    });
+    const timer = setTimeout(() => { try { child.kill(); } catch (e) { /* */ } }, timeoutMs);
+    child.on('close', () => {
+      clearTimeout(timer);
+      let protocol = null; let parseError = null;
+      try { protocol = JSON.parse(readFileSync(proto, 'utf8')); } catch (e) {
+        parseError = String(e.message).slice(0, 120);
+      }
+      const readOr = (p) => { try { return readFileSync(p, 'utf8'); } catch (e) { return ''; } };
+      const subjectOut = readOr(out); const subjectErr = readOr(err);
+      rmSync(dir, { recursive: true, force: true });
+      resolve({ protocol, parseError, subjectOut, subjectErr,
+        subjectBytes: subjectOut.length + subjectErr.length, pid: child.pid });
+    });
+  });
 }
