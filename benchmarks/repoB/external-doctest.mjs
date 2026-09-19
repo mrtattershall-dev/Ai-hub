@@ -77,7 +77,7 @@ const runDoctest = (rootDir, modules) => {
 // using my own `assertionHeld` semantics, reimplemented here in Python so both sides see the same
 // execution and differ only in COMPARISON RULES - which is the thing under test.
 const MINE = [
-  'import importlib, json, sys, traceback',
+  'import importlib, json, sys, traceback, io, contextlib',
   'sys.path.insert(0, sys.argv[1])',
   'pkg = sys.argv[2]',
   'rows = json.loads(open(sys.argv[3], encoding="utf-8").read())',
@@ -93,7 +93,9 @@ const MINE = [
   '        out.append({"module": r["module"], "source": r["invocation"], "outcome": "IMPORT_FAILED"})',
   '        continue',
   '    status = "OK"; value = None',
+  '    sink = io.StringIO()',
   '    try:',
+  '      with contextlib.redirect_stdout(sink):',
   '        for line in r["setup"]:',
   '            exec(line, ns)',
   '        try:',
@@ -101,6 +103,7 @@ const MINE = [
   '        except SyntaxError:',
   '            exec(compile(r["invocation"], "<x>", "exec"), ns)',
   '            value = None',
+  '        printed = sink.getvalue()',
   '    except Exception as e:',
   '        status = "RAISED:" + type(e).__name__',
   '    wants = (r.get("wants") or "").strip()',
@@ -113,7 +116,8 @@ const MINE = [
   '        outcome = "UNEXPECTED_EXCEPTION"',
   '    else:',
   '        outcome = "PASS" if str(value) == wants else "OUTPUT_MISMATCH"',
-  '    out.append({"module": r["module"], "source": r["invocation"], "outcome": outcome})',
+  '    out.append({"module": r["module"], "source": r["invocation"], "outcome": outcome,',
+  '                "printed": bool(sink.getvalue())})',
   'print(json.dumps(out))',
 ].join(NL);
 
@@ -137,6 +141,18 @@ const failSet = (list) => new Set((list || [])
   .filter((x) => x.outcome === 'OUTPUT_MISMATCH' || x.outcome === 'UNEXPECTED_EXCEPTION')
   .map((x) => x.module + '|' + String(x.source).trim()));
 const eqSet = (a, b) => a.size === b.size && [...a].every((x) => b.has(x));
+
+// UNOBSERVABLE IS NEVER AN ADMISSION - a law this project already enforces in legaverify, and which the
+// FIRST version of this very harness broke: `runMine` threw, returned null, and failSet(null) scored it
+// as ZERO FAILURES. X1/X2/X2b run 0 were invalid for that reason and are recorded as such.
+const mustObserve = (r, what) => {
+  if (r === null || r === undefined) {
+    console.error('REFUSING TO SCORE: ' + what + ' could not be observed. A harness that cannot run has'
+      + ' NOT reported a clean result.');
+    process.exit(2);
+  }
+  return r;
+};
 
 // REASON TOPOLOGY, not merely accept/reject. Agreeing that an example failed while disagreeing about
 // WHY is not reproduction. CPython distinguishes an output mismatch from an unexpected exception, and so
@@ -162,8 +178,8 @@ const kindAgreement = (a, b) => {
 };
 
 // ---- X1 control, on the pristine corpus
-const d0 = runDoctest(ROOT, MODULES);
-const m0 = runMine(ROOT, rowsFile);
+const d0 = mustObserve(runDoctest(ROOT, MODULES), 'CPython doctest on the pristine corpus');
+const m0 = mustObserve(runMine(ROOT, rowsFile), 'my classifier on the pristine corpus');
 const dF0 = failSet(d0); const mF0 = failSet(m0);
 console.log('X1 CONTROL on the pristine corpus');
 console.log('   CPython doctest failures : ' + dF0.size);
@@ -195,8 +211,8 @@ for (const c of candidates) {
     expectParses: true });
   if (!m.ok) { rmSync(dir, { recursive: true, force: true }); continue; }
   applied++;
-  const d = runDoctest(dir, MODULES);
-  const mine = runMine(dir, rowsFile);
+  const d = mustObserve(runDoctest(dir, MODULES), 'doctest under mutation ' + c.fn);
+  const mine = mustObserve(runMine(dir, rowsFile), 'my classifier under mutation ' + c.fn);
   const dF = failSet(d); const mF = failSet(mine);
   varied.add([...dF].sort().join('~'));
   const ka = kindAgreement(d, mine);
