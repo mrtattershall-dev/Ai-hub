@@ -58,12 +58,15 @@ function deepInterior(hi) {
 // This is hazard 3c in the ledger, which was recorded as "caught before use". It has now been used.
 // Both the normalization and the audit below exist because a weaker probe set must never be a silent
 // outcome - the whole point of this module is that a wrong realization has nowhere to hide.
-export function normalizeDomain(d) {
-  if (!d || d.kind !== 'interval') return d;
-  const lo = d.lo === null || d.lo === undefined ? -Infinity : d.lo;
-  const hi = d.hi === null || d.hi === undefined ? Infinity : d.hi;
-  return { ...d, lo, hi };
-}
+// IMPORTED, not reimplemented. Both of these used to exist here as well as in legacore, kept in
+// agreement by discipline - and the `set` kind broke that agreement the moment it existed. There is one
+// implementation now, in the module that defines the domain model. Re-exported so callers are unchanged.
+// Imported AND re-exported: `export ... from` alone would re-export the names without binding them in
+// this module, and every internal use below would be undefined. That was caught by 18 failing tests
+// rather than by reading, which is the point of running them.
+import { normalizeDomain, containsPoint } from '../legacore/predicates.mjs';
+
+export { normalizeDomain, containsPoint };
 
 // Does this probe set actually interrogate the ends the contract left open? An unbounded end with no
 // probe far into it is a probe set that cannot see an invented bound, and returning one quietly is the
@@ -71,6 +74,19 @@ export function normalizeDomain(d) {
 export function auditProbeSet(requested, values) {
   const d = normalizeDomain(requested);
   const problems = [];
+  // A SET's analogue of the unbounded end. Every member must be probed, and so must a NON-member next
+  // to one, or a guard that widened the set into a range passes every probe it was given.
+  if (d && d.kind === 'set') {
+    for (const v of d.values) {
+      if (!values.includes(v)) problems.push('set member ' + v + ' is never probed');
+    }
+    const nonMember = values.some((v) => !d.values.includes(v)
+      && d.values.some((m) => Math.abs(m - v) === 1));
+    if (!nonMember) {
+      problems.push('no probe sits immediately beside a member, so a guard that widened the set into a'
+        + ' range would pass every probe');
+    }
+  }
   if (d && d.kind === 'interval') {
     if (d.lo === -Infinity && d.hi !== Infinity) {
       if (!values.some((v) => v <= d.hi - 100)) problems.push('unbounded below, but no probe 100 or more beneath the upper bound');
@@ -80,22 +96,6 @@ export function auditProbeSet(requested, values) {
     }
   }
   return problems;
-}
-
-export function containsPoint(domain, v) {
-  domain = normalizeDomain(domain);
-  if (!domain) return false;
-  switch (domain.kind) {
-    case 'point': return v === domain.value;
-    case 'complement_point': return v !== domain.value;
-    case 'universe': return true;
-    case 'interval': {
-      const okLo = domain.lo === -Infinity || (domain.loOpen ? v > domain.lo : v >= domain.lo);
-      const okHi = domain.hi === Infinity || (domain.hiOpen ? v < domain.hi : v <= domain.hi);
-      return okLo && okHi;
-    }
-    default: return false;
-  }
 }
 
 // The probe VALUES, derived only from the shape of the contract.
@@ -118,6 +118,12 @@ export function probeValues({ requested, existing = [] }) {
       triple(requested.value).forEach(add);
     } else if (requested.kind === 'complement_point') {
       triple(requested.value).forEach(add);
+    } else if (requested.kind === 'set') {
+      // Every member AND each member's neighbours. The neighbours are the whole point: a set is not an
+      // interval, so a guard that widened `n in (1, 5, 9)` into `1 <= n <= 9` answers correctly on all
+      // three members and wrongly at 2, 6 and 8. Probing only the members cannot see that, and it is
+      // the exact analogue of probing only a bound and missing an invented one.
+      for (const v of requested.values) triple(v).forEach(add);
     }
   }
 
@@ -130,6 +136,8 @@ export function probeValues({ requested, existing = [] }) {
     else if (d.kind === 'interval') {
       if (d.lo !== -Infinity) triple(d.lo).forEach(add);
       if (d.hi !== Infinity) triple(d.hi).forEach(add);
+    } else if (d.kind === 'set') {
+      for (const v of d.values) triple(v).forEach(add);
     }
   }
   const out = [...vs].sort((a, b) => a - b);

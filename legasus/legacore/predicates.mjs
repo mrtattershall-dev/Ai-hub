@@ -20,11 +20,75 @@
 // instead of inventing a domain.
 const NL = String.fromCharCode(10);
 
+// THE CANONICAL MEMBERSHIP PREDICATE LIVES HERE, with the domain model that defines it.
+//
+// It used to exist twice - once in `legacore/ordering.mjs` and once in `legaverify/probes.mjs` - kept in
+// agreement by discipline. Adding the `set` kind exposed that immediately: the ordering copy returned
+// false for every set, so `DECIDE` would have called every pair of sets DISJOINT and cheerfully derived
+// no precedence at all, while `PROVE` scored them correctly. Silent disagreement between two stages
+// about what a domain MEANS is the worst shape of defect this project has.
+//
+// That is hazard 9's permanent rule, which this file now obeys rather than restates:
+//
+//     any artifact compared across components has exactly ONE canonical implementation.
+//
+// `ordering.mjs` and `probes.mjs` both import this one and re-export it, and a test asserts they are
+// the same function object rather than merely agreeing today.
+export function normalizeDomain(d) {
+  if (!d || d.kind !== 'interval') return d;
+  const lo = d.lo === null || d.lo === undefined ? -Infinity : d.lo;
+  const hi = d.hi === null || d.hi === undefined ? Infinity : d.hi;
+  return { ...d, lo, hi };
+}
+
+export function containsPoint(domain, v) {
+  const d = normalizeDomain(domain);
+  if (!d) return false;
+  switch (d.kind) {
+    case 'point': return v === d.value;
+    case 'complement_point': return v !== d.value;
+    case 'universe': return true;
+    case 'interval': {
+      const okLo = d.lo === -Infinity || (d.loOpen ? v > d.lo : v >= d.lo);
+      const okHi = d.hi === Infinity || (d.hiOpen ? v < d.hi : v <= d.hi);
+      return okLo && okHi;
+    }
+    case 'set': return d.values.includes(v);
+    default: return false;
+  }
+}
+
 // ---- numeric domains over a single variable.
 // { kind: 'interval', lo, hi, loOpen, hiOpen } with -Infinity/Infinity for unbounded ends,
-// { kind: 'point', value }, { kind: 'universe' }, or { kind: 'unmodelled', text }.
+// { kind: 'point', value }, { kind: 'set', values }, { kind: 'universe' }, or
+// { kind: 'unmodelled', text }.
+// Strip ONE wrapping pair of parentheses, and only when they are actually a matched pair around the
+// whole expression.
+//
+// The previous version stripped a leading `(` or a trailing `)` independently, which was harmless while
+// every condition was a bare comparison and became a silent defect the moment `n in (1, 5, 9)` existed:
+// the trailing paren was removed, the membership pattern no longer matched, and the domain came back
+// `unmodelled` instead of a set. It would also have mangled `(a) and (b)` into `a) and (b`.
+function stripWrappingParens(s) {
+  let t = s;
+  for (;;) {
+    if (!(t.startsWith('(') && t.endsWith(')'))) return t;
+    let depth = 0;
+    for (let i = 0; i < t.length; i++) {
+      if (t[i] === '(') depth++;
+      else if (t[i] === ')') {
+        depth--;
+        // The opening paren closed before the end, so the outer pair is not a wrapper.
+        if (depth === 0 && i !== t.length - 1) return t;
+      }
+    }
+    if (depth !== 0) return t;
+    t = t.slice(1, -1).trim();
+  }
+}
+
 export function parseCondition(text) {
-  const t = String(text || '').trim().replace(/^\(|\)$/g, '').trim();
+  const t = stripWrappingParens(String(text || '').trim());
   if (!t) return { kind: 'unmodelled', text: String(text || '') };
 
   let m = t.match(/^([A-Za-z_]\w*)\s*==\s*(-?\d+(?:\.\d+)?)$/);
@@ -41,6 +105,30 @@ export function parseCondition(text) {
 
   m = t.match(/^([A-Za-z_]\w*)\s*!=\s*(-?\d+(?:\.\d+)?)$/);
   if (m) return { kind: 'complement_point', variable: m[1], value: Number(m[2]) };
+
+  // ---- SET MEMBERSHIP, and it is here because every claim in this program so far rests on integer
+  // INTERVALS over one function shape. Intervals make containment easy and make one relation
+  // unreachable: two intervals that overlap without nesting are rare in a specification, and prefixes
+  // or ranges cannot express "shares some values with you but neither contains the other" naturally.
+  //
+  // Finite sets can express all three relations, which is what makes them the right second domain kind:
+  //
+  //     {1,3,5} vs {3,5}     CONTAINMENT, and the subset must win where they overlap
+  //     {1,3}   vs {5,7}     DISJOINT, so any order is legal
+  //     {1,3}   vs {3,5}     INTERSECTING WITHOUT CONTAINMENT - the UNDETERMINED case, which the
+  //                          architecture must REFUSE rather than order arbitrarily
+  //
+  // A set is also not an interval in disguise: {1, 5, 9} has no lo/hi that describes it, so anything
+  // downstream that secretly assumed bounds will break here rather than quietly agree.
+  m = t.match(/^([A-Za-z_]\w*)\s+in\s*[([{]([^)\]}]*)[)\]}]$/);
+  if (m) {
+    const raw = m[2].split(',').map((x) => x.trim()).filter((x) => x.length);
+    if (raw.length && raw.every((x) => /^-?\d+(?:\.\d+)?$/.test(x))) {
+      // Sorted and de-duplicated, so two spellings of the same set are the same domain.
+      const values = [...new Set(raw.map(Number))].sort((x, y) => x - y);
+      return { kind: 'set', variable: m[1], values };
+    }
+  }
 
   return { kind: 'unmodelled', text: t };
 }
@@ -93,6 +181,10 @@ const COND_FORMS = [
   [/\b([a-z_]\w*)\s*(?:is\s+)?(?:less than)\s+(-?\d+)/i, (m) => m[1] + ' < ' + m[2]],
   [/\b([a-z_]\w*)\s*(?:is\s+)?(?:equal to|exactly)\s+(-?\d+)/i, (m) => m[1] + ' == ' + m[2]],
   [/\b([a-z_]\w*)\s*(<=|>=|<|>|==)\s*(-?\d+)/, (m) => m[1] + ' ' + m[2] + ' ' + m[3]],
+  // Set membership in prose: "for the values 1, 3 and 5" / "n is one of 1, 3, 5".
+  [/\b([a-z_]\w*)\s*(?:is\s+)?(?:one of|among|in)\s+((?:-?\d+)(?:\s*(?:,|and|or)\s*-?\d+)+)/i,
+    (m) => m[1] + ' in (' + m[2].split(/\s*(?:,|and|or)\s*/).map((x) => x.trim())
+      .filter((x) => x.length).join(', ') + ')'],
 ];
 
 // A specification usually names the quantity generically - "values below 10" - rather than by the

@@ -20,28 +20,51 @@
 //
 // It also must not order DISJOINT behaviours. They cannot shadow each other, so both orders are legal
 // and picking one would be an ENGINEERING CHOICE presented as a derivation.
-import { NL } from './predicates.mjs';
+// The membership predicate is IMPORTED, not reimplemented. This file used to carry its own copy, and it
+// silently returned false for every `set` domain the moment that kind existed - which would have made
+// DECIDE call every pair of sets DISJOINT while PROVE judged them correctly. Re-exported so existing
+// callers keep working, but there is only one implementation.
+import { NL, containsPoint } from './predicates.mjs';
 
 const isInterval = (d) => d && d.kind === 'interval';
 const lo = (d) => (d.lo === null || d.lo === undefined ? -Infinity : d.lo);
 const hi = (d) => (d.hi === null || d.hi === undefined ? Infinity : d.hi);
 
-export function containsPoint(d, v) {
-  if (!d) return false;
-  if (d.kind === 'point') return v === d.value;
-  if (d.kind === 'complement_point') return v !== d.value;
-  if (d.kind === 'universe') return true;
-  if (!isInterval(d)) return false;
-  const okLo = lo(d) === -Infinity || (d.loOpen ? v > lo(d) : v >= lo(d));
-  const okHi = hi(d) === Infinity || (d.hiOpen ? v < hi(d) : v <= hi(d));
-  return okLo && okHi;
-}
+export { containsPoint };
 
 // Does `outer` contain every point of `inner`, and strictly more? Decided on the bounds, then WITNESSED
 // on actual values, because a containment claim that no example supports is the kind of derivation this
 // project refuses to ship.
 export function strictlyContains(outer, inner) {
   if (!outer || !inner) return null;
+  // SETS. Strict containment is PROPER SUBSET, and the witnesses are real members rather than bounds:
+  // one value inside both, and one inside the outer but not the inner. A set has no lo/hi, so nothing
+  // here can fall back on interval reasoning - which is the point of having a second domain kind.
+  if (outer.kind === 'set' || inner.kind === 'set') {
+    if (outer.kind !== 'set') {
+      // An interval or point can strictly contain a set: it holds every member, and holds something the
+      // set does not.
+      if (!inner.values || !inner.values.every((v) => containsPoint(outer, v))) return null;
+      const near = [];
+      for (const m of inner.values) near.push(m + 1, m - 1);
+      const outsideInner = near.find((v) => containsPoint(outer, v) && !containsPoint(inner, v));
+      if (outsideInner === undefined) return null;
+      return { inside: inner.values[0], outsideInner };
+    }
+    if (inner.kind !== 'set') {
+      // A finite set cannot strictly contain an interval, and contains a point only when the point is a
+      // member and the set has another member.
+      if (inner.kind !== 'point') return null;
+      if (!outer.values.includes(inner.value)) return null;
+      const other = outer.values.find((v) => v !== inner.value);
+      return other === undefined ? null : { inside: inner.value, outsideInner: other };
+    }
+    if (!inner.values.every((v) => outer.values.includes(v))) return null;
+    const outsideInner = outer.values.find((v) => !inner.values.includes(v));
+    // Equal sets are containment but not STRICT containment, so there is no precedence to derive.
+    if (outsideInner === undefined) return null;
+    return { inside: inner.values[0], outsideInner };
+  }
   if (inner.kind === 'point') {
     if (!containsPoint(outer, inner.value)) return null;
     // A point is strictly inside anything that also holds some other value.
