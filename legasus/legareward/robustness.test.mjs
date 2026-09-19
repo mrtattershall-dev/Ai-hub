@@ -10,7 +10,7 @@
 // Revision 1 called those equal and then demoted the self-defending guard. Revision 2 must not.
 import test from 'node:test';
 import assert from 'node:assert';
-import { placementRobustness, insertionPositions } from './robustness.mjs';
+import { placementRobustness, insertionPositions, hostLegalPositions } from './robustness.mjs';
 
 const NL = String.fromCharCode(10);
 
@@ -94,6 +94,32 @@ test('a WRONG realization is not rescued by being placed well', () => {
   // every position rather than well at one.
   const wrong = score('n < 5');
   assert.equal(wrong.correct, 0, 'the wrong domain must not verify anywhere: ' + JSON.stringify(wrong.detail));
+});
+
+test('THE DENOMINATOR IS CANDIDATE-INDEPENDENT — fitting in fewer places must not raise the score', () => {
+  // The trap this pins: if legality were decided per candidate, one that parses at fewer positions would
+  // shrink its own denominator and score HIGHER for being compatible with less. That is the opposite of
+  // robustness and the exact shape of every accidental oracle here.
+  const a = score('n < 10 and n != 3');
+  const b = score('n < 10');
+  const c = score('n < 10 and n != 999');
+  assert.equal(a.legal, b.legal, 'every candidate is answerable for the same host positions');
+  assert.equal(b.legal, c.legal);
+  assert.ok(a.legal > 0);
+  // The legal set is the host's, so it is reproducible without reference to any candidate.
+  assert.equal(hostLegalPositions(SRC, INPUTS).length, a.legal);
+});
+
+test('a candidate that FAILS TO COMPILE at a legal position is charged for it', () => {
+  // A guard whose own text breaks at a position the host accepts is a candidate failure, counted in the
+  // denominator and not correct - not an excused absence.
+  const broken = placementRobustness({ srcLines: SRC,
+    guardLines: ['    if n < 10:', '    return "tiny"'],   // body not indented: parses nowhere
+    inputs: INPUTS, expected: EXPECTED });
+  assert.equal(broken.correct, 0);
+  assert.ok(broken.legal > 0, 'the host positions still exist');
+  assert.equal(broken.candidateFailures, broken.legal, 'and the candidate is charged at every one');
+  assert.equal(broken.fraction, 0, 'it must not score 0/0 = undefined or be silently excused');
 });
 
 test('the ground truth comes from the CONTRACT, never from the candidate', () => {

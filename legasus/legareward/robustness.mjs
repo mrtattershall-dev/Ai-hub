@@ -81,28 +81,49 @@ function assembleAt(srcLines, guardLines, position) {
 // `expected` is the ground truth from the CONTRACT: a Map from input to required answer. It is supplied by
 // the caller, never derived from the candidate - a robustness measure that read its answers off the
 // candidate would report every candidate perfectly robust.
-// A POSITION THAT DOES NOT COMPILE IS NOT A PLACEMENT THE CANDIDATE FAILED AT. It is not a placement at
-// all - inserting a guard between `if n == 3:` and its body is an indentation error for every candidate
-// alike. Counting those as failures deflates everything equally, so the ORDERING survives, but the
-// fraction then does not mean what its name says. The denominator is the positions where the unit still
-// compiles, and that is measured rather than assumed.
+// THE DENOMINATOR MUST NOT DEPEND ON THE CANDIDATE, and the previous revision's did.
+//
+// It asked "does THIS candidate parse here?" and dropped the positions where it did not. That lets a
+// candidate raise its own score BY BEING COMPATIBLE WITH FEWER ENVIRONMENTS:
+//
+//     A   compiles at 2 of 4, correct at 2   ->  2/2 = 1.00
+//     B   compiles at 4 of 4, correct at 3   ->  3/4 = 0.75
+//
+// A wins for fitting in fewer places, which is the opposite of robustness and exactly the shape of every
+// accidental oracle in this project. So legality is decided by the HOST, using a NEUTRAL REPRESENTATIVE
+// of the operation kind - a guarded return with an inert condition. If a guarded return cannot go there
+// at all, the position is not in anybody's denominator; if it can, every candidate is answerable for it.
+//
+//     HOST_ILLEGAL                              excluded from the denominator entirely
+//     legal, candidate does not compile         CANDIDATE FAILURE - counted, not correct
+//     legal, compiles, contract fails           behavioral failure - counted, not correct
+//     legal, compiles, contract holds           behavioral success
+//     apparatus failure                         UNOBSERVABLE - propagates, never quietly scored
+const NEUTRAL_GUARD = ['    if False:', '        return "neutral-probe"'];
+
+export function hostLegalPositions(srcLines, inputs) {
+  return insertionPositions(srcLines).filter((p) =>
+    runProgram(assembleAt(srcLines, NEUTRAL_GUARD, p), inputs) !== ILLEGAL);
+}
+
 export function placementRobustness({ srcLines, guardLines, inputs, expected }) {
-  const positions = insertionPositions(srcLines);
-  let correct = 0; let legal = 0;
+  // Candidate-independent: the same set for every candidate measured against this host.
+  const legalPositions = hostLegalPositions(srcLines, inputs);
+  let correct = 0; let candidateFailures = 0;
   const detail = [];
-  for (const p of positions) {
+  for (const p of legalPositions) {
     const program = assembleAt(srcLines, guardLines, p);
-    // An evaluation failure here is NOT caught: it propagates so the caller records the candidate as
-    // unobservable rather than quietly scoring it. Only a genuine syntax error is an accounting fact.
+    // An evaluation failure is NOT caught: it propagates so the caller records the candidate as
+    // unobservable rather than quietly scoring it. Only a syntax error is an accounting fact.
     const got = runProgram(program, inputs);
     const compiles = got !== ILLEGAL;
+    if (!compiles) candidateFailures++;
     const ok = compiles && inputs.every((v) => got.get(v) === expected.get(v));
-    if (compiles) legal++;
     if (ok) correct++;
     detail.push({ position: p, compiles, ok });
   }
-  return { correct, legal, positions: positions.length,
-    fraction: legal ? correct / legal : 0, detail };
+  return { correct, legal: legalPositions.length, positions: insertionPositions(srcLines).length,
+    candidateFailures, fraction: legalPositions.length ? correct / legalPositions.length : 0, detail };
 }
 
 export { NL, L };

@@ -485,6 +485,37 @@ metric that was confidently reporting the reverse of the truth.
 
 ---
 
+## A PERMANENT rule, promoted out of the preference probe
+
+> **A bug does not need to have changed yesterday's result to be dangerous to tomorrow's autonomy.**
+
+`placementRobustness` decided legality **per candidate**: each realization was assembled at each position
+and the ones it failed to parse at were dropped from *its own* denominator. That rewards a candidate for
+being compatible with fewer environments —
+
+    A   compiles at 2 of 4, correct at 2   ->  2/2 = 1.00
+    B   compiles at 4 of 4, correct at 3   ->  3/4 = 0.75
+
+— which is the opposite of the property the dimension is named for.
+
+**Re-running after the fix changed nothing.** In that family every compared candidate had the same
+syntactically legal placement set, so the two denominators coincided. The two facts are kept separate
+rather than collapsed into "harmless":
+
+    APPARATUS DEFECT    legality was candidate-conditioned, creating an incentive for incompatibility
+    OBSERVED IMPACT     none in this experiment, because the legal placement sets happened to coincide
+
+**Rule:** a threat to validity is fixed when it is found, not when it is shown to have bitten. "It did not
+change the headline" is evidence about one dataset. A measure that can be gamed by the thing it scores is
+a measure that *will* be gamed once something is allowed to search against it for ten thousand iterations —
+and the whole point of this apparatus is to be trustworthy before that happens, not after.
+
+Mechanized: legality now comes from the HOST, via a neutral representative of the operation kind, and two
+controls assert that every candidate reports the same legal count and that a candidate parsing nowhere is
+charged at every legal position rather than excused into `0/0`.
+
+---
+
 ## A PERMANENT LegaLabs rule, promoted out of the rendering ladder
 
 > **JSON artifacts are authoritative. Console output is NON-EVIDENTIARY.**

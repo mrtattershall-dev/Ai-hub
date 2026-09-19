@@ -148,3 +148,67 @@ And the governance ladder it now implements:
 
 Nothing was promoted, demoted, rejected or archived by this run. Every realization named remains verified
 and admissible.
+
+---
+
+## ADDENDUM — the denominator trap, found after the result and fixed before it was trusted
+
+`ILLEGAL` was decided **per candidate**: each realization was assembled at each position, and the ones it
+failed to parse at were dropped from *its own* denominator. That lets a candidate raise its score by being
+compatible with fewer environments:
+
+    A   compiles at 2 of 4, correct at 2   ->  2/2 = 1.00
+    B   compiles at 4 of 4, correct at 3   ->  3/4 = 0.75
+
+`A` wins for fitting in fewer places, which is the opposite of robustness and the same shape as every
+accidental oracle this project has found.
+
+**Legality is now decided by the HOST**, using a neutral representative of the operation kind — a guarded
+return with an inert condition. If a guarded return cannot go at a position at all, that position is in
+nobody's denominator; if it can, every candidate is answerable for it:
+
+    HOST_ILLEGAL
+        host cannot accept this operation kind
+        -> excluded from denominator
+    LEGAL + candidate syntax failure
+        -> candidate robustness failure
+    LEGAL + candidate executes + contract fails
+        -> candidate robustness failure
+    LEGAL + candidate executes + contract holds
+        -> candidate robustness success
+    apparatus/evaluation failure
+        -> UNOBSERVABLE
+        -> no score emitted
+
+Two controls pin it: every candidate against a host must report the **same** `legal` count, reproducible
+from `hostLegalPositions` without reference to any candidate; and a guard whose own text parses nowhere is
+**charged at every legal position** rather than excused into `0/0`.
+
+## The two facts, kept separate
+
+- **Apparatus defect:** legality was candidate-conditioned, creating a possible incentive for
+  incompatibility.
+- **Observed impact on this experiment:** none, because every compared candidate had the same
+  syntactically legal placement set.
+
+> After replacing candidate-conditioned legality with candidate-independent host legality, all previously
+> reported rev-2 promotion conclusions remained unchanged. In this family, candidate legal-placement sets
+> happened to coincide, so the defect was real but non-operative in the observed results.
+
+The rev-2 conclusion therefore survives unchanged, but now for a stronger reason: **the denominator is
+defined independently of the thing being scored.** "The fix changed no numbers" is evidence about *this
+dataset*, never evidence that the bug was harmless.
+
+## The validation chain this dimension has accumulated
+
+    correct perturbation axis          insertion placement, not operation order
+    positive calibration               reproduces the middle family's 0.667 against 0.333
+    calibration FOR THE STATED REASON  the gained position is the one ahead of the preserved behaviour
+    anti-bloat negative control        n != 999 buys nothing, piled up or not
+    wrong-domain control               a wrong realization scores 0 at every position
+    impossible-expectation control     a self-confirming measurement scores 0 for everything
+    non-vacuity behaviour              evaluation failure propagates, never quietly scored
+    candidate-independent denominator  the host decides legality, not the candidate
+
+That is the chain that has to hold before this dimension is given limited promotion authority over a
+repository.
