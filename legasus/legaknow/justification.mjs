@@ -72,7 +72,43 @@ export const ANY = Symbol('ANY');
 // assertion about the source alone: it is an assertion about SOURCE x EXECUTION HISTORY. Two systems
 // evaluating "the same example" under different histories are evaluating DIFFERENT SUBJECTS, and must be
 // refused a comparison rather than scored as disagreeing.
-export const DIMENSIONS = ['repository', 'environment', 'invocation', 'implementation', 'history'];
+export const DIMENSIONS = ['repository', 'environment', 'invocation', 'implementation', 'history',
+  'criterion'];
+
+// LAW 5 — COMPOSITIONAL ENTITLEMENT.
+//
+//     INDIVIDUALLY JUSTIFIED CLAIMS MAY COMPOSE ONLY OVER A COMPATIBLE CONTEXT, OR THROUGH AN
+//     AUTHORIZED BRIDGE.
+//
+// The hole this closes was real in this file: each premise was checked against the QUERY's scope and
+// never against the OTHER PREMISES. With any dimension left unpinned by the consumer, two premises
+// established in different worlds both passed and the conclusion was entitled. Nothing was destroyed, no
+// referent moved and nobody self-ratified - THE AUTHORITY APPEARED BETWEEN THE EDGES.
+//
+//     day 3   A -> B verified at S100
+//     day 17  B -> C verified at S900
+//     day 41  C -> D verified at S3100
+//     the graph now shows A -> D, which was never true in any single world.
+//
+// THE DISTINCTION THAT MAKES THIS WORKABLE: premises may legitimately differ in WHAT THEY ARE ABOUT, but
+// not in THE WORLD THEY WERE ESTABLISHED IN. "utils.foo is in the region because specifiers.bar reaches
+// it" is a perfectly good join between claims about different subjects. Joining a claim from S100 with a
+// claim from S900 is not.
+export const CONTEXT_DIMENSIONS = ['repository', 'environment', 'history', 'criterion'];
+export const SUBJECT_DIMENSIONS = ['invocation', 'implementation'];
+
+// Concrete-and-different on a CONTEXT dimension blocks a join. A dimension either side leaves open is not
+// a conflict - it is simply unestablished, and that is handled by covers().
+export function joinConflicts(a, b) {
+  const out = [];
+  for (const d of CONTEXT_DIMENSIONS) {
+    const x = a[d]; const y = b[d];
+    if (x === null || x === undefined || y === null || y === undefined) continue;
+    if (x === ANY || y === ANY) continue;
+    if (x !== y) out.push({ dimension: d, a: String(x), b: String(y) });
+  }
+  return out;
+}
 
 export function scope(partial = {}) {
   const s = {};
@@ -186,6 +222,29 @@ export function entitled(g, id, required = scope()) {
       }
     }
     const next = new Set(inProgress); next.add(cur);
+    // LAW 5. Conjunctive premises must have been established in a COMPATIBLE WORLD - checked against each
+    // other and against this node, never merely against what the consumer happened to ask for.
+    const conj = n.supports.filter((sp) => sp.edge !== EDGE.REFUTES && sp.edge !== EDGE.ANY_OF
+      && sp.edge !== EDGE.GENERALIZES);
+    for (let i = 0; i < conj.length; i++) {
+      const pi = g.nodes[conj[i].id];
+      if (!pi) continue;
+      for (let j = i + 1; j < conj.length; j++) {
+        const pj = g.nodes[conj[j].id];
+        if (!pj) continue;
+        for (const cf of joinConflicts(pi.scope, pj.scope)) {
+          if ((n.joinBridges || {})[cf.dimension]) continue;
+          problems.push({ id: cur, why: 'INVALID JOIN at "' + n.proposition + '": premises differ in '
+            + cf.dimension + ' (' + cf.a + ' vs ' + cf.b + ') and no bridge was established. Each premise'
+            + ' may be valid and the composite still never true in any single world.' });
+        }
+      }
+      for (const cf of joinConflicts(pi.scope, n.scope)) {
+        if ((n.joinBridges || {})[cf.dimension]) continue;
+        problems.push({ id: cur, why: 'INVALID DERIVATION at "' + n.proposition + '": the conclusion is'
+          + ' stated for ' + cf.dimension + ' ' + cf.b + ' from a premise established at ' + cf.a });
+      }
+    }
     const alternatives = [];
     for (const sp of n.supports) {
       if (sp.edge === EDGE.REFUTES) continue;
