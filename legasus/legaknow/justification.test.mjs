@@ -6,7 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import { graph, add, node, invalidate, reestablish, entitled, widen, covers, scope, standing,
-  NODE, VALIDITY, GENERALIZATION, ANY } from './justification.mjs';
+  NODE, VALIDITY, GENERALIZATION, EDGE, ANY } from './justification.mjs';
 
 // The real ancestry of one verified capability, as this project actually produces it.
 function builtGraph() {
@@ -142,4 +142,59 @@ test('standing() reports what the system is currently entitled to, not what it o
   assert.equal(s.INVALID, 1);
   assert.equal(s.UNESTABLISHED, 3);
   assert.equal(s.ESTABLISHED, 2);
+});
+
+// ---------------------------------------------------------------------------------------------------
+// TYPED EDGES. The node-and-edge syntax proves nothing by itself; the obligations are the content.
+
+test('REFUTES destroys entitlement even when the justification below is intact', () => {
+  const { g, sc, ids } = builtGraph();
+  assert.equal(entitled(g, ids.capability.id, sc).ok, true);
+  const counter = node({ kind: NODE.OBSERVATION, proposition: 'a counterexample was executed',
+    scope: sc, basis: 'EXECUTION_WITNESS', supports: [{ id: ids.capability.id, edge: EDGE.REFUTES }] });
+  add(g, counter);
+  const e = entitled(g, ids.capability.id, sc);
+  assert.equal(e.ok, false);
+  assert.ok(e.problems.some((p) => /REFUTED by/.test(p.why)), JSON.stringify(e.problems));
+  // A refuter that is itself not established refutes nothing.
+  invalidate(g, counter.id, 'the counterexample ran against the wrong copy');
+  assert.equal(entitled(g, ids.capability.id, sc).ok, true);
+});
+
+test('IDENTIFIES carries the NON-ALIASING obligation: an unpinned identity is a name', () => {
+  const g = graph();
+  const target = node({ kind: NODE.OBSERVATION, proposition: 'the site executed',
+    scope: scope({ repository: 'S1', implementation: 'fp:abc' }), basis: 'EXECUTION_WITNESS' });
+  add(g, target);
+  const unpinned = node({ kind: NODE.INTERPRETATION, proposition: 'that site is canonicalize_name',
+    scope: scope({ repository: 'S1' }), basis: 'NAME',
+    supports: [{ id: target.id, edge: EDGE.IDENTIFIES }] });
+  add(g, unpinned);
+  const e = entitled(g, unpinned.id, scope({ repository: 'S1' }));
+  assert.equal(e.ok, false);
+  assert.ok(e.problems.some((p) => /that is a name, not an identity/.test(p.why)),
+    JSON.stringify(e.problems));
+
+  // POSITIVE CONTROL: pin the implementation and the same edge is fine.
+  const pinned = node({ kind: NODE.INTERPRETATION, proposition: 'that site is canonicalize_name#abc',
+    scope: scope({ repository: 'S1', implementation: 'fp:abc' }), basis: 'FINGERPRINT',
+    supports: [{ id: target.id, edge: EDGE.IDENTIFIES }] });
+  add(g, pinned);
+  assert.equal(entitled(g, pinned.id, scope({ repository: 'S1' })).ok, true);
+});
+
+test('THERE IS NO INVERSE OPERATION — nothing in the API walks upward turning red nodes green', async () => {
+  // Downward invalidity may propagate by dependency. Upward validity requires fresh evidence. If any
+  // export could restore dependents, the graph would have become an oracle over its own conclusions.
+  const mod = await import('./justification.mjs');
+  const suspicious = Object.keys(mod).filter((k) =>
+    /propagateValid|restoreAll|revalidateTree|cascadeValid|greenify/i.test(k));
+  assert.deepEqual(suspicious, []);
+  // And behaviourally: reestablish touches exactly one node, proven by counting.
+  const { g, ids } = builtGraph();
+  invalidate(g, ids.corpus.id, 'x');
+  const before = standing(g);
+  reestablish(g, ids.corpus.id, { evidence: ['re-checked'] });
+  const after = standing(g);
+  assert.equal(after.ESTABLISHED, before.ESTABLISHED + 1, 'exactly one node changed colour');
 });

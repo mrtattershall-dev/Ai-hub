@@ -32,6 +32,19 @@ import { createHash } from 'node:crypto';
 
 const sha = (s) => createHash('sha256').update(String(s)).digest('hex').slice(0, 12);
 
+// TYPED EDGES, each carrying a PROOF OBLIGATION narrow enough to state. The obligations are the content;
+// the node-and-edge syntax by itself proves nothing at all, and a "unified graph" that still needs five
+// unrelated algorithms underneath is the old architecture wearing graph notation.
+export const EDGE = {
+  OBSERVES: 'OBSERVES',           // obligation: the observation actually occurred (non-vacuity)
+  IDENTIFIES: 'IDENTIFIES',       // obligation: the identity is non-aliasing - implementation is PINNED
+  DERIVED_FROM: 'DERIVED_FROM',   // obligation: the parent is established at this scope
+  SUPPORTS: 'SUPPORTS',           // obligation: the parent is established at this scope
+  REQUIRES: 'REQUIRES',           // obligation: conjunctive - every parent, at this scope
+  GENERALIZES: 'GENERALIZES',     // obligation: carries its own authority; absorbs ONE dimension
+  REFUTES: 'REFUTES',             // obligation: if the refuter is established, the target is INVALID
+};
+
 export const NODE = {
   ASSUMPTION: 'ASSUMPTION',      // the ground: tracer semantics, corpus identity, environment
   OBSERVATION: 'OBSERVATION',    // something that happened and was recorded
@@ -71,17 +84,29 @@ export function covers(granted, required) {
   return { ok: missing.length === 0, missing };
 }
 
+// A support may be given as a bare id (meaning SUPPORTS) or as {id, edge}. Normalised once, here, so no
+// consumer has to know both shapes.
+const normalize = (supports) => supports.map((s) =>
+  (typeof s === 'string' ? { id: s, edge: EDGE.SUPPORTS } : { id: s.id, edge: s.edge || EDGE.SUPPORTS }));
+
 export function node({ kind, proposition, scope: sc, basis, supports = [], evidence = [] }) {
-  const id = sha([kind, proposition, JSON.stringify(supports)].join('|'));
-  return { id, kind, proposition, scope: sc || scope(), basis, supports: [...supports], evidence,
+  const norm = normalize(supports);
+  const id = sha([kind, proposition, JSON.stringify(norm.map((n) => n.id + ':' + n.edge))].join('|'));
+  return { id, kind, proposition, scope: sc || scope(), basis, supports: norm, evidence,
     validity: VALIDITY.ESTABLISHED };
 }
 
-export const graph = () => ({ nodes: {}, dependents: {} });
+export const graph = () => ({ nodes: {}, dependents: {}, refuters: {} });
 
 export function add(g, n) {
   g.nodes[n.id] = n;
-  for (const s of n.supports) (g.dependents[s] = g.dependents[s] || []).push(n.id);
+  for (const s of n.supports) {
+    if (s.edge === EDGE.REFUTES) {
+      (g.refuters[s.id] = g.refuters[s.id] || []).push(n.id);
+    } else {
+      (g.dependents[s.id] = g.dependents[s.id] || []).push(n.id);
+    }
+  }
   return n.id;
 }
 
@@ -142,10 +167,27 @@ export function entitled(g, id, required = scope()) {
     if (!c.ok) {
       problems.push({ id: cur, why: 'SCOPE INFLATION at "' + n.proposition + '" — ' + c.missing.join('; ') });
     }
-    const next = n.generalizedDimension
-      ? { ...need, [n.generalizedDimension]: null }
-      : need;
-    for (const s of n.supports) walk(s, next);
+    // REFUTES: an established refuter destroys the target, whatever its own justification says.
+    for (const r of (g.refuters[cur] || [])) {
+      const rn = g.nodes[r];
+      if (rn && rn.validity === VALIDITY.ESTABLISHED) {
+        problems.push({ id: cur, why: 'REFUTED by "' + rn.proposition + '"' });
+      }
+    }
+    for (const s of n.supports) {
+      if (s.edge === EDGE.REFUTES) continue;
+      // IDENTIFIES carries the non-aliasing obligation: an identity node that has not pinned the
+      // implementation dimension is not an identity, it is a name.
+      if (s.edge === EDGE.IDENTIFIES && (n.scope.implementation === null
+        || n.scope.implementation === undefined)) {
+        problems.push({ id: cur, why: 'IDENTIFIES edge from "' + n.proposition
+          + '" without a pinned implementation: that is a name, not an identity' });
+      }
+      const next = (s.edge === EDGE.GENERALIZES && n.generalizedDimension)
+        ? { ...need, [n.generalizedDimension]: null }
+        : need;
+      walk(s.id, next);
+    }
   };
   walk(id, required);
   return { ok: problems.length === 0, problems, path };
@@ -173,7 +215,7 @@ export function widen(g, id, { dimension, to, via, evidence = [] }) {
   const widened = node({ kind: NODE.CLAIM,
     proposition: n.proposition + ' [generalized over ' + dimension + ']',
     scope: { ...n.scope, [dimension]: to },
-    basis: 'GENERALIZATION:' + via, supports: [id], evidence });
+    basis: 'GENERALIZATION:' + via, supports: [{ id, edge: EDGE.GENERALIZES }], evidence });
   widened.generalizedDimension = dimension;
   add(g, widened);
   return widened;
