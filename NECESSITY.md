@@ -107,7 +107,33 @@ Surface attraction, copying, semantic anchoring and pattern interference are all
 1.5B mechanism and none of them is measured yet. Naming it now would be inventing a mechanism from one
 contrast — the same error as claiming a capacity law from three models.
 
-**This does not weaken the rule — it is the third independent measurement of the same dominance.**
+### And the 14B half needed qualifying, by a falsification condition I had written down
+
+The 2x2 crossed `RELATIONSHIP` with `SURFACE SIMILARITY`, same meaning either way, with a comprehension
+control on the alternative wording. At 14B comprehension was perfect (60/60), so that column is
+interpretable:
+
+                    SIMILAR       DISSIMILAR
+      IN_CHAIN       61/80          21/80
+      ELSEWHERE       0/80           0/80
+
+    RELATIONSHIP   82/160 vs 0/160    p = 2.8e-31     the relationship is a PRECONDITION
+    SURFACE        61/160 vs 21/160   p = 4.0e-7      and it is not the whole driver
+
+**Both factors matter and they compose.** No surface form produces capture when the sibling belongs to
+another function; but *given* the relationship, rewording the same fact cuts capture by two thirds. The
+earlier "relationship-sensitive" reading is correct and **incomplete** — I had preregistered exactly this
+as a falsification condition and it triggered.
+
+At 1.5B and 7B the alternative wording was not reliably understood (`0.794` and `0.797` against `1.000`),
+so their `DISSIMILAR` column is **void** and the suggestive 1.5B numbers are not reported as a surface
+effect. 7B captured **1 time in 320** eligible guards, a third family showing the same unexplained
+non-monotonicity.
+
+And a `RENDER` finding that arrived as a control: rewording an operation's **own** obligation, with no
+siblings anywhere, cost correctness at two of three capacities.
+
+**This does not weaken the rule — it is now the fourth independent measurement of the same dominance.**
 `ISOLATED` is 1.000 at every capacity again; the best rival reaches 1.000 only at 14B and 0.429 at 1.5B. A
 rendering rule that works only above a capacity threshold is not one the architecture can rely on,
 because the architecture's claim is that the proposal source is **substitutable**.

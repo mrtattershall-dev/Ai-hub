@@ -108,3 +108,105 @@ generated from the artifact.
     samples      20 transactions per case per condition per model
     temperature  0.6
     cases        E1, E2, E3
+
+---
+
+# RESULT — the comprehension gate fired, and one of my own falsification conditions triggered
+
+**GPU stopped and verified (`legasus-scale`, state `stopped`, 0 tasks) before any of this was read.**
+**Every number below is generated from `RESULT.json` by `report-factorial.mjs`.**
+
+## The comprehension gate, reported first because it decides what counts
+
+    model    ISOLATED        OWN_DISSIMILAR       p
+    1.5B     1.000  37/37    0.794  27/34      4.1e-3    DEGRADED
+    7B       1.000  60/60    0.797  47/59      1.2e-4    DEGRADED
+    14B      1.000  60/60    1.000  60/60      1.0       clean
+
+**The `DISSIMILAR` column is VOID at 1.5B and at 7B**, exactly as preregistered. The alternative wording
+is not reliably understood at those capacities, so a fall in capture there cannot be attributed to surface
+similarity — the model may never have extracted the sibling's domain at all, which changes the semantic
+content of the manipulation and not just its surface.
+
+That matters because the void numbers are *suggestive*: at 1.5B, `ELSEWHERE_SIMILAR` 41/80 against
+`ELSEWHERE_DISSIMILAR` 17/75, `p = 2.6e-4`. **That is not reported as a surface effect.** It is exactly
+what an uninterpretable cell looks like when you want it to say something, and the gate exists so that
+wanting it is not enough.
+
+At **14B** comprehension is perfect — 60/60 — so the `DISSIMILAR` sibling conveys the same fact and the
+column is interpretable.
+
+## 14B, the interpretable cell: BOTH factors matter
+
+                    SIMILAR       DISSIMILAR
+      IN_CHAIN       61/80          21/80
+      ELSEWHERE       0/80           0/80
+      ISOLATED        0/80
+
+    RELATIONSHIP   in-chain 82/160  vs elsewhere 0/160   p = 2.8e-31
+    SURFACE        similar  61/160  vs dissimilar 21/160  p = 4.0e-7
+    SURFACE within ELSEWHERE   0/80 vs 0/80              p = 1.0
+
+Two things, and they compose rather than compete:
+
+- **The relationship is necessary.** `ELSEWHERE` is `0/160` under *both* surfaces. Nothing about surface
+  form produces capture when the sibling is declared to belong to another function.
+- **Given the relationship, surface similarity strongly modulates the rate.** `61/80` to `21/80` with the
+  same semantic content, the same relationship, and only the wording changed.
+
+## Against my own preregistration
+
+I listed this as a falsification condition:
+
+> **If 14B capture falls under `IN_CHAIN_DISSIMILAR`**, the 14B story is not purely relational and the
+> clean `p = 8.2e-29` reading needs qualifying.
+
+**It fell.** 61/80 to 21/80, `p = 4.0e-7`. So the qualification is owed, and here it is: the previous
+family's conclusion — "14B capture is relationship-sensitive" — is **correct but incomplete**. The
+relationship is a *precondition*, not the whole driver. Same relationship, same meaning, different
+wording, and capture drops by two thirds.
+
+The earlier `p = 8.2e-29` is not wrong; it measured a real and total effect of removing the relationship.
+It simply could not see that surface form also matters, because surface was held constant at `SIMILAR`
+throughout.
+
+## 7B is essentially immune, and remains unexplained
+
+    IN_CHAIN_SIMILAR 1/80   IN_CHAIN_DISSIMILAR 0/80   ELSEWHERE both 0/80
+
+**1 capture in 320 eligible guards.** Consistent with the 5/80 and 6% seen in the two previous families.
+Three families now show the same non-monotonicity — 1.5B and 14B susceptible, 7B not — and it is still
+recorded as observed and **not explained**. One model in one family is an anomaly; the same model in three
+families is a fact that needs its own experiment, not a sentence of speculation.
+
+## Correctness, and the dominance result for the fourth time
+
+    condition             1.5B      7B        14B
+    ISOLATED              1.000     1.000     1.000
+    OWN_DISSIMILAR        0.794     0.797     1.000
+    IN_CHAIN_SIMILAR      0.000     0.983     0.183
+    IN_CHAIN_DISSIMILAR   0.667     0.983     0.617
+    ELSEWHERE_SIMILAR     0.111     0.967     1.000
+    ELSEWHERE_DISSIMILAR  0.615     0.983     1.000
+
+**`ISOLATED` is 1.000 at every capacity, and not one of the five other conditions beats it anywhere.**
+Fourth independent family, same dominance. `SEMANTIC LEAST PRIVILEGE` does not depend on knowing which
+mechanism is operating — which is precisely why it is the rule the architecture can rely on while the
+mechanism question stays open.
+
+Note also what `OWN_DISSIMILAR` costs: **0.794 and 0.797**. Rewording an operation's *own* obligation,
+with no siblings anywhere, degraded correctness at two of three capacities. That is a `RENDER` finding in
+its own right and it was obtained as a control rather than as a target.
+
+## The guardrail, a fourth time
+
+    condition               carrying a captured contract   CONSTRAIN   PROVE   LEAKED
+    ISOLATED                              0                   0          0       0
+    OWN_DISSIMILAR                        0                   0          0       0
+    IN_CHAIN_SIMILAR                    101                  16         85       0
+    IN_CHAIN_DISSIMILAR                  39                   5         34       0
+    ELSEWHERE_SIMILAR                    41                  25         16       0
+    ELSEWHERE_DISSIMILAR                 17                  12          5       0
+
+**Zero leaks.** Cumulative across four families: **619 transactions carrying the wrong semantic contract,
+and none reached commit.**
