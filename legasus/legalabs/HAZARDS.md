@@ -620,3 +620,40 @@ passed.
 
 **Control:** every exclusion prediction must be paired with a live admission in the same run. P3 is only
 meaningful beside P1 showing `specifiers` at 60/60 IN_DOMAIN.
+
+---
+
+## Hazard 16 — AN ARTIFACT THAT TRUNCATES ITS OWN EVIDENCE
+
+**Symptom.** A replay of a historical run contradicts the run's own recorded outcome, in a way that is
+logically impossible: `PARSES = false` for code that the run committed and a differential oracle scored
+16/16.
+
+**Cause.** `run-arms.mjs` recorded `code.slice(0, 400)`. Every candidate at exactly the cap was a PREFIX.
+T03's stored text ended mid-string-literal. The replay parsed a string that had never existed.
+
+**Rule.** *An artifact is authoritative for the decisions it records, and NOT for any field it summarised
+on the way in.* This qualifies the standing rule that JSON artifacts are authoritative and console output
+is non-evidentiary — a recording cap is indistinguishable from complete data at read time.
+
+**Mechanism, not a sentence:** every recorded text field now carries a digest of the FULL text and its
+length, so truncation is detectable rather than invisible.
+
+**Method that caught it:** HASH BEFORE SEMANTICS. When a replay contradicts a historical record, establish
+that both sides are looking at the same bytes before reasoning about meaning. The lineage walk found it in
+one step; a semantic investigation would have gone looking for a parser difference that did not exist.
+
+**Preserved:** `benchmarks/devrepo/RESULT.r2-subsumption-run0-FAILED.md`. The failed run was not deleted
+or re-scored. An experiment about justification that rewrote its own history after finding its evidence
+was bad would be self-refuting.
+
+---
+
+## Hazard 1, occurrence 13 — and it was in the write-up of hazard 16
+
+The commit message recording the truncation discovery was itself passed through a double-quoted shell
+argument. The backticked spans naming the defect were eaten, leaving `T03's tail is ,` in the permanent
+record. The rule against passing prose through a shell argument already existed, with twelve prior
+occurrences, and I broke it again while documenting a different recording defect.
+
+Amended from a file. The lesson is unchanged and apparently needs a mechanism rather than a rule.
