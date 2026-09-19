@@ -1,0 +1,43 @@
+  E0             ORDERED      order fifty then high then micro   basis DERIVED_WITH_ENGINEERING_CHOICE
+  E0 NOTE: reversed order verifies, which is expected to depend on which constraint the reversal crosses
+  E1             ORDERED      order high then micro then low   basis DERIVED_WITH_ENGINEERING_CHOICE
+  E1 NOTE: reversed order fails, which is expected to depend on which constraint the reversal crosses
+  E2             ORDERED      order five then micro then low   basis DERIVED_WITH_ENGINEERING_CHOICE
+  E2 NOTE: reversed order fails, which is expected to depend on which constraint the reversal crosses
+  E3             ORDERED      order micro then low then mid   basis DERIVED
+  UND            UNDETERMINED NO GENERATION   blocked by low/plus at n=1
+
+  ABLATION INSTRUMENT (perfect fragments, presented order):
+    E0   edges 0   DECIDE ON verified   DECIDE OFF verified   expected OFF verified
+    E1   edges 1   DECIDE ON verified   DECIDE OFF failed: micro   expected OFF failed
+    E2   edges 2   DECIDE ON verified   DECIDE OFF failed: micro,five   expected OFF failed
+    E3   edges 3   DECIDE ON verified   DECIDE OFF failed: low,micro   expected OFF failed
+
+  controls ok: orders derived as expected, each prompt isolated from the other operation, both realizations verify, the reversed composition fails where ordering is derived and passes where both orders are legal
+  RULE 3 ok: qwen2.5-coder:1.5b, qwen2.5-coder:7b, qwen2.5-coder:14b
+  4 transaction cases x 3 models   samples 20
+
+  qwen2.5-coder:1.5b   E0            op-yield 0.900   assembled 14/20   verified 14   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 0   DECIDE-OFF verified 14   broken  0/14
+  qwen2.5-coder:1.5b   E1            op-yield 0.833   assembled 11/20   verified 11   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 1   DECIDE-OFF verified  0   broken 11/11
+  qwen2.5-coder:1.5b   E2            op-yield 0.900   assembled 15/20   verified 15   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 2   DECIDE-OFF verified  0   broken 15/15
+  qwen2.5-coder:1.5b   E3            op-yield 0.933   assembled 16/20   verified 16   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 3   DECIDE-OFF verified  0   broken 16/16
+  qwen2.5-coder:7b     E0            op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 0   DECIDE-OFF verified 20   broken  0/20
+  qwen2.5-coder:7b     E1            op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 1   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:7b     E2            op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 2   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:7b     E3            op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 3   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:14b    E0            op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 0   DECIDE-OFF verified 20   broken  0/20
+  qwen2.5-coder:14b    E1            op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 1   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:14b    E2            op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 2   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:14b    E3            op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 3   DECIDE-OFF verified  0   broken 20/20
+
+  qwen2.5-coder:1.5b    transaction yield 0.700   P(correct|assembled) 1.000   verified end-to-end 0.700   sec/verified 4.5
+  qwen2.5-coder:7b      transaction yield 1.000   P(correct|assembled) 1.000   verified end-to-end 1.000   sec/verified 3.4
+  qwen2.5-coder:14b     transaction yield 1.000   P(correct|assembled) 1.000   verified end-to-end 1.000   sec/verified 7.4
+
+  DOSE-RESPONSE  (paired: of the transactions DECIDE got right, how many the presented order broke)
+  E0    violated edges 0   DECIDE ON  54   DECIDE OFF  54   broken by ablation   0/54   0%
+  E1    violated edges 1   DECIDE ON  51   DECIDE OFF   0   broken by ablation  51/51   100%
+  E2    violated edges 2   DECIDE ON  55   DECIDE OFF   0   broken by ablation  55/55   100%
+  E3    violated edges 3   DECIDE ON  56   DECIDE OFF   0   broken by ablation  56/56   100%
+
+  written -> measurements/2026-09-18-decide-specificity/RESULT.json

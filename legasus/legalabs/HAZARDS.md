@@ -404,6 +404,46 @@ Never build them with `printf` in a command substitution.
 
 ---
 
+## 11. A verdict computed from the PLAN and reported as a measurement — MECHANIZED
+
+`reachability` decided whether an operation was dead from the requested domains and the committed order.
+It never saw the emitted code. Its verdict was therefore a pure function of `(plan, order)` — the same
+for every model, every temperature and every realization — and it produced the headline `DECIDE` result:
+**dead-op 105, probe-fail 0**. A number that cannot vary with the artifact is not a measurement of the
+artifact.
+
+It also **rejected a legitimate alternative**, which is how it was caught. A self-defending realization
+(`n < 10 and n >= 0` beside `n < 0`) contains no dead code at all, and executing it proves every branch
+fires. The planned check condemned it anyway.
+
+**Mechanized:** `reachabilityExecuted` asks the artifact — an operation is dead when no input produces
+its result. `auditResultLabels` refuses rather than guesses when an observation could not be attributed.
+The planned version is **kept**, because the gap between plan-dead and execution-alive is exactly what a
+self-defending realization looks like, and that gap is the only way a rescue rate can be measured.
+
+**The tell to remember:** a failure count that is *identical across models of very different capacity*,
+with one mechanism at 100% and every other mechanism at 0.
+
+---
+
+## 12. An ablation that moves its own EXPECTATIONS with the treatment — RULE ONLY
+
+The same `DECIDE` ablation recomputed probe expectations from the **presented** order while also
+assembling in it. The broken program was graded against a broken expectation, the probes agreed by
+construction, and the only term left that could fire was the analytic one from hazard 11. The two
+defects together fully explain a result that read as decisive.
+
+This is hazard 3f's sibling. 3f is *an ablation that repairs the proposal until the pipeline works*;
+this is *an ablation that lowers the bar until the damaged output passes*. Both make the treatment arm
+measure something more flattering than the treatment.
+
+**Rule:** in an ablation, exactly one thing moves. Ground truth is derived from the **contract** and
+computed identically in both arms. Two requested behaviours whose domains are nested can only both be
+satisfied if the narrower wins where they overlap — that holds however the file is laid out, so the
+expectation may never be recomputed from the arm's own assembly.
+
+---
+
 ## A PERMANENT LegaLabs rule, promoted out of hazard 9
 
 > **Any artifact whose coordinates are compared across components must have exactly one canonical

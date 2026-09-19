@@ -129,3 +129,89 @@ where both orders are legal.
     samples      20 transactions per case per model
     temperature  0.6
     cases        E0, E1, E2, E3 generate; UND refuses
+
+---
+
+# RESULT
+
+**GPU stopped and verified (`legasus-scale`, state `stopped`, 0 tasks) before any of this was read.**
+
+## Primary endpoint — CONFIRMED, and it is a clean separation
+
+Paired on identical fragments: the same generated code assembled twice.
+
+    case  violated edges   DECIDE ON   DECIDE OFF   broken by ablation
+    E0          0              54          54            0/54     0%
+    E1          1              51           0           51/51   100%
+    E2          2              55           0           55/55   100%
+    E3          3              56           0           56/56   100%
+
+    E0 vs E1            p = 3.3e-31
+    E0 vs E2            p = 2.0e-32
+    E0 vs E3            p = 1.0e-32
+    E0 vs E1+E2+E3      p = 2.8e-52
+
+**Disjoint transactions survive the ablation completely; every constrained transaction fails.** The cost
+of removing `DECIDE` lands exactly where derived precedence exists and nowhere else.
+
+`E0` is not vacuous: its presented order `[micro, fifty, high]` differs from its derived order
+`[fifty, high, micro]`, so the file really was assembled differently and verified anyway. That is the
+anti-oracle property holding — for disjoint operations every order is legal, and the verifier admits
+them all.
+
+Every one of the 162 failures is a **named dead operation**, zero probe-only failures:
+`micro x162, five x55, low x56`. Under `DECIDE OFF` the wider guard is placed first and the narrower
+operation can never fire.
+
+## Secondary endpoint — NOT OBSERVED, and the reason is measured
+
+The predicted gradient did not appear. The response is a **step**: 0% at zero edges, 100% at one, two
+and three. Monotone non-decreasing holds trivially; the interesting part does not.
+
+The preregistration named the only mechanism that could have produced a gradient — a realization that
+defends itself against a violated edge — and that mechanism is **absent from the data, not merely rare**:
+
+    rescued (plan says dead, execution says alive)                          0 / 216
+
+The models are not incapable of self-defence. They did it 167 times:
+
+    EVERY extra clause written, beyond the operation's own requested domain:
+        167x   n != 3     defends against the PRESERVED behaviour, which every prompt names
+          0x   anything   defending against a SIBLING operation
+
+And the split by capacity is the finding:
+
+    model                guards   defends the NAMED fact   defends an UNNAMED sibling
+    qwen2.5-coder:1.5b     168          28/58  (48%)                  0
+    qwen2.5-coder:7b       240          62/80  (78%)                  0
+    qwen2.5-coder:14b      240          77/80  (96%)                  0
+
+**Defence against the fact the prompt names scales hard with capacity — 48% to 96% across a 9x parameter
+range. Defence against the fact no prompt names is flat at zero.**
+
+## What this establishes
+
+> A realization can defend itself only against facts its own prompt names. Cross-operation precedence is
+> exactly the fact that no single operation's prompt can contain, because it is a property of the
+> **transaction**, not of any operation.
+
+That is a stronger necessity claim than 105/0 was, and it is stronger in a specific way. The `OBSERVE`
+middle family found the model's realization strategy substituting for the architecture 145 times, which
+made correctness contingent on style and on capacity. Here the substitution is **structurally
+unavailable**, and scaling does not begin to buy it. `DECIDE` is not doing work the model would
+eventually learn to do for itself.
+
+## Falsification conditions, as they stood
+
+- `E0` collapsing would have meant something other than ordering changed in the ablation. **It did not
+  collapse: 0/54.** The 105/0 interpretation survives contact with its own control.
+- `E1` to `E3` failing to degrade would have meant the cost is not specific. **They degraded totally.**
+- `UND` generating anything would have meant an intersecting pair silently became ordered. **It refused**,
+  blocked by `low`/`plus` at `n=1`.
+
+## Recorded honestly
+
+The secondary endpoint is preserved as **not observed**. It was preregistered as a real prediction, the
+apparatus was proven able to register it (a constructed self-defending realization was rescued at 1, 2
+and 3 violated edges before any tokens were spent), and it did not occur. The step function is the
+result; the explanation above is a measurement of why, not a repair of the endpoint.

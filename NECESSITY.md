@@ -26,7 +26,7 @@ left to look like a preregistration written before the result it responds to.
 | Stage | Status | Evidence |
 |---|---|---|
 | `OBSERVE` | **Load-bearing — robustness independence** | derived 229/233; blind-top 145/233 failing 86x PRESERVATION_BROKEN; blind-bottom **0/233** failing 233x NEW_DEAD. Earlier top-heavy family could not separate it: derived 624/692 == blind-bottom 624/692 |
-| `DECIDE` | **Load-bearing** | same 105 transactions: derived order 105/105, presentation order **0/105**, every failure a named dead operation |
+| `DECIDE` | **Load-bearing, and the cost is SPECIFIC** | same 105 transactions: derived 105/105, presented **0/105**. And the specificity family, paired on identical fragments: **disjoint 0/54 broken, constrained 162/162 broken** (p = 2.8e-52). No realization ever substituted — 0/648 guards defended against a sibling operation, at any capacity |
 | `RENDER` | **Causal, requires regeneration** | semantic plan held fixed; `EXTENT` vs `SILENT` moved authorization precision 0.775 → 0.986 at 7B and 0.677 → 0.969 at 14B |
 | `PROPOSE` | **Substitutable stochastic backend — no necessity claim, by design** | swapping 1.5B → 7B → 14B changes proposal yield, realization strategy and failure distribution while the downstream authority semantics stay fixed. A necessity result for any particular model would contradict the architecture rather than support it |
 | `CONSTRAIN` | **Load-bearing as interface protection** | of 28 refusals: 14 do not load unchanged, 1 is a case `PROVE` would also catch, 6 exceed granted authority, 2 in-scope equivalents, 5 undetermined |
@@ -74,6 +74,53 @@ something a later family discovers the hard way.
 **The frozen boundary:** `PROVE` decides whether a candidate deserves persistence; `COMMIT` decides
 whether persistence is atomic. `COMMIT` never computes a verdict — a test asserts it asks exactly once
 and never second-guesses.
+
+## DECIDE — why a perfect score needed a specificity test, and what it turned into
+
+`105/105 → 0/105` showed that `DECIDE` **can** matter enormously. It could not show that `DECIDE`
+matters **only when it logically should** — and a result that total is also what a broken ablation looks
+like. Building the control found that it partly was: deadness was computed from the plan and never from
+the program, and the probe expectations were recomputed from the presented order, so the broken program
+was graded against a broken expectation. One term could not vary with the code; the other was blind.
+Both are fixed, and the original result is unchanged under the repaired instrument.
+
+Then the specificity family, four transactions presented in an order violating 0, 1, 2 and 3 derived
+edges:
+
+    violated edges      0        1        2        3
+    DECIDE ON          54       51       55       56
+    DECIDE OFF         54        0        0        0
+    broken           0/54    51/51    55/55    56/56
+
+**The damage lands exactly where derived precedence exists and nowhere else.** `E0`'s presented order
+genuinely differs from its derived order, so the disjoint file really was rebuilt a different way and
+verified anyway — the anti-oracle property holding in the place it matters.
+
+### The dose-response was predicted and did NOT appear, which turned out to be the better result
+
+The response is a step, not a gradient. The preregistration named the only mechanism that could produce
+a gradient — a realization defending itself against a violated edge — and proved the apparatus could
+register it before any tokens were spent. It never occurred: **rescued 0/216**.
+
+Not because these models cannot defend a guard. They did it 167 times. Every single instance was the
+same clause:
+
+    167x   n != 3     defends the PRESERVED behaviour, which every prompt names
+      0x              defending against a SIBLING operation
+
+    model     guards   defends the NAMED fact   defends an UNNAMED sibling
+    1.5B        168         28/58   48%                     0
+    7B          240         62/80   78%                     0
+    14B         240         77/80   96%                     0
+
+> **A realization can defend itself only against facts its own prompt names. Cross-operation precedence
+> is exactly the fact no single operation's prompt can contain, because it is a property of the
+> transaction rather than of any operation.**
+
+That is why this is a stronger necessity claim than the 105/0 was. `OBSERVE` found the model's
+realization strategy substituting for the architecture 145 times, making correctness contingent on style
+and on capacity. Here the substitution is **structurally unavailable**, and a 9x parameter range does not
+begin to buy it while buying compliance with the named fact twice over.
 
 ## The asymmetry, and it is a property of the architecture
 
