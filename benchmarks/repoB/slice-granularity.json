@@ -1,0 +1,192 @@
+{
+ "partial": 24,
+ "full": 0,
+ "partials": [
+  {
+   "fn": "Version.__lt__",
+   "covered": 3,
+   "total": 22,
+   "runs": 1
+  },
+  {
+   "fn": "Version.__ne__",
+   "covered": 3,
+   "total": 22,
+   "runs": 1
+  },
+  {
+   "fn": "Version.__gt__",
+   "covered": 4,
+   "total": 22,
+   "runs": 2
+  },
+  {
+   "fn": "_validate_local",
+   "covered": 2,
+   "total": 7,
+   "runs": 2
+  },
+  {
+   "fn": "_parse_local_version",
+   "covered": 2,
+   "total": 5,
+   "runs": 20
+  },
+  {
+   "fn": "_validate_dev",
+   "covered": 3,
+   "total": 7,
+   "runs": 2
+  },
+  {
+   "fn": "Version.epoch",
+   "covered": 1,
+   "total": 2,
+   "runs": 22
+  },
+  {
+   "fn": "Version.release",
+   "covered": 1,
+   "total": 2,
+   "runs": 22
+  },
+  {
+   "fn": "Version.pre",
+   "covered": 1,
+   "total": 2,
+   "runs": 56
+  },
+  {
+   "fn": "Version.post",
+   "covered": 1,
+   "total": 2,
+   "runs": 22
+  },
+  {
+   "fn": "Version.dev",
+   "covered": 1,
+   "total": 2,
+   "runs": 56
+  },
+  {
+   "fn": "Version.local",
+   "covered": 2,
+   "total": 4,
+   "runs": 52
+  },
+  {
+   "fn": "Version.is_prerelease",
+   "covered": 1,
+   "total": 2,
+   "runs": 36
+  },
+  {
+   "fn": "Version.__repr__",
+   "covered": 1,
+   "total": 2,
+   "runs": 2
+  },
+  {
+   "fn": "Version.__str__",
+   "covered": 7,
+   "total": 13,
+   "runs": 21
+  },
+  {
+   "fn": "_parse_letter_version",
+   "covered": 6,
+   "total": 8,
+   "runs": 20
+  },
+  {
+   "fn": "_cmpkey",
+   "covered": 18,
+   "total": 23,
+   "runs": 36
+  },
+  {
+   "fn": "Version.__init__",
+   "covered": 22,
+   "total": 28,
+   "runs": 58
+  },
+  {
+   "fn": "_TrimmedRelease.__init__",
+   "covered": 9,
+   "total": 11,
+   "runs": 17
+  },
+  {
+   "fn": "Version.__ge__",
+   "covered": 18,
+   "total": 22,
+   "runs": 33
+  },
+  {
+   "fn": "Version.__le__",
+   "covered": 18,
+   "total": 22,
+   "runs": 2
+  },
+  {
+   "fn": "Version.__replace__",
+   "covered": 23,
+   "total": 27,
+   "runs": 2
+  },
+  {
+   "fn": "_TrimmedRelease.release",
+   "covered": 6,
+   "total": 7,
+   "runs": 17
+  },
+  {
+   "fn": "Version.__eq__",
+   "covered": 20,
+   "total": 22,
+   "runs": 13
+  }
+ ],
+ "divergent": [
+  {
+   "fn": "Version.__init__",
+   "a": "Specifier(\"==1.2.3\") == Specifier(\"== 1.2.3.0\")",
+   "b": "\"1.3.0a1\" in Specifier(\">=1.2.3\")",
+   "shared": 11,
+   "differing": 11,
+   "aOnly": 0
+  },
+  {
+   "fn": "_TrimmedRelease.release",
+   "a": "Specifier(\"==1.2.3\") == Specifier(\"== 1.2.3.0\")",
+   "b": "(Specifier(\"==1.2.3\", prereleases=False) ==\n Spe",
+   "shared": 5,
+   "differing": 1,
+   "aOnly": 1
+  },
+  {
+   "fn": "_cmpkey",
+   "a": "\"1.2.3\" in Specifier(\">=1.2.3\")",
+   "b": "\"1.0.0\" in Specifier(\">=1.2.3\")",
+   "shared": 6,
+   "differing": 1,
+   "aOnly": 0
+  },
+  {
+   "fn": "Version.__le__",
+   "a": "SpecifierSet(\">=2.0,<1.0\").is_unsatisfiable()",
+   "b": "SpecifierSet(\">=1.0,<2.0\").is_unsatisfiable()",
+   "shared": 11,
+   "differing": 7,
+   "aOnly": 7
+  },
+  {
+   "fn": "Version.__eq__",
+   "a": "SpecifierSet(\">=2.0,<1.0\").is_unsatisfiable()",
+   "b": "SpecifierSet(\"==1.0,!=1.0\").is_unsatisfiable()",
+   "shared": 11,
+   "differing": 9,
+   "aOnly": 0
+  }
+ ]
+}
