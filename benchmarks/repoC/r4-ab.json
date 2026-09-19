@@ -1,0 +1,271 @@
+{
+ "note": "r4 DEVELOPMENT EVIDENCE, not a prospective result",
+ "n": 182,
+ "r3": {
+  "OBSERVED_OK": 60,
+  "OBSERVED_RAISED": 15,
+  "SETUP_FAILED": 57,
+  "UNOBSERVABLE": 50
+ },
+ "r4": {
+  "OBSERVED_OK": 106,
+  "OBSERVED_RAISED": 18,
+  "SETUP_FAILED": 58,
+  "UNOBSERVABLE": 0
+ },
+ "flipped": 50,
+ "lost": 0,
+ "attributedToChannel": 50,
+ "flippedSample": [
+  {
+   "inv": "pp.show_best_practices()",
+   "to": "OK",
+   "bytes": 2261
+  },
+  {
+   "inv": "print(res)",
+   "to": "OK",
+   "bytes": 11
+  },
+  {
+   "inv": "res = Word('a').parse_string('aaaaabaaa', parse_all=Tr",
+   "to": "RAISED:ParseException",
+   "bytes": 11
+  },
+  {
+   "inv": "print(patt.parse_string('ablaj /* comment */ lskjd'))",
+   "to": "OK",
+   "bytes": 11
+  },
+  {
+   "inv": "patt = Word(alphas)[...].ignore(c_style_comment)",
+   "to": "RAISED:NameError",
+   "bytes": 11
+  },
+  {
+   "inv": "print(patt.parse_string('ablaj /* comment */ lskjd'))",
+   "to": "SETUP_FAILED:NameError",
+   "bytes": 11
+  },
+  {
+   "inv": "print(qs.search_string('lsjdf \"This is the quote\" sldj",
+   "to": "OK",
+   "bytes": 25
+  },
+  {
+   "inv": "complex_qs = QuotedString('{{', end_quote_char='}}')",
+   "to": "OK",
+   "bytes": 25
+  },
+  {
+   "inv": "print(complex_qs.search_string(\n   'lsjdf {{This is th",
+   "to": "OK",
+   "bytes": 52
+  },
+  {
+   "inv": "sql_qs = QuotedString('\"', esc_quote='\"\"')",
+   "to": "OK",
+   "bytes": 52
+  },
+  {
+   "inv": "print(sql_qs.search_string(\n    'lsjdf \"This is the qu",
+   "to": "OK",
+   "bytes": 100
+  },
+  {
+   "inv": "print(result.dump())",
+   "to": "OK",
+   "bytes": 26
+  },
+  {
+   "inv": "result = greeting.parse_string(\"Hello, World!\")",
+   "to": "OK",
+   "bytes": 26
+  },
+  {
+   "inv": "print(result.dump())",
+   "to": "OK",
+   "bytes": 74
+  },
+  {
+   "inv": "print(number.search_string(\"123 3.1416 789\"))  # Fail!",
+   "to": "OK",
+   "bytes": 37
+  },
+  {
+   "inv": "number = Combine(Word(nums) + '.' + Word(nums)) | Word",
+   "to": "OK",
+   "bytes": 37
+  },
+  {
+   "inv": "print(number.search_string(\"123 3.1416 789\"))  # Bette",
+   "to": "OK",
+   "bytes": 69
+  },
+  {
+   "inv": "attr_expr[1, ...].parse_string(text).pprint()",
+   "to": "OK",
+   "bytes": 28
+  },
+  {
+   "inv": "attr_expr = Group(\n    label + Suppress(':')\n    + One",
+   "to": "OK",
+   "bytes": 28
+  },
+  {
+   "inv": "OneOrMore(attr_expr).parse_string(text).pprint()  # Be",
+   "to": "OK",
+   "bytes": 95
+  },
+  {
+   "inv": "(attr_expr * (1,)).parse_string(text).pprint()",
+   "to": "OK",
+   "bytes": 162
+  },
+  {
+   "inv": "print(real.parse_string('3.1416'))",
+   "to": "OK",
+   "bytes": 20
+  },
+  {
+   "inv": "print(real.parse_string('3. 1416'))",
+   "to": "OK",
+   "bytes": 40
+  },
+  {
+   "inv": "real = Combine(Word(nums) + '.' + Word(nums))",
+   "to": "OK",
+   "bytes": 40
+  },
+  {
+   "inv": "print(real.parse_string('3.1416'))",
+   "to": "OK",
+   "bytes": 52
+  },
+  {
+   "inv": "print(real.parse_string('3. 1416'))",
+   "to": "RAISED:ParseException",
+   "bytes": 52
+  },
+  {
+   "inv": "print(func.parse_string(\"fn a, b, 100\"))",
+   "to": "OK",
+   "bytes": 25
+  },
+  {
+   "inv": "func = ident + Group(Opt(DelimitedList(term)))",
+   "to": "OK",
+   "bytes": 25
+  },
+  {
+   "inv": "print(func.parse_string(\"fn a, b, 100\"))",
+   "to": "OK",
+   "bytes": 52
+  },
+  {
+   "inv": "print(attr_expr[1, ...].parse_string(text).dump())",
+   "to": "OK",
+   "bytes": 87
+  },
+  {
+   "inv": "result = Dict(Group(attr_expr)[1, ...]).parse_string(t",
+   "to": "OK",
+   "bytes": 87
+  },
+  {
+   "inv": "print(result.dump())",
+   "to": "OK",
+   "bytes": 392
+  },
+  {
+   "inv": "print(result['shape'])",
+   "to": "OK",
+   "bytes": 400
+  },
+  {
+   "inv": "print(result.as_dict())",
+   "to": "OK",
+   "bytes": 487
+  },
+  {
+   "inv": "print(wd_list1.parse_string(source))",
+   "to": "OK",
+   "bytes": 37
+  },
+  {
+   "inv": "wd_list2 = wd + (Suppress(',') + wd)[...]",
+   "to": "OK",
+   "bytes": 37
+  },
+  {
+   "inv": "print(wd_list2.parse_string(source))",
+   "to": "OK",
+   "bytes": 59
+  },
+  {
+   "inv": "source = \"lead in START relevant text END trailing tex",
+   "to": "OK",
+   "bytes": 59
+  },
+  {
+   "inv": "start_marker = Keyword(\"START\")",
+   "to": "OK",
+   "bytes": 59
+  },
+  {
+   "inv": "end_marker = Keyword(\"END\")",
+   "to": "OK",
+   "bytes": 59
+  },
+  {
+   "inv": "find_body = Suppress(...) + start_marker + ... + end_m",
+   "to": "OK",
+   "bytes": 59
+  },
+  {
+   "inv": "print(find_body.parse_string(source))",
+   "to": "OK",
+   "bytes": 95
+  },
+  {
+   "inv": "print(attr_expr[1, ...].parse_string(text).dump())",
+   "to": "OK",
+   "bytes": 87
+  },
+  {
+   "inv": "attr_label = label",
+   "to": "OK",
+   "bytes": 87
+  },
+  {
+   "inv": "attr_value = Suppress(':') + OneOrMore(data_word, stop",
+   "to": "OK",
+   "bytes": 87
+  },
+  {
+   "inv": "result = dict_of(attr_label, attr_value).parse_string(",
+   "to": "OK",
+   "bytes": 87
+  },
+  {
+   "inv": "print(result.dump())",
+   "to": "OK",
+   "bytes": 392
+  },
+  {
+   "inv": "print(result['shape'])",
+   "to": "OK",
+   "bytes": 400
+  },
+  {
+   "inv": "print(result.shape)  # object attribute access works t",
+   "to": "OK",
+   "bytes": 408
+  },
+  {
+   "inv": "print(result.as_dict())",
+   "to": "OK",
+   "bytes": 495
+  }
+ ]
+}

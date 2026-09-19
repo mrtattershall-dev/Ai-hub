@@ -109,3 +109,46 @@ Both are r4 work. Neither may be repaired in r3.
                  the demonstrated violated invariants V1 and V2.
 
 ---
+## Entry 3 — r4 / V1 repair: observer-subject channel isolation
+
+    objective    repair the violated invariant V1, tested against the INVARIANT not the manifestation
+    authority    delegated r4 development surface
+    start hash   a52c26f
+    hypothesis   the subject and the observer share an untyped transport; giving the protocol a private
+                 channel should recover the lost observations without losing any
+
+    INTERVENTION
+      legasus/legaexercise/channel.mjs   FD-LEVEL isolation via os.dup2, protocol to a private file.
+                                         NOT contextlib.redirect_stdout, which misses os.write(1,...),
+                                         C extensions, inherited child descriptors and late threads.
+      legasus/legaexercise/observe-r4.mjs  the witness rebuilt on that channel; r3's observe() is left
+                                         intact and importable so the two can be A/B compared.
+
+    CONTROLS  16 attacks on the boundary, all surviving: plain print, PROTOCOL-SHAPED JSON (forgery),
+      multiple JSON objects, partial JSON, no trailing newline, embedded newlines, 2 MB and 5 MB output,
+      ANSI and control bytes, raw os.write to fd 1 and fd 2, all 256 byte values, stderr, subprocess
+      stdout, subprocess stderr, a thread writing after the call returns, and flush abuse.
+      Plus: an absent protocol stays distinguishable from an emitted empty payload; a crashing subject
+      still leaves its output as evidence; and the KNOWN TRANSPARENCY COST is asserted rather than hidden
+      (isatty() is False under capture, so subjects branching on it are judged in that world).
+
+    RESULT (r4 development evidence, NOT a prospective result)
+                          r3 shared channel    r4 isolated
+      OBSERVED_OK                  60              106
+      OBSERVED_RAISED              15               18
+      SETUP_FAILED                 57               58
+      UNOBSERVABLE                 50                0
+      OBSERVED total          75 (41.2%)      124 (68.1%)
+      observations LOST by the repair            0
+      flipped examples emitting subject bytes   50 / 50
+
+    CONFOUND RECORDED. observe-r4 is not a single-variable change: it also restructured setup handling.
+    The A/B therefore cannot attribute the whole difference to the channel by itself. Partial attribution
+    is reported instead - all 50 flipped examples emitted subject bytes, which is the precondition for
+    the channel explanation, so the channel is a SUFFICIENT explanation for every one of them.
+
+    LIMIT. Threat model is cooperative-but-noisy code. The subject may emit anything, including exact
+    protocol bytes, but is not assumed to hunt for and write to the observer's private file.
+
+    next         V2 - the execution-model entailment error
+---

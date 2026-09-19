@@ -1,0 +1,34 @@
+r4 / V1: observer-subject channel isolation, attacked at the boundary
+
+Repo C demonstrated the violated invariant: frozen r3 put the observer protocol and the subject program
+output on one untyped transport, and 48 of 50 unobservable pyparsing runs were individually attributed
+to it. The development corpus never exercised the collision because packaging doctests are quiet, so a
+MISSING ISOLATION BOUNDARY LOOKED LIKE AN OBSERVATION CAPABILITY.
+
+The repair is NOT contextlib.redirect_stdout, which only intercepts Python-level writes through
+sys.stdout and misses os.write(1,...), C extensions, inherited child descriptors and late threads.
+Isolation is at the FILE DESCRIPTOR level via os.dup2, and the protocol goes to a private file.
+
+16 ATTACKS ON THE BOUNDARY, ALL SURVIVED, including the subject emitting bytes that are EXACTLY a
+well-formed protocol message - forgery rather than noise. Also raw writes to fd 1 and fd 2, all 256 byte
+values, 5 MB of output, subprocess stdout and stderr, a thread writing after the call returns, and flush
+abuse. An absent protocol remains distinguishable from an emitted empty payload, so repairing V1 does
+not reintroduce run 0 one layer down.
+
+THE KNOWN TRANSPARENCY COST IS ASSERTED RATHER THAN HIDDEN: isatty() is False under capture, so a
+subject that branches on it is judged in that world. Isolating the channel by changing how the subject
+behaves would be the classic instrumentation failure, so both requirements are tested.
+
+r4 DEVELOPMENT EVIDENCE, NOT A PROSPECTIVE RESULT. On pyparsing: UNOBSERVABLE 50 -> 0, OBSERVED 75 -> 124
+(41.2% -> 68.1%), and ZERO observations lost. All 50 flipped examples emitted subject bytes, which is
+the precondition for the channel explanation.
+
+CONFOUND RECORDED: observe-r4 also restructured setup handling, so the A/B varies more than one factor
+and cannot by itself attribute the whole difference to the channel. Partial attribution is reported
+instead of assumed.
+
+Repo C prospective numbers are unchanged and legasus-freeze-r3 is untouched.
+
+Message-File: scratch/m5.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
