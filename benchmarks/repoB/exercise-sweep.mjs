@@ -29,17 +29,22 @@ let unobservable = 0;
 for (const ex of mined) {
   const r = observe({ rootDir: ROOT, packageName: PKG, setup: ex.setup, invocation: ex.invocation,
     namespaceModule: ex.dotted });
-  if (r === null) { unobservable++; runs.push({ ex, lines: [], entered: [], status: 'UNOBSERVABLE' }); continue; }
+  if (r === null) { unobservable++; runs.push({ ex, lines: [], qlines: [], entered: [], enteredq: [], status: 'UNOBSERVABLE' }); continue; }
   if (String(r.status).startsWith('SETUP_FAILED')) { failedSetup++; }
-  runs.push({ ex, lines: r.lines || [], entered: r.entered || [], status: r.status,
-    foreign: (r.foreignSources || []).length > 0 });
+  runs.push({ ex, lines: r.lines || [], qlines: r.qlines || [], entered: r.entered || [],
+    enteredq: r.enteredq || [],
+    status: r.status, foreign: (r.foreignSources || []).length > 0 });
 }
 
 const reachedLines = new Set();
+const reachedQLines = new Set();
 const enteredFns = new Set();
+const enteredIds = new Set();
 for (const r of runs) {
   for (const l of r.lines) reachedLines.add(l);
+  for (const l of (r.qlines || [])) reachedQLines.add(l);
   for (const e of r.entered) enteredFns.add(e);
+  for (const e of (r.enteredq || [])) enteredIds.add(e);
 }
 
 console.log('ran ' + runs.length + ' examples in ' + ((Date.now() - t0) / 1000).toFixed(1) + 's');
@@ -52,10 +57,13 @@ writeFileSync(OUT, JSON.stringify({
   minedCount: mined.length,
   failedSetup, unobservable,
   reachedLines: [...reachedLines].sort(),
+  reachedQLines: [...reachedQLines].sort(),
   enteredFns: [...enteredFns].sort(),
+  enteredIds: [...enteredIds].sort(),
   runs: runs.map((r) => ({ module: r.ex.module, dotted: r.ex.dotted, owner: r.ex.owner,
-    setup: r.ex.setup, invocation: r.ex.invocation, status: r.status,
-    lines: r.lines, entered: r.entered, foreign: !!r.foreign })),
+    setup: r.ex.setup, invocation: r.ex.invocation, wants: r.ex.wants, status: r.status,
+    lines: r.lines, qlines: r.qlines || [], entered: r.entered, enteredq: r.enteredq || [],
+    foreign: !!r.foreign })),
 }, null, 1), 'utf8');
 console.log('wrote ' + OUT);
 void readFileSync;

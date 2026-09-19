@@ -31,6 +31,7 @@
 //                                                                        (a platform branch)
 //     SITE_REACHED             the line ran                           -> authority experiment is VALID
 import { execFileSync } from 'node:child_process';
+import { FINGERPRINT_SRC } from './pysite.mjs';
 
 const NL = String.fromCharCode(10);
 
@@ -56,10 +57,17 @@ export function observe({ rootDir, packageName, setup = [], invocation, namespac
   timeoutMs = 30000 }) {
   const prog = [
     'import sys, json, os',
+    FINGERPRINT_SRC,
     'sys.path.insert(0, sys.argv[1])',
     'pkg = sys.argv[2]',
     'entered = set()',
     'lines = set()',
+    // SITES MUST BE KEYED BY CODE OBJECT, NOT BY MODULE AND LINE. Keying on module:line conflates the
+    // module-level `def foo(` STATEMENT (which executes at import) with the phantom co_lines() entry the
+    // function's own code object carries for its `def` line (offset 0, RESUME, which never emits a line
+    // event). That single ambiguity can inflate a numerator and a denominator at the same time.
+    'qlines = set()',
+    'enteredq = set()',
     'root = os.path.abspath(sys.argv[1]).replace("\\\\", "/")',
     'marker = "/" + pkg + "/"',
     'sources = set()',
@@ -77,9 +85,12 @@ export function observe({ rootDir, packageName, setup = [], invocation, namespac
     '    mod = os.path.basename(fn)[:-3]',
     '    if event == "call":',
     '        entered.add(mod + "." + code.co_name)',
+    '        qual = getattr(code, "co_qualname", code.co_name)',
+    '        enteredq.add(mod + "|" + qual + "#" + sitefp(code))',
     '        return tracer',
     '    if event == "line":',
     '        lines.add(mod + ":" + str(frame.f_lineno))',
+    '        qlines.add(sitekey(mod, code, frame.f_lineno))',
     '    return tracer',
     'ns = {}',
     // THE REPOSITORY'S OWN NAMESPACE. A doctest runs with its module's globals, which is why an authored
@@ -113,6 +124,7 @@ export function observe({ rootDir, packageName, setup = [], invocation, namespac
     '    sys.settrace(None)',
     'print(json.dumps({"status": status, "value": rendered,',
     '                  "entered": sorted(entered), "lines": sorted(lines),',
+    '                  "qlines": sorted(qlines), "enteredq": sorted(enteredq),',
     '                  "foreignSources": sorted(sources)[:3]}))',
   ].join(NL);
   try {
