@@ -1,0 +1,64 @@
+{
+ "model": "qwen2.5-coder:1.5b",
+ "baseline": {
+  "failed": 73,
+  "attempted": 182
+ },
+ "n": 3,
+ "results": [
+  {
+   "task": "core.py/_trim_arity",
+   "operator": "BOUNDARY_SHIFT",
+   "brokenFailed": 75,
+   "raw": {
+    "committed": true,
+    "failed": 91,
+    "attempted": 182,
+    "satisfies": false
+   },
+   "legasus": {
+    "committed": false,
+    "failed": 91,
+    "attempted": 182,
+    "refusal": "PROVE:failed=91,attempted=182"
+   },
+   "candidateChars": 1595
+  },
+  {
+   "task": "core.py/wrapper",
+   "operator": "BOUNDARY_SHIFT",
+   "brokenFailed": 91,
+   "raw": {
+    "committed": true,
+    "failed": 47,
+    "attempted": 52,
+    "satisfies": false
+   },
+   "legasus": {
+    "committed": false,
+    "failed": null,
+    "attempted": null,
+    "refusal": "SIGNATURE_UNCHANGED"
+   },
+   "candidateChars": 1104
+  },
+  {
+   "task": "helpers.py/counted_array",
+   "operator": "BOUNDARY_SHIFT",
+   "brokenFailed": 75,
+   "raw": {
+    "committed": true,
+    "failed": 67,
+    "attempted": 160,
+    "satisfies": false
+   },
+   "legasus": {
+    "committed": false,
+    "failed": null,
+    "attempted": null,
+    "refusal": "PARSES,SINGLE_TOP_LEVEL_STATEMENT,THAT_STATEMENT_IS_A_FUNCTION,DEFINES_THE_NAMED_FUNCTION,SIGNATURE_UNCHANGED,NON_EMPTY_BODY"
+   },
+   "candidateChars": 1443
+  }
+ ]
+}

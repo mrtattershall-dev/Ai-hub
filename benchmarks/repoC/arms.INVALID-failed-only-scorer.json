@@ -1,0 +1,55 @@
+{
+ "model": "qwen2.5-coder:1.5b",
+ "baseline": {
+  "failed": 73,
+  "attempted": 182
+ },
+ "n": 3,
+ "results": [
+  {
+   "task": "core.py/_trim_arity",
+   "operator": "BOUNDARY_SHIFT",
+   "brokenFailed": 75,
+   "raw": {
+    "committed": true,
+    "failed": 47
+   },
+   "legasus": {
+    "committed": false,
+    "failed": null,
+    "refusal": "PARSES,SINGLE_TOP_LEVEL_STATEMENT,THAT_STATEMENT_IS_A_FUNCTION,DEFINES_THE_NAMED_FUNCTION,SIGNATURE_UNCHANGED,NON_EMPTY_BODY"
+   },
+   "candidateChars": 1922
+  },
+  {
+   "task": "core.py/wrapper",
+   "operator": "BOUNDARY_SHIFT",
+   "brokenFailed": 91,
+   "raw": {
+    "committed": true,
+    "failed": 47
+   },
+   "legasus": {
+    "committed": false,
+    "failed": null,
+    "refusal": "PARSES,SINGLE_TOP_LEVEL_STATEMENT,THAT_STATEMENT_IS_A_FUNCTION,DEFINES_THE_NAMED_FUNCTION,SIGNATURE_UNCHANGED,NON_EMPTY_BODY"
+   },
+   "candidateChars": 1124
+  },
+  {
+   "task": "helpers.py/counted_array",
+   "operator": "BOUNDARY_SHIFT",
+   "brokenFailed": 75,
+   "raw": {
+    "committed": true,
+    "failed": 75
+   },
+   "legasus": {
+    "committed": false,
+    "failed": 75,
+    "refusal": "PROVE:75"
+   },
+   "candidateChars": 2027
+  }
+ ]
+}
