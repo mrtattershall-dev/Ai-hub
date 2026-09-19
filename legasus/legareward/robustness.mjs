@@ -31,12 +31,28 @@ import { join } from 'node:path';
 const NL = String.fromCharCode(10);
 const L = (...xs) => xs.join(NL);
 
+// A POSITION THAT DOES NOT PARSE AND AN EVALUATION THAT COULD NOT BE MADE ARE DIFFERENT THINGS, and
+// collapsing them is the vacuity trap in miniature: the first is a legitimate accounting fact about the
+// unit, the second means the measurement did not happen. `ILLEGAL` is returned for a syntax error;
+// anything else throws and the caller must treat it as unobservable.
+const ILLEGAL = Symbol('ILLEGAL_POSITION');
+
 function runProgram(program, inputs) {
   const ws = mkdtempSync(join(tmpdir(), 'robust-'));
   writeFileSync(join(ws, 'impl.py'), program + NL, 'utf8');
   writeFileSync(join(ws, 'p.py'), L('import impl',
     ...inputs.map((v, i) => 'print("r' + i + '=" + str(impl.classify(' + JSON.stringify(v) + ')))')), 'utf8');
-  const out = execFileSync('python', ['p.py'], { cwd: ws, encoding: 'utf8', timeout: 20000 });
+  let out;
+  try {
+    // stderr is captured rather than inherited: a non-compiling position is an expected, counted outcome,
+    // not something to spray over the report.
+    out = execFileSync('python', ['p.py'],
+      { cwd: ws, encoding: 'utf8', timeout: 20000, stdio: ['ignore', 'pipe', 'pipe'] });
+  } catch (e) {
+    const text = String((e.stderr || '') + (e.message || ''));
+    if (/SyntaxError|IndentationError|TabError/.test(text)) return ILLEGAL;
+    throw e;
+  }
   const m = new Map();
   inputs.forEach((v, i) => {
     const mm = out.match(new RegExp('^r' + i + '=(.*)$', 'm'));
@@ -44,6 +60,8 @@ function runProgram(program, inputs) {
   });
   return m;
 }
+
+export { ILLEGAL };
 
 // Every position the guard could occupy inside the unit body: before the first statement, between any two,
 // and after the last. The signature line is not a position.
@@ -63,21 +81,28 @@ function assembleAt(srcLines, guardLines, position) {
 // `expected` is the ground truth from the CONTRACT: a Map from input to required answer. It is supplied by
 // the caller, never derived from the candidate - a robustness measure that read its answers off the
 // candidate would report every candidate perfectly robust.
+// A POSITION THAT DOES NOT COMPILE IS NOT A PLACEMENT THE CANDIDATE FAILED AT. It is not a placement at
+// all - inserting a guard between `if n == 3:` and its body is an indentation error for every candidate
+// alike. Counting those as failures deflates everything equally, so the ORDERING survives, but the
+// fraction then does not mean what its name says. The denominator is the positions where the unit still
+// compiles, and that is measured rather than assumed.
 export function placementRobustness({ srcLines, guardLines, inputs, expected }) {
   const positions = insertionPositions(srcLines);
-  let correct = 0;
+  let correct = 0; let legal = 0;
   const detail = [];
   for (const p of positions) {
     const program = assembleAt(srcLines, guardLines, p);
-    let ok = false;
-    try {
-      const got = runProgram(program, inputs);
-      ok = inputs.every((v) => got.get(v) === expected.get(v));
-    } catch (e) { ok = false; }
+    // An evaluation failure here is NOT caught: it propagates so the caller records the candidate as
+    // unobservable rather than quietly scoring it. Only a genuine syntax error is an accounting fact.
+    const got = runProgram(program, inputs);
+    const compiles = got !== ILLEGAL;
+    const ok = compiles && inputs.every((v) => got.get(v) === expected.get(v));
+    if (compiles) legal++;
     if (ok) correct++;
-    detail.push({ position: p, ok });
+    detail.push({ position: p, compiles, ok });
   }
-  return { correct, legal: positions.length, fraction: correct / positions.length, detail };
+  return { correct, legal, positions: positions.length,
+    fraction: legal ? correct / legal : 0, detail };
 }
 
 export { NL, L };

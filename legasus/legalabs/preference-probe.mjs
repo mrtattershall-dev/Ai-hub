@@ -14,8 +14,10 @@ import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { measure, DIMENSIONS } from '../legareward/metrics.mjs';
-import { compare, VERDICT } from '../legareward/dominance.mjs';
+import { measure, DIMENSIONS, behavioralDimensions, descriptiveDimensions }
+  from '../legareward/metrics.mjs';
+import { compare, mayReplaceChampion, VERDICT } from '../legareward/dominance.mjs';
+import { placementRobustness } from '../legareward/robustness.mjs';
 import { makeTally, observed, unobservable, finding, conclude } from './nonvacuity.mjs';
 
 const NL = String.fromCharCode(10);
@@ -90,27 +92,40 @@ for (const key of Object.keys(r.cells)) {
   }
 }
 
-// PLACEMENT ROBUSTNESS, by execution: how many of the k! arrangements keep the contract satisfied?
+// PLACEMENT ROBUSTNESS REV 2: the INSERTION POSITION is varied against the existing program, and the
+// denominator is the positions where the unit still compiles. Rev 1 permuted the order of the new
+// operations and its own evidence convicted it - it called `n < 10 and n != 3` and `n < 10` equally
+// robust and then demoted the self-defending guard, while the middle family had measured 0.651 against
+// 0.470 the other way.
 const candidates = [];
 for (const [gk, forms] of realizations) {
   for (const f of forms.values()) {
     const ops = f.order;
-    if (ops.length < 2) { continue; }
+    if (ops.length < 2) continue;
     try {
       const inputs = [];
       for (let v = -3; v <= 12; v++) inputs.push(v);
       for (const v of [50, 101, -100]) inputs.push(v);
-      const want = expectationsFor(ops, f.sample, inputs);
-      const perms = permutations(ops);
-      let correctPlacements = 0;
-      for (const p of perms) {
-        const got = runProgram(assemble(p, f.sample), inputs);
-        if (inputs.every((v) => got.get(v) === want.get(v))) correctPlacements++;
-      }
+
+      // Ground truth from the CONTRACT: the derived order, assembled as the architecture would.
+      const expected = expectationsFor(ops, f.sample, inputs);
+
+      // The unit the guard is being placed into: the fixed source PLUS the transaction's other
+      // operations in their derived order. Varying this guard's position against that is the real
+      // deployment variation - neighbours move when files are edited.
+      const others = ops.filter((id) => id !== f.id);
+      const srcLines = [SRC_LINES[0],
+        ...SRC_LINES.slice(1, INSERT_AFTER + 1),
+        ...others.flatMap((id) => [expand(f.sample[id], id).split(NL)[0],
+          expand(f.sample[id], id).split(NL)[1]]),
+        ...SRC_LINES.slice(INSERT_AFTER + 1)];
+      const guardLines = expand(f.code, f.id).split(NL);
+
+      const rob = placementRobustness({ srcLines, guardLines, inputs, expected });
       candidates.push({ group: gk, code: f.code, id: f.id, case: f.case, verified: true,
         models: [...f.models].sort(),
-        metrics: measure({ code: f.code, placementsLegal: perms.length, placementsCorrect: correctPlacements }),
-        placements: correctPlacements + '/' + perms.length });
+        metrics: measure({ code: f.code, placementsLegal: rob.legal, placementsCorrect: rob.correct }),
+        placements: rob.correct + '/' + rob.legal });
       observed(tally);
     } catch (e) {
       unobservable(tally, gk + ' | ' + f.code + '  ->  ' + String(e.message).split(NL)[0]);
@@ -181,6 +196,24 @@ for (const row of rows.slice(0, 24)) {
     + (row.onlySurface ? 'SURFACE-ONLY  ' : '              ')
     + row.a + '  [' + row.aPlace + ']   vs   ' + row.b + '  [' + row.bPlace + ']');
 }
+
+// ---- PROMOTION under the rev 2 rule -------------------------------------------------------------
+console.log('');
+console.log('  PROMOTION — behavioral dimensions only. Descriptive gains may not take a champion.');
+let promotions = 0; let blockedDescriptive = 0;
+for (const [, pool] of byGroup) {
+  for (let i = 0; i < pool.length; i++) {
+    for (let j = 0; j < pool.length; j++) {
+      if (i === j) continue;
+      const m = mayReplaceChampion(pool[i], pool[j]);
+      if (m.replace) promotions++;
+      else if (m.behavioralVerdict === VERDICT.EQUIVALENT
+        && m.descriptiveVerdict === VERDICT.DOMINATES) blockedDescriptive++;
+    }
+  }
+}
+console.log('    promotions allowed (behavioral dominance)   ' + promotions);
+console.log('    BLOCKED: descriptive-only gains             ' + blockedDescriptive);
 
 // ---- stability: does any dominance direction REVERSE across models? -----------------------------
 console.log('');
