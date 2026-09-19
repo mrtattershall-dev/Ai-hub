@@ -92,23 +92,43 @@ const MINE = [
   '    except Exception:',
   '        out.append({"module": r["module"], "source": r["invocation"], "outcome": "IMPORT_FAILED"})',
   '        continue',
-  '    status = "OK"; value = None',
+  '    status = "OK"; value = None; setup_failed = False',
   '    sink = io.StringIO()',
+  // CORRECTION 2: a doctest example's "setup" is the examples that precede it in the same docstring.
+  // When one of those raises, doctest attributes the failure to the example that RAISED and carries on.
+  // Charging it to the CURRENT example is misattribution - the same family as every identity defect in
+  // this project. The preceding example is its own row here and is classified on its own merits.
   '    try:',
   '      with contextlib.redirect_stdout(sink):',
   '        for line in r["setup"]:',
   '            exec(line, ns)',
-  '        try:',
-  '            value = repr(eval(compile(r["invocation"], "<x>", "eval"), ns))',
-  '        except SyntaxError:',
-  '            exec(compile(r["invocation"], "<x>", "exec"), ns)',
-  '            value = None',
-  '        printed = sink.getvalue()',
-  '    except Exception as e:',
+  '    except Exception:',
+  '        setup_failed = True',
+  '    sink = io.StringIO()',
+  '    if not setup_failed:',
+  '      try:',
+  '        with contextlib.redirect_stdout(sink):',
+  '            try:',
+  '                value = repr(eval(compile(r["invocation"], "<x>", "eval"), ns))',
+  '            except SyntaxError:',
+  '                exec(compile(r["invocation"], "<x>", "exec"), ns)',
+  '                value = None',
+  '      except Exception as e:',
   '        status = "RAISED:" + type(e).__name__',
+  '    printed = sink.getvalue()',
   '    wants = (r.get("wants") or "").strip()',
-  '    if not wants:',
-  '        outcome = "NO_ASSERTION"',
+  '    if setup_failed:',
+  '        outcome = "SETUP_FAILED"',
+  // CORRECTION 1: empty expected output is NOT "nothing asserted". doctest requires the example to
+  // complete SILENTLY and WITHOUT RAISING, and prints repr(value) for any non-None result - so a value
+  // appearing where none was documented is an output mismatch.
+  '    elif not wants:',
+  '        if status.startswith("RAISED:"):',
+  '            outcome = "UNEXPECTED_EXCEPTION"',
+  '        elif printed or (value is not None and value != "None"):',
+  '            outcome = "OUTPUT_MISMATCH"',
+  '        else:',
+  '            outcome = "PASS"',
   '    elif wants.startswith("Traceback"):',
   '        hit = status.startswith("RAISED:") and status[7:] in wants',
   '        outcome = "PASS" if hit else "UNEXPECTED_EXCEPTION"',
@@ -117,9 +137,86 @@ const MINE = [
   '    else:',
   '        outcome = "PASS" if str(value) == wants else "OUTPUT_MISMATCH"',
   '    out.append({"module": r["module"], "source": r["invocation"], "outcome": outcome,',
-  '                "printed": bool(sink.getvalue())})',
+  '                "printed": bool(printed)})',
   'print(json.dumps(out))',
 ].join(NL);
+
+// MINE_SEQ — the SAME comparison rules, under DOCTEST'S EXECUTION MODEL rather than mine.
+//
+// The residual 8 disagreements all point at one structural difference, and this variant tests that claim
+// instead of asserting it. doctest has no notion of "setup": a docstring is ONE test whose examples run
+// in sequence over SHARED globals, every example runs whatever happened before it, and an earlier failure
+// leaves names unbound so later examples raise NameError - which doctest duly reports.
+//
+// My classifier treats each example as INDEPENDENTLY REPLAYABLE with reconstructed setup. That is not an
+// accident and not a bug: per-example replayability is exactly what the witness bank requires, and it is
+// precisely what makes it differ from doctest here.
+//
+// NOTE ON WHAT THIS CAN AND CANNOT SHOW: as the classifier is made more like doctest, agreement stops
+// being evidence of anything. This variant exists to CONFIRM THE DIAGNOSIS - that the residual is fully
+// explained by execution model - not to claim a better score.
+const MINE_SEQ = [
+  'import importlib, json, sys, io, contextlib',
+  'sys.path.insert(0, sys.argv[1])',
+  'rows = json.loads(open(sys.argv[3], encoding="utf-8").read())',
+  'groups = {}',
+  'order = []',
+  'for r in rows:',
+  '    k = r["dotted"] + "|" + str(r.get("owner"))',
+  '    if k not in groups:',
+  '        groups[k] = []',
+  '        order.append(k)',
+  '    groups[k].append(r)',
+  'out = []',
+  'for k in order:',
+  '    rs = groups[k]',
+  '    try:',
+  '        ns = dict(vars(importlib.import_module(rs[0]["dotted"])))',
+  '    except Exception:',
+  '        for r in rs:',
+  '            out.append({"module": r["module"], "source": r["invocation"],',
+  '                        "outcome": "IMPORT_FAILED"})',
+  '        continue',
+  '    for r in rs:',
+  '        status = "OK"; value = None',
+  '        sink = io.StringIO()',
+  '        try:',
+  '            with contextlib.redirect_stdout(sink):',
+  '                try:',
+  '                    value = repr(eval(compile(r["invocation"], "<x>", "eval"), ns))',
+  '                except SyntaxError:',
+  '                    exec(compile(r["invocation"], "<x>", "exec"), ns)',
+  '                    value = None',
+  '        except Exception as e:',
+  '            status = "RAISED:" + type(e).__name__',
+  '        printed = sink.getvalue()',
+  '        wants = (r.get("wants") or "").strip()',
+  '        if not wants:',
+  '            if status.startswith("RAISED:"):',
+  '                outcome = "UNEXPECTED_EXCEPTION"',
+  '            elif printed or (value is not None and value != "None"):',
+  '                outcome = "OUTPUT_MISMATCH"',
+  '            else:',
+  '                outcome = "PASS"',
+  '        elif wants.startswith("Traceback"):',
+  '            hit = status.startswith("RAISED:") and status[7:] in wants',
+  '            outcome = "PASS" if hit else "UNEXPECTED_EXCEPTION"',
+  '        elif status.startswith("RAISED:"):',
+  '            outcome = "UNEXPECTED_EXCEPTION"',
+  '        else:',
+  '            outcome = "PASS" if str(value) == wants else "OUTPUT_MISMATCH"',
+  '        out.append({"module": r["module"], "source": r["invocation"], "outcome": outcome,',
+  '                    "printed": bool(printed)})',
+  'print(json.dumps(out))',
+].join(NL);
+
+const runMineSeq = (rootDir, rowsFile) => {
+  try {
+    return JSON.parse(execFileSync('python', ['-c', MINE_SEQ, rootDir, PKG, rowsFile],
+      { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 120000,
+        env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' } }));
+  } catch (e) { return null; }
+};
 
 const runMine = (rootDir, rowsFile) => {
   try {
@@ -132,7 +229,7 @@ const runMine = (rootDir, rowsFile) => {
 
 const sweep = JSON.parse(readFileSync('benchmarks/repoB/sweep.json', 'utf8'));
 const rows = sweep.runs.map((r) => ({ module: r.module.replace(/\.py$/, ''), dotted: r.dotted,
-  setup: r.setup, invocation: r.invocation, wants: r.wants }));
+  owner: r.owner, setup: r.setup, invocation: r.invocation, wants: r.wants }));
 const MODULES = [...new Set(rows.map((r) => r.module))];
 const rowsFile = join(tmpdir(), 'rows-' + process.pid + '.json');
 writeFileSync(rowsFile, JSON.stringify(rows), 'utf8');
@@ -196,6 +293,7 @@ if (!eqSet(dF0, mF0)) {
 const candidates = JSON.parse(readFileSync('benchmarks/repoB/candidates.json', 'utf8'));
 let agree = 0; let applied = 0; const varied = new Set(); const disagreements = [];
 let kindSame = 0; let kindDiff = 0; const kindExamples = [];
+let seqAgree = 0;
 for (const c of candidates) {
   const dir = mkdtempSync(join(tmpdir(), 'ext-'));
   mkdirSync(join(dir, PKG), { recursive: true });
@@ -218,6 +316,8 @@ for (const c of candidates) {
   const ka = kindAgreement(d, mine);
   kindSame += ka.same; kindDiff += ka.differ;
   for (const ex of ka.examples) if (kindExamples.length < 8) kindExamples.push(ex);
+  const seqF = failSet(mustObserve(runMineSeq(dir, rowsFile), 'MINE_SEQ under ' + c.fn));
+  if (eqSet(dF, seqF)) seqAgree++;
   if (eqSet(dF, mF)) agree++;
   else {
     disagreements.push({ c: c.file + '/' + c.fn, onlyD: [...dF].filter((x) => !mF.has(x)).length,
@@ -237,6 +337,10 @@ console.log('   examples both call failing        : ' + (kindSame + kindDiff));
 console.log('   same failure KIND                 : ' + kindSame
   + (kindDiff === 0 ? '   HELD' : '   DIFFERING KIND: ' + kindDiff));
 for (const ex of kindExamples) console.log('     ' + ex);
+console.log('');
+console.log('X4 DIAGNOSIS TEST - same comparison rules, doctest execution model');
+console.log('   identical failing sets            : ' + seqAgree + '/' + applied
+  + (seqAgree === applied ? '   the residual IS the execution model' : '   something else remains'));
 console.log('');
 console.log('X3 NON-VACUITY');
 console.log('   distinct failing-set signatures  : ' + varied.size
