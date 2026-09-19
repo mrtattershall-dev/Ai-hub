@@ -93,13 +93,19 @@ condition"), same shape, same position, near-identical length.
     14B    63/80 -> 0/80     p = 8.2e-29    eliminated entirely, P(correct) back to 1.000
     1.5B   51/78 -> 40/79    p = 0.076      NOT significant - it persists
 
-    composition-linked capture   the model misreads a REAL relationship   fixable by framing, at capacity
-    surface capture              a narrower same-shape bound is COPIED    not fixable by framing
-
 At 14B the model narrows itself because it believes the sibling constrains it, and stops the moment it is
-told otherwise. At 1.5B, 33 guards still wrote `n < 0` for an operation asked for `n < 10` **after being
-told in the same prompt that `n < 0` belongs to a different function**. Only the first is a reasoning
-error; the second is interference, and no amount of correct explanation removes it.
+told otherwise — a **relationship-sensitive** failure. At 1.5B, 33 guards still wrote `n < 0` for an
+operation asked for `n < 10` **after being told in the same prompt that `n < 0` belongs to a different
+function**.
+
+**What is established, and no more:**
+
+> `1.5B` capture is **substantially less sensitive to whether the foreign domain is actually relevant** to
+> the local operation than `14B` capture is.
+
+Surface attraction, copying, semantic anchoring and pattern interference are all live hypotheses for the
+1.5B mechanism and none of them is measured yet. Naming it now would be inventing a mechanism from one
+contrast — the same error as claiming a capacity law from three models.
 
 **This does not weaken the rule — it is the third independent measurement of the same dominance.**
 `ISOLATED` is 1.000 at every capacity again; the best rival reaches 1.000 only at 14B and 0.429 at 1.5B. A

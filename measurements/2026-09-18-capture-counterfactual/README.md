@@ -136,8 +136,13 @@ model narrows itself because it believes the sibling constrains it, and stops wh
 
 At **1.5B**, capture survives the same disclaimer at 51%: 33 guards still wrote `n < 0` for an operation
 asked for `n < 10`, after being told in the same prompt that `n < 0` is handled by a different function
-and does not affect its condition. There is no composition story available. That is **surface copying** of
-a narrower same-shape bound.
+and does not affect its condition. There is no composition story available at that capacity.
+
+**What is established, and no more.** `1.5B` capture is **substantially less sensitive to whether the
+foreign domain is actually relevant** than `14B` capture is. Calling the 1.5B mechanism "surface copying"
+would be inventing a mechanism from a single contrast — surface attraction, copying, semantic anchoring
+and pattern interference all predict this result equally well, and none of them is measured. Isolating it
+needs a factorial that varies surface similarity independently of relationship.
 
 ## Against my own preregistration
 
@@ -147,9 +152,14 @@ alone would have read as clean support for a hypothesis that one of the three mo
 
 The honest form of the finding is therefore narrower than the question asked:
 
-> Whether `CROSS-OBLIGATION CAPTURE` is composition reasoning or surface copying **is not a property of
-> the phenomenon. It is a property of the model.** The same prompt manipulation abolishes it at 14B and
-> leaves it essentially intact at 1.5B.
+> **The mechanism behind `CROSS-OBLIGATION CAPTURE` is not one thing.** The same prompt manipulation
+> abolishes it at 14B and leaves it essentially intact at 1.5B, so whatever drives it differs with
+> capacity. The question as posed — reasoning *or* copying — presumed a single answer and does not have
+> one.
+
+The 14B half is characterized: relationship-sensitive. The 1.5B half is characterized only by what it is
+**not** sensitive to. That is as far as this family reaches, and isolating it requires varying surface
+similarity independently of relationship.
 
 ## What this does and does not change for the architecture
 
@@ -167,11 +177,11 @@ not a rule the architecture can rely on, because the architecture's claim is tha
 
 It does sharpen what the rule is protecting against. There are two hazards, not one:
 
-    composition-linked capture   the model misreads a real relationship   fixable by framing, at capacity
-    surface capture              a narrower same-shape bound is copied    not fixable by framing
+    relationship-sensitive capture   tracks whether the sibling is really in the chain   14B
+    relevance-insensitive capture    largely ignores that distinction                   1.5B
 
-Only the first is a reasoning error. The second is closer to interference, and no amount of correct
-explanation removes it.
+Only the first is characterized. The second is named by what it is NOT sensitive to, which is all the
+data supports.
 
 ## The hard guardrail, a third time
 
