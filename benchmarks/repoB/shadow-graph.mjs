@@ -159,7 +159,7 @@ for (const s of subjects) {
   const sc = scope({ repository: REPO, environment: ENV, invocation: 'mined', implementation: s });
   const n = node({ kind: NODE.CLAIM, proposition: 'in the purpose region: ' + s, scope: sc,
     basis: 'CONNECTIVITY',
-    supports: parents.map((p) => ({ id: idsFor.get(p), edge: EDGE.REQUIRES })) });
+    supports: parents.map((p) => ({ id: idsFor.get(p), edge: EDGE.ANY_OF })) });
   g2.nodes[idsFor.get(s)] = { ...n, id: idsFor.get(s) };
   for (const p of parents) (g2.dependents[idsFor.get(p)] = g2.dependents[idsFor.get(p)] || [])
     .push(idsFor.get(s));
@@ -172,10 +172,14 @@ for (const s of subjects) {
 for (const s of subjects) {
   if (!roots.has(s) && !(reachedBy.get(s) || new Set()).size) continue;
 }
+// THE QUESTION IS ASKED WITH `implementation` UNPINNED, and that is a modelling correction rather than a
+// convenience. "X is in the purpose region" is NOT quantified over a single implementation: its ancestors
+// are necessarily OTHER code, so pinning the axis made every parent trip SCOPE INFLATION and the graph
+// admitted only the 20 roots. The claim is quantified over repository, environment and the witness set.
 let a2 = 0;
 for (const s of subjects) {
-  const sc = scope({ repository: REPO, environment: ENV, invocation: 'mined', implementation: s });
-  const e = entitled(g2, idsFor.get(s), sc);
+  const ask = scope({ repository: REPO, environment: ENV, invocation: 'mined' });
+  const e = entitled(g2, idsFor.get(s), ask);
   if (e.ok === inRegion.has(s)) a2++;
 }
 
@@ -183,7 +187,7 @@ console.log('SHADOW-GRAPH EQUIVALENCE — one frozen algebra, four independently
 console.log('');
 tally('L1 admission (frozen 56)', a1, classified.rows.length);
 tally('L3 survey frontier (VERIFIED)', a3, n3);
-tally('L2 connectivity region', a2, subjects.length, 'conjunctive supports');
+tally('L2 connectivity region', a2, subjects.length, 'ANY_OF (algebra v2)');
 console.log('');
 console.log('algebra exceptions required: ' + algebraExceptions
   + (algebraExceptions === 0 ? '   (no layer-specific rules were added)' : '   HYPOTHESIS WEAKENED'));
