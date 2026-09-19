@@ -1,0 +1,23 @@
+{
+ "cells": {
+  "OBSERVED_RAISED | UNEXPECTED_EXCEPTION": 10,
+  "SETUP_FAILED | UNEXPECTED_EXCEPTION": 44,
+  "OBSERVED_OK | PASS": 56,
+  "OBSERVED_OK | OUTPUT_MISMATCH": 3,
+  "OBSERVED_RAISED | OUTPUT_MISMATCH": 5,
+  "UNOBSERVABLE | PASS": 43,
+  "UNOBSERVABLE | OUTPUT_MISMATCH": 5,
+  "UNOBSERVABLE | UNEXPECTED_EXCEPTION": 1,
+  "SETUP_FAILED | PASS": 8,
+  "SETUP_FAILED | OUTPUT_MISMATCH": 5
+ },
+ "tot": 180,
+ "observed": 74,
+ "setupFailed": 57,
+ "setupSupported": 49,
+ "unobs": 49,
+ "unmatched": [
+  "import pyparsing as pp",
+  "pp.show_best_practices()"
+ ]
+}
