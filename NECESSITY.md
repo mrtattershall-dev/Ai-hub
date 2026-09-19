@@ -76,6 +76,36 @@ gives `RENDER` a second obligation mirroring the one `sufficiency.mjs` enforces:
     SUFFICIENCY      does the prompt contain every fact required for the authorized operation?
     NONINTERFERENCE  does it OMIT semantic facts belonging to other operations?
 
+Both are now mechanized — `legarender/noninterference.mjs`, with admit cases taken from the prompts that
+measured `1.000` and catch cases from the prompts that produced the capture.
+
+### Capture is TWO phenomena, and which one you have is a property of the model
+
+The counterfactual family stated the **same sibling domains** and changed only their relevance —
+`IN_CHAIN` ("same function, same chain") against `ELSEWHERE` ("a different function; does not affect your
+condition"), same shape, same position, near-identical length.
+
+    capture              1.5B       7B        14B
+    ISOLATED            0/79       0/80      0/80
+    IN_CHAIN           51/78       5/80     63/80        replicates at 50.0%
+    ELSEWHERE          40/79       0/80      0/80
+
+    14B    63/80 -> 0/80     p = 8.2e-29    eliminated entirely, P(correct) back to 1.000
+    1.5B   51/78 -> 40/79    p = 0.076      NOT significant - it persists
+
+    composition-linked capture   the model misreads a REAL relationship   fixable by framing, at capacity
+    surface capture              a narrower same-shape bound is COPIED    not fixable by framing
+
+At 14B the model narrows itself because it believes the sibling constrains it, and stops the moment it is
+told otherwise. At 1.5B, 33 guards still wrote `n < 0` for an operation asked for `n < 10` **after being
+told in the same prompt that `n < 0` belongs to a different function**. Only the first is a reasoning
+error; the second is interference, and no amount of correct explanation removes it.
+
+**This does not weaken the rule — it is the third independent measurement of the same dominance.**
+`ISOLATED` is 1.000 at every capacity again; the best rival reaches 1.000 only at 14B and 0.429 at 1.5B. A
+rendering rule that works only above a capacity threshold is not one the architecture can rely on,
+because the architecture's claim is that the proposal source is **substitutable**.
+
 ## The law that keeps emerging
 
 > **Anything with the authority to reject must prove that it can admit legitimate alternatives.**

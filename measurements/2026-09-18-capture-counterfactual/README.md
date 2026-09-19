@@ -90,3 +90,100 @@ non-evidentiary.** Every number in the result section is generated from the arti
     samples      20 transactions per case per condition per model
     temperature  0.6
     cases        E0, E1, E2, E3 generate; UND refuses
+
+---
+
+# RESULT — the prediction holds at 14B, fails at 1.5B, and the phenomenon splits in two
+
+**GPU stopped and verified (`legasus-scale`, state `stopped`, 0 tasks) before any of this was read.**
+**Every number below is generated from `RESULT.json`. No number here was read off a console.**
+
+## The discriminator
+
+    condition     P(correct|assembled)   guards containing a sibling   captured
+    ISOLATED            1.000                      239                 0    0.0%
+    IN_CHAIN            0.524                      238               119   50.0%
+    ELSEWHERE           0.910                      239                40   16.7%
+
+    POOLED   119/238 vs 40/239    p = 7.1e-15
+
+`IN_CHAIN` replicated (50.0% here, 53.0% and 53.1% in the two previous families). Pooled, **relevance
+matters**: stating the same domains as belonging to a different function cuts capture by two thirds.
+
+## But the pooled number hides the result
+
+    capture              1.5B       7B        14B
+    ISOLATED            0/79       0/80      0/80
+    IN_CHAIN           51/78       5/80     63/80
+    ELSEWHERE          40/79       0/80      0/80
+
+    14B    63/80 -> 0/80     p = 8.2e-29    eliminated entirely
+    7B      5/80 -> 0/80     p = 0.059      low baseline, not significant
+    1.5B   51/78 -> 40/79    p = 0.076      NOT significant - it persists
+
+    P(correct|assembled)  1.5B       7B        14B
+    ISOLATED             1.000     1.000     1.000
+    IN_CHAIN             0.240     0.925     0.300
+    ELSEWHERE            0.429     0.988     1.000
+
+**These are two different phenomena wearing one signature.**
+
+At **14B**, capture is entirely contingent on the sibling actually being in the chain. The identical
+domains, reframed as belonging to a different function, remove it **completely** and restore
+`P(correct|assembled)` to **1.000**. What it writes changes accordingly: 58 of 80 guards are the correct
+`n < 10 and n != 3`. That is wrong composition reasoning about a relationship that genuinely exists — the
+model narrows itself because it believes the sibling constrains it, and stops when told it does not.
+
+At **1.5B**, capture survives the same disclaimer at 51%: 33 guards still wrote `n < 0` for an operation
+asked for `n < 10`, after being told in the same prompt that `n < 0` is handled by a different function
+and does not affect its condition. There is no composition story available. That is **surface copying** of
+a narrower same-shape bound.
+
+## Against my own preregistration
+
+The prediction was "`ELSEWHERE` MUCH LOWER than `IN_CHAIN`". It is **confirmed pooled and at 14B**, and
+**falsified at 1.5B** (`p = 0.076`). Recorded as a split rather than as a win, because the pooled number
+alone would have read as clean support for a hypothesis that one of the three models contradicts.
+
+The honest form of the finding is therefore narrower than the question asked:
+
+> Whether `CROSS-OBLIGATION CAPTURE` is composition reasoning or surface copying **is not a property of
+> the phenomenon. It is a property of the model.** The same prompt manipulation abolishes it at 14B and
+> leaves it essentially intact at 1.5B.
+
+## What this does and does not change for the architecture
+
+It does **not** weaken `SEMANTIC LEAST PRIVILEGE`, and the reason is the same dominance argument as
+before, now measured a third time:
+
+    P(correct|assembled)  1.5B       7B        14B
+    ISOLATED             1.000     1.000     1.000
+    best rival           0.429     0.988     1.000
+
+**`ISOLATED` is still optimal at every capacity.** The best that careful framing achieves is *matching* it
+at 14B while remaining far worse at 1.5B. A rendering rule that only works above a capacity threshold is
+not a rule the architecture can rely on, because the architecture's claim is that the proposal source is
+**substitutable**.
+
+It does sharpen what the rule is protecting against. There are two hazards, not one:
+
+    composition-linked capture   the model misreads a real relationship   fixable by framing, at capacity
+    surface capture              a narrower same-shape bound is copied    not fixable by framing
+
+Only the first is a reasoning error. The second is closer to interference, and no amount of correct
+explanation removes it.
+
+## The hard guardrail, a third time
+
+    condition     transactions carrying a captured contract   CONSTRAIN   PROVE   LEAKED
+    ISOLATED                       0                              0         0        0
+    IN_CHAIN                     107                             12        95        0
+    ELSEWHERE                     40                             25        15        0
+
+**Zero leaks.** Cumulative across the three families: **421 transactions carrying the wrong semantic
+contract, and none reached commit.**
+
+Worth noting where the work moved. Under `ELSEWHERE` at 1.5B the captured fragments were rejected by
+`CONSTRAIN` more often than by `PROVE` (25 against 15), the reverse of `IN_CHAIN` (12 against 95) — the
+small model's output degraded in form as well as in meaning. The total held regardless of which stage
+caught it, which is what having two independent stages is for.
