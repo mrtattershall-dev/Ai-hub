@@ -1,0 +1,19 @@
+  S_DISJ         ORDERED      order evens then odds   basis DERIVED_WITH_ENGINEERING_CHOICE
+  S_DISJ NOTE: reversed order verifies, which is expected to depend on which constraint the reversal crosses
+  S_NEST         ORDERED      order mid2 then evens   basis DERIVED
+  S_MIX          ORDERED      order mid2 then low   basis DERIVED
+  S_TRIPLE       ORDERED      order four then mid2 then evens   basis DERIVED
+  S_UNDET        UNDETERMINED NO GENERATION   blocked by mid2/cross at n=6
+
+  ABLATION INSTRUMENT (perfect fragments, presented order):
+    S_DISJ edges 0   DECIDE ON verified   DECIDE OFF verified   expected OFF verified
+    S_NEST edges 1   DECIDE ON verified   DECIDE OFF failed: mid2   expected OFF failed
+    S_MIX edges 1   DECIDE ON verified   DECIDE OFF failed: mid2   expected OFF failed
+    S_TRIPLE edges 3   DECIDE ON verified   DECIDE OFF failed: mid2,four   expected OFF failed
+
+  controls ok: orders derived as expected, each prompt isolated from the other operation, both realizations verify, the reversed composition fails where ordering is derived and passes where both orders are legal
+  RULE 3 ok: qwen2.5-coder:1.5b, qwen2.5-coder:7b, qwen2.5-coder:14b
+  4 transaction cases x 3 models   samples 20
+
+  qwen2.5-coder:1.5b   S_DISJ        op-yield 1.000   assembled 20/20   verified  4   P(correct|assembled) 0.200   dead-op 2   probe-fail 14  ||  edges 0   DECIDE-OFF verified  4   broken  0/4
+  qwen2.5-coder:1.5b   S_NEST        op-yield 0.950   assembled 18/20   verified  1   P(correct|assembled) 0.056   dead-op 0   probe-fail 17  ||  edges 1   DECIDE-OFF verified  0   broken  1/1
