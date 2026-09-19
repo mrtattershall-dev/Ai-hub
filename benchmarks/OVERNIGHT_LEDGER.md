@@ -152,3 +152,36 @@ Both are r4 work. Neither may be repaired in r3.
 
     next         V2 - the execution-model entailment error
 ---
+## Entry 4 — r4 / V2: the execution model made explicit
+
+    objective    repair V2 - r3's entailment "a failed prefix means this cannot be an experiment"
+    authority    delegated r4 development surface
+    start hash   60323a5
+    hypothesis   the entailment is a property of r3's MODEL, not of the subject. Making the model an
+                 explicit recorded coordinate (RECONSTRUCTED_PREFIX vs SEQUENTIAL_SHARED) should recover
+                 the 8 wrong entailments without rescuing genuine failures.
+
+    RESULT (preregistered in the commit before the run)
+      W1  8 cases r3 called SETUP_FAILED while external PASSED
+          now OBSERVED under SEQUENTIAL_SHARED: 8 / 8, all with status OK          HELD
+      W2  49 cases where BOTH reported failure
+          still failing under SEQUENTIAL_SHARED: 47 / 49                           FAILED
+      W3  75 observable under RECONSTRUCTED_PREFIX, still observable: 75 / 75      HELD
+
+    W2 IS THE INFORMATIVE ONE AND IT FAILED. The control existed precisely to catch a model that is more
+    permissive rather than more faithful, and it caught one.
+
+    DIAGNOSIS, not a rewritten hypothesis. The w2 cohort contains 44 UNEXPECTED_EXCEPTION and 5
+    OUTPUT_MISMATCH. My SEQUENTIAL_SHARED model observes EXECUTION ONLY - it records whether an example
+    raised and never compares its result against the documented output. It therefore CANNOT detect an
+    output mismatch, and 2 of those 5 slipped through as successes.
+
+    This is a genuine incompleteness in the r4 repair, not a flaw in the test. The prediction stands as
+    FAILED.
+
+    NEXT OBJECTIVE, derived from the failure. Add assertion evaluation to the sequential model - and
+    delegate the comparison to doctest.OutputChecker rather than reimplementing it. Reimplementing
+    CPython's comparison rules is exactly what produced the 86% agreement ceiling on packaging; the
+    authority that DEFINES the comparison should perform it.
+
+---

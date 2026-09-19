@@ -1,0 +1,33 @@
+r4 / V2: execution model made explicit. W1 and W3 held, W2 FAILED and located the next defect
+
+Preregistered before the run in the preceding commit.
+
+  W1  the 8 cases r3 called SETUP_FAILED while the external verifier PASSED are now OBSERVED under
+      SEQUENTIAL_SHARED: 8 of 8, all with status OK.                                  HELD
+  W2  the 49 cases where BOTH reported failure still fail: 47 of 49.                  FAILED
+  W3  all 75 observable under RECONSTRUCTED_PREFIX remain observable: 75 of 75.       HELD
+
+W1 CONFIRMS THE V2 DIAGNOSIS. r3 concluded the example could not become an experiment because ITS model
+requires the reconstructed prefix to succeed. A failed prefix blocks the example only under
+reconstruction - that is a property of the model, not of the subject. Both models are now available and
+each result carries the model it was produced under, which makes them different subjects under the
+already-admitted `history` coordinate rather than a disagreement to adjudicate.
+
+W2 IS THE INFORMATIVE RESULT AND IT FAILED. The control existed to catch a model that is more PERMISSIVE
+rather than more FAITHFUL, and it caught one. Diagnosis rather than a rewritten hypothesis: the w2 cohort
+is 44 UNEXPECTED_EXCEPTION and 5 OUTPUT_MISMATCH, and SEQUENTIAL_SHARED observes EXECUTION ONLY - it
+records whether an example raised and never compares the result against the documented output. It cannot
+detect an output mismatch, and 2 of the 5 slipped through as successes.
+
+That is a genuine incompleteness in the repair, not a flaw in the test. The prediction stands FAILED.
+
+NEXT, DERIVED FROM THE FAILURE: add assertion evaluation, and delegate the comparison to
+doctest.OutputChecker rather than reimplementing it. Reimplementing CPython comparison rules is exactly
+what produced the 86% agreement ceiling on packaging - the authority that DEFINES the comparison should
+perform it.
+
+Repo C prospective numbers unchanged; legasus-freeze-r3 untouched.
+
+Message-File: scratch/m7.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

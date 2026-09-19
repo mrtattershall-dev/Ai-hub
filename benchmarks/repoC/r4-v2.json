@@ -1,0 +1,54 @@
+{
+ "note": "r4 DEVELOPMENT EVIDENCE, not a prospective result",
+ "models": {
+  "RECONSTRUCTED_PREFIX": "RECONSTRUCTED_PREFIX",
+  "SEQUENTIAL_SHARED": "SEQUENTIAL_SHARED"
+ },
+ "w1": {
+  "n": 8,
+  "observed": 8,
+  "ok": 8
+ },
+ "w2": {
+  "n": 49,
+  "stillFails": 47
+ },
+ "w3": {
+  "n": 75,
+  "kept": 75
+ },
+ "w1cases": [
+  {
+   "inv": "integer.set_name(\"integer\")",
+   "seq": "OK"
+  },
+  {
+   "inv": "patt = CloseMatch(\"ATCATCGAATGGA\", max_mismatches=2)",
+   "seq": "OK"
+  },
+  {
+   "inv": "print(result.dump())",
+   "seq": "OK"
+  },
+  {
+   "inv": "def remove_first(tokens):\n    tokens.pop(0)",
+   "seq": "OK"
+  },
+  {
+   "inv": "def remove_LABEL(tokens):\n    tokens.pop(\"LABEL\")\n    return tokens",
+   "seq": "OK"
+  },
+  {
+   "inv": "def insert_locn(locn, tokens):\n    tokens.insert(0, locn)",
+   "seq": "OK"
+  },
+  {
+   "inv": "def append_sum(tokens):\n    tokens.append(sum(map(int, tokens)))",
+   "seq": "OK"
+  },
+  {
+   "inv": "import json",
+   "seq": "OK"
+  }
+ ]
+}
