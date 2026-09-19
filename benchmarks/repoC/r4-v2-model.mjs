@@ -1,3 +1,8 @@
+// HISTORICAL — NON-RUNNABLE. The replay implementation this script exercised was RETIRED in the r4
+// replay retirement (benchmarks/RETIREMENT.md). The script is kept because its RESULT is part of the
+// record and the reasoning that produced it must remain auditable; it is not kept because it still runs.
+// The evidence it produced is preserved and provenance-stamped in benchmarks/PROVENANCE.json.
+//
 // r4 / V2 — does making the execution model explicit recover the 8 wrong entailments?
 //
 // r4 DEVELOPMENT EVIDENCE. Repo C's prospective numbers against legasus-freeze-r3 are unchanged.

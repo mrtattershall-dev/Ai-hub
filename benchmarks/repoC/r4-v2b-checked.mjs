@@ -1,3 +1,8 @@
+// HISTORICAL — NON-RUNNABLE. The replay implementation this script exercised was RETIRED in the r4
+// replay retirement (benchmarks/RETIREMENT.md). The script is kept because its RESULT is part of the
+// record and the reasoning that produced it must remain auditable; it is not kept because it still runs.
+// The evidence it produced is preserved and provenance-stamped in benchmarks/PROVENANCE.json.
+//
 // r4 / V2b — does delegated assertion evaluation close the W2 gap?
 //
 // r4 DEVELOPMENT EVIDENCE. Repo C's prospective numbers are unchanged.

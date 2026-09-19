@@ -1,0 +1,42 @@
+r4: replay retirement. R3 FAILED first and found a defect in the LEDGER, not the replay path
+
+An authority-boundary simplification experiment, not cleanup. Predictions frozen in 95bcd70.
+
+  R1 HELD   no live authority-bearing consumer requires replay evidence
+  R2 HELD   426 tests unchanged - no supported capability reduced
+  R3 FAILED then repaired
+  R4 HELD   after the scanner was tightened
+  R5 HELD   UNKNOWN_MAPPING by construction
+  R6 HELD   the analysis found 1, 10 and 5 users for the keepers, so its silence is meaningful
+
+R3 FAILED AND BLOCKED THE RETIREMENT. Not one historical artifact could say what produced it - sweep.json
+carried corpus, minedCount, failedSetup and no producer, no semantics, no version. Deleting the
+implementation would have left those records UNATTRIBUTABLE. THE LEDGER WAS NOT PRESERVING EVIDENCE
+INDEPENDENTLY OF MACHINERY, which is the thing it exists to do. The experiment found a defect in the
+LEDGER rather than in the replay path. Repaired by PROVENANCE.json: 21 artifacts, 0 unknown, an ANNOTATION
+BESIDE the artifacts and never inside them, with git as its own evidence.
+
+RETIRED: assertionHeld, surveyFrontier, observeSequential, observeSequentialChecked - none produced
+anything the external producer does not.
+
+KEPT, and the reason is the whole point: observeIsolated reports traced execution SITES, and doctest
+reports verdicts while never saying which code objects ran, so site-level reachability is NOT duplicated
+authority. Also the r3 witness for reproducibility, and mineDoctests for site tracing.
+
+    VERIFIED SUBTRACTION IS PROGRESS WHEN IT REDUCES DUPLICATED AUTHORITY WHILE PRESERVING THE
+    EVIDENCE-BACKED CAPABILITY FRONTIER - AND ONLY THEN.
+
+First removal in this architecture; every prior step added a component because missing capability demanded
+one. Without this operation the architecture can only grow.
+
+THREE DEFECTS OF MY OWN, all caught before being recorded as findings: the R4 scanner matched comments and
+its own source; the sidecar carried a hand-written artifact list naming five files that never existed; and
+I briefly believed a mis-attribution existed from reading TRUNCATED CONSOLE OUTPUT across a record
+boundary when the JSON said UNKNOWN all along. JSON ARTIFACTS ARE AUTHORITATIVE; CONSOLE OUTPUT IS
+NON-EVIDENTIARY - a rule already in this project, broken by me.
+
+Carried forward unerased: POSIX_FORK_INHERITANCE = UNTESTED.
+
+Message-File: scratch/m14.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -311,3 +311,34 @@ Both are r4 work. Neither may be repaired in r3.
                  the replay path (2/5 naming), which is now a RETIREMENT candidate.
 
 ---
+## Entry 8 — r4: replay retirement as an authority-boundary simplification
+
+    R1 HELD, R2 HELD (426 tests unchanged), R3 FAILED then repaired, R4 HELD, R5 HELD, R6 HELD
+
+    R3 FAILED AND BLOCKED THE RETIREMENT. No historical artifact could say what produced it, so deleting
+    the implementation would have left the records unattributable. THE LEDGER WAS NOT PRESERVING EVIDENCE
+    INDEPENDENTLY OF MACHINERY. The experiment found a defect in the LEDGER, not in the replay path.
+    Repaired by benchmarks/PROVENANCE.json - 21 artifacts, 0 unknown, an ANNOTATION BESIDE the artifacts
+    and never inside them, with git as its own evidence.
+
+    TWO DEFECTS IN MY OWN ANALYSIS, both caught before being recorded as findings:
+      1. the R4 scanner matched COMMENTS and its own source, reporting two fallbacks that were neither.
+         Both were inspected before dismissal; the crude result stands in the record.
+      2. the sidecar carried a HAND-WRITTEN artifact list naming five repoB files that never existed, and
+         reported R3 failing because of my list. Replaced by enumeration.
+
+    AND ONE MISREADING OF MY OWN: I briefly believed a provenance mis-attribution existed, from reading
+    TRUNCATED CONSOLE OUTPUT across a record boundary. The JSON said UNKNOWN all along. JSON ARTIFACTS ARE
+    AUTHORITATIVE; CONSOLE OUTPUT IS NON-EVIDENTIARY - a rule already in this project, broken by me.
+
+    RETIRED: assertionHeld, surveyFrontier, observeSequential, observeSequentialChecked.
+    KEPT: observeIsolated (traced SITES - the producer reports verdicts and never which code objects ran),
+          the r3 witness (reproducibility), mineDoctests (feeds site tracing).
+
+    VERIFIED SUBTRACTION IS PROGRESS WHEN IT REDUCES DUPLICATED AUTHORITY WHILE PRESERVING THE
+    EVIDENCE-BACKED CAPABILITY FRONTIER - and only then. First removal in this architecture; every prior
+    step added.
+
+    next         QUIESCE check - is there a justified operation whose outcome could change entitlement?
+
+---
