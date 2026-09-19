@@ -1,0 +1,16 @@
+{
+ "note": "r4 DEVELOPMENT EVIDENCE, not a prospective result; agreement with doctest is expected by construction and is NOT a finding",
+ "x1": {
+  "n": 49,
+  "detected": 49
+ },
+ "x2": {
+  "n": 8,
+  "retained": 8
+ },
+ "x3": {
+  "n": 75,
+  "kept": 75
+ },
+ "mismatchDetected": 2
+}

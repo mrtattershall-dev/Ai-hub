@@ -185,3 +185,42 @@ Both are r4 work. Neither may be repaired in r3.
     authority that DEFINES the comparison should perform it.
 
 ---
+## Entry 5 — r4 / V2b: delegated assertion evaluation
+
+    objective    close the W2 gap by giving the sequential model a failure vocabulary
+    start hash   4eda10d
+    hypothesis   X1 W2 rises to 49/49; X2 W1 stays 8/8; X3 W3 stays 75/75
+
+    RESULT
+      X1  both reported failure, now detected      49 / 49    HELD
+          of which OUTPUT_MISMATCH correctly named  2 / 5     IMPRECISE, recorded
+      X2  W1 recoveries retained                    8 / 8     HELD, but only after a defect of MINE
+      X3  nothing became unobservable              75 / 75    HELD
+
+    X2 FAILED ON THE FIRST RUN AT 6/8, AND THE CAUSE WAS MINE, NOT THE MODEL'S
+      1. mine.mjs strips the trailing newline from `want`. doctest's example.want ALWAYS ends in one, so
+         a stripped want was compared against a newline-terminated got and "integer" failed against
+         "integer\n". DELEGATING A COMPARISON WHILE MANGLING ITS INPUT IS NOT DELEGATION. The contract is
+         now restored at the point of use.
+      2. The other case was a KEY COLLISION, not a model failure - see below.
+
+    A CORRECTION TO A PUBLISHED REPO C NUMBER, and it goes slightly in r3's FAVOUR
+      3 external keys are AMBIGUOUS: the same (module|source) appears in two docstrings with DIFFERENT
+      outcomes, and a last-wins map silently picked one.
+          PASS / OUTPUT_MISMATCH        core|print(real.parse_string('3. 1416'))
+          PASS / OUTPUT_MISMATCH        core|print(patt.parse_string('ablaj /* comment */ lskjd'))
+          UNEXPECTED_EXCEPTION / PASS   helpers|print(result.dump())
+      ONE of the 8 SETUP_FAILED|PASS cohort sits on the third of those. So Repo C's CONSEQUENCE
+      calibration of 49/57 carries +/-1 uncertainty: it is between 49/57 and 50/57, and one alleged wrong
+      entailment may be correctly classified. Stated plainly because it favours r3.
+
+    REMAINING GAP, NOT HIDDEN. OUTPUT_MISMATCH is correctly NAMED in only 2 of 5 cases; the other 3 are
+    detected as failures but attributed to the wrong kind. Detection is right, reason topology is not.
+
+    ARCHITECTURAL INSIGHT DERIVED FROM THIS, for the next objective. r3 mined doctests and replayed them,
+    which is Legasus REIMPLEMENTING AN EVIDENCE PRODUCER IT COULD SIMPLY RUN. Every disagreement in this
+    entry came from that reimplementation - stripped wants, collided keys, a missing failure vocabulary.
+    The cleaner design treats doctest as an EXTERNAL PRODUCER and adapts its output under Law 4 rather
+    than rebuilding it.
+
+---

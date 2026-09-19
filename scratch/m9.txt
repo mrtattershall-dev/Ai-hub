@@ -1,0 +1,31 @@
+r4 / V2b: X1 and X3 held, X2 held only after fixing MY defect, and a Repo C number needs a correction
+
+  X1  both reported failure, now detected      49 / 49    HELD
+      of which OUTPUT_MISMATCH correctly named  2 / 5     IMPRECISE, recorded not hidden
+  X2  W1 recoveries retained                    8 / 8     HELD, after a defect of mine
+  X3  nothing became unobservable              75 / 75    HELD
+
+X2 FAILED ON THE FIRST RUN AT 6/8 AND THE CAUSE WAS MINE. mine.mjs strips the trailing newline from
+`want`, while doctest example.want ALWAYS ends in one - so a stripped want met a newline-terminated got
+and "integer" failed against "integer" plus newline. DELEGATING A COMPARISON WHILE MANGLING ITS INPUT IS
+NOT DELEGATION. Contract restored at the point of use.
+
+A CORRECTION TO A PUBLISHED REPO C NUMBER, AND IT FAVOURS r3, SO IT IS STATED PLAINLY. Three external
+keys are AMBIGUOUS - the same module|source appears in two docstrings with different outcomes and a
+last-wins map silently picked one. ONE of the 8 SETUP_FAILED|PASS cohort sits on such a key. Repo C
+CONSEQUENCE calibration of 49/57 therefore carries +/-1 uncertainty: it lies between 49/57 and 50/57,
+and one alleged wrong entailment may be correctly classified.
+
+REMAINING GAP: OUTPUT_MISMATCH is correctly NAMED in only 2 of 5. Detection is right; reason topology is
+not.
+
+INSIGHT FOR THE NEXT OBJECTIVE: r3 mined doctests and replayed them, which is Legasus REIMPLEMENTING AN
+EVIDENCE PRODUCER IT COULD SIMPLY RUN. Every disagreement in this entry came from that reimplementation -
+stripped wants, collided keys, a missing failure vocabulary. The cleaner design treats doctest as an
+EXTERNAL PRODUCER and adapts its output under Law 4.
+
+legasus-freeze-r3 untouched.
+
+Message-File: scratch/m9.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

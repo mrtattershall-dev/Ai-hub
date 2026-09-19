@@ -181,6 +181,12 @@ export function observeSequentialChecked({ rootDir, packageName, dotted, example
     '    raise SystemExit(0)',
     'for ex in spec["examples"]:',
     '    src = ex["invocation"]; want = ex.get("wants") or ""',
+    // RESTORE THE CHECKER INPUT CONTRACT. doctest's example.want ALWAYS ends in a newline and the
+    // miner strips it, so a stripped want met a newline-terminated got and "integer" failed
+    // against "integer" plus newline. A harness defect, not a checker disagreement:
+    // DELEGATING A COMPARISON WHILE MANGLING ITS INPUT IS NOT DELEGATION.
+    '    if want and not want.endswith(chr(10)):',
+    '        want = want + chr(10)',
     '    sink = io.StringIO(); exc = None',
     '    try:',
     '        with contextlib.redirect_stdout(sink):',
