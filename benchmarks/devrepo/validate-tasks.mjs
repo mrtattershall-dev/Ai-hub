@@ -12,6 +12,7 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { TASKS, ENVELOPE_COUNTS } from './tasks.mjs';
+import { locate, applyMutation } from './admission.mjs';
 import { makeTally, observed, unobservable, finding, conclude } from '../../legasus/legalabs/nonvacuity.mjs';
 
 const NL = String.fromCharCode(10);
@@ -62,14 +63,18 @@ for (const t of TASKS) {
     continue;
   }
   const src = readFileSync(join(PRISTINE, mutModule), 'utf8');
-  const occurrences = src.split(t.mutate.find).length - 1;
+  // VIA locate(), which translates an LF anchor into the file's own convention. This validator used a raw
+  // string match and therefore only ever worked while the corpus was wrongly normalized to LF. Restoring
+  // the corpus to its real CRLF bytes exposed it - a stale checker, not a regression. `run-arms.mjs` used
+  // the CRLF-aware path throughout, so Run 0 and Dev 1 are unaffected.
+  const occurrences = locate(src, t.mutate.find).count;
   if (occurrences !== 1) {
     unobservable(tally, t.id + ': find-string occurs ' + occurrences + ' times in ' + mutModule);
     report.push({ id: t.id, envelope: t.envelope, kind: 'MUTATION', applies: 'NO (' + occurrences + ')',
       bites: '-' });
     continue;
   }
-  writeFileSync(join(WORK, mutModule), src.replace(t.mutate.find, t.mutate.replace), 'utf8');
+  writeFileSync(join(WORK, mutModule), applyMutation(src, t.mutate.find, t.mutate.replace).text, 'utf8');
 
   const oracleModule = t.oracleModule || mutModule;
   const n = t.mutating ? t.mutatingProbes.length : t.probes.length;
