@@ -1,0 +1,13 @@
+preregister X1/X2/X3 for the V2b repair (delegated assertion evaluation)
+
+X1  W2 rises to 49/49 including the 5 OUTPUT_MISMATCH an execution-only model cannot see
+X2  W1 stays 8/8
+X3  W3 stays 75/75
+
+DELIBERATELY NOT MEASURED: overall agreement with doctest. This model borrows doctest OutputChecker, so
+agreement is expected BY CONSTRUCTION and would be evidence of nothing. The claim under test is narrow -
+that the witness can DETECT an output mismatch at all, which it previously could not.
+
+Message-File: scratch/m8.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

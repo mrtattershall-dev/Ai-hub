@@ -144,3 +144,72 @@ export function observeSequential({ rootDir, packageName, dotted, examples, time
   }
   return { ...r.protocol, subjectBytes: r.subjectBytes };
 }
+
+// r4 / V2b — ASSERTION EVALUATION, with the comparison DELEGATED rather than reimplemented.
+//
+// W2 failed and located this: SEQUENTIAL_SHARED observed execution only. It recorded whether an example
+// raised and never compared the result against the documented output, so it could not detect an output
+// mismatch at all - 2 of 5 slipped through as successes.
+//
+// THE COMPARISON IS DELEGATED TO doctest.OutputChecker. Reimplementing CPython's comparison rules -
+// <BLANKLINE>, ELLIPSIS, whitespace normalisation, exception-detail matching - is exactly what produced
+// the 86% agreement ceiling on packaging. THE AUTHORITY THAT DEFINES A COMPARISON SHOULD PERFORM IT.
+//
+// WHAT THIS IS AND IS NOT FOR. The purpose is to give the witness a FAITHFUL FAILURE VOCABULARY so that
+// "the documented behaviour does not hold" becomes observable evidence at all. It is NOT to maximise
+// agreement with doctest: the more this borrows doctest's own machinery, the less any agreement between
+// them means. Agreement here is expected BY CONSTRUCTION and must not be reported as a finding.
+//
+// LAYERED CAPTURE. The V1 fd-level isolation protects the protocol from anything, including C extensions
+// and children. A per-example Python-level redirect sits inside it purely to ATTRIBUTE output to the
+// right example. If a native write escapes attribution it still lands in the subject file rather than
+// corrupting evidence.
+export function observeSequentialChecked({ rootDir, packageName, dotted, examples,
+  timeoutMs = 120000 }) {
+  const body = [
+    'import sys, json, os, io, contextlib, importlib, doctest, traceback',
+    'sys.path.insert(0, sys.argv[1])',
+    'spec = json.loads(sys.argv[2])',
+    'checker = doctest.OutputChecker()',
+    'flags = 0',
+    'out = []',
+    'try:',
+    '    ns = dict(vars(importlib.import_module(spec["dotted"])))',
+    'except Exception as e:',
+    '    _emit({"model": "SEQUENTIAL_SHARED_CHECKED", "importFailed": type(e).__name__,',
+    '           "results": []})',
+    '    raise SystemExit(0)',
+    'for ex in spec["examples"]:',
+    '    src = ex["invocation"]; want = ex.get("wants") or ""',
+    '    sink = io.StringIO(); exc = None',
+    '    try:',
+    '        with contextlib.redirect_stdout(sink):',
+    '            try:',
+    '                value = eval(compile(src, "<w>", "eval"), ns)',
+    '                if value is not None:',
+    '                    sink.write(repr(value) + chr(10))',
+    '            except SyntaxError:',
+    '                exec(compile(src, "<w>", "exec"), ns)',
+    '    except Exception:',
+    '        exc = traceback.format_exc()',
+    '    got = sink.getvalue()',
+    '    if exc is not None:',
+    '        # doctest treats a documented Traceback as an EXPECTATION, not a failure.',
+    '        if want.strip().startswith("Traceback"):',
+    '            ok = checker.check_output(want, exc, flags)',
+    '            outcome = "PASS" if ok else "UNEXPECTED_EXCEPTION"',
+    '        else:',
+    '            outcome = "UNEXPECTED_EXCEPTION"',
+    '    else:',
+    '        outcome = "PASS" if checker.check_output(want, got, flags) else "OUTPUT_MISMATCH"',
+    '    out.append({"invocation": src, "outcome": outcome, "got": got[:400],',
+    '                "raised": exc is not None})',
+    '_emit({"model": "SEQUENTIAL_SHARED_CHECKED", "results": out})',
+  ].join(NL);
+  const r = runIsolated({ body, timeoutMs, args: [rootDir, JSON.stringify({ dotted, examples })] });
+  if (r.protocol === null) {
+    return { model: 'SEQUENTIAL_SHARED_CHECKED', unobservable: true,
+      why: r.parseError || r.threw || 'no protocol emitted', results: [] };
+  }
+  return { ...r.protocol, subjectBytes: r.subjectBytes };
+}
