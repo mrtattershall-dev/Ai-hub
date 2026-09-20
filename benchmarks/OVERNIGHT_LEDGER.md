@@ -1107,3 +1107,73 @@ Both are r4 work. Neither may be repaired in r3.
                  the implied one.
 
 ---
+## Entry 19 — the ledger's own vocabulary was overclaiming, and the compounding thesis is narrowed to what survived
+
+    objective    stop this ledger's taxonomy from impersonating a verification system, and state the
+                 compounding claim at the strength the evidence supports
+    authority    OWNER, 2026-09-20, reviewing Entry 18
+    start hash   4cadc5e
+    evidence     PROTECTION_PREREG.md (d0d307c), legaknow/protection.mjs, protection.test.mjs
+
+    THE CONFLATION, in the owner's three terms:
+
+        FAILURE PATTERN     conceptual similarity across incidents
+        MECHANIZED REGION   the exact area in which a detector has DEMONSTRATED reach
+        COVERED CLASS       a generalized class with INDEPENDENTLY JUSTIFIED coverage
+
+    This ledger has been writing "mechanized" for the second and reading it as the third. That is
+    precisely how C4 got four commits of cover, and at scale it is how a catalogue of named failures
+    starts to read as a guarantee. The three are now representable, and the first thing represented
+    was this project's own case.
+
+    C4, WITH ITS REAL EVIDENCE, EARNS MECHANIZED_REGION AND NOT COVERED_CLASS:
+
+        incidents     C4        an UNADMITTED runtime key took an admitted dimension's authority
+                      C8-word   an exported state word took ledger.mjs LAW 3's obligation
+        detectors     producer-keyed promotion   covers C4 only       (unadmitted-attack C4-a/C4-b)
+                      frozen collision inventory covers C8-word only  (vocabulary-collision AT-7)
+        observed      2/2        <- a RATIO beside the verdict, never the verdict
+        disjoint      true       <- NO SINGLE detector reaches both
+        class         UNKNOWN
+
+    PT-1 IS THE FACT THAT HID THE OVERCLAIM. The two detectors are disjoint. The inventory guard
+    cannot see the original C4 at all, because `collectionCohort` was a RUNTIME DATA KEY, not an
+    exported state word - measured, not assumed. So the pattern is covered only as a UNION OF
+    DISJOINT REGIONS, which is not a claim about the pattern, and the module prints that sentence
+    rather than a ratio that flatters it.
+
+    MEASURED, AND IT IS THE 452/452 SHAPE AT SMALL SCALE: twenty commits from introducing the
+    CONTESTED defect to recording it, with SEVEN PASSING FULL SUITES in between.
+
+    THE COMPOUNDING THESIS, RESTATED AT THE STRENGTH THAT SURVIVED. Not:
+
+        every failure makes the system unable to make that failure again
+
+    which this session falsified in four commits. Instead:
+
+        every discovery should leave behind reusable protection WHOSE EXACT COVERAGE IS KNOWN, so
+        repetitions INSIDE that coverage become cheaper to detect, diagnose or prevent
+
+    A recurrence is therefore not automatically a failure of compounding - the question is whether
+    the earlier discovery lowered the cost of the later one. For C4 the answer is honestly mixed: the
+    first repair did not cover the provenance route, so the class was not eliminated; the accumulated
+    machinery did make the recurrence RECOGNIZABLE as the same authority pattern when a reader met
+    it; and there is now a detector that would have surfaced that specific cross-module form at
+    introduction. Incremental, bounded, and stated with its bound.
+
+    ONE DATA POINT IS REPORTED AS ONE DATA POINT. Detection distance for incident 2 was 20 commits
+    and 7 green suites, and the inventory guard would make it 0 - for that incident only, and it says
+    nothing about incident 1, which that guard cannot see. The owner named a family of long-run
+    metrics (time-to-detection, compute, human analysis, distance from introduction, verified
+    coverage, repeat escapes). NO FRAMEWORK IS BUILT OVER n=1: that would be the
+    budget-becomes-entitlement error in a new costume, and the metrics are recorded as a shape.
+
+    HISTORY IS NOT REWRITTEN. Entries 15-18 keep the word "mechanized" where they used it. The
+    project's rule is that a record is not edited to match a later understanding; the distinction
+    governs what is claimed from here, and this entry is the correction.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. Every finding since Entry 15 has come from
+                 the owner reading the record rather than from the frontier, which is now four
+                 demonstrations of the completeness gap rather than an argument about it.
+
+---
