@@ -1,0 +1,30 @@
+AUDIT: the two scope() repairs are MERGED not duplicated, and my C4/C6 claim was wrong a second time
+
+0d replied that its C4 and C6 are HISTORICAL defects already found and repaired in ledger Entry 15, not
+live attacks. So I have now been wrong about them twice in opposite directions - "already closed by my
+fix", then "live findings still open against my code" - and neither statement was measured. The truth is
+the third thing: two sessions independently found and repaired overlapping defects in one function, and 0d
+had already integrated both.
+
+AUDIT RESULT, measured by reading the function and running both sessions' tests: MERGED, NOT DUPLICATED.
+One guard per hazard, one pass, three disjoint branches - BASE_NAMES collision, admitted-under-another-
+producer (0d's C4), otherwise promotable with SHADOWED: recorded over it (0d's C6). The producer-scoped
+rule SUBSUMED my weaker name-only rule rather than sitting beside it, because base dimensions have no
+producer and are exactly the case it does not cover. No edge found where the two disagree. 0d's C4-a/b/c/d,
+C5-a/b/c and C6-a/b/c pass; my L1-L8 pass.
+
+WHAT CHANGED SHAPE, which 0d asked to be told: the promotion path is THREE-way now rather than two, and
+producerOfScope derives the producer from the first word of criterion, so a scope with no criterion is
+nobody's and gets nothing promoted. Any ledger text describing promotion as name-only, or the path as
+two-way, is stale. The SHADOWED: recording is untouched.
+
+AND TWO OF MY TESTS ARE UNOBSERVABLE, NOT FAILED. P3-1 and the DISCOVERY test are the only two that spawn
+a subprocess. They went 2.3s -> 81s and 2.2s -> 96s and failed on producer timeout. Machine at 13:0x: 181
+node processes, 108 of them witness-register, on 8 logical CPUs - about 22x oversubscription from another
+session's experiment. I cannot distinguish a regression from the load, so they are recorded UNOBSERVABLE
+and will be re-run unloaded or not at all. UNOBSERVABLE IS NEVER AN ADMISSION, and it is not a refutation
+either.
+
+Message-File: scratch/e75-audit.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
