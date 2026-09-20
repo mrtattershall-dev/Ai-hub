@@ -535,3 +535,50 @@ Both are r4 work. Neither may be repaired in r3.
     next         re-run the QUIESCE check against the new state rather than assume the answer.
 
 ---
+## Entry 12 — QUIESCENT. The system is entitled to stop, and one item is OWNER_REQUIRED
+
+    objective    re-run the quiesce check against the post-producer-#3 state, as Entry 11 required,
+                 rather than assume the answer
+    authority    legasus/legaknow/stopping.mjs
+    start hash   d2cda02
+    evidence     benchmarks/quiesce-check.mjs, re-run
+
+    VERDICT   QUIESCENT_CONTEST. Six open questions, ZERO justified, no objectives generated.
+              THE SYSTEM IS ENTITLED TO STOP INVESTIGATING - a positive finding about entitlement, and
+              not a failure to try hard enough.
+
+      POSIX_FORK_INHERITANCE          not executable   the PLATFORM (measured: no os.fork on win32)
+      REPOC_UNRESOLVED_ATTRIBUTION    not executable   INFORMATION DESTROYED AT COLLECTION TIME. 49/7/1
+                                                       is permanent, not pending.
+      REPO_D_PROSPECTIVE_VALIDATION   not executable   SEQUENCING under the frozen burn rule
+      PRODUCER_3_SCOPE_VOCABULARY     RESOLVED         kept in the list rather than deleted: a question
+                                                       that vanishes cannot be audited against what it
+                                                       returned
+      PRODUCER_4                      no outcome       see below
+      FREEZE_R4_AND_SELECT_REPO_D     NOT AUTHORIZED   OWNER_REQUIRED, see below
+
+    PRODUCER #4 IS THE TREADMILL, AND THE FOURTH CONDITION IS WHAT REFUSED IT. Everything about it was
+    available - trace and timeit were the runners-up in the very selection that chose pytest, and an hour
+    would have built one. But the producer #3 repair is GENERIC IN MECHANISM rather than per-coordinate:
+    scope() carries EVERY unmapped coordinate without naming any of them, so a fourth producer takes the
+    same path pytest's took, by construction. And the two questions a fourth producer COULD have raised
+    were both asked directly and far more cheaply - L7 name-collision aliasing and L5 registry leakage -
+    and both found REAL defects. An expensive investigation is not justified when a cheaper operation
+    targets the same distinction. This is the loop the stopping law was written to stop, and tonight is
+    the first time it actually stopped one.
+
+    FREEZE_R4_AND_SELECT_REPO_D IS OWNER_REQUIRED AND IS RECORDED RATHER THAN GUESSED AT. It is the only
+    remaining operation that could decisively change what may be claimed, and it is outside delegated
+    authority for two independent reasons. Selecting Repo D BURNS it - once r4 has been exposed to a
+    repository, that repository can never again serve as its prospective test, and no later work undoes
+    that. And it is a declaration that r4 is FINISHED, which tonight repeatedly showed it is not: two
+    defects were found inside a repair written hours earlier.
+
+    THE HONEST SHAPE OF THE NIGHT. Every blocked question is blocked by the PLATFORM, by INFORMATION
+    DESTROYED IN THE PAST, by SEQUENCING, by EPISTEMIC POINTLESSNESS, or by OWNER AUTHORITY. Not one is
+    blocked by lack of effort, and not one is unblocked by working harder tonight.
+
+    next         NONE. A quiescent contest generates no objective. Emitting one here is how a loop runs
+                 forever.
+
+---

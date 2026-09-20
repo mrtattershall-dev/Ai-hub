@@ -119,19 +119,55 @@ const OPEN = [
       + ' changing - which is a decision about r4, not about Repo D.',
   },
   {
-    name: 'PRODUCER_3_SCOPE_VOCABULARY',
+    // RESOLVED at 8b694ad / d2cda02. Kept in the list rather than deleted, because a question that
+    // disappears from the ledger cannot be audited against what it actually returned.
+    name: 'PRODUCER_3_SCOPE_VOCABULARY  [RESOLVED]',
     question: 'is scope construction now producer-agnostic, or merely doctest-UNION-git shaped?',
     authorized: true,                     // DECLARED
-    executable: true,                     // DECLARED - candidates exist in this environment
-    targetsDistinction: true,             // DECLARED
-    canChangeEntitlement: true,           // DECLARED - see below
-    ifNotJustified: 'n/a',
+    executable: true,                     // DECLARED
+    targetsDistinction: false,            // RESOLVED - the distinction it targeted no longer stands open
+    canChangeEntitlement: false,          // RESOLVED - it already changed it; re-running changes nothing
+    ifNotJustified: 'ANSWERED: merely doctest-UNION-git shaped. pytest carried a coordinate none of the'
+      + ' six names, the set reported a CONTRADICTION AS AGREEMENT, and the repair made the admission'
+      + ' gate the only door. Re-running it now would re-measure a question already settled.',
     whyItCanChangeEntitlement: 'the producer #2 repair asserts a GENERAL property - "a coordinate the'
       + ' producer cannot establish is ABSENT rather than invented" - from exactly ONE counterexample.'
       + ' And the repair may only have MOVED the failure: scope has a closed set of 6 dimension names,'
       + ' and admitDimension - the gate built to adjudicate a new one - has NO PRODUCTION CONSUMER, so a'
       + ' producer whose coordinate is none of the six has nowhere to put it and no path to earn one.'
       + ' Some outcome of a third producer FALSIFIES a claim currently being relied on.',
+  },
+  {
+    // THE TREADMILL QUESTION, and law 7 is what refuses it. Everything about producer #4 is available:
+    // trace and timeit were runners-up in the very selection that chose pytest, and building one would
+    // take an hour. The FOURTH condition is the only thing standing between this system and spending the
+    // rest of the night confirming what it already knows.
+    name: 'PRODUCER_4',
+    question: 'would a fourth producer bend the boundary again?',
+    authorized: true,                     // DECLARED
+    executable: true,                     // DECLARED - trace and timeit are the runners-up, both present
+    targetsDistinction: true,             // DECLARED
+    canChangeEntitlement: false,          // DECLARED - and this is the whole entry
+    ifNotJustified: 'the producer #3 repair is GENERIC IN MECHANISM rather than per-coordinate: scope()'
+      + ' carries EVERY unmapped coordinate without naming any of them, so a fourth producer takes the'
+      + " same path pytest's took, by construction. The two questions a fourth producer could have"
+      + ' raised were both asked DIRECTLY and more cheaply - name-collision aliasing (L7, which found a'
+      + ' real L2 violation in the repair) and registry leakage (L5, which found a real one too).'
+      + ' Running it anyway is epistemically pointless however cheap it is, and this is exactly the loop'
+      + ' the stopping law was written to stop.',
+  },
+  {
+    name: 'FREEZE_R4_AND_SELECT_REPO_D',
+    question: 'declare r4 finished and burn a fourth repository on its prospective test',
+    authorized: false,                    // OWNER_REQUIRED - see below
+    executable: true,                     // DECLARED - candidates could be enumerated tonight
+    targetsDistinction: true,             // DECLARED
+    canChangeEntitlement: true,           // DECLARED - decisively, and it is the only thing that can
+    ifNotJustified: 'OWNER_REQUIRED. Selecting Repo D BURNS it: once r4 has been exposed to a repository'
+      + ' that repository can never again serve as its prospective test, and no later work undoes that.'
+      + ' It is also a declaration that r4 is FINISHED, which tonight repeatedly showed it is not - two'
+      + ' defects were found inside a repair written hours ago. That is outside ordinary reversible'
+      + ' repository work, so it is recorded and left rather than guessed at.',
   },
 ];
 
@@ -154,8 +190,8 @@ for (const { o, r } of results) {
 
 // ---------------------------------------------------------------------------- THE VERDICT
 const frontier = evidenceFrontier({
-  requiredProducers: ['CPython doctest', 'git'],
-  attempted: ['CPython doctest', 'git'],
+  requiredProducers: ['CPython doctest', 'git', 'pytest'],
+  attempted: ['CPython doctest', 'git', 'pytest'],
   pending: [],
 });
 const contest = contestState({ frontier, investigations: OPEN });

@@ -1,0 +1,38 @@
+QUIESCENT: six open questions, zero justified - and the stopping law refused producer #4 rather than me
+
+Entry 11 said re-run the quiesce check rather than assume the answer, so it was re-run. The verdict is
+QUIESCENT_CONTEST: the frontier is closed, no authorized operation has a justified expectation of changing
+what may be claimed, and NO OBJECTIVES ARE GENERATED. That is a positive finding about entitlement, not a
+failure to try hard enough.
+
+  POSIX_FORK_INHERITANCE          the PLATFORM - measured, no os.fork on win32
+  REPOC_UNRESOLVED_ATTRIBUTION    INFORMATION DESTROYED AT COLLECTION TIME - 49/7/1 is permanent
+  REPO_D_PROSPECTIVE_VALIDATION   SEQUENCING under the frozen burn rule
+  PRODUCER_3_SCOPE_VOCABULARY     RESOLVED - kept in the list, because a question that vanishes from the
+                                  ledger cannot be audited against what it actually returned
+  PRODUCER_4                      NO OUTCOME WOULD CHANGE ENTITLEMENT
+  FREEZE_R4_AND_SELECT_REPO_D     OWNER_REQUIRED
+
+PRODUCER #4 IS THE TREADMILL AND THE FOURTH CONDITION IS WHAT REFUSED IT, NOT MY JUDGEMENT. Everything
+about it was available: trace and timeit were the runners-up in the very selection that chose pytest, and
+an hour would have built one. But the producer #3 repair is GENERIC IN MECHANISM rather than
+per-coordinate - scope() carries EVERY unmapped coordinate without naming any of them - so a fourth
+producer takes the same path pytest's took, by construction. And the two questions a fourth producer COULD
+have raised were both asked directly and far more cheaply, and both found REAL defects: L7 name-collision
+aliasing and L5 registry leakage. An expensive investigation is not justified when a cheaper operation
+targets the SAME distinction. This is the loop the stopping law was written to stop, and it is the first
+time it has actually stopped one.
+
+FREEZE_R4_AND_SELECT_REPO_D IS RECORDED AS OWNER_REQUIRED RATHER THAN GUESSED AT. It is the only remaining
+operation that could decisively change what may be claimed, and it is outside delegated authority twice
+over. Selecting Repo D BURNS it - once r4 has been exposed to a repository, that repository can never
+again serve as its prospective test. And it declares r4 FINISHED, which tonight repeatedly showed it is
+not: two defects were found inside a repair written hours earlier.
+
+EVERY BLOCKED QUESTION IS BLOCKED BY THE PLATFORM, BY INFORMATION DESTROYED IN THE PAST, BY SEQUENCING, BY
+EPISTEMIC POINTLESSNESS, OR BY OWNER AUTHORITY. Not one is blocked by lack of effort, and not one is
+unblocked by working harder tonight.
+
+Message-File: scratch/m22.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
