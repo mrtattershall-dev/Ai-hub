@@ -1,8 +1,11 @@
-// r4 — composition wave 2, justification graph. Predictions frozen in benchmarks/COMPOSITION_PREREG_2.md
-// (W2-a, W2-b) BEFORE this file existed. Assertions state the PREDICTED DEFECT; controls beside them.
+// r4 — composition wave 2, justification graph. Predictions were frozen in
+// benchmarks/COMPOSITION_PREREG_2.md (W2-a, W2-b); the PRE-REPAIR run that reproduced both is preserved
+// in benchmarks/RESULT.composition-2.md and at b0673cd, where this file asserted the defects. It now
+// asserts the repairs and keeps every control.
 import test from 'node:test';
 import assert from 'node:assert';
-import { graph, add, node, entitled, reestablish, scope, NODE, EDGE, ANY } from './justification.mjs';
+import { graph, add, node, entitled, reestablish, invalidate, scope, NODE, EDGE, ANY, VALIDITY }
+  from './justification.mjs';
 
 const S = (repository) => scope({ repository });
 
@@ -15,11 +18,9 @@ const refuted = (claimRepo, refuterRepo) => {
   return entitled(g, c.id, S(claimRepo));
 };
 
-test('W2-a-1 ATTACK — a refuter established at S2 refutes a claim about S1', () => {
+test('W2-a-1 REGRESSION — a refuter established at S2 does NOT refute a claim about S1', () => {
   const e = refuted('S1', 'S2');
-  // PREDICTED DEFECT: refuted across worlds, no bridge.
-  assert.equal(e.ok, false, 'prediction W2-a-1: refuted');
-  assert.ok(e.problems.some((p) => /REFUTED by/.test(p.why)), JSON.stringify(e.problems));
+  assert.equal(e.ok, true, 'b0673cd refuted this across worlds: ' + JSON.stringify(e.problems));
 });
 
 test('W2-a-2 CONTROL — a refuter in the SAME world refutes', () => {
@@ -34,22 +35,36 @@ test('W2-a-3 CONTROL — a for-all refuter refutes a claim about any world', () 
   assert.ok(e.problems.some((p) => /REFUTED by/.test(p.why)));
 });
 
-test('W2-b-1 ATTACK — reestablish() moves the scope under an identity that encodes the old one', () => {
+test('W2-a-4 — a refuter established nowhere in particular refutes nothing; an invalidated one still refutes nothing', () => {
+  assert.equal(refuted('S1', null).ok, true);
   const g = graph();
-  const p = node({ kind: NODE.CLAIM, proposition: 'P', scope: S('S1'), basis: 'X' });
-  add(g, p);
-  const before = p.id;
-  const r = reestablish(g, p.id, { evidence: ['w2'], scope: S('S2') });
-  // PREDICTED DEFECT: the node now says S2 while its id is the one computed for S1.
-  assert.equal(g.nodes[before].scope.repository, 'S2', 'prediction W2-b-1: scope moved in place');
-  assert.equal(r.id, before);
+  const c = node({ kind: NODE.CLAIM, proposition: 'P holds', scope: S('S1'), basis: 'W' });
+  const r = node({ kind: NODE.OBSERVATION, proposition: 'a counterexample ran', scope: S('S1'),
+    basis: 'EXECUTION_WITNESS', supports: [{ id: c.id, edge: EDGE.REFUTES }] });
+  add(g, c); add(g, r);
+  assert.equal(entitled(g, c.id, S('S1')).ok, false);
+  invalidate(g, r.id, 'the counterexample ran against the wrong copy');
+  assert.equal(entitled(g, c.id, S('S1')).ok, true);
 });
 
-test('W2-b-2 CONTROL — reestablish() with evidence only keeps the scope and the identity', () => {
+test('W2-b-1 REGRESSION — reestablish() REFUSES to move the scope under an identity that encodes it', () => {
   const g = graph();
   const p = node({ kind: NODE.CLAIM, proposition: 'P', scope: S('S1'), basis: 'X' });
   add(g, p);
-  reestablish(g, p.id, { evidence: ['w2'] });
+  const r = reestablish(g, p.id, { evidence: ['w2'], scope: S('S2') });
+  assert.equal(r.rejected, true, 'b0673cd moved the scope in place');
+  assert.match(r.why, /different claim/);
   assert.equal(g.nodes[p.id].scope.repository, 'S1');
+  assert.equal(g.nodes[p.id].validity, VALIDITY.ESTABLISHED, 'a refusal changes nothing');
+});
+
+test('W2-b-2 CONTROL — reestablish() with evidence, or with the SAME scope, still works', () => {
+  const g = graph();
+  const p = node({ kind: NODE.CLAIM, proposition: 'P', scope: S('S1'), basis: 'X' });
+  add(g, p);
+  invalidate(g, p.id, 'x');
+  const r = reestablish(g, p.id, { evidence: ['w2'], scope: S('S1') });
+  assert.equal(r.rejected, undefined);
+  assert.equal(g.nodes[p.id].validity, VALIDITY.ESTABLISHED);
   assert.deepEqual(g.nodes[p.id].evidence, ['w2']);
 });

@@ -360,9 +360,17 @@ export function invalidate(g, id, why) {
 export function reestablish(g, id, { evidence, scope: sc }) {
   const n = g.nodes[id];
   if (!n) return null;
+  // A SCOPE IS NOT RE-ESTABLISHED, IT IS A DIFFERENT CLAIM. Since scope entered node identity, rewriting
+  // it here would leave the node saying one world under an id computed for another, with dependents
+  // still pointing at it (composition attack W2-b, C7 through a second door). Evidence may be replaced;
+  // a claim about another world is a new node.
+  if (sc && scopeKey(sc) !== scopeKey(n.scope)) {
+    return { rejected: true, id,
+      why: 'reestablish() may replace evidence, not scope. "' + n.proposition + '" at another scope is a'
+        + ' different claim: build it with node() and add() it, and let its dependents be re-derived' };
+  }
   n.validity = VALIDITY.ESTABLISHED;
   n.evidence = evidence || n.evidence;
-  if (sc) n.scope = sc;
   n.why = 'directly re-established; DEPENDENTS ARE NOT RESTORED and must each be re-derived';
   return n;
 }
@@ -430,11 +438,17 @@ export function entitled(g, id, required = scope()) {
     if (!c.ok) {
       problems.push({ id: cur, why: 'SCOPE INFLATION at "' + n.proposition + '" - ' + c.missing.join('; ') });
     }
+    // A REFUTER REFUTES ONLY THE WORLD IT WAS ESTABLISHED IN. The first version let any ESTABLISHED
+    // refuter defeat its target at any scope, so a counterexample executed at S2 refuted a claim about
+    // S1 with no bridge (composition attack W2-a) - authority carried across the REFUTES edge by
+    // ignoring scope, which is Law 2 seen from the negative side. The refuter is now held to the same
+    // coverage a premise is held to: on every context dimension it must cover the target (ANY, equal,
+    // or a target that is itself null); a refuter established nowhere in particular refutes nothing.
     for (const r of (g.refuters[cur] || [])) {
       const rn = g.nodes[r];
-      if (rn && rn.validity === VALIDITY.ESTABLISHED) {
-        problems.push({ id: cur, why: 'REFUTED by "' + rn.proposition + '"' });
-      }
+      if (!rn || rn.validity !== VALIDITY.ESTABLISHED) continue;
+      if (derivationProblems(n, rn).length) continue;   // outside this world: not a refutation
+      problems.push({ id: cur, why: 'REFUTED by "' + rn.proposition + '"' });
     }
     const next = new Set(inProgress); next.add(cur);
     // LAW 5. Conjunctive premises must have been established in a COMPATIBLE WORLD - checked against each
