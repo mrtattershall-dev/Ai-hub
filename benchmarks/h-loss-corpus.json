@@ -1,0 +1,173 @@
+{
+  "corpus_rule": "The 31 entries of h-default-corpus.json unchanged, plus the 5 defects named in ledger Entries 31-32. Enumerated before classification. The H-DEFAULT corpus was built for a different hypothesis.",
+  "strictness": "Criterion 1 requires the distinction to have EXISTED in an upstream representation and been DISCARDED. Information that was never acquired fails criterion 1. Criterion 2 requires a boundary that COLLAPSES two states; a consumer that simply fails to read a distinction which survived fails criterion 2.",
+  "entries": [
+    { "id": "C1", "verdict": "H_LOSS",
+      "upstream": "the intermediate node genuinely established no value for the dimension, which is distinct from establishing one",
+      "boundary": "scope representation stores an unestablished dimension as a missing key, the same as a dimension nobody asked about",
+      "downstream": "entitled() reads the absence as passable and laundered S1 into S2" },
+
+    { "id": "C2", "verdict": "H_LOSS",
+      "upstream": "a premise either established a context dimension or did not, and both facts existed at mint time",
+      "boundary": "the context map represents not-established and not-mentioned identically",
+      "downstream": "derive filtered absent dimensions out before intersecting, concluding at a world no premise covered" },
+
+    { "id": "C3", "verdict": "H_LOSS",
+      "upstream": "whether a value was minted by a constructor was known at the moment of minting",
+      "boundary": "representing that fact as a readable Symbol property maps minted-by-constructor and carries-this-symbol onto one observable",
+      "downstream": "isAuthority() reconstructs mintedness from the property, and a forged object traced to OWNER" },
+
+    { "id": "C4", "verdict": "H_LOSS",
+      "upstream": "which producer argued an admission was known when the admission was made",
+      "boundary": "keying the registry by dimension NAME collapses admitted-by-pytest and admitted-by-git",
+      "downstream": "the registry decides governance from the key, so a pytest-argued dimension governed git records" },
+
+    { "id": "C5", "verdict": "H_LOSS", "disputable": true,
+      "upstream": "reserved keys were distinguishable from user keys in the admission path",
+      "boundary": "the admissibility check treats every key alike once admitted",
+      "downstream": "comparison manufactured NOT_COMPARABLE from the reserved key" },
+
+    { "id": "C6", "verdict": "H_LOSS",
+      "upstream": "a carried value existed and was shadowed, which differs from never having been carried",
+      "boundary": "shadowing removed it, leaving the same representation as absence",
+      "downstream": "consumers read the absence as nothing having been carried" },
+
+    { "id": "C7", "verdict": "H_LOSS",
+      "upstream": "a claim about S1 and a claim about S2 are different claims and both scopes existed",
+      "boundary": "the node identity key excluded scope, mapping both onto one id",
+      "downstream": "add() decided they were the same node and moved the referent under existing dependents" },
+
+    { "id": "C8-a", "verdict": "H_LOSS",
+      "upstream": "the same content had several distinct production histories, each known when produced",
+      "boundary": "the ledger keyed provenance by digest, keeping one binding per digest",
+      "downstream": "provenance lookups reconstruct history from content and returned the last binding" },
+
+    { "id": "C9-a", "verdict": "NOT_H_LOSS", "fails": "upstream",
+      "why": "the relevance of a pending item was never established in any upstream representation, so no boundary discarded it. Information that was never acquired is not information that was lost." },
+
+    { "id": "C9-b", "verdict": "H_LOSS", "disputable": true,
+      "upstream": "whether a block is terminal is a fact about the block, known independently of how it was reached",
+      "boundary": "measuring terminality by PATH maps terminal-by-nature and terminal-on-this-path onto one value",
+      "downstream": "attainment reconstructed terminality, and a regenerated external.json would have flipped it" },
+
+    { "id": "W2-a", "verdict": "H_LOSS",
+      "upstream": "the refuter was established at S2 and the claim was about S1, and both scopes existed",
+      "boundary": "the REFUTES edge carried no scope, so refuters at any world looked alike",
+      "downstream": "validity was computed from the edge and a claim about S1 was refuted at S2" },
+
+    { "id": "W2-b", "verdict": "H_LOSS",
+      "upstream": "the identity of a node encodes its scope, so the old and new scope were distinguishable",
+      "boundary": "reestablish() took a scope argument without consulting the identity it was rewriting",
+      "downstream": "the node's scope was rewritten under an identity that still claimed the old one" },
+
+    { "id": "W2-c", "verdict": "H_LOSS",
+      "upstream": "the staleness of a witness was known when it was recorded",
+      "boundary": "the execution-edge representation carries no staleness, so stale and fresh edges are identical",
+      "downstream": "scoring read the edge and credited ADVANCEMENT" },
+
+    { "id": "W2-d", "verdict": "H_LOSS",
+      "upstream": "a metric was measured or it was not, and which was true was known at measurement time",
+      "boundary": "the frontier representation stores unmeasured and equal identically",
+      "downstream": "Pareto comparison read the unmeasured metric as EQUIVALENT and kept a candidate on the frontier" },
+
+    { "id": "W2-e", "verdict": "H_LOSS",
+      "upstream": "the producer version was absent, which differs from a version whose text is undefined",
+      "boundary": "string concatenation maps an absent field and the literal text onto one criterion string",
+      "downstream": "criterion comparison treated pytest undefined as an established criterion" },
+
+    { "id": "W2-f", "verdict": "H_LOSS",
+      "upstream": "an IMPORT_FAILED record established no document and no ordinal, and the failure was known",
+      "boundary": "the record shape gives every record a document and an ordinal slot",
+      "downstream": "identity was reconstructed from those slots, using an ARRAY INDEX as an ordinal" },
+
+    { "id": "W2-g", "verdict": "H_LOSS",
+      "upstream": "which producer actually produced a record was known at production time",
+      "boundary": "the adapter matched on the producer WORD, collapsing distinct producers that share a name",
+      "downstream": "doctest semantics were granted to any producer whose word matched" },
+
+    { "id": "W3-c", "verdict": "H_LOSS",
+      "upstream": "a grantee either requested no restriction or requested the empty world, and the caller knew which",
+      "boundary": "an omitted context argument and an empty context object become the same request",
+      "downstream": "delegate reconstructed the intended world and handed a grant over S1 to every world" },
+
+    { "id": "W3-d", "verdict": "H_LOSS", "disputable": true,
+      "upstream": "whether a dimension was established was known before narrowing was requested",
+      "boundary": "the narrowing request represents an absent dimension the same as one being narrowed",
+      "downstream": "narrow() moved an established world under restriction's free pass" },
+
+    { "id": "W3-e", "verdict": "NOT_H_LOSS", "fails": "boundary",
+      "why": "the token's KIND was present, carried and readable the whole way; nothing collapsed EPISTEMIC and NORMATIVE onto one representation. commit() simply did not consult a distinction that had survived. A consumer failing to read is not a boundary destroying." },
+
+    { "id": "W3-f", "verdict": "NOT_H_LOSS", "fails": "boundary",
+      "why": "both premises' kinds and grants were present and distinguishable; derive read premises[0]. Argument order determined the answer, which is an incidental property choosing semantics - leakage, not loss. Nothing was erased." },
+
+    { "id": "SLICE1-a", "verdict": "H_LOSS",
+      "upstream": "the operation refused, which is a different event from producing an output with no coordinates",
+      "boundary": "a refusal object and an output with empty coordinates read identically to the probe",
+      "downstream": "the probe read every coordinate as changed and produced a confident ALL_OF" },
+
+    { "id": "SLICE1-b", "verdict": "H_LOSS",
+      "upstream": "came-from-outside-the-inputs and survived-losing-every-input are different facts about support",
+      "boundary": "both were recorded as no single input affects it",
+      "downstream": "the label UNSUPPORTED was reconstructed from that one representation" },
+
+    { "id": "SLICE1-c", "verdict": "H_LOSS",
+      "upstream": "a probe either could not measure or measured an absence, and the run knew which",
+      "boundary": "both were returned as a bare undefined",
+      "downstream": "the dependency matrix reconstructed meaning from that undefined" },
+
+    { "id": "SLICE2-a", "verdict": "NOT_H_LOSS", "fails": "upstream",
+      "why": "which fact supports which output coordinate was never captured by any upstream representation - that relation is exactly what lineage existed to discover. The strip assumed name equality in place of a distinction that had never been acquired." },
+
+    { "id": "AUTOCF-a", "verdict": "H_LOSS",
+      "upstream": "a baseline that produced a readable authority output differs from one that refused, and both were observed",
+      "boundary": "the comparison read both sides through a coordinate projection that is empty for either",
+      "downstream": "two empty projections compared equal and were scored OBSERVED with no delta" },
+
+    { "id": "AUTOCF-b", "verdict": "H_LOSS",
+      "upstream": "a world that could not be constructed differs from one constructed identically, and the attempt knew which",
+      "boundary": "the decode failure path returned the same result as an unchanged argument",
+      "downstream": "PERTURBATION_NO_EFFECT was reconstructed from that shared representation" },
+
+    { "id": "AUTOCF-c", "verdict": "H_LOSS",
+      "upstream": "both the inner producer and the validating wrapper returned the value, and both calls were recorded",
+      "boundary": "byResult kept ONE producer per object identity, discarding the outer one",
+      "downstream": "replay reconstructed the value through the inner call and silently skipped the wrapper's refusal" },
+
+    { "id": "SEMANTIC-a", "verdict": "H_LOSS",
+      "upstream": "the DAG distinguishes nodes that were constructed and handed in from the target's own arguments",
+      "boundary": "the group set was taken as nodes carrying leaves, collapsing premises with the operation's own facts",
+      "downstream": "the support formula was inferred over that set, making ALL_OF structurally unreachable" },
+
+    { "id": "BRIDGE-a", "verdict": "H_LOSS",
+      "upstream": "ANY is an explicit value in production meaning licenses anything, and it was present in the observed call",
+      "boundary": "the translation into a calculus context has no wildcard, so ANY and a specific value both become a context value",
+      "downstream": "the comparison reconstructed a verdict and produced 965 accusations against working code" },
+
+    { "id": "BRIDGE-b", "verdict": "H_LOSS",
+      "upstream": "two scopes with equal structure and different object references were distinguishable as structures",
+      "boundary": "the specification compares context values with strict inequality, which reads references not worlds",
+      "downstream": "identical scopes were refused and the refusal was read as a disagreement" },
+
+    { "id": "BACK-a", "verdict": "H_LOSS",
+      "upstream": "the child process either ran and produced nothing or died before producing anything, and the runtime knew",
+      "boundary": "an exit code of 0 with empty stdout represents both",
+      "downstream": "I read the empty output as a completed run with no findings" },
+
+    { "id": "BACK-b", "verdict": "H_LOSS",
+      "upstream": "the stack contained real ESM frames naming real production files",
+      "boundary": "the frame pattern could not read file:///C:/ and the unreadable lines were dropped, leaving the same empty list as a stack with no production frames",
+      "downstream": "reachability was reconstructed from the empty list as PRODUCTION_REACHED 0" },
+
+    { "id": "BACK-c", "verdict": "NOT_H_LOSS", "fails": "boundary",
+      "why": "the aggregate-of-private-bindings structure was present in the AST throughout and was never collapsed with anything; the rule simply consulted a different feature, the consumer count. Choosing the wrong evidence is not a boundary destroying a distinction." },
+
+    { "id": "BACK-d", "verdict": "H_LOSS",
+      "upstream": "a stack line that failed to parse is a frame that exists and was not read, which differs from a frame that is not there",
+      "boundary": "frames() dropped unparsed lines, so a path with a hole and a complete path had identical representations",
+      "downstream": "reachability verdicts were issued over 676 paths with holes in them" },
+
+    { "id": "BACK-e", "verdict": "NOT_H_LOSS", "fails": "boundary",
+      "why": "every enclosing function was present in the index the whole time; the rule asked only the innermost. The distinction survived and the query was wrong, which is not a lossy boundary." }
+  ]
+}
