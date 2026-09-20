@@ -26,6 +26,7 @@
 //     without unjustified loss of required existing region.
 // Not lines. Not commits. Not features ticked off. Not model opinion. Not even function count.
 import { LIFECYCLE } from '../legaknow/ledger.mjs';
+import { liveWitnesses } from './frontier.mjs';
 
 export const BOUNDARY = {
   UNEXERCISED_BRANCH: 'UNEXERCISED_BRANCH',   // inside a region function, never established
@@ -40,6 +41,11 @@ const key = (mod, line) => mod + ':' + line;
 // A region is built from witnesses, at SITE granularity, retaining which witness established each site.
 // Retaining the attribution is what makes the region re-checkable rather than a bag of line numbers.
 export function buildRegion({ witnesses, roots, siteMap }) {
+  // A STALE or INVALID witness is not an edge and establishes no site (composition attack W2-c, the
+  // same class as connectivity() in frontier.mjs, which owns the rule). The exclusions are reported on
+  // the region so a STALE_EDGE boundary can be derived from them rather than from a caller's memory.
+  const { live, excluded } = liveWitnesses(witnesses);
+  witnesses = live;
   const inRegion = new Set(roots);
   let grew = true;
   const reachedFrom = new Map();
@@ -69,6 +75,7 @@ export function buildRegion({ witnesses, roots, siteMap }) {
   }
 
   return { subjects: inRegion, sites, witnesses: contributing, siteMap,
+    excludedWitnesses: excluded.map((w) => ({ id: w.id ?? w.rootSubject, lifecycle: w.lifecycle })),
     lifecycle: LIFECYCLE.VALID };
 }
 

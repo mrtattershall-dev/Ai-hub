@@ -51,9 +51,26 @@ const namespaceOf = (subject) => String(subject).split('.')[0];
 
 // EXECUTION CONNECTIVITY, derived from witnesses. A witness records the subject its invocation was rooted
 // at and every frame that execution entered. Nothing here consults a name, a docstring, or a plan.
+// A WITNESS WHOSE EVIDENCE NO LONGER APPLIES IS NOT AN EDGE. The first version read `entered` off every
+// witness handed in and never looked at its lifecycle, so a witness the bank had marked STALE - its
+// source or setup digest moved - still connected the region and a subject reached only through it
+// scored ADVANCEMENT (composition attack W2-c). "Stale -> current" inside the ratchet that exists to
+// stop exactly that. Only a witness whose lifecycle is VALID, REVALIDATED, or unstated (a raw witness
+// that has never been through the bank) contributes; STALE and INVALID witnesses are excluded and the
+// exclusion is reported, so a boundary of kind STALE_EDGE can be fed from it.
+const DEAD_LIFECYCLES = new Set(['STALE', 'INVALID']);
+export const liveWitnesses = (witnesses) => {
+  const live = []; const excluded = [];
+  for (const w of witnesses || []) {
+    (DEAD_LIFECYCLES.has(w.lifecycle) ? excluded : live).push(w);
+  }
+  return { live, excluded };
+};
+
 export function connectivity(witnesses) {
+  const { live, excluded } = liveWitnesses(witnesses);
   const reachedFrom = new Map();
-  for (const w of witnesses) {
+  for (const w of live) {
     const set = reachedFrom.get(w.rootSubject) || new Set();
     for (const f of w.entered || []) set.add(f);
     reachedFrom.set(w.rootSubject, set);
@@ -62,6 +79,8 @@ export function connectivity(witnesses) {
     reaches: (from, to) => (reachedFrom.get(from) || new Set()).has(to),
     reachedBy: (to) => [...reachedFrom.entries()].filter(([, s]) => s.has(to)).map(([f]) => f),
     roots: () => [...reachedFrom.keys()],
+    excluded: () => excluded.map((w) => ({ id: w.id ?? w.rootSubject, rootSubject: w.rootSubject,
+      lifecycle: w.lifecycle })),
   };
 }
 
