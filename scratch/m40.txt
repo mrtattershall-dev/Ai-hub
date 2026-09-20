@@ -1,0 +1,19 @@
+Repair W2-f: a doctest record with no example carries no document and no ordinal
+
+producer.mjs wrote document = testName ?? '<module>' and ordinal = x.ordinal ?? i, the flat index of
+the record in the output array, so an IMPORT_FAILED record was given coordinates it does not have
+and the adapter built a history for an experiment that never existed (b0673cd). That is the strain
+producer #2 found ("undefined#undefined"), living in producer #1 with a nicer spelling. A record
+with no example now carries the module it belongs to and nothing else; the adapter leaves history
+absent and records the module under UNADMITTED; externalIdentity says '-' rather than borrowing a
+number. PASS records are byte-unchanged in identity, checked key by key.
+
+Suite 527/527. The eight threatened rigs byte-identical to baseline.
+
+Recorded, because it happened while committing this: the first version of this message had a line
+that wrapped onto a leading '#', which git strips as a comment, and the hazard-1 guard refused the
+commit as a mismatch. A message can lose a line without any shell involved.
+
+Message-File: scratch/m40.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

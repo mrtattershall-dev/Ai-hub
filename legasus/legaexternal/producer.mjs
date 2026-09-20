@@ -91,20 +91,27 @@ export function runProducer({ rootDir, modules, timeoutMs = 300000 }) {
     subjectBytes: r.subjectBytes,
     // RAW, and preserved verbatim. A later revision with a better vocabulary must be able to re-adapt
     // this without rerunning the subject or pretending its ontology existed at observation time.
-    records: records.map((x, i) => ({
+    // A RECORD WITH NO EXAMPLE HAS NO DOCUMENT AND NO ORDINAL. The first version wrote
+    // `document: testName ?? '<module>'` and `ordinal: x.ordinal ?? i` - the flat index of the record
+    // in this array - so an IMPORT_FAILED record was given coordinates it does not have, and the
+    // adapter then built a history for an experiment that never existed (composition attack W2-f).
+    // That is the producer #2 strain, "undefined#undefined", living in producer #1 with a nicer
+    // spelling. A coordinate the producer cannot establish is ABSENT; the module the failure belongs
+    // to is carried as the one thing such a record does know.
+    records: records.map((x) => ({
       ...x,
-      identity: {
-        producer, producerVersion,
-        document: x.testName ?? ('<' + x.module + '>'),
-        ordinal: x.ordinal ?? i,
-        lineno: x.lineno ?? null,
-      },
+      identity: x.testName === undefined
+        ? { producer, producerVersion, module: x.module, lineno: x.lineno ?? null }
+        : { producer, producerVersion, document: x.testName, ordinal: x.ordinal,
+          lineno: x.lineno ?? null },
     })),
   };
 }
 
-// The identity of one external experiment, as a comparable string. Source text is deliberately absent.
+// The identity of one external experiment, as a comparable string. Source text is deliberately absent,
+// and a record with no example says so with '-' rather than borrowing a number.
 export const externalIdentity = (rec) => [rec.identity.producer, rec.identity.producerVersion,
-  rec.identity.document, String(rec.identity.ordinal)].join('|');
+  rec.identity.document ?? ('module:' + rec.identity.module),
+  rec.identity.ordinal === undefined ? '-' : String(rec.identity.ordinal)].join('|');
 
 export { NL };
