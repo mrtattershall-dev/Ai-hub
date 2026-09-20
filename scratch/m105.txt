@@ -1,0 +1,37 @@
+Freeze the BACKWARD-1 mechanism and preregister TRANSFER-1, the one-shot hub run
+
+The mechanism is pinned by digest in BACKWARD_1_FROZEN.txt at COMBINED 76f35914abd5b737. Any edit to
+a listed file invalidates the freeze, and a run after such an edit must be reported as a SECOND run
+rather than as the transfer test - said now so it cannot be renegotiated after a disappointing first
+attempt.
+
+A PRECONDITION WAS DISCOVERED WHILE PLANNING THE RUN. BK-5 says no file is written into the hub
+repository, but witnessing requires executing the hub's own tests and those tests perform filesystem
+mutations, which is exactly why the hub is an interesting subject. Running in place would violate
+BK-5 on the first effect. So the run happens in a CLEAN ROOM - a copy outside the repository,
+discarded afterwards - and the real repository is never executed, never written to and never has a
+process started inside it. That is recorded as a precondition rather than discovered mid-run and
+rationalised.
+
+INTERSECTION IS NOT THE SUCCESS METRIC, and that is recorded before the result because it would
+otherwise be tempting afterwards. Zero function-level overlap is legitimate for an architecture that
+separates permission calculation from effect execution. The eventual target is a chain from Evidence
+to Entitlement to Decision to effect with every arrow independently justified, and TRANSFER-1 tests
+only the first step of that.
+
+Six independent coordinates are reported separately and none is averaged into the others: can frozen
+sink discovery witness real effects, can ancestry cross private production code, does the structural
+detector identify naturally occurring test-only access, does backward recover territory forward
+cannot, does it survive mixed module architecture, and does it FAIL LOUDLY where CommonJS prevents
+observation.
+
+T-3 is the first natural specimen for the backdoor detector, which has so far fired only on a
+constructed fixture. T-6 matters most for honesty: any percentage whose denominator silently excludes
+the unobservable region falsifies it, because that would be the unparsed-frame error at repository
+scale. T-7 is the dangerous null preregistered as failure - if witnessing requires the hub's test-only
+exports, naming a hub function, or configuring the run with architectural knowledge, the transfer
+fails and is reported as failed rather than as partial success.
+
+Message-File: scratch/m105.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
