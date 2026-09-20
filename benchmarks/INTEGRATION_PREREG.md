@@ -2,10 +2,19 @@
 
 ## Authority
 
-QUIESCENT_CONTEST was the correct state and it is not being overridden by a manufactured objective. This
-is an **OWNER grant**, 2026-09-20, which is the one thing in the calculus that can change entitlement
-without deriving it — OWNER is an axiom, not a conclusion. The six open questions in `quiesce-check.mjs`
-are unchanged and `FREEZE_R4_AND_SELECT_REPO_D` remains declined.
+This is an **OWNER grant**, 2026-09-20 — the one thing in the calculus that can change entitlement without
+deriving it. OWNER is an axiom, not a conclusion. `FREEZE_R4_AND_SELECT_REPO_D` remains declined.
+
+> **CORRECTION, and it is mine.** The first version of this section said "QUIESCENT_CONTEST was the
+> correct state ... the six open questions are unchanged." **That was stale when I wrote it.** My session
+> last observed the ledger at Entry 14 / `aa03ab9`; a second session has since taken it to **Entry 33**
+> via BACKWARD-1, H-LOSS, H-DISTINCTION and TRANSFER-1, and was mid-run when I committed on top. I
+> asserted a system state from memory instead of reading it — the precise error this project spends its
+> time mechanizing against, committed in the authority section of a preregistration.
+>
+> The predictions below are unaffected: they are about the Odysseus interface and were not derived from
+> the ledger state. **The authority claim was.** Before this experiment runs, its starting state must be
+> re-read from the ledger and the quiesce check re-executed, not recalled.
 
 ## The question, and what it is NOT
 
