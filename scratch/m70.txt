@@ -1,0 +1,33 @@
+Preregister the LegaScreen holdout: freeze the selection rule and the outcome vocabulary before any candidate is named
+
+v1's three cases each motivated a probe, so rediscovering them shows the probes were faithfully
+built and not that they transfer. A fourth defect, chosen mechanically from a pool none of the
+probes were designed around, is the first thing in this line of work that could fail honestly.
+
+Five eligibility conditions, all required: recorded before LegaScreen existed, changed an
+authority-relevant decision, has an identifiable live commit and repair commit, is none of the three
+pathologies the probes were built around, and is cited in neither screening preregistration.
+Selection takes the first identifier in the ledger's own canonical order, with no property of any
+candidate inspected before the rule picks.
+
+Two readings are reported because they answer different questions and reporting one would be
+choosing the flattering half afterwards. STRICT runs the probes with their committed drivers and
+targets exactly as they stand, asking whether the screen as shipped reaches the defect. POINTED runs
+the same probe code with the harness aimed at the module the defect lives in, under a driver that
+exercises that module's exports in the obvious way and is reproduced verbatim in the result so the
+claim can be judged. No probe is added, edited or retuned after selection; if a probe would need to
+change, the outcome is SILENT and that is the finding.
+
+Four outcomes fixed now - DETECTED, PARTIAL, SILENT, UNMEASURABLE - with what follows each decided
+now so the result cannot choose its own consequence. SILENT is a good result: it measures how narrow
+the microscope is, and narrowness stated is worth more than breadth assumed. No probe is written in
+this slice under any outcome.
+
+Also recorded before it can be quoted as more: because the C1 repair already closed the ANY route,
+that discovery does not show the screen would have prevented a new defect prospectively. It shows
+the repair's protected region was larger than the manually demonstrated one and that the screen
+could expose that afterwards. Real, and narrower than it sounds.
+
+Message-File: scratch/m70.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
