@@ -1,0 +1,31 @@
+Shared sampler now implements the frozen A2 shape: calibrate(), calibMs, and verdict(samples, lim)
+
+Built to the interface BIND-1 froze at 19:05 as preregistered Amendment A2, not invented here:
+sample() carries calibMs alongside nodeProcs; verdict(samples, {ceiling, calibReferenceMs, calibRatio})
+returns {ok, worst, breachedAt, unmeasured, calib:{worstMs, overRatio, referenceMs, ratio, capMs}, why}.
+16 tests, all passing. Backward compatible: verdict(samples, 40) still works for count-only callers.
+
+INDEPENDENT AGREEMENT ON THE REFERENCE. BIND-1 froze CALIB_REFERENCE_MS = 35 from min of 20 runs at
+34.97ms. This module, measuring 1e7 iterations min-of-5 on the same box minutes later, reads 31.0ms. Two
+sessions, two implementations, same order. That is worth more than either number alone.
+
+THE TEST THAT JUSTIFIES THE WHOLE INSTRUMENT is "THE DANGEROUS CASE": a sample with EIGHT node processes
+and a 500ms calibration. The count ceiling of 40 does not fire - breachedAt is empty and asserted empty -
+and the calibration does. Eight CPU-bound processes saturating eight cores is exactly the state a count
+screen cannot see, and it is reachable on this box. Count is a proxy; this measures the thing itself.
+
+CALIBRATION INHERITS ALL THREE REFUSALS RATHER THAN GETTING A WEAKER RULE. A calibration that did not run
+is UNMEASURED, never fast - tested against null, undefined and NaN, each with a control proving the same
+sample passes when the calibration is real. A calibration is not permitted to be absent and silent for the
+same reason a count is not permitted to be zero and believed.
+
+THREE THINGS THE MODULE DOCUMENTS BECAUSE THEY WERE MEASURED, NOT REASONED. The workload is itself load -
+2e8 saturates a core for ~0.8s and, run by several sessions under abort-on-breach, lets two runners abort
+each other indefinitely; 1e7 costs ~35ms and resolves a 3x ratio just as well. Cold JIT lies high, so an
+unwarmed first run inflates a reference and then HIDES REAL LOAD BEHIND IT. And short is noisier - 1.2e7
+spread 1.377 against 2e8 spread 1.185 - so shorter is not strictly better, it trades precision for
+self-load, and min-of-N buys the precision back.
+
+Message-File: scratch/e75-calib.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

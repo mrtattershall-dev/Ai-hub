@@ -4,7 +4,7 @@
 // every suite and protect nothing. Every property below has a control that fails in the other direction.
 import test from 'node:test';
 import assert from 'node:assert';
-import { sample, verdict, UNMEASURED, SUSPECT_ZERO } from './load-sampler.mjs';
+import { sample, verdict, calibrate, UNMEASURED, SUSPECT_ZERO } from './load-sampler.mjs';
 
 const S = (n, at = '2026-09-20T13:00:00.000Z') => ({ at, nodeProcs: n, cpuPct: null });
 
@@ -87,4 +87,70 @@ test('the real instrument composes with the real verdict', () => {
   assert.equal(v.ok, true, 'a live sample under an absurd ceiling must pass: ' + v.why);
   // NON-VACUITY: the same live samples must FAIL under a ceiling of zero, or this test proves nothing
   assert.equal(verdict(samples, 0).ok, false, 'a live sample under a zero ceiling must fail');
+});
+
+// ---------------------------------------------------------------------------------------------------
+// CALIBRATION — the A2 shape frozen by the BIND-1 session: { ceiling, calibReferenceMs, calibRatio }.
+// Count is a proxy; this measures contention directly. Every property has a control that fails the
+// other way.
+
+const SC = (ms, n = 10, at = 'x') => ({ at, nodeProcs: n, cpuPct: null, calibMs: ms });
+const A2 = { ceiling: 40, calibReferenceMs: 35, calibRatio: 3.0 };   // cap = 105ms
+
+test('calibrate() returns a real duration and warms the JIT first', () => {
+  const ms = calibrate();
+  assert.ok(Number.isFinite(ms) && ms > 0, 'got ' + ms);
+  // a cold first run is an outlier that would inflate a reference and hide load behind it; the module
+  // warms once, so a second call must not be dramatically faster
+  const again = calibrate();
+  assert.ok(again < ms * 3, 'second calibration ' + again + ' vs first ' + ms + ' - warmup leaked');
+});
+
+test('a calibration UNDER the cap passes — the positive control', () => {
+  const v = verdict([SC(31), SC(40)], A2);
+  assert.equal(v.ok, true, v.why);
+  assert.equal(v.calib.capMs, 105);
+  assert.equal(v.calib.worstMs, 40);
+});
+
+test('a calibration OVER the cap aborts, and names the ratio', () => {
+  const v = verdict([SC(31), SC(420)], A2);
+  assert.equal(v.ok, false);
+  assert.equal(v.calib.overRatio.length, 1);
+  assert.equal(v.calib.overRatio[0].ratio, 12);
+  assert.match(v.why, /CONTENTION measured directly/);
+});
+
+test('THE DANGEROUS CASE — low process count, saturated machine', () => {
+  // eight CPU-bound processes saturate eight cores and sail under a ceiling of 40. The count screen
+  // cannot see this; the calibration can. This is the whole reason calibration exists.
+  const v = verdict([SC(500, 8)], A2);
+  assert.equal(v.ok, false, 'count 8 passes the ceiling, but the machine is saturated');
+  assert.deepEqual(v.breachedAt, [], 'and the COUNT rule did not fire - only calibration caught it');
+  assert.equal(v.calib.overRatio.length, 1);
+});
+
+test('A CALIBRATION THAT DID NOT RUN IS UNMEASURED, NEVER FAST', () => {
+  for (const bad of [null, undefined, NaN]) {
+    const v = verdict([SC(bad)], A2);
+    assert.equal(v.ok, false, 'calibMs=' + String(bad) + ' must not pass');
+    assert.match(v.unmeasured[0].reason, /calibration/);
+  }
+  // control: the same sample with a real calibration passes
+  assert.equal(verdict([SC(31)], A2).ok, true);
+});
+
+test('BACKWARD COMPATIBLE — the count-only callers that predate calibration still work', () => {
+  assert.equal(verdict([S(9)], 40).ok, true);
+  assert.equal(verdict([S(99)], 40).ok, false);
+  // and with the object form but no calibration keys, calibration is simply not checked
+  assert.equal(verdict([SC(99999)], { ceiling: 40 }).ok, true, 'no reference frozen, no calibration rule');
+});
+
+test('the live instrument composes with the A2 verdict, and is non-vacuous', () => {
+  const s = sample();
+  assert.ok(Number.isFinite(s.calibMs), 'live sample carries a calibration: ' + JSON.stringify(s));
+  assert.equal(verdict([s], { ceiling: 100000, calibReferenceMs: 35, calibRatio: 1000 }).ok, true);
+  // NON-VACUITY: the same live sample must FAIL under an impossible ratio
+  assert.equal(verdict([s], { ceiling: 100000, calibReferenceMs: 0.001, calibRatio: 1.0 }).ok, false);
 });

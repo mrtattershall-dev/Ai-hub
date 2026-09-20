@@ -31,9 +31,48 @@ const TIMEOUT_MS = 15000;
 
 const countFrom = (out) => out.split(/\r?\n/).filter((l) => /(^|[\\/\s])node(\.exe)?\b/i.test(l)).length;
 
+// CALIBRATION — the instrument that measures CONTENTION rather than a correlate of it.
+//
+// Process count is a proxy and a bad one: measured on this box, 108 processes gave an 81s test and 110
+// gave 13s. Count cannot see eight CPU-bound processes saturating eight cores, and it disqualifies a
+// hundred idle ones that cost nothing. A fixed workload timed against a frozen reference sees both.
+//
+// THREE THINGS THIS GETS WRONG IF BUILT CARELESSLY, all measured rather than reasoned:
+//
+//   IT IS ITSELF LOAD.  A 2e8-iteration workload is one core fully saturated for ~0.8s. Run before every
+//                       unit, by several sessions, the instrument becomes a contender in what it
+//                       measures - and two abort-on-breach runners can then abort each other
+//                       indefinitely, each firing on the other's calibration. 1e7 costs ~35ms and
+//                       resolves a 3x ratio just as well.
+//   COLD JIT LIES HIGH. An unwarmed first run is an outlier that inflates a reference and then HIDES
+//                       REAL LOAD BEHIND IT. Warm before measuring, always.
+//   SHORT IS NOISIER.   Measured: 1.2e7 spread 1.377 vs 2e8 spread 1.185. Shorter is NOT strictly
+//                       better; it trades precision for self-load. min-of-N buys the precision back.
+const CALIB_ITERS = 1e7;
+const CALIB_RUNS = 5;
+
+const burn = (iters) => { let x = 0; for (let i = 0; i < iters; i++) x = (x + i * 7) % 1000003; return x; };
+
+let warmed = false;
+
+// Returns milliseconds, or NULL if it could not measure. NEVER a fast number on failure.
+export function calibrate({ iters = CALIB_ITERS, runs = CALIB_RUNS } = {}) {
+  try {
+    if (!warmed) { burn(5e6); warmed = true; }
+    let best = Infinity;
+    for (let k = 0; k < runs; k++) {
+      const t = process.hrtime.bigint();
+      burn(iters);
+      const ms = Number(process.hrtime.bigint() - t) / 1e6;
+      if (ms < best) best = ms;
+    }
+    return Number.isFinite(best) ? best : null;
+  } catch (e) { return null; }
+}
+
 // ONE SAMPLE. Never throws: a sampler that throws inside a harness gets wrapped in a try/catch that
 // swallows it, and the run continues unmeasured. It returns its failure as data instead.
-export function sample() {
+export function sample({ calib: withCalib = true } = {}) {
   const at = new Date().toISOString();
   try {
     let nodeProcs;
@@ -55,7 +94,7 @@ export function sample() {
     // cpuPct is NULL ON PURPOSE. Every cheap Windows instrument for it is wrong under load and every
     // correct one is slow. Reporting a bad number would be worse than reporting none, and an absent
     // field is honest in a way a plausible one is not.
-    return { at, nodeProcs, cpuPct: null };
+    return { at, nodeProcs, cpuPct: null, calibMs: withCalib ? calibrate() : undefined };
   } catch (e) {
     // pgrep exits 1 when nothing matches - a real zero on a machine not running node
     if (!WIN && e && e.status === 1) return { at, nodeProcs: 0, cpuPct: null };
@@ -70,11 +109,22 @@ export const SUSPECT_ZERO = 'SUSPECT_ZERO';
 // THE VERDICT IS A PURE FUNCTION OF FROZEN INPUTS. Nothing here reads the clock, the machine, or the
 // result the samples were taken around - so "was the machine too busy?" cannot be decided after seeing
 // the number it would disqualify. Freeze the ceiling before the run and let it fire against you.
-export function verdict(samples, ceiling) {
+export const CALIB_SLOW = 'CALIB_SLOW';
+
+// Accepts the frozen BIND-1 shape { ceiling, calibReferenceMs, calibRatio }, or a bare number for the
+// count-only callers that predate calibration.
+export function verdict(samples, lim) {
+  const L = (typeof lim === 'number' || lim === undefined) ? { ceiling: lim } : (lim || {});
+  const { ceiling, calibReferenceMs, calibRatio } = L;
+  const checkCalib = Number.isFinite(calibReferenceMs) && Number.isFinite(calibRatio);
+  const capMs = checkCalib ? calibReferenceMs * calibRatio : null;
+
   const list = Array.isArray(samples) ? samples : [];
   const breachedAt = [];
   const unmeasured = [];
   let worst = 0;
+  let worstMs = 0;
+  const overRatio = [];
 
   for (const s of list) {
     const n = s && s.nodeProcs;
@@ -88,15 +138,29 @@ export function verdict(samples, ceiling) {
     // instrument failed in a way that looks like success - the exact failure this module exists to
     // refuse - so it is never evidence of quiet.
     if (n === 0) { unmeasured.push({ at: s && s.at, reason: SUSPECT_ZERO }); continue; }
-    if (n > ceiling) breachedAt.push({ at: s && s.at, nodeProcs: n });
+    if (Number.isFinite(ceiling) && n > ceiling) breachedAt.push({ at: s && s.at, nodeProcs: n });
+
+    if (checkCalib) {
+      const ms = s.calibMs;
+      // A CALIBRATION THAT DID NOT RUN IS UNMEASURED, NEVER FAST. Same refusal as the count.
+      if (ms === null || ms === undefined || !Number.isFinite(ms)) {
+        unmeasured.push({ at: s && s.at, reason: UNMEASURED + ' (calibration)' });
+        continue;
+      }
+      if (ms > worstMs) worstMs = ms;
+      if (ms > capMs) overRatio.push({ at: s && s.at, calibMs: ms, ratio: +(ms / calibReferenceMs).toFixed(2) });
+    }
   }
 
   const noSamples = list.length === 0;
+  const ok = !noSamples && breachedAt.length === 0 && unmeasured.length === 0 && overRatio.length === 0;
   return {
-    ok: !noSamples && breachedAt.length === 0 && unmeasured.length === 0,
+    ok,
     worst,
     breachedAt,
     unmeasured,
+    calib: checkCalib ? { worstMs, overRatio, referenceMs: calibReferenceMs, ratio: calibRatio,
+      capMs } : null,
     ceiling,
     samples: list.length,
     why: noSamples
@@ -104,10 +168,16 @@ export function verdict(samples, ceiling) {
       : unmeasured.length
         ? 'NOT OK: ' + unmeasured.length + ' sample(s) did not measure (' + unmeasured[0].reason
           + '). An instrument that could not measure is not evidence of a quiet machine.'
-        : breachedAt.length
-          ? 'NOT OK: ' + breachedAt.length + ' sample(s) exceeded the frozen ceiling of ' + ceiling
-            + ', worst ' + worst + '. This attempt is UNOBSERVABLE (load) - preserve and label it;'
-            + ' it says nothing about the subject.'
-          : 'OK: ' + list.length + ' sample(s), worst ' + worst + ', ceiling ' + ceiling,
+        : overRatio.length
+          ? 'NOT OK: ' + overRatio.length + ' sample(s) over ' + calibRatio + 'x the frozen reference of '
+            + calibReferenceMs + 'ms (cap ' + capMs + 'ms, worst ' + worstMs.toFixed(1) + 'ms).'
+            + ' CONTENTION measured directly, not inferred from process count. UNOBSERVABLE (load).'
+          : breachedAt.length
+            ? 'NOT OK: ' + breachedAt.length + ' sample(s) exceeded the frozen ceiling of ' + ceiling
+              + ', worst ' + worst + '. This attempt is UNOBSERVABLE (load) - preserve and label it;'
+              + ' it says nothing about the subject.'
+            : 'OK: ' + list.length + ' sample(s), worst count ' + worst
+              + (checkCalib ? ', worst calibration ' + worstMs.toFixed(1) + 'ms against a '
+                + capMs + 'ms cap' : ', ceiling ' + ceiling),
   };
 }
