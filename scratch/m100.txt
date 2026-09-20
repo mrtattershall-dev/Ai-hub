@@ -1,0 +1,25 @@
+Ledger Entry 31: H-DEFAULT recorded, including the prediction that did not hold
+
+Records the experiment with its failure condition intact. The table went in with six roles and six
+laws and came out with six, mechanically checked by tests that feed classify() a seventh role and a
+new law and require refusal.
+
+D-1 is recorded as NOT holding. Forty-two percent, or twenty-nine on the strict reading, is not the
+high fraction the prediction wanted, and fifteen of thirty-one defects have nothing to do with
+omission at all. The entry states plainly that the default problem is a real class but not the class,
+and names the four disputable readings so the number can be recomputed by anyone who disagrees.
+
+D-2 is recorded as holding weakly, with three of six roles never appearing as the required role, so
+half the vocabulary is unexercised by this project's own standard.
+
+D-3 is the result worth having and is recorded as prospective: the same semantic request to delegate
+gets opposite answers depending on whether the caller omits the argument or passes an empty object,
+decided by a JavaScript falsiness test. The per-dimension refusal is deliberate and documented; the
+divergence is documented nowhere, and the comment defending the behaviour reads an empty context as
+every world, which is the QUERY completion applied to a REQUEST operand.
+
+No production code was changed.
+
+Message-File: scratch/m100.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -2059,3 +2059,79 @@ Both are r4 work. Neither may be repaired in r3.
                  the surface find authority-bearing code that no brand shape reaches.
 
 ---
+
+## Entry 31 — H-DEFAULT: the table survived its failure condition, explained 42%, and predicted one real thing
+
+    objective    the owner's experiment, run BEFORE building anything: are historically distinct
+                 authority defects the same defect - an omitted coordinate completed under the wrong
+                 role's law?
+    authority    OWNER, 2026-09-20
+    start hash   c188ac3 (preregistration alone, frozen before any defect was classified)
+    evidence     H_DEFAULT_PREREG.md (c188ac3), RESULT.h-default.md,
+                 legasus/legascreen/roles.mjs, benchmarks/h-default-corpus.json
+
+    THE HARD FAILURE CONDITION WAS NOT TRIGGERED. Thirty-one defects, enumerated before
+    classification, every one validated against the SIX frozen roles and SIX frozen laws.
+    classify() throws on a seventh role or a new law, and tests feed it both and require refusal.
+    Six roles in, six out - a measurement rather than a promise.
+
+    D-1 DID NOT HOLD AS STATED.
+
+        EXPLAINED by wrong-role completion    13   42%
+        VALUE_CONFUSION (ANY/STALE/OPAQUE)     3   the VALUE set covers these, the table does not
+        NOT_AN_OMISSION                       15   forgery, naming, ordering, identity, kind
+        EXPLAINED excluding disputable         9   29%
+
+    The prediction was "a high fraction". 42% is not high and 29% is less. FIFTEEN OF THIRTY-ONE
+    DEFECTS HAVE NOTHING TO DO WITH OMISSION: a readable Symbol brand, a name-keyed admission,
+    ordering dependence, a referent moved by identity, a wrapper elided from a DAG. THE DEFAULT
+    PROBLEM IS A REAL CLASS; IT IS NOT THE CLASS. The four disputable readings are named in the data
+    so anyone who disagrees with a reading can recompute the number.
+
+    D-2 HELD WEAKLY, AND HALF THE TABLE NEVER FIRES.
+
+        9  EVIDENCE read as QUERY      2  REQUEST read as QUERY
+        1  STATE read as EVIDENCE      1  STATE read as DELTA
+
+    Four distinct confusions, so it is not one observation wearing a table - but nine of thirteen are
+    one pair. QUERY, GRANT AND DELTA ARE NEVER THE REQUIRED ROLE IN THIS CORPUS. By this project's
+    own standard, half the vocabulary is unexercised, and a test records that.
+
+    D-3 HELD, PROSPECTIVELY, AND IS THE RESULT WORTH HAVING. Stated before any classification, then
+    confirmed against the real calculus.delegate:
+
+        context argument OMITTED      PERMITTED  ctx={repository:S1, criterion:K}
+        context: {}                   REFUSED    drops or changes repository, criterion
+        context omits ONE dimension   REFUSED    drops or changes criterion
+
+    THE SAME SEMANTIC REQUEST GETS OPPOSITE ANSWERS depending on whether the caller omits the
+    argument or passes an empty object, and the divergence comes from `context || from.context` - a
+    JavaScript falsiness test deciding a question about authority. The per-dimension refusal IS
+    deliberate and documented as the W3-c repair; THE DIVERGENCE BETWEEN THE TWO FORMS OF OMISSION IS
+    DOCUMENTED NOWHERE. And the prose that justifies the code reads an empty context as "every
+    world", which is the QUERY completion applied to a REQUEST operand: the role confusion is visible
+    in the comment defending the behaviour.
+
+    As predicted in advance, it is NOT a safety defect - refusing never grants more than inheriting -
+    but an expressiveness one: a grantee cannot narrow one dimension without restating every other.
+    D-3 predicted the inconsistency, predicted it was undeliberate, and predicted it was
+    expressiveness rather than safety. All three.
+
+    D-4 (C2 as EVIDENCE-read-as-QUERY) holds and was recorded as a retrodiction worth less than D-3
+    BEFORE it was checked. D-5 HELD: NO PRODUCTION CODE WAS CHANGED. delegate behaves exactly as it
+    did, and a repair would need its own preregistration - and is not obviously wanted, since the
+    current behaviour errs safe.
+
+    HONEST VERDICT: H-DEFAULT IS NEITHER REFUTED NOR VINDICATED. It survived its own failure
+    condition, explains a real recurring class covering about two fifths of the corpus, and made one
+    correct prospective prediction about production code nobody had encoded. It does not explain most
+    of the defects here, and half its vocabulary has never been needed. Worth keeping; NOT worth
+    building a semantic substrate on yet.
+
+    Focused 6/6. Suite 678/678.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. Open and named: the bridge-mutation gap
+                 from Entry 30, which no control can currently catch; backward discovery from effect
+                 sinks; and whether the three unexercised roles do any work outside this corpus.
+
+---
