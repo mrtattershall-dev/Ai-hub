@@ -1,0 +1,34 @@
+Repair W3-c, W3-d, W3-e and W3-f: the world a grant applies in cannot widen, narrow() cannot move, commit() consumes permission, and derivation is epistemic
+
+W3-c. delegate() took context || from.context on trust, so a holder of [x] over {repository: S1}
+could hand [x] over {} - every world - to a grantee. Non-widening was enforced for the grant and not
+for where it applies. Every dimension the grantor's context pins must be present and equal in the
+grantee's; adding dimensions is narrowing and still delegates; a chain still roots.
+
+W3-d. narrow() set context[dimension] = value unconditionally, so moving repository from S1 to S2
+was "free" - a referent move under restriction's free pass. A dimension established at a different
+value is refused with the reason; an absent one, or the same value, is a restriction.
+
+W3-e. commit() accepted any valid token, so an OBSERVE token - evidence - committed an action while
+delegate() one function up refused to mint permission from the same evidence. commit now asks
+tracesToIndependentRoot, which existed and which nothing called: NORMATIVE, reaching OWNER, holding
+every grant the action requires. Evidence still cannot act.
+
+W3-f. derive() took kind and grant from premises[0], so the same premises in opposite order minted
+different authority. Derivation is epistemic: a NORMATIVE premise is refused - permission is
+delegated, not derived - and the output is EPISTEMIC with no grant, in either order.
+
+TWO EXISTING TESTS CHANGED, each with the reason beside it. calculus.test's PROPOSE/COMMIT test
+committed on tok(), an epistemic token, and so asserted W3-e; it now commits on a grant delegated
+from OWNER, and the property it tests - commit returns no new authority - is unchanged. calculus.test's
+HONEST RESIDUE demonstrated "authority does not stop a pointless investigation" with an epistemic
+token; the residue is unchanged and is now shown with a rooted grant to rerun. AND ONE OF MY OWN
+WAVE-1 CONTROLS WAS WRONG: calculus-attack.test C3-b asserted that narrowing repository S1 to S2
+mints - it enshrined W3-d as a positive control. It now narrows an absent dimension. A positive
+control that enshrines a defect is how a defect survives a repair; kept in the test as a comment.
+
+Focused 34/34. Suite 544/544. FREEZE-GATE: ten refusals, nine admissions, unchanged.
+
+Message-File: scratch/m43.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

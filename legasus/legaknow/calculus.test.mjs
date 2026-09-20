@@ -140,7 +140,11 @@ test('PROPOSE creates zero authority, and COMMIT consumes rather than produces',
   const p = propose('def f(): return 1');
   assert.equal(p.authority, null);
   assert.match(p.why, /no constructor that turns one into authority/);
-  const c = commit({ authority: tok(), action: 'write bytes' });
+  // This used to commit on tok() - an EPISTEMIC token - and so asserted the W3-e defect: evidence
+  // acting. commit now consumes PERMISSION, so the token here is delegated from OWNER. The property
+  // under test is unchanged: commit returns no new authority.
+  const c = commit({ authority: delegate({ from: 'OWNER', grant: ['write'], to: 'PROPOSE' }),
+    action: 'write bytes', requires: ['write'] });
   assert.equal(c.committed, true);
   assert.ok(c.consumed.length > 0);
   assert.equal(c.authority, undefined, 'COMMIT returns no new authority');
@@ -201,8 +205,12 @@ test('HONEST RESIDUE — two things the three constructors do NOT account for', 
   //    investigation must be able to CHANGE ENTITLEMENT is not a conservation property at all - nothing
   //    about authority forbids running a probe that cannot change its own mind. It is a TERMINATION
   //    property, and it needs its own justification outside this calculus.
-  const t = tok();
-  const pointlessButPermitted = commit({ authority: t, action: 'rerun the identical probe' });
+  //    The token here was tok() - epistemic - until commit() started consuming PERMISSION (W3-e).
+  //    The residue is unchanged and is shown with what commit now requires: a rooted grant to rerun.
+  //    Permission to rerun does not make rerunning worthwhile; that is the half that does not reduce.
+  const t = delegate({ from: 'OWNER', grant: ['rerun'], to: 'PROBE' });
+  const pointlessButPermitted = commit({ authority: t, action: 'rerun the identical probe',
+    requires: ['rerun'] });
   assert.equal(pointlessButPermitted.committed, true,
     'the calculus PERMITS a pointless investigation: authority is not what stops it');
 });

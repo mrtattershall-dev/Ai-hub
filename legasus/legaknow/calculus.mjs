@@ -97,6 +97,14 @@ export function derive({ premises = [], rule, relationWitnesses = [], claim, con
     return refuse('DERIVE requires every premise to be currently valid');
   }
   if (!rule) return refuse('DERIVE requires an admissible inference rule');
+  // DERIVATION IS EPISTEMIC. The first version took kind and grant from premises[0], so the same two
+  // premises in opposite order minted a NORMATIVE token carrying a grant, or an EPISTEMIC one carrying
+  // nothing (composition attack W3-f): authority that depends on argument order can be steered by
+  // argument order. Permission is DELEGATED, never derived; a normative premise is refused here.
+  if (premises.some((p) => p.kind !== KIND.EPISTEMIC)) {
+    return refuse('DERIVE is an epistemic constructor: it entails what may be BELIEVED from what is'
+      + ' believed. A NORMATIVE premise has no place in it - permission is delegated, not derived.');
+  }
 
   // COEXISTENCE DOES NOT ESTABLISH RELATION. Every relation the rule depends on needs its own witness.
   const needed = rule.requires || [];
@@ -146,7 +154,7 @@ export function derive({ premises = [], rule, relationWitnesses = [], claim, con
     }
     for (const c of conflicts) dropped.push({ dimension: c.dimension, why: 'bridged, not carried' });
   }
-  return token({ claim, kind: premises[0].kind, context, grant: premises[0].grant,
+  return token({ claim, kind: KIND.EPISTEMIC, context, grant: [],
     ancestry: [{ via: 'DERIVE', rule: rule.name, premises: premises.length,
       witnesses: relationWitnesses.map((w) => w.relation), dropped }],
     constructor: 'DERIVE' });
@@ -178,16 +186,41 @@ export function delegate({ from, grant = [], to, context }) {
       + ' which the grantor does not hold. Delegation may narrow and may never widen, which is why'
       + ' circulating permission around a cycle cannot amplify it.', { widening });
   }
-  return token({ claim: to, kind: KIND.NORMATIVE, context: context || from.context, grant,
+  // THE WORLD A GRANT APPLIES IN MAY NARROW AND MAY NEVER WIDEN, exactly like the grant. The first
+  // version took `context || from.context` on trust, so a holder of [x] over {repository: S1} could hand
+  // [x] over {} - every world - to a grantee (composition attack W3-c): non-widening was enforced for
+  // the grant and not for where it applies. Every dimension the grantor's context establishes must be
+  // present and equal in the grantee's; the grantee may add dimensions.
+  const ctx = context || from.context;
+  const widened = Object.entries(from.context).filter(([d, v]) => ctx[d] !== v).map(([d]) => d);
+  if (widened.length) {
+    return refuse('DELEGATE refused: the grantee\'s context drops or changes ' + widened.join(', ')
+      + ', which the grantor\'s context pins. A grant over one world is not a grant over every world.',
+    { widened });
+  }
+  return token({ claim: to, kind: KIND.NORMATIVE, context: ctx, grant,
     ancestry: [...from.ancestry, { via: 'DELEGATE', to }], constructor: 'DELEGATE' });
 }
 
 // ---------------------------------------------------------------------------------------------------
 // RESTRICTIONS. Free, unbounded, and requiring no proof, because none of them can increase authority.
-export const narrow = (t, dimension, value) => (isAuthority(t)
-  ? token({ ...t, context: { ...t.context, [dimension]: value },
-    ancestry: [...t.ancestry, { via: 'NARROW', dimension }], constructor: t.constructor })
-  : t);
+//
+// NARROW ADDS A CONSTRAINT; IT DOES NOT MOVE ONE. The first version set context[dimension] = value
+// unconditionally, so narrowing repository from S1 to S2 was "free" - a referent move under
+// restriction's free pass (composition attack W3-d). A dimension already established at a different
+// value is refused; an absent one, or the same value, is a restriction.
+export const narrow = (t, dimension, value) => {
+  if (!isAuthority(t)) return t;
+  const held = t.context[dimension];
+  if (held !== undefined && held !== null && held !== value) {
+    return refuse('NARROW refused: ' + dimension + ' is established at ' + String(held)
+      + ' and cannot be moved to ' + String(value) + '. That is a change of referent, not a'
+      + ' restriction, and restriction is the only thing this operation is free to do.',
+    { dimension, held, value });
+  }
+  return token({ ...t, context: { ...t.context, [dimension]: value },
+    ancestry: [...t.ancestry, { via: 'NARROW', dimension }], constructor: t.constructor });
+};
 
 export const restrictGrant = (t, grant) => (isAuthority(t)
   ? token({ ...t, grant: grant.filter((g) => t.grant.includes(g)),
@@ -206,9 +239,22 @@ export const propose = (candidate) => ({ candidate, authority: null,
   why: 'a proposal is an untrusted possibility. There is no constructor that turns one into authority.' });
 
 // COMMIT CONSUMES authority rather than producing it.
-export function commit({ authority, action }) {
+//
+// AND THE AUTHORITY IT CONSUMES IS PERMISSION. The first version accepted any valid token, so an
+// OBSERVE token - evidence - committed an action: OBSERVE plus COMMIT was an action nobody permitted
+// (composition attack W3-e), while delegate() one function up refused to mint permission from the same
+// evidence. commit now asks tracesToIndependentRoot, which already existed and which nothing called:
+// the token must be NORMATIVE, reach OWNER through a continuous delegation path, and hold every grant
+// the action requires. Evidence still establishes what may be believed and still cannot act.
+export function commit({ authority, action, requires = [] }) {
   if (!isAuthority(authority) || !authority.valid) {
     return { committed: false, why: 'COMMIT consumes an authority token and none was presented' };
+  }
+  const rooted = tracesToIndependentRoot(authority, requires);
+  if (!rooted.ok) {
+    return { committed: false, why: 'COMMIT refused: ' + rooted.why
+      + '. Evidence establishes what may be believed; acting needs permission that reaches an'
+      + ' independent root.' };
   }
   return { committed: true, action, consumed: authority.ancestry,
     why: 'authority was consumed, not produced' };

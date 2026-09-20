@@ -66,7 +66,11 @@ test('C3-b CONTROL — the constructors and the free restrictions still mint rec
   const root = delegate({ from: 'OWNER', grant: ['edit:implementation'], to: 'A' });
   assert.equal(isAuthority(root), true);
   assert.equal(isAuthority(delegate({ from: root, grant: ['edit:implementation'], to: 'B' })), true);
-  assert.equal(isAuthority(narrow(tok({ repository: 'S1' }), 'repository', 'S2')), true);
+  // THIS CONTROL WAS WRONG when first written in wave 1: it asserted that narrowing repository from S1
+  // to S2 mints, which is the referent move wave 3 found (W3-d) and narrow() now refuses. A positive
+  // control that enshrines a defect is how a defect survives a repair. The control now narrows an
+  // ABSENT dimension, which is what restriction means.
+  assert.equal(isAuthority(narrow(tok({ repository: 'S1' }), 'criterion', 'K')), true);
   assert.equal(isAuthority(restrictGrant(root, ['edit:implementation'])), true);
   const dead = invalidate(root, 'stale');
   assert.equal(isAuthority(dead), true, 'an invalidated token is still a token');
