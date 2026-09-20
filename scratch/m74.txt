@@ -1,0 +1,37 @@
+LegaScreen v2: the architecture correction worked, the prediction of no-detection held, and the rescan found nothing new
+
+Four predictions held and the real experiment failed, which is the result.
+
+V2-1 was a prediction of NO detection and it held: I-ANCESTRY does not flag C2, because S1 was in
+the closure of the inputs and nothing was minted from nothing. Only I-WEAKENING flags it. The probe
+is not credited with a catch its universal invariant does not make, and the owner's formulation is
+confirmed insufficient for this defect by execution rather than by argument. Two invariants were
+needed.
+
+V2-4 is the architecture result. On calculus, v1's erasure probe produced seven positives over eight
+functions, nearly all wrong-shape artifact; v2 produces zero at HEAD and two real ones at b11e51f.
+Requiring a witnessed call before concluding anything from an output removed the artifact class
+entirely, and the rule that fixed it - no observation without execution - has been in witness.mjs
+since r2 while the screening layer ignored it.
+
+V2-5 FAILED. The rescan over four trees found nothing meeting the four frozen conditions for a new
+finding. The two positives are C2 on two dimensions of the same function in the motivating module,
+which is not new. The preregistration fixed the reading and it is taken: v2 is a regression test
+wearing a screen's clothes and the earlier ANY moment did not repeat. No probe is added to chase a
+better result. The honest bound on that negative is that the rescan surface was seven transforms
+across four modules, so a null is weak evidence about the repository and strong evidence about the
+probe's reach.
+
+What the run did find is about the screen rather than the repository. The first version reported
+adapt.adaptRecord minting criterion and history at HEAD, and both were false: the input identity is
+keyed by producer and document while the output scope is keyed by criterion and history, so
+stripping a name the input never carried changed nothing and the invariant failed without any
+perturbation occurring. That is hazard 3 from this project's own ledger, a control that could not
+fire, committed inside a screen built to catch that class. Repaired with a non-vacuity check, and
+three dimensions at HEAD are now honestly unscreened for that cause.
+
+Suite 599/599.
+
+Message-File: scratch/m74.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
