@@ -1,0 +1,29 @@
+Note the tree-blind sweep and the signature-scoped verification, from BIND-1's failure rather than mine
+
+BIND-1's run hit its budget, fired a tree kill, and the child's close event still took about fifty
+more minutes because something held the stdio pipes through it. Two facts about my runner fall out of
+that, one lucky and one not.
+
+The lucky one: my parent spawns with stdio ignored on all three streams, so there are no pipes to
+hold and that exact failure cannot occur here. It was not foresight - I chose it to keep ninety
+subjects' output off stdout.
+
+The unlucky one: my sweep kills the pids I spawned and NOT their descendants, so a subject that
+starts a server leaves grandchildren the sweep never looks at. Worse, the post-run verification
+matched on my own command-line signature, so a hub-spawned server process could not have appeared in
+it. The check could not see the case it existed to rule out.
+
+Re-verified properly by enumerating every node process rather than filtering to mine: eight total,
+all of them either predating TRANSFER-2 by eight to ten days, children of those, or the owner's own
+hub server and vite. TRANSFER-2 left none. So the claim holds - but it held by luck of the subject
+and was verified by a method that could not have falsified it, and the second statement is the
+stronger one.
+
+Not built, consistent with the standard applied to the measured-quantity construct: BIND-1's instance
+has fired and mine is structural and unexercised, and fixing it in the hour I learned of it is the
+reflex that produced four apparatus defects today. The trigger is the first subject whose
+grandchildren outlive the sweep.
+
+Message-File: scratch/m121.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

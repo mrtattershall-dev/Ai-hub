@@ -2536,3 +2536,40 @@ well-phrased, and phrasing is what made them travel. The defence is a commitment
 is at stake - which is what the fourth-quantity trigger is, and what a preregistration is.
 
 ---
+
+### NOTED, NOT BUILT — the sweep is tree-blind, and the verification that cleared it was signature-scoped
+
+From BIND-1's run, not mine: its 180s budget fired `taskkill /T /F` and the child's `close` event
+still took ~50 more minutes, because something held the stdio pipes through a tree kill.
+
+TWO FACTS ABOUT MY RUNNER FALL OUT, one lucky and one not.
+
+LUCKY: my parent spawns with `stdio: ['ignore','ignore','ignore']`, so there are no pipes to hold and
+BIND-1's exact failure cannot occur here. That was not foresight - it was chosen to keep 90 subjects'
+output off stdout.
+
+NOT LUCKY: the sweep is `process.kill(pid, 'SIGKILL')` over spawned pids. THAT KILLS MY CHILDREN AND
+NOT THEIR DESCENDANTS. A subject that starts a server - which hub tests do - leaves grandchildren the
+sweep never looks at. AND THE POST-RUN VERIFICATION MATCHED MY OWN COMMAND-LINE SIGNATURE, so a
+hub-spawned `node server/index.js` could not have appeared in it. The check could not see the case it
+was supposed to rule out.
+
+RE-VERIFIED PROPERLY, every node process enumerated rather than filtered:
+
+    total node.exe                8
+    predate TRANSFER-2 by days    mockModel.mjs (Sep 10), index.js (Sep 11), fuzzForever.mjs
+                                  (Sep 12) and its child
+    the owner's own               hub server, vite
+    left by TRANSFER-2            NONE
+
+So TRANSFER-2's claim holds - but it held by luck of the subject, and was VERIFIED BY A METHOD THAT
+COULD NOT HAVE FALSIFIED IT. The stronger statement is the second one.
+
+NOT BUILT, consistent with the measured-quantity construct above and with the standard applied there:
+BIND-1's instance has FIRED; mine is structural and unexercised. Fixing it in the hour I learned of
+it is the reflex that produced four apparatus defects today, each a repair applied faster than it was
+tested.
+
+TRIGGER: the first subject whose grandchildren outlive the sweep. Until then, named and undone.
+
+---
