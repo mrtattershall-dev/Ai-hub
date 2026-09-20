@@ -40,12 +40,27 @@ export function adaptRecord(rec, { mapping = DOCTEST_MAPPING } = {}) {
     native: { result: native, details: rec.nativeDetails ?? null, want: rec.want ?? null,
       source: rec.source ?? null, optionflags: rec.optionflags ?? {} },
     identity: rec.identity,
-    scope: {
-      // The claim is bounded by the semantics that produced it. A doctest PASS is satisfaction of THAT
-      // example under THAT producer's rules - not general correctness.
-      criterion: rec.identity.producer + ' ' + rec.identity.producerVersion,
-      history: rec.identity.document + '#' + rec.identity.ordinal,
-    },
+    // SCOPE IS BUILT FROM WHAT THE PRODUCER ACTUALLY HAS.
+    //
+    // The first version hard-coded `history: document + '#' + ordinal`, which is doctest's shape. Handed
+    // a git record - which has neither - it produced the literal string "undefined#undefined": a
+    // fabricated coordinate where the honest answer is that the dimension DOES NOT APPLY. That is
+    // UNKNOWN collapsing into a value, inside the very boundary built to prevent it, and producer #2
+    // found it within minutes.
+    //
+    // A coordinate the producer cannot establish is now ABSENT rather than invented. Absent is not the
+    // same as unknown and neither is the same as a string that looks like data.
+    scope: (() => {
+      const sc = { criterion: rec.identity.producer + ' ' + rec.identity.producerVersion };
+      if (rec.identity.document !== undefined && rec.identity.ordinal !== undefined) {
+        sc.history = rec.identity.document + '#' + rec.identity.ordinal;
+      }
+      if (rec.identity.object !== undefined) sc.implementation = rec.identity.object;
+      if (rec.identity.head !== undefined && rec.identity.head !== null) {
+        sc.repository = rec.identity.head;
+      }
+      return sc;
+    })(),
   };
   if (m === null) {
     return { ...base, observability: UNKNOWN_MAPPING, assertion: null,

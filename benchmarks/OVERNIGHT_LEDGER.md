@@ -342,3 +342,50 @@ Both are r4 work. Neither may be repaired in r3.
     next         QUIESCE check - is there a justified operation whose outcome could change entitlement?
 
 ---
+## Entry 9 — r4: producer #2 (git) attacks the external-evidence boundary
+
+    objective    find out whether the evidence boundary is GENERIC or merely doctest-shaped, by running a
+                 second, maximally unlike external authority through it
+    authority    P2-SELECTION and predictions E1-E10, frozen in 087ec67 BEFORE candidates were inspected
+    start hash   087ec67
+    evidence     benchmarks/producer2-selection.mjs, legasus/legaexternal/git-producer.mjs,
+                 legasus/legaexternal/producer2.test.mjs (11 tests), benchmarks/RESULT.producer2.md
+    hypothesis   E1-E10 hold; and if the boundary must change shape to admit producer #2, THAT is the
+                 result, to be recorded rather than engineered away
+
+    RESULT   E1-E10 ALL HELD. 444 tests, 444 pass, 0 fail.
+
+    THE BOUNDARY HAD TO BEND, AND THAT IS THE FINDING. The adapter hard-coded doctest's history shape,
+    document + "#" + ordinal. Handed a git record - which has NEITHER coordinate - it emitted the literal
+    string "undefined#undefined". A FABRICATED COORDINATE WHERE THE HONEST ANSWER IS THAT THE DIMENSION
+    DOES NOT APPLY: UNKNOWN collapsing into a value, inside the very abstraction built to prevent exactly
+    that. It survived producer #1 only because producer #1 always had both fields. Repaired so that a
+    coordinate the producer cannot establish is ABSENT rather than invented; git carries its own
+    (implementation = oid, repository = HEAD) and doctest's scope is byte-unchanged.
+    ABSENT IS NOT UNKNOWN, AND NEITHER IS A STRING THAT LOOKS LIKE DATA.
+
+    THE SELECTION RULE'S ORDERING CLAUSE DID NO WORK, and this is recorded as an apparatus defect rather
+    than smoothed over. All five eligible candidates (git, pip-check, py_compile, symtable, unittest)
+    differ from doctest on ALL SEVEN axes, so "most axes differing" tied everywhere and the LEXICOGRAPHIC
+    TIEBREAK made the choice. The rule was applied as frozen rather than repaired mid-experiment. The
+    eligibility filter is still a real filter; the ordering clause is recorded as
+    P2-SELECTION-ORDERING = UNDISCRIMINATING on this candidate set, and must NOT be cited as evidence
+    that git was the maximally distant choice. git's merits stand independently: it never executes the
+    subject, its identity is content-addressed, its history is a DAG, and it has no PASS or FAIL.
+
+    E6 IS THE PREDICTION THAT DISTINGUISHES GENERIC FROM MERELY TOLERANT. git evidence does not just
+    survive storage - it DERIVES a scoped Legasus claim ("the copy measured is the copy that was
+    committed") with assertion: null. git establishes IDENTITY, NOT AN ASSERTION, and forcing an assertion
+    field onto it would have invented a distinction the producer never made. Law 4 in the direction that
+    is easy to miss, because the invented value would have looked harmless.
+
+    NOT ESTABLISHED. Two producers is not "generic" - it is ONE demonstrated bend plus a repair. Nothing
+    here tests whether {observability, assertion} are the right two fields; both producers fit them so
+    far, and git fits only by being allowed to DECLINE the second. win32, git 2.43, no POSIX run.
+
+    next         QUIESCE check against law 7's four conditions, rather than manufacturing an objective.
+                 Still open: POSIX_FORK_INHERITANCE = UNTESTED; the one UNRESOLVED ATTRIBUTION case;
+                 r4's prospective validation requires Repo D, which cannot be selected while r4 is under
+                 development.
+
+---
