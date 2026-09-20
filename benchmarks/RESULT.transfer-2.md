@@ -187,3 +187,40 @@ The uncomfortable generalisation, and it is not about one detector: **every prob
 repository was validated the same way.** That this number came out 1/4 rather than 4/4 is luck about
 which specimen arrived first, not a property of the method. The only remedy demonstrated here is the
 one that happened by accident - meet a real subject early and let it say 1/4 out loud.
+
+## THIRD CORRECTION — the 1-of-4 cause is now MEASURED, and my explanation of it was wrong
+
+This result said: "The structural rule requires at least half an aggregate's properties to reference
+bindings the module does not otherwise export; three of the four did not meet it. Whether those three
+are genuinely different in shape or the threshold is simply too strict is UNMEASURED."
+
+Measured now. **THE THRESHOLD HAS NOTHING TO DO WITH IT.**
+
+    __modelCallTest    CAUGHT    callModel, pruneHistory, capMessage, ...      bare identifier refs
+    __toolPolicyTest   MISSED    autoTools: () => new Set(AUTO_TOOLS)          arrow-wrapped
+    __godotToolTest    MISSED    collect: (root) => collectGodotFiles(root)    arrow-wrapped
+    __supervisorTest   MISSED    brake: (item) => supervisorBrake(item)        arrow-wrapped
+
+`testBackdoors` collects `properties.filter(pr => pr.value.type === 'Identifier')`. The three misses
+wrap their private binding in an arrow, so their value nodes are `ArrowFunctionExpression` and are
+filtered out entirely. Their property list comes out **EMPTY**, and the guard `agg.props.length &&
+...` then declines before any threshold is consulted. A getter (`get planTaskFor() {...}`) is dropped
+the same way.
+
+So the detector recognises **re-export by REFERENCE** and not **re-export by WRAPPER**. Both expose
+the same module-private binding; one does it through a closure.
+
+**AND THAT IS THE SAME DEFECT AS EVERYTHING ELSE TODAY.** An incidental property of the
+representation - whether the author wrote `callModel,` or `callModel: (x) => callModel(x)` - was
+allowed to decide a semantic classification. It is the readable brand, the name-keyed admission, the
+consumer-count backdoor rule and `String(v)` again, in the detector written to find that family.
+
+**NOT FIXED.** Widening the rule to count wrapper bodies would be fitting it to the three specimens
+that exposed it, and the honest sensitivity number is the one measured BEFORE the fix. What changes
+here is only that the cause is known:
+
+    1/4, cause UNMEASURED     ->    1/4, cause MEASURED: wrapper indirection, not threshold
+
+A repair needs its own preregistration, with a falsifier and a specimen set not drawn from these
+four - otherwise the next recall figure measures the fixture again, which is the finding that
+started this.
