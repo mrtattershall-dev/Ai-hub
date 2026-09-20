@@ -1,0 +1,35 @@
+preregister producer #3: freeze the rule and predictions BEFORE naming any candidate
+
+The quiesce check found this the ONLY justified open investigation, and law 7's fourth condition is why:
+some outcome of it FALSIFIES a claim currently relied on. Producer #2 answered "what if the producer has
+FEWER coordinates than Legasus names?" Producer #3 asks the harder one - WHAT IF IT HAS A COORDINATE
+LEGASUS HAS NO NAME FOR? Three outcomes, one acceptable: carried with an explicit admission, refused with a
+named reason, or SILENTLY VANISHED. The third is UNKNOWN collapsing into absence - the producer #2 defect
+wearing the opposite sign.
+
+P3-SELECTION-ORDERING REPLACES A RULE THAT FAILED. P2's "most axes differing" saturated at 7 of 7 for all
+five candidates, so the LEXICOGRAPHIC TIEBREAK made that choice; a saturating criterion is not a criterion.
+The replacement ranks by FOREIGN-COORDINATE COUNT - how many of the producer's native scoping coordinates
+have no counterpart among the six declared dimensions - which is the quantity the question is actually
+about. Ties break on distance from GIT rather than doctest, because git is the less-tested direction.
+
+THE ORDERING IS ADVERSARIAL BY DESIGN AND THAT ASYMMETRY IS DECLARED IN ADVANCE. It deliberately selects
+the candidate most likely to break the boundary, so a failure is EXPECTED and therefore weak evidence,
+while a pass is strong - and the failure MODE is predicted in advance so that "it broke" cannot be the only
+possible reading. If no eligible candidate has a foreign-coordinate count above zero, the rule selects
+NOTHING, and that is a statement about this environment rather than about the ontology.
+
+P3-3 must be shown BY EXECUTION, not by grepping importers: a gate can have a consumer that never runs, and
+an import count is not a decision path. P3-5 is the non-vacuity control without which "silently dropped"
+passes for free. P3-9 is the hardest and the likeliest to fail - the obvious repair, making scope()
+open-ended, VIOLATES the anti-overfitting invariant that an unadmitted coordinate must never defeat a
+comparison.
+
+A NULL RESULT IS WRITTEN DOWN IN ADVANCE TOO: if P3-2 is falsified, the producer #2 repair generalized
+further than one counterexample justified, and no repair is warranted.
+
+Committed alone, before the candidate table exists.
+
+Message-File: scratch/m18.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
