@@ -1,0 +1,46 @@
+AUTO-CF-1: K is 140 with zero drivers, a preregistered control could not fire, and a validating wrapper was being skipped on replay
+
+C-1 held. From 55 witnessed and 55 replayed transformations recorded off two existing test files, 140
+counterfactuals reached OBSERVED out of 667 leaf facts tried, with no hand-authored facts, construct
+or operate anywhere on the path. Per transformation, observe is 79 of 297 and derive is 61 of 291;
+calculus.delegate is K equals ZERO over 79 leaf facts, every delegation counterfactual refused or
+unreadable, and that is reported rather than smoothed. Seventy-nine percent of all attempts produced
+no measurement and each says why in its own state, where the old representation would have carried
+most of them as an undefined.
+
+The run also found a real thing about the subject, mechanically and without a probe written for it:
+removing one fact from one premise turns a derive REFUSAL into a CONCLUSION, because derive refuses
+on conflict but drops a dimension some premise never established, so deleting the conflicting
+criterion removes the conflict. Both halves are documented in calculus.mjs and nobody had put them
+next to each other. This slice issues no judgment about it and records it for the slice that has a
+contract to judge against.
+
+C-2b DID NOT FIRE AND THE PREDICTION WAS WRONG. A constructor re-supplying a default lands in the
+OUTPUT, not the rebuilt ARGUMENT where the proof is taken, and once an object key is gone the
+argument always differs - so PERTURBATION_NO_EFFECT is unreachable under removal, 0 of 667. The state
+is kept because the proof is the right one and value substitution will reach it, and it is recorded
+as never shown to fire, which is not the same as safe.
+
+THREE DEFECTS IN MY OWN LAYER, ALL FOUND BY RUNNING IT. K was 254 on the first run because a witness
+whose baseline was already a refusal compared two refusals, found them equal and reported OBSERVED
+with no delta - false confidence manufactured out of an absence, slice 1's defect wearing the new
+architecture. A world that could not be built was reported as a world in which nothing changed, which
+is could-not-measure collapsing into a measured absence, the oldest defect class here, committed once
+more inside the layer built to prevent it. And the most dangerous one did not fail loudly at all: when
+a recorded function returned another recorded call's value unchanged, the recorder kept the INNER
+producer, so replay rebuilt the value by calling the inner function directly and a validating
+wrapper's refusal was silently removed from the replayed path. Calls complete inner-first, so the
+outermost producer now wins.
+
+The repair to the first is deliberately NOT that the baseline must be observable, because the
+baseline-refusal case is the most informative result in the run.
+
+C-6 held and is asserted over the source and all 667 records rather than intended: nothing calls
+held() or violated(), and no result carries a verdict. Two test files never used in development gave
+N 30, M 30, K 58. No coverage fraction is reported anywhere.
+
+Focused 27/27. Suite 639/639.
+
+Message-File: scratch/m87.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

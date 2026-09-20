@@ -66,23 +66,34 @@ export function recorder() {
   }
 
   // Rebuild from a template, re-running referenced nodes through their OWN recorded functions.
-  function decode(t, memo) {
+  function decode(t, memo, mut, state) {
     if (Object.hasOwn(t, '__leaf')) return t.__leaf;
-    if (Object.hasOwn(t, '__ref')) return run(nodes[t.__ref], memo);
+    if (Object.hasOwn(t, '__ref')) return run(nodes[t.__ref], memo, mut, state);
     if (Object.hasOwn(t, '__foreign') || Object.hasOwn(t, '__opaque')) {
       return opaques[t.__foreign ?? t.__opaque];
     }
-    if (Object.hasOwn(t, '__array')) return t.__array.map((x) => decode(x, memo));
-    return Object.fromEntries(Object.entries(t.__object).map(([k, x]) => [k, decode(x, memo)]));
+    if (Object.hasOwn(t, '__array')) return t.__array.map((x) => decode(x, memo, mut, state));
+    return Object.fromEntries(Object.entries(t.__object)
+      .map(([k, x]) => [k, decode(x, memo, mut, state)]));
   }
 
   // Re-execute one node. Memoized per replay, so two premises that were the SAME object stay the same
   // object and two that were distinct stay distinct - the sharing structure is part of the recipe.
-  function run(node, memo) {
+  //
+  // `mut` replaces ONE node's argument template. The intervention therefore lands on FACTS, before
+  // any constructor runs, and every object downstream of it is minted by the production path from the
+  // perturbed world. Nothing here copies, edits or constructs an authority object.
+  function run(node, memo, mut, state) {
     if (memo.has(node.id)) return memo.get(node.id);
-    const args = node.args.map((a) => decode(a, memo));
-    const r = node.fn(...args);
+    const tpl = (mut && mut.node === node.id) ? mut.args : node.args;
+    const args = tpl.map((a) => decode(a, memo, mut, state));
+    let r;
+    try { r = node.fn(...args); } catch (e) {
+      if (state) { state.threwAt = node.id; state.error = e.message; }
+      throw e;
+    }
     memo.set(node.id, r);
+    if (state) state.results.set(node.id, r);
     return r;
   }
 
@@ -106,7 +117,13 @@ export function recorder() {
         const node = { id: nodes.length, op, root: at === 0, fn, args: encoded,
           threw: threw ? String(threw && threw.message) : undefined };
         nodes.push(node);
-        if (!threw && result !== null && typeof result === 'object' && !byResult.has(result)) {
+        // THE OUTERMOST PRODUCER WINS. When a recorded function returns another recorded call's
+        // value unchanged - a validating wrapper, say - the first version kept the INNER producer,
+        // and replay then rebuilt the value by calling the inner function directly. The wrapper's
+        // own refusal was silently skipped, so a perturbation it would have rejected sailed through
+        // and was scored. Calls complete inner-first, so overwriting keeps the call closest to the
+        // consumer, which is the one the consumer actually got the value from.
+        if (!threw && result !== null && typeof result === 'object') {
           byResult.set(result, node.id);
         }
         node.result = threw ? undefined : result;
@@ -125,26 +142,44 @@ export function recorder() {
     replay(w) { return replay(w); },
     leaves(w) { return w.leaves; },
     clear() { nodes.length = 0; opaques.length = 0; depth = 0; },
+
+    // ---- the surface AUTO-CF-1 builds on. None of it can construct anything: `rebuild` re-runs the
+    // recorded functions, and `argsOf` decodes a template into the values that would be passed.
+    node: (id) => nodes[id],
+    isAuthorityObject: (v) => isBranded(v),
+    argsOf(node, tpl) {
+      const state = { results: new Map() };
+      try { return { ok: true, args: (tpl || node.args).map((a) => decode(a, new Map(), null, state)) }; }
+      catch (e) { return { ok: false, why: e.message }; }
+    },
+    rebuild(w, mut) {
+      const state = { results: new Map(), threwAt: null, error: null };
+      try { return { ok: true, result: run(w.root, new Map(), mut, state), state }; }
+      catch { return { ok: false, state }; }
+    },
   };
 
   function closure(root) {
     const ids = new Set();
     const leaves = [];
     const foreign = [];
-    const walk = (t, id, path) => {
-      if (Object.hasOwn(t, '__leaf')) { leaves.push({ node: id, path: path.join('') }); return; }
+    // `keys` is the addressable route to the leaf - the argument index, then the object keys and
+    // array indices to reach it. A path STRING is for reading; the keys are what an intervention
+    // navigates, so no part of this addresses anything by the name it happens to share with an output.
+    const walk = (t, id, path, keys) => {
+      if (Object.hasOwn(t, '__leaf')) { leaves.push({ node: id, path: path.join(''), keys }); return; }
       if (Object.hasOwn(t, '__ref')) { visit(nodes[t.__ref]); return; }
       if (Object.hasOwn(t, '__foreign')) { foreign.push({ node: id, path: path.join('') }); return; }
       if (Object.hasOwn(t, '__opaque')) return;
       if (Object.hasOwn(t, '__array')) {
-        t.__array.forEach((x, i) => walk(x, id, [...path, '[' + i + ']'])); return;
+        t.__array.forEach((x, i) => walk(x, id, [...path, '[' + i + ']'], [...keys, i])); return;
       }
-      for (const [k, x] of Object.entries(t.__object)) walk(x, id, [...path, '.' + k]);
+      for (const [k, x] of Object.entries(t.__object)) walk(x, id, [...path, '.' + k], [...keys, k]);
     };
     const visit = (n) => {
       if (ids.has(n.id)) return;
       ids.add(n.id);
-      n.args.forEach((a, i) => walk(a, n.id, ['arg[' + i + ']']));
+      n.args.forEach((a, i) => walk(a, n.id, ['arg[' + i + ']'], [i]));
     };
     visit(root);
     const ord = [...ids].sort((a, b) => a - b);
@@ -161,7 +196,7 @@ export function recorder() {
           + ' is incomplete and no legitimate rebuild exists' };
     }
     let out;
-    try { out = run(w.root, new Map()); } catch (e) {
+    try { out = run(w.root, new Map(), null, null); } catch (e) {
       return { ok: false, reason: 'REPLAY_THREW', why: 'replaying the recorded recipe threw: ' + e.message };
     }
     const a = semantic(w.root.result);
