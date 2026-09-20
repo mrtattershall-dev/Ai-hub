@@ -26,6 +26,33 @@
 //     no admissible resolution is currently justified within the declared evidence and authority frontier
 //
 // which is a statement about the SYSTEM'S ENTITLEMENT, not about the proposition.
+//
+// THE COMPLETENESS BOUNDARY, named by the owner 2026-09-20 and previously only implied by the words
+// "declared" and "frontier". Four statements look alike in ordinary software and are not equivalent
+// here, and this law reaches exactly one of them:
+//
+//     no defect observed                        an outcome of running instruments
+//     no known attack remains                   a statement about the attacks someone thought of
+//     NO JUSTIFIED OBJECTIVE EXISTS             <- what QUIESCENT sounds like
+//     the system is ready                       an owner's decision, never this law's
+//
+// What contestState() computes is narrower than the third:
+//
+//     ESTABLISHES       no investigation FORMULATED in this frontier is currently justified
+//     DOES NOT ESTABLISH that no justified investigation exists - the frontier's COMPLETENESS over the
+//                       space of questions that could be asked is not established here, and nothing in
+//                       this module could establish it
+//
+// The evidence that the gap is real rather than pedantic is this project's own: on 2026-09-20 the
+// frontier was QUIESCENT with zero objectives, and three successive preregistered attack waves each
+// found new authority defects in deciding paths - twenty-one in total - after the previous wave had
+// gone green. The verdict was correct every time over the questions it held. It was silent about the
+// ones nobody had written down.
+//
+// SO THE QUALIFICATION TRAVELS WITH THE VERDICT rather than living in this comment, because a bounded
+// claim quoted without its bound is an unbounded claim. Every contestState() result carries
+// `establishes` and `doesNotEstablish`. This adds no objective: "is the frontier complete?" is not an
+// investigation with an outcome, and a law that emitted one here would be the loop it forbids.
 
 export const FRONTIER = { OPEN: 'OPEN', CLOSED: 'CLOSED' };
 
@@ -75,6 +102,15 @@ export function investigationJustified({ name, authorized, executable, targetsDi
 
 // The state of a standing conflict. QUIESCENT is a POSITIVE finding about the system's entitlement, not a
 // failure to try hard enough.
+// The bound every verdict carries. Stated once, attached to all of them, so no reader can quote the
+// state without it.
+export const SCOPE = {
+  establishes: 'no investigation FORMULATED in this frontier is currently justified',
+  doesNotEstablish: 'that no justified investigation EXISTS. The frontier is a set of questions'
+    + ' someone wrote down; its completeness over the space of questions that could be asked is not'
+    + ' established here, and nothing in this module could establish it.',
+};
+
 export function contestState({ frontier, investigations = [] }) {
   const justified = investigations.map(investigationJustified).filter((i) => i.ok);
   // A PENDING OPERATION HOLDS THE FRONTIER OPEN ONLY WHILE IT IS ITSELF A JUSTIFIED INVESTIGATION.
@@ -96,19 +132,19 @@ export function contestState({ frontier, investigations = [] }) {
       + (discharged.length ? ' (discharged from pending as not a justified investigation: '
         + discharged.join(', ') + ')' : '') };
   if (open) {
-    return { state: CONTEST.OPEN_CONTEST, justified, frontier: view,
+    return { state: CONTEST.OPEN_CONTEST, justified, frontier: view, ...SCOPE,
       why: 'the conflict stands and the evidence frontier is not closed: ' + view.why };
   }
   if (justified.length) {
-    return { state: CONTEST.OPEN_CONTEST, justified, frontier: view,
+    return { state: CONTEST.OPEN_CONTEST, justified, frontier: view, ...SCOPE,
       why: 'the frontier is closed but ' + justified.length + ' justified investigation(s) remain: '
         + justified.map((i) => i.name).join(', ') };
   }
-  return { state: CONTEST.QUIESCENT_CONTEST, justified: [], frontier: view,
-    why: 'the frontier is closed and no authorized operation has a justified expectation of changing'
-      + ' what may be claimed. The system is ENTITLED TO STOP INVESTIGATING. This says nothing about'
-      + ' whether the proposition is decidable - only that this system cannot currently justify an'
-      + ' attempt.' };
+  return { state: CONTEST.QUIESCENT_CONTEST, justified: [], frontier: view, ...SCOPE,
+    why: 'no investigation formulated in this frontier is currently justified, so the system is'
+      + ' ENTITLED TO STOP INVESTIGATING. This says nothing about whether the proposition is'
+      + ' decidable, and nothing about whether a justified investigation exists that nobody has'
+      + ' formulated - see doesNotEstablish.' };
 }
 
 // THE RULE PURPOSE MUST OBEY, or the architecture cannot ever be idle.

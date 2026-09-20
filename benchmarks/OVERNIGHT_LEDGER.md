@@ -868,3 +868,95 @@ Both are r4 work. Neither may be repaired in r3.
                  against taking it yet.
 
 ---
+## Entry 16 — the owner reviews Entry 15, and two standing claims are narrowed
+
+    objective    record the owner's review of the composition session, and correct what it showed to
+                 be overstated - in the code where the claims are made, not only in prose
+    authority    OWNER, 2026-09-20, reviewing Entry 15
+    start hash   4f93a79
+    evidence     PROVENANCE_RELATION_PREREG.md / RESULT.provenance-relation.md (554440f / fefb29d),
+                 legaknow/stopping-scope.test.mjs, quiesce-check.mjs
+
+    THE STOPPING LAW'S CLAIM WAS NARROWER THAN ITS NAME, and the owner named the gap:
+
+        ESTABLISHES        no objective FORMULATED in the frontier is justified
+        DOES NOT ESTABLISH that no justified objective exists
+
+    The frontier can be perfectly correct over the questions it holds while being incomplete over the
+    questions that could be asked. There may be no complete solution to the second problem; the
+    defect was never having said which one law 7 reaches. Entry 15's own closing sentence had found
+    it - "no more cases I can name is the honest stopping reason and also the weakest one" - and left
+    it as prose in a report rather than as a bound on the verdict.
+
+    MECHANIZED, because a bounded claim quoted without its bound is an unbounded claim. Every
+    contestState() result now carries `establishes` and `doesNotEstablish`; quiesce-check prints both
+    beside the verdict, with this project's own evidence that the gap is not pedantic: on 2026-09-20
+    the check said QUIESCENT with zero objectives, and three preregistered waves then found
+    twenty-one authority defects in deciding paths, each after the previous had gone green. The
+    verdict was correct every time over the questions it held. It was silent about the rest.
+
+    It adds NO objective. "Is the frontier complete?" is not an investigation with an outcome, and a
+    stopping law that emitted one there would be the loop it forbids. A test asserts that the
+    qualification changed no state and no objective it qualifies.
+
+    PROVENANCE IS A RELATION, NOT A FUNCTION OF CONTENT, and the C8-a repair said otherwise. bind()
+    asserts "this content was produced by this implementation" and the module decided that identical
+    bytes at another path retain provenance; the repair inherited that and declared two attributions
+    for one digest to be CONTESTED. But identical bytes can legitimately arise through several
+    histories - three pyparsing files in repoC/IDENTITY.json already share the empty-file digest - so
+    "A produced these bytes" and "B produced these bytes" can BOTH BE TRUE.
+
+    AND THE WORD CARRIED AN OBLIGATION IT COULD NOT DISCHARGE. ledger.mjs LAW 3 defines CONTESTED as
+    contradicting live claims that block reliance AND OWE AN EXPERIMENT. No experiment separates two
+    tools that each emitted an empty file. That is composition attack C4 - a state acquiring a
+    declared word's authority because the strings matched - committed by me inside the repair for C8,
+    and found by the owner reviewing the repair rather than by its author. The session's own finding,
+    applied to the session's own work, from outside it.
+
+    Bounded by its own controls: PR-4 showed the ENTITLEMENT was already right - neither state ever
+    attributed to one producer - so only the relation's description moved. MULTIPLY_BOUND states what
+    is known and why nothing stronger is available: the digest is the only identity here, so this
+    ledger cannot tell two legitimate histories from one damaged record. CONTESTED is removed from the
+    module rather than renamed into it; a conflict claim needs evidence the content had ONE history,
+    and where that check belongs is recorded as UNKNOWN rather than invented. LATENT, not live: 21
+    artifacts, 21 distinct digests, and the sidecar regenerates to a byte-identical seal.
+
+    THE 21/21 READING, corrected to the owner's framing. Entry 15 called the calibration "favourable
+    and thin". Sharper: the hypotheses were formed AFTER inspecting the implementations, so these are
+    not 21 independent tests of the architecture. The defensible statement is
+
+        given architectural inspection, the current invariants were powerful enough to predict
+        numerous concrete implementation violations, and those predictions survived execution
+
+    and NOT "21 prospective tests independently validated the architecture". Prospective pressure
+    begins at Repo D and nowhere earlier.
+
+    THE CALCULUS IS AN EXECUTABLE SPECIFICATION, NOT AN ENFORCEMENT BOUNDARY. Entry 15 recorded that
+    it has no production consumer; the owner's framing is the consequence. commit-requires-rooted-
+    permission, delegation-cannot-widen, derive-is-epistemic and narrow-cannot-move are properties OF
+    THE CALCULUS, not of every production path, until production decisions consume those objects.
+    Nothing stops other code from deciding and writing. And OWNER is a semantic convention while
+    delegate({from: 'OWNER'}) is callable by anyone. Recorded as the edge of the evidence, not
+    repaired: wiring the calculus into a deciding path is architecture work that would want its own
+    preregistration, and is not started.
+
+    INSTRUMENT CLASS BOUNDARIES. The owner names the remaining danger correctly: one witnessed member
+    of a broadly named class must not establish power over the whole class. instruments.mjs requires a
+    witness per class and says UNKNOWN without one, which is the guard; it does not police how broadly
+    a class is named. That is why the rigs' classes are left UNKNOWN rather than enumerated.
+
+    REPO D REMAINS OWNER_REQUIRED AND NOT YET, on the owner's sharpened criterion: not "recent repairs
+    found defects" but "three newly preregistered adversarial waves each exposed additional authority
+    defects after the previous wave went green" - measurable evidence that the repair surface has not
+    exhausted its defect yield. The stopping law having no justified objective does not make the
+    architecture ready; those are different authorities, and only one of them is the owner's.
+
+    WHAT WOULD EVENTUALLY LIFT IT, recorded as a shape and not started: a precommitted adversarial
+    challenge procedure, bounded in budget, that itself stops producing authority violations - and,
+    per Entry 14, a null from that procedure means something only to the extent its coverage or power
+    is independently established. Otherwise the budget becomes the entitlement again. That recursion
+    is real and is recorded as real.
+
+    next         NONE. QUIESCENT, now with its bound printed beside it.
+
+---

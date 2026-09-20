@@ -292,6 +292,15 @@ say('FRONTIER : ' + frontier.state + ' - ' + frontier.why);
 say('CONTEST  : ' + contest.state);
 say('           ' + contest.why);
 say('');
+// THE BOUND, PRINTED BESIDE THE VERDICT AND NOT ONLY IN THE MODULE. A reader who quotes
+// "QUIESCENT_CONTEST, zero objectives" without this is quoting an unbounded claim.
+say('WHAT THIS ESTABLISHES      : ' + contest.establishes);
+say('WHAT IT DOES NOT ESTABLISH : ' + contest.doesNotEstablish);
+say('  This project is its own evidence that the gap is real: on 2026-09-20 this check said QUIESCENT');
+say('  with zero objectives, and three successive preregistered attack waves then found 21 authority');
+say('  defects in deciding paths, each wave after the previous one had gone green. The verdict was');
+say('  correct every time over the questions it HELD. It was silent about the ones not yet written.');
+say('');
 say('OBJECTIVES GENERATED: ' + objectives.objectives.length);
 for (const ob of objectives.objectives) say('  ' + ob.kind + '  ' + ob.target);
 say('  ' + objectives.why);

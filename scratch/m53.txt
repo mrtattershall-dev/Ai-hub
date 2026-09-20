@@ -1,0 +1,30 @@
+Entry 16: narrow what quiescence claims, and carry the bound with every verdict
+
+The owner reviewing Entry 15 named a gap the entry had found and left as prose. Law 7 establishes
+that no objective FORMULATED in the frontier is justified; it does not establish that no justified
+objective exists. The frontier can be perfectly correct over the questions it holds while being
+incomplete over the questions that could be asked, and there may be no complete solution to the
+second problem - the defect was never saying which one the law reaches.
+
+Mechanized rather than commented, because a bounded claim quoted without its bound is an unbounded
+claim: every contestState result carries establishes and doesNotEstablish, and quiesce-check prints
+both beside the verdict together with this project's own evidence that the gap is not pedantic -
+QUIESCENT with zero objectives, then three preregistered waves finding twenty-one authority defects
+in deciding paths, each after the previous went green. It adds no objective; a test asserts the
+qualification changed no state and no objective it qualifies, and that asking about completeness
+generates nothing.
+
+Entry 16 also records the owner's corrections to Entry 15's own readings: the 21/21 result is what
+architectural inspection can predict, not twenty-one independent prospective tests; the calculus is
+an executable specification rather than an enforcement boundary until a deciding path consumes it,
+with OWNER a semantic convention while its delegate argument is a string anyone can pass; the
+instrument guard requires a witness per class but does not police how broadly a class is named,
+which is why the rigs stay UNKNOWN; and Repo D stays OWNER_REQUIRED and NOT YET on the sharpened
+criterion, with the shape of what would eventually lift it - a precommitted bounded adversarial
+procedure whose null means something only insofar as its power is independently established.
+
+Suite 561/561.
+
+Message-File: scratch/m53.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
