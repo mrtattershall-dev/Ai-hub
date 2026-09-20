@@ -41,6 +41,20 @@ export function compare(a, b, { dimensions = Object.keys(DIMENSIONS), protectedD
       why: 'both candidates must have passed PROVE before preference is meaningful; an incorrect'
         + ' candidate is not a worse point on the frontier, it is not on the frontier' };
   }
+  // AN UNMEASURED BEHAVIORAL DIMENSION IS NOT A TIE. The first version skipped any dimension either
+  // candidate lacked, so a candidate whose placementRobustness was never measured could not be
+  // dominated on it and sat on the Pareto frontier beside a measured one (composition attack W2-d):
+  // "missing -> compatible", in the mild direction, but in the one class of dimension allowed to
+  // promote. A candidate lacking a declared BEHAVIORAL metric is INCOMPARABLE, with the dimension
+  // named. DESCRIPTIVE dimensions may still be absent - they cannot promote, so their absence cannot
+  // manufacture a preference.
+  const unmeasured = dimensions.filter((dim) => DIMENSIONS[dim] && DIMENSIONS[dim].class === 'BEHAVIORAL'
+    && (a.metrics[dim] === undefined || b.metrics[dim] === undefined));
+  if (unmeasured.length) {
+    return { verdict: VERDICT.INCOMPARABLE, unmeasured,
+      why: 'a behavioral dimension was never measured on one side (' + unmeasured.join(', ')
+        + '); an unmeasured candidate is not equal to a measured one, it is not comparable to it' };
+  }
   const aBetter = []; const bBetter = []; const same = [];
   for (const dim of dimensions) {
     if (!DIMENSIONS[dim]) continue;
@@ -118,8 +132,29 @@ export function mayReplaceChampion(candidate, champion, opts = {}) {
 
 // The set of candidates nothing else dominates. Keeping a frontier rather than a winner is the whole
 // point: two verified implementations that trade off are two answers, not one answer and one mistake.
-export function paretoFrontier(candidates, opts = {}) {
-  const verified = candidates.filter((c) => c && c.verified === true);
-  return verified.filter((c) => !verified.some((o) =>
+//
+// AN UNMEASURED CANDIDATE IS NOT ON THE FRONTIER. compare() now calls it INCOMPARABLE (W2-d), and
+// INCOMPARABLE is not DOMINATED, so filtering on domination alone would keep it - the first flip of the
+// W2-d regression caught exactly that. It is excluded up front, with a record naming the missing
+// dimension, so its absence from the frontier can be told apart from its being beaten.
+export function paretoFrontierReport(candidates, opts = {}) {
+  const behavioral = opts.behavioral || behavioralDimensions();
+  const excluded = [];
+  const verified = candidates.filter((c) => {
+    if (!c || c.verified !== true) return false;
+    const missing = behavioral.filter((d) => c.metrics[d] === undefined);
+    if (missing.length) {
+      excluded.push({ name: c.name, unmeasured: missing,
+        why: 'never measured on ' + missing.join(', ') + ', so not comparable to any measured candidate' });
+      return false;
+    }
+    return true;
+  });
+  const frontier = verified.filter((c) => !verified.some((o) =>
     o !== c && compare(o, c, opts).verdict === VERDICT.DOMINATES));
+  return { frontier, excluded };
+}
+
+export function paretoFrontier(candidates, opts = {}) {
+  return paretoFrontierReport(candidates, opts).frontier;
 }
