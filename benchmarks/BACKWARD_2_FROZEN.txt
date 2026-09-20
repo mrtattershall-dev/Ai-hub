@@ -1,0 +1,14 @@
+BACKWARD-2 MECHANISM FREEZE (supersedes BACKWARD_1_FROZEN.txt, which stands as the digest TRANSFER-1 ran against)
+
+TRANSFER-2 runs ONCE against exactly this mechanism. Any change to a file below invalidates
+the freeze; a run after such a change is TRANSFER-3, and the TRANSFER-2 result stands.
+
+944f55862c3579ea  legasus/legascreen/sink.mjs
+6b129623c26c46f0  legasus/legascreen/ancestry.mjs
+59e422211de7b10e  legasus/legascreen/witness-loader.mjs
+e5fa267e94f03180  legasus/legascreen/witness-store.mjs
+4c59d11fed1fbeb6  legasus/legascreen/witness-register.mjs
+76298079036576cb  benchmarks/run-backward.mjs
+b3542499902a4fab  benchmarks/backward-child.mjs
+
+COMBINED  0784cd3f4e3970b3

@@ -1,7 +1,18 @@
 # PREREGISTRATION — TRANSFER-2. The hub run, after TRANSFER-1 failed on subject lifecycle.
 
-Frozen before the run. Mechanism digest: **see `BACKWARD_2_FROZEN.txt`** (written at freeze time,
-after the Legasus regression passes). `TRANSFER_1_PREREG.md` and `RESULT.transfer-1.md` stand
+Frozen before the run. Mechanism digest: **BACKWARD_2_FROZEN.txt, COMBINED 0784cd3f4e3970b3**,
+frozen after the Legasus regression passed.
+
+Regression gate, on a quiet machine (8 node.exe baseline), before the freeze:
+
+    EFFECT_WITNESSED 3804   FILESYSTEM 3421   PROCESS_EXECUTION 383
+    COMPLETE 93  DRAIN_INCOMPLETE 1  TIMED_OUT 1  NO_RECORD 0  swept 0
+    private fns on effect paths: 4 - runProgram, snapshot, restore, git (the original four)
+    INTERSECTION 0 (reproduced)
+
+Lower than the pre-leak 4132/717 because entries now run ISOLATED rather than sharing one process,
+so cross-file state no longer accumulates. The isolated figure is the more correct measurement, and
+the headline findings reproduce exactly. `TRANSFER_1_PREREG.md` and `RESULT.transfer-1.md` stand
 unamended.
 
 ## ANCESTRY — what TRANSFER-1 established, kept permanently visible
