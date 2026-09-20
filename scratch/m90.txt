@@ -1,0 +1,50 @@
+SURFACE-1: the denominator is 15, not 251, and the headline is that level 1 is empty
+
+Static discovery seeded only by the repository's own SHAPE - an identity brand, new WeakSet plus add
+and has, found with acorn rather than regex - propagated through the import and call graph, then
+confirmed by running the entire existing test suite with the discovered set instrumented.
+
+    STATIC AUTHORITY CANDIDATES      15
+    DYNAMICALLY OBSERVED             13
+    CONFIRMED AUTHORITY TRANSFORMS   11
+    SCREENABLE                        5
+    UNSCREENABLE                     10
+
+THE HEADLINE IS THE LEVEL COUNT, NOT THE SURFACE COUNT. L1 equals 1, and that one is LegaScreen's own
+intervene calling journey. No production module under legasus imports the authority calculus at all.
+The ledger has asserted since Entry 15 that the calculus has no production consumer; it now falls out
+of a mechanical scan. The surface is small because the architecture's unforgeable core is unconsumed,
+and that is the real content of the number 15.
+
+A STRUCTURAL LIMIT OF THE METHOD IS VISIBLE IN THE TABLE. isAuthority, commit, restrictGrant and
+tracesToIndependentRoot are all unscreenable for one reason: the counterfactual method reads
+authority coordinates off an output, and a predicate returns a boolean. This screen can measure
+producers of authority and cannot currently measure consumers of it, and four of the calculus's ten
+exports are consumers. That is not coverage to be closed by running more tests, it is an invariant
+shape the method does not have.
+
+AND DELEGATE'S K EQUALS ZERO WAS THE SAMPLE, NOT THE SUBJECT. Over the whole suite delegate has 25
+witnesses instead of 13 and 5 counterfactuals reach OBSERVED. I flagged that I could not tell
+instrument from transformation; the answer is the sample, and one run's K of 0 is a statement about
+which tests were run.
+
+S-2b fired: a fixture carrying every authority-sounding name in the vocabulary and no brand yields
+ZERO candidates, so the mechanism does not fall back to names. S-3b fired: private brand-touchers are
+discovered and reported unwrappable rather than dropped, which is why token and seal appear.
+S-4 held precisely - the whole suite ran with every discovered export wrapped and 639 of 639 passed,
+so the shims are transparent to the subject rather than merely non-crashing.
+
+The instrument's own tests prove what it cannot see: a consumer reached only through a dynamic import
+does not appear on the surface. Combined with the brand-shape seed that is the content of CAVEAT,
+which is exported so a report cannot omit it by forgetting. Concretely justification, stopping,
+provenance and ledger are authority-bearing by any reading and are NOT on this surface, because they
+use no identity brand. One seed is not a surface.
+
+SCREENABLE IS NOT SCREENED. Sound transforms actually screened is still 1, hand-driven, and
+previously unknown repository defects discovered is still 0.
+
+Focused 7/7. Suite 646/646.
+
+Message-File: scratch/m90.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
