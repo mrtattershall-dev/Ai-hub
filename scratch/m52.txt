@@ -1,0 +1,31 @@
+Repair the provenance relation: MULTIPLY_BOUND states what is known, and CONTESTED leaves a module that cannot establish a conflict
+
+Two attributions for one digest are a RELATION, not a winner and not a contest. What the C8-a repair
+established stands untouched: the last-wins map is gone, every binding is kept, and no lookup
+attributes to one producer - PR-4 confirmed the entitlement was already right. What moved is the
+claim made about the two bindings. MULTIPLY_BOUND says N production events bind this content and no
+single producer is established, and says why nothing stronger is available: the digest is the only
+identity here, by the decision that makes the identity property work, so this ledger cannot tell two
+legitimate histories from one damaged record and must not pretend otherwise.
+
+CONTESTED is removed from the module rather than renamed into it. A conflict claim needs evidence
+that the content had ONE history; the digest is not that evidence, the check that would hold such a
+coordinate is not started, and where it belongs is left UNKNOWN. The word goes back to meaning only
+what ledger.mjs LAW 3 says - contradicting live claims that block reliance and owe an experiment -
+which is exactly the obligation that could not be satisfied for two tools that each emitted an empty
+file.
+
+ONE EXISTING TEST CHANGED with the reason beside it: the C8-a regression named the state in its
+title and asserted the word. It now asserts the repair it actually guards - both kept, neither
+returned - plus that the why does not claim a contradiction. The attack file additionally asserts
+that provenance.CONTESTED is undefined, so the word cannot quietly return.
+
+Not a live corruption, restated: 21 artifacts, 21 distinct digests. The sidecar regenerates to a
+byte-identical seal, so the relation path is untouched for every real artifact, and the
+regeneration was reverted as timestamp-only noise.
+
+Focused 16/16. Suite 558/558.
+
+Message-File: scratch/m52.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -4,20 +4,26 @@
 // asserts the repairs and keeps every control.
 import test from 'node:test';
 import assert from 'node:assert';
-import { bind, ledger, verifySeal, NOT_ESTABLISHED, CONTESTED, digestOf } from './provenance.mjs';
+import { bind, ledger, verifySeal, NOT_ESTABLISHED, MULTIPLY_BOUND, digestOf } from './provenance.mjs';
 
 const BYTES = Buffer.from('{"result": 1}');
 
-test('C8-a REGRESSION — two bindings over the SAME bytes with DIFFERENT producers are CONTESTED, neither returned', () => {
+// The state this test names was CONTESTED when the C8-a repair landed. The owner's review showed that
+// word asserts a conflict the evidence does not support - ledger.mjs LAW 3 makes CONTESTED owe an
+// experiment, and identical bytes may legitimately have several histories. The repair this test
+// guards is UNCHANGED (both kept, neither attributed); only the relation's name and claim moved.
+// See PROVENANCE_RELATION_PREREG.md and RESULT.provenance-relation.md.
+test('C8-a REGRESSION — two bindings over the SAME bytes with DIFFERENT producers: both kept, neither returned', () => {
   const first = bind({ bytes: BYTES, producedBy: 'LEGASUS_REPLAY_r3', path: 'a.json' });
   const second = bind({ bytes: BYTES, producedBy: 'CPYTHON_DOCTEST', path: 'b.json' });
   const led = ledger([first, second]);
   const found = led.lookup(BYTES);
-  assert.equal(found.provenance, CONTESTED, 'b11e51f returned the second binding here');
+  assert.equal(found.provenance, MULTIPLY_BOUND, 'b11e51f returned the second binding here');
   assert.equal(found.producedBy, undefined);
   assert.deepEqual(found.bindings.map((b) => b.producedBy).sort(), ['CPYTHON_DOCTEST', 'LEGASUS_REPLAY_r3']);
   assert.match(found.why, /last-wins/);
-  // a third, different attribution joins the contest; order of arrival does not pick a winner
+  assert.match(found.why, /NOT a contradiction/, 'and it does not assert a conflict it cannot establish');
+  // a third, different attribution joins the relation; order of arrival does not pick a winner
   const third = bind({ bytes: BYTES, producedBy: 'LEGASUS_r4', path: 'c.json' });
   assert.equal(ledger([third, first, second]).lookup(BYTES).bindings.length, 3);
 });

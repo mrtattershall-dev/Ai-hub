@@ -37,12 +37,31 @@ export function bind({ bytes, producedBy, git = null, path = null }) {
   return { digest: digestOf(bytes), producedBy, git, describedPath: path };
 }
 
-// TWO ATTRIBUTIONS FOR ONE DIGEST ARE A CONTEST, NOT A WINNER. The first ledger did `byDigest.set` in
-// order, so the second binding for the same bytes silently replaced the first - the last-wins map of
-// Entry 5, the exact defect behind 49 / 7 / 1, inside the module written to fix attribution
-// (composition attack C8-a). Conflicting bindings are now kept together under CONTESTED and a lookup
-// returns neither as THE attribution. An identical attribution bound twice is one attribution.
-export const CONTESTED = 'CONTESTED';
+// TWO ATTRIBUTIONS FOR ONE DIGEST ARE A RELATION, NOT A WINNER AND NOT A CONTEST.
+//
+// The first ledger did `byDigest.set` in order, so the second binding for the same bytes silently
+// replaced the first - the last-wins map of Entry 5, the exact defect behind 49 / 7 / 1, inside the
+// module written to fix attribution (composition attack C8-a). Keeping both and attributing to
+// neither was right and still stands.
+//
+// CALLING THEM CONTESTED WAS NOT. `ledger.mjs` LAW 3 defines CONTESTED as contradicting live claims
+// that block reliance AND OWE AN EXPERIMENT. Provenance is a RELATION - a production event relates a
+// producer to content - and identical bytes can legitimately arise through several histories, so
+// "A produced these bytes" and "B produced these bytes" can BOTH BE TRUE. No experiment separates two
+// tools that each emitted an empty file, and this project already contains the case: three pyparsing
+// files in repoC/IDENTITY.json share the empty-file digest. Attaching an unsatisfiable obligation to
+// that state manufactures work out of a name - and it is composition attack C4, a state acquiring a
+// declared word's authority because the strings matched, committed inside the repair for C8.
+//
+// So the state says what is known - N production events bind this content, no single producer is
+// established - and says why nothing stronger is available: the digest is the only identity here (path
+// is DESCRIPTION, by the decision that makes the identity property work), so this ledger CANNOT tell
+// two legitimate histories from one damaged record, and must not pretend otherwise.
+//
+// CONTESTED IS NOT RENAMED INTO THIS MODULE, it is removed from it. A conflict claim needs evidence
+// that the content had ONE history; a check holding that coordinate is not started, and where it
+// belongs is recorded as UNKNOWN rather than invented here.
+export const MULTIPLY_BOUND = 'MULTIPLY_BOUND';
 
 const sameAttribution = (x, y) => x.producedBy === y.producedBy
   && JSON.stringify(x.git ?? null) === JSON.stringify(y.git ?? null);
@@ -54,20 +73,21 @@ export function ledger(bindings) {
     if (b.rejected) continue;
     const held = byDigest.get(b.digest);
     if (!held) { byDigest.set(b.digest, b); continue; }
-    if (held.provenance === CONTESTED) {
+    if (held.provenance === MULTIPLY_BOUND) {
       if (!held.bindings.some((x) => sameAttribution(x, b))) held.bindings.push(b);
       continue;
     }
     if (sameAttribution(held, b)) continue;
-    byDigest.set(b.digest, { digest: b.digest, provenance: CONTESTED, bindings: [held, b],
-      why: 'these bytes carry two different attributions. Neither is returned as the provenance; both'
-        + ' are kept, because picking one would be the last-wins map that destroyed the Repo C'
-        + ' attribution in the first place.' });
+    byDigest.set(b.digest, { digest: b.digest, provenance: MULTIPLY_BOUND, bindings: [held, b],
+      why: 'these bytes carry more than one production event. No single producer is established and'
+        + ' every binding is kept - picking one would be the last-wins map that destroyed the Repo C'
+        + ' attribution. This is NOT a contradiction: identical content may have several histories,'
+        + ' and a digest-keyed ledger cannot tell that from a damaged record, so it claims neither.' });
   }
   // THE SEAL COVERS THE ATTRIBUTIONS, NOT ONLY THE ARTIFACT SET. The first seal was a digest over the
   // sorted digests, so rewriting a binding's producedBy after sealing left the seal valid (C8-b): it
   // protected which artifacts were listed and not what was said about them.
-  const sealLine = (b) => b.digest + '=' + (b.provenance === CONTESTED
+  const sealLine = (b) => b.digest + '=' + (b.provenance === MULTIPLY_BOUND
     ? b.bindings.map(attributionKey).sort().join('||') : attributionKey(b));
   return {
     byDigest,
