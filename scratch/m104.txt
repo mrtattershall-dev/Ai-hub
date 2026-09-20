@@ -1,0 +1,25 @@
+Ledger Entry 32: BACKWARD-1, zero intersection, and four instrument defects of which three were silent
+
+Records the disjoint surfaces as the result: forward only 10, backward only 39, intersection 0, with
+forward discovery having zero overlap with everything that actually happens on this repository. It
+also records the owner's reading, because it changes the target - zero overlap is evidence the two
+directions select different ontological objects, entitlement and exercise, joined by a justification
+relation rather than by a shared function, so intersection is NOT the success metric.
+
+Four defects were mine and three were silent: a resolve hook that killed the child process with no
+output and exit 0, a frame pattern that dropped every ESM frame on Windows and reported
+PRODUCTION_REACHED 0 with complete confidence, a backdoor rule that conflated a property of the
+repository with a property of the export, and - after the parser was repaired - the SILENCE about
+parse failure, which left 676 of a published 2245 resting on paths with holes in them. The earlier
+number is preserved rather than replaced.
+
+Observability is now a coordinate and is unexercised on Legasus, which is exactly why a mixed-module
+subject is the interesting transfer test.
+
+BK-3 remains untested and is recorded as such: appearing on a path is participation, not relevance.
+
+The prospective subject was not run.
+
+Message-File: scratch/m104.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

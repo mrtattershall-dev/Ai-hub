@@ -2135,3 +2135,92 @@ Both are r4 work. Neither may be repaired in r3.
                  sinks; and whether the three unexercised roles do any work outside this corpus.
 
 ---
+
+## Entry 32 — BACKWARD-1: the two surfaces are disjoint, and four of my own defects made the number
+
+    objective    discovery from effect sinks, because forward discovery seeds on a brand and a brand
+                 exists only where somebody built one - so forward-only is a mirror, not a screen
+    authority    OWNER, 2026-09-20
+    start hash   e970b61 (preregistration alone, with a contamination register)
+    evidence     BACKWARD_1_PREREG.md (e970b61), RESULT.backward.md,
+                 legasus/legascreen/{sink,ancestry}.mjs, benchmarks/run-backward.mjs
+
+    THE PROSPECTIVE SUBJECT WAS NOT RUN. The preregistration says the hub is run ONCE after the
+    mechanism is frozen. The mechanism took four repairs during this slice, so it is not frozen, and
+    running it would have burned the only unspoiled transfer test for nothing.
+
+        EFFECT_WITNESSED      4132     FILESYSTEM_MUTATION 3415   PROCESS_EXECUTION 717
+        PRODUCTION_REACHED    1569
+        TEST_ONLY             1889
+        ANCESTRY_INCOMPLETE    676
+
+        BK-4    forward only 10    backward only 39    INTERSECTION 0
+
+    ZERO INTERSECTION. On this repository the brand-seeded and sink-seeded surfaces DO NOT OVERLAP AT
+    ALL. Forward finds the authority calculus, which nothing in production consumes; backward finds
+    snapshot, restore, runProgram and git - authority-bearing by any reading, and not one of them on
+    the forward surface. That is stronger than "neither direction is sufficient": FORWARD DISCOVERY
+    HAS ZERO OVERLAP WITH EVERYTHING THAT ACTUALLY HAPPENS.
+
+    The owner's reading, recorded because it changes the target: zero overlap is evidence that the
+    two directions are selecting DIFFERENT ONTOLOGICAL OBJECTS - entitlement and exercise - and that
+    the join is not a shared function but a justification relation, ENTITLEMENT authorizes DECISION
+    causes EFFECT. Intersection is therefore NOT the success metric, and a clean architecture could
+    legitimately have none.
+
+    NOTHING NAMES THE SUBJECT. Six sink CLASSES and twelve Node platform module boundaries; the sink
+    shim wraps EVERY export of a boundary module, discovered at load time, so nothing picks the
+    interesting functions.
+
+    FOUR DEFECTS IN MY OWN LAYER, THREE OF THEM SILENT.
+
+      1 The first resolve hook redirected fs for EVERY importer including Node's own module
+        machinery. The child produced NO OUTPUT AT ALL AND EXITED 0. A silent death, in the loader
+        built to hunt silent deaths.
+      2 The stack-frame pattern recognised a path by its prefix and stopped at the first colon, so
+        every ESM frame on Windows was dropped and the run reported PRODUCTION_REACHED 0 WITH
+        COMPLETE CONFIDENCE.
+      3 The first backdoor rule called any export test-only when only tests mentioned it, flagging
+        192 exports including a plain function and a constant. It had conflated NO_PRODUCTION_CONSUMER
+        (a property of the repository) with TEST_BACKDOOR (a property of the export) - LETTING WHO
+        HAPPENS TO REFERENCE SOMETHING DECIDE WHAT IT IS, which is the representation leakage this
+        work exists to detect.
+      4 AND THE PARSER REPAIR DID NOT REPAIR THE SILENCE. frames() still dropped a line it could not
+        read, so a hole in the ancestry was indistinguishable from a complete path, and the published
+        PRODUCTION_REACHED of 2245 included 676 effects whose verdict rested on a path with an
+        unreadable frame in it. Sixteen percent. THIRD TIME IN ONE SLICE THAT INFORMATION DESTRUCTION
+        INCREASED CERTAINTY INSIDE THE INSTRUMENT.
+
+            REPRESENTATION_UNRECOGNIZED  ->  EMPTY SET  ->  SEMANTIC ABSENCE
+
+        FRAME_UNPARSED is now counted; recognised-but-excluded is counted separately because treating
+        a deliberate exclusion as unreadable would poison every claim; and a hole yields
+        ANCESTRY_INCOMPLETE rather than a confident verdict. The 2245 is preserved in the result file
+        rather than quietly replaced.
+
+    A CONTROL CORRECTED THE REACHABILITY RULE TOO. The signal is not an aggregate handle in a stack -
+    it never appears there. It is that PRODUCTION CODE CANNOT CALL A MODULE-PRIVATE BINDING FROM
+    OUTSIDE THAT MODULE, so entering production at a private function means test-only accessibility
+    was required, whatever shape the backdoor took.
+
+    OBSERVABILITY IS NOW A COORDINATE: 258 OBSERVABLE, 0 UNOBSERVABLE on Legasus, which means it is
+    UNEXERCISED here and fires only on a fixture. The loader substitutes ES modules, so a CommonJS
+    region is not unmeasured but outside what this instrument can see, and a coverage number that hid
+    such a region would repeat the unparsed-frame error at repository scale.
+
+    BK-3 IS THE SUBSTANTIVE CLAIM AND IT IS NOT TESTED. Four private functions sit on witnessed
+    effect paths, but APPEARING ON A PATH IS PARTICIPATION, NOT RELEVANCE. A stack gives coarse
+    causal participation and not counterfactual dependence; establishing relevance needs perturbation
+    with the same non-vacuity discipline used elsewhere - baseline witness, lawful perturbation,
+    execution opportunity remaining, then a change in the effect relation. Not built.
+
+        EFFECT_DISCOVERED / EFFECT_WITNESSED / ANCESTRY_OBSERVED       reached
+        SUPPORT_CHARACTERIZED / JUSTIFICATION_ESTABLISHED / SCREENED   not reached
+
+    Focused 8/8. Suite 686/686.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. TRANSFER-1 is preregistered separately: the
+                 one-shot hub run, in a CLEAN ROOM, reporting six independent coordinates rather than
+                 one coverage number, with the unobservable CommonJS region in the denominator.
+
+---
