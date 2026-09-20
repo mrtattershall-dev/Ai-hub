@@ -1,0 +1,44 @@
+BRIDGE-1: the bridge manufactured 965 findings against working production code, and B-4b failed
+
+Production is justification.covers and the specification is calculus.delegate. Production does not
+import the calculus and does not know it exists. 12,301 production calls were witnessed from existing
+tests and each was put to the specification through the specification's own constructors, with both
+endpoints pinned by digest.
+
+B-6 held: zero RESULT_DISAGREEMENT and zero REASON_DISAGREEMENT. The wide bridge declares PARTIAL and
+therefore licenses no verdict at all, so all 12,301 comparisons are UNMAPPABLE. The restricted bridge
+declares EQUIVALENT on the stated domain where both quantifiers range over the same dimension set,
+and there 770 AGREE and 3,990 are UNMAPPABLE. A large UNMAPPABLE count is the honest expected result
+rather than a failure of the slice.
+
+BUT THE BRIDGE MANUFACTURED 965 FINDINGS AGAINST PRODUCTION, TWICE. The first run reported 965
+RESULT_DISAGREEMENTs, every one the same shape: covers treats ANY as licensing anything and the
+calculus context has no wildcard at all, since delegate compares contexts with strict inequality. The
+second run left 4, and two of those had granted and required IDENTICAL while the specification still
+refused, because the scopes carried an UNADMITTED object and strict inequality over a nested object
+decides on reference identity rather than on worlds. Production was right both times, the
+specification was right both times, and a mistaken correspondence produced accusations against
+working code. The repair is general rather than per-case: a non-primitive scope value has no faithful
+counterpart. Stripping UNADMITTED before translating was REJECTED, because that would be the bridge
+claiming the drop is meaning-preserving.
+
+AND B-4b FAILED. The preregistration said a corrupted bridge must not produce silent agreement. It
+does. With production correct and the specification correct and refusing for genuinely different
+reasons, one edited line of reason_correspondence turns REASON_DISAGREEMENT into AGREE, and nothing
+in the comparison can tell. The bridge is the oracle for its own correctness, and provenance plus
+endpoint pinning give attributability and staleness rather than detection. A test asserts the failure
+so it cannot quietly become behaviour, and the two mutation modes that DO work - implementation and
+specification - are asserted beside it.
+
+What would be needed is not more provenance but a second independently derived correspondence to
+disagree with the first, or reason classes derived from counterfactual behaviour rather than
+declared. Neither is built and neither is claimed.
+
+The calculus is still not wired into production. Wiring them would let both sides share one
+implementation defect and agreement would stop being evidence.
+
+Focused 11/11. Suite 672/672.
+
+Message-File: scratch/m96.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
