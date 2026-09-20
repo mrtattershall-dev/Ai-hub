@@ -42,12 +42,30 @@ export const DOCTEST_MAPPING = {
   IMPORT_FAILED: { observability: OBSERVABILITY.PREREQUISITE_MISSING, assertion: null },
 };
 
+// PRODUCER #3's MAPPING, declared under benchmarks/PYTEST_MAPPING_PREREG.md and argued from pytest's
+// documented outcomes (passed / failed / skipped, and a setup phase that did not pass). FAILED covers
+// both an assertion that failed and a body that raised - pytest reports one word for both, so the
+// adapter may not distinguish them: the same forced collapse as OUTPUT_MISMATCH / UNEXPECTED_EXCEPTION
+// above, legal while no consumer distinguishes them. Anything not listed - xfail and xpass wrinkles,
+// reruns, plugin outcomes - is UNKNOWN_MAPPING by construction.
+export const PYTEST_MAPPING = {
+  [FOR_PRODUCER]: 'pytest',
+  PASSED: { observability: OBSERVABILITY.OBSERVED, assertion: 'HELD' },
+  FAILED: { observability: OBSERVABILITY.OBSERVED, assertion: 'REFUTED' },
+  SKIPPED: { observability: OBSERVABILITY.NOT_ATTEMPTED, assertion: null },
+  SETUP_FAILED: { observability: OBSERVABILITY.PREREQUISITE_MISSING, assertion: null },
+  SETUP_SKIPPED: { observability: OBSERVABILITY.NOT_ATTEMPTED, assertion: null },
+};
+
 export const UNKNOWN_MAPPING = 'UNKNOWN_MAPPING';
 
-// The mappings this adapter knows, by the producer they are for. pytest has none: every pytest verdict
-// adapts to UNKNOWN_MAPPING, which is the adapter refusing to invent and means no scoped claim has yet
-// derived from pytest evidence (recorded in RESULT.composition-2.md).
-const REGISTERED = new Map([[DOCTEST_MAPPING[FOR_PRODUCER], DOCTEST_MAPPING]]);
+// The mappings this adapter knows, by the producer they are for. git has none on purpose: its
+// evidence is identity, not an assertion, and producer2.test declares a git mapping locally to show
+// that a declared one derives (E6).
+const REGISTERED = new Map([
+  [DOCTEST_MAPPING[FOR_PRODUCER], DOCTEST_MAPPING],
+  [PYTEST_MAPPING[FOR_PRODUCER], PYTEST_MAPPING],
+]);
 
 export function adaptRecord(rec, { mapping } = {}) {
   const id = rec.identity || {};

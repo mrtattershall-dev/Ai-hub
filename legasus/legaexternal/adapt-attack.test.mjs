@@ -64,12 +64,19 @@ test('W2-g-4 ADMIT CONTROL — a mapping extended by spread keeps its producer, 
   assert.match(a.why, /declares no producer/);
 });
 
-test('W2-g FINDING — pytest has no declared mapping: every pytest verdict is UNKNOWN_MAPPING', () => {
-  for (const native of ['PASSED', 'FAILED', 'SETUP_FAILED']) {
-    const r = adaptRecord({ nodeid: 't.py::a', nativeResult: native, nativeDetails: {},
-      identity: { producer: 'pytest', producerVersion: '9.1.1', invocation: 't.py::a',
-        collectionCohort: 'A', pluginSet: 'P' } });
-    assert.equal(r.observability, UNKNOWN_MAPPING, native);
-    assert.match(r.why, /no mapping is declared for producer "pytest"/);
-  }
+// This test recorded, at b0673cd, that pytest had NO declared mapping and every pytest verdict was
+// UNKNOWN_MAPPING. That finding opened the objective preregistered in PYTEST_MAPPING_PREREG.md and
+// resolved at the commit that registered PYTEST_MAPPING. The finding is history (RESULT.composition-2.md
+// keeps it); the test now asserts the state that replaced it, with git as the producer that still has
+// no registered mapping - so "no mapping for producer X" stays a reachable, non-vacuous answer.
+test('W2-g FINDING, superseded — pytest now has a declared mapping; a producer without one is still refused by name', () => {
+  const r = adaptRecord({ nodeid: 't.py::a', nativeResult: 'PASSED', nativeDetails: {},
+    identity: { producer: 'pytest', producerVersion: '9.1.1', invocation: 't.py::a',
+      collectionCohort: 'A', pluginSet: 'P' } });
+  assert.equal(r.observability, OBSERVABILITY.OBSERVED, 'b0673cd: UNKNOWN_MAPPING');
+  assert.equal(r.assertion, 'HELD');
+  const g = adaptRecord({ path: 'x', nativeResult: 'TRACKED_CLEAN', nativeDetails: {},
+    identity: { producer: 'git', producerVersion: '2.43', object: 'a'.repeat(40), head: 'b'.repeat(40) } });
+  assert.equal(g.observability, UNKNOWN_MAPPING);
+  assert.match(g.why, /no mapping is declared for producer "git"/);
 });
