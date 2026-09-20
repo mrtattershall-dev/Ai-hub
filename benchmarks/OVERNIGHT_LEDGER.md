@@ -1032,3 +1032,78 @@ Both are r4 work. Neither may be repaired in r3.
                  demonstrating itself twice more.
 
 ---
+## Entry 18 — TWO completeness gaps, the level actually earned, and a counterexample to this project's own compounding claim
+
+    objective    answer two questions from the owner's review of Entry 17 by computation rather than
+                 by agreement
+    authority    OWNER, 2026-09-20
+    start hash   543629e
+    evidence     ATTAINMENT_PREREG.md (04d94f3), legaknow/attainment.test.mjs,
+                 legaknow/vocabulary-collision.test.mjs, quiesce-check.mjs
+
+    CORRECTION TO ENTRY 17. It called the frontier gap "the same gap one layer down". It is not. There
+    are TWO gaps on different axes, and neither implies the other:
+
+        QUESTION COMPLETENESS   what investigations have we FORMULATED?   (contestState)
+        EVIDENCE COMPLETENESS   what producers have we DECLARED required? (evidenceFrontier)
+
+    A frontier can be perfectly correct over questions [Q1,Q2,Q3] and producers [P1,P2,P3] while
+    reality contains Q4 and P4, and nothing inside that computation can know either is missing. So
+    CLOSED means closed over the DECLARED evidence requirements, never that the evidence space is
+    complete. An open-world boundary, and now two of them.
+
+    THE LEVEL ACTUALLY EARNED, computed against the real entries and weaker than QUIESCENT sounded:
+
+        LEVEL EARNED : NO_CURRENT_OBJECTIVE
+            YES               NO_CURRENT_OBJECTIVE
+            no                FRONTIER_EXHAUSTED
+            no                NAMED_COVERAGE_EXHAUSTED
+            NOT_REPRESENTABLE COMPLETE
+
+    Level 2 fails on exactly one of eight questions: INSTRUMENT_CLASSES_FOR_THE_RIGS is UNKNOWN-
+    classed, which is NEITHER resolved NOR blocked - "nothing to do now" is not "nothing left open",
+    and the UNKNOWN class added in Entry 15 is what makes the difference visible instead of hiding it
+    in a block list. Level 3 fails because coverage needs an OUTSIDE witness and instruments.mjs
+    reports the rigs' classes as UNKNOWN; `coverageEstablished` is passed null and UNKNOWN is never a
+    quiet yes. Level 4 is NOT_REPRESENTABLE rather than false, because returning false would imply
+    the question had been evaluated. AT-1 reads the live entries out of quiesce-check rather than a
+    fixture, so the test measures the system and not my model of it.
+
+    THE COMPOUNDING CLAIM IS FALSIFIED IN ITS STRONG FORM, BY THIS SESSION. C4 - authority
+    transferred because two strings matched - was found and repaired at `a31046c`. FOUR COMMITS LATER,
+    at `58b62aa`, the C8 repair exported `CONTESTED` from provenance.mjs against ledger.mjs's
+    STATE.CONTESTED, whose LAW 3 meaning carries an obligation, and the obligation travelled. Same
+    class, already called mechanized, recurred - and it took the owner's review two entries later to
+    find it.
+
+    THE REASON IS VISIBLE IN THE REPAIR: C4's guard is producer-keyed promotion INSIDE
+    justification.mjs. It guards one mechanism. The ledger called it a class.
+
+        MECHANIZING AN INSTANCE DOES NOT MECHANIZE ITS CLASS, and recording an instance repair as a
+        class repair is how the next instance gets four commits of cover.
+
+    THE WEAK FORM, WHICH IS ACHIEVABLE AND IS WHAT WAS BUILT. The cross-module state-word inventory is
+    frozen at its measured seven, and AT-7 proves BY RECONSTRUCTION - not by argument - that adding
+    `CONTESTED` back makes it the eighth: the guard would have fired at the moment the real defect was
+    introduced. It classifies nothing. None of the seven standing collisions is a demonstrated defect;
+    they are namespaced by their enum, and what made CONTESTED dangerous was that the word carried an
+    OBLIGATION, which is not mechanically derivable - the same hand-authored boundary instruments.mjs
+    already records. A new collision is surfaced FOR ARGUMENT. That is the owner's compounding
+    property in the only form this session's evidence supports: not "the class cannot recur", but
+    "the next instance is visible at introduction instead of in someone else's review".
+
+    AT-8 FAILED ON ITS FIRST RUN AND IS KEPT. The innocuous-addition control used `HELD`, which is not
+    in the scanned inventory at all - it lives in legaexternal/adapt.mjs, nested deeper than the scan
+    reaches - so it asserted a collision that could not occur and failed for a reason unrelated to the
+    guard. A control must be shown able to pass. Replaced with `ESTABLISHED`, measured as owned by
+    exactly one module; and the failure produced AT-8b, which asserts the scan's blast radius is one
+    directory and one nesting depth so a green inventory is never read as "no collisions anywhere".
+
+    WHAT THIS DOES NOT CHANGE. No verdict moved: AT-5 asserts it, and the contest, the objectives and
+    every block class are what they were. The frontier still holds one UNKNOWN question, Repo D is
+    still OWNER_REQUIRED, and the level earned is still the weakest of the three establishable ones.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE, which is now the reported claim rather than
+                 the implied one.
+
+---

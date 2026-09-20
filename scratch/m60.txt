@@ -1,0 +1,30 @@
+Entry 18: two completeness gaps rather than one, the level actually earned, and this session falsifying its own compounding claim
+
+Entry 17 called the frontier gap the same gap one layer down. It is not. Question completeness - what
+investigations have we formulated - and evidence completeness - what producers have we declared
+required - are different axes, and neither implies the other. A frontier can be correct over its
+questions and its producers while reality contains one more of each, with nothing inside the
+computation able to know. CLOSED means closed over the declared requirements, never that the evidence
+space is complete.
+
+The level earned is computed against the real entries and is weaker than QUIESCENT sounded:
+NO_CURRENT_OBJECTIVE. Frontier exhausted fails on exactly one of eight questions, the UNKNOWN-classed
+one, which is neither resolved nor blocked - nothing to do now is not nothing left open. Named
+coverage exhausted fails because coverage needs an outside witness and instruments reports the rigs'
+classes as UNKNOWN. Complete is NOT_REPRESENTABLE rather than false, since false would imply the
+question was evaluated.
+
+And the strong form of the compounding claim is falsified by this session. C4 was repaired at
+a31046c; four commits later the C8 repair exported CONTESTED against the ledger's word whose meaning
+carries an obligation, and the obligation travelled. C4's guard was producer-keyed promotion inside
+one module - it guarded a mechanism while the ledger called it a class. Mechanizing an instance does
+not mechanize its class, and recording an instance repair as a class repair is how the next instance
+gets four commits of cover. The weak form is what was built: a frozen inventory that would have
+fired on the real defect, proven by reconstruction, classifying nothing.
+
+AT-8's first failure is kept, with the control it produced: the scan reaches one directory and one
+nesting depth, so a green inventory is never read as no collisions anywhere.
+
+Message-File: scratch/m60.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
