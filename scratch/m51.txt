@@ -1,0 +1,23 @@
+Run the provenance-relation attack: both predictions reproduce, and PR-4 bounds how much of the objection holds
+
+Five assertions from 554440f against 4f93a79 unmodified, all held. Two legitimate histories for
+identical bytes are declared CONTESTED (PR-1), and the module cannot distinguish that from a
+genuinely damaged record because the digest is the only identity and path is DESCRIPTION by decision
+(PR-2). The controls bound the finding: the same attribution bound twice is still one attribution
+(PR-3), the seal still covers every attribution (PR-5), and - the important one - neither state
+attributes to a single producer (PR-4). The ENTITLEMENT the C8-a repair established was already
+right. What is wrong is the relation asserted about the two bindings.
+
+The class is C4 and it is mine: CONTESTED is defined in ledger.mjs as contradicting claims that
+block reliance and owe an experiment, and no experiment separates two tools that each emitted an
+empty file. A state acquired that authority because I reused the word, inside the repair for C8.
+Found by the owner reviewing the repair, not by its author.
+
+Not a live corruption: 21 artifacts, 21 distinct digests, nothing mis-reported. Latent, with the
+triggering condition already present in repoC/IDENTITY.json.
+
+Nothing is repaired in this commit.
+
+Message-File: scratch/m51.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
