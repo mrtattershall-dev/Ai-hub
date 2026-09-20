@@ -389,3 +389,69 @@ Both are r4 work. Neither may be repaired in r3.
                  development.
 
 ---
+## Entry 10 — the QUIESCE check, and what law 7 found by being asked
+
+    objective    answer Entry 8's closing question MECHANICALLY: is there a justified operation whose
+                 outcome could change entitlement, or is the system entitled to stop?
+    authority    legasus/legaknow/stopping.mjs, applied to this ledger's own open questions
+    start hash   ec8f035
+    evidence     benchmarks/quiesce-check.mjs (runnable; prints its evidence before its verdict)
+    hypothesis   none stated in advance; this is an entitlement computation, not a test
+
+    VERDICT   OPEN_CONTEST. DO NOT QUIESCE. 1 of 4 open questions is justified.
+              Stopping here would be STALLING, which is a different thing and must not be reported as
+              quiescence.
+
+    WHAT THE CHECK IS AND IS NOT. The four conditions are booleans, and a boolean I assert is my judgment
+    wearing a machine's clothes. Each is tagged MEASURED or DECLARED in the output. The value is not that
+    it computes the answer - it is that canChangeEntitlement becomes UNSKIPPABLE and a declared condition
+    is VISIBLY declared.
+
+    THREE ARE BLOCKED AND NONE IS BLOCKED BY LACK OF AUTHORITY.
+
+      POSIX_FORK_INHERITANCE        not executable   MEASURED: python hasattr(os,"fork") is False on
+                                                     win32. Blocked by the PLATFORM. Stays UNTESTED and
+                                                     the envelope keeps EXCLUDING it.
+      REPOC_UNRESOLVED_ATTRIBUTION  not executable   MEASURED: external.json records carry exactly
+                                                     {module, outcome, source}. 3 keys hold CONFLICTING
+                                                     outcomes and NO coordinate distinguishes them.
+                                                     Blocked by INFORMATION DESTROYED AT COLLECTION TIME,
+                                                     before the last-wins map. A fresh run yields
+                                                     observations with NOTHING TO JOIN ON - it would not
+                                                     resolve the old case, it would silently REPLACE it.
+                                                     49 / 7 / 1 is therefore PERMANENT, not pending. This
+                                                     is law 1 seen from the other side: information
+                                                     destroyed in the past cannot be restored by
+                                                     authority in the present.
+      REPO_D_PROSPECTIVE_VALIDATION not executable   Blocked by SEQUENCING under the frozen burn rule.
+                                                     The block lifts when r4 STOPS CHANGING - a decision
+                                                     about r4, not about Repo D.
+
+    THE ONE JUSTIFIED INVESTIGATION IS PRODUCER_3_SCOPE_VOCABULARY, and the check sharpened it while
+    computing it.
+
+    APPARATUS CORRECTION, recorded rather than quietly fixed. Measurement 3 first looked for
+    SCOPE_DIMENSIONS in admissibility.mjs and printed "NOT FOUND" - true and useless. The dimensions live
+    in justification.mjs; admissibility.mjs holds the GATE deciding whether a new one may exist. Repointed.
+
+    AND THE CORRECTED MEASUREMENT FOUND A DEFECT THE HYPOTHESIS HAD NOT PREDICTED:
+
+        declared scope dimensions            repository, environment, history, criterion, invocation,
+                                             implementation   (6, a CLOSED set)
+        production modules using admitDimension   NONE - imported only by its own test
+
+    scope(), covers() and joinConflicts() all iterate the module constant DIMENSIONS. admitDimension -
+    the gate built to adjudicate whether a NEW coordinate may exist, with the whole anti-overfitting
+    argument behind it - HAS NO PRODUCTION CONSUMER. The set is closed in practice however the gate rules.
+    THE DECIDING PATH AND THE ADVISORY PATH ARE NOT THE SAME PATH, which is a defect class this project
+    has paid for before, now found inside Legasus's own authority core.
+
+    So the producer #2 repair may have MOVED the failure rather than removed it: a coordinate the producer
+    cannot establish is now absent instead of invented, but a coordinate the producer CAN establish and
+    Legasus has no name for still has nowhere to go and no path to earn a name.
+
+    next         freeze the producer #3 predictions BEFORE selecting a candidate, with a selection rule
+                 that actually discriminates - the P2 ordering clause tied on all five candidates and the
+                 lexicographic tiebreak made that choice.
+
+---

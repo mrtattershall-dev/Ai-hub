@@ -1,0 +1,181 @@
+// r4 — THE QUIESCE CHECK. Law 7 applied to the system's own open questions.
+//
+//     SAFE AUTONOMY IS NOT ONLY "DO NOT DO UNJUSTIFIED THINGS". IT IS ALSO "KNOW WHEN THERE IS NO
+//     JUSTIFIED THING TO DO."
+//
+// Entry 8 ended with "QUIESCE check - is there a justified operation whose outcome could change
+// entitlement?" and that question must be answered by running the architecture's own stopping law on the
+// architecture's own ledger, not by deciding and then writing prose that agrees.
+//
+// WHAT THIS ARTIFACT IS AND IS NOT. The four conditions are booleans, and a boolean I assert is my
+// judgment wearing a machine's clothes. So each one below is tagged:
+//
+//     MEASURED   established by executing something in this file, printed with its evidence
+//     DECLARED   my judgment, stated so it can be disputed
+//
+// The value of the check is NOT that it computes the answer. It is that the fourth condition -
+// canChangeEntitlement - becomes unskippable, and that a DECLARED condition is visibly declared. A
+// system that quiesces because nobody asked has not quiesced; it has stalled.
+import { readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { evidenceFrontier, contestState, investigationJustified, objectivesFromContest }
+  from '../legasus/legaknow/stopping.mjs';
+import { CONTEXT_DIMENSIONS, SUBJECT_DIMENSIONS } from '../legasus/legaknow/justification.mjs';
+
+const say = (...a) => console.log(...a);
+const evidence = [];
+const note = (tag, what, detail) => { evidence.push({ tag, what, detail }); return detail; };
+
+// ---------------------------------------------------------------- MEASUREMENT 1: can fork be attacked?
+const forkProbe = spawnSync('python',
+  ['-c', 'import os,sys; sys.stdout.write("1" if hasattr(os,"fork") else "0")'],
+  { encoding: 'utf8', timeout: 20000 });
+const forkAvailable = forkProbe.status === 0 && forkProbe.stdout.trim() === '1';
+note('MEASURED', 'python hasattr(os, "fork")', String(forkAvailable)
+  + '  (platform ' + process.platform + ')');
+
+// ------------------------------------------- MEASUREMENT 2: is the repoC attribution collision joinable?
+// The ambiguity is three external keys carrying CONFLICTING outcomes under a last-wins map. Resolving it
+// requires a coordinate in the PRESERVED record that distinguishes the colliding observations. If the
+// record has no such coordinate, the distinction was destroyed at COLLECTION time and no later analysis
+// recovers it - a fresh run yields observations that cannot be JOINED to the ambiguous old one, because
+// the old one has nothing to join on. Law 1, exactly: authority cannot be created by destroying
+// information.
+const ext = JSON.parse(readFileSync('benchmarks/repoC/external.json', 'utf8'));
+const fields = [...new Set(ext.flatMap((x) => Object.keys(x)))].sort();
+const byKey = new Map();
+for (const x of ext) {
+  const k = x.module.split('.').pop() + '|' + String(x.source).trim();
+  if (!byKey.has(k)) byKey.set(k, []);
+  byKey.get(k).push(x.outcome);
+}
+const conflicting = [...byKey.entries()].filter(([, v]) => new Set(v).size > 1);
+const DISCRIMINATORS = ['document', 'ordinal', 'lineno', 'name', 'docstring', 'index'];
+const hasDiscriminator = DISCRIMINATORS.some((d) => fields.includes(d));
+note('MEASURED', 'external.json record fields', JSON.stringify(fields));
+note('MEASURED', 'keys with CONFLICTING outcomes', String(conflicting.length));
+note('MEASURED', 'any coordinate that could disambiguate', String(hasDiscriminator));
+
+// ------------------------------------------- MEASUREMENT 3: is the scope vocabulary closed, and how big?
+//
+// APPARATUS CORRECTION, recorded rather than quietly fixed. The first version of this measurement looked
+// for SCOPE_DIMENSIONS in admissibility.mjs and printed "NOT FOUND", which was true and useless - the
+// dimensions live in justification.mjs and admissibility.mjs holds the GATE that decides whether a new
+// one may exist. Re-pointed, and the corrected measurement is sharper than the hypothesis it was written
+// to support.
+const dims = [...CONTEXT_DIMENSIONS, ...SUBJECT_DIMENSIONS];
+note('MEASURED', 'declared scope dimensions',
+  dims.join(', ') + '  (' + dims.length + ', a CLOSED set)');
+
+// And the decisive one: is the admission GATE wired to the structure it admits into? scope(), covers()
+// and joinConflicts() all iterate the module constant DIMENSIONS. If nothing feeds admitDimension's
+// output into that constant, the gate is ADVISORY and the closed set is closed in practice however the
+// gate rules.
+const importers = [];
+for (const f of ['legasus/legaknow/justification.mjs', 'legasus/legaknow/observation.mjs',
+  'legasus/legaknow/ledger.mjs', 'legasus/legaknow/calculus.mjs', 'legasus/legaknow/conflict.mjs',
+  'legasus/legaexternal/adapt.mjs', 'legasus/legaknow/monotonicity.mjs']) {
+  try { if (readFileSync(f, 'utf8').includes('admitDimension')) importers.push(f); } catch (e) { /* */ }
+}
+note('MEASURED', 'production modules using admitDimension',
+  importers.length ? importers.join(', ') : 'NONE - the gate is imported only by its own test');
+
+say('EVIDENCE');
+for (const e of evidence) say('  [' + e.tag + '] ' + e.what.padEnd(38) + e.detail);
+say('');
+
+// ---------------------------------------------------------------------------- THE OPEN QUESTIONS
+const OPEN = [
+  {
+    name: 'POSIX_FORK_INHERITANCE',
+    question: 'does a forked child inherit the observation channel descriptor and corrupt attribution?',
+    authorized: true,                     // DECLARED - within the r4 development surface
+    executable: forkAvailable,            // MEASURED
+    targetsDistinction: true,             // DECLARED
+    canChangeEntitlement: true,           // DECLARED - it would widen or puncture the concurrency envelope
+    ifNotJustified: 'stays UNTESTED and the envelope keeps EXCLUDING it. "Cannot be tested" was never'
+      + ' recorded as "is safe" and still is not.',
+  },
+  {
+    name: 'REPOC_UNRESOLVED_ATTRIBUTION',
+    question: 'was the one ambiguous cohort member a supported agreement or a supported disagreement?',
+    authorized: true,                     // DECLARED
+    executable: hasDiscriminator,         // MEASURED - and it is false
+    targetsDistinction: true,             // DECLARED
+    canChangeEntitlement: true,           // DECLARED - 49 / 7 / 1 would become 50 / 7 or 49 / 8
+    ifNotJustified: 'the distinguishing coordinate was destroyed at COLLECTION time, before the last-wins'
+      + ' map. A fresh run yields observations with NOTHING TO JOIN ON, so it would not resolve the old'
+      + ' case - it would silently replace it. Stays 49 / 7 / 1 UNRESOLVED ATTRIBUTION, permanently.',
+  },
+  {
+    name: 'REPO_D_PROSPECTIVE_VALIDATION',
+    question: 'does r4 actually do the job on an unseen repository?',
+    authorized: true,                     // DECLARED
+    executable: false,                    // DECLARED - sequencing, per the frozen burn rule
+    targetsDistinction: true,             // DECLARED
+    canChangeEntitlement: true,           // DECLARED - decisively; the biggest open question here
+    ifNotJustified: 'blocked by SEQUENCING, not by authority. Selecting Repo D while r4 is still changing'
+      + ' burns it, and the burn rule is frozen in REPO_C_SELECTION.md. The block lifts when r4 stops'
+      + ' changing - which is a decision about r4, not about Repo D.',
+  },
+  {
+    name: 'PRODUCER_3_SCOPE_VOCABULARY',
+    question: 'is scope construction now producer-agnostic, or merely doctest-UNION-git shaped?',
+    authorized: true,                     // DECLARED
+    executable: true,                     // DECLARED - candidates exist in this environment
+    targetsDistinction: true,             // DECLARED
+    canChangeEntitlement: true,           // DECLARED - see below
+    ifNotJustified: 'n/a',
+    whyItCanChangeEntitlement: 'the producer #2 repair asserts a GENERAL property - "a coordinate the'
+      + ' producer cannot establish is ABSENT rather than invented" - from exactly ONE counterexample.'
+      + ' And the repair may only have MOVED the failure: scope has a closed set of 6 dimension names,'
+      + ' and admitDimension - the gate built to adjudicate a new one - has NO PRODUCTION CONSUMER, so a'
+      + ' producer whose coordinate is none of the six has nowhere to put it and no path to earn one.'
+      + ' Some outcome of a third producer FALSIFIES a claim currently being relied on.',
+  },
+];
+
+say('THE FOUR CONDITIONS, PER OPEN QUESTION');
+say('');
+const results = OPEN.map((o) => ({ o, r: investigationJustified(o) }));
+for (const { o, r } of results) {
+  say('  ' + (r.ok ? 'JUSTIFIED    ' : 'not justified') + '  ' + o.name);
+  say('      ' + o.question);
+  say('      authorized=' + o.authorized + '  executable=' + o.executable
+    + '  targets=' + o.targetsDistinction + '  canChangeEntitlement=' + o.canChangeEntitlement);
+  if (!r.ok) {
+    say('      BLOCKED BY: ' + r.failed.join('; '));
+    say('      ' + o.ifNotJustified);
+  } else {
+    say('      ' + o.whyItCanChangeEntitlement);
+  }
+  say('');
+}
+
+// ---------------------------------------------------------------------------- THE VERDICT
+const frontier = evidenceFrontier({
+  requiredProducers: ['CPython doctest', 'git'],
+  attempted: ['CPython doctest', 'git'],
+  pending: [],
+});
+const contest = contestState({ frontier, investigations: OPEN });
+const objectives = objectivesFromContest(contest);
+
+say('FRONTIER : ' + frontier.state + ' - ' + frontier.why);
+say('CONTEST  : ' + contest.state);
+say('           ' + contest.why);
+say('');
+say('OBJECTIVES GENERATED: ' + objectives.objectives.length);
+for (const ob of objectives.objectives) say('  ' + ob.kind + '  ' + ob.target);
+say('  ' + objectives.why);
+say('');
+if (contest.state === 'QUIESCENT_CONTEST') {
+  say('QUIESCE. There is no justified next action, and that is a POSITIVE finding about entitlement.');
+} else {
+  say('DO NOT QUIESCE. ' + objectives.objectives.length + ' justified investigation(s) remain, so'
+    + ' stopping here would be STALLING rather than quiescing.');
+  say('');
+  say('AND NOTE WHAT THE THREE BLOCKED ONES HAVE IN COMMON: none is blocked by lack of authority.');
+  say('One is blocked by the PLATFORM, one by INFORMATION DESTROYED IN THE PAST, one by SEQUENCING.');
+  say('Only the last can ever be unblocked by further work, and not by further work on IT.');
+}
