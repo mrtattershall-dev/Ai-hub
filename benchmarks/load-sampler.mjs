@@ -44,8 +44,11 @@ const countFrom = (out) => out.split(/\r?\n/).filter((l) => /(^|[\\/\s])node(\.e
 //                       measures - and two abort-on-breach runners can then abort each other
 //                       indefinitely, each firing on the other's calibration. 1e7 costs ~35ms and
 //                       resolves a 3x ratio just as well.
-//   COLD JIT LIES HIGH. An unwarmed first run is an outlier that inflates a reference and then HIDES
-//                       REAL LOAD BEHIND IT. Warm before measuring, always.
+//   COLD JIT LIES HIGH  - BUT min-of-N ALREADY HANDLES IT, and the first version of this module did not
+//                       realise that. A cold run can only ever be the MAX, so min-of-N with N>=2 is
+//                       self-warming by construction and a separate warm-up burn is pure self-load: the
+//                       exact defect this module criticises elsewhere, committed here. Caught by the
+//                       BIND-1 session. Warm-up is now run ONLY for N<2, where min cannot save you.
 //   SHORT IS NOISIER.   Measured: 1.2e7 spread 1.377 vs 2e8 spread 1.185. Shorter is NOT strictly
 //                       better; it trades precision for self-load. min-of-N buys the precision back.
 const CALIB_ITERS = 1e7;
@@ -58,7 +61,9 @@ let warmed = false;
 // Returns milliseconds, or NULL if it could not measure. NEVER a fast number on failure.
 export function calibrate({ iters = CALIB_ITERS, runs = CALIB_RUNS } = {}) {
   try {
-    if (!warmed) { burn(5e6); warmed = true; }
+    // N>=2 is self-warming: the cold run becomes the max and min discards it. Only a single-run
+    // calibration needs the burn, and it pays for it in self-load.
+    if (runs < 2 && !warmed) { burn(5e6); warmed = true; }
     let best = Infinity;
     for (let k = 0; k < runs; k++) {
       const t = process.hrtime.bigint();

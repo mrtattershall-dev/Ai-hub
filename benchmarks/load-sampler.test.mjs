@@ -97,13 +97,16 @@ test('the real instrument composes with the real verdict', () => {
 const SC = (ms, n = 10, at = 'x') => ({ at, nodeProcs: n, cpuPct: null, calibMs: ms });
 const A2 = { ceiling: 40, calibReferenceMs: 35, calibRatio: 3.0 };   // cap = 105ms
 
-test('calibrate() returns a real duration and warms the JIT first', () => {
-  const ms = calibrate();
-  assert.ok(Number.isFinite(ms) && ms > 0, 'got ' + ms);
-  // a cold first run is an outlier that would inflate a reference and hide load behind it; the module
-  // warms once, so a second call must not be dramatically faster
-  const again = calibrate();
-  assert.ok(again < ms * 3, 'second calibration ' + again + ' vs first ' + ms + ' - warmup leaked');
+test('calibrate() is SELF-WARMING at N>=2 — no separate warm-up burn needed', () => {
+  // The first version of this module warmed with a 5e6 burn before measuring. That was redundant and
+  // was itself self-load: a cold run can only ever be the MAX, so min-of-N with N>=2 discards it by
+  // construction. Caught by the BIND-1 session; the burn now runs only for N<2.
+  const first = calibrate();
+  const second = calibrate();
+  assert.ok(Number.isFinite(first) && first > 0, 'got ' + first);
+  assert.ok(second < first * 3,
+    'first ' + first + ' vs second ' + second + ' - if min-of-N were NOT self-warming, the first call'
+    + ' would be dramatically slower than the second');
 });
 
 test('a calibration UNDER the cap passes — the positive control', () => {

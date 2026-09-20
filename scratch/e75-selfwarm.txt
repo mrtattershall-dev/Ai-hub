@@ -1,0 +1,32 @@
+Remove a redundant warm-up burn from calibrate(): min-of-N is self-warming, and the burn was self-load
+
+BIND-1 caught a defect in my implementation and it is the same defect this module criticises elsewhere,
+committed inside the fix for it.
+
+calibrate() warmed the JIT with a 5e6 burn before measuring. That is unnecessary: A COLD RUN CAN ONLY EVER
+BE THE MAX, so min-of-N with N>=2 discards it by construction. The warm-up bought nothing and cost one
+core a few milliseconds on every sample, on a machine where three sessions sample constantly and two of
+them abort on breach. The module's own header warns that an instrument which is a meaningful share of what
+it samples is broken; mine was adding load for no measurement.
+
+Warm-up now runs ONLY for runs < 2, the one case where min cannot save you. The test is rewritten to
+assert the self-warming property rather than the warm-up behaviour, so it now pins the reason rather than
+the workaround.
+
+WORTH RECORDING WHY I MISSED IT. I reasoned "cold JIT lies high, therefore warm first" and never asked
+what min-of-N already does to a high outlier. The premise was true and the conclusion did not follow from
+it. That is the same shape as the diagnostic I offered 0d earlier - orphans-per-entry, derived from a
+hypothesised cause and inheriting its assumption - and it is the third time today an inference of mine
+held up in form while being wrong in substance.
+
+AND THE REFERENCE REPLICATED ACROSS SESSIONS. My 1.2e7 min-of-5 = 43.3ms at 18:55:03Z scaled to 1e7 is
+36.1ms. BIND-1's frozen constant is 35, from min-of-20 = 34.97ms at 18:58:43Z. Two sessions, two
+implementations, three minutes apart, within 3%. BIND-1 declined to re-amend A2 on the second measurement,
+correctly: changing a frozen constant because a later measurement AGREES with it is tuning, not
+correcting.
+
+16 tests, all passing.
+
+Message-File: scratch/e75-selfwarm.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
