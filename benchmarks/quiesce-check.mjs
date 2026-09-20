@@ -18,8 +18,8 @@
 // system that quiesces because nobody asked has not quiesced; it has stalled.
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { evidenceFrontier, contestState, investigationJustified, objectivesFromContest }
-  from '../legasus/legaknow/stopping.mjs';
+import { evidenceFrontier, contestState, investigationJustified, objectivesFromContest, attainment,
+  ATTAINMENT } from '../legasus/legaknow/stopping.mjs';
 import { CONTEXT_DIMENSIONS, SUBJECT_DIMENSIONS } from '../legasus/legaknow/justification.mjs';
 import { pinnedArtifact } from '../legasus/legaknow/pin.mjs';
 
@@ -304,6 +304,16 @@ say('  with zero objectives, and three successive preregistered attack waves the
 say('  defects in deciding paths, each wave after the previous one had gone green. The verdict was');
 say('  correct every time over the questions it HELD. It was silent about the ones not yet written.');
 say('');
+// WHICH LEVEL THIS RUN HAS EARNED. `coverageEstablished` is left null on purpose: level 3 needs an
+// outside witness, and instruments.mjs reports the rigs' failure classes as UNKNOWN.
+const level = attainment({ contest, entries: OPEN, coverageEstablished: null });
+say('LEVEL EARNED : ' + level.earned);
+for (const [name, v] of Object.entries(level.levels)) {
+  say('    ' + (v === true ? 'YES           ' : v === false ? 'no            ' : v + ' ') + name);
+}
+say('    ' + level.why);
+say('');
+
 say('OBJECTIVES GENERATED: ' + objectives.objectives.length);
 for (const ob of objectives.objectives) say('  ' + ob.kind + '  ' + ob.target);
 say('  ' + objectives.why);

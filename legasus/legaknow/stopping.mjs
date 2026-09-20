@@ -160,6 +160,66 @@ export function contestState({ frontier, investigations = [] }) {
       + ' formulated - see doesNotEstablish.' };
 }
 
+// WHICH LEVEL HAS BEEN EARNED. Four claims that look alike and are not, named by the owner
+// 2026-09-20, and reporting the weakest while sounding like the strongest is the Entry 16 error at
+// higher resolution:
+//
+//     1 NO_CURRENT_OBJECTIVE     no represented investigation is presently justified
+//     2 FRONTIER_EXHAUSTED       every represented investigation is resolved or blocked
+//     3 NAMED_COVERAGE_EXHAUSTED a predeclared challenge found no defect over failure classes whose
+//                                coverage was INDEPENDENTLY established
+//     4 COMPLETE                 no important failure exists anywhere
+//
+// Levels 1-3 are potentially establishable. LEVEL 4 IS NOT A PROPOSITION THIS SYSTEM CAN HOLD, so it
+// is refused rather than computed - returning `false` would imply the question had been evaluated.
+//
+// LEVEL 2 IS NOT LEVEL 1. An UNKNOWN-classed question - one for which neither an unblocking condition
+// nor terminality is established - is NEITHER resolved NOR blocked, so a frontier can have no
+// justified investigation while still holding a question it cannot classify. That is the honest
+// difference between "nothing to do now" and "nothing left open".
+//
+// LEVEL 3 NEEDS AN OUTSIDE WITNESS and cannot be self-asserted: `coverage` must come from something
+// that established it - instruments.mjs subsumption, for instance - and its absence is UNKNOWN, never
+// a quiet yes.
+export const ATTAINMENT = {
+  NO_CURRENT_OBJECTIVE: 'NO_CURRENT_OBJECTIVE',
+  FRONTIER_EXHAUSTED: 'FRONTIER_EXHAUSTED',
+  NAMED_COVERAGE_EXHAUSTED: 'NAMED_COVERAGE_EXHAUSTED',
+  COMPLETE: 'COMPLETE',
+};
+
+// `entries` are the represented investigations, each carrying the block class the frontier assigned.
+// `coverageEstablished` is a claim someone else must have earned; UNKNOWN by default.
+export function attainment({ contest, entries = [], coverageEstablished = null }) {
+  const unclassified = entries.filter((e) => !e.blockClass
+    || /^UNKNOWN/.test(String(e.blockClass)));
+  const level1 = contest.state === CONTEST.QUIESCENT_CONTEST;
+  const level2 = level1 && entries.length > 0 && unclassified.length === 0;
+  const level3 = level2 && coverageEstablished === true;
+  return {
+    earned: level3 ? ATTAINMENT.NAMED_COVERAGE_EXHAUSTED
+      : level2 ? ATTAINMENT.FRONTIER_EXHAUSTED
+        : level1 ? ATTAINMENT.NO_CURRENT_OBJECTIVE : null,
+    levels: {
+      [ATTAINMENT.NO_CURRENT_OBJECTIVE]: level1,
+      [ATTAINMENT.FRONTIER_EXHAUSTED]: level2,
+      [ATTAINMENT.NAMED_COVERAGE_EXHAUSTED]: level3,
+      [ATTAINMENT.COMPLETE]: 'NOT_REPRESENTABLE',
+    },
+    unclassified: unclassified.map((e) => e.name),
+    why: (level1 ? '' : 'a justified investigation remains, so not even level 1. ')
+      + (level1 && !level2
+        ? unclassified.length + ' represented question(s) are UNKNOWN-classed - neither resolved nor'
+          + ' blocked (' + unclassified.map((e) => e.name).join(', ') + ') - so the frontier is not'
+          + ' exhausted even though nothing in it is currently justified. ' : '')
+      + (level2 && !level3
+        ? 'coverage over named failure classes is ' + (coverageEstablished === null ? 'UNKNOWN'
+          : 'not established') + ', so no predeclared challenge can be said to have exhausted it. ' : '')
+      + 'COMPLETE is NOT_REPRESENTABLE: no finite procedure here establishes that no important failure'
+      + ' class was left unimagined, and returning false would imply the question was evaluated.',
+  };
+}
+
 // THE RULE PURPOSE MUST OBEY, or the architecture cannot ever be idle.
 //
 // AND THE BOUND TRAVELS INTO IT. Entry 16 attached `establishes` / `doesNotEstablish` to the verdict
