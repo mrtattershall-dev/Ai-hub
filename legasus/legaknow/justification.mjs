@@ -249,16 +249,39 @@ export function covers(granted, required) {
 const normalize = (supports) => supports.map((s) =>
   (typeof s === 'string' ? { id: s, edge: EDGE.SUPPORTS } : { id: s.id, edge: s.edge || EDGE.SUPPORTS }));
 
+// SCOPE IS PART OF IDENTITY. The first version hashed kind, proposition and supports only, so "P at S1"
+// and "P at S2" were ONE node, and adding the second silently replaced the first under every dependent
+// that had been justified by it - a referent moved by overwrite, with no invalidation reaching anything
+// (composition attack C7). A claim that cannot be told apart from a claim about another world is what
+// scopedClaim() refuses at construction; the graph now refuses it too. UNADMITTED is excluded on purpose:
+// it is recorded-not-authoritative, covers() and joinConflicts() ignore it, so two nodes differing only
+// there ARE the same claim. ANY is rendered explicitly because JSON.stringify drops a Symbol.
+const scopeKey = (sc) => Object.keys(sc || {}).filter((k) => k !== UNADMITTED).sort()
+  .map((k) => k + '=' + (sc[k] === ANY ? '<ANY>'
+    : (sc[k] === null || sc[k] === undefined) ? '<null>' : String(sc[k]))).join(',');
+
 export function node({ kind, proposition, scope: sc, basis, supports = [], evidence = [] }) {
   const norm = normalize(supports);
-  const id = sha([kind, proposition, JSON.stringify(norm.map((n) => n.id + ':' + n.edge))].join('|'));
-  return { id, kind, proposition, scope: sc || scope(), basis, supports: norm, evidence,
+  const resolved = sc || scope();
+  const id = sha([kind, proposition, JSON.stringify(norm.map((n) => n.id + ':' + n.edge)),
+    scopeKey(resolved)].join('|'));
+  return { id, kind, proposition, scope: resolved, basis, supports: norm, evidence,
     validity: VALIDITY.ESTABLISHED };
 }
 
 export const graph = () => ({ nodes: {}, dependents: {}, refuters: {} });
 
+// A DUPLICATE IDENTITY IS REFUSED, NOT OVERWRITTEN. With scope in the identity, a second node with the
+// same id is the same claim; changing its evidence is what reestablish() is for, and doing it through
+// add() would restore a node without its dependents noticing. The refusal carries its reason; no
+// production caller consumes add()'s return value (measured before this change).
 export function add(g, n) {
+  if (g.nodes[n.id]) {
+    return { rejected: true, id: n.id,
+      why: 'a node with this identity already exists ("' + n.proposition + '" at the same scope). A claim'
+        + ' at another scope is a different claim with a different identity; the same claim with new'
+        + ' evidence goes through reestablish(), so its dependents are not silently kept' };
+  }
   g.nodes[n.id] = n;
   for (const s of n.supports) {
     if (s.edge === EDGE.REFUTES) {
@@ -309,6 +332,49 @@ export function reestablish(g, id, { evidence, scope: sc }) {
   return n;
 }
 
+// LAW 5, THE DERIVATION HALF, STATED AS COVERAGE.
+//
+// The first version compared a premise's scope with the conclusion's through joinConflicts(), which
+// skips any dimension either side leaves null. That made a never-established intermediate a universal
+// bridge: A@S1 -> D1@null -> D2@S2 was ENTITLED for a consumer that did not pin repository, while the
+// direct edge A@S1 -> D2@S2 was refused (composition attack C1). Every edge was locally legal; the
+// path laundered S1 into S2. "null licenses nothing" was already the rule in covers(); it now applies
+// to derivation too: on every CONTEXT dimension a conjunctive premise must COVER the conclusion.
+//
+//     conclusion null      fine - the conclusion is weaker than its premise; restriction is free
+//     premise ANY          fine - established for all values
+//     premise null         REFUSED - a premise established nowhere in particular is not evidence about
+//                          anywhere in particular
+//     conclusion ANY       REFUSED - widening needs a GENERALIZES edge, which is not conjunctive
+//     both concrete        equal, or REFUSED (the original check)
+//
+// A bridge on that dimension exempts it, exactly as before.
+const derivationProblems = (n, premise) => {
+  const out = [];
+  for (const d of contextDims()) {
+    if ((n.joinBridges || {})[d]) continue;
+    const c = n.scope[d]; const p = premise.scope[d];
+    if (c === null || c === undefined) continue;
+    if (p === ANY) continue;
+    const at = 'INVALID DERIVATION at "' + n.proposition + '": the conclusion is stated for ' + d + ' ';
+    if (p === null || p === undefined) {
+      out.push({ id: n.id, why: at + String(c) + ' from a premise ("' + premise.proposition
+        + '") that never established ' + d + '. A premise established nowhere in particular is not'
+        + ' evidence about anywhere in particular, however many edges lie between them.' });
+      continue;
+    }
+    if (c === ANY) {
+      out.push({ id: n.id, why: at + 'ANY from a premise established at ' + String(p)
+        + '; widening a quantifier needs a GENERALIZES edge, not a derivation' });
+      continue;
+    }
+    if (p !== c) {
+      out.push({ id: n.id, why: at + String(c) + ' from a premise established at ' + String(p) });
+    }
+  }
+  return out;
+};
+
 // THE ENTITLEMENT QUESTION. Walk the justification to its leaves: every ancestor must be ESTABLISHED, and
 // every ancestor's scope must cover what is being asked for.
 export function entitled(g, id, required = scope()) {
@@ -353,11 +419,7 @@ export function entitled(g, id, required = scope()) {
             + ' may be valid and the composite still never true in any single world.' });
         }
       }
-      for (const cf of joinConflicts(pi.scope, n.scope)) {
-        if ((n.joinBridges || {})[cf.dimension]) continue;
-        problems.push({ id: cur, why: 'INVALID DERIVATION at "' + n.proposition + '": the conclusion is'
-          + ' stated for ' + cf.dimension + ' ' + cf.b + ' from a premise established at ' + cf.a });
-      }
+      problems.push(...derivationProblems(n, pi).map((p) => ({ ...p, id: cur })));
     }
     const alternatives = [];
     for (const sp of n.supports) {
@@ -374,7 +436,13 @@ export function entitled(g, id, required = scope()) {
       problems.push(...walk(sp.id, sub, next));
     }
     if (alternatives.length) {
-      const attempts = alternatives.map((a) => walk(a.sp.id, a.sub, next));
+      // An alternative that does not COVER the conclusion on the context dimensions is not a surviving
+      // alternative: the laundering path of attack C1 would otherwise run through ANY_OF untouched.
+      const attempts = alternatives.map((a) => {
+        const alt = g.nodes[a.sp.id];
+        const cover = alt ? derivationProblems(n, alt).map((p) => ({ ...p, id: cur })) : [];
+        return [...cover, ...walk(a.sp.id, a.sub, next)];
+      });
       if (!attempts.some((p) => p.length === 0)) {
         problems.push({ id: cur, why: 'no surviving alternative justification for "' + n.proposition
           + '" (' + alternatives.length + ' tried)' });

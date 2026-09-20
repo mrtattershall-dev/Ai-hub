@@ -1,0 +1,31 @@
+Repair C1 and C7: a derivation must be COVERED by its premises on every context dimension, and scope is part of node identity
+
+C1. entitled() compared a premise with its conclusion through joinConflicts(), which skips a dimension
+either side leaves null. A never-established intermediate was therefore a universal bridge:
+A@S1 -> D1@null -> D2@S2 was entitled for a consumer that did not pin repository, while the direct
+edge A@S1 -> D2@S2 was refused (b11e51f, C1-a/C1-b). Every edge locally legal, the path laundering
+S1 into S2. The rule covers() already held - null licenses nothing - now applies to derivation: on
+each CONTEXT dimension a conjunctive premise must cover the conclusion (ANY, equal, or a
+conclusion-null restriction), bridges exempting; a null premise under a concrete conclusion is
+refused by name, and so is a conclusion widened to ANY without a GENERALIZES edge. The same check
+gates ANY_OF alternatives, or the laundering path would run through them untouched (C1-f, executed).
+
+C7. node identity hashed kind, proposition and supports only, so P@S1 and P@S2 were one node and a
+second add() replaced the first under its dependents with no invalidation (b11e51f, C7-a). Scope now
+participates in identity - ANY rendered explicitly, UNADMITTED excluded because it is recorded-not-
+authoritative - and add() refuses a duplicate identity with its reason instead of overwriting.
+Measured before the change: no artifact stores node ids and no production caller reads add()'s
+return.
+
+Admit controls executed beside the regressions: a restriction chain A@S1 -> null -> null stays
+entitled, an ANY premise covers any concrete conclusion, a same-world ANY_OF alternative survives,
+and a difference only in UNADMITTED is still one claim.
+
+Focused 53/53. Suite 494/494. Threatened rigs re-run and byte-identical to their baselines at
+b11e51f: shadow-graph 56/56 44/44 142/142, graph-subsumption 56/56 51/51, shadow-perturbation
+table, r2-subsumption 7/7, intervention-tracking 70/70, obligation-topology S1 58/59 (pre-existing,
+noted in that file) S2 60/60 S3 119/119.
+
+Message-File: scratch/m27.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
