@@ -4,7 +4,8 @@
 // every suite and protect nothing. Every property below has a control that fails in the other direction.
 import test from 'node:test';
 import assert from 'node:assert';
-import { sample, verdict, calibrate, UNMEASURED, SUSPECT_ZERO } from './load-sampler.mjs';
+import { sample, verdict, calibrate, pids, newSince, UNMEASURED, SUSPECT_ZERO }
+  from './load-sampler.mjs';
 
 const S = (n, at = '2026-09-20T13:00:00.000Z') => ({ at, nodeProcs: n, cpuPct: null });
 
@@ -171,4 +172,33 @@ test('sample() takes a label, and calib:false skips the burn a caller does not n
   // NON-VACUITY: skipping it must actually be cheaper, or the option is decoration
   assert.ok(ms < 8000);
   assert.ok(Number.isFinite(bare.nodeProcs), 'and the count is still taken');
+});
+
+// ---------------------------------------------------------------------------------------------------
+// pids() / newSince() — for identifying a handle holder that is NOT in a known descendant set.
+// Requested by the BIND-1 session after taskkill /T was shown to reach live non-detached grandchildren,
+// which means the holder it is hunting is outside the tree it can kill.
+
+test('pids() returns real pids and agrees with the count from the same parse', () => {
+  const list = pids();
+  assert.ok(Array.isArray(list) && list.length >= 1, 'got ' + JSON.stringify(list));
+  for (const p of list) assert.ok(Number.isInteger(p) && p > 0, 'bad pid ' + p);
+  assert.ok(list.includes(process.pid), 'the calling process must be in its own list');
+
+  // ONE PARSE, TWO CONSUMERS: the count and the list cannot drift, because they are the same parse
+  const n = sample({ calib: false }).nodeProcs;
+  assert.ok(Math.abs(n - list.length) <= 3, 'count ' + n + ' vs list ' + list.length);
+});
+
+test('newSince() finds what appeared, and refuses when either side is unmeasured', () => {
+  const before = pids();
+  const after = [...before, 999001, 999002];
+  assert.deepEqual(newSince(before, after), [999001, 999002]);
+  assert.deepEqual(newSince(before, before), [], 'nothing new when nothing changed');
+
+  // A DIFF AGAINST AN UNKNOWN IS UNKNOWN, not an empty diff. An empty diff reads as "nothing new
+  // appeared", which is the passing value — exactly what this module refuses everywhere else.
+  assert.equal(newSince(null, after), null);
+  assert.equal(newSince(before, null), null);
+  assert.equal(newSince(null, null), null);
 });

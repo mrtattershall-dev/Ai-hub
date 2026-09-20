@@ -29,7 +29,42 @@ const WIN = process.platform === 'win32';
 // is called before every witness file.
 const TIMEOUT_MS = 15000;
 
-const countFrom = (out) => out.split(/\r?\n/).filter((l) => /(^|[\\/\s])node(\.exe)?\b/i.test(l)).length;
+// ONE PARSE, TWO CONSUMERS. pids() and sample() read the same tasklist output through the same
+// extractor. A count and a list derived by separate code is the "principle implemented in two places"
+// defect waiting to happen — they would drift, and the drift would be silent.
+const pidsFrom = (out) => out.split(/\r?\n/)
+  .filter((l) => /(^|[\\/\s])node(\.exe)?\b/i.test(l))
+  .map((l) => { const m = l.match(/\s(\d+)\s/); return m ? Number(m[1]) : null; })
+  .filter((n) => Number.isFinite(n) && n > 0);
+
+const countFrom = (out) => pidsFrom(out).length;
+
+// RAW NODE PIDS, or NULL if the instrument could not measure. Never an empty array on failure: an empty
+// list reads as "a quiet machine" exactly the way a zero count does, which is the defect this module
+// exists to refuse. Built for holder identification — snapshot at start, snapshot at timeout, diff.
+export function pids() {
+  try {
+    if (WIN) {
+      const out = execFileSync('tasklist', ['/FI', 'IMAGENAME eq node.exe', '/NH'],
+        { encoding: 'utf8', timeout: TIMEOUT_MS, windowsHide: true });
+      if (/^ERROR:/m.test(out)) return null;
+      const list = pidsFrom(out);
+      // the caller is itself node, so an EMPTY list is instrument failure, not an empty machine
+      return list.length ? list : null;
+    }
+    const out = execFileSync('pgrep', ['node'], { encoding: 'utf8', timeout: TIMEOUT_MS });
+    const list = String(out).split(/\r?\n/).map(Number).filter((n) => Number.isFinite(n) && n > 0);
+    return list.length ? list : null;
+  } catch (e) { return null; }
+}
+
+// WHO IS ALIVE NOW THAT WAS NOT ALIVE THEN. Returns null if EITHER side is unmeasured, because a diff
+// against an unknown is unknown — not an empty diff, which would read as "nothing new appeared".
+export function newSince(beforePids, afterPids = pids()) {
+  if (!Array.isArray(beforePids) || !Array.isArray(afterPids)) return null;
+  const was = new Set(beforePids);
+  return afterPids.filter((p) => !was.has(p));
+}
 
 // CALIBRATION — the instrument that measures CONTENTION rather than a correlate of it.
 //
