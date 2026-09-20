@@ -123,6 +123,12 @@ const BLOCK = {
   EPISTEMIC: 'EPISTEMIC     - no outcome would change entitlement',
   OWNER: 'OWNER         - unblocks only by owner decision',
   RESOLVED: 'RESOLVED      - already answered',
+  // Added 2026-09-20 (Entry 15). A question that cannot yet be classified as BLOCKED (no identified
+  // condition would unblock it) or TERMINAL (no evidence that the information is gone) is UNKNOWN, and
+  // saying so is the honest state. Forcing it into either of the others is the conversion the entry
+  // was written to refuse: UNKNOWN -> TERMINAL retires a question on no evidence; UNKNOWN -> BLOCKED
+  // invents a condition. An UNKNOWN entry generates no work by itself.
+  UNKNOWN: 'UNKNOWN       - neither an unblocking condition nor terminality is established',
 };
 
 // ---------------------------------------------------------------------------- THE OPEN QUESTIONS
@@ -201,6 +207,43 @@ const OPEN = [
       + ' real L2 violation in the repair) and registry leakage (L5, which found a real one too).'
       + ' Running it anyway is epistemically pointless however cheap it is, and this is exactly the loop'
       + ' the stopping law was written to stop.',
+  },
+  {
+    // RESOLVED 2026-09-20 (Entry 15). Opened by a finding beside composition attack W2-g: pytest had no
+    // declared mapping, so no scoped claim had ever derived from pytest evidence. Preregistered in
+    // PYTEST_MAPPING_PREREG.md, six predictions held, mapping registered. Kept in the list, as Entry 12
+    // requires, so the question can be audited against what it returned.
+    name: 'PYTEST_MAPPING  [RESOLVED]',
+    blockClass: BLOCK.RESOLVED,
+    question: 'can pytest evidence DERIVE a scoped claim, or only be stored?',
+    authorized: true,                     // DECLARED
+    executable: true,                     // MEASURED at the time: pytest 9.1.1 present
+    targetsDistinction: false,            // RESOLVED
+    canChangeEntitlement: false,          // RESOLVED - it already did
+    ifNotJustified: 'ANSWERED: it derives. PASSED -> OBSERVED/HELD, FAILED -> OBSERVED/REFUTED, with'
+      + " FAILED's collapse forced by the producer; the cohort's two verdicts read as contradictory"
+      + ' before admission and incomparable after. E6 now holds for producer #3.',
+  },
+  {
+    // UNKNOWN, and left so. instruments.mjs can say whether one instrument subsumes another only when
+    // each instrument's failure classes are enumerated with executed witnesses. Two instruments have
+    // that enumeration for free - the freeze gate and the composition suite, each from its own
+    // refusals - and neither subsumes the other (instruments-applied.test.mjs). The shadow-graph rigs
+    // and the conformance audit have no such enumeration, and producing one means naming what they
+    // could fail to see from a source independent of any discrepancy they have shown. Whether such a
+    // source exists is not established either way. Not TERMINAL (nothing was destroyed), not BLOCKED
+    // (no identified condition unblocks it), not manufactured into work.
+    name: 'INSTRUMENT_CLASSES_FOR_THE_RIGS',
+    blockClass: BLOCK.UNKNOWN,
+    question: 'can the shadow-graph rigs and the conformance audit be described as instruments with'
+      + ' independently argued failure classes, so their nulls can be related?',
+    authorized: true,                     // DECLARED
+    executable: false,                    // DECLARED - no independent source for the classes is known
+    targetsDistinction: true,             // DECLARED
+    canChangeEntitlement: true,           // DECLARED - it would say whose null stands in for whose
+    ifNotJustified: 'UNKNOWN. An enumeration argued from the rigs\' own past disagreements would be the'
+      + ' forbidden route of admissibility.mjs applied to instruments. Nothing here says such an'
+      + ' enumeration is impossible, and nothing here says how to get one.',
   },
   {
     name: 'FREEZE_R4_AND_SELECT_REPO_D',

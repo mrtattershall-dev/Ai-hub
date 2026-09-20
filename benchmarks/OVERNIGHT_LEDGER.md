@@ -709,3 +709,162 @@ Both are r4 work. Neither may be repaired in r3.
     next         NONE. Still QUIESCENT. Still one OWNER_REQUIRED transition, still declined.
 
 ---
+## Entry 15 — r4 development under composition attack: 21 predicted defects reproduced, 2 predicted non-defects held, 0 falsified
+
+    objective    attack the hypothesis that individually justified inputs plus an authorized relation
+                 can produce output authority the joint evidence does not support; repair only what a
+                 preregistered attack reproduced; recompute the frontier after each slice
+    authority    OWNER, 2026-09-20: active r4 development. r3 immutable, Repo D unselected and
+                 uninspected, nothing published. Every boundary held.
+    start hash   aa03ab9 (clean, 464 pass, QUIESCENT_CONTEST reproduced by execution before any change)
+    end hash     the commit carrying this entry; 25 commits; clean tree; 553 pass; QUIESCENT_CONTEST
+    evidence     COMPOSITION_PREREG.md / RESULT.composition.md (wave 1, a62b1c4 / b11e51f)
+                 COMPOSITION_PREREG_2.md / RESULT.composition-2.md (wave 2, 80724ba / b0673cd)
+                 COMPOSITION_PREREG_3.md / RESULT.composition-3.md (wave 3, 7c49fae / 32b0207)
+                 PYTEST_MAPPING_PREREG.md (9704145), retirement-constraints.mjs (a0b48e6)
+                 every attack file at the commit that ran it asserts the DEFECT; the same file after the
+                 repair asserts the REPAIR and keeps every control
+
+    THE METHOD, so it can be judged. Each wave: read the relation-producing operations, derive
+    predictions, freeze them in a commit that contains nothing else, write attacks asserting the
+    predicted defect beside a control that refuses the neighbouring case, run once, preserve the raw
+    run before touching any implementation, repair in separate commits with the attack flipped to a
+    regression plus an admit control, run the focused tests, the whole suite, and every historical
+    rig that consumes the changed module against a baseline captured before the change.
+
+    THE RESULT, in the hypothesis's own terms. The class is REAL and it is GENERAL: twenty-one
+    instances in deciding paths, beyond the pytest case that motivated it, and none needed a new law.
+    Every one was an implementation admitting what a stated invariant already forbade:
+
+      LAW 5 (compose only over a compatible world)
+        C1   a never-established intermediate laundered S1 into S2 through entitled(); the direct
+             edge was refused, the three-node chain admitted. Repaired: a premise must COVER its
+             conclusion on every context dimension; ANY_OF alternatives too.
+        C2   the calculus read absence as "for all", the graph as "never established". One meaning now.
+        W3-c a grant over S1 was delegated over every world. Context now narrows like the grant.
+      LAW 2 (authority does not transfer by changing the referent)
+        C7   node identity excluded scope, so add() moved the referent under existing dependents
+        C4   an admission keyed by NAME let a pytest-argued dimension govern git records
+        W2-a a refuter at S2 refuted a claim about S1
+        W2-b reestablish() rewrote a scope the identity now encodes
+        W2-g the adapter granted doctest's semantics to any producer whose word matched
+        W3-d narrow() moved an established world under restriction's free pass
+      LAW 3 / L6 (evidence is not permission; permission roots at OWNER)
+        W3-e commit() consumed an OBSERVE token - evidence acted; tracesToIndependentRoot existed
+             and nothing called it
+        W3-f derive() minted NORMATIVE-with-grant or not, by argument ORDER
+      LAW 1 / LAW 4 (nothing from information loss; adapters do not invent)
+        C8-a the provenance ledger kept the LAST binding per digest - Entry 5's map, inside the
+             module written to fix it     C8-b the seal covered digests, not attributions
+        W2-e "pytest undefined" and "undefined undefined" as criteria
+        W2-f producer #1 gave IMPORT_FAILED records a document and an ARRAY INDEX as ordinal, and so
+             a history for no experiment - the producer #2 strain, in producer #1 all along
+        C3   the authority brand was a Symbol readable off any real token; a forgery traced to OWNER
+      THE UNADMITTED CONTRACT (Entry 11)
+        C5   the reserved key was admissible and then manufactured NOT_COMPARABLE
+        C6   a shadowed carried value vanished
+      THE STOPPING LAW
+        C9-a an irrelevant pending string held the contest OPEN with zero objectives, forever
+        C9-b TERMINAL was measured by PATH: a regenerated external.json would have flipped it and
+             silently replaced the evidence. Now pinned to the recorded digest.
+      THE RATCHET / PREFERENCE
+        W2-c a STALE witness was still an execution edge and scored ADVANCEMENT
+        W2-d an unmeasured behavioural metric read as EQUIVALENT on the Pareto frontier
+      VOCABULARY
+        C10  OBSERVATION_DIMENSIONS listed history twice; removed
+
+    FALSIFICATIONS, kept. Zero of 21 defect predictions failed and both no-defect predictions held
+    (covers() transitive over 4,096 triples; the ledger not reconciling across worlds by recency).
+    Stated plainly: read-derived predictions reproducing is what accurate reading yields and is not
+    evidence the reading is complete; two no-defect probes on simple mechanisms are a favourable and
+    THIN calibration. The program has not yet falsified my model of the code. What DID fail:
+      - the first flip of W2-d: repairing compare() alone left the unmeasured candidate on the
+        frontier, because INCOMPARABLE is not DOMINATED. Kept in the test; paretoFrontierReport()
+        excludes with a record.
+      - my own wave-1 control C3-b asserted that narrowing repository S1 to S2 mints - it enshrined
+        W3-d as a positive control. A positive control that enshrines a defect is how a defect
+        survives a repair. Kept in the test as a comment.
+      - the first retirement scanner reported all six candidates retirable; score-constraints.mjs
+        loads './constraints.mjs' from an argv DEFAULT, a dynamic path no import scan sees. Found by
+        hand after a disagreement with a plain grep. R4 is now a string scan. Two candidates stayed.
+      - two existing tests asserted defects as behaviour and were changed with the reason beside
+        them: calculus.test's PROPOSE/COMMIT (committed on evidence) and HONEST RESIDUE (same);
+        external.test's NON-INVENTION pair used a placeholder producer under doctest's mapping,
+        which IS W2-g.
+      - apparatus: hazard 1 occurred three times in one hour while recording the previous one - a
+        commit message line wrapped onto a leading hash (git drops it as a comment; the guard fired
+        and blamed the shell, and now names the cause), a probe regex collapsed in node -e, and five
+        heredocs in one shell call failed to parse. HAZARDS.md 14-16. The mechanism, not the rule.
+      - the m42 commit swallowed four staged deletions from the index; caught on the next status,
+        soft-reset and recommitted with only its own files before anything was built on it.
+
+    AUTHORITY WITHOUT CONSTRUCTOR ANCESTRY. The calculus has NO production consumer (measured; the
+    Entry 10 scan's hit on quiesce-check is the string in its own file list). Its brand was
+    recoverable (C3, now a WeakSet); commit() consumed evidence (W3-e); delegate() widened worlds
+    (W3-c). All closed as representation; none protects a path that does not ask, and no path asks.
+    delegate({from: 'OWNER'}) remains callable by any code: OWNER_REQUIRED is enforced by procedure,
+    not by the runtime, which is the axiom of REPO_C_PROTOCOL §unresolved 1 seen from inside.
+
+    DELETED. constraints2.mjs, constraints4.mjs, constraints5.mjs, opcontext2.mjs (1,097 lines):
+    no importer, no code reference, each named once by the frozen record of its own revision, which
+    stays interpretable as text with the code at 7c49fae. R6 control: constraints6 and opfacts read
+    LIVE. constraints.mjs and score-constraints.mjs stay together: the latter is the argv-default
+    consumer of the former and the instrument behind a measurement README the sidecar does not
+    cover. OBSERVATION_DIMENSIONS removed. Net legasus source 28,243 -> 27,654 lines with eight new
+    modules and test files added.
+
+    EVIDENCE THREATENED AND REVALIDATED. Eight rigs baselined before the first change and re-run
+    after every slice, byte-identical throughout: shadow-graph 56/56 44/44 142/142;
+    graph-subsumption 56/56 51/51; shadow-perturbation table; r2-subsumption 7/7;
+    intervention-tracking 70/70; obligation-topology S1 58/59 (pre-existing) S2 60/60 S3 119/119;
+    region-frontier 512/779; purpose-connectivity P1-P3 HELD. FREEZE-GATE ten refusals, nine
+    admissions, unchanged. Conformance audit on revision 6: its one FAIL is the recorded
+    scopecont/j01:op3. PROVENANCE.json regenerated once (58b62aa): every record byte-identical, only
+    the seal formula changed, old seal in history. The frozen r3 numbers are untouched.
+
+    OPENED AND RESOLVED. PYTEST_MAPPING: pytest evidence had never derived a claim (W2-g's finding).
+    Preregistered, six predictions held, mapping declared for its producer. The Entry 11 payoff now
+    has assertions: the cohort's two verdicts are comparable and CONTRADICTORY before admission and
+    incomparable after. E6 holds for producer #3.
+
+    ENTRY 14, REPRESENTED. instruments.mjs: SUBSUMES only when every class the weaker detects, the
+    stronger detects WITH A WITNESS; UNKNOWN on any missing witness; a cheap finding stands on its
+    own. Applied once where classes come from executed refusals: the freeze gate and the composition
+    suite subsume neither the other - the historical fact that 464/464 was green with twenty-one
+    defects live, said by the representation. The classes for the rigs are UNKNOWN (below).
+
+    REMAINING, by class (quiesce-check.mjs, re-run at this commit)
+      TERMINAL        REPOC_UNRESOLVED_ATTRIBUTION - now pinned to the recorded bytes
+      PLATFORM        POSIX_FORK_INHERITANCE
+      SEQUENCING      REPO_D_PROSPECTIVE_VALIDATION
+      EPISTEMIC       PRODUCER_4
+      UNKNOWN         INSTRUMENT_CLASSES_FOR_THE_RIGS - new class, added rather than forced into
+                      BLOCKED or TERMINAL; generates no work
+      OWNER_REQUIRED  FREEZE_R4_AND_SELECT_REPO_D - unchanged, and this session's answer to the
+                      owner's own criterion ("still yielding information under adversarial
+                      development") is YES: every wave found new authority defects in deciding paths.
+                      r4 is not finished by that test.
+      RESOLVED        PRODUCER_3_SCOPE_VOCABULARY, PYTEST_MAPPING (kept in the list)
+
+    QUIESCENCE. Re-run after the last repair: QUIESCENT_CONTEST, zero objectives. Attacked as asked:
+    an irrelevant pending item can no longer stall it (C9-a); a regenerated artifact can no longer
+    flip TERMINAL (C9-b); an UNKNOWN question now has a place that is neither. Work stops because the
+    remaining questions are terminal, platform-bound, sequenced behind the owner's decision,
+    epistemically pointless, unknown, or owner-required - not because the attacks ran dry: the
+    frontier recomputed after wave 3 yields no case I can name against a stated invariant, which is
+    the honest reason and also the weakest one, since three waves in a row found cases the previous
+    wave had not.
+
+    REPO D READINESS, prerequisites only, no repository named or inspected. (1) The owner's
+    criterion is measurable and currently says NOT READY. (2) A prospective run needs the four
+    measurements separate, an undefined precision reported as undefined, unresolved attribution
+    reported as its own count, and apparatus-invalid as an outcome. (3) It needs the pytest mapping
+    and the UNADMITTED admission of collectionCohort argued in the preregistration, not at run time.
+    (4) It needs the instrument-subsumption question stated as a question (Entry 14) with the
+    asymmetry in advance. (5) Every wave's attack suite runs green at the freeze, and the freeze gate
+    is known NOT to subsume it.
+
+    next         NONE. QUIESCENT. One OWNER_REQUIRED transition, and this session's evidence argues
+                 against taking it yet.
+
+---

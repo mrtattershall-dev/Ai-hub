@@ -1,0 +1,18 @@
+Entry 15: the session record, and the quiesce check re-run with an UNKNOWN class and two more questions
+
+The ledger entry records the method, the twenty-one reproduced defects grouped by the invariant each
+implementation admitted, the two no-defect predictions that held, what failed along the way and
+where it is kept, the authority that appeared without constructor ancestry, what was deleted and
+why, every threatened rig and its post-change status, the objective that was opened and resolved,
+the instrument representation and its one application, the remaining questions by block class, the
+quiescence result and the honest reason for it, and Repo D prerequisites without a repository.
+
+quiesce-check.mjs gains a block class, UNKNOWN - neither an unblocking condition nor terminality is
+established - so a question that fits neither BLOCKED nor TERMINAL is not forced into one; it
+generates no work. Two entries added: PYTEST_MAPPING, resolved and kept, and
+INSTRUMENT_CLASSES_FOR_THE_RIGS, unknown and left so. Re-run at this commit: QUIESCENT_CONTEST,
+zero objectives, external.json PINNED to its recorded digest.
+
+Message-File: scratch/m49.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
