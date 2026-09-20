@@ -91,8 +91,12 @@ test('FIDELITY — native results survive adaptation unchanged', () => {
 });
 
 test('NON-INVENTION — an unmapped native result becomes UNKNOWN_MAPPING, not the nearest label', () => {
+  // The record identifies as the producer the default mapping is FOR. It used to say producer 'p' -
+  // a foreign producer adapted under doctest's mapping, which is the W2-g defect itself; after that
+  // repair the positive control below would be UNKNOWN_MAPPING for the right reason. Changed so this
+  // test keeps testing what it names: an UNMAPPED native word is refused, a mapped one maps.
   const rec = { nativeResult: 'SKIPPED_BY_OPTION_FLAG', nativeDetails: {}, want: '', source: 'x()',
-    identity: { producer: 'p', producerVersion: '1', document: 'd', ordinal: 0 } };
+    identity: { producer: 'CPython doctest', producerVersion: '1', document: 'd', ordinal: 0 } };
   const out = adaptRecord(rec);
   assert.equal(out.observability, UNKNOWN_MAPPING);
   assert.equal(out.assertion, null);
@@ -108,7 +112,9 @@ test('NON-INVENTION, mechanically — the adapter cannot refine what the produce
     { name: 'exception raised', source: 'OUTPUT_MISMATCH', truth: 'UNEXPECTED_EXCEPTION' },
   ];
   const r = illegalRefinement({ states,
-    adapt: (s) => adaptRecord({ nativeResult: s.source, identity: { producer: 'p',
+    // producer named as the one the mapping is for (W2-g), so this exercises the mapping path rather
+    // than two UNKNOWN_MAPPINGs that are trivially equal
+    adapt: (s) => adaptRecord({ nativeResult: s.source, identity: { producer: 'CPython doctest',
       producerVersion: '1', document: 'd', ordinal: 0 } }).assertion,
     consumers: [{ name: 'treats as refuted', grants: (v) => v === 'REFUTED' }] });
   assert.equal(r.ok, true, 'the adapter reads only what the producer said');

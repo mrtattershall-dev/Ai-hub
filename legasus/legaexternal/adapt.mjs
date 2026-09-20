@@ -24,7 +24,18 @@ import { UNADMITTED } from '../legaknow/justification.mjs';
 
 // The declared mapping. Anything not named here is UNKNOWN_MAPPING by construction rather than by
 // oversight, so adding a producer cannot silently acquire a default.
+// A MAPPING IS FOR ONE PRODUCER'S VOCABULARY. The first adaptRecord applied whatever mapping it was
+// handed - the doctest one by default - to any record, so a git record whose native result happened to
+// be spelled PASS received doctest's semantics, OBSERVED / HELD (composition attack W2-g): same name,
+// same authority, at the one boundary whose job is to refuse exactly that. A mapping now declares the
+// producer it is for under a Symbol key - a Symbol so that it can never collide with a native result
+// name, and so that a mapping extended by spread (`{...DOCTEST_MAPPING, NEW: ...}`, the re-adaptation
+// path) keeps its declaration. A record from any other producer, or a mapping that declares no
+// producer, is UNKNOWN_MAPPING with the mismatch named.
+export const FOR_PRODUCER = Symbol('mapping-for-producer');
+
 export const DOCTEST_MAPPING = {
+  [FOR_PRODUCER]: 'CPython doctest',
   PASS: { observability: OBSERVABILITY.OBSERVED, assertion: 'HELD' },
   OUTPUT_MISMATCH: { observability: OBSERVABILITY.OBSERVED, assertion: 'REFUTED' },
   UNEXPECTED_EXCEPTION: { observability: OBSERVABILITY.OBSERVED, assertion: 'REFUTED' },
@@ -33,9 +44,30 @@ export const DOCTEST_MAPPING = {
 
 export const UNKNOWN_MAPPING = 'UNKNOWN_MAPPING';
 
-export function adaptRecord(rec, { mapping = DOCTEST_MAPPING } = {}) {
+// The mappings this adapter knows, by the producer they are for. pytest has none: every pytest verdict
+// adapts to UNKNOWN_MAPPING, which is the adapter refusing to invent and means no scoped claim has yet
+// derived from pytest evidence (recorded in RESULT.composition-2.md).
+const REGISTERED = new Map([[DOCTEST_MAPPING[FOR_PRODUCER], DOCTEST_MAPPING]]);
+
+export function adaptRecord(rec, { mapping } = {}) {
+  const id = rec.identity || {};
+  // A RECORD THAT CANNOT SAY WHO PRODUCED IT IS MALFORMED, NOT ADAPTABLE. The first version built
+  // `criterion: undefined + ' ' + undefined` for it (composition attack W2-e).
+  if (typeof id.producer !== 'string' || !id.producer) {
+    return { rejected: true, identity: rec.identity ?? null, native: { result: rec.nativeResult },
+      why: 'the record names no producer, so nothing can say whose semantics its native result carries;'
+        + ' it is refused rather than adapted under a guessed criterion' };
+  }
+  const chosen = mapping === undefined ? (REGISTERED.get(id.producer) || null) : mapping;
+  const declaredFor = chosen ? chosen[FOR_PRODUCER] : null;
   const native = rec.nativeResult;
-  const m = Object.hasOwn(mapping, native) ? mapping[native] : null;
+  let m = null; let mismatch = null;
+  if (!chosen) mismatch = 'no mapping is declared for producer "' + id.producer + '"';
+  else if (!declaredFor) mismatch = 'the mapping declares no producer, so it may be applied to none';
+  else if (declaredFor !== id.producer) {
+    mismatch = 'the mapping is declared for "' + declaredFor + '" and this record is from "'
+      + id.producer + '"; a matching native word is not a matching meaning';
+  } else m = Object.hasOwn(chosen, native) ? chosen[native] : null;
   const base = {
     // RAW, verbatim, never rewritten.
     native: { result: native, details: rec.nativeDetails ?? null, want: rec.want ?? null,
@@ -62,8 +94,10 @@ export function adaptRecord(rec, { mapping = DOCTEST_MAPPING } = {}) {
     // So the mapping is DECLARED, and every identity key it does not consume is carried explicitly.
     // Carrying is not squeezing: an unmapped coordinate never becomes a value of a declared dimension.
     scope: (() => {
-      const id = rec.identity;
-      const sc = { criterion: id.producer + ' ' + id.producerVersion };
+      // An unversioned producer is a criterion of its own, not the string "undefined" (W2-e): covers()
+      // will refuse to equate "pytest" with "pytest 9.1.1", which is the honest relation between them.
+      const sc = { criterion: (id.producerVersion === undefined || id.producerVersion === null)
+        ? id.producer : id.producer + ' ' + id.producerVersion };
       const consumed = new Set(['producer', 'producerVersion']);
       if (id.document !== undefined && id.ordinal !== undefined) {
         sc.history = id.document + '#' + id.ordinal;
@@ -81,8 +115,11 @@ export function adaptRecord(rec, { mapping = DOCTEST_MAPPING } = {}) {
   };
   if (m === null) {
     return { ...base, observability: UNKNOWN_MAPPING, assertion: null,
-      why: 'the producer reported "' + native + '", for which this adapter declares no mapping. The'
-        + ' nearest familiar label would be an invented distinction.' };
+      why: mismatch
+        ? 'the producer reported "' + native + '" but ' + mismatch + '. The nearest familiar label'
+          + ' would be an invented distinction.'
+        : 'the producer reported "' + native + '", for which this adapter declares no mapping. The'
+          + ' nearest familiar label would be an invented distinction.' };
   }
   return { ...base, observability: m.observability, assertion: m.assertion };
 }

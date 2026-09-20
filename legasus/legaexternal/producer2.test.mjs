@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { runGitProducer, gitIdentity } from './git-producer.mjs';
-import { adaptRecord, readapt, UNKNOWN_MAPPING } from './adapt.mjs';
+import { adaptRecord, readapt, UNKNOWN_MAPPING, FOR_PRODUCER } from './adapt.mjs';
 
 const NL = String.fromCharCode(10);
 
@@ -158,7 +158,10 @@ test('E6 — a SCOPED Legasus claim legitimately derives from git evidence', () 
   const p = runGitProducer({ repo: dir, paths: ['clean.txt', 'dirty.txt'] });
   // git's OWN vocabulary, declared rather than borrowed. There is no assertion here, and forcing one
   // would be inventing a distinction the producer never made.
+  // Declared for git under FOR_PRODUCER since composition attack W2-g: a mapping states whose
+  // vocabulary it translates, and applies to no other producer's records.
   const GIT_MAPPING = {
+    [FOR_PRODUCER]: 'git',
     TRACKED_CLEAN: { observability: 'OBSERVED', assertion: null },
     TRACKED_MODIFIED: { observability: 'OBSERVED', assertion: null },
     UNTRACKED: { observability: 'OBSERVED', assertion: null },
