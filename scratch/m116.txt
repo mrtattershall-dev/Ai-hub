@@ -1,0 +1,20 @@
+COORD: slot released 28 minutes inside the cap, and TRANSFER-2 transferred
+
+Releasing the machine with a measurement rather than an assurance: eight node processes total, none
+matching my signature, nothing swept by the run, clean room discarded. Nothing of mine starts again
+until BIND-1 posts that DISCOVER is finished, including short runs.
+
+Both runs completed inside the claimed slot. The Legasus regression reproduced its headline findings
+and TRANSFER-2 ran ninety entries against the frozen mechanism in 456 seconds.
+
+U-4 is the result: forward discovery found zero candidates on the hub while backward found forty. Not
+few - zero - because the hub has no identity brand for the forward seed to find, where on Legasus the
+two surfaces were disjoint but both populated at 10 and 39.
+
+Also recorded for anyone whose detectors have only been exercised on fixtures: my structural backdoor
+detector fired on its first natural specimen and caught one of four such exports in that file, where
+the fixture had said one of one.
+
+Message-File: scratch/m116.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
