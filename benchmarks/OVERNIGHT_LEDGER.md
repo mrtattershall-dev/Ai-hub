@@ -1401,3 +1401,79 @@ Both are r4 work. Neither may be repaired in r3.
                  preregistration governing it can be written first.
 
 ---
+## Entry 23 — v2: the witness architecture works, the no-detection prediction held, and the rescan found nothing
+
+    objective    write the probe the holdout justified, on the architecture the holdout forced, and
+                 answer the only question worth asking of it: what does it find BESIDES its
+                 motivating defect
+    authority    OWNER, 2026-09-20
+    start hash   64ef716
+    evidence     LEGASCREEN_V2_PREREG.md / RESULT.legascreen-v2.md (9079e38 / this commit)
+                 legasus/legascreen/minting.mjs, minting.test.mjs
+
+    A FINDING BEFORE ANY CODE, recorded in the preregistration so it could not look convenient
+    afterwards. The owner's general formulation -
+
+        Authority(output) is a subset of AuthorizedClosure(inputs)
+
+    - DOES NOT CATCH THE HOLDOUT. C2 was derive({}, {repository: S1}) yielding {repository: S1}, and
+    S1 IS in the closure of the inputs: premise two established it. Nothing was minted from nothing.
+    The defect is that DERIVE IS CONJUNCTIVE - its own source says "the output context is the
+    INTERSECTION" - and it took a dimension only ONE premise established. So v2 carries TWO
+    invariants, and the owner's instruction not to collapse single-edge minting with multi-edge
+    laundering is obeyed: the data has not earned that reduction.
+
+        I-ANCESTRY   strip D from EVERY input -> the output must not establish D. Universal.
+        I-WEAKENING  strip D from ONE input -> the output must not establish D. Only for operations
+                     whose own source declares conjunction. THE HAND-AUTHORED PART, named as such.
+
+    V2-1 WAS A PREDICTION OF NO DETECTION AND IT HELD. I-ANCESTRY does not flag C2; only I-WEAKENING
+    does. The probe is not credited with a catch its universal invariant cannot make, and the
+    insufficiency of the general formulation is now EXECUTED rather than argued.
+
+    THE ARCHITECTURE RESULT, V2-4, and it is the strongest thing here. The holdout showed v1's
+    erasure probe producing 7 positives over 8 functions on calculus.mjs, nearly all because a
+    wrong-shape call returns a plausible object. v2 requires a WITNESSED call - a legitimate
+    invocation that actually succeeded - before anything is concluded from an output:
+
+        v1 P-ERASURE on calculus.mjs   7 positives / 8 functions, nearly all artifact
+        v2 minting  on calculus.mjs    0 at HEAD, 2 real at b11e51f
+
+    The artifact class is gone. AND THE RULE THAT REMOVED IT WAS ALREADY IN THIS REPOSITORY:
+    legaexercise/witness.mjs has said since r2 that there is NO OBSERVATION WITHOUT EXECUTION. The
+    screening layer ignored its own project's oldest discipline and paid the ordinary price.
+
+    V2-5 FAILED, AND THE PREREGISTRATION FIXED THE READING IN ADVANCE.
+
+        findings meeting all four frozen conditions for "new": 0
+
+    The rescan over four trees surfaced C2 and nothing else. Two positives, both on calculus.derive
+    in the motivating module, differing only in which dimension exhibits the same defect - not new.
+    So: V2 IS A REGRESSION TEST WEARING A SCREEN'S CLOTHES, the ANY moment did not repeat, and no
+    probe is added to chase a better result. The honest bound on that negative is that the rescan
+    surface was SEVEN TRANSFORMS across four modules: a null there is weak evidence about the
+    repository and strong evidence about the probe's REACH.
+
+    AND THE RUN FOUND A DEFECT IN THE SCREEN ITSELF. The first minting.mjs reported adapt.adaptRecord
+    minting `criterion` and `history` at HEAD. Both false: the input identity is keyed
+    {producer, document, ordinal} while the output scope is keyed {criterion, history}, so stripping
+    `criterion` from an input that never had it CHANGED NOTHING and the invariant failed without any
+    perturbation having occurred. That is HAZARD 3 - a control that could not fire - committed inside
+    a screen built to catch that class, and found by running it rather than by reading it. Repaired
+    with a non-vacuity check; three dimensions at HEAD are now honestly UNSCREENED for that reason,
+    because they are derived from differently-named inputs and this probe cannot perturb them by name.
+
+    THE COVERAGE MAP, which is the accumulated product of Entries 20-23:
+
+        ERASURE                        yes, under compatible object shapes; specificity collapses off
+        ALIAS                          yes, for the scanned exported-name region
+        COMPOSITION LAUNDERING         yes, over the generated 64-chain region; found null AND ANY
+        SINGLE-TRANSFORMATION MINTING  I-ANCESTRY found no instance in 7 transforms;
+                                       I-WEAKENING yes, for operations that DECLARE conjunction
+        DERIVED-BY-ANOTHER-NAME        UNSCREENED - named, and outside every probe's reach
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. The screen has four demonstrated lenses,
+                 one measured blind spot, and one failed attempt at discovery - which is a more
+                 honest inventory than it had before this entry.
+
+---
