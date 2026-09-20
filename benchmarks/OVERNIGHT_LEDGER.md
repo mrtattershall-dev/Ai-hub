@@ -1553,3 +1553,80 @@ Both are r4 work. Neither may be repaired in r3.
                  than an improvement.
 
 ---
+
+## Entry 25 — slice 2: the counterfactual is minted upstream, HEAD becomes measurable, and the control finds the defect again
+
+    objective    build the instrument the owner asked for - lawful counterfactual execution through
+                 the production constructor - and stop
+    authority    OWNER, 2026-09-20, "Stop doing holdouts now. Build the instrument."
+    start hash   49cb644 (preregistration alone)
+    evidence     LEGASCREEN_V3_SLICE2_PREREG.md (49cb644), RESULT.legascreen-cf.md,
+                 legasus/legascreen/counterfactual.mjs, run-legascreen-cf.mjs
+
+    CF-1 HELD, AND IT WAS THE DECISIVE PREDICTION. Entry 24 ended with HEAD unscreenable: the probe
+    perturbed by copying a token, the C3 repair brands tokens by membership in a module-private
+    WeakSet, so the copy was not a token and derive correctly refused it.
+
+        slice 1 (copy the token)            HEAD   observed 0   unobservable 4   aggregation UNKNOWN
+        slice 2 (mint from mutated facts)   HEAD   OBSERVED=4                    aggregation ALL_OF
+
+    The intervention moved UPSTREAM OF AUTHORITY ISSUANCE. The screen mutates pre-authority FACTS and
+    calls observe() - the same constructor production calls - to obtain a second, genuinely valid
+    token. So the tension Entry 24 named is not a trade-off to be managed: unforgeability stops being
+    an obstacle and becomes part of EXPERIMENTAL VALIDITY, because the counterfactual is legitimate
+    precisely in virtue of having been minted the way production mints.
+
+    CF-2 HELD. b11e51f is still convicted, and the conviction now carries its warrant:
+
+        context.repository   declared ALL_OF   observed ANY_OF   MISMATCH
+        context.criterion    declared ALL_OF   observed ANY_OF   MISMATCH
+        ...on the authority of calculus.mjs, DERIVE: "The output context is the INTERSECTION"
+
+    CF-4 HELD AND IS ASSERTED, NOT INTENDED. The owner's constraint was that the screen must not get a
+    backdoor constructor, since a forgeTokenForTesting() would weaken the exact property being
+    screened. The substrate exports AGGREGATION, OUTCOME, SCORES, counterfactual, mismatches - no
+    mint, no forge, no test-only path - and a test pins that list so one cannot be added quietly.
+
+    NON-VACUITY NOW LIVES IN THE SUBSTRATE RATHER THAN IN PROBE AUTHORS' MEMORIES. Eight tagged
+    outcomes replace every epistemic use of null and undefined in the control flow, and only OBSERVED
+    may be scored. The three slice-1 defects are therefore not repaired - they are UNREPRESENTABLE:
+
+        a refused input read as a dependency     ->  AUTHORITY_REFUSED, and never an edge
+        "could not measure" vs "was removed"     ->  distinct tagged outcomes
+        a perturbation that did not perturb      ->  NO_CHANGE, proven by the ENGINE
+
+    Baseline replay is a precondition: a construction path that cannot reproduce its own observation
+    returns BASELINE_UNSTABLE and scores nothing, so no difference can be attributed to an
+    intervention that was never isolated.
+
+    CF-6 IN ITS MINIMAL FORM ONLY. A declared aggregation with no stated AUTHORITY returns
+    UNCOMPARABLE rather than agreement, so a criterion and an implementation cannot be moved together
+    and pass silently. The owner's fuller requirement - pinning the declaration to the state it is
+    valid against - IS NOT BUILT.
+
+    AND THE CONTROL FOUND A RESIDUAL NAME ASSUMPTION INSIDE THE SUBSTRATE. CF-5's vacuity case failed
+    on the first run: UNKNOWN where the answer is UNSUPPORTED. The all-facts strip was deleting a
+    fact key NAMED AFTER THE OUTPUT COORDINATE - the same-name assumption slice 1 existed to
+    eliminate, surviving in the one place nobody had looked. With an output named context.fixed and
+    facts named a, it stripped nothing. Repaired by emptying the facts.
+
+        FOURTH CONSECUTIVE SLICE IN WHICH A CONTROL WRITTEN AGAINST THE PREREGISTRATION FOUND A
+        DEFECT IN THE INSTRUMENT RATHER THAN IN THE SUBJECT.
+
+    That rate is itself a measurement, and it is not comfortable: the layer built to detect an
+    assumption keeps committing that assumption. The controls are catching it every time so far, which
+    is the only reason the rate is knowable at all.
+
+    Focused 7/7. Suite 612/612.
+
+    NOT ESTABLISHED, and named: anything beyond two transforms and two trees; the support FORMULA
+    representation; the shared mutation engine; AST discovery; the 143-transform surface; path and
+    graph invariants; the coverage report; fault injection of the screen itself; legitimate-neighbour
+    controls at scale; and pinning declared semantics to a state. Readiness gate A' B' C D met,
+    E-J NOT STARTED. This is not a repository screen and nothing in the slice says it is.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. The owner's instruction is to stop and
+                 inspect the instrument before the 143-transform scanner, and that boundary is the
+                 stopping condition, not a pause in work.
+
+---

@@ -1,0 +1,20 @@
+Ledger Entry 25: slice 2 recorded, including the fourth consecutive control-found instrument defect
+
+Records the slice-2 result as evidence rather than as narrative: CF-1 held and HEAD went from
+unscreenable to four observed coordinates with ALL_OF, CF-2 still convicts b11e51f and now quotes the
+authority the declaration rests on, CF-4 is asserted mechanically rather than intended, and CF-6
+exists only in its minimal form with the state-pinning requirement written down as NOT BUILT.
+
+The entry also records the rate rather than burying it. CF-5's vacuity control failed on its first
+run because the all-facts strip was deleting a fact key named after the output coordinate - the
+same-name assumption slice 1 existed to eliminate - which makes this the fourth consecutive slice
+where a control written against the preregistration found the defect in the instrument rather than in
+the subject. That rate is a measurement and it is not a comfortable one; the controls catching it
+every time so far is the only reason it is knowable.
+
+NEXT is NONE, QUIESCENT at NO_CURRENT_OBJECTIVE, because the owner's instruction was to build this
+slice and then stop and inspect before the 143-transform scanner.
+
+Message-File: scratch/m82.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
