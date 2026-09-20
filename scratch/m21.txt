@@ -1,0 +1,41 @@
+two hazards in my own repair: the registry leaks on failure, and a NAME COLLISION was granting a declared dimension's authority
+
+Both were investigated because law 7's fourth condition said they could change entitlement, not because
+they were available to investigate.
+
+HAZARD 1 - THE MUTABLE REGISTRY, INVESTIGATED RATHER THAN ASSUMED HARMLESS. The producer #3 repair made
+the admitted-dimension set mutable module state and accepted that WITH A REASON; "accepted with a reason"
+is not "shown to be safe", and the difference between those two is most of this project. L1-L6 in
+legasus/legaknow/registry-leak.test.mjs measure it:
+
+  L5 CONFIRMS THE LEAK IS REAL. A test that throws before its trailing reset leaves the dimension admitted
+     for everything that runs after it, and the consequence is not cosmetic - a join that would have
+     SUCCEEDED is silently REFUSED. Fixed with beforeEach(resetScopeDimensions), which survives a failure
+     in the previous test where a trailing reset does not.
+  L6 BOUNDS THE BLAST RADIUS. Module state is per-instance and node --test runs each file in its own
+     process, so the leak cannot cross a file.
+
+HAZARD 2 - AND THIS ONE WAS L2 IN MY OWN CODE. Asked directly, rather than by building a fourth producer
+to ask it: would a producer coordinate whose NAME collides with a declared dimension be aliased onto it?
+
+    scope({ criterion: 'x', UNADMITTED: { history: 'HTTP request log' } })
+    ->  history: "HTTP request log"          ALIASED
+
+A coordinate the adapter had explicitly REFUSED to map acquired the declared history dimension's authority
+because two strings were equal. AUTHORITY TRANSFERRED BY CHANGING THE REFERENT, inside the repair written
+to stop coordinates being mishandled. A carried name that is one of the BASE SIX is now treated as a
+COLLISION rather than an omission - the adapter had every chance to map it and did not, so its presence in
+UNADMITTED is a REFUSAL - and it stays recorded and stays out of the dimension. Only a name the GATE
+admitted is promoted, which can never be one of the six. L7 pins it with a positive control so it cannot
+pass by nothing ever being able to set history; L8 proves a genuinely foreign name still promotes.
+
+AND THIS IS LAW 7 CUTTING THE OTHER WAY. An expensive investigation is not justified when a cheaper
+operation targets the SAME distinction. "Would producer #4 alias its coordinate?" was answerable in four
+lines. Building a fourth producer to discover it would have been the treadmill the stopping law exists to
+refuse - and would have taken hours to reach a worse-evidenced version of the same answer.
+
+464 tests, 464 pass.
+
+Message-File: scratch/m21.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -1,7 +1,7 @@
 // r4 — producer #3 (pytest) against the evidence boundary. Predictions P3-1..P3-10 frozen in 0baca08.
 //
 // Run against the EXISTING boundary first, so that any shape change is DISCOVERED rather than pre-empted.
-import test from 'node:test';
+import test, { beforeEach } from 'node:test';
 import assert from 'node:assert';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -15,6 +15,12 @@ import { admitDimension, registry, comparisonDefeat, RELEVANCE, ARGUED_FROM }
 
 const NL = String.fromCharCode(10);
 const SIX = [...CONTEXT_DIMENSIONS, ...SUBJECT_DIMENSIONS];
+
+// THE MUTABLE REGISTRY LEAKS ON FAILURE, and that is not speculation - registry-leak.test.mjs L5
+// reproduces it: a test that THROWS before its trailing reset leaves the dimension admitted for
+// everything that runs after it, silently turning later comparisons into refusals. beforeEach is used
+// rather than a trailing reset precisely because it survives a failure in the PREVIOUS test.
+beforeEach(resetScopeDimensions);
 
 // THE SUBJECT. test_b passes ALONE and fails WHEN test_a RAN FIRST, because the fixture is module-scoped
 // and therefore shared. Same file, same bytes, same interpreter, same criterion, same nodeid.

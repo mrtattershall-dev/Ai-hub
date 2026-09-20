@@ -197,16 +197,34 @@ export function joinConflicts(a, b) {
 // third face. Flattening also gives PROMOTION for free: when the gate later admits a coordinate, a scope
 // that has been carrying it unadmitted starts reading it as a discriminating dimension, with no
 // re-observation and no rewriting of the stored record.
+// AND A NAME COLLISION IS NOT AN ADMISSION. The first version of this flattening promoted ANY carried
+// key whose name matched an active dimension, so a producer coordinate named `history` - meaning an HTTP
+// request log, say - silently acquired the authority of the declared `history` dimension because the
+// strings matched. That is L2 exactly: authority transferred by changing the referent, and it was my own
+// repair doing it.
+//
+// A carried coordinate whose name is one of the BASE six is a COLLISION, not an omission: the adapter had
+// every chance to map it and explicitly did not, so its presence in UNADMITTED is a REFUSAL. It stays
+// recorded and stays out of the dimension. Only a name the GATE admitted - which can never be one of the
+// six, since those are active from the start - is promoted.
+const BASE_NAMES = BASE_ENTRIES.map((e) => e.name);
+
 export function scope(partial = {}) {
   const active = activeDims();
   const carried = (partial[UNADMITTED] && typeof partial[UNADMITTED] === 'object')
     ? partial[UNADMITTED] : {};
-  const flat = { ...carried, ...partial };
+  const promotable = {};
+  const collided = {};
+  for (const [k, v] of Object.entries(carried)) {
+    if (BASE_NAMES.includes(k)) collided[k] = v; else promotable[k] = v;
+  }
+  const flat = { ...promotable, ...partial };
   delete flat[UNADMITTED];
   const s = {};
   for (const d of active) s[d] = Object.hasOwn(flat, d) ? flat[d] : null;
   const extras = Object.keys(flat).filter((k) => !active.includes(k));
-  if (extras.length) s[UNADMITTED] = Object.fromEntries(extras.map((k) => [k, flat[k]]));
+  const rest = { ...collided, ...Object.fromEntries(extras.map((k) => [k, flat[k]])) };
+  if (Object.keys(rest).length) s[UNADMITTED] = rest;
   return s;
 }
 
