@@ -1,0 +1,36 @@
+LegaScreen v3 slice 2: HEAD is measurable because the counterfactual is minted upstream, and no backdoor was needed
+
+CF-1 held, which was the decisive prediction. Slice 1 reported zero observed and four unobservable
+for calculus.derive at HEAD because it perturbed by copying a token and the C3 repair makes a copy
+not a token. Slice 2 mutates pre-authority FACTS and calls observe - the same constructor production
+calls - to obtain a second genuinely valid token, and HEAD now reports four observed with ALL_OF on
+both dimensions and no mismatch. The tension between a secure authority object and a screenable one
+is resolved by moving the intervention upstream of authority issuance, and unforgeability stops
+being an obstacle: the counterfactual is legitimate precisely because the production path minted it.
+
+CF-2 held at b11e51f with both mismatches now quoting the authority the declaration came from. CF-4
+held and is asserted mechanically - the substrate exports AGGREGATION, OUTCOME, SCORES,
+counterfactual and mismatches, with no mint, forge or test-only constructor, and a test pins the
+export list so one cannot be added quietly.
+
+Non-vacuity now lives in the substrate rather than in probe authors' memories. Eight tagged outcomes
+replace every epistemic use of null and undefined in the control flow and only OBSERVED may be
+scored, which makes the three slice-1 defects unrepresentable rather than repaired: a refused input
+becomes AUTHORITY_REFUSED and never an edge, could-not-measure and was-removed are distinct
+outcomes, and a perturbation that did not perturb is proven by the engine. CF-6 in its minimal form
+means a declaration with no stated authority returns UNCOMPARABLE rather than agreement, so criterion
+and implementation cannot move together and pass silently; pinning the declaration to a state is not
+built.
+
+AND THE CONTROL FOUND A RESIDUAL NAME ASSUMPTION IN THE SUBSTRATE. CF-5's vacuity case failed on the
+first run, reporting UNKNOWN where the answer is UNSUPPORTED, because the all-facts strip was
+deleting a fact key named after the output coordinate - the same-name assumption slice 1 existed to
+eliminate, surviving in the one place nobody had looked. Repaired by emptying the facts. That is the
+fourth consecutive slice in which a control written against the preregistration found a defect in
+the instrument rather than in the subject.
+
+Focused 7/7. Suite 612/612.
+
+Message-File: scratch/m81.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
