@@ -1,0 +1,33 @@
+Preregister H-DEFAULT: freeze the role table before looking at a single defect, and state the prospective prediction first
+
+The hypothesis is the owner's: historically distinct authority defects can be reproduced as
+incorrect role-specific completion of an omitted semantic coordinate. The claim underneath is that an
+empty object has no single correct reading - as a query it means I am not asking, as a delta it means
+preserve, as evidence it means not established, as a state it means incomplete - and that ANY is none
+of those because it is an explicit value.
+
+The six roles and their six completion laws are frozen in this commit, taken verbatim, and the hard
+failure condition is stated before the data: if the taxonomy needs a new role, a new completion law,
+or a per-defect special case, then H-DEFAULT is just another explanation machine and will be reported
+as refuted. Six roles in, six roles out. The corpus rule is also fixed in advance - every defect
+named in ledger Entries 15 through 30, whether or not it looks like an omission problem, so the
+denominator includes the ones the hypothesis cannot touch.
+
+D-3 is the prospective test and is stated before any classification has been done. delegate receives
+context in the REQUEST role, whose completion law is INHERIT, and the current implementation inherits
+when the whole object is omitted but refuses when a single dimension is omitted. Under the frozen
+table both are REQUEST-role omissions and both should inherit. I predict the inconsistency is real
+and was not deliberate, and further that it is not a safety defect - refusing never grants more than
+inheriting - but an expressiveness one. If the difference turns out to be deliberate and documented,
+D-3 is refuted, and saying so now is what stops that being adjusted later.
+
+D-4 records C2 as a retrodiction and explicitly says it is worth less than D-3.
+
+D-5 predicts no repair: this slice changes no production code. It is a classification experiment over
+history plus one prospective check, and if it survives the repair is a separate slice with its own
+preregistration. No canonical world model and no completion layer are built, per the owner's
+instruction not to implement a giant new layer yet.
+
+Message-File: scratch/m98.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
