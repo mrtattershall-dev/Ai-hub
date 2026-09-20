@@ -1,0 +1,29 @@
+Entry 21: the three-case bar is met, and a generated space reached what hand enumeration missed
+
+The owner's success criterion was frozen before any probe was written, including the definition of
+same machinery so it could not be argued afterwards - one harness with pluggable probes, and a probe
+needing the defect's file, function, field or commit named in it fails. Met on all three: erasure at
+77fd921, alias at 58b62aa, composition at b11e51f, with all three silent at HEAD over the same
+spaces.
+
+The decisive prediction was the composition probe, because it is the only one written as a
+metamorphic property over a generated space rather than as a scan - lengthening a justification path
+must not grant what the direct path refuses - enumerating sixty-four three-node chains and comparing
+against the two-node graph with the same endpoints. The erasure result could have been a scan
+finding a scan-shaped defect; this one could not.
+
+And it found a route this project never enumerated. An intermediate at ANY launders identically to
+one at null. Wave 1 predicted and tested the null case only. The repair happens to close the other,
+which is why HEAD is silent, but the repair covering it was luck of construction rather than
+coverage demonstrated - which is the distinction Entry 19 exists to keep. First evidence here that a
+generated space reaches a member of a class that preregistered hand enumeration missed.
+
+False positives are reported rather than tuned, with the alias set differing across commits, which
+is why the delta and not the count is the signal. The screen is itself screened: every probe shown
+to fire on a synthetic defective module and be silent on a sound one over the same space, and to
+report an unusable target with examined at zero. The region is stated, classCoverage stays UNKNOWN,
+and the unbuilt parts of the design are named rather than implied.
+
+Message-File: scratch/m69.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -1258,3 +1258,76 @@ Both are r4 work. Neither may be repaired in r3.
                  stated region.
 
 ---
+## Entry 21 — LegaScreen v1 meets the owner's three-case bar, and a generated space beats hand enumeration
+
+    objective    meet the owner's success criterion for the screening proposal, or record that it was
+                 not met
+    authority    OWNER, 2026-09-20
+    start hash   3eec93f
+    evidence     LEGASCREEN_V1_PREREG.md / RESULT.legascreen-v1.md (6534588 / and this commit)
+                 legasus/legascreen/probes.mjs, probes.test.mjs, benchmarks/run-legascreen-v1.mjs
+
+    THE BAR, in the owner's words and frozen before any probe was written: surface three historical
+    defects at the commits where each was live, from a commit before each was known, with the SAME
+    machinery rather than three special cases, while preserving explicit UNSCREENED for what cannot
+    be evaluated. "Same machinery" was defined in the preregistration so it could not be argued
+    afterwards: one harness - enumeration, exercise, coverage, unscreened reporting - with pluggable
+    probes, and a probe that needs the defect's file, function, field or commit named in it FAILS.
+
+    MET, on all three:
+
+        77fd921   P-ERASURE      objectivesFromContest lost establishes, doesNotEstablish
+        58b62aa   P-ALIAS        CONTESTED owned by ledger.mjs and provenance.mjs
+        b11e51f   P-COMPOSITION  A=S1 -> M=null -> C=S2, and three more
+        HEAD      all three silent on those findings, over the same spaces
+
+    V1-3 WAS THE DECISIVE PREDICTION AND IT IS WHY THIS IS NOT THREE SCANS. P-COMPOSITION is the only
+    probe written as a METAMORPHIC PROPERTY over a generated space:
+
+        LENGTHENING A JUSTIFICATION PATH MUST NOT GRANT WHAT THE DIRECT PATH REFUSES
+
+    It enumerates 64 three-node chains over {null, ANY, S1, S2}, builds the two-node graph with the
+    same endpoints, and compares entitlement. It contains no mention of null, of C1, of which
+    dimension matters, or of what laundering looks like. The erasure result could have been a scan
+    finding a scan-shaped defect; this one could not.
+
+    AND IT FOUND A ROUTE THIS PROJECT NEVER ENUMERATED:
+
+        A=S1 -> M=null -> C=S2     C1 as recorded, predicted and tested in wave 1
+        A=S1 -> M=ANY  -> C=S2     NEVER PREDICTED, NEVER TESTED, NEVER WRITTEN DOWN
+
+    An intermediate at ANY launders identically to one at null. The wave-1 preregistration predicted
+    the null case and tested exactly it. The C1 repair happens to close the ANY route - which is why
+    HEAD is silent - but THE REPAIR COVERING IT WAS LUCK OF CONSTRUCTION, NOT COVERAGE I HAD
+    DEMONSTRATED, and Entry 19 exists precisely to keep that distinction. This is the first evidence
+    in this project that a generated space reaches a member of a class that preregistered hand
+    enumeration missed.
+
+    FALSE POSITIVES REPORTED, NOT TUNED. P-ALIAS carries its standing collisions everywhere - seven
+    at HEAD and a DIFFERENT seven at 77fd921, since pin.mjs exists there and instruments.mjs does
+    not, which is exactly why the count is not the signal and the DELTA ACROSS COMMITS is. P-ERASURE
+    carries the wrong-shape artifacts whose cause v0 named: JavaScript does not throw when a function
+    is handed the wrong shape, so specificity is limited by the language and not by the invariant.
+
+    THE SCREEN IS ITSELF SCREENED, which this project's history makes mandatory. Every probe is shown
+    to FIRE on a synthetic defective module and to be SILENT on a sound one over the same space, and
+    to report an unusable target as UNSCREENED with `examined: 0` so silence can never be read as
+    clean. The composition probe's fixtures are written in the test, not imported, so it cannot pass
+    by accident of the real module's state.
+
+    THE REGION, per protection.mjs: field erasure over one module's reachable exports; state-word
+    collisions in one directory at one nesting depth; three-node chains over one dimension and four
+    scope values. Covers SC-1, the C8 alias, C1 and one unrecorded C1 variant. classCoverage stays
+    UNKNOWN. NOT covered and restated: value-level loss inside a retained field, array- and
+    Map-shaped transformations, every other module, chains longer than three, more than one dimension
+    at a time, and every other pathology the owner listed.
+
+    NOT BUILT, named so the slice is not mistaken for the cathedral: the repository-wide authority
+    graph, runtime instrumentation of the authority APIs, a static parser, the mutation battery,
+    shrinking, finding IDs with repair packets, severity dimensions, historical bisection beyond the
+    three named commits, and per-model rendering.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. The bar is met for three cases, which
+                 licenses one more slice on evidence - not the remaining design on enthusiasm.
+
+---
