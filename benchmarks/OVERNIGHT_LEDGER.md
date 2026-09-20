@@ -582,3 +582,83 @@ Both are r4 work. Neither may be repaired in r3.
                  forever.
 
 ---
+## Entry 13 — the OWNER decision, and two things preserved against being summarised away
+
+    objective    record the owner's ruling on the one OWNER_REQUIRED item, and preserve two results that
+                 a final-state summary would erase
+    authority    OWNER, 2026-09-20 00:43
+    start hash   02c02bb
+
+    FREEZE_R4_AND_SELECT_REPO_D — NOT AUTHORIZED. Recorded with the owner's stated reason, which is
+    sharper than the one this ledger gave:
+
+        "The reason isn't simply that two defects were found recently. It's that tonight demonstrated
+         something more diagnostic: THE REPAIR SURFACE IS STILL PRODUCING NEW AUTHORITY BUGS WHEN
+         EXERCISED COMPOSITIONALLY. A unit-level green suite reached 452/452 while the original
+         contradiction remained alive one layer above it. Then the repaired representation itself
+         produced an L2-style alias through a matching string. Those are signs that r4 is still yielding
+         information under adversarial development."
+
+    The distinction matters for WHEN the block lifts. "Two recent defects" would lift on a quiet night.
+    "Still yielding information under adversarial development" lifts only when adversarial development
+    STOPS producing findings - a measurable condition, not a mood.
+
+    ALSO NOT AUTHORIZED: publishing any outward-facing page. The development record stands as the record.
+    The owner's reason is the burn rule seen from the outside: a public page is only meaningful AFTER
+    Repo D, because the most consequential question is deliberately still unanswered - DO THESE R4
+    REPAIRS TRANSFER PROSPECTIVELY TO A REPOSITORY THAT PLAYED NO ROLE IN CREATING THEM?
+
+    ------------------------------------------------------------------------------------------------
+    PRESERVED #1 — THE 452/452 STATE. IT IS EVIDENCE, AND 464/464 MUST NOT REPLACE IT HISTORICALLY.
+
+        452/452 GREEN, and the original contradiction SURVIVES
+          -> PIPELINE-LEVEL FALSIFICATION: the repair was real and UNREACHED. scope() recorded what it
+             was handed; the ADAPTER discarded the coordinate before scope() was ever handed it.
+          -> repair the ACTUAL DECISION LAYER
+        REPRESENTATION-LOSS DEFECT: the merge filtered out the UNADMITTED key, silently discarding
+        everything the adapter had just carefully carried
+          -> repair
+        AUTHORITY-ALIAS DEFECT: a carried coordinate named history, meaning something else entirely,
+        acquired the declared history dimension's authority because two STRINGS MATCHED. L2 inside the
+        repair written to stop coordinates being mishandled.
+          -> repair
+        464/464
+
+    WITHOUT THAT SEQUENCE, "464 TESTS PASS" RADICALLY UNDERSTATES WHAT THOSE TESTS NOW MEAN. A green
+    suite is not evidence that a pipeline is correct; it is evidence about the propositions someone
+    thought to assert. The 452/452 state is the counterexample to its own reassurance and is kept in the
+    record permanently, at 8b694ad and d2cda02.
+
+    ------------------------------------------------------------------------------------------------
+    PRESERVED #2 — 49 / 7 / 1 IS A SUCCESSFUL EPISTEMIC OUTCOME, NOT UNFINISHED BOOKKEEPING.
+
+        UNRESOLVED ATTRIBUTION is not a task waiting for a sufficiently clever agent.
+        It is the MAXIMALLY JUSTIFIED TERMINAL STATE of that evidence.
+
+    The collection procedure destroyed the distinguishing coordinate before the last-wins map ever ran.
+    No amount of later intelligence recovers information that was never recorded. Mechanized rather than
+    left as prose: every entry in quiesce-check.mjs now carries a BLOCK CLASS, and this one is TERMINAL -
+    "UNBLOCKS NEVER. Do not re-attempt." PLATFORM unblocks on a different host, SEQUENCING when the
+    sequence advances, OWNER on an owner decision. TERMINAL unblocks never, and conflating it with the
+    others is how an agent spends days reconstructing information that no longer exists.
+
+    ------------------------------------------------------------------------------------------------
+    AND ONE OBSERVATION ABOUT THE PYTEST RESULT, in the owner's framing, because it names a class this
+    ledger had not named. The earlier failures mostly LOST A DISTINCTION and accidentally GAINED
+    AUTHORITY. This one is the dual symptom at the RELATION layer:
+
+        AN INCOMPLETE COORDINATE SYSTEM CAN MANUFACTURE A FALSE RELATION BETWEEN OTHERWISE FAITHFULLY
+        REPRESENTED EVIDENCE.
+
+    The system did not report UNKNOWN. It POSITIVELY REPRESENTED A COMPATIBILITY THAT DID NOT EXIST. The
+    resolution is the three-state split the UNADMITTED repair introduced - absent /
+    observed-but-unadmitted / admitted - separating WE OBSERVED A DISTINCTION from THIS DISTINCTION IS
+    AUTHORIZED TO AFFECT THIS DECISION. Preserving a difference without granting it comparison authority
+    is what resolves the standing tension between information preservation and anti-explanation
+    overfitting.
+
+    next         NONE. The state is QUIESCENT and the only remaining transition is OWNER_REQUIRED and has
+                 been explicitly declined. The next useful information requires a fresh world, not
+                 another internal idea.
+
+---

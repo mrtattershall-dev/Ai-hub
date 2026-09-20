@@ -84,10 +84,31 @@ say('EVIDENCE');
 for (const e of evidence) say('  [' + e.tag + '] ' + e.what.padEnd(38) + e.detail);
 say('');
 
+// BLOCKED IS NOT ONE THING, AND CONFLATING ITS KINDS IS HOW AN AGENT WASTES DAYS.
+//
+// A question blocked by the PLATFORM unblocks on a different host. One blocked by SEQUENCING unblocks
+// when the sequence advances. One blocked by OWNER authority unblocks when the owner decides. But a
+// question blocked because the distinguishing information WAS NEVER RECORDED unblocks NEVER - no amount
+// of later intelligence recovers information that does not exist - and it is not a task waiting for a
+// sufficiently clever agent. It is the MAXIMALLY JUSTIFIED TERMINAL STATE OF THAT EVIDENCE, which is a
+// successful epistemic outcome rather than unfinished bookkeeping.
+//
+// The class is carried on every entry so a future run cannot rediscover a terminal question as an
+// opportunity.
+const BLOCK = {
+  PLATFORM: 'PLATFORM      - unblocks on a different host',
+  TERMINAL: 'TERMINAL      - UNBLOCKS NEVER. Do not re-attempt.',
+  SEQUENCING: 'SEQUENCING    - unblocks when the sequence advances',
+  EPISTEMIC: 'EPISTEMIC     - no outcome would change entitlement',
+  OWNER: 'OWNER         - unblocks only by owner decision',
+  RESOLVED: 'RESOLVED      - already answered',
+};
+
 // ---------------------------------------------------------------------------- THE OPEN QUESTIONS
 const OPEN = [
   {
     name: 'POSIX_FORK_INHERITANCE',
+    blockClass: BLOCK.PLATFORM,
     question: 'does a forked child inherit the observation channel descriptor and corrupt attribution?',
     authorized: true,                     // DECLARED - within the r4 development surface
     executable: forkAvailable,            // MEASURED
@@ -98,6 +119,7 @@ const OPEN = [
   },
   {
     name: 'REPOC_UNRESOLVED_ATTRIBUTION',
+    blockClass: BLOCK.TERMINAL,
     question: 'was the one ambiguous cohort member a supported agreement or a supported disagreement?',
     authorized: true,                     // DECLARED
     executable: hasDiscriminator,         // MEASURED - and it is false
@@ -109,6 +131,7 @@ const OPEN = [
   },
   {
     name: 'REPO_D_PROSPECTIVE_VALIDATION',
+    blockClass: BLOCK.SEQUENCING,
     question: 'does r4 actually do the job on an unseen repository?',
     authorized: true,                     // DECLARED
     executable: false,                    // DECLARED - sequencing, per the frozen burn rule
@@ -122,6 +145,7 @@ const OPEN = [
     // RESOLVED at 8b694ad / d2cda02. Kept in the list rather than deleted, because a question that
     // disappears from the ledger cannot be audited against what it actually returned.
     name: 'PRODUCER_3_SCOPE_VOCABULARY  [RESOLVED]',
+    blockClass: BLOCK.RESOLVED,
     question: 'is scope construction now producer-agnostic, or merely doctest-UNION-git shaped?',
     authorized: true,                     // DECLARED
     executable: true,                     // DECLARED
@@ -143,6 +167,7 @@ const OPEN = [
     // take an hour. The FOURTH condition is the only thing standing between this system and spending the
     // rest of the night confirming what it already knows.
     name: 'PRODUCER_4',
+    blockClass: BLOCK.EPISTEMIC,
     question: 'would a fourth producer bend the boundary again?',
     authorized: true,                     // DECLARED
     executable: true,                     // DECLARED - trace and timeit are the runners-up, both present
@@ -158,6 +183,7 @@ const OPEN = [
   },
   {
     name: 'FREEZE_R4_AND_SELECT_REPO_D',
+    blockClass: BLOCK.OWNER,
     question: 'declare r4 finished and burn a fourth repository on its prospective test',
     authorized: false,                    // OWNER_REQUIRED - see below
     executable: true,                     // DECLARED - candidates could be enumerated tonight
@@ -180,6 +206,7 @@ for (const { o, r } of results) {
   say('      authorized=' + o.authorized + '  executable=' + o.executable
     + '  targets=' + o.targetsDistinction + '  canChangeEntitlement=' + o.canChangeEntitlement);
   if (!r.ok) {
+    say('      CLASS     : ' + o.blockClass);
     say('      BLOCKED BY: ' + r.failed.join('; '));
     say('      ' + o.ifNotJustified);
   } else {
