@@ -1,0 +1,23 @@
+Ledger Entry 28: the authority surface is 15, level 1 is empty, and the screen cannot measure consumers
+
+Records the discovered denominator and, more importantly, what the level count means. Propagating
+from brand sites through the import and call graph found exactly one function outside a brand module
+and it is LegaScreen's own, so no production module under legasus imports the authority calculus at
+all. This ledger has asserted that since Entry 15; it now falls out of a mechanical scan.
+
+The entry also records a structural limit the table made visible rather than one I reasoned to: the
+counterfactual method reads authority coordinates off an output, so a predicate returning a boolean
+cannot be screened by it. Four of the calculus's ten exports are consumers, and that is an invariant
+shape this method does not have rather than coverage to be closed by running more tests.
+
+It corrects Entry 27 in the open: delegate's K of zero was the sample, not the subject. Over the
+whole suite delegate has 25 witnesses and 5 counterfactuals reach OBSERVED.
+
+The seed problem is recorded as having been stated before it was solved, and CAVEAT is exported so a
+report cannot omit it by forgetting - justification, stopping, provenance and ledger are
+authority-bearing by any reading and are not on this surface because they use no identity brand. One
+seed is not a surface.
+
+Message-File: scratch/m91.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

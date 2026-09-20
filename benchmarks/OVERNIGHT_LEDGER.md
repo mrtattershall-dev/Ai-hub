@@ -1819,3 +1819,74 @@ Both are r4 work. Neither may be repaired in r3.
                  before adding a layer that draws conclusions from it.
 
 ---
+
+## Entry 28 — SURFACE-1: the denominator is discovered, it is 15, and level 1 is empty
+
+    objective    the owner's correction - discover the repository's AUTHORITY SURFACE rather than
+                 assume "every export" as a denominator
+    authority    OWNER, 2026-09-20
+    start hash   2dafbf3 (preregistration alone)
+    evidence     SURFACE_1_PREREG.md (2dafbf3), RESULT.surface.md,
+                 legasus/legascreen/surface.mjs, benchmarks/run-surface.mjs
+
+        STATIC AUTHORITY CANDIDATES      15          modules parsed 156
+        DYNAMICALLY OBSERVED             13          brand sites found BY SHAPE: calculus, outcome
+        CONFIRMED AUTHORITY TRANSFORMS   11          10 in the SUBJECT, 5 in LegaScreen itself
+        SCREENABLE                        5          by level: L0=14  L1=1
+        UNSCREENABLE                     10
+
+    THE SEED PROBLEM WAS STATED BEFORE IT WAS SOLVED, because a hand-authored list of authority
+    functions would be the driver problem wearing a new hat - deciding the answer and then measuring
+    it. The only root set used is one the repository's own SHAPE yields: a module-private WeakSet
+    used as an identity brand, found by PARSING with acorn. Nothing names a module or a function.
+
+    THE HEADLINE IS THE LEVEL COUNT, NOT THE SURFACE COUNT. L1 = 1, and that one is LegaScreen's own
+    intervene calling journey. NO PRODUCTION MODULE UNDER legasus/ IMPORTS THE AUTHORITY CALCULUS AT
+    ALL. This ledger has asserted since Entry 15 that the calculus has no production consumer; it now
+    falls out of a mechanical scan rather than being asserted. The surface is small because the
+    architecture's unforgeable core is UNCONSUMED, and that is the real content of the number 15.
+
+    A STRUCTURAL LIMIT OF THE METHOD IS VISIBLE IN THE TABLE. isAuthority, commit, restrictGrant and
+    tracesToIndependentRoot are UNSCREENABLE for one reason: the counterfactual method reads
+    authority COORDINATES off an output, and a predicate returns a boolean.
+
+        THE SCREEN CAN MEASURE PRODUCERS OF AUTHORITY. IT CANNOT MEASURE CONSUMERS OF IT.
+
+    Four of the calculus's ten exports are consumers. That is not coverage to be closed by running
+    more tests; it is an invariant shape this method does not have. outcome.mjs::finding is
+    UNSCREENABLE as NOT_REPLAYABLE for a different and correct reason - its argument is a verdict
+    sealed by a method rather than by a recorded call, so it is FOREIGN and no lawful rebuild exists.
+    W-4 firing on real code.
+
+    AND DELEGATE'S K=0 WAS THE SAMPLE, NOT THE SUBJECT. Entry 27 reported calculus.delegate at K=0
+    over 79 leaf facts and said I could not tell instrument from transformation. Over the whole suite
+    delegate has 25 witnesses instead of 13 and 5 counterfactuals reach OBSERVED. One run's K of 0 is
+    a statement about which tests were run, and I should not have needed a second run to know that.
+
+    CONTROLS. S-2b FIRED: a fixture carrying every authority-sounding name in the vocabulary and no
+    brand yields ZERO candidates, so the mechanism does not fall back to names. S-3b FIRED: private
+    brand-touchers are discovered and returned as unwrappable rather than dropped, which is why token
+    and seal appear at all. S-4 held precisely - the whole suite ran with every discovered export
+    wrapped and 639/639 passed, so the shims are TRANSPARENT to the subject rather than merely
+    non-crashing.
+
+    WHAT THE INSTRUMENT CANNOT SEE, PROVEN BY ITS OWN TESTS: a consumer reached only through
+    `await import(...)` does not appear on the surface. With the brand-shape seed that is the content
+    of CAVEAT, which is EXPORTED so a report cannot omit it by forgetting. Concretely justification,
+    stopping, provenance and ledger are authority-bearing by any reading and are NOT on this surface,
+    because they use no identity brand. ONE SEED IS NOT A SURFACE.
+
+    SCREENABLE IS NOT SCREENED. Nothing here compares an observation to a declaration.
+
+        sound transforms actually SCREENED     1   (hand-driven, slice 2)
+        previously unknown repository defects  0
+
+    Focused 7/7. Suite 646/646.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. The remaining gap to the owner's stated
+                 next win is the semantic relationship check: support formulas over the truth table
+                 K now makes available, judged against a contract carrying its own provenance. The
+                 producer/consumer limit found here bounds what that can cover, and should be
+                 carried into its preregistration rather than discovered again afterwards.
+
+---
