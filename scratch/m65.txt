@@ -1,0 +1,34 @@
+LegaScreen v0: the decisive prediction held on one defect, with five artifacts and a named unscreened region
+
+The screen, told nothing about SC-1 and pointed by a driver that composes the module the way
+quiesce-check does, flagged stopping.objectivesFromContest for losing establishes and
+doesNotEstablish at 77fd921 and does not flag it at HEAD. A mechanical screen with a declared
+invariant rediscovered a defect that had taken twenty commits, seven green suites and an owner's
+review to find. The sharpest form was not in the preregistration and came out of running it: the
+DELTA between two commits' positives is the regression.
+
+False positives are reported as predicted and not tuned away. Four positives at HEAD, six at
+77fd921, and most are one artifact worth naming precisely - JavaScript lets a function be called
+with the wrong shape without throwing, so feeding a contest to evidenceFrontier yields a plausible
+object that lost fields the input happened to carry. The honest tally is ONE principled true
+positive and five artifacts, of which two happen to point at functions that really did have SC-3 and
+SC-4 defects. Those two are coincidences rather than detections, and counting them as hits would be
+the metric-as-property error this project has already paid for twice.
+
+The unscreened region is the point: one of six exported functions was never called, so the run says
+nothing whatever about it. A clean positives list without that line would be the 452/452 defect
+wearing a lab coat.
+
+The region earned, per protection.mjs, is field-level erasure over one module's reachable exports,
+with a witness, covering SC-1 and nothing else. Not covered and stated so: value-level loss inside a
+retained field, array and Map-shaped transformations, every other module, every other pathology.
+Specificity is limited by the language rather than by the invariant, which a declared signature per
+export would fix and which does not exist here. v0 does not license a second slice on enthusiasm.
+
+The worktree method changed mid-run: git worktree at 77fd921 failed on a Windows path-length limit
+in an unrelated measurement file, so the single self-contained module was extracted instead.
+Recorded because it is why the method is what it is.
+
+Message-File: scratch/m65.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
