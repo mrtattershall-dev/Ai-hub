@@ -1177,3 +1177,84 @@ Both are r4 work. Neither may be repaired in r3.
                  demonstrations of the completeness gap rather than an argument about it.
 
 ---
+## Entry 20 — LegaScreen v0 rediscovers a defect it was never told about, and COMPLETE gets its subject back
+
+    objective    test the one premise the owner's screening proposal rests on, and correct an
+                 overclaim of mine that the owner's own correction exposed
+    authority    OWNER, 2026-09-20
+    start hash   e977487
+    evidence     LEGASCREEN_V0_PREREG.md / RESULT.legascreen-v0.md (8a4c1df / daf38b2)
+                 legasus/legascreen/erasure.mjs, benchmarks/run-legascreen.mjs
+
+    THE PROPOSAL AND WHAT WAS BUILT. The owner proposed LegaScreen: a high-sensitivity screen over
+    authority-bearing transformations that tolerates false positives and feeds narrow diagnostics -
+    screening, not diagnosis. Building that from the design downward would be machinery whose
+    coverage is asserted rather than demonstrated, which Entry 19 had just finished naming. So v0
+    tested the single premise underneath it:
+
+        a screen given only the module surface and a DECLARED invariant, told nothing about any
+        specific defect, flags a transformation this session found by hand
+
+    LS-1 HELD, AND IT IS THE RESULT:
+
+        at 77fd921   stopping.objectivesFromContest   lost: establishes, doesNotEstablish, state
+        at HEAD      stopping.objectivesFromContest   lost: state
+
+    The screen has no knowledge of SC-1; its driver composes the module the way quiesce-check does.
+    It found, mechanically, the erasure that had cost twenty commits, seven green suites and an
+    owner's review. AND THE SHARPEST FORM WAS NOT PREREGISTERED - it came out of running the thing:
+    THE DELTA BETWEEN TWO COMMITS' POSITIVES IS THE REGRESSION. A standing false-positive set is
+    tolerable; a NEW lost field is a signal.
+
+    THE HONEST TALLY, because counting the flattering version would be this project's own metric
+    defect. Six positives at 77fd921: ONE principled true positive and FIVE ARTIFACTS. The artifact
+    has a single cause worth naming - JavaScript lets a function be called with the wrong shape
+    without throwing, so feeding a contest to evidenceFrontier returns a plausible object that "lost"
+    fields the input happened to carry. Two of those artifacts point at nextAction and
+    evidenceFrontier, which really did have SC-3 and SC-4 defects. THOSE TWO ARE COINCIDENCES, NOT
+    DETECTIONS, and are not counted. Demonstrated sensitivity: one defect.
+
+    Specificity is limited BY THE LANGUAGE, not by the invariant. A declared signature per export
+    would fix it and does not exist here.
+
+    UNSCREENED IS REPORTED, which is the whole point: of six exported functions, one - `attainment` -
+    was never called, so the run says nothing whatever about it. A clean positives list without that
+    line would be the 452/452 defect wearing a lab coat.
+
+    THE REGION, per protection.mjs: field-level erasure, object to object, over one module's
+    reachable exports, witnessed by this run, covering SC-1 and nothing else. NOT covered: value-level
+    loss inside a retained field (C6), array- and Map-shaped transformations (C8-a), every other
+    module, every other pathology the owner listed. v0 earns one more slice on evidence, not on
+    enthusiasm.
+
+    ------------------------------------------------------------------------------------------------
+    AND A CORRECTION TO ENTRY 18, FROM THE OWNER WITHDRAWING THEIR OWN EARLIER OVERSTATEMENT.
+
+    `attainment()` reported COMPLETE as NOT_REPRESENTABLE with the gloss "no important failure exists
+    anywhere". That is right about ITS subject - the failure-class space of arbitrary unconstrained
+    software, an open-world claim over an unenumerated space - and WRONG if read as "completeness is
+    unreachable". It is reachable over a BOUNDED CONTRACT: a finite input domain, a fully specified
+    required behaviour, no side effects, a fixed environment. Sixteen states can be checked. There is
+    no philosophical mystery left in that case.
+
+    AND THIS REPOSITORY ALREADY HELD THE AUTHORITY FOR IT. `GENERALIZATION.EXHAUSTIVE` in
+    justification.mjs is exactly "the domain was enumerated and all of it was checked", and `widen()`
+    already REFUSES it without the enumeration carried as evidence - asserted now by AT-3b, which
+    shows the refusal and then the grant. `domain-algebra.mjs` decides relations on witnesses for the
+    same reason. The machinery for a PROVE mode is older than the proposal for one.
+
+    So the refusal now names its subject, in the code and in the printed verdict. PERFECTION IS
+    RELATIVE TO A CRITERION - Perfect(P, C) - and is not a mystical property of source; several
+    implementations can be equally perfect under one contract, and adding a clause to C changes the
+    admissible set. That is why `legareward/dominance.mjs` keeps a Pareto FRONTIER rather than
+    electing a winner, and it has always been the same claim in a different layer.
+
+    NOT DONE, and not started: the PROVE mode as a component, the authority-flow graph, the mutation
+    battery, the static/dynamic cross-check, the unscreened-region map over the whole repository, and
+    the classification of regions as BROKEN / UNVERIFIED / SCREENED / VERIFIED / COMPLETE / OPTIMAL.
+    Those are a design, and this entry records exactly one measurement toward it.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE, with one screen that has a witness and a
+                 stated region.
+
+---

@@ -40,11 +40,36 @@ test('AT-2 — level 3 needs coverage established elsewhere, and UNKNOWN is neve
     .levels[ATTAINMENT.NAMED_COVERAGE_EXHAUSTED], false);
 });
 
-test('AT-3 — COMPLETE is refused, not computed', () => {
+test('AT-3 — COMPLETE is refused, not computed, AND the refusal names its subject', () => {
   const a = attainment({ contest: quiescent(), entries: liveEntries() });
   assert.equal(a.levels[ATTAINMENT.COMPLETE], 'NOT_REPRESENTABLE');
   assert.notEqual(a.levels[ATTAINMENT.COMPLETE], false, 'false would imply the question was evaluated');
   assert.match(a.why, /no finite procedure here establishes/);
+  // CORRECTED after the owner showed the first wording overstated an impossibility: what is not
+  // representable is completeness over the FAILURE-CLASS SPACE, not completeness as such. A bounded
+  // contract with an enumerable domain can be finished, and this repository already carries the
+  // authority for that.
+  assert.match(a.why, /NOT_REPRESENTABLE OVER THIS SUBJECT/);
+  assert.match(a.why, /BOUNDED contract/);
+});
+
+test('AT-3b — the authority for bounded completeness already exists and still demands the enumeration', async () => {
+  const { graph, add, node, widen, entitled, scope, GENERALIZATION, NODE, ANY } =
+    await import('./justification.mjs');
+  const g = graph();
+  const observed = node({ kind: NODE.OBSERVATION, proposition: 'f behaves on every input',
+    scope: scope({ invocation: '0' }), basis: 'EXECUTION_WITNESS' });
+  add(g, observed);
+  // An exhaustive claim WITHOUT the enumeration is refused - completeness is not free for being small.
+  assert.equal(widen(g, observed.id, { dimension: 'invocation', to: ANY,
+    via: GENERALIZATION.EXHAUSTIVE, evidence: [] }).rejected, true);
+  // WITH the enumeration it is granted, and the widened claim is entitled over the whole domain.
+  const proven = widen(g, observed.id, { dimension: 'invocation', to: ANY,
+    via: GENERALIZATION.EXHAUSTIVE,
+    evidence: ['all 16 inputs enumerated and checked against the specified behaviour'] });
+  assert.equal(proven.rejected, undefined);
+  assert.equal(entitled(g, proven.id, scope({ invocation: '15' })).ok, true,
+    'a bounded region CAN be finished; that is a different proposition from the failure-class space');
 });
 
 test('AT-4 CONTROL — a fully blocked frontier DOES earn level 2, and with coverage, level 3', () => {

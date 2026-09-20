@@ -170,8 +170,25 @@ export function contestState({ frontier, investigations = [] }) {
 //                                coverage was INDEPENDENTLY established
 //     4 COMPLETE                 no important failure exists anywhere
 //
-// Levels 1-3 are potentially establishable. LEVEL 4 IS NOT A PROPOSITION THIS SYSTEM CAN HOLD, so it
-// is refused rather than computed - returning `false` would imply the question had been evaluated.
+// Levels 1-3 are potentially establishable. LEVEL 4 IS NOT A PROPOSITION THIS SYSTEM CAN HOLD ABOUT
+// THIS SUBJECT, so it is refused rather than computed - returning `false` would imply the question
+// had been evaluated.
+//
+// AND THE SUBJECT IS THE WHOLE OF THE REFUSAL, corrected 2026-09-20 after the owner pointed out that
+// the first wording overstated an impossibility. What is NOT representable is
+//
+//     no important failure exists anywhere in arbitrary unconstrained software
+//
+// which is an open-world claim over an unenumerated space. COMPLETENESS OVER A BOUNDED CONTRACT IS A
+// DIFFERENT PROPOSITION AND THIS REPOSITORY ALREADY HAS A CONSTRUCTOR FOR IT: a function with a
+// finite input domain, a fully specified required behaviour and no side effects can be enumerated,
+// and `GENERALIZATION.EXHAUSTIVE` in justification.mjs is exactly that authority - "the domain was
+// enumerated and all of it was checked" - which widen() already refuses without the enumeration as
+// evidence. `domain-algebra.mjs` decides relations on witnesses for the same reason.
+//
+// So COMPLETE here means "complete over the failure-class space", not "complete is unreachable". A
+// bounded region can be finished. This function is not the place that says so, and saying it could
+// never be said anywhere was the overclaim.
 //
 // LEVEL 2 IS NOT LEVEL 1. An UNKNOWN-classed question - one for which neither an unblocking condition
 // nor terminality is established - is NEITHER resolved NOR blocked, so a frontier can have no
@@ -215,8 +232,11 @@ export function attainment({ contest, entries = [], coverageEstablished = null }
       + (level2 && !level3
         ? 'coverage over named failure classes is ' + (coverageEstablished === null ? 'UNKNOWN'
           : 'not established') + ', so no predeclared challenge can be said to have exhausted it. ' : '')
-      + 'COMPLETE is NOT_REPRESENTABLE: no finite procedure here establishes that no important failure'
-      + ' class was left unimagined, and returning false would imply the question was evaluated.',
+      + 'COMPLETE is NOT_REPRESENTABLE OVER THIS SUBJECT - the failure-class space - because no finite'
+      + ' procedure here establishes that no important failure class was left unimagined, and'
+      + ' returning false would imply the question was evaluated. This is NOT a claim that'
+      + ' completeness is unreachable in general: over a BOUNDED contract with an enumerable domain it'
+      + ' is reachable, and GENERALIZATION.EXHAUSTIVE is the authority that carries it.',
   };
 }
 
