@@ -1477,3 +1477,79 @@ Both are r4 work. Neither may be repaired in r3.
                  honest inventory than it had before this entry.
 
 ---
+## Entry 24 — lineage: support discovered without names, C2 generalized, and the architecture's own unforgeability defeating the screen
+
+    objective    build the ONE part of the owner's v3 design that the v2 blind spot justified -
+                 semantic lineage - and nothing else
+    authority    OWNER, 2026-09-20
+    start hash   4677039
+    evidence     LEGASCREEN_V2_BASELINE.md (907ca86), LEGASCREEN_V3_PREREG.md (3d51b6c),
+                 RESULT.legascreen-v3-lineage.md, legasus/legascreen/lineage.mjs
+
+    V2 WAS FROZEN FIRST, in its own commit, with its five measured blind spots written down before
+    anything that might make it look broader in retrospect. Four demonstrated lenses, MECHANIZED_
+    REGION for each and COVERED_CLASS for none.
+
+    L-1 HELD. v2 perturbs by NAME, so where an output coordinate is derived from a differently-named
+    input it reported UNSCREENED. Lineage discovers the support by execution instead:
+
+        identity.producer  -> scope.criterion      identity.document -> scope.history
+        identity.version   -> scope.criterion      identity.ordinal  -> scope.history
+
+    No name matching anywhere. The blind spot is closed FOR THIS CASE.
+
+    L-3 HELD, AND IT IS THE GENERALIZATION. Aggregation is observable by the same means: remove one
+    of several inputs and see whether the output coordinate survives.
+
+        b11e51f   context.repository   declared ALL_OF   OBSERVED ANY_OF   MISMATCH
+                  context.criterion    declared ALL_OF   OBSERVED ANY_OF   MISMATCH
+
+    C2 is now a mismatch between OBSERVED and DECLARED aggregation. v2's I-WEAKENING needed a human
+    to encode "derive is conjunctive" as a probe input; this needs only the operation's own contract,
+    and the observation is mechanical.
+
+    L-2 IS NOT MEASURABLE AT HEAD, AND THAT IS THE FINDING OF THE ENTRY.
+
+        HEAD   calculus.derive   observed 0   vacuous 0   unobservable 4   aggregation UNKNOWN
+
+    The perturbation builds a modified COPY of a token. Since the C3 repair a token is branded by
+    membership in a module-private WeakSet, so a copy IS NOT AN AUTHORITY TOKEN and derive correctly
+    refuses it. Verified at both commits rather than inferred: at HEAD the copy carries zero own
+    symbols and is refused; at b11e51f it carries one and is accepted.
+
+        THE ARCHITECTURE'S OWN UNFORGEABILITY DEFEATS EXTERNAL PERTURBATION.
+
+    The C3 repair made tokens harder to forge and, by the same property, harder to SCREEN. A real
+    tension between defensibility and screenability, found by the screen failing rather than by
+    anyone reasoning about it. The fix is named and NOT built: perturbation must go through the
+    CONSTRUCTORS - rebuild the premise via observe() at a perturbed context - because a screen that
+    mutates objects from outside can only screen objects that permit outside mutation.
+
+    THREE DEFECTS IN THE PROBE, every one found by running it rather than reading it:
+
+      1 A REFUSED INPUT WAS READ AS A DEPENDENCY. `{minted: false}` has no context, so every output
+        coordinate "changed" - producing a confident ALL_OF at HEAD where NOTHING had been observed.
+        L-5's non-vacuity requirement is what exposed it: a matrix where everything depends on
+        everything has discovered nothing.
+      2 UNSUPPORTED AND ANY_OF WERE CONFLATED. "No single input affects it" means either it came from
+        outside the inputs or it survived the loss of every one - opposite findings. Only the
+        all-inputs-stripped run separates them, and before the fix the probe reported UNKNOWN at
+        b11e51f where the answer was the defect.
+      3 "COULD NOT MEASURE" AND "WAS REMOVED" SHARED ONE REPRESENTATION - a bare `undefined`. THAT IS
+        THIS PROJECT'S OLDEST DEFECT CLASS, UNKNOWN COLLAPSING INTO A VALUE, THE ONE LAW 1 WAS
+        WRITTEN FOR, COMMITTED INSIDE THE LAYER BUILT TO DETECT IT.
+
+    Defect 3 is the most instructive thing in this entry. The layer whose purpose is to notice
+    information loss lost the distinction between an unmeasured probe and a measured absence, in its
+    own return value, at the first attempt.
+
+    NOT ESTABLISHED, and named: anything about HEAD's calculus, which is unscreenable by this method
+    until perturbation goes through constructors; anything beyond two transforms; the support FORMULA
+    representation; the shared mutation engine; AST discovery; the 143-transform surface; path
+    invariants; and the readiness gate A-J, of which this slice satisfies C and D only.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. Slice 1 earns the right to attempt slice 2 -
+                 constructor-based perturbation, which the HEAD result makes a prerequisite rather
+                 than an improvement.
+
+---
