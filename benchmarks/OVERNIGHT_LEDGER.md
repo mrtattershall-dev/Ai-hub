@@ -1721,3 +1721,101 @@ Both are r4 work. Neither may be repaired in r3.
                  until that works.
 
 ---
+
+## Entry 27 — AUTO-CF-1: K is 140 with zero drivers, a preregistered control could not fire, and a check was being silently skipped
+
+    objective    the owner's next milestone - from a recorded witness, mutate one eligible leaf fact,
+                 reconstruct through the real production path, prove the perturbation occurred,
+                 execute the same target, produce a typed outcome. No semantic judgment.
+    authority    OWNER, 2026-09-20
+    start hash   45403a1 (preregistration alone)
+    evidence     AUTO_CF_1_PREREG.md (45403a1), RESULT.auto-cf.md,
+                 legasus/legascreen/intervene.mjs, benchmarks/run-auto-cf.mjs
+
+    C-1 HELD, AND THE OWNER'S METRIC IS THE ONE REPORTED.
+
+        hand-authored counterfactual drivers  : 0
+        authority transforms WITNESSED    (N) : 55
+        authority transforms REPLAYED     (M) : 55
+        authority transforms PERTURBED    (K) : 140   of 667 leaf facts tried
+
+        op                     N    M    K   leaves
+        calculus.observe      29   29   79      297
+        calculus.derive       13   13   61      291
+        calculus.delegate     13   13    0       79
+
+    CALCULUS.DELEGATE IS K = 0 OVER 79 LEAF FACTS. Every delegation counterfactual was refused or
+    unreadable and not one produced a scorable observation. Reported, not smoothed.
+
+        RECONSTRUCTION_FAILED  199    AUTHORITY_REFUSED  187    OBSERVED  140
+        OUTPUT_UNOBSERVABLE    114    PERTURBATION_NOT_APPLICABLE  27
+
+    79% of attempts produced NO MEASUREMENT, and each says why in its own state. Under the old
+    representation most of those would have been an undefined somewhere.
+
+    A REAL OBSERVATION ABOUT THE SUBJECT, FOUND MECHANICALLY AND WITHOUT A PROBE WRITTEN FOR IT:
+
+        derive#7   #5 arg[0].context.criterion  ->  context.repository ADDED
+                   #6 arg[0].context.criterion  ->  context.repository ADDED
+
+    Removing one fact from one premise turns a REFUSAL into a CONCLUSION. derive refuses when
+    premises conflict on a dimension with no bridge witness, and DROPS a dimension some premise never
+    established - so deleting the conflicting criterion removes the conflict and the derivation
+    proceeds at repository S1. Both halves are documented in calculus.mjs; nobody had put them next
+    to each other. Not a defect, and this slice issues no judgment about it.
+
+    C-2b DID NOT FIRE, AND THE PREDICTION WAS WRONG. The preregistration said a constructor
+    re-supplying a default would make an intervention vacuous. It does not: a default lands in the
+    constructor's OUTPUT, while the proof is taken on the rebuilt ARGUMENT, and once an object key is
+    gone the argument always differs. PERTURBATION_NO_EFFECT is therefore UNREACHABLE under
+    removal-perturbation - 0 of 667. The state is kept because the proof is the right one and value
+    substitution will reach it, and it is recorded as NEVER SHOWN TO FIRE, which is not the same as
+    safe.
+
+    THREE DEFECTS IN MY OWN LAYER, ALL FOUND BY RUNNING IT.
+
+      1 A REFUSED BASELINE WAS SCORED AS A MEASUREMENT. K was 254 on the first run: a witness whose
+        baseline was already a refusal compared two refusals, found them equal, and reported OBSERVED
+        with no delta six times over a call that never produced anything to read. False confidence
+        manufactured out of an absence - slice 1's defect wearing the new architecture. K fell to
+        140. The repair is deliberately NOT "the baseline must be observable", because the
+        baseline-refusal case above is the most informative result in the run.
+      2 A WORLD THAT COULD NOT BE BUILT WAS REPORTED AS A WORLD IN WHICH NOTHING CHANGED. When
+        reconstruction threw, the first version returned PERTURBATION_NO_EFFECT. Could-not-measure
+        collapsing into a measured absence: THE OLDEST DEFECT CLASS IN THIS PROJECT, committed once
+        more inside the layer built to prevent it.
+      3 A VALIDATING WRAPPER WAS SILENTLY SKIPPED ON REPLAY. When a recorded function returned
+        another recorded call's value unchanged, the recorder kept the INNER producer, so replay
+        rebuilt the value by calling the inner function directly and the wrapper's own refusal left
+        the replayed path. A perturbation it would have rejected sailed through and was scored. Calls
+        complete inner-first, so the OUTERMOST producer - the one the consumer actually got the value
+        from - now wins. THIS IS THE DANGEROUS ONE: it did not fail, it quietly removed a check.
+
+    A fourth, smaller: the C-6 checker matched its own report text, because the line that PRINTS the
+    result mentions the method names inside a string. The smallest possible instance of reading your
+    own output back as evidence.
+
+    C-6 HELD and is asserted over the source and all 667 records rather than intended - nothing calls
+    held() or violated(), and no result carries a verdict. A completed journey CAN judge, and 140 of
+    them correctly could; the claim is that nothing here asks.
+
+    ENTRY 26'S PUBLISHED NUMBERS WERE RE-RUN because defect 3 threatened them, and are unchanged:
+    29/13/13 root witnesses, 12 with upstream history, 12/12 replayed, 6/6 branded.
+
+    Two test files never used in development: N 30, M 30, K 58 of 288 leaves.
+
+    NO COVERAGE FRACTION. Still an undiscovered surface, still no denominator.
+
+    NOT BUILT: support formulas (ALL_OF/ANY_OF need complete truth tables), the contract source
+    (declared is still human testimony and is not consulted), discovery of the authority surface, and
+    anything about transformations that do not execute during an existing test. The five prototypes
+    remain unmerged.
+
+    Focused 27/27. Suite 639/639.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. The owner's sequence puts support formulas
+                 after this, over the truth table that K now makes available - but the instrument has
+                 produced four defects in itself in one slice, and that rate is the thing to weigh
+                 before adding a layer that draws conclusions from it.
+
+---

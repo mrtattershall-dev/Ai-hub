@@ -1,0 +1,24 @@
+Ledger Entry 27: AUTO-CF-1 recorded, including a failed prediction and four defects in the instrument
+
+Records the milestone with the owner's metric rather than a flattering one: zero hand-authored
+drivers, N 55, M 55, K 140 of 667 leaf facts, and calculus.delegate at K equals zero over 79 leaf
+facts. Seventy-nine percent of attempts produced no measurement, each saying why in its own state.
+
+The entry keeps the failed prediction in its own section. C-2b could not fire because the
+preregistration was wrong about where a re-supplied default lands, which makes
+PERTURBATION_NO_EFFECT unreachable under removal-perturbation; the state is kept and recorded as
+never shown to fire, which is not the same as safe.
+
+It also records four defects found in my own layer in one slice, and names the dangerous one: a
+recorded function returning another recorded call's value unchanged caused replay to rebuild through
+the INNER producer, so a validating wrapper's refusal silently left the replayed path. It did not
+fail, it removed a check. Entry 26's published numbers were re-run because that repair threatened
+them and are unchanged.
+
+The next line is QUIESCENT rather than support formulas. The owner's sequence puts formulas next, but
+the instrument produced four defects in itself in one slice and that rate deserves weighing before a
+layer is added that draws conclusions from it.
+
+Message-File: scratch/m88.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
