@@ -14,7 +14,8 @@ import { scope, covers, joinConflicts, admitScopeDimension, scopeDimensions, res
   UNADMITTED, DIMENSIONS } from './justification.mjs';
 import { RELEVANCE, ARGUED_FROM } from './admissibility.mjs';
 
-const ENTRY = (name) => ({ name, side: 'CONTEXT', relevance: RELEVANCE.COMPARISON_ENTITLEMENT,
+const ENTRY = (name) => ({ name, side: 'CONTEXT', producer: 'probe',
+  relevance: RELEVANCE.COMPARISON_ENTITLEMENT,
   argument: 'declared for this leak investigation, argued from the module design rather than from any'
     + ' observed discrepancy',
   arguedFrom: ARGUED_FROM.DESIGN, establishedAt: 'registry-leak investigation' });
@@ -119,7 +120,9 @@ test('L7 — a carried coordinate whose NAME collides with a declared dimension 
 
 test('L8 — a GENUINELY foreign name still promotes once the gate admits it', () => {
   resetScopeDimensions();
-  const carried = { criterion: 'x', [UNADMITTED]: { collectionCohort: 'A B' } };
+  // criterion names the producer the admission was argued from (composition attack C4); a carrier
+  // that names another producer, or none, keeps the coordinate recorded and unpromoted.
+  const carried = { criterion: 'probe 1', [UNADMITTED]: { collectionCohort: 'A B' } };
   assert.equal(scope(carried).collectionCohort, undefined, 'before admission: carried, not promoted');
 
   assert.equal(admitScopeDimension(ENTRY('collectionCohort')).admitted, true);

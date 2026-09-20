@@ -126,7 +126,10 @@ test('P3-10 — admitting a dimension NARROWS authority; it never widens it', ()
   const refusedBefore = covers(granted, askedFor).ok;
   assert.equal(refusedBefore, false, 'the control: this was refused before the admission');
 
-  const v = admitScopeDimension({ name: 'collectionCohort', side: 'CONTEXT',
+  // `producer` was added to the entry after composition attack C4: an admission argued from pytest's
+  // fixture semantics governs pytest records, and a same-named key on another producer's record is
+  // recorded rather than promoted.
+  const v = admitScopeDimension({ name: 'collectionCohort', side: 'CONTEXT', producer: 'pytest',
     relevance: RELEVANCE.COMPARISON_ENTITLEMENT,
     argument: 'pytest builds module- and session-scoped fixtures once per session and reuses them, so a'
       + ' verdict for one nodeid is conditional on which other nodes were collected.',
@@ -228,7 +231,7 @@ test('DISCOVERY (beyond the prereg), now repaired — the contradiction is visib
   assert.equal(covers(sa, sb).ok, true);
 
   // NOW TAKE IT THROUGH THE GATE. This is the path that did not exist before the repair.
-  const v = admitScopeDimension({ name: 'collectionCohort', side: 'CONTEXT',
+  const v = admitScopeDimension({ name: 'collectionCohort', side: 'CONTEXT', producer: 'pytest',
     relevance: RELEVANCE.COMPARISON_ENTITLEMENT,
     argument: 'pytest builds module- and session-scoped fixtures once per session and reuses them, so a'
       + ' verdict for one nodeid is conditional on which other nodes were collected. Argued from'

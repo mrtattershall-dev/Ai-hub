@@ -52,7 +52,21 @@ const INDEPENDENT = new Set([ARGUED_FROM.SPECIFICATION, ARGUED_FROM.SOURCE_INSPE
 // A dimension may only be admitted when its relevance was argued from a source INDEPENDENT of the
 // discrepancy it would explain. The provenance is declared structurally so the illegitimate route has to
 // be named to be taken.
+// A DIMENSION NAME IS AN IDENTIFIER, AND THE BOOKKEEPING KEY IS NOT ONE. Composition attack C5 admitted
+// a dimension literally named UNADMITTED; scope() then wrote its recorded block under an active key,
+// covers() compared two identical blocks by object identity, and NOT_COMPARABLE was manufactured out of
+// a key that exists to carry what is NOT authoritative. The gate refuses the reserved name and anything
+// that is not a plain identifier, so a bookkeeping key can never become a dimension by being named.
+const RESERVED_NAMES = new Set(['UNADMITTED']);
+const IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
 export function admitDimension({ name, relevance, argument, arguedFrom, motivatedBy, establishedAt }) {
+  if (typeof name !== 'string' || !IDENTIFIER.test(name) || RESERVED_NAMES.has(name)) {
+    return { admitted: false, name,
+      why: 'REFUSED: "' + String(name) + '" is not a dimension name. A dimension is a plain identifier,'
+        + ' and the reserved bookkeeping key UNADMITTED - which carries what is recorded and NOT'
+        + ' authoritative - can never itself be a dimension.' };
+  }
   if (!argument || !arguedFrom) {
     return { admitted: false, name,
       why: 'a dimension must state its relevance ARGUMENT and where that argument was ARGUED FROM. A'

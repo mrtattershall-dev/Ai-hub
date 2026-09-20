@@ -136,6 +136,19 @@ export function admitScopeDimension(entry) {
       why: 'a scope dimension must declare its SIDE - CONTEXT (the world a claim was established in) or'
         + ' SUBJECT (what the claim is about). Law 5 turns on that split and it may not be defaulted.' };
   }
+  // AN ADMISSION IS ARGUED FROM ONE PRODUCER'S SEMANTICS AND GOVERNS THAT PRODUCER'S RECORDS. The
+  // relevance of collectionCohort was argued from pytest's documented fixture scoping; a git identity
+  // key that happens to be spelled the same says nothing of the kind. The first version keyed promotion
+  // on the NAME alone, so after that admission two git records were refused a join on a dimension whose
+  // argument was about pytest (composition attack C4) - L7 again, one door further in. The entry now
+  // names its producer and promotion is gated on it below; the base six are producer-agnostic by
+  // design and are the only entries without one.
+  if (typeof entry.producer !== 'string' || !entry.producer.trim()) {
+    return { admitted: false, name: entry.name,
+      why: 'a scope dimension must declare the PRODUCER whose semantics its relevance argument was drawn'
+        + ' from. Same name is not same referent: a coordinate this admission did not argue about'
+        + ' cannot borrow its authority by being spelled the same way.' };
+  }
   const r = admitDimension(entry);
   if (!r.admitted) return r;                        // refused, with a reason; nothing changes
   if (activeDims().includes(entry.name)) return { ...r, alreadyActive: true };
@@ -208,22 +221,44 @@ export function joinConflicts(a, b) {
 // recorded and stays out of the dimension. Only a name the GATE admitted - which can never be one of the
 // six, since those are active from the start - is promoted.
 const BASE_NAMES = BASE_ENTRIES.map((e) => e.name);
+const producerOf = (name) => (ENTRIES.find((e) => e.name === name) || {}).producer;
+
+// The producer a scope's evidence came from is the first word of its criterion - the adapter writes
+// criterion as `<producer> <version>` - and a scope that does not say is nobody's.
+const producerOfScope = (partial) => String(partial.criterion ?? '').trim().split(/\s+/)[0] || null;
+
+// A SHADOWED CARRIED VALUE IS RECORDED, NEVER DROPPED. `{...promotable, ...partial}` lets a top-level
+// coordinate win over a carried one of the same name, which is right - the declared value is the
+// adapter's deliberate mapping - but the first version then forgot the carried value existed
+// (composition attack C6). It now survives under a SHADOWED: key inside UNADMITTED, where nothing
+// authoritative reads it and nothing can mistake it for a dimension.
+const SHADOWED = 'SHADOWED:';
 
 export function scope(partial = {}) {
   const active = activeDims();
   const carried = (partial[UNADMITTED] && typeof partial[UNADMITTED] === 'object')
     ? partial[UNADMITTED] : {};
+  const from = producerOfScope(partial);
   const promotable = {};
   const collided = {};
+  const foreign = {};
   for (const [k, v] of Object.entries(carried)) {
-    if (BASE_NAMES.includes(k)) collided[k] = v; else promotable[k] = v;
+    if (BASE_NAMES.includes(k)) collided[k] = v;
+    // Admitted under another producer's argument: recorded, and NOT promoted (C4).
+    else if (active.includes(k) && producerOf(k) !== from) foreign[k] = v;
+    else promotable[k] = v;
+  }
+  const shadowed = {};
+  for (const [k, v] of Object.entries(promotable)) {
+    if (Object.hasOwn(partial, k) && partial[k] !== v) shadowed[SHADOWED + k] = v;
   }
   const flat = { ...promotable, ...partial };
   delete flat[UNADMITTED];
   const s = {};
   for (const d of active) s[d] = Object.hasOwn(flat, d) ? flat[d] : null;
   const extras = Object.keys(flat).filter((k) => !active.includes(k));
-  const rest = { ...collided, ...Object.fromEntries(extras.map((k) => [k, flat[k]])) };
+  const rest = { ...collided, ...foreign, ...Object.fromEntries(extras.map((k) => [k, flat[k]])),
+    ...shadowed };
   if (Object.keys(rest).length) s[UNADMITTED] = rest;
   return s;
 }
