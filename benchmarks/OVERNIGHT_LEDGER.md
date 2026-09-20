@@ -2298,3 +2298,124 @@ Both are r4 work. Neither may be repaired in r3.
                  unspent TRANSFER-1 hub run.
 
 ---
+
+## Entry 34 — TRANSFER: the hub found four defects in LegaScreen before LegaScreen found anything in the hub, and then it transferred
+
+    objective    spend the one-shot transfer: can sink-seeded discovery observe a repository that was
+                 never built around this ontology?
+    authority    OWNER, 2026-09-20
+    start hash   e970b61 (BACKWARD-1 prereg), c44cdbf (BACKWARD_1_FROZEN + TRANSFER-1 prereg),
+                 ea11328 (BACKWARD_2_FROZEN + TRANSFER-2 prereg)
+    evidence     RESULT.transfer-1.md, RESULT.transfer-2.md, BACKWARD_{1,2}_FROZEN.txt,
+                 legasus/legascreen/{backward-child,lifecycle.test}.mjs
+
+    TRANSFER-1 FAILED, AND THE FAILURE IS THE FIRST HALF OF THIS ENTRY.
+
+    The frozen observer shared process lifetime with its subject. All 90 hub test files call
+    process.exit; the second one ended the process before the exit handler existed. Exit 0, 23 lines,
+    NO REPORT AT ALL - which is indistinguishable from a subject with no effects unless the
+    difference is made explicit. Every coordinate NOT ESTABLISHED. The 23 lines are apparatus
+    evidence, not hub evidence, and RESULT.transfer-1.md stands unamended.
+
+    The assumption is recorded in its RAW PROSPECTIVE FORM and deliberately not filed under H-LOSS,
+    H-DISTINCTION or representation leakage, though all three would fit:
+
+        the frozen observer assumed multiple subject entries could safely share observer
+        process lifetime
+
+    FOUR ATTEMPTS AT ONE REPAIR, EACH WRONG IN A NEW WAY.
+
+      1 one child per entry, handler registered before load    necessary, insufficient
+      2 exit when `await import` returns                       KILLED SUBJECTS MID-SUITE. import
+                                                               returns when tests are REGISTERED, not
+                                                               run: 4132 -> 2295 effects, 717 -> 10
+                                                               process executions, WHILE EVERY
+                                                               LIFECYCLE CONTROL STILL PASSED
+      3 let it drain, unbounded                                LEAKED THE MACHINE
+      4 the defect underneath all three                        see below
+
+    REMOVING THE CHILD'S process.exit(0) ALSO REMOVED THE GUARD THAT STOPPED THE CHILD FALLING
+    THROUGH INTO THE PARENT SECTION OF THE SAME FILE. Every child ran the parent code and started a
+    run of its own, recursively. An unbounded drain alone leaks ONE orphan per entry; 261 accumulated.
+    Two other sessions on this machine hit fork failures and lost timing work. I killed 261 of my own
+    processes to clear it.
+
+    THE REPAIRS, IN THE FORM WORTH KEEPING:
+
+      - the child is its own FILE, so fall-through is UNREPRESENTABLE rather than forbidden. Session
+        75's phrasing, and the right one: guards fail by being removed; representability does not.
+      - the bound is an UNREF'D timer, armed BEFORE the subject loads. Armed after, it cannot bound a
+        subject that hangs DURING load, because import never returns and the arming line never runs.
+        A BOUND THAT CAN ONLY BE INSTALLED BY THE THING IT IS BOUNDING IS NOT A BOUND.
+      - the parent records every pid and sweeps, reporting a count that must be 0.
+      - an empty event list is THREE facts: died during load; finished loading but never let go; ran
+        to the end and caused nothing. Only the third may be read as "no effects".
+
+    Eight lifecycle controls, all forced from fixtures, all passing. One could not fire at first: the
+    hang fixture used a bare unsettled top-level await, and Node exits code 13 when the loop drains
+    with a pending promise, so the subject terminated itself and TIMED_OUT stayed 0.
+
+    TRANSFER-2 RAN AGAINST 0784cd3f4e3970b3 AND IT TRANSFERRED.
+
+        forward discovery on the hub     0 candidates
+        backward discovery              40
+        INTERSECTION                     0
+
+    FORWARD FOUND NOTHING AT ALL - not few, ZERO - because the hub has no identity brand for the
+    brand-shape seed to find. On Legasus the two surfaces were disjoint but BOTH POPULATED, 10 and
+    39. A screen seeded only on explicit authority machinery is a mirror, and this repository holds
+    nothing up to it. That is the transfer question answered, and it is why backward discovery was
+    never a coverage improvement.
+
+    ELEVEN PRIVATE FUNCTIONS reached through effects - lock acquisition, enqueue, dequeue, completion,
+    stale-lock clearing, quarantine, ledger writes, a filesystem walk. None exported, none reachable
+    by any forward method. PARTICIPATION, NOT RELEVANCE: a stack is coarse causal participation and
+    not counterfactual dependence.
+
+    THE BACKDOOR DETECTOR FIRED ON ITS FIRST NATURAL SPECIMEN, agent.js::__modelCallTest, with no
+    name supplied - AND FOUND ONE OF FOUR such exports in that file. The fixture had said 1/1; the
+    real subject said 1/4 within minutes. A DETECTOR VALIDATED ONLY ON CONSTRUCTED EXAMPLES FLATTERS
+    ITSELF. Whether the other three differ in shape or the threshold is too strict is UNMEASURED.
+
+    THE COMMONJS COORDINATE FIRED FOR THE FIRST TIME: 148 observable, 10 unobservable by this
+    instrument, 17 with no module syntax. 27 of 175 modules are outside what the technique can see,
+    and nothing divides by 175 as though they had been examined.
+
+    AND THE COST IS STATED PLAINLY: 64 of 90 entries ended the process themselves, so their effects
+    are UNESTABLISHED. For 71% of this repository's entries the question "did it cause nothing?"
+    CANNOT BE ANSWERED, and 4498 is a floor rather than a count.
+
+    A CLAIM CORRECTED AFTER THE FACT. I wrote that per-entry cost fell from ~8s to <1s and that "that
+    8s was the fall-through". Session 75 calibrated the cleared machine: 808.5ms unloaded against
+    ~1500ms under load, an inflation of ~1.85x. The 8s was measured under my own leak, so two causes
+    produced it and I attributed it to one. Direction holds, MAGNITUDE DOES NOT, the split is
+    unmeasured and is not being estimated after the fact. The frozen preregistration was NOT edited;
+    the correction is in RESULT.transfer-2.md.
+
+    CROSS-SESSION, because three sessions shared this checkout and the machine:
+
+      - 75 traced the leak from process metadata alone and was right on every count. Its suggested
+        diagnostic - orphans vs entries processed - WOULD HAVE MISLED, because a diagnostic derived
+        from a hypothesised cause inherits that hypothesis. It named that itself.
+      - 75 retracted a claim that my C4/C6 were already closed by its d2cda02. I measured rather than
+        accepted: C4 IS closed, at exactly the layer it said was open - admitScopeDimension refuses an
+        entry that does not name its producer, promotion is gated on it, C4-a/C4-b/C6-a all pass. The
+        retraction over-corrected and would have handed me two phantom findings.
+      - BIND-1 (ce) independently replicated TRANSFER-1's failure class in its own tracer: a mutant
+        that kills the witness makes every later case UNOBSERVABLE, not a discrimination. Two
+        sessions, two apparatus, same class, found independently.
+      - Machine discipline: a claimed slot with a hard cap, released 28 minutes inside it with a
+        process count rather than an assurance.
+
+    The hub repository was never executed, written to, or given a process. Verified by mtime after
+    the run.
+
+        stage reached   EFFECT_DISCOVERED / EFFECT_WITNESSED / ANCESTRY_OBSERVED
+        not reached     SUPPORT_CHARACTERIZED / JUSTIFICATION_ESTABLISHED / SCREENED
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. Named and open: the eleven hub participants
+                 are not established dependencies, which needs perturbation joined to the sink
+                 recorder; the backdoor detector's 1/4; L-3's String(v) and DX-1's semantic(), both
+                 still unrepaired by their own preregistrations; and Entry 30's bridge-mutation gap.
+
+---

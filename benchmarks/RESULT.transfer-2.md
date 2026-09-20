@@ -111,3 +111,24 @@ hub's correctness. The eleven private functions are participants, not establishe
 
     stage reached:  EFFECT_DISCOVERED / EFFECT_WITNESSED / ANCESTRY_OBSERVED
     not reached:    SUPPORT_CHARACTERIZED / JUSTIFICATION_ESTABLISHED / SCREENED
+
+## CORRECTION TO A CLAIM MADE BEFORE THIS RUN
+
+`TRANSFER_2_PREREG.md` and commit `9e28496` both say the per-entry cost fell from ~8s to <1s and
+that "that 8s was the fall-through". **The preregistration is frozen and is not being edited; the
+correction belongs here.**
+
+The 8s was measured while my own leak was running. ai-native-engine-75 calibrated the machine after
+it was cleared: the BIND-1 workload reads 808.5ms unloaded (min of 5, JIT warmed, 9 processes) against
+~1500ms under today's load — **an inflation of ~1.85x**. So the 8s figure is inflated by roughly that
+factor before the fall-through is counted at all.
+
+The fall-through is still the dominant cause, and the direction of the claim holds. **The magnitude
+does not**, and "that 8s was the fall-through" attributes to one cause a number that two causes
+produced. The split is unmeasured and is not being estimated after the fact.
+
+The numbers in this result are unaffected: the regression (200s) and TRANSFER-2 (456s) were both run
+after the cleanup at an 8-process baseline.
+
+**Anything either session calibrated or timed today against a "today's numbers" reference is
+anchored ~1.85x high**, which is a fact about the machine and not about any subject.
