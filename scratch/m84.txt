@@ -1,0 +1,49 @@
+AUTO-WITNESS-1: the construction recipe is recorded from a test that was going to run anyway, and the driver is gone
+
+W-1 held. Two existing test files ran unmodified under a module loader hook - 18 of their own tests
+passed under instrumentation, so the shim is transparent to the subject - and the run yielded 55
+recorded calls, 12 derive witnesses carrying upstream construction history, and 55 of 55 root
+witnesses replaying semantically identical through the real production functions. A captured recipe
+for one derive names 24 leaf facts. Slice 2's hand-written driver declared four, and I chose those
+four; here I chose none of them.
+
+An ES module namespace is immutable from outside, so an already-written test cannot be intercepted by
+assignment, but substituting the module can be: the loader returns a shim that re-exports the real
+module and wraps the named exports. The shim adds no capability, since every wrapper calls the real
+function and returns the real value. Classification is by identity and never by name or shape -
+DERIVED when an object IS a recorded call's return value, FOREIGN when the subject's OWN brand
+predicate says it is authority that no recorded call produced, OPAQUE when it cannot be rebuilt, LEAF
+only for plain data. FOREIGN exists because a frozen token is a plain object, and calling it a leaf
+would hand the screen mutable raw data where the architecture keeps an authority object.
+
+W-3 was the prediction most likely to kill the slice and it held where it counts: of 12 witnesses, 6
+originally produced a minted token, and 6 of those 6 replayed to a token calculus.isAuthority
+accepts. The other 6 replayed a refusal, which proves nothing about branding, so they are counted
+separately rather than folded into a 12 of 12.
+
+W-5 is now structural rather than advisory. outcome.mjs carries 11 states and 3 verdicts, and a
+verdict is not something a probe returns but something a journey earns over DISCOVERED to
+BASELINE_REPLAYED to PERTURBATION_APPLIED to OBSERVED. A real witness that reached BASELINE_REPLAYED
+and asked for a verdict got INVARIANT_UNKNOWN naming the two stages it never reached. HELD is gated
+exactly as hard as VIOLATED, because a pass asserted over an experiment that never ran is the same
+error with a comfortable sign. The honest limit is stated in the file: nobody can stop a probe from
+returning its own object, but such an object is not a verdict and finding() refuses it.
+
+AND THE FIRST VERSION OF W-2b COULD NOT FIRE. It varied a field derive does not read, so the output
+was identical every time and the control passed while proving nothing - a vacuous control written
+inside the slice whose subject is vacuity. Found by running it, repaired by varying a field the
+subject actually consumes.
+
+W-8 was a prediction of no detection and it held: this slice contains no judgment and produced no
+finding about the repository. No coverage fraction is reported at all, because the authority surface
+has not been discovered and a better-looking fraction over the same unestablished surface would be
+the same error as the one it replaces.
+
+Two test files never used during development gave 30 of 30 replayed, and a mixed two-constructor
+recipe appeared on its own - a derive whose premises were a delegate and an observe.
+
+Focused 17/17. Suite 629/629.
+
+Message-File: scratch/m84.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
