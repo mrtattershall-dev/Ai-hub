@@ -75,6 +75,78 @@ export const ANY = Symbol('ANY');
 export const DIMENSIONS = ['repository', 'environment', 'invocation', 'implementation', 'history',
   'criterion'];
 
+// ---------------------------------------------------------------------------------------------------
+// PRODUCER #3 REPAIR — THE GATE IS NOW THE ONLY DOOR.
+//
+// admissibility.mjs has always held the gate deciding whether a NEW coordinate may exist, carrying the
+// entire anti-overfitting argument. Producer #3 showed BY EXECUTION that it was never wired to anything:
+// admitDimension answered `admitted: true` for pytest's collectionCohort and scope() dropped the
+// coordinate anyway, because scope(), covers() and joinConflicts() all read a module constant. THE
+// DECIDING PATH AND THE ADVISORY PATH WERE NOT THE SAME PATH.
+//
+// And worse than the drop, which was not predicted: two pytest verdicts for the SAME nodeid - one PASSED,
+// one FAILED, differing only in which other tests were collected alongside it - produced IDENTICAL scopes
+// over all six dimensions, no join conflict, and mutual coverage. THE CLOSED SET DID NOT MERELY LOSE
+// INFORMATION; IT REPORTED A CONTRADICTION AS AGREEMENT.
+//
+// Two things follow and both are enforced below.
+//
+//   NOTHING VANISHES    a coordinate outside the active set is RECORDED under UNADMITTED, never dropped.
+//                       Absent, unknown and unadmitted are three different states, and the producer #2
+//                       lesson - a fabricated coordinate is a lie, a vanished one is a different lie -
+//                       applies in this direction too.
+//   NOTHING SNEAKS IN   an unadmitted coordinate may NEVER defeat a comparison. covers() and
+//                       joinConflicts() do not read UNADMITTED at all, so RECORDING a difference cannot
+//                       become an EXCUSE for refusing to compare. That is the invariant admissibility.mjs
+//                       exists to protect and the repair must not trade one defect for it.
+//
+// THE MUTABLE REGISTRY IS A REAL HAZARD, named rather than hidden: module-level state makes test order
+// matter. It is accepted because the alternative - threading a registry through every caller - leaves the
+// DEFAULT path unwired, which is the defect being repaired. resetScopeDimensions() exists for hygiene,
+// and an admission must declare its own side of the CONTEXT/SUBJECT split because law 5 turns on it.
+import { admitDimension, registry, RELEVANCE, ARGUED_FROM } from './admissibility.mjs';
+
+export const UNADMITTED = 'UNADMITTED';
+
+const ARG = (name, side, argument) => ({ name, side, relevance: RELEVANCE.COMPARISON_ENTITLEMENT,
+  argument, arguedFrom: ARGUED_FROM.DESIGN, establishedAt: 'r3 ontology, before producer #3' });
+
+// The six, each stating the argument it has always rested on, so the gate is RUN on them rather than
+// them being privileged by having been hard-coded.
+const BASE_ENTRIES = [
+  ARG('repository', 'CONTEXT', 'a claim established against one tree is not established against another'),
+  ARG('environment', 'CONTEXT', 'interpreter and platform change what the same source does'),
+  ARG('history', 'CONTEXT', 'a doctest example after two others asserts SOURCE x EXECUTION HISTORY'),
+  ARG('criterion', 'CONTEXT', 'two authorities applying different criteria are not disagreeing'),
+  ARG('invocation', 'SUBJECT', 'which call was made is part of what the claim is about'),
+  ARG('implementation', 'SUBJECT', 'which code object ran is part of what the claim is about'),
+];
+
+let ENTRIES = [...BASE_ENTRIES];
+let ACTIVE = registry(ENTRIES);
+
+const activeDims = () => ACTIVE.discriminating();
+const sideOf = (name) => (ENTRIES.find((e) => e.name === name) || {}).side;
+
+// THE ONLY DOOR. A coordinate reaches comparison through the gate or it does not reach it at all, and a
+// refusal comes back WITH ITS REASON rather than as silence.
+export function admitScopeDimension(entry) {
+  if (!entry || !entry.side || !['CONTEXT', 'SUBJECT'].includes(entry.side)) {
+    return { admitted: false, name: entry && entry.name,
+      why: 'a scope dimension must declare its SIDE - CONTEXT (the world a claim was established in) or'
+        + ' SUBJECT (what the claim is about). Law 5 turns on that split and it may not be defaulted.' };
+  }
+  const r = admitDimension(entry);
+  if (!r.admitted) return r;                        // refused, with a reason; nothing changes
+  if (activeDims().includes(entry.name)) return { ...r, alreadyActive: true };
+  ENTRIES = [...ENTRIES, entry];
+  ACTIVE = registry(ENTRIES);
+  return r;
+}
+
+export const scopeDimensions = () => [...activeDims()];
+export function resetScopeDimensions() { ENTRIES = [...BASE_ENTRIES]; ACTIVE = registry(ENTRIES); }
+
 // LAW 5 — COMPOSITIONAL ENTITLEMENT.
 //
 //     INDIVIDUALLY JUSTIFIED CLAIMS MAY COMPOSE ONLY OVER A COMPATIBLE CONTEXT, OR THROUGH AN
@@ -97,11 +169,19 @@ export const DIMENSIONS = ['repository', 'environment', 'invocation', 'implement
 export const CONTEXT_DIMENSIONS = ['repository', 'environment', 'history', 'criterion'];
 export const SUBJECT_DIMENSIONS = ['invocation', 'implementation'];
 
+// The ACTIVE split, which is the base six plus whatever the gate has admitted. The two constants above
+// stay exported unchanged so existing readers are unaffected.
+const contextDims = () => activeDims().filter((d) => sideOf(d) === 'CONTEXT');
+
 // Concrete-and-different on a CONTEXT dimension blocks a join. A dimension either side leaves open is not
 // a conflict - it is simply unestablished, and that is handled by covers().
+//
+// UNADMITTED IS NOT READ HERE, deliberately. A difference the gate has not admitted is recorded and
+// IGNORED; letting it block a join is how an accidental difference becomes an excuse, which is the exact
+// failure admissibility.mjs was written to prevent.
 export function joinConflicts(a, b) {
   const out = [];
-  for (const d of CONTEXT_DIMENSIONS) {
+  for (const d of contextDims()) {
     const x = a[d]; const y = b[d];
     if (x === null || x === undefined || y === null || y === undefined) continue;
     if (x === ANY || y === ANY) continue;
@@ -110,17 +190,33 @@ export function joinConflicts(a, b) {
   return out;
 }
 
+// A coordinate outside the active set is RECORDED, never dropped. The key appears only when there is
+// something to record, so a scope built from declared coordinates alone is byte-identical to before.
+// An already-carried UNADMITTED block is MERGED rather than discarded - the first version of this repair
+// filtered the key out and quietly threw the carried coordinates away, which is the same defect wearing a
+// third face. Flattening also gives PROMOTION for free: when the gate later admits a coordinate, a scope
+// that has been carrying it unadmitted starts reading it as a discriminating dimension, with no
+// re-observation and no rewriting of the stored record.
 export function scope(partial = {}) {
+  const active = activeDims();
+  const carried = (partial[UNADMITTED] && typeof partial[UNADMITTED] === 'object')
+    ? partial[UNADMITTED] : {};
+  const flat = { ...carried, ...partial };
+  delete flat[UNADMITTED];
   const s = {};
-  for (const d of DIMENSIONS) s[d] = Object.hasOwn(partial, d) ? partial[d] : null;
+  for (const d of active) s[d] = Object.hasOwn(flat, d) ? flat[d] : null;
+  const extras = Object.keys(flat).filter((k) => !active.includes(k));
+  if (extras.length) s[UNADMITTED] = Object.fromEntries(extras.map((k) => [k, flat[k]]));
   return s;
 }
 
 // Is `granted` broad enough to license `required`? null means "not established over this dimension at
 // all", which licenses nothing. ANY licenses anything. Otherwise the values must match exactly.
+//
+// UNADMITTED is not read here either, and for the same reason.
 export function covers(granted, required) {
   const missing = [];
-  for (const d of DIMENSIONS) {
+  for (const d of activeDims()) {
     const g = granted[d]; const r = required[d];
     if (r === null || r === undefined) continue;          // the consumer does not care about this axis
     if (g === ANY) continue;

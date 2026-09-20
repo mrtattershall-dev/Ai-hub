@@ -455,3 +455,83 @@ Both are r4 work. Neither may be repaired in r3.
                  lexicographic tiebreak made that choice.
 
 ---
+## Entry 11 — r4: producer #3 (pytest). The closed dimension set REPORTED A CONTRADICTION AS AGREEMENT
+
+    objective    the one justified investigation from Entry 10: is scope construction producer-agnostic,
+                 or merely doctest-UNION-git shaped?
+    authority    P3-SELECTION and predictions P3-1..P3-10, frozen ALONE in 0baca08 before any candidate
+                 was named
+    start hash   17edf5e (pre-repair state committed separately, before any repair existed)
+    evidence     benchmarks/producer3-selection.mjs, legasus/legaexternal/pytest-producer.mjs,
+                 legasus/legaexternal/producer3.test.mjs (12 tests), benchmarks/RESULT.producer3.md
+
+    RESULT   P3-1..P3-7 HELD pre-repair; P3-8, P3-9, P3-10, P3-10b HELD post-repair.
+             456 tests, 456 pass. Frozen r3 numbers re-run unchanged: 56/56, 44/44, 142/142,
+             subsumption 56/56 and 51/51.
+
+    SELECTION HALF-WORKED AND THAT IS RECORDED. The replacement ordering criterion - FOREIGN-COORDINATE
+    COUNT - spread 2 / 1 / 0 where P2's saturated at 7/7 for every candidate, and the eligibility filter
+    did visible work (sqlite3 scored 2 foreign coordinates and was refused for not being a fact Legasus
+    has reason to consume). But three candidates tied at 2, the git tiebreak saturated at 7 among them,
+    and THE LEXICOGRAPHIC TIEBREAK DECIDED A SECOND TIME.
+    P3-SELECTION-ORDERING = DISCRIMINATING BUT NOT DECISIVE.
+    And the ranking is MY coordinate assignment; every arguable coordinate was resolved CONSERVATIVELY,
+    which biases against the hypothesis the experiment wanted to confirm.
+
+    THE FOREIGN COORDINATE IS DEMONSTRATED, NOT ASSERTED.
+
+        pytest test_cohort.py::test_b      test_b PASSED
+        pytest test_cohort.py              test_b FAILED
+
+    Same nodeid, same bytes, same interpreter, same criterion. Only the COLLECTION COHORT differs - a set
+    test_b is not the only member of, named by none of the six.
+
+    THE DISCOVERY, WHICH THE PREREGISTRATION DID NOT PREDICT AND WHICH IS THEREFORE NOT COUNTED AS A
+    CONFIRMED PREDICTION. The prereg predicted a silent DROP and that held. This is worse:
+
+        native results   PASSED vs FAILED      scopes  IDENTICAL on all six
+        joinConflicts    []                    covers  ok: true
+
+    THE CLOSED DIMENSION SET DID NOT MERELY LOSE INFORMATION - IT REPORTED A CONTRADICTION AS AGREEMENT.
+    A dropped coordinate is a gap; this is a gap that MANUFACTURES CONSENSUS, and a ledger built on it
+    would record two incompatible verdicts as mutually supporting.
+
+    THREE APPARATUS FAILURES OF MY OWN, ALL INSIDE THE REPAIR.
+      1. THE FIRST REPAIR PASSED ITS OWN TESTS WHILE THE DEFECT SURVIVED ONE LAYER UP. I fixed scope() to
+         record rather than drop - and the ADAPTER discarded collectionCohort before scope() ever saw it.
+         The suite went green at 452/452 with the contradiction fully intact. Found by EXECUTING the
+         pipeline end to end, not by reasoning about it. Fix the DECIDING path, not the advisory one -
+         a lesson already paid for here, re-learned inside the fix for that same lesson.
+      2. My scope() merge FILTERED OUT the UNADMITTED key to avoid nesting, silently discarding everything
+         the adapter had just carried. The same defect wearing a third face.
+      3. pluginSet carried a MEMORY ADDRESS - list_name_plugin() names some entries str(id(obj)) - so the
+         coordinate changed every run. A distinction manufactured out of a heap pointer, which is exactly
+         the accidental difference the anti-overfitting law exists to refuse. Caught only because a
+         failing test printed the value.
+
+    THE REPAIR MAKES THE GATE THE ONLY DOOR. admissibility.mjs had always held admitDimension, registry,
+    comparisonDefeat and discriminatingProjection, with the entire anti-overfitting argument behind them,
+    and NOTHING CONSUMED ANY OF IT. Now scope(), covers() and joinConflicts() read the ACTIVE REGISTRY;
+    an unmapped coordinate is RECORDED under UNADMITTED, never dropped; UNADMITTED is NOT READ by covers()
+    or joinConflicts(), so recording a difference can never become an excuse for refusing to compare;
+    admitScopeDimension() is the only way in, requires the entry to declare its CONTEXT/SUBJECT side
+    because law 5 turns on that split, and REFUSES WITH A REASON while changing nothing; and admission
+    PROMOTES a coordinate already being carried, with no re-observation and no rewriting of any record.
+
+    THE PAYOFF: once collectionCohort is admitted on pytest's documented fixture semantics, the two
+    verdicts STOP BEING A CONTRADICTION. They become claims about DIFFERENT SUBJECTS, refused a comparison
+    for a stated, independently argued reason. That is what the architecture always claimed and had never
+    implemented.
+
+    NOT ESTABLISHED. Three producers is not "generic" - it is two bends and two repairs. The six still
+    cannot explain the pytest contradiction on their own; the repair built the DOOR, it did not add a
+    dimension, and nothing here argues collectionCohort should be standing. The MUTABLE MODULE-LEVEL
+    REGISTRY is a real hazard, named in the source rather than hidden. win32, pytest 9.1.1.
+
+    AND REPO D IS NOW FURTHER AWAY, NOT CLOSER. This is another architecture change, and the frozen burn
+    rule says r4's prospective test cannot begin while r4 is still changing. Every repair tonight has
+    extended that block. That is a cost, and it is recorded as one.
+
+    next         re-run the QUIESCE check against the new state rather than assume the answer.
+
+---

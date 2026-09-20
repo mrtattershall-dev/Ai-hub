@@ -20,6 +20,7 @@
 // on the downstream authority decisions - exactly the illegalCompression test. A collapse is legitimate
 // only when no consumer distinguishes the collapsed states.
 import { OBSERVABILITY } from '../legaknow/observation.mjs';
+import { UNADMITTED } from '../legaknow/justification.mjs';
 
 // The declared mapping. Anything not named here is UNKNOWN_MAPPING by construction rather than by
 // oversight, so adding a producer cannot silently acquire a default.
@@ -50,14 +51,30 @@ export function adaptRecord(rec, { mapping = DOCTEST_MAPPING } = {}) {
     //
     // A coordinate the producer cannot establish is now ABSENT rather than invented. Absent is not the
     // same as unknown and neither is the same as a string that looks like data.
+    // AND A COORDINATE THE ADAPTER CANNOT MAP IS CARRIED, NOT DROPPED.
+    //
+    // Producer #3 found this the hard way. scope() was repaired to record an unmappable coordinate under
+    // UNADMITTED instead of dropping it - and the repair was UNREACHED, because the adapter discarded
+    // pytest's collectionCohort before scope() ever saw it. The fix passed its own tests while the defect
+    // survived one layer up. THE DECIDING PATH IS THE ONE THAT MUST BE FIXED, and finding it took
+    // executing the pipeline rather than reasoning about it.
+    //
+    // So the mapping is DECLARED, and every identity key it does not consume is carried explicitly.
+    // Carrying is not squeezing: an unmapped coordinate never becomes a value of a declared dimension.
     scope: (() => {
-      const sc = { criterion: rec.identity.producer + ' ' + rec.identity.producerVersion };
-      if (rec.identity.document !== undefined && rec.identity.ordinal !== undefined) {
-        sc.history = rec.identity.document + '#' + rec.identity.ordinal;
+      const id = rec.identity;
+      const sc = { criterion: id.producer + ' ' + id.producerVersion };
+      const consumed = new Set(['producer', 'producerVersion']);
+      if (id.document !== undefined && id.ordinal !== undefined) {
+        sc.history = id.document + '#' + id.ordinal;
+        consumed.add('document'); consumed.add('ordinal');
       }
-      if (rec.identity.object !== undefined) sc.implementation = rec.identity.object;
-      if (rec.identity.head !== undefined && rec.identity.head !== null) {
-        sc.repository = rec.identity.head;
+      if (id.object !== undefined) { sc.implementation = id.object; consumed.add('object'); }
+      if (id.head !== undefined && id.head !== null) { sc.repository = id.head; consumed.add('head'); }
+      if (id.invocation !== undefined) { sc.invocation = id.invocation; consumed.add('invocation'); }
+      const unmapped = Object.keys(id).filter((k) => !consumed.has(k) && id[k] !== undefined);
+      if (unmapped.length) {
+        sc[UNADMITTED] = Object.fromEntries(unmapped.map((k) => [k, id[k]]));
       }
       return sc;
     })(),

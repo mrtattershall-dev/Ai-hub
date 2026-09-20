@@ -36,7 +36,12 @@ const PLUGIN = [
   '                     "outcome": report.outcome.upper()})',
   'def pytest_sessionfinish(session, exitstatus):',
   '    out = {"exitstatus": int(exitstatus), "cohort": list(_collected),',
-  '           "plugins": sorted(n for n, _ in session.config.pluginmanager.list_name_plugin()),',
+  // list_name_plugin() names some entries str(id(obj)), which CHANGES EVERY RUN. Carrying those would
+  // manufacture a distinction out of a MEMORY ADDRESS - the exact accidental difference the
+  // anti-overfitting law exists to refuse, and it was caught only because a test printed the value.
+  // Only stably-named plugins are part of the coordinate.
+  '           "plugins": sorted(n for n, _ in session.config.pluginmanager.list_name_plugin()',
+  '                             if n and not n.isdigit()),',
   '           "records": _records}',
   '    with open(os.environ["LEGA_PYTEST_OUT"], "w", encoding="utf-8") as fh:',
   '        json.dump(out, fh)',

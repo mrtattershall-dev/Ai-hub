@@ -8,9 +8,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runPytestProducer } from './pytest-producer.mjs';
 import { adaptRecord } from './adapt.mjs';
-import { scope, covers, joinConflicts, CONTEXT_DIMENSIONS, SUBJECT_DIMENSIONS }
-  from '../legaknow/justification.mjs';
-import { admitDimension, RELEVANCE, ARGUED_FROM } from '../legaknow/admissibility.mjs';
+import { scope, covers, joinConflicts, CONTEXT_DIMENSIONS, SUBJECT_DIMENSIONS, UNADMITTED,
+  admitScopeDimension, scopeDimensions, resetScopeDimensions } from '../legaknow/justification.mjs';
+import { admitDimension, registry, comparisonDefeat, RELEVANCE, ARGUED_FROM }
+  from '../legaknow/admissibility.mjs';
 
 const NL = String.fromCharCode(10);
 const SIX = [...CONTEXT_DIMENSIONS, ...SUBJECT_DIMENSIONS];
@@ -63,12 +64,96 @@ test('P3-1 — the foreign coordinate is a REAL distinction the producer makes, 
     rmSync(dir, { recursive: true, force: true });
   });
 
-test('P3-2 — THE HYPOTHESIS: scope() SILENTLY DROPS a coordinate outside the six', () => {
+// P3-2 HELD PRE-REPAIR and is pinned in git history at 17edf5e, where this asserted the coordinate was
+// simply GONE. After the repair the same assertion would still pass - the key is not a top-level property
+// either way - so keeping it unchanged would be a test that looks green while its meaning drifted. It is
+// restated to assert the behaviour that now has to hold.
+test('P3-2 (restated post-repair) — the foreign coordinate is RECORDED, not dropped', () => {
   const s = scope({ invocation: 'test_cohort.py::test_b', collectionCohort: 'a b', pluginSet: 'x' });
-  assert.equal(Object.hasOwn(s, 'collectionCohort'), false, 'the foreign coordinate is gone');
-  assert.equal(Object.hasOwn(s, 'pluginSet'), false);
-  // no error, no record, no UNKNOWN - it simply is not there
+  assert.equal(s.collectionCohort, undefined, 'it is still not a discriminating dimension');
+  assert.equal(s[UNADMITTED].collectionCohort, 'a b', 'but it is PRESENT and readable');
+  assert.equal(s[UNADMITTED].pluginSet, 'x');
   assert.equal(s.invocation, 'test_cohort.py::test_b');
+});
+
+test('P3-8 — a foreign coordinate can no longer silently vanish, end to end', () => {
+  const rec = { nodeid: 't.py::b', nativeResult: 'PASSED', nativeDetails: {},
+    identity: { producer: 'pytest', producerVersion: '8', invocation: 't.py::b',
+      collectionCohort: 'A B', pluginSet: 'P' } };
+  // through the ADAPTER...
+  const adapted = adaptRecord(rec);
+  assert.equal(adapted.scope[UNADMITTED].collectionCohort, 'A B',
+    'the adapter carries what it cannot map');
+  // ...and through scope(), which is where the first version of this repair silently threw it away again
+  const s = scope(adapted.scope);
+  assert.equal(s[UNADMITTED].collectionCohort, 'A B', 'and scope() MERGES rather than discards');
+  assert.equal(s[UNADMITTED].pluginSet, 'P');
+  assert.equal(JSON.stringify(s).includes('A B'), true);
+});
+
+test('P3-9 — an UNADMITTED coordinate may NOT defeat a comparison', () => {
+  resetScopeDimensions();
+  const a = scope({ invocation: 'n', criterion: 'pytest 8', collectionCohort: 'A' });
+  const b = scope({ invocation: 'n', criterion: 'pytest 8', collectionCohort: 'A B' });
+  assert.notDeepEqual(a[UNADMITTED], b[UNADMITTED], 'the difference is RECORDED');
+  assert.deepEqual(joinConflicts(a, b), [],
+    'and it does NOT block the join - recording a difference must never become an excuse');
+  assert.equal(covers(a, b).ok, true, 'nor defeat coverage');
+
+  // the anti-overfitting audit says the same thing, in its own words
+  const reg = registry([{ name: 'criterion', relevance: RELEVANCE.COMPARISON_ENTITLEMENT,
+    argument: 'authorities applying different criteria are not disagreeing',
+    arguedFrom: ARGUED_FROM.DESIGN }]);
+  const d = comparisonDefeat({ a: { criterion: 'x', collectionCohort: 'A' },
+    b: { criterion: 'x', collectionCohort: 'A B' }, reg });
+  assert.equal(d.defeats, false);
+  assert.deepEqual(d.incidental, ['collectionCohort']);
+});
+
+test('P3-10 — admitting a dimension NARROWS authority; it never widens it', () => {
+  resetScopeDimensions();
+  const before = scopeDimensions().length;
+
+  // what was refused before must not become admitted merely because a new dimension exists
+  const granted = scope({ criterion: 'pytest 8' });
+  const askedFor = scope({ criterion: 'pytest 8', invocation: 'n' });
+  const refusedBefore = covers(granted, askedFor).ok;
+  assert.equal(refusedBefore, false, 'the control: this was refused before the admission');
+
+  const v = admitScopeDimension({ name: 'collectionCohort', side: 'CONTEXT',
+    relevance: RELEVANCE.COMPARISON_ENTITLEMENT,
+    argument: 'pytest builds module- and session-scoped fixtures once per session and reuses them, so a'
+      + ' verdict for one nodeid is conditional on which other nodes were collected.',
+    arguedFrom: ARGUED_FROM.SPECIFICATION, establishedAt: 'producer #3 prereg, 0baca08' });
+  assert.equal(v.admitted, true);
+  assert.equal(scopeDimensions().length, before + 1);
+  assert.equal(covers(granted, askedFor).ok, false, 'still refused - authority did not widen');
+
+  // and the newly admitted coordinate is now DISCRIMINATING, which is strictly narrowing
+  const a = scope({ criterion: 'c', collectionCohort: 'A' });
+  const b = scope({ criterion: 'c', collectionCohort: 'A B' });
+  assert.equal(a.collectionCohort, 'A', 'PROMOTED out of UNADMITTED into a real dimension');
+  assert.equal(joinConflicts(a, b).length, 1, 'and NOW it is entitled to block the join');
+  assert.equal(covers(a, b).ok, false);
+  resetScopeDimensions();
+});
+
+test('P3-10b — the gate REFUSES with a reason, and a refusal changes nothing', () => {
+  resetScopeDimensions();
+  const before = scopeDimensions().slice();
+
+  const noSide = admitScopeDimension({ name: 'wallClock',
+    relevance: RELEVANCE.COMPARISON_ENTITLEMENT, argument: 'x', arguedFrom: ARGUED_FROM.DESIGN });
+  assert.equal(noSide.admitted, false);
+  assert.match(noSide.why, /must declare its SIDE/);
+
+  const circular = admitScopeDimension({ name: 'phaseOfMoon', side: 'CONTEXT',
+    relevance: RELEVANCE.COMPARISON_ENTITLEMENT,
+    argument: 'the two runs differed on it, which explains the discrepancy',
+    arguedFrom: ARGUED_FROM.OBSERVED_DISCREPANCY });
+  assert.equal(circular.admitted, false, 'explanatory power does not grant discriminative authority');
+
+  assert.deepEqual(scopeDimensions(), before, 'a refusal leaves the active set untouched');
 });
 
 test('P3-5 — NON-VACUITY CONTROL: a coordinate that IS one of the six survives scope() intact', () => {
@@ -79,7 +164,11 @@ test('P3-5 — NON-VACUITY CONTROL: a coordinate that IS one of the six survives
   // without this, "silently dropped" would pass for free
 });
 
-test('P3-3 — admitDimension says YES and it changes NOTHING. Shown by EXECUTION, not by import-grep',
+// P3-3 HELD PRE-REPAIR and STILL HOLDS, which is deliberate rather than an unfixed defect. admitDimension
+// is the JUDGEMENT and it remains inert on its own; admitScopeDimension is the DOOR. Keeping the raw gate
+// callable and inert is itself a trap - someone may call it and believe something happened - so the fact
+// is pinned here by execution rather than left to be rediscovered.
+test('P3-3 — admitDimension alone is a JUDGEMENT, not a door; only admitScopeDimension changes anything',
   () => {
     const verdict = admitDimension({
       name: 'collectionCohort',
@@ -92,16 +181,24 @@ test('P3-3 — admitDimension says YES and it changes NOTHING. Shown by EXECUTIO
     });
     assert.equal(verdict.admitted, true, 'the GATE admits it: ' + verdict.why);
 
-    // AND THE ADMISSION IS INERT. scope() reads a module constant; nothing feeds the gate's answer in.
+    // PRE-REPAIR (17edf5e) the coordinate was DROPPED here. It is now recorded, but it is still not a
+    // discriminating dimension - because admitDimension by itself feeds nothing into the active set.
+    resetScopeDimensions();
     const s = scope({ invocation: 'n', collectionCohort: 'a b' });
-    assert.equal(Object.hasOwn(s, 'collectionCohort'), false,
-      'ADMITTED and still dropped - the deciding path and the advisory path are not the same path');
+    assert.equal(s.collectionCohort, undefined, 'the raw gate alone promotes nothing');
+    assert.equal(s[UNADMITTED].collectionCohort, 'a b', 'though it is no longer thrown away');
+    assert.equal(scopeDimensions().includes('collectionCohort'), false);
   });
 
-// NOT A FROZEN PREDICTION. The prereg predicted a silent DROP (P3-2) and it holds. This is worse than
-// what was predicted and it was not predicted, so it is labelled a DISCOVERY and not counted as a
-// confirmed prediction. P3-9 keeps its frozen meaning: a POST-REPAIR requirement, tested below.
-test('DISCOVERY (beyond the prereg) — the closed dimension set ADMITS A CONTRADICTION', () => {
+// NOT A FROZEN PREDICTION. The prereg predicted a silent DROP and it held. This was worse and was NOT
+// predicted, so it is a DISCOVERY and is not counted as a confirmed prediction.
+//
+// PRE-REPAIR, pinned at 17edf5e: the two scopes were deepEqual, joinConflicts returned [] and each
+// covered the other - a CONTRADICTION REPORTED AS AGREEMENT. This now asserts the repaired behaviour,
+// and the six dimensions STILL cannot explain the disagreement. That has not changed and is not claimed
+// to have. What changed is that the difference is now VISIBLE, and can be made discriminating THROUGH
+// THE GATE rather than by editing a constant.
+test('DISCOVERY (beyond the prereg), now repaired — the contradiction is visible and explicable', () => {
   const dir = suite();
   const alone = runPytestProducer({ dir, select: ['test_cohort.py::test_b'] });
   const together = runPytestProducer({ dir, select: ['test_cohort.py'] });
@@ -110,15 +207,40 @@ test('DISCOVERY (beyond the prereg) — the closed dimension set ADMITS A CONTRA
 
   assert.notEqual(a.native.result, b.native.result, 'the producer genuinely disagrees with itself');
 
+  resetScopeDimensions();
   const sa = scope(a.scope);
   const sb = scope(b.scope);
-  assert.deepEqual(sa, sb, 'yet the two scopes are IDENTICAL on all six dimensions');
-  assert.deepEqual(joinConflicts(sa, sb), [],
-    'so the join gate sees NO conflict and would let these two compose');
-  assert.equal(covers(sa, sb).ok, true, 'and each covers the other');
 
-  // THIS IS WORSE THAN A DROPPED COORDINATE. The closed dimension set does not merely lose information -
-  // it admits a CONTRADICTION it has no vocabulary to explain, and reports the two as comparable.
+  // THE SIX STILL CANNOT EXPLAIN IT. That is unchanged by the repair and is not claimed to be.
+  for (const d of SIX) assert.equal(sa[d], sb[d], d + ' is identical across the two runs');
+
+  // WHAT CHANGED: the difference is no longer invisible.
+  assert.notEqual(sa[UNADMITTED].collectionCohort, sb[UNADMITTED].collectionCohort);
+
+  // and it is still not entitled to defeat the comparison, because the gate has not admitted it
+  assert.deepEqual(joinConflicts(sa, sb), []);
+  assert.equal(covers(sa, sb).ok, true);
+
+  // NOW TAKE IT THROUGH THE GATE. This is the path that did not exist before the repair.
+  const v = admitScopeDimension({ name: 'collectionCohort', side: 'CONTEXT',
+    relevance: RELEVANCE.COMPARISON_ENTITLEMENT,
+    argument: 'pytest builds module- and session-scoped fixtures once per session and reuses them, so a'
+      + ' verdict for one nodeid is conditional on which other nodes were collected. Argued from'
+      + " pytest's documented fixture-scope semantics, not from this disagreement.",
+    arguedFrom: ARGUED_FROM.SPECIFICATION, establishedAt: 'producer #3 prereg, 0baca08' });
+  assert.equal(v.admitted, true);
+
+  const ta = scope(a.scope);
+  const tb = scope(b.scope);
+  assert.equal(ta.collectionCohort, a.scope[UNADMITTED].collectionCohort, 'promoted, no re-observation');
+  const conflicts = joinConflicts(ta, tb);
+  assert.equal(conflicts.length, 1, 'and NOW the join is correctly refused');
+  assert.equal(conflicts[0].dimension, 'collectionCohort');
+
+  // THE POINT. The two verdicts are no longer a contradiction at all - they are claims about DIFFERENT
+  // SUBJECTS, refused a comparison for a stated and independently argued reason. That is what the
+  // architecture always claimed and had never implemented.
+  resetScopeDimensions();
   rmSync(dir, { recursive: true, force: true });
 });
 

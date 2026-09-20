@@ -1,0 +1,45 @@
+producer #3 repair: the gate is now the only door - and my first fix passed its own tests while the defect survived one layer up
+
+THE REPAIR. admissibility.mjs had always held admitDimension, registry, comparisonDefeat and
+discriminatingProjection, carrying the entire anti-overfitting argument, and NOTHING CONSUMED ANY OF IT.
+Now scope(), covers() and joinConflicts() read the ACTIVE REGISTRY instead of a module constant; a
+coordinate outside the active set is RECORDED under UNADMITTED, never dropped; UNADMITTED is NOT READ by
+covers() or joinConflicts(), so recording a difference can never become an excuse for refusing to compare;
+admitScopeDimension() is the only way in, it requires the entry to declare its CONTEXT/SUBJECT side
+because law 5 turns on that split, and a refusal comes back WITH ITS REASON and changes nothing; and
+admission PROMOTES a coordinate already being carried, with no re-observation and no record rewritten.
+
+THE PAYOFF. Once collectionCohort is admitted on pytest's documented fixture semantics, the two verdicts
+STOP BEING A CONTRADICTION. They become claims about DIFFERENT SUBJECTS, refused a comparison for a stated
+and independently argued reason. That is what the architecture always claimed and had never implemented.
+
+THREE APPARATUS FAILURES OF MY OWN, ALL INSIDE THIS REPAIR, AND THE FIRST IS THE ONE THAT MATTERS.
+
+  1. I fixed scope() to record rather than drop, and THE ADAPTER DISCARDED THE COORDINATE BEFORE scope()
+     EVER SAW IT. The suite went green at 452/452 with the contradiction fully intact. Found by EXECUTING
+     the pipeline end to end, not by reasoning about it. Fix the DECIDING path, not the advisory one - a
+     lesson already paid for in this project, re-learned inside the fix for that same lesson.
+  2. My scope() merge FILTERED OUT the UNADMITTED key to avoid nesting, silently discarding everything the
+     adapter had just carefully carried. The same defect wearing a third face.
+  3. pluginSet carried a MEMORY ADDRESS - list_name_plugin() names some entries str(id(obj)) - so the
+     coordinate changed every run. A distinction manufactured out of a heap pointer, which is exactly the
+     accidental difference the anti-overfitting law exists to refuse. Caught only because a failing test
+     printed the value.
+
+P3-8, P3-9, P3-10 and P3-10b all hold. P3-9 was the hardest and the likeliest to fail, and the prereg said
+why: the obvious repair, making scope() open-ended, VIOLATES the invariant that an unadmitted coordinate
+must never defeat a comparison. It is enforced structurally - the two comparison functions do not read
+UNADMITTED at all - and checked twice, once directly and once through comparisonDefeat's own audit.
+
+456 tests, 456 pass. Frozen r3 re-run unchanged: 56/56, 44/44, 142/142, subsumption 56/56 and 51/51.
+
+NOT ESTABLISHED: three producers is not "generic", it is two bends and two repairs. The six still cannot
+explain the pytest contradiction on their own - the repair built the DOOR, it did not add a dimension. The
+MUTABLE MODULE-LEVEL REGISTRY is a real hazard and is named in the source rather than hidden.
+
+AND REPO D IS NOW FURTHER AWAY, NOT CLOSER. Every repair tonight extended the burn-rule block on r4's
+prospective test. That is a cost and it is recorded as one.
+
+Message-File: scratch/m20.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
