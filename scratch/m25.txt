@@ -1,25 +1,41 @@
-Preregister the composition attacks: ten hypotheses, predicted outcomes and controls, before any attack runs
+preregister the Odysseus x Legasus integration BEFORE any glue exists, and declare the two constraints while they are still cheap
 
-Development authority for r4 was granted at aa03ab9 with three boundaries: r3 immutable, Repo D
-unselected and uninspected, nothing published. The starting observation is QUIESCENT_CONTEST, re-run
-and reproduced at this commit, and the suite at 464 (462 under the two-level glob plus 2 under
-legalabs/substrate - the ledger counted by find, the earlier session by glob; no discrepancy).
+AUTHORITY. QUIESCENT_CONTEST was correct and is not being overridden by a manufactured objective. This is
+an OWNER grant, which is the one thing in the calculus that changes entitlement without deriving it -
+OWNER is an axiom, not a conclusion. The six open questions are unchanged and FREEZE_R4_AND_SELECT_REPO_D
+remains declined.
 
-The first target is authority created under composition, held as a zero-authority handoff
-hypothesis. Ten cases were derived from READING the implementations and none has been executed:
-a never-established intermediate laundering a context dimension through entitled() (C1); calculus
-and justification disagreeing about what absence means (C2); the authority brand being recoverable
-from any real token (C3); UNADMITTED promotion by name across producers (C4); the reserved key being
-admissible as a dimension (C5); scope() dropping a shadowed carried value (C6); node identity
-excluding scope so add() overwrites across worlds (C7); the provenance ledger's last-wins digests
-and a seal that does not cover attribution (C8); a pending string holding the frontier open forever
-and a TERMINAL verdict measured by path (C9); one duplicated vocabulary entry (C10).
+THE QUESTION IS NOT WHETHER THE COMBINATION IS BETTER. It is whether an independently designed agent
+platform can operate NORMALLY while Legasus observes and governs, WITHOUT Odysseus becoming
+Legasus-shaped. Any capability claim extracted from this run is out of scope, because the run is not
+designed to support one.
 
-Each names the existing invariant it is expected to fall under, so a repair lands in an
-implementation rather than in a new law. Each has a control that a refusal machine could not pass.
-The threatened historical results are named in advance. A predicted defect that does not reproduce
-is a falsification of mine and is kept.
+C1 - THE DISPOSABLE REPOSITORY IS DECLARED NOT REPO D, IN ADVANCE, AND IS BURNED BY THIS EXPERIMENT. A
+repository silently promoted to Repo D after r4 has seen it would LOOK like prospective validation and be
+nothing of the kind. Declaring it first is the whole point.
+
+C2 - THIS MOVES AWAY FROM REPO D, NOT TOWARD IT. The owner's lifting condition is that adversarial
+composition stops exposing new authority defects. A new composition surface will, if it is any good,
+expose more. That is why it is worth running AND it is the cost. It must not later be reported as
+progress toward Repo D.
+
+WHY THIS IS A BETTER TEST THAN PRODUCER #4 WOULD HAVE BEEN. Producer #4 was refused partly because I
+would be choosing a producer convenient to my own abstraction. Odysseus was designed by someone else for
+another purpose and will carry coordinates Legasus has no name for - session, agent identity, tool-call
+id, model version - with no regard for whether Legasus can represent them. That makes it an INDEPENDENT
+test of tonight's UNADMITTED repair rather than a self-selected one.
+
+I6 IS THE SHARPEST PREDICTION AND THE ONE I EXPECT TO BE HARDEST. The agent is made to claim success on a
+change that is broken, and THE CLAIM MUST NOT MOVE THE VERDICT. An autonomous worker cannot be allowed to
+mint entitlement by asserting it. That is the entire architecture compressed into one test.
+
+I5 is the non-vacuity control: without a REFUSAL that names its cause, I4's commit is unfalsifiable and
+"it worked" means nothing. I1 and I8 are the layering thesis itself - if Odysseus needs modification, or
+if the calculus has to move to accept it, THAT IS THE RESULT and it is recorded rather than engineered
+away.
+
+NO GLUE EXISTS YET. NO REPOSITORY HAS BEEN CREATED OR BURNED. NOTHING HAS BEEN STARTED.
 
 Message-File: scratch/m25.txt
 
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
