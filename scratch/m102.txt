@@ -1,0 +1,43 @@
+BACKWARD-1 on Legasus: the two surfaces are disjoint, three defects were mine, and the hub was not run
+
+Sink-seeded discovery, with the only inputs being six sink CLASSES and twelve Node platform module
+boundaries. No file, function or API of the subject is named anywhere in the mechanism, and the sink
+shim wraps every export of a boundary module discovered at load time, so nothing picks the
+interesting functions.
+
+THE PROSPECTIVE SUBJECT WAS NOT TOUCHED. The preregistration says the hub is run once after the
+mechanism is frozen; the mechanism took three repairs during this slice, so it is not frozen, and
+running it now would have burned the only unspoiled transfer test for nothing.
+
+4,132 effects witnessed, 2,245 production-reached. And BK-4 came out at ZERO: forward only 10,
+backward only 42, INTERSECTION 0. On this repository the brand-seeded surface and the sink-seeded
+surface do not overlap at all. Forward discovery finds the authority calculus, which nothing in
+production consumes; backward discovery finds snapshot, restore, run-a-program and run-git, which are
+authority-bearing by any reading and not one of which is on the forward surface. That is stronger
+than neither-direction-is-sufficient: forward discovery has zero overlap with everything that
+actually happens.
+
+THREE DEFECTS IN MY OWN LAYER, TWO OF THEM SILENT. The first resolve hook redirected fs for every
+importer including Node's own module machinery, and the child produced no output at all and exited 0
+- the failure class this project hunts, committed in the loader built to hunt it. The stack-frame
+pattern recognised a path by its prefix and stopped at the first colon, so every ESM frame on Windows
+was dropped and the run reported PRODUCTION_REACHED 0 with complete confidence: an unparsed
+representation became a measured absence. And the first backdoor rule called any export test-only
+when only tests mentioned it, which flagged 192 exports including a plain function and a constant -
+conflating a property of the repository with a property of the export, which is the representation
+leakage this line of work exists to detect.
+
+A control corrected the reachability rule too. The signal is that production code cannot call a
+module-private binding from outside that module, so if control entered production at a private
+function the path required test-only accessibility, whatever shape the backdoor took.
+
+BK-3 IS THE SUBSTANTIVE CLAIM AND IT IS NOT TESTED. Four private functions sit on witnessed effect
+paths, but appearing on a path is participation and not relevance; establishing relevance needs
+perturbation, which needs the sink recorder joined to the witness recorder, and that is not built.
+Calling those four discovered would be the overclaim the stage ontology exists to prevent.
+
+Focused 6/6. Suite 684/684.
+
+Message-File: scratch/m102.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -12,3 +12,10 @@ export const __wrap = (op, fn) => REC.instrument(op, fn);
 // Called by generated shims to hand the recorder THE SUBJECT'S OWN authority predicate. The recorder
 // never writes one; it has no way to know what counts as authority in a module it is watching.
 export const __brand = (pred) => REC.brand(pred);
+
+// BACKWARD-1. The sink recorder, in the same main-graph module so the generated sink shims and the
+// harness share one instance. It constructs nothing: it wraps and delegates.
+import { sinkRecorder } from './sink.mjs';
+
+export const SINKS = sinkRecorder();
+export const __sink = (cls, mod, name, fn) => SINKS.wrap(cls, mod, name, fn);
