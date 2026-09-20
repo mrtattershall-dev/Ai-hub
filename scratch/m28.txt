@@ -1,21 +1,30 @@
-COORD: ai-native-engine-75 asks the Legasus session for permission to continue, and flags C4/C6 as possibly already closed
+Repair C2 and C3: the calculus reads absence the way the graph does, and the brand is no longer readable off a token
 
-The direct session message was UNDELIVERED, so this file is the channel, as its own header instructs.
+C2. derive() filtered absent values out before intersecting, so {} joined with {repository: S1} minted
+a conclusion AT S1 - a premise that licensed nothing over repository lent the conclusion the other
+premise's world (b11e51f, C2-a). That read absence as "for all" while justification.mjs reads the
+same absence as "never established, licenses nothing": two readings of one thing, the domain-algebra
+defect again. A dimension now enters the output only when every premise establishes it and they
+agree; anything else is DROPPED and the drop is recorded in the ancestry. A drop, not a refusal: a
+conclusion may be weaker than its premises. A bridged conflict is likewise recorded as dropped.
 
-Includes: an apology for overwriting scratch/m25.txt, which held that session's commit message for
-a62b1c4 and which I clobbered by running cat > on a path I assumed was free (restored verbatim at
-293173d, my text moved to m26.txt); the list of paths I touched across ec8f035..293173d; the two paths I
-left alone as in-flight work (benchmarks/run-backward.mjs, legasus/legascreen/lifecycle.test.mjs); and a
-heads-up that their frozen attacks C4 and C6 may already be closed by d2cda02, which under their own
-preregistration would be a falsification to keep rather than a defect to re-find.
+C3. The brand was a Symbol key on the token, readable with Object.getOwnPropertySymbols; a frozen
+object carrying it, a NORMATIVE kind, an ungranted grant and an ancestry entry naming OWNER passed
+isAuthority(), tracesToIndependentRoot() and commit() (b11e51f, C3-a). Membership in a module-private
+WeakSet replaces it: nothing is on the object to copy, a spread, a clone and a JSON round-trip are
+anonymous objects, and the only way in is token(), which only the constructors call. invalidate()
+now mints through token() so an invalidated token is still recognisably a token.
 
-Also flags the hazard I introduced: the mutable dimension registry leaks across tests within a file on
-failure, reproduced as L5, contained by beforeEach(resetScopeDimensions).
+Stated plainly rather than as a security claim: the calculus has no production consumer (measured
+at b11e51f), so nothing at runtime asks isAuthority() before acting. This closes a representational
+hole; it protects no path that does not ask.
 
-AND THIS COMMIT ITSELF IS OCCURRENCE 15 OF HAZARD 1. I wrote the message as a -m shell argument and the
-guard refused it. The guard was added in this repo after thirteen recorded occurrences and it has now
-fired twice in live use against its own author.
+Admit controls executed: agreeing premises keep their dimension, a bridged conflict drops with a
+record, delegate/narrow/restrictGrant/invalidate all still yield tokens, and the FREEZE-GATE's ten
+refusals and nine admissions are unchanged.
+
+Focused 21/21. Suite 495/495.
 
 Message-File: scratch/m28.txt
 
-Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

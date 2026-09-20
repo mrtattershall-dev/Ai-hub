@@ -1,41 +1,27 @@
-preregister the Odysseus x Legasus integration BEFORE any glue exists, and declare the two constraints while they are still cheap
+Run the preregistered composition attacks: 25/25 reproduce, every control holds, zero falsified
 
-AUTHORITY. QUIESCENT_CONTEST was correct and is not being overridden by a manufactured objective. This is
-an OWNER grant, which is the one thing in the calculus that changes entitlement without deriving it -
-OWNER is an axiom, not a conclusion. The six open questions are unchanged and FREEZE_R4_AND_SELECT_REPO_D
-remains declined.
+Six attack files, each assertion stating the PREDICTED DEFECT from a62b1c4 and each beside a
+control that refuses the neighbouring case. Run against aa03ab9 unmodified. All twenty-five held.
 
-THE QUESTION IS NOT WHETHER THE COMBINATION IS BETTER. It is whether an independently designed agent
-platform can operate NORMALLY while Legasus observes and governs, WITHOUT Odysseus becoming
-Legasus-shaped. Any capability claim extracted from this run is out of scope, because the run is not
-designed to support one.
+Four instances of authority appearing under composition, in deciding paths, beyond the pytest case
+that motivated the hypothesis: a null intermediate launders a context dimension through entitled()
+while the direct edge is refused (C1); node identity excludes scope, so a second add() moves the
+referent under an existing dependent without invalidating it (C7); admission is keyed by name, so a
+pytest-argued dimension blocks joins between git records (C4); the provenance ledger keeps the LAST
+binding for a digest and reports no conflict (C8-a). And six representational holes: absence means
+"for all" in the calculus and "never established" in the graph (C2); the mint symbol is readable off
+any real token and a forgery then traces to OWNER (C3); the reserved key UNADMITTED is admissible and
+then manufactures NOT_COMPARABLE (C5); a carried value shadowed by a top-level value vanishes (C6);
+the seal covers digests and not attributions (C8-b); an irrelevant pending string holds the contest
+OPEN with zero objectives (C9-a). One duplicated vocabulary entry (C10).
 
-C1 - THE DISPOSABLE REPOSITORY IS DECLARED NOT REPO D, IN ADVANCE, AND IS BURNED BY THIS EXPERIMENT. A
-repository silently promoted to Repo D after r4 has seen it would LOOK like prospective validation and be
-nothing of the kind. Declaring it first is the whole point.
+Zero predictions failed. Recorded plainly: the predictions came from reading the implementations,
+so full reproduction is what accurate reading yields and is not evidence the reading was complete.
+Measured beside the run: calculus.mjs has no production importer (the quiesce-check scan's hit is
+its own file list), no production caller consumes add()'s return, and no artifact stores node ids.
 
-C2 - THIS MOVES AWAY FROM REPO D, NOT TOWARD IT. The owner's lifting condition is that adversarial
-composition stops exposing new authority defects. A new composition surface will, if it is any good,
-expose more. That is why it is worth running AND it is the cost. It must not later be reported as
-progress toward Repo D.
+Nothing is repaired in this commit. The result file is written before any repair and stays as is.
 
-WHY THIS IS A BETTER TEST THAN PRODUCER #4 WOULD HAVE BEEN. Producer #4 was refused partly because I
-would be choosing a producer convenient to my own abstraction. Odysseus was designed by someone else for
-another purpose and will carry coordinates Legasus has no name for - session, agent identity, tool-call
-id, model version - with no regard for whether Legasus can represent them. That makes it an INDEPENDENT
-test of tonight's UNADMITTED repair rather than a self-selected one.
+Message-File: scratch/m26.txt
 
-I6 IS THE SHARPEST PREDICTION AND THE ONE I EXPECT TO BE HARDEST. The agent is made to claim success on a
-change that is broken, and THE CLAIM MUST NOT MOVE THE VERDICT. An autonomous worker cannot be allowed to
-mint entitlement by asserting it. That is the entire architecture compressed into one test.
-
-I5 is the non-vacuity control: without a REFUSAL that names its cause, I4's commit is unfalsifiable and
-"it worked" means nothing. I1 and I8 are the layering thesis itself - if Odysseus needs modification, or
-if the calculus has to move to accept it, THAT IS THE RESULT and it is recorded rather than engineered
-away.
-
-NO GLUE EXISTS YET. NO REPOSITORY HAS BEEN CREATED OR BURNED. NOTHING HAS BEEN STARTED.
-
-Message-File: scratch/m25.txt
-
-Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

@@ -1,35 +1,31 @@
-CORRECTION: I overwrote another session's scratch file, and asserted a ledger state I had not read
+Repair C1 and C7: a derivation must be COVERED by its premises on every context dimension, and scope is part of node identity
 
-TWO ERRORS, BOTH MINE, BOTH IN fb9da14.
+C1. entitled() compared a premise with its conclusion through joinConflicts(), which skips a dimension
+either side leaves null. A never-established intermediate was therefore a universal bridge:
+A@S1 -> D1@null -> D2@S2 was entitled for a consumer that did not pin repository, while the direct
+edge A@S1 -> D2@S2 was refused (b11e51f, C1-a/C1-b). Every edge locally legal, the path laundering
+S1 into S2. The rule covers() already held - null licenses nothing - now applies to derivation: on
+each CONTEXT dimension a conjunctive premise must cover the conclusion (ANY, equal, or a
+conclusion-null restriction), bridges exempting; a null premise under a concrete conclusion is
+refused by name, and so is a conclusion widened to ANY without a GENERALIZES edge. The same check
+gates ANY_OF alternatives, or the laundering path would run through them untouched (C1-f, executed).
 
-1. DESTRUCTIVE WRITE ON ANOTHER SESSION'S FILE. scratch/m25.txt already held the second session's
-   commit-message file for a62b1c4, "Preregister the composition attacks". I ran cat > on that path
-   because I had been counting up from m16 and ASSUMED the next number was free. 22 lines were replaced.
-   Restored here verbatim from a62b1c4; my own text moved to scratch/m26.txt. The content was never at
-   risk of being lost - it survives in a62b1c4's own message - but the file at HEAD was wrong and the
-   habit that produced it is worse than the damage. LOOK AT THE TARGET BEFORE OVERWRITING IT.
+C7. node identity hashed kind, proposition and supports only, so P@S1 and P@S2 were one node and a
+second add() replaced the first under its dependents with no invalidation (b11e51f, C7-a). Scope now
+participates in identity - ANY rendered explicitly, UNADMITTED excluded because it is recorded-not-
+authoritative - and add() refuses a duplicate identity with its reason instead of overwriting.
+Measured before the change: no artifact stores node ids and no production caller reads add()'s
+return.
 
-2. I ASSERTED A SYSTEM STATE FROM MEMORY INSTEAD OF READING IT. The authority section claimed
-   "QUIESCENT_CONTEST ... the six open questions are unchanged". My session last observed the ledger at
-   Entry 14 / aa03ab9. A second session has since carried it to ENTRY 33 through BACKWARD-1, H-LOSS,
-   H-DISTINCTION and TRANSFER-1, and was mid-run when I committed on top of its work. The quiescent state
-   I described had been superseded for roughly an hour.
+Admit controls executed beside the regressions: a restriction chain A@S1 -> null -> null stays
+entitled, an ANY premise covers any concrete conclusion, a same-world ANY_OF alternative survives,
+and a difference only in UNADMITTED is still one claim.
 
-   That is the exact error this project mechanizes against, committed inside the authority section of a
-   PREREGISTRATION - the one place a stale premise does the most damage, because everything downstream
-   inherits it.
-
-CORRECTED IN PLACE RATHER THAN AMENDED. fb9da14 stays in the history with its stale claim, and this
-commit carries the correction, because an amend would erase the evidence that the error happened. Same
-reason Entry 13 preserves the 452/452 state.
-
-THE PREDICTIONS ARE UNAFFECTED. I1-I8 are about the Odysseus interface and were not derived from the
-ledger state. Only the AUTHORITY claim was. The prereg now says the starting state must be RE-READ and
-the quiesce check RE-EXECUTED before the experiment runs, not recalled.
-
-NOT TOUCHED: benchmarks/run-backward.mjs and legasus/legascreen/lifecycle.test.mjs are the other
-session's in-flight work and are left exactly as found.
+Focused 53/53. Suite 494/494. Threatened rigs re-run and byte-identical to their baselines at
+b11e51f: shadow-graph 56/56 44/44 142/142, graph-subsumption 56/56 51/51, shadow-perturbation
+table, r2-subsumption 7/7, intervention-tracking 70/70, obligation-topology S1 58/59 (pre-existing,
+noted in that file) S2 60/60 S3 119/119.
 
 Message-File: scratch/m27.txt
 
-Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
