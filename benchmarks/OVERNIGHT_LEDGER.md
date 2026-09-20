@@ -2224,3 +2224,77 @@ Both are r4 work. Neither may be repaired in r3.
                  one coverage number, with the unobservable CommonJS region in the denominator.
 
 ---
+
+## Entry 33 — H-LOSS and H-DISTINCTION: three prospective hits, and a descent that refutes less at every level
+
+    objective    test the owner's successive hypotheses - information loss, then distinction - each
+                 frozen before classification, and try to BREAK the second rather than confirm it
+    authority    OWNER, 2026-09-20
+    start hash   17ef98f (H-LOSS prereg), fff897b (H-DISTINCTION prereg), both alone
+    evidence     H_LOSS_PREREG.md, H_DISTINCTION_PREREG.md, RESULT.h-loss.md,
+                 RESULT.h-distinction.md, legasus/legascreen/loss.mjs, two corpora
+
+    BOTH PROSPECTIVE PREDICTIONS FIRED, AND EACH FOUND A LIVE DEFECT.
+
+    L-3: coordinates() projects with String(v). A counterfactual that genuinely changes a coordinate
+    from {tag:A} to {tag:B} is reported as NO CHANGE, giving a support formula of CONSTANT - "it does
+    not come from the facts at all" - for a coordinate ENTIRELY determined by the facts. CONSTANT is
+    in the specification vocabulary, so a contract resolution over it is SCREENED rather than
+    UNMAPPABLE: a false conviction or a false acquittal. Blast radius CHECKED rather than assumed -
+    every witnessed calculus context dimension holds a primitive, so the P-5 milestone is clean.
+
+    DX-1: semantic() gives every non-plain object a fresh identity, and replay() compares projections
+    to judge baseline stability. A PERFECTLY DETERMINISTIC subject whose output carries a freshly
+    allocated Map is declared BASELINE_UNSTABLE. THE INSTRUMENT'S LIMITATION REPORTED AS A PROPERTY
+    OF THE SUBJECT. It is the exact opposite error from L-3: over-fine projection giving a FALSE
+    REFUSAL where String(v) gave a FALSE AGREEMENT.
+
+    Neither is repaired; both preregistrations forbade it, and each needs its own slice.
+
+    L-2 WAS HALF REFUTED. The sets do not coincide and H-LOSS reaches 17 defects H-DEFAULT called
+    NOT_AN_OMISSION - but I predicted at least one H-DEFAULT EXPLAINED entry would fail a criterion
+    and ZERO did. H-LOSS is a STRICT SUPERSET of H-DEFAULT on this corpus, which makes H-DEFAULT a
+    proper special case rather than an independent finding.
+
+    DX-2, THE BREAKING PREDICTION, SURVIVED BY ONE ENTRY. W3-e alone: the token KIND was carried,
+    distinct and readable at every step, and commit() did not branch on it. Under the LOCATING RULE -
+    a collapse may be located only in a PROJECTION, never in a consumer's decision, fixed before any
+    defect was seen - a consumer failing to consult is not a collapse. WITHOUT THAT RULE IT WOULD
+    HAVE BEEN 36 OF 36.
+
+    AND THE TREND IS THE REAL FINDING.
+
+        hypothesis        covers          discriminating set
+        H-DEFAULT         13 / 31  42%    15  (+3 it could not express)
+        H-LOSS            30 / 36  83%     6
+        H-DISTINCTION     35 / 36  97%     1
+
+    EACH LEVEL DOWN EXPLAINS MORE AND REFUTES LESS. That is the signature of a frame becoming
+    unfalsifiable, not of one becoming true, and by that measure the next level would explain
+    everything and rule out nothing. Reading those coverage numbers as confirmation would be the
+    precise error every one of these hypotheses was written to detect.
+
+    WHAT PAID WAS THE PROSPECTIVE RECORD: 3 OF 3.
+
+        D-3   H-DEFAULT       delegate inherits on an omitted argument, refuses on {}, decided by ||
+        L-3   H-LOSS          String(v) turns a real change into a false CONSTANT
+        DX-1  H-DISTINCTION   a deterministic subject declared BASELINE_UNSTABLE
+
+    THREE HYPOTHESES, THREE PROSPECTIVE HITS, ZERO DEFECTS FOUND BY CLASSIFICATION. The
+    classifications produced coverage percentages; the predictions produced defects. The way to run
+    this ladder is to demand a prospective prediction per level and ignore the retrospective fit.
+
+    NO INVENTION IS CLAIMED for the distinction framing - it is contextual/observational equivalence
+    and intervention-based identification of relevant variables, reached from another direction, and
+    the prior art is older and better developed.
+
+    NOT BUILT: no quotient machinery, no per-obligation projections, no event graph, no transition
+    calculus. BACKWARD_1_FROZEN.txt STILL VERIFIES and THE HUB IS STILL UNRUN.
+
+    Suite 686/686.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. Two named unrepaired defects, each needing
+                 its own preregistration; the bridge-mutation gap from Entry 30; and the frozen,
+                 unspent TRANSFER-1 hub run.
+
+---
