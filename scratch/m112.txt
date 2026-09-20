@@ -1,0 +1,50 @@
+Repair the observer's lifetime coupling: a separate child file, a watchdog armed before load, and a sweep that must find nothing
+
+TRANSFER-1 died because the observer shared process lifetime with the subject. Repairing that took
+four attempts and the first three were each worse in a new way, so all four are recorded here rather
+than only the one that worked.
+
+ATTEMPT 1, one child per entry with the exit handler registered before the subject loads. Correct and
+necessary, and not sufficient.
+
+ATTEMPT 2, exit as soon as await import returns. WRONG: import returns when a module has been
+EVALUATED, which for a test file means its tests are REGISTERED and not run. It killed subjects
+mid-suite and Legasus fell from 4132 witnessed effects to 2295 and from 717 process executions to 10
+WHILE EVERY LIFECYCLE CONTROL STILL PASSED.
+
+ATTEMPT 3, let the subject drain with no bound. WORSE, and this one left the machine. A subject
+holding any live handle never exits, spawnSync's timeout does not reliably reap on Windows, and one
+orphan per entry accumulated to 261 across runs. Two other sessions on this box hit fork failures and
+lost timing work, and every number my own run took during that window was measuring my leak rather
+than any subject. I killed 261 processes to clear it.
+
+ATTEMPT 4, and the defect underneath all of it: REMOVING THE CHILD'S process.exit(0) ALSO REMOVED THE
+GUARD THAT STOPPED THE CHILD FALLING THROUGH INTO THE PARENT SECTION. Every child had been starting a
+whole run of its own. The child now lives in benchmarks/backward-child.mjs, so fall-through is
+unrepresentable rather than forbidden - the repair this project keeps choosing once a rule turns out
+to be load-bearing.
+
+The bound is an UNREF'D timer, armed BEFORE the subject loads. Unref'd costs nothing: it does not
+hold the loop open, so a subject that finishes still exits naturally and it never fires. Armed after
+the import it could not bound a subject that hangs DURING load, because import never returns and the
+arming line never runs; such a subject fell through to the parent's kill, which is exactly the path
+that orphans. The parent also records every pid and sweeps at the end, and the sweep count is
+reported with the assertion that it must be zero.
+
+An empty event list is now three different facts and not one: LOADING means the subject took the
+process away before the entry finished; LOADED with WATCHDOG means it finished loading and never let
+go; LOADED with NATURAL is the only emptiness that may be read as "ran and caused nothing". Entries
+in the first two categories contribute to EFFECTS ARE UNESTABLISHED and may never support a claim
+about what they caused.
+
+Eight lifecycle controls, all passing, all forced from a fixture: normal return, explicit exit 0,
+explicit exit non-zero, load-time throw, exit before any effect, a load-time hang, a subject that
+finishes but holds the loop, and the assertion that no child outlives the run. Per-entry cost fell
+from about 8 seconds to under 1, which was the fall-through, and orphans after a full control run are
+zero.
+
+The hub was not touched. TRANSFER-1's result stands as recorded and the next attempt is TRANSFER-2.
+
+Message-File: scratch/m112.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
