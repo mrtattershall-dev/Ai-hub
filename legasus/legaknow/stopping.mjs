@@ -63,6 +63,18 @@ export const CONTEST = {
 
 // EVIDENCE COMPLETENESS, which validity alone does not give you. "A says P, B says not-P" may really be
 // "A vs B with a decisive C that never ran".
+// THE FRONTIER'S OWN BOUND, and it is where the completeness gap ORIGINATES (consumption attack
+// SC-4). CLOSED is computed from `requiredProducers`, an INPUT - in quiesce-check.mjs, three
+// hand-written strings. So CLOSED has never meant "the evidence that could discriminate has been
+// gathered"; it means "the producers someone listed were run", and the contest layer inherits that
+// before it adds a gap of its own. Entry 16 said the frontier is a set of questions someone wrote
+// down. The evidence requirement is a set someone wrote down too.
+export const FRONTIER_SCOPE = {
+  establishes: 'every producer DECLARED required was attempted, and nothing justified is pending',
+  doesNotEstablish: 'that the declared requirement list covers the evidence that could discriminate.'
+    + ' requiredProducers is an input to this function, not a finding of it.',
+};
+
 export function evidenceFrontier({ requiredProducers = [], attempted = [], pending = [] }) {
   const missing = requiredProducers.filter((p) => !attempted.includes(p));
   const state = (missing.length || pending.length) ? FRONTIER.OPEN : FRONTIER.CLOSED;
@@ -70,13 +82,14 @@ export function evidenceFrontier({ requiredProducers = [], attempted = [], pendi
     state,
     missing,
     pending: [...pending],
+    ...FRONTIER_SCOPE,
     why: state === FRONTIER.OPEN
       ? 'the evidence frontier is OPEN: '
         + (missing.length ? 'required producers never attempted (' + missing.join(', ') + ')' : '')
         + (missing.length && pending.length ? '; ' : '')
         + (pending.length ? 'operations already authorized and expected to discriminate are pending ('
           + pending.join(', ') + ')' : '')
-      : 'every required producer was attempted and nothing authorized is pending',
+      : 'every producer DECLARED required was attempted and nothing authorized is pending',
   };
 }
 
@@ -148,25 +161,45 @@ export function contestState({ frontier, investigations = [] }) {
 }
 
 // THE RULE PURPOSE MUST OBEY, or the architecture cannot ever be idle.
+//
+// AND THE BOUND TRAVELS INTO IT. Entry 16 attached `establishes` / `doesNotEstablish` to the verdict
+// and stopped there; this function - the artifact PURPOSE consumes - dropped both, so "zero
+// objectives" arrived downstream denying nothing. informationMonotonicity, this project's own Law 1
+// instrument, reported it as a FORBIDDEN TRANSITION: erasure GAINED the permission to conclude that
+// no justified investigation exists (consumption attack SC-2). An objective list is a PROJECTION of a
+// verdict, so it inherits that verdict's bound verbatim rather than being given one of its own.
 export function objectivesFromContest(contest) {
+  const bound = { establishes: contest.establishes, doesNotEstablish: contest.doesNotEstablish };
   if (contest.state === CONTEST.QUIESCENT_CONTEST) {
-    return { objectives: [],
+    return { objectives: [], ...bound,
       why: 'a QUIESCENT contest generates NO objective. An epistemic deficit generates work only when'
         + ' there is an authorized operation with a justified expectation of increasing relevant'
         + ' information. Emitting RESOLVE_CONTEST here is how a loop runs forever.' };
   }
   return { objectives: contest.justified.map((i) => ({ kind: 'REDUCE_UNCERTAINTY', target: i.name })),
+    ...bound,
     why: 'each objective corresponds to an investigation that passed all four conditions' };
 }
 
 // THE LEGITIMATE IDLE STATE. Most agent architectures assume `while (true) choose_action()`, which forces
 // an answer out of an authority graph that may not have one.
+//
+// ITS BOUND IS ABOUT THE CANDIDATES, not the frontier, so it is stated separately rather than reusing
+// SCOPE. "There is no justified next action" is bounded by who supplied the candidate list, and this
+// function never said so (consumption attack SC-3).
+export const ACTION_SCOPE = {
+  establishes: 'no candidate OFFERED to this call is justified',
+  doesNotEstablish: 'that no justified action exists. The candidate list is supplied by the caller,'
+    + ' and nothing here establishes that it covers the actions available.',
+};
+
 export function nextAction({ candidates = [] }) {
   const justified = candidates.filter((c) => c.justified);
   if (!justified.length) {
-    return { quiesce: true, action: null,
+    return { quiesce: true, action: null, ...ACTION_SCOPE,
       why: 'there is currently no justified next action. The model is NOT asked what to do when the'
         + ' authority graph has no justified answer - that is where invented objectives come from.' };
   }
-  return { quiesce: false, frontier: justified, why: justified.length + ' justified candidate(s)' };
+  return { quiesce: false, frontier: justified, ...ACTION_SCOPE,
+    why: justified.length + ' justified candidate(s)' };
 }

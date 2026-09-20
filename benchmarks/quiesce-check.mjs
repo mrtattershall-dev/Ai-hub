@@ -296,6 +296,9 @@ say('');
 // "QUIESCENT_CONTEST, zero objectives" without this is quoting an unbounded claim.
 say('WHAT THIS ESTABLISHES      : ' + contest.establishes);
 say('WHAT IT DOES NOT ESTABLISH : ' + contest.doesNotEstablish);
+say('  AND ONE LAYER DOWN       : ' + frontier.doesNotEstablish);
+say('  - the list this run declared: ' + JSON.stringify(frontier.requiredProducersDeclared
+  || ['CPython doctest', 'git', 'pytest']));
 say('  This project is its own evidence that the gap is real: on 2026-09-20 this check said QUIESCENT');
 say('  with zero objectives, and three successive preregistered attack waves then found 21 authority');
 say('  defects in deciding paths, each wave after the previous one had gone green. The verdict was');
