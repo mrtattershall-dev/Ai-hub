@@ -37,15 +37,31 @@ import { evidenceFrom } from './observation.mjs';
 
 // The brand. Module-private, so a token cannot be constructed anywhere else - this is the difference
 // between a rule and an impossibility.
-const MINT = Symbol('authority-mint');
+//
+// THE FIRST BRAND WAS A SYMBOL KEY ON THE TOKEN, and a symbol key is readable off any real token with
+// Object.getOwnPropertySymbols. Composition attack C3 built a frozen object carrying the recovered
+// symbol, a NORMATIVE kind, a grant it was never given and an ancestry entry naming OWNER - and
+// isAuthority(), tracesToIndependentRoot() and commit() all accepted it. "Unforgeable" held only
+// against code that never held a token. Membership in a module-private WeakSet carries nothing on the
+// object at all: there is no property to copy, a clone or a JSON round-trip is not a member, and the
+// only way in is token(), which only the constructors below call.
+//
+// STATED PLAINLY, because the alternative is theater: this closes a representational hole. The
+// calculus has no production consumer today (measured), so nothing at runtime asks isAuthority()
+// before acting; a consumer that never asks is not protected by an answer.
+const MINTED = new WeakSet();
 
-const token = ({ claim, kind, context, grant, ancestry, constructor: ctor }) => Object.freeze({
-  [MINT]: true, claim, kind, context: Object.freeze({ ...context }),
-  grant: Object.freeze([...(grant || [])]), ancestry: Object.freeze([...ancestry]), constructor: ctor,
-  valid: true,
-});
+const token = ({ claim, kind, context, grant, ancestry, constructor: ctor, valid = true, why }) => {
+  const t = Object.freeze({
+    claim, kind, context: Object.freeze({ ...context }),
+    grant: Object.freeze([...(grant || [])]), ancestry: Object.freeze([...ancestry]), constructor: ctor,
+    valid, ...(why === undefined ? {} : { why }),
+  });
+  MINTED.add(t);
+  return t;
+};
 
-export const isAuthority = (t) => !!(t && t[MINT] === true);
+export const isAuthority = (t) => !!(t && typeof t === 'object' && MINTED.has(t));
 
 export const KIND = { EPISTEMIC: 'EPISTEMIC', NORMATIVE: 'NORMATIVE' };
 
@@ -94,15 +110,30 @@ export function derive({ premises = [], rule, relationWitnesses = [], claim, con
 
   // The output context is the INTERSECTION. A dimension on which premises disagree is not in it, so no
   // conclusion can be stated for a world none of the premises covered.
+  //
+  // AND A DIMENSION A PREMISE NEVER ESTABLISHED IS NOT IN IT EITHER. The first version filtered absent
+  // values out before intersecting, so {} joined with {repository: S1} produced a conclusion AT S1 - a
+  // premise that licensed nothing over repository lent the conclusion the other premise's world
+  // (composition attack C2). That read absence as "for all"; justification.mjs reads the same absence
+  // as "never established, licenses nothing", and two readings of one thing is the domain-algebra
+  // defect again. The calculus now agrees with the graph: a dimension goes into the output only when
+  // EVERY premise establishes it and they agree. Anything else is DROPPED - a free narrowing, not a
+  // refusal, because a conclusion may be weaker than its premises - and the drop is recorded in the
+  // ancestry so an audit can see what the conclusion is no longer about.
   const dims = contextDimensions.length ? contextDimensions
     : [...new Set(premises.flatMap((p) => Object.keys(p.context)))];
   const context = {};
   const conflicts = [];
+  const dropped = [];
   for (const d of dims) {
-    const vals = [...new Set(premises.map((p) => p.context[d]).filter((v) => v !== undefined
-      && v !== null))];
+    const each = premises.map((p) => p.context[d]);
+    if (each.some((v) => v === undefined || v === null)) {
+      dropped.push({ dimension: d, why: 'not established by every premise' });
+      continue;
+    }
+    const vals = [...new Set(each)];
     if (vals.length > 1) { conflicts.push({ dimension: d, values: vals.map(String) }); continue; }
-    if (vals.length === 1) context[d] = vals[0];
+    context[d] = vals[0];
   }
   if (conflicts.length) {
     const bridged = conflicts.filter((c) => !relationWitnesses
@@ -113,10 +144,11 @@ export function derive({ premises = [], rule, relationWitnesses = [], claim, con
         + ') and no bridge witness covers the difference. The authority would appear BETWEEN the edges.',
       { conflicts: bridged });
     }
+    for (const c of conflicts) dropped.push({ dimension: c.dimension, why: 'bridged, not carried' });
   }
   return token({ claim, kind: premises[0].kind, context, grant: premises[0].grant,
     ancestry: [{ via: 'DERIVE', rule: rule.name, premises: premises.length,
-      witnesses: relationWitnesses.map((w) => w.relation) }],
+      witnesses: relationWitnesses.map((w) => w.relation), dropped }],
     constructor: 'DERIVE' });
 }
 
@@ -162,8 +194,10 @@ export const restrictGrant = (t, grant) => (isAuthority(t)
     ancestry: [...t.ancestry, { via: 'RESTRICT' }], constructor: t.constructor })
   : t);
 
+// An invalidated token is still a TOKEN - recognisable, refusable by name - so it goes through token()
+// rather than a spread, which under the WeakSet brand would make it an anonymous object instead.
 export const invalidate = (t, why) => (isAuthority(t)
-  ? Object.freeze({ ...t, valid: false, why }) : t);
+  ? token({ ...t, valid: false, why }) : t);
 
 // ---------------------------------------------------------------------------------------------------
 // PROPOSE creates NO authority. It produces an untrusted possibility, and the calculus has no constructor
