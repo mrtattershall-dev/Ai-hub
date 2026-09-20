@@ -1,0 +1,34 @@
+Entry 17: name the class both recent findings belong to, and record that Entry 16 was a member of it
+
+CORRECT OPERATIONAL BEHAVIOUR, INCORRECT OR ABSENT ACCOUNT OF WHY IT IS JUSTIFIED. Not a false
+belief and not a wrong action - a right decision with a wrong reason topology attached, which is
+dangerous on a delay because explanations are inputs to later machinery. The provenance case shows
+the shape: the module already refused to attribute to one producer, and a consumer meeting CONTESTED
+could legitimately conclude experiment owed, block reliance, generate an objective. A future
+behavioural bug born from a present-day safe verdict with a wrong reason. That is why this project
+has measured reason topology rather than PASS/FAIL since Repo C, and it is now a class with two
+members rather than an instinct.
+
+Entry 16's own repair was a member. The bound was attached to the verdict and followed no further:
+objectivesFromContest dropped both fields, nextAction never had them, and evidenceFrontier's CLOSED
+said every required producer was attempted over a declared list. Law 1 caught it - the project's own
+informationMonotonicity, on the project's own API, one commit after it was written, reporting a
+forbidden transition and a permission manufactured out of information loss. The deeper half is that
+the completeness gap already existed one layer below the contest, in a requiredProducers list that
+quiesce-check writes by hand and the contest inherits.
+
+Repaired so each artifact carries the bound belonging to its own claim, with no verdict changed, and
+the residual asserted rather than promised: the state is still a bare string a reader can compare
+alone, which the pipeline no longer does for them.
+
+The owner's formulation for eventually freezing r4 is adopted as a shape including its limit - no
+finite procedure shows that no important failure class was left unimagined, so the decision cannot
+become PROVEN SAFE, only a predeclared challenge with established coverage over named classes,
+a fixed budget, and explicit residual UNKNOWN for the owner to accept or not.
+
+Both findings since Entry 15 came from the owner reading the record rather than from the frontier,
+which is the completeness gap demonstrating itself twice more.
+
+Message-File: scratch/m57.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

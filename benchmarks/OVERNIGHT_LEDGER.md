@@ -960,3 +960,75 @@ Both are r4 work. Neither may be repaired in r3.
     next         NONE. QUIESCENT, now with its bound printed beside it.
 
 ---
+## Entry 17 — a named defect class, and Entry 16's own repair leaking one function downstream
+
+    objective    test the owner's claim that the Entry 16 bound must survive consumption, and name the
+                 class both of the last two findings belong to
+    authority    OWNER, 2026-09-20, reviewing Entry 16
+    start hash   d188998
+    evidence     STOPPING_SCOPE_PREREG.md / RESULT.stopping-scope.md (0018592 / 77fd921)
+                 legaknow/stopping-consumption-attack.test.mjs
+
+    THE CLASS, in the owner's words and worth a name:
+
+        CORRECT OPERATIONAL BEHAVIOUR, INCORRECT OR ABSENT ACCOUNT OF WHY IT IS JUSTIFIED
+
+    Not "the system believed something false" and not "the system did something wrong". The decision
+    was conservative and right; the REASON TOPOLOGY attached to it was wrong. That is dangerous on a
+    delay, because explanations are inputs to later machinery. The provenance case shows the shape
+    exactly: the module already refused to attribute to one producer, and a consumer meeting
+    CONTESTED could legitimately conclude "experiment owed, block reliance, generate a resolution
+    objective" - a future behavioural bug born from a present-day safe verdict with a wrong reason.
+    This is why the project has measured reason topology and not PASS/FAIL since Repo C, and it is
+    now a class with two members rather than an instinct.
+
+    AND ENTRY 16'S REPAIR WAS ITSELF A MEMBER. The bound was attached to the verdict and followed no
+    further. Three sites, measured:
+
+        objectivesFromContest   the artifact PURPOSE consumes - dropped both fields
+        nextAction              the same shape of claim, over a CALLER-SUPPLIED candidate list,
+                                with no bound it had ever had
+        evidenceFrontier        CLOSED means every producer on a DECLARED list was attempted, and
+                                said "every required producer was attempted"
+
+    SC-2 IS THE RESULT, AND IT IS THIS PROJECT'S OWN INSTRUMENT FIRING ON THIS PROJECT'S OWN API ONE
+    COMMIT AFTER IT WAS WRITTEN. informationMonotonicity, rich = the bounded verdict, erase =
+    objectivesFromContest, consumer = concludes no justified investigation exists:
+
+        ok false   gained ['concludes no justified investigation exists']
+        FORBIDDEN TRANSITION ... Authority was manufactured out of information loss.
+
+    Law 1, at an API boundary, against a repair for a Law-7 overclaim. Non-vacuity asserted in the
+    same test - the consumer is refused on the rich state and granted on an unbounded artifact - and
+    the regression additionally proves the instrument still FAILS against an erasure that really
+    drops the bound, so a green result means the permission was withheld rather than never available.
+
+    SC-4 IS THE DEEPER HALF AND THE OWNER DID NOT NAME IT. The completeness gap Entry 16 found at the
+    CONTEST layer already existed at the FRONTIER layer and was inherited upward: `requiredProducers`
+    is an INPUT, and in quiesce-check it is three hand-written strings. Entry 16 said the frontier is
+    a set of questions someone wrote down. The evidence requirement is a set someone wrote down too,
+    and the check now prints that second bound beside the first with the list this run declared.
+
+    REPAIRED: each artifact carries the bound belonging to ITS OWN claim - the objectives list
+    inherits the verdict's verbatim (a projection does not restate), nextAction states one about its
+    candidates, the frontier states that its requirement list is an input. No verdict changed; SC-5
+    asserts every state and objective list is what it was.
+
+    THE RESIDUAL IS ASSERTED RATHER THAN PROMISED. A test pins that `state` is still a bare string, is
+    still readable alone, and that a consumer comparing only it regains the inference. The pipeline no
+    longer erases the bound; a reader still can. Making the state unreadable without its bound would
+    change every comparison in the freeze gate and is not started.
+
+    ON FREEZING r4, the owner's formulation is adopted as the shape, including its limit: no finite
+    procedure establishes that no important failure class was left unimagined, so the decision cannot
+    become PROVEN SAFE. What it can become is a predeclared challenge procedure with independently
+    established coverage over NAMED failure classes, completed under a fixed budget without finding
+    another defect, with the residual outside that coverage recorded as explicit UNKNOWN - and the
+    owner deciding whether that residual is acceptable for burning Repo D. That is more rigorous than
+    treating test exhaustion as completeness, and it is recorded as a shape, not started.
+
+    next         NONE. QUIESCENT. The two findings since Entry 15 both came from the owner reading
+                 the record rather than from the frontier, which is the completeness gap
+                 demonstrating itself twice more.
+
+---
