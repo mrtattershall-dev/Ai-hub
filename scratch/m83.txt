@@ -1,0 +1,25 @@
+Preregister AUTO-WITNESS-1: capture the construction history from an existing test, with no hand-written driver
+
+The inspection found the bottleneck is not invariants but the automatic construction of a legitimate
+experiment, and the owner named the milestone: given an authority-bearing transformation that
+executes during an existing test or benchmark, capture enough upstream construction history to
+reproduce the same legitimate invocation without a driver.
+
+W-1 is decisive and is about the absence of a file rather than the presence of one: no driver under
+benchmarks or legascreen may supply facts, construct or operate for the captured call. W-3 names the
+most likely failure in advance - a recorder that deep-clones its arguments destroys membership in the
+module-private WeakSet, which is the slice-2 lesson arriving one layer up. W-5 demands that a
+violation verdict be structurally unreachable without the full journey, because four slices of
+evidence say a convention will not hold.
+
+W-8 is a prediction of NO detection. This slice adds no judgment, so a finding about the repository
+would be an artifact of the instrument.
+
+And the scope section is written before the result: no coverage fraction will be reported at all. The
+owner's correction stands - 251 exported functions was a denominator over a surface never
+established, and replacing it with a better-looking fraction over the same unestablished surface
+would be the same error. Counts only until discovery exists.
+
+Message-File: scratch/m83.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
