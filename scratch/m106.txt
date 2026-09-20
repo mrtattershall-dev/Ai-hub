@@ -1,0 +1,42 @@
+Preregister H-LOSS: three hard criteria, a corpus built for a different hypothesis, and one prospective prediction about my own screen
+
+The hypothesis is the owner's: a substantial fraction of historical failures occur after a richer
+distinction was available upstream, discarded by a representation boundary, and subsequently
+reconstructed or defaulted downstream. The suspicion underneath is that the recurring problem is not
+representation leakage but lossy projection - reality compressed before anyone knows which
+distinctions later reasoning will need, with the downstream reconstruction becoming an oracle.
+
+All three criteria must be named separately and concretely: the upstream distinction demonstrably
+existed, the boundary demonstrably maps two distinguishable states onto one representation, and an
+authority-bearing operation demonstrably infers or defaults the lost distinction. If any one is not
+demonstrable the entry is NOT_H_LOSS with no interpretive rescue, and the classifier refuses an entry
+that omits any of the three, so the criteria not being relaxed is a measurement rather than a promise.
+
+The corpus is the 31 entries of h-default-corpus.json unchanged, plus the defects named in Entries 31
+and 32, enumerated before classification. That corpus was built for a different hypothesis and is
+reused precisely because it was not selected for this one.
+
+L-2 is the test against H-LOSS being a bigger word for the same thing. If every H-DEFAULT EXPLAINED
+entry is H-LOSS and nothing else is, this is a relabelling; the prediction is that H-LOSS covers
+defects H-DEFAULT called NOT_AN_OMISSION and that at least one H-DEFAULT EXPLAINED entry fails a
+criterion, and it is refuted if the sets coincide or if H-LOSS turns out to be a superset containing
+everything.
+
+L-3 is prospective and is stated before running it. coordinates() projects authority coordinates with
+String(v), which is a lossy boundary, and the delta comparison downstream feeds the support formula
+and then a contract verdict - so a counterfactual that genuinely changes a coordinate from one
+non-primitive value to a different non-primitive value should be reported as NO CHANGE, yielding a
+false CONSTANT or ALL_OF. Its strength is rated honestly in the preregistration: a prediction about
+unobserved behaviour rather than unseen code, worth less than one about a subject I cannot see and
+more than a retrodiction, and not to be upgraded later.
+
+L-4 predicts no repair. This slice changes no production code and no frozen mechanism, and
+BACKWARD_1_FROZEN.txt must still verify at the end. TRANSFER-1 is untouched and the hub run remains
+unspent - H-LOSS needs its own later experiment rather than a reinterpretation of that one.
+
+The event-graph architecture and the projection-carries-its-loss mechanism are NOT built. Freezing
+the hypothesis comes first.
+
+Message-File: scratch/m106.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
