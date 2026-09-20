@@ -1331,3 +1331,73 @@ Both are r4 work. Neither may be repaired in r3.
                  licenses one more slice on evidence - not the remaining design on enthusiasm.
 
 ---
+## Entry 22 — the holdout: the screen did NOT transfer, and that is the most useful result of the series
+
+    objective    run the owner's holdout - one historical defect chosen mechanically from a pool no
+                 probe was designed around, with the probes untouched after selection
+    authority    OWNER, 2026-09-20
+    start hash   27ade4a
+    evidence     LEGASCREEN_HOLDOUT_PREREG.md / RESULT.legascreen-holdout.md (040d95e / this commit)
+                 benchmarks/run-legascreen-holdout.mjs
+
+    THE DESIGN, and its point. v1 met a three-case bar in which EACH PROBE WAS BUILT AROUND THE CASE
+    IT LATER FOUND. That shows the probes were faithfully built; it does not show they transfer. The
+    selection rule, the two readings and the four outcomes were frozen in a commit containing nothing
+    else, before any candidate was named, with the consequence of each outcome decided in advance so
+    the result could not choose its own.
+
+    SELECTED MECHANICALLY: C2 - derive()'s output context gains a dimension NO PREMISE ESTABLISHED -
+    the first eligible identifier in canonical order once C1 (composition family) and C4 (alias
+    family) were excluded. Verified LIVE in the target tree by direct evaluation, so silence could
+    not be misread as absence:
+
+        derive({}, {repository: S1}).context = {"repository": "S1"}    minted = true
+
+    RESULT
+
+        STRICT   the three probes as shipped, at b11e51f: 12 positives, NONE relating to calculus,
+                 to derive, or to C2.                                              SILENT
+        POINTED  the same probe code aimed at calculus.mjs, driver committed verbatim: 7 positives
+                 over 8 functions, one naming the right function and field.        PARTIAL
+
+    AND PARTIAL IS NOT ROUNDED UP. `calculus.derive lost: context` names the right place for three
+    wrong reasons: the seeds are tokens so the call is wrong-shaped and the refusal object naturally
+    lacks context; C2 is a GAIN and the probe detects LOSS, which no driver or target can repair; and
+    a reader following it asks why derive drops context, finds it was called wrongly, and stops.
+    Three other functions carry an identical flag.
+
+    WHAT THIS ESTABLISHES, and it is worth more than the three v1 positives:
+
+        the screen detects   LOSS of a field           (P-ERASURE)
+                             COLLISION of a name       (P-ALIAS)
+                             GAIN along a lengthened path (P-COMPOSITION)
+        C2 is               GAIN FROM ABSENCE IN A SINGLE TRANSFORMATION - a fourth shape
+
+    The first defect none of the probes was designed around is not reached. The microscope's
+    narrowness is now MEASURED rather than assumed, which is the thing this series has been trying to
+    buy.
+
+    ALSO MEASURED, AND UNFLATTERING. Aimed at a module whose functions take structured arguments
+    rather than each other's outputs, P-ERASURE produced SEVEN POSITIVES OVER EIGHT FUNCTIONS,
+    essentially all the wrong-shape artifact. v0 named the cause - JavaScript does not throw on a
+    wrong-shape call - and this quantifies it: specificity collapses off the composition path.
+
+    THE FOURTH PROBE IS NAMED BY THE EVIDENCE AND IS NOT BUILT:
+
+        A DERIVED CONTEXT MUST NOT ESTABLISH A DIMENSION THAT NO PREMISE ESTABLISHED
+
+    the dual of the erasure invariant, metamorphic and target-independent. The preregistration fixed
+    that a SILENT or PARTIAL outcome makes the missing property define the next probe, that the probe
+    must then rescan ALL prior history rather than its motivating defect alone, and that no probe is
+    written in this slice. None is.
+
+    CARRIED FORWARD, unstrengthened: because the C1 repair already closed the ANY route, v1's ANY
+    discovery does not show the screen would have prevented a defect prospectively. It shows the
+    repair's protected region was larger than the demonstrated one and that the screen could expose
+    that afterwards. Recorded before this run, and this run does not improve it.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. A fourth probe is now justified BY EVIDENCE
+                 rather than by imagination, and is deliberately left unwritten so that the
+                 preregistration governing it can be written first.
+
+---
