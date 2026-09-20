@@ -21,6 +21,7 @@ import { spawnSync } from 'node:child_process';
 import { evidenceFrontier, contestState, investigationJustified, objectivesFromContest }
   from '../legasus/legaknow/stopping.mjs';
 import { CONTEXT_DIMENSIONS, SUBJECT_DIMENSIONS } from '../legasus/legaknow/justification.mjs';
+import { pinnedArtifact } from '../legasus/legaknow/pin.mjs';
 
 const say = (...a) => console.log(...a);
 const evidence = [];
@@ -41,20 +42,40 @@ note('MEASURED', 'python hasattr(os, "fork")', String(forkAvailable)
 // recovers it - a fresh run yields observations that cannot be JOINED to the ambiguous old one, because
 // the old one has nothing to join on. Law 1, exactly: authority cannot be created by destroying
 // information.
-const ext = JSON.parse(readFileSync('benchmarks/repoC/external.json', 'utf8'));
-const fields = [...new Set(ext.flatMap((x) => Object.keys(x)))].sort();
-const byKey = new Map();
-for (const x of ext) {
-  const k = x.module.split('.').pop() + '|' + String(x.source).trim();
-  if (!byKey.has(k)) byKey.set(k, []);
-  byKey.get(k).push(x.outcome);
+//
+// MEASURED ON THE BYTES THE VERDICT IS ABOUT, NOT ON WHATEVER OCCUPIES THE PATH. The first version read
+// external.json by path. Regenerated with richer records under the same name, it would have flipped
+// this TERMINAL entry to JUSTIFIED and the fresh run would have silently REPLACED the old evidence
+// rather than resolved it - the exact thing the paragraph above says cannot happen (composition attack
+// C9-b). The read is pinned to the digest PROVENANCE.json recorded for the artifact; any other bytes are
+// reported as REPLACED, re-measure nothing, and leave the entry not executable.
+const PROVENANCE = JSON.parse(readFileSync('benchmarks/PROVENANCE.json', 'utf8'));
+const EXT_PATH = 'benchmarks/repoC/external.json';
+const extRecord = PROVENANCE.records.find((r) => r.artifact === EXT_PATH);
+const pinned = pinnedArtifact({ path: EXT_PATH, expectedDigest: extRecord && extRecord.sha256 });
+note('MEASURED', 'external.json identity', pinned.state + '  (digest '
+  + String(pinned.digest || pinned.actualDigest || '-').slice(0, 12) + ', recorded '
+  + String(extRecord && extRecord.sha256).slice(0, 12) + ')');
+let hasDiscriminator = false;
+if (pinned.ok) {
+  const ext = JSON.parse(pinned.bytes.toString('utf8'));
+  const fields = [...new Set(ext.flatMap((x) => Object.keys(x)))].sort();
+  const byKey = new Map();
+  for (const x of ext) {
+    const k = x.module.split('.').pop() + '|' + String(x.source).trim();
+    if (!byKey.has(k)) byKey.set(k, []);
+    byKey.get(k).push(x.outcome);
+  }
+  const conflicting = [...byKey.entries()].filter(([, v]) => new Set(v).size > 1);
+  const DISCRIMINATORS = ['document', 'ordinal', 'lineno', 'name', 'docstring', 'index'];
+  hasDiscriminator = DISCRIMINATORS.some((d) => fields.includes(d));
+  note('MEASURED', 'external.json record fields', JSON.stringify(fields));
+  note('MEASURED', 'keys with CONFLICTING outcomes', String(conflicting.length));
+  note('MEASURED', 'any coordinate that could disambiguate', String(hasDiscriminator));
+} else {
+  note('MEASURED', 'external.json', pinned.state + ' - ' + pinned.why
+    + '. The TERMINAL verdict is about the recorded bytes and stands; nothing here re-classifies it.');
 }
-const conflicting = [...byKey.entries()].filter(([, v]) => new Set(v).size > 1);
-const DISCRIMINATORS = ['document', 'ordinal', 'lineno', 'name', 'docstring', 'index'];
-const hasDiscriminator = DISCRIMINATORS.some((d) => fields.includes(d));
-note('MEASURED', 'external.json record fields', JSON.stringify(fields));
-note('MEASURED', 'keys with CONFLICTING outcomes', String(conflicting.length));
-note('MEASURED', 'any coordinate that could disambiguate', String(hasDiscriminator));
 
 // ------------------------------------------- MEASUREMENT 3: is the scope vocabulary closed, and how big?
 //

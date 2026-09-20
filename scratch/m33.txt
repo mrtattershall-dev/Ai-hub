@@ -1,0 +1,26 @@
+Repair C9-b: the TERMINAL verdict is measured on the recorded bytes of external.json, not on whatever occupies its path
+
+The quiesce check classified REPOC_UNRESOLVED_ATTRIBUTION as TERMINAL by reading
+benchmarks/repoC/external.json by path and asking whether its records carry a disambiguating
+coordinate. Regenerated with richer records under the same name, that read would have flipped the
+entry to JUSTIFIED and the fresh observations would have silently replaced the old evidence rather
+than resolved it - the exact thing Entry 10 says cannot happen, made to happen by a file that kept
+its name. Same path is not same referent.
+
+legaknow/pin.mjs pins a measurement to the digest PROVENANCE.json recorded for the artifact and
+returns the bytes only when they match; REPLACED, ABSENT and UNPINNED re-measure nothing and say
+why. The quiesce check reads through it and prints the identity line first. Run at this commit:
+PINNED fc0f04acdfd9 against recorded fc0f04acdfd9, fields unchanged, three conflicting keys, no
+discriminator, QUIESCENT_CONTEST with zero objectives - the verdict is what it was, now about the
+bytes it was always about.
+
+Stated rather than implied: the REPLACED branch of the quiesce check itself was not exercised on the
+repository artifact, because that would mean rewriting it. The branch is exercised in pin.test on
+temporary files under the same function the check calls; the check's own line shows the function ran
+on the real artifact.
+
+Suite 503/503.
+
+Message-File: scratch/m33.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
