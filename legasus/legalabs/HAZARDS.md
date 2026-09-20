@@ -99,6 +99,24 @@ the escapes out of a regex it was fixing. The fifth
 occurrence adds: this applies to PYTHON heredocs too, and Python eats a different set of escapes than
 the shell does.
 
+**Occurrence 14 (2026-09-20) is a DIFFERENT loss path caught by the SAME guard.** A commit message
+written to a file, with the trailer, committed with `-F` - the rule followed to the letter - was refused
+as "does not match the file". No shell had touched it. One line of prose had wrapped onto a leading `#`,
+and git's message cleanup drops such lines as comments before any hook runs. The message reached git
+one line short and the file was intact. The guard fired correctly and blamed the shell; it now names
+this cause when a `#`-initial line is present in the file. The lesson is the guard's own: a comparison
+against the bytes you meant to send catches losses you did not know existed, and the diagnosis text
+should not pretend to know the mechanism.
+
+And **occurrence 15**, the same day, minutes later: a regex probed through `node -e` inside a shell
+argument printed `froms+` for `from\s+` - the probe's own regex had collapsed. The scanner under
+investigation was written with the editor and intact; its own control was trusted and the probe was not.
+
+**Occurrence 16**, minutes after that: five commit-message files pushed through one shell call as
+heredocs failed to parse at line 111 with an unmatched quote - none was written - and the messages
+were written with the editor instead. The rule already said so. Three occurrences in one hour, each
+while recording the previous one, is the argument for the mechanism restated.
+
 ---
 
 ## 2. Pipe truncation reporting success — RULE ONLY

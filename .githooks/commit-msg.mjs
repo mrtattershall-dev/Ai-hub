@@ -52,7 +52,20 @@ const file = m[1].trim();
 if (!existsSync(file)) refuse('Message-File names a file that does not exist:', '    ' + file);
 
 const strip = (s) => s.split(/\r?\n/).filter((l) => !/^Message-File:/.test(l)).join('\n').trim();
-if (strip(readFileSync(file, 'utf8')) !== strip(body)) {
+const fileText = readFileSync(file, 'utf8');
+if (strip(fileText) !== strip(body)) {
+  // A SECOND LOSS PATH, WITNESSED 2026-09-20 (scratch/m40.txt, first version): a line that wraps onto a
+  // leading '#' is a COMMENT to git's message cleanup and is dropped before this hook sees it. No
+  // shell involved; the file is intact and the message is one line short. The guard fired correctly
+  // and blamed the shell. It now names the actual cause when that is the cause, so the next person
+  // rewraps the line instead of hunting for a backslash.
+  const commentLines = fileText.split(/\r?\n/).filter((l) => l.startsWith('#'));
+  if (commentLines.length) {
+    refuse('The message does not match the file it claims to come from, and the file has a line',
+      'beginning with "#", which git strips as a comment before any hook runs:',
+      '', ...commentLines.map((l) => '    ' + l.slice(0, 72)), '',
+      'Rewrap so no line starts with "#". This is not shell damage.');
+  }
   refuse('The message does not match the file it claims to come from.',
     'That is the signature of shell damage: the file is intact, the argument that',
     'reached git is not.');
