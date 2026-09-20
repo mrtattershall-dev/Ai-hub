@@ -48,6 +48,8 @@ export const REACHABILITY = {
   PRODUCTION_REACHED: 'PRODUCTION_REACHED',
   TEST_ONLY: 'TEST_ONLY',
   UNREACHED: 'UNREACHED',
+  // A claim that needs the whole path cannot be made from a path with a hole in it.
+  ANCESTRY_INCOMPLETE: 'ANCESTRY_INCOMPLETE',
 };
 
 export const STAGE = {
@@ -68,16 +70,31 @@ export const STAGE = {
 // wearing a regular expression. The line/column pair is the only reliable anchor.
 const FRAME = /at (?:async )?(?:(.+?) )?\(?(.+):(\d+):(\d+)\)?$/;
 
+// A LINE THAT LOOKS LIKE A FRAME AND DOES NOT PARSE IS `FRAME_UNPARSED`, NOT NOTHING.
+//
+// Dropping it silently is how the last run reported PRODUCTION_REACHED 0 with complete confidence:
+//
+//     REPRESENTATION_UNRECOGNIZED  ->  EMPTY SET  ->  SEMANTIC ABSENCE
+//
+// Information destruction increased certainty, which is Law 1 arriving inside the instrument. An
+// unparsed frame therefore POISONS every downstream claim that needs complete ancestry - it might
+// have been the frame where control crossed - while leaving the frames that did parse valid as
+// participation. NO OBSERVATION IS NOT OBSERVED NOTHING.
 export function frames(stack) {
-  const out = [];
-  for (const line of String(stack || '').split('\n').slice(1)) {
-    const m = FRAME.exec(line.trim());
-    if (!m) continue;
+  const parsed = [];
+  let unparsed = 0;
+  let excluded = 0;
+  for (const raw of String(stack || '').split('\n').slice(1)) {
+    const line = raw.trim();
+    if (!line.startsWith('at ')) continue;                 // not a frame line at all
+    const m = FRAME.exec(line);
+    if (!m) { unparsed++; continue; }                      // a frame we could not read
     const file = m[2].replace(/^file:\/\/\/?/, '').replace(/\\/g, '/');
-    if (/[/\\]node_modules[/\\]/.test(file) || file.startsWith('node:')) continue;
-    out.push({ fn: m[1] || '<anonymous>', file, line: Number(m[3]) });
+    // Recognised and deliberately out of scope - a different fact from unreadable.
+    if (/[/\\]node_modules[/\\]/.test(file) || file.startsWith('node:')) { excluded++; continue; }
+    parsed.push({ fn: m[1] || '<anonymous>', file, line: Number(m[3]) });
   }
-  return out;
+  return { parsed, unparsed, excluded, complete: unparsed === 0 };
 }
 
 export const isTestFile = (f) => /\.test\.[cm]?[jt]s$|[/\\]tests?[/\\]/.test(f || '');
@@ -96,8 +113,10 @@ export function sinkRecorder() {
           const err = new Error('lgs-sink');
           armed = false;                        // a sink reached from inside a sink is one effect
           try {
+            const f = frames(err.stack);
             events.push({ sinkClass, module: moduleName, name: exportName,
-              arity: args.length, at: events.length, stack: frames(err.stack) });
+              arity: args.length, at: events.length, stack: f.parsed,
+              unparsed: f.unparsed, excluded: f.excluded, ancestryComplete: f.complete });
           } finally { armed = true; }
         }
         return value.apply(this, args);

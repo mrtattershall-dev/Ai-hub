@@ -38,7 +38,7 @@ if (!process.env.LGS_WITNESS) {
 }
 
 const { SINKS } = await import('../legasus/legascreen/witness-store.mjs');
-const { indexTree, testBackdoors, noProductionConsumer, classifyEvent } = await import('../legasus/legascreen/ancestry.mjs');
+const { indexTree, testBackdoors, noProductionConsumer, classifyEvent, observability } = await import('../legasus/legascreen/ancestry.mjs');
 const { discover } = await import('../legasus/legascreen/surface.mjs');
 const fwdSurface = discover(ROOT);
 
@@ -56,6 +56,8 @@ process.on('exit', () => {
 
   const prod = events.filter((e) => e.reachability === REACHABILITY.PRODUCTION_REACHED);
   const tOnly = events.filter((e) => e.reachability === REACHABILITY.TEST_ONLY);
+  const holed = events.filter((e) => e.reachability === REACHABILITY.ANCESTRY_INCOMPLETE);
+  const obs = observability(index);
 
   const privateFns = new Map();     // file::fn -> effects it participated in
   for (const e of prod) {
@@ -86,6 +88,11 @@ process.on('exit', () => {
   say('  REACHABILITY (test-only accessibility cannot establish production reachability):');
   say('      PRODUCTION_REACHED        ' + String(prod.length).padStart(6));
   say('      TEST_ONLY                 ' + String(tOnly.length).padStart(6));
+  say('      ANCESTRY_INCOMPLETE       ' + String(holed.length).padStart(6)
+    + '   a hole in the path poisons the claim, it does not empty it');
+  say('');
+  say('  WHAT THIS INSTRUMENT CAN SEE AT ALL (the denominator must say):');
+  for (const [k, n] of Object.entries(obs)) say('      ' + k.padEnd(34) + String(n).padStart(5));
   say('');
   say('  TEST BACKDOORS DISCOVERED BY STRUCTURE (not named): ' + backdoors.size);
   for (const t of [...backdoors].slice(0, 6)) say('      ' + t);

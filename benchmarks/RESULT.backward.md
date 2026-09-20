@@ -10,12 +10,13 @@ running it now would have burned the only unspoiled transfer test for nothing.
 ## The result that matters
 
     EFFECT_WITNESSED            4132      FILESYSTEM_MUTATION 3415   PROCESS_EXECUTION 717
-    PRODUCTION_REACHED          2245
+    PRODUCTION_REACHED          1569
     TEST_ONLY                   1889
+    ANCESTRY_INCOMPLETE          676
 
     BK-4 THE TWO SURFACES
         forward only (brand-seeded)       10
-        backward only (sink-seeded)       42
+        backward only (sink-seeded)       39
         INTERSECTION                       0
 
 **Zero.** On this repository the brand-seeded surface and the sink-seeded surface do not overlap at
@@ -33,6 +34,36 @@ overlap with everything that actually happens.**
 
 Snapshot, restore, run-a-program, run-git. Authority-bearing by any reading, and **not one of them is
 on the forward surface.**
+
+## THE FIRST PUBLISHED NUMBER WAS AN OVERCLAIM, AND THE HARDENING CAUGHT IT
+
+The run before the epistemic repair reported **PRODUCTION_REACHED 2245**. It is 1569.
+
+    2245  ->  1569 PRODUCTION_REACHED  +  676 ANCESTRY_INCOMPLETE
+
+**676 effects - 16% of the witnessed total - had a reachability verdict resting on a path with an
+unreadable frame in it.** `frames()` was still dropping a line it could not parse, so a hole in the
+ancestry was indistinguishable from a complete path. That is the same defect as the Windows frame
+URL, one level up: the parser was fixed, the SILENCE about parse failure was not.
+
+An unparsed frame might have BEEN the crossing point, so it poisons the reachability claim while
+leaving the frames that did parse valid as participation.
+
+    REPRESENTATION_UNRECOGNIZED  ->  EMPTY SET  ->  SEMANTIC ABSENCE
+
+Information destruction was increasing certainty, inside the instrument, for the third time in one
+slice. The earlier number is preserved here rather than quietly replaced.
+
+## What the instrument cannot see, counted rather than omitted
+
+    OBSERVABLE                          258
+    UNOBSERVABLE_BY_THIS_INSTRUMENT       0
+    NO_MODULE_SYNTAX                      0
+
+Legasus is entirely ES modules, so this coordinate is **unexercised on this subject** and fires only
+on a fixture. It exists because the loader technique substitutes ES modules and a CommonJS region is
+not unmeasured but *outside what this instrument can see* - and a coverage number that hid such a
+region would repeat the unparsed-frame error at repository scale.
 
 ## Nothing names the subject
 

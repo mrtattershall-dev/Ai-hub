@@ -9,7 +9,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { frames, isTestFile, REACHABILITY } from './sink.mjs';
-import { indexTree, testBackdoors, noProductionConsumer, classifyEvent } from './ancestry.mjs';
+import { indexTree, testBackdoors, noProductionConsumer, classifyEvent, observability } from './ancestry.mjs';
 
 function tree(files) {
   const dir = mkdtempSync(join(tmpdir(), 'lgs-back-'));
@@ -97,19 +97,61 @@ test('AN ESM FRAME ON WINDOWS PARSES — regression for a silent measured absenc
     '    at /home/u/p/legasus/x.mjs:9:1',
     '    at TestContext.<anonymous> (C:\\p\\legasus\\a.test.mjs:12:3)'].join('\n');
   const f = frames(stack);
-  assert.equal(f.length, 4);
-  assert.equal(f[1].fn, 'snapshot');
-  assert.equal(f[1].line, 44);
-  assert.ok(f[1].file.endsWith('legacommit/transactional.mjs'));
-  assert.ok(f[3].file.endsWith('a.test.mjs'), 'a Windows path without a file: scheme parses too');
+  assert.equal(f.parsed.length, 4);
+  assert.equal(f.unparsed, 0);
+  assert.equal(f.complete, true);
+  assert.equal(f.parsed[1].fn, 'snapshot');
+  assert.equal(f.parsed[1].line, 44);
+  assert.ok(f.parsed[1].file.endsWith('legacommit/transactional.mjs'));
+  assert.ok(f.parsed[3].file.endsWith('a.test.mjs'), 'a Windows path with no file: scheme parses too');
 });
 
-test('node_modules and runtime-internal frames are not the subject', () => {
+test('MUST FIRE — an UNREADABLE frame is FRAME_UNPARSED, and it poisons the claim', () => {
+  // REPRESENTATION_UNRECOGNIZED -> EMPTY SET -> SEMANTIC ABSENCE is how the last run reported
+  // PRODUCTION_REACHED 0 with complete confidence. An unparsed frame might have BEEN the crossing
+  // point, so no reachability claim survives one.
+  const f = frames(['Error: x',
+    '    at real (/p/src/a.mjs:3:1)',
+    '    at async Promise.all (index 0)'].join('\n'));
+  assert.equal(f.parsed.length, 1, 'the readable frame is still readable');
+  assert.equal(f.unparsed, 1, 'and the unreadable one is COUNTED, not dropped');
+  assert.equal(f.complete, false);
+
+  const dir = tree({ 'a.mjs': 'export function real() { return 1; }\n' });
+  try {
+    const idx = indexTree(dir);
+    const ev = classifyEvent({ sinkClass: 'FILESYSTEM_MUTATION', ancestryComplete: false,
+      stack: [{ fn: 'real', file: join(dir, 'a.mjs').replace(/\\/g, '/'), line: 1 }] },
+    idx, new Set());
+    assert.equal(ev.reachability, REACHABILITY.ANCESTRY_INCOMPLETE,
+      'a hole in the path poisons the claim rather than emptying it');
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('recognised-but-excluded is a DIFFERENT fact from unreadable', () => {
   const f = frames(['Error: x',
     '    at foo (/p/node_modules/dep/index.js:1:1)',
     '    at bar (node:internal/modules/run:5:2)',
     '    at baz (/p/src/real.mjs:7:1)'].join('\n'));
-  assert.deepEqual(f.map((x) => x.fn), ['baz']);
+  assert.deepEqual(f.parsed.map((x) => x.fn), ['baz']);
+  assert.equal(f.excluded, 2, 'deliberately out of scope');
+  assert.equal(f.unparsed, 0, 'and NOT counted as unreadable, which would poison every claim');
+  assert.equal(f.complete, true);
+});
+
+test('OBSERVABILITY IS A COORDINATE — a CommonJS module is not unmeasured, it is unobservable', () => {
+  const dir = tree({
+    'esm.mjs': 'export function a() { return 1; }\n',
+    'cjs.js': 'function b() { return 2; }\nmodule.exports = { b };\n',
+    'plain.js': 'const x = 1;\n',
+  });
+  try {
+    const t = observability(indexTree(dir));
+    assert.equal(t.OBSERVABLE, 1);
+    assert.equal(t.UNOBSERVABLE_BY_THIS_INSTRUMENT, 1,
+      'the loader substitutes ES modules; CommonJS is outside what this instrument can see');
+    assert.equal(t.NO_MODULE_SYNTAX, 1);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
 test('isTestFile recognises the shapes, and only those', () => {

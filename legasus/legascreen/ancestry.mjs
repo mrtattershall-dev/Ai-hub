@@ -102,8 +102,14 @@ export function indexTree(root) {
         from: n.loc.start.line, to: n.loc.end.line });
     } });
 
+    // OBSERVABILITY IS A COORDINATE. The loader technique substitutes ES MODULES; a CommonJS module
+    // is not unmeasured, it is UNOBSERVABLE BY THIS INSTRUMENT, and a coverage number that hides
+    // that region would repeat the unparsed-frame error at repository scale.
+    const esm = ast.body.some((n) => /^(Import|Export)/.test(n.type));
+    const cjs = !esm && /\brequire\s*\(|\bmodule\.exports\b/.test(readFileSync(file, 'utf8'));
     byFile.set(key, { funcs, exported: [...exported], declared: [...declared],
-      aggregates, test: isTestFile(key) });
+      aggregates, test: isTestFile(key),
+      observability: esm ? 'OBSERVABLE' : cjs ? 'UNOBSERVABLE_BY_THIS_INSTRUMENT' : 'NO_MODULE_SYNTAX' });
     walk(ast, (n) => {
       if (n.type !== 'Identifier') return;
       if (!refs.has(n.name)) refs.set(n.name, new Set());
@@ -182,6 +188,10 @@ export function classifyEvent(event, index, backdoors) {
   // counting them would let the screen grow its own coverage by growing itself.
   const production = path.filter((p) => p.known && !p.test && !p.file.startsWith('legascreen/'));
   let reachability = REACHABILITY.PRODUCTION_REACHED;
+  // POISONED BY A HOLE. An unparsed frame might have been the crossing point, so no reachability
+  // claim survives one. The frames that DID parse remain valid as participation.
+  if (event.ancestryComplete === false) reachability = REACHABILITY.ANCESTRY_INCOMPLETE;
+  else
   if (!production.length) reachability = REACHABILITY.TEST_ONLY;
   else {
     // The frame where control CROSSED from test code into production code - the deepest production
@@ -195,4 +205,11 @@ export function classifyEvent(event, index, backdoors) {
   return { ...event, path, reachability,
     privateOnPath: production.filter((p) => !p.exported && p.fn !== '<anonymous>'),
     exportedOnPath: production.filter((p) => p.exported) };
+}
+
+// The denominator must state what the instrument cannot see.
+export function observability(index) {
+  const t = { OBSERVABLE: 0, UNOBSERVABLE_BY_THIS_INSTRUMENT: 0, NO_MODULE_SYNTAX: 0 };
+  for (const [, info] of index.byFile) if (info.observability) t[info.observability]++;
+  return t;
 }
