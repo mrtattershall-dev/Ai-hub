@@ -1,0 +1,25 @@
+Retire constraints2, constraints4, constraints5 and opcontext2: named only by the frozen records of their own revisions
+
+RETIREMENT_PREREG's questions, run as benchmarks/retirement-constraints.mjs with its evidence
+printed. R1: no live importer of any of the four. R2: the conformance audit imports revision 6, so
+supported evidence does not depend on them. R3: PROVENANCE.json names implementations, never these
+files. R4, answered by a STRING scan after the first version's import scan proved insufficient: no
+code references them; each is named exactly once, by LEGACORE_REV2/4/5/6.frozen - the frozen record
+of its own revision, which is history and stays interpretable as text, with the code retrievable at
+7c49fae. R6, the control: constraints6 (from gate diagnostics and conformance) and opfacts (from
+constraints3, opcontext, conformance) read LIVE, so the scanner can see a dependency.
+
+NOT retired, and why: constraints.mjs is referenced as a string by score-constraints.mjs (its argv
+default) and by a measurement README outside the sidecar's coverage; score-constraints.mjs itself is
+referenced by nothing, but it is the instrument behind that README's numbers, and retiring the
+instrument that produced a record the sidecar does not cover is the R3 question in a form this
+analysis does not answer. Both stay, together, and the scanner reports them as it found them.
+
+After the deletion: suite 544/544; conformance audit runs on revision 6 (its one FAIL,
+NO OVER-CONSTRAINT on scopecont/j01:op3, is the recorded pre-existing failure SUPPORTED.md says must
+stand); the eight threatened rigs byte-identical to baseline. The scanner now skips candidates that
+no longer exist and says so, so it describes the tree and not its list.
+
+Message-File: scratch/m45.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
