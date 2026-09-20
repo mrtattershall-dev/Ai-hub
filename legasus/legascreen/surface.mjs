@@ -75,17 +75,32 @@ function analyze(file, root) {
   const imports = new Map();          // local name -> { from (resolved path), imported }
   const funcs = new Map();            // function name -> { name, exported, calls:Set, brandOps:Set }
   const brands = new Set();           // local names bound to `new WeakSet()`
+  const links = [];                   // S-8: every in-tree module edge, with how it was established
 
   for (const n of ast.body) {
     if (n.type === 'ImportDeclaration') {
       const spec = n.source.value;
       const from = spec.startsWith('.') ? resolve(dirname(file), spec) : spec;
+      if (spec.startsWith('.')) links.push({ kind: 'STATIC', target: from, from: rel });
       for (const s of n.specifiers) {
         imports.set(s.local.name, { from,
           imported: s.type === 'ImportSpecifier' ? s.imported.name : '*' });
       }
     }
   }
+
+  // S-8. A DYNAMIC IMPORT IS NOT AN ABSENCE. `await import(expr)` whose target cannot be established
+  // statically is UNRESOLVED - a coordinate with a value - rather than a module edge that silently
+  // is not there. The report should look gray, not green.
+  walk(ast, (n) => {
+    if (n.type !== 'ImportExpression') return;
+    const a = n.source;
+    if (a && a.type === 'Literal' && typeof a.value === 'string' && a.value.startsWith('.')) {
+      links.push({ kind: 'DYNAMIC', target: resolve(dirname(file), a.value), from: rel });
+    } else if (!(a && a.type === 'Literal' && typeof a.value === 'string')) {
+      links.push({ kind: 'UNRESOLVED', target: null, from: rel });
+    }
+  });
 
   // Brands, by shape: a binding initialised to `new WeakSet()`.
   walk(ast, (n) => {
@@ -139,7 +154,7 @@ function analyze(file, root) {
     }
   });
 
-  return { file, rel, imports, funcs, brands };
+  return { file, rel, imports, funcs, brands, links };
 }
 
 // The surface: brand-touching functions, then everything that reaches them, to a fixpoint.
@@ -199,7 +214,19 @@ export function discover(root) {
     if (!added) break;
   }
 
-  return { candidates: [...found.values()].sort((a, b) => a.level - b.level
+  // S-8. Module-resolution completeness as an explicit COORDINATE, not an absence. RUNTIME_ONLY is
+  // reserved and is NOT measured by this slice; saying so is the point of having the word.
+  const linkage = { STATIC_LINKED: 0, DYNAMIC_LINKED: 0, UNRESOLVED: 0, RUNTIME_ONLY: 'NOT MEASURED' };
+  for (const m of mods) {
+    for (const l of m.links) {
+      const known = l.target !== null && byFile.has(String(l.target).replace(/.mjs$/, ''));
+      if (l.kind === 'UNRESOLVED' || !known) linkage.UNRESOLVED++;
+      else if (l.kind === 'DYNAMIC') linkage.DYNAMIC_LINKED++;
+      else linkage.STATIC_LINKED++;
+    }
+  }
+
+  return { linkage, candidates: [...found.values()].sort((a, b) => a.level - b.level
     || a.module.localeCompare(b.module) || a.fn.localeCompare(b.fn)),
   modules: mods.length, brandSites: mods.filter((m) => m.brands.size).map((m) => m.rel), caveat: CAVEAT };
 }

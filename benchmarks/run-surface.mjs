@@ -145,6 +145,9 @@ process.on('exit', () => {
       + String(s.observed).padStart(7) + String(s.produced + s.consumed).padStart(6) + '  ' + status);
   }
   say('');
+  say('  S-8 MODULE RESOLUTION, as a coordinate rather than an absence:');
+  for (const [k, v] of Object.entries(surface.linkage)) say('      ' + k.padEnd(16) + v);
+  say('');
   say('  CAVEAT: ' + CAVEAT);
   say('  SCREENABLE IS NOT SCREENED. Nothing here compares an observation to a declaration, so the');
   say('  count of transforms actually SCREENED is still 1 (hand-driven) and previously unknown');

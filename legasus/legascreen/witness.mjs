@@ -85,7 +85,10 @@ export function recorder() {
   // perturbed world. Nothing here copies, edits or constructs an authority object.
   function run(node, memo, mut, state) {
     if (memo.has(node.id)) return memo.get(node.id);
-    const tpl = (mut && mut.node === node.id) ? mut.args : node.args;
+    // `mut` is a Map(nodeId -> argument template). A counterfactual may have to remove facts from
+    // SEVERAL construction nodes at once - the all-removed cell of a support truth table needs
+    // exactly that - so the intervention is a set, not a single edit.
+    const tpl = (mut && mut.has(node.id)) ? mut.get(node.id) : node.args;
     const args = tpl.map((a) => decode(a, memo, mut, state));
     let r;
     try { r = node.fn(...args); } catch (e) {

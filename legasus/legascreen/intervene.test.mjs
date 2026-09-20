@@ -53,7 +53,7 @@ test('C-3b MUST FIRE — a leaf the subject IGNORES is OBSERVED with no delta, n
   const r = intervene(R, w, leafAt(w, 'arg[0].context.note'));
   assert.equal(r.outcome, STATE.OBSERVED, 'the intervention HAPPENED');
   assert.deepEqual(r.delta, [], 'and the output did not move');
-  assert.match(r.why, /authority coordinates did not/);
+  assert.match(r.why, /the observed reading did not/);
 });
 
 test('C-2b DID NOT FIRE, AND THE PREDICTION WAS WRONG — under removal, NO_EFFECT is unreachable', () => {
@@ -132,7 +132,7 @@ test('BOTH SIDES UNREADABLE IS NOT A MEASUREMENT', () => {
   const w = g.R.witnesses('t.derive')[0];
   const r = intervene(g.R, w, leafAt(w, 'arg[0].premises[0].context.repo'));
   assert.equal(r.outcome, STATE.OUTPUT_UNOBSERVABLE);
-  assert.match(r.why, /neither the baseline nor the counterfactual/);
+  assert.match(r.why, /neither side carries anything this observer can read/);
 });
 
 test('A BASELINE REFUSAL WHOSE COUNTERFACTUAL SUCCEEDS IS STILL A MEASUREMENT', () => {
@@ -165,5 +165,5 @@ test('C-6 — no result carries a verdict, and nothing here asks for one', () =>
 test('C-5b — THE INTERVENTION SUBSTRATE OFFERS NO BACKDOOR', () => {
   const names = Object.keys(substrate).sort();
   assert.deepEqual(names.filter((k) => /forge|mint|fabricat|unsafe|bypass|testonly/i.test(k)), []);
-  assert.deepEqual(names, ['intervene', 'interveneAll']);
+  assert.deepEqual(names, ['OBSERVER', 'coordinates', 'intervene', 'interveneAll']);
 });

@@ -103,10 +103,10 @@ process.on('exit', () => {
       if (r.outcome !== STATE.OBSERVED) continue;
       const d = r.delta.length ? r.delta.map((x) => x.coordinate + ' ' + x.effect).join(', ')
         : 'NO DELTA (input changed, authority coordinates did not)';
-      say('      #' + String(r.leaf.node).padEnd(3) + r.leaf.path.padEnd(38) + d);
+      say('      #' + String(r.leaves[0].node).padEnd(3) + r.leaves[0].path.padEnd(38) + d);
     }
-    const vac = ex.results.filter((r) => r.outcome === STATE.PERTURBATION_NO_EFFECT).length;
-    say('      ...' + vac + ' leaf(s) were PERTURBATION_NO_EFFECT and scored nothing');
+    const vac0 = ex.results.filter((r) => r.outcome === STATE.PERTURBATION_NO_EFFECT).length;
+    say('      ...' + vac0 + ' leaf(s) were PERTURBATION_NO_EFFECT and scored nothing');
     say('');
   }
 
