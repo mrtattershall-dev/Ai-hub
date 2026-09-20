@@ -1,0 +1,37 @@
+Correct TRANSFER-2: forward discovery's zero was UNOBSERVABLE, and the mechanism now says so
+
+ai-native-engine-75 read the result and caught it. Forward discovery did not find nothing on the hub
+- it could not look. Its precondition is at least one identity brand to seed on and the hub has none,
+so a mechanism whose precondition was absent reported its own inapplicability, and recording that as
+zero candidates invites a later reader to treat it as evidence that the hub HAS no authority surface.
+That is absence of observation becoming evidence of absence.
+
+The intersection line was not a result either: an intersection of zero between a populated set and an
+UNMEASURED one is not two methods disagreeing, it is one method unwitnessed by the other. On Legasus
+the 10 and 39 were both populated and genuinely disjoint, which IS a result about two surfaces; the
+hub number is not the same kind of object and must not sit in the same column.
+
+So the honest headline is narrower. BACKWARD discovery transferred; forward discovery is UNTESTED on
+this subject, because a subject that cannot exercise half a mechanism has not tested that half.
+
+The damning part is that this codebase already made the distinction twice - supportFormula returns
+UNKNOWN below two constructed inputs, and observability returns UNOBSERVABLE_BY_THIS_INSTRUMENT
+rather than counting a CommonJS module as examined-and-empty - and the same session broke it in a
+third place. Repaired at the mechanism rather than in the wording: discover() returns forward
+MEASURED or UNOBSERVABLE with its reason, the runner prints INTERSECTION UNDEFINED when either
+surface is unmeasured, and two controls pin it including a POSITIVE one so UNOBSERVABLE cannot become
+the constant answer.
+
+TRANSFER-2's numbers stand as recorded and the frozen preregistration is untouched; the mechanism
+change means any future hub run is TRANSFER-3.
+
+The amendment also records 75's judgement that the backdoor detector's one-of-four outranks
+TRANSFER-2: fixture recall 1.0 against first-real-specimen recall 0.25, where the fixture came from
+the same generative process as the detector and so could only confirm it. Every probe set in this
+repository was validated that way, and 1/4 rather than 4/4 is luck about which specimen arrived
+first. And that 75 declined Entry 35 because a ledger number claimed merely because one is free is
+the manufactured objective law 7 refuses.
+
+Message-File: scratch/m118.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

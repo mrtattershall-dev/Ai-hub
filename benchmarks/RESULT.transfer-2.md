@@ -132,3 +132,58 @@ after the cleanup at an 8-process baseline.
 
 **Anything either session calibrated or timed today against a "today's numbers" reference is
 anchored ~1.85x high**, which is a fact about the machine and not about any subject.
+
+## SECOND CORRECTION — U-4's "forward = 0" WAS WRONG, AND THE HEADLINE IS NARROWER
+
+Raised by ai-native-engine-75 reading this result. It is right, and the mechanism has been repaired
+rather than only the wording.
+
+**Forward discovery did not find nothing. IT COULD NOT LOOK.** Its precondition is at least one
+identity brand to seed on, and the hub has none. A mechanism whose precondition is absent reported
+its own inapplicability, and recording that as `0 candidates` invites a reader - including me, later
+- to treat it as evidence that the hub HAS no authority surface. That is absence of observation
+becoming evidence of absence.
+
+    was        forward only (brand-seeded)   0
+    should be  forward                       UNOBSERVABLE (precondition absent: no identity brand)
+
+**And the intersection line is not a result either.** An intersection of 0 between a populated set
+and an UNMEASURED one is not two methods disagreeing; it is one method, unwitnessed by the other. On
+Legasus, 10 and 39 were both populated and genuinely disjoint - that IS a result about two surfaces.
+The hub number is not the same kind of object and must not sit in the same column.
+
+    hub INTERSECTION   UNDEFINED, not 0
+
+**The honest headline is narrower than "it transferred":**
+
+> **BACKWARD discovery transferred.** Forward discovery is UNTESTED on this subject, because a
+> subject that cannot exercise half a mechanism has not tested that half.
+
+That is a scope statement, not a retreat: the backward half reaching a foreign subject is a real
+result and is not improved by a claim the run cannot support.
+
+**What this project already knew, and violated anyway.** `supportFormula` returns UNKNOWN below two
+constructed inputs. `observability` returns UNOBSERVABLE_BY_THIS_INSTRUMENT rather than counting a
+CommonJS module as examined-and-empty. The same distinction, made correctly twice in this codebase
+and then broken in a third place by the session that wrote both.
+
+`discover()` now returns `forward: MEASURED | UNOBSERVABLE` with its reason, two controls pin it (no
+brand yields UNOBSERVABLE; a populated seed yields MEASURED, so UNOBSERVABLE cannot become the
+constant answer), and the runner prints INTERSECTION: UNDEFINED when either surface is unmeasured.
+**TRANSFER-2's numbers stand as recorded** and the frozen preregistration is untouched; the mechanism
+change means any future hub run is TRANSFER-3.
+
+## AND THE 1-OF-4 IS PROBABLY THE MORE IMPORTANT RESULT
+
+    backdoor detector, fixture                1/1      recall 1.0
+    backdoor detector, first real specimen    1/4      recall 0.25
+
+The fixture was drawn from the same generative process as the detector, so it could only confirm it:
+**it measured the fixture, not the phenomenon.** The other three were never represented in the thing
+that validated it - the recall-side twin of the vacuity problem this project has been chasing on the
+precision side all along.
+
+The uncomfortable generalisation, and it is not about one detector: **every probe set in this
+repository was validated the same way.** That this number came out 1/4 rather than 4/4 is luck about
+which specimen arrived first, not a property of the method. The only remedy demonstrated here is the
+one that happened by accident - meet a real subject early and let it say 1/4 out loud.

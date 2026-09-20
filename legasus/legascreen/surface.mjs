@@ -226,9 +226,30 @@ export function discover(root) {
     }
   }
 
-  return { linkage, candidates: [...found.values()].sort((a, b) => a.level - b.level
+  const brandSites = mods.filter((m) => m.brands.size).map((m) => m.rel);
+
+  // A ZERO FROM AN EMPTY SEED IS NOT A MEASUREMENT.
+  //
+  // Forward discovery has a PRECONDITION: at least one identity brand to seed on. On a subject with
+  // none, this mechanism did not look and found nothing - it reported its own inapplicability. The
+  // two are different states, and recording the second as "0 candidates" invites a later reader to
+  // treat it as evidence that the subject HAS no authority surface. That is absence of observation
+  // becoming evidence of absence.
+  //
+  // This module already made the distinction twice elsewhere - supportFormula returns UNKNOWN below
+  // two constructed inputs, observability returns UNOBSERVABLE_BY_THIS_INSTRUMENT rather than
+  // counting a CommonJS module as examined-and-empty - and TRANSFER-2 recorded forward = 0 on a
+  // subject with no brand anyway. Caught by ai-native-engine-75 reading the result.
+  const state = brandSites.length
+    ? { forward: 'MEASURED', why: 'seeded on ' + brandSites.length + ' identity brand site(s)' }
+    : { forward: 'UNOBSERVABLE',
+      why: 'PRECONDITION ABSENT: no identity brand site exists in this subject, so forward discovery'
+        + ' has no seed and did not look. This is not a finding that the subject lacks an authority'
+        + ' surface; it is this mechanism reporting that it cannot be applied here.' };
+
+  return { ...state, linkage, candidates: [...found.values()].sort((a, b) => a.level - b.level
     || a.module.localeCompare(b.module) || a.fn.localeCompare(b.fn)),
-  modules: mods.length, brandSites: mods.filter((m) => m.brands.size).map((m) => m.rel), caveat: CAVEAT };
+  modules: mods.length, brandSites, caveat: CAVEAT };
 }
 
 // The loader config that instruments exactly the EXPORTED candidates. Private ones cannot be wrapped

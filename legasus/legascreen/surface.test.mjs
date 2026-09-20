@@ -37,6 +37,28 @@ test('S-2b MUST FIRE — no brand, no candidates: discovery never falls back to 
     const s = discover(dir);
     assert.equal(s.candidates.length, 0, 'names are not evidence of authority');
     assert.deepEqual(s.brandSites, []);
+
+    // AND THE ZERO IS NOT A MEASUREMENT. With no brand there is no seed, so the mechanism did not
+    // look. TRANSFER-2 recorded forward = 0 on exactly such a subject and the number read as
+    // evidence that the hub has no authority surface. Caught by ai-native-engine-75.
+    assert.equal(s.forward, 'UNOBSERVABLE');
+    assert.match(s.why, /PRECONDITION ABSENT/);
+    assert.match(s.why, /not a finding that the subject lacks an authority surface/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('MUST FIRE — a populated seed is MEASURED, so UNOBSERVABLE is not the constant answer', () => {
+  // The positive half. Without it, a mechanism that always says UNOBSERVABLE would pass the control
+  // above and be indistinguishable from one that works.
+  const dir = tree({ 'a.mjs': `
+    const B = new WeakSet();
+    export function make(x) { const t = Object.freeze({ x }); B.add(t); return t; }
+  ` });
+  try {
+    const s = discover(dir);
+    assert.equal(s.forward, 'MEASURED');
+    assert.equal(s.candidates.length, 1);
+    assert.match(s.why, /seeded on 1 identity brand site/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 

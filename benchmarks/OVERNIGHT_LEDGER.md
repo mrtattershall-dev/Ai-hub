@@ -2419,3 +2419,44 @@ Both are r4 work. Neither may be repaired in r3.
                  still unrepaired by their own preregistrations; and Entry 30's bridge-mutation gap.
 
 ---
+
+### AMENDMENT to Entry 34 — forward discovery's zero was UNOBSERVABLE, and the headline was too wide
+
+Raised by ai-native-engine-75 reading RESULT.transfer-2.md. Upheld, and repaired at the mechanism.
+
+Entry 34 records "FORWARD FOUND NOTHING AT ALL - not few, ZERO". WRONG. Forward discovery's
+precondition is an identity brand to seed on; the hub has none; so it did not look. A mechanism
+reporting its own inapplicability is not a candidate count, and 0 invites a later reader to treat it
+as evidence the hub has no authority surface - absence of observation becoming evidence of absence,
+which is the defect the non-vacuity discipline exists to refuse.
+
+    forward         UNOBSERVABLE (precondition absent), not 0
+    INTERSECTION    UNDEFINED, not 0 - a populated set against an unmeasured one is not a
+                    disagreement between two methods, it is one method unwitnessed by the other
+    headline        BACKWARD discovery transferred. Forward is UNTESTED on this subject.
+
+THIS CODEBASE ALREADY MADE THAT DISTINCTION TWICE - supportFormula returns UNKNOWN below two
+constructed inputs, and observability returns UNOBSERVABLE_BY_THIS_INSTRUMENT rather than counting a
+CommonJS module as examined-and-empty - and the same session broke it in a third place.
+
+discover() now returns forward MEASURED or UNOBSERVABLE with its reason; two controls pin it,
+including a POSITIVE one so UNOBSERVABLE cannot become the constant answer. TRANSFER-2's numbers
+stand as recorded and the frozen preregistration is untouched; the mechanism change makes any future
+hub run TRANSFER-3.
+
+AND 75 IS RIGHT THAT THE 1-OF-4 OUTRANKS TRANSFER-2.
+
+    backdoor detector, fixture              1/1    recall 1.0
+    backdoor detector, first real specimen  1/4    recall 0.25
+
+Inside minutes of meeting a real subject. The fixture came from the same generative process as the
+detector, so it could only confirm it: IT MEASURED THE FIXTURE, NOT THE PHENOMENON, and the other
+three shapes were never represented in the thing that validated it. That is the RECALL-side twin of
+the vacuity problem this project has chased on the precision side all along. EVERY PROBE SET IN THIS
+REPOSITORY WAS VALIDATED THAT WAY, 75's included, and 1/4 rather than 4/4 is luck about which
+specimen arrived first rather than a property of the method.
+
+75 declined Entry 35 on the grounds that a ledger number claimed because one is free is precisely the
+manufactured objective law 7 refuses. Recorded because it is the correct call and worth the precedent.
+
+---
