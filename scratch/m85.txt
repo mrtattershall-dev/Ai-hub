@@ -1,0 +1,21 @@
+Ledger Entry 26: AUTO-WITNESS-1, and the fifth consecutive control-found instrument defect
+
+Records the milestone as evidence: 55 calls recorded from two existing test files running unmodified,
+55 of 55 root witnesses replaying semantically identical through the real production functions, 24
+leaf facts discovered for a derive whose hand-written driver had declared four, and a no-driver check
+asserting the absence of facts, construct and operate across all five files on the capture path.
+
+The entry keeps the two uncomfortable numbers in their honest form. W-3's branding result is 6 of 6
+over the six witnesses whose original result was a minted token, not 12 of 12, because the other six
+replayed a refusal and a refusal proves nothing about branding. And no coverage fraction appears
+anywhere, because the authority surface has not been discovered and a better-looking fraction over
+the same unestablished surface would be the same error as the one the owner corrected.
+
+The control-found defect this time was in the control itself: W-2b varied a field derive does not
+read, so the output was identical every time and the non-determinism control passed while proving
+nothing. That is the fifth consecutive slice where a control found a defect in the instrument rather
+than in the subject, and the first where the instrument at fault was the control.
+
+Message-File: scratch/m85.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -1630,3 +1630,94 @@ Both are r4 work. Neither may be repaired in r3.
                  stopping condition, not a pause in work.
 
 ---
+
+## Entry 26 — AUTO-WITNESS-1: the recipe is recorded rather than authored, and the driver is gone
+
+    objective    the owner's named milestone - capture enough upstream construction history from a
+                 transformation that runs during an EXISTING test to reproduce the same legitimate
+                 invocation without a hand-written driver
+    authority    OWNER, 2026-09-20, after the slice-2 inspection
+    start hash   c3cec92 (preregistration alone)
+    evidence     AUTO_WITNESS_1_PREREG.md (c3cec92), RESULT.auto-witness.md,
+                 legasus/legascreen/{outcome,witness,witness-store,witness-loader,witness-register}.mjs
+
+    THE INSPECTION FOUND THE BOTTLENECK AND THE OWNER NAMED IT: the screen is not limited by its
+    invariants, it is limited by its ability to automatically construct a legitimate experiment.
+    Slice 2's driver was twelve lines of my own judgment about what derive's pre-authority facts ARE,
+    and writing 250 more would not have been progress - it would have been 250 more chances for the
+    screen author to decide what the subject means.
+
+    W-1 HELD. Two existing test files ran unmodified under a module loader hook; 18 of their own
+    tests passed under instrumentation, so the shim is transparent to the subject.
+
+        calls recorded 55       op                  ROOT  UPSTREAM  REPLAYED
+                                calculus.observe      29         0        29
+                                calculus.derive       13        12        13
+                                calculus.delegate     13         7        13
+
+        NO-DRIVER CHECK: 5 files on the capture path -> none supplies facts/construct/operate
+
+    One captured recipe names 24 LEAF FACTS. The hand-written driver declared four, and I chose those
+    four. Here I chose none of them.
+
+    An ES module namespace is immutable from outside, so an already-written test cannot be intercepted
+    by assignment - but substituting the MODULE can be. The loader returns a shim that re-exports the
+    real module and wraps the named exports, and the shim ADDS NO CAPABILITY: every wrapper calls the
+    real function and returns the real value.
+
+    CLASSIFICATION IS BY IDENTITY, NEVER BY NAME OR SHAPE.
+
+        DERIVED   this object IS a recorded call's return value
+        FOREIGN   the SUBJECT'S OWN brand says it is authority, but no recorded call produced it
+        OPAQUE    cannot be rebuilt, held by reference
+        LEAF      plain data - the only mutable surface
+
+    FOREIGN exists because a frozen token is a plain object. Calling it a leaf would hand the screen
+    mutable raw data exactly where the architecture keeps an authority object.
+
+    W-3 WAS THE PREDICTION MOST LIKELY TO KILL THE SLICE, and it held where it counts:
+
+        witnesses whose ORIGINAL result was a minted token : 6 / 12
+        of those, REPLAYED to a token the subject accepts  : 6 / 6
+
+    Asked of calculus.isAuthority itself. A recorder that deep-cloned anything it touched would score
+    zero, because a clone is not in the module-private WeakSet. The other six replayed a REFUSAL,
+    which proves nothing about branding, so they are counted separately rather than folded into a
+    comfortable 12 of 12.
+
+    W-5: A JUDGMENT IS NOW STRUCTURALLY UNREACHABLE WITHOUT THE EXPERIMENT. Eleven states, three
+    verdicts, and a verdict is not something a probe returns but something a journey earns over
+    DISCOVERED -> BASELINE_REPLAYED -> PERTURBATION_APPLIED -> OBSERVED. A real witness that reached
+    BASELINE_REPLAYED and asked for a verdict got INVARIANT_UNKNOWN naming the two stages it never
+    reached. HELD IS GATED EXACTLY AS HARD AS VIOLATED, because a pass asserted over an experiment
+    that never ran is the same error with a comfortable sign. The honest limit is written into the
+    file: nobody can stop a probe returning its own object, but such an object is not a verdict.
+
+    AND THE FIRST VERSION OF CONTROL W-2b COULD NOT FIRE. It varied a field derive does not read, so
+    the output was identical every time and the control passed while proving nothing - a vacuous
+    control written inside the slice whose subject is vacuity. Found by running it. FIFTH CONSECUTIVE
+    SLICE IN WHICH A CONTROL FOUND A DEFECT IN THE INSTRUMENT RATHER THAN IN THE SUBJECT, and the
+    first in which the defect was in the control itself.
+
+    W-8 was a prediction of NO detection and held: no judgment here, so no finding about the
+    repository. Two test files never used during development gave 30/30 replayed and produced a mixed
+    two-constructor recipe unprompted - a derive whose premises were a delegate and an observe.
+
+    NO COVERAGE FRACTION IS REPORTED. The owner's correction stands: 1/251 exported functions was a
+    fraction over a surface never established, and a better-looking fraction over the same
+    unestablished surface would be the same error. Counts only until discovery exists.
+
+    NOT BUILT, and named: perturbation, counterfactual, support formulas; declared remains human
+    testimony and is not consulted; no static discovery of the authority surface; nothing about
+    transformations that do not execute during an existing test, and that population is UNMEASURED,
+    not empty. The five prototypes are NOT merged - the correct common abstraction is still unknown,
+    and merging on accidental similarity would freeze it.
+
+    Focused 17/17. Suite 629/629.
+
+    next         AUTO-CF-1, which the owner sequenced immediately after this one: mutate one eligible
+                 leaf fact, reconstruct through the real production path, prove the perturbation
+                 occurred, execute the same target, produce a typed outcome. No semantic judgment
+                 until that works.
+
+---
