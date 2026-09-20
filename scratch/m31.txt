@@ -1,0 +1,19 @@
+Repair C9-a: a pending operation holds the frontier open only while it is itself a justified investigation
+
+evidenceFrontier took `pending` on trust: any string in it made the frontier OPEN, and contestState
+then reported OPEN_CONTEST with zero objectives - a stall that says "do not quiesce" and offers
+nothing to do (b11e51f, C9-a). Adding an irrelevant name to a list held the system out of QUIESCE
+indefinitely. A name is not an obligation. contestState now discharges a pending item that is not a
+justified investigation, records the discharge on the frontier view it returns, and lets a missing
+required producer hold the frontier open on its own, because that is a real gap and not a name.
+
+Executed both ways: a justified pending investigation still holds the contest OPEN with one
+objective; an unjustified one - absent from the list, or present but failing a condition - is
+discharged and the contest quiesces. The freeze gate's tenth refusal and the antiexplanation
+QUIESCENT test are unchanged.
+
+Suite 503/503.
+
+Message-File: scratch/m31.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

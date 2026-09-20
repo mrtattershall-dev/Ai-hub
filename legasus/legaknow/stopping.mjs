@@ -77,16 +77,34 @@ export function investigationJustified({ name, authorized, executable, targetsDi
 // failure to try hard enough.
 export function contestState({ frontier, investigations = [] }) {
   const justified = investigations.map(investigationJustified).filter((i) => i.ok);
-  if (frontier.state === FRONTIER.OPEN) {
-    return { state: CONTEST.OPEN_CONTEST, justified, frontier,
-      why: 'the conflict stands and the evidence frontier is not closed: ' + frontier.why };
+  // A PENDING OPERATION HOLDS THE FRONTIER OPEN ONLY WHILE IT IS ITSELF A JUSTIFIED INVESTIGATION.
+  // The first version took `pending` on trust: any string in it made the frontier OPEN, and an OPEN
+  // frontier with zero justified investigations is a stall that reports "do not quiesce" forever
+  // (composition attack C9-a). Adding an irrelevant name to a list created non-work that could not be
+  // discharged. A name is not an obligation; a pending item that is not a justified investigation is
+  // DISCHARGED, and the discharge is recorded on the frontier rather than silently dropped. A missing
+  // required producer still holds the frontier open on its own - that is a real gap, not a name.
+  const justifiedNames = new Set(justified.map((i) => i.name));
+  const pending = frontier.pending || [];
+  const discharged = pending.filter((p) => !justifiedNames.has(p));
+  const stillPending = pending.filter((p) => justifiedNames.has(p));
+  const missing = frontier.missing || [];
+  const open = missing.length > 0 || stillPending.length > 0;
+  const view = { ...frontier, pending: stillPending, discharged,
+    state: open ? FRONTIER.OPEN : FRONTIER.CLOSED,
+    why: (open ? frontier.why : 'every required producer was attempted and nothing justified is pending')
+      + (discharged.length ? ' (discharged from pending as not a justified investigation: '
+        + discharged.join(', ') + ')' : '') };
+  if (open) {
+    return { state: CONTEST.OPEN_CONTEST, justified, frontier: view,
+      why: 'the conflict stands and the evidence frontier is not closed: ' + view.why };
   }
   if (justified.length) {
-    return { state: CONTEST.OPEN_CONTEST, justified, frontier,
+    return { state: CONTEST.OPEN_CONTEST, justified, frontier: view,
       why: 'the frontier is closed but ' + justified.length + ' justified investigation(s) remain: '
         + justified.map((i) => i.name).join(', ') };
   }
-  return { state: CONTEST.QUIESCENT_CONTEST, justified: [], frontier,
+  return { state: CONTEST.QUIESCENT_CONTEST, justified: [], frontier: view,
     why: 'the frontier is closed and no authorized operation has a justified expectation of changing'
       + ' what may be claimed. The system is ENTITLED TO STOP INVESTIGATING. This says nothing about'
       + ' whether the proposition is decidable - only that this system cannot currently justify an'
