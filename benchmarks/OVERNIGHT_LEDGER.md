@@ -1890,3 +1890,92 @@ Both are r4 work. Neither may be repaired in r3.
                  carried into its preregistration rather than discovered again afterwards.
 
 ---
+
+## Entry 29 — SEMANTIC-1: a transform nobody pointed at reached SCREENED, and the first run failed on my own defect
+
+    objective    the owner's two tracks - producer semantics (support formulas against a
+                 provenance-bound contract) and consumer semantics (decisions under weakened
+                 authority) - kept apart, with the calculus NOT wired into production
+    authority    OWNER, 2026-09-20
+    start hash   c66c89c (preregistration alone)
+    evidence     SEMANTIC_1_PREREG.md (c66c89c), RESULT.semantic.md,
+                 legasus/legascreen/{semantic,contract}.mjs, contracts/calculus.derive.json
+
+    P-5 REACHED.
+
+        legaknow/calculus.mjs::derive
+          DISCOVERED         by the brand-shape surface scan; no name supplied
+          WITNESSED          from an existing test; no hand-written driver
+          COUNTERFACTUALIZED 22 cells, minted through the PRODUCTION constructors
+          CONTRACT-RESOLVED  against calculus.mjs @ 8988942c5701be7b
+          SCREENED           INVARIANT_HELD
+
+        coordinates measured 19    SCREENED 3 (held 3, violated 0)
+        CHARACTERIZED        16    UNMAPPABLE 0
+
+    "Human points to function" has left the pipeline. WHAT HAS NOT LEFT IT IS THE CRITERION: the
+    contract is still human testimony, and the claim is precisely that the DRIVER is gone.
+
+    ROLES ARE ESTABLISHED FROM WHAT A CALL DID, NOT FROM WHAT IT IS CALLED. derive is a TRANSDUCER on
+    8 calls and a CONSUMER on 9 - the same function, different roles, because the role is a property
+    of the call. observe never consumes; isAuthority never produces. None of that was told to the
+    screen.
+
+    TRACK C's POSITIVE CONTROL FIRED ON REAL CODE: 50 decisions UNCHANGED under a real perturbation
+    against 13 CHANGED, with isAuthority at 0 required and 12 irrelevant, because no fact of a token
+    changes whether it IS a token. A screen that convicted every perturbation would have scored
+    twelve findings there and looked better for it.
+
+    AND THE FIRST RUN FAILED P-5 ON A DEFECT IN MY OWN LAYER. I counted the target's own
+    configuration facts - a rule name, a claim string - as a third input group, so two of three
+    groups carried the coordinate, every derive call came out SOME_OF(2/3), and ALL_OF WAS
+    STRUCTURALLY UNREACHABLE for anything in the repository. The repair is structural rather than a
+    tuning: an input group is a node a recorded call CONSTRUCTED and handed in, and the root's own
+    scalars are facts about the operation, not premises of an aggregation over premises. SIXTH
+    CONSECUTIVE SLICE IN WHICH A CONTROL OR A RUN FOUND A DEFECT IN THE INSTRUMENT RATHER THAN IN
+    THE SUBJECT.
+
+    UNMAPPABLE IS FIRST-CLASS, AND HAD TO BE FORCED TO FIRE. After the repair it is 0 on the real
+    tree, which makes it a state never shown to work - not acceptable here - so a control forces it:
+    an observation of SOME_OF(2/3) against a vocabulary with no such word resolves UNMAPPABLE, NOT
+    coerced to UNKNOWN and NOT coerced to the nearest available word.
+
+        CHARACTERIZED   measured; no established contract says what it should be
+        UNMAPPABLE      measured; the specification has no vocabulary for what we saw
+
+    A capability gap in the SPECIFICATION is not evidence against the subject. The state was added
+    mid-slice on owner instruction and is recorded as such, not as a discovery of my own.
+
+    P-3, SELF-RATIFICATION BLOCKED BY CONSTRUCTION. A contract is REFUSED at construction without
+    source, provenance and validAgainst, and validAgainst is a digest of the subject's bytes. Proven
+    on real bytes: a contract convicts, the implementation is edited, and the contract can neither
+    convict NOR absolve. THE ABSOLVE HALF IS THE ONE USUALLY FORGOTTEN. The structural gate still
+    applies on top - a current, established contract asked to judge an experiment that never ran
+    returns INVARIANT_UNKNOWN.
+
+    S-8, MODULE RESOLUTION AS A COORDINATE: STATIC_LINKED 256, DYNAMIC_LINKED 0, UNRESOLVED 4,
+    RUNTIME_ONLY NOT MEASURED. The four are dynamic imports whose target acorn cannot establish -
+    unresolved rather than absent. Gray, not green.
+
+    A NUMBER THAT MOVED: the surface now reports 18 static candidates instead of 15. The SUBJECT
+    count is unchanged at 10; the INSTRUMENT grew from 5 to 8 because this slice added modules that
+    call journey. The screen counting itself is exactly what the subject/instrument split is for.
+
+    NOT ESTABLISHED: the differential comparison of production behaviour against the calculus as a
+    specification, and the semantic bridge that would make such a comparison honest, arrived mid-slice
+    and are NOT folded into this frozen preregistration. No backward/sink discovery, so the surface
+    is still one-directional. THE CALCULUS IS NOT WIRED INTO PRODUCTION and nothing here nudges it
+    that way - a scanner that requires its subject to adopt its ontology is a scanner for cooperative
+    software only.
+
+        transforms SCREENED (mechanically, no driver)   1   (derive, 3 coordinates)
+        transforms SCREENED (hand-driven, slice 2)      1
+        previously unknown repository defects           0
+
+    Focused 15/15. Suite 661/661.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. BRIDGE-1 is preregistered separately: the
+                 production-versus-specification comparison, with AGREE / RESULT_DISAGREEMENT /
+                 REASON_DISAGREEMENT / UNMAPPABLE, and a bridge object that can itself be mutated.
+
+---

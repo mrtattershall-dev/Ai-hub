@@ -1,0 +1,24 @@
+Ledger Entry 29: P-5 reached, and the sixth consecutive instrument defect
+
+Records the milestone in the owner's terms - calculus.derive going from DISCOVERED to SCREENED with
+no hand-written driver - together with the qualification that what left the pipeline is the driver
+and not the criterion, since the contract remains human testimony.
+
+The entry keeps the failure in its own section. The first run did not reach P-5, because I counted
+the target's own configuration facts as a third input group, which made ALL_OF structurally
+unreachable for every derive in the repository. The repair is structural rather than a tuning, and
+that is the sixth consecutive slice where a control or a run found the defect in the instrument
+rather than in the subject.
+
+It records that UNMAPPABLE was added mid-slice on owner instruction rather than discovered by me,
+that it is 0 on the real tree and therefore had to be forced to fire by a control, and that
+CHARACTERIZED and UNMAPPABLE are different facts kept apart.
+
+It records the absolve half of the staleness rule as the half usually forgotten, the surface total
+moving because the instrument grew rather than the repository changing, and that the calculus is
+still not wired into production - a scanner that requires its subject to adopt its ontology is a
+scanner for cooperative software only.
+
+Message-File: scratch/m94.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
