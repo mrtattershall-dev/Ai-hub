@@ -1979,3 +1979,83 @@ Both are r4 work. Neither may be repaired in r3.
                  REASON_DISAGREEMENT / UNMAPPABLE, and a bridge object that can itself be mutated.
 
 ---
+
+## Entry 30 — BRIDGE-1: the bridge accused working code 965 times, and bridge mutation is NOT caught
+
+    objective    compare what production DOES against the calculus as an executable SPECIFICATION,
+                 without either side defining the other, and without wiring the calculus into
+                 production
+    authority    OWNER, 2026-09-20
+    start hash   865363b (preregistration alone)
+    evidence     BRIDGE_1_PREREG.md (865363b), RESULT.bridge.md,
+                 legasus/legascreen/bridge.mjs, bridges/covers-delegate.mjs
+
+    PRODUCTION      justification.covers(granted, required)
+    SPECIFICATION   calculus.delegate({from, grant, to, context})
+
+    Production does not import the calculus and does not know it exists. 12,301 production calls were
+    witnessed from existing tests and each was put to the specification through the SPECIFICATION'S
+    OWN constructors, with both endpoints pinned by digest.
+
+        WIDE BRIDGE        relation PARTIAL        UNMAPPABLE 12301
+        RESTRICTED BRIDGE  relation EQUIVALENT     in domain 4760 / 12301
+            AGREE 770    UNMAPPABLE 3990    RESULT_DISAGREEMENT 0    REASON_DISAGREEMENT 0
+
+    B-6 HELD. A PARTIAL relation licenses no verdict at all, so the wide bridge concludes nothing
+    about 12,301 calls, and that is the correct behaviour rather than a gap. A large UNMAPPABLE count
+    is the honest expected result.
+
+    AND THE BRIDGE MANUFACTURED 965 FINDINGS AGAINST WORKING PRODUCTION CODE, TWICE.
+
+      1 The first run reported 965 RESULT_DISAGREEMENTs, every one the same shape. covers() treats
+        ANY as "licenses anything"; THE CALCULUS CONTEXT HAS NO WILDCARD AT ALL, because delegate
+        compares contexts with !==. A production concept with no counterpart in the specification was
+        silently coerced into 965 accusations.
+      2 Four survived the first repair, and TWO OF THEM HAD granted AND required IDENTICAL while the
+        specification still refused - the scopes carried an UNADMITTED object, and !== over a nested
+        object decides on REFERENCE IDENTITY rather than on worlds. covers() ignores UNADMITTED by
+        design.
+
+        965 -> 4 -> 0
+
+    Production was right both times. The specification was right both times. A MISTAKEN
+    CORRESPONDENCE PRODUCED ACCUSATIONS AGAINST WORKING CODE, which is the same fabrication as a
+    false agreement wearing the opposite sign. The repair is general rather than per-case: a
+    non-primitive scope value has no faithful counterpart, because strict equality over it answers a
+    question about references. STRIPPING UNADMITTED BEFORE TRANSLATING WAS REJECTED - that would be
+    the bridge claiming the drop is meaning-preserving, which is the thing being guarded against.
+
+    B-4b FAILED AND IS RECORDED AS A FAILURE. The preregistration said a corrupted bridge must not
+    produce silent AGREEMENT. It does:
+
+        production REFUSED because STALE_EVIDENCE
+        specification REFUSED because CONTEXT_WIDENED       genuinely different reasons
+        honest bridge                     -> REASON_DISAGREEMENT
+        ONE EDITED LINE of correspondence -> AGREE
+
+    Nothing in the comparison can tell. THE BRIDGE IS THE ORACLE FOR ITS OWN CORRECTNESS, and
+    provenance plus endpoint pinning give attributability and staleness, NOT detection. A test
+    asserts the failure so it cannot quietly become behaviour. The two mutation modes that DO work -
+    implementation mutation and specification mutation - are asserted beside it.
+
+    What is needed is not more provenance: a SECOND, independently derived correspondence to disagree
+    with the first, or reason classes derived from counterfactual behaviour rather than declared.
+    Neither is built and neither is claimed.
+
+    THE INDEPENDENCE IS THE POINT. The calculus is an executable specification and production is an
+    independent implementation, so a defect in one does not automatically exist in the other - which
+    is what makes agreement informative. Wiring production through the calculus would let both sides
+    share one implementation defect and agreement would stop being evidence. IT IS STILL NOT WIRED.
+
+        transforms SCREENED (mechanically, no driver)   1
+        previously unknown repository defects           0
+        production/specification RESULT_DISAGREEMENTs   0
+
+    Focused 11/11. Suite 672/672.
+
+    next         NONE. QUIESCENT at NO_CURRENT_OBJECTIVE. The named open problem is bridge
+                 verification - a correspondence that can be wrong and cannot currently be caught
+                 being wrong - and after that, backward discovery from effect sinks, which would let
+                 the surface find authority-bearing code that no brand shape reaches.
+
+---
