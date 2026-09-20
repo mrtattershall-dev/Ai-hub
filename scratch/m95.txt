@@ -1,0 +1,29 @@
+Preregister BRIDGE-1: compare production behaviour to the calculus as a specification, and treat the correspondence itself as something that can be wrong
+
+The differential architecture arrived while SEMANTIC-1 was mid-flight. Folding it into a frozen
+preregistration would be reinterpreting a prediction after seeing a result, so SEMANTIC-1 was
+finished as written and this is preregistered on its own.
+
+The triangle is production behaviour, the calculus as executable specification, and bridge evidence
+saying why those refer to the same semantic question. Three objects, and if any edge is missing the
+answer is UNKNOWN or UNMAPPABLE rather than a verdict. The calculus is NOT imported into production
+and production need not know it exists, because a scanner that requires its subject to adopt its
+ontology is a scanner for cooperative software only.
+
+B-1 predicts four comparison states with REASON_DISAGREEMENT kept out of AGREE, and a control that
+must fire on a fixture where production and specification give the same answer for different reasons.
+A path can refuse safely today for a reason that becomes dangerous downstream, and prod equals spec
+cannot see that.
+
+B-4 is the one that will bite. Three independent attack modes are preregistered - implementation
+mutation, specification mutation and bridge mutation - and the bridge control must test the dangerous
+direction specifically: with production correct and specification correct, a corrupted bridge must
+not produce silent AGREEMENT. False agreement is the hazard, not false discrepancy.
+
+B-6 is a prediction of NO detection. Production does not consume the calculus, so the comparison will
+mostly be UNMAPPABLE, and a large UNMAPPABLE count is the expected honest result rather than a
+failure of the slice to be quietly narrowed into agreement.
+
+Message-File: scratch/m95.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
