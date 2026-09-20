@@ -1,0 +1,32 @@
+Preregister LegaScreen v0: can a mechanical screen rediscover a defect it was never told about?
+
+The owner proposed a high-sensitivity screen over authority-bearing transformations that tolerates
+false positives and feeds narrow diagnostics. The vision is large, and building it from the design
+downward would be this project's own worst pattern - machinery whose coverage is asserted rather
+than demonstrated, which Entry 19 just finished naming. So v0 tests the single premise everything
+rests on: a screen given only the module surface and a declared invariant, told nothing about any
+specific defect, flags a transformation this session found by hand.
+
+The pathology is the one with the most recorded instances and the cleanest signature - information
+disappears and authority increases - whose Law 1 instrument already exists and has always been
+pointed by hand. The screen points it automatically. The authority-relevant field vocabulary is
+declared from the laws before the run and not tuned afterwards.
+
+Ground truth is pinned to commits where the defect was live. The decisive prediction is that at
+77fd921 the screen flags objectivesFromContest for losing its two bound fields, with no knowledge of
+SC-1 or of the preregistration that found it; and that at HEAD the same function is not flagged, so
+the screen tracks the repair rather than the name. Non-vacuity requires a countable number of
+exercised pairs. False positives are expected and reported as a rate with no threshold tuned to
+flatter it. The unscreened region is reported, because not flagged must be distinguishable from
+never called - the 452/452 problem applied to the screen itself.
+
+The region v0 will have earned is stated in advance as whatever it flags and nothing more, with its
+blind spots named now: value-level loss inside a retained field, losses through array or Map-shaped
+transformations, modules outside the scanned set, and every pathology other than erasure. If the
+decisive prediction fails, mechanical enumeration plus a declared invariant does not reach what hand
+analysis reaches, and the thesis needs a different mechanism rather than a bigger seed corpus bolted
+on after seeing the result.
+
+Message-File: scratch/m64.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
