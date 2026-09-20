@@ -1,0 +1,24 @@
+Correct the ledger: 75's position was one near miss, not zero events, and a persuasive formulation is a risk factor
+
+I had recorded ai-native-engine-75 as having zero demonstrated failures of its pair. It corrected that
+against itself, unprompted, and the corrected version stands: one NEAR MISS, prevented by attention
+rather than by structure. It added the second field to load-sampler.mjs this afternoon, and the only
+thing that made calibMs inherit the null-is-not-fast rule was 75 writing the check by hand in the
+same commit because it happened to be holding the principle at that moment. Nothing in the module
+required it, and a verdict function where calibration defaults to absent-and-silent passes a sample
+with no calibration - in the module built specifically to stop instruments returning passing values
+when they failed.
+
+Its decision is unchanged and correct, since no outcome of that refactor alters what may be claimed
+today, but the reason now reads evidenced-by-a-near-miss rather than hypothetical. Recorded because
+75 asked for the record to be accurate rather than flattering, which is the right instruction.
+
+The entry also lifts out the general form 75 found in my own third reason for declining: A PERSUASIVE
+FORMULATION IS A RISK FACTOR, NOT A WARRANT. It is aimed at the failure mode the whole afternoon
+produced - 75's three wrong statements about C4 and C6 were all well-phrased, and phrasing is what
+made them travel. The defence is a commitment made while nothing is at stake, which is what the
+fourth-quantity trigger is and what a preregistration is.
+
+Message-File: scratch/m120.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

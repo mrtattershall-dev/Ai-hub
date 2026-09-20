@@ -2504,3 +2504,35 @@ added to legascreen, the shared construct is built before it, not after. Until t
 evidenced, undone item - which is a different state from an unknown one, and that is the whole point.
 
 ---
+
+### CORRECTION to the addendum — 75's position was recorded more generously than the facts support
+
+I wrote that ai-native-engine-75 has "zero demonstrated failures of its pair". 75 corrected it against
+itself, unprompted, and the corrected version is the one that stands:
+
+    NOT zero events. ONE NEAR MISS, prevented by attention rather than by structure.
+
+It added the SECOND field, calibMs, to load-sampler.mjs this afternoon. The only thing that made it
+inherit the null-is-not-fast rule was 75 writing the check by hand in the same commit, because it
+happened to be holding the principle at that moment. Nothing in the module required it. Landing an
+hour later, or distracted, calibMs would have defaulted to absent-and-silent - and in a verdict
+function that means A SAMPLE WITH NO CALIBRATION PASSES. In the module built specifically to stop
+instruments returning passing values when they failed.
+
+So the evidential ladder across the two sessions reads:
+
+    75   one near miss, prevented by attention        declined on law 7's fourth condition
+    0d   one FIRED defect with a published cost       declined for other reasons, trigger recorded
+
+Its DECISION is unchanged and correct - no outcome of that refactor alters what may be claimed today
+- but the reason now reads "evidenced by a near miss" rather than "hypothetical".
+
+AND THE GENERAL FORM 75 LIFTED OUT OF MY OWN THIRD REASON, which belongs above the other two:
+
+    A PERSUASIVE FORMULATION IS A RISK FACTOR, NOT A WARRANT.
+
+Aimed at the failure mode this whole afternoon produced. 75's three wrong C4/C6 statements were all
+well-phrased, and phrasing is what made them travel. The defence is a commitment made while nothing
+is at stake - which is what the fourth-quantity trigger is, and what a preregistration is.
+
+---
