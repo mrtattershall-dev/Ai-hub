@@ -37,17 +37,43 @@ export function bind({ bytes, producedBy, git = null, path = null }) {
   return { digest: digestOf(bytes), producedBy, git, describedPath: path };
 }
 
+// TWO ATTRIBUTIONS FOR ONE DIGEST ARE A CONTEST, NOT A WINNER. The first ledger did `byDigest.set` in
+// order, so the second binding for the same bytes silently replaced the first - the last-wins map of
+// Entry 5, the exact defect behind 49 / 7 / 1, inside the module written to fix attribution
+// (composition attack C8-a). Conflicting bindings are now kept together under CONTESTED and a lookup
+// returns neither as THE attribution. An identical attribution bound twice is one attribution.
+export const CONTESTED = 'CONTESTED';
+
+const sameAttribution = (x, y) => x.producedBy === y.producedBy
+  && JSON.stringify(x.git ?? null) === JSON.stringify(y.git ?? null);
+const attributionKey = (b) => b.producedBy + '@' + ((b.git && b.git.commit) || '-');
+
 export function ledger(bindings) {
   const byDigest = new Map();
   for (const b of bindings) {
     if (b.rejected) continue;
-    byDigest.set(b.digest, b);
+    const held = byDigest.get(b.digest);
+    if (!held) { byDigest.set(b.digest, b); continue; }
+    if (held.provenance === CONTESTED) {
+      if (!held.bindings.some((x) => sameAttribution(x, b))) held.bindings.push(b);
+      continue;
+    }
+    if (sameAttribution(held, b)) continue;
+    byDigest.set(b.digest, { digest: b.digest, provenance: CONTESTED, bindings: [held, b],
+      why: 'these bytes carry two different attributions. Neither is returned as the provenance; both'
+        + ' are kept, because picking one would be the last-wins map that destroyed the Repo C'
+        + ' attribution in the first place.' });
   }
+  // THE SEAL COVERS THE ATTRIBUTIONS, NOT ONLY THE ARTIFACT SET. The first seal was a digest over the
+  // sorted digests, so rewriting a binding's producedBy after sealing left the seal valid (C8-b): it
+  // protected which artifacts were listed and not what was said about them.
+  const sealLine = (b) => b.digest + '=' + (b.provenance === CONTESTED
+    ? b.bindings.map(attributionKey).sort().join('||') : attributionKey(b));
   return {
     byDigest,
     // The integrity of the sidecar ITSELF. A modified ledger must be detectable, or provenance is only
     // as trustworthy as the last person to edit the file.
-    seal: () => digestOf([...byDigest.keys()].sort().join('|')),
+    seal: () => digestOf([...byDigest.values()].map(sealLine).sort().join('|')),
     // LOOKUP IS BY CONTENT. A path is never enough to establish provenance.
     lookup: (bytes) => byDigest.get(digestOf(bytes))
       || { provenance: NOT_ESTABLISHED,
