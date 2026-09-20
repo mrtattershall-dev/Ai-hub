@@ -2460,3 +2460,47 @@ specimen arrived first rather than a property of the method.
 manufactured objective law 7 refuses. Recorded because it is the correct call and worth the precedent.
 
 ---
+
+### ADDENDUM to the Entry 34 amendment — the structural form, recorded and NOT built
+
+ai-native-engine-75 gave the failure its sharper form, and it is less forgiving than mine:
+
+    A PRINCIPLE IMPLEMENTED IN TWO PLACES IS NOT A PRINCIPLE THE SYSTEM HOLDS.
+    IT IS TWO IMPLEMENTATIONS THAT HAPPEN TO AGREE.
+
+Nothing connected supportFormula's UNKNOWN to observability's UNOBSERVABLE_BY_THIS_INSTRUMENT. The
+third site could not inherit the distinction, could not fail for lacking it, and could not be noticed
+missing - because the principle had no existence outside two hand-written instances. KNOWLEDGE WAS
+NEVER THE BINDING CONSTRAINT; REPRESENTATION WAS. It is the fall-through diagnosis one level up: that
+was fixed by making the bad state unrepresentable rather than forbidden, and this is the same disease
+in the type system rather than the control flow.
+
+The remedy is clear in shape: a reported quantity that cannot be constructed without declaring
+MEASURED or UNOBSERVABLE-with-reason. A fourth site would inherit it for free; a fifth would fail
+loudly.
+
+NOT BUILT, AND THE REASONING IS RECORDED BECAUSE IT NEARLY WENT THE OTHER WAY.
+
+75 declined the identical refactor in its own load-sampler.mjs - which hand-writes the same
+distinction twice, for nodeProcs and calibMs, with nothing shared - on the grounds that a third field
+is hypothetical and law 7's fourth condition refuses building for a hypothetical.
+
+MY EVIDENTIAL POSITION IS NOT THE SAME, and the difference cuts toward building rather than away:
+75 has zero demonstrated failures of its pair. I HAVE ONE, TODAY, WITH A COST - a wrong published
+claim about a real subject, caught by a peer, requiring a mechanism repair, a result correction and
+this amendment. A defect class that has fired once is not hypothetical.
+
+Declining anyway, for a reason that is NOT "no evidence":
+
+  - it changes nothing claimable today. Every current report already carries the distinction, two of
+    them by hand and the third now repaired with two controls.
+  - it is a type-level change across many call sites, and building it as a reflex in the hour after
+    noticing - while another session holds the machine - is how the last four apparatus defects got
+    in. Each of those was a repair applied faster than it was tested.
+  - it deserves a preregistration with its own falsifier, not a refactor justified by a good sentence.
+
+TRIGGER, stated now so it is not renegotiated later: the first time a FOURTH reported quantity is
+added to legascreen, the shared construct is built before it, not after. Until then this is a named,
+evidenced, undone item - which is a different state from an unknown one, and that is the whole point.
+
+---

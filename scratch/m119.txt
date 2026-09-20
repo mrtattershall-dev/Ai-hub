@@ -1,0 +1,34 @@
+Record the structural form of the two-places failure, and decline to build the remedy today
+
+ai-native-engine-75 gave the failure a sharper form than mine: a principle implemented in two places
+is not a principle the system holds, it is two implementations that happen to agree. Nothing
+connected supportFormula's UNKNOWN to observability's UNOBSERVABLE_BY_THIS_INSTRUMENT, so the third
+site could not inherit the distinction, could not fail for lacking it, and could not be noticed
+missing. Knowledge was never the binding constraint; representation was. It is the fall-through
+diagnosis one level up, in the type system rather than the control flow.
+
+The remedy is clear in shape - a reported quantity that cannot be constructed without declaring
+MEASURED or UNOBSERVABLE with a reason - and it is NOT BUILT.
+
+The reasoning is recorded because it nearly went the other way. 75 declined the identical refactor in
+its own load-sampler, which hand-writes the same distinction twice with nothing shared, on the
+grounds that a third field is hypothetical and law 7 refuses building for a hypothetical. My position
+is not the same and the difference cuts toward building: 75 has zero demonstrated failures of its
+pair, and I have one today with a cost - a wrong published claim about a real subject, caught by a
+peer, requiring a mechanism repair, a result correction and a ledger amendment. A defect class that
+has fired once is not hypothetical.
+
+Declining anyway, for a reason that is not an absence of evidence. It changes nothing claimable
+today, since every current report already carries the distinction. It is a type-level change across
+many call sites, and building it as a reflex in the hour after noticing - while another session holds
+the machine - is precisely how the last four apparatus defects got in, each of them a repair applied
+faster than it was tested. And it deserves a preregistration with its own falsifier rather than a
+refactor justified by a good sentence.
+
+The trigger is stated now so it cannot be renegotiated later: the first time a fourth reported
+quantity is added to legascreen, the shared construct is built before it rather than after. Until
+then this is a named, evidenced, undone item, which is a different state from an unknown one.
+
+Message-File: scratch/m119.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
