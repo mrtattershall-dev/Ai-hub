@@ -1,6 +1,8 @@
 {
  "note": "ANNOTATION beside the artifacts, never inside them. Evidence for each attribution is the git commit that last wrote the artifact plus an explicit declaration of the implementation that produced it. Artifacts are NOT modified.",
- "generated": "2026-09-19T23:12:58.367Z",
+ "generated": "2026-09-20T02:11:46.724Z",
+ "bindingProperty": "provenance attaches to immutable artifact identity (content digest), never to storage location. Path is DESCRIPTION.",
+ "seal": "4365cdde0a0cb6e4f3a9e74efea8c000259f1bc2db3b140cbede327a655ad4a2",
  "records": [
   {
    "artifact": "benchmarks/devrepo/RESULT.1p5b.json",

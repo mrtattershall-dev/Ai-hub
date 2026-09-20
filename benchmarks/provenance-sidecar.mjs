@@ -18,6 +18,7 @@
 import { writeFileSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { bind, ledger } from '../legasus/legaknow/provenance.mjs';
 
 // ENUMERATED, not hand-listed. The first version carried a hand-written list that named five repoB
 // artifacts which never existed, and reported R3 as failing because of MY list rather than because of any
@@ -97,11 +98,22 @@ for (const a of ARTIFACTS) {
 
 const unknown = records.filter((r) => r.present && String(r.producedBy).startsWith('UNKNOWN'));
 const missing = records.filter((r) => !r.present);
+
+// BINDING IS BY CONTENT, NOT BY PATH. The first version of this sidecar keyed provenance by pathname,
+// which is the `module:line` identity mistake one layer out: rewrite an artifact and the new bytes
+// silently inherit the old attribution. The ledger below is digest-keyed and SEALED, so a later edit to
+// the sidecar itself is detectable.
+const led = ledger(records.filter((r) => r.present).map((r) => bind({
+  bytes: readFileSync(r.artifact), producedBy: r.producedBy, git: r.git, path: r.artifact })));
+const seal = led.seal();
 writeFileSync('benchmarks/PROVENANCE.json', JSON.stringify({
   note: 'ANNOTATION beside the artifacts, never inside them. Evidence for each attribution is the git'
     + ' commit that last wrote the artifact plus an explicit declaration of the implementation that'
     + ' produced it. Artifacts are NOT modified.',
   generated: new Date().toISOString(),
+  bindingProperty: 'provenance attaches to immutable artifact identity (content digest), never to'
+    + ' storage location. Path is DESCRIPTION.',
+  seal,
   records,
 }, null, 1), 'utf8');
 
