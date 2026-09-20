@@ -27,8 +27,6 @@
 //
 // `failSet(null) -> {}` was never eligible: no failure of it could be told apart from a clean result. A
 // procedure whose only possible report is success cannot be a primitive, however reliable it looks.
-import { DIMENSIONS } from './justification.mjs';
-
 // EIGHT DISTINCT SITUATIONS AN ORDINARY HARNESS COLLAPSES INTO ONE EMPTY VALUE. They are kept disjoint
 // here because their downstream permissions differ, and because the collapse is the defect.
 export const OBSERVABILITY = {
@@ -119,12 +117,11 @@ export function admissibleAsPrimitive({ name, run, probes = [] }) {
   return { ok: true, statuses: [...statuses], representableFailures: nonSuccess };
 }
 
-// The scope dimensions an observation is quantified over. HISTORY is the one the doctest experiment
-// forced: an example that runs after two others is not an assertion about the source alone, it is an
-// assertion about SOURCE x EXECUTION HISTORY. Two systems evaluating "the same example" under different
-// histories are evaluating DIFFERENT SUBJECTS, and should be refused a comparison rather than scored as
-// disagreeing.
-export const OBSERVATION_DIMENSIONS = [...DIMENSIONS, 'history'];
+// The scope dimensions an observation is quantified over are justification.mjs's DIMENSIONS - one
+// definition. This file used to export OBSERVATION_DIMENSIONS = [...DIMENSIONS, 'history'] from the
+// night history was forced by the doctest experiment; DIMENSIONS has carried history itself since, so
+// the constant listed it twice and nothing but its own test read it (composition attack C10). Removed.
+// Two definitions of one vocabulary is the domain-algebra defect, and a stale copy is how it starts.
 
 // TYPED NON-KNOWLEDGE. This is not three-valued logic with one UNKNOWN: the six non-evidential statuses
 // all block entitlement, but for DIFFERENT CAUSAL REASONS, and the work that would make knowing possible

@@ -1,0 +1,14 @@
+Remove C10: the observation-side copy of the scope dimensions, which listed history twice
+
+OBSERVATION_DIMENSIONS = [...DIMENSIONS, 'history'] dated from the night history was forced by the
+doctest experiment; DIMENSIONS has carried history itself since, so the constant listed it twice and
+nothing but its own test read it (b11e51f, C10). Removed, with the import that existed only for it.
+Two definitions of one vocabulary is the domain-algebra defect, and a stale copy is how it starts.
+observation.test reads the one definition now; the attack file asserts the export is gone and that
+history appears exactly once.
+
+Suite 503/503.
+
+Message-File: scratch/m32.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

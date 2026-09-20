@@ -5,7 +5,8 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import { observation, evidenceFrom, degrade, admissibleAsPrimitive, OBSERVABILITY,
-  PROVENANCE_FIELDS, OBSERVATION_DIMENSIONS } from './observation.mjs';
+  PROVENANCE_FIELDS } from './observation.mjs';
+import { DIMENSIONS } from './justification.mjs';
 
 const full = (status, value = 'v') => observation({ status, value,
   subject: 'utils.canonicalize_name#3f7c', producer: 'line-tracer', procedure: 'observe()',
@@ -109,6 +110,7 @@ test('a procedure that THROWS is treated as a representable failure, not as a cr
 });
 
 test('HISTORY is a scope dimension, because the subject includes its causal context', () => {
-  assert.ok(OBSERVATION_DIMENSIONS.includes('history'));
-  assert.ok(OBSERVATION_DIMENSIONS.includes('implementation'));
+  // Read from the one definition; the observation-side copy was removed (composition attack C10).
+  assert.ok(DIMENSIONS.includes('history'));
+  assert.ok(DIMENSIONS.includes('implementation'));
 });
