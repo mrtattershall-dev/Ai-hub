@@ -77,7 +77,16 @@ export function calibrate({ iters = CALIB_ITERS, runs = CALIB_RUNS } = {}) {
 
 // ONE SAMPLE. Never throws: a sampler that throws inside a harness gets wrapped in a try/catch that
 // swallows it, and the run continues unmeasured. It returns its failure as data instead.
-export function sample({ calib: withCalib = true } = {}) {
+// Accepts sample(), sample('label'), or sample({ where, calib }).
+//
+// `calib: false` MATTERS MORE THAN IT LOOKS. A caller that supplies its own calibration and spreads this
+// result over it pays for BOTH - measured on this box at 167ms per sample, ~155ms of it a CPU burn whose
+// answer is then discarded. Called before every unit, by a runner that aborts on contention, on a laptop
+// shared by three sessions, that is the instrument becoming the load all over again. Pass calib:false
+// when you are bringing your own.
+export function sample(opts = {}) {
+  const o = (typeof opts === 'string') ? { where: opts } : (opts || {});
+  const { where, calib: withCalib = true } = o;
   const at = new Date().toISOString();
   try {
     let nodeProcs;
@@ -86,24 +95,26 @@ export function sample({ calib: withCalib = true } = {}) {
       const out = execFileSync('tasklist', ['/FI', 'IMAGENAME eq node.exe', '/NH'],
         { encoding: 'utf8', timeout: TIMEOUT_MS, windowsHide: true });
       if (/^ERROR:/m.test(out)) {
-        return { at, nodeProcs: null, cpuPct: null, error: 'tasklist: ' + out.trim().slice(0, 120) };
+        return { at, where, nodeProcs: null, cpuPct: null,
+          error: 'tasklist: ' + out.trim().slice(0, 120) };
       }
       nodeProcs = countFrom(out);
     } else {
       const out = execFileSync('pgrep', ['-c', 'node'], { encoding: 'utf8', timeout: TIMEOUT_MS });
       nodeProcs = Number(String(out).trim());
       if (!Number.isFinite(nodeProcs)) {
-        return { at, nodeProcs: null, cpuPct: null, error: 'pgrep returned unparseable output' };
+        return { at, where, nodeProcs: null, cpuPct: null,
+          error: 'pgrep returned unparseable output' };
       }
     }
     // cpuPct is NULL ON PURPOSE. Every cheap Windows instrument for it is wrong under load and every
     // correct one is slow. Reporting a bad number would be worse than reporting none, and an absent
     // field is honest in a way a plausible one is not.
-    return { at, nodeProcs, cpuPct: null, calibMs: withCalib ? calibrate() : undefined };
+    return { at, where, nodeProcs, cpuPct: null, calibMs: withCalib ? calibrate() : undefined };
   } catch (e) {
     // pgrep exits 1 when nothing matches - a real zero on a machine not running node
-    if (!WIN && e && e.status === 1) return { at, nodeProcs: 0, cpuPct: null };
-    return { at, nodeProcs: null, cpuPct: null,
+    if (!WIN && e && e.status === 1) return { at, where, nodeProcs: 0, cpuPct: null };
+    return { at, where, nodeProcs: null, cpuPct: null,
       error: String((e && e.message) || e).slice(0, 160) };
   }
 }

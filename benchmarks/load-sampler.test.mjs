@@ -157,3 +157,18 @@ test('the live instrument composes with the A2 verdict, and is non-vacuous', () 
   // NON-VACUITY: the same live sample must FAIL under an impossible ratio
   assert.equal(verdict([s], { ceiling: 100000, calibReferenceMs: 0.001, calibRatio: 1.0 }).ok, false);
 });
+
+test('sample() takes a label, and calib:false skips the burn a caller does not need', () => {
+  const labelled = sample('discover:auth.test');
+  assert.equal(labelled.where, 'discover:auth.test', 'a string argument is the label, not ignored');
+  assert.ok(Number.isFinite(labelled.calibMs), 'calibration on by default');
+
+  const t = Date.now();
+  const bare = sample({ where: 'x', calib: false });
+  const ms = Date.now() - t;
+  assert.equal(bare.calibMs, undefined, 'no calibration when the caller brings its own');
+  assert.equal(bare.where, 'x');
+  // NON-VACUITY: skipping it must actually be cheaper, or the option is decoration
+  assert.ok(ms < 8000);
+  assert.ok(Number.isFinite(bare.nodeProcs), 'and the count is still taken');
+});

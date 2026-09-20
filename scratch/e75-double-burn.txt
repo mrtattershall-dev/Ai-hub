@@ -1,0 +1,34 @@
+sample() takes a label, and calib:false exists - because the described adapter would burn 167ms per sample and discard it
+
+BIND-1 described its adapter as spreading shared.sample(where) and then layering its own calibration over
+the result. That is correct in shape and expensive in fact, MEASURED on this box:
+
+    sample('a-string')        342 ms
+    sample({calib: false})    175 ms
+    redundant calibration     167 ms per sample, ~155ms of it a CPU burn whose answer is DISCARDED
+
+Called before every witness file, by a runner that ABORTS ON CONTENTION, on a laptop shared by three
+sessions. That is the instrument becoming the load again - the same defect as the 2e8 workload and the
+redundant warm-up, now arriving through the INTEGRATION rather than through either implementation. Neither
+module is wrong on its own; the composition is.
+
+TWO FIXES, both small.
+  sample() now accepts a STRING as a label - the described call passes `where` and the previous version
+  silently dropped it, so the field a caller thought it was recording did not exist.
+  calib:false is documented at the call site rather than buried, with the measured cost stated, so the
+  reason to pass it is visible to whoever writes the next adapter.
+
+17 tests. The new one is non-vacuous: it asserts the label survives, that calibration is ON by default,
+that calib:false removes calibMs entirely, AND that the count is still taken - an option that quietly
+disabled the count while claiming to skip only the burn would be the same class of defect one layer down.
+
+WORTH NAMING THE PATTERN, because this is the fourth instance today. A shelled tasklist returning zero. A
+count that cannot see saturation. A baseline anchored to contaminated data. A warm-up that was itself
+contamination. And now two correct instruments that, composed, pay twice. EVERY ONE WAS INVISIBLE FROM
+INSIDE THE LAYER BELOW IT, and the last one is invisible from inside EITHER module - it exists only in the
+relation between them. Which is the pytest finding from last night in a different domain: an incomplete
+view of the composition manufactures a cost, or a compatibility, that neither part contains.
+
+Message-File: scratch/e75-double-burn.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
