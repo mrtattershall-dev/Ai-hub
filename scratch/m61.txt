@@ -1,0 +1,31 @@
+Preregister the protection levels: a named pattern, a demonstrated region and a covered class are three different claims
+
+The owner, reviewing Entry 18, named three things this project has been conflating - a failure
+pattern is conceptual similarity across incidents, a mechanized region is the exact area where a
+detector has demonstrated reach, and a covered class needs independently justified coverage. The
+ledger has been writing mechanized for the second and reading it as the third, which is how C4 got
+four commits of cover, and at scale is how a catalogue of named failures starts to look like a
+guarantee.
+
+Measured before predicting: twenty commits from introducing the CONTESTED incident to its being
+recorded as a defect, seven of them reporting a passing full suite, and collectionCohort is not an
+exported state word anywhere - so the detector built for the second incident could not have seen the
+first, which was a runtime data key colliding with a dimension name rather than a cross-module
+export.
+
+Six predictions. The two detectors are disjoint over the two incidents, each covering exactly one,
+which is the fact that makes the overclaim visible. The verdict should be MECHANIZED_REGION even
+though the union covers two of two known incidents, because covering every observed member is not a
+coverage argument over the class, and observed coverage belongs beside the verdict rather than as
+the verdict. COVERED_CLASS needs coverage established outside the detectors' own say-so. Controls
+for an unwitnessed claim, for a pattern that genuinely does reach COVERED_CLASS, and for one with no
+detector at all. The detection-distance figure is reported as one before-and-after on one incident
+and nothing more.
+
+Not done, and stated so: history is not rewritten - entries 15 to 18 keep the word they used, and
+the distinction applies to what is claimed from here. No long-run metric framework is built over a
+single data point.
+
+Message-File: scratch/m61.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
