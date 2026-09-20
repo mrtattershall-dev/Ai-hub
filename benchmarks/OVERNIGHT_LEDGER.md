@@ -662,3 +662,50 @@ Both are r4 work. Neither may be repaired in r3.
                  another internal idea.
 
 ---
+## Entry 14 — a DEFERRED question, recorded because preregistration only works before the experiment
+
+    status       NOT AN OBJECTIVE. This generates no work and does not reopen the quiescent contest.
+    authority    OWNER, 2026-09-20, explicitly declining to codify it now
+    start hash   62c0a2e
+
+    WHY IT IS WRITTEN AT ALL. It is a question ABOUT Repo D, stated before Repo D exists or has been
+    authorized. That is the only moment at which writing it down is worth anything; written afterwards it
+    would be a rationalisation of whatever happened. The conversation is not the evidence record - a
+    transcript is weaker than console output, and this project already holds that console output is
+    non-evidentiary.
+
+    THE OBSERVATION. Law 7 did not behave as a brake tonight. It behaved as an EXPERIMENTAL-EFFICIENCY
+    CONSTRAINT:
+
+        expensive experiment is not justified
+          -> identify the DISTINCTION it was supposed to resolve
+          -> perform a CHEAPER authorized experiment capable of changing the SAME entitlement
+
+    Producer #4 was refused, and the two questions it could have raised were asked directly instead -
+    L7 name-collision aliasing and L5 registry leakage. Both found REAL defects.
+
+    THE EMERGING SECOND CLAUSE, stated by the owner and DELIBERATELY NOT CODIFIED:
+
+        among actions capable of resolving the distinction, why perform a more expensive one?
+
+    It is not a law. The question for Repo D is whether Repo D INDEPENDENTLY DEMANDS it.
+
+    AND A HAZARD IN IT THAT TONIGHT DID NOT TEST, recorded now so a later run cannot mistake tonight for
+    evidence that the clause is safe. THE TWO CHEAP PROBES WERE DECISIVE BECAUSE THEY FOUND SOMETHING.
+    A cheap probe that finds NOTHING is not equivalent evidence to an expensive one finding nothing:
+
+        cheap probe FINDS a defect      -> conclusive, and the expensive experiment was unnecessary
+        cheap probe finds NOTHING       -> NOT conclusive. It may simply be the weaker instrument.
+
+    So the clause as stated is sound only in the positive direction, and tonight supplies evidence for
+    exactly that direction and none for the other. A cost-minimising rule that treats a cheap null result
+    as a substitute for an expensive null result would be manufacturing entitlement out of a BUDGET, which
+    is the same error this architecture refuses everywhere else. If the clause is ever codified it needs a
+    POWER condition, not just a cost comparison - and nothing here establishes one.
+
+    IF AND WHEN Repo D is authorized, this belongs in its PREREGISTRATION, as a question, with the above
+    asymmetry stated in advance.
+
+    next         NONE. Still QUIESCENT. Still one OWNER_REQUIRED transition, still declined.
+
+---
