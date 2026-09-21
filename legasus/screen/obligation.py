@@ -112,25 +112,40 @@ def compare(a, b):
     return DOES_NOT_LICENSE
 
 
-def strongest_licensed(claim, ext):
-    """The strongest claim this extent licenses, derived - not tabulated."""
+def strongest_licensed(claim, ext, known_domains=()):
+    """The strongest RESTRICTION of `claim` that this extent discharges.
+
+    REPAIR-LATERAL_PREREG.md: a candidate may be returned only if
+    compare(claim, candidate) == LICENSES. That one condition excludes upward
+    and lateral reformulation together. What the evidence supports but the
+    request does not license is a different question and is not answered here.
+
+    `known_domains` supplies the domain objects (with containment) that
+    candidates may be drawn from; an extent's coverage keys are bare names.
+    """
     res = compile_obligation(claim, ext)
     if res.passed:
         return claim, res
-    if claim.quantifier == EXISTS:
-        # fall back to the domain in which membership IS established
-        for o in ext.observed:
-            if not o.predicate_established:
-                continue
-            for dname in o.membership_established_in:
-                return Claim2(Domain(dname), EXISTS, claim.predicate), res
-        return None, res
+    doms = {d.name: d for d in known_domains}
+    doms.setdefault(claim.domain.name, claim.domain)
+
+    candidates = []
     if claim.quantifier in (FOR_ALL, NONE):
-        # fall back to a domain that IS exhaustively covered
+        # a universal over a domain WITHIN the requested one is a restriction
         for dname, cov in ext.coverage_of.items():
-            if cov == EXHAUSTIVE:
-                cand = Claim2(Domain(dname), claim.quantifier, claim.predicate)
-                if compile_obligation(cand, ext).passed:
-                    return cand, res
-        return None, res
+            if cov != EXHAUSTIVE or dname not in doms:
+                continue
+            cand = Claim2(doms[dname], claim.quantifier, claim.predicate)
+            if compile_obligation(cand, ext).passed:
+                candidates.append(cand)
+    elif claim.quantifier == EXISTS:
+        # a restriction of an existential is one over a CONTAINING domain, which
+        # cannot have membership if the requested domain lacks it. No candidate
+        # is constructed; the request is simply not discharged.
+        candidates = []
+
+    for cand in candidates:
+        if compare(claim, cand) == LICENSES:
+            assert compare(claim, cand) == LICENSES   # cannot serialize otherwise
+            return cand, res
     return None, res

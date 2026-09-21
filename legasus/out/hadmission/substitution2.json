@@ -1,0 +1,65 @@
+{
+  "failures": [],
+  "ranks": [
+    [
+      "E0 full record",
+      [
+        "F",
+        "O",
+        "R",
+        "_",
+        "A",
+        "L",
+        "L",
+        " ",
+        "o",
+        "v",
+        "e",
+        "r",
+        " ",
+        "S",
+        "A",
+        "M",
+        "P",
+        "L",
+        "E"
+      ]
+    ],
+    [
+      "E1 reachability evidence removed",
+      [
+        "N",
+        "O",
+        "T",
+        "H",
+        "I",
+        "N",
+        "G"
+      ]
+    ],
+    [
+      "E2 positive control removed",
+      [
+        "N",
+        "O",
+        "T",
+        "H",
+        "I",
+        "N",
+        "G"
+      ]
+    ],
+    [
+      "E3 a required premise opened",
+      [
+        "N",
+        "O",
+        "T",
+        "H",
+        "I",
+        "N",
+        "G"
+      ]
+    ]
+  ]
+}

@@ -51,36 +51,57 @@ def new_gate_obligation(claim, ev):
     return GateFinding(res.passed, "; ".join(res.unmet) or "obligations discharged"), c2, ext
 
 
+KNOWN_DOMAINS = [dom(n) for n in list(CONTAINMENT) + ["REPOSITORY"]]
+
+
+def run_floor(ev):
+    """Always licensed: a direct observation of what the instrument emitted.
+
+    About the RUN, not the subject. Never a version of the request, never
+    compared against subject-level claims. Satisfies no-silent-drop by being
+    present at every step regardless of the gate vector.
+    """
+    return O.Claim2(dom("THIS_RUN"), O.POINTWISE, "%s emitted this result" % ev.instrument)
+
+
 def new_attempt(claim, ev):
+    """Returns (o, d, m, subject_claim, requested2, floor).
+
+    subject_claim is the strongest RESTRICTION of the request the evidence
+    discharges, or None. It is None whenever M or D fails: an incapable
+    instrument or an open premise licenses nothing about the subject.
+    """
     o, c2, ext = new_gate_obligation(claim, ev)
     d = gate_derivation(claim, ev)
     m = gate_measurement(claim, ev)
-    licensed2 = None
-    if not m.passed:
-        licensed2 = O.Claim2(dom("THIS_RUN"), O.POINTWISE,
-                             "%s emitted this result" % ev.instrument)
-    elif not d.passed:
-        licensed2 = None
+    if not m.passed or not d.passed:
+        subject = None
     elif not o.passed:
-        licensed2, _ = O.strongest_licensed(c2, ext)
+        subject, _ = O.strongest_licensed(c2, ext, KNOWN_DOMAINS)
     else:
-        licensed2 = c2
-    return o, d, m, licensed2, c2
+        subject = c2
+    return o, d, m, subject, c2, run_floor(ev)
 
 
-STRENGTH = {O.POINTWISE: 0, O.EXISTS: 1, O.FOR_ALL: 2, O.NONE: 2}
-
-
-def is_upward(requested, emitted):
-    """Is `emitted` strictly stronger than `requested`? A8's falsifier."""
+def not_licensed_by(requested, emitted):
+    """R-1 / A8: an emitted subject claim must be licensed by its request."""
     if emitted is None:
         return False
-    if STRENGTH[emitted.quantifier] > STRENGTH[requested.quantifier]:
+    return O.compare(requested, emitted) != O.LICENSES
+
+
+def weaker_or_equal(prev, cur):
+    """A5 monotonicity on SUBJECT claims only, by the model's own compare().
+
+    No rank, no special cases. Authority(E_{n+1}) subset-of Authority(E_n):
+    once nothing is licensed nothing may reappear; otherwise the earlier claim
+    must license the later, or they are the same claim.
+    """
+    if prev is None:
+        return cur is None
+    if cur is None:
         return True
-    # a domain strictly CONTAINING the requested one is upward
-    if emitted.domain.name != requested.domain.name and requested.domain.within(emitted.domain):
-        return True
-    return False
+    return prev == cur or O.compare(prev, cur) == O.LICENSES
 
 
 if __name__ == "__main__":
@@ -99,10 +120,14 @@ if __name__ == "__main__":
     print("%-30s %-10s %-10s %s" % ("case", "old", "new", "licensed (new)"))
     for name, (claim, ev, expected) in CASES.items():
         old = E.attempt(claim, ev)
-        o, d, m, lic2, req2 = new_attempt(claim, ev)
+        o, d, m, lic2, req2, floor = new_attempt(claim, ev)
         newvec = (o.passed, d.passed, m.passed)
         s = lambda v: "".join("P" if x else "F" for x in v)
-        print("%-30s %-10s %-10s %s" % (name[:30], s(old.vector()), s(newvec), fmt(lic2)))
+        print("%-30s %-10s %-10s %-28s floor=%s" % (name[:30], s(old.vector()), s(newvec),
+                                                     fmt(lic2), floor is not None))
+        # W-4 carried into the substitution: the run floor is never absent
+        if floor is None:
+            fails.append("W-4 %s: run floor absent" % name)
         # A2: anything the old model minted must still be mintable
         if old.entitled and not all(newvec):
             fails.append("A2 %s was mintable and no longer is" % name)
@@ -113,32 +138,32 @@ if __name__ == "__main__":
         # A6: multi-gate cases keep complete vectors
         if name.startswith(("F3'", "F5")) and sum(1 for x in newvec if not x) < 2:
             fails.append("A6 %s lost a gate failure" % name)
-        # A8: never emit something stronger than requested
-        if is_upward(req2, lic2):
-            fails.append("A8 UPWARD REFORMULATION on %s: %s -> %s"
-                         % (name, fmt(req2), fmt(lic2)))
+        # A8 / R-1: anything emitted as a version of the request must be LICENSED by it
+        if not_licensed_by(req2, lic2):
+            fails.append("A8/R-1 on %s: emitted %s is not licensed by requested %s (%s)"
+                         % (name, fmt(lic2), fmt(req2), O.compare(req2, lic2)))
 
-    # ---- A4/A5 degradation chain ----
-    print("\nA4/A5  degradation chain under the NEW compiler")
-    prev = None
-    ranks = []
-    for name, claim, ev in degradation_chain():
-        o, d, m, lic2, req2 = new_attempt(claim, ev)
+    # ---- A4/A5 degradation chain, measured by compare(), no rank ----
+    print("\nA4/A5  degradation chain under the NEW compiler (measured by compare(), no rank)")
+    prev_lic, outputs = None, []
+    for i, (name, claim, ev) in enumerate(degradation_chain()):
+        o, d, m, lic2, req2, floor = new_attempt(claim, ev)
         s = "".join("P" if x else "F" for x in (o.passed, d.passed, m.passed))
-        r = (STRENGTH[lic2.quantifier] if lic2 else -1,
-             0 if lic2 is None else (1 if lic2.domain.name != "THIS_RUN" else 0))
-        print("   %-34s vector=%s  licensed=%-32s rank=%s" % (name, s, fmt(lic2), r))
-        if prev is not None and r > prev:
-            fails.append("A5 VIOLATION: %s strengthened the claim" % name)
-        if is_upward(req2, lic2):
-            fails.append("A8 UPWARD on %s" % name)
-        prev = r
-        ranks.append((name, r))
-    # A4: E1 must no longer be inert
-    if ranks[0][1] == ranks[1][1]:
-        fails.append("A4 E1 is STILL INERT under the new compiler")
+        print("   %-34s vector=%s  subject=%-22s floor=%s" % (name, s, fmt(lic2), floor is not None))
+        if floor is None:
+            fails.append("W-4 %s: run floor absent" % name)
+        if i > 0 and not weaker_or_equal(prev_lic, lic2):
+            fails.append("A5 VIOLATION: %s is not weaker-or-equal to the previous step" % name)
+        if not_licensed_by(req2, lic2):
+            fails.append("A8/R-1 on %s: %s not licensed by %s" % (name, fmt(lic2), fmt(req2)))
+        outputs.append(lic2)
+        prev_lic = lic2
+    # A4 / R-3: E1 is live iff the licensed OUTPUT changed between E0 and E1
+    if fmt(outputs[0]) == fmt(outputs[1]):
+        fails.append("A4 E1 is STILL INERT: %s -> %s" % (fmt(outputs[0]), fmt(outputs[1])))
     else:
-        print("   A4 E1 is live: rank moved %s -> %s" % (ranks[0][1], ranks[1][1]))
+        print("   A4/R-3 E1 is live: %s -> %s" % (fmt(outputs[0]), fmt(outputs[1])))
+    ranks = [(n, fmt(x)) for n, x in zip([c[0] for c in degradation_chain()], outputs)]
 
     # ---- A7 falsifier ----
     c0 = degradation_chain()[0]

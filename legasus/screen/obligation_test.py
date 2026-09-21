@@ -58,20 +58,30 @@ if r_r.passed:
 
 # ---------------------------------------------------------------- Q-5
 print("\nQ-5 the shadow specimen: remove established membership in the claimed domain")
-before, _ = strongest_licensed(claim_exists_repo, ext_w)
+KNOWN = (REPO, FUNC, S60)
+before, _ = strongest_licensed(claim_exists_repo, ext_w, KNOWN)
 stripped = Observation("F:line41", membership_established_in=("function_F",),
                        predicate_established=True)
 ext_s = Extent(observed=[stripped], coverage_of={"function_F": EXHAUSTIVE,
                                                  "repository": PARTIAL})
-after, res_after = strongest_licensed(claim_exists_repo, ext_s)
+after, res_after = strongest_licensed(claim_exists_repo, ext_s, KNOWN)
 fmt = lambda c: "None" if c is None else "%s over %s" % (c.quantifier, c.domain.name)
 print("   before : %s" % fmt(before))
-print("   after  : %s" % fmt(after))
+print("   after  : %s  (REPAIR-LATERAL: no restriction of the request is discharged)" % fmt(after))
 print("   reason : %s" % res_after.unmet)
-if before is None or after is None or before.domain.name == after.domain.name:
-    fails.append("Q-5: removal was INERT, reproducing the scalar-lattice failure")
+# live means the licensed output CHANGED; the repaired output is None, not a lateral claim
+if before is None or after is not None:
+    fails.append("Q-5: expected EXISTS-over-repository -> None; got %s -> %s"
+                 % (fmt(before), fmt(after)))
 elif "membership" not in " ".join(res_after.unmet):
-    fails.append("Q-5: narrowed for a reason other than the frozen one")
+    fails.append("Q-5: refused for a reason other than the frozen one")
+# R-1: whatever is emitted anywhere must be licensed by its request
+for req, ext in ((claim_exists_repo, ext_w), (claim_exists_repo, ext_s),
+                 (Claim2(REPO, FOR_ALL, "beyond locality"), ext60),
+                 (Claim2(S60, FOR_ALL, "beyond locality"), ext60)):
+    emitted, _ = strongest_licensed(req, ext, KNOWN)
+    if emitted is not None and compare(req, emitted) != LICENSES:
+        fails.append("R-1: emitted %s not licensed by requested %s" % (fmt(emitted), fmt(req)))
 
 # ---------------------------------------------------------------- report
 print()
