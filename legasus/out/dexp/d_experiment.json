@@ -1,0 +1,63 @@
+{
+  "sealedTarget": "C:\\Users\\tatte\\AppData\\Local\\Temp\\screen2-target\\mpt",
+  "stubbed": [
+    "loguru",
+    "moviepy",
+    "moviepy.video",
+    "moviepy.video.tools",
+    "moviepy.video.tools.subtitles",
+    "app",
+    "app.config",
+    "app.models",
+    "app.models.const",
+    "app.models.schema",
+    "app.utils",
+    "app.utils.utils"
+  ],
+  "real": [
+    "PIL",
+    "unicodedata",
+    "os",
+    "functools"
+  ],
+  "results": {
+    "D1": {
+      "returned": true,
+      "loggedWarnings": [],
+      "error": null,
+      "proposition": "inspection completes, glyphs present -> True",
+      "verdict": "HOLDS"
+    },
+    "D2": {
+      "returned": false,
+      "loggedWarnings": [],
+      "error": null,
+      "proposition": "inspection completes, glyph absent -> False",
+      "verdict": "HOLDS"
+    },
+    "D3": {
+      "returned": true,
+      "loggedWarnings": [
+        [
+          "warning",
+          "failed to inspect subtitle font glyphs: C:\\Users\\tatte\\AppData\\Local\\Temp\\screen2-target\\mpt\\no-such-font-9f3a2b.ttf, cannot open resource"
+        ]
+      ],
+      "error": null,
+      "proposition": "inspection cannot complete -> True",
+      "verdict": "HOLDS"
+    },
+    "D4": {
+      "proposition": "under D3 the warning that fires for an established unsupported result is suppressed",
+      "warningWhenUnverifiable": [],
+      "warningWhenEstablishedUnsupported": [
+        "Subtitle Font Does Not Support Text"
+      ],
+      "warningWhenSupported": [],
+      "verdict": "HOLDS",
+      "note": "if no warning fires even for an established unsupported font, the comparison has no positive control and D4 is UNOBSERVABLE rather than demonstrated"
+    }
+  },
+  "notes": [],
+  "fontUsed": "C:\\Windows\\Fonts\\arial.ttf"
+}
