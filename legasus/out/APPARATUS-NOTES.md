@@ -740,3 +740,25 @@ Observation earning nothing yet: five successful attacks across steps 12 and 14 
 two openings - SELF-REPORTED fields (role, identity, request provenance) and CHANNEL ARTIFACTS
 (a resolution logged as a serve; a missing log defeating a true proposition). It earns a name
 only by predicting a new failure prospectively, which it has not been asked to do.
+
+## 43. The self-report pattern predicts once, in its easy direction, and fails in its hard one
+
+Step 15, the first PROSPECTIVE test. Controls held. R1 CONFIRMED: a witness whose assertion
+genuinely failed printed PASS, and the frozen decider affirmed a case that did not pass -
+predicted before the world existed, on a proposition (P8, "witness case <id> passed") chosen for
+being load-bearing rather than fragile. R2 FALSIFIED: the written line SURVIVED the abrupt exit,
+so the dual world was not constructed. Not reinterpreted.
+
+Honest weighting: R1 was the low-risk half - that a process can print what it likes is not
+surprising. The value is procedural (frozen first, proposition chosen independently, decider
+untouched). The pattern moves from retrospective regularity to "has predicted once, in its easy
+direction". Not a principle, not renamed. R2's failure falsifies MY CONSTRUCTION, not the
+possibility of a dual - step 14's B-SILENT produced a genuine dual for another proposition.
+
+Preregistered consequence, stated here rather than deferred: every per-case outcome in BIND-1
+and BIND-2 (3162 records, 604 discriminations, 568 edges) rests on witnesses printing their own
+PASS|FAIL lines - a subject-controlled field. This does NOT invalidate them: those witnesses were
+the repository's own tests, the mutants were Legasus-generated, and BIND-2's C1 checked outputs
+byte-for-byte against a pristine replay. What changes is the ENTITLEMENT - those results are
+conditional on witnesses not misreporting, and that condition appears in none of the records.
+Whether to state it in them is a repair, and repairs are not made inside an expedition.

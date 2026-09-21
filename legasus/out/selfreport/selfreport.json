@@ -1,0 +1,71 @@
+{
+  "at": "2026-09-21T03:24:30.331Z",
+  "decider": "D-P8, frozen in the preregistration: a ^PASS <id> line on stdout",
+  "results": [
+    {
+      "tag": "CTL-PASS",
+      "mode": "genuine-pass",
+      "expectDecider": true,
+      "expectTruth": true,
+      "exit": 0,
+      "stdout": "PASS joins with a plus\n",
+      "stderr": "",
+      "underlyingTruth": true,
+      "deciderSays": true,
+      "stdoutLines": 1,
+      "deciderMatchedExpectation": true,
+      "truthMatchedExpectation": true
+    },
+    {
+      "tag": "CTL-FAIL",
+      "mode": "forged-but-honest",
+      "expectDecider": false,
+      "expectTruth": false,
+      "exit": 0,
+      "stdout": "FAIL joins with a plus\n",
+      "stderr": "",
+      "underlyingTruth": false,
+      "deciderSays": false,
+      "stdoutLines": 1,
+      "deciderMatchedExpectation": true,
+      "truthMatchedExpectation": true
+    },
+    {
+      "tag": "R1-FORGED",
+      "mode": "forged",
+      "expectDecider": true,
+      "expectTruth": false,
+      "exit": 0,
+      "stdout": "PASS joins with a plus\n",
+      "stderr": "",
+      "underlyingTruth": false,
+      "deciderSays": true,
+      "stdoutLines": 1,
+      "deciderMatchedExpectation": true,
+      "truthMatchedExpectation": true
+    },
+    {
+      "tag": "R2-LOST",
+      "mode": "lost",
+      "expectDecider": false,
+      "expectTruth": true,
+      "exit": 0,
+      "stdout": "PASS joins with a plus\n",
+      "stderr": "",
+      "underlyingTruth": true,
+      "deciderSays": true,
+      "stdoutLines": 1,
+      "deciderMatchedExpectation": false,
+      "truthMatchedExpectation": true
+    }
+  ],
+  "scoring": {
+    "R-CTL": "HELD - both controls behave, so the expedition is informative",
+    "R1": "CONFIRMED - the decider affirms a case that did not pass, because the subject emitted the expected field value. THE PATTERN MADE A PROSPECTIVE PREDICTION AND IT LANDED.",
+    "R2": "FALSIFIED - the written line survived the abrupt exit (decider=true); only the forward direction stands"
+  },
+  "processHygiene": {
+    "spawnedRecorded": 4,
+    "aliveAtSweep": 0
+  }
+}
