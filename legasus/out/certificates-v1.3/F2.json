@@ -64,7 +64,7 @@
     ],
     "open_frontier": "no supporting derivation with settled, decidable premises",
     "rule_id": "existential-from-established-member",
-    "rule_digest": "1a05042bff94c34e9dac01224d00cb7582625fe085a9a32d81a61e9f16c48e88"
+    "rule_digest": "f5cbb0c5daf495dd018089114b0dcb34cd237b6b25a64de317bdbdce2cba6bfc"
   },
   "measurement": {
     "capability_demonstrated": true,
@@ -100,6 +100,6 @@
       "out/hadmission/substitution2.json"
     ],
     "run_id": "F2",
-    "emitted_at": "2026-09-21T15:59:13Z"
+    "emitted_at": "2026-09-21T16:16:38Z"
   }
 }

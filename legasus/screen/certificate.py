@@ -34,12 +34,18 @@ RULE_FINGERPRINTS = {
 # fingerprint is correctly refused with RULE_DEFINITION_MOVED.
 RULE_FINGERPRINTS_V13 = {
     "existential-from-established-member":
-        "1a05042bff94c34e9dac01224d00cb7582625fe085a9a32d81a61e9f16c48e88",
+        "f5cbb0c5daf495dd018089114b0dcb34cd237b6b25a64de317bdbdce2cba6bfc",
     "universal-from-exhaustive-coverage":
-        "5d0b57cf7a23cd7f1ce03de075e2b3e9ac4605b89d94dd116e928b08c2160105",
+        "1c356ca01d173bd4d3656ae003781df7e991e3cb4033250750a6ee1764930ba4",
     "claim-from-direct-observation":
         "eaedaf843c76e495aa215ff6c355f4efc3a4a03460435e4d6978bed56bb53f5d",
 }
+# RE-PINNED. The matchers now resolve an evidence_root against the authority store instead of
+# checking that the string is non-empty, so two of the three rule DEFINITIONS moved and the producer
+# had to re-pin. That is RULE_DEFINITION_MOVED working as designed: the earlier fingerprints were
+#     existential ... 1a05042bff94c34e   universal ... 5d0b57cf7a23cd7f
+# and certificates carrying them are now correctly refused.
+# claim-from-direct-observation is UNCHANGED, because it has no obligation and therefore no matcher.
 
 RULE_FOR_QUANTIFIER = {"EXISTS": "existential-from-established-member",
                        "FOR_ALL": "universal-from-exhaustive-coverage",
