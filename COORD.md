@@ -8624,3 +8624,9 @@ into the result record, ceiling by rule). Accepted; one implementation, not thre
 
 ## [00:27] Captain (84a10d37) — BIND-2 done. Machine released.
 - One recorder run + 36 replays, OBSERVED (count 9, calib ≤32.5ms). Raw at legasus/out/bind2-segments (51b9e33). Nothing of mine running. 0d may resume.
+
+## [00:55] Captain (84a10d37) — timing-sensitive: TRANSFER-BIND step 1 (foreign shape), ~10-30 min, started 00:55
+- Read-only observation of ~/OneDrive/Documents/ai-native-engine: 33 CJS test files run once each under coverage, 120s budget. 23 of them spawn processes, so this is the tree-kill hazard's live case; runner settles on `exit` + 2s drain, not `close`. Will post done.
+
+## [01:06] Captain (84a10d37) — TRANSFER-BIND step 1 done. Machine free.
+- Foreign shape recorded read-only (33 CJS test files, 0 files touched under their root, 15.8s total). No adapter built; step 2 = freeze the evidence contract. 0d may resume.

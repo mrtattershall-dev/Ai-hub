@@ -1,0 +1,35 @@
+  exit=  0     82ms cov=  1 lines=  51 PASS_FAIL_leading=27(dup 0) touched=0  core/editor_test.js
+  exit=  0     76ms cov=  1 lines=  50 PASS_FAIL_leading=26(dup 0) touched=0  core/history_test.js
+  exit=  0     87ms cov=  1 lines=  64 PASS_FAIL_leading=39(dup 0) touched=0  core/integration_test.js
+  exit=  0     65ms cov=  1 lines=  25 PASS_FAIL_leading=6(dup 0) touched=0  core/live_loop_test.js
+  exit=  0     78ms cov=  1 lines=  27 PASS_FAIL_leading=20(dup 0) touched=0  core/ordered_test.js
+  exit=  0     71ms cov=  1 lines=  39 PASS_FAIL_leading=18(dup 0) touched=0  core/persistence_test.js
+  exit=  0     65ms cov=  1 lines=  33 PASS_FAIL_leading=14(dup 0) touched=0  core/protocol_test.js
+  exit=  0     54ms cov=  1 lines=  26 PASS_FAIL_leading=14(dup 0) touched=0  core/repair_test.js
+  exit=  0     69ms cov=  1 lines=  34 PASS_FAIL_leading=29(dup 0) touched=0  core/tick_test.js
+  exit=  0     67ms cov=  1 lines=  41 PASS_FAIL_leading=18(dup 0) touched=0  core/tombstone_gc_test.js
+  exit=  0    142ms cov=  1 lines=  13 PASS_FAIL_leading=0(dup 0) touched=0  experiments/006_soa_world/memory_test.js
+  exit=  0  10679ms cov=266 lines=  60 PASS_FAIL_leading=48(dup 0) touched=0  experiments/025_behavior_corpus/harness_test.js
+  exit=  0    662ms cov=  1 lines=  24 PASS_FAIL_leading=15(dup 0) touched=0  experiments/036_multiplayer/m1_test.js
+  exit=  0    559ms cov=  1 lines=  12 PASS_FAIL_leading=9(dup 0) touched=0  experiments/036_multiplayer/m2_schema_transport_test.js
+  exit=  0    572ms cov=  1 lines=  12 PASS_FAIL_leading=9(dup 0) touched=0  experiments/036_multiplayer/m4_creation_test.js
+  exit=  0     78ms cov=  1 lines= 115 PASS_FAIL_leading=85(dup 0) touched=0  experiments/037_ai_native_editor/explain_test.js
+  exit=  0    319ms cov=  1 lines=  16 PASS_FAIL_leading=13(dup 0) touched=0  experiments/037_ai_native_editor/intent2_e2e_pong_test.js
+  exit=  0     90ms cov=  1 lines=  78 PASS_FAIL_leading=75(dup 0) touched=0  experiments/037_ai_native_editor/intent2_test.js
+  exit=  0    126ms cov=  1 lines= 107 PASS_FAIL_leading=104(dup 0) touched=0  experiments/037_ai_native_editor/intent_test.js
+  exit=  0    149ms cov=  1 lines=  26 PASS_FAIL_leading=23(dup 0) touched=0  experiments/040_spatial/spatial_test.js
+  exit=  0    273ms cov=  1 lines=   8 PASS_FAIL_leading=5(dup 0) touched=0  experiments/041_aggregation_index/equivalence_test.js
+  exit=  0    104ms cov=  1 lines=  16 PASS_FAIL_leading=13(dup 0) touched=0  experiments/042_pong/pong_test.js
+  exit=  0     97ms cov=  1 lines=  25 PASS_FAIL_leading=22(dup 0) touched=0  experiments/042_pong/pong_v2_test.js
+  exit=  0    126ms cov=  1 lines=  21 PASS_FAIL_leading=18(dup 0) touched=0  experiments/044_shooter/shooter_test.js
+  exit=  0     82ms cov=  1 lines=  30 PASS_FAIL_leading=27(dup 0) touched=0  experiments/045_write_smell/write_smell_test.js
+  exit=  0     90ms cov=  1 lines=  19 PASS_FAIL_leading=16(dup 0) touched=0  experiments/046_platformer/platformer_test.js
+  exit=  0    104ms cov=  1 lines=  14 PASS_FAIL_leading=11(dup 0) touched=0  experiments/047_racing/racing_test.js
+  exit=  0     93ms cov=  1 lines=  15 PASS_FAIL_leading=12(dup 0) touched=0  experiments/048_adventure/adventure_test.js
+  exit=  0    101ms cov=  1 lines=  26 PASS_FAIL_leading=11(dup 0) touched=0  experiments/049_tower_defense/td_test.js
+  exit=  0     63ms cov=  1 lines=  23 PASS_FAIL_leading=6(dup 0) touched=0  experiments/050_relational/adversarial_test.js
+  exit=  0     76ms cov=  1 lines=  22 PASS_FAIL_leading=11(dup 0) touched=0  experiments/050_relational/falsification_test.js
+  exit=  0    376ms cov=  1 lines=  28 PASS_FAIL_leading=15(dup 0) touched=0  experiments/051_safety_patches/patch_test.js
+  exit=  0     93ms cov=  1 lines=  31 PASS_FAIL_leading=17(dup 0) touched=0  experiments/052_turnbased/turn_test.js
+-> C:\Users\tatte\Projects\ai-coding-hub\legasus\out\transfer-engine\engine-shape.json  (33 test files, 84 other source files, dynamic=true)
+exit=0

@@ -1,0 +1,4216 @@
+{
+  "root": "C:\\Users\\tatte\\OneDrive\\Documents\\ai-native-engine",
+  "at": "2026-09-21T00:35:34.581Z",
+  "node": "v24.15.0",
+  "platform": "win32",
+  "counts": {
+    "allSourceFiles": 117,
+    "testFiles": 33,
+    "nonTestFiles": 84
+  },
+  "packageJson": null,
+  "isGitRepo": false,
+  "testShapes": [
+    {
+      "file": "core/editor_test.js",
+      "bytes": 7828,
+      "lines": 120,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "node:os",
+        "node:fs"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:os",
+        "node:fs"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "core/history_test.js",
+      "bytes": 9872,
+      "lines": 178,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js",
+        "./protocol.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`${FAIL === 0 ? 'ALL PASS' : FAIL + ' FAILED'}  (${PASS} passed, ${FAIL} failed) — history/undo`"
+      ]
+    },
+    {
+      "file": "core/integration_test.js",
+      "bytes": 12552,
+      "lines": 200,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`${FAIL === 0 ? 'ALL PASS' : FAIL + ' FAILED'}  (${PASS} passed, ${FAIL} failed) — integrated core`"
+      ]
+    },
+    {
+      "file": "core/live_loop_test.js",
+      "bytes": 5798,
+      "lines": 108,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js",
+        "./live_loop.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`${FAIL === 0 ? 'ALL PASS' : FAIL + ' FAILED'}  (${PASS} passed, ${FAIL} failed) — live-model loop`"
+      ]
+    },
+    {
+      "file": "core/ordered_test.js",
+      "bytes": 5970,
+      "lines": 116,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js",
+        "./persistence.js",
+        "./protocol.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`${FAIL === 0 ? 'ALL PASS' : FAIL + ' FAILED'}  (${PASS} passed, ${FAIL} failed) — ordered lists`"
+      ]
+    },
+    {
+      "file": "core/persistence_test.js",
+      "bytes": 11214,
+      "lines": 206,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js",
+        "./persistence.js",
+        "./protocol.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`${FAIL === 0 ? 'ALL PASS' : FAIL + ' FAILED'}  (${PASS} passed, ${FAIL} failed) — persistence`"
+      ]
+    },
+    {
+      "file": "core/protocol_test.js",
+      "bytes": 14552,
+      "lines": 259,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js",
+        "./protocol.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`${FAIL === 0 ? 'ALL PASS' : FAIL + ' FAILED'}  (${PASS} passed, ${FAIL} failed) — AI↔engine protocol`"
+      ]
+    },
+    {
+      "file": "core/repair_test.js",
+      "bytes": 5498,
+      "lines": 84,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "core/tick_test.js",
+      "bytes": 8535,
+      "lines": 170,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "core/tombstone_gc_test.js",
+      "bytes": 7645,
+      "lines": 128,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js",
+        "./persistence.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`${FAIL === 0 ? 'ALL PASS' : FAIL + ' FAILED'}  (${PASS} passed, ${FAIL} failed) — tombstone GC`"
+      ]
+    },
+    {
+      "file": "experiments/006_soa_world/memory_test.js",
+      "bytes": 3206,
+      "lines": 68,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./soa_world"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/025_behavior_corpus/harness_test.js",
+      "bytes": 5514,
+      "lines": 92,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./corpus.js",
+        "./harness.js",
+        "./adapters.js",
+        "path"
+      ],
+      "requiresExternal": [
+        "path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "'\\n=== C3: every axis is genuinely passable (no always-FAIL detector) ==='",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/036_multiplayer/m1_test.js",
+      "bytes": 8566,
+      "lines": 152,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:net",
+        "node:path",
+        "./m1_server.js"
+      ],
+      "requiresExternal": [
+        "node:net",
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/036_multiplayer/m2_schema_transport_test.js",
+      "bytes": 4950,
+      "lines": 95,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:net",
+        "./m1_server.js"
+      ],
+      "requiresExternal": [
+        "node:net"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-M2 transport schema`"
+      ]
+    },
+    {
+      "file": "experiments/036_multiplayer/m4_creation_test.js",
+      "bytes": 5108,
+      "lines": 95,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:net",
+        "./m1_server.js"
+      ],
+      "requiresExternal": [
+        "node:net"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-034: a game born from an empty world through the three gates`"
+      ]
+    },
+    {
+      "file": "experiments/037_ai_native_editor/explain_test.js",
+      "bytes": 11719,
+      "lines": 199,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "./explain.js"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`${FAIL === 0 ? 'ALL PASS' : FAIL + ' FAILED'}  (${PASS} passed, ${FAIL} failed) — rule -> English explainer`"
+      ]
+    },
+    {
+      "file": "experiments/037_ai_native_editor/intent2_e2e_pong_test.js",
+      "bytes": 7717,
+      "lines": 148,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:net",
+        "node:http",
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:net",
+        "node:http",
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/037_ai_native_editor/intent2_test.js",
+      "bytes": 16382,
+      "lines": 319,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "fs",
+        "path",
+        "./intent2.js"
+      ],
+      "requiresExternal": [
+        "fs",
+        "path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/037_ai_native_editor/intent_test.js",
+      "bytes": 20667,
+      "lines": 399,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./intent.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/040_spatial/spatial_test.js",
+      "bytes": 8067,
+      "lines": 124,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-025 spatial scope`"
+      ]
+    },
+    {
+      "file": "experiments/041_aggregation_index/equivalence_test.js",
+      "bytes": 7063,
+      "lines": 124,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-026 equivalence & determinism`"
+      ]
+    },
+    {
+      "file": "experiments/042_pong/pong_test.js",
+      "bytes": 5469,
+      "lines": 97,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "./pong_rules.js"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\nFAIL — the grammar could not express Pong; see rejections above`); process.exit(1",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-027: Pong on today's grammar, zero core edits`"
+      ]
+    },
+    {
+      "file": "experiments/042_pong/pong_v2_test.js",
+      "bytes": 7441,
+      "lines": 121,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "./pong_rules_v2.js",
+        "./pong_rules.js"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "'\\nFAIL — natural form rejected'); process.exit(1",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-028 signed fields + multiply`"
+      ]
+    },
+    {
+      "file": "experiments/044_shooter/shooter_test.js",
+      "bytes": 7322,
+      "lines": 131,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "./shooter_rules.js"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "'\\nFAIL — the grammar could not express the shooter'); process.exit(1",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-032: a top-down shooter on the same rule system, zero core edits`"
+      ]
+    },
+    {
+      "file": "experiments/045_write_smell/write_smell_test.js",
+      "bytes": 6925,
+      "lines": 126,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "path"
+      ],
+      "requiresExternal": [
+        "path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/046_platformer/platformer_test.js",
+      "bytes": 6372,
+      "lines": 116,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-036: platformer, a 4th genre, zero core edits`"
+      ]
+    },
+    {
+      "file": "experiments/047_racing/racing_test.js",
+      "bytes": 5223,
+      "lines": 102,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-037: racing, a 5th genre, zero core edits`"
+      ]
+    },
+    {
+      "file": "experiments/048_adventure/adventure_test.js",
+      "bytes": 5226,
+      "lines": 98,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-038: action/adventure, a 6th genre, zero core edits`"
+      ]
+    },
+    {
+      "file": "experiments/049_tower_defense/td_test.js",
+      "bytes": 5859,
+      "lines": 107,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`     verdict: ${r.ok ? 'ACCEPTED' : 'REJECTED ' + JSON.stringify((r.errors || []).map((e) => e.code))}`",
+        "`     verdict: ${r.ok ? 'ACCEPTED (!!)' : 'REJECTED ' + JSON.stringify((r.errors || []).map((e) => e.code))}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-039: tower defense — the genre plays (area/inversion), and the RD-032 relational gap is REAL and now pinned as gate verdicts`"
+      ]
+    },
+    {
+      "file": "experiments/050_relational/adversarial_test.js",
+      "bytes": 9066,
+      "lines": 131,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/050_relational/falsification_test.js",
+      "bytes": 8860,
+      "lines": 132,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-040 H1 falsification set: all three express via inversion + L1/L2, self-writes only`"
+      ]
+    },
+    {
+      "file": "experiments/051_safety_patches/patch_test.js",
+      "bytes": 8933,
+      "lines": 131,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "node:net"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:net"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-035 audit: both safety holes (#1 createChild range bypass, #2 tx-flood) CLOSED`"
+      ]
+    },
+    {
+      "file": "experiments/052_turnbased/turn_test.js",
+      "bytes": 7076,
+      "lines": 113,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`     verdict: ${rel.ok ? 'ACCEPTED' : 'REJECTED ' + JSON.stringify((rel.errors || []).map((e) => e.code))}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — RD-041: turn-based tactical, zero core edits; the tick is a heartbeat, not the clock`"
+      ]
+    }
+  ],
+  "subjectShapes": [
+    {
+      "file": "core/behavior.js",
+      "bytes": 36811,
+      "lines": 583,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "parseRule",
+        "installRule",
+        "uninstallRule",
+        "writeSmells",
+        "SPAWN_CAP_MAX",
+        "setAccel"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "core/editor.js",
+      "bytes": 25833,
+      "lines": 439,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "./engine.js",
+        "node:fs",
+        "node:readline"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:fs",
+        "node:readline"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "Editor",
+        "mockModel",
+        "realModel",
+        "runRuleLoop",
+        "buildRulePrompt",
+        "RULE_GRAMMAR",
+        "ruleGrammar",
+        "worldSig"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`✗ error: ${e.message}`); return rl.prompt("
+      ]
+    },
+    {
+      "file": "core/engine.js",
+      "bytes": 67119,
+      "lines": 1112,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "Engine",
+        "World",
+        "TYPE",
+        "TYPE_NAME",
+        "foldSemantics",
+        "isFoldable",
+        "fold",
+        "FIELD_OWNER",
+        "FIELD_RANGE",
+        "NO_ROW",
+        "CLAIM_TTL_MAX",
+        "makeSchema",
+        "DEFAULT_SCHEMA_DEFS"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "core/live_loop.js",
+      "bytes": 6911,
+      "lines": 121,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js",
+        "./protocol.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "runProposalLoop",
+        "buildPrompt",
+        "IR_GRAMMAR"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "core/live_loop_real.js",
+      "bytes": 8296,
+      "lines": 138,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js",
+        "./live_loop.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "core/persistence.js",
+      "bytes": 12120,
+      "lines": 217,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js",
+        "./behavior.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "save",
+        "saveText",
+        "load",
+        "loadText",
+        "SCHEMA_VERSION"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "core/protocol.js",
+      "bytes": 10908,
+      "lines": 203,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./engine.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "parseProposal",
+        "apply",
+        "compileContract",
+        "FIELD_SPEC",
+        "VERBS"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "core/repair.js",
+      "bytes": 3794,
+      "lines": 70,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "collapseAwareRepair",
+        "normalize"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/001_world_representation/world_representation_query.js",
+      "bytes": 4145,
+      "lines": 82,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/004_object_identity/conflicting_field_merge.js",
+      "bytes": 1967,
+      "lines": 41,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": false,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/004_object_identity/dangling_reference.js",
+      "bytes": 5186,
+      "lines": 113,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${pass ? 'PASS' : 'FAIL'} - ${name}  (${detail})`"
+      ]
+    },
+    {
+      "file": "experiments/004_object_identity/identity_fixture.js",
+      "bytes": 4569,
+      "lines": 88,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": false,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${r.pass ? 'PASS' : 'FAIL'} - ${r.invariant}`, JSON.stringify(r)"
+      ]
+    },
+    {
+      "file": "experiments/004_object_identity/reference_and_merge_tests.js",
+      "bytes": 3173,
+      "lines": 59,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": false,
+      "requires": [
+        "crypto"
+      ],
+      "requiresExternal": [
+        "crypto"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "'before:', originalHash, ' after:', renamedHash, ' pass (should be FAIL):', originalHash === renamedHash"
+      ]
+    },
+    {
+      "file": "experiments/005_conflict_policy/resolution_policies.js",
+      "bytes": 8673,
+      "lines": 172,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/006_soa_world/integration_capstone.js",
+      "bytes": 5569,
+      "lines": 118,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "./soa_world"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${pass ? 'PASS' : 'FAIL'} - ${name}`",
+        "allPass ? '\\nALL PASS — conflict-safety holds on the dense typed-array world.' : '\\nSOME FAILED'"
+      ]
+    },
+    {
+      "file": "experiments/006_soa_world/soa_world.js",
+      "bytes": 7695,
+      "lines": 184,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "World",
+        "TYPE",
+        "TYPE_NAME"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${pass ? 'PASS' : 'FAIL'} - ${name}`",
+        "allPass ? '\\nALL PASS' : '\\nSOME FAILED'"
+      ]
+    },
+    {
+      "file": "experiments/009_fold_semantics_location/fold_semantics_location.js",
+      "bytes": 3912,
+      "lines": 77,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${pass ? 'PASS' : 'FAIL'} - ${name}${detail ? '  (' + detail + ')' : ''}`"
+      ]
+    },
+    {
+      "file": "experiments/010_structural_conflicts/structural_conflicts.js",
+      "bytes": 4822,
+      "lines": 98,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${pass ? 'PASS' : 'FAIL'} - ${name}  (${detail})`",
+        "allPass ? '\\nALL PASS — structural merge detects reparent/orphan/cycle instead of silently resolving.' : '\\nSOME FAILED'"
+      ]
+    },
+    {
+      "file": "experiments/011_quantized_context/quantized_serialization.js",
+      "bytes": 5218,
+      "lines": 89,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/014_agent_architecture/agent_architecture.js",
+      "bytes": 35203,
+      "lines": 536,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${ok ? 'PASS' : 'FAIL'} ${label}${detail ? ' — ' + detail : ''}`",
+        "`\\n${failCount === 0 ? 'ALL PASS' : failCount + ' FAILURE(S)'}`"
+      ]
+    },
+    {
+      "file": "experiments/017_index_transactions/index_transactions.js",
+      "bytes": 15928,
+      "lines": 286,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n  ${FAIL === 0 ? 'ALL PASS' : FAIL + ' FAILED'}  (${PASS} passed, ${FAIL} failed)`"
+      ]
+    },
+    {
+      "file": "experiments/021_ordered_list_conflicts/ordered_list_conflicts.js",
+      "bytes": 10262,
+      "lines": 170,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n  ${FAIL === 0 ? 'ALL PASS' : FAIL + ' FAILED'}  (${PASS} passed, ${FAIL} failed)`"
+      ]
+    },
+    {
+      "file": "experiments/022_index_representation/index_representation.js",
+      "bytes": 9640,
+      "lines": 175,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/022_index_representation/sweep.js",
+      "bytes": 4959,
+      "lines": 125,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/024_concurrency_fuzz/fuzz.js",
+      "bytes": 13200,
+      "lines": 249,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "../../core/engine.js",
+        "../../core/persistence.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`ALL PASS — determinism + index + identity + structure + undo held on every random batch.`",
+        "`${failures.length} FAILURE(S) FOUND:`"
+      ]
+    },
+    {
+      "file": "experiments/024_concurrency_fuzz/repro.js",
+      "bytes": 3962,
+      "lines": 45,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "../../core/engine.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/025_behavior_corpus/adapters.js",
+      "bytes": 7460,
+      "lines": 129,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "adapters",
+        "EXPECTED"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/025_behavior_corpus/corpus.js",
+      "bytes": 22290,
+      "lines": 357,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "../../core/engine.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "REAL",
+        "MALICIOUS",
+        "NONDET",
+        "MALFORMED",
+        "ALL",
+        "byId",
+        "REJECT",
+        "makeView",
+        "canonOps",
+        "opsEqual",
+        "typeOfIn",
+        "TYPE",
+        "TYPE_NAME",
+        "ids",
+        "malicious",
+        "nondet",
+        "malformed"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "'CORPUS SELF-CHECK FAILED'); for (const f of fails) console.log(f); process.exit(1"
+      ]
+    },
+    {
+      "file": "experiments/025_behavior_corpus/crosscheck_rules.js",
+      "bytes": 5856,
+      "lines": 84,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "path",
+        "./harness.js",
+        "../../core/behavior.js"
+      ],
+      "requiresExternal": [
+        "path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`  ${label}: ${r.ok ? 'ACCEPTED (!)' : `rejected [${e.code}] ${e.detail || ''}`}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/025_behavior_corpus/harness.js",
+      "bytes": 12770,
+      "lines": 232,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "path",
+        "worker_threads",
+        "./corpus.js"
+      ],
+      "requiresExternal": [
+        "path",
+        "worker_threads"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "scoreAdapter",
+        "formatMatrix",
+        "BUDGET",
+        "OP_CAP"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": true,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/025_behavior_corpus/rules_adapter.js",
+      "bytes": 2278,
+      "lines": 43,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "../../core/behavior.js"
+      ],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "name",
+        "execMode",
+        "sourceKey",
+        "compile(source) {\n    const r = parseRule(stubEngine()",
+        "source);\n    if (r.ok) return { ok",
+        "behavior",
+        "fn"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/025_behavior_corpus/worker_run.js",
+      "bytes": 4690,
+      "lines": 93,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "worker_threads",
+        "./corpus.js"
+      ],
+      "requiresExternal": [
+        "worker_threads"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/025_behavior_representation/behavior_representation.js",
+      "bytes": 37770,
+      "lines": 589,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:vm",
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:vm",
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/026_behavior_invariants/behavior_invariants.js",
+      "bytes": 22751,
+      "lines": 359,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/026_behavior_invariants/repro_11984.js",
+      "bytes": 2201,
+      "lines": 43,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/027_behavior_live/behavior_conflict.js",
+      "bytes": 4532,
+      "lines": 82,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/027_behavior_live/behavior_live.js",
+      "bytes": 15772,
+      "lines": 258,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/029_multirule_session/multirule_live.js",
+      "bytes": 19967,
+      "lines": 317,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/029_multirule_session/multirule_session.js",
+      "bytes": 21962,
+      "lines": 373,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "buildFarm",
+        "runSession",
+        "checkFarmObservable",
+        "classifyOpGrowth",
+        "ORACLE_RULES",
+        "MISSING_LINK_RULES",
+        "BENIGN_LINEAR_RULES",
+        "OPPOSED_FOLD_RULES",
+        "DELETE_VS_WRITE_RULES"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "'\\n=== T2: oracle minus reseed FAILS the observable (checker bites) ==='",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/030_rule_persistence/rule_persistence.js",
+      "bytes": 12321,
+      "lines": 198,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/031_reload_composition/reload_composition.js",
+      "bytes": 22134,
+      "lines": 362,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/032_claim_ttl/claim_ttl.js",
+      "bytes": 25784,
+      "lines": 441,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/033_tick_budget/tick_budget.js",
+      "bytes": 15214,
+      "lines": 252,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/034_homestead_game/b1_author_world.js",
+      "bytes": 3835,
+      "lines": 67,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "node:fs"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:fs"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/034_homestead_game/b2_author_rules.js",
+      "bytes": 4418,
+      "lines": 70,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "node:fs"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:fs"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": true,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/034_homestead_game/b2_live.js",
+      "bytes": 6739,
+      "lines": 102,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/034_homestead_game/b2_smoke.js",
+      "bytes": 2291,
+      "lines": 37,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "node:fs"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:fs"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/034_homestead_game/b3_rescue.js",
+      "bytes": 9473,
+      "lines": 145,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/034_homestead_game/b4_play.js",
+      "bytes": 5651,
+      "lines": 95,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "node:fs"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:fs"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/034_homestead_game/b5_checkpoint.js",
+      "bytes": 6221,
+      "lines": 101,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "node:os",
+        "node:fs"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:os",
+        "node:fs"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'}  ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/034_homestead_game/b6_export_trace.js",
+      "bytes": 2126,
+      "lines": 54,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/034_homestead_game/b8_ab.js",
+      "bytes": 6141,
+      "lines": 90,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/034_homestead_game/homestead.js",
+      "bytes": 11809,
+      "lines": 202,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "M_TICKS",
+        "buildStartWorld",
+        "oracleRules",
+        "playSession",
+        "checkHomesteadObservable",
+        "runGame",
+        "HOMESTEAD_GOALS",
+        "nearMissProposer",
+        "oracleRulesHard",
+        "checkHomesteadObservableHard"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/035_behavior_aggregations/aggregations.js",
+      "bytes": 10775,
+      "lines": 181,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/036_multiplayer/f2_retrocheck.js",
+      "bytes": 6786,
+      "lines": 116,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "node:fs"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:fs"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${cond ? 'PASS' : 'FAIL'} ${msg}`",
+        "`\\n=== ${FAIL === 0 ? 'ALL PASS' : 'FAILURES'} — ${PASS} passed, ${FAIL} failed ===`"
+      ]
+    },
+    {
+      "file": "experiments/036_multiplayer/m01_granularity_ab.js",
+      "bytes": 5407,
+      "lines": 92,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/036_multiplayer/m0_latency.js",
+      "bytes": 13975,
+      "lines": 242,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "node:fs"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:fs"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": true,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`>=1000 live sustained: ${passLoad ? 'PASS' : 'FAIL'} (popMin=${ref.popMin})`",
+        "`p50 <= 5ms:  ${passP50 ? 'PASS' : 'FAIL'} (${ref.tickMs.p50.toFixed(2)}ms)`",
+        "`p99 <= 10ms: ${passP99 ? 'PASS' : 'FAIL'} (${ref.tickMs.p99.toFixed(2)}ms)`",
+        "`unsafe == 0 everywhere: ${safe ? 'PASS' : 'FAIL'}`"
+      ]
+    },
+    {
+      "file": "experiments/036_multiplayer/m1_client.js",
+      "bytes": 7400,
+      "lines": 113,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:net",
+        "node:readline"
+      ],
+      "requiresExternal": [
+        "node:net",
+        "node:readline"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "m.ok ? `✓ rule '${m.name}' installed` : `✗ rule rejected:\\n${(m.errors ?? []).map(e => `  [${e.where}] ${e.code}: ${e.detail ?? ''}`).join('\\n')}`); rl.prompt(",
+        "'commands: look | plant [name] | water name|u [amt] | claim name|u [ticks=40] | harvest name|u | set name|u field v | name u label | move u after|front | del u | rule {json} | uninstall n | quit'); rl.prompt("
+      ]
+    },
+    {
+      "file": "experiments/036_multiplayer/m1_server.js",
+      "bytes": 28508,
+      "lines": 473,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:net",
+        "node:http",
+        "node:fs",
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:net",
+        "node:http",
+        "node:fs",
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "startServer",
+        "sanitizeOps"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": true,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/036_multiplayer/m1_visit.js",
+      "bytes": 4093,
+      "lines": 80,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:net"
+      ],
+      "requiresExternal": [
+        "node:net"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": true,
+      "caseLogTemplates": [
+        "'CONNECT FAILED:', e.message, '— is the server running on', port, '?'); process.exit(1); }"
+      ]
+    },
+    {
+      "file": "experiments/037_ai_native_editor/explain.js",
+      "bytes": 16323,
+      "lines": 283,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "explainRule",
+        "explainErrors",
+        "explainReason"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/037_ai_native_editor/intent.js",
+      "bytes": 24393,
+      "lines": 422,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "parse"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/037_ai_native_editor/intent2.js",
+      "bytes": 15553,
+      "lines": 298,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "parse"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/038_continuous_motion/frame_budget_bench.js",
+      "bytes": 4381,
+      "lines": 86,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "./motion_system.js",
+        "./gated_events.js"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/038_continuous_motion/gated_events.js",
+      "bytes": 2751,
+      "lines": 61,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "./motion_system.js"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "buildWorld",
+        "eventsToTxs",
+        "unsafeCheck",
+        "q255"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "'ALL PASS — gated_events smoke'"
+      ]
+    },
+    {
+      "file": "experiments/038_continuous_motion/h2_corruption_probe.js",
+      "bytes": 5331,
+      "lines": 89,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "./motion_system.js",
+        "./gated_events.js"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS + FAIL} checks, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "experiments/038_continuous_motion/motion_system.js",
+      "bytes": 3013,
+      "lines": 67,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "createMotion",
+        "WORLD"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "'ALL PASS — motion_system smoke'"
+      ]
+    },
+    {
+      "file": "experiments/039_schema_authoring/pong_vocab.js",
+      "bytes": 7397,
+      "lines": 121,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed — Pong vocabulary at runtime, zero core edits`"
+      ]
+    },
+    {
+      "file": "experiments/040_spatial/near_bench.js",
+      "bytes": 5674,
+      "lines": 87,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/041_aggregation_index/accel_bench.js",
+      "bytes": 3946,
+      "lines": 66,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/042_pong/pong_rules.js",
+      "bytes": 8426,
+      "lines": 133,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "buildWorld",
+        "RULE_SET",
+        "install",
+        "W",
+        "H",
+        "ZERO",
+        "SPEED",
+        "PADDLE_SPEED",
+        "HIT_R",
+        "GOAL_L",
+        "GOAL_R"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/042_pong/pong_rules_v2.js",
+      "bytes": 8503,
+      "lines": 136,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "buildWorld",
+        "RULE_SET",
+        "install",
+        "W",
+        "H",
+        "SPEED",
+        "PADDLE_SPEED",
+        "HIT_R",
+        "GOAL_L",
+        "GOAL_R"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/043_ai_authors_pong/ab_run.js",
+      "bytes": 6396,
+      "lines": 107,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:fs",
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:fs",
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": true,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`\\n===== GATE-PASS TALLY (gated != correct — behavior is scored separately) =====`"
+      ]
+    },
+    {
+      "file": "experiments/043_ai_authors_pong/score_behavior.js",
+      "bytes": 6637,
+      "lines": 118,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/044_shooter/shooter_rules.js",
+      "bytes": 7677,
+      "lines": 121,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "buildWorld",
+        "RULE_SET",
+        "install",
+        "POOL",
+        "W",
+        "H",
+        "HIT_R",
+        "TOUCH_R",
+        "DMG",
+        "BULLET_LIFE",
+        "PLAYER_SPEED"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/046_platformer/live_author_gravity.js",
+      "bytes": 5292,
+      "lines": 91,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path",
+        "node:fs"
+      ],
+      "requiresExternal": [
+        "node:path",
+        "node:fs"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": true,
+      "spawnsProcesses": true,
+      "usesNetwork": true,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'INCOMPLETE' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed. Full transcript -> results.jsonl`"
+      ]
+    },
+    {
+      "file": "experiments/046_platformer/platformer_rules.js",
+      "bytes": 5197,
+      "lines": 89,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "buildWorld",
+        "RULE_SET",
+        "install",
+        "W",
+        "H",
+        "G",
+        "VY_MAX",
+        "JUMP",
+        "NEAR_R",
+        "PLAT_X",
+        "PLAT_Y"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/047_racing/racing_rules.js",
+      "bytes": 5114,
+      "lines": 84,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "buildWorld",
+        "RULE_SET",
+        "install",
+        "W",
+        "H",
+        "TOP",
+        "NEAR_R",
+        "FINISH_X",
+        "FAR_X",
+        "LANE_Y"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/048_adventure/adventure_rules.js",
+      "bytes": 4588,
+      "lines": 74,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "buildWorld",
+        "RULE_SET",
+        "install",
+        "W",
+        "H",
+        "NEAR_R",
+        "KEYS_NEEDED",
+        "MAX_KEYS"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/049_tower_defense/td_rules.js",
+      "bytes": 5230,
+      "lines": 83,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "buildWorld",
+        "RULE_SET",
+        "install",
+        "W",
+        "H",
+        "SPEED",
+        "DMG",
+        "BOUNTY",
+        "TOWER_R",
+        "CORNER_X",
+        "EXIT_Y",
+        "START_LIFE",
+        "ENEMY_HP"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/050_relational/relational_harness.js",
+      "bytes": 7301,
+      "lines": 130,
+      "moduleSystem": "none-detected",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [],
+      "requiresExternal": [],
+      "imports": [],
+      "exportsCjs": [
+        "makeWorld",
+        "step",
+        "evalExpr",
+        "evalPred",
+        "snapshot"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/052_turnbased/turn_rules.js",
+      "bytes": 5435,
+      "lines": 86,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [
+        "buildWorld",
+        "RULE_SET",
+        "install",
+        "W",
+        "H",
+        "POISON_DMG"
+      ],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": false,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": []
+    },
+    {
+      "file": "experiments/053_stealth/knowledge_probe.js",
+      "bytes": 5900,
+      "lines": 90,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": true,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "`${c ? 'PASS' : 'FAIL'} ${m}`",
+        "`\\n${FAIL ? 'FAIL' : 'ALL PASS'} — ${PASS} passed, ${FAIL} failed`"
+      ]
+    },
+    {
+      "file": "_stress_enginefuzz.js",
+      "bytes": 3455,
+      "lines": 79,
+      "moduleSystem": "cjs",
+      "extension": ".js",
+      "strictPragma": true,
+      "requires": [
+        "node:child_process",
+        "node:path"
+      ],
+      "requiresExternal": [
+        "node:child_process",
+        "node:path"
+      ],
+      "imports": [],
+      "exportsCjs": [],
+      "exportsCjsNamed": [],
+      "exportsEsm": [],
+      "callsProcessExit": false,
+      "writesFs": false,
+      "spawnsProcesses": true,
+      "usesNetwork": false,
+      "usesTimers": false,
+      "caseLogTemplates": [
+        "'  FAIL/anomaly lines:'); failLines.forEach(l => console.log('   ' + l)",
+        "'  FAIL lines:'); failLines.forEach(l => console.log('   ' + l)",
+        "'ALL FUZZERS PASS across all seeds/iterations — no invariant break, no known-stale failure either.'"
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "file": "core/editor_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 82,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 51,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 27,
+          "distinctIds": 27,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS an unknown command is reported, not thrown |  | ALL PASS — 27 passed, 0 failed"
+    },
+    {
+      "file": "core/history_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 76,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 50,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 26,
+          "distinctIds": 26,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "============================================= | ALL PASS  (26 passed, 0 failed) — history/undo | ============================================="
+    },
+    {
+      "file": "core/integration_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 87,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 64,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 39,
+          "distinctIds": 39,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "============================================= | ALL PASS  (39 passed, 0 failed) — integrated core | ============================================="
+    },
+    {
+      "file": "core/live_loop_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 65,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 25,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 6,
+          "distinctIds": 6,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "============================================= | ALL PASS  (6 passed, 0 failed) — live-model loop | ============================================="
+    },
+    {
+      "file": "core/ordered_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 78,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 27,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 20,
+          "distinctIds": 20,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "============================================= | ALL PASS  (20 passed, 0 failed) — ordered lists | ============================================="
+    },
+    {
+      "file": "core/persistence_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 71,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 39,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 18,
+          "distinctIds": 18,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "============================================= | ALL PASS  (18 passed, 0 failed) — persistence | ============================================="
+    },
+    {
+      "file": "core/protocol_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 65,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 33,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 14,
+          "distinctIds": 14,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "============================================= | ALL PASS  (14 passed, 0 failed) — AI↔engine protocol | ============================================="
+    },
+    {
+      "file": "core/repair_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 54,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 26,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 14,
+          "distinctIds": 14,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS whitespace-jittered re-emit is still caught as collapse and rescued |  | ALL PASS — 14 passed, 0 failed"
+    },
+    {
+      "file": "core/tick_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 69,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 34,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 29,
+          "distinctIds": 29,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS T5 committed state IDENTICAL under reversed system registration order (RD-003 inherited) |  | ALL PASS — 29 passed, 0 failed"
+    },
+    {
+      "file": "core/tombstone_gc_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 67,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 41,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 18,
+          "distinctIds": 18,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "  RD-019 storage cost (unlike NEVER) while keeping deleted-metadata exactly while it |   is still reachable (unlike EAGER/HardDelete). Safe by RD-004.6: uuids never recycle. | ============================================="
+    },
+    {
+      "file": "experiments/006_soa_world/memory_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 142,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 13,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": " | ratio (naive / SoA): ~6.1x | note: report the SoA number as fact; the ratio inherits the naive number's noise."
+    },
+    {
+      "file": "experiments/025_behavior_corpus/harness_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 10679,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 60,
+      "coverageFiles": 266,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 48,
+          "distinctIds": 48,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS NC-nondet fails ONLY DETERMINISTIC — the axis is isolated (correct multiset, unstable order) |  | ALL PASS — 48 passed, 0 failed"
+    },
+    {
+      "file": "experiments/036_multiplayer/m1_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 662,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 24,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 15,
+          "distinctIds": 15,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS the session record carries the rule-effect accounting line |  | ALL PASS — 15 passed, 0 failed"
+    },
+    {
+      "file": "experiments/036_multiplayer/m2_schema_transport_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 559,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 12,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 9,
+          "distinctIds": 9,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS unsafe sweep: 0 after mixed farm + dynamic wire traffic |  | ALL PASS — 9 passed, 0 failed — RD-M2 transport schema"
+    },
+    {
+      "file": "experiments/036_multiplayer/m4_creation_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 572,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 12,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 9,
+          "distinctIds": 9,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS unsafe sweep: 0 — a world authored from nothing keeps every invariant |  | ALL PASS — 9 passed, 0 failed — RD-034: a game born from an empty world through the three gates"
+    },
+    {
+      "file": "experiments/037_ai_native_editor/explain_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 78,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 115,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 85,
+          "distinctIds": 85,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "============================================= | ALL PASS  (85 passed, 0 failed) — rule -> English explainer | ============================================="
+    },
+    {
+      "file": "experiments/037_ai_native_editor/intent2_e2e_pong_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 319,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 16,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 13,
+          "distinctIds": 13,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS the Pong world has no crop type at all (de-farmed at the source, not just the strings) |  | ALL PASS — 13 passed, 0 failed"
+    },
+    {
+      "file": "experiments/037_ai_native_editor/intent2_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 90,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 78,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 75,
+          "distinctIds": 75,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS source audit: intent2.js contains no game nouns outside comments |  | ALL PASS — 75 passed, 0 failed"
+    },
+    {
+      "file": "experiments/037_ai_native_editor/intent_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 126,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 107,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 104,
+          "distinctIds": 104,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS 'the dry one' with none dry -> error explaining dry |  | ALL PASS — 104 passed, 0 failed"
+    },
+    {
+      "file": "experiments/040_spatial/spatial_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 149,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 26,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 23,
+          "distinctIds": 23,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS the near-scoped rule reinstalled and still computes 7 post-load |  | ALL PASS — 23 passed, 0 failed — RD-025 spatial scope"
+    },
+    {
+      "file": "experiments/041_aggregation_index/equivalence_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 273,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 8,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 5,
+          "distinctIds": 5,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS near is per-entity, never memoized across entities (a=1 b=1 c=0, got 1 1 0) |  | ALL PASS — 5 passed, 0 failed — RD-026 equivalence & determinism"
+    },
+    {
+      "file": "experiments/042_pong/pong_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 104,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 16,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 13,
+          "distinctIds": 13,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS deterministic: two identical runs produce identical ball traces |  | ALL PASS — 13 passed, 0 failed — RD-027: Pong on today's grammar, zero core edits"
+    },
+    {
+      "file": "experiments/042_pong/pong_v2_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 97,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 25,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 22,
+          "distinctIds": 22,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS the RD-025 near-grid still installs on a type carrying signed fields |  | ALL PASS — 22 passed, 0 failed — RD-028 signed fields + multiply"
+    },
+    {
+      "file": "experiments/044_shooter/shooter_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 126,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 21,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 18,
+          "distinctIds": 18,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS deterministic: two identical shooter sessions produce identical traces |  | ALL PASS — 18 passed, 0 failed — RD-032: a top-down shooter on the same rule system, zero core edits"
+    },
+    {
+      "file": "experiments/045_write_smell/write_smell_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 82,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 30,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 27,
+          "distinctIds": 27,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS writeSmells never mutates the engine |  | ALL PASS — 27 passed, 0 failed"
+    },
+    {
+      "file": "experiments/046_platformer/platformer_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 90,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 19,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 16,
+          "distinctIds": 16,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS deterministic: two identical runs produce byte-identical (y,vy) traces |  | ALL PASS — 16 passed, 0 failed — RD-036: platformer, a 4th genre, zero core edits"
+    },
+    {
+      "file": "experiments/047_racing/racing_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 104,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 14,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 11,
+          "distinctIds": 11,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS deterministic: two identical races produce identical (x,speed) traces |  | ALL PASS — 11 passed, 0 failed — RD-037: racing, a 5th genre, zero core edits"
+    },
+    {
+      "file": "experiments/048_adventure/adventure_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 93,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 15,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 12,
+          "distinctIds": 12,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS deterministic: two identical runs produce identical (keys,gate,foe-hp) traces |  | ALL PASS — 12 passed, 0 failed — RD-038: action/adventure, a 6th genre, zero core edits"
+    },
+    {
+      "file": "experiments/049_tower_defense/td_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 101,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 26,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 11,
+          "distinctIds": 11,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS a relational predicate (field cmp FIELD) does NOT install — the grammar has field-vs-CONSTANT only. This is the exact wall behind ordered-checkpoint racing AND per-enemy-waypoint pathing AND single-target 'nearest/strongest' selection. |  | ALL PASS — 11 passed, 0 failed — RD-039: tower defense"
+    },
+    {
+      "file": "experiments/050_relational/adversarial_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 63,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 23,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 6,
+          "distinctIds": 6,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "  support/debuff/single-target-by-field/per-enemy-pathing. The residue is NARROW & CHARACTERIZED: |   L3a = distance-as-value (nearest/chain/ranking);  L3b = references + per-pair state (persistent |   aggro-lock, threat tables, arbitrary target bindings) — and ONLY L3b reopens RD-005."
+    },
+    {
+      "file": "experiments/050_relational/falsification_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 76,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 22,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 11,
+          "distinctIds": 11,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS double-buffer: reversing rule evaluation order changes NOTHING (reads are all pre-tick) — RD-005 property preserved |  | ALL PASS — 11 passed, 0 failed — RD-040 H1 falsification set: all three express via inversion + L1/L2, self-writes only"
+    },
+    {
+      "file": "experiments/051_safety_patches/patch_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 376,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 28,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 15,
+          "distinctIds": 15,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS after a tick drains the queue, the client can submit again (cap is per-tick, not permanent) |  | ALL PASS — 15 passed, 0 failed — RD-035 audit: both safety holes (#1 createChild range bypass, #2 tx-flood) CLOSED"
+    },
+    {
+      "file": "experiments/052_turnbased/turn_test.js",
+      "exitCode": 0,
+      "signal": null,
+      "ms": 93,
+      "timedOut": false,
+      "settledVia": "close",
+      "drainMs": 0,
+      "stdoutLines": 31,
+      "coverageFiles": 1,
+      "caseLineCandidates": {
+        "PASS_FAIL_leading": {
+          "count": 17,
+          "distinctIds": 17,
+          "duplicatedIds": 0
+        },
+        "ok_notok_tap": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        },
+        "check_cross": {
+          "count": 0,
+          "distinctIds": 0,
+          "duplicatedIds": 0
+        }
+      },
+      "filesTouchedUnderRoot": [],
+      "tail": "PASS auto-initiative REJECTED (field-vs-field) — turn ORDER needs RD-040 L2; turn STRUCTURE (this whole genre) does not. Player-driven turns work today. |  | ALL PASS — 17 passed, 0 failed — RD-041: turn-based tactical, zero core edits; the tick is a heartbeat, not the clock"
+    }
+  ],
+  "ranDynamic": true,
+  "budgetMs": 120000
+}
