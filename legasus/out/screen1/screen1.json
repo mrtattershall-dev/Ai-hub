@@ -1,0 +1,60 @@
+{
+  "target": "C:\\Users\\tatte\\odysseus",
+  "filesSeen": 546,
+  "filesParsed": 546,
+  "unparseable": [],
+  "counts": {
+    "INV-A": 2,
+    "INV-B": 4
+  },
+  "candidates": [
+    {
+      "invariant": "INV-A",
+      "function": "_mcp_oauth_token_missing",
+      "line": 67,
+      "flagged_line": 77,
+      "flagged_source": "return True",
+      "file": "odysseus/routes/mcp_routes.py"
+    },
+    {
+      "invariant": "INV-B",
+      "function": "is_vision_model",
+      "line": 70,
+      "flagged_line": 80,
+      "flagged_source": "return bool(_VISION_VL_RE.search(m))",
+      "file": "odysseus/src/chat_helpers.py"
+    },
+    {
+      "invariant": "INV-B",
+      "function": "is_self_hosted",
+      "line": 49,
+      "flagged_line": 64,
+      "flagged_source": "return host not in _SOTA_HOSTS",
+      "file": "odysseus/src/teacher_escalation.py"
+    },
+    {
+      "invariant": "INV-A",
+      "function": "_mcp_oauth_token_missing",
+      "line": 67,
+      "flagged_line": 77,
+      "flagged_source": "return True",
+      "file": "routes/mcp_routes.py"
+    },
+    {
+      "invariant": "INV-B",
+      "function": "is_vision_model",
+      "line": 70,
+      "flagged_line": 80,
+      "flagged_source": "return bool(_VISION_VL_RE.search(m))",
+      "file": "src/chat_helpers.py"
+    },
+    {
+      "invariant": "INV-B",
+      "function": "is_self_hosted",
+      "line": 49,
+      "flagged_line": 64,
+      "flagged_source": "return host not in _SOTA_HOSTS",
+      "file": "src/teacher_escalation.py"
+    }
+  ]
+}
