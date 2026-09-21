@@ -525,3 +525,24 @@ but agreement was checked by me afterwards from raw records, never by the classi
 no representation of LOAD COUNT, only of identity variety; the step-5 multiplicity test
 (distinct identities > 1) could not have fired on this. Whether it needs one is left open and
 no state was invented for it.
+
+## 34. Ledger cardinality audit (10 checks): 6 verified, 2 corrected, 1 unverifiable, 1 mismatch
+
+legasus/out/audit/CARDINALITY_AUDIT.md. For every artifact-derived number in this branch:
+name the artifact, name the unit, establish the mapping. 34 mutants ARE 34 distinct
+perturbations (and (family,site) is NOT the key - 31 pairs, because one family yields several
+mutants at a site); 3162 records ARE 34x93; 87 calls ARE 57 distinct inputs; 568 edges ARE 568
+distinct (case,class) pairs over 21 classes and are NOT 568 findings. Unverifiable: cross-file
+uniqueness of step-1 case id STRINGS - stored evidence has counts, not strings; no claim
+depends on it because identity is the (file,id) pair, and that is now stated rather than
+assumed. Mismatch: my own step-6 field name `totalProcessesWithCoverage` holds a file count -
+the same error one layer down, in the instrument written to measure it, hours after finding it
+upstream. Left unrenamed so the evidence survives.
+
+The audit's own first run produced a FALSE mismatch by reading a field from the wrong artifact.
+Fixed within the run and recorded.
+
+Standing check, not a law: where the artifact->unit mapping is many-to-one (records->findings,
+files->processes, calls->inputs, edges->classes, snapshots->replications), report BOTH
+cardinalities or the smaller one. Applied at write time it would have caught all three of
+tonight's corrections immediately instead of after one, two and six hours.

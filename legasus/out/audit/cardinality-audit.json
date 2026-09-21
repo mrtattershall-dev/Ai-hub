@@ -1,0 +1,82 @@
+{
+  "at": "2026-09-21T02:02:50.947Z",
+  "checks": [
+    {
+      "claim": "\"34 mutants, all valid\" (BIND-1)",
+      "artifact": "34 mutant files",
+      "unitAsserted": "distinct perturbations",
+      "verdict": "VERIFIED",
+      "finding": "34 files, 34 distinct byte-contents - one perturbation each. Note 31 distinct (family, site) pairs < 34: (family, site) is NOT a unique key, because one family can yield several mutants at one site (BOUNDARY gives both +1 and -1 on a numeric literal). Distinct byte-content is the key that holds"
+    },
+    {
+      "claim": "\"93 cases\" / \"3162 records\" (BIND-1)",
+      "artifact": "3162 case records",
+      "unitAsserted": "distinct witness cases x mutants",
+      "verdict": "VERIFIED",
+      "finding": "93 distinct witness identities; every mutant has exactly 93 case records; 34 mutants x 93 = 3162 vs 3162 records"
+    },
+    {
+      "claim": "\"87 calls, 57 distinct inputs\" (BIND-2)",
+      "artifact": "87 recorded calls",
+      "unitAsserted": "distinct argument values",
+      "verdict": "VERIFIED",
+      "finding": "87 call records collapse to 57 distinct serialized arguments (bind2.json records 87 calls / 57 distinct); orphan calls 0. A call is NOT an input and the record keeps both"
+    },
+    {
+      "claim": "\"568 licensed edges\" (BIND-2)",
+      "artifact": "568 edge records",
+      "unitAsserted": "distinct (witness case, support class) pairs",
+      "verdict": "VERIFIED",
+      "finding": "568 edges, 568 distinct (case, class) pairs over 21 classes - an edge is NOT an independent finding; the class-level count is 21"
+    },
+    {
+      "claim": "\"272 UNASSERTED\" (BIND-2, corrected 2026-09-21)",
+      "artifact": "276 joined records",
+      "unitAsserted": "behavioural classes exhibiting the signal",
+      "verdict": "CORRECTED",
+      "finding": "276 records span 18 mutants and 17 classes; one mutant (M005-BOUNDARY) contributes 71. The defensible count is 17 classes"
+    },
+    {
+      "claim": "\"266 coverage processes\" (step 1, notes 23/27/28, P-F2 rationale)",
+      "artifact": "298 coverage files",
+      "unitAsserted": "processes",
+      "verdict": "CORRECTED",
+      "finding": "298 files carry 33 distinct (witness, pid) pairs - one process per witness; no witness used more than one"
+    },
+    {
+      "claim": "\"776 uniquely identified cases\" (step 1)",
+      "artifact": "776 PASS/FAIL lines",
+      "unitAsserted": "uniquely identified witness cases",
+      "verdict": "UNVERIFIABLE",
+      "verdictDetail": "partially verified",
+      "finding": "within-file uniqueness IS established (0 duplicated ids across 33 files). Cross-file uniqueness of the id STRING is not: the stored shape records counts, not id strings. This does not endanger any claim made, because witness identity is the (file, id) PAIR everywhere it is used - but a claim of globally unique ids would be unsupported"
+    },
+    {
+      "claim": "\"95-99 executed scripts\" as the scope universe (step 5)",
+      "artifact": "coverage script entries",
+      "unitAsserted": "distinct executed modules",
+      "verdict": "VERIFIED",
+      "finding": "URLs are set-deduplicated before counting, so the count names distinct module URLs, not coverage entries (F-A:99 urls/1 covfiles, F-B:97 urls/1 covfiles, F-C:97 urls/1 covfiles, F-G:95 urls/1 covfiles)"
+    },
+    {
+      "claim": "\"the substitution held across 266 re-evaluations\" (step 6)",
+      "artifact": "266 coverage snapshots / marker records",
+      "unitAsserted": "observed module re-evaluations within ONE run",
+      "verdict": "VERIFIED",
+      "finding": "1 process; 1 distinct identity (T000_IDENTITY); NOT 266 processes, NOT 266 independent replications, NOT 266 independent interventions - one run containing 266 observed re-evaluations"
+    },
+    {
+      "claim": "field name `totalProcessesWithCoverage` (step 6 runner)",
+      "artifact": "coverage file count",
+      "unitAsserted": "processes",
+      "verdict": "MISMATCH",
+      "finding": "the field NAME asserts processes while holding a file count; it is the same error one layer down, in the instrument written to measure the error. Recorded, not renamed retroactively in the stored artifact"
+    }
+  ],
+  "tally": {
+    "VERIFIED": 6,
+    "CORRECTED": 2,
+    "UNVERIFIABLE": 1,
+    "MISMATCH": 1
+  }
+}
