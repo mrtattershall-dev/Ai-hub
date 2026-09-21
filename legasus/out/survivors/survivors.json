@@ -1,0 +1,272 @@
+{
+  "at": "2026-09-21T03:00:50.754Z",
+  "node": "v24.15.0",
+  "deciders": "step-11 deciders, verbatim",
+  "results": [
+    {
+      "id": "S1",
+      "prop": "P1",
+      "text": "a request was issued",
+      "hostile": {
+        "worker": "none",
+        "request": false,
+        "preseedRequest": true
+      },
+      "control": {
+        "worker": "none",
+        "request": false
+      },
+      "falseBecause": "the record was written by another writer; the intervention issued nothing",
+      "deciderHostile": true,
+      "deciderControl": false,
+      "mustFireNegativeHeld": true,
+      "verdict": "PROPOSITION DIES - affirmed in a world where it is false",
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1
+      },
+      "hostileRaw": {
+        "markers": 1,
+        "requests": 1,
+        "ops": 0,
+        "served": 1
+      },
+      "controlRaw": {
+        "markers": 1,
+        "requests": 0,
+        "ops": 0,
+        "served": 1
+      }
+    },
+    {
+      "id": "S2",
+      "prop": "P2",
+      "text": "module M was served",
+      "hostile": {
+        "worker": "none",
+        "request": false,
+        "resolveOnly": true
+      },
+      "control": {
+        "worker": "none",
+        "request": false,
+        "serve": false
+      },
+      "falseBecause": "the hook answered a resolution; nothing was supplied to an execution",
+      "deciderHostile": true,
+      "deciderControl": false,
+      "mustFireNegativeHeld": true,
+      "verdict": "PROPOSITION DIES - affirmed in a world where it is false",
+      "hostileBundle": {
+        "events": [],
+        "servedCount": 1
+      },
+      "hostileRaw": {
+        "markers": 0,
+        "requests": 0,
+        "ops": 0,
+        "served": 1
+      },
+      "controlRaw": {
+        "markers": 1,
+        "requests": 0,
+        "ops": 0,
+        "served": 0
+      }
+    },
+    {
+      "id": "S3",
+      "prop": "P3",
+      "text": "an execution occurred outside the witness",
+      "hostile": {
+        "worker": "none",
+        "request": false,
+        "witnessRole": "worker"
+      },
+      "control": {
+        "worker": "none",
+        "request": false
+      },
+      "falseBecause": "the only process was the witness, wearing a self-reported label",
+      "deciderHostile": true,
+      "deciderControl": false,
+      "mustFireNegativeHeld": true,
+      "verdict": "PROPOSITION DIES - affirmed in a world where it is false",
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1
+      },
+      "hostileRaw": {
+        "markers": 1,
+        "requests": 0,
+        "ops": 0,
+        "served": 1
+      },
+      "controlRaw": {
+        "markers": 1,
+        "requests": 0,
+        "ops": 0,
+        "served": 1
+      }
+    },
+    {
+      "id": "S4",
+      "prop": "P4",
+      "text": "the execution followed the request",
+      "hostile": {
+        "worker": "on-timer",
+        "opworker": true,
+        "request": true,
+        "workerDelay": 900,
+        "requestDelay": 0
+      },
+      "control": {
+        "worker": "on-timer",
+        "request": true,
+        "workerDelay": 100,
+        "requestDelay": 800
+      },
+      "falseBecause": "the operation began before the request; only the load came after",
+      "deciderHostile": true,
+      "deciderControl": false,
+      "mustFireNegativeHeld": true,
+      "verdict": "PROPOSITION DIES - affirmed in a world where it is false",
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "operation-start",
+            "role": "worker",
+            "identity": null
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 2,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 3,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1
+      },
+      "hostileRaw": {
+        "markers": 2,
+        "requests": 1,
+        "ops": 1,
+        "served": 1
+      },
+      "controlRaw": {
+        "markers": 2,
+        "requests": 1,
+        "ops": 0,
+        "served": 1
+      }
+    },
+    {
+      "id": "S5",
+      "prop": "P5",
+      "text": "every observed execution used M",
+      "hostile": {
+        "worker": "none",
+        "request": false,
+        "serveImpostor": true
+      },
+      "control": {
+        "worker": "on-timer",
+        "request": false
+      },
+      "falseBecause": "the served file was not the requested mutant; it self-reported the identity",
+      "deciderHostile": true,
+      "deciderControl": false,
+      "mustFireNegativeHeld": true,
+      "verdict": "PROPOSITION DIES - affirmed in a world where it is false",
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1
+      },
+      "hostileRaw": {
+        "markers": 1,
+        "requests": 0,
+        "ops": 0,
+        "served": 1
+      },
+      "controlRaw": {
+        "markers": 2,
+        "requests": 0,
+        "ops": 0,
+        "served": 1
+      }
+    }
+  ],
+  "died": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+  ],
+  "survived": [],
+  "voids": [],
+  "processHygiene": {
+    "spawnedRecorded": 3,
+    "aliveAtSweep": 0,
+    "sweep": [
+      {
+        "tag": "S4-hostile",
+        "role": "worker",
+        "pid": 27304,
+        "aliveAtSweep": false
+      },
+      {
+        "tag": "S4-control",
+        "role": "worker",
+        "pid": 39804,
+        "aliveAtSweep": false
+      },
+      {
+        "tag": "S5-control",
+        "role": "worker",
+        "pid": 3012,
+        "aliveAtSweep": false
+      }
+    ]
+  }
+}

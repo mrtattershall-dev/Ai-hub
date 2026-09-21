@@ -1,0 +1,194 @@
+{
+  "at": "2026-09-21T03:01:54.338Z",
+  "postHoc": true,
+  "caveat": "run AFTER step 12 and labelled post-hoc; it characterises the deaths, it does not rescue any proposition",
+  "results": [
+    {
+      "id": "S1",
+      "prop": "P1",
+      "text": "a request was issued",
+      "deathKind": "DECIDER_WEAKNESS",
+      "note": "the bundles differ, so the record holds something this decider did not consult - the proposition is not shown unidentifiable, only this decider unsound",
+      "genuineBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          }
+        ],
+        "servedCount": 1
+      },
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1
+      }
+    },
+    {
+      "id": "S2",
+      "prop": "P2",
+      "text": "module M was served",
+      "deathKind": "DECIDER_WEAKNESS",
+      "note": "the bundles differ, so the record holds something this decider did not consult - the proposition is not shown unidentifiable, only this decider unsound",
+      "genuineBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1
+      },
+      "hostileBundle": {
+        "events": [],
+        "servedCount": 1
+      }
+    },
+    {
+      "id": "S3",
+      "prop": "P3",
+      "text": "an execution occurred outside the witness",
+      "deathKind": "DECIDER_WEAKNESS",
+      "note": "the bundles differ, so the record holds something this decider did not consult - the proposition is not shown unidentifiable, only this decider unsound",
+      "genuineBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1
+      },
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1
+      }
+    },
+    {
+      "id": "S4",
+      "prop": "P4",
+      "text": "the execution followed the request",
+      "deathKind": "DECIDER_WEAKNESS",
+      "note": "the bundles differ, so the record holds something this decider did not consult - the proposition is not shown unidentifiable, only this decider unsound",
+      "genuineBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 2,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1
+      },
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "operation-start",
+            "role": "worker",
+            "identity": null
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 2,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 3,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1
+      }
+    },
+    {
+      "id": "S5",
+      "prop": "P5",
+      "text": "every observed execution used M",
+      "deathKind": "EVIDENCE_LIMIT",
+      "note": "the genuine-true bundle and the hostile bundle are identical: no decider over these recorded fields separates them",
+      "genuineBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1
+      },
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1
+      }
+    }
+  ],
+  "aliveAtSweep": 0
+}

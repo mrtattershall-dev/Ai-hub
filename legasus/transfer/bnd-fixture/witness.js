@@ -1,5 +1,13 @@
 const path = require('node:path');
 const fs = require('node:fs');
+// S2: resolve the target without ever loading it. The hook answers the resolution and logs
+// `served`; nothing is supplied to an execution.
+if (process.env.LEGASUS_RESOLVE_ONLY === '1') {
+  require.resolve(path.join(__dirname, 'target.js'));
+  console.log('PASS witness resolved the target without loading it');
+  setTimeout(() => { console.log('ALL PASS'); process.exit(0); }, 900);
+  return;
+}
 const T = require(path.join(__dirname, 'target.js'));
 
 let PASS = 0;

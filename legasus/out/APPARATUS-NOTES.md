@@ -662,3 +662,31 @@ Limitations recorded: P2's contrast is not minimal (World- changes the loaded id
 NOT_IDENTIFIABLE_STRONG is relative to THESE recorded fields - an identifiability failure under
 this observation model, never an impossibility proof; seven propositions chosen by me are a
 start, not a taxonomy. A survivor of one contrast is not established, only not-yet-killed.
+
+## 40. All five step-11 deciders are unsound - but only ONE death is an evidence limit
+
+Step 12. Frozen criterion: each step-11 decider affirms its proposition in a world where it is
+false (S1 pre-seeded request channel; S2 resolve without load; S3 witness self-labels as worker;
+S4 operation begins before the request; S5 impostor self-reports MUTANT). All five must-fire
+negatives held, so this is not a decider that says true everywhere.
+
+Post-hoc classification (labelled as such) narrows it sharply: comparing each hostile bundle
+against a genuinely-true world, only P5's bundles are IDENTICAL. P1-P4's differ - so four of the
+five deaths are about MY deciders, not about the evidence.
+
+And the four "decider weakness" labels are weaker still, by inspection: P1 differs only in the
+RANK of the request (a mid-run seeder erases it; nothing records the issuer); P3 only in the
+COUNT of executions (nothing establishes that two roles are two processes); P4 because my
+hostile world emits a record type the genuine one lacks - an artifact of construction. Only P2
+plausibly admits a stronger decider over existing fields.
+
+Honest three-way position: decider unsound ESTABLISHED for all five; death is an evidence limit
+ESTABLISHED for P5 only; a SOUND decider exists ESTABLISHED for none.
+
+S4 forced a distinction without settling it: "followed the request" names at least four events -
+operation start, module load, marker emission, observation - and the decider silently used the
+last. Which reading is right was NOT decided.
+
+Observation recorded, earning nothing: three of five attacks succeeded via a SELF-REPORTED field
+(role, identity, request provenance) and a fourth via a channel artifact (a resolution logged as
+a serve).
