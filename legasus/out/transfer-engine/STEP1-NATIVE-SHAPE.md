@@ -82,3 +82,18 @@ now measured rather than hoped for.
 
 No requirement is declared satisfied. No adapter is built. Step 2 (freeze the evidence contract,
 the permitted native observations, the adapter prohibitions and the failure states) has not begun.
+
+## CORRECTION (2026-09-21 03:25, measured at step 6) — coverage FILES are not processes
+
+The dynamic table above records "V8 coverage files per run: 1 for 32 files; 266 for
+harness_test.js", and finding 3 then reads that as "1 file produced more than one coverage
+PROCESS". Recounting the same stored coverage by the pid in each filename:
+
+    witnesses with more than one process   0 of 33
+    total coverage files                   298
+    total distinct pids                     33      (exactly one per witness)
+
+harness_test.js is ONE process that wrote 266 coverage snapshots. This codebase contains no
+multiprocess witness. The counts above are correct; the inference drawn from them was not, and
+it propagated into APPARATUS-NOTES 23/27/28 and into the step-5 preregistration's rationale for
+P-F2. Left in place rather than edited, so the inference and its correction are both legible.

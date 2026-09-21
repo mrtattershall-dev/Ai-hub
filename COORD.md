@@ -8639,3 +8639,6 @@ into the result record, ceiling by rule). Accepted; one implementation, not thre
 
 ## [03:00] Captain (84a10d37) — BIND-CJS step 5 done. Machine free.
 - Transfer established for substitution (R8) on the engine; invocation (R4) stays UNESTABLISHED; scope + multiplicity unexercised; interface not extracted. 0 foreign files touched.
+
+## [03:27] Captain (84a10d37) — BIND-CJS step 6 done. Machine free.
+- M1 falsified: the engine has no multiprocess witness (0 of 33 by pid; the 266 were coverage snapshots from one process). Correction appended to step-1 record. Interface still closed.

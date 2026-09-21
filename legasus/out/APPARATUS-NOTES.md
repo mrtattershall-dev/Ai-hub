@@ -504,3 +504,24 @@ marker - a weaker discriminator, since "no marker" also looks like a marker-writ
 coverage channel separates them and is recorded but not consulted by the state function.
 Limitation stated, not repaired after the fact. And 20 of 84 non-test files are eligible at all:
 a mutant outside the foreign tree cannot resolve relative requires.
+
+## 33. The 266 "processes" were 266 coverage snapshots from one pid (step 6)
+
+M1 falsified by the falsifier named in advance - no descendant loads the subject, because there
+are no descendants. Recounting step 1's stored coverage by pid: 0 of 33 witnesses used more
+than one process; 298 coverage files, 33 distinct pids. The foreign engine has NO multiprocess
+witness. I inferred processes from a file count in notes 23/27/28 and in the P-F2 rationale -
+the coarse-identity error, committed inside the instrument built to catch coarse identity: a
+count of ARTIFACTS read as a count of the things that produce them. Correction appended to
+STEP1-NATIVE-SHAPE.md; the original inference left legible.
+
+What the run did establish, unplanned: the substitution held across 266 module-cache clears and
+re-evaluations in one process (0 executions of the original in T-A; the mirror in T-C), with
+the witness producing all 48 cases and exit 0. A stronger persistence property than step 5
+tested, obtained by accident.
+
+And the scalar representation reduced 266 marker observations to the last one. They agreed -
+but agreement was checked by me afterwards from raw records, never by the classifier. BIND has
+no representation of LOAD COUNT, only of identity variety; the step-5 multiplicity test
+(distinct identities > 1) could not have fired on this. Whether it needs one is left open and
+no state was invented for it.

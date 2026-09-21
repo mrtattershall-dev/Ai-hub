@@ -1,0 +1,116 @@
+{
+  "at": "2026-09-21T01:53:32.842Z",
+  "node": "v24.15.0",
+  "mechanism": "legasus/cjs-preload.mjs @ e41c1e3, unchanged",
+  "witness": "experiments/025_behavior_corpus/harness_test.js",
+  "subject": "experiments/025_behavior_corpus/adapters.js",
+  "exportNames": [
+    "adapters",
+    "EXPECTED"
+  ],
+  "mutantAvailable": false,
+  "results": [
+    {
+      "id": "T-A",
+      "requested": "T000_IDENTITY",
+      "ms": 11099,
+      "executionSet": {
+        "totalProcessesWithCoverage": 266,
+        "processesThatRanOriginal": 0,
+        "processesThatRanReplacement": 266,
+        "markerProcesses": 1,
+        "distinctMarkerIdentities": [
+          "T000_IDENTITY"
+        ],
+        "sampleOriginalPids": [],
+        "sampleReplacement": [
+          {
+            "pid": 35904,
+            "served": [
+              "T000_IDENTITY"
+            ]
+          },
+          {
+            "pid": 35904,
+            "served": [
+              "T000_IDENTITY"
+            ]
+          },
+          {
+            "pid": 35904,
+            "served": [
+              "T000_IDENTITY"
+            ]
+          },
+          {
+            "pid": 35904,
+            "served": [
+              "T000_IDENTITY"
+            ]
+          },
+          {
+            "pid": 35904,
+            "served": [
+              "T000_IDENTITY"
+            ]
+          }
+        ]
+      },
+      "legacyState": "VALID_INTERVENTION",
+      "denial": {
+        "denied": false,
+        "label": null,
+        "reason": null
+      },
+      "disagree": false,
+      "witness": {
+        "exit": 0,
+        "caseLines": 48,
+        "failLines": 0,
+        "tail": " | ALL PASS — 48 passed, 0 failed"
+      },
+      "mechanismServedRecords": 271,
+      "foreignFilesTouched": []
+    },
+    {
+      "id": "T-C",
+      "requested": null,
+      "ms": 10458,
+      "executionSet": {
+        "totalProcessesWithCoverage": 266,
+        "processesThatRanOriginal": 266,
+        "processesThatRanReplacement": 0,
+        "markerProcesses": 0,
+        "distinctMarkerIdentities": [],
+        "sampleOriginalPids": [
+          40720,
+          40720,
+          40720,
+          40720,
+          40720
+        ],
+        "sampleReplacement": []
+      },
+      "legacyState": "SUBSTITUTION_UNOBSERVED",
+      "denial": {
+        "denied": false,
+        "label": null,
+        "reason": null
+      },
+      "disagree": false,
+      "witness": {
+        "exit": 0,
+        "caseLines": 48,
+        "failLines": 0,
+        "tail": " | ALL PASS — 48 passed, 0 failed"
+      },
+      "mechanismServedRecords": 0,
+      "foreignFilesTouched": []
+    }
+  ],
+  "scoring": {
+    "M1": "FALSIFIED OR UNEXERCISED - see executionSet",
+    "M2": "NOT CONFIRMED - the classifiers did not disagree",
+    "M3": "deliberately unpredicted; the raw execution set is recorded for the ontology question"
+  }
+}
