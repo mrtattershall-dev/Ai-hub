@@ -13,7 +13,10 @@ import urllib.request
 
 API = "https://api.github.com"
 UA = {"User-Agent": "legasus-screen2-selector", "Accept": "application/vnd.github+json"}
-LOCAL_REPOS = {"pewdiepie-archdaemon/odysseus"}   # C7: already on this machine / inspected
+# C7: both prior targets are excluded - Odysseus was the detector-development corpus and
+# MoneyPrinterTurbo produced the case H-INFO was built from. Neither can serve as a naturally
+# occurring test of a theory it contributed to.
+LOCAL_REPOS = {"pewdiepie-archdaemon/odysseus", "harry0703/moneyprinterturbo"}
 
 
 def get(url):
