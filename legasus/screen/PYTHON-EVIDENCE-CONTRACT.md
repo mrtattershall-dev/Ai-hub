@@ -43,8 +43,9 @@ Which is decidable **without knowing which value means success**:
     VIOLATION    an `except` handler returns a value IDENTICAL to a value returned by a
                  non-exceptional completion path of the same function. The handler is then
                  indistinguishable from success, whatever "success" means here.
-    SAFE         every value returned by an exceptional path differs from every value returned
-                 on a non-exceptional path.
+    DISTINGUISHABLE  every value returned by an exceptional path differs from every value
+                 returned on a non-exceptional path. (See the precision section: this is NOT
+                 "SAFE" and NOT "correct" - it is only "no violation of this invariant".)
     UNKNOWN      the returned values are not statically comparable (computed expressions,
                  calls, names), so identity can neither be established nor refused.
 
