@@ -64,7 +64,7 @@
     ],
     "open_frontier": null,
     "rule_id": "universal-from-exhaustive-coverage",
-    "rule_digest": "5d0b57cf7a23cd7f1ce03de075e2b3e9ac4605b89d94dd116e928b08c2160105"
+    "rule_digest": "1c356ca01d173bd4d3656ae003781df7e991e3cb4033250750a6ee1764930ba4"
   },
   "measurement": {
     "capability_demonstrated": true,
@@ -100,6 +100,6 @@
       "out/hadmission/substitution2.json"
     ],
     "run_id": "F4",
-    "emitted_at": "2026-09-21T15:59:13Z"
+    "emitted_at": "2026-09-21T16:16:38Z"
   }
 }

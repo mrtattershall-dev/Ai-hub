@@ -35,9 +35,9 @@ const floorOf = (cert) => (cert && cert.run_floor)
     run: cert.run_floor.run_id }
   : null;
 
-export function admit(cert) {
+export function admit(cert, deps = {}) {
   const floor = floorOf(cert);
-  const out = adapt(cert);
+  const out = adapt(cert, deps);
 
   // NO TOKEN, NO ADMISSION. Not a warning, not a log line - the claim cannot enter the store.
   if (!out.token) {
@@ -75,8 +75,8 @@ export function store() {
   const established = [];
   return {
     established,
-    offer(cert) {
-      const r = admit(cert);
+    offer(cert, deps = {}) {
+      const r = admit(cert, deps);
       if (r.established) established.push({ claim: r.claim, ancestry: r.ancestry });
       return r;
     },

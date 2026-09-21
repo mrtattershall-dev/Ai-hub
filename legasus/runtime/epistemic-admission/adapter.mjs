@@ -122,16 +122,21 @@ export function deriveArgs(cert, localRule, premiseTokens, bound) {
 }
 
 // The binding context, assembled from the certificate but never from its assertions about itself.
-export function bindingContext(cert, altIndex) {
+// `authorityStore` is the runtime's, not the certificate's: an evidence_root resolves against
+// authority this consumer already holds, so naming evidence is not the same as having it.
+// `derivingClaim` is carried so a root cannot rest on the very claim it is being used to justify.
+export function bindingContext(cert, altIndex, authorityStore) {
   return {
     claimDomain: cert.requested_claim.domain.name,
     premiseRefs: cert.derivation.alternatives[altIndex].premises.map((p) => p.ref),
+    derivingClaim: cert.requested_claim.predicate,
+    authorityStore,
   };
 }
 
 // THE ONE ENTRY POINT. Returns what the calculus returned, plus why the adapter stopped if it did.
 // It never returns a token it made; `observe` and `derive` are the only sources.
-export function adapt(cert) {
+export function adapt(cert, { authorityStore } = {}) {
   const why = readable(cert);
   if (why) return refuse(why, { stage: 'READ' });
 
@@ -155,7 +160,7 @@ export function adapt(cert) {
   }
 
   // WHICH CANDIDATES ACTUALLY BIND. The rule decides; the certificate only offers.
-  const ctx = bindingContext(cert, idx);
+  const ctx = bindingContext(cert, idx, authorityStore);
   const cands = cert.derivation.alternatives[idx].relation_witnesses || [];
   const { satisfied, rejected } = bindWitnesses(r.rule, cands, ctx);
 

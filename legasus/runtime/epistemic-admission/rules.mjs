@@ -16,13 +16,14 @@
 // before derive() is called: a candidate that fails its matcher is not forwarded, and the calculus
 // refuses on a missing witness on its own terms. legaknow is not modified to accommodate this.
 import { createHash } from 'node:crypto';
+import { resolveEvidenceRoot } from './authority-store.mjs';
 
 export const RULE_MOVED = 'RULE_DEFINITION_MOVED';
 
 // A matcher returns null when the candidate BINDS, or a string naming which binding failed. It never
 // returns a bare boolean, because "refused" without a reason is the collapse this project keeps
 // finding.
-const present = (v) => v !== null && v !== undefined && v !== '';
+const present = (v) => v !== null && v !== undefined && v !== '';   // eslint-disable-line no-unused-vars
 
 // COVERAGE(evidence, domain, claim): the witness must be about the domain the claim is over, and
 // must root in evidence that exists.
@@ -33,14 +34,13 @@ const coverageMatcher = (w, ctx) => {
     return 'witness covers "' + w.domain + '" and the claim is over "' + ctx.claimDomain
       + '". A coverage witness about another world does not cover this one.';
   }
-  if (!present(w.evidence_root)) {
-    return 'witness has no evidence_root: it asserts coverage without rooting in anything';
-  }
   if (!ctx.premiseRefs.includes(w.subject)) {
     return 'witness subject "' + w.subject + '" is not a premise of this derivation ('
       + ctx.premiseRefs.join(', ') + '), so it is bound to something the inference does not rest on';
   }
-  return null;
+  // v1.4: the root must RESOLVE to authority establishing COVERAGE(subject, object), not merely be
+  // a non-empty string. A witness is a reference to an established relation claim, not evidence.
+  return resolveEvidenceRoot(w, ctx);
 };
 
 // MEMBERSHIP(element, domain): the element must be a premise of THIS derivation and the domain must
@@ -51,11 +51,10 @@ const membershipMatcher = (w, ctx) => {
     return 'witness asserts membership in "' + w.object + '" and the claim is over "'
       + ctx.claimDomain + '"';
   }
-  if (!present(w.evidence_root)) return 'witness has no evidence_root';
   if (!ctx.premiseRefs.includes(w.subject)) {
     return 'witness subject "' + w.subject + '" is not a premise of this derivation';
   }
-  return null;
+  return resolveEvidenceRoot(w, ctx);
 };
 
 const define = (name, obligations, version) => Object.freeze({ name, obligations: Object.freeze(obligations),

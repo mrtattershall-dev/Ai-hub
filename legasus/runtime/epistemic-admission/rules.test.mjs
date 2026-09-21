@@ -11,6 +11,7 @@ import { admit, STATE } from './admission.mjs';
 import { ADMITTED_RULES, DIGESTS, resolveRule, digestOf, RULE_MOVED } from './rules.mjs';
 import { derive, observe, isAuthority } from '../../legaknow/calculus.mjs';
 import { observation, OBSERVABILITY } from '../../legaknow/observation.mjs';
+import { deps } from './_test-support.mjs';
 
 const load = (n) => JSON.parse(readFileSync(new URL('./fixtures/' + n + '.json', import.meta.url), 'utf8'));
 const F4 = load('F4');          // FOR_ALL, exhaustive coverage, witnesses established
@@ -33,10 +34,10 @@ test('P-1 BASELINE, kept as the record of the defect v1.2 repairs', () => {
 });
 
 test('R1 — known rule, every required witness supplied: MINT', () => {
-  const out = adapt(F4);
+  const out = adapt(F4, deps(F4));
   assert.equal(isAuthority(out.token), true, out.why);
   assert.equal(out.rule, 'universal-from-exhaustive-coverage');
-  assert.equal(admit(F4).state, STATE.ESTABLISHED);
+  assert.equal(admit(F4, deps(F4)).state, STATE.ESTABLISHED);
   // the witness was a FACT the producer established, and the requirement came from here
   assert.deepEqual(ADMITTED_RULES['universal-from-exhaustive-coverage'].requires, ['COVERAGE']);
   assert.ok(F4.derivation.alternatives[0].relation_witnesses
@@ -46,12 +47,12 @@ test('R1 — known rule, every required witness supplied: MINT', () => {
 test('R2 — same rule, the required witness omitted: REFUSE, naming the relation', () => {
   const c = structuredClone(F4);
   for (const a of c.derivation.alternatives) a.relation_witnesses = [];
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(out.minted, false);
   assert.equal(out.stage, 'DERIVE');
   assert.match(out.why, /requires witnesses for COVERAGE/);
   assert.deepEqual(out.missing, ['COVERAGE']);
-  assert.equal(admit(c).established, false);
+  assert.equal(admit(c, deps(c)).established, false);
 });
 
 test('R3 THE ATTACK — a certificate cannot shrink its own obligation', () => {
@@ -65,7 +66,7 @@ test('R3 THE ATTACK — a certificate cannot shrink its own obligation', () => {
   const forged = structuredClone(F4);
   forged.derivation.requires = [];                        // the lie
   for (const a of forged.derivation.alternatives) a.relation_witnesses = [];
-  const out = adapt(forged);
+  const out = adapt(forged, deps(forged));
   assert.equal(out.minted, false, 'the forged requirement must not be honoured');
   assert.match(out.why, /requires witnesses for COVERAGE/);
   assert.deepEqual(out.requires, ['COVERAGE'], 'the LOCAL requirement was used, not the certificate');
@@ -85,7 +86,7 @@ test('R4 ANTI-REFUSAL — a rule that genuinely requires nothing mints without w
   c.derivation.rule_id = 'claim-from-direct-observation';
   c.derivation.rule_digest = DIGESTS['claim-from-direct-observation'];
   for (const a of c.derivation.alternatives) a.relation_witnesses = [];
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(isAuthority(out.token), true, 'v1.2 must not become "every derivation needs a witness"');
   assert.equal(out.rule, 'claim-from-direct-observation');
 });
@@ -94,13 +95,13 @@ test('R5 DRIFT — a moved rule definition is REFUSED, never silently re-interpr
   const c = structuredClone(F4);
   c.derivation.rule_digest =                              // the v1.2 definition of the same rule
     '018abb658b2d297384410a5f073deaa8e34ffc07b1bf41b974bfefa7ae0d2f7d';
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(out.minted, false);
   assert.equal(out.stage, 'RULE');
   assert.equal(out.moved, true);
   assert.match(out.why, new RegExp(RULE_MOVED));
   assert.match(out.why, /neither convict nor absolve/);
-  assert.equal(admit(c).established, false);
+  assert.equal(admit(c, deps(c)).established, false);
 
   // and the drift is real rather than nominal. v1.3 digests OBLIGATIONS (relation + matcher), so
   // these probes are written in that shape; the prediction is unchanged.
@@ -117,7 +118,7 @@ test('R5 DRIFT — a moved rule definition is REFUSED, never silently re-interpr
 test('an unknown rule_id is refused: what it cannot resolve it cannot enforce', () => {
   const c = structuredClone(F4);
   c.derivation.rule_id = 'rule-this-runtime-never-admitted';
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(out.minted, false);
   assert.equal(out.stage, 'RULE');
   assert.equal(out.moved, false);
@@ -130,10 +131,10 @@ test('F1 — the Stage B scope defect now appears as a MISSING WITNESS', () => {
   assert.equal(F1.requested_claim.quantifier, 'EXISTS');
   assert.equal(F1.derivation.rule_id, 'existential-from-established-member');
   assert.deepEqual(F1.derivation.alternatives[0].relation_witnesses, []);
-  const out = adapt(F1);
+  const out = adapt(F1, deps(F1));
   assert.equal(out.minted, false);
   assert.match(out.why, /requires witnesses for MEMBERSHIP/);
-  assert.equal(admit(F1).established, false);
+  assert.equal(admit(F1, deps(F1)).established, false);
 });
 
 test('a v1.1 certificate is now refused: it carries no rule identity', () => {

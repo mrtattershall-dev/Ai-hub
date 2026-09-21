@@ -9,6 +9,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { adapt, readable, carriesAuthorityShape, CONTRACT_VERSION } from './adapter.mjs';
 import { admit, store, STATE } from './admission.mjs';
 import { isAuthority, KIND } from '../../legaknow/calculus.mjs';
+import { deps } from './_test-support.mjs';
 
 const DIR = new URL('./fixtures/', import.meta.url);
 const NAMES = readdirSync(DIR).filter((f) => f.endsWith('.json')).map((f) => f.replace('.json', ''));
@@ -24,7 +25,7 @@ test('the admission table, printed so the record carries it', () => {
   for (const n of NAMES) {
     const c = CERTS[n];
     const v = ['O', 'D', 'M'].map((g) => (c.frontier.some((f) => f.gate === g) ? 'F' : 'P')).join('');
-    const r = admit(c);
+    const r = admit(c, deps(c));
     console.log(n.padEnd(6) + v.padEnd(9) + String(c.licensed_relation).padEnd(12)
       + r.state.padEnd(16) + r.why.slice(0, 68));
   }
@@ -32,10 +33,10 @@ test('the admission table, printed so the record carries it', () => {
 });
 
 test('the fully supported certificate is ADMITTED, and the token is real', () => {
-  const r = admit(CERTS[SUPPORTED]);
+  const r = admit(CERTS[SUPPORTED], deps(CERTS[SUPPORTED]));
   assert.equal(r.state, STATE.ESTABLISHED, r.why);
   assert.equal(r.established, true);
-  const out = adapt(CERTS[SUPPORTED]);
+  const out = adapt(CERTS[SUPPORTED], deps(CERTS[SUPPORTED]));
   assert.equal(isAuthority(out.token), true, 'a genuine branded token, not an object this file built');
   assert.equal(out.token.kind, KIND.EPISTEMIC);
   assert.deepEqual(out.token.grant, [], 'epistemic authority carries no grant');
@@ -49,20 +50,20 @@ test('the fully supported certificate is ADMITTED, and the token is real', () =>
 test('ABLATE M — remove the observation evidence: OBSERVE cannot mint, so nothing is admitted', () => {
   const c = structuredClone(CERTS[SUPPORTED]);
   c.measurement.observation.evidential_force = false;      // the observer did not observe
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(out.minted, false);
   assert.equal(out.stage, 'OBSERVE');
   assert.match(out.why, /Authority cannot be inferred from its own absence/);
-  assert.equal(admit(c).state, STATE.OBSERVED, 'the run floor survives; the subject claim does not');
-  assert.equal(admit(c).established, false);
+  assert.equal(admit(c, deps(c)).state, STATE.OBSERVED, 'the run floor survives; the subject claim does not');
+  assert.equal(admit(c, deps(c)).established, false);
 
   // and the same through the OTHER M route: provenance the certificate cannot supply
   const d = structuredClone(CERTS[SUPPORTED]);
   d.measurement.observation.attribution = null;
-  const out2 = adapt(d);
+  const out2 = adapt(d, deps(d));
   assert.equal(out2.minted, false);
   assert.equal(out2.reason, 'PROVENANCE_INCOMPLETE');
-  assert.equal(admit(d).established, false);
+  assert.equal(admit(d, deps(d)).established, false);
 });
 
 test('ABLATE D — open a required premise: DERIVE is not attempted and the frontier is preserved', () => {
@@ -70,11 +71,11 @@ test('ABLATE D — open a required premise: DERIVE is not attempted and the fron
   for (const a of c.derivation.alternatives) { a.closed = false; a.premises[0].settled = false; }
   c.derivation.passed = false;
   c.derivation.open_frontier = 'premise 0 is not settled';
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(out.minted, false);
   assert.equal(out.stage, 'DERIVE');
   assert.ok(isAuthority(out.observationToken), 'the OBSERVATION still minted - only the derivation failed');
-  const r = admit(c);
+  const r = admit(c, deps(c));
   assert.equal(r.state, STATE.FRONTIER_OPEN);
   assert.equal(r.established, false);
   assert.match(r.why, /premise 0 is not settled/, 'what blocks closure is preserved, not discarded');
@@ -85,9 +86,9 @@ test('ABLATE O — break the claim relation: a token mints and the REQUEST is st
   const c = structuredClone(CERTS[SUPPORTED]);
   c.licensed_claim = null;
   c.licensed_relation = 'NONE';
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(isAuthority(out.token), true, 'the calculus still mints: the evidence is fine');
-  const r = admit(c);
+  const r = admit(c, deps(c));
   assert.equal(r.established, false, 'and the claim is STILL not admitted');
   assert.equal(r.state, STATE.CANDIDATE);
   assert.match(r.why, /the REQUEST is not established/);
@@ -97,7 +98,7 @@ test('ABLATE O — break the claim relation: a token mints and the REQUEST is st
 });
 
 test('all three present — the supported claim is admitted; each removal alone prevents it', () => {
-  const base = admit(CERTS[SUPPORTED]);
+  const base = admit(CERTS[SUPPORTED], deps(CERTS[SUPPORTED]));
   assert.equal(base.established, true);
   const ablations = {
     M: (c) => { c.measurement.observation.evidential_force = false; },
@@ -107,7 +108,7 @@ test('all three present — the supported claim is admitted; each removal alone 
   for (const [gate, mutate] of Object.entries(ablations)) {
     const c = structuredClone(CERTS[SUPPORTED]);
     mutate(c);
-    assert.equal(admit(c).established, false, 'removing ' + gate + ' alone must prevent admission');
+    assert.equal(admit(c, deps(c)).established, false, 'removing ' + gate + ' alone must prevent admission');
   }
 });
 
@@ -122,8 +123,8 @@ test('CHEAT 1 — a perfectly formed certificate mints NOTHING by being well for
   forged.obligation.passed = true;
   forged.derivation.passed = true;
   assert.equal(readable(forged), null, 'it is perfectly readable');
-  assert.equal(adapt(forged).minted, false, 'and still mints nothing');
-  assert.equal(admit(forged).established, false);
+  assert.equal(adapt(forged, deps(forged)).minted, false, 'and still mints nothing');
+  assert.equal(admit(forged, deps(forged)).established, false);
 });
 
 test('CHEAT 2 — a certificate that carries authority shape is refused UNREAD, at any depth', () => {
@@ -134,7 +135,7 @@ test('CHEAT 2 — a certificate that carries authority shape is refused UNREAD, 
     for (const k of path.slice(0, -1)) cur = cur[k];
     cur[path[path.length - 1]] = true;
     assert.ok(carriesAuthorityShape(c), path.join('.') + ' must be detected');
-    const out = adapt(c);
+    const out = adapt(c, deps(c));
     assert.equal(out.minted, false, path.join('.'));
     assert.equal(out.stage, 'READ');
     assert.match(out.why, /application for authority and never authority/);
@@ -149,14 +150,14 @@ test('an older certificate is refused: a version this adapter cannot check it mu
     c.contract_version = older;
     assert.match(readable(c), new RegExp('this adapter consumes ' + CONTRACT_VERSION.split('-')[0]),
       older);
-    assert.equal(adapt(c).minted, false, older);
+    assert.equal(adapt(c, deps(c)).minted, false, older);
   }
 });
 
 test('the store admits only what admit() passes', () => {
   const s = store();
-  s.offer(CERTS[SUPPORTED]);
-  for (const n of NAMES.filter((x) => x !== SUPPORTED)) s.offer(CERTS[n]);
+  s.offer(CERTS[SUPPORTED], deps(CERTS[SUPPORTED]));
+  for (const n of NAMES.filter((x) => x !== SUPPORTED)) s.offer(CERTS[n], deps(CERTS[n]));
   assert.equal(s.established.length, 1, 'exactly the one supported certificate entered the store');
   assert.equal(s.established[0].claim.predicate, CERTS[SUPPORTED].licensed_claim.predicate);
 });
@@ -168,7 +169,12 @@ test('the adapter imports no semantic bridge, and builds no token of its own', (
   // CODE, not prose. The first version of this test scanned raw text and failed on the adapter's own
   // comment explaining that it does NOT call delegate - a measure seeing the wrong thing, which is
   // the failure this whole line of work is about. Comments are stripped before asserting.
-  const strip = (s) => s.split('\n').map((l) => l.replace(/\/\/.*$/, '')).join('\n');
+  // `\r` is stripped FIRST. JS `.` does not match \r, so on a CRLF file `//.*$` cannot reach
+  // end-of-string and the comment TEXT survives with only the `//` removed - which made this test
+  // match `commit(` inside admission.mjs's own comment saying commit is not a consumer here.
+  // Fifth instance in this sequence of a measure reading something other than what it meant to.
+  const strip = (s) => s.replace(/\r/g, '').split('\n')
+    .map((l) => l.replace(/\/\/.*$/, '')).join('\n');
   const src = strip(readFileSync(new URL('./adapter.mjs', import.meta.url), 'utf8'));
   const adm = strip(readFileSync(new URL('./admission.mjs', import.meta.url), 'utf8'));
 

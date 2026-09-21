@@ -10,6 +10,7 @@ import { adapt, bindingContext, CONTRACT_VERSION } from './adapter.mjs';
 import { admit, STATE } from './admission.mjs';
 import { ADMITTED_RULES, DIGESTS, bindWitnesses, digestOf } from './rules.mjs';
 import { isAuthority } from '../../legaknow/calculus.mjs';
+import { deps } from './_test-support.mjs';
 
 const F4 = JSON.parse(readFileSync(new URL('./fixtures/F4.json', import.meta.url), 'utf8'));
 const witnessesOf = (c) => c.derivation.alternatives[0].relation_witnesses;
@@ -27,40 +28,40 @@ test('setup — F4 carries witness INSTANCES, and the rule needs exactly one of 
 });
 
 test('W1 — correct relation, correct domain and endpoints: ACCEPTED', () => {
-  const out = adapt(F4);
+  const out = adapt(F4, deps(F4));
   assert.equal(isAuthority(out.token), true, out.why);
   assert.deepEqual(out.bound, ['COVERAGE']);
-  assert.equal(admit(F4).state, STATE.ESTABLISHED);
+  assert.equal(admit(F4, deps(F4)).state, STATE.ESTABLISHED);
 });
 
 test('W2 — same relation NAME, wrong claim domain: REFUSED, naming the binding', () => {
   // This is the v1.2 specimen. The witness still says COVERAGE; it is simply about another world.
   const c = structuredClone(F4);
   c.requested_claim.domain.name = 'A_DOMAIN_NEVER_COVERED';
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(out.minted, false, 'B-2 REGRESSION: the recorded defect must no longer reproduce');
   assert.equal(out.stage, 'DERIVE');
   assert.deepEqual(out.missing, ['COVERAGE']);
   const why = out.unbound.map((u) => u.why).join(' | ');
   assert.match(why, /covers "SAMPLE" and the claim is over "A_DOMAIN_NEVER_COVERED"/);
   assert.match(why, /does not cover this one/);
-  assert.equal(admit(c).established, false);
+  assert.equal(admit(c, deps(c)).established, false);
 });
 
 test('W3 — correct domain, no established evidence: REFUSED', () => {
   const c = structuredClone(F4);
   coverageOf(c).evidence_root = null;
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(out.minted, false);
   assert.deepEqual(out.missing, ['COVERAGE']);
   assert.match(out.unbound.map((u) => u.why).join(' | '),
-    /no evidence_root: it asserts coverage without rooting in anything/);
+    /no evidence_root: it asserts a relation without rooting in anything/);
 });
 
 test('W4 — same relation and evidence, bound to a different subject: REFUSED', () => {
   const c = structuredClone(F4);
   coverageOf(c).subject = 'some:other:derivation:premise0';
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(out.minted, false);
   assert.deepEqual(out.missing, ['COVERAGE']);
   assert.match(out.unbound.map((u) => u.why).join(' | '),
@@ -76,9 +77,9 @@ test('W5 ANTI-REFUSAL — a legitimate witness with all bindings is still ACCEPT
     evidence_root: 'a-different-but-real-evidence-root',
     provenance: 'hand-written in the test, with every binding present',
   }];
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(isAuthority(out.token), true, 'a fully bound witness must still satisfy: ' + out.why);
-  assert.equal(admit(c).established, true);
+  assert.equal(admit(c, deps(c)).established, true);
 });
 
 test('the matcher belongs to the RULE, and a producer has no field to assert satisfaction', () => {
@@ -107,7 +108,7 @@ test('B-3 DRIFT covers SEMANTICS — changing a matcher moves the digest', () =>
   // and a v1.2-pinned certificate is refused outright
   const c = structuredClone(F4);
   c.derivation.rule_digest = '018abb658b2d297384410a5f073deaa8e34ffc07b1bf41b974bfefa7ae0d2f7d';
-  const out = adapt(c);
+  const out = adapt(c, deps(c));
   assert.equal(out.stage, 'RULE');
   assert.equal(out.moved, true);
 });
