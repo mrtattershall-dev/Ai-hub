@@ -1,0 +1,103 @@
+{
+  "at": "2026-09-21T03:18:42.816Z",
+  "partA": {
+    "hostile": {
+      "events": [
+        {
+          "rank": 0,
+          "kind": "execution",
+          "role": "witness",
+          "identity": "MUTANT"
+        },
+        {
+          "rank": 1,
+          "kind": "execution",
+          "role": "worker",
+          "identity": "MUTANT"
+        }
+      ],
+      "servedCount": 3
+    },
+    "genuine": {
+      "events": [
+        {
+          "rank": 0,
+          "kind": "execution",
+          "role": "witness",
+          "identity": "MUTANT"
+        },
+        {
+          "rank": 1,
+          "kind": "execution",
+          "role": "worker",
+          "identity": "MUTANT"
+        }
+      ],
+      "servedCount": 2
+    },
+    "identical": true
+  },
+  "partB": {
+    "genuine": {
+      "events": [
+        {
+          "rank": 0,
+          "kind": "execution",
+          "role": "witness",
+          "identity": "MUTANT"
+        }
+      ],
+      "servedCount": 1
+    },
+    "nothing": {
+      "events": [
+        {
+          "rank": 0,
+          "kind": "execution",
+          "role": "witness",
+          "identity": "SUBJECT"
+        }
+      ],
+      "servedCount": 0
+    },
+    "impostor": {
+      "events": [
+        {
+          "rank": 0,
+          "kind": "execution",
+          "role": "witness",
+          "identity": "MUTANT"
+        }
+      ],
+      "servedCount": 1
+    },
+    "silent": {
+      "events": [
+        {
+          "rank": 0,
+          "kind": "execution",
+          "role": "witness",
+          "identity": "MUTANT"
+        }
+      ],
+      "servedCount": 0
+    },
+    "DP2": {
+      "genuine": true,
+      "nothing": false,
+      "impostor": true,
+      "silent": false
+    }
+  },
+  "scoring": {
+    "A1": "CONFIRMED - P3 converts to an evidence limit under this configuration",
+    "B-CTL": "HELD - the rescue discriminates a genuine world from one where nothing is served",
+    "B1": "CONFIRMED - the distinction occurs WITHOUT the proposition (an impostor was served; M never was)",
+    "B2": "CONFIRMED - the proposition occurs WITHOUT the distinction (M was served and evaluated; no served record)",
+    "verdict": "D-P2' dies in BOTH directions"
+  },
+  "processHygiene": {
+    "spawnedRecorded": 7,
+    "aliveAtSweep": 0
+  }
+}

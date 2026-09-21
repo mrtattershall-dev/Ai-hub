@@ -712,3 +712,31 @@ answer, and it was not attacked inside this expedition.
 Map: P1, P5, P6, P7 are evidence limits; P4 is a limit under the original configuration and
 identifiable under the extended one; P3 unconverted with one distinction outstanding; P2
 untouched by design.
+
+## 42. P3 converts after three rounds; the obvious P2 rescue dies in BOTH directions
+
+Step 14, both parts frozen before either ran.
+
+A1 CONFIRMED: with the genuine world's external worker given the mechanism, S3"'s bundles are
+identical - nothing recorded establishes that two role labels are two processes. P3 joins the
+evidence-limit group. The conversion took three rounds (step 12 decider weakness -> step 13
+event-count scar removed, identity scar found -> step 14 identity scar removed), each round
+making the claim WEAKER and more accurate. The frozen stopping rule was not needed.
+
+Part B: D-P2' (a served record AND a MUTANT execution), NAMED in the prereg before being
+attacked, dies in both directions. B1: an impostor self-identifying as MUTANT is served, the
+rescue affirms, M was never supplied - the distinction without the proposition. B2: M is served
+and evaluated with the mechanism's log channel removed, the rescue declines - the proposition
+without the distinction. Both controls held.
+
+NOT established: that P2 is unidentifiable. Part B attacked the DISTINCTION, not the evidence;
+P2 does not join the evidence-limit group without step 13's minimisation treatment. No third
+decider written.
+
+Every candidate attacked across 13 expeditions has now died; none has survived an attack
+designed against it. Recorded as a fact about the expeditions, not generalised.
+
+Observation earning nothing yet: five successful attacks across steps 12 and 14 used the same
+two openings - SELF-REPORTED fields (role, identity, request provenance) and CHANNEL ARTIFACTS
+(a resolution logged as a serve; a missing log defeating a true proposition). It earns a name
+only by predicting a new failure prospectively, which it has not been asked to do.
