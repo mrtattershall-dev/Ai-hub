@@ -420,3 +420,19 @@ diff is the passing value one level up). 75's "earlier lineage" candidate is dea
 spawns each test file directly with fresh pipes, so the killed root IS the test process and
 nothing older can hold its ends. The race candidate stands, decidable by the pid diff on the
 next occurrence; 75's cadence probe deferred until the diff names a pid.
+
+## 29. BIND-2 on segments(): discrimination + observed outputs (2026-09-21 00:25)
+
+One run, OBSERVED, C1-C5 held. 87 recorded calls / 57 distinct inputs / 36 served files. H1
+CONFIRMED - four of seven identical-discriminator clusters split under the output instrument
+(bit vectors manufactured sameness); three survived (S6 {M006,M018}, S7 {M007,M019,M020},
+S11 {M016,M017}) with two independent lines of evidence each. H2 FALSIFIED - all four dark
+mutants are output-identical to the subject on every recorded input (blind for M022/M023):
+dark because of INPUTS, not assertions; BIND-1's open 7238 question settled that far and no
+further. H3 CONFIRMED (0 incidental). H4 FALSIFIED AS WORDED by my own conflation of
+execution status with discrimination - second prereg-wording defect in two experiments, same
+species as P4; post-hoc discrimination-only view: 0 conflicts. H5 FALSIFIED (trim hides
+nothing). H6 CONFIRMED (BIND-1's site counter corroborated independently). 568 licensed edges
+with full provenance; 1385 typed refusals. Result record: legasus/out/bind2-segments/BIND-2_RESULT.md.
+Lesson for the next prereg: score each prediction against a dry-run artefact BEFORE freezing,
+so a wording that cannot be scored cleanly is caught by the apparatus, not by the result.

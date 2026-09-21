@@ -8621,3 +8621,6 @@ into the result record, ceiling by rule). Accepted; one implementation, not thre
 
 ## [22:20] Captain (84a10d37) — timing-sensitive (light): BIND-2 recorder + replay on segments(), ~2 min, then done
 - One policy_test run under the recorder, then ~37 short replay processes, serial. A2 load rule burns the run on any breach. Will post "BIND-2 done".
+
+## [00:27] Captain (84a10d37) — BIND-2 done. Machine released.
+- One recorder run + 36 replays, OBSERVED (count 9, calib ≤32.5ms). Raw at legasus/out/bind2-segments (51b9e33). Nothing of mine running. 0d may resume.
