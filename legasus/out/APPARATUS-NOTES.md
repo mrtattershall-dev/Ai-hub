@@ -762,3 +762,24 @@ the repository's own tests, the mutants were Legasus-generated, and BIND-2's C1 
 byte-for-byte against a pristine replay. What changes is the ENTITLEMENT - those results are
 conditional on witnesses not misreporting, and that condition appears in none of the records.
 Whether to state it in them is a repair, and repairs are not made inside an expedition.
+
+## 44. H1 discriminated from H0 in both directions - the first purchased descent
+
+Step 16. Two worlds where the shallow and deeper accounts predict OPPOSITE outcomes, both
+frozen first, both controls held.
+
+D1 (BOUND): the witness emitted a forged PASS - visible in the record beside the tagged FAIL -
+and the decider declined. Self-report was PRESENT and was NOT sufficient for failure, which H0
+did not predict. Honest weakness: the decider was defined to require the nonce, so this half is
+close to definitional and the verdict does not rest on it.
+
+D2 (OBSERVER): a SEPARATE process read the subject's state and reported it faithfully, adding
+nothing. The state was a lie and a case that did not pass was affirmed. H0 predicted safety and
+was wrong. This half is not definitional and carries the verdict.
+
+So: step 15's R1 was prospective but non-discriminating and purchased nothing; step 16 does the
+discriminating. H1 earns standing as the better of two STATED accounts on this pair of worlds -
+not a name, not a place in the architecture, not a principle. BOUND tested a NAIVE forger only;
+the nonce is readable from the witness environment, so D1 does not establish that
+representations can be bound in-process, and the adversarial variant is the obvious next attack
+on H1 itself.

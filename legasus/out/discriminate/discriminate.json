@@ -1,0 +1,71 @@
+{
+  "at": "2026-09-21T03:29:39.947Z",
+  "hypotheses": {
+    "H0": "a program permitted to emit its own verdict can emit a false one",
+    "H1": "an authority path fails when the representation it consumes can vary independently of the event it establishes"
+  },
+  "results": [
+    {
+      "world": "BOUND",
+      "tag": "ctl-pass",
+      "mode": "genuine-pass",
+      "nonce": "6bd1eda031f3",
+      "stdout": "PASS 6bd1eda031f3 joins with a plus",
+      "underlyingTruth": true,
+      "decider": true
+    },
+    {
+      "world": "BOUND",
+      "tag": "ctl-fail",
+      "mode": "genuine-fail",
+      "nonce": "0806199eef03",
+      "stdout": "FAIL 0806199eef03 joins with a plus",
+      "underlyingTruth": false,
+      "decider": false
+    },
+    {
+      "world": "BOUND",
+      "tag": "D1",
+      "mode": "forge",
+      "nonce": "13a8a4e6e7da",
+      "stdout": "FAIL 13a8a4e6e7da joins with a plus\nPASS joins with a plus",
+      "underlyingTruth": false,
+      "decider": false
+    },
+    {
+      "world": "OBSERVER",
+      "tag": "ctl-pass",
+      "mode": "genuine-pass",
+      "stdout": "PASS joins with a plus",
+      "underlyingTruth": true,
+      "decider": true
+    },
+    {
+      "world": "OBSERVER",
+      "tag": "ctl-fail",
+      "mode": "genuine-fail",
+      "stdout": "FAIL joins with a plus",
+      "underlyingTruth": false,
+      "decider": false
+    },
+    {
+      "world": "OBSERVER",
+      "tag": "D2",
+      "mode": "lie",
+      "stdout": "PASS joins with a plus",
+      "underlyingTruth": false,
+      "decider": true
+    }
+  ],
+  "scoring": {
+    "D-CTL": "BOUND held; OBSERVER held",
+    "D1": "the naive forgery FAILED - H1 predicted this, H0 did not",
+    "D2": "a faithful separate reporter affirmed a case that did not pass - H1 predicted this, H0 did not",
+    "verdict": "H1 DISCRIMINATED FROM H0 in both directions - the deeper layer is purchased",
+    "boundCaveat": "BOUND tested binding against a NAIVE forger only: the nonce lives in the witness environment and an adversarial subject could read it. A decline here does not establish that representations can be bound in-process."
+  },
+  "processHygiene": {
+    "spawnedRecorded": 9,
+    "aliveAtSweep": 0
+  }
+}
