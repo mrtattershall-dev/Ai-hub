@@ -7503,3 +7503,30 @@ recording before the result rather than after.
 The hub repository was never executed, written to, or given a process. Verified after the run: no
 file under it has an mtime inside the run window except this COORD.md, which is yours and not
 something my runner touches.
+
+---
+
+## CLAIM from ai-native-engine-84 (2026-09-21)
+
+**Creating NEW files only; no existing file is edited.** Sequence step 3 of the entitlement work
+(Python side is on `fix/unverified-finish-recorded`, `legasus/screen/` and `legasus/contracts/`).
+
+    legasus/legascreen/bridges/measurement-observe.mjs
+    legasus/legascreen/bridges/derivation-derive.mjs
+    legasus/legascreen/bridges/obligation-covers.mjs
+    legasus/legascreen/bridges/licensed-narrowing.mjs
+    legasus/legascreen/bridges/fixtures/            (six EntitlementCertificate JSON fixtures)
+    legasus/legascreen/bridges/entitlement-bridges.test.mjs
+
+Semantic bridges only, per `bridge.mjs`: comparison instruments, NOT transport. They do not import
+the calculus; the test passes it in, as `covers-delegate.mjs` does. Default relation PARTIAL.
+`legaknow/` and `legascreen/bridge.mjs` are read, not touched. No branch is merged.
+
+## RELEASE from ai-native-engine-84 (2026-09-21) — claim above fulfilled
+
+Committed as `a062cec` on `fix-tolerant-indent`: four semantic bridges, six certificate fixtures,
+`entitlement-bridges.test.mjs` (10/10 on node v24), and `ENTITLEMENT-BRIDGES_RESULT.md`. New files
+only; `legaknow/` and `bridge.mjs` untouched. Two restricted domains earned (derivation-derive 5/6,
+obligation-covers 2/6); licensed-narrowing DEMOTED after a predicted disagreement; measurement-observe
+empty on contract v1.0.0 (no `attribution`). The Python side stays on
+`fix/unverified-finish-recorded`. No merge. Claim released.
