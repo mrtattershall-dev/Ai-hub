@@ -1,0 +1,85 @@
+{
+  "contract_version": "1.0.0-frozen-2026-09-21",
+  "requested_claim": {
+    "domain": {
+      "name": "SAMPLE",
+      "contained_in": [
+        "REPOSITORY"
+      ]
+    },
+    "quantifier": "FOR_ALL",
+    "predicate": "closure extends beyond the function body"
+  },
+  "licensed_claim": {
+    "domain": {
+      "name": "SAMPLE",
+      "contained_in": [
+        "REPOSITORY"
+      ]
+    },
+    "quantifier": "FOR_ALL",
+    "predicate": "closure extends beyond the function body"
+  },
+  "licensed_relation": "EQUIVALENT",
+  "collateral_observations": [],
+  "frontier": [],
+  "obligation": {
+    "passed": true,
+    "unmet": [],
+    "coverage": {
+      "SAMPLE": "EXHAUSTIVE"
+    }
+  },
+  "derivation": {
+    "passed": true,
+    "alternatives": [
+      {
+        "premises": [
+          {
+            "ref": "F4:derivation0:premise0",
+            "decidable_at_site": true,
+            "settled": true
+          }
+        ],
+        "relation_witnesses": [],
+        "closed": true
+      }
+    ],
+    "open_frontier": null
+  },
+  "measurement": {
+    "capability_demonstrated": true,
+    "positive_control": {
+      "fired": true,
+      "ref": "F4:positive_control"
+    },
+    "observation": {
+      "ref": "F4:observation",
+      "evidential_force": true,
+      "procedure": "reach1 tracer over SAMPLE",
+      "context": {
+        "evidence_scope": "SAMPLE",
+        "examined": 60,
+        "domain_size": 60
+      }
+    },
+    "instrument": {
+      "name": "reach1 tracer",
+      "version_digest": "df3172fe7c4e8398925c1222b32cb2e71c853b10be326d23c31ff76fdfad194a"
+    }
+  },
+  "run_floor": {
+    "instrument": "reach1 tracer",
+    "emitted_ref": "F4:emitted",
+    "run_id": "F4"
+  },
+  "provenance": {
+    "producer": "legasus/screen/obligation.py",
+    "producer_digest": "b228113d57ba907b5ed9e7916372f9dc4388b85cd2522b2d0e6140d6c96ce5c6",
+    "evidence_refs": [
+      "out/hadmission/substitution2.json"
+    ],
+    "run_id": "F4",
+    "emitted_at": "2026-09-21T15:14:30Z"
+  }
+}
