@@ -1,0 +1,56 @@
+{
+  "pytorch": {
+    "C2": {
+      "files": 4940,
+      "dropped": 0,
+      "direction": "NONE",
+      "witnesses": []
+    },
+    "C5": {
+      "kept": 3268,
+      "dropped": 1674,
+      "direction": "SPLIT",
+      "witnesses": [
+        {
+          "file": "test\\bench_mps_ops.py"
+        },
+        {
+          "file": "test\\conftest.py"
+        },
+        {
+          "file": "test\\create_dummy_torchscript_model.py"
+        },
+        {
+          "file": "test\\linear.py"
+        }
+      ]
+    }
+  },
+  "mpt": {
+    "C2": {
+      "files": 121,
+      "dropped": 0,
+      "direction": "NONE",
+      "witnesses": []
+    },
+    "C5": {
+      "kept": 50,
+      "dropped": 71,
+      "direction": "SPLIT",
+      "witnesses": [
+        {
+          "file": "test\\test_main.py"
+        },
+        {
+          "file": "test\\__init__.py"
+        },
+        {
+          "file": "test\\services\\test_api_authentication.py"
+        },
+        {
+          "file": "test\\services\\test_asgi_cors.py"
+        }
+      ]
+    }
+  }
+}
