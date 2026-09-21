@@ -546,3 +546,26 @@ Standing check, not a law: where the artifact->unit mapping is many-to-one (reco
 files->processes, calls->inputs, edges->classes, snapshots->replications), report BOTH
 cardinalities or the smaller one. Applied at write time it would have caught all three of
 tonight's corrections immediately instead of after one, two and six hours.
+
+## 35. C1 CONFIRMED: the scalar intervention representation erases a mid-sequence contradiction
+
+Step 7 (legasus/out/reeval/REEVAL_RESULT.md). Bridge control passed. Five arms, two real:
+
+    M M M M M   -> VALID_INTERVENTION        (correct)
+    M M S M M   -> VALID_INTERVENTION        *** a dissenting evaluation erased ***
+    M M M M S   -> TRANSPORT_CONTRADICTION   (caught, because it is last)
+    S M M M M   -> VALID_INTERVENTION        *** erased ***
+    S S S S S   -> SUBSTITUTION_UNOBSERVED   (correct)
+
+One contradiction; visible in one of five positions. An intervention that failed on one of five
+evaluations is certified valid. The evidence bundle CONTAINS sequence, distinctIdentities and
+uniform - the classifier discards them. This bounds step 6's 266/266 correctly: it held because
+all 266 agreed, and agreement was never checked by the classifier, only by me afterwards.
+
+Stopped per the prereg. No repair, no new state, no uniformity field consumed by any verdict.
+The Intervention abstraction stays closed - now because the representation is DEMONSTRATED to
+destroy verdict-determining information, not because a property was unexercised.
+
+Third cardinality found in passing, three hours after the audit: R-A's real bundle has 10
+served records for 5 evaluations in 1 process (each iteration resolves twice - require.resolve
+and require). Resolutions are not evaluations are not interventions.

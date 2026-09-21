@@ -1,0 +1,147 @@
+{
+  "at": "2026-09-21T02:08:18.048Z",
+  "node": "v24.15.0",
+  "classifier": "step-5 scalar rule, verbatim",
+  "mechanism": "legasus/cjs-preload.mjs @ e41c1e3, unchanged",
+  "bridgeControl": {
+    "passed": true,
+    "constructedUniform": "VALID_INTERVENTION",
+    "realUniform": "VALID_INTERVENTION"
+  },
+  "results": [
+    {
+      "id": "R-A",
+      "provenance": "REAL RUN",
+      "requested": "MUTANT",
+      "sequence": [
+        "MUTANT",
+        "MUTANT",
+        "MUTANT",
+        "MUTANT",
+        "MUTANT"
+      ],
+      "distinctIdentities": [
+        "MUTANT"
+      ],
+      "uniform": true,
+      "evaluations": 5,
+      "scalarState": "VALID_INTERVENTION",
+      "executedScalar": "MUTANT",
+      "servedScalar": "MUTANT",
+      "expectation": {
+        "mustNotBe": null
+      },
+      "violatesExpectation": false,
+      "informationDiscarded": null
+    },
+    {
+      "id": "R-B",
+      "provenance": "CONSTRUCTED from R-A (identity sequence only)",
+      "requested": "MUTANT",
+      "sequence": [
+        "MUTANT",
+        "MUTANT",
+        "SUBJECT",
+        "MUTANT",
+        "MUTANT"
+      ],
+      "distinctIdentities": [
+        "MUTANT",
+        "SUBJECT"
+      ],
+      "uniform": false,
+      "evaluations": 5,
+      "scalarState": "VALID_INTERVENTION",
+      "executedScalar": "MUTANT",
+      "servedScalar": "MUTANT",
+      "expectation": {
+        "mustNotBe": "VALID_INTERVENTION"
+      },
+      "violatesExpectation": true,
+      "informationDiscarded": "5 observations, 2 distinct identities, classifier consumed 1 (the last)"
+    },
+    {
+      "id": "R-C",
+      "provenance": "CONSTRUCTED from R-A (identity sequence only)",
+      "requested": "MUTANT",
+      "sequence": [
+        "MUTANT",
+        "MUTANT",
+        "MUTANT",
+        "MUTANT",
+        "SUBJECT"
+      ],
+      "distinctIdentities": [
+        "MUTANT",
+        "SUBJECT"
+      ],
+      "uniform": false,
+      "evaluations": 5,
+      "scalarState": "TRANSPORT_CONTRADICTION",
+      "executedScalar": "SUBJECT",
+      "servedScalar": "MUTANT",
+      "expectation": {
+        "mustNotBe": "VALID_INTERVENTION"
+      },
+      "violatesExpectation": false,
+      "informationDiscarded": "5 observations, 2 distinct identities, classifier consumed 1 (the last)"
+    },
+    {
+      "id": "R-D",
+      "provenance": "CONSTRUCTED from R-A (identity sequence only)",
+      "requested": "MUTANT",
+      "sequence": [
+        "SUBJECT",
+        "MUTANT",
+        "MUTANT",
+        "MUTANT",
+        "MUTANT"
+      ],
+      "distinctIdentities": [
+        "SUBJECT",
+        "MUTANT"
+      ],
+      "uniform": false,
+      "evaluations": 5,
+      "scalarState": "VALID_INTERVENTION",
+      "executedScalar": "MUTANT",
+      "servedScalar": "MUTANT",
+      "expectation": {
+        "mustNotBe": "VALID_INTERVENTION"
+      },
+      "violatesExpectation": true,
+      "informationDiscarded": "5 observations, 2 distinct identities, classifier consumed 1 (the last)"
+    },
+    {
+      "id": "R-E",
+      "provenance": "REAL RUN",
+      "requested": null,
+      "sequence": [
+        "SUBJECT",
+        "SUBJECT",
+        "SUBJECT",
+        "SUBJECT",
+        "SUBJECT"
+      ],
+      "distinctIdentities": [
+        "SUBJECT"
+      ],
+      "uniform": true,
+      "evaluations": 5,
+      "scalarState": "SUBSTITUTION_UNOBSERVED",
+      "executedScalar": "SUBJECT",
+      "servedScalar": null,
+      "expectation": {
+        "mustBe": "SUBSTITUTION_UNOBSERVED"
+      },
+      "violatesExpectation": false,
+      "informationDiscarded": null
+    }
+  ],
+  "scoring": {
+    "C1": "CONFIRMED - a mid-sequence contradiction is erased",
+    "C2": "CONFIRMED - a terminal contradiction is caught",
+    "C3": "CONFIRMED",
+    "positionalDependence": "ISOLATED - the same contradiction changes the verdict by its position alone"
+  }
+}
