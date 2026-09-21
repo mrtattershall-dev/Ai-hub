@@ -1,0 +1,7 @@
+BIND-2 RECORD: C:\Users\tatte\Projects\ai-coding-hub\server\approvalPolicy.js :: segments  witness server/policy_test.mjs
+load sampler: legasus/loadSample.mjs (stand-in); start={"at":"2026-09-21T00:20:38.894Z","where":"record start","nodeProcs":9,"calibMs":31.3,"calibRunsMs":[31.8,32.9,32,31.3,33.1],"calibResult":3255,"source":"legasus/loadSample.mjs (stand-in)"}
+record run: exit=0 PASS=93 FAIL=0
+recorded inputs: 87 (orphan calls after the last case line: 0)
+BIND-2 REPLAY: 57 distinct inputs x 36 served files; start={"at":"2026-09-21T00:20:39.819Z","where":"replay start","nodeProcs":9,"calibMs":32.5,"calibRunsMs":[38.4,32.5,32.5,33.5,33.3],"calibResult":3255,"source":"legasus/loadSample.mjs (stand-in)"}
+attempt: OBSERVED; classes 22; edges 568; refused 1385; incidental 0; inconsistent 87
+-> C:\Users\tatte\Projects\ai-coding-hub\legasus\out\bind2-segments\REPORT.md

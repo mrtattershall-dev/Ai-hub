@@ -1,0 +1,533 @@
+{
+  "subject": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\server\\approvalPolicy.js",
+  "fn": "segments",
+  "witnessFile": "server/policy_test.mjs",
+  "inputs": [
+    {
+      "k": 1,
+      "x": "rm -rf /",
+      "o0": "[\"rm -rf /\"]",
+      "case": "server/policy_test.mjs :: [strict] deny  rm -rf /"
+    },
+    {
+      "k": 2,
+      "x": "rm -rf node_modules",
+      "o0": "[\"rm -rf node_modules\"]",
+      "case": "server/policy_test.mjs :: [strict] deny  rm -rf node_modules"
+    },
+    {
+      "k": 3,
+      "x": "sudo apt install ffmpeg",
+      "o0": "[\"sudo apt install ffmpeg\"]",
+      "case": "server/policy_test.mjs :: [strict] deny  sudo apt install ffmpeg"
+    },
+    {
+      "k": 4,
+      "x": "git push origin main",
+      "o0": "[\"git push origin main\"]",
+      "case": "server/policy_test.mjs :: [strict] deny  git push origin main"
+    },
+    {
+      "k": 5,
+      "x": "npm publish",
+      "o0": "[\"npm publish\"]",
+      "case": "server/policy_test.mjs :: [strict] deny  npm publish"
+    },
+    {
+      "k": 6,
+      "x": "shutdown /s /t 0",
+      "o0": "[\"shutdown /s /t 0\"]",
+      "case": "server/policy_test.mjs :: [strict] deny  shutdown /s /t 0"
+    },
+    {
+      "k": 7,
+      "x": "reg add HKLM\\Software\\Foo /v Bar",
+      "o0": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]",
+      "case": "server/policy_test.mjs :: [strict] deny  reg add HKLM\\Software\\Foo /v Bar"
+    },
+    {
+      "k": 8,
+      "x": "rm -rf /",
+      "o0": "[\"rm -rf /\"]",
+      "case": "server/policy_test.mjs :: [build] deny  rm -rf /"
+    },
+    {
+      "k": 9,
+      "x": "rm -rf node_modules",
+      "o0": "[\"rm -rf node_modules\"]",
+      "case": "server/policy_test.mjs :: [build] deny  rm -rf node_modules"
+    },
+    {
+      "k": 10,
+      "x": "sudo apt install ffmpeg",
+      "o0": "[\"sudo apt install ffmpeg\"]",
+      "case": "server/policy_test.mjs :: [build] deny  sudo apt install ffmpeg"
+    },
+    {
+      "k": 11,
+      "x": "git push origin main",
+      "o0": "[\"git push origin main\"]",
+      "case": "server/policy_test.mjs :: [build] deny  git push origin main"
+    },
+    {
+      "k": 12,
+      "x": "npm publish",
+      "o0": "[\"npm publish\"]",
+      "case": "server/policy_test.mjs :: [build] deny  npm publish"
+    },
+    {
+      "k": 13,
+      "x": "shutdown /s /t 0",
+      "o0": "[\"shutdown /s /t 0\"]",
+      "case": "server/policy_test.mjs :: [build] deny  shutdown /s /t 0"
+    },
+    {
+      "k": 14,
+      "x": "reg add HKLM\\Software\\Foo /v Bar",
+      "o0": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]",
+      "case": "server/policy_test.mjs :: [build] deny  reg add HKLM\\Software\\Foo /v Bar"
+    },
+    {
+      "k": 15,
+      "x": "rm -rf /",
+      "o0": "[\"rm -rf /\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  rm -rf /"
+    },
+    {
+      "k": 16,
+      "x": "rm -rf node_modules",
+      "o0": "[\"rm -rf node_modules\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  rm -rf node_modules"
+    },
+    {
+      "k": 17,
+      "x": "sudo apt install ffmpeg",
+      "o0": "[\"sudo apt install ffmpeg\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  sudo apt install ffmpeg"
+    },
+    {
+      "k": 18,
+      "x": "git push origin main",
+      "o0": "[\"git push origin main\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  git push origin main"
+    },
+    {
+      "k": 19,
+      "x": "npm publish",
+      "o0": "[\"npm publish\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  npm publish"
+    },
+    {
+      "k": 20,
+      "x": "shutdown /s /t 0",
+      "o0": "[\"shutdown /s /t 0\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  shutdown /s /t 0"
+    },
+    {
+      "k": 21,
+      "x": "reg add HKLM\\Software\\Foo /v Bar",
+      "o0": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  reg add HKLM\\Software\\Foo /v Bar"
+    },
+    {
+      "k": 22,
+      "x": "npm install && rm -rf /",
+      "o0": "[\"npm install\",\"rm -rf /\"]",
+      "case": "server/policy_test.mjs :: [build] deny  npm install && rm -rf /"
+    },
+    {
+      "k": 23,
+      "x": "node build.js; sudo rm x",
+      "o0": "[\"node build.js\",\"sudo rm x\"]",
+      "case": "server/policy_test.mjs :: [build] deny  node build.js; sudo rm x"
+    },
+    {
+      "k": 24,
+      "x": "ls && git push",
+      "o0": "[\"ls\",\"git push\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  ls && git push"
+    },
+    {
+      "k": 25,
+      "x": "npm install && node test.js",
+      "o0": "[\"npm install\",\"node test.js\"]",
+      "case": "server/policy_test.mjs :: [build] allow npm install && node test.js"
+    },
+    {
+      "k": 26,
+      "x": "ls | grep foo",
+      "o0": "[\"ls\",\"grep foo\"]",
+      "case": "server/policy_test.mjs :: [build] allow ls | grep foo"
+    },
+    {
+      "k": 27,
+      "x": "ls && npm install",
+      "o0": "[\"ls\",\"npm install\"]",
+      "case": "server/policy_test.mjs :: [strict] ask   ls && npm install"
+    },
+    {
+      "k": 28,
+      "x": "cat C:/Users/tatte/.ssh/id_rsa",
+      "o0": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]",
+      "case": "server/policy_test.mjs :: [yolo] ask   cat C:/Users/tatte/.ssh/id_rsa"
+    },
+    {
+      "k": 29,
+      "x": "node ../../evil.js",
+      "o0": "[\"node ../../evil.js\"]",
+      "case": "server/policy_test.mjs :: [yolo] ask   node ../../evil.js"
+    },
+    {
+      "k": 30,
+      "x": "echo $(whoami)",
+      "o0": "[\"echo $(whoami)\"]",
+      "case": "server/policy_test.mjs :: [build] ask   echo $(whoami)"
+    },
+    {
+      "k": 31,
+      "x": "node -e \"x\" > C:/windows/foo",
+      "o0": "[\"node -e \\\"x\\\" > C:/windows/foo\"]",
+      "case": "server/policy_test.mjs :: [build] ask   node -e \"x\" > C:/windows/foo"
+    },
+    {
+      "k": 32,
+      "x": "type \\\\server\\share\\x",
+      "o0": "[\"type \\\\\\\\server\\\\share\\\\x\"]",
+      "case": "server/policy_test.mjs :: [yolo] ask   type \\\\server\\share\\x"
+    },
+    {
+      "k": 33,
+      "x": "ls -la",
+      "o0": "[\"ls -la\"]",
+      "case": "server/policy_test.mjs :: [strict] allow ls -la"
+    },
+    {
+      "k": 34,
+      "x": "cat package.json",
+      "o0": "[\"cat package.json\"]",
+      "case": "server/policy_test.mjs :: [strict] allow cat package.json"
+    },
+    {
+      "k": 35,
+      "x": "grep -r foo .",
+      "o0": "[\"grep -r foo .\"]",
+      "case": "server/policy_test.mjs :: [strict] allow grep -r foo ."
+    },
+    {
+      "k": 36,
+      "x": "npm install",
+      "o0": "[\"npm install\"]",
+      "case": "server/policy_test.mjs :: [strict] ask   npm install"
+    },
+    {
+      "k": 37,
+      "x": "node index.js",
+      "o0": "[\"node index.js\"]",
+      "case": "server/policy_test.mjs :: [strict] ask   node index.js"
+    },
+    {
+      "k": 38,
+      "x": "python main.py",
+      "o0": "[\"python main.py\"]",
+      "case": "server/policy_test.mjs :: [strict] ask   python main.py"
+    },
+    {
+      "k": 39,
+      "x": "npm install",
+      "o0": "[\"npm install\"]",
+      "case": "server/policy_test.mjs :: [build] allow npm install"
+    },
+    {
+      "k": 40,
+      "x": "npm ci",
+      "o0": "[\"npm ci\"]",
+      "case": "server/policy_test.mjs :: [build] allow npm ci"
+    },
+    {
+      "k": 41,
+      "x": "npm run build",
+      "o0": "[\"npm run build\"]",
+      "case": "server/policy_test.mjs :: [build] allow npm run build"
+    },
+    {
+      "k": 42,
+      "x": "npm test",
+      "o0": "[\"npm test\"]",
+      "case": "server/policy_test.mjs :: [build] allow npm test"
+    },
+    {
+      "k": 43,
+      "x": "pip install requests",
+      "o0": "[\"pip install requests\"]",
+      "case": "server/policy_test.mjs :: [build] allow pip install requests"
+    },
+    {
+      "k": 44,
+      "x": "node index.js",
+      "o0": "[\"node index.js\"]",
+      "case": "server/policy_test.mjs :: [build] allow node index.js"
+    },
+    {
+      "k": 45,
+      "x": "python main.py",
+      "o0": "[\"python main.py\"]",
+      "case": "server/policy_test.mjs :: [build] allow python main.py"
+    },
+    {
+      "k": 46,
+      "x": "pytest -q",
+      "o0": "[\"pytest -q\"]",
+      "case": "server/policy_test.mjs :: [build] allow pytest -q"
+    },
+    {
+      "k": 47,
+      "x": "mkdir assets",
+      "o0": "[\"mkdir assets\"]",
+      "case": "server/policy_test.mjs :: [build] allow mkdir assets"
+    },
+    {
+      "k": 48,
+      "x": "git status",
+      "o0": "[\"git status\"]",
+      "case": "server/policy_test.mjs :: [build] allow git status"
+    },
+    {
+      "k": 49,
+      "x": "git commit -m ok",
+      "o0": "[\"git commit -m ok\"]",
+      "case": "server/policy_test.mjs :: [build] allow git commit -m ok"
+    },
+    {
+      "k": 50,
+      "x": "ffmpeg -i a.mp4 b.gif",
+      "o0": "[\"ffmpeg -i a.mp4 b.gif\"]",
+      "case": "server/policy_test.mjs :: [build] ask   ffmpeg -i a.mp4 b.gif"
+    },
+    {
+      "k": 51,
+      "x": "docker run x",
+      "o0": "[\"docker run x\"]",
+      "case": "server/policy_test.mjs :: [build] ask   docker run x"
+    },
+    {
+      "k": 52,
+      "x": "git remote add origin http://x",
+      "o0": "[\"git remote add origin http://x\"]",
+      "case": "server/policy_test.mjs :: [build] ask   git remote add origin http://x"
+    },
+    {
+      "k": 53,
+      "x": "ffmpeg -i a.mp4 b.gif",
+      "o0": "[\"ffmpeg -i a.mp4 b.gif\"]",
+      "case": "server/policy_test.mjs :: [yolo] allow ffmpeg -i a.mp4 b.gif"
+    },
+    {
+      "k": 54,
+      "x": "docker run x",
+      "o0": "[\"docker run x\"]",
+      "case": "server/policy_test.mjs :: [yolo] allow docker run x"
+    },
+    {
+      "k": 55,
+      "x": "rm -rf .",
+      "o0": "[\"rm -rf .\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  rm -rf ."
+    },
+    {
+      "k": 56,
+      "x": "echo hi & rm -rf .",
+      "o0": "[\"echo hi\",\"rm -rf .\"]",
+      "case": "server/policy_test.mjs :: [strict] deny  echo hi & rm -rf ."
+    },
+    {
+      "k": 57,
+      "x": "npm test & del /s /q .",
+      "o0": "[\"npm test\",\"del /s /q .\"]",
+      "case": "server/policy_test.mjs :: [strict] deny  npm test & del /s /q ."
+    },
+    {
+      "k": 58,
+      "x": "ls & shutdown /s",
+      "o0": "[\"ls\",\"shutdown /s\"]",
+      "case": "server/policy_test.mjs :: [strict] deny  ls & shutdown /s"
+    },
+    {
+      "k": 59,
+      "x": "echo hi & rm -rf .",
+      "o0": "[\"echo hi\",\"rm -rf .\"]",
+      "case": "server/policy_test.mjs :: [build] deny  echo hi & rm -rf ."
+    },
+    {
+      "k": 60,
+      "x": "npm test & del /s /q .",
+      "o0": "[\"npm test\",\"del /s /q .\"]",
+      "case": "server/policy_test.mjs :: [build] deny  npm test & del /s /q ."
+    },
+    {
+      "k": 61,
+      "x": "ls & shutdown /s",
+      "o0": "[\"ls\",\"shutdown /s\"]",
+      "case": "server/policy_test.mjs :: [build] deny  ls & shutdown /s"
+    },
+    {
+      "k": 62,
+      "x": "echo hi & rm -rf .",
+      "o0": "[\"echo hi\",\"rm -rf .\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  echo hi & rm -rf ."
+    },
+    {
+      "k": 63,
+      "x": "npm test & del /s /q .",
+      "o0": "[\"npm test\",\"del /s /q .\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  npm test & del /s /q ."
+    },
+    {
+      "k": 64,
+      "x": "ls & shutdown /s",
+      "o0": "[\"ls\",\"shutdown /s\"]",
+      "case": "server/policy_test.mjs :: [yolo] deny  ls & shutdown /s"
+    },
+    {
+      "k": 65,
+      "x": "echo done & npm run lint",
+      "o0": "[\"echo done\",\"npm run lint\"]",
+      "case": "server/policy_test.mjs :: [build] allow echo done & npm run lint"
+    },
+    {
+      "k": 66,
+      "x": "npm test",
+      "o0": "[\"npm test\"]",
+      "case": "server/policy_test.mjs :: segments  npm test"
+    },
+    {
+      "k": 67,
+      "x": "npm install && rm -rf /",
+      "o0": "[\"npm install\",\"rm -rf /\"]",
+      "case": "server/policy_test.mjs :: segments  npm install && rm -rf /"
+    },
+    {
+      "k": 68,
+      "x": "a; b",
+      "o0": "[\"a\",\"b\"]",
+      "case": "server/policy_test.mjs :: segments  a; b"
+    },
+    {
+      "k": 69,
+      "x": "a | b",
+      "o0": "[\"a\",\"b\"]",
+      "case": "server/policy_test.mjs :: segments  a | b"
+    },
+    {
+      "k": 70,
+      "x": "echo hi & rm -rf .",
+      "o0": "[\"echo hi\",\"rm -rf .\"]",
+      "case": "server/policy_test.mjs :: segments  echo hi & rm -rf ."
+    },
+    {
+      "k": 71,
+      "x": "node -e \"console.log(1); console.log(2)\"",
+      "o0": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]",
+      "case": "server/policy_test.mjs :: segments  node -e \"console.log(1); console.log(2)\""
+    },
+    {
+      "k": 72,
+      "x": "git commit -m \"fix: a; b and x && y\"",
+      "o0": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]",
+      "case": "server/policy_test.mjs :: segments  git commit -m \"fix: a; b and x && y\""
+    },
+    {
+      "k": 73,
+      "x": "node -e \"console.log(1)\" && rm -rf .",
+      "o0": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]",
+      "case": "server/policy_test.mjs :: segments  node -e \"console.log(1)\" && rm -rf ."
+    },
+    {
+      "k": 74,
+      "x": "cat $HOME/.ssh/id_rsa",
+      "o0": "[\"cat $HOME/.ssh/id_rsa\"]",
+      "case": "server/policy_test.mjs :: [build] ask   cat $HOME/.ssh/id_rsa"
+    },
+    {
+      "k": 75,
+      "x": "type %USERPROFILE%\\.ssh\\id_rsa",
+      "o0": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]",
+      "case": "server/policy_test.mjs :: [build] ask   type %USERPROFILE%\\.ssh\\id_rsa"
+    },
+    {
+      "k": 76,
+      "x": "echo x > %TEMP%/evil.bat",
+      "o0": "[\"echo x > %TEMP%/evil.bat\"]",
+      "case": "server/policy_test.mjs :: [build] ask   echo x > %TEMP%/evil.bat"
+    },
+    {
+      "k": 77,
+      "x": "cat $HOME/.bashrc",
+      "o0": "[\"cat $HOME/.bashrc\"]",
+      "case": "server/policy_test.mjs :: [strict] ask   cat $HOME/.bashrc"
+    },
+    {
+      "k": 78,
+      "x": "grep \"foo$\" README.md",
+      "o0": "[\"grep \\\"foo$\\\" README.md\"]",
+      "case": "server/policy_test.mjs :: [build] allow grep \"foo$\" README.md"
+    },
+    {
+      "k": 79,
+      "x": "node build.js",
+      "o0": "[\"node build.js\"]",
+      "case": "server/policy_test.mjs :: [build] allow node build.js"
+    },
+    {
+      "k": 80,
+      "x": "npm test && npm run lint",
+      "o0": "[\"npm test\",\"npm run lint\"]",
+      "case": "server/policy_test.mjs :: [build] allow npm test && npm run lint"
+    },
+    {
+      "k": 81,
+      "x": "node -e \"const m = require('./maths.js'); console.log('add:', m.add(2,3));\"",
+      "o0": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]",
+      "case": "server/policy_test.mjs :: [build] allow node -e \"const m = require('./maths.js'); console.log('add:',"
+    },
+    {
+      "k": 82,
+      "x": "node -e \"console.log(1); console.log(2)\"",
+      "o0": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]",
+      "case": "server/policy_test.mjs :: [build] allow node -e \"console.log(1); console.log(2)\""
+    },
+    {
+      "k": 83,
+      "x": "python -c \"import sys; print(sys.version)\"",
+      "o0": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]",
+      "case": "server/policy_test.mjs :: [build] allow python -c \"import sys; print(sys.version)\""
+    },
+    {
+      "k": 84,
+      "x": "git commit -m \"fix: handle a; b and x && y in messages\"",
+      "o0": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]",
+      "case": "server/policy_test.mjs :: [build] allow git commit -m \"fix: handle a; b and x && y in messages\""
+    },
+    {
+      "k": 85,
+      "x": "node -e \"console.log(1)\" && rm -rf .",
+      "o0": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]",
+      "case": "server/policy_test.mjs :: [build] deny  node -e \"console.log(1)\" && rm -rf ."
+    },
+    {
+      "k": 86,
+      "x": "echo \"safe\" & rm -rf .",
+      "o0": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]",
+      "case": "server/policy_test.mjs :: [build] deny  echo \"safe\" & rm -rf ."
+    },
+    {
+      "k": 87,
+      "x": "echo \"safe\"; shutdown /s",
+      "o0": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]",
+      "case": "server/policy_test.mjs :: [build] deny  echo \"safe\"; shutdown /s"
+    }
+  ],
+  "orphanCalls": 0,
+  "recordExit": 0,
+  "passLines": 93,
+  "failLines": 0
+}

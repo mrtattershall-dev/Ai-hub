@@ -67,6 +67,9 @@ if (TRACE && REGION) {
     const line = args.length === 1 && typeof args[0] === 'string' ? args[0] : args.map(String).join(' ');
     const m = line.match(CASE_LINE);
     if (!m) return;
+    // BIND-2 (env-gated, absent in BIND-1 runs): a SYNCHRONOUS case marker, written before the
+    // coverage round-trip, so recorder call records are attributed by file order alone.
+    if (process.env.LEGASUS_RECORD) { try { appendFileSync(process.env.LEGASUS_RECORD, JSON.stringify({ caseMark: m[2], outcome: m[1] }) + '\n'); } catch { /* C4 sees the gap */ } }
     session.post('Profiler.takePreciseCoverage', (err, res) => {
       const rec = {
         ordinal: ordinal++,

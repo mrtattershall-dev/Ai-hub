@@ -1,0 +1,35 @@
+{
+  "subject": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js",
+  "fn": "clamp",
+  "witnessFile": "legasus/selfcheck/toy_witness.mjs",
+  "inputs": [
+    {
+      "k": 1,
+      "x": 50,
+      "o0": "10",
+      "case": "legasus/selfcheck/toy_witness.mjs :: big clamps"
+    },
+    {
+      "k": 2,
+      "x": 3,
+      "o0": "3",
+      "case": "legasus/selfcheck/toy_witness.mjs :: small passes"
+    },
+    {
+      "k": 3,
+      "x": "x",
+      "o0": "-1",
+      "case": "legasus/selfcheck/toy_witness.mjs :: string is -1"
+    },
+    {
+      "k": 4,
+      "x": 1,
+      "o0": "1",
+      "case": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong"
+    }
+  ],
+  "orphanCalls": 0,
+  "recordExit": 0,
+  "passLines": 4,
+  "failLines": 1
+}

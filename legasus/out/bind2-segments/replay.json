@@ -1,0 +1,8552 @@
+{
+  "served": [
+    "PRISTINE",
+    "M000-IDENTITY",
+    "M001-RETURN_EMPTY",
+    "M002-RETURN_UNDEFINED",
+    "M003-BOUNDARY",
+    "M004-BOUNDARY",
+    "M005-BOUNDARY",
+    "M006-INVERT_COND",
+    "M007-DROP_BRANCH",
+    "M008-DROP_EFFECT",
+    "M009-INVERT_COND",
+    "M010-DROP_BRANCH",
+    "M011-BOUNDARY",
+    "M012-BOUNDARY",
+    "M013-BOUNDARY",
+    "M014-DROP_EFFECT",
+    "M015-INVERT_COND",
+    "M016-DROP_BRANCH",
+    "M017-DROP_EFFECT",
+    "M018-INVERT_COND",
+    "M019-DROP_BRANCH",
+    "M020-DROP_EFFECT",
+    "M021-DROP_EFFECT",
+    "M022-BOUNDARY",
+    "M023-BOUNDARY",
+    "M024-INVERT_COND",
+    "M025-DROP_BRANCH",
+    "M026-DROP_EFFECT",
+    "M027-DROP_EFFECT",
+    "M028-DROP_EFFECT",
+    "M029-INVERT_COND",
+    "M030-DROP_BRANCH",
+    "M031-DROP_EFFECT",
+    "M032-DROP_EFFECT",
+    "M033-DROP_EFFECT",
+    "M034-DROP_EFFECT"
+  ],
+  "inputs": [
+    {
+      "k": 0,
+      "x": "rm -rf /"
+    },
+    {
+      "k": 1,
+      "x": "rm -rf node_modules"
+    },
+    {
+      "k": 2,
+      "x": "sudo apt install ffmpeg"
+    },
+    {
+      "k": 3,
+      "x": "git push origin main"
+    },
+    {
+      "k": 4,
+      "x": "npm publish"
+    },
+    {
+      "k": 5,
+      "x": "shutdown /s /t 0"
+    },
+    {
+      "k": 6,
+      "x": "reg add HKLM\\Software\\Foo /v Bar"
+    },
+    {
+      "k": 7,
+      "x": "npm install && rm -rf /"
+    },
+    {
+      "k": 8,
+      "x": "node build.js; sudo rm x"
+    },
+    {
+      "k": 9,
+      "x": "ls && git push"
+    },
+    {
+      "k": 10,
+      "x": "npm install && node test.js"
+    },
+    {
+      "k": 11,
+      "x": "ls | grep foo"
+    },
+    {
+      "k": 12,
+      "x": "ls && npm install"
+    },
+    {
+      "k": 13,
+      "x": "cat C:/Users/tatte/.ssh/id_rsa"
+    },
+    {
+      "k": 14,
+      "x": "node ../../evil.js"
+    },
+    {
+      "k": 15,
+      "x": "echo $(whoami)"
+    },
+    {
+      "k": 16,
+      "x": "node -e \"x\" > C:/windows/foo"
+    },
+    {
+      "k": 17,
+      "x": "type \\\\server\\share\\x"
+    },
+    {
+      "k": 18,
+      "x": "ls -la"
+    },
+    {
+      "k": 19,
+      "x": "cat package.json"
+    },
+    {
+      "k": 20,
+      "x": "grep -r foo ."
+    },
+    {
+      "k": 21,
+      "x": "npm install"
+    },
+    {
+      "k": 22,
+      "x": "node index.js"
+    },
+    {
+      "k": 23,
+      "x": "python main.py"
+    },
+    {
+      "k": 24,
+      "x": "npm ci"
+    },
+    {
+      "k": 25,
+      "x": "npm run build"
+    },
+    {
+      "k": 26,
+      "x": "npm test"
+    },
+    {
+      "k": 27,
+      "x": "pip install requests"
+    },
+    {
+      "k": 28,
+      "x": "pytest -q"
+    },
+    {
+      "k": 29,
+      "x": "mkdir assets"
+    },
+    {
+      "k": 30,
+      "x": "git status"
+    },
+    {
+      "k": 31,
+      "x": "git commit -m ok"
+    },
+    {
+      "k": 32,
+      "x": "ffmpeg -i a.mp4 b.gif"
+    },
+    {
+      "k": 33,
+      "x": "docker run x"
+    },
+    {
+      "k": 34,
+      "x": "git remote add origin http://x"
+    },
+    {
+      "k": 35,
+      "x": "rm -rf ."
+    },
+    {
+      "k": 36,
+      "x": "echo hi & rm -rf ."
+    },
+    {
+      "k": 37,
+      "x": "npm test & del /s /q ."
+    },
+    {
+      "k": 38,
+      "x": "ls & shutdown /s"
+    },
+    {
+      "k": 39,
+      "x": "echo done & npm run lint"
+    },
+    {
+      "k": 40,
+      "x": "a; b"
+    },
+    {
+      "k": 41,
+      "x": "a | b"
+    },
+    {
+      "k": 42,
+      "x": "node -e \"console.log(1); console.log(2)\""
+    },
+    {
+      "k": 43,
+      "x": "git commit -m \"fix: a; b and x && y\""
+    },
+    {
+      "k": 44,
+      "x": "node -e \"console.log(1)\" && rm -rf ."
+    },
+    {
+      "k": 45,
+      "x": "cat $HOME/.ssh/id_rsa"
+    },
+    {
+      "k": 46,
+      "x": "type %USERPROFILE%\\.ssh\\id_rsa"
+    },
+    {
+      "k": 47,
+      "x": "echo x > %TEMP%/evil.bat"
+    },
+    {
+      "k": 48,
+      "x": "cat $HOME/.bashrc"
+    },
+    {
+      "k": 49,
+      "x": "grep \"foo$\" README.md"
+    },
+    {
+      "k": 50,
+      "x": "node build.js"
+    },
+    {
+      "k": 51,
+      "x": "npm test && npm run lint"
+    },
+    {
+      "k": 52,
+      "x": "node -e \"const m = require('./maths.js'); console.log('add:', m.add(2,3));\""
+    },
+    {
+      "k": 53,
+      "x": "python -c \"import sys; print(sys.version)\""
+    },
+    {
+      "k": 54,
+      "x": "git commit -m \"fix: handle a; b and x && y in messages\""
+    },
+    {
+      "k": 55,
+      "x": "echo \"safe\" & rm -rf ."
+    },
+    {
+      "k": 56,
+      "x": "echo \"safe\"; shutdown /s"
+    }
+  ],
+  "outputs": {
+    "PRISTINE": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M000-IDENTITY": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M001-RETURN_EMPTY": [
+      {
+        "k": 0,
+        "o": "[]"
+      },
+      {
+        "k": 1,
+        "o": "[]"
+      },
+      {
+        "k": 2,
+        "o": "[]"
+      },
+      {
+        "k": 3,
+        "o": "[]"
+      },
+      {
+        "k": 4,
+        "o": "[]"
+      },
+      {
+        "k": 5,
+        "o": "[]"
+      },
+      {
+        "k": 6,
+        "o": "[]"
+      },
+      {
+        "k": 7,
+        "o": "[]"
+      },
+      {
+        "k": 8,
+        "o": "[]"
+      },
+      {
+        "k": 9,
+        "o": "[]"
+      },
+      {
+        "k": 10,
+        "o": "[]"
+      },
+      {
+        "k": 11,
+        "o": "[]"
+      },
+      {
+        "k": 12,
+        "o": "[]"
+      },
+      {
+        "k": 13,
+        "o": "[]"
+      },
+      {
+        "k": 14,
+        "o": "[]"
+      },
+      {
+        "k": 15,
+        "o": "[]"
+      },
+      {
+        "k": 16,
+        "o": "[]"
+      },
+      {
+        "k": 17,
+        "o": "[]"
+      },
+      {
+        "k": 18,
+        "o": "[]"
+      },
+      {
+        "k": 19,
+        "o": "[]"
+      },
+      {
+        "k": 20,
+        "o": "[]"
+      },
+      {
+        "k": 21,
+        "o": "[]"
+      },
+      {
+        "k": 22,
+        "o": "[]"
+      },
+      {
+        "k": 23,
+        "o": "[]"
+      },
+      {
+        "k": 24,
+        "o": "[]"
+      },
+      {
+        "k": 25,
+        "o": "[]"
+      },
+      {
+        "k": 26,
+        "o": "[]"
+      },
+      {
+        "k": 27,
+        "o": "[]"
+      },
+      {
+        "k": 28,
+        "o": "[]"
+      },
+      {
+        "k": 29,
+        "o": "[]"
+      },
+      {
+        "k": 30,
+        "o": "[]"
+      },
+      {
+        "k": 31,
+        "o": "[]"
+      },
+      {
+        "k": 32,
+        "o": "[]"
+      },
+      {
+        "k": 33,
+        "o": "[]"
+      },
+      {
+        "k": 34,
+        "o": "[]"
+      },
+      {
+        "k": 35,
+        "o": "[]"
+      },
+      {
+        "k": 36,
+        "o": "[]"
+      },
+      {
+        "k": 37,
+        "o": "[]"
+      },
+      {
+        "k": 38,
+        "o": "[]"
+      },
+      {
+        "k": 39,
+        "o": "[]"
+      },
+      {
+        "k": 40,
+        "o": "[]"
+      },
+      {
+        "k": 41,
+        "o": "[]"
+      },
+      {
+        "k": 42,
+        "o": "[]"
+      },
+      {
+        "k": 43,
+        "o": "[]"
+      },
+      {
+        "k": 44,
+        "o": "[]"
+      },
+      {
+        "k": 45,
+        "o": "[]"
+      },
+      {
+        "k": 46,
+        "o": "[]"
+      },
+      {
+        "k": 47,
+        "o": "[]"
+      },
+      {
+        "k": 48,
+        "o": "[]"
+      },
+      {
+        "k": 49,
+        "o": "[]"
+      },
+      {
+        "k": 50,
+        "o": "[]"
+      },
+      {
+        "k": 51,
+        "o": "[]"
+      },
+      {
+        "k": 52,
+        "o": "[]"
+      },
+      {
+        "k": 53,
+        "o": "[]"
+      },
+      {
+        "k": 54,
+        "o": "[]"
+      },
+      {
+        "k": 55,
+        "o": "[]"
+      },
+      {
+        "k": 56,
+        "o": "[]"
+      }
+    ],
+    "M002-RETURN_UNDEFINED": [
+      {
+        "k": 0,
+        "o": "undefined"
+      },
+      {
+        "k": 1,
+        "o": "undefined"
+      },
+      {
+        "k": 2,
+        "o": "undefined"
+      },
+      {
+        "k": 3,
+        "o": "undefined"
+      },
+      {
+        "k": 4,
+        "o": "undefined"
+      },
+      {
+        "k": 5,
+        "o": "undefined"
+      },
+      {
+        "k": 6,
+        "o": "undefined"
+      },
+      {
+        "k": 7,
+        "o": "undefined"
+      },
+      {
+        "k": 8,
+        "o": "undefined"
+      },
+      {
+        "k": 9,
+        "o": "undefined"
+      },
+      {
+        "k": 10,
+        "o": "undefined"
+      },
+      {
+        "k": 11,
+        "o": "undefined"
+      },
+      {
+        "k": 12,
+        "o": "undefined"
+      },
+      {
+        "k": 13,
+        "o": "undefined"
+      },
+      {
+        "k": 14,
+        "o": "undefined"
+      },
+      {
+        "k": 15,
+        "o": "undefined"
+      },
+      {
+        "k": 16,
+        "o": "undefined"
+      },
+      {
+        "k": 17,
+        "o": "undefined"
+      },
+      {
+        "k": 18,
+        "o": "undefined"
+      },
+      {
+        "k": 19,
+        "o": "undefined"
+      },
+      {
+        "k": 20,
+        "o": "undefined"
+      },
+      {
+        "k": 21,
+        "o": "undefined"
+      },
+      {
+        "k": 22,
+        "o": "undefined"
+      },
+      {
+        "k": 23,
+        "o": "undefined"
+      },
+      {
+        "k": 24,
+        "o": "undefined"
+      },
+      {
+        "k": 25,
+        "o": "undefined"
+      },
+      {
+        "k": 26,
+        "o": "undefined"
+      },
+      {
+        "k": 27,
+        "o": "undefined"
+      },
+      {
+        "k": 28,
+        "o": "undefined"
+      },
+      {
+        "k": 29,
+        "o": "undefined"
+      },
+      {
+        "k": 30,
+        "o": "undefined"
+      },
+      {
+        "k": 31,
+        "o": "undefined"
+      },
+      {
+        "k": 32,
+        "o": "undefined"
+      },
+      {
+        "k": 33,
+        "o": "undefined"
+      },
+      {
+        "k": 34,
+        "o": "undefined"
+      },
+      {
+        "k": 35,
+        "o": "undefined"
+      },
+      {
+        "k": 36,
+        "o": "undefined"
+      },
+      {
+        "k": 37,
+        "o": "undefined"
+      },
+      {
+        "k": 38,
+        "o": "undefined"
+      },
+      {
+        "k": 39,
+        "o": "undefined"
+      },
+      {
+        "k": 40,
+        "o": "undefined"
+      },
+      {
+        "k": 41,
+        "o": "undefined"
+      },
+      {
+        "k": 42,
+        "o": "undefined"
+      },
+      {
+        "k": 43,
+        "o": "undefined"
+      },
+      {
+        "k": 44,
+        "o": "undefined"
+      },
+      {
+        "k": 45,
+        "o": "undefined"
+      },
+      {
+        "k": 46,
+        "o": "undefined"
+      },
+      {
+        "k": 47,
+        "o": "undefined"
+      },
+      {
+        "k": 48,
+        "o": "undefined"
+      },
+      {
+        "k": 49,
+        "o": "undefined"
+      },
+      {
+        "k": 50,
+        "o": "undefined"
+      },
+      {
+        "k": 51,
+        "o": "undefined"
+      },
+      {
+        "k": 52,
+        "o": "undefined"
+      },
+      {
+        "k": 53,
+        "o": "undefined"
+      },
+      {
+        "k": 54,
+        "o": "undefined"
+      },
+      {
+        "k": 55,
+        "o": "undefined"
+      },
+      {
+        "k": 56,
+        "o": "undefined"
+      }
+    ],
+    "M003-BOUNDARY": [
+      {
+        "k": 0,
+        "o": "[\"m -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"m -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"udo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"it push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"pm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"hutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"eg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"pm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"ode build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"s\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"pm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"s\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"s\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"at C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"ode ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"cho $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"ode -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"ype \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"s -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"at package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"rep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"pm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"ode index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"ython main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"pm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"pm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"pm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"ip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"ytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"kdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"it status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"it commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"fmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"ocker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"it remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"m -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"cho hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"pm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"s\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"cho done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"ode -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"it commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"ode -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"at $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"ype %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"cho x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"at $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"rep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"ode build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"pm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"ode -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"ython -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"it commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"cho \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"cho \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M004-BOUNDARY": [
+      {
+        "k": 0,
+        "o": "[\"undefinedrm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"undefinedrm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"undefinedsudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"undefinedgit push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"undefinednpm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"undefinedshutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"undefinedreg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"undefinednpm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"undefinednode build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"undefinedls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"undefinednpm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"undefinedls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"undefinedls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"undefinedcat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"undefinednode ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"undefinedecho $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"undefinednode -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"undefinedtype \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"undefinedls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"undefinedcat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"undefinedgrep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"undefinednpm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"undefinednode index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"undefinedpython main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"undefinednpm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"undefinednpm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"undefinednpm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"undefinedpip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"undefinedpytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"undefinedmkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"undefinedgit status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"undefinedgit commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"undefinedffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"undefineddocker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"undefinedgit remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"undefinedrm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"undefinedecho hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"undefinednpm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"undefinedls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"undefinedecho done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"undefineda\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"undefineda\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"undefinednode -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"undefinedgit commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"undefinednode -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"undefinedcat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"undefinedtype %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"undefinedecho x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"undefinedcat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"undefinedgrep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"undefinednode build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"undefinednpm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"undefinednode -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"undefinedpython -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"undefinedgit commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"undefinedecho \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"undefinedecho \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M005-BOUNDARY": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /undefined\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modulesundefined\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpegundefined\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin mainundefined\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publishundefined\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0undefined\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Barundefined\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /undefined\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm xundefined\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git pushundefined\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.jsundefined\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep fooundefined\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm installundefined\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsaundefined\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.jsundefined\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)undefined\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/fooundefined\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\xundefined\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -laundefined\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.jsonundefined\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .undefined\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm installundefined\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.jsundefined\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.pyundefined\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ciundefined\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run buildundefined\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm testundefined\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requestsundefined\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -qundefined\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assetsundefined\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git statusundefined\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m okundefined\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gifundefined\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run xundefined\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://xundefined\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .undefined\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .undefined\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .undefined\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /sundefined\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lintundefined\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"bundefined\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"bundefined\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"undefined\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"undefined\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .undefined\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsaundefined\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsaundefined\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.batundefined\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrcundefined\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.mdundefined\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.jsundefined\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lintundefined\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"undefined\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"undefined\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"undefined\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .undefined\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /sundefined\"]"
+      }
+    ],
+    "M006-INVERT_COND": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install && rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js; sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls && git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install && node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls | grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls && npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi & rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test & del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls & shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done & npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a; b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a | b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\" && rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test && npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\" & rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"; shutdown /s\"]"
+      }
+    ],
+    "M007-DROP_BRANCH": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1)\",\"console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a\",\"b and x\",\"y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js')\",\"console.log('add:', m.add(2,3))\",\"\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys\",\"print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a\",\"b and x\",\"y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M008-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M009-INVERT_COND": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/fooundefined\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"undefined\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"undefined\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\" && rm -rf .undefined\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.mdundefined\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"undefined\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\" & rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"; shutdown /s\"]"
+      }
+    ],
+    "M010-DROP_BRANCH": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M011-BOUNDARY": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M012-BOUNDARY": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M013-BOUNDARY": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M014-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M015-INVERT_COND": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1)\",\"console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a\",\"b and x\",\"y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js')\",\"console.log('add:', m.add(2,3))\",\"\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys\",\"print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a\",\"b and x\",\"y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"; shutdown /s\"]"
+      }
+    ],
+    "M016-DROP_BRANCH": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\" && rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\" & rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"; shutdown /s\"]"
+      }
+    ],
+    "M017-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\" && rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\" & rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"; shutdown /s\"]"
+      }
+    ],
+    "M018-INVERT_COND": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install && rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js; sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls && git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install && node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls | grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls && npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi & rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test & del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls & shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done & npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a; b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a | b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\" && rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test && npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\" & rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"; shutdown /s\"]"
+      }
+    ],
+    "M019-DROP_BRANCH": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1)\",\"console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a\",\"b and x\",\"y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js')\",\"console.log('add:', m.add(2,3))\",\"\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys\",\"print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a\",\"b and x\",\"y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M020-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1)\",\"console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a\",\"b and x\",\"y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js')\",\"console.log('add:', m.add(2,3))\",\"\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys\",\"print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a\",\"b and x\",\"y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M021-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M022-BOUNDARY": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M023-BOUNDARY": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M024-INVERT_COND": [
+      {
+        "k": 0,
+        "o": "[]"
+      },
+      {
+        "k": 1,
+        "o": "[]"
+      },
+      {
+        "k": 2,
+        "o": "[]"
+      },
+      {
+        "k": 3,
+        "o": "[]"
+      },
+      {
+        "k": 4,
+        "o": "[]"
+      },
+      {
+        "k": 5,
+        "o": "[]"
+      },
+      {
+        "k": 6,
+        "o": "[]"
+      },
+      {
+        "k": 7,
+        "o": "[]"
+      },
+      {
+        "k": 8,
+        "o": "[]"
+      },
+      {
+        "k": 9,
+        "o": "[]"
+      },
+      {
+        "k": 10,
+        "o": "[]"
+      },
+      {
+        "k": 11,
+        "o": "[]"
+      },
+      {
+        "k": 12,
+        "o": "[]"
+      },
+      {
+        "k": 13,
+        "o": "[]"
+      },
+      {
+        "k": 14,
+        "o": "[]"
+      },
+      {
+        "k": 15,
+        "o": "[]"
+      },
+      {
+        "k": 16,
+        "o": "[\"\\\"x\\\"\"]"
+      },
+      {
+        "k": 17,
+        "o": "[]"
+      },
+      {
+        "k": 18,
+        "o": "[]"
+      },
+      {
+        "k": 19,
+        "o": "[]"
+      },
+      {
+        "k": 20,
+        "o": "[]"
+      },
+      {
+        "k": 21,
+        "o": "[]"
+      },
+      {
+        "k": 22,
+        "o": "[]"
+      },
+      {
+        "k": 23,
+        "o": "[]"
+      },
+      {
+        "k": 24,
+        "o": "[]"
+      },
+      {
+        "k": 25,
+        "o": "[]"
+      },
+      {
+        "k": 26,
+        "o": "[]"
+      },
+      {
+        "k": 27,
+        "o": "[]"
+      },
+      {
+        "k": 28,
+        "o": "[]"
+      },
+      {
+        "k": 29,
+        "o": "[]"
+      },
+      {
+        "k": 30,
+        "o": "[]"
+      },
+      {
+        "k": 31,
+        "o": "[]"
+      },
+      {
+        "k": 32,
+        "o": "[]"
+      },
+      {
+        "k": 33,
+        "o": "[]"
+      },
+      {
+        "k": 34,
+        "o": "[]"
+      },
+      {
+        "k": 35,
+        "o": "[]"
+      },
+      {
+        "k": 36,
+        "o": "[]"
+      },
+      {
+        "k": 37,
+        "o": "[]"
+      },
+      {
+        "k": 38,
+        "o": "[]"
+      },
+      {
+        "k": 39,
+        "o": "[]"
+      },
+      {
+        "k": 40,
+        "o": "[]"
+      },
+      {
+        "k": 41,
+        "o": "[]"
+      },
+      {
+        "k": 42,
+        "o": "[\"\\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"\\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"\\\"console.log(1)\\\"\"]"
+      },
+      {
+        "k": 45,
+        "o": "[]"
+      },
+      {
+        "k": 46,
+        "o": "[]"
+      },
+      {
+        "k": 47,
+        "o": "[]"
+      },
+      {
+        "k": 48,
+        "o": "[]"
+      },
+      {
+        "k": 49,
+        "o": "[\"\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[]"
+      },
+      {
+        "k": 51,
+        "o": "[]"
+      },
+      {
+        "k": 52,
+        "o": "[\"\\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"\\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"\\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"\\\" & rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"\\\"; shutdown /s\"]"
+      }
+    ],
+    "M025-DROP_BRANCH": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M026-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M027-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"npm install  rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"ls  git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"npm install  node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"ls  npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"node -e \\\"console.log(1)\\\"  rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm test  npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M028-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"shutdown /s\"]"
+      }
+    ],
+    "M029-INVERT_COND": [
+      {
+        "k": 0,
+        "o": "[]"
+      },
+      {
+        "k": 1,
+        "o": "[]"
+      },
+      {
+        "k": 2,
+        "o": "[]"
+      },
+      {
+        "k": 3,
+        "o": "[]"
+      },
+      {
+        "k": 4,
+        "o": "[]"
+      },
+      {
+        "k": 5,
+        "o": "[]"
+      },
+      {
+        "k": 6,
+        "o": "[]"
+      },
+      {
+        "k": 7,
+        "o": "[]"
+      },
+      {
+        "k": 8,
+        "o": "[\";\"]"
+      },
+      {
+        "k": 9,
+        "o": "[]"
+      },
+      {
+        "k": 10,
+        "o": "[]"
+      },
+      {
+        "k": 11,
+        "o": "[\"|\"]"
+      },
+      {
+        "k": 12,
+        "o": "[]"
+      },
+      {
+        "k": 13,
+        "o": "[]"
+      },
+      {
+        "k": 14,
+        "o": "[]"
+      },
+      {
+        "k": 15,
+        "o": "[]"
+      },
+      {
+        "k": 16,
+        "o": "[\"\\\"x\\\"\"]"
+      },
+      {
+        "k": 17,
+        "o": "[]"
+      },
+      {
+        "k": 18,
+        "o": "[]"
+      },
+      {
+        "k": 19,
+        "o": "[]"
+      },
+      {
+        "k": 20,
+        "o": "[]"
+      },
+      {
+        "k": 21,
+        "o": "[]"
+      },
+      {
+        "k": 22,
+        "o": "[]"
+      },
+      {
+        "k": 23,
+        "o": "[]"
+      },
+      {
+        "k": 24,
+        "o": "[]"
+      },
+      {
+        "k": 25,
+        "o": "[]"
+      },
+      {
+        "k": 26,
+        "o": "[]"
+      },
+      {
+        "k": 27,
+        "o": "[]"
+      },
+      {
+        "k": 28,
+        "o": "[]"
+      },
+      {
+        "k": 29,
+        "o": "[]"
+      },
+      {
+        "k": 30,
+        "o": "[]"
+      },
+      {
+        "k": 31,
+        "o": "[]"
+      },
+      {
+        "k": 32,
+        "o": "[]"
+      },
+      {
+        "k": 33,
+        "o": "[]"
+      },
+      {
+        "k": 34,
+        "o": "[]"
+      },
+      {
+        "k": 35,
+        "o": "[]"
+      },
+      {
+        "k": 36,
+        "o": "[\"&\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"&\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"&\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"&\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\";\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"|\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"\\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"\\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"\\\"console.log(1)\\\"\"]"
+      },
+      {
+        "k": 45,
+        "o": "[]"
+      },
+      {
+        "k": 46,
+        "o": "[]"
+      },
+      {
+        "k": 47,
+        "o": "[]"
+      },
+      {
+        "k": 48,
+        "o": "[]"
+      },
+      {
+        "k": 49,
+        "o": "[\"\\\"foo$\\\"\"]"
+      },
+      {
+        "k": 50,
+        "o": "[]"
+      },
+      {
+        "k": 51,
+        "o": "[]"
+      },
+      {
+        "k": 52,
+        "o": "[\"\\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"\\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"\\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"\\\"safe\\\"\",\"&\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"\\\"safe\\\";\"]"
+      }
+    ],
+    "M030-DROP_BRANCH": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js; sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls | grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi & rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test & del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls & shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done & npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a; b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a | b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\" & rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"; shutdown /s\"]"
+      }
+    ],
+    "M031-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"shutdown /s\"]"
+      }
+    ],
+    "M032-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[\"rm -rf /\"]"
+      },
+      {
+        "k": 1,
+        "o": "[\"rm -rf node_modules\"]"
+      },
+      {
+        "k": 2,
+        "o": "[\"sudo apt install ffmpeg\"]"
+      },
+      {
+        "k": 3,
+        "o": "[\"git push origin main\"]"
+      },
+      {
+        "k": 4,
+        "o": "[\"npm publish\"]"
+      },
+      {
+        "k": 5,
+        "o": "[\"shutdown /s /t 0\"]"
+      },
+      {
+        "k": 6,
+        "o": "[\"reg add HKLM\\\\Software\\\\Foo /v Bar\"]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\",\"rm -rf /\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\",\"node build.js sudo rm x\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\",\"git push\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\",\"node test.js\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\",\"ls  grep foo\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\",\"npm install\"]"
+      },
+      {
+        "k": 13,
+        "o": "[\"cat C:/Users/tatte/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 14,
+        "o": "[\"node ../../evil.js\"]"
+      },
+      {
+        "k": 15,
+        "o": "[\"echo $(whoami)\"]"
+      },
+      {
+        "k": 16,
+        "o": "[\"node -e \\\"x\\\" > C:/windows/foo\"]"
+      },
+      {
+        "k": 17,
+        "o": "[\"type \\\\\\\\server\\\\share\\\\x\"]"
+      },
+      {
+        "k": 18,
+        "o": "[\"ls -la\"]"
+      },
+      {
+        "k": 19,
+        "o": "[\"cat package.json\"]"
+      },
+      {
+        "k": 20,
+        "o": "[\"grep -r foo .\"]"
+      },
+      {
+        "k": 21,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 22,
+        "o": "[\"node index.js\"]"
+      },
+      {
+        "k": 23,
+        "o": "[\"python main.py\"]"
+      },
+      {
+        "k": 24,
+        "o": "[\"npm ci\"]"
+      },
+      {
+        "k": 25,
+        "o": "[\"npm run build\"]"
+      },
+      {
+        "k": 26,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 27,
+        "o": "[\"pip install requests\"]"
+      },
+      {
+        "k": 28,
+        "o": "[\"pytest -q\"]"
+      },
+      {
+        "k": 29,
+        "o": "[\"mkdir assets\"]"
+      },
+      {
+        "k": 30,
+        "o": "[\"git status\"]"
+      },
+      {
+        "k": 31,
+        "o": "[\"git commit -m ok\"]"
+      },
+      {
+        "k": 32,
+        "o": "[\"ffmpeg -i a.mp4 b.gif\"]"
+      },
+      {
+        "k": 33,
+        "o": "[\"docker run x\"]"
+      },
+      {
+        "k": 34,
+        "o": "[\"git remote add origin http://x\"]"
+      },
+      {
+        "k": 35,
+        "o": "[\"rm -rf .\"]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\",\"echo hi  rm -rf .\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\",\"npm test  del /s /q .\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\",\"ls  shutdown /s\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\",\"echo done  npm run lint\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\",\"a b\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\",\"a  b\"]"
+      },
+      {
+        "k": 42,
+        "o": "[\"node -e \\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"git commit -m \\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\",\"rm -rf .\"]"
+      },
+      {
+        "k": 45,
+        "o": "[\"cat $HOME/.ssh/id_rsa\"]"
+      },
+      {
+        "k": 46,
+        "o": "[\"type %USERPROFILE%\\\\.ssh\\\\id_rsa\"]"
+      },
+      {
+        "k": 47,
+        "o": "[\"echo x > %TEMP%/evil.bat\"]"
+      },
+      {
+        "k": 48,
+        "o": "[\"cat $HOME/.bashrc\"]"
+      },
+      {
+        "k": 49,
+        "o": "[\"grep \\\"foo$\\\" README.md\"]"
+      },
+      {
+        "k": 50,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\",\"npm run lint\"]"
+      },
+      {
+        "k": 52,
+        "o": "[\"node -e \\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"python -c \\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"git commit -m \\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\",\"echo \\\"safe\\\"  rm -rf .\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\",\"echo \\\"safe\\\" shutdown /s\"]"
+      }
+    ],
+    "M033-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[]"
+      },
+      {
+        "k": 1,
+        "o": "[]"
+      },
+      {
+        "k": 2,
+        "o": "[]"
+      },
+      {
+        "k": 3,
+        "o": "[]"
+      },
+      {
+        "k": 4,
+        "o": "[]"
+      },
+      {
+        "k": 5,
+        "o": "[]"
+      },
+      {
+        "k": 6,
+        "o": "[]"
+      },
+      {
+        "k": 7,
+        "o": "[]"
+      },
+      {
+        "k": 8,
+        "o": "[]"
+      },
+      {
+        "k": 9,
+        "o": "[]"
+      },
+      {
+        "k": 10,
+        "o": "[]"
+      },
+      {
+        "k": 11,
+        "o": "[]"
+      },
+      {
+        "k": 12,
+        "o": "[]"
+      },
+      {
+        "k": 13,
+        "o": "[]"
+      },
+      {
+        "k": 14,
+        "o": "[]"
+      },
+      {
+        "k": 15,
+        "o": "[]"
+      },
+      {
+        "k": 16,
+        "o": "[\"\\\"x\\\"\"]"
+      },
+      {
+        "k": 17,
+        "o": "[]"
+      },
+      {
+        "k": 18,
+        "o": "[]"
+      },
+      {
+        "k": 19,
+        "o": "[]"
+      },
+      {
+        "k": 20,
+        "o": "[]"
+      },
+      {
+        "k": 21,
+        "o": "[]"
+      },
+      {
+        "k": 22,
+        "o": "[]"
+      },
+      {
+        "k": 23,
+        "o": "[]"
+      },
+      {
+        "k": 24,
+        "o": "[]"
+      },
+      {
+        "k": 25,
+        "o": "[]"
+      },
+      {
+        "k": 26,
+        "o": "[]"
+      },
+      {
+        "k": 27,
+        "o": "[]"
+      },
+      {
+        "k": 28,
+        "o": "[]"
+      },
+      {
+        "k": 29,
+        "o": "[]"
+      },
+      {
+        "k": 30,
+        "o": "[]"
+      },
+      {
+        "k": 31,
+        "o": "[]"
+      },
+      {
+        "k": 32,
+        "o": "[]"
+      },
+      {
+        "k": 33,
+        "o": "[]"
+      },
+      {
+        "k": 34,
+        "o": "[]"
+      },
+      {
+        "k": 35,
+        "o": "[]"
+      },
+      {
+        "k": 36,
+        "o": "[]"
+      },
+      {
+        "k": 37,
+        "o": "[]"
+      },
+      {
+        "k": 38,
+        "o": "[]"
+      },
+      {
+        "k": 39,
+        "o": "[]"
+      },
+      {
+        "k": 40,
+        "o": "[]"
+      },
+      {
+        "k": 41,
+        "o": "[]"
+      },
+      {
+        "k": 42,
+        "o": "[\"\\\"console.log(1); console.log(2)\\\"\"]"
+      },
+      {
+        "k": 43,
+        "o": "[\"\\\"fix: a; b and x && y\\\"\"]"
+      },
+      {
+        "k": 44,
+        "o": "[\"\\\"console.log(1)\\\"\"]"
+      },
+      {
+        "k": 45,
+        "o": "[]"
+      },
+      {
+        "k": 46,
+        "o": "[]"
+      },
+      {
+        "k": 47,
+        "o": "[]"
+      },
+      {
+        "k": 48,
+        "o": "[]"
+      },
+      {
+        "k": 49,
+        "o": "[\"\\\"foo$\\\"\"]"
+      },
+      {
+        "k": 50,
+        "o": "[]"
+      },
+      {
+        "k": 51,
+        "o": "[]"
+      },
+      {
+        "k": 52,
+        "o": "[\"\\\"const m = require('./maths.js'); console.log('add:', m.add(2,3));\\\"\"]"
+      },
+      {
+        "k": 53,
+        "o": "[\"\\\"import sys; print(sys.version)\\\"\"]"
+      },
+      {
+        "k": 54,
+        "o": "[\"\\\"fix: handle a; b and x && y in messages\\\"\"]"
+      },
+      {
+        "k": 55,
+        "o": "[\"\\\"safe\\\"\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"\\\"safe\\\"\"]"
+      }
+    ],
+    "M034-DROP_EFFECT": [
+      {
+        "k": 0,
+        "o": "[]"
+      },
+      {
+        "k": 1,
+        "o": "[]"
+      },
+      {
+        "k": 2,
+        "o": "[]"
+      },
+      {
+        "k": 3,
+        "o": "[]"
+      },
+      {
+        "k": 4,
+        "o": "[]"
+      },
+      {
+        "k": 5,
+        "o": "[]"
+      },
+      {
+        "k": 6,
+        "o": "[]"
+      },
+      {
+        "k": 7,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 8,
+        "o": "[\"node build.js\"]"
+      },
+      {
+        "k": 9,
+        "o": "[\"ls\"]"
+      },
+      {
+        "k": 10,
+        "o": "[\"npm install\"]"
+      },
+      {
+        "k": 11,
+        "o": "[\"ls\"]"
+      },
+      {
+        "k": 12,
+        "o": "[\"ls\"]"
+      },
+      {
+        "k": 13,
+        "o": "[]"
+      },
+      {
+        "k": 14,
+        "o": "[]"
+      },
+      {
+        "k": 15,
+        "o": "[]"
+      },
+      {
+        "k": 16,
+        "o": "[]"
+      },
+      {
+        "k": 17,
+        "o": "[]"
+      },
+      {
+        "k": 18,
+        "o": "[]"
+      },
+      {
+        "k": 19,
+        "o": "[]"
+      },
+      {
+        "k": 20,
+        "o": "[]"
+      },
+      {
+        "k": 21,
+        "o": "[]"
+      },
+      {
+        "k": 22,
+        "o": "[]"
+      },
+      {
+        "k": 23,
+        "o": "[]"
+      },
+      {
+        "k": 24,
+        "o": "[]"
+      },
+      {
+        "k": 25,
+        "o": "[]"
+      },
+      {
+        "k": 26,
+        "o": "[]"
+      },
+      {
+        "k": 27,
+        "o": "[]"
+      },
+      {
+        "k": 28,
+        "o": "[]"
+      },
+      {
+        "k": 29,
+        "o": "[]"
+      },
+      {
+        "k": 30,
+        "o": "[]"
+      },
+      {
+        "k": 31,
+        "o": "[]"
+      },
+      {
+        "k": 32,
+        "o": "[]"
+      },
+      {
+        "k": 33,
+        "o": "[]"
+      },
+      {
+        "k": 34,
+        "o": "[]"
+      },
+      {
+        "k": 35,
+        "o": "[]"
+      },
+      {
+        "k": 36,
+        "o": "[\"echo hi\"]"
+      },
+      {
+        "k": 37,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 38,
+        "o": "[\"ls\"]"
+      },
+      {
+        "k": 39,
+        "o": "[\"echo done\"]"
+      },
+      {
+        "k": 40,
+        "o": "[\"a\"]"
+      },
+      {
+        "k": 41,
+        "o": "[\"a\"]"
+      },
+      {
+        "k": 42,
+        "o": "[]"
+      },
+      {
+        "k": 43,
+        "o": "[]"
+      },
+      {
+        "k": 44,
+        "o": "[\"node -e \\\"console.log(1)\\\"\"]"
+      },
+      {
+        "k": 45,
+        "o": "[]"
+      },
+      {
+        "k": 46,
+        "o": "[]"
+      },
+      {
+        "k": 47,
+        "o": "[]"
+      },
+      {
+        "k": 48,
+        "o": "[]"
+      },
+      {
+        "k": 49,
+        "o": "[]"
+      },
+      {
+        "k": 50,
+        "o": "[]"
+      },
+      {
+        "k": 51,
+        "o": "[\"npm test\"]"
+      },
+      {
+        "k": 52,
+        "o": "[]"
+      },
+      {
+        "k": 53,
+        "o": "[]"
+      },
+      {
+        "k": 54,
+        "o": "[]"
+      },
+      {
+        "k": 55,
+        "o": "[\"echo \\\"safe\\\"\"]"
+      },
+      {
+        "k": 56,
+        "o": "[\"echo \\\"safe\\\"\"]"
+      }
+    ]
+  }
+}

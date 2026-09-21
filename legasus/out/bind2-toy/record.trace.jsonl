@@ -1,0 +1,15 @@
+{"phase":"ARMED","served":"file:///C:/Users/tatte/Projects/ai-coding-hub/legasus/out/bind2-toy/R000-RECORDER.js"}
+{"call":1,"x":50,"o":"10"}
+{"caseMark":"big clamps","outcome":"PASS"}
+{"ordinal":0,"outcome":"PASS","id":"big clamps","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"call":2,"x":3,"o":"3"}
+{"caseMark":"small passes","outcome":"PASS"}
+{"ordinal":1,"outcome":"PASS","id":"small passes","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"call":3,"x":"x","o":"-1"}
+{"caseMark":"string is -1","outcome":"PASS"}
+{"ordinal":2,"outcome":"PASS","id":"string is -1","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"caseMark":"untouched","outcome":"PASS"}
+{"ordinal":3,"outcome":"PASS","id":"untouched","fnCount":0,"siteCount":0,"scriptSeen":true}
+{"call":4,"x":1,"o":"1"}
+{"caseMark":"deliberately wrong","outcome":"FAIL"}
+{"ordinal":4,"outcome":"FAIL","id":"deliberately wrong","fnCount":1,"siteCount":1,"scriptSeen":true}

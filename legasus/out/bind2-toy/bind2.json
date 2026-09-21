@@ -1,0 +1,2726 @@
+{
+  "attempt": {
+    "status": "OBSERVED",
+    "phase": "SUPPORT",
+    "sampler": "legasus/loadSample.mjs (stand-in)",
+    "load": {
+      "ok": true,
+      "ceiling": 40,
+      "worst": 9,
+      "breachedAt": [],
+      "unmeasured": [],
+      "calib": {
+        "referenceMs": 35,
+        "ratio": 3,
+        "limitMs": 105,
+        "worstMs": 32.3,
+        "overRatio": []
+      },
+      "why": "within every preregistered limit"
+    }
+  },
+  "loadSamples": [
+    {
+      "at": "2026-09-21T00:20:18.786Z",
+      "where": "record start",
+      "nodeProcs": 9,
+      "calibMs": 29.9,
+      "calibRunsMs": [
+        29.9,
+        32.7,
+        32.1,
+        31.6,
+        32.3
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-21T00:20:19.238Z",
+      "where": "record end",
+      "nodeProcs": 9,
+      "calibMs": 31.5,
+      "calibRunsMs": [
+        31.5,
+        32.6,
+        31.7,
+        31.9,
+        33.2
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-21T00:20:19.596Z",
+      "where": "replay start",
+      "nodeProcs": 9,
+      "calibMs": 32.3,
+      "calibRunsMs": [
+        36.1,
+        32.5,
+        32.3,
+        32.6,
+        32.7
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-21T00:20:21.159Z",
+      "where": "replay end",
+      "nodeProcs": 9,
+      "calibMs": 31.4,
+      "calibRunsMs": [
+        34.2,
+        31.4,
+        33.2,
+        32.5,
+        33.6
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    }
+  ],
+  "subject": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js",
+  "fn": "clamp",
+  "witnessFile": "legasus/selfcheck/toy_witness.mjs",
+  "inputsRecorded": 4,
+  "distinctInputs": 4,
+  "orphanCalls": 0,
+  "controls": {
+    "C1": true,
+    "C2": true,
+    "C3": true,
+    "C4": true,
+    "C5": true
+  },
+  "classes": [
+    {
+      "S": "S0",
+      "members": [
+        "PRISTINE",
+        "M000-IDENTITY",
+        "M005-DROP_BRANCH",
+        "M006-BOUNDARY",
+        "M007-BOUNDARY",
+        "M008-BOUNDARY",
+        "M012-DROP_EFFECT"
+      ],
+      "distinguishingInputs": null
+    },
+    {
+      "S": "S1",
+      "members": [
+        "M001-RETURN_EMPTY"
+      ],
+      "distinguishingInputs": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "S": "S2",
+      "members": [
+        "M002-RETURN_UNDEFINED"
+      ],
+      "distinguishingInputs": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "S": "S3",
+      "members": [
+        "M003-INVERT_COND"
+      ],
+      "distinguishingInputs": [
+        0,
+        1,
+        3
+      ]
+    },
+    {
+      "S": "S4",
+      "members": [
+        "M004-DROP_BRANCH",
+        "M009-DROP_EFFECT"
+      ],
+      "distinguishingInputs": [
+        0
+      ]
+    },
+    {
+      "S": "S5",
+      "members": [
+        "M010-BOUNDARY"
+      ],
+      "distinguishingInputs": [
+        0
+      ]
+    },
+    {
+      "S": "S6",
+      "members": [
+        "M011-BOUNDARY"
+      ],
+      "distinguishingInputs": [
+        0
+      ]
+    },
+    {
+      "S": "S7",
+      "members": [
+        "M013-BOUNDARY"
+      ],
+      "distinguishingInputs": [
+        1,
+        3
+      ]
+    },
+    {
+      "S": "S8",
+      "members": [
+        "M014-BOUNDARY"
+      ],
+      "distinguishingInputs": [
+        1,
+        3
+      ]
+    },
+    {
+      "S": "S9",
+      "members": [
+        "M015-EXCEPTION",
+        "M018-DROP_BRANCH"
+      ],
+      "distinguishingInputs": [
+        2
+      ]
+    },
+    {
+      "S": "S10",
+      "members": [
+        "M016-EXCEPTION"
+      ],
+      "distinguishingInputs": [
+        2
+      ]
+    },
+    {
+      "S": "S11",
+      "members": [
+        "M017-INVERT_COND"
+      ],
+      "distinguishingInputs": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "S": "S12",
+      "members": [
+        "M019-BOUNDARY"
+      ],
+      "distinguishingInputs": [
+        2
+      ]
+    },
+    {
+      "S": "S13",
+      "members": [
+        "M020-BOUNDARY"
+      ],
+      "distinguishingInputs": [
+        2
+      ]
+    }
+  ],
+  "joined": [
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "S": "S1",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        0
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "S": "S1",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        1
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "S": "S1",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        2
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "S": "S1",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "S": "S1",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "S": "S2",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        0
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "S": "S2",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        1
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "S": "S2",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        2
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "S": "S2",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "S": "S2",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "S": "S3",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        0
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "S": "S3",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        1
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "S": "S3",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "S": "S3",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "S": "S3",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        0
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        0
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "S": "S5",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        0
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "S": "S5",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "S": "S5",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "S": "S5",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "S": "S5",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "S": "S6",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        0
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "S": "S6",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "S": "S6",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "S": "S6",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "S": "S6",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "S": "S7",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "S": "S7",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        1
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "S": "S7",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "S": "S7",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "S": "S7",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "S": "S8",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "S": "S8",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        1
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "S": "S8",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "EXECUTED_NOT_DISCRIMINATED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        2
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "S": "S8",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "S": "S8",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        2
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "S": "S10",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "S": "S10",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "S": "S10",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "DISCRIMINATED_BY_ERROR",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        2
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "S": "S10",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "UNOBSERVABLE",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "S": "S10",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "S": "S11",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        0
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "S": "S11",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        1
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "S": "S11",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        2
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "S": "S11",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "S": "S11",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        2
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "S": "S12",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "S": "S12",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "S": "S12",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        2
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "S": "S12",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "S": "S12",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "S": "S13",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        0
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "S": "S13",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "klass": "NOT_EXECUTED",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        1
+      ],
+      "state": "NO_DIFFERENCE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "S": "S13",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "klass": "DISCRIMINATED_BY_FAIL",
+      "delta": true,
+      "deltaTrim": true,
+      "inputs": [
+        2
+      ],
+      "state": "LICENSABLE",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "S": "S13",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "klass": "NOT_EXECUTED",
+      "delta": null,
+      "deltaTrim": null,
+      "inputs": [],
+      "state": "NO_INPUT",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "S": "S13",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "klass": "BASELINE_INVALID",
+      "delta": false,
+      "deltaTrim": false,
+      "inputs": [
+        3
+      ],
+      "state": "BASELINE_INVALID",
+      "executable": {
+        "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+        "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+      }
+    }
+  ],
+  "stateTally": {
+    "LICENSABLE": 22,
+    "NO_INPUT": 20,
+    "BASELINE_INVALID": 20,
+    "NO_DIFFERENCE": 38
+  },
+  "edges": [
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "S": "S1",
+      "mutants": [
+        "M001-RETURN_EMPTY"
+      ],
+      "inputs": [
+        0
+      ],
+      "provenance": [
+        {
+          "mutant": "M001-RETURN_EMPTY",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "S": "S1",
+      "mutants": [
+        "M001-RETURN_EMPTY"
+      ],
+      "inputs": [
+        1
+      ],
+      "provenance": [
+        {
+          "mutant": "M001-RETURN_EMPTY",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "S": "S1",
+      "mutants": [
+        "M001-RETURN_EMPTY"
+      ],
+      "inputs": [
+        2
+      ],
+      "provenance": [
+        {
+          "mutant": "M001-RETURN_EMPTY",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "S": "S2",
+      "mutants": [
+        "M002-RETURN_UNDEFINED"
+      ],
+      "inputs": [
+        0
+      ],
+      "provenance": [
+        {
+          "mutant": "M002-RETURN_UNDEFINED",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "S": "S2",
+      "mutants": [
+        "M002-RETURN_UNDEFINED"
+      ],
+      "inputs": [
+        1
+      ],
+      "provenance": [
+        {
+          "mutant": "M002-RETURN_UNDEFINED",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "S": "S2",
+      "mutants": [
+        "M002-RETURN_UNDEFINED"
+      ],
+      "inputs": [
+        2
+      ],
+      "provenance": [
+        {
+          "mutant": "M002-RETURN_UNDEFINED",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "S": "S3",
+      "mutants": [
+        "M003-INVERT_COND"
+      ],
+      "inputs": [
+        0
+      ],
+      "provenance": [
+        {
+          "mutant": "M003-INVERT_COND",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "S": "S3",
+      "mutants": [
+        "M003-INVERT_COND"
+      ],
+      "inputs": [
+        1
+      ],
+      "provenance": [
+        {
+          "mutant": "M003-INVERT_COND",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "S": "S4",
+      "mutants": [
+        "M004-DROP_BRANCH",
+        "M009-DROP_EFFECT"
+      ],
+      "inputs": [
+        0
+      ],
+      "provenance": [
+        {
+          "mutant": "M004-DROP_BRANCH",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        },
+        {
+          "mutant": "M009-DROP_EFFECT",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "S": "S5",
+      "mutants": [
+        "M010-BOUNDARY"
+      ],
+      "inputs": [
+        0
+      ],
+      "provenance": [
+        {
+          "mutant": "M010-BOUNDARY",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "S": "S6",
+      "mutants": [
+        "M011-BOUNDARY"
+      ],
+      "inputs": [
+        0
+      ],
+      "provenance": [
+        {
+          "mutant": "M011-BOUNDARY",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "S": "S7",
+      "mutants": [
+        "M013-BOUNDARY"
+      ],
+      "inputs": [
+        1
+      ],
+      "provenance": [
+        {
+          "mutant": "M013-BOUNDARY",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "S": "S8",
+      "mutants": [
+        "M014-BOUNDARY"
+      ],
+      "inputs": [
+        1
+      ],
+      "provenance": [
+        {
+          "mutant": "M014-BOUNDARY",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "S": "S9",
+      "mutants": [
+        "M015-EXCEPTION",
+        "M018-DROP_BRANCH"
+      ],
+      "inputs": [
+        2
+      ],
+      "provenance": [
+        {
+          "mutant": "M015-EXCEPTION",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        },
+        {
+          "mutant": "M018-DROP_BRANCH",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "S": "S10",
+      "mutants": [
+        "M016-EXCEPTION"
+      ],
+      "inputs": [
+        2
+      ],
+      "provenance": [
+        {
+          "mutant": "M016-EXCEPTION",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_ERROR",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "S": "S11",
+      "mutants": [
+        "M017-INVERT_COND"
+      ],
+      "inputs": [
+        0
+      ],
+      "provenance": [
+        {
+          "mutant": "M017-INVERT_COND",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "S": "S11",
+      "mutants": [
+        "M017-INVERT_COND"
+      ],
+      "inputs": [
+        1
+      ],
+      "provenance": [
+        {
+          "mutant": "M017-INVERT_COND",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "S": "S11",
+      "mutants": [
+        "M017-INVERT_COND"
+      ],
+      "inputs": [
+        2
+      ],
+      "provenance": [
+        {
+          "mutant": "M017-INVERT_COND",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "S": "S12",
+      "mutants": [
+        "M019-BOUNDARY"
+      ],
+      "inputs": [
+        2
+      ],
+      "provenance": [
+        {
+          "mutant": "M019-BOUNDARY",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "S": "S13",
+      "mutants": [
+        "M020-BOUNDARY"
+      ],
+      "inputs": [
+        2
+      ],
+      "provenance": [
+        {
+          "mutant": "M020-BOUNDARY",
+          "baseline": "PASS",
+          "perturbed": "DISCRIMINATED_BY_FAIL",
+          "delta": true,
+          "deltaTrim": true,
+          "executable": {
+            "witnessRun": "BIND-1 bind.mjs (mutant served by loader redirect)",
+            "replay": "bind2-replay-child.mjs (direct import, fresh process)"
+          }
+        }
+      ]
+    }
+  ],
+  "refused": [
+    {
+      "S": "S1",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M001-RETURN_EMPTY": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S1",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M001-RETURN_EMPTY": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S2",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M002-RETURN_UNDEFINED": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S2",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M002-RETURN_UNDEFINED": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S3",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M003-INVERT_COND": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S3",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M003-INVERT_COND": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S3",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M003-INVERT_COND": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M004-DROP_BRANCH": "NO_DIFFERENCE",
+        "M009-DROP_EFFECT": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M004-DROP_BRANCH": "NO_DIFFERENCE",
+        "M009-DROP_EFFECT": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M004-DROP_BRANCH": "NO_INPUT",
+        "M009-DROP_EFFECT": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S4",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M004-DROP_BRANCH": "BASELINE_INVALID",
+        "M009-DROP_EFFECT": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S5",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M010-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S5",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M010-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S5",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M010-BOUNDARY": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S5",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M010-BOUNDARY": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S6",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M011-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S6",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M011-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S6",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M011-BOUNDARY": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S6",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M011-BOUNDARY": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S7",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M013-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S7",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M013-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S7",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M013-BOUNDARY": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S7",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M013-BOUNDARY": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S8",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M014-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S8",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M014-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S8",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M014-BOUNDARY": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S8",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M014-BOUNDARY": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M015-EXCEPTION": "NO_DIFFERENCE",
+        "M018-DROP_BRANCH": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M015-EXCEPTION": "NO_DIFFERENCE",
+        "M018-DROP_BRANCH": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M015-EXCEPTION": "NO_INPUT",
+        "M018-DROP_BRANCH": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S9",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M015-EXCEPTION": "BASELINE_INVALID",
+        "M018-DROP_BRANCH": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S10",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M016-EXCEPTION": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S10",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M016-EXCEPTION": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S10",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M016-EXCEPTION": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S10",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M016-EXCEPTION": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S11",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M017-INVERT_COND": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S11",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M017-INVERT_COND": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S12",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M019-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S12",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M019-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S12",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M019-BOUNDARY": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S12",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M019-BOUNDARY": "BASELINE_INVALID"
+      }
+    },
+    {
+      "S": "S13",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M020-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S13",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "state": "NO_DIFFERENCE",
+      "states": {
+        "M020-BOUNDARY": "NO_DIFFERENCE"
+      }
+    },
+    {
+      "S": "S13",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "state": "NO_INPUT",
+      "states": {
+        "M020-BOUNDARY": "NO_INPUT"
+      }
+    },
+    {
+      "S": "S13",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "state": "BASELINE_INVALID",
+      "states": {
+        "M020-BOUNDARY": "BASELINE_INVALID"
+      }
+    }
+  ],
+  "inconsistent": [
+    {
+      "S": "S0",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "klasses": {
+        "M005-DROP_BRANCH": "EXECUTED_NOT_DISCRIMINATED",
+        "M006-BOUNDARY": "EXECUTED_NOT_DISCRIMINATED",
+        "M007-BOUNDARY": "EXECUTED_NOT_DISCRIMINATED",
+        "M008-BOUNDARY": "EXECUTED_NOT_DISCRIMINATED",
+        "M012-DROP_EFFECT": "NOT_EXECUTED"
+      }
+    }
+  ],
+  "predictions": {
+    "H1": [
+      {
+        "cluster": [
+          "M001-RETURN_EMPTY",
+          "M024-INVERT_COND",
+          "M029-INVERT_COND",
+          "M033-DROP_EFFECT"
+        ],
+        "sClasses": [
+          "S1"
+        ]
+      },
+      {
+        "cluster": [
+          "M010-DROP_BRANCH",
+          "M011-BOUNDARY",
+          "M012-BOUNDARY",
+          "M013-BOUNDARY",
+          "M014-DROP_EFFECT",
+          "M022-BOUNDARY",
+          "M023-BOUNDARY",
+          "M025-DROP_BRANCH",
+          "M028-DROP_EFFECT"
+        ],
+        "sClasses": [
+          "S6",
+          "S7"
+        ]
+      }
+    ],
+    "H2": [],
+    "H3": [],
+    "H5": [],
+    "H6": [
+      {
+        "mutant": "M011-BOUNDARY",
+        "anyDelta": true
+      },
+      {
+        "mutant": "M013-BOUNDARY",
+        "anyDelta": true
+      }
+    ]
+  }
+}
