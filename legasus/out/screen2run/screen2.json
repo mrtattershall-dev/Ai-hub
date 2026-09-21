@@ -1,0 +1,421 @@
+{
+  "target": "C:\\Users\\tatte\\AppData\\Local\\Temp\\screen2-target\\mpt",
+  "filesSeen": 50,
+  "filesParsed": 50,
+  "unparseable": [],
+  "verdictCounts": {
+    "INV-A2:VIOLATION": 45,
+    "INV-A2:UNKNOWN": 52,
+    "INV-B2:UNKNOWN": 28,
+    "INV-A2:DISTINGUISHABLE": 5,
+    "INV-B2:PROVEN_FAILURE_REACHABLE": 11
+  },
+  "candidates": [
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/asgi.py",
+      "function": "_normalize_allowed_origin",
+      "line": 69,
+      "flagged_line": 96,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/config/config.py",
+      "function": "get_container_default_gateway_ip",
+      "line": 361,
+      "flagged_line": 374,
+      "reason": "an except handler returns '', identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/bgm.py",
+      "function": "should_use_bgm",
+      "line": 73,
+      "flagged_line": 86,
+      "reason": "an except handler returns False, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/material.py",
+      "function": "_safe_public_url",
+      "line": 40,
+      "flagged_line": 54,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/material.py",
+      "function": "search_videos_pixabay",
+      "line": 394,
+      "flagged_line": 456,
+      "reason": "an except handler returns ('List', ()), identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/material.py",
+      "function": "generate_images_openai",
+      "line": 1434,
+      "flagged_line": 1480,
+      "reason": "an except handler returns ('List', ()), identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/material_cache.py",
+      "function": "_safe_public_url",
+      "line": 40,
+      "flagged_line": 47,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/material_cache.py",
+      "function": "load_material_search_cache",
+      "line": 186,
+      "flagged_line": 233,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/material_cache.py",
+      "function": "save_material_search_cache",
+      "line": 309,
+      "flagged_line": 385,
+      "reason": "an except handler returns False, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/material_cache.py",
+      "function": "cleanup_expired_material_search_cache",
+      "line": 388,
+      "flagged_line": 422,
+      "reason": "an except handler returns 0, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/task.py",
+      "function": "_is_cross_post_owner_alive",
+      "line": 201,
+      "flagged_line": 211,
+      "reason": "an except handler returns False, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/task.py",
+      "function": "generate_audio",
+      "line": 482,
+      "flagged_line": 519,
+      "reason": "an except handler returns ('Tuple', (None, None, None)), identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/task.py",
+      "function": "get_video_materials",
+      "line": 648,
+      "flagged_line": 728,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/task.py",
+      "function": "_record_loomloom_run_reference",
+      "line": 817,
+      "flagged_line": 841,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/task.py",
+      "function": "_patch_cross_post_state",
+      "line": 1032,
+      "flagged_line": 1047,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/task.py",
+      "function": "_ensure_cross_post_terminal_state",
+      "line": 1075,
+      "flagged_line": 1085,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/twelvelabs.py",
+      "function": "embed_text",
+      "line": 71,
+      "flagged_line": 86,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/twelvelabs.py",
+      "function": "analyze_clip",
+      "line": 135,
+      "flagged_line": 166,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/version_checker.py",
+      "function": "get_available_update",
+      "line": 39,
+      "flagged_line": 54,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/video.py",
+      "function": "_ffmpeg_encoder_exists",
+      "line": 303,
+      "flagged_line": 325,
+      "reason": "an except handler returns False, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/video.py",
+      "function": "get_bgm_file",
+      "line": 656,
+      "flagged_line": 669,
+      "reason": "an except handler returns '', identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/video.py",
+      "function": "_subtitle_font_supports_sample",
+      "line": 1169,
+      "flagged_line": 1192,
+      "reason": "an except handler returns True, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/voice.py",
+      "function": "get_elevenlabs_voices",
+      "line": 188,
+      "flagged_line": 210,
+      "reason": "an except handler returns ('List', ()), identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/voice.py",
+      "function": "_tts_with_pauses",
+      "line": 834,
+      "flagged_line": 951,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/voice.py",
+      "function": "gemini_tts",
+      "line": 1596,
+      "flagged_line": 1689,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/voice.py",
+      "function": "minimax_tts",
+      "line": 1987,
+      "flagged_line": 2012,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/voice.py",
+      "function": "voxcpm_tts",
+      "line": 2589,
+      "flagged_line": 2657,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/services/voice.py",
+      "function": "_get_audio_duration_from_file",
+      "line": 3100,
+      "flagged_line": 3114,
+      "reason": "an except handler returns 0.0, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "app/utils/utils.py",
+      "function": "check_ffmpeg_ready",
+      "line": 189,
+      "flagged_line": 220,
+      "reason": "an except handler returns False, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "cli.py",
+      "function": "_ui_config_value",
+      "line": 831,
+      "flagged_line": 860,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "cli.py",
+      "function": "run_cli",
+      "line": 1717,
+      "flagged_line": 1755,
+      "reason": "an except handler returns 1, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "docs/skill/mpt_agent.py",
+      "function": "_parse_string_list",
+      "line": 213,
+      "flagged_line": 218,
+      "reason": "an except handler returns ('List', ()), identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_safe_load_task_script",
+      "line": 767,
+      "flagged_line": 777,
+      "reason": "an except handler returns ('Dict', ()), identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_find_final_task_video",
+      "line": 780,
+      "flagged_line": 790,
+      "reason": "an except handler returns '', identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_scan_history_tasks",
+      "line": 933,
+      "flagged_line": 961,
+      "reason": "an except handler returns ('List', ()), identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_delete_task",
+      "line": 1114,
+      "flagged_line": 1122,
+      "reason": "an except handler returns False, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_load_task_restore_payload",
+      "line": 1371,
+      "flagged_line": 1379,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_render_current_generation_task",
+      "line": 2065,
+      "flagged_line": 2078,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "get_groq_model_ids",
+      "line": 2555,
+      "flagged_line": 2584,
+      "reason": "an except handler returns ('List', ()), identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_render_settings_transfer",
+      "line": 2953,
+      "flagged_line": 2989,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_matching_full_voice_preview_duration",
+      "line": 4134,
+      "flagged_line": 4154,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_current_loomloom_video_quote_context",
+      "line": 4222,
+      "flagged_line": 4259,
+      "reason": "an except handler returns ('Tuple', (None, '')), identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_render_loomloom_run_progress",
+      "line": 4621,
+      "flagged_line": 4639,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_sync_voxcpm_reference_audio",
+      "line": 5727,
+      "flagged_line": 5773,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "webui/Main.py",
+      "function": "_sync_voxcpm_prompt_audio",
+      "line": 5789,
+      "flagged_line": 5827,
+      "reason": "an except handler returns None, identical to a value returned on a non-exceptional path"
+    }
+  ],
+  "note": "only VIOLATION and PROVEN_FAILURE_UNREACHABLE are reportable; UNKNOWN and DISTINGUISHABLE are counted and never reported as findings"
+}
