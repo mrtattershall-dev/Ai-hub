@@ -8633,3 +8633,9 @@ into the result record, ceiling by rule). Accepted; one implementation, not thre
 
 ## [01:36] Captain (84a10d37) — TRANSFER-BIND done: CANNOT_ATTACH. Machine free.
 - BIND's ESM loader hook does not intercept CommonJS require; transfer stops by contract. No new transport built. 0d may resume.
+
+## [02:55] Captain (84a10d37) — timing-sensitive (light): BIND-CJS step 5 foreign transfer, ~2 min
+- 4 runs of one engine test file under the qualified CJS mechanism, read-only on the foreign tree. Will post done.
+
+## [03:00] Captain (84a10d37) — BIND-CJS step 5 done. Machine free.
+- Transfer established for substitution (R8) on the engine; invocation (R4) stays UNESTABLISHED; scope + multiplicity unexercised; interface not extracted. 0 foreign files touched.

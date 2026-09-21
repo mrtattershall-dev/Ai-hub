@@ -1,0 +1,715 @@
+{
+  "subject": "C:\\Users\\tatte\\OneDrive\\Documents\\ai-native-engine\\experiments\\037_ai_native_editor\\intent.js",
+  "fnName": "parse",
+  "region": {
+    "fnStart": 22767,
+    "fnEnd": 24363
+  },
+  "families": {
+    "RETURN_EMPTY": {
+      "total": 1,
+      "valid": 1
+    },
+    "RETURN_UNDEFINED": {
+      "total": 1,
+      "valid": 1
+    },
+    "INVERT_COND": {
+      "total": 13,
+      "valid": 13
+    },
+    "DROP_BRANCH": {
+      "total": 11,
+      "valid": 11
+    },
+    "BOUNDARY": {
+      "total": 25,
+      "valid": 25
+    },
+    "DROP_EFFECT": {
+      "total": 1,
+      "valid": 1
+    }
+  },
+  "notApplicable": [
+    "EXCEPTION"
+  ],
+  "mutants": [
+    {
+      "id": "M001-RETURN_EMPTY",
+      "family": "RETURN_EMPTY",
+      "describe": "body := return []",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M001-RETURN_EMPTY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 22822,
+        "site": 22809
+      }
+    },
+    {
+      "id": "M002-RETURN_UNDEFINED",
+      "family": "RETURN_UNDEFINED",
+      "describe": "body := return undefined",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M002-RETURN_UNDEFINED.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 22829,
+        "site": 22809
+      }
+    },
+    {
+      "id": "M003-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @22825",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M003-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 22825
+      }
+    },
+    {
+      "id": "M004-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @22904",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M004-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 22904
+      }
+    },
+    {
+      "id": "M005-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @23012",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M005-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 23012
+      }
+    },
+    {
+      "id": "M006-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @23016",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M006-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24214,
+        "site": 23016
+      }
+    },
+    {
+      "id": "M007-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "> := >=",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M007-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24364,
+        "site": 23295
+      }
+    },
+    {
+      "id": "M008-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 2",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M008-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23297
+      }
+    },
+    {
+      "id": "M009-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 0",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M009-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23297
+      }
+    },
+    {
+      "id": "M010-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := 1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M010-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23365
+      }
+    },
+    {
+      "id": "M011-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := -1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M011-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24364,
+        "site": 23365
+      }
+    },
+    {
+      "id": "M012-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "describe": "drop AssignmentExpression @23370",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M012-DROP_EFFECT.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24341,
+        "site": 23370
+      }
+    },
+    {
+      "id": "M013-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 2",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M013-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23390
+      }
+    },
+    {
+      "id": "M014-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 0",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M014-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23390
+      }
+    },
+    {
+      "id": "M015-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 2",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M015-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23470
+      }
+    },
+    {
+      "id": "M016-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 0",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M016-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23470
+      }
+    },
+    {
+      "id": "M017-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := 1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M017-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23508
+      }
+    },
+    {
+      "id": "M018-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := -1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M018-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24364,
+        "site": 23508
+      }
+    },
+    {
+      "id": "M019-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @23519",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M019-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 23519
+      }
+    },
+    {
+      "id": "M020-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @23537",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M020-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24333,
+        "site": 23537
+      }
+    },
+    {
+      "id": "M021-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @23576",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M021-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 23576
+      }
+    },
+    {
+      "id": "M022-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @23594",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M022-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24328,
+        "site": 23594
+      }
+    },
+    {
+      "id": "M023-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 2",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M023-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23627
+      }
+    },
+    {
+      "id": "M024-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 0",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M024-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23627
+      }
+    },
+    {
+      "id": "M025-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @23638",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M025-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 23638
+      }
+    },
+    {
+      "id": "M026-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @23658",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M026-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24331,
+        "site": 23658
+      }
+    },
+    {
+      "id": "M027-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @23699",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M027-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 23699
+      }
+    },
+    {
+      "id": "M028-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @23717",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M028-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24333,
+        "site": 23717
+      }
+    },
+    {
+      "id": "M029-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @23756",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M029-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 23756
+      }
+    },
+    {
+      "id": "M030-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @23776",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M030-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24331,
+        "site": 23776
+      }
+    },
+    {
+      "id": "M031-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @23817",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M031-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 23817
+      }
+    },
+    {
+      "id": "M032-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @23836",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M032-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24322,
+        "site": 23836
+      }
+    },
+    {
+      "id": "M033-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 2",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M033-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23870
+      }
+    },
+    {
+      "id": "M034-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 0",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M034-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23870
+      }
+    },
+    {
+      "id": "M035-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @23886",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M035-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 23886
+      }
+    },
+    {
+      "id": "M036-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @23905",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M036-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24332,
+        "site": 23905
+      }
+    },
+    {
+      "id": "M037-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @23945",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M037-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 23945
+      }
+    },
+    {
+      "id": "M038-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @23983",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M038-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24330,
+        "site": 23983
+      }
+    },
+    {
+      "id": "M039-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := 1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M039-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 23978
+      }
+    },
+    {
+      "id": "M040-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := -1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M040-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24364,
+        "site": 23978
+      }
+    },
+    {
+      "id": "M041-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @24025",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M041-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 24025
+      }
+    },
+    {
+      "id": "M042-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @24066",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M042-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24321,
+        "site": 24066
+      }
+    },
+    {
+      "id": "M043-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := 1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M043-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 24061
+      }
+    },
+    {
+      "id": "M044-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := -1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M044-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24364,
+        "site": 24061
+      }
+    },
+    {
+      "id": "M045-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @24117",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M045-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24366,
+        "site": 24117
+      }
+    },
+    {
+      "id": "M046-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @24182",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M046-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24321,
+        "site": 24182
+      }
+    },
+    {
+      "id": "M047-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := 1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M047-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 24133
+      }
+    },
+    {
+      "id": "M048-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := -1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M048-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24364,
+        "site": 24133
+      }
+    },
+    {
+      "id": "M049-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := 1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M049-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 24144
+      }
+    },
+    {
+      "id": "M050-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := -1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M050-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24364,
+        "site": 24144
+      }
+    },
+    {
+      "id": "M051-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := 1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M051-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24363,
+        "site": 24269
+      }
+    },
+    {
+      "id": "M052-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := -1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\bind-cjs-transfer\\mutants\\mutants\\M052-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 22767,
+        "fnEnd": 24364,
+        "site": 24269
+      }
+    }
+  ]
+}

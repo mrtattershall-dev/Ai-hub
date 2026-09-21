@@ -483,3 +483,24 @@ module the condition aimed at. Every earlier condition substituted at most one m
 "last" was accidentally correct seven times. The first two-substitution condition exposed it.
 A perfect score is not evidence that the scorer works; a state nothing can produce is not a
 control. Both lessons were already in the ledger and both were re-earned in one run.
+
+## 32. BIND-CJS transfers: R8 established on the engine, two properties never exercised
+
+The unchanged qualified mechanism (e41c1e3) produced all four preregistered states on a foreign
+CommonJS subject (experiments/037_ai_native_editor/intent.js::parse, witness intent_test.js),
+touching 0 foreign files. Two independent channels agree in opposite directions: the marker
+says which Legasus file executed, coverage says whether the ORIGINAL also ran - false in both
+substitution arms, true in both bypass arms. Non-vacuous: the mutant took the witness from
+104 cases/0 fail to 2 cases/1 fail; the identity copy reproduced the baseline exactly.
+
+P-F3 confirmed. P-F1 (scope violation) and P-F2 (multiplicity) UNEXERCISED - one Legasus file
+per run, one served record, no child processes in the selected witness. So the two properties
+Q-H proved are NOT implied by the target triple have still only ever fired in a three-module
+synthetic fixture. The Intervention interface stays unextracted on exactly that ground.
+
+Also recorded: bypass is caught by a DIFFERENT rule branch on a foreign subject (executed
+absent) than on the fixture (executed == SUBJECT), because a foreign subject cannot carry a
+marker - a weaker discriminator, since "no marker" also looks like a marker-write failure. The
+coverage channel separates them and is recorded but not consulted by the state function.
+Limitation stated, not repaired after the fact. And 20 of 84 non-test files are eligible at all:
+a mutant outside the foreign tree cannot resolve relative requires.

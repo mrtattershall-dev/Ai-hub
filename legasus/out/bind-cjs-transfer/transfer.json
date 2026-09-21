@@ -1,0 +1,213 @@
+{
+  "at": "2026-09-21T01:17:28.315Z",
+  "node": "v24.15.0",
+  "mechanism": "legasus/cjs-preload.mjs @ e41c1e3, unchanged",
+  "foreignRoot": "C:\\Users\\tatte\\OneDrive\\Documents\\ai-native-engine",
+  "selectionRecord": {
+    "candidateSubjects": 20,
+    "candidatePairs": 20,
+    "top": [
+      {
+        "subject": "experiments/037_ai_native_editor/intent.js",
+        "witness": "experiments/037_ai_native_editor/intent_test.js",
+        "caseLines": 104,
+        "exports": [
+          "parse"
+        ]
+      },
+      {
+        "subject": "experiments/037_ai_native_editor/explain.js",
+        "witness": "experiments/037_ai_native_editor/explain_test.js",
+        "caseLines": 85,
+        "exports": [
+          "explainRule",
+          "explainErrors",
+          "explainReason"
+        ]
+      },
+      {
+        "subject": "experiments/037_ai_native_editor/intent2.js",
+        "witness": "experiments/037_ai_native_editor/intent2_test.js",
+        "caseLines": 75,
+        "exports": [
+          "parse"
+        ]
+      },
+      {
+        "subject": "experiments/025_behavior_corpus/adapters.js",
+        "witness": "experiments/025_behavior_corpus/harness_test.js",
+        "caseLines": 48,
+        "exports": [
+          "adapters",
+          "EXPECTED"
+        ]
+      },
+      {
+        "subject": "core/engine.js",
+        "witness": "core/integration_test.js",
+        "caseLines": 39,
+        "exports": [
+          "Engine",
+          "World",
+          "TYPE",
+          "TYPE_NAME",
+          "foldSemantics",
+          "isFoldable",
+          "fold",
+          "FIELD_OWNER",
+          "FIELD_RANGE",
+          "NO_ROW",
+          "CLAIM_TTL_MAX",
+          "makeSchema",
+          "DEFAULT_SCHEMA_DEFS"
+        ]
+      }
+    ],
+    "selected": {
+      "subject": "experiments/037_ai_native_editor/intent.js",
+      "witness": "experiments/037_ai_native_editor/intent_test.js",
+      "caseLines": 104,
+      "exports": [
+        "parse"
+      ]
+    },
+    "limitation": "subjects with relative requires are excluded: a mutant lives outside the foreign tree and could not resolve them; placing mutants inside the tree is prohibited"
+  },
+  "fnName": "parse",
+  "mutant": {
+    "id": "M001-RETURN_EMPTY",
+    "family": "RETURN_EMPTY",
+    "describe": "body := return []"
+  },
+  "results": [
+    {
+      "id": "F-A",
+      "requested": "F001_MUTANT",
+      "served": "F001_MUTANT",
+      "executed": "F001_MUTANT",
+      "state": "VALID_INTERVENTION",
+      "expected": "VALID_INTERVENTION",
+      "match": true,
+      "scope": {
+        "executedScriptUrls": 99,
+        "coverageFiles": 1,
+        "legasusFilesExecuted": [
+          "F001_MUTANT"
+        ],
+        "unauthorized": [],
+        "subjectAlsoExecuted": false
+      },
+      "multiplicity": {
+        "servedRecordsForSubject": 1,
+        "distinctMarkerIdentities": [
+          "F001_MUTANT"
+        ],
+        "flagged": false
+      },
+      "witness": {
+        "exit": 1,
+        "caseLines": 2,
+        "failLines": 1,
+        "tail": "PASS purity: snapshot unchanged after parses | FAIL water by displayName -> 1 op"
+      },
+      "foreignFilesTouched": [],
+      "mechanismRecords": 2
+    },
+    {
+      "id": "F-B",
+      "requested": "F000_IDENTITY",
+      "served": "F000_IDENTITY",
+      "executed": "F000_IDENTITY",
+      "state": "VALID_INTERVENTION",
+      "expected": "VALID_INTERVENTION",
+      "match": true,
+      "scope": {
+        "executedScriptUrls": 97,
+        "coverageFiles": 1,
+        "legasusFilesExecuted": [
+          "F000_IDENTITY"
+        ],
+        "unauthorized": [],
+        "subjectAlsoExecuted": false
+      },
+      "multiplicity": {
+        "servedRecordsForSubject": 1,
+        "distinctMarkerIdentities": [
+          "F000_IDENTITY"
+        ],
+        "flagged": false
+      },
+      "witness": {
+        "exit": 0,
+        "caseLines": 104,
+        "failLines": 0,
+        "tail": " | ALL PASS — 104 passed, 0 failed"
+      },
+      "foreignFilesTouched": [],
+      "mechanismRecords": 2
+    },
+    {
+      "id": "F-C",
+      "requested": "F001_MUTANT",
+      "served": null,
+      "executed": null,
+      "state": "SUBSTITUTION_UNOBSERVED",
+      "expected": "SUBSTITUTION_UNOBSERVED",
+      "match": true,
+      "scope": {
+        "executedScriptUrls": 97,
+        "coverageFiles": 1,
+        "legasusFilesExecuted": [],
+        "unauthorized": [],
+        "subjectAlsoExecuted": true
+      },
+      "multiplicity": {
+        "servedRecordsForSubject": 0,
+        "distinctMarkerIdentities": [],
+        "flagged": false
+      },
+      "witness": {
+        "exit": 0,
+        "caseLines": 104,
+        "failLines": 0,
+        "tail": " | ALL PASS — 104 passed, 0 failed"
+      },
+      "foreignFilesTouched": [],
+      "mechanismRecords": 1
+    },
+    {
+      "id": "F-G",
+      "requested": null,
+      "served": null,
+      "executed": null,
+      "state": "SUBSTITUTION_UNOBSERVED",
+      "expected": "SUBSTITUTION_UNOBSERVED",
+      "match": true,
+      "scope": {
+        "executedScriptUrls": 95,
+        "coverageFiles": 1,
+        "legasusFilesExecuted": [],
+        "unauthorized": [],
+        "subjectAlsoExecuted": true
+      },
+      "multiplicity": {
+        "servedRecordsForSubject": 0,
+        "distinctMarkerIdentities": [],
+        "flagged": false
+      },
+      "witness": {
+        "exit": 0,
+        "caseLines": 104,
+        "failLines": 0,
+        "tail": " | ALL PASS — 104 passed, 0 failed"
+      },
+      "foreignFilesTouched": [],
+      "mechanismRecords": 0
+    }
+  ],
+  "verdict": {
+    "status": "TRANSFER_ESTABLISHED",
+    "reason": "the unchanged qualified mechanism produced every preregistered state on the foreign subject, and no foreign file was modified"
+  },
+  "R4": "UNESTABLISHED - the foreign codebase has no manifest, no test script and no VCS; the invocation used here (`node <witness>`, cwd = foreign root) is this probe's choice, not the codebase's statement. Substitution success does not establish it."
+}
