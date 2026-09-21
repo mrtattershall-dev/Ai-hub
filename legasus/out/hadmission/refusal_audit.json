@@ -1,0 +1,51 @@
+{
+  "site10": {
+    "counted": 494,
+    "witnesses": [
+      {
+        "root": "pt",
+        "file": "torch\\profiler\\_cuspy\\pm_sampling.py",
+        "line": 95,
+        "code": "frozenset()",
+        "equivalent_literal": "frozenset()",
+        "kind": "FALSE_SPLIT"
+      },
+      {
+        "root": "pt",
+        "file": "torch\\profiler\\_cuspy\\pm_sampling.py",
+        "line": 110,
+        "code": "frozenset()",
+        "equivalent_literal": "frozenset()",
+        "kind": "FALSE_SPLIT"
+      },
+      {
+        "root": "pt",
+        "file": ".github\\scripts\\trymerge.py",
+        "line": 1814,
+        "code": "frozenset()",
+        "equivalent_literal": "frozenset()",
+        "kind": "FALSE_SPLIT"
+      },
+      {
+        "root": "odysseus",
+        "file": "routes\\model_routes.py",
+        "line": 136,
+        "code": "set()",
+        "equivalent_literal": "set()",
+        "kind": "FALSE_SPLIT"
+      },
+      {
+        "root": "odysseus",
+        "file": "src\\endpoint_resolver.py",
+        "line": 85,
+        "code": "set()",
+        "equivalent_literal": "set()",
+        "kind": "FALSE_SPLIT"
+      }
+    ]
+  },
+  "site13": {
+    "false_merge": [],
+    "false_split": []
+  }
+}
