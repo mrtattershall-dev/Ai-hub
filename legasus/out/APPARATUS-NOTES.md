@@ -616,3 +616,25 @@ Map now: final identity NO; preserve all identities NO; uniformity NO; ancestry 
 candidates removed, none replaced, nothing named. Observation recorded and nothing more: every
 candidate so far decides membership from properties OF THE OBSERVATION, and the one thing A-1's
 evidence lacked - that the witness asked for the work - is not such a property.
+
+## 38. H-CAU and H-POST denied; K3 returned "none"
+
+Step 10. K0 held (both rules fire on the genuine case, so the test is not vacuous). K1: in C-A
+the worker ignores requests and loads on its own timer, the witness requests anyway, H-CAU says
+belongs - and the counterfactual C-A0 produces the SAME execution with no request. Succession
+after a request is not causation, shown by the counterfactual run rather than by describing the
+fixture. K2: H-POST includes an in-window execution with no request at all.
+
+K3 is the one that matters: NO recorded field distinguishes C-A's execution (request present,
+causally inert) from C-REQ's (request present, causally responsible). loaded identity, role,
+in-window, after-request, pid - all identical. Not repaired; adding a field now would
+manufacture the distinction from the fixtures that motivated it.
+
+The information that showed C-A's request inert exists only ACROSS the two runs, and a live
+intervention performs one run - it cannot also observe the world in which it did nothing. This
+was flagged in the prereg BEFORE the fixture was built so that seeing it could not be mistaken
+for discovering it. It is a finding about retrospective observation, not a licence to design
+candidate #6.
+
+Map: six candidates removed (last identity, all identities, uniformity, ancestry, request-then-
+execution, window containment). None replaced. Nothing named, at any point.

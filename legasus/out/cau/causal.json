@@ -1,0 +1,149 @@
+{
+  "at": "2026-09-21T02:46:49.344Z",
+  "node": "v24.15.0",
+  "hypotheses": "H-CAU and H-POST - evaluated, never adopted",
+  "results": [
+    {
+      "world": "C-REQ",
+      "why": "positive control: the worker acts ONLY when asked, and is asked",
+      "requestIssued": true,
+      "requestsRecorded": 1,
+      "window": {
+        "start": 1789958802868,
+        "end": 1789958804426
+      },
+      "workerExecutions": [
+        {
+          "at": 1789958803057,
+          "pid": 32456,
+          "loaded": "SUBJECT",
+          "hcau": {
+            "belongs": true,
+            "basis": "request at 1789958803013, execution at 1789958803057"
+          },
+          "hpost": {
+            "belongs": true,
+            "basis": "window 1789958802868..1789958804426, execution at 1789958803057"
+          }
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 2,
+        "distinctPids": 2,
+        "identities": [
+          "MUTANT",
+          "SUBJECT"
+        ]
+      },
+      "witness": {
+        "exit": 0
+      },
+      "workerStdout": "PASS worker executed (a request arrived, pid 32456)"
+    },
+    {
+      "world": "C-A",
+      "why": "request present, causal responsibility absent: the worker ignores requests",
+      "requestIssued": true,
+      "requestsRecorded": 1,
+      "window": {
+        "start": 1789958804840,
+        "end": 1789958806328
+      },
+      "workerExecutions": [
+        {
+          "at": 1789958805608,
+          "pid": 33312,
+          "loaded": "SUBJECT",
+          "hcau": {
+            "belongs": true,
+            "basis": "request at 1789958804899, execution at 1789958805608"
+          },
+          "hpost": {
+            "belongs": true,
+            "basis": "window 1789958804840..1789958806328, execution at 1789958805608"
+          }
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 2,
+        "distinctPids": 2,
+        "identities": [
+          "MUTANT",
+          "SUBJECT"
+        ]
+      },
+      "witness": {
+        "exit": 0
+      },
+      "workerStdout": "PASS worker executed (own timer, no request consulted, pid 33312)"
+    },
+    {
+      "world": "C-A0",
+      "why": "counterfactual for C-A, and H-POST's object: no request at all",
+      "requestIssued": false,
+      "requestsRecorded": 0,
+      "window": {
+        "start": 1789958806744,
+        "end": 1789958808261
+      },
+      "workerExecutions": [
+        {
+          "at": 1789958807539,
+          "pid": 29388,
+          "loaded": "SUBJECT",
+          "hcau": {
+            "belongs": false,
+            "basis": "no request recorded"
+          },
+          "hpost": {
+            "belongs": true,
+            "basis": "window 1789958806744..1789958808261, execution at 1789958807539"
+          }
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 2,
+        "distinctPids": 2,
+        "identities": [
+          "MUTANT",
+          "SUBJECT"
+        ]
+      },
+      "witness": {
+        "exit": 0
+      },
+      "workerStdout": "PASS worker executed (own timer, no request consulted, pid 29388)"
+    }
+  ],
+  "scoring": {
+    "K0": "HELD - both rules fire on the genuine case, so they are capable of saying belongs",
+    "K1": "CONFIRMED - H-CAU says belongs in C-A, and C-A0 shows the same execution occurring with NO request: succession after a request does not establish causation",
+    "K2": "CONFIRMED - H-POST says belongs for an execution inside the window with no request at all: temporal containment does not establish causation",
+    "K3": "NO recorded field distinguishes C-A's execution from C-REQ's - left as the finding, not repaired",
+    "verdict": "H-CAU and/or H-POST DENIED the status of a sufficient basis"
+  },
+  "processHygiene": {
+    "spawnedRecorded": 3,
+    "aliveAtSweep": 0,
+    "sweep": [
+      {
+        "world": "C-REQ",
+        "role": "worker",
+        "pid": 32456,
+        "aliveAtSweep": false
+      },
+      {
+        "world": "C-A",
+        "role": "worker",
+        "pid": 33312,
+        "aliveAtSweep": false
+      },
+      {
+        "world": "C-A0",
+        "role": "worker",
+        "pid": 29388,
+        "aliveAtSweep": false
+      }
+    ]
+  }
+}
