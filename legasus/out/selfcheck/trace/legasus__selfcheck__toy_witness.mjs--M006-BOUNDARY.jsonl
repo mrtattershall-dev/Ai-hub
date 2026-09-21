@@ -1,0 +1,6 @@
+{"phase":"ARMED","served":"file:///C:/Users/tatte/Projects/ai-coding-hub/legasus/out/selfcheck/mutants/M006-BOUNDARY.js"}
+{"ordinal":0,"outcome":"PASS","id":"big clamps","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":1,"outcome":"PASS","id":"small passes","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":2,"outcome":"PASS","id":"string is -1","fnCount":1,"siteCount":1,"scriptSeen":true}
+{"ordinal":3,"outcome":"PASS","id":"untouched","fnCount":0,"siteCount":0,"scriptSeen":true}
+{"ordinal":4,"outcome":"FAIL","id":"deliberately wrong","fnCount":1,"siteCount":1,"scriptSeen":true}

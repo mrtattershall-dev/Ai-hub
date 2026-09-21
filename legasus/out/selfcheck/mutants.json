@@ -1,0 +1,301 @@
+{
+  "subject": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js",
+  "fnName": "clamp",
+  "region": {
+    "fnStart": 179,
+    "fnEnd": 406
+  },
+  "families": {
+    "RETURN_EMPTY": {
+      "total": 1,
+      "valid": 1
+    },
+    "RETURN_UNDEFINED": {
+      "total": 1,
+      "valid": 1
+    },
+    "INVERT_COND": {
+      "total": 2,
+      "valid": 2
+    },
+    "DROP_BRANCH": {
+      "total": 3,
+      "valid": 3
+    },
+    "BOUNDARY": {
+      "total": 9,
+      "valid": 9
+    },
+    "DROP_EFFECT": {
+      "total": 2,
+      "valid": 2
+    },
+    "EXCEPTION": {
+      "total": 2,
+      "valid": 2
+    }
+  },
+  "notApplicable": [],
+  "mutants": [
+    {
+      "id": "M001-RETURN_EMPTY",
+      "family": "RETURN_EMPTY",
+      "describe": "body := return []",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M001-RETURN_EMPTY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 211,
+        "site": 198
+      }
+    },
+    {
+      "id": "M002-RETURN_UNDEFINED",
+      "family": "RETURN_UNDEFINED",
+      "describe": "body := return undefined",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M002-RETURN_UNDEFINED.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 218,
+        "site": 198
+      }
+    },
+    {
+      "id": "M003-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @220",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M003-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 409,
+        "site": 220
+      }
+    },
+    {
+      "id": "M004-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @230",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M004-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 389,
+        "site": 230
+      }
+    },
+    {
+      "id": "M005-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop else @255",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M005-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 377,
+        "site": 255
+      }
+    },
+    {
+      "id": "M006-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "> := >=",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M006-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 407,
+        "site": 224
+      }
+    },
+    {
+      "id": "M007-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "10 := 11",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M007-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 406,
+        "site": 226
+      }
+    },
+    {
+      "id": "M008-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "10 := 9",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M008-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 405,
+        "site": 226
+      }
+    },
+    {
+      "id": "M009-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "describe": "drop AssignmentExpression @236",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M009-DROP_EFFECT.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 398,
+        "site": 236
+      }
+    },
+    {
+      "id": "M010-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "10 := 11",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M010-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 406,
+        "site": 242
+      }
+    },
+    {
+      "id": "M011-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "10 := 9",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M011-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 405,
+        "site": 242
+      }
+    },
+    {
+      "id": "M012-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "describe": "drop AssignmentExpression @261",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M012-DROP_EFFECT.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 393,
+        "site": 261
+      }
+    },
+    {
+      "id": "M013-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := 1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M013-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 406,
+        "site": 273
+      }
+    },
+    {
+      "id": "M014-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := -1",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M014-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 407,
+        "site": 273
+      }
+    },
+    {
+      "id": "M015-EXCEPTION",
+      "family": "EXCEPTION",
+      "describe": "swallow catch @370",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M015-EXCEPTION.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 388,
+        "site": 370
+      }
+    },
+    {
+      "id": "M016-EXCEPTION",
+      "family": "EXCEPTION",
+      "describe": "propagate catch @370",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M016-EXCEPTION.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 398,
+        "site": 370
+      }
+    },
+    {
+      "id": "M017-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @296",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M017-INVERT_COND.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 409,
+        "site": 296
+      }
+    },
+    {
+      "id": "M018-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @319",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M018-DROP_BRANCH.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 372,
+        "site": 319
+      }
+    },
+    {
+      "id": "M019-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 2",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M019-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 406,
+        "site": 384
+      }
+    },
+    {
+      "id": "M020-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 0",
+      "file": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\out\\selfcheck\\mutants\\M020-BOUNDARY.js",
+      "valid": true,
+      "invalidReason": null,
+      "region": {
+        "fnStart": 179,
+        "fnEnd": 406,
+        "site": 384
+      }
+    }
+  ]
+}

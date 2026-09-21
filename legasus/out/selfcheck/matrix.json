@@ -1,0 +1,1936 @@
+{
+  "attempt": {
+    "status": "OBSERVED",
+    "load": {
+      "ok": true,
+      "ceiling": 40,
+      "worst": 10,
+      "breachedAt": [],
+      "unmeasured": [],
+      "calib": {
+        "referenceMs": 35,
+        "ratio": 3,
+        "limitMs": 105,
+        "worstMs": 41.7,
+        "overRatio": []
+      },
+      "why": "within every preregistered limit"
+    },
+    "sampler": "legasus/loadSample.mjs (stand-in)",
+    "calibBaselineMs": 35
+  },
+  "loadSamples": [
+    {
+      "at": "2026-09-20T19:00:10.798Z",
+      "where": "start",
+      "nodeProcs": 9,
+      "calibMs": 32.5,
+      "calibRunsMs": [
+        32.5,
+        35.5,
+        34.7,
+        33,
+        32.9
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:11.847Z",
+      "where": "M001-RETURN_EMPTY x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 35.7,
+      "calibRunsMs": [
+        35.7,
+        44.1,
+        62.5,
+        38.5,
+        35.8
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:12.734Z",
+      "where": "M002-RETURN_UNDEFINED x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 34.7,
+      "calibRunsMs": [
+        34.7,
+        35.8,
+        43.4,
+        38.5,
+        36.1
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:13.361Z",
+      "where": "M003-INVERT_COND x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 36.1,
+      "calibRunsMs": [
+        37.4,
+        36.1,
+        39.9,
+        38.1,
+        36.3
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:14.156Z",
+      "where": "M004-DROP_BRANCH x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 40.7,
+      "calibRunsMs": [
+        40.7,
+        50.4,
+        44.2,
+        55.8,
+        47.8
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:14.698Z",
+      "where": "M005-DROP_BRANCH x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 31.8,
+      "calibRunsMs": [
+        34.8,
+        34.4,
+        37.4,
+        31.8,
+        34.2
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:15.258Z",
+      "where": "M006-BOUNDARY x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 32.1,
+      "calibRunsMs": [
+        34.5,
+        35.7,
+        32.1,
+        32.6,
+        33.1
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:15.828Z",
+      "where": "M007-BOUNDARY x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 41.7,
+      "calibRunsMs": [
+        41.7,
+        43.1,
+        41.7,
+        45.7,
+        42.5
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:16.423Z",
+      "where": "M008-BOUNDARY x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 36.5,
+      "calibRunsMs": [
+        38.4,
+        41.3,
+        42.8,
+        36.5,
+        41.6
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:17.049Z",
+      "where": "M009-DROP_EFFECT x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 32.5,
+      "calibRunsMs": [
+        39.2,
+        32.5,
+        53.2,
+        42,
+        38.4
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:17.664Z",
+      "where": "M010-BOUNDARY x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 36.4,
+      "calibRunsMs": [
+        41.9,
+        45.2,
+        36.4,
+        41.6,
+        41.8
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:18.176Z",
+      "where": "M011-BOUNDARY x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 34.3,
+      "calibRunsMs": [
+        41.1,
+        34.5,
+        36.8,
+        34.3,
+        36
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:18.680Z",
+      "where": "M012-DROP_EFFECT x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 32.3,
+      "calibRunsMs": [
+        32.3,
+        34,
+        33.9,
+        35,
+        36.7
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:19.262Z",
+      "where": "M013-BOUNDARY x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 31.5,
+      "calibRunsMs": [
+        38.9,
+        43.5,
+        31.5,
+        34.9,
+        34.2
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:19.785Z",
+      "where": "M014-BOUNDARY x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 34.5,
+      "calibRunsMs": [
+        34.5,
+        37.5,
+        37.5,
+        37.8,
+        40.3
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:20.366Z",
+      "where": "M015-EXCEPTION x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 31.7,
+      "calibRunsMs": [
+        40.9,
+        33.1,
+        31.7,
+        36.5,
+        33.6
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:20.990Z",
+      "where": "M016-EXCEPTION x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 37.8,
+      "calibRunsMs": [
+        43.1,
+        38.8,
+        38.1,
+        37.8,
+        41.6
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:21.489Z",
+      "where": "M017-INVERT_COND x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 31.8,
+      "calibRunsMs": [
+        39.1,
+        42.9,
+        31.8,
+        40.3,
+        37.9
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:21.974Z",
+      "where": "M018-DROP_BRANCH x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 32.9,
+      "calibRunsMs": [
+        35.3,
+        32.9,
+        46,
+        32.9,
+        32.9
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:22.502Z",
+      "where": "M019-BOUNDARY x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 10,
+      "calibMs": 32.4,
+      "calibRunsMs": [
+        32.4,
+        41.7,
+        38.1,
+        39.6,
+        43
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:23.182Z",
+      "where": "M020-BOUNDARY x legasus/selfcheck/toy_witness.mjs",
+      "nodeProcs": 9,
+      "calibMs": 33.3,
+      "calibRunsMs": [
+        33.3,
+        44.6,
+        47.8,
+        51.4,
+        40
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    },
+    {
+      "at": "2026-09-20T19:00:23.914Z",
+      "where": "end",
+      "nodeProcs": 9,
+      "calibMs": 38.5,
+      "calibRunsMs": [
+        38.5,
+        48.7,
+        52.5,
+        44.9,
+        53.6
+      ],
+      "calibResult": 3255,
+      "source": "legasus/loadSample.mjs (stand-in)"
+    }
+  ],
+  "subject": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js",
+  "fnName": "clamp",
+  "witnesses": [
+    {
+      "file": "legasus/selfcheck/toy_witness.mjs",
+      "granularity": "case",
+      "baselineValidFile": true
+    }
+  ],
+  "unobservable": [],
+  "records": [
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "family": "RETURN_EMPTY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "family": "RETURN_EMPTY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "family": "RETURN_EMPTY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "family": "RETURN_EMPTY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "family": "RETURN_EMPTY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "family": "RETURN_UNDEFINED",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "family": "RETURN_UNDEFINED",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "family": "RETURN_UNDEFINED",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "family": "RETURN_UNDEFINED",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "family": "RETURN_UNDEFINED",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "family": "INVERT_COND",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "family": "INVERT_COND",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "family": "INVERT_COND",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "family": "INVERT_COND",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "family": "INVERT_COND",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "EXECUTED_NOT_DISCRIMINATED"
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "family": "EXCEPTION",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "family": "EXCEPTION",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "family": "EXCEPTION",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "family": "EXCEPTION",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "family": "EXCEPTION",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "family": "EXCEPTION",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "family": "EXCEPTION",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "family": "EXCEPTION",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "WITNESS_ERROR",
+      "executedSite": true,
+      "klass": "DISCRIMINATED_BY_ERROR",
+      "detail": "process died in the served subject while this case ran"
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "family": "EXCEPTION",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": null,
+      "executedSite": null,
+      "klass": "UNOBSERVABLE",
+      "detail": "process died before this case ran"
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "family": "EXCEPTION",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "family": "INVERT_COND",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "family": "INVERT_COND",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "family": "INVERT_COND",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "family": "INVERT_COND",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "family": "INVERT_COND",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": true,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "FAIL",
+      "executedSite": true,
+      "executedFn": true,
+      "klass": "DISCRIMINATED_BY_FAIL"
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "granularity": "case",
+      "baseline": "PASS",
+      "outcome": "PASS",
+      "executedSite": false,
+      "executedFn": false,
+      "klass": "NOT_EXECUTED"
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "family": "BOUNDARY",
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "granularity": "case",
+      "baseline": "FAIL",
+      "klass": "BASELINE_INVALID",
+      "detail": "baseline FAIL"
+    }
+  ],
+  "perMutant": [
+    {
+      "mutant": "M001-RETURN_EMPTY",
+      "family": "RETURN_EMPTY",
+      "describe": "body := return []",
+      "discriminated": 3,
+      "byFail": 3,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 1,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps",
+        "legasus/selfcheck/toy_witness.mjs :: small passes",
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ]
+    },
+    {
+      "mutant": "M002-RETURN_UNDEFINED",
+      "family": "RETURN_UNDEFINED",
+      "describe": "body := return undefined",
+      "discriminated": 3,
+      "byFail": 3,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 1,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps",
+        "legasus/selfcheck/toy_witness.mjs :: small passes",
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ]
+    },
+    {
+      "mutant": "M003-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @220",
+      "discriminated": 2,
+      "byFail": 2,
+      "byError": 0,
+      "executedNotDiscriminated": 1,
+      "notExecuted": 1,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps",
+        "legasus/selfcheck/toy_witness.mjs :: small passes"
+      ]
+    },
+    {
+      "mutant": "M004-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @230",
+      "discriminated": 1,
+      "byFail": 1,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 3,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps"
+      ]
+    },
+    {
+      "mutant": "M005-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop else @255",
+      "discriminated": 0,
+      "byFail": 0,
+      "byError": 0,
+      "executedNotDiscriminated": 3,
+      "notExecuted": 1,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": []
+    },
+    {
+      "mutant": "M006-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "> := >=",
+      "discriminated": 0,
+      "byFail": 0,
+      "byError": 0,
+      "executedNotDiscriminated": 3,
+      "notExecuted": 1,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": []
+    },
+    {
+      "mutant": "M007-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "10 := 11",
+      "discriminated": 0,
+      "byFail": 0,
+      "byError": 0,
+      "executedNotDiscriminated": 3,
+      "notExecuted": 1,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": []
+    },
+    {
+      "mutant": "M008-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "10 := 9",
+      "discriminated": 0,
+      "byFail": 0,
+      "byError": 0,
+      "executedNotDiscriminated": 3,
+      "notExecuted": 1,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": []
+    },
+    {
+      "mutant": "M009-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "describe": "drop AssignmentExpression @236",
+      "discriminated": 1,
+      "byFail": 1,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 3,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps"
+      ]
+    },
+    {
+      "mutant": "M010-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "10 := 11",
+      "discriminated": 1,
+      "byFail": 1,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 3,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps"
+      ]
+    },
+    {
+      "mutant": "M011-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "10 := 9",
+      "discriminated": 1,
+      "byFail": 1,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 3,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps"
+      ]
+    },
+    {
+      "mutant": "M012-DROP_EFFECT",
+      "family": "DROP_EFFECT",
+      "describe": "drop AssignmentExpression @261",
+      "discriminated": 0,
+      "byFail": 0,
+      "byError": 0,
+      "executedNotDiscriminated": 2,
+      "notExecuted": 2,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": []
+    },
+    {
+      "mutant": "M013-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := 1",
+      "discriminated": 1,
+      "byFail": 1,
+      "byError": 0,
+      "executedNotDiscriminated": 1,
+      "notExecuted": 2,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: small passes"
+      ]
+    },
+    {
+      "mutant": "M014-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "0 := -1",
+      "discriminated": 1,
+      "byFail": 1,
+      "byError": 0,
+      "executedNotDiscriminated": 1,
+      "notExecuted": 2,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: small passes"
+      ]
+    },
+    {
+      "mutant": "M015-EXCEPTION",
+      "family": "EXCEPTION",
+      "describe": "swallow catch @370",
+      "discriminated": 1,
+      "byFail": 1,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 3,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ]
+    },
+    {
+      "mutant": "M016-EXCEPTION",
+      "family": "EXCEPTION",
+      "describe": "propagate catch @370",
+      "discriminated": 1,
+      "byFail": 0,
+      "byError": 1,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 2,
+      "baselineInvalid": 1,
+      "unobservable": 1,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ]
+    },
+    {
+      "mutant": "M017-INVERT_COND",
+      "family": "INVERT_COND",
+      "describe": "invert test @296",
+      "discriminated": 3,
+      "byFail": 3,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 1,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps",
+        "legasus/selfcheck/toy_witness.mjs :: small passes",
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ]
+    },
+    {
+      "mutant": "M018-DROP_BRANCH",
+      "family": "DROP_BRANCH",
+      "describe": "drop consequent @319",
+      "discriminated": 1,
+      "byFail": 1,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 3,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ]
+    },
+    {
+      "mutant": "M019-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 2",
+      "discriminated": 1,
+      "byFail": 1,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 3,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ]
+    },
+    {
+      "mutant": "M020-BOUNDARY",
+      "family": "BOUNDARY",
+      "describe": "1 := 0",
+      "discriminated": 1,
+      "byFail": 1,
+      "byError": 0,
+      "executedNotDiscriminated": 0,
+      "notExecuted": 3,
+      "baselineInvalid": 1,
+      "unobservable": 0,
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ]
+    }
+  ],
+  "perWitness": [
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: big clamps",
+      "label": "DISCRIMINATES",
+      "validAgainst": "BIND-1 mutation family",
+      "discriminates": [
+        "M001-RETURN_EMPTY",
+        "M002-RETURN_UNDEFINED",
+        "M003-INVERT_COND",
+        "M004-DROP_BRANCH",
+        "M009-DROP_EFFECT",
+        "M010-BOUNDARY",
+        "M011-BOUNDARY",
+        "M017-INVERT_COND"
+      ],
+      "executedNotDiscriminated": 4,
+      "notExecuted": 8
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: small passes",
+      "label": "DISCRIMINATES",
+      "validAgainst": "BIND-1 mutation family",
+      "discriminates": [
+        "M001-RETURN_EMPTY",
+        "M002-RETURN_UNDEFINED",
+        "M003-INVERT_COND",
+        "M013-BOUNDARY",
+        "M014-BOUNDARY",
+        "M017-INVERT_COND"
+      ],
+      "executedNotDiscriminated": 5,
+      "notExecuted": 9
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: string is -1",
+      "label": "DISCRIMINATES",
+      "validAgainst": "BIND-1 mutation family",
+      "discriminates": [
+        "M001-RETURN_EMPTY",
+        "M002-RETURN_UNDEFINED",
+        "M015-EXCEPTION",
+        "M016-EXCEPTION",
+        "M017-INVERT_COND",
+        "M018-DROP_BRANCH",
+        "M019-BOUNDARY",
+        "M020-BOUNDARY"
+      ],
+      "executedNotDiscriminated": 8,
+      "notExecuted": 4
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: untouched",
+      "label": "NOT_EXECUTED",
+      "validAgainst": "BIND-1 mutation family",
+      "discriminates": [],
+      "executedNotDiscriminated": 0,
+      "notExecuted": 19
+    },
+    {
+      "witness": "legasus/selfcheck/toy_witness.mjs :: deliberately wrong",
+      "label": "BASELINE_INVALID",
+      "validAgainst": "BIND-1 mutation family",
+      "discriminates": [],
+      "executedNotDiscriminated": 0,
+      "notExecuted": 0
+    }
+  ],
+  "candidates": [
+    {
+      "D": "D1",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M001-RETURN_EMPTY: body := return []",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps",
+        "legasus/selfcheck/toy_witness.mjs :: small passes",
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D2",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M002-RETURN_UNDEFINED: body := return undefined",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps",
+        "legasus/selfcheck/toy_witness.mjs :: small passes",
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D3",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M003-INVERT_COND: invert test @220",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps",
+        "legasus/selfcheck/toy_witness.mjs :: small passes"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D4",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M004-DROP_BRANCH: drop consequent @230",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D5",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M009-DROP_EFFECT: drop AssignmentExpression @236",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D6",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M010-BOUNDARY: 10 := 11",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D7",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M011-BOUNDARY: 10 := 9",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D8",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M013-BOUNDARY: 0 := 1",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: small passes"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D9",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M014-BOUNDARY: 0 := -1",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: small passes"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D10",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M015-EXCEPTION: swallow catch @370",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D11",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M016-EXCEPTION: propagate catch @370",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D12",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M017-INVERT_COND: invert test @296",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: big clamps",
+        "legasus/selfcheck/toy_witness.mjs :: small passes",
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D13",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M018-DROP_BRANCH: drop consequent @319",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D14",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M019-BOUNDARY: 1 := 2",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    },
+    {
+      "D": "D15",
+      "region": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\selfcheck\\toy.js :: clamp",
+      "perturbation": "M020-BOUNDARY: 1 := 0",
+      "discriminators": [
+        "legasus/selfcheck/toy_witness.mjs :: string is -1"
+      ],
+      "provenance": "BIND-1, generic family, no semantics assumed"
+    }
+  ]
+}

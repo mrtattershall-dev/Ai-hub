@@ -73,3 +73,6 @@ server/variance-index.jsonl
 server/yolo-index.jsonl
 server/agent-queue.json.prerestart
 server/cycle1-mixed-index.jsonl
+# BIND-1 V8 coverage dumps (112MB, per-run, kept on disk; discover.json/matrix.json/trace are the tracked evidence)
+legasus/out/**/cov/
+legasus/out/**/cov-bind/

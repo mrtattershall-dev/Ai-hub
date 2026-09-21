@@ -1,0 +1,2 @@
+{ "subject": "SELFCHECK", "fnName": "clamp", "note": "hand-written for the instrument self-check; the real DISCOVER is not bypassed for real subjects",
+  "results": [ { "file": "legasus/selfcheck/toy_witness.mjs", "status": "EXECUTED", "ms": 300, "exitCode": 0, "baselineValid": true, "perCaseLines": 5 } ] }
