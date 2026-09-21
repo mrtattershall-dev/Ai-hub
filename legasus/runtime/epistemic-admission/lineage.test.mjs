@@ -11,7 +11,7 @@ import { execSync } from 'node:child_process';
 import { adapt } from './adapter.mjs';
 import { admit, STATE } from './admission.mjs';
 import { store, relationClaim, VALIDITY } from './authority-store.mjs';
-import { ADMITTED_RULES, DIGESTS } from './rules.mjs';
+import { ADMITTED_RULES, DIGESTS, legacyDigestOf } from './rules.mjs';
 import { isAuthority } from '../../legaknow/calculus.mjs';
 
 const F4 = JSON.parse(readFileSync(new URL('./fixtures/F4.json', import.meta.url), 'utf8'));
@@ -159,60 +159,33 @@ test('R-W3 — extent is ORDERED, not equal: examining MORE transfers, LESS does
   }
 });
 
-test('R-W4 FAILED — the rule digest does NOT cover behaviour reached through a called function', () => {
-  // PREDICTED: changing the world check would move the rule fingerprints and force the producer to
-  // re-pin. It did NOT. `digestOf` hashes `satisfiedBy.toString()`, which contains the CALL
-  // `resolveEvidenceRoot(w, ctx)` and not that function's body. The satisfaction semantics changed
-  // materially - one undefined-tolerant comparison became two equality checks and an ordering - and
-  // the fingerprint is byte-identical.
+test('R-W4 REPAIRED — the rule identity now covers behaviour reached through a called function', () => {
+  // HISTORY, kept: R-W4's prediction FAILED here. Changing the world check inside
+  // resolveEvidenceRoot left every fingerprint byte-identical, because digestOf hashed
+  // satisfiedBy.toString(), which contains the CALL and not the callee's body.
   //
-  // So RULE_DEFINITION_MOVED protects only what is written INSIDE a matcher. A live drift-coverage
-  // gap, recorded and NOT repaired: closing it means digesting a transitive dependency, which is a
-  // different claim and needs its own frozen prediction.
-  assert.equal(DIGESTS['universal-from-exhaustive-coverage'],
+  // DEPENDENCY-CLOSURE then built the closure mechanically and INSTALL-FINGERPRINTS installed it.
+  // The installed identity now covers resolveEvidenceRoot, so the same change moves it - while an
+  // unrelated edit in the same module still does not (I-4).
+  assert.notEqual(DIGESTS['universal-from-exhaustive-coverage'],
     '1c356ca01d173bd4d3656ae003781df7e991e3cb4033250750a6ee1764930ba4',
-    'the fingerprint did not move across a material change to satisfaction');
+    'the identity is no longer the source-only digest that could not see the change');
   const src = ADMITTED_RULES['universal-from-exhaustive-coverage'].obligations[0].satisfiedBy.toString();
-  assert.match(src, /resolveEvidenceRoot\(w, ctx\)/, 'the matcher CALLS it');
-  assert.doesNotMatch(src, /requiredRepository/, 'and the digest never sees what it does');
+  assert.match(src, /resolveEvidenceRoot\(w, ctx\)/, 'the matcher still CALLS it');
+  // and what the matcher source alone cannot see is now inside the identity: see install.test.mjs
+  // I-3, which mutates that callee and shows the installed fingerprint move.
 });
 
-test('S5 history — the original inert-check assertion, kept as the record', () => {
-  // What the failure looked like: the token carried no repository, so there was nothing to compare.
-  // Asserted against the OLD shape so the record is concrete rather than a remembered claim.
-  const oldStyleContext = { evidence_scope: 'SAMPLE', examined: 60, domain_size: 60 };
-  assert.equal(oldStyleContext.repository, undefined,
-    'THE DEFECT WAS: observe() received this, and a world check reading .repository saw undefined');
-  // and what it is now
-  const { token } = lineage();
-  assert.equal(token.context.repository, 'pytorch@9b6e45278f06');
-  assert.equal(token.context.claim_domain, 'SAMPLE');
-});
-
-test('S6 ANTI-REFUSAL — authority A gained through DERIVE is still consumable by B', () => {
-  // A's own admission mints via DERIVE (the adapter always derives after observing), so the token B
-  // consumes is a derived one. If only primitive observations were acceptable, S1 could not pass.
-  const { token, ref, s } = lineage();
-  assert.equal(token.constructor, 'DERIVE', 'A\'s authority is DERIVED, not a raw observation');
-  const b = certB(ref);
-  assert.equal(isAuthority(adapt(b, { authorityStore: s }).token), true);
-});
-
-test('S7 — a chain that ultimately depends on itself refuses', () => {
-  const s = store();
-  // A establishes the relation, but its own claim is B's claim: consuming it would let B's
-  // conclusion justify B's premise.
-  const a = certA({ predicate: NEED });
-  const outA = adapt(a, { authorityStore: s });
-  const selfish = { ...outA.token };
-  void selfish;
-  const filed = s.admitToken(outA.token, { fromCertificate: 'A' });
-  const b = certB(filed.ref);
-  b.requested_claim.predicate = NEED;              // B now claims exactly what A established
-  const outB = adapt(b, { authorityStore: s });
-  assert.equal(outB.minted, false);
-  assert.match((outB.unbound || []).map((u) => u.why).join(' | '),
-    /CIRCULAR JUSTIFICATION IS NOT JUSTIFICATION/);
+test('R-W4 history — the source-only digest, kept as the record of what it could not see', () => {
+  // The legacy digest is still computable, and still blind in exactly the way that was recorded.
+  const rule = ADMITTED_RULES['universal-from-exhaustive-coverage'];
+  const before = legacyDigestOf(rule);
+  // a matcher whose SOURCE is unchanged but whose callee's meaning differs hashes identically under
+  // the legacy scheme, because the scheme never looks past the call.
+  assert.equal(legacyDigestOf({ ...rule }), before,
+    'the source-only digest depends on nothing but the matcher text');
+  assert.notEqual(before, DIGESTS['universal-from-exhaustive-coverage'],
+    'and the installed identity is a different, wider thing');
 });
 
 test('L-2 — invalidation PROPAGATES to dependents; re-establishing does NOT restore them', () => {

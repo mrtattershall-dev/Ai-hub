@@ -16,7 +16,9 @@
 // before derive() is called: a candidate that fails its matcher is not forwarded, and the calculus
 // refuses on a missing witness on its own terms. legaknow is not modified to accommodate this.
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { resolveEvidenceRoot } from './authority-store.mjs';
+import { fingerprintOf } from './fingerprint.mjs';
 
 export const RULE_MOVED = 'RULE_DEFINITION_MOVED';
 
@@ -76,11 +78,25 @@ export const ADMITTED_RULES = Object.freeze({
   'claim-from-direct-observation': define('claim-from-direct-observation', [], '2'),
 });
 
-// THE DIGEST COVERS MEANING, INCLUDING THE MATCHER. A matcher is part of what the rule means, so a
-// runtime whose matcher moved must refuse a certificate pinned to the old definition. Digesting only
-// {name, requires, version} would let the satisfaction condition change silently underneath a
-// certificate that still validated - the drift this project already refuses at every other boundary.
-export const digestOf = (r) => createHash('sha256').update(JSON.stringify({
+// THE DIGEST COVERS MEANING, INCLUDING THE MATCHER'S SEMANTIC DEPENDENCY CLOSURE.
+//
+// The first version hashed `satisfiedBy.toString()` only. R-W4 proved that insufficient: the world
+// check moved from one tolerant comparison to two equality checks and an ordering, entirely inside
+// `resolveEvidenceRoot`, and the fingerprints were byte-identical. A matcher MEANS its own source
+// plus the behaviour of what it calls, so the closure is what gets hashed - derived mechanically,
+// never from a declared dependency list, which would mean "the rule means whatever the author
+// remembered".
+//
+// The kernel is inside the closure. What `isAuthority` means is part of what these rules mean, and
+// treating legaknow as unexaminable ground would be admitted ground that can change silently.
+const MODULE_SOURCES = ['rules.mjs', 'authority-store.mjs']
+  .map((f) => ({ path: f, source: readFileSync(new URL('./' + f, import.meta.url), 'utf8') }))
+  .concat(['calculus.mjs', 'observation.mjs']
+    .map((f) => ({ path: 'legaknow/' + f,
+      source: readFileSync(new URL('../../legaknow/' + f, import.meta.url), 'utf8') })));
+
+// The legacy digest, kept ONLY so the migration can be shown to be a migration.
+export const legacyDigestOf = (r) => createHash('sha256').update(JSON.stringify({
   name: r.name,
   version: r.version,
   obligations: [...r.obligations]
@@ -88,8 +104,19 @@ export const digestOf = (r) => createHash('sha256').update(JSON.stringify({
     .sort((a, b) => a.relation.localeCompare(b.relation)),
 })).digest('hex');
 
+export const digestOf = (r) => {
+  const f = fingerprintOf(r, MODULE_SOURCES);
+  return f.ok ? f.digest : null;            // null: this rule HAS no identity and cannot be pinned
+};
+
+export const UNPINNABLE = Object.freeze(Object.fromEntries(
+  Object.entries(ADMITTED_RULES)
+    .map(([id, r]) => [id, fingerprintOf(r, MODULE_SOURCES)])
+    .filter(([, f]) => !f.ok)
+    .map(([id, f]) => [id, f.why])));
+
 export const DIGESTS = Object.freeze(Object.fromEntries(
-  Object.entries(ADMITTED_RULES).map(([id, r]) => [id, digestOf(r)])));
+  Object.entries(ADMITTED_RULES).map(([id, r]) => [id, digestOf(r)]).filter(([, d]) => d !== null)));
 
 // Resolve a certificate's rule IDENTITY to the runtime's definition. Never a rule assembled from
 // certificate data.
@@ -98,6 +125,12 @@ export function resolveRule({ rule_id, rule_digest }) {
   if (!local) {
     return { ok: false, why: 'rule_id "' + rule_id + '" is not an admitted rule of this runtime.'
       + ' A rule the consumer does not recognise is one whose obligations it cannot enforce.' };
+  }
+  // I-5: a rule whose semantic closure cannot be resolved HAS no identity, so it cannot be pinned
+  // and must not fall back to any other one.
+  if (UNPINNABLE[rule_id]) {
+    return { ok: false, why: 'rule "' + rule_id + '" has no resolvable identity: '
+      + UNPINNABLE[rule_id] + '. A rule that cannot be pinned cannot be relied on.' };
   }
   const here = DIGESTS[rule_id];
   if (rule_digest !== here) {
