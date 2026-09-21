@@ -18,9 +18,12 @@ import * as DD from './derivation-derive.mjs';
 import * as OC from './obligation-covers.mjs';
 import * as LN from './licensed-narrowing.mjs';
 
-const load = (n) => JSON.parse(readFileSync(new URL('./fixtures/' + n + '.json', import.meta.url), 'utf8'));
+const load = (dir, n) => JSON.parse(readFileSync(new URL('./' + dir + '/' + n + '.json', import.meta.url), 'utf8'));
 const NAMES = ['F1', 'F2', 'F3', 'F3p', 'F4', 'F5'];
-const CERTS = Object.fromEntries(NAMES.map((n) => [n, load(n)]));
+const CERTS = Object.fromEntries(NAMES.map((n) => [n, load('fixtures', n)]));
+// v1.1 adds observation.attribution. NO BRIDGE FILE IS EDITED for it: the existing domain
+// predicates decide for themselves whether the correspondence is now earned.
+const CERTS11 = Object.fromEntries(NAMES.map((n) => [n, load('fixtures-v1.1', n)]));
 
 const SPEC = {
   calculus: digestOf(new URL('../../legaknow/calculus.mjs', import.meta.url)),
@@ -78,17 +81,28 @@ function evaluate(name, cert) {
   return { wide: wide.comparison, restricted: r.comparison, why: r.why };
 }
 
-const MATRIX = {};
-for (const name of Object.keys(BRIDGES)) {
-  MATRIX[name] = {};
-  for (const n of NAMES) MATRIX[name][n] = evaluate(name, CERTS[n]);
-}
+const matrixOver = (certs) => {
+  const m = {};
+  for (const name of Object.keys(BRIDGES)) {
+    m[name] = {};
+    for (const n of NAMES) m[name][n] = evaluate(name, certs[n]);
+  }
+  return m;
+};
+const MATRIX = matrixOver(CERTS);
+const MATRIX11 = matrixOver(CERTS11);
 
-test('the matrix, printed so the record carries it', () => {
-  console.log('\n' + 'bridge \\ cert'.padEnd(22) + ' ' + NAMES.map((n) => n.padEnd(15)).join(''));
-  for (const [name, row] of Object.entries(MATRIX)) {
+const printMatrix = (label, m) => {
+  console.log('\n' + label);
+  console.log('bridge \\ cert'.padEnd(22) + ' ' + NAMES.map((n) => n.padEnd(15)).join(''));
+  for (const [name, row] of Object.entries(m)) {
     console.log(name.padEnd(22) + ' ' + NAMES.map((n) => row[n].restricted.padEnd(15)).join(''));
   }
+};
+
+test('the matrices, printed so the record carries them', () => {
+  printMatrix('contract v1.0.0 (steps 3-4, historical)', MATRIX);
+  printMatrix('contract v1.1.0 (attribution added)', MATRIX11);
   console.log();
 });
 
@@ -193,6 +207,60 @@ test('endpoint drift — either digest moving makes every bridge UNKNOWN, unable
         specification: { result: 'PERMITTED', reasonClass: 'x' } });
       assert.equal(r.comparison, COMPARISON.UNKNOWN, name + ' ' + side);
       assert.equal(r.stale, side);
+    }
+  }
+});
+
+// ---------------------------------------------------------------------------------------------------
+// CONTRACT v1.1. The predictions below were frozen in legasus/contracts/V1.1_PREREG.md before the
+// emitter was changed, and NO BRIDGE FILE WAS EDITED to accommodate them.
+
+test('V-3 — the v1.0 row is UNCHANGED: history does not move when a new contract appears', () => {
+  for (const n of NAMES) {
+    assert.equal(MATRIX['measurement-observe'][n].restricted, 'UNMAPPABLE', n);
+    assert.match(MATRIX['measurement-observe'][n].gap, /attribution/, n);
+  }
+});
+
+test('V-4 — on v1.1 the measurement domain opens WITHOUT a bridge edit, and both sides AGREE', () => {
+  const row = MATRIX11['measurement-observe'];
+  for (const n of NAMES) {
+    assert.notEqual(row[n].restricted, 'UNMAPPABLE', n + ' should no longer be a vocabulary gap');
+    assert.notEqual(row[n].restricted, 'OUT_OF_DOMAIN', n + ' should be inside the restricted domain');
+    assert.equal(row[n].restricted, COMPARISON.AGREE, n + ': ' + (row[n].why || ''));
+  }
+  // and the mint is real: F4 carries force and full provenance, so observe() actually mints
+  const tok = MO.toSpecification(C, Obs, CERTS11.F4);
+  assert.equal(tok.minted, undefined, 'a minted token is not a refusal object');
+  assert.equal(C.isAuthority(tok), true, 'observe() minted a real authority token from v1.1 provenance');
+  assert.equal(tok.kind, C.KIND.EPISTEMIC, 'and it is EPISTEMIC - evidence never originates permission');
+  assert.deepEqual(tok.grant, [], 'an epistemic token carries no grant');
+});
+
+test('V-5 — attribution:null is a REAL disagreement, not a vocabulary gap', () => {
+  // Once the contract can EXPRESS attribution, its absence stops being a gap. The M gate asks about
+  // instrument CAPABILITY and never checks provenance completeness; observe() refuses on
+  // PROVENANCE_INCOMPLETE. Predicted RESULT_DISAGREEMENT before running.
+  const nulled = structuredClone(CERTS11.F4);
+  nulled.measurement.observation.attribution = null;
+  // unrepresentable() takes the MEASUREMENT object, not the certificate - the first version of this
+  // line passed the whole certificate and got "carries no observation object", a test-harness bug.
+  assert.equal(MO.unrepresentable(nulled.measurement), null,
+    'null is representable; only ABSENT was the gap');
+  const r = evaluate('measurement-observe', nulled);
+  console.log('   V-5 attribution:null ->', r.restricted, '-', (r.why || '').slice(0, 95));
+  assert.equal(r.restricted, COMPARISON.RESULT_DISAGREEMENT,
+    'the M gate does not check provenance completeness and observe() does');
+  const tok = MO.toSpecification(C, Obs, nulled);
+  assert.equal(tok.minted, false);
+  assert.equal(tok.reason, 'PROVENANCE_INCOMPLETE');
+});
+
+test('V-6 — attribution touches measurement ONLY; every other row is identical on v1.1', () => {
+  for (const name of ['derivation-derive', 'obligation-covers', 'licensed-narrowing']) {
+    for (const n of NAMES) {
+      assert.equal(MATRIX11[name][n].restricted, MATRIX[name][n].restricted,
+        name + '/' + n + ' moved when only attribution changed');
     }
   }
 });
