@@ -1,0 +1,90 @@
+[
+  {
+    "case": "F2 REACH-1 get_path",
+    "relation": "COVERAGE",
+    "subject": "F2:derivation0:premise0",
+    "object": "FUNCTION_PARAMETER",
+    "domain": "FUNCTION_PARAMETER",
+    "repository": "pytorch@9b6e45278f06",
+    "recorded_by": "obligation.coverage[FUNCTION_PARAMETER] == EXHAUSTIVE",
+    "missing": []
+  },
+  {
+    "case": "F2 REACH-1 get_path",
+    "relation": "MEMBERSHIP",
+    "subject": "F2:derivation0:premise0",
+    "object": "FUNCTION_PARAMETER",
+    "domain": "FUNCTION_PARAMETER",
+    "repository": "pytorch@9b6e45278f06",
+    "recorded_by": "extent.observed[].membership_established_in",
+    "missing": []
+  },
+  {
+    "case": "F3 SCREEN-1 as stated",
+    "relation": "COVERAGE",
+    "subject": "F3:derivation0:premise0",
+    "object": "THIS_RUN",
+    "domain": "THIS_RUN",
+    "repository": "odysseus@local",
+    "recorded_by": "obligation.coverage[THIS_RUN] == EXHAUSTIVE",
+    "missing": [
+      "an observation carrying evidential force"
+    ]
+  },
+  {
+    "case": "F3 SCREEN-1 as stated",
+    "relation": "MEMBERSHIP",
+    "subject": "F3:derivation0:premise0",
+    "object": "THIS_RUN",
+    "domain": "THIS_RUN",
+    "repository": "odysseus@local",
+    "recorded_by": "extent.observed[].membership_established_in",
+    "missing": [
+      "an observation carrying evidential force"
+    ]
+  },
+  {
+    "case": "F4 REACH-1 R2",
+    "relation": "COVERAGE",
+    "subject": "F4:derivation0:premise0",
+    "object": "SAMPLE",
+    "domain": "SAMPLE",
+    "repository": "pytorch@9b6e45278f06",
+    "recorded_by": "obligation.coverage[SAMPLE] == EXHAUSTIVE",
+    "missing": []
+  },
+  {
+    "case": "F4 REACH-1 R2",
+    "relation": "MEMBERSHIP",
+    "subject": "F4:derivation0:premise0",
+    "object": "SAMPLE",
+    "domain": "SAMPLE",
+    "repository": "pytorch@9b6e45278f06",
+    "recorded_by": "extent.observed[].membership_established_in",
+    "missing": []
+  },
+  {
+    "case": "F5 richness run",
+    "relation": "COVERAGE",
+    "subject": "F5:derivation0:premise0",
+    "object": "SAMPLE",
+    "domain": "SAMPLE",
+    "repository": "mpt@919170b05831",
+    "recorded_by": "obligation.coverage[SAMPLE] == EXHAUSTIVE",
+    "missing": [
+      "an observation carrying evidential force"
+    ]
+  },
+  {
+    "case": "F5 richness run",
+    "relation": "MEMBERSHIP",
+    "subject": "F5:derivation0:premise0",
+    "object": "SAMPLE",
+    "domain": "SAMPLE",
+    "repository": "mpt@919170b05831",
+    "recorded_by": "extent.observed[].membership_established_in",
+    "missing": [
+      "an observation carrying evidential force"
+    ]
+  }
+]

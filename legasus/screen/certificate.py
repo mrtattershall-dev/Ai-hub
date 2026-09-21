@@ -3,12 +3,13 @@
 Data only. There is no authority field to set, and the schema fails if one
 appears. This module exercises the contract; it is not a consumer of it.
 """
-import datetime, hashlib, json, sys
+import dataclasses, datetime, hashlib, json, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import obligation as O
 from shadow_substitution import new_attempt, to_new, KNOWN_DOMAINS, dom
+from entitlement import Claim
 
 HERE = Path(__file__).parent
 CONTRACT_V10 = "1.0.0-frozen-2026-09-21"
@@ -150,6 +151,36 @@ def derivation_block(d, alternatives, requested2, version):
         block["rule_id"] = rule_id
         block["rule_digest"] = prints[rule_id]
     return block
+
+
+def emit_relation(fact, ev, run_id, evidence_refs, attribution):
+    """Emit an ORDINARY certificate whose claim is a relation the producer ALREADY recorded.
+
+    No new evidence: the SAME evidence record the ordinary case carries, with a different
+    proposition drawn from it. No `relation_established` field exists and none may be added - the
+    producer reports facts and requests a claim, and the normal admission path decides whether the
+    relation is established.
+
+    The fact comes from `natural_selection.relation_facts`, which reads the obligation and extent
+    record and invents nothing.
+    """
+    predicate = "%s(%s, %s)" % (fact["relation"], fact["subject"], fact["object"])
+    claim = Claim(form="RELATION", predicate=predicate, scope=fact["domain"], run=run_id)
+
+    # THE RELATION RESTS ON THE OBSERVATION, NOT ON THE CASE'S INFERENCE.
+    #
+    # The first version of this function reused the case's evidence record WHOLE, which handed the
+    # relation claim F2's supporting derivation - the undecidable premise at census site #7. But the
+    # relation does not depend on that inference: coverage was directly enumerated, while the
+    # derivation that fails is about reachability. Attributing an unrelated open premise to a claim
+    # that does not rest on it is the wrong-referent error this branch keeps finding.
+    #
+    # This is ATTRIBUTION, not fabrication. The observation already exists and already carries
+    # evidential force - that is precisely why the fact qualified under the frozen selection rule.
+    # Nothing is added; the premise is pointed at the evidence the claim actually rests on.
+    rel_ev = dataclasses.replace(ev, supporting_derivations=[
+        dict(premises_decidable=True, premises_settled=bool(ev.positive_control_fired))])
+    return emit(claim, rel_ev, run_id, evidence_refs, version=CONTRACT_V14, attribution=attribution)
 
 
 def emit(claim, ev, run_id, evidence_refs, version=CONTRACT_V10, attribution=None):

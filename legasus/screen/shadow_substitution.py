@@ -14,7 +14,11 @@ from shadow_wiring import degradation_chain, SETTLED, OPEN
 
 QMAP = {"ABSENCE": O.NONE, "UNIVERSAL": O.FOR_ALL, "EXISTENTIAL": O.EXISTS,
         "OBSERVATIONAL_NEGATIVE": O.EXISTS, "OBSERVATIONAL": O.POINTWISE,
-        "DISTINCTION": O.POINTWISE, "IDENTITY": O.POINTWISE}
+        "DISTINCTION": O.POINTWISE, "IDENTITY": O.POINTWISE,
+        # A RELATION claim is pointwise: it asserts that one relation holds between named endpoints,
+        # not that anything holds over a population. The producer may REQUEST one; whether it is
+        # established is decided by the same obligation machinery as any other claim.
+        "RELATION": O.POINTWISE}
 
 # domain containment, declared once: everything the branch reasons over sits in a repository
 CONTAINMENT = {"FUNCTION": ("MODULE", "PROGRAM", "REPOSITORY"),

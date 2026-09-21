@@ -1,0 +1,112 @@
+{
+  "contract_version": "1.4.0-frozen-2026-09-21",
+  "requested_claim": {
+    "domain": {
+      "name": "FUNCTION_PARAMETER",
+      "contained_in": [
+        "FUNCTION",
+        "MODULE",
+        "PROGRAM",
+        "REPOSITORY"
+      ]
+    },
+    "quantifier": "POINTWISE",
+    "predicate": "COVERAGE(F2:derivation0:premise0, FUNCTION_PARAMETER)"
+  },
+  "licensed_claim": {
+    "domain": {
+      "name": "FUNCTION_PARAMETER",
+      "contained_in": [
+        "FUNCTION",
+        "MODULE",
+        "PROGRAM",
+        "REPOSITORY"
+      ]
+    },
+    "quantifier": "POINTWISE",
+    "predicate": "COVERAGE(F2:derivation0:premise0, FUNCTION_PARAMETER)"
+  },
+  "licensed_relation": "EQUIVALENT",
+  "collateral_observations": [],
+  "frontier": [],
+  "obligation": {
+    "passed": true,
+    "unmet": [],
+    "coverage": {
+      "FUNCTION_PARAMETER": "EXHAUSTIVE"
+    }
+  },
+  "derivation": {
+    "passed": true,
+    "alternatives": [
+      {
+        "premises": [
+          {
+            "ref": "F2-REL:derivation0:premise0",
+            "decidable_at_site": true,
+            "settled": true
+          }
+        ],
+        "relation_witnesses": [
+          {
+            "relation": "COVERAGE",
+            "subject": "F2-REL:derivation0:premise0",
+            "object": "FUNCTION_PARAMETER",
+            "domain": "FUNCTION_PARAMETER",
+            "evidence_root": "F2-REL:obligation:coverage[FUNCTION_PARAMETER]",
+            "provenance": "legasus/screen/obligation.py compile_obligation()"
+          },
+          {
+            "relation": "MEMBERSHIP",
+            "subject": "F2-REL:derivation0:premise0",
+            "object": "FUNCTION_PARAMETER",
+            "domain": "FUNCTION_PARAMETER",
+            "evidence_root": "F2-REL:observation",
+            "provenance": "legasus/screen/obligation.py compile_obligation()"
+          }
+        ],
+        "closed": true
+      }
+    ],
+    "open_frontier": null,
+    "rule_id": "claim-from-direct-observation",
+    "rule_digest": "eaedaf843c76e495aa215ff6c355f4efc3a4a03460435e4d6978bed56bb53f5d"
+  },
+  "measurement": {
+    "capability_demonstrated": true,
+    "positive_control": {
+      "fired": true,
+      "ref": "F2-REL:positive_control"
+    },
+    "observation": {
+      "ref": "F2-REL:observation",
+      "evidential_force": true,
+      "procedure": "reach1 tracer over FUNCTION_PARAMETER",
+      "context": {
+        "evidence_scope": "FUNCTION_PARAMETER",
+        "examined": 1,
+        "domain_size": 1,
+        "repository": "pytorch@9b6e45278f06"
+      },
+      "attribution": "natural_selection.relation_facts['F2 REACH-1 get_path'] -> COVERAGE recorded by obligation.coverage[FUNCTION_PARAMETER] == EXHAUSTIVE"
+    },
+    "instrument": {
+      "name": "reach1 tracer",
+      "version_digest": "df3172fe7c4e8398925c1222b32cb2e71c853b10be326d23c31ff76fdfad194a"
+    }
+  },
+  "run_floor": {
+    "instrument": "reach1 tracer",
+    "emitted_ref": "F2-REL:emitted",
+    "run_id": "F2-REL"
+  },
+  "provenance": {
+    "producer": "legasus/screen/obligation.py",
+    "producer_digest": "b228113d57ba907b5ed9e7916372f9dc4388b85cd2522b2d0e6140d6c96ce5c6",
+    "evidence_refs": [
+      "out/natural_selection.json"
+    ],
+    "run_id": "F2-REL",
+    "emitted_at": "2026-09-21T16:58:57Z"
+  }
+}
