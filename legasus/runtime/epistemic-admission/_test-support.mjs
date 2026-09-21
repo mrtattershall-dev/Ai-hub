@@ -17,16 +17,22 @@ export function relationTokenFor(w) {
     procedure: 'establish ' + w.relation, context: { repository: w.domain } });
 }
 
-// A store holding authority for every witness the certificate offers, under its own evidence_root.
+// A store holding authority for every witness the certificate offers, and the certificate REWRITTEN
+// to carry the handles the store issued. Handles are opaque: the producer names one, it does not
+// choose what it resolves to.
 export function storeFor(cert) {
   const s = store();
   for (const alt of cert.derivation.alternatives || []) {
     for (const w of alt.relation_witnesses || []) {
       if (!w.evidence_root) continue;
-      s.put(w.evidence_root, relationTokenFor(w));
+      const r = s.admitToken(relationTokenFor(w), { note: 'test support: prior admission stand-in' });
+      w.evidence_root = r.ref;                    // the certificate now references a real handle
     }
   }
   return s;
 }
 
+// NOTE: this MUTATES the certificate's evidence_root fields into issued handles, which is what a
+// real producer would receive from a prior admission. Callers pass a clone when they need the
+// original bytes.
 export const deps = (cert) => ({ authorityStore: storeFor(cert) });
