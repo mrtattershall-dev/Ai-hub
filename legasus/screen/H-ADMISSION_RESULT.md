@@ -85,3 +85,15 @@ attributable to these, since both groups are measured identically.
 Two targets, one language, one coercion shape (`except ...: return <ordinary constant>`). No claim
 that admission is the common root of anything. No detector changed, no architecture installed, and
 the `LOCAL`/`PROGRAM` split from REACH-1 remains unbuilt.
+
+---
+
+## CORRECTION 2026-09-21 (from H-INVERSE, 3840745)
+
+The PyTorch target is a **sparse checkout, pattern `*.py`** — zero C++, CUDA, `.pyi` or Cython
+sources. **The "Bias directions" section above is wrong**: non-Python callers are invisible there,
+so consumers are undercounted and concentration is *overstated*, a bias toward A1 rather than away.
+
+A1 survives on the other target. Odysseus is a full checkout with median 3, inside the frozen
+threshold of 5. **Read A1 off Odysseus, not PyTorch.** A2's failure is unaffected, since both groups
+are measured in the same corpus.

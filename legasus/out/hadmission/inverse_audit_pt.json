@@ -1,0 +1,155 @@
+{
+  "M1": {
+    "names_total": 89456,
+    "names_shared": 9703,
+    "collision_rate": 0.1085,
+    "witnesses": [
+      {
+        "name": "__init__",
+        "distinct_definitions": 9055,
+        "files": [
+          "benchmarks\\upload_scribe.py",
+          "benchmarks\\upload_scribe.py",
+          "test\\conftest.py"
+        ]
+      },
+      {
+        "name": "forward",
+        "distinct_definitions": 8404,
+        "files": [
+          "test\\create_dummy_torchscript_model.py",
+          "test\\linear.py",
+          "test\\mkldnn_verbose.py"
+        ]
+      },
+      {
+        "name": "fn",
+        "distinct_definitions": 7017,
+        "files": [
+          "test\\test_accelerator.py",
+          "test\\test_autograd.py",
+          "test\\test_autograd.py"
+        ]
+      },
+      {
+        "name": "f",
+        "distinct_definitions": 3134,
+        "files": [
+          "test\\bench_mps_ops.py",
+          "test\\bench_mps_ops.py",
+          "test\\bench_mps_ops.py"
+        ]
+      },
+      {
+        "name": "foo",
+        "distinct_definitions": 1082,
+        "files": [
+          "test\\test_autograd.py",
+          "test\\test_autograd.py",
+          "test\\test_autograd.py"
+        ]
+      }
+    ]
+  },
+  "M2": {
+    "returns_wrapping_a_call": 4001,
+    "unrecognised": 4001,
+    "witnesses": [
+      {
+        "file": "setup.py",
+        "line": 60,
+        "code": "return subprocess.run(replacement).returncode",
+        "form": "Attribute"
+      },
+      {
+        "file": ".spin\\cmds.py",
+        "line": 630,
+        "code": "return ['uvx', '--python', '3.12', f'pyrefly@{_pyrefly_version()}']",
+        "form": "List"
+      },
+      {
+        "file": "mypy_plugins\\sympy_mypy_plugin.py",
+        "line": 15,
+        "code": "return lambda ctx: ctx.api.named_generic_type('builtins.set', [ctx.api.named_type('sympy.S",
+        "form": "Lambda"
+      },
+      {
+        "file": "scripts\\setup_hooks.py",
+        "line": 52,
+        "code": "return shutil.which(cmd) is not None",
+        "form": "Compare"
+      },
+      {
+        "file": "test\\run_test.py",
+        "line": 150,
+        "code": "return s.lower() not in {'', '0', 'false', 'off'}",
+        "form": "Compare"
+      },
+      {
+        "file": "test\\run_test.py",
+        "line": 454,
+        "code": "return test.startswith(CPP_TEST_PREFIX) and (not test.startswith('cpp_extensions'))",
+        "form": "BoolOp"
+      }
+    ]
+  },
+  "M3": {
+    "non_py_sources": {},
+    "witnesses": []
+  },
+  "M4": {
+    "distinct_states_merged": 9,
+    "members": [
+      "None",
+      "''",
+      "0",
+      "0.0",
+      "False",
+      "[]",
+      "()",
+      "{}",
+      "set()"
+    ],
+    "witnesses": [
+      {
+        "note": "all of these yield the same REACHABLE branch",
+        "members": [
+          "None",
+          "''",
+          "0",
+          "0.0",
+          "False",
+          "[]",
+          "()",
+          "{}",
+          "set()"
+        ]
+      }
+    ]
+  },
+  "M5": {
+    "unrecognised": 0,
+    "witnesses": []
+  },
+  "M6": {
+    "ast_identical_groups": 2,
+    "groups_with_differing_bytes": 2,
+    "witnesses": [
+      {
+        "files": [
+          "tools\\__init__.py",
+          "torch\\cuda\\sparse.py",
+          "torch\\_functorch\\__init__.py"
+        ],
+        "distinct_hashes": 16
+      },
+      {
+        "files": [
+          "torch\\ao\\nn\\sparse\\quantized\\dynamic\\__init__.py",
+          "torch\\ao\\nn\\qat\\dynamic\\modules\\__init__.py"
+        ],
+        "distinct_hashes": 2
+      }
+    ]
+  }
+}

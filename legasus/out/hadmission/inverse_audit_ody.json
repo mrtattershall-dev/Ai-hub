@@ -1,0 +1,172 @@
+{
+  "M1": {
+    "names_total": 7735,
+    "names_shared": 492,
+    "collision_rate": 0.0636,
+    "witnesses": [
+      {
+        "name": "__init__",
+        "distinct_definitions": 288,
+        "files": [
+          "core\\auth.py",
+          "core\\exceptions.py",
+          "core\\exceptions.py"
+        ]
+      },
+      {
+        "name": "fake_get",
+        "distinct_definitions": 36,
+        "files": [
+          "tests\\test_endpoint_probing.py",
+          "tests\\test_endpoint_probing.py",
+          "tests\\test_endpoint_probing.py"
+        ]
+      },
+      {
+        "name": "filter",
+        "distinct_definitions": 33,
+        "files": [
+          "tests\\test_api_chat_security.py",
+          "tests\\test_auth_config_lock_concurrency.py",
+          "tests\\test_builtin_actions_owner_scope.py"
+        ]
+      },
+      {
+        "name": "query",
+        "distinct_definitions": 31,
+        "files": [
+          "tests\\test_api_chat_security.py",
+          "tests\\test_auth_config_lock_concurrency.py",
+          "tests\\test_builtin_actions_owner_scope.py"
+        ]
+      },
+      {
+        "name": "close",
+        "distinct_definitions": 30,
+        "files": [
+          "scripts\\hf_download.py",
+          "src\\webhook_manager.py",
+          "tests\\test_api_chat_security.py"
+        ]
+      }
+    ]
+  },
+  "M2": {
+    "returns_wrapping_a_call": 1454,
+    "unrecognised": 1454,
+    "witnesses": [
+      {
+        "file": "app.py",
+        "line": 876,
+        "code": "return await serve_index(request)",
+        "form": "Await"
+      },
+      {
+        "file": "app.py",
+        "line": 880,
+        "code": "return await serve_index(request)",
+        "form": "Await"
+      },
+      {
+        "file": "app.py",
+        "line": 888,
+        "code": "return await serve_index(request)",
+        "form": "Await"
+      },
+      {
+        "file": "app.py",
+        "line": 892,
+        "code": "return await serve_index(request)",
+        "form": "Await"
+      },
+      {
+        "file": "app.py",
+        "line": 896,
+        "code": "return await serve_index(request)",
+        "form": "Await"
+      },
+      {
+        "file": "app.py",
+        "line": 900,
+        "code": "return await serve_index(request)",
+        "form": "Await"
+      }
+    ]
+  },
+  "M3": {
+    "non_py_sources": {
+      ".pyx": 11,
+      ".pyi": 422,
+      ".pxd": 24,
+      ".pyd": 113,
+      ".cpp": 16
+    },
+    "witnesses": [
+      {
+        "kind": ".pyx",
+        "count": 11
+      },
+      {
+        "kind": ".pyi",
+        "count": 422
+      },
+      {
+        "kind": ".pxd",
+        "count": 24
+      },
+      {
+        "kind": ".pyd",
+        "count": 113
+      },
+      {
+        "kind": ".cpp",
+        "count": 16
+      }
+    ]
+  },
+  "M4": {
+    "distinct_states_merged": 9,
+    "members": [
+      "None",
+      "''",
+      "0",
+      "0.0",
+      "False",
+      "[]",
+      "()",
+      "{}",
+      "set()"
+    ],
+    "witnesses": [
+      {
+        "note": "all of these yield the same REACHABLE branch",
+        "members": [
+          "None",
+          "''",
+          "0",
+          "0.0",
+          "False",
+          "[]",
+          "()",
+          "{}",
+          "set()"
+        ]
+      }
+    ]
+  },
+  "M5": {
+    "unrecognised": 1,
+    "witnesses": [
+      {
+        "file": "src\\embeddings.py",
+        "line": 106,
+        "code": "return vecs  (bound to [])"
+      }
+    ]
+  },
+  "M6": {
+    "ast_identical_groups": 0,
+    "groups_with_differing_bytes": 0,
+    "witnesses": []
+  }
+}
