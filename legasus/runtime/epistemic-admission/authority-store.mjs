@@ -124,11 +124,25 @@ export function resolveEvidenceRoot(witness, ctx) {
     return 'reference "' + ref + '" establishes "' + tok.claim + '" and this witness needs "' + need
       + '". A valid token for another proposition is not evidence for this one.';
   }
-  const held = tok.context && tok.context.repository;
-  if (held !== undefined && held !== null && held !== witness.domain) {
-    return 'reference "' + ref + '" was established at repository ' + String(held)
-      + ' and the witness is about ' + String(witness.domain)
+  // WORLD IDENTITY is {repository, claim_domain}, determined by the search in
+  // WORLD-IDENTITY_PREREG. Both are compared for EQUALITY; extent is compared by ORDER, because
+  // requiring extent equality would refuse a legitimate narrowing (arm D3a).
+  const c = tok.context || {};
+  if (ctx.requiredRepository !== undefined && c.repository !== undefined
+      && c.repository !== ctx.requiredRepository) {
+    return 'reference "' + ref + '" was established in repository ' + String(c.repository)
+      + ' and this derivation is in ' + String(ctx.requiredRepository)
       + '. A relation proven in another world does not hold in this one.';
+  }
+  if (c.claim_domain !== undefined && c.claim_domain !== witness.domain) {
+    return 'reference "' + ref + '" was established over claim domain ' + String(c.claim_domain)
+      + ' and the witness is about ' + String(witness.domain)
+      + '. Same repository, different population: the authority does not transfer.';
+  }
+  if (ctx.requiredExtent !== undefined && ctx.requiredExtent !== null
+      && c.examined !== undefined && c.examined !== null && c.examined < ctx.requiredExtent) {
+    return 'reference "' + ref + '" examined ' + c.examined + ' of the domain and this derivation'
+      + ' needs ' + ctx.requiredExtent + '. Narrowing is free; widening needs its own authority.';
   }
   if (ctx.derivingClaim) {
     const ancestry = JSON.stringify(tok.ancestry || []);

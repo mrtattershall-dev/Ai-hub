@@ -18,11 +18,24 @@ const W = () => F4.derivation.alternatives[0].relation_witnesses.find((w) => w.r
 const NEED = relationClaim('COVERAGE', W().subject, W().object);
 
 // A relation token, minted by the calculus from a real observation OF THE RELATION.
-const relationToken = (claim, repository = 'SAMPLE') => observe({
-  observation: observation({ status: OBSERVABILITY.OBSERVED, value: claim, subject: claim,
-    producer: 'coverage-prover', procedure: 'enumerate the domain', attribution: 'domain enumeration',
-    context: { repository } }),
-  procedure: 'enumerate the domain', context: { repository } });
+//
+// v1.4: minted IN A WORLD. Identity is {repository, claim_domain} - the unique minimal subset the
+// world-identity search found. Defaults match F4's own world so E1 exercises legitimate transfer;
+// E4 varies one coordinate.
+const HOME = F4.measurement.observation.context.repository;
+const relationToken = (claim, world = {}) => {
+  const ctx = { repository: HOME, claim_domain: cov4().domain,
+    examined: F4.measurement.observation.context.examined,
+    domain_size: F4.measurement.observation.context.domain_size, ...world };
+  return observe({
+    observation: observation({ status: OBSERVABILITY.OBSERVED, value: claim, subject: claim,
+      producer: 'coverage-prover', procedure: 'enumerate the domain',
+      attribution: 'domain enumeration', context: ctx }),
+    procedure: 'enumerate the domain', context: ctx });
+};
+function cov4() {
+  return F4.derivation.alternatives[0].relation_witnesses.find((w) => w.relation === 'COVERAGE');
+}
 
 // A store holding `tok` under an ISSUED handle, and a clone of F4 whose COVERAGE witness references
 // that handle. The producer names the handle it was given; it does not choose what it resolves to.
@@ -61,20 +74,29 @@ test('E3 — valid authority for an UNRELATED proposition refuses', () => {
   assert.match(whyOf(out), /A valid token for another proposition is not evidence for this one/);
 });
 
-test('E4 — the right relation proposition in the WRONG world refuses', () => {
-  const { out } = run(relationToken(NEED, 'A_DIFFERENT_REPOSITORY'));
-  assert.equal(out.minted, false);
-  assert.match(whyOf(out), /established at repository A_DIFFERENT_REPOSITORY/);
-  assert.match(whyOf(out), /the witness is about SAMPLE/);
-  assert.match(whyOf(out), /A relation proven in another world does not hold in this one/);
+test('E4 — the right relation proposition in the WRONG world refuses, on either coordinate', () => {
+  // v1.4: world identity is {repository, claim_domain}. Both must block transfer on their own.
+  const byRepo = run(relationToken(NEED, { repository: 'A_DIFFERENT_REPOSITORY' }));
+  assert.equal(byRepo.out.minted, false);
+  assert.match(whyOf(byRepo.out), /established in repository A_DIFFERENT_REPOSITORY/);
+  assert.match(whyOf(byRepo.out), /A relation proven in another world does not hold in this one/);
+
+  const byDomain = run(relationToken(NEED, { claim_domain: 'A_DIFFERENT_POPULATION' }));
+  assert.equal(byDomain.out.minted, false);
+  assert.match(whyOf(byDomain.out), /established over claim domain A_DIFFERENT_POPULATION/);
+  assert.match(whyOf(byDomain.out), /Same repository, different population/);
 });
 
 test('E5 — a root that depends on the claim it is justifying refuses as CIRCULAR', () => {
+  // the seed is in the RIGHT world, so circularity is the only thing wrong with it. Before v1.4 this
+  // carried {repository: 'SAMPLE'}, which conflated the repository with the claim domain.
+  const world = { repository: HOME, claim_domain: cov4().domain,
+    examined: F4.measurement.observation.context.examined };
   const seed = observe({
     observation: observation({ status: OBSERVABILITY.OBSERVED, value: 'v',
       subject: F4.requested_claim.predicate, producer: 'p', procedure: 'proc',
-      attribution: 'a', context: { repository: 'SAMPLE' } }),
-    procedure: 'proc', context: { repository: 'SAMPLE' } });
+      attribution: 'a', context: world }),
+    procedure: 'proc', context: world });
   const circular = derive({ premises: [seed],
     rule: { name: F4.requested_claim.predicate, requires: [] },
     relationWitnesses: [], claim: NEED });

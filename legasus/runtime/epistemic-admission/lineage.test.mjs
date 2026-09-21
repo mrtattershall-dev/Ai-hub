@@ -11,7 +11,7 @@ import { execSync } from 'node:child_process';
 import { adapt } from './adapter.mjs';
 import { admit, STATE } from './admission.mjs';
 import { store, relationClaim, VALIDITY } from './authority-store.mjs';
-import { DIGESTS } from './rules.mjs';
+import { ADMITTED_RULES, DIGESTS } from './rules.mjs';
 import { isAuthority } from '../../legaknow/calculus.mjs';
 
 const F4 = JSON.parse(readFileSync(new URL('./fixtures/F4.json', import.meta.url), 'utf8'));
@@ -112,30 +112,81 @@ test('S4 — a serialized clone of A cannot become authority', () => {
   assert.equal(s.recordOf(ref).claim, NEED, 'it carries the claim, evidence and provenance instead');
 });
 
-test('S5 FAILED — the world check is INERT on the real lineage path, and that is a live defect', () => {
-  // PREDICTED: A established in another repository would be refused by B.
-  // OBSERVED: it is accepted, because the token's context never carries a repository at all.
+test('S5 REPAIRED — the world check now fires on the real lineage path, on BOTH coordinates', () => {
+  // HISTORY, kept: S5's original prediction FAILED. B accepted a root from another world, because
+  // observe() was handed the certificate's observation context, which carried no repository at all,
+  // so `token.context.repository` was undefined and the comparison never fired. The earlier arms
+  // passed only on tokens CONSTRUCTED with an explicit world.
   //
-  // observe() is given `cert.measurement.observation.context`, which the producer fills with
-  // {evidence_scope, examined, domain_size}. So `token.context.repository` is undefined, the
-  // `held !== witness.domain` check in resolveEvidenceRoot never fires, and E4 only passed because
-  // its tokens were CONSTRUCTED with an explicit {repository} context. On the path a real admission
-  // actually takes, the world check does nothing.
-  //
-  // RECORDED, NOT REPAIRED. Fixing it after seeing the result is the retroactive repair this branch
-  // forbids. The fix is to carry the claim's domain into the observation context, and it needs its
-  // own frozen prediction because it changes what every token means.
-  const { s, ref, token } = lineage({ repository: 'A_DIFFERENT_REPOSITORY' });
-  assert.ok(ref, 'A was admitted in its own world');
-  assert.equal(token.context.repository, undefined,
-    'THE DEFECT: the minted token carries no repository, so there is no world to compare');
+  // WORLD-IDENTITY_PREREG then SEARCHED every subset of {repository, claim_domain, evidence_extent,
+  // procedure} and found exactly one minimal identity: {repository, claim_domain}. The repair
+  // carries both into the token, and extent is ORDERED rather than compared for equality.
+
+  // (a) different CLAIM DOMAIN, same repository
+  const { s, ref } = lineage({ repository: 'A_DIFFERENT_CLAIM_DOMAIN' });
+  assert.ok(ref, 'A was admitted over its own claim domain');
   const b = certB(ref);
   const outB = adapt(b, { authorityStore: s });
-  assert.equal(isAuthority(outB.token), true,
-    'PREDICTION FAILED: B accepts a root established in another world');
+  assert.equal(outB.minted, false, 'R-W1: B now refuses a root from another population');
+  assert.match((outB.unbound || []).map((u) => u.why).join(' | '),
+    /established over claim domain A_DIFFERENT_CLAIM_DOMAIN/);
 
-  // the check itself is sound and fires when a world IS present - E4 in evidence-root.test.mjs
-  // covers that. What is missing is the world reaching the token in the first place.
+  // (b) different REPOSITORY, same claim domain
+  const s2 = store();
+  const a2 = certA();
+  a2.measurement.observation.context.repository = 'a-different-repository';
+  const out2 = adapt(a2, { authorityStore: s2 });
+  const filed = s2.admitToken(out2.token, { fromCertificate: 'A' });
+  const b2 = certB(filed.ref);
+  const outB2 = adapt(b2, { authorityStore: s2 });
+  assert.equal(outB2.minted, false, 'R-W1: and refuses a root from another repository');
+  assert.match((outB2.unbound || []).map((u) => u.why).join(' | '),
+    /established in repository a-different-repository/);
+});
+
+test('R-W3 — extent is ORDERED, not equal: examining MORE transfers, LESS does not', () => {
+  // The arm that determined extent cannot be an identity coordinate (D3a).
+  for (const [tokenExamined, need, shouldTransfer] of [[60, 60, true], [90, 60, true], [30, 60, false]]) {
+    const s = store();
+    const a = certA();
+    a.measurement.observation.context.examined = tokenExamined;
+    const filed = s.admitToken(adapt(a, { authorityStore: s }).token, { fromCertificate: 'A' });
+    const b = certB(filed.ref);
+    b.measurement.observation.context.examined = need;
+    const out = adapt(b, { authorityStore: s });
+    assert.equal(isAuthority(out.token), shouldTransfer,
+      'token examined ' + tokenExamined + ', needed ' + need + ': ' + (out.why || 'minted'));
+  }
+});
+
+test('R-W4 FAILED — the rule digest does NOT cover behaviour reached through a called function', () => {
+  // PREDICTED: changing the world check would move the rule fingerprints and force the producer to
+  // re-pin. It did NOT. `digestOf` hashes `satisfiedBy.toString()`, which contains the CALL
+  // `resolveEvidenceRoot(w, ctx)` and not that function's body. The satisfaction semantics changed
+  // materially - one undefined-tolerant comparison became two equality checks and an ordering - and
+  // the fingerprint is byte-identical.
+  //
+  // So RULE_DEFINITION_MOVED protects only what is written INSIDE a matcher. A live drift-coverage
+  // gap, recorded and NOT repaired: closing it means digesting a transitive dependency, which is a
+  // different claim and needs its own frozen prediction.
+  assert.equal(DIGESTS['universal-from-exhaustive-coverage'],
+    '1c356ca01d173bd4d3656ae003781df7e991e3cb4033250750a6ee1764930ba4',
+    'the fingerprint did not move across a material change to satisfaction');
+  const src = ADMITTED_RULES['universal-from-exhaustive-coverage'].obligations[0].satisfiedBy.toString();
+  assert.match(src, /resolveEvidenceRoot\(w, ctx\)/, 'the matcher CALLS it');
+  assert.doesNotMatch(src, /requiredRepository/, 'and the digest never sees what it does');
+});
+
+test('S5 history — the original inert-check assertion, kept as the record', () => {
+  // What the failure looked like: the token carried no repository, so there was nothing to compare.
+  // Asserted against the OLD shape so the record is concrete rather than a remembered claim.
+  const oldStyleContext = { evidence_scope: 'SAMPLE', examined: 60, domain_size: 60 };
+  assert.equal(oldStyleContext.repository, undefined,
+    'THE DEFECT WAS: observe() received this, and a world check reading .repository saw undefined');
+  // and what it is now
+  const { token } = lineage();
+  assert.equal(token.context.repository, 'pytorch@9b6e45278f06');
+  assert.equal(token.context.claim_domain, 'SAMPLE');
 });
 
 test('S6 ANTI-REFUSAL — authority A gained through DERIVE is still consumable by B', () => {

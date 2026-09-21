@@ -29,7 +29,13 @@ import { observe, derive, isAuthority, KIND } from '../../legaknow/calculus.mjs'
 //      refuses on a missing witness on its own terms. The calculus is not modified for this.
 import { resolveRule, bindWitnesses } from './rules.mjs';
 
-export const CONTRACT_VERSION = '1.3.0-frozen-2026-09-21';
+export const CONTRACT_VERSION = '1.4.0-frozen-2026-09-21';
+
+// THE MINIMUM WORLD IDENTITY, determined by measurement rather than chosen. WORLD-IDENTITY_PREREG
+// searched every subset of {repository, claim_domain, evidence_extent, procedure}: exactly one
+// minimal subset satisfies "must not transfer across a changed repository or claim domain, must
+// still transfer when everything matches, and must permit a legitimate narrowing of extent".
+export const WORLD_IDENTITY = Object.freeze(['repository', 'claim_domain']);
 
 // A certificate that carries any of these has started becoming a second authority system. The
 // producer's schema forbids them; the consumer refuses them again, because a forged certificate does
@@ -87,6 +93,18 @@ export function readable(cert) {
 export function observeArgs(cert) {
   const m = cert.measurement;
   const o = m.observation;
+  // THE WORLD THE AUTHORITY WILL BE VALID IN. Identity first - repository from the certificate's
+  // observation context, claim_domain from the claim itself - then extent and procedure alongside as
+  // provenance. Before v1.4 this passed `o.context` straight through, which carried no repository at
+  // all, so the world check downstream compared undefined against everything and was INERT on the
+  // real admission path. That was S5.
+  const world = {
+    repository: o.context.repository,
+    claim_domain: cert.requested_claim.domain.name,
+    examined: o.context.examined,
+    domain_size: o.context.domain_size,
+    procedure: o.procedure,
+  };
   return {
     observation: observation({
       status: o.evidential_force ? OBSERVABILITY.OBSERVED : OBSERVABILITY.PRODUCER_FAILED,
@@ -95,10 +113,10 @@ export function observeArgs(cert) {
       producer: cert.provenance.producer,
       procedure: o.procedure,
       attribution: o.attribution,          // transmitted, never synthesized
-      context: o.context,
+      context: world,
     }),
     procedure: o.procedure,
-    context: o.context,
+    context: world,
   };
 }
 
@@ -126,10 +144,14 @@ export function deriveArgs(cert, localRule, premiseTokens, bound) {
 // authority this consumer already holds, so naming evidence is not the same as having it.
 // `derivingClaim` is carried so a root cannot rest on the very claim it is being used to justify.
 export function bindingContext(cert, altIndex, authorityStore) {
+  const o = cert.measurement.observation;
   return {
     claimDomain: cert.requested_claim.domain.name,
     premiseRefs: cert.derivation.alternatives[altIndex].premises.map((p) => p.ref),
     derivingClaim: cert.requested_claim.predicate,
+    // the world THIS derivation is in, against which a root's world is compared
+    requiredRepository: o.context.repository,
+    requiredExtent: o.context.examined,
     authorityStore,
   };
 }

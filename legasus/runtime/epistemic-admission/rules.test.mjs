@@ -6,7 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import { readFileSync } from 'node:fs';
-import { adapt, deriveArgs, readable } from './adapter.mjs';
+import { adapt, deriveArgs, readable, CONTRACT_VERSION } from './adapter.mjs';
 import { admit, STATE } from './admission.mjs';
 import { ADMITTED_RULES, DIGESTS, resolveRule, digestOf, RULE_MOVED } from './rules.mjs';
 import { derive, observe, isAuthority } from '../../legaknow/calculus.mjs';
@@ -140,7 +140,9 @@ test('F1 — the Stage B scope defect now appears as a MISSING WITNESS', () => {
 test('a v1.1 certificate is now refused: it carries no rule identity', () => {
   const c = structuredClone(F4);
   c.contract_version = '1.1.0-frozen-2026-09-21';
-  assert.match(readable(c), /this adapter consumes 1\.3\.0/);
+  // asserted against the adapter's OWN version so it cannot go stale on a bump
+  assert.match(readable(c), new RegExp('this adapter consumes '
+    + CONTRACT_VERSION.split('-')[0].replace(/\./g, '\.')));
   const noRule = structuredClone(F4);
   delete noRule.derivation.rule_id;
   assert.match(readable(noRule), /carries no rule identity/);
