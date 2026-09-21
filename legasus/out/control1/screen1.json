@@ -1,0 +1,97 @@
+{
+  "target": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\screen\\control-corpus",
+  "filesSeen": 3,
+  "filesParsed": 2,
+  "unparseable": [
+    {
+      "file": "unparseable.py",
+      "error": "invalid syntax (<unknown>, line 1)"
+    }
+  ],
+  "counts": {
+    "INV-A": 4,
+    "INV-B": 6
+  },
+  "candidates": [
+    {
+      "invariant": "INV-A",
+      "function": "sync_records_with_failure_path",
+      "line": 31,
+      "flagged_line": 38,
+      "flagged_source": "return 1",
+      "file": "cases.py"
+    },
+    {
+      "invariant": "INV-A",
+      "function": "token_missing",
+      "line": 43,
+      "flagged_line": 50,
+      "flagged_source": "return True",
+      "file": "cases.py"
+    },
+    {
+      "invariant": "INV-B",
+      "function": "is_ready",
+      "line": 54,
+      "flagged_line": 55,
+      "flagged_source": "return True",
+      "file": "cases.py"
+    },
+    {
+      "invariant": "INV-B",
+      "function": "has_access",
+      "line": 60,
+      "flagged_line": 63,
+      "flagged_source": "return True",
+      "file": "cases.py"
+    },
+    {
+      "invariant": "INV-B",
+      "function": "is_ready_host",
+      "line": 68,
+      "flagged_line": 71,
+      "flagged_source": "return host in READY_HOSTS",
+      "file": "cases.py"
+    },
+    {
+      "invariant": "INV-A",
+      "function": "sync_records_with_failure_path",
+      "line": 31,
+      "flagged_line": 38,
+      "flagged_source": "return 1",
+      "file": "nested/deep/cases.py"
+    },
+    {
+      "invariant": "INV-A",
+      "function": "token_missing",
+      "line": 43,
+      "flagged_line": 50,
+      "flagged_source": "return True",
+      "file": "nested/deep/cases.py"
+    },
+    {
+      "invariant": "INV-B",
+      "function": "is_ready",
+      "line": 54,
+      "flagged_line": 55,
+      "flagged_source": "return True",
+      "file": "nested/deep/cases.py"
+    },
+    {
+      "invariant": "INV-B",
+      "function": "has_access",
+      "line": 60,
+      "flagged_line": 63,
+      "flagged_source": "return True",
+      "file": "nested/deep/cases.py"
+    },
+    {
+      "invariant": "INV-B",
+      "function": "is_ready_host",
+      "line": 68,
+      "flagged_line": 71,
+      "flagged_source": "return host in READY_HOSTS",
+      "file": "nested/deep/cases.py"
+    }
+  ]
+}

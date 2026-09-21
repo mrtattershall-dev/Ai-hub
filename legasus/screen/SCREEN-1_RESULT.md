@@ -103,3 +103,22 @@ venv. A flag of mine, not a fault of the target. The second invocation failed fo
 reason - `grep -c` returning 0 exits 1, which broke an `&&` chain before pytest ran. Both are
 recorded because a screener's own run log is evidence too, and "the suite did not run" must not
 be quietly retried into "the suite ran".
+
+## The authorised suite run — a baseline, NOT a defect count
+
+    4401 passed   116 failed   21 errors   20 skipped
+    tracked files modified by this session: 0   (8 untracked entries, all pre-existing)
+
+**These 116 failures are not findings and are not attributed to Odysseus.** The sampled errors
+are `FileNotFoundError` in `test_code_nav_tools.py` (grep/glob helpers) on a Windows box with a
+venv of unknown provenance — the signature of a missing external binary such as ripgrep, not of
+a defect. Reading them as defects would be precisely the promotion
+`SCREENER-DEPENDENCY-MAP.md` forbids: *anomaly observed -> defect*.
+
+Nor can they be cross-referenced with anything: SCREEN-1 produced **zero** candidates, so there
+is no finding whose liveness this run could confirm. Its only value is as a recorded baseline
+for a future dynamic screen, and even that baseline is environment-contaminated and would need
+re-establishing on a clean install before it could carry weight.
+
+**What this run does establish:** the suite is executable here, it was executed with tatte's
+explicit authorisation, and the target tree came through unmodified.
