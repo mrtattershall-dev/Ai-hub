@@ -459,3 +459,11 @@ unaffected, artifact regenerated via Edit.
 
 Not building a CJS transport. BIND-CJS would be a new experiment under its own prereg; built
 tonight it would convert a clean negative into an apparatus tuned until it passed.
+Recorded, NOT promoted (tatte, same night): arm B is an instance of a topology seen before -
+requested operation silently does not happen; the original system behaves correctly; the
+observer reads success; success is attributed to the operation that never occurred. Nastier
+than an ordinary false positive because the subject's CORRECTNESS conceals the apparatus
+failure. Relatives already in this ledger: empty observation read as absence, a control that
+could not fire, tracing the wrong executable copy. Per the post-H-DISTINCTION rule it earns an
+abstraction only by predicting a NEW failure prospectively, not by explaining old ones well.
+No architecture derived tonight.
