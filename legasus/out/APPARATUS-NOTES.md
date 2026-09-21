@@ -436,3 +436,6 @@ nothing). H6 CONFIRMED (BIND-1's site counter corroborated independently). 568 l
 with full provenance; 1385 typed refusals. Result record: legasus/out/bind2-segments/BIND-2_RESULT.md.
 Lesson for the next prereg: score each prediction against a dry-run artefact BEFORE freezing,
 so a wording that cannot be scored cleanly is caught by the apparatus, not by the result.
+Correction to 29 (same night, no measurement changed): UNASSERTED must be counted per
+behavioural class - 17 of 21 non-S0 classes - not per record (272/276, of which one mutant
+contributes 71). Appended to BIND-2_RESULT.md as a denominator correction.

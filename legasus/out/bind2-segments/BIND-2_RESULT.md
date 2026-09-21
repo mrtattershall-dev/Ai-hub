@@ -138,3 +138,17 @@ class as an artefact of the witness input set. The same probe applied to S0 test
 mutant is distinguishable at all. Preregister the input source before drawing it.
 
 No obligation is named. No supersession authority is granted. BIND-2 stops here.
+
+## Denominator correction (added 2026-09-21 after the interpretation commit; no number changed)
+
+The 272 UNASSERTED refusals (276 joined states) are records, not independent findings: they are
+17 mutants x the cases that reached them, and one mutant (M005, class S5) contributes 71 of the
+276 by itself. The defensible screening statement is per behavioural class:
+
+    17 of the 21 non-S0 classes contain at least one case where the output changed, the witness
+    executed the region, and the witness did not discriminate.
+
+The record counts describe frequency and shape INSIDE those classes; they do not multiply the
+number of distinct findings. Any finding card built on this signal counts classes. Recorded
+because the raw count is the number a later reader would otherwise lift - the wrong-denominator
+failure this project has already paid for twice.
