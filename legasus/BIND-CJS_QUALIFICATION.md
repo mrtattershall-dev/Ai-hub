@@ -87,3 +87,26 @@ evidentiary properties on a synthetic fixture.* It earns nothing about the forei
 nothing about extracting an Intervention interface — that requires the mechanism to also
 transfer, after which two materially different module systems will have independently satisfied
 one frozen contract.
+
+## Amendment Q-1 (2026-09-21 02:20, after run 1, before any result record)
+
+Run 1 produced all seven preregistered states. That is the moment to check the checker: of the
+six frozen states, two were never produced by ANY condition, so they were not yet controls -
+a state that nothing can make the classifier emit is unfalsifiable (HAZARDS.md 3, "a control
+that could not fire").
+
+    SCOPE_VIOLATION           no condition substituted a module outside the request
+    TRANSPORT_CONTRADICTION   no condition made the mechanism's claim disagree with observation
+
+Added, with expectations stated before running them:
+
+  Q-H  live scope violation. The mechanism is configured to substitute BOTH target and decoy
+       while the condition declares decoy out of scope. Expected: `SCOPE_VIOLATION`.
+  CLF  classifier must-fire unit checks over hand-built identity triples, one per state,
+       including TRANSPORT_CONTRADICTION, which cannot be produced by an honest mechanism and
+       is therefore checked at the classifier rather than through a process. Labelled as a
+       classifier check, never as a mechanism observation.
+
+These additions can only make the verdict worse, never better: they add ways to fail. The
+qualification verdict is recomputed over all conditions including them, and run 1's verdict is
+superseded by run 2's rather than kept alongside it.

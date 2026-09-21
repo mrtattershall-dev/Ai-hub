@@ -1,0 +1,3 @@
+{"event":"armed","entries":2}
+{"event":"served","requestedFrom":"C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\transfer\\cjs-qual\\target.js","servedPath":"C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\transfer\\cjs-qual\\target.M1.js","specifier":"./target.js","at":1789952729956}
+{"event":"served","requestedFrom":"C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\transfer\\cjs-qual\\decoy.js","servedPath":"C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\transfer\\cjs-qual\\decoy.M.js","specifier":"./decoy.js","at":1789952729959}

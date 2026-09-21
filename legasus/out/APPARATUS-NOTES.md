@@ -467,3 +467,19 @@ failure. Relatives already in this ledger: empty observation read as absence, a 
 could not fire, tracing the wrong executable copy. Per the post-H-DISTINCTION rule it earns an
 abstraction only by predicting a NEW failure prospectively, not by explaining old ones well.
 No architecture derived tonight.
+
+## 31. BIND-CJS qualified — and the control added for an unfirable state found a real bug
+
+module.registerHooks (synchronous, in-thread) DOES intercept a CommonJS require where
+module.register's async ESM hook did not. Q1 confirmed. Eight conditions + six classifier
+must-fire checks all produced their preregistered states; all five states demonstrated
+producible; BIND interpretation untouched; foreign engine not used.
+
+The methodologically important part: run 1 scored 7/7. Amendment Q-1 then added Q-H and the
+classifier checks BECAUSE two of the six frozen states had never been produced by anything and
+so were not controls. Q-H failed immediately - and the defect was in my driver, not the
+mechanism: `served` was the LAST substitution record in the run rather than the one for the
+module the condition aimed at. Every earlier condition substituted at most one module, so
+"last" was accidentally correct seven times. The first two-substitution condition exposed it.
+A perfect score is not evidence that the scorer works; a state nothing can produce is not a
+control. Both lessons were already in the ledger and both were re-earned in one run.

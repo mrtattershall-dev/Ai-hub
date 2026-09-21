@@ -1,0 +1,302 @@
+{
+  "at": "2026-09-21T01:05:29.969Z",
+  "node": "v24.15.0",
+  "mechanism": "legasus/cjs-preload.mjs (module.registerHooks, synchronous in-thread)",
+  "fixture": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\transfer\\cjs-qual",
+  "results": [
+    {
+      "id": "Q-A",
+      "why": "normal substitution",
+      "requested": "TARGET_M1",
+      "served": "TARGET_M1",
+      "executed": "TARGET_M1",
+      "scope": {},
+      "loadedSequence": [
+        "TARGET_M1",
+        "DECOY"
+      ],
+      "state": "VALID_INTERVENTION",
+      "expected": "VALID_INTERVENTION",
+      "match": true,
+      "witnessExit": 1,
+      "expectedWitnessExit": 1,
+      "witnessOk": true,
+      "cases": [
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ],
+      "mechanismRecords": 2,
+      "stderrTail": ""
+    },
+    {
+      "id": "Q-B",
+      "why": "identity substitution",
+      "requested": "TARGET_M0",
+      "served": "TARGET_M0",
+      "executed": "TARGET_M0",
+      "scope": {},
+      "loadedSequence": [
+        "TARGET_M0",
+        "DECOY"
+      ],
+      "state": "VALID_INTERVENTION",
+      "expected": "VALID_INTERVENTION",
+      "match": true,
+      "witnessExit": 0,
+      "expectedWitnessExit": 0,
+      "witnessOk": true,
+      "cases": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "mechanismRecords": 2,
+      "stderrTail": ""
+    },
+    {
+      "id": "Q-C",
+      "why": "total bypass",
+      "requested": "TARGET_M1",
+      "served": null,
+      "executed": "TARGET",
+      "scope": {},
+      "loadedSequence": [
+        "TARGET",
+        "DECOY"
+      ],
+      "state": "SUBSTITUTION_UNOBSERVED",
+      "expected": "SUBSTITUTION_UNOBSERVED",
+      "match": true,
+      "witnessExit": 0,
+      "expectedWitnessExit": 0,
+      "witnessOk": true,
+      "cases": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "mechanismRecords": 1,
+      "stderrTail": ""
+    },
+    {
+      "id": "Q-D",
+      "why": "wrong substitution",
+      "requested": "TARGET_M1",
+      "served": "TARGET_M2",
+      "executed": "TARGET_M2",
+      "scope": {},
+      "loadedSequence": [
+        "TARGET_M2",
+        "DECOY"
+      ],
+      "state": "IDENTITY_MISMATCH",
+      "expected": "IDENTITY_MISMATCH",
+      "match": true,
+      "witnessExit": 1,
+      "expectedWitnessExit": null,
+      "witnessOk": true,
+      "cases": [
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ],
+      "mechanismRecords": 2,
+      "stderrTail": ""
+    },
+    {
+      "id": "Q-E",
+      "why": "scope preservation (target substituted, decoy must not be)",
+      "requested": "TARGET_M1",
+      "served": "TARGET_M1",
+      "executed": "TARGET_M1",
+      "scope": {
+        "DECOY": "DECOY"
+      },
+      "loadedSequence": [
+        "TARGET_M1",
+        "DECOY"
+      ],
+      "state": "VALID_INTERVENTION",
+      "expected": "VALID_INTERVENTION",
+      "match": true,
+      "witnessExit": 1,
+      "expectedWitnessExit": 1,
+      "witnessOk": true,
+      "cases": [
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ],
+      "mechanismRecords": 2,
+      "stderrTail": ""
+    },
+    {
+      "id": "Q-F",
+      "why": "scope negative (decoy substituted, target must not be)",
+      "requested": "DECOY_M",
+      "served": "DECOY_M",
+      "executed": "DECOY_M",
+      "scope": {
+        "TARGET": "TARGET"
+      },
+      "loadedSequence": [
+        "TARGET",
+        "DECOY_M"
+      ],
+      "state": "VALID_INTERVENTION",
+      "expected": "VALID_INTERVENTION",
+      "match": true,
+      "witnessExit": 1,
+      "expectedWitnessExit": 1,
+      "witnessOk": true,
+      "cases": [
+        "PASS",
+        "PASS",
+        "FAIL"
+      ],
+      "mechanismRecords": 2,
+      "stderrTail": ""
+    },
+    {
+      "id": "Q-G",
+      "why": "no request at all",
+      "requested": null,
+      "served": null,
+      "executed": "TARGET",
+      "scope": {},
+      "loadedSequence": [
+        "TARGET",
+        "DECOY"
+      ],
+      "state": "SUBSTITUTION_UNOBSERVED",
+      "expected": "SUBSTITUTION_UNOBSERVED",
+      "match": true,
+      "witnessExit": 0,
+      "expectedWitnessExit": 0,
+      "witnessOk": true,
+      "cases": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "mechanismRecords": 0,
+      "stderrTail": ""
+    },
+    {
+      "id": "Q-H",
+      "why": "live scope violation (must fire)",
+      "requested": "TARGET_M1",
+      "served": "TARGET_M1",
+      "executed": "TARGET_M1",
+      "scope": {
+        "DECOY": "DECOY_M"
+      },
+      "loadedSequence": [
+        "TARGET_M1",
+        "DECOY_M"
+      ],
+      "state": "SCOPE_VIOLATION",
+      "expected": "SCOPE_VIOLATION",
+      "match": true,
+      "witnessExit": 1,
+      "expectedWitnessExit": 1,
+      "witnessOk": true,
+      "cases": [
+        "FAIL",
+        "FAIL",
+        "FAIL"
+      ],
+      "mechanismRecords": 3,
+      "stderrTail": ""
+    }
+  ],
+  "classifierChecks": [
+    {
+      "name": "valid",
+      "input": {
+        "requested": "TARGET_M1",
+        "served": "TARGET_M1",
+        "executed": "TARGET_M1",
+        "scope": {}
+      },
+      "expect": "VALID_INTERVENTION",
+      "got": "VALID_INTERVENTION",
+      "match": true
+    },
+    {
+      "name": "executed absent",
+      "input": {
+        "requested": "TARGET_M1",
+        "served": "TARGET_M1",
+        "executed": null,
+        "scope": {}
+      },
+      "expect": "SUBSTITUTION_UNOBSERVED",
+      "got": "SUBSTITUTION_UNOBSERVED",
+      "match": true
+    },
+    {
+      "name": "bypass",
+      "input": {
+        "requested": "TARGET_M1",
+        "served": null,
+        "executed": "TARGET",
+        "scope": {}
+      },
+      "expect": "SUBSTITUTION_UNOBSERVED",
+      "got": "SUBSTITUTION_UNOBSERVED",
+      "match": true
+    },
+    {
+      "name": "wrong mutant",
+      "input": {
+        "requested": "TARGET_M1",
+        "served": "TARGET_M2",
+        "executed": "TARGET_M2",
+        "scope": {}
+      },
+      "expect": "IDENTITY_MISMATCH",
+      "got": "IDENTITY_MISMATCH",
+      "match": true
+    },
+    {
+      "name": "claim contradicts observation",
+      "input": {
+        "requested": "TARGET_M1",
+        "served": "TARGET_M1",
+        "executed": "TARGET_M2",
+        "scope": {}
+      },
+      "expect": "TRANSPORT_CONTRADICTION",
+      "got": "TRANSPORT_CONTRADICTION",
+      "match": true
+    },
+    {
+      "name": "scope violated",
+      "input": {
+        "requested": "TARGET_M1",
+        "served": "TARGET_M1",
+        "executed": "TARGET_M1",
+        "scope": {
+          "DECOY": "DECOY_M"
+        }
+      },
+      "expect": "SCOPE_VIOLATION",
+      "got": "SCOPE_VIOLATION",
+      "match": true
+    }
+  ],
+  "statesProduced": [
+    "VALID_INTERVENTION",
+    "SUBSTITUTION_UNOBSERVED",
+    "IDENTITY_MISMATCH",
+    "SCOPE_VIOLATION",
+    "TRANSPORT_CONTRADICTION"
+  ],
+  "unproducedStates": [],
+  "verdict": {
+    "status": "QUALIFIED",
+    "reason": "every preregistered condition produced its preregistered state, every constrained witness outcome matched, every classifier state was demonstrated to be producible, and no frozen state went unproduced"
+  }
+}
