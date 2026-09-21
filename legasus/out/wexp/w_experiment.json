@@ -1,0 +1,25 @@
+{
+  "sealedTarget": "C:\\Users\\tatte\\AppData\\Local\\Temp\\screen2-target\\mpt",
+  "results": {
+    "T1 (assertTrue only)": {
+      "W0": "PASS",
+      "W1": "PASS",
+      "W2": "FAIL"
+    },
+    "T2 (assertFalse + assertTrue)": {
+      "W0": "PASS",
+      "W1": "FAIL",
+      "W2": "FAIL"
+    }
+  },
+  "discrimination": {
+    "T1 (assertTrue only)": {
+      "W0_vs_W1_verified_vs_unverifiable": "CANNOT DISTINGUISH",
+      "W0_vs_W2_verified_vs_unsupported": "DISCRIMINATES"
+    },
+    "T2 (assertFalse + assertTrue)": {
+      "W0_vs_W1_verified_vs_unverifiable": "DISCRIMINATES",
+      "W0_vs_W2_verified_vs_unsupported": "DISCRIMINATES"
+    }
+  }
+}
