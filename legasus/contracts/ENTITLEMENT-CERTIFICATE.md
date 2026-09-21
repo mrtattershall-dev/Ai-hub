@@ -118,3 +118,38 @@ a claim that observation authority already exists.
 A v1.1 certificate is **refused** by v1.0 (`additionalProperties: false` sees `attribution` as
 unknown), and a v1.0 certificate is **refused** by v1.1 (the key is required). Neither version can
 be mistaken for the other by a consumer that validates.
+
+---
+
+# v1.2 — rule identity (frozen 2026-09-21)
+
+Schema: `entitlement-certificate.v1.2.schema.json`. v1.0.0 and v1.1 are preserved unmodified.
+
+## The question v1.2 answers
+
+**Who owns the semantics of an inference rule?**
+
+`derive()` computes its missing witnesses from `rule.requires`. Until v1.2 the adapter wrote
+`requires: []` itself, so the witness check passed vacuously — the calculus enforcing correctly
+against a rule object that asked for nothing. Letting the certificate supply `requires` instead would
+let the producer choose its own burden of proof, which is the same defect with extra steps.
+
+    certificate    rule_id, rule_digest, relation_witnesses[]     identity + established FACTS
+    consumer       ADMITTED_RULES[rule_id] -> { name, requires }  the OBLIGATION
+    derive()       refuses against the LOCAL requires
+
+## What changed
+
+    derivation.rule_id       which admitted rule this derivation claims to have used
+    derivation.rule_digest   SHA-256 of {name, requires sorted, version}, the pinned definition
+
+**There is deliberately no field for requirements**, and `additionalProperties: false` means one
+cannot be added by a producer. `relation_witnesses[]` keeps its meaning: facts the producer
+established, never obligations it invented.
+
+## Drift
+
+A certificate naming `rule X @ digest A` against a runtime holding `rule X @ digest B` yields
+`RULE_DEFINITION_MOVED`. It is not silently evaluated against B, because a certificate must not stay
+syntactically valid while the meaning of its derivation changes underneath it. A renamed rule with
+identical requirements is also a different fingerprint: identical names are not identical referents.

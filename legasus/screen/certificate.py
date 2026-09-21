@@ -13,6 +13,39 @@ from shadow_substitution import new_attempt, to_new, KNOWN_DOMAINS, dom
 HERE = Path(__file__).parent
 CONTRACT_V10 = "1.0.0-frozen-2026-09-21"
 CONTRACT_V11 = "1.1.0-frozen-2026-09-21"
+CONTRACT_V12 = "1.2.0-frozen-2026-09-21"
+
+# PUBLISHED RULE FINGERPRINTS, not rule definitions. The producer pins WHICH rule it claims to have
+# used; the consumer owns what that rule REQUIRES. Duplicating the requirements here would be two
+# definitions of one vocabulary, which is the defect this project keeps finding. These are identity
+# only, and a runtime whose definition has moved refuses with RULE_DEFINITION_MOVED.
+RULE_FINGERPRINTS = {
+    "existential-from-established-member":
+        "128fcfe3b29b3519b17c4407babc2b439a7dada53e99a1025ef4da8550579b5e",
+    "universal-from-exhaustive-coverage":
+        "018abb658b2d297384410a5f073deaa8e34ffc07b1bf41b974bfefa7ae0d2f7d",
+    "claim-from-direct-observation":
+        "5af06cb1e7d1e9cfd37a1b00cd87eeb9e9d04254576b1a4fe9f972e109f63e37",
+}
+
+RULE_FOR_QUANTIFIER = {"EXISTS": "existential-from-established-member",
+                       "FOR_ALL": "universal-from-exhaustive-coverage",
+                       "NONE": "universal-from-exhaustive-coverage",
+                       "POINTWISE": "claim-from-direct-observation"}
+
+
+def witnesses_established(requested2, ext):
+    """Relation witnesses the producer ACTUALLY established. Facts, never requirements.
+
+    A witness is emitted only where the obligation record already carries the fact: exhaustive
+    coverage of the claimed domain, or established membership of an observed element in it.
+    """
+    out = []
+    if ext.coverage_of.get(requested2.domain.name) == O.EXHAUSTIVE:
+        out.append("COVERAGE")
+    if any(requested2.domain.name in o.membership_established_in for o in ext.observed):
+        out.append("MEMBERSHIP")
+    return out
 
 INSTRUMENT_SOURCE = {"reach1 tracer": "reach1.py", "SCREEN-1 detectors": "screen1.py",
                      "stageb diagnosis": "stageb_diagnose.py", "hinfo harness": "hinfo.py"}
@@ -55,6 +88,17 @@ def collateral_for(requested2, ext, licensed2):
     return out
 
 
+def derivation_block(d, alternatives, requested2, version):
+    """v1.2 adds rule IDENTITY. There is no place here to say what the rule requires."""
+    block = {"passed": d.passed, "alternatives": alternatives,
+             "open_frontier": None if d.passed else d.detail}
+    if version == CONTRACT_V12:
+        rule_id = RULE_FOR_QUANTIFIER[requested2.quantifier]
+        block["rule_id"] = rule_id
+        block["rule_digest"] = RULE_FINGERPRINTS[rule_id]
+    return block
+
+
 def emit(claim, ev, run_id, evidence_refs, version=CONTRACT_V10, attribution=None):
     """`attribution` is supplied by the PRODUCER from the real binding record.
 
@@ -80,12 +124,13 @@ def emit(claim, ev, run_id, evidence_refs, version=CONTRACT_V10, attribution=Non
     if not m.passed:
         frontier.append({"gate": "M", "unmet": m.detail, "blocking_kind": "instrument_capability"})
 
+    witnesses = witnesses_established(requested2, ext) if version == CONTRACT_V12 else []
     alternatives = []
     for i, sd in enumerate(ev.supporting_derivations):
         prem = {"ref": "%s:derivation%d:premise0" % (run_id, i),
                 "decidable_at_site": bool(sd.get("premises_decidable")),
                 "settled": bool(sd.get("premises_settled"))}
-        alternatives.append({"premises": [prem], "relation_witnesses": [],
+        alternatives.append({"premises": [prem], "relation_witnesses": list(witnesses),
                              "closed": prem["decidable_at_site"] and prem["settled"]})
 
     observation = {"ref": "%s:observation" % run_id,
@@ -93,7 +138,7 @@ def emit(claim, ev, run_id, evidence_refs, version=CONTRACT_V10, attribution=Non
                    "procedure": "%s over %s" % (ev.instrument, ev.evidence_scope),
                    "context": {"evidence_scope": ev.evidence_scope,
                                "examined": ev.examined, "domain_size": ev.domain_size}}
-    if version == CONTRACT_V11:
+    if version in (CONTRACT_V11, CONTRACT_V12):
         observation["attribution"] = attribution
 
     return {
@@ -106,8 +151,7 @@ def emit(claim, ev, run_id, evidence_refs, version=CONTRACT_V10, attribution=Non
         "obligation": {"passed": o.passed,
                        "unmet": [] if o.passed else [o.detail],
                        "coverage": dict(ext.coverage_of)},
-        "derivation": {"passed": d.passed, "alternatives": alternatives,
-                       "open_frontier": None if d.passed else d.detail},
+        "derivation": derivation_block(d, alternatives, requested2, version),
         "measurement": {
             "capability_demonstrated": m.passed,
             "positive_control": {"fired": bool(ev.positive_control_fired),
@@ -129,7 +173,8 @@ def emit(claim, ev, run_id, evidence_refs, version=CONTRACT_V10, attribution=Non
 if __name__ == "__main__":
     from entitlement_conformance import CASES
     out_dir = Path(sys.argv[1]); out_dir.mkdir(parents=True, exist_ok=True)
-    version = CONTRACT_V11 if (len(sys.argv) > 2 and sys.argv[2] == "v1.1") else CONTRACT_V10
+    arg = sys.argv[2] if len(sys.argv) > 2 else "v1.0"
+    version = {"v1.0": CONTRACT_V10, "v1.1": CONTRACT_V11, "v1.2": CONTRACT_V12}[arg]
     for name, (claim, ev, _) in CASES.items():
         run_id = name.split()[0].replace("'", "p")
         # THE REAL BINDING RECORD. What tied this observation to this subject is the frozen case

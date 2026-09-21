@@ -1,0 +1,91 @@
+{
+  "contract_version": "1.2.0-frozen-2026-09-21",
+  "requested_claim": {
+    "domain": {
+      "name": "FUNCTION_PARAMETER",
+      "contained_in": [
+        "FUNCTION",
+        "MODULE",
+        "PROGRAM",
+        "REPOSITORY"
+      ]
+    },
+    "quantifier": "EXISTS",
+    "predicate": "falsy value reaching the guard"
+  },
+  "licensed_claim": null,
+  "licensed_relation": "NONE",
+  "collateral_observations": [],
+  "frontier": [
+    {
+      "gate": "D",
+      "unmet": "no supporting derivation with settled, decidable premises",
+      "blocking_kind": "undecidable_or_open_premise"
+    }
+  ],
+  "obligation": {
+    "passed": true,
+    "unmet": [],
+    "coverage": {
+      "FUNCTION_PARAMETER": "EXHAUSTIVE"
+    }
+  },
+  "derivation": {
+    "passed": false,
+    "alternatives": [
+      {
+        "premises": [
+          {
+            "ref": "F2:derivation0:premise0",
+            "decidable_at_site": false,
+            "settled": false
+          }
+        ],
+        "relation_witnesses": [
+          "COVERAGE",
+          "MEMBERSHIP"
+        ],
+        "closed": false
+      }
+    ],
+    "open_frontier": "no supporting derivation with settled, decidable premises",
+    "rule_id": "existential-from-established-member",
+    "rule_digest": "128fcfe3b29b3519b17c4407babc2b439a7dada53e99a1025ef4da8550579b5e"
+  },
+  "measurement": {
+    "capability_demonstrated": true,
+    "positive_control": {
+      "fired": true,
+      "ref": "F2:positive_control"
+    },
+    "observation": {
+      "ref": "F2:observation",
+      "evidential_force": true,
+      "procedure": "reach1 tracer over FUNCTION_PARAMETER",
+      "context": {
+        "evidence_scope": "FUNCTION_PARAMETER",
+        "examined": 1,
+        "domain_size": 1
+      },
+      "attribution": "entitlement_conformance.CASES['F2 REACH-1 get_path'] -> (claim=EXISTENTIAL over FUNCTION_PARAMETER, evidence_scope=FUNCTION_PARAMETER)"
+    },
+    "instrument": {
+      "name": "reach1 tracer",
+      "version_digest": "df3172fe7c4e8398925c1222b32cb2e71c853b10be326d23c31ff76fdfad194a"
+    }
+  },
+  "run_floor": {
+    "instrument": "reach1 tracer",
+    "emitted_ref": "F2:emitted",
+    "run_id": "F2"
+  },
+  "provenance": {
+    "producer": "legasus/screen/obligation.py",
+    "producer_digest": "b228113d57ba907b5ed9e7916372f9dc4388b85cd2522b2d0e6140d6c96ce5c6",
+    "evidence_refs": [
+      "out/hadmission/substitution2.json"
+    ],
+    "run_id": "F2",
+    "emitted_at": "2026-09-21T15:43:39Z"
+  }
+}
