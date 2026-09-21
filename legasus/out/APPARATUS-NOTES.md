@@ -804,3 +804,23 @@ interface - framed as questions, since LegaScreen internals are theirs.
 
 Branch exit condition met. No architecture installed. Next: the screener itself, as the next
 falsification environment.
+
+## Notes 46-48 (REACH-1, 2026-09-21)
+
+**46. Closure SIZE inversely tracks proof difficulty.** UNKNOWN closures had median 0 definitions,
+settled ones 7-8. An unprovable trace is small precisely because it stops the instant it hits a
+blocking source. Any ranking by "minimal slice size" therefore ranks the unsettleable cases as the
+easiest. The quantity that separates them is the TERMINATION PROFILE - does every branch reach
+ground, and by what kind of fact. A closure reaching a trusted primitive settled 8/8; no UNKNOWN
+ever reached one. Sufficient, never necessary.
+
+**47. A recording fault moved 16 of 60 verdicts.** Two call-site paths appended UNKNOWN without a
+blocking kind. Diagnosing those 23 naked UNKNOWNs exposed a much worse gap the metric had hidden:
+keyword arguments were ignored entirely, so every keyword-supplied value silently became UNKNOWN.
+The visible violation was cosmetic; the bug it led to was substantive. Seventh instance of the
+remedy being "assert the precondition" - now asserted in the runner.
+
+**48. Eighth escape-eating instance, this time in a commit message.** Backticks inside a
+double-quoted git message triggered command substitution and deleted the very fact the sentence
+existed to state - the closure's terminal or-fallback. Commit messages are prose passed through a
+shell argument and fall under the same standing rule: write them to a file.
