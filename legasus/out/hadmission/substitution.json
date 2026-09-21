@@ -1,0 +1,35 @@
+{
+  "failures": [
+    "A4 E1 is STILL INERT under the new compiler"
+  ],
+  "ranks": [
+    [
+      "E0 full record",
+      [
+        2,
+        1
+      ]
+    ],
+    [
+      "E1 reachability evidence removed",
+      [
+        2,
+        1
+      ]
+    ],
+    [
+      "E2 positive control removed",
+      [
+        0,
+        0
+      ]
+    ],
+    [
+      "E3 a required premise opened",
+      [
+        0,
+        0
+      ]
+    ]
+  ]
+}
