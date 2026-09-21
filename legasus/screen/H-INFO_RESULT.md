@@ -78,3 +78,31 @@ around. One discriminating result on one construction is where it stands.
 One construction, four states, three representations, one subject. Same author as the
 hypothesis. Stage A. A Stage B test — a different failure mechanism, or a naturally occurring
 case not built around equivalence classes — has not been attempted.
+
+## CORRECTION (appended; original wording left above)
+
+**1. "R_rich" is a bad name and the result does not depend on richness.** The relevant object is
+the **partition** a representation induces:
+
+    s1 ~_R s2   iff   R(s1) = R(s2)
+
+and the condition for `P` to be recoverable from `R` is that there exists some `g` with
+`P = g ∘ R` — equivalently, `R(s1) = R(s2) ⇒ P(s1) = P(s2)`. Three observable values can preserve
+the *wrong* distinctions while two preserve exactly the one `P` needs. The renaming matters
+because "richer" invites the cardinality reading that this very run falsified. Read `R_rich` as
+*the representation with a finer partition that is finer in the wrong place*.
+
+**2. H-INFO is a NECESSARY condition, not a theory of entitlement.** The asymmetry:
+
+    P differs inside one R-class    ->  R alone cannot entitle P
+    P constant inside every R-class ->  R does not PREVENT entitlement; entitlement is NOT
+                                        thereby established
+
+The result above shows only the first arrow. `R_poor` "HOLDS" in the table means *no collision
+blocks entitlement*, **not** that entitlement was established.
+
+**3. The tautology risk, which must govern Stage B.** If "entitled to `P`" is defined as "`P` is
+recoverable from `R`", H-INFO is true by construction and worthless. Stage B must keep the
+entitlement criterion **independently defined** and ask whether H-INFO predicts failures of that
+independent criterion. This run did not do that — its entitlement test *is* the recoverability
+test — so its discrimination is against H-RICH only, and carries no weight against tautology.
