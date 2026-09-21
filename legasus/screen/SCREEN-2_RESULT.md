@@ -163,3 +163,30 @@ direction: a detector whose VIOLATION means what it claims is more useful than o
 45 things of which 44 are wrong.
 
 A3 is a new experiment with its own preregistration, not a patch to a frozen detector.
+
+## CORRECTION (appended, original wording left above)
+
+Two overclaims in the sections above, corrected here rather than edited away.
+
+**1. "precision 1/45" must not be read as a prospective precision estimate.** The adjudication
+rule was frozen only after the first five candidates were read, so the 45 do not form one
+prospectively adjudicated cohort. The defensible presentation is the split, which is *harsher*
+on A2 than the flattened figure:
+
+    cohort        candidates   survived   rejected
+    pre-rule               5          1          4
+    frozen-rule           40          0         40
+
+**2. "A2 is wrong in exactly one way" is stronger than the evidence.** What is established is:
+*one observed failure family explains all 44 rejected candidates in this corpus.* Unseen failure
+families may exist in other code. The evidence for the family is nonetheless strong precisely
+because the shared values are heterogeneous — `None`, `False`, `[]`, `''`, `0`, `0.0`, `1`,
+`{}`, tuples, and even `True` all participate, so this is not an artifact of one sentinel. The
+commonality is semantic, not syntactic:
+
+> **ordinary execution ≠ successful execution**
+
+**The result, stated at the width the evidence supports:**
+
+> In this external prospective target, every observed false positive from INV-A2 arose from one
+> unsupported inference: treating a non-exceptional return as evidence of successful execution.
