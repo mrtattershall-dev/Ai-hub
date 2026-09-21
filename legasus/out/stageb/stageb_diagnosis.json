@@ -1,0 +1,64 @@
+{
+  "case1_gh_summary_path": {
+    "states": {
+      "UNSET": {
+        "R": "None",
+        "decision_proceeds": false,
+        "D_says_P": false,
+        "entitlement_wrong": false
+      },
+      "EMPTY": {
+        "R": "None",
+        "decision_proceeds": false,
+        "D_says_P": false,
+        "entitlement_wrong": false
+      },
+      "SET_writable": {
+        "R": "C:\\Users\\tatte\\AppData\\Local\\Temp\\tmpiwvj2n5s\\summary.md",
+        "decision_proceeds": true,
+        "D_says_P": true,
+        "entitlement_wrong": false
+      },
+      "SET_unwritable": {
+        "R": "C:\\Users\\tatte\\AppData\\Local\\Temp\\tmpiwvj2n5s\\no-such-dir\\summary.md",
+        "decision_proceeds": true,
+        "D_says_P": false,
+        "entitlement_wrong": true
+      }
+    },
+    "wrong_entitlement": true
+  },
+  "case2_local_image_exists": {
+    "verdict": "UNOBSERVABLE",
+    "reason": "the docker package is not installed, so the direct channel D cannot be opened"
+  },
+  "case3_validate_cuda": {
+    "states": {
+      "ALL_VALID": {
+        "R": true,
+        "decision_suppresses_warning": true,
+        "D_says_P": true,
+        "entitlement_wrong": false
+      },
+      "SOME_INVALID": {
+        "R": false,
+        "decision_suppresses_warning": false,
+        "D_says_P": false,
+        "entitlement_wrong": false
+      },
+      "EMPTY": {
+        "R": true,
+        "decision_suppresses_warning": true,
+        "D_says_P": false,
+        "entitlement_wrong": true
+      },
+      "WHITESPACE": {
+        "R": true,
+        "decision_suppresses_warning": true,
+        "D_says_P": false,
+        "entitlement_wrong": true
+      }
+    },
+    "wrong_entitlement": true
+  }
+}
