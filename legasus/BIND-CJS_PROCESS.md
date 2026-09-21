@@ -72,3 +72,22 @@ No repair inside this experiment. No abstraction extracted regardless of outcome
 recorded at full cardinality with its units named (processes ≠ evaluations ≠ resolutions ≠
 records), per the audit. If X2 holds, the finding is preserved and the next expedition is a
 separate preregistration.
+
+## Amendment P-1 (2026-09-21 04:35, after run 1, before any result record)
+
+Run 1 falsified X1: in P-B the scalar said `TRANSPORT_CONTRADICTION`, not `VALID_INTERVENTION`.
+Inspecting the construction rather than celebrating: **the child runs AFTER the witness's own
+load, so P-B's contradiction is TERMINAL** — the very position step 7 showed a last-wins rule
+catches. X1 was falsified by my fixture's ordering, not by the representation being sound.
+
+Left as it stands, "the scalar survived process composition" would be false comfort.
+
+Added, expectation stated before running:
+
+  P-E  the witness loads the target, spawns a plain child (which loads the ORIGINAL), and then
+       RE-LOADS the target itself after the child returns -> identity sequence M, S, M.
+       Expected: the scalar reports `VALID_INTERVENTION` despite a descendant having executed
+       the original, because the contradiction is no longer last.
+
+This can only make the verdict worse, never better. X1 is rescored over both P-B and P-E, and
+run 1's falsification is superseded rather than kept alongside.

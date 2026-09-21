@@ -1,0 +1,3 @@
+{"loaded":"MUTANT","pid":29120,"ppid":13512,"role":"witness","argv1":"C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\transfer\\proc-fixture\\witness.js"}
+{"loaded":"SUBJECT","pid":29248,"ppid":29120,"role":"descendant","argv1":"C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\transfer\\proc-fixture\\loader.js"}
+{"loaded":"MUTANT","pid":29120,"ppid":13512,"role":"witness","argv1":"C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\transfer\\proc-fixture\\witness.js"}

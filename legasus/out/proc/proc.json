@@ -1,0 +1,218 @@
+{
+  "at": "2026-09-21T02:32:27.487Z",
+  "node": "v24.15.0",
+  "mechanism": "legasus/cjs-preload.mjs @ e41c1e3, unchanged",
+  "classifier": "step-5 scalar, verbatim",
+  "foil": "naive uniformity - a FOIL for X2, not a proposal",
+  "results": [
+    {
+      "id": "P-A",
+      "why": "parent alone, under the mechanism",
+      "witnessPid": 13908,
+      "processes": [
+        {
+          "pid": 13908,
+          "ppid": 13512,
+          "role": "witness",
+          "loads": [
+            "MUTANT"
+          ]
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 1,
+        "distinctPids": 1,
+        "resolutionsServed": 1,
+        "distinctIdentities": [
+          "MUTANT"
+        ]
+      },
+      "scalarState": "VALID_INTERVENTION",
+      "naiveUniformityState": "VALID_INTERVENTION",
+      "descendantExecutedOriginal": false,
+      "violatesMinimumExpectation": false,
+      "witness": {
+        "exit": 0,
+        "cases": 1,
+        "stdoutTail": "PASS witness segments | ALL PASS  (1 passed, 0 failed)"
+      },
+      "stranger": null
+    },
+    {
+      "id": "P-B",
+      "why": "descendant WITHOUT the mechanism (--import is not inherited)",
+      "witnessPid": 36192,
+      "processes": [
+        {
+          "pid": 9412,
+          "ppid": 36192,
+          "role": "descendant",
+          "loads": [
+            "SUBJECT"
+          ]
+        },
+        {
+          "pid": 36192,
+          "ppid": 13512,
+          "role": "witness",
+          "loads": [
+            "MUTANT"
+          ]
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 2,
+        "distinctPids": 2,
+        "resolutionsServed": 1,
+        "distinctIdentities": [
+          "MUTANT",
+          "SUBJECT"
+        ]
+      },
+      "scalarState": "TRANSPORT_CONTRADICTION",
+      "naiveUniformityState": "NOT_UNIFORM",
+      "descendantExecutedOriginal": true,
+      "violatesMinimumExpectation": false,
+      "witness": {
+        "exit": 0,
+        "cases": 3,
+        "stdoutTail": "PASS loader(descendant) segments | PASS child (plain) completed | ALL PASS  (2 passed, 0 failed)"
+      },
+      "stranger": null
+    },
+    {
+      "id": "P-C",
+      "why": "descendant WITH the mechanism, via NODE_OPTIONS",
+      "witnessPid": 29808,
+      "processes": [
+        {
+          "pid": 29808,
+          "ppid": 13512,
+          "role": "witness",
+          "loads": [
+            "MUTANT"
+          ]
+        },
+        {
+          "pid": 37816,
+          "ppid": 29808,
+          "role": "descendant",
+          "loads": [
+            "MUTANT"
+          ]
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 2,
+        "distinctPids": 2,
+        "resolutionsServed": 2,
+        "distinctIdentities": [
+          "MUTANT"
+        ]
+      },
+      "scalarState": "VALID_INTERVENTION",
+      "naiveUniformityState": "VALID_INTERVENTION",
+      "descendantExecutedOriginal": false,
+      "violatesMinimumExpectation": false,
+      "witness": {
+        "exit": 0,
+        "cases": 3,
+        "stdoutTail": "PASS loader(descendant) segments | PASS child (inherit) completed | ALL PASS  (2 passed, 0 failed)"
+      },
+      "stranger": null
+    },
+    {
+      "id": "P-D",
+      "why": "an INDEPENDENT process, not a descendant of the witness",
+      "witnessPid": 6612,
+      "processes": [
+        {
+          "pid": 6612,
+          "ppid": 13512,
+          "role": "witness",
+          "loads": [
+            "MUTANT"
+          ]
+        },
+        {
+          "pid": 29640,
+          "ppid": 13512,
+          "role": "stranger",
+          "loads": [
+            "SUBJECT"
+          ]
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 2,
+        "distinctPids": 2,
+        "resolutionsServed": 1,
+        "distinctIdentities": [
+          "MUTANT",
+          "SUBJECT"
+        ]
+      },
+      "scalarState": "TRANSPORT_CONTRADICTION",
+      "naiveUniformityState": "NOT_UNIFORM",
+      "descendantExecutedOriginal": false,
+      "violatesMinimumExpectation": false,
+      "witness": {
+        "exit": 0,
+        "cases": 1,
+        "stdoutTail": "PASS witness segments | ALL PASS  (1 passed, 0 failed)"
+      },
+      "stranger": {
+        "exit": 0,
+        "stdout": "PASS loader(stranger) segments"
+      }
+    },
+    {
+      "id": "P-E",
+      "why": "descendant without the mechanism, then the witness RE-LOADS - contradiction no longer last",
+      "witnessPid": 29120,
+      "processes": [
+        {
+          "pid": 29120,
+          "ppid": 13512,
+          "role": "witness",
+          "loads": [
+            "MUTANT",
+            "MUTANT"
+          ]
+        },
+        {
+          "pid": 29248,
+          "ppid": 29120,
+          "role": "descendant",
+          "loads": [
+            "SUBJECT"
+          ]
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 3,
+        "distinctPids": 2,
+        "resolutionsServed": 3,
+        "distinctIdentities": [
+          "MUTANT",
+          "SUBJECT"
+        ]
+      },
+      "scalarState": "VALID_INTERVENTION",
+      "naiveUniformityState": "NOT_UNIFORM",
+      "descendantExecutedOriginal": true,
+      "violatesMinimumExpectation": true,
+      "witness": {
+        "exit": 0,
+        "cases": 4,
+        "stdoutTail": "PASS child (plain) completed | PASS witness segments after child | ALL PASS  (3 passed, 0 failed)"
+      },
+      "stranger": null
+    }
+  ],
+  "scoring": {
+    "X1": "CONFIRMED (rescored under amendment P-1) - the scalar certified VALID_INTERVENTION while a descendant executed the original",
+    "X2": "CONFIRMED - P-B and P-D receive the same verdict from BOTH the current representation (TRANSPORT_CONTRADICTION) and the foil (NOT_UNIFORM); neither distinguishes an escaped descendant from a stranger",
+    "X3": "deliberately unpredicted; raw lineage (pid, ppid, role, argv) recorded in full, no distinction named"
+  }
+}

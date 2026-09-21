@@ -569,3 +569,24 @@ destroy verdict-determining information, not because a property was unexercised.
 Third cardinality found in passing, three hours after the audit: R-A's real bundle has 10
 served records for 5 evaluations in 1 process (each iteration resolves twice - require.resolve
 and require). Resolutions are not evaluations are not interventions.
+
+## 36. Step 8: the obvious repair to step 7 does not reach process composition
+
+Five worlds. X1 CONFIRMED only after amendment P-1: run 1 had P-B reporting
+TRANSPORT_CONTRADICTION, which looked like the scalar surviving - but P-B's contradiction is
+TERMINAL by construction, the one position step 7 showed last-wins catches. P-E moves it off
+the end (witness re-loads after the child returns) and the scalar certifies VALID_INTERVENTION
+while a descendant executed the original. Stopping at run 1 would have recorded "survived
+process composition"; it survived one ORDERING.
+
+X2 CONFIRMED and it is the finding: P-B (descendant that ESCAPED the intervention) and P-D
+(stranger, ppid = driver, never part of it) get the same verdict from the current
+representation (TRANSPORT_CONTRADICTION) AND from the naive uniformity foil (NOT_UNIFORM) -
+collapsed for OPPOSITE reasons, one ignoring every execution but the last, the other ignoring
+lineage. The missing distinction is therefore NOT multiplicity, and the obvious answer to
+step 7 does not reach it.
+
+X3 left open deliberately. The evidence DOES distinguish them (ppid), but no rule does, and
+ppid-descent was not adopted: it is trivially defeatable (re-parenting, pools, detached
+grandchildren) and adopting it because it separates two constructed worlds would invent the
+distinction from the fixture. No state, field or concept created.
