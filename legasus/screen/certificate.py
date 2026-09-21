@@ -35,9 +35,9 @@ RULE_FINGERPRINTS = {
 # fingerprint is correctly refused with RULE_DEFINITION_MOVED.
 RULE_FINGERPRINTS_V13 = {
     "existential-from-established-member":
-        "f5cbb0c5daf495dd018089114b0dcb34cd237b6b25a64de317bdbdce2cba6bfc",
+        "bab699a8a7d722fc3c835c702d02ae29caa6dfbe50e85c6de4ba76409c0cffa2",
     "universal-from-exhaustive-coverage":
-        "1c356ca01d173bd4d3656ae003781df7e991e3cb4033250750a6ee1764930ba4",
+        "04501b606a6c9b6ee794b44965ab5ea77bdc08966fb316395cf1d03337820149",
     "claim-from-direct-observation":
         "eaedaf843c76e495aa215ff6c355f4efc3a4a03460435e4d6978bed56bb53f5d",
 }
@@ -47,6 +47,14 @@ RULE_FINGERPRINTS_V13 = {
 #     existential ... 1a05042bff94c34e   universal ... 5d0b57cf7a23cd7f
 # and certificates carrying them are now correctly refused.
 # claim-from-direct-observation is UNCHANGED, because it has no obligation and therefore no matcher.
+#
+# RE-PINNED A SECOND TIME. The consumer installed CLOSURE fingerprints, which cover the semantic
+# dependency closure of each matcher rather than only the matcher's own source, so a change inside
+# resolveEvidenceRoot now moves the rule identity - exactly what R-W4 proved the old digest could not
+# see. The pins immediately before this one were
+#     existential ... f5cbb0c5daf495dd   universal ... 1c356ca01d173bd4
+# claim-from-direct-observation did not move through EITHER re-pin: no obligation, no matcher, no
+# closure. A rule with nothing to satisfy has nothing that can drift.
 
 RULE_FOR_QUANTIFIER = {"EXISTS": "existential-from-established-member",
                        "FOR_ALL": "universal-from-exhaustive-coverage",
