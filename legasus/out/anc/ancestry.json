@@ -1,0 +1,191 @@
+{
+  "at": "2026-09-21T02:37:42.826Z",
+  "node": "v24.15.0",
+  "hypothesis": "H-ANC - evaluated, never adopted",
+  "mechanism": "legasus/cjs-preload.mjs @ e41c1e3, unchanged",
+  "results": [
+    {
+      "world": "A-1",
+      "witnessPid": 17088,
+      "processes": [
+        {
+          "pid": 17088,
+          "ppid": 32236,
+          "role": "witness",
+          "loads": [
+            "MUTANT"
+          ]
+        },
+        {
+          "pid": 19652,
+          "ppid": 32236,
+          "role": "worker",
+          "loads": [
+            "SUBJECT"
+          ]
+        }
+      ],
+      "nonWitness": [
+        {
+          "pid": 19652,
+          "ppid": 32236,
+          "role": "worker",
+          "loads": [
+            "SUBJECT"
+          ],
+          "hanc": {
+            "belongs": null,
+            "evaluable": false,
+            "why": "ppid 32236 names a process absent from the record (exited, or never observed) - the chain cannot be reconstructed"
+          }
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 2,
+        "distinctPids": 2,
+        "identities": [
+          "MUTANT",
+          "SUBJECT"
+        ]
+      },
+      "witness": {
+        "exit": 0,
+        "stdoutTail": "PASS witness segments | PASS work requested from the pre-existing worker | ALL PASS  (2 passed, 0 failed)"
+      },
+      "workerStdout": "spawned by the driver, before the witness existed"
+    },
+    {
+      "world": "A-2",
+      "witnessPid": 24356,
+      "processes": [
+        {
+          "pid": 24356,
+          "ppid": 32236,
+          "role": "witness",
+          "loads": [
+            "MUTANT"
+          ]
+        },
+        {
+          "pid": 41868,
+          "ppid": 24356,
+          "role": "background",
+          "loads": [
+            "SUBJECT"
+          ]
+        }
+      ],
+      "nonWitness": [
+        {
+          "pid": 41868,
+          "ppid": 24356,
+          "role": "background",
+          "loads": [
+            "SUBJECT"
+          ],
+          "hanc": {
+            "belongs": true,
+            "evaluable": true,
+            "hops": 1
+          }
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 2,
+        "distinctPids": 2,
+        "identities": [
+          "MUTANT",
+          "SUBJECT"
+        ]
+      },
+      "witness": {
+        "exit": 0,
+        "stdoutTail": "PASS background housekeeping (pid 41868, ppid 24356) | PASS background task completed | ALL PASS  (2 passed, 0 failed)"
+      },
+      "workerStdout": null
+    },
+    {
+      "world": "A-3",
+      "witnessPid": 39544,
+      "processes": [
+        {
+          "pid": 31028,
+          "ppid": 26288,
+          "role": "grandchild",
+          "loads": [
+            "SUBJECT"
+          ]
+        },
+        {
+          "pid": 39544,
+          "ppid": 32236,
+          "role": "witness",
+          "loads": [
+            "MUTANT"
+          ]
+        }
+      ],
+      "nonWitness": [
+        {
+          "pid": 31028,
+          "ppid": 26288,
+          "role": "grandchild",
+          "loads": [
+            "SUBJECT"
+          ],
+          "hanc": {
+            "belongs": null,
+            "evaluable": false,
+            "why": "ppid 26288 names a process absent from the record (exited, or never observed) - the chain cannot be reconstructed"
+          }
+        }
+      ],
+      "cardinality": {
+        "markerRecords": 2,
+        "distinctPids": 2,
+        "identities": [
+          "MUTANT",
+          "SUBJECT"
+        ]
+      },
+      "witness": {
+        "exit": 0,
+        "stdoutTail": "PASS witness segments | PASS intermediate exited | ALL PASS  (2 passed, 0 failed)"
+      },
+      "workerStdout": null
+    }
+  ],
+  "scoring": {
+    "A1": "CONFIRMED - the worker executed the target (caused by the witness's request) and H-ANC gives belongs=null: under-inclusion",
+    "A2": "CONFIRMED - a descendant doing work outside every witness case is included by H-ANC, and its record is identical in kind to step 8 P-B's escaped descendant",
+    "A3": "CONFIRMED - H-ANC is NOT EVALUABLE for the grandchild: ppid 26288 names a process absent from the record (exited, or never observed) - the chain cannot be reconstructed",
+    "verdict": "H-ANC DENIED the status of a sufficient basis"
+  },
+  "processHygiene": {
+    "spawnedRecorded": 3,
+    "aliveAtSweep": 0,
+    "sweep": [
+      {
+        "world": "A-1",
+        "role": "worker",
+        "pid": 19652,
+        "aliveAtSweep": false,
+        "killed": false
+      },
+      {
+        "world": "A-3",
+        "role": "intermediate",
+        "pid": 26288,
+        "aliveAtSweep": false,
+        "killed": false
+      },
+      {
+        "world": "A-3",
+        "role": "grandchild",
+        "pid": 31028,
+        "aliveAtSweep": false,
+        "killed": false
+      }
+    ]
+  }
+}

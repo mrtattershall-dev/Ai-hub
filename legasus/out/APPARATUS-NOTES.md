@@ -590,3 +590,29 @@ X3 left open deliberately. The evidence DOES distinguish them (ppid), but no rul
 ppid-descent was not adopted: it is trivially defeatable (re-parenting, pools, detached
 grandchildren) and adopting it because it separates two constructed worlds would invent the
 distinction from the fixture. No state, field or concept created.
+
+## 37. H-ANC denied - and it failed by ONE mechanism, not the two I predicted
+
+Step 9. Three hostile worlds, all three predictions confirmed, H-ANC denied as a sufficient
+basis. Process hygiene: 3 pids recorded, 0 alive at sweep.
+
+The correction that matters more than the score: I framed A-1 as an EXTENSION failure (H-ANC
+excludes an execution a causal account includes) and A-3 as an EVALUABILITY failure. Reality
+collapsed them - the pre-existing worker was not excluded, H-ANC simply could not be EVALUATED
+for it, for the same reason as the detached grandchild: its parent left no marker.
+
+    H-ANC is evaluable from the recorded evidence ONLY where the parent also appears in that
+    evidence - in practice the ONE-HOP case, a direct child of the witness.
+
+A-2 evaluated only because ppid == witnessPid directly. Lateral or deeper-with-a-silent-
+intermediate returns null, silently. So a relation that looks like a structural fact about the
+process tree is, from inside the evidence, a one-hop lookup that fails the moment an
+intermediate does not happen to load the target - an accident unrelated to lineage.
+
+Also killed: over-inclusion. A-2's background descendant is included by H-ANC and its record is
+identical IN KIND to step 8 P-B's escaped descendant, the case H-ANC was meant to catch.
+
+Map now: final identity NO; preserve all identities NO; uniformity NO; ancestry NO. Four
+candidates removed, none replaced, nothing named. Observation recorded and nothing more: every
+candidate so far decides membership from properties OF THE OBSERVATION, and the one thing A-1's
+evidence lacked - that the witness asked for the work - is not such a property.
