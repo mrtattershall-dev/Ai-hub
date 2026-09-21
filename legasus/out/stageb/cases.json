@@ -1,0 +1,53 @@
+{
+  "target": "C:\\Users\\tatte\\AppData\\Local\\Temp\\stageb-target\\pt",
+  "filesScanned": 4940,
+  "filesParsed": 4940,
+  "parseFailures": [],
+  "parseFailureCount": 0,
+  "localFunctionNames": 89456,
+  "candidates": 3531,
+  "selected": [
+    {
+      "file": ".ci/lumen_cli/cli/lib/core/vllm/vllm_build.py",
+      "line": 188,
+      "decision": "if not gh_summary_path():",
+      "calledFunction": "gh_summary_path",
+      "definedAt": [
+        [
+          ".ci/lumen_cli/cli/lib/common/gh_summary.py",
+          55
+        ]
+      ],
+      "definitionSites": 1,
+      "bodyAction": "return"
+    },
+    {
+      "file": ".ci/lumen_cli/cli/lib/core/vllm/vllm_build.py",
+      "line": 260,
+      "decision": "if local_image_exists(base_image):",
+      "calledFunction": "local_image_exists",
+      "definedAt": [
+        [
+          ".ci/lumen_cli/cli/lib/common/docker_helper.py",
+          26
+        ]
+      ],
+      "definitionSites": 1,
+      "bodyAction": "return"
+    },
+    {
+      "file": ".ci/lumen_cli/cli/lib/core/vllm/vllm_test.py",
+      "line": 221,
+      "decision": "if not validate_cuda(get_env(\"TORCH_CUDA_ARCH_LIST\")):",
+      "calledFunction": "validate_cuda",
+      "definedAt": [
+        [
+          ".ci/lumen_cli/cli/lib/core/vllm/vllm_test.py",
+          291
+        ]
+      ],
+      "definitionSites": 1,
+      "bodyAction": "log.warning"
+    }
+  ]
+}

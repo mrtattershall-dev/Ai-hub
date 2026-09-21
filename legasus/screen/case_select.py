@@ -24,6 +24,11 @@ ACTION_WORDS = ("warn", "error", "abort", "skip", "fallback")
 LOG_LEVELS = ("warning", "error", "critical", "exception", "fatal")
 
 
+import builtins
+
+BUILTIN_NAMES = set(dir(builtins))
+
+
 def called_name(node):
     f = node.func
     if isinstance(f, ast.Name):
@@ -31,6 +36,26 @@ def called_name(node):
     if isinstance(f, ast.Attribute):
         return f.attr
     return None
+
+
+def project_local_call(node, local_funcs):
+    """APPARATUS CORRECTION (fifth instance of the weakened-criterion pattern).
+
+    The frozen rule says "a call to a PROJECT-LOCAL function". The first implementation asked
+    only whether the called NAME appeared among names defined in the repo - a weaker proxy. In a
+    repository this size, `len` and `match` are defined somewhere, so builtins and stdlib calls
+    were admitted and the top three selections were `len()` and `re.match()`.
+
+    Corrected to implement the frozen criterion: a BARE NAME call (not an attribute access on a
+    module or object) whose name is defined in this repository and is not a Python builtin.
+    The rule is unchanged; only its implementation is.
+    """
+    f = node.func
+    if not isinstance(f, ast.Name):
+        return None                       # `re.match(...)`, `self.foo(...)` - not a bare local call
+    if f.id in BUILTIN_NAMES:
+        return None                       # `len(...)` is a builtin regardless of shadowing
+    return f.id if f.id in local_funcs else None
 
 
 def body_is_action(body):
@@ -86,13 +111,13 @@ def main():
             if not isinstance(node, ast.If):
                 continue
             calls = [c for c in ast.walk(node.test) if isinstance(c, ast.Call)]
-            local = [c for c in calls if called_name(c) in local_funcs]
+            local = [c for c in calls if project_local_call(c, local_funcs)]
             if not local:
                 continue
             action = body_is_action(node.body)
             if not action:
                 continue
-            fn = called_name(local[0])
+            fn = project_local_call(local[0], local_funcs)
             candidates.append({
                 "file": rel, "line": node.lineno,
                 "decision": lines[node.lineno - 1].strip()[:150] if node.lineno - 1 < len(lines) else "",
