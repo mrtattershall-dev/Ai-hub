@@ -141,12 +141,16 @@ test('CHEAT 2 — a certificate that carries authority shape is refused UNREAD, 
   }
 });
 
-test('a v1.0 certificate is refused: a version this adapter cannot check it must not read', () => {
-  const c = structuredClone(CERTS[SUPPORTED]);
-  c.contract_version = '1.0.0-frozen-2026-09-21';
-  delete c.measurement.observation.attribution;
-  assert.match(readable(c), /this adapter consumes 1\.1\.0/);
-  assert.equal(adapt(c).minted, false);
+test('an older certificate is refused: a version this adapter cannot check it must not read', () => {
+  // Asserted against the adapter's OWN declared version rather than a literal, so this test does not
+  // go stale every time the contract moves - which is exactly how it failed on the v1.2 bump.
+  for (const older of ['1.0.0-frozen-2026-09-21', '1.1.0-frozen-2026-09-21']) {
+    const c = structuredClone(CERTS[SUPPORTED]);
+    c.contract_version = older;
+    assert.match(readable(c), new RegExp('this adapter consumes ' + CONTRACT_VERSION.split('-')[0]),
+      older);
+    assert.equal(adapt(c).minted, false, older);
+  }
 });
 
 test('the store admits only what admit() passes', () => {

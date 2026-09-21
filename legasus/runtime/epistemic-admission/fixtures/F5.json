@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.1.0-frozen-2026-09-21",
+  "contract_version": "1.2.0-frozen-2026-09-21",
   "requested_claim": {
     "domain": {
       "name": "SAMPLE",
@@ -60,11 +60,16 @@
             "settled": false
           }
         ],
-        "relation_witnesses": [],
+        "relation_witnesses": [
+          "COVERAGE",
+          "MEMBERSHIP"
+        ],
         "closed": false
       }
     ],
-    "open_frontier": "no supporting derivation with settled, decidable premises"
+    "open_frontier": "no supporting derivation with settled, decidable premises",
+    "rule_id": "claim-from-direct-observation",
+    "rule_digest": "5af06cb1e7d1e9cfd37a1b00cd87eeb9e9d04254576b1a4fe9f972e109f63e37"
   },
   "measurement": {
     "capability_demonstrated": false,
@@ -100,6 +105,6 @@
       "out/hadmission/substitution2.json"
     ],
     "run_id": "F5",
-    "emitted_at": "2026-09-21T15:32:36Z"
+    "emitted_at": "2026-09-21T15:43:39Z"
   }
 }

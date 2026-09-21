@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.1.0-frozen-2026-09-21",
+  "contract_version": "1.2.0-frozen-2026-09-21",
   "requested_claim": {
     "domain": {
       "name": "SAMPLE",
@@ -41,11 +41,16 @@
             "settled": true
           }
         ],
-        "relation_witnesses": [],
+        "relation_witnesses": [
+          "COVERAGE",
+          "MEMBERSHIP"
+        ],
         "closed": true
       }
     ],
-    "open_frontier": null
+    "open_frontier": null,
+    "rule_id": "universal-from-exhaustive-coverage",
+    "rule_digest": "018abb658b2d297384410a5f073deaa8e34ffc07b1bf41b974bfefa7ae0d2f7d"
   },
   "measurement": {
     "capability_demonstrated": true,
@@ -81,6 +86,6 @@
       "out/hadmission/substitution2.json"
     ],
     "run_id": "F4",
-    "emitted_at": "2026-09-21T15:32:36Z"
+    "emitted_at": "2026-09-21T15:43:39Z"
   }
 }

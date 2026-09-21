@@ -17,10 +17,15 @@
 //   3. It may TRANSMIT and VALIDATE attribution. It may never SYNTHESIZE it, and never infer it from
 //      procedure, filename, producer or issuer. There is deliberately no code path that writes one.
 //   4. A certificate is an APPLICATION for authority. Successful parsing establishes nothing.
+//   5. RULE IDENTITY, NOT RULE AUTHORITY. The certificate says WHICH rule it claims to have used and
+//      WHICH witnesses it established. What that rule REQUIRES is resolved here, from this runtime's
+//      own registry, and a moved definition is refused rather than silently re-interpreted. Letting
+//      the producer declare `requires` would let it choose its own burden of proof.
 import { OBSERVABILITY, observation } from '../../legaknow/observation.mjs';
 import { observe, derive, isAuthority, KIND } from '../../legaknow/calculus.mjs';
+import { resolveRule } from './rules.mjs';
 
-export const CONTRACT_VERSION = '1.1.0-frozen-2026-09-21';
+export const CONTRACT_VERSION = '1.2.0-frozen-2026-09-21';
 
 // A certificate that carries any of these has started becoming a second authority system. The
 // producer's schema forbids them; the consumer refuses them again, because a forged certificate does
@@ -65,6 +70,10 @@ export function readable(cert) {
     return 'measurement.observation has no attribution key. v1.0 cannot express it, and this adapter'
       + ' may not synthesize one.';
   }
+  if (!cert.derivation.rule_id || !cert.derivation.rule_digest) {
+    return 'derivation carries no rule identity. A derivation whose rule this runtime cannot resolve'
+      + ' is one whose obligations it cannot enforce.';
+  }
   return null;
 }
 
@@ -92,15 +101,16 @@ export function observeArgs(cert) {
 // ARGUMENTS FOR DERIVE, for ONE closed alternative. Alternatives are claim-level ANY_OF and are not
 // flattened: the caller picks an alternative, and every premise inside it is conjunctive.
 //
-// THE LIMIT, stated rather than hidden: the certificate names an alternative and its relation
-// witnesses, but carries no rule REQUIREMENTS, so `rule.requires` is empty and derive()'s witness
-// check passes vacuously. That is a gap in the contract, not a bypass of the calculus, and it means a
-// derived token here rests on a weaker witness obligation than derive() is capable of enforcing.
-export function deriveArgs(cert, altIndex, premiseTokens) {
+// THE RULE COMES FROM THE LOCAL REGISTRY. `localRule` is what resolveRule() returned for the
+// certificate's rule_id after its digest matched. The certificate contributes WITNESSES - facts it
+// established - and contributes nothing to what is required. Earlier this function wrote
+// `requires: []` itself, so derive()'s witness check passed vacuously; the calculus was enforcing
+// correctly against a rule object that asked for nothing.
+export function deriveArgs(cert, altIndex, premiseTokens, localRule) {
   const alt = cert.derivation.alternatives[altIndex];
   return {
     premises: premiseTokens,
-    rule: { name: 'certificate:' + cert.provenance.run_id + ':alternative' + altIndex, requires: [] },
+    rule: localRule,                                   // never assembled from certificate data
     relationWitnesses: (alt.relation_witnesses || []).map((r) => ({ relation: r })),
     claim: cert.requested_claim.predicate,
   };
@@ -125,11 +135,19 @@ export function adapt(cert) {
       why: 'no closed alternative in the certificate; ' + (cert.derivation.open_frontier
         || 'the derivation frontier is open') };
   }
-  const derTok = derive(deriveArgs(cert, idx, [obsTok]));
-  if (!isAuthority(derTok)) {
-    return refuse('derive() refused: ' + derTok.why, { stage: 'DERIVE', observationToken: obsTok });
+  // RESOLVE THE RULE LOCALLY, and refuse a definition that has moved underneath the certificate.
+  const r = resolveRule(cert.derivation);
+  if (!r.ok) {
+    return refuse(r.why, { stage: 'RULE', moved: !!r.moved, observationToken: obsTok });
   }
-  return { token: derTok, observationToken: obsTok, alternative: idx, kind: derTok.kind };
+
+  const derTok = derive(deriveArgs(cert, idx, [obsTok], r.rule));
+  if (!isAuthority(derTok)) {
+    return refuse('derive() refused: ' + derTok.why, { stage: 'DERIVE', observationToken: obsTok,
+      rule: r.rule.name, requires: r.rule.requires, missing: derTok.missing });
+  }
+  return { token: derTok, observationToken: obsTok, alternative: idx, kind: derTok.kind,
+    rule: r.rule.name };
 }
 
 export { isAuthority, KIND };
