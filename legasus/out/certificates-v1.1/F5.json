@@ -1,0 +1,105 @@
+{
+  "contract_version": "1.1.0-frozen-2026-09-21",
+  "requested_claim": {
+    "domain": {
+      "name": "SAMPLE",
+      "contained_in": [
+        "REPOSITORY"
+      ]
+    },
+    "quantifier": "POINTWISE",
+    "predicate": "H-INFO discriminated from H-RICH"
+  },
+  "licensed_claim": null,
+  "licensed_relation": "NONE",
+  "collateral_observations": [
+    {
+      "claim": {
+        "domain": {
+          "name": "SAMPLE",
+          "contained_in": [
+            "REPOSITORY"
+          ]
+        },
+        "quantifier": "EXISTS",
+        "predicate": "H-INFO discriminated from H-RICH"
+      },
+      "relation_to_request": "INCOMPARABLE",
+      "established_by": [
+        "obs"
+      ]
+    }
+  ],
+  "frontier": [
+    {
+      "gate": "D",
+      "unmet": "no supporting derivation with settled, decidable premises",
+      "blocking_kind": "undecidable_or_open_premise"
+    },
+    {
+      "gate": "M",
+      "unmet": "hinfo harness has not demonstrated capability for this observation",
+      "blocking_kind": "instrument_capability"
+    }
+  ],
+  "obligation": {
+    "passed": true,
+    "unmet": [],
+    "coverage": {
+      "SAMPLE": "EXHAUSTIVE"
+    }
+  },
+  "derivation": {
+    "passed": false,
+    "alternatives": [
+      {
+        "premises": [
+          {
+            "ref": "F5:derivation0:premise0",
+            "decidable_at_site": true,
+            "settled": false
+          }
+        ],
+        "relation_witnesses": [],
+        "closed": false
+      }
+    ],
+    "open_frontier": "no supporting derivation with settled, decidable premises"
+  },
+  "measurement": {
+    "capability_demonstrated": false,
+    "positive_control": {
+      "fired": false,
+      "ref": "F5:positive_control"
+    },
+    "observation": {
+      "ref": "F5:observation",
+      "evidential_force": false,
+      "procedure": "hinfo harness over SAMPLE",
+      "context": {
+        "evidence_scope": "SAMPLE",
+        "examined": 3,
+        "domain_size": 3
+      },
+      "attribution": "entitlement_conformance.CASES['F5 richness run'] -> (claim=DISTINCTION over SAMPLE, evidence_scope=SAMPLE)"
+    },
+    "instrument": {
+      "name": "hinfo harness",
+      "version_digest": "14e1c6252a4c72ab5abd6c41fdc63ce4c7f1582c090399fbcb4397091887e3d3"
+    }
+  },
+  "run_floor": {
+    "instrument": "hinfo harness",
+    "emitted_ref": "F5:emitted",
+    "run_id": "F5"
+  },
+  "provenance": {
+    "producer": "legasus/screen/obligation.py",
+    "producer_digest": "b228113d57ba907b5ed9e7916372f9dc4388b85cd2522b2d0e6140d6c96ce5c6",
+    "evidence_refs": [
+      "out/hadmission/substitution2.json"
+    ],
+    "run_id": "F5",
+    "emitted_at": "2026-09-21T15:32:36Z"
+  }
+}

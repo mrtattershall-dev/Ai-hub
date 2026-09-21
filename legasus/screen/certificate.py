@@ -11,7 +11,8 @@ import obligation as O
 from shadow_substitution import new_attempt, to_new, KNOWN_DOMAINS, dom
 
 HERE = Path(__file__).parent
-CONTRACT_VERSION = "1.0.0-frozen-2026-09-21"
+CONTRACT_V10 = "1.0.0-frozen-2026-09-21"
+CONTRACT_V11 = "1.1.0-frozen-2026-09-21"
 
 INSTRUMENT_SOURCE = {"reach1 tracer": "reach1.py", "SCREEN-1 detectors": "screen1.py",
                      "stageb diagnosis": "stageb_diagnose.py", "hinfo harness": "hinfo.py"}
@@ -54,7 +55,12 @@ def collateral_for(requested2, ext, licensed2):
     return out
 
 
-def emit(claim, ev, run_id, evidence_refs):
+def emit(claim, ev, run_id, evidence_refs, version=CONTRACT_V10, attribution=None):
+    """`attribution` is supplied by the PRODUCER from the real binding record.
+
+    It is never synthesized here and never derived from the procedure, the file
+    name, the producer or the issuer. v1.0 carries no such field at all.
+    """
     o, d, m, licensed2, requested2, floor = new_attempt(claim, ev)
     _, ext = to_new(claim, ev)
 
@@ -82,8 +88,16 @@ def emit(claim, ev, run_id, evidence_refs):
         alternatives.append({"premises": [prem], "relation_witnesses": [],
                              "closed": prem["decidable_at_site"] and prem["settled"]})
 
+    observation = {"ref": "%s:observation" % run_id,
+                   "evidential_force": bool(ev.positive_control_fired),
+                   "procedure": "%s over %s" % (ev.instrument, ev.evidence_scope),
+                   "context": {"evidence_scope": ev.evidence_scope,
+                               "examined": ev.examined, "domain_size": ev.domain_size}}
+    if version == CONTRACT_V11:
+        observation["attribution"] = attribution
+
     return {
-        "contract_version": CONTRACT_VERSION,
+        "contract_version": version,
         "requested_claim": claim_json(requested2),
         "licensed_claim": claim_json(licensed2),
         "licensed_relation": relation,
@@ -98,11 +112,7 @@ def emit(claim, ev, run_id, evidence_refs):
             "capability_demonstrated": m.passed,
             "positive_control": {"fired": bool(ev.positive_control_fired),
                                  "ref": "%s:positive_control" % run_id},
-            "observation": {"ref": "%s:observation" % run_id,
-                            "evidential_force": bool(ev.positive_control_fired),
-                            "procedure": "%s over %s" % (ev.instrument, ev.evidence_scope),
-                            "context": {"evidence_scope": ev.evidence_scope,
-                                        "examined": ev.examined, "domain_size": ev.domain_size}},
+            "observation": observation,
             "instrument": {"name": ev.instrument,
                            "version_digest": digest_of(INSTRUMENT_SOURCE.get(ev.instrument,
                                                                              ev.instrument))}},
@@ -119,10 +129,17 @@ def emit(claim, ev, run_id, evidence_refs):
 if __name__ == "__main__":
     from entitlement_conformance import CASES
     out_dir = Path(sys.argv[1]); out_dir.mkdir(parents=True, exist_ok=True)
+    version = CONTRACT_V11 if (len(sys.argv) > 2 and sys.argv[2] == "v1.1") else CONTRACT_V10
     for name, (claim, ev, _) in CASES.items():
         run_id = name.split()[0].replace("'", "p")
-        cert = emit(claim, ev, run_id, ["out/hadmission/substitution2.json"])
+        # THE REAL BINDING RECORD. What tied this observation to this subject is the frozen case
+        # entry in entitlement_conformance.CASES - the (claim, evidence) pair under this exact key.
+        # That is a fact about how the run was constructed, not a label invented for the schema.
+        attribution = ("entitlement_conformance.CASES[%r] -> (claim=%s over %s, evidence_scope=%s)"
+                       % (name, claim.form, claim.scope, ev.evidence_scope))
+        cert = emit(claim, ev, run_id, ["out/hadmission/substitution2.json"],
+                    version=version, attribution=attribution)
         (out_dir / ("%s.json" % run_id)).write_text(json.dumps(cert, indent=2), encoding="utf-8")
-        print("%-30s licensed=%-9s collateral=%d frontier=%s"
-              % (name[:30], cert["licensed_relation"], len(cert["collateral_observations"]),
-                 [f["gate"] for f in cert["frontier"]]))
+        print("%-30s v=%-6s licensed=%-9s collateral=%d frontier=%s"
+              % (name[:30], version.split("-")[0], cert["licensed_relation"],
+                 len(cert["collateral_observations"]), [f["gate"] for f in cert["frontier"]]))

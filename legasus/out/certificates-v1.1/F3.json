@@ -1,0 +1,84 @@
+{
+  "contract_version": "1.1.0-frozen-2026-09-21",
+  "requested_claim": {
+    "domain": {
+      "name": "THIS_RUN",
+      "contained_in": [
+        "SAMPLE",
+        "REPOSITORY"
+      ]
+    },
+    "quantifier": "EXISTS",
+    "predicate": "candidate finding"
+  },
+  "licensed_claim": null,
+  "licensed_relation": "NONE",
+  "collateral_observations": [],
+  "frontier": [
+    {
+      "gate": "M",
+      "unmet": "SCREEN-1 detectors has not demonstrated capability for this observation",
+      "blocking_kind": "instrument_capability"
+    }
+  ],
+  "obligation": {
+    "passed": true,
+    "unmet": [],
+    "coverage": {
+      "THIS_RUN": "EXHAUSTIVE"
+    }
+  },
+  "derivation": {
+    "passed": true,
+    "alternatives": [
+      {
+        "premises": [
+          {
+            "ref": "F3:derivation0:premise0",
+            "decidable_at_site": true,
+            "settled": true
+          }
+        ],
+        "relation_witnesses": [],
+        "closed": true
+      }
+    ],
+    "open_frontier": null
+  },
+  "measurement": {
+    "capability_demonstrated": false,
+    "positive_control": {
+      "fired": false,
+      "ref": "F3:positive_control"
+    },
+    "observation": {
+      "ref": "F3:observation",
+      "evidential_force": false,
+      "procedure": "SCREEN-1 detectors over THIS_RUN",
+      "context": {
+        "evidence_scope": "THIS_RUN",
+        "examined": 546,
+        "domain_size": 546
+      },
+      "attribution": "entitlement_conformance.CASES['F3 SCREEN-1 as stated'] -> (claim=EXISTENTIAL over THIS_RUN, evidence_scope=THIS_RUN)"
+    },
+    "instrument": {
+      "name": "SCREEN-1 detectors",
+      "version_digest": "d136d47c5c9461c88de5a5cfe923a55b180241fdd2c109169d01c363ba38ca9e"
+    }
+  },
+  "run_floor": {
+    "instrument": "SCREEN-1 detectors",
+    "emitted_ref": "F3:emitted",
+    "run_id": "F3"
+  },
+  "provenance": {
+    "producer": "legasus/screen/obligation.py",
+    "producer_digest": "b228113d57ba907b5ed9e7916372f9dc4388b85cd2522b2d0e6140d6c96ce5c6",
+    "evidence_refs": [
+      "out/hadmission/substitution2.json"
+    ],
+    "run_id": "F3",
+    "emitted_at": "2026-09-21T15:32:36Z"
+  }
+}

@@ -14,26 +14,29 @@ import obligation as O
 from shadow_substitution import dom
 
 HERE = Path(__file__).parent
-SCHEMA = json.loads((HERE.parent / "contracts" / "entitlement-certificate.schema.json")
-                    .read_text(encoding="utf-8"))
+CONTRACTS = HERE.parent / "contracts"
+SCHEMA = json.loads((CONTRACTS / "entitlement-certificate.schema.json").read_text(encoding="utf-8"))
+SCHEMA11 = json.loads((CONTRACTS / "entitlement-certificate.v1.1.schema.json").read_text(encoding="utf-8"))
 V = Draft202012Validator(SCHEMA, format_checker=FormatChecker())
+V11 = Draft202012Validator(SCHEMA11, format_checker=FormatChecker())
 CERT_DIR = HERE.parent / "out" / "certificates"
+CERT_DIR11 = HERE.parent / "out" / "certificates-v1.1"
 
 fails = []
 
 
-def valid(doc):
-    return not list(V.iter_errors(doc))
+def valid(doc, validator=None):
+    return not list((validator or V).iter_errors(doc))
 
 
-def first_error(doc):
-    errs = list(V.iter_errors(doc))
+def first_error(doc, validator=None):
+    errs = list((validator or V).iter_errors(doc))
     return errs[0].message[:90] if errs else "(none)"
 
 
 # ---------------- positive control: every emitted certificate validates ----------------
 certs = {p.stem: json.loads(p.read_text(encoding="utf-8")) for p in sorted(CERT_DIR.glob("*.json"))}
-print("=== positive control: emitted certificates ===")
+print("=== positive control: v1.0 certificates against v1.0 ===")
 for name, c in certs.items():
     ok = valid(c)
     print("   %-6s %s  licensed=%-10s collateral=%d" % (name, "VALID" if ok else "INVALID",
@@ -43,6 +46,35 @@ for name, c in certs.items():
         fails.append("positive control: %s invalid: %s" % (name, first_error(c)))
 if not certs:
     fails.append("no certificates emitted")
+
+# ---------------- V-1 / V-2: preservation and version discrimination ----------------
+certs11 = {p.stem: json.loads(p.read_text(encoding="utf-8")) for p in sorted(CERT_DIR11.glob("*.json"))}
+if certs11:
+    print("\n=== V-1/V-2: v1.1 certificates ===")
+    for name, c in certs11.items():
+        ok11 = valid(c, V11)
+        ok10 = valid(c, V)
+        attr = c["measurement"]["observation"].get("attribution")
+        print("   %-6s v1.1=%-7s v1.0=%-9s attribution=%s"
+              % (name, "VALID" if ok11 else "INVALID", "REFUSED" if not ok10 else "ACCEPTED",
+                 "present" if attr else repr(attr)))
+        if not ok11:
+            fails.append("V-1: %s invalid under v1.1: %s" % (name, first_error(c, V11)))
+        if ok10:
+            fails.append("V-2: %s validated under v1.0; the versions are not discriminable" % name)
+    # v1.0 certificates must still be refused by v1.1, which requires attribution
+    for name, c in certs.items():
+        if valid(c, V11):
+            fails.append("V-2: v1.0 certificate %s validated under v1.1 despite no attribution" % name)
+    # attribution must be expressible as null, and null must not be confused with absent
+    probe = copy.deepcopy(next(iter(certs11.values())))
+    probe["measurement"]["observation"]["attribution"] = None
+    print("   null attribution is REPRESENTABLE under v1.1: %s" % valid(probe, V11))
+    if not valid(probe, V11):
+        fails.append("V-1: v1.1 cannot express attribution=null, so 'not established' is inexpressible")
+    del probe["measurement"]["observation"]["attribution"]
+    if valid(probe, V11):
+        fails.append("V-1: v1.1 accepted a certificate with attribution ABSENT; null and absent must differ")
 
 
 # ---------------- semantic cross-check: the relation proof is real ----------------

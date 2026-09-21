@@ -84,3 +84,37 @@ it; the epistemic × normative action join is a later, separately preregistered 
 
 Frozen. Exercised by `legasus/screen/certificate.py` (emitter) and `certificate_test.py`
 (validation, including adversarial cases). No consumer exists. No branch is merged.
+
+---
+
+# v1.1 — observation attribution (frozen 2026-09-21)
+
+Schema: `entitlement-certificate.v1.1.schema.json`. **v1.0.0 is preserved unmodified** as the
+contract steps 2–4 were actually run against, and its six fixtures are unchanged.
+
+## What changed
+
+One field, inside the observation and not at certificate level, because six observations from six
+producers must not silently inherit one global attribution:
+
+    measurement.observation.attribution    required key; string or null
+
+`null` means *not established*, which is a different fact from the field being absent. v1.0 cannot
+express either.
+
+## The frozen rule
+
+    The adapter MAY transmit attribution and MAY validate its presence and shape.
+    The adapter MAY NOT synthesize it, and MAY NOT infer it from procedure, filename,
+    producer, or certificate issuer.
+    attribution: null  ->  the measurement->OBSERVE mapping is non-mintable.
+    ATTRIBUTION NEVER CONSTITUTES AUTHORITY.
+
+Attribution is provenance. It is what `legaknow.observe()` needs in order to decide for itself, not
+a claim that observation authority already exists.
+
+## Version discrimination is structural, not a string
+
+A v1.1 certificate is **refused** by v1.0 (`additionalProperties: false` sees `attribution` as
+unknown), and a v1.0 certificate is **refused** by v1.1 (the key is required). Neither version can
+be mistaken for the other by a consumer that validates.
