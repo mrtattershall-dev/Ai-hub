@@ -161,16 +161,47 @@ export function replayMerged(merged, { authorityStore: st } = {}) {
         // 2. THE PROPOSITION. A record from any origin that has ALREADY replayed into authority for
         //    exactly this claim. Selection is by claim; binding is still resolveEvidenceRoot's call.
         const need = relationClaim(c.relation, c.subject, c.object);
-        const cands = byClaim.get(need) || [];
+        // ELIGIBILITY IS DECIDED BY ACTUALLY BINDING, NOT BY CLAIM IDENTITY.
+        //
+        // Found by S3 failing: a record establishing the same claim string in ANOTHER WORLD was
+        // being counted as eligible support, so apparent agreement was reported as multiplicity.
+        // Claim identity is only a way to find CANDIDATES; whether one is support for THIS witness
+        // is a question the adapter already answers, and it is asked here by trying the bind. No
+        // world check is reimplemented - the trial token is discarded and nothing is filed.
+        const cands = (byClaim.get(need) || []).filter((x) => {
+          const trial = structuredClone(cert);
+          for (const alt of trial.derivation ? trial.derivation.alternatives || [] : []) {
+            for (const w of alt.relation_witnesses || []) {
+              if (w.relation === c.relation && w.subject === c.subject && w.object === c.object) {
+                w.evidence_root = x.fresh;
+              }
+            }
+          }
+          return (adapt(trial, { authorityStore: st }).bound || []).includes(c.relation);
+        });
         if (cands.length > 1) {
+          // WHAT THIS REFUSAL KNOWS, and no more. Several records are eligible to support the same
+          // proposition. That is NOT a report that the evidence disagrees, and it is not a report
+          // that the claim is better supported: two histories can replay one observation, which is
+          // two histories and ONE reason. Composition of multiple eligible supports is undefined in
+          // this contract, so nothing is composed and nothing is chosen.
           blocked = { ...at, state: STATE.UNRESOLVED, minted: false,
-            why: 'more than one record establishes "' + need + '" (' + cands.map((x) =>
-              x.origin + '/' + x.ref).join(', ') + '). Merging does not choose between them' };
+            candidates: cands.map((x) => ({ origin: x.origin, ref: x.ref })),
+            why: 'MULTIPLE ELIGIBLE SUPPORTS for "' + need + '" (' + cands.map((x) =>
+              x.origin + '/' + x.ref).join(', ') + '). Composition of several supports is undefined'
+              + ' here, so none is chosen. This is not a finding that the evidence disagrees, and'
+              + ' not a finding that the claim is better supported' };
           break;
         }
         if (cands.length === 1) {
           fresh = cands[0].fresh;
-          from = { origin: cands[0].origin, ref: cands[0].ref, by: 'CLAIM', claim: need };
+          // THE PROVENANCE STAYS EXPLICIT, including the basis on which the candidate set was
+          // believed complete. That basis is the DECLARED claim of still-pending records - a hint,
+          // never an authority - and saying so in the outcome is the only honest option while it
+          // remains the basis. See S6 in MULTIPLICITY_PREREG.md.
+          from = { origin: cands[0].origin, ref: cands[0].ref, by: 'CLAIM', claim: need,
+            candidates: [{ origin: cands[0].origin, ref: cands[0].ref }],
+            completenessBasis: 'DECLARED_CLAIMS_OF_PENDING_RECORDS' };
         }
       }
       if (!fresh) {

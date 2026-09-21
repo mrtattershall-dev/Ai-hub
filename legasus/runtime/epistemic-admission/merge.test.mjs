@@ -324,7 +324,10 @@ test('M10 — several records establishing the SAME claim: reported, not selecte
   assert.equal(outcomeFor(r, 'C', 'auth:1:c').state, STATE.ESTABLISHED);
   const o = outcomeFor(r, 'A', 'auth:2:a');
   assert.equal(o.minted, false, 'the consumer must not pick one: ' + o.why);
-  assert.match(o.why, /more than one record establishes/);
+  // reworded in the multiplicity run: the refusal means "multiple suppliers, composition
+  // undefined", never "the evidence disagrees". Behaviour is unchanged; S0 asserts that.
+  assert.match(o.why, /MULTIPLE ELIGIBLE SUPPORTS/);
+  assert.match(o.why, /not a finding that the evidence disagrees/);
   assert.match(o.why, /B\/auth:1:b/);
   assert.match(o.why, /C\/auth:1:c/);
   assert.deepEqual(o.bound || [], []);
