@@ -1,0 +1,42 @@
+{
+  "rows": [
+    {
+      "case": "F1 StageB case3 validate_cuda",
+      "family": "O",
+      "O": false,
+      "D": true,
+      "M": true,
+      "entitled": false,
+      "off_diagonal": []
+    },
+    {
+      "case": "F2 REACH-1 get_path (site #7)",
+      "family": "D",
+      "O": true,
+      "D": false,
+      "M": true,
+      "entitled": false,
+      "off_diagonal": []
+    },
+    {
+      "case": "F3 SCREEN-1 zero findings",
+      "family": "M",
+      "O": true,
+      "D": true,
+      "M": false,
+      "entitled": false,
+      "off_diagonal": []
+    },
+    {
+      "case": "F4 REACH-1 R2 (59/60 beyond locality)",
+      "family": "none",
+      "O": true,
+      "D": true,
+      "M": true,
+      "entitled": true,
+      "off_diagonal": []
+    }
+  ],
+  "cross_detection": 0,
+  "t1": true
+}
