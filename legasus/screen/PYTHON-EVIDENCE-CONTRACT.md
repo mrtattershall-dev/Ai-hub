@@ -55,6 +55,23 @@ property that actually matters and is structurally decidable.
 It also fixes the false negative: `upload_ok` — `try: return True` / `except: return True` —
 needs no literal failure return anywhere to be a VIOLATION.
 
+## INV-A2 precision: what "identical" means, and what SAFE does not mean
+
+**Identical means observationally identical under a narrowly defined comparison rule, not
+AST-text-identical.** `return True` and `return bool(1)` are syntactically different and
+indistinguishable to a caller; `Result(True, source="normal")` and `Result(True, source="error")`
+share an apparent success bit while remaining distinguishable. A2 does not attempt sophisticated
+evaluation. It defines a **supported equivalence relation** - literal constants compared by
+value, after folding the handful of trivially foldable forms - and pushes **everything outside
+that relation to UNKNOWN**. The contract states exactly what has been established and no more.
+
+**The second state is DISTINGUISHABLE, not SAFE.** Formally it means *no violation of this
+invariant was established* - the exceptional path is distinguishable from the compared ordinary
+path. It does **not** mean the function is correct. `try: return 1 / except: return 2` is
+DISTINGUISHABLE while possibly being terrible design. `SAFE` may be used as external vocabulary
+only with that definition attached, because "SAFE" quietly becoming "good code" is the same
+entitlement expansion this contract exists to prevent.
+
 ## INV-B2 — three states, with computed returns moving to UNKNOWN
 
     PROVEN_FAILURE_UNREACHABLE   every return is a truthy literal, and no `raise` — the
