@@ -1,0 +1,6236 @@
+{
+  "root": "C:\\Users\\tatte\\AppData\\Local\\Temp\\stageb-target\\pt",
+  "indexed_functions": 163314,
+  "n_coercing": 286,
+  "n_plain": 163028,
+  "summary": {
+    "coercing_all": {
+      "label": "COERCING (all)",
+      "n": 286,
+      "median": 2.0,
+      "mean": 157.79,
+      "p90": 51,
+      "max": 2000,
+      "frac_over_20": 0.1573,
+      "frac_zero": 0.101,
+      "p90_reach_fraction": 0.00018,
+      "capped": 19
+    },
+    "control_all": {
+      "label": "CONTROL  (all)",
+      "n": 400,
+      "median": 4.0,
+      "mean": 705.7,
+      "p90": 2000,
+      "max": 2000,
+      "frac_over_20": 0.415,
+      "frac_zero": 0.343,
+      "p90_reach_fraction": 0.00941,
+      "capped": 139
+    },
+    "coercing_unambiguous": {
+      "label": "COERCING (unambiguous names)",
+      "n": 219,
+      "median": 1,
+      "mean": 3.93,
+      "p90": 10,
+      "max": 51,
+      "frac_over_20": 0.0411,
+      "frac_zero": 0.114,
+      "p90_reach_fraction": 4e-05,
+      "capped": 0
+    },
+    "control_unambiguous": {
+      "label": "CONTROL  (unambiguous names)",
+      "n": 183,
+      "median": 0,
+      "mean": 35.3,
+      "p90": 5,
+      "max": 2000,
+      "frac_over_20": 0.0328,
+      "frac_zero": 0.612,
+      "p90_reach_fraction": 2e-05,
+      "capped": 3
+    }
+  },
+  "rows": {
+    "coercing": [
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_to_sparse_backward",
+        "file": "test\\test_autograd.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_inference_tensor",
+        "file": "test\\test_autograd.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "check_inversion_possible",
+        "file": "test\\test_autograd.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_cuda_graph_error_options",
+        "file": "test\\test_cuda.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "throws_on_cuda_event",
+        "file": "test\\test_cuda.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_cupti_backend_available",
+        "file": "test\\test_cuda_graph_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_can_appear_in_trace",
+        "file": "test\\test_decomp.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_storage_throws_on_data_ptr_access",
+        "file": "test\\test_torch.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_broadcast",
+        "file": "test\\test_torch.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "raises_on_data_ptr",
+        "file": "test\\test_torch.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "broadcastable",
+        "file": "test\\test_torch.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_xpu_graph_error_options",
+        "file": "test\\test_xpu.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "throws_on_xpu_event",
+        "file": "test\\test_xpu.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "parse_junit_reports",
+        "file": "tools\\render_junit.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "parse_file",
+        "file": "tools\\render_junit.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_compressed_file",
+        "file": "torch\\serialization.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_should_read_directly",
+        "file": "torch\\serialization.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 10,
+        "reached_functions": 8,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_callable_argument_names",
+        "file": "torch\\_jit_internal.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_same_inode",
+        "file": "torch\\_precompile.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 461,
+        "reached_functions": 234,
+        "propagated_through": 3,
+        "capped": false,
+        "name": "gradcheck",
+        "file": "torch\\autograd\\gradcheck.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_make_uvm_allocator",
+        "file": "torch\\cuda\\memory.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_uvm_alloc",
+        "file": "torch\\cuda\\memory.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1253,
+        "reached_functions": 543,
+        "propagated_through": 5,
+        "capped": false,
+        "name": "is_available",
+        "file": "torch\\cuda\\_graph_node_callbacks.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 572,
+        "reached_functions": 226,
+        "propagated_through": 5,
+        "capped": false,
+        "name": "register",
+        "file": "torch\\cuda\\_graph_node_callbacks.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 36,
+        "reached_functions": 26,
+        "propagated_through": 2,
+        "capped": false,
+        "name": "_check_bf16_tensor_supported",
+        "file": "torch\\cuda\\__init__.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_rocm_sdk_core_amdsmi_paths",
+        "file": "torch\\cuda\\__init__.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_valid_local_device",
+        "file": "torch\\distributed\\remote_device.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_check_state_dict_similarity",
+        "file": "torch\\distributed\\_state_dict_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1265,
+        "propagated_through": 130,
+        "capped": true,
+        "name": "get_attr",
+        "file": "torch\\fx\\graph.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_get_attr_reference_exists",
+        "file": "torch\\fx\\graph.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_graph_provenance_json",
+        "file": "torch\\fx\\traceback.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_get_dependencies",
+        "file": "torch\\package\\package_exporter.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_module_exists",
+        "file": "torch\\package\\package_exporter.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 24,
+        "reached_functions": 14,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "__contains__",
+        "file": "torch\\package\\_digraph.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "check_compiler_is_gcc",
+        "file": "torch\\utils\\cpp_extension.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_ninja_available",
+        "file": "torch\\utils\\cpp_extension.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "try_acquire",
+        "file": "torch\\utils\\file_baton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 24,
+        "reached_functions": 14,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "__contains__",
+        "file": "torch\\utils\\weak.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "has_helion_package",
+        "file": "torch\\utils\\_helion.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 22,
+        "reached_functions": 6,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_check_module_exists",
+        "file": "torch\\utils\\_import_utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_jax_package",
+        "file": "torch\\utils\\_pallas.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "has_pallas_package",
+        "file": "torch\\utils\\_pallas.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_jax_cuda_backend",
+        "file": "torch\\utils\\_pallas.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_jax_tpu_backend",
+        "file": "torch\\utils\\_pallas.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 33,
+        "reached_functions": 19,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_triton_package",
+        "file": "torch\\utils\\_triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 13,
+        "reached_functions": 11,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_triton_experimental_host_tma",
+        "file": "torch\\utils\\_triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 3,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_has_triton_amd_tdm_device",
+        "file": "torch\\utils\\_triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 23,
+        "reached_functions": 8,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_parse_visible_devices",
+        "file": "torch\\xpu\\__init__.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1253,
+        "propagated_through": 119,
+        "capped": true,
+        "name": "__call__",
+        "file": "torch\\_dynamo\\aot_compile.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "accepts",
+        "file": "torch\\_dynamo\\aot_compile.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_get_stack_for_eval",
+        "file": "torch\\_dynamo\\bytecode_debugger.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 13,
+        "reached_functions": 11,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "same_two_models",
+        "file": "torch\\_dynamo\\debug_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 3,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "backend_accuracy_fails",
+        "file": "torch\\_dynamo\\debug_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_can_emit_module_constructor",
+        "file": "torch\\_dynamo\\debug_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_einops_supports_dynamo_tracing",
+        "file": "torch\\_dynamo\\decorators.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 51,
+        "reached_functions": 8,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "is_dynamo_supported",
+        "file": "torch\\_dynamo\\eval_frame.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_inductor_supported",
+        "file": "torch\\_dynamo\\eval_frame.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "should_use_remote_dynamo_pgo_cache",
+        "file": "torch\\_dynamo\\pgo.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_defined_where_read",
+        "file": "torch\\_dynamo\\precompile_package.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "snapshot_attr_mutation",
+        "file": "torch\\_dynamo\\side_effects.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "format_tensor_computation_trace",
+        "file": "torch\\_dynamo\\symbolic_convert.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1221,
+        "propagated_through": 46,
+        "capped": true,
+        "name": "step",
+        "file": "torch\\_dynamo\\symbolic_convert.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 6,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "hashable",
+        "file": "torch\\_dynamo\\utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_tensor_getset_descriptor",
+        "file": "torch\\_dynamo\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 7,
+        "reached_functions": 6,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "fx_graph_cse",
+        "file": "torch\\_functorch\\compile_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "checkable_node",
+        "file": "torch\\_functorch\\compile_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "potential_input_alias_or_mutation",
+        "file": "torch\\_higher_order_ops\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "load_aoti_eager_cache",
+        "file": "torch\\_inductor\\aoti_eager.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "aoti_compile_with_persistent_cache",
+        "file": "torch\\_inductor\\aoti_eager.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 5,
+        "reached_functions": 6,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "wait_process_pool_ready",
+        "file": "torch\\_inductor\\async_compile.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_meta_ws",
+        "file": "torch\\_inductor\\autows_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 334,
+        "reached_functions": 165,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "insert",
+        "file": "torch\\_inductor\\cache.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_has_nvlink",
+        "file": "torch\\_inductor\\comm_analysis.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_fallback_handler",
+        "file": "torch\\_inductor\\compile_fx_ext.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_compiler_version_string",
+        "file": "torch\\_inductor\\cpp_builder.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_gcc_version_less_than",
+        "file": "torch\\_inductor\\cpp_builder.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 5,
+        "reached_functions": 6,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_is_msvc_cl",
+        "file": "torch\\_inductor\\cpp_builder.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_is_intel_compiler",
+        "file": "torch\\_inductor\\cpp_builder.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_compiler_version_info",
+        "file": "torch\\_inductor\\cpp_builder.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_conda_llvm_openmp_installed",
+        "file": "torch\\_inductor\\cpp_builder.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 9,
+        "reached_functions": 9,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_ensure_mingw_cudart_import_lib",
+        "file": "torch\\_inductor\\cpp_builder.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 16,
+        "reached_functions": 8,
+        "propagated_through": 3,
+        "capped": false,
+        "name": "_probe_load",
+        "file": "torch\\_inductor\\cpu_vec_isa.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 14,
+        "reached_functions": 5,
+        "propagated_through": 2,
+        "capped": false,
+        "name": "check_build",
+        "file": "torch\\_inductor\\cpu_vec_isa.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "dump_inductor_provenance_info",
+        "file": "torch\\_inductor\\debug.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 6,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "create_kernel_information_json",
+        "file": "torch\\_inductor\\debug.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "numbytes_hint",
+        "file": "torch\\_inductor\\dependencies.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "numel_hint",
+        "file": "torch\\_inductor\\dependencies.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "numbytes_hint",
+        "file": "torch\\_inductor\\dependencies.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "numel_hint",
+        "file": "torch\\_inductor\\dependencies.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "check_halide_import",
+        "file": "torch\\_inductor\\fuzzer.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "create_deferred_runtime_asserts",
+        "file": "torch\\_inductor\\graph.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_convertible",
+        "file": "torch\\_inductor\\graph.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 22,
+        "reached_functions": 12,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_storage_and_layout",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_contiguous_storage_and_layout",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_dense_contiguous_storage_and_layout",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_stride_order_storage_and_layout",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_output_plannable_nvgemm_choice",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_input_buffer",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 23,
+        "reached_functions": 17,
+        "propagated_through": 5,
+        "capped": false,
+        "name": "require_contiguous",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_cshim_scalar_abi_forces_proxy",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_mkldnn_tensor",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_integral_tensor",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_constant_values_equal",
+        "file": "torch\\_inductor\\pattern_matcher.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 36,
+        "reached_functions": 25,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "register_replacement",
+        "file": "torch\\_inductor\\pattern_matcher.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 23,
+        "reached_functions": 9,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "check_fn",
+        "file": "torch\\_inductor\\pattern_matcher.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "compile_llvm_ir_to_code_object",
+        "file": "torch\\_inductor\\rocm_multiarch_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 2,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "create_multiarch_bundle",
+        "file": "torch\\_inductor\\rocm_multiarch_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 11,
+        "reached_functions": 11,
+        "propagated_through": 2,
+        "capped": false,
+        "name": "_get_estimated_runtime",
+        "file": "torch\\_inductor\\scheduler.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "speedup_by_fusion",
+        "file": "torch\\_inductor\\scheduler.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "can_fusion_increase_peak_memory",
+        "file": "torch\\_inductor\\scheduler.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 11,
+        "reached_functions": 8,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "can_buffer_be_removed_through_fusion",
+        "file": "torch\\_inductor\\scheduler.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "speedup_by_combo_kernel",
+        "file": "torch\\_inductor\\scheduler.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "compile_without_benchmarking",
+        "file": "torch\\_inductor\\scheduler.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "benchmark_when_ready",
+        "file": "torch\\_inductor\\scheduler.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_device_is_available",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_torchvision_roi_align",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 4,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_gfx1250_device_prereqs",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "ensure_cute_available",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 15,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "ensure_nv_universal_gemm_available",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "ensure_nvmatmul_heuristics_available",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "try_import_ck_lib",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 13,
+        "reached_functions": 12,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_get_device_tflops",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 13,
+        "reached_functions": 11,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_device_tflops",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "should_use_remote_fx_graph_cache",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 5,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "tlx_only_cuda_options",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "tlx_only_hip_options",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 2,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_prefers_swizzle_32_8_cached",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_inner_triton_kernels",
+        "file": "torch\\_library\\triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_interpreted_triton_kernel",
+        "file": "torch\\_library\\triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_has_interpreted_triton_autotuner",
+        "file": "torch\\_library\\triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 4,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "find_triton_kernels",
+        "file": "torch\\_library\\triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 35,
+        "reached_functions": 16,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "covers",
+        "file": "torch\\_native\\aot_manifest.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 10,
+        "reached_functions": 9,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "is_dsl_available",
+        "file": "torch\\_native\\dsl_registry.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 3,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_native_aot_embedded",
+        "file": "torch\\_native\\__init__.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1517,
+        "propagated_through": 100,
+        "capped": true,
+        "name": "__eq__",
+        "file": "torch\\_numpy\\_dtypes.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 9,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "array_equiv",
+        "file": "torch\\_numpy\\_funcs_impl.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 25,
+        "reached_functions": 10,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "isscalar",
+        "file": "torch\\_numpy\\_funcs_impl.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_sequence",
+        "file": "torch\\_numpy\\_util.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_start_strobelight",
+        "file": "torch\\_strobelight\\cli_function_profiler.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "try_duck_specialization_first",
+        "file": "torch\\_subclasses\\fake_impls.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 10,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "safe_is_leaf",
+        "file": "torch\\_subclasses\\meta_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 15,
+        "reached_functions": 15,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_iterable_of_tensors",
+        "file": "torch\\_subclasses\\schema_check_mode.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1403,
+        "propagated_through": 59,
+        "capped": true,
+        "name": "__torch_dispatch__",
+        "file": "torch\\_subclasses\\schema_check_mode.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_aliased",
+        "file": "torch\\_subclasses\\schema_check_mode.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_max_dynamic_smem_bytes",
+        "file": "torch\\_vendor\\quack\\rmsnorm_config.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_flock_held_exclusively",
+        "file": "torch\\_vendor\\quack\\cache\\async_compile.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1213,
+        "propagated_through": 98,
+        "capped": true,
+        "name": "submit",
+        "file": "torch\\_vendor\\quack\\cache\\async_compile.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 8,
+        "reached_functions": 6,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_arch_ok",
+        "file": "torch\\_native\\utils\\capability.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "on_current_device",
+        "file": "torch\\_native\\utils\\capability.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_check_nvmath_cublaslt",
+        "file": "torch\\_native\\ops\\foreach_mm\\impl.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_calculate_flops",
+        "file": "torch\\_inductor\\analysis\\profile_analysis.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 8,
+        "reached_functions": 6,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_compatible",
+        "file": "torch\\_inductor\\codegen\\simd.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_operation_preserves_group_width",
+        "file": "torch\\_inductor\\codegen\\simd.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 13,
+        "reached_functions": 6,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "are_block_parameters_compatible",
+        "file": "torch\\_inductor\\codegen\\triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_has_stride1_on_rdim",
+        "file": "torch\\_inductor\\codegen\\triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_persistent_RBLOCK",
+        "file": "torch\\_inductor\\codegen\\triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "use_uint8_triton_storage_for_cuda_float8_e4m3fn",
+        "file": "torch\\_inductor\\codegen\\triton_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_tensor_within_2gb",
+        "file": "torch\\_inductor\\codegen\\triton_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 9,
+        "reached_functions": 8,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "config_of",
+        "file": "torch\\_inductor\\codegen\\triton_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "include_tensor_alignment",
+        "file": "torch\\_inductor\\codegen\\triton_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_has_multicast_support",
+        "file": "torch\\_inductor\\fx_passes\\low_contention_collectives.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_mm_compute_bound",
+        "file": "torch\\_inductor\\fx_passes\\pad_mm.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 14,
+        "reached_functions": 14,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "reinplace_inplaceable_ops_core",
+        "file": "torch\\_inductor\\fx_passes\\reinplace.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 5,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "can_inplace",
+        "file": "torch\\_inductor\\fx_passes\\reinplace.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_overlap",
+        "file": "torch\\_inductor\\fx_passes\\reinplace.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_should_use_remote_autotune_cache",
+        "file": "torch\\_inductor\\runtime\\autotune_cache.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_should_use_bundled_autotune_remote_cache",
+        "file": "torch\\_inductor\\runtime\\autotune_cache.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "copy_args_to_cpu_if_needed",
+        "file": "torch\\_inductor\\runtime\\triton_heuristics.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 10,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "ensure_flash_available",
+        "file": "torch\\_inductor\\kernel\\flex\\flex_flash_attention.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "flash_supports_aux_scalars",
+        "file": "torch\\_inductor\\kernel\\flex\\flex_flash_attention.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "workers_ready",
+        "file": "torch\\_inductor\\kernel\\flex_gemm\\compile_pool.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1213,
+        "propagated_through": 98,
+        "capped": true,
+        "name": "submit",
+        "file": "torch\\_inductor\\kernel\\flex_gemm\\compile_pool.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "node_preserves_tensor_shapes",
+        "file": "torch\\_inductor\\kernel\\flex_gemm\\quack_reductions.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_filter_configs",
+        "file": "torch\\_inductor\\heuristics\\template\\triton.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "should_skip_mi350x_config",
+        "file": "torch\\_inductor\\heuristics\\template\\triton.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 13,
+        "reached_functions": 9,
+        "propagated_through": 2,
+        "capped": false,
+        "name": "_can_fuse_epilogue_impl",
+        "file": "torch\\_inductor\\codegen\\cutlass\\scheduling.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 33,
+        "reached_functions": 17,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "try_import_cutlass",
+        "file": "torch\\_inductor\\codegen\\cutlass\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_composite_generated_reduction_plan",
+        "file": "torch\\_inductor\\codegen\\nv_universal_gemm\\epilogue_lowering.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_unclaimed_reduction",
+        "file": "torch\\_inductor\\codegen\\nv_universal_gemm\\epilogue_lowering.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 21,
+        "reached_functions": 12,
+        "propagated_through": 2,
+        "capped": false,
+        "name": "_is_nvgemm_ir_buffer",
+        "file": "torch\\_inductor\\codegen\\nv_universal_gemm\\nv_universal_gemm_scheduling.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 29,
+        "reached_functions": 29,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_ck_tile_universal_gemm_v2_api",
+        "file": "torch\\_inductor\\codegen\\rocm\\ck_tile_universal_gemm_template.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_check_num_k_loops",
+        "file": "torch\\_inductor\\codegen\\rocm\\ck_universal_gemm_template.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 6,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "gen_ops",
+        "file": "torch\\_inductor\\codegen\\rocm\\ck_universal_gemm_template.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "should_use_remote_autograd_cache",
+        "file": "torch\\_functorch\\_aot_autograd\\autograd_cache.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "impl_CONTAINS_OP_fallback",
+        "file": "torch\\_dynamo\\polyfills\\__init__.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "inductor_fails",
+        "file": "torch\\_dynamo\\repro\\after_aot.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "backend_fails",
+        "file": "torch\\_dynamo\\repro\\after_dynamo.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "repro_minify",
+        "file": "torch\\_dynamo\\repro\\aoti.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 10,
+        "reached_functions": 10,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "module_fails",
+        "file": "torch\\_dynamo\\repro\\aoti.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 166,
+        "reached_functions": 123,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_python_constant",
+        "file": "torch\\_dynamo\\variables\\base.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_proxy",
+        "file": "torch\\_dynamo\\variables\\base.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_set_or_dictview",
+        "file": "torch\\_dynamo\\variables\\dicts.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_matches_allowed_type",
+        "file": "torch\\_dynamo\\variables\\functions.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 166,
+        "reached_functions": 123,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_python_constant",
+        "file": "torch\\_dynamo\\variables\\functions.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 2,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "is_reusable",
+        "file": "torch\\_dynamo\\variables\\invoke_subgraph.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_iterator_exhausted",
+        "file": "torch\\_dynamo\\variables\\iter.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_python_subtype",
+        "file": "torch\\_dynamo\\variables\\object_protocol.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 11,
+        "reached_functions": 9,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_hashable",
+        "file": "torch\\_dynamo\\variables\\user_defined.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_supported_random",
+        "file": "torch\\_dynamo\\variables\\user_defined.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_start_strobelight",
+        "file": "torch\\utils\\_strobelight\\cli_function_profiler.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_definitely_ge_value",
+        "file": "torch\\utils\\_sympy\\value_ranges.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 8,
+        "reached_functions": 9,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_try_import_pandas",
+        "file": "torch\\utils\\data\\datapipes\\dataframe\\dataframe_wrapper.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_cupti_version",
+        "file": "torch\\testing\\_internal\\common_cuda.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_cuda_graph_tools_id_available",
+        "file": "torch\\testing\\_internal\\common_cuda.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "evaluate_platform_supports_green_context",
+        "file": "torch\\testing\\_internal\\common_cuda.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "evaluate_platform_supports_workqueue_config",
+        "file": "torch\\testing\\_internal\\common_cuda.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_corresponding_torch_dtype",
+        "file": "torch\\testing\\_internal\\common_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_iterable",
+        "file": "torch\\testing\\_internal\\common_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 15,
+        "reached_functions": 15,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_iterable_of_tensors",
+        "file": "torch\\testing\\_internal\\common_utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_should_stop_test_suite",
+        "file": "torch\\testing\\_internal\\common_utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_cpu",
+        "file": "torch\\testing\\_internal\\inductor_utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "running_on_tdm_device",
+        "file": "torch\\testing\\_internal\\inductor_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_multigpu",
+        "file": "torch\\testing\\_internal\\inductor_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_has_active_cuda_context",
+        "file": "torch\\profiler\\_cuspy\\core.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_noisy_runtime_cbids",
+        "file": "torch\\profiler\\_cuspy\\cupti_python.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 656,
+        "propagated_through": 23,
+        "capped": true,
+        "name": "simplify",
+        "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 19,
+        "reached_functions": 14,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_guarding_hint",
+        "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 5,
+        "reached_functions": 4,
+        "propagated_through": 2,
+        "capped": false,
+        "name": "is_nonnegative_value",
+        "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 6,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "hashable",
+        "file": "torch\\fx\\experimental\\unification\\utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 108,
+        "reached_functions": 67,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "raises",
+        "file": "torch\\fx\\experimental\\unification\\utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 108,
+        "reached_functions": 67,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "raises",
+        "file": "torch\\fx\\experimental\\unification\\multipledispatch\\utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "validate_checkpoint_id",
+        "file": "torch\\distributed\\checkpoint\\_fsspec_filesystem.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_nvshmem_available",
+        "file": "torch\\distributed\\_symmetric_memory\\__init__.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_should_keep_alive",
+        "file": "torch\\distributed\\elastic\\rendezvous\\dynamic_rendezvous.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1166,
+        "propagated_through": 107,
+        "capped": true,
+        "name": "shutdown",
+        "file": "torch\\distributed\\elastic\\rendezvous\\dynamic_rendezvous.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 13,
+        "reached_functions": 12,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_closed",
+        "file": "torch\\distributed\\elastic\\rendezvous\\etcd_rendezvous.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1166,
+        "propagated_through": 107,
+        "capped": true,
+        "name": "shutdown",
+        "file": "torch\\distributed\\elastic\\rendezvous\\etcd_rendezvous.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_reap_worker_no_throw",
+        "file": "torch\\distributed\\elastic\\timer\\api.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_process_running",
+        "file": "torch\\distributed\\elastic\\timer\\file_based_local_timer.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_reap_worker",
+        "file": "torch\\distributed\\elastic\\timer\\file_based_local_timer.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_reap_worker",
+        "file": "torch\\distributed\\elastic\\timer\\local_timer.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_resolve_uninterruptible_state_timeout",
+        "file": "torch\\distributed\\elastic\\agent\\server\\local_elastic_agent.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 5,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_disabled_tests",
+        "file": "tools\\stats\\import_test_stats.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 8,
+        "reached_functions": 8,
+        "propagated_through": 6,
+        "capped": false,
+        "name": "get_from_test_infra_generated_stats",
+        "file": "tools\\stats\\import_test_stats.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1368,
+        "reached_functions": 575,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_check",
+        "file": "tools\\torchtlx\\sanity.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 2,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "unzip_file",
+        "file": "tools\\stats\\upload_utilization_stats\\upload_utilization_stats.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_grandfather",
+        "file": "tools\\linter\\adapters\\docstring_linter.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "check_allowlist",
+        "file": "tools\\linter\\adapters\\grep_linter.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1394,
+        "reached_functions": 595,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "check_file",
+        "file": "tools\\linter\\adapters\\scoped_library_linter.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_has_nccl_offload",
+        "file": "test\\distributed\\test_c10d_suspend_resume.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_nccl_ep_available",
+        "file": "test\\distributed\\test_token_switch.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_crossref",
+        "file": "test\\dynamo\\test_compiler_bisector.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1502,
+        "propagated_through": 100,
+        "capped": true,
+        "name": "test_fn",
+        "file": "test\\dynamo\\test_compiler_bisector.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_dict_update_rejects_too_many_args",
+        "file": "test\\dynamo\\test_dicts.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_dicts.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_cell_is_empty",
+        "file": "test\\dynamo\\test_guard_serialization.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_detectron2",
+        "file": "test\\dynamo\\test_repros.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_exec_import",
+        "file": "test\\dynamo\\test_repros.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1375,
+        "propagated_through": 70,
+        "capped": true,
+        "name": "fn2",
+        "file": "test\\dynamo\\test_repros.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_run_assert_triton",
+        "file": "test\\inductor\\test_device_assert.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "should_not_throw",
+        "file": "test\\inductor\\test_device_assert.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "has_tlx",
+        "file": "test\\inductor\\test_max_autotune_blackwell.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_triton_cpu_supports_tensor_descriptor",
+        "file": "test\\inductor\\test_torchinductor_strided_blocks.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "required_paranoid_setting",
+        "file": "test\\profiler\\test_xpu_scope_profiler.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_ignored_only",
+        "file": "test\\scripts\\run_cuda_memcheck.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 14,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_fa3_dependencies_available",
+        "file": "test\\nn\\attention\\test_fa3.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 12,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_fa4_dependencies_available",
+        "file": "test\\nn\\attention\\test_fa4.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "pid_exists",
+        "file": "test\\distributed\\launcher\\test_run.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_set_dict",
+        "file": "test\\cpython\\v3_13\\test_descr.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "can_delete_dict",
+        "file": "test\\cpython\\v3_13\\test_descr.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_close_return_value",
+        "file": "test\\cpython\\v3_13\\test_generators.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_close_not_started",
+        "file": "test\\cpython\\v3_13\\test_generators.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_close_exhausted",
+        "file": "test\\cpython\\v3_13\\test_generators.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_close_closed",
+        "file": "test\\cpython\\v3_13\\test_generators.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1580,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "f",
+        "file": "test\\cpython\\v3_13\\test_generators.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1580,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "f",
+        "file": "test\\cpython\\v3_13\\test_generators.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1580,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "f",
+        "file": "test\\cpython\\v3_13\\test_generators.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1580,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "f",
+        "file": "test\\cpython\\v3_13\\test_generators.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_delitem_hash_collision",
+        "file": "test\\cpython\\v3_13\\test_ordered_dict.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1517,
+        "propagated_through": 100,
+        "capped": true,
+        "name": "__eq__",
+        "file": "test\\cpython\\v3_13\\test_ordered_dict.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_check_cuda_available",
+        "file": "test\\cpp_extensions\\libtorch_agn_2_10_extension\\test_version_compatibility.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1144,
+        "propagated_through": 105,
+        "capped": true,
+        "name": "main",
+        "file": "scripts\\codeowners\\check_taxonomy.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "read_json",
+        "file": "scripts\\pr_review\\emit_row.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "usage_metrics",
+        "file": "scripts\\pr_review\\emit_row.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "fetch_pr_title",
+        "file": "scripts\\release_notes\\parse_cherry_picks.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_add_docstr_source_lines",
+        "file": "docs\\source\\conf.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "check_for_functorch",
+        "file": "benchmarks\\functional_autograd_benchmark\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "benchmark_single_shape_for_backend",
+        "file": "benchmarks\\dynamo\\genai_layers\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "allequal",
+        "file": "benchmarks\\distributed\\ddp\\benchmark.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_number",
+        "file": "aten\\src\\ATen\\native\\transformers\\hip\\flash_attn\\ck\\fav_v3\\codegen_compat.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_protected",
+        "file": ".github\\scripts\\delete_old_branches.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_tag",
+        "file": ".github\\scripts\\generate_pytorch_version.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_commit_hash",
+        "file": ".github\\scripts\\gitutils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "local_image_exists",
+        "file": ".ci\\lumen_cli\\cli\\lib\\common\\docker_helper.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "pkg_exists",
+        "file": ".ci\\lumen_cli\\cli\\lib\\common\\pip_helper.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_load_disabled_vllm_tests_from_github",
+        "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\lib.py",
+        "name_ambiguous": false
+      }
+    ],
+    "control": [
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1144,
+        "propagated_through": 105,
+        "capped": true,
+        "name": "main",
+        "file": "setup.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_ctx_output_grad_dtype_aliased_outputs",
+        "file": "test\\test_autograd.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_fork_join_in_middle",
+        "file": "test\\test_autograd.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "fn_sac",
+        "file": "test\\test_autograd.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\test_autograd.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 12,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_supported",
+        "file": "test\\test_binary_ufuncs.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_memory_stats_of_multiple_generators_and_graphs",
+        "file": "test\\test_cuda.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_model_weight_dead",
+        "file": "test\\test_cuda_graph_debug.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_data_dependent_compile",
+        "file": "test\\test_custom_ops.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1190,
+        "propagated_through": 3,
+        "capped": true,
+        "name": "backward",
+        "file": "test\\test_custom_ops.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_persistent_workers_pin_memory_atexit_uses_iterator_shutdown",
+        "file": "test\\test_dataloader.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "upcast",
+        "file": "test\\test_decomp.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1057,
+        "propagated_through": 119,
+        "capped": true,
+        "name": "func",
+        "file": "test\\test_dynamic_shapes.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_grad_dtype_functional_tensor_no_crash",
+        "file": "test\\test_fake_tensor.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1580,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "f",
+        "file": "test\\test_functionalization.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_preserve_unused_attr_after_unpickle",
+        "file": "test\\test_fx.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_optimize_for_inference_cpu",
+        "file": "test\\test_fx_experimental.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_from_keyword_positional_only_pattern",
+        "file": "test\\test_inspect_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_torch_functional_tensordot_int",
+        "file": "test\\test_jit.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\test_jit.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1580,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "f",
+        "file": "test\\test_jit.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\test_jit.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\test_jit.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "strip_profiling_nodes",
+        "file": "test\\test_jit_fuser_te.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_out_dims_must_be_int_or_tuple_of_int_err_msg",
+        "file": "test\\test_legacy_vmap.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_baddbmm_nan_input_with_zero_beta",
+        "file": "test\\test_linalg.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_test_unary_binary_equality",
+        "file": "test\\test_maskedtensor.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_retain_grad",
+        "file": "test\\test_modules.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_sum_reduction_non_contiguous",
+        "file": "test\\test_mps.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_conv1d_contiguous",
+        "file": "test\\test_mps.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "gen_nontrivial_input",
+        "file": "test\\test_mps.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_specialize_dynamic_shape",
+        "file": "test\\test_nestedtensor.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_large_max_pool2d_ch_last",
+        "file": "test\\test_nn.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_autograd_roundtrip_matches_aten",
+        "file": "test\\test_nn.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1539,
+        "propagated_through": 135,
+        "capped": true,
+        "name": "__new__",
+        "file": "test\\test_opaque_obj_v2.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_make_precise",
+        "file": "test\\test_ops.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_cache_holds_only_artifact",
+        "file": "test\\test_precompile.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 5,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_any_digamma",
+        "file": "test\\test_proxy_tensor.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1539,
+        "propagated_through": 135,
+        "capped": true,
+        "name": "__new__",
+        "file": "test\\test_python_dispatch.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_scaled_addmm_empty",
+        "file": "test\\test_scaled_matmul_cuda.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 13,
+        "reached_functions": 13,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_rand_shape",
+        "file": "test\\test_shape_ops.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_print",
+        "file": "test\\test_sparse_csr.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_data_negative_reinterpreted_as_uint64",
+        "file": "test\\test_stateless_rng.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1215,
+        "reached_functions": 245,
+        "propagated_through": 4,
+        "capped": false,
+        "name": "test",
+        "file": "test\\test_tensorexpr.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_strides_are_bytes",
+        "file": "test\\test_tensor_iterator.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_cdist_cuda_backward",
+        "file": "test\\test_torch.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 49,
+        "reached_functions": 14,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_helper",
+        "file": "test\\test_torch.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_indexing",
+        "file": "test\\test_type_promotion.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 22,
+        "reached_functions": 13,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_generate_input",
+        "file": "test\\test_view_ops.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_is_bf16_supported",
+        "file": "test\\test_xpu.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1088,
+        "propagated_through": 83,
+        "capped": true,
+        "name": "__torch_function__",
+        "file": "torch\\overrides.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "__sub__",
+        "file": "torch\\_guards.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 18,
+        "reached_functions": 9,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "pooling_output_shape_pad_lr",
+        "file": "torch\\_meta_registrations.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1536,
+        "propagated_through": 100,
+        "capped": true,
+        "name": "__hash__",
+        "file": "torch\\_tensor.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "hint",
+        "file": "torch\\__init__.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "load_declaration",
+        "file": "torchgen\\native_aot_decl.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 7,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "generate_heuristic",
+        "file": "torchgen\\_autoheuristic\\train.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_dot_with_type_promotion",
+        "file": "torch\\autograd\\gradcheck.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "export_graph_data",
+        "file": "torch\\cuda\\graphs.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_nvrtc_compile",
+        "file": "torch\\cuda\\_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "tags_to_pg",
+        "file": "torch\\distributed\\distributed_c10d.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1253,
+        "propagated_through": 119,
+        "capped": true,
+        "name": "__call__",
+        "file": "torch\\distributions\\constraints.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1531,
+        "propagated_through": 100,
+        "capped": true,
+        "name": "mode",
+        "file": "torch\\distributions\\negative_binomial.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_split_decomp_table_to_cia_and_python_decomp",
+        "file": "torch\\export\\exported_program.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1057,
+        "propagated_through": 149,
+        "capped": true,
+        "name": "mul",
+        "file": "torch\\foreach\\__init__.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 25,
+        "reached_functions": 15,
+        "propagated_through": 2,
+        "capped": false,
+        "name": "__deepcopy__",
+        "file": "torch\\fx\\proxy.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "insert_point_guard",
+        "file": "torch\\jit\\_ir_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 92,
+        "reached_functions": 79,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_get_device_index",
+        "file": "torch\\mtia\\_utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "torch\\optim\\lr_scheduler.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 9,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "add_metadata_json",
+        "file": "torch\\profiler\\profiler.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1253,
+        "propagated_through": 119,
+        "capped": true,
+        "name": "__call__",
+        "file": "torch\\utils\\checkpoint.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 50,
+        "reached_functions": 40,
+        "propagated_through": 6,
+        "capped": false,
+        "name": "to_dict",
+        "file": "torch\\utils\\_config_module.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_json_to_treespec",
+        "file": "torch\\utils\\_pytree.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 101,
+        "capped": true,
+        "name": "unsafe_split",
+        "file": "torch\\_decomp\\decompositions.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "encode_varint",
+        "file": "torch\\_dynamo\\bytecode_transformation.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "torch\\_dynamo\\debug_utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1279,
+        "propagated_through": 123,
+        "capped": true,
+        "name": "create_fx_graph_from_captured_output",
+        "file": "torch\\_dynamo\\functional_export.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1253,
+        "propagated_through": 119,
+        "capped": true,
+        "name": "__call__",
+        "file": "torch\\_dynamo\\output_graph.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "check_allowed_side_effect",
+        "file": "torch\\_dynamo\\side_effects.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "CACHE",
+        "file": "torch\\_dynamo\\symbolic_convert.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 57,
+        "reached_functions": 44,
+        "propagated_through": 3,
+        "capped": false,
+        "name": "_get_fake_value_impl",
+        "file": "torch\\_dynamo\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "node_inline_",
+        "file": "torch\\_export\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 56,
+        "reached_functions": 26,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_count_ops",
+        "file": "torch\\_functorch\\partitioners.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_triton_asm_to_cuda_asm",
+        "file": "torch\\_higher_order_ops\\inline_asm_elementwise.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 158,
+        "reached_functions": 73,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "register_fake",
+        "file": "torch\\_higher_order_ops\\utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1532,
+        "propagated_through": 104,
+        "capped": true,
+        "name": "__getattribute__",
+        "file": "torch\\_inductor\\choices.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "fw_compiler_freezing",
+        "file": "torch\\_inductor\\compile_fx.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "new_func_id",
+        "file": "torch\\_inductor\\cudagraph_trees.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1483,
+        "propagated_through": 103,
+        "capped": true,
+        "name": "__repr__",
+        "file": "torch\\_inductor\\fuzzer.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "index_length",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "torch\\_inductor\\ir.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "lower_assert_functional_async",
+        "file": "torch\\_inductor\\lowering.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_dep_size_hint",
+        "file": "torch\\_inductor\\memory.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1253,
+        "propagated_through": 119,
+        "capped": true,
+        "name": "__call__",
+        "file": "torch\\_inductor\\output_code.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "can_codegen_in_low_precision",
+        "file": "torch\\_inductor\\scheduler.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_fixed_input_dtype",
+        "file": "torch\\_inductor\\select_algorithm.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 9,
+        "reached_functions": 7,
+        "propagated_through": 2,
+        "capped": false,
+        "name": "_type_of",
+        "file": "torch\\_inductor\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "torch\\_lazy\\device_context.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 8,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "instrumented_cutedsl_cache",
+        "file": "torch\\_native\\instrumentation.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "normalizer",
+        "file": "torch\\_numpy\\_normalizations.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1184,
+        "propagated_through": 87,
+        "capped": true,
+        "name": "fill",
+        "file": "torch\\_refs\\__init__.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 1,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "slow",
+        "file": "torch\\_subclasses\\fake_impls.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 20,
+        "reached_functions": 19,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "make_fake_stream",
+        "file": "torch\\_vendor\\quack\\compile_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 24,
+        "reached_functions": 15,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "consumer_release",
+        "file": "torch\\_vendor\\quack\\pipeline.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "create_blockscaled_operand_tensor",
+        "file": "torch\\_vendor\\quack\\blockscaled\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "stat_total",
+        "file": "torch\\_vendor\\quack\\epilogue\\ops.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "cos_impl",
+        "file": "torch\\_subclasses\\complex_tensor\\_ops\\aten.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_make_two_accum",
+        "file": "torch\\_native\\ops\\reductions\\inner_tree_kernel.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_best_choices",
+        "file": "torch\\_inductor\\autoheuristic\\learnedheuristic_interface.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1350,
+        "propagated_through": 65,
+        "capped": true,
+        "name": "reciprocal",
+        "file": "torch\\_inductor\\codegen\\cpp.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1281,
+        "propagated_through": 132,
+        "capped": true,
+        "name": "benchmark",
+        "file": "torch\\_inductor\\codegen\\cpp_template_kernel.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_print_Max",
+        "file": "torch\\_inductor\\codegen\\halide.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 52,
+        "reached_functions": 10,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "hypot",
+        "file": "torch\\_inductor\\codegen\\pallas.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 7,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "score_mod",
+        "file": "torch\\_inductor\\codegen\\simd.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 7,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_backend_features",
+        "file": "torch\\_inductor\\codegen\\triton.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "codegen_partition_call",
+        "file": "torch\\_inductor\\codegen\\wrapper.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "int8_woq_fusion_pattern",
+        "file": "torch\\_inductor\\fx_passes\\freezing_patterns.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1516,
+        "propagated_through": 100,
+        "capped": true,
+        "name": "get_val",
+        "file": "torch\\_inductor\\fx_passes\\mkldnn_fusion.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1539,
+        "propagated_through": 100,
+        "capped": true,
+        "name": "_check_node_kwarg_arg_value",
+        "file": "torch\\_inductor\\fx_passes\\quantization.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "torch\\_inductor\\kernel\\gemm_epilogue_codegen.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_is_concrete_backend_option_value",
+        "file": "torch\\_inductor\\runtime\\triton_helpers.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 5,
+        "reached_functions": 5,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "_hierarchical_indexer_cute",
+        "file": "torch\\_inductor\\kernel\\flex\\flex_flash_attention.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 5,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_extra_kwargs",
+        "file": "torch\\_inductor\\heuristics\\template\\aten.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1258,
+        "propagated_through": 124,
+        "capped": true,
+        "name": "hook",
+        "file": "torch\\_inductor\\codegen\\cutedsl\\cutedsl_kernel.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_static_reduction_plan",
+        "file": "torch\\_inductor\\codegen\\nv_universal_gemm\\epilogue_lowering.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_collect_backward_regions",
+        "file": "torch\\_functorch\\_activation_checkpointing\\remat_using_tags_for_fwd_loss_bwd_graph_pass.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 35,
+        "reached_functions": 33,
+        "propagated_through": 10,
+        "capped": false,
+        "name": "_create_runtime_wrapper",
+        "file": "torch\\_functorch\\_aot_autograd\\runtime_wrappers.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 7,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_dump_dynamic_shapes",
+        "file": "torch\\_export\\serde\\dynamic_shapes.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 11,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "starmap",
+        "file": "torch\\_dynamo\\polyfills\\itertools.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 782,
+        "propagated_through": 3,
+        "capped": true,
+        "name": "check",
+        "file": "torch\\_dynamo\\variables\\base.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1235,
+        "propagated_through": 102,
+        "capped": true,
+        "name": "enter",
+        "file": "torch\\_dynamo\\variables\\ctx_manager.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 25,
+        "reached_functions": 19,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "get_code",
+        "file": "torch\\_dynamo\\variables\\functions.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1130,
+        "propagated_through": 188,
+        "capped": true,
+        "name": "call_function",
+        "file": "torch\\_dynamo\\variables\\iter.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 182,
+        "reached_functions": 133,
+        "propagated_through": 3,
+        "capped": false,
+        "name": "python_type",
+        "file": "torch\\_dynamo\\variables\\misc.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 4,
+        "propagated_through": 4,
+        "capped": false,
+        "name": "_dictview_binop",
+        "file": "torch\\_dynamo\\variables\\sets.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "handle_functorch_peek_interpreter_stack",
+        "file": "torch\\_dynamo\\variables\\torch.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1087,
+        "propagated_through": 101,
+        "capped": true,
+        "name": "__getitem__",
+        "file": "torch\\utils\\data\\dataset.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_eval_is_nonpositive",
+        "file": "torch\\utils\\_sympy\\functions.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1585,
+        "propagated_through": 50,
+        "capped": true,
+        "name": "identity",
+        "file": "torch\\utils\\_sympy\\value_ranges.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_file_pathnames_from_root",
+        "file": "torch\\utils\\data\\datapipes\\utils\\common.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 3,
+        "propagated_through": 3,
+        "capped": false,
+        "name": "skipCUDAIfNoMagma",
+        "file": "torch\\testing\\_internal\\common_device_type.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_check_forward_prefetch",
+        "file": "torch\\testing\\_internal\\common_fsdp.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "sample_inputs_mvlgamma",
+        "file": "torch\\testing\\_internal\\common_methods_invocations.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "reference_fn",
+        "file": "torch\\testing\\_internal\\common_modules.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "torch\\testing\\_internal\\common_quantization.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_get_legacy_float32_matmul_precision",
+        "file": "torch\\testing\\_internal\\common_utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "sample_inputs_invoke_subgraph",
+        "file": "torch\\testing\\_internal\\hop_db.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "torch\\testing\\_internal\\distributed\\distributed_test.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_ddp_broadcast_buffer",
+        "file": "torch\\testing\\_internal\\distributed\\distributed_test.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "sample_inputs_linalg_pinv_hermitian",
+        "file": "torch\\testing\\_internal\\opinfo\\definitions\\linalg.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "no_result",
+        "file": "torch\\testing\\_internal\\distributed\\rpc\\rpc_test.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_device_maps_gpu",
+        "file": "torch\\testing\\_internal\\distributed\\rpc\\rpc_test.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_torchscript_function",
+        "file": "torch\\testing\\_internal\\distributed\\rpc\\jit\\rpc_test.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_validate_gqa_configuration",
+        "file": "torch\\onnx\\ops\\_impl.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 741,
+        "propagated_through": 54,
+        "capped": true,
+        "name": "_apply",
+        "file": "torch\\onnx\\_internal\\torchscript_exporter\\symbolic_helper.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1591,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "amin",
+        "file": "torch\\onnx\\_internal\\torchscript_exporter\\symbolic_opset9.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1087,
+        "propagated_through": 101,
+        "capped": true,
+        "name": "__getitem__",
+        "file": "torch\\nn\\attention\\flex_attention.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "torch\\nn\\modules\\linear.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "torch\\nn\\modules\\_functions.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 21,
+        "reached_functions": 16,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_constant",
+        "file": "torch\\nested\\_internal\\nested_int.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "torch\\fx\\experimental\\dynamic_spec.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_lru_cache",
+        "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 21,
+        "reached_functions": 16,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_constant",
+        "file": "torch\\fx\\experimental\\sym_node.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 835,
+        "propagated_through": 10,
+        "capped": true,
+        "name": "size",
+        "file": "torch\\fx\\passes\\infra\\partitioner.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 22,
+        "reached_functions": 12,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "has_record",
+        "file": "torch\\export\\pt2_archive\\_package.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "async_save",
+        "file": "torch\\distributed\\checkpoint\\_checkpointer.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_get_modules",
+        "file": "torch\\distributed\\fsdp\\_flat_param.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_update_losses",
+        "file": "torch\\distributed\\pipelining\\schedules.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_mask_tensor",
+        "file": "torch\\distributed\\tensor\\placement_types.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1404,
+        "propagated_through": 60,
+        "capped": true,
+        "name": "_local_barrier",
+        "file": "torch\\distributed\\_local_tensor\\_c10d.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "adapter",
+        "file": "torch\\distributed\\_symmetric_memory\\__init__.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_mark_sharding",
+        "file": "torch\\distributed\\tensor\\experimental\\_tp_transform.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "dim_flatten",
+        "file": "torch\\distributed\\tensor\\_ops\\_view_ops.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "set_modules_to_forward_prefetch",
+        "file": "torch\\distributed\\fsdp\\_fully_shard\\_fully_shard.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "torch\\distributed\\elastic\\timer\\local_timer.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 20,
+        "reached_functions": 8,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "set_flags",
+        "file": "torch\\backends\\mkldnn\\__init__.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_default_compare_output_module_list",
+        "file": "torch\\ao\\quantization\\quantization_mappings.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_maybe_insert_output_observer_for_node",
+        "file": "torch\\ao\\quantization\\fx\\prepare.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "inference_and_evaluation",
+        "file": "torch\\ao\\pruning\\_experimental\\data_sparsifier\\benchmarks\\evaluate_model_metrics.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_ntuple_from_first",
+        "file": "torch\\ao\\nn\\quantized\\modules\\utils.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 11,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_base_name",
+        "file": "tools\\autograd\\gen_inplace_or_view_type.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_sccache_stats",
+        "file": "tools\\stats\\upload_sccache_stats.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_plain_and_optional_tensors_are_gated",
+        "file": "tools\\test\\test_native_aot_tools.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_bare_decorator_is_flagged",
+        "file": "tools\\test\\test_unspecified_backend_linter.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 132,
+        "reached_functions": 106,
+        "propagated_through": 3,
+        "capped": false,
+        "name": "as_posix",
+        "file": "tools\\linter\\adapters\\ruff_linter.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "can_produce",
+        "file": "tools\\experimental\\torchfuzz\\operators\\elementwise_math.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "torch_op_name",
+        "file": "tools\\experimental\\torchfuzz\\operators\\scalar_pointwise.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1581,
+        "propagated_through": 48,
+        "capped": true,
+        "name": "bar2",
+        "file": "test\\autograd\\test_functional.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_define_out_tag_mutable_positional_arg",
+        "file": "test\\custom_operator\\test_out_variant.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\distributed\\test_c10d_common.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 278,
+        "reached_functions": 164,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "tearDown",
+        "file": "test\\distributed\\test_c10d_gloo.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1258,
+        "propagated_through": 124,
+        "capped": true,
+        "name": "hook",
+        "file": "test\\distributed\\test_c10d_nccl.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 10,
+        "reached_functions": 7,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_cuda",
+        "file": "test\\distributed\\test_c10d_spawn_gloo.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_all_failed",
+        "file": "test\\distributed\\test_debug.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_construct_fsdp",
+        "file": "test\\distributed\\test_fake_pg.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1057,
+        "propagated_through": 119,
+        "capped": true,
+        "name": "func",
+        "file": "test\\distributed\\test_inductor_collectives.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 9,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_validate_error",
+        "file": "test\\distributed\\test_pg_wrapper.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 7,
+        "reached_functions": 7,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_check_sampler_discrete",
+        "file": "test\\distributions\\test_distributions.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_region_activation_memory_budget_nested_graph_breaks",
+        "file": "test\\dynamo\\test_activation_checkpointing.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_arg_dupe_via_dynamo_recompiles_many_args_param_non_tensor_arg",
+        "file": "test\\dynamo\\test_aot_autograd.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "unpack_fp8_with_scale",
+        "file": "test\\dynamo\\test_aot_autograd_cache.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_aot_compile_module_scan_warning_names_the_index_served",
+        "file": "test\\dynamo\\test_aot_compile.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "scaled",
+        "file": "test\\dynamo\\test_aot_compile.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\dynamo\\test_autograd_function.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_bytecode_utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_comprehensions.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_ctx_manager.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_nonstrict_trace_object_in_context_error",
+        "file": "test\\dynamo\\test_decorators.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_mapping_proxy_for_nonlocal",
+        "file": "test\\dynamo\\test_dicts.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_shapes_spec_repr_with_assumptions",
+        "file": "test\\dynamo\\test_dynamic_spec.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_error_messages.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "raise_exc",
+        "file": "test\\dynamo\\test_exitstack.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1135,
+        "propagated_through": 153,
+        "capped": true,
+        "name": "true_fn",
+        "file": "test\\dynamo\\test_export.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_pos_only_args_with_same_name_in_star_kwargs",
+        "file": "test\\dynamo\\test_functions.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_functions.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1253,
+        "propagated_through": 119,
+        "capped": true,
+        "name": "__call__",
+        "file": "test\\dynamo\\test_functions.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_generator.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\dynamo\\test_getitem.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_global_func_wrong_fqn",
+        "file": "test\\dynamo\\test_guard_serialization.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_allow_python_side_effects_utility",
+        "file": "test\\dynamo\\test_higher_order_ops.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_higher_order_ops.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 1,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "do_stuff",
+        "file": "test\\dynamo\\test_hooks.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_iter_property_attribute_error_with_getitem",
+        "file": "test\\dynamo\\test_iterators.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_trace_source_cond",
+        "file": "test\\dynamo\\test_logging.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_numpy_ndarray_graph_break",
+        "file": "test\\dynamo\\test_misc.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_sourceless_namedtuple",
+        "file": "test\\dynamo\\test_misc.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1580,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "f",
+        "file": "test\\dynamo\\test_misc.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "injected_bool",
+        "file": "test\\dynamo\\test_misc.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_misc.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\dynamo\\test_misc.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "update_global",
+        "file": "test\\dynamo\\test_modules.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\dynamo\\test_modules.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_nb_index.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_left_sub_right_falls_back_to_rsub",
+        "file": "test\\dynamo\\test_nb_operators.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_unbound_builtin_bool",
+        "file": "test\\dynamo\\test_nb_unary.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1465,
+        "propagated_through": 113,
+        "capped": true,
+        "name": "fn3",
+        "file": "test\\dynamo\\test_nops.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_aliasing_guard_failures_with_globals",
+        "file": "test\\dynamo\\test_recompiles.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "flex_attn_fn",
+        "file": "test\\dynamo\\test_regional_inductor.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_torch_compile_in_compile_frame",
+        "file": "test\\dynamo\\test_repros.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_repros.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 16,
+        "reached_functions": 15,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "capture",
+        "file": "test\\dynamo\\test_repros.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_binop_or",
+        "file": "test\\dynamo\\test_sets.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1530,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "wrapper",
+        "file": "test\\dynamo\\test_structured_trace.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_subclasses.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_getattr_matches_dot_access",
+        "file": "test\\dynamo\\test_tp_getattro.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_tp_hash.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_tree_map.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\dynamo\\test_user_defined_object.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\export\\test_converter.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1536,
+        "propagated_through": 100,
+        "capped": true,
+        "name": "__hash__",
+        "file": "test\\export\\test_experimental.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_where_broadcast_preserves_symint",
+        "file": "test\\export\\test_export.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\export\\test_export.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\export\\test_export.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\export\\test_export.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_move_device_to",
+        "file": "test\\export\\test_passes.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\export\\test_swap.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\functorch\\attn_positional.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_aot_export_multiple_outputs_require_grad_banned",
+        "file": "test\\functorch\\test_aotdispatch.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1580,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "f",
+        "file": "test\\functorch\\test_aotdispatch.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_f",
+        "file": "test\\functorch\\test_aotdispatch.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_cond_autograd_complex",
+        "file": "test\\functorch\\test_control_flow.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\functorch\\test_control_flow.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "true_true_fn",
+        "file": "test\\functorch\\test_control_flow.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "cond_fn_nested",
+        "file": "test\\functorch\\test_control_flow.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "mysum_grad_rule",
+        "file": "test\\functorch\\test_eager_transforms.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_leaf_function_nested_annotations",
+        "file": "test\\functorch\\test_leaf_function.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 10,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_module",
+        "file": "test\\functorch\\test_minifier.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_max",
+        "file": "test\\functorch\\test_vmap.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_keep_collectives",
+        "file": "test\\fx\\test_dce_pass.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_dynamo_innermost_fn",
+        "file": "test\\fx\\test_lazy_graph_module.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\fx\\test_z3_gradual_types.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1512,
+        "propagated_through": 44,
+        "capped": true,
+        "name": "gn",
+        "file": "test\\higher_order_ops\\test_invoke_subgraph.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1580,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "f",
+        "file": "test\\higher_order_ops\\test_print.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_triton_kernel_tma_descriptor_1d",
+        "file": "test\\inductor\\test_aot_inductor.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\inductor\\test_aot_inductor.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 235,
+        "reached_functions": 231,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "check_model",
+        "file": "test\\inductor\\test_aot_inductor_package.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 9,
+        "reached_functions": 9,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "make_params",
+        "file": "test\\inductor\\test_benchmarking.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1424,
+        "propagated_through": 113,
+        "capped": true,
+        "name": "encode",
+        "file": "test\\inductor\\test_caching.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\inductor\\test_codecache.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\inductor\\test_combo_kernels.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1281,
+        "propagated_through": 79,
+        "capped": true,
+        "name": "compiler_fn",
+        "file": "test\\inductor\\test_compiled_autograd.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\inductor\\test_control_deps.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1251,
+        "propagated_through": 60,
+        "capped": true,
+        "name": "get_name",
+        "file": "test\\inductor\\test_cpp_wrapper_asserts.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "run_compile_decomposed_fake_quant",
+        "file": "test\\inductor\\test_cpu_repro.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\inductor\\test_cpu_select_algorithm.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "mutating_op",
+        "file": "test\\inductor\\test_cudagraph_trees.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_accuracy_issue1",
+        "file": "test\\inductor\\test_cuda_repro.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\inductor\\test_custom_post_grad_passes.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_backend_init_fires_on_compile_fx",
+        "file": "test\\inductor\\test_device_backends.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_fully_masked_out_rows",
+        "file": "test\\inductor\\test_flex_attention.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\inductor\\test_flex_attention.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 7,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "score_mod",
+        "file": "test\\inductor\\test_flex_flash.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1417,
+        "propagated_through": 111,
+        "capped": true,
+        "name": "epilogue_fn",
+        "file": "test\\inductor\\test_flex_gemm.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\inductor\\test_foreach.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_custom_backend",
+        "file": "test\\inductor\\test_fxir_backend.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\inductor\\test_indexing.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_nll_loss_backward",
+        "file": "test\\inductor\\test_layout_optim.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_tuning_pool_cache_env_clears_codecache",
+        "file": "test\\inductor\\test_max_autotune.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "is_releasable",
+        "file": "test\\inductor\\test_mem_estimation.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "make_cpp_wrapper_test",
+        "file": "test\\inductor\\test_multi_kernel.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1580,
+        "propagated_through": 47,
+        "capped": true,
+        "name": "f",
+        "file": "test\\inductor\\test_nested_reduction.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 6,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "check_repr_against_values",
+        "file": "test\\inductor\\test_ordered_set.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_strided_large_offset_2d",
+        "file": "test\\inductor\\test_pallas.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "custom_pass",
+        "file": "test\\inductor\\test_pattern_matcher.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\inductor\\test_provenance_tracing.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\inductor\\test_snode_runtime.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "assert_expected_dynamic_dims",
+        "file": "test\\inductor\\test_torchinductor.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_repeat_as_strided",
+        "file": "test\\inductor\\test_torchinductor.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_check_resize_common",
+        "file": "test\\inductor\\test_torchinductor.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\inductor\\test_torchinductor.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_like_rands_on_different_device",
+        "file": "test\\inductor\\test_torchinductor.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\inductor\\test_torchinductor.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\inductor\\test_torchinductor_dynamic_shapes.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_triton_kernel_with_constexpr_dtype_annotations",
+        "file": "test\\inductor\\test_triton_kernels.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "patched_save_gpu_kernel",
+        "file": "test\\inductor\\test_triton_launcher_integration.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "raise_if_triton_unavailable",
+        "file": "test\\inductor\\test_utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "too_many_args",
+        "file": "test\\jit\\test_builtins.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_simple_stream",
+        "file": "test\\jit\\test_cuda.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\jit\\test_freezing.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "list_in_if_else",
+        "file": "test\\jit\\test_isinstance.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\jit\\test_list_dict.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\jit\\test_module_interface.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\jit\\test_recursive_script.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\jit\\test_string_formatting.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1467,
+        "propagated_through": 58,
+        "capped": true,
+        "name": "foo",
+        "file": "test\\jit\\test_tracer.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\jit\\test_typing.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 8,
+        "reached_functions": 7,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "text",
+        "file": "test\\lazy\\test_functionalization.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_init_methods_no_error",
+        "file": "test\\nn\\test_init.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\nn\\test_parametrization.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\onnx\\test_onnx_opset.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_list_append_nested_mixed_dtype",
+        "file": "test\\onnx\\test_pytorch_onnx_onnxruntime.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\onnx\\test_pytorch_onnx_onnxruntime.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\onnx\\test_pytorch_onnx_onnxruntime.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\onnx\\test_pytorch_onnx_onnxruntime.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 5,
+        "reached_functions": 5,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_test_lr_is_constant_for_constant_epoch",
+        "file": "test\\optim\\test_lrscheduler.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 63,
+        "reached_functions": 41,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "tearDownClass",
+        "file": "test\\profiler\\test_cpp_thread.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_event_list",
+        "file": "test\\profiler\\test_profiler.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_nonexistent_dsl_queries",
+        "file": "test\\python_native\\test_dsl_registry.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_prod_strided_outer_input",
+        "file": "test\\python_native\\test_sum_cutedsl.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_conv2d_no_grad",
+        "file": "test\\xpu\\test_conv.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_empty_unicode",
+        "file": "test\\torch_np\\numpy_tests\\core\\test_multiarray.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1087,
+        "propagated_through": 101,
+        "capped": true,
+        "name": "__getitem__",
+        "file": "test\\torch_np\\numpy_tests\\core\\test_multiarray.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_stack",
+        "file": "test\\torch_np\\numpy_tests\\core\\test_shape_base.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_weights",
+        "file": "test\\torch_np\\numpy_tests\\lib\\test_histograms.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_import_nn_quantizable_rnn",
+        "file": "test\\quantization\\ao_migration\\test_ao_migration.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_per_tensor_qtensor_to_memory_format",
+        "file": "test\\quantization\\core\\test_quantized_tensor.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 60,
+        "reached_functions": 26,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "checkQuantized",
+        "file": "test\\quantization\\eager\\test_quantize_eager_ptq.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_qat_prepare_device_affinity",
+        "file": "test\\quantization\\fx\\test_quantize_fx.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 4,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "from_observed",
+        "file": "test\\quantization\\fx\\test_quantize_fx.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\quantization\\fx\\test_subgraph_rewriter.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\quantization\\jit\\test_quantize_jit.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1494,
+        "propagated_through": 101,
+        "capped": true,
+        "name": "dist",
+        "file": "test\\onnx\\exporter\\test_small_models_e2e.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\mobile\\model_test\\builtin_ops.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_dtensor_checkpoint_resharding_with_empty_shard",
+        "file": "test\\distributed\\checkpoint\\test_hf_safetensor_e2e.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "_use_unsharded_views_assert_as_tensors",
+        "file": "test\\distributed\\fsdp\\test_fsdp_core.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "test\\distributed\\fsdp\\test_fsdp_optim_state.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_create_3d_mesh",
+        "file": "test\\distributed\\local_tensor_tutorial_examples\\test_local_tensor_tutorial_examples.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_checkpoint_apis_check_partial_placement",
+        "file": "test\\distributed\\tensor\\test_api.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\distributed\\tensor\\test_dtensor_compile.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_hinted_unbacked_even_chunk_preserves_symbolic_shard_size",
+        "file": "test\\distributed\\tensor\\test_placement_types.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_dtensor_dtype_conversion",
+        "file": "test\\distributed\\tensor\\test_tensor_ops.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_left_inverse",
+        "file": "test\\distributed\\_pycute\\test_left_inverse.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "assert_fn",
+        "file": "test\\distributed\\_composable\\fsdp\\test_fully_shard_frozen.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1272,
+        "propagated_through": 121,
+        "capped": true,
+        "name": "backend",
+        "file": "test\\distributed\\_composable\\test_composability\\test_2d_composability.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 710,
+        "reached_functions": 344,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "setUp",
+        "file": "test\\distributed\\elastic\\multiprocessing\\redirects_test.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_get_all_rank_0",
+        "file": "test\\distributed\\elastic\\utils\\util_test.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_shared_memory_tensor_ipc",
+        "file": "test\\distributed\\checkpoint\\_experimental\\test_checkpoint_process.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1467,
+        "propagated_through": 58,
+        "capped": true,
+        "name": "foo",
+        "file": "test\\cpython\\v3_13\\test_abc.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 61,
+        "capped": true,
+        "name": "__getattr__",
+        "file": "test\\cpython\\v3_13\\test_builtin.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1517,
+        "propagated_through": 100,
+        "capped": true,
+        "name": "__eq__",
+        "file": "test\\cpython\\v3_13\\test_class.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 152,
+        "reached_functions": 76,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "assertAlmostEqual",
+        "file": "test\\cpython\\v3_13\\test_complex.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 30,
+        "reached_functions": 26,
+        "propagated_through": 1,
+        "capped": false,
+        "name": "memoize",
+        "file": "test\\cpython\\v3_13\\test_decorators.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\cpython\\v3_13\\test_descr.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1517,
+        "propagated_through": 100,
+        "capped": true,
+        "name": "__eq__",
+        "file": "test\\cpython\\v3_13\\test_dict.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1135,
+        "propagated_through": 154,
+        "capped": true,
+        "name": "hello",
+        "file": "test\\cpython\\v3_13\\test_enum.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_is_integer",
+        "file": "test\\cpython\\v3_13\\test_float.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_attributes_unwritable",
+        "file": "test\\cpython\\v3_13\\test_functools.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 68,
+        "reached_functions": 49,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "find_spec",
+        "file": "test\\cpython\\v3_13\\test_generators.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 13,
+        "reached_functions": 3,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "same_hash",
+        "file": "test\\cpython\\v3_13\\test_hash.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "isOdd",
+        "file": "test\\cpython\\v3_13\\test_itertools.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_round",
+        "file": "test\\cpython\\v3_13\\test_long.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_reinsert",
+        "file": "test\\cpython\\v3_13\\test_ordered_dict.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 36,
+        "reached_functions": 8,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "whereis",
+        "file": "test\\cpython\\v3_13\\test_patma.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "make_adder5",
+        "file": "test\\cpython\\v3_13\\test_scope.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_small_stability",
+        "file": "test\\cpython\\v3_13\\test_sort.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_getwindowsversion",
+        "file": "test\\cpython\\v3_13\\test_sys.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "test\\cpython\\v3_13\\test_with.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1538,
+        "propagated_through": 99,
+        "capped": true,
+        "name": "fn",
+        "file": "test\\cpp_extensions\\open_registration_extension\\torch_openreg\\tests\\test_compile.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "generate_cuda_alloc_test",
+        "file": "test\\cpp\\aoti_inference\\test.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_the_published_count_is_the_true_total",
+        "file": "scripts\\pr_review\\test_extract_verdict.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 4,
+        "reached_functions": 4,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "get_commit_data_cache",
+        "file": "scripts\\release_notes\\common.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1380,
+        "propagated_through": 31,
+        "capped": true,
+        "name": "device",
+        "file": "benchmarks\\distributed\\bench_nvshmem_tile_reduce.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_prepare_repro_installs_timm_without_deps",
+        "file": "benchmarks\\dynamo\\test.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "run_layer_norm",
+        "file": "benchmarks\\gpt_fast\\benchmark.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 1,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "nnc_fun",
+        "file": "benchmarks\\tensorexpr\\microbenchmarks.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 1466,
+        "propagated_through": 106,
+        "capped": true,
+        "name": "forward",
+        "file": "benchmarks\\operator_benchmark\\pt\\qbatchnorm_test.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 2000,
+        "reached_functions": 571,
+        "propagated_through": 0,
+        "capped": true,
+        "name": "__init__",
+        "file": "benchmarks\\dynamo\\microbenchmarks\\operator_inp_utils.py",
+        "name_ambiguous": true
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 2,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "translate_desired_cuda",
+        "file": ".github\\scripts\\generate_binary_build_matrix.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 0,
+        "reached_functions": 0,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "test_requested_changes_are_reported_ahead_of_an_approval",
+        "file": ".github\\scripts\\test_greenlight_preflight.py",
+        "name_ambiguous": false
+      },
+      {
+        "discharge_sites": 3,
+        "reached_functions": 1,
+        "propagated_through": 0,
+        "capped": false,
+        "name": "handle_exception",
+        "file": ".github\\scripts\\trymerge.py",
+        "name_ambiguous": false
+      }
+    ]
+  }
+}
