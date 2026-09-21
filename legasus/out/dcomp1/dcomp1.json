@@ -1,0 +1,23 @@
+{
+  "stage": "A - adversarial constructed cases, same author as the model",
+  "X1_causally_irrelevant_discrimination": {
+    "W_under_W0": "PASS",
+    "realizes_I_C": true,
+    "W_under_I": "FAIL (OSError)",
+    "realizes_Iprime_C": true,
+    "W_under_Iprime": "PASS",
+    "discriminates_W_P_C_I": true,
+    "F1_entitlement_false": true
+  },
+  "X2_contrast_coverage": {
+    "W_under_W0": "PASS",
+    "realizes_I2_UNSUPPORTED": true,
+    "W_under_I2_unsupported": "FAIL",
+    "realizes_I3_UNVERIFIABLE": true,
+    "W_under_I3_unverifiable": "PASS",
+    "discriminates_W_P_UNSUPPORTED": true,
+    "F2_entitlement_false": true
+  },
+  "Y1_counterexample": true,
+  "Y2_counterexample": true
+}
