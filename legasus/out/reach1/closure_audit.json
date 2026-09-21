@@ -1,0 +1,76 @@
+{
+  "settled": 29,
+  "open_frontier": [
+    "path_helper.py::get_path::path",
+    "utils.py::working_directory::path",
+    "filter_test_configs.py::parse_reenabled_issues::s"
+  ],
+  "closed_frontier_n": 26,
+  "moved_open": [
+    "path_helper.py::get_path::path"
+  ],
+  "moved_ctrl": [
+    "utils.py::str2bool::value"
+  ],
+  "cl1_exact": false,
+  "open_facts": {
+    "path_helper.py::get_path::path": [
+      {
+        "kind": "trusted_primitive",
+        "file": "torch\\utils\\_config_module.py",
+        "line": 1119,
+        "text": "self._hash_cache_var.get()",
+        "radius": 2
+      }
+    ],
+    "utils.py::working_directory::path": [
+      {
+        "kind": "trusted_primitive",
+        "file": ".ci\\lumen_cli\\cli\\lib\\core\\torchtitan\\lib.py",
+        "line": 65,
+        "text": "tests.get('working_directory', '')",
+        "radius": 1
+      }
+    ],
+    "filter_test_configs.py::parse_reenabled_issues::s": [
+      {
+        "kind": "trusted_primitive",
+        "file": ".github\\scripts\\test_filter_test_configs.py",
+        "line": 791,
+        "text": "case.get('pr_body', '')",
+        "radius": 3
+      }
+    ]
+  },
+  "base_verdicts": {
+    "path_helper.py::get_path::path": "REACHABLE",
+    "path_helper.py::remove_dir::path": "REACHABLE",
+    "utils.py::run_command::use_shell": "REACHABLE",
+    "utils.py::run_command::log_cmd": "UNREACHABLE",
+    "utils.py::str2bool::value": "UNREACHABLE",
+    "utils.py::working_directory::path": "REACHABLE",
+    "repair_wheel.py::set_rpath::force_rpath": "REACHABLE",
+    "cherry_pick.py::create_cherry_pick_branch::trunk_revert_sha": "REACHABLE",
+    "cherry_pick.py::submit_pr::trunk_revert_sha": "REACHABLE",
+    "filter_test_configs.py::filter::ignore_test_config_labels": "REACHABLE",
+    "filter_test_configs.py::parse_reenabled_issues::s": "REACHABLE",
+    "github_utils.py::_gh_post_comment::dry_run": "REACHABLE",
+    "greenlight_messages.py::render_refusal::suffix": "REACHABLE",
+    "label_utils.py::gh_add_labels::dry_run": "REACHABLE",
+    "pytest_caching_utils.py::_get_s3_key_prefix::sha": "REACHABLE",
+    "pytest_caching_utils.py::_get_s3_key_prefix::test_config": "REACHABLE",
+    "pytest_caching_utils.py::_get_s3_key_prefix::shard": "REACHABLE",
+    "trymerge.py::check_for_sev::skip_mandatory_checks": "REACHABLE",
+    "trymerge.py::merge::skip_mandatory_checks": "REACHABLE",
+    "trymerge.py::merge::ignore_current": "REACHABLE",
+    "trymerge.py::gen_commit_message::filter_ghstack": "REACHABLE",
+    "trymerge.py::gen_commit_message::ghstack_deps": "REACHABLE",
+    "trymerge.py::merge_changes_locally::comment_id": "REACHABLE",
+    "tryrebase.py::rebase_onto::dry_run": "REACHABLE",
+    "tryrebase.py::rebase_ghstack_onto::dry_run": "REACHABLE",
+    "cmds.py::_pip_install_cmd::editable": "REACHABLE",
+    "_dim_entry.py::_match_levels::drop_levels": "REACHABLE",
+    "categorize.py::__init__::use_classifier": "REACHABLE",
+    "create_alerts.py::filter_job_names::job_name_regex": "REACHABLE"
+  }
+}
