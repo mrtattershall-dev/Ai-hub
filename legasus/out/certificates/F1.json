@@ -1,0 +1,103 @@
+{
+  "contract_version": "1.0.0-frozen-2026-09-21",
+  "requested_claim": {
+    "domain": {
+      "name": "PROGRAM",
+      "contained_in": [
+        "REPOSITORY"
+      ]
+    },
+    "quantifier": "EXISTS",
+    "predicate": "input breaking validate_cuda"
+  },
+  "licensed_claim": null,
+  "licensed_relation": "NONE",
+  "collateral_observations": [
+    {
+      "claim": {
+        "domain": {
+          "name": "FUNCTION",
+          "contained_in": [
+            "MODULE",
+            "PROGRAM",
+            "REPOSITORY"
+          ]
+        },
+        "quantifier": "EXISTS",
+        "predicate": "input breaking validate_cuda"
+      },
+      "relation_to_request": "STRONGER_THAN_REQUEST",
+      "established_by": [
+        "obs"
+      ]
+    }
+  ],
+  "frontier": [
+    {
+      "gate": "O",
+      "unmet": "no observation with established membership in PROGRAM"
+    }
+  ],
+  "obligation": {
+    "passed": false,
+    "unmet": [
+      "no observation with established membership in PROGRAM"
+    ],
+    "coverage": {
+      "FUNCTION": "EXHAUSTIVE",
+      "PROGRAM": "UNKNOWN"
+    }
+  },
+  "derivation": {
+    "passed": true,
+    "alternatives": [
+      {
+        "premises": [
+          {
+            "ref": "F1:derivation0:premise0",
+            "decidable_at_site": true,
+            "settled": true
+          }
+        ],
+        "relation_witnesses": [],
+        "closed": true
+      }
+    ],
+    "open_frontier": null
+  },
+  "measurement": {
+    "capability_demonstrated": true,
+    "positive_control": {
+      "fired": true,
+      "ref": "F1:positive_control"
+    },
+    "observation": {
+      "ref": "F1:observation",
+      "evidential_force": true,
+      "procedure": "stageb diagnosis over FUNCTION",
+      "context": {
+        "evidence_scope": "FUNCTION",
+        "examined": 1,
+        "domain_size": 1
+      }
+    },
+    "instrument": {
+      "name": "stageb diagnosis",
+      "version_digest": "f8a831b7e443fed2d6189d3464a69514643ec35fa3b8869cdd5d119eedafa442"
+    }
+  },
+  "run_floor": {
+    "instrument": "stageb diagnosis",
+    "emitted_ref": "F1:emitted",
+    "run_id": "F1"
+  },
+  "provenance": {
+    "producer": "legasus/screen/obligation.py",
+    "producer_digest": "b228113d57ba907b5ed9e7916372f9dc4388b85cd2522b2d0e6140d6c96ce5c6",
+    "evidence_refs": [
+      "out/hadmission/substitution2.json"
+    ],
+    "run_id": "F1",
+    "emitted_at": "2026-09-21T15:14:30Z"
+  }
+}
