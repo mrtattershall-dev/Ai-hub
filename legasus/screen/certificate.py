@@ -14,6 +14,7 @@ HERE = Path(__file__).parent
 CONTRACT_V10 = "1.0.0-frozen-2026-09-21"
 CONTRACT_V11 = "1.1.0-frozen-2026-09-21"
 CONTRACT_V12 = "1.2.0-frozen-2026-09-21"
+CONTRACT_V13 = "1.3.0-frozen-2026-09-21"
 
 # PUBLISHED RULE FINGERPRINTS, not rule definitions. The producer pins WHICH rule it claims to have
 # used; the consumer owns what that rule REQUIRES. Duplicating the requirements here would be two
@@ -28,23 +29,53 @@ RULE_FINGERPRINTS = {
         "5af06cb1e7d1e9cfd37a1b00cd87eeb9e9d04254576b1a4fe9f972e109f63e37",
 }
 
+# v1.3 fingerprints. The registry's digest now covers the MATCHER as well as the requirement, so
+# every rule moved when satisfaction stopped being a name comparison. A producer pinned to a v1.2
+# fingerprint is correctly refused with RULE_DEFINITION_MOVED.
+RULE_FINGERPRINTS_V13 = {
+    "existential-from-established-member":
+        "1a05042bff94c34e9dac01224d00cb7582625fe085a9a32d81a61e9f16c48e88",
+    "universal-from-exhaustive-coverage":
+        "5d0b57cf7a23cd7f1ce03de075e2b3e9ac4605b89d94dd116e928b08c2160105",
+    "claim-from-direct-observation":
+        "eaedaf843c76e495aa215ff6c355f4efc3a4a03460435e4d6978bed56bb53f5d",
+}
+
 RULE_FOR_QUANTIFIER = {"EXISTS": "existential-from-established-member",
                        "FOR_ALL": "universal-from-exhaustive-coverage",
                        "NONE": "universal-from-exhaustive-coverage",
                        "POINTWISE": "claim-from-direct-observation"}
 
 
-def witnesses_established(requested2, ext):
+def witnesses_established(requested2, ext, version=None, premise_ref=None, run_id=None):
     """Relation witnesses the producer ACTUALLY established. Facts, never requirements.
 
     A witness is emitted only where the obligation record already carries the fact: exhaustive
     coverage of the claimed domain, or established membership of an observed element in it.
+
+    v1.3 emits INSTANCES rather than labels - subject, object, domain and evidence_root - because a
+    relation name is not a relation instance. The producer still only OFFERS these; the consumer's
+    rule matcher decides whether they bind, and there is no field by which the producer can assert
+    that they do.
     """
-    out = []
+    names = []
     if ext.coverage_of.get(requested2.domain.name) == O.EXHAUSTIVE:
-        out.append("COVERAGE")
+        names.append("COVERAGE")
     if any(requested2.domain.name in o.membership_established_in for o in ext.observed):
-        out.append("MEMBERSHIP")
+        names.append("MEMBERSHIP")
+    if version != CONTRACT_V13:
+        return names
+    out = []
+    for rel in names:
+        out.append({
+            "relation": rel,
+            "subject": premise_ref,
+            "object": requested2.domain.name,
+            "domain": requested2.domain.name,
+            "evidence_root": "%s:obligation:coverage[%s]" % (run_id, requested2.domain.name)
+            if rel == "COVERAGE" else "%s:observation" % run_id,
+            "provenance": "legasus/screen/obligation.py compile_obligation()",
+        })
     return out
 
 INSTRUMENT_SOURCE = {"reach1 tracer": "reach1.py", "SCREEN-1 detectors": "screen1.py",
@@ -92,10 +123,11 @@ def derivation_block(d, alternatives, requested2, version):
     """v1.2 adds rule IDENTITY. There is no place here to say what the rule requires."""
     block = {"passed": d.passed, "alternatives": alternatives,
              "open_frontier": None if d.passed else d.detail}
-    if version == CONTRACT_V12:
+    if version in (CONTRACT_V12, CONTRACT_V13):
         rule_id = RULE_FOR_QUANTIFIER[requested2.quantifier]
+        prints = RULE_FINGERPRINTS_V13 if version == CONTRACT_V13 else RULE_FINGERPRINTS
         block["rule_id"] = rule_id
-        block["rule_digest"] = RULE_FINGERPRINTS[rule_id]
+        block["rule_digest"] = prints[rule_id]
     return block
 
 
@@ -124,13 +156,17 @@ def emit(claim, ev, run_id, evidence_refs, version=CONTRACT_V10, attribution=Non
     if not m.passed:
         frontier.append({"gate": "M", "unmet": m.detail, "blocking_kind": "instrument_capability"})
 
-    witnesses = witnesses_established(requested2, ext) if version == CONTRACT_V12 else []
     alternatives = []
     for i, sd in enumerate(ev.supporting_derivations):
-        prem = {"ref": "%s:derivation%d:premise0" % (run_id, i),
+        ref = "%s:derivation%d:premise0" % (run_id, i)
+        prem = {"ref": ref,
                 "decidable_at_site": bool(sd.get("premises_decidable")),
                 "settled": bool(sd.get("premises_settled"))}
-        alternatives.append({"premises": [prem], "relation_witnesses": list(witnesses),
+        if version in (CONTRACT_V12, CONTRACT_V13):
+            w = witnesses_established(requested2, ext, version, ref, run_id)
+        else:
+            w = []
+        alternatives.append({"premises": [prem], "relation_witnesses": w,
                              "closed": prem["decidable_at_site"] and prem["settled"]})
 
     observation = {"ref": "%s:observation" % run_id,
@@ -138,7 +174,7 @@ def emit(claim, ev, run_id, evidence_refs, version=CONTRACT_V10, attribution=Non
                    "procedure": "%s over %s" % (ev.instrument, ev.evidence_scope),
                    "context": {"evidence_scope": ev.evidence_scope,
                                "examined": ev.examined, "domain_size": ev.domain_size}}
-    if version in (CONTRACT_V11, CONTRACT_V12):
+    if version in (CONTRACT_V11, CONTRACT_V12, CONTRACT_V13):
         observation["attribution"] = attribution
 
     return {
@@ -174,7 +210,8 @@ if __name__ == "__main__":
     from entitlement_conformance import CASES
     out_dir = Path(sys.argv[1]); out_dir.mkdir(parents=True, exist_ok=True)
     arg = sys.argv[2] if len(sys.argv) > 2 else "v1.0"
-    version = {"v1.0": CONTRACT_V10, "v1.1": CONTRACT_V11, "v1.2": CONTRACT_V12}[arg]
+    version = {"v1.0": CONTRACT_V10, "v1.1": CONTRACT_V11, "v1.2": CONTRACT_V12,
+                "v1.3": CONTRACT_V13}[arg]
     for name, (claim, ev, _) in CASES.items():
         run_id = name.split()[0].replace("'", "p")
         # THE REAL BINDING RECORD. What tied this observation to this subject is the frozen case

@@ -1,0 +1,642 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "legasus/contracts/entitlement-certificate.v1.3.schema.json",
+  "title": "EntitlementCertificate",
+  "description": "A certificate carries evidence and correspondence claims. It carries no authority. Successful deserialization establishes nothing. v1.3 makes relation witnesses INSTANCES rather than labels; the rule, not the producer, decides satisfaction.",
+  "type": "object",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "$ref": "#/$defs/noAuthorityFields"
+    },
+    {
+      "$ref": "#/$defs/noCauseFields"
+    }
+  ],
+  "required": [
+    "contract_version",
+    "requested_claim",
+    "licensed_claim",
+    "licensed_relation",
+    "collateral_observations",
+    "frontier",
+    "obligation",
+    "derivation",
+    "measurement",
+    "run_floor",
+    "provenance"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "1.3.0-frozen-2026-09-21"
+    },
+    "requested_claim": {
+      "$ref": "#/$defs/claim"
+    },
+    "licensed_claim": {
+      "description": "null, or a claim the requested claim LICENSES under the producer's own comparison. Never a merely supported claim.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/claim"
+        }
+      ]
+    },
+    "licensed_relation": {
+      "description": "The relation proof. NONE iff licensed_claim is null.",
+      "enum": [
+        "NONE",
+        "LICENSES",
+        "EQUIVALENT"
+      ]
+    },
+    "collateral_observations": {
+      "description": "Claims the run established that do NOT restrict the requested claim. Knowledge is not thrown away; it is kept off the licensed slot.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/collateral"
+      }
+    },
+    "frontier": {
+      "description": "What prevented the requested claim, per gate. Vector, never a diagnosis.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/frontierItem"
+      }
+    },
+    "obligation": {
+      "$ref": "#/$defs/obligation"
+    },
+    "derivation": {
+      "$ref": "#/$defs/derivation"
+    },
+    "measurement": {
+      "$ref": "#/$defs/measurement"
+    },
+    "run_floor": {
+      "description": "Direct observation of what the instrument emitted. About the run, not the subject. Never compared against subject-level claims.",
+      "$ref": "#/$defs/runFloor"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    }
+  },
+  "if": {
+    "properties": {
+      "licensed_claim": {
+        "type": "null"
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "licensed_relation": {
+        "const": "NONE"
+      }
+    }
+  },
+  "else": {
+    "properties": {
+      "licensed_relation": {
+        "enum": [
+          "LICENSES",
+          "EQUIVALENT"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "noAuthorityFields": {
+      "description": "A certificate that carries any of these has started becoming a second authority system. Fail it.",
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "authority"
+            ]
+          },
+          {
+            "required": [
+              "authorized"
+            ]
+          },
+          {
+            "required": [
+              "minted"
+            ]
+          },
+          {
+            "required": [
+              "grant"
+            ]
+          },
+          {
+            "required": [
+              "OWNER"
+            ]
+          },
+          {
+            "required": [
+              "owner"
+            ]
+          },
+          {
+            "required": [
+              "kind"
+            ]
+          },
+          {
+            "required": [
+              "isAuthority"
+            ]
+          },
+          {
+            "required": [
+              "token"
+            ]
+          },
+          {
+            "required": [
+              "permission"
+            ]
+          }
+        ]
+      }
+    },
+    "noCauseFields": {
+      "description": "Multi-gate failures stay vectors. No field names a cause.",
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "cause"
+            ]
+          },
+          {
+            "required": [
+              "reason"
+            ]
+          },
+          {
+            "required": [
+              "root_cause"
+            ]
+          },
+          {
+            "required": [
+              "primary"
+            ]
+          }
+        ]
+      }
+    },
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "contained_in"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contained_in": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/noAuthorityFields"
+        }
+      ],
+      "required": [
+        "domain",
+        "quantifier",
+        "predicate"
+      ],
+      "properties": {
+        "domain": {
+          "$ref": "#/$defs/domain"
+        },
+        "quantifier": {
+          "enum": [
+            "EXISTS",
+            "FOR_ALL",
+            "NONE",
+            "POINTWISE"
+          ]
+        },
+        "predicate": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "collateral": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim",
+        "relation_to_request",
+        "established_by"
+      ],
+      "properties": {
+        "claim": {
+          "$ref": "#/$defs/claim"
+        },
+        "relation_to_request": {
+          "description": "Why this is collateral and not licensed. LICENSES is excluded by construction.",
+          "enum": [
+            "INCOMPARABLE",
+            "DOES_NOT_LICENSE",
+            "STRONGER_THAN_REQUEST"
+          ]
+        },
+        "established_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "frontierItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gate",
+        "unmet"
+      ],
+      "properties": {
+        "gate": {
+          "enum": [
+            "O",
+            "D",
+            "M"
+          ]
+        },
+        "unmet": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blocking_kind": {
+          "type": "string"
+        }
+      }
+    },
+    "obligation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "passed",
+        "unmet",
+        "coverage"
+      ],
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "unmet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": {
+            "enum": [
+              "PARTIAL",
+              "EXHAUSTIVE",
+              "UNKNOWN"
+            ]
+          }
+        }
+      }
+    },
+    "premise": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "decidable_at_site",
+        "settled"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decidable_at_site": {
+          "type": "boolean"
+        },
+        "settled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "supportingDerivation": {
+      "description": "ONE derivation: ALL of its premises must be settled for it to be closed.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "premises",
+        "relation_witnesses",
+        "closed"
+      ],
+      "properties": {
+        "premises": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/premise"
+          },
+          "minItems": 1
+        },
+        "relation_witnesses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relationWitness"
+          }
+        },
+        "closed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "derivation": {
+      "description": "ANY one closed alternative suffices; WITHIN an alternative, ALL premises must be settled. relation_witnesses are FACTS THE PRODUCER ESTABLISHED. What the rule REQUIRES is owned by the consumer.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "passed",
+        "rule_id",
+        "rule_digest",
+        "alternatives",
+        "open_frontier"
+      ],
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/supportingDerivation"
+          }
+        },
+        "open_frontier": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "rule_id": {
+          "description": "Which admitted rule this derivation claims to have used. The CONSUMER resolves this to its own definition. The certificate may not state the rule's requirements; there is deliberately no field for them, and additionalProperties is false.",
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_digest": {
+          "description": "SHA-256 of the canonical rule definition the producer pinned: {name, requires sorted, version}. A mismatch against the runtime's definition is RULE_DEFINITION_MOVED, never silent use of the local one.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "measurement": {
+      "description": "Capability is NOT the observation. legaknow.observe() needs the actual observation, its evidential force, procedure and context; a fired positive control alone does not mint.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability_demonstrated",
+        "positive_control",
+        "observation",
+        "instrument"
+      ],
+      "properties": {
+        "capability_demonstrated": {
+          "type": "boolean"
+        },
+        "positive_control": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fired",
+            "ref"
+          ],
+          "properties": {
+            "fired": {
+              "type": "boolean"
+            },
+            "ref": {
+              "type": "string"
+            }
+          }
+        },
+        "observation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ref",
+            "evidential_force",
+            "procedure",
+            "attribution",
+            "context"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "evidential_force": {
+              "type": "boolean"
+            },
+            "procedure": {
+              "type": "string",
+              "minLength": 1
+            },
+            "context": {
+              "type": "object"
+            },
+            "attribution": {
+              "description": "How THIS observation was bound to its subject. Supplied by the producer. The adapter may transmit and validate it and may NEVER synthesize it or infer it from procedure, filename, producer or issuer. null means not established, which makes the measurement->OBSERVE mapping non-mintable. Attribution never constitutes authority.",
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            }
+          }
+        },
+        "instrument": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version_digest"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version_digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "runFloor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instrument",
+        "emitted_ref",
+        "run_id"
+      ],
+      "properties": {
+        "instrument": {
+          "type": "string",
+          "minLength": 1
+        },
+        "emitted_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producer",
+        "producer_digest",
+        "evidence_refs",
+        "run_id",
+        "emitted_at"
+      ],
+      "properties": {
+        "producer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "producer_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "emitted_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "relationWitness": {
+      "description": "A witness CANDIDATE. The producer offers it; the consumer's rule matcher decides whether it binds. There is no field by which a producer can assert that it does.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relation",
+        "subject",
+        "object",
+        "domain",
+        "evidence_root",
+        "provenance"
+      ],
+      "properties": {
+        "relation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject": {
+          "description": "what the relation holds OF; must be a premise of this derivation",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "object": {
+          "description": "what it holds TOWARD, e.g. the domain for MEMBERSHIP",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "domain": {
+          "description": "the domain the witness is about; a witness about another world does not bind to this claim",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "evidence_root": {
+          "description": "what the witness roots in. null asserts the relation without rooting in anything.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "provenance": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
