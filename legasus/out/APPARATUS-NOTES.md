@@ -690,3 +690,25 @@ last. Which reading is right was NOT decided.
 Observation recorded, earning nothing: three of five attacks succeeded via a SELF-REPORTED field
 (role, identity, request provenance) and a fourth via a channel artifact (a resolution logged as
 a serve).
+
+## 41. The boundary MOVED when the observation configuration changed (step 13)
+
+N1 confirmed: with the request channel seeded MID-run, S1's bundles are identical - nothing
+recorded identifies the ISSUER of a request. P1 converts to an evidence limit.
+
+N3a+N3b confirmed and this is the finding: the SAME two worlds, scored under two field sets -
+identical under executions+requests, different once operation-start records are included. The
+worlds did not change; what was recorded did. So NOT_IDENTIFIABLE_STRONG is a property of the
+evidence configuration, which step 11 asserted as a caveat and could not then demonstrate. NOT
+read as "therefore record operation starts" - that is a design decision a different experiment
+would have to earn.
+
+N2 falsified: S3' still differs, but the kind:role sequences are identical and the difference is
+IDENTITY - hostile [MUTANT,MUTANT] vs genuine [MUTANT,SUBJECT], because my genuine external
+worker received no mechanism while the hostile witness's second load was served. A third scar,
+not information about P3. Per the prereg a surviving difference is the NEXT TARGET, not an
+answer, and it was not attacked inside this expedition.
+
+Map: P1, P5, P6, P7 are evidence limits; P4 is a limit under the original configuration and
+identifiable under the extended one; P3 unconverted with one distinction outstanding; P2
+untouched by design.

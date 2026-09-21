@@ -1,0 +1,277 @@
+{
+  "at": "2026-09-21T03:09:21.704Z",
+  "results": [
+    {
+      "id": "S1prime",
+      "prop": "P1",
+      "text": "a request was issued",
+      "hostile": {
+        "worker": "none",
+        "request": false,
+        "foreignSeedAt": 250
+      },
+      "genuine": {
+        "worker": "none",
+        "request": true,
+        "requestDelay": 250
+      },
+      "fieldSet": "original",
+      "expect": "IDENTICAL",
+      "outcome": "IDENTICAL",
+      "matched": true,
+      "classification": "EVIDENCE_LIMIT under this field set",
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          }
+        ],
+        "servedCount": 1
+      },
+      "genuineBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          }
+        ],
+        "servedCount": 1
+      }
+    },
+    {
+      "id": "S3prime",
+      "prop": "P3",
+      "text": "an execution occurred outside the witness",
+      "hostile": {
+        "worker": "none",
+        "request": false,
+        "selfWorker": true,
+        "selfWorkerDelay": 300
+      },
+      "genuine": {
+        "worker": "on-timer",
+        "request": false,
+        "workerDelay": 300
+      },
+      "fieldSet": "original",
+      "expect": "IDENTICAL",
+      "outcome": "DIFFER",
+      "matched": false,
+      "classification": "a difference remains - the next target, not an answer",
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 3
+      },
+      "genuineBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1
+      }
+    },
+    {
+      "id": "S4prime-original",
+      "prop": "P4",
+      "text": "the execution followed the request (original field set)",
+      "hostile": {
+        "worker": "on-timer",
+        "opworker": true,
+        "request": true,
+        "workerDelay": 900,
+        "requestDelay": 0
+      },
+      "genuine": {
+        "worker": "on-timer",
+        "request": true,
+        "workerDelay": 900,
+        "requestDelay": 0,
+        "opsMark": true,
+        "opsDelay": 400
+      },
+      "fieldSet": "original",
+      "expect": "IDENTICAL",
+      "outcome": "IDENTICAL",
+      "matched": true,
+      "classification": "EVIDENCE_LIMIT under this field set",
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 2,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1
+      },
+      "genuineBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 2,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1
+      }
+    },
+    {
+      "id": "S4prime-extended",
+      "prop": "P4",
+      "text": "the execution followed the request (operation-start included)",
+      "hostile": {
+        "worker": "on-timer",
+        "opworker": true,
+        "request": true,
+        "workerDelay": 900,
+        "requestDelay": 0
+      },
+      "genuine": {
+        "worker": "on-timer",
+        "request": true,
+        "workerDelay": 900,
+        "requestDelay": 0,
+        "opsMark": true,
+        "opsDelay": 400
+      },
+      "fieldSet": "extended",
+      "expect": "DIFFER",
+      "outcome": "DIFFER",
+      "matched": true,
+      "classification": "a difference remains - the next target, not an answer",
+      "hostileBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "operation-start",
+            "role": "worker",
+            "identity": null
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 2,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 3,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1
+      },
+      "genuineBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 2,
+            "kind": "operation-start",
+            "role": "worker",
+            "identity": null
+          },
+          {
+            "rank": 3,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1
+      }
+    }
+  ],
+  "configurationFinding": {
+    "originalFieldSet": "IDENTICAL",
+    "extendedFieldSet": "DIFFER",
+    "boundaryMoved": true
+  },
+  "processHygiene": {
+    "spawnedRecorded": 13,
+    "aliveAtSweep": 0
+  }
+}

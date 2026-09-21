@@ -25,4 +25,21 @@ if (process.env.LEGASUS_REQUEST === '1') {
   d > 0 ? setTimeout(issue, d) : issue();
 }
 
+// S3': two execution events, two role labels, ONE process. Equalises the event count with a
+// genuine world that has a separate worker, so the bundles can be compared without that scar.
+if (process.env.LEGASUS_SELF_WORKER === '1') {
+  setTimeout(() => {
+    delete require.cache[require.resolve(path.join(__dirname, 'target.js'))];
+    process.env.LEGASUS_ROLE = 'worker';
+    require(path.join(__dirname, 'target.js'));
+    console.log('PASS the witness executed again, wearing a different label');
+  }, Number(process.env.LEGASUS_SELF_WORKER_DELAY || 300));
+}
+
+// S4': the genuine world emits an operation-start too, so the record type is not itself the
+// difference. Here the operation begins AFTER the request; in the hostile world, before it.
+if (process.env.LEGASUS_OPS_MARK === '1') {
+  setTimeout(() => { fs.appendFileSync(process.env.LEGASUS_OPS, JSON.stringify({ event: 'operation-start', role: 'worker', at: Date.now() }) + String.fromCharCode(10)); }, Number(process.env.LEGASUS_OPS_DELAY || 400));
+}
+
 setTimeout(() => { console.log('ALL PASS'); process.exit(0); }, 1600);
