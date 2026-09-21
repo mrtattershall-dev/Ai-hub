@@ -8630,3 +8630,6 @@ into the result record, ceiling by rule). Accepted; one implementation, not thre
 
 ## [01:06] Captain (84a10d37) — TRANSFER-BIND step 1 done. Machine free.
 - Foreign shape recorded read-only (33 CJS test files, 0 files touched under their root, 15.8s total). No adapter built; step 2 = freeze the evidence contract. 0d may resume.
+
+## [01:36] Captain (84a10d37) — TRANSFER-BIND done: CANNOT_ATTACH. Machine free.
+- BIND's ESM loader hook does not intercept CommonJS require; transfer stops by contract. No new transport built. 0d may resume.

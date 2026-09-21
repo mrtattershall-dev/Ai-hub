@@ -439,3 +439,23 @@ so a wording that cannot be scored cleanly is caught by the apparatus, not by th
 Correction to 29 (same night, no measurement changed): UNASSERTED must be counted per
 behavioural class - 17 of 21 non-S0 classes - not per record (272/276, of which one mutant
 contributes 71). Appended to BIND-2_RESULT.md as a denominator correction.
+
+## 30. TRANSFER-BIND: CANNOT_ATTACH, and the false success occurred (2026-09-21 01:35)
+
+BIND's ESM resolve hook does not answer a CommonJS require (Node 24.15.0, win32). T1 confirmed,
+frozen before the probe. The arm that matters is B: a RETURN_EMPTY mutant was requested, never
+served, and the witness reported 2 PASS / exit 0 - which read from the outcome alone is
+"mutant ran, nothing discriminated, equivalent, preserved". Four false steps. Caught by the
+served file's load-time self-identification (contract R11), which said SUBJECT where MUTANT was
+requested. An occurrence, not an avoided hypothetical, in the first run after the contract froze.
+
+Arm D (ESM, same mechanism, same probe) DID substitute - without it, "did not intercept" could
+not be told from "never armed", and the CJS arms would have been evidence about the probe.
+That arm was added after the first run and before any result was recorded.
+
+Hazard 1 again, occurrence N+1: a sed patch put a literal '+D.executedIdentity+' into the
+verdict template - inside the write-up of a result about not trusting representations. Numbers
+unaffected, artifact regenerated via Edit.
+
+Not building a CJS transport. BIND-CJS would be a new experiment under its own prereg; built
+tonight it would convert a clean negative into an apparatus tuned until it passed.

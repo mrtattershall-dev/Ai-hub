@@ -1,0 +1,84 @@
+{
+  "at": "2026-09-21T00:42:47.422Z",
+  "node": "v24.15.0",
+  "platform": "win32",
+  "mechanism": "module.register + ESM resolve hook (legasus/preload.mjs, unmodified)",
+  "fixture": {
+    "root": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\transfer\\cjs-probe",
+    "moduleSystem": "commonjs (nested package.json type:commonjs; foreign subject has no package.json at all - stated difference)"
+  },
+  "arms": [
+    {
+      "arm": "C",
+      "why": "no mutant requested; proves the marker is observable at all",
+      "requestedIdentity": null,
+      "executedIdentity": "SUBJECT",
+      "interceptionObserved": null,
+      "witnessExit": 0,
+      "witnessCases": 2,
+      "witnessOutcomes": [
+        "PASS",
+        "PASS"
+      ],
+      "markerLines": 1,
+      "spawnError": null,
+      "stdoutTail": "PASS single segment survives | ALL PASS  (2 passed, 0 failed)",
+      "stderrTail": ""
+    },
+    {
+      "arm": "A",
+      "why": "T2 control: identity copy; distinguishes substitution from its absence",
+      "requestedIdentity": "BASELINE",
+      "executedIdentity": "SUBJECT",
+      "interceptionObserved": false,
+      "witnessExit": 0,
+      "witnessCases": 2,
+      "witnessOutcomes": [
+        "PASS",
+        "PASS"
+      ],
+      "markerLines": 1,
+      "spawnError": null,
+      "stdoutTail": "PASS single segment survives | ALL PASS  (2 passed, 0 failed)",
+      "stderrTail": ""
+    },
+    {
+      "arm": "B",
+      "why": "T1: the perturbation BIND would need to serve",
+      "requestedIdentity": "MUTANT",
+      "executedIdentity": "SUBJECT",
+      "interceptionObserved": false,
+      "witnessExit": 0,
+      "witnessCases": 2,
+      "witnessOutcomes": [
+        "PASS",
+        "PASS"
+      ],
+      "markerLines": 1,
+      "spawnError": null,
+      "stdoutTail": "PASS single segment survives | ALL PASS  (2 passed, 0 failed)",
+      "stderrTail": ""
+    },
+    {
+      "arm": "D",
+      "why": "probe control: the SAME mechanism on an ESM import, where it is known to work",
+      "requestedIdentity": "ESM_MUTANT",
+      "executedIdentity": "ESM_MUTANT",
+      "interceptionObserved": true,
+      "witnessExit": 1,
+      "witnessCases": 2,
+      "witnessOutcomes": [
+        "FAIL",
+        "FAIL"
+      ],
+      "markerLines": 1,
+      "spawnError": null,
+      "stdoutTail": "FAIL single segment survives | 2 FAILED  (0 passed, 2 failed)",
+      "stderrTail": ""
+    }
+  ],
+  "verdict": {
+    "status": "CANNOT_ATTACH: UNSUPPORTED_MODULE_INTERCEPTION",
+    "reason": "the ESM resolve hook DID substitute an ESM import in the same probe (arm D executed ESM_MUTANT, witness exit 1) and did NOT answer a CommonJS require: arm A executed SUBJECT (requested BASELINE), arm B executed SUBJECT (requested MUTANT). Arm B's witness exited 0 with 2 PASS - the false success R11 exists to catch, caught by the marker and not by the outcome."
+  }
+}
