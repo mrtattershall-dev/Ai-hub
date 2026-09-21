@@ -84,3 +84,29 @@ Two witnesses, one function, one target, three constructed worlds. No claim abou
 general, and no witness was promoted to entitling anything. The interventions patched
 `PIL.ImageFont` in the loaded module's namespace; the project's test code was not edited, and
 its assertions were transcribed verbatim.
+
+## CORRECTION (appended; original wording left above)
+
+**1. "Witness adequacy is dynamic, not static" is stronger than the evidence.** What was
+demonstrated is narrower:
+
+> A3 cannot establish witness adequacy **merely from the surface form of tests**. Actual
+> discrimination under the relevant non-establishment state cannot be inferred from ordinary
+> assertion structure.
+
+Sufficiently strong static proof could in principle establish discrimination. Nothing here rules
+that out; what is ruled out is inferring it from assertion shape.
+
+**2. Adequacy is a RELATION, not a property of a witness.** The result above says T2
+discriminated SUPPORTED from UNVERIFIABLE *under this intervention*. It does not say T2
+discriminates SUPPORTED from every way support can be unestablished. The correct form is:
+
+    discriminates(W, P, C, I)      witness, proposition, contrast class, intervention
+
+and every claim of adequacy must name all four. `adequate(W)` is not a well-formed claim.
+
+**3. A third sentence, earned by T1.** T1 inherits the information loss of the API it observes:
+the producer maps UNVERIFIABLE onto the same `True` as SUPPORTED, so no assertion over that
+return value can separate them.
+
+> **A witness cannot recover distinctions already erased by its observation boundary.**
