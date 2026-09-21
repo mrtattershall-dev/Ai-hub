@@ -1,0 +1,110 @@
+{
+  "target": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\legasus\\screen\\control-corpus",
+  "filesSeen": 3,
+  "filesParsed": 2,
+  "unparseable": [
+    {
+      "file": "unparseable.py",
+      "error": "invalid syntax (<unknown>, line 1)"
+    }
+  ],
+  "verdictCounts": {
+    "INV-A2:VIOLATION": 6,
+    "INV-A2:DISTINGUISHABLE": 2,
+    "INV-B2:PROVEN_FAILURE_UNREACHABLE": 4,
+    "INV-B2:UNKNOWN": 2
+  },
+  "candidates": [
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "cases.py",
+      "function": "upload_ok",
+      "line": 11,
+      "flagged_line": 16,
+      "reason": "an except handler returns True, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "cases.py",
+      "function": "sync_records",
+      "line": 21,
+      "flagged_line": 26,
+      "reason": "an except handler returns 1, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "cases.py",
+      "function": "sync_records_with_failure_path",
+      "line": 31,
+      "flagged_line": 38,
+      "reason": "an except handler returns 1, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-B2",
+      "verdict": "PROVEN_FAILURE_UNREACHABLE",
+      "file": "cases.py",
+      "function": "is_ready",
+      "line": 54,
+      "flagged_line": 55,
+      "reason": "every return is a truthy literal and the function cannot raise"
+    },
+    {
+      "invariant": "INV-B2",
+      "verdict": "PROVEN_FAILURE_UNREACHABLE",
+      "file": "cases.py",
+      "function": "has_access",
+      "line": 60,
+      "flagged_line": 62,
+      "reason": "every return is a truthy literal and the function cannot raise"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "nested/deep/cases.py",
+      "function": "upload_ok",
+      "line": 11,
+      "flagged_line": 16,
+      "reason": "an except handler returns True, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "nested/deep/cases.py",
+      "function": "sync_records",
+      "line": 21,
+      "flagged_line": 26,
+      "reason": "an except handler returns 1, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-A2",
+      "verdict": "VIOLATION",
+      "file": "nested/deep/cases.py",
+      "function": "sync_records_with_failure_path",
+      "line": 31,
+      "flagged_line": 38,
+      "reason": "an except handler returns 1, identical to a value returned on a non-exceptional path"
+    },
+    {
+      "invariant": "INV-B2",
+      "verdict": "PROVEN_FAILURE_UNREACHABLE",
+      "file": "nested/deep/cases.py",
+      "function": "is_ready",
+      "line": 54,
+      "flagged_line": 55,
+      "reason": "every return is a truthy literal and the function cannot raise"
+    },
+    {
+      "invariant": "INV-B2",
+      "verdict": "PROVEN_FAILURE_UNREACHABLE",
+      "file": "nested/deep/cases.py",
+      "function": "has_access",
+      "line": 60,
+      "flagged_line": 62,
+      "reason": "every return is a truthy literal and the function cannot raise"
+    }
+  ],
+  "note": "only VIOLATION and PROVEN_FAILURE_UNREACHABLE are reportable; UNKNOWN and DISTINGUISHABLE are counted and never reported as findings"
+}

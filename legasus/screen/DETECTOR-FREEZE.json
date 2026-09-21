@@ -1,0 +1,22 @@
+{
+  "frozenAt": "2026-09-21T04:45:43.368852+00:00",
+  "purpose": "detector bytes sealed BEFORE any MoneyPrinterTurbo source is opened",
+  "files": {
+    "screen2.py": {
+      "sha256": "52b6a7a020febaf1fb7119e12366d81ace73f3261a07ce0fab56ca5f29c6129d",
+      "bytes": 8556
+    },
+    "PYTHON-EVIDENCE-CONTRACT.md": {
+      "sha256": "d959403ab8918afecdd2919631dfa773f451131b066c821c900ec820ed6c9081",
+      "bytes": 7029
+    },
+    "control1_check.py": {
+      "sha256": "25e67357a83e1920ac88f78feef52b1e82673feae41e7ef9a0a9b64c723d7075",
+      "bytes": 3558
+    },
+    "control-corpus/cases.py": {
+      "sha256": "a1e6a6e5d5a72b9fbdef833273a97401ee4524f64c26ee9f981a268d95d52139",
+      "bytes": 1984
+    }
+  }
+}

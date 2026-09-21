@@ -24,6 +24,8 @@ NEGATIVES = {
 
 
 def main():
+    # Accepts screen1.json or screen2.json: invariant names are matched by FAMILY
+    # (INV-A matches INV-A2), a mechanical adaptation for the rename, not a relaxation.
     d = json.load(open(sys.argv[1], encoding="utf-8"))
     cands = d["candidates"]
     by_fn = {}
@@ -36,7 +38,7 @@ def main():
     for fn, inv in POSITIVES.items():
         hits = by_fn.get(fn, [])
         logical = {(h["file"].split("/")[-1], h["function"], h["invariant"]) for h in hits}
-        ok = len(hits) >= 1 and all(h["invariant"] == inv for h in hits)
+        ok = len(hits) >= 1 and all(h["invariant"].startswith(inv) for h in hits)
         rows.append(("POSITIVE", fn, inv, len(hits), len(logical), "FLAGGED" if ok else "MISSED"))
         if not ok:
             failures.append(f"positive {fn} ({inv}) was not flagged")
