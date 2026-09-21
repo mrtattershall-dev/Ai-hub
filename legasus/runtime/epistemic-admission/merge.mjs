@@ -28,6 +28,22 @@ import { JOURNAL_VERSION } from './replay.mjs';
 
 export const MERGE_VERSION = 'merged-journal-1.0.0-frozen-2026-09-21';
 
+// WITNESS REQUIREMENT MODES. What would SATISFY this consumer's obligation - a different question
+// from "has everything relevant been exposed", which is exhaustion and is not built here.
+//
+// A MODE IS A PROPERTY OF THE OBLIGATION AND IS NEVER READ FROM THE CERTIFICATE. A producer
+// declaring EXISTENTIAL on its own witness would be choosing its own burden of proof, which is the
+// defect v1.2 removed when producers stopped supplying `requires`. It is resolved here from an
+// explicit RUNTIME policy, because no registry rule may be added or changed in this run - a
+// recorded hazard: that is weaker than the registry, and the runtime author can still choose the
+// burden. The producer still cannot.
+export const MODE = Object.freeze({
+  DESIGNATED: 'DESIGNATED',     // only that exact source satisfies. Designation REDUCES the search.
+  EXISTENTIAL: 'EXISTENTIAL',   // any one admissible support that actually binds. A further
+                                // agreeing support changes nothing.
+  COMPLETE: 'COMPLETE',         // a decision over the WHOLE candidate set. Not satisfiable today.
+});
+
 // A NUL separator got into the first version of this line. It made the module a BINARY file to
 // grep and - worse - made a mutation control silently fail to apply while reporting the suite as
 // insensitive. JSON encoding is unambiguous and printable.
@@ -99,7 +115,11 @@ function orderWithinOrigins(records) {
 
 /** Re-execute the merged set. Every outcome names the (origin, ref) it belongs to, so a caller can
  *  never read a neighbour's result by position. */
-export function replayMerged(merged, { authorityStore: st } = {}) {
+export function replayMerged(merged, { authorityStore: st, witnessModes } = {}) {
+  // Absent policy means the DEFAULT, which is none of the three modes and never had a name: try the
+  // designated address within its own origin, and failing that fall back to candidates found by
+  // claim, requiring exactly one eligible, else refuse. T1 pins it so vocabulary cannot move it.
+  const modeFor = (c) => (witnessModes && witnessModes[c.relation]) || null;
   const ord = orderWithinOrigins(merged.records);
   if (ord.cycle) {
     return { ok: false, why: 'records refer to one another in a cycle within one origin: '
@@ -132,6 +152,11 @@ export function replayMerged(merged, { authorityStore: st } = {}) {
   const needOf = (c) => relationClaim(c.relation, c.subject, c.object);
   const ready = (r) => (r.entry.consumed || []).every((c) => {
     if (live.has(key(r.origin, c.ref))) return true;
+    // A DESIGNATED witness never waits on a claim: nothing but its own source can satisfy it, so
+    // no arriving supplier could change the answer. Designation reduces the search.
+    if (modeFor(c) === MODE.DESIGNATED) return true;
+    // COMPLETE refuses today whatever else happens; waiting would not make it satisfiable.
+    if (modeFor(c) === MODE.COMPLETE) return true;
     const need = needOf(c);
     if (couldStillEstablish(need)) return false;          // a supplier may still arrive: wait
     return true;                                          // decidable now, one way or the other
@@ -157,6 +182,23 @@ export function replayMerged(merged, { authorityStore: st } = {}) {
     for (const c of e.consumed || []) {
       // 1. THE REFERENCE, resolved only within its OWN origin.
       let fresh = live.get(key(r.origin, c.ref)), from = { origin: r.origin, ref: c.ref, by: 'REFERENCE' };
+      const mode = modeFor(c);
+      if (mode) from.mode = mode;
+      if (!fresh && mode === MODE.COMPLETE) {
+        blocked = { ...at, state: STATE.FRONTIER_OPEN, minted: false, mode,
+          why: 'this witness requires a decision over the COMPLETE candidate set, and completeness'
+            + ' is not established here. A stalled pass shows only that nothing can advance under'
+            + ' the current scheduling rules - not that every possible supplier has been exposed,'
+            + ' because replayability itself depends on consumers still being postponed' };
+        break;
+      }
+      if (!fresh && mode === MODE.DESIGNATED) {
+        blocked = { ...at, state: STATE.FRONTIER_OPEN, minted: false, mode,
+          why: 'the DESIGNATED source "' + c.ref + '" in origin ' + r.origin + ' did not resolve.'
+            + ' Another record establishing the same claim is not this source, and a designated'
+            + ' obligation is not satisfied by an equally true substitute' };
+        break;
+      }
       if (!fresh) {
         // 2. THE PROPOSITION. A record from any origin that has ALREADY replayed into authority for
         //    exactly this claim. Selection is by claim; binding is still resolveEvidenceRoot's call.
@@ -178,8 +220,22 @@ export function replayMerged(merged, { authorityStore: st } = {}) {
             }
           }
           return (adapt(trial, { authorityStore: st }).bound || []).includes(c.relation);
-        });
-        if (cands.length > 1) {
+        // A STABLE TOTAL ORDER, not the input order. T5 found EXISTENTIAL picking a different
+        // support depending on which journal was passed first: satisfaction was invariant but the
+        // PROVENANCE was not, and provenance that moves with argument order is not provenance.
+        // The order is arbitrary - it is (origin, ref) - and being arbitrary is fine here only
+        // because the obligation said any one eligible support would do. Every candidate is still
+        // named regardless of which was used.
+        }).sort((x, y) => (x.origin + ' ' + x.ref).localeCompare(y.origin + ' ' + y.ref));
+        if (cands.length > 1 && mode === MODE.EXISTENTIAL) {
+          // ONE admissible support that binds is what this obligation asked for. A second agreeing
+          // support leaves satisfaction unchanged - it does not strengthen the claim and it does
+          // not create an impasse. Every eligible support is still named in the provenance.
+          fresh = cands[0].fresh;
+          from = { origin: cands[0].origin, ref: cands[0].ref, by: 'CLAIM', claim: need,
+            mode, candidates: cands.map((x) => ({ origin: x.origin, ref: x.ref })),
+            completenessBasis: 'NOT_REQUIRED_BY_THIS_MODE' };
+        } else if (cands.length > 1) {
           // WHAT THIS REFUSAL KNOWS, and no more. Several records are eligible to support the same
           // proposition. That is NOT a report that the evidence disagrees, and it is not a report
           // that the claim is better supported: two histories can replay one observation, which is
@@ -201,7 +257,11 @@ export function replayMerged(merged, { authorityStore: st } = {}) {
           // remains the basis. See S6 in MULTIPLICITY_PREREG.md.
           from = { origin: cands[0].origin, ref: cands[0].ref, by: 'CLAIM', claim: need,
             candidates: [{ origin: cands[0].origin, ref: cands[0].ref }],
-            completenessBasis: 'DECLARED_CLAIMS_OF_PENDING_RECORDS' };
+            // EXISTENTIAL never needed the candidate set to be complete, so it must not report a
+            // completeness basis it did not rely on - in either branch.
+            completenessBasis: mode === MODE.EXISTENTIAL ? 'NOT_REQUIRED_BY_THIS_MODE'
+              : 'DECLARED_CLAIMS_OF_PENDING_RECORDS' };
+          if (mode) from.mode = mode;
         }
       }
       if (!fresh) {
