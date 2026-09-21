@@ -1,0 +1,92 @@
+{
+  "odysseus": {
+    "returns": 6586,
+    "resolve_cov": 0.27756,
+    "literal_cov": 0.35029,
+    "top_unresolved_forms": [
+      [
+        "Dict",
+        1467
+      ],
+      [
+        "Call",
+        1037
+      ],
+      [
+        "Name",
+        981
+      ],
+      [
+        "Tuple",
+        327
+      ],
+      [
+        "JoinedStr",
+        143
+      ]
+    ],
+    "exposure": "HIGH"
+  },
+  "mpt": {
+    "returns": 1363,
+    "resolve_cov": 0.30741,
+    "literal_cov": 0.30888,
+    "top_unresolved_forms": [
+      [
+        "Call",
+        365
+      ],
+      [
+        "Name",
+        293
+      ],
+      [
+        "Tuple",
+        68
+      ],
+      [
+        "JoinedStr",
+        42
+      ],
+      [
+        "BoolOp",
+        34
+      ]
+    ],
+    "exposure": "NONE (blinded)"
+  },
+  "pytorch": {
+    "returns": 62299,
+    "resolve_cov": 0.16405,
+    "literal_cov": 0.16511,
+    "top_unresolved_forms": [
+      [
+        "Call",
+        23242
+      ],
+      [
+        "Name",
+        12385
+      ],
+      [
+        "Tuple",
+        3851
+      ],
+      [
+        "Attribute",
+        2619
+      ],
+      [
+        "JoinedStr",
+        2288
+      ]
+    ],
+    "exposure": "NONE"
+  },
+  "scoring": {
+    "gap_resolve": 0.11350999999999997,
+    "gap_literal": 0.18517999999999998,
+    "L1_resolve_gap_larger": false,
+    "mpt_patterns_with": "odysseus"
+  }
+}
