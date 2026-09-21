@@ -15,6 +15,7 @@ CONTRACT_V10 = "1.0.0-frozen-2026-09-21"
 CONTRACT_V11 = "1.1.0-frozen-2026-09-21"
 CONTRACT_V12 = "1.2.0-frozen-2026-09-21"
 CONTRACT_V13 = "1.3.0-frozen-2026-09-21"
+CONTRACT_V14 = "1.4.0-frozen-2026-09-21"
 
 # PUBLISHED RULE FINGERPRINTS, not rule definitions. The producer pins WHICH rule it claims to have
 # used; the consumer owns what that rule REQUIRES. Duplicating the requirements here would be two
@@ -69,7 +70,7 @@ def witnesses_established(requested2, ext, version=None, premise_ref=None, run_i
         names.append("COVERAGE")
     if any(requested2.domain.name in o.membership_established_in for o in ext.observed):
         names.append("MEMBERSHIP")
-    if version != CONTRACT_V13:
+    if version not in (CONTRACT_V13, CONTRACT_V14):
         return names
     out = []
     for rel in names:
@@ -83,6 +84,12 @@ def witnesses_established(requested2, ext, version=None, premise_ref=None, run_i
             "provenance": "legasus/screen/obligation.py compile_obligation()",
         })
     return out
+
+# Which target each instrument actually analysed. Real identities, not placeholders.
+TARGET_OF = {"reach1 tracer": "pytorch@9b6e45278f06",
+             "stageb diagnosis": "pytorch@9b6e45278f06",
+             "SCREEN-1 detectors": "odysseus@local",
+             "hinfo harness": "mpt@919170b05831"}
 
 INSTRUMENT_SOURCE = {"reach1 tracer": "reach1.py", "SCREEN-1 detectors": "screen1.py",
                      "stageb diagnosis": "stageb_diagnose.py", "hinfo harness": "hinfo.py"}
@@ -129,9 +136,9 @@ def derivation_block(d, alternatives, requested2, version):
     """v1.2 adds rule IDENTITY. There is no place here to say what the rule requires."""
     block = {"passed": d.passed, "alternatives": alternatives,
              "open_frontier": None if d.passed else d.detail}
-    if version in (CONTRACT_V12, CONTRACT_V13):
+    if version in (CONTRACT_V12, CONTRACT_V13, CONTRACT_V14):
         rule_id = RULE_FOR_QUANTIFIER[requested2.quantifier]
-        prints = RULE_FINGERPRINTS_V13 if version == CONTRACT_V13 else RULE_FINGERPRINTS
+        prints = RULE_FINGERPRINTS_V13 if version in (CONTRACT_V13, CONTRACT_V14) else RULE_FINGERPRINTS
         block["rule_id"] = rule_id
         block["rule_digest"] = prints[rule_id]
     return block
@@ -168,19 +175,24 @@ def emit(claim, ev, run_id, evidence_refs, version=CONTRACT_V10, attribution=Non
         prem = {"ref": ref,
                 "decidable_at_site": bool(sd.get("premises_decidable")),
                 "settled": bool(sd.get("premises_settled"))}
-        if version in (CONTRACT_V12, CONTRACT_V13):
+        if version in (CONTRACT_V12, CONTRACT_V13, CONTRACT_V14):
             w = witnesses_established(requested2, ext, version, ref, run_id)
         else:
             w = []
         alternatives.append({"premises": [prem], "relation_witnesses": w,
                              "closed": prem["decidable_at_site"] and prem["settled"]})
 
+    # v1.4: the REPOSITORY the observation was made in. With the claim domain this is the minimum
+    # identity of the world the resulting authority is valid in, determined by the world-identity
+    # search rather than chosen. Only the producer knows which target it analysed.
     observation = {"ref": "%s:observation" % run_id,
                    "evidential_force": bool(ev.positive_control_fired),
                    "procedure": "%s over %s" % (ev.instrument, ev.evidence_scope),
                    "context": {"evidence_scope": ev.evidence_scope,
                                "examined": ev.examined, "domain_size": ev.domain_size}}
-    if version in (CONTRACT_V11, CONTRACT_V12, CONTRACT_V13):
+    if version == CONTRACT_V14:
+        observation["context"]["repository"] = TARGET_OF.get(ev.instrument, "unknown-target")
+    if version in (CONTRACT_V11, CONTRACT_V12, CONTRACT_V13, CONTRACT_V14):
         observation["attribution"] = attribution
 
     return {
@@ -217,7 +229,7 @@ if __name__ == "__main__":
     out_dir = Path(sys.argv[1]); out_dir.mkdir(parents=True, exist_ok=True)
     arg = sys.argv[2] if len(sys.argv) > 2 else "v1.0"
     version = {"v1.0": CONTRACT_V10, "v1.1": CONTRACT_V11, "v1.2": CONTRACT_V12,
-                "v1.3": CONTRACT_V13}[arg]
+                "v1.3": CONTRACT_V13, "v1.4": CONTRACT_V14}[arg]
     for name, (claim, ev, _) in CASES.items():
         run_id = name.split()[0].replace("'", "p")
         # THE REAL BINDING RECORD. What tied this observation to this subject is the frozen case
