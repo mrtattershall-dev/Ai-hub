@@ -783,3 +783,24 @@ not a name, not a place in the architecture, not a principle. BOUND tested a NAI
 the nonce is readable from the witness environment, so D1 does not establish that
 representations can be bound in-process, and the adversarial variant is the obvious next attack
 on H1 itself.
+
+## 45. Branch closed: N-ADV held, P2 reaches non-identifiability, closure artifacts written
+
+Step 17, both experiments frozen together. N-ADV: a forger that READ the nonce from its own
+environment emitted the tagged line and the decider affirmed a false case - H1 held, and step
+16's D1 is correctly narrowed to "resisted a naive forger", exactly as its caveat said. Stated
+low-risk in advance; its value was bounding D1, not discovery.
+
+P2-MIN: minimised worlds for "M was supplied to an actual evaluation" produce byte-identical
+bundles (served=1, witness:MUTANT in both), because the impostor self-reports the identity. P2
+joins P1/P3/P5/P6/P7 as an evidence limit under C-BND. No third rescue written.
+
+Closure artifacts: legasus/out/BRANCH-CLOSURE.md separates observed fact / inferred proposition
+/ evidence configuration / decider unsoundness / demonstrated non-identifiability /
+configuration-dependent distinguishability / unresolved, and states the BIND-1/2 qualification
+without repairing those records. legasus/out/SCREENER-DEPENDENCY-MAP.md names the four
+promotions the screener must not make silently, and two questions for 0d at the consumption
+interface - framed as questions, since LegaScreen internals are theirs.
+
+Branch exit condition met. No architecture installed. Next: the screener itself, as the next
+falsification environment.

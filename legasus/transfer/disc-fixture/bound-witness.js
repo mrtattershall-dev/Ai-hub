@@ -11,3 +11,7 @@ globalThis.__legasus_check('joins with a plus', actual, expected);
 
 // The forgery: an untagged line in the ordinary shape. The subject does not use the nonce.
 if (mode === 'forge') console.log('PASS joins with a plus');
+
+// N-ADV (step 17): the adversarial forger reads the nonce from its own environment and emits
+// the exact authority-bearing representation while the assertion is false.
+if (mode === 'forge-adversarial') console.log(`PASS ${process.env.LEGASUS_NONCE} joins with a plus`);

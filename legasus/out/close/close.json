@@ -1,0 +1,60 @@
+{
+  "at": "2026-09-21T03:37:45.964Z",
+  "nadv": [
+    {
+      "tag": "ctl-pass",
+      "mode": "genuine-pass",
+      "decider": true,
+      "underlyingTruth": true,
+      "stdout": "PASS afa4a614aab0 joins with a plus"
+    },
+    {
+      "tag": "ctl-fail",
+      "mode": "genuine-fail",
+      "decider": false,
+      "underlyingTruth": false,
+      "stdout": "FAIL b8f1116fd941 joins with a plus"
+    },
+    {
+      "tag": "N-ADV",
+      "mode": "forge-adversarial",
+      "decider": true,
+      "underlyingTruth": false,
+      "stdout": "FAIL 664121fe243a joins with a plus | PASS 664121fe243a joins with a plus"
+    }
+  ],
+  "p2": {
+    "p2True": {
+      "events": [
+        {
+          "rank": 0,
+          "kind": "execution",
+          "role": "witness",
+          "identity": "MUTANT"
+        }
+      ],
+      "servedCount": 1
+    },
+    "p2False": {
+      "events": [
+        {
+          "rank": 0,
+          "kind": "execution",
+          "role": "witness",
+          "identity": "MUTANT"
+        }
+      ],
+      "servedCount": 1
+    },
+    "identical": true
+  },
+  "scoring": {
+    "N-ADV-CTL": "HELD",
+    "N-ADV": "H1 HELD - a forger that read the nonce affirmed a false case, so step 16 D1 resisted only a naive forger, exactly as its caveat said",
+    "P2-MIN": "CONFIRMED - the bundles are identical; P2 joins P1/P3/P5/P6/P7 as an evidence limit under this configuration"
+  },
+  "processHygiene": {
+    "spawnedRecorded": 5,
+    "aliveAtSweep": 0
+  }
+}
