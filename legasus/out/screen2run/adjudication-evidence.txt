@@ -1,0 +1,706 @@
+candidates raw 45  deduped 45
+
+[1] app/asgi.py:69 _normalize_allowed_origin()  shared value: None
+     exceptional return at line 96
+     ORDINARY return at line 100, preceded by:
+          96|         return None
+          97| 
+          98|     # 只有 http/https 具备浏览器 Origin 语义，且两者都有可省略的默认端口。
+          99|     if scheme not in _DEFAULT_PORTS or not host:
+         100|         return None
+     ORDINARY return at line 102, preceded by:
+          98|     # 只有 http/https 具备浏览器 Origin 语义，且两者都有可省略的默认端口。
+          99|     if scheme not in _DEFAULT_PORTS or not host:
+         100|         return None
+         101|     if any(character.isspace() for character in host):
+         102|         return None
+
+[2] app/config/config.py:361 get_container_default_gateway_ip()  shared value: ''
+     exceptional return at line 374
+     ORDINARY return at line 392, preceded by:
+         388|         except ValueError:
+         389|             logger.warning(f"invalid container gateway route entry: {line.strip()}")
+         390|             return ""
+         391| 
+         392|     return ""
+
+[3] app/services/bgm.py:73 should_use_bgm()  shared value: False
+     exceptional return at line 86
+     ORDINARY return at line 82, preceded by:
+          78|     自定义、Sonilo 以及未来新增的提供商都必须跳过文件解析、外部生成和最终混音。
+          79|     放在通用 BGM 服务中可以避免每增加一个提供商就复制一套 0 音量判断。
+          80|     """
+          81|     if not str(bgm_type or "").strip():
+          82|         return False
+
+[4] app/services/material.py:40 _safe_public_url()  shared value: None
+     exceptional return at line 54
+     ORDINARY return at line 49, preceded by:
+          45|     帮助用户回到供应商的公开素材页，不应保存鉴权参数；用户信息形式的 URL
+          46|     同样拒绝，避免 ``https://user:pass@example.com`` 一类内容落盘。
+          47|     """
+          48|     if not isinstance(value, str) or not value.strip():
+          49|         return None
+     ORDINARY return at line 61, preceded by:
+          57|         or not parsed.hostname
+          58|         or parsed.username is not None
+          59|         or parsed.password is not None
+          60|     ):
+          61|         return None
+
+[5] app/services/material.py:394 search_videos_pixabay()  shared value: ('List', ())
+     exceptional return at line 456
+     ORDINARY return at line 433, preceded by:
+         429|                 "pixabay search was blocked by a Cloudflare challenge: "
+         430|                 f"status={status_code}, cf_ray={cf_ray or 'unknown'}. "
+         431|                 "Check the server network or proxy, or use Pexels/Coverr instead."
+         432|             )
+         433|             return []
+     ORDINARY return at line 440, preceded by:
+         436|             logger.error(
+         437|                 "pixabay API rate limit exceeded: "
+         438|                 f"status=429, retry_after={retry_after or 'unknown'}"
+         439|             )
+         440|             return []
+     ORDINARY return at line 447, preceded by:
+         443|             logger.error(
+         444|                 "pixabay search request failed: "
+         445|                 f"status={status_code}, content_type={content_type or 'unknown'}"
+         446|             )
+         447|             return []
+     ORDINARY return at line 517, preceded by:
+         513|             "pixabay search request failed: "
+         514|             f"error={type(e).__name__}, detail={error_message}"
+         515|         )
+         516| 
+         517|     return []
+
+[6] app/services/material.py:1434 generate_images_openai()  shared value: ('List', ())
+     exceptional return at line 1480
+     ORDINARY return at line 1468, preceded by:
+        1464|         logger.error(
+        1465|             f"openai image generation failed: term={search_term!r}, "
+        1466|             f"detail={failure_detail}"
+        1467|         )
+        1468|         return []
+
+[7] app/services/material_cache.py:40 _safe_public_url()  shared value: None
+     exceptional return at line 47
+     ORDINARY return at line 43, preceded by:
+          39| 
+          40| def _safe_public_url(value) -> str | None:
+          41|     """移除公开页面 URL 的查询参数和用户凭据，避免缓存意外保存 token。"""
+          42|     if not isinstance(value, str) or not value.strip():
+          43|         return None
+     ORDINARY return at line 54, preceded by:
+          50|         or not parsed.hostname
+          51|         or parsed.username is not None
+          52|         or parsed.password is not None
+          53|     ):
+          54|         return None
+
+[8] app/services/material_cache.py:186 load_material_search_cache()  shared value: None
+     exceptional return at line 233
+     ORDINARY return at line 217, preceded by:
+         213|             logger.warning(
+         214|                 "failed to remove disabled Coverr material search cache: "
+         215|                 f"error={type(exc).__name__}, detail={exc}"
+         216|             )
+         217|         return None
+     ORDINARY return at line 251, preceded by:
+         247|     # 系统时间回拨或文件从其它机器复制后，mtime 可能落在未来。此时不能把
+         248|     # 缓存长期视为新鲜数据，直接失效并重新请求远端更可靠。
+         249|     if cache_age < 0 or cache_age >= MATERIAL_SEARCH_CACHE_TTL_SECONDS:
+         250|         _remove_invalid_cache(cache_path)
+         251|         return None
+
+[9] app/services/material_cache.py:309 save_material_search_cache()  shared value: False
+     exceptional return at line 385
+     ORDINARY return at line 324, preceded by:
+         320|     ``os.replace`` 发布，可以保证读进程只会看到完整旧文件或完整新文件；
+         321|     即使两个写进程同时完成，最终内容也都是同一缓存键对应的合法结果。
+         322|     """
+         323|     if str(provider).strip().lower() == "coverr":
+         324|         return False
+     ORDINARY return at line 342, preceded by:
+         338|                     "source_info": source_info,
+         339|                 }
+         340|             )
+         341|         if not serialized_items:
+         342|             return False
+
+[10] app/services/material_cache.py:388 cleanup_expired_material_search_cache()  shared value: 0
+     exceptional return at line 422
+     ORDINARY return at line 411, preceded by:
+         407|             and _last_cleanup_monotonic is not None
+         408|             and monotonic_now - _last_cleanup_monotonic
+         409|             < _CACHE_CLEANUP_INTERVAL_SECONDS
+         410|         ):
+         411|             return 0
+
+[11] app/services/task.py:201 _is_cross_post_owner_alive()  shared value: False
+     exceptional return at line 211
+     ORDINARY return at line 204, preceded by:
+         200| 
+         201| def _is_cross_post_owner_alive(owner: str | None) -> bool:
+         202|     """判断持久化发布任务的本机进程是否仍存在。"""
+         203|     if not owner:
+         204|         return False
+     ORDINARY return at line 222, preceded by:
+         218|     # 当前进程内是否仍有真实发布工作，已经由 Future 注册表准确判断。运行到
+         219|     # 这里说明注册表中没有对应 Future，即使 owner 与当前进程完全一致，也应
+         220|     # 视为已中断；这可以覆盖终态写入持续失败、Future 已结束的场景。
+         221|     if process_id == os.getpid():
+         222|         return False
+
+[12] app/services/task.py:482 generate_audio()  shared value: ('Tuple', (None, None, None))
+     exceptional return at line 519
+     ORDINARY return at line 551, preceded by:
+         547|                 task_id,
+         548|                 "audio",
+         549|                 "failed to synthesize audio; verify the selected voice and TTS connectivity",
+         550|             )
+         551|             return None, None, None
+     ORDINARY return at line 565, preceded by:
+         561|             file_duration if file_duration > 0 else voice.get_audio_duration(sub_maker)
+         562|         )
+         563|         if audio_duration == 0:
+         564|             _mark_task_failed(task_id, "audio", "generated audio duration is zero")
+         565|             return None, None, None
+     ORDINARY return at line 576, preceded by:
+         572|                 task_id,
+         573|                 "audio",
+         574|                 "custom audio duration is zero",
+         575|             )
+         576|             return None, None, None
+
+[13] app/services/task.py:648 get_video_materials()  shared value: None
+     exceptional return at line 728
+     ORDINARY return at line 666, preceded by:
+         662|                 task_id,
+         663|                 "materials",
+         664|                 "no valid local video materials were found",
+         665|             )
+         666|             return None
+     ORDINARY return at line 677, preceded by:
+         673|                 task_id,
+         674|                 "materials",
+         675|                 "LoomLoom video generation requires a confirmed quote",
+         676|             )
+         677|             return None
+     ORDINARY return at line 813, preceded by:
+         809|                 task_id,
+         810|                 "materials",
+         811|                 f"failed to download video materials from {params.video_source}",
+         812|             )
+         813|             return None
+
+[14] app/services/task.py:817 _record_loomloom_run_reference()  shared value: None
+     exceptional return at line 841
+     ORDINARY return at line 857, preceded by:
+         853|                 f"task_id={task_id}, run_id={run_id}"
+         854|             )
+         855|         return updated
+         856| 
+         857|     return None
+
+[15] app/services/task.py:1032 _patch_cross_post_state()  shared value: None
+     exceptional return at line 1047
+     ORDINARY return at line 1055, preceded by:
+        1051|                 f"fields: {', '.join(kwargs)}, attempt: {attempt}, error: {exc}"
+        1052|             )
+        1053|             time.sleep(_CROSS_POST_STATE_RETRY_DELAY_SECONDS)
+        1054| 
+        1055|     return None
+
+[16] app/services/task.py:1075 _ensure_cross_post_terminal_state()  shared value: None
+     exceptional return at line 1085
+     ORDINARY return at line 1088, preceded by:
+        1084|         )
+        1085|         return
+        1086| 
+        1087|     if not task or task.get("cross_post_state") not in _ACTIVE_CROSS_POST_STATES:
+        1088|         return
+
+[17] app/services/twelvelabs.py:71 embed_text()  shared value: None
+     exceptional return at line 86
+     ORDINARY return at line 78, preceded by:
+          74| 
+          75|     Cached so repeated terms across a session don't re-hit the API.
+          76|     """
+          77|     if not is_enabled() or not text or not text.strip():
+          78|         return None
+
+[18] app/services/twelvelabs.py:135 analyze_clip()  shared value: None
+     exceptional return at line 166
+     ORDINARY return at line 151, preceded by:
+         147|         bare local path; the analyzed window must be >= 4s.
+         148|       * max_tokens must be >= 512 for this model.
+         149|     """
+         150|     if not is_enabled() or not video_url:
+         151|         return None
+
+[19] app/services/version_checker.py:39 get_available_update()  shared value: None
+     exceptional return at line 54
+     ORDINARY return at line 78, preceded by:
+          74|         logger.debug(
+          75|             "GitHub release check returned an invalid payload: "
+          76|             f"payload_type={type(payload).__name__}"
+          77|         )
+          78|         return None
+     ORDINARY return at line 90, preceded by:
+          86|         )
+          87|         return None
+          88| 
+          89|     if latest_version <= installed_version:
+          90|         return None
+
+[20] app/services/video.py:303 _ffmpeg_encoder_exists()  shared value: False
+     exceptional return at line 325
+     ORDINARY return at line 332, preceded by:
+         328|         logger.warning(
+         329|             "failed to inspect ffmpeg encoders, "
+         330|             f"fallback to {_DEFAULT_VIDEO_CODEC}: {(result.stderr or result.stdout or '').strip()}"
+         331|         )
+         332|         return False
+
+[21] app/services/video.py:656 get_bgm_file()  shared value: ''
+     exceptional return at line 669
+     ORDINARY return at line 658, preceded by:
+         654| 
+         655| 
+         656| def get_bgm_file(bgm_type: str = "random", bgm_file: str = ""):
+         657|     if not bgm_type:
+         658|         return ""
+     ORDINARY return at line 677, preceded by:
+         673|         files = bgm_service.list_bgm_files()
+         674|         # 当背景音乐目录为空时，直接回退为“不使用 BGM”，避免 random.choice([]) 抛异常。
+         675|         if not files:
+         676|             logger.warning("no background music files found")
+         677|             return ""
+     ORDINARY return at line 680, preceded by:
+         676|             logger.warning("no background music files found")
+         677|             return ""
+         678|         return random.choice(files)
+         679| 
+         680|     return ""
+
+[22] app/services/video.py:1169 _subtitle_font_supports_sample()  shared value: True
+     exceptional return at line 1192
+     ORDINARY return at line 1188, preceded by:
+        1184|                 bytes(char_mask),
+        1185|             )
+        1186|             if char_mask.getbbox() is None or char_signature == missing_signature:
+        1187|                 return False
+        1188|         return True
+
+[23] app/services/voice.py:188 get_elevenlabs_voices()  shared value: ('List', ())
+     exceptional return at line 210
+     ORDINARY return at line 190, preceded by:
+         186| 
+         187| 
+         188| def get_elevenlabs_voices(api_key: str) -> list[str]:
+         189|     if not api_key:
+         190|         return []
+     ORDINARY return at line 200, preceded by:
+         196|         if response.status_code != 200:
+         197|             logger.warning(
+         198|                 f"ElevenLabs voices fetch failed with status {response.status_code}: {response.text}"
+         199|             )
+         200|             return []
+
+[24] app/services/voice.py:834 _tts_with_pauses()  shared value: None
+     exceptional return at line 951
+     ORDINARY return at line 847, preceded by:
+         843|     分段生成语音和精确的 PCM 静音，基于真实解码样本计算字幕偏移，并在末尾执行单次统一编码。
+         844|     """
+         845|     segments = utils.parse_script_with_pauses(text)
+         846|     if not segments:
+         847|         return None
+     ORDINARY return at line 862, preceded by:
+         858|         total_pause_duration = min(
+         859|             total_pause_duration, utils.MAX_PAUSE_DURATION_SECONDS
+         860|         )
+         861|         if not generate_silent_audio(total_pause_duration, voice_file):
+         862|             return None
+     ORDINARY return at line 918, preceded by:
+         914|                 if not chunk_submaker or not os.path.exists(chunk_audio_file) or os.path.getsize(chunk_audio_f
+         915|                     logger.error(
+         916|                         f"failed to synthesize speech chunk (audio missing or empty): {speech_text[:50]}"
+         917|                     )
+         918|                     return None
+     ORDINARY return at line 942, preceded by:
+         938|                     logger.error(
+         939|                         f"failed to decode speech chunk audio to PCM WAV: {speech_text[:50]}, "
+         940|                         f"error: {(res.stderr or res.stdout or '').strip()}"
+         941|                     )
+         942|                     return None
+     ORDINARY return at line 957, preceded by:
+         953|                 if chunk_samples <= 0:
+         954|                     logger.error(
+         955|                         f"decoded speech chunk has no audio samples: {speech_text[:50]}"
+         956|                     )
+         957|                     return None
+     ORDINARY return at line 989, preceded by:
+         985|                 cumulative_samples += chunk_samples
+         986| 
+         987|         if not _concat_audio_files(audio_chunk_files, voice_file):
+         988|             logger.error("failed to concatenate audio chunks with pauses")
+         989|             return None
+
+[25] app/services/voice.py:1596 gemini_tts()  shared value: None
+     exceptional return at line 1689
+     ORDINARY return at line 1627, preceded by:
+        1623|     try:
+        1624|         api_key = config.app.get("gemini_api_key", "")
+        1625|         if not api_key:
+        1626|             logger.error("Gemini API key is not set")
+        1627|             return None
+     ORDINARY return at line 1654, preceded by:
+        1650| 
+        1651|         # 检查响应
+        1652|         if not response.candidates or not response.candidates[0].content:
+        1653|             logger.error("No audio content received from Gemini TTS")
+        1654|             return None
+     ORDINARY return at line 1665, preceded by:
+        1661|                 break
+        1662| 
+        1663|         if not audio_data:
+        1664|             logger.error("No audio data found in response")
+        1665|             return None
+
+[26] app/services/voice.py:1987 minimax_tts()  shared value: None
+     exceptional return at line 2012
+     ORDINARY return at line 1992, preceded by:
+        1988|     """Generate speech with the synchronous MiniMax T2A HTTP API."""
+        1989|     text, voice_id = (text or "").strip(), (voice_id or "").strip()
+        1990|     if not text or not voice_id:
+        1991|         logger.error("MiniMax TTS requires text and a voice ID")
+        1992|         return None
+     ORDINARY return at line 1997, preceded by:
+        1993|     settings = config.minimax_tts
+        1994|     api_key = get_minimax_tts_api_key()
+        1995|     if not api_key:
+        1996|         logger.error("MiniMax TTS API key is not set")
+        1997|         return None
+     ORDINARY return at line 2002, preceded by:
+        1998|     url = get_minimax_tts_endpoint()
+        1999|     model = str(settings.get("model_id", MINIMAX_TTS_DEFAULT_MODEL) or MINIMAX_TTS_DEFAULT_MODEL).strip()
+        2000|     if model not in MINIMAX_TTS_MODELS:
+        2001|         logger.error(f"Unsupported MiniMax TTS model: {model}")
+        2002|         return None
+     ORDINARY return at line 2016, preceded by:
+        2012|         return None
+        2013|     audio_format = str(settings.get("audio_format", "mp3") or "mp3").strip()
+        2014|     if audio_format not in {"mp3", "wav", "flac", "pcm"}:
+        2015|         logger.error(f"Unsupported MiniMax TTS audio format: {audio_format}")
+        2016|         return None
+     ORDINARY return at line 2050, preceded by:
+        2046|                 ensure_legacy_submaker_fields(SubMaker()), text, audio_duration
+        2047|             )
+        2048|         except (OSError, ValueError, requests.RequestException) as exc:
+        2049|             logger.error(f"MiniMax TTS failed: {str(exc)}")
+        2050|     return None
+
+[27] app/services/voice.py:2589 voxcpm_tts()  shared value: None
+     exceptional return at line 2657
+     ORDINARY return at line 2612, preceded by:
+        2608| 
+        2609|     text = (text or "").strip()
+        2610|     if not text:
+        2611|         logger.error("VoxCPM TTS text is empty")
+        2612|         return None
+     ORDINARY return at line 2617, preceded by:
+        2613| 
+        2614|     api_key = str(config.voxcpm.get("api_key", "") or "").strip()
+        2615|     if not api_key:
+        2616|         logger.error("VoxCPM API key is not set")
+        2617|         return None
+     ORDINARY return at line 2626, preceded by:
+        2622|     ).strip().rstrip("/")
+        2623|     model_id = str(config.voxcpm.get("model_id", "") or "").strip()
+        2624|     if not model_id:
+        2625|         logger.error("VoxCPM model ID is not set")
+        2626|         return None
+     ORDINARY return at line 2645, preceded by:
+        2641|     }
+        2642|     prompt_text = str(prompt_text or "").strip()
+        2643|     if bool(prompt_audio) != bool(prompt_text):
+        2644|         logger.error("VoxCPM prompt audio and prompt text must be provided together")
+        2645|         return None
+     ORDINARY return at line 2686, preceded by:
+        2682|                     f"VoxCPM TTS failed with status {response.status_code}: "
+        2683|                     f"{response.text[:200]}"
+        2684|                 )
+        2685|                 if response.status_code in _VOXCPM_NON_RETRYABLE_STATUS_CODES:
+        2686|                     return None
+     ORDINARY return at line 2762, preceded by:
+        2758|                     os.unlink(temporary_audio)
+        2759|                 except OSError as exc:
+        2760|                     logger.warning(f"could not remove temporary VoxCPM audio: {exc}")
+        2761| 
+        2762|     return None
+
+[28] app/services/voice.py:3100 _get_audio_duration_from_file()  shared value: 0.0
+     exceptional return at line 3114
+     ORDINARY return at line 3106, preceded by:
+        3102|     获取音频文件时长（支持 mp3/m4a/wav/aac 等 ffmpeg 可解码的格式）
+        3103|     """
+        3104|     if not os.path.exists(audio_file):
+        3105|         logger.error(f"audio file does not exist: {audio_file}")
+        3106|         return 0.0
+
+[29] app/utils/utils.py:189 check_ffmpeg_ready()  shared value: False
+     exceptional return at line 220
+     ORDINARY return at line 232, preceded by:
+         228|         logger.warning(
+         229|             f"ffmpeg ({ffmpeg_bin}) probe exited with status {completed.returncode}; "
+         230|             f"video generation may fail later. {_FFMPEG_INSTALL_HINT}"
+         231|         )
+         232|         return False
+
+[30] cli.py:831 _ui_config_value()  shared value: None
+     exceptional return at line 860
+     ORDINARY return at line 845, preceded by:
+         841|     ``#RRGGBB``。
+         842|     """
+         843|     value = ui_config.get(key)
+         844|     if value is None:
+         845|         return None
+     ORDINARY return at line 848, preceded by:
+         844|     if value is None:
+         845|         return None
+         846|     # ``isinstance(True, int)`` 为真，所以在期望数字时必须显式排除 bool。
+         847|     if isinstance(value, bool) != (expected_type is bool):
+         848|         return None
+     ORDINARY return at line 853, preceded by:
+         849|     # TOML 中的 ``1`` 是整数，但对音量、语速这类字段同样是合法取值。
+         850|     if expected_type is float and isinstance(value, int):
+         851|         value = float(value)
+         852|     if not isinstance(value, expected_type):
+         853|         return None
+     ORDINARY return at line 855, preceded by:
+         851|         value = float(value)
+         852|     if not isinstance(value, expected_type):
+         853|         return None
+         854|     if expected_type is str and not value.strip():
+         855|         return None
+
+[31] cli.py:1717 run_cli()  shared value: 1
+     exceptional return at line 1755
+     ORDINARY return at line 1763, preceded by:
+        1759|         logger.error(
+        1760|             f"CLI task failed: task_id={task_id}, stop_at={args.stop_at}, "
+        1761|             f"stage={failed_stage}, error={error}"
+        1762|         )
+        1763|         return 1
+
+[32] docs/skill/mpt_agent.py:213 _parse_string_list()  shared value: ('List', ())
+     exceptional return at line 218
+     ORDINARY return at line 220, preceded by:
+         216|         parsed = json.loads(value)
+         217|     except json.JSONDecodeError:
+         218|         return []
+         219|     if not isinstance(parsed, list):
+         220|         return []
+
+[33] webui/Main.py:767 _safe_load_task_script()  shared value: ('Dict', ())
+     exceptional return at line 777
+     ORDINARY return at line 770, preceded by:
+         766| 
+         767| def _safe_load_task_script(task_path):
+         768|     script_file = os.path.join(task_path, "script.json")
+         769|     if not os.path.isfile(script_file):
+         770|         return {}
+
+[34] webui/Main.py:780 _find_final_task_video()  shared value: ''
+     exceptional return at line 790
+     ORDINARY return at line 799, preceded by:
+         795|         if match:
+         796|             candidates.append((int(match.group("index")), file_name))
+         797| 
+         798|     if not candidates:
+         799|         return ""
+
+[35] webui/Main.py:933 _scan_history_tasks()  shared value: ('List', ())
+     exceptional return at line 961
+     ORDINARY return at line 936, preceded by:
+         932| 
+         933| def _scan_history_tasks(limit=30):
+         934|     tasks_root = utils.task_dir()
+         935|     if not os.path.isdir(tasks_root):
+         936|         return []
+
+[36] webui/Main.py:1114 _delete_task()  shared value: False
+     exceptional return at line 1122
+     ORDINARY return at line 1131, preceded by:
+        1127|         task_snapshot["state"] = const.TASK_STATE_PROCESSING
+        1128| 
+        1129|     if tm.is_task_busy(task_snapshot):
+        1130|         logger.warning(f"refused to delete running task: {task_id}")
+        1131|         return False
+     ORDINARY return at line 1140, preceded by:
+        1136|     # 删除任务会移除任务状态和本地生成文件。这里必须限定在 storage/tasks
+        1137|     # 下，避免异常 task_path 造成误删其它本地目录。
+        1138|     if not normalized_path.startswith(tasks_root + os.sep):
+        1139|         logger.warning(f"invalid task folder path for deletion: {normalized_path}")
+        1140|         return False
+
+[37] webui/Main.py:1371 _load_task_restore_payload()  shared value: None
+     exceptional return at line 1379
+     ORDINARY return at line 1385, preceded by:
+        1381|     script_data = _safe_load_task_script(task_path)
+        1382|     raw_params = script_data.get("params")
+        1383|     if not isinstance(raw_params, dict):
+        1384|         logger.warning(f"task has no restorable parameters: {task_id}")
+        1385|         return None
+
+[38] webui/Main.py:2065 _render_current_generation_task()  shared value: None
+     exceptional return at line 2078
+     ORDINARY return at line 2069, preceded by:
+        2065| def _render_current_generation_task():
+        2066|     """在生成按钮下方恢复当前页面最近提交任务的可查询 UI。"""
+        2067|     task_id = st.session_state.get("current_generation_task_id", "")
+        2068|     if not task_id:
+        2069|         return
+     ORDINARY return at line 2084, preceded by:
+        2080|     state = _normalize_task_state((task or {}).get("state"))
+        2081|     if state in {const.TASK_STATE_COMPLETE, const.TASK_STATE_FAILED}:
+        2082|         _remove_active_generation_task(task_id)
+        2083|         _render_generation_task_snapshot(task_id, task)
+        2084|         return
+
+[39] webui/Main.py:2555 get_groq_model_ids()  shared value: ('List', ())
+     exceptional return at line 2584
+     ORDINARY return at line 2557, preceded by:
+        2553| 
+        2554| @st.cache_data(ttl=300, show_spinner=False)
+        2555| def get_groq_model_ids(api_key: str, base_url: str) -> list[str]:
+        2556|     if not api_key:
+        2557|         return []
+
+[40] webui/Main.py:2953 _render_settings_transfer()  shared value: None
+     exceptional return at line 2989
+     ORDINARY return at line 2977, preceded by:
+        2973|             type=["json"],
+        2974|             key="settings_preset_uploader",
+        2975|         )
+        2976|         if uploaded_preset is None:
+        2977|             return
+     ORDINARY return at line 2981, preceded by:
+        2977|             return
+        2978|         # 上传的文件在之后每次 rerun 都会重新出现。记录已处理的文件标识，
+        2979|         # 避免用户改完控件后被同一个预设反复覆盖。
+        2980|         if st.session_state.get("settings_preset_file_id") == uploaded_preset.file_id:
+        2981|             return
+
+[41] webui/Main.py:4134 _matching_full_voice_preview_duration()  shared value: None
+     exceptional return at line 4154
+     ORDINARY return at line 4138, preceded by:
+        4134| def _matching_full_voice_preview_duration(script, voice_rate):
+        4135|     """仅在文案、Provider、音色和语速均未变化时采用完整试听的真实时长。"""
+        4136|     cached = st.session_state.get("voice_preview_audio")
+        4137|     if not isinstance(cached, dict) or cached.get("preview_type") != "full":
+        4138|         return None
+     ORDINARY return at line 4141, preceded by:
+        4137|     if not isinstance(cached, dict) or cached.get("preview_type") != "full":
+        4138|         return None
+        4139|     script_digest = hashlib.sha256(str(script or "").encode("utf-8")).hexdigest()
+        4140|     if cached.get("content_digest") != script_digest:
+        4141|         return None
+     ORDINARY return at line 4161, preceded by:
+        4157|         or cached.get("voice_name") != current_voice_name
+        4158|         or not math.isfinite(cached_voice_rate)
+        4159|         or not math.isclose(cached_voice_rate, voice_rate)
+        4160|     ):
+        4161|         return None
+     ORDINARY return at line 4169, preceded by:
+        4165|         not isinstance(duration, (int, float))
+        4166|         or not math.isfinite(duration)
+        4167|         or duration <= 0
+        4168|     ):
+        4169|         return None
+
+[42] webui/Main.py:4222 _current_loomloom_video_quote_context()  shared value: ('Tuple', (None, ''))
+     exceptional return at line 4259
+     ORDINARY return at line 4231, preceded by:
+        4227|     if (
+        4228|         not isinstance(capability, loomloom.LoomLoomVideoCapability)
+        4229|         or st.session_state.get("loomloom_video_capability_fingerprint") != fingerprint
+        4230|     ):
+        4231|         return None, ""
+     ORDINARY return at line 4250, preceded by:
+        4246|         or not model_id
+        4247|         or not prompts
+        4248|         or aspect_ratio not in capability.aspect_ratios
+        4249|     ):
+        4250|         return None, ""
+
+[43] webui/Main.py:4621 _render_loomloom_run_progress()  shared value: None
+     exceptional return at line 4639
+     ORDINARY return at line 4624, preceded by:
+        4620| @st.fragment(run_every="2s")
+        4621| def _render_loomloom_run_progress():
+        4622|     run_id = str(st.session_state.get("loomloom_run_id", "") or "").strip()
+        4623|     if not run_id or st.session_state.get("loomloom_poll_paused", False):
+        4624|         return
+     ORDINARY return at line 4633, preceded by:
+        4629|             tr("LoomLoom Poll Retry Pending").format(
+        4630|                 seconds=retry_wait_seconds,
+        4631|             )
+        4632|         )
+        4633|         return
+     ORDINARY return at line 4656, preceded by:
+        4652|         st.session_state["loomloom_candidate_errors"] = result.errors
+        4653|         st.session_state["loomloom_selected_candidate"] = 0
+        4654|         st.session_state["loomloom_run_id"] = ""
+        4655|         st.rerun(scope="app")
+        4656|         return
+     ORDINARY return at line 4662, preceded by:
+        4658|         st.session_state["loomloom_run_error"] = run.first_error_message or run.status
+        4659|         st.session_state["loomloom_run_id"] = ""
+        4660|         st.session_state["loomloom_poll_paused"] = False
+        4661|         st.rerun(scope="app")
+        4662|         return
+
+[44] webui/Main.py:5727 _sync_voxcpm_reference_audio()  shared value: None
+     exceptional return at line 5773
+     ORDINARY return at line 5734, preceded by:
+        5730|         st.session_state.pop(VOXCPM_REFERENCE_AUDIO_SESSION_KEY, None)
+        5731|         st.session_state.pop(VOXCPM_REFERENCE_AUDIO_ERROR_SESSION_KEY, None)
+        5732|         _clear_voxcpm_prompt_state()
+        5733|         st.session_state.pop(VOXCPM_HIGH_FIDELITY_SESSION_KEY, None)
+        5734|         return None
+     ORDINARY return at line 5743, preceded by:
+        5739|         _clear_voxcpm_prompt_state()
+        5740|         st.session_state[VOXCPM_REFERENCE_AUDIO_ERROR_SESSION_KEY] = tr(
+        5741|             "VoxCPM Reference Audio Empty"
+        5742|         )
+        5743|         return None
+     ORDINARY return at line 5750, preceded by:
+        5746|         _clear_voxcpm_prompt_state()
+        5747|         st.session_state[VOXCPM_REFERENCE_AUDIO_ERROR_SESSION_KEY] = tr(
+        5748|             "VoxCPM Reference Audio Upload Too Large"
+        5749|         ).format(limit=voice.VOXCPM_REFERENCE_AUDIO_MAX_UPLOAD_BYTES // (1024 * 1024))
+        5750|         return None
+
+[45] webui/Main.py:5789 _sync_voxcpm_prompt_audio()  shared value: None
+     exceptional return at line 5827
+     ORDINARY return at line 5794, preceded by:
+        5790|     """Normalize the optional delivery example without persisting its content."""
+        5791|     if uploaded_file is None:
+        5792|         st.session_state.pop(VOXCPM_PROMPT_AUDIO_SESSION_KEY, None)
+        5793|         st.session_state.pop(VOXCPM_PROMPT_AUDIO_ERROR_SESSION_KEY, None)
+        5794|         return None
+     ORDINARY return at line 5802, preceded by:
+        5798|         st.session_state.pop(VOXCPM_PROMPT_AUDIO_SESSION_KEY, None)
+        5799|         st.session_state[VOXCPM_PROMPT_AUDIO_ERROR_SESSION_KEY] = tr(
+        5800|             "VoxCPM Prompt Audio Empty"
+        5801|         )
+        5802|         return None
+     ORDINARY return at line 5808, preceded by:
+        5804|         st.session_state.pop(VOXCPM_PROMPT_AUDIO_SESSION_KEY, None)
+        5805|         st.session_state[VOXCPM_PROMPT_AUDIO_ERROR_SESSION_KEY] = tr(
+        5806|             "VoxCPM Prompt Audio Upload Too Large"
+        5807|         ).format(limit=voice.VOXCPM_REFERENCE_AUDIO_MAX_UPLOAD_BYTES // (1024 * 1024))
+        5808|         return None

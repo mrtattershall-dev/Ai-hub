@@ -100,3 +100,66 @@ No issue filed, no patch proposed, no contact with the project. The finding goes
 3. **A3 is a new experiment, not a patch.** The fix — compare only against ordinary returns that
    are success returns — reintroduces the polarity problem the contract tried to dissolve, and
    would need its own preregistration explaining how success is established without guessing.
+
+## Adjudication complete — all 45, in two cohorts kept separate
+
+    raw candidates                 45
+    after dedup (before denominator)  45   (the target has no duplicated tree)
+
+    COHORT A  read BEFORE the adjudication rule was frozen      5
+              survives 1   rejected 4   unknown 0
+    COHORT B  adjudicated UNDER the frozen rule                 40
+              survives 0   rejected 40  unknown 0
+
+    total: 1 survives, 44 rejected, 0 UNKNOWN     precision 1/45
+
+**The single survivor is in cohort A** (`_subtitle_font_supports_sample`, read fifth, before
+the rule existed). Re-checked against the frozen rule afterwards, it satisfies it: the matched
+ordinary return is the terminal `return True` reached only after every glyph is verified — an
+established success outcome, not a guard. The cohorts are not flattened into one figure, because
+the survivor's provenance is pre-rule and that is part of what the number means.
+
+**UNKNOWN was available and never needed.** Every candidate could be settled from source. That
+is a fact about this cohort, not evidence that the category is superfluous.
+
+## Instrument characterization — one failure family, not several
+
+The question the remaining 40 were read to answer: is the early pattern one dominant structural
+flaw, or does A2 contain further failure families not yet seen?
+
+**One family. All 44 rejections share an identical cause**: the matched ordinary return is a
+guard or a logged-failure path — `if not x: return None`, `logger.error(...); return []`,
+`if audio_duration == 0: _mark_task_failed(...); return None, None, None`. Across 14 files, 45
+candidates, 11 distinct shared values (`None`×23, `False`×6, `[]`×6, `''`×3, `0`, `0.0`, `1`,
+`True`, `{}`, and two tuple shapes), **no second failure family appeared.**
+
+So the falsification is narrow and total: A2 is wrong in exactly one way, and that way accounts
+for 44 of 45 candidates. The unjustified edge in its evidence chain is precisely:
+
+    an ordinary path exists  ->  [assumed successful]  ->  same observable result
+                             ->  exception admitted as success
+
+## The sharpened proposition this run produced
+
+> An exceptional path is suspicious when it is observationally indistinguishable from an
+> **established successful** outcome — not merely from an outcome reachable without an exception.
+
+Equivalently, and this is the sentence the run earned:
+
+> **Non-exceptional execution is not evidence of successful execution.**
+
+A2 was explicitly designed to eliminate polarity assumptions, passed its frozen conformance
+controls 6/6, and still embedded that assumption structurally. An independent target found it;
+the author's own corpus could not.
+
+## A3's boundary, from this result
+
+A3 must require an **independently established success witness** — a test assertion, a caller
+branch, an explicit contract, a witnessed successful execution — and must **not** infer success
+from "this return did not throw". With no such witness: **UNKNOWN**.
+
+A3 will therefore say UNKNOWN far more often than A2 and report far less. That is the intended
+direction: a detector whose VIOLATION means what it claims is more useful than one that reports
+45 things of which 44 are wrong.
+
+A3 is a new experiment with its own preregistration, not a patch to a frozen detector.
