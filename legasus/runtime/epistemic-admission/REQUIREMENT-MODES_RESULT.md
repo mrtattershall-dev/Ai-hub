@@ -5,12 +5,16 @@
 
 ## The prerequisite, discharged first
 
-**T0: the eligibility probe is observationally inert.** This was the arm I was least sure of, because
-a trial calls `adapt`, which calls `derive()`, which *mints*. Measured over 25 consecutive trials
-against a live store: **no store entry added, no validity changed, no record changed**, the same
-answer every time, and probing order does not change what is admitted. The trial token is returned
-and dropped; nothing files it, and only `admitToken` files anything. The probe may now be treated as
-a pure question — because it was measured, not argued.
+**T0: the eligibility probe showed observational non-interference under the measured conditions.**
+Measured over 25 consecutive trials against a live store: **no store entry added, no validity
+changed, no record changed**, the same answer every time, and probing order does not change what is
+admitted.
+
+**Narrowed, replacing a wider claim in the first version of this document.** This is not general
+purity. `derive()` still *mints* during probing. The defensible statement is exactly this: **those
+trial tokens produced no observed persistent or admission-relevant effect under T0's conditions.**
+What was not shown is that they produce none under any conditions, or that minting is free of
+effects this suite does not observe.
 
 ## The default had no name, and now it is pinned
 
@@ -58,9 +62,13 @@ fails too — the identical record, declaring its claim, is found, and the undec
 declared claim still gates termination; the mode only narrows the set of consumers for whom that
 gating can change an outcome.
 
-So the precise standing of S6 after this run: **the defect is unchanged and its blast radius is now
-measurable.** It can alter an admission wherever the obligation needs the candidate set — which is
-the default today, and `COMPLETE` in future.
+So the precise standing of S6 after this run, **narrowed from a wider claim in the first version of
+this document**: the defect is unchanged, and it is **not confined to multiplicity-sensitive
+decisions**. An existential success needs one binding witness, not a complete candidate set — but
+*stopping without finding one* still depends on how suppliers are discovered. Hiding the only
+supplier changes the outcome while leaving its admissible evidence entirely intact. So the defect
+reaches **both** multiplicity-sensitive decisions **and existential search termination**. The mode
+narrows which consumers can be affected; it does not remove the class.
 
 ## Mutation table
 
