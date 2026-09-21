@@ -1,0 +1,81 @@
+{
+  "P": "glyph inspection completed",
+  "facts": {
+    "SUPPORTED": {
+      "shipped": true,
+      "missing": 0,
+      "completed": true,
+      "intervention_realised": true
+    },
+    "UNSUPPORTED_ALL": {
+      "shipped": false,
+      "missing": 4,
+      "completed": true,
+      "intervention_realised": true
+    },
+    "UNSUPPORTED_PARTIAL": {
+      "shipped": false,
+      "missing": 2,
+      "completed": true,
+      "intervention_realised": true
+    },
+    "UNVERIFIABLE": {
+      "shipped": true,
+      "missing": 0,
+      "completed": false,
+      "intervention_realised": true
+    }
+  },
+  "results": {
+    "R_rich": {
+      "observations": {
+        "SUPPORTED": "ok",
+        "UNSUPPORTED_ALL": "missing:4",
+        "UNSUPPORTED_PARTIAL": "missing:2",
+        "UNVERIFIABLE": "ok"
+      },
+      "holds": false,
+      "collisions": [
+        [
+          "SUPPORTED",
+          "UNVERIFIABLE",
+          "ok"
+        ]
+      ],
+      "distinctValues": 3
+    },
+    "R_poor": {
+      "observations": {
+        "SUPPORTED": true,
+        "UNSUPPORTED_ALL": true,
+        "UNSUPPORTED_PARTIAL": true,
+        "UNVERIFIABLE": false
+      },
+      "holds": true,
+      "collisions": [],
+      "distinctValues": 2
+    },
+    "R_shipped(control)": {
+      "observations": {
+        "SUPPORTED": true,
+        "UNSUPPORTED_ALL": false,
+        "UNSUPPORTED_PARTIAL": false,
+        "UNVERIFIABLE": true
+      },
+      "holds": false,
+      "collisions": [
+        [
+          "SUPPORTED",
+          "UNVERIFIABLE",
+          true
+        ]
+      ],
+      "distinctValues": 2
+    }
+  },
+  "G1_rich_fails": true,
+  "G2_poor_holds": true,
+  "G3_control_reproduces": true,
+  "R_rich_actually_richer": true,
+  "verdict": "H-INFO DISCRIMINATED from H-RICH"
+}
