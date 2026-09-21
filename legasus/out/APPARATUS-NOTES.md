@@ -638,3 +638,27 @@ candidate #6.
 
 Map: six candidates removed (last identity, all identities, uniformity, ancestry, request-then-
 execution, window containment). None replaced. Nothing named, at any point.
+
+## 39. The single run's epistemic boundary, carved by construction (step 11)
+
+Method control passed: P7 reproduced step 10's NOT_IDENTIFIABLE_STRONG from a different
+fixture, driver and normalization. All seven rows matched their preregistered expectation.
+
+ESTABLISHED by a single run: a request was issued; a module was served; an execution occurred
+outside the witness; its order relative to the request; the identities of OBSERVED executions.
+NOT ESTABLISHED: that the observations are complete (P6); that the request was responsible (P7).
+
+P5/P6 are the pair. P5 survives only because it is quantified over OBSERVATIONS; P6's World-
+had a process execute the target with the observation channel removed, and its bundle is
+byte-identical to a world where nothing executed. So "every execution used M" is not supported;
+"every execution I OBSERVED used M" is - and every proposition quantified over "all executions"
+inherits that limit silently.
+
+The preregistered trap held: 5 of 7 survived in the same runs that killed 2, so a stronger
+proposition failing did not destroy the weaker ones. Over-correcting into useless skepticism
+would have been its own failure and is now measurable rather than rhetorical.
+
+Limitations recorded: P2's contrast is not minimal (World- changes the loaded identity too);
+NOT_IDENTIFIABLE_STRONG is relative to THESE recorded fields - an identifiability failure under
+this observation model, never an impossibility proof; seven propositions chosen by me are a
+start, not a taxonomy. A survivor of one contrast is not established, only not-yet-killed.

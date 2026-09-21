@@ -1,0 +1,561 @@
+{
+  "at": "2026-09-21T02:52:07.376Z",
+  "node": "v24.15.0",
+  "normalization": "pids -> role labels, timestamps -> rank order, paths -> basenames (frozen in the prereg)",
+  "methodControl": {
+    "P7reproducesStep10": true
+  },
+  "results": [
+    {
+      "id": "P1",
+      "text": "a request was issued",
+      "plus": {
+        "worker": "none",
+        "request": true
+      },
+      "minus": {
+        "worker": "none",
+        "request": false
+      },
+      "expected": "IDENTIFIABLE",
+      "decider": {
+        "plus": true,
+        "minus": false
+      },
+      "bundlesIdentical": false,
+      "plusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "minusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "raw": {
+        "plus": {
+          "markers": 1,
+          "requests": 1,
+          "served": 1
+        },
+        "minus": {
+          "markers": 1,
+          "requests": 0,
+          "served": 1
+        }
+      },
+      "status": "IDENTIFIABLE",
+      "matchedExpectation": true
+    },
+    {
+      "id": "P2",
+      "text": "module M was served",
+      "plus": {
+        "worker": "none",
+        "request": false
+      },
+      "minus": {
+        "worker": "none",
+        "request": false,
+        "serve": false
+      },
+      "expected": "IDENTIFIABLE",
+      "decider": {
+        "plus": true,
+        "minus": false
+      },
+      "bundlesIdentical": false,
+      "plusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "minusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 0,
+        "servedBasenames": []
+      },
+      "raw": {
+        "plus": {
+          "markers": 1,
+          "requests": 0,
+          "served": 1
+        },
+        "minus": {
+          "markers": 1,
+          "requests": 0,
+          "served": 0
+        }
+      },
+      "status": "IDENTIFIABLE",
+      "matchedExpectation": true
+    },
+    {
+      "id": "P3",
+      "text": "an execution occurred outside the witness",
+      "plus": {
+        "worker": "on-timer",
+        "request": false
+      },
+      "minus": {
+        "worker": "none",
+        "request": false
+      },
+      "expected": "IDENTIFIABLE",
+      "decider": {
+        "plus": true,
+        "minus": false
+      },
+      "bundlesIdentical": false,
+      "plusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "minusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "raw": {
+        "plus": {
+          "markers": 2,
+          "requests": 0,
+          "served": 1
+        },
+        "minus": {
+          "markers": 1,
+          "requests": 0,
+          "served": 1
+        }
+      },
+      "status": "IDENTIFIABLE",
+      "matchedExpectation": true
+    },
+    {
+      "id": "P4",
+      "text": "that execution followed the request",
+      "plus": {
+        "worker": "on-timer",
+        "request": true,
+        "workerDelay": 700,
+        "requestDelay": 0
+      },
+      "minus": {
+        "worker": "on-timer",
+        "request": true,
+        "workerDelay": 100,
+        "requestDelay": 800
+      },
+      "expected": "IDENTIFIABLE",
+      "decider": {
+        "plus": true,
+        "minus": false
+      },
+      "bundlesIdentical": false,
+      "plusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 2,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "minusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          },
+          {
+            "rank": 2,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "raw": {
+        "plus": {
+          "markers": 2,
+          "requests": 1,
+          "served": 1
+        },
+        "minus": {
+          "markers": 2,
+          "requests": 1,
+          "served": 1
+        }
+      },
+      "status": "IDENTIFIABLE",
+      "matchedExpectation": true
+    },
+    {
+      "id": "P5",
+      "text": "every OBSERVED execution used M",
+      "plus": {
+        "worker": "none",
+        "request": false
+      },
+      "minus": {
+        "worker": "on-timer",
+        "request": false
+      },
+      "expected": "IDENTIFIABLE",
+      "decider": {
+        "plus": true,
+        "minus": false
+      },
+      "bundlesIdentical": false,
+      "plusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "minusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "raw": {
+        "plus": {
+          "markers": 1,
+          "requests": 0,
+          "served": 1
+        },
+        "minus": {
+          "markers": 2,
+          "requests": 0,
+          "served": 1
+        }
+      },
+      "status": "IDENTIFIABLE",
+      "matchedExpectation": true
+    },
+    {
+      "id": "P6",
+      "text": "no UNOBSERVED execution occurred",
+      "plus": {
+        "worker": "none",
+        "request": false
+      },
+      "minus": {
+        "worker": "on-timer",
+        "request": false,
+        "observeWorker": false
+      },
+      "expected": "NOT_IDENTIFIABLE_STRONG",
+      "decider": {
+        "plus": null,
+        "minus": null
+      },
+      "bundlesIdentical": true,
+      "plusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "minusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "raw": {
+        "plus": {
+          "markers": 1,
+          "requests": 0,
+          "served": 1
+        },
+        "minus": {
+          "markers": 1,
+          "requests": 0,
+          "served": 1
+        }
+      },
+      "status": "NOT_IDENTIFIABLE_STRONG",
+      "matchedExpectation": true
+    },
+    {
+      "id": "P7",
+      "text": "the request was responsible for the execution",
+      "plus": {
+        "worker": "on-request",
+        "request": true,
+        "workerDelay": 200
+      },
+      "minus": {
+        "worker": "on-timer",
+        "request": true,
+        "workerDelay": 200
+      },
+      "expected": "NOT_IDENTIFIABLE_STRONG",
+      "decider": {
+        "plus": null,
+        "minus": null
+      },
+      "bundlesIdentical": true,
+      "plusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 2,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "minusBundle": {
+        "events": [
+          {
+            "rank": 0,
+            "kind": "execution",
+            "role": "witness",
+            "identity": "MUTANT"
+          },
+          {
+            "rank": 1,
+            "kind": "request",
+            "role": "witness",
+            "identity": null
+          },
+          {
+            "rank": 2,
+            "kind": "execution",
+            "role": "worker",
+            "identity": "SUBJECT"
+          }
+        ],
+        "servedCount": 1,
+        "servedBasenames": [
+          "mutant.js"
+        ]
+      },
+      "raw": {
+        "plus": {
+          "markers": 2,
+          "requests": 1,
+          "served": 1
+        },
+        "minus": {
+          "markers": 2,
+          "requests": 1,
+          "served": 1
+        }
+      },
+      "status": "NOT_IDENTIFIABLE_STRONG",
+      "matchedExpectation": true
+    }
+  ],
+  "survived": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+  ],
+  "died": [
+    "P6:NOT_IDENTIFIABLE_STRONG",
+    "P7:NOT_IDENTIFIABLE_STRONG"
+  ],
+  "processHygiene": {
+    "spawnedRecorded": 7,
+    "aliveAtSweep": 0,
+    "sweep": [
+      {
+        "tag": "P3-plus",
+        "role": "worker",
+        "pid": 32772,
+        "aliveAtSweep": false
+      },
+      {
+        "tag": "P4-plus",
+        "role": "worker",
+        "pid": 40752,
+        "aliveAtSweep": false
+      },
+      {
+        "tag": "P4-minus",
+        "role": "worker",
+        "pid": 28316,
+        "aliveAtSweep": false
+      },
+      {
+        "tag": "P5-minus",
+        "role": "worker",
+        "pid": 6876,
+        "aliveAtSweep": false
+      },
+      {
+        "tag": "P6-minus",
+        "role": "worker",
+        "pid": 25164,
+        "aliveAtSweep": false
+      },
+      {
+        "tag": "P7-plus",
+        "role": "worker",
+        "pid": 7104,
+        "aliveAtSweep": false
+      },
+      {
+        "tag": "P7-minus",
+        "role": "worker",
+        "pid": 28648,
+        "aliveAtSweep": false
+      }
+    ]
+  }
+}
