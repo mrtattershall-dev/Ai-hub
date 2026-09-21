@@ -23,9 +23,13 @@
 //      the producer declare `requires` would let it choose its own burden of proof.
 import { OBSERVABILITY, observation } from '../../legaknow/observation.mjs';
 import { observe, derive, isAuthority, KIND } from '../../legaknow/calculus.mjs';
-import { resolveRule } from './rules.mjs';
+//   6. A RELATION NAME IS NOT A RELATION INSTANCE. The producer supplies witness CANDIDATES; the
+//      RULE owns the matcher that decides whether a candidate binds to this claim's domain, this
+//      derivation's premises, and real evidence. Unbound candidates are not forwarded, so derive()
+//      refuses on a missing witness on its own terms. The calculus is not modified for this.
+import { resolveRule, bindWitnesses } from './rules.mjs';
 
-export const CONTRACT_VERSION = '1.2.0-frozen-2026-09-21';
+export const CONTRACT_VERSION = '1.3.0-frozen-2026-09-21';
 
 // A certificate that carries any of these has started becoming a second authority system. The
 // producer's schema forbids them; the consumer refuses them again, because a forged certificate does
@@ -101,18 +105,27 @@ export function observeArgs(cert) {
 // ARGUMENTS FOR DERIVE, for ONE closed alternative. Alternatives are claim-level ANY_OF and are not
 // flattened: the caller picks an alternative, and every premise inside it is conjunctive.
 //
-// THE RULE COMES FROM THE LOCAL REGISTRY. `localRule` is what resolveRule() returned for the
-// certificate's rule_id after its digest matched. The certificate contributes WITNESSES - facts it
-// established - and contributes nothing to what is required. Earlier this function wrote
-// `requires: []` itself, so derive()'s witness check passed vacuously; the calculus was enforcing
-// correctly against a rule object that asked for nothing.
-export function deriveArgs(cert, altIndex, premiseTokens, localRule) {
-  const alt = cert.derivation.alternatives[altIndex];
+// THE RULE COMES FROM THE LOCAL REGISTRY, and so does the decision about which witnesses count.
+// `bound` is the output of the rule's own matchers: only candidates that bind to this claim's
+// domain, this derivation's premises and real evidence. An unbound candidate is NOT forwarded, so
+// derive() sees a missing witness and refuses on its own terms.
+//
+// Earlier versions of this function wrote `requires: []` itself (v1.1, vacuous), then forwarded every
+// candidate by name (v1.2, a label satisfying a relation).
+export function deriveArgs(cert, localRule, premiseTokens, bound) {
   return {
     premises: premiseTokens,
-    rule: localRule,                                   // never assembled from certificate data
-    relationWitnesses: (alt.relation_witnesses || []).map((r) => ({ relation: r })),
+    rule: { name: localRule.name, requires: [...localRule.requires] },
+    relationWitnesses: bound.map((b) => ({ relation: b.relation, witness: b.witness })),
     claim: cert.requested_claim.predicate,
+  };
+}
+
+// The binding context, assembled from the certificate but never from its assertions about itself.
+export function bindingContext(cert, altIndex) {
+  return {
+    claimDomain: cert.requested_claim.domain.name,
+    premiseRefs: cert.derivation.alternatives[altIndex].premises.map((p) => p.ref),
   };
 }
 
@@ -141,13 +154,19 @@ export function adapt(cert) {
     return refuse(r.why, { stage: 'RULE', moved: !!r.moved, observationToken: obsTok });
   }
 
-  const derTok = derive(deriveArgs(cert, idx, [obsTok], r.rule));
+  // WHICH CANDIDATES ACTUALLY BIND. The rule decides; the certificate only offers.
+  const ctx = bindingContext(cert, idx);
+  const cands = cert.derivation.alternatives[idx].relation_witnesses || [];
+  const { satisfied, rejected } = bindWitnesses(r.rule, cands, ctx);
+
+  const derTok = derive(deriveArgs(cert, r.rule, [obsTok], satisfied));
   if (!isAuthority(derTok)) {
     return refuse('derive() refused: ' + derTok.why, { stage: 'DERIVE', observationToken: obsTok,
-      rule: r.rule.name, requires: r.rule.requires, missing: derTok.missing });
+      rule: r.rule.name, requires: [...r.rule.requires], missing: derTok.missing,
+      unbound: rejected.map((x) => ({ relation: x.relation, why: x.why })) });
   }
   return { token: derTok, observationToken: obsTok, alternative: idx, kind: derTok.kind,
-    rule: r.rule.name };
+    rule: r.rule.name, bound: satisfied.map((s) => s.relation) };
 }
 
 export { isAuthority, KIND };

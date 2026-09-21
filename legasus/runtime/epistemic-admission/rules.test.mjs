@@ -39,7 +39,8 @@ test('R1 — known rule, every required witness supplied: MINT', () => {
   assert.equal(admit(F4).state, STATE.ESTABLISHED);
   // the witness was a FACT the producer established, and the requirement came from here
   assert.deepEqual(ADMITTED_RULES['universal-from-exhaustive-coverage'].requires, ['COVERAGE']);
-  assert.ok(F4.derivation.alternatives[0].relation_witnesses.includes('COVERAGE'));
+  assert.ok(F4.derivation.alternatives[0].relation_witnesses
+    .some((w) => w.relation === 'COVERAGE'), 'v1.3: witnesses are INSTANCES, not labels');
 });
 
 test('R2 — same rule, the required witness omitted: REFUSE, naming the relation', () => {
@@ -71,7 +72,7 @@ test('R3 THE ATTACK — a certificate cannot shrink its own obligation', () => {
 
   // (c) the adapter builds derive() arguments from the local rule object it was handed
   const local = resolveRule(F4.derivation);
-  const args = deriveArgs(forged, 0, [obsToken()], local.rule);
+  const args = deriveArgs(forged, local.rule, [obsToken()], []);
   assert.deepEqual(args.rule.requires, ['COVERAGE']);
   assert.notEqual(args.rule, forged.derivation, 'the rule is never the certificate');
 });
@@ -91,7 +92,8 @@ test('R4 ANTI-REFUSAL — a rule that genuinely requires nothing mints without w
 
 test('R5 DRIFT — a moved rule definition is REFUSED, never silently re-interpreted', () => {
   const c = structuredClone(F4);
-  c.derivation.rule_digest = 'f'.repeat(64);              // produced against another definition
+  c.derivation.rule_digest =                              // the v1.2 definition of the same rule
+    '018abb658b2d297384410a5f073deaa8e34ffc07b1bf41b974bfefa7ae0d2f7d';
   const out = adapt(c);
   assert.equal(out.minted, false);
   assert.equal(out.stage, 'RULE');
@@ -100,14 +102,16 @@ test('R5 DRIFT — a moved rule definition is REFUSED, never silently re-interpr
   assert.match(out.why, /neither convict nor absolve/);
   assert.equal(admit(c).established, false);
 
-  // and the drift is real rather than nominal: change what the rule REQUIRES and the digest moves
-  const moved = { name: 'universal-from-exhaustive-coverage', requires: ['COVERAGE', 'MEMBERSHIP'],
-    version: '1' };
+  // and the drift is real rather than nominal. v1.3 digests OBLIGATIONS (relation + matcher), so
+  // these probes are written in that shape; the prediction is unchanged.
+  const real = ADMITTED_RULES['universal-from-exhaustive-coverage'];
+  const moved = { ...real, obligations: [...real.obligations,
+    { relation: 'MEMBERSHIP', satisfiedBy: () => null }] };
   assert.notEqual(digestOf(moved), DIGESTS['universal-from-exhaustive-coverage'],
     'a changed obligation changes the fingerprint');
-  // a renamed rule with identical requirements is also a different referent
-  const renamed = { name: 'something-else', requires: ['COVERAGE'], version: '1' };
-  assert.notEqual(digestOf(renamed), DIGESTS['universal-from-exhaustive-coverage']);
+  // a renamed rule with identical obligations is also a different referent
+  assert.notEqual(digestOf({ ...real, name: 'something-else' }),
+    DIGESTS['universal-from-exhaustive-coverage']);
 });
 
 test('an unknown rule_id is refused: what it cannot resolve it cannot enforce', () => {
@@ -135,7 +139,7 @@ test('F1 — the Stage B scope defect now appears as a MISSING WITNESS', () => {
 test('a v1.1 certificate is now refused: it carries no rule identity', () => {
   const c = structuredClone(F4);
   c.contract_version = '1.1.0-frozen-2026-09-21';
-  assert.match(readable(c), /this adapter consumes 1\.2\.0/);
+  assert.match(readable(c), /this adapter consumes 1\.3\.0/);
   const noRule = structuredClone(F4);
   delete noRule.derivation.rule_id;
   assert.match(readable(noRule), /carries no rule identity/);
@@ -144,7 +148,11 @@ test('a v1.1 certificate is now refused: it carries no rule identity', () => {
 test('the registry is the runtime\'s, and the adapter reads requirements from nowhere else', () => {
   const src = readFileSync(new URL('./adapter.mjs', import.meta.url), 'utf8')
     .split('\n').map((l) => l.replace(/\/\/.*$/, '')).join('\n');
-  assert.doesNotMatch(src, /requires:\s*\[/, 'the adapter never writes a requirements list');
+  // The adapter may COPY the resolved local rule's requirements into derive()'s argument - that is
+  // transmission. What it must never do is AUTHOR one, i.e. write literal relation names.
+  assert.doesNotMatch(src, /requires:\s*\[\s*['"]/, 'the adapter never authors a requirements list');
+  assert.match(src, /requires:\s*\[\.\.\.localRule\.requires\]/,
+    'any requirements it passes are spread from the LOCAL rule');
   assert.doesNotMatch(src, /cert\.derivation\.requires|derivation\.requires/,
     'and never reads one from the certificate');
   assert.match(src, /resolveRule\(/, 'it resolves locally');

@@ -175,15 +175,21 @@ test('A-5 SPECIFICITY IS WEAK — the right relation NAME with the wrong content
     relationWitnesses: [{ relation: 'COVERAGE', of: 'a completely different domain', evidence: null }],
     claim: 'everything in THIS domain holds' });
   assert.equal(isAuthority(bogus), true,
-    'PREDICTED: a name-shaped witness satisfies the requirement; the registry constrains the RELATION'
-    + ' NAME and not the relation CONTENT');
+    'PREDICTED: a name-shaped witness satisfies the requirement AT THE CALCULUS LEVEL; derive()'
+    + ' constrains the RELATION NAME and not the relation CONTENT. This is still true and is not'
+    + ' repaired by v1.3, because legaknow is not modified to accommodate the consumer.');
 
-  // and the same through the real adapter path, on a real certificate
+  // THE SPECIMEN THIS TEST RECORDED WAS SUBSEQUENTLY REPAIRED, and the repair is asserted here so the
+  // finding keeps its history. In v1.2 the same mutation through the adapter still minted; v1.3 gives
+  // each obligation a matcher owned by the RULE, so an unbound candidate is never forwarded to
+  // derive() and the calculus refuses on a missing witness. See WITNESS-BINDING_PREREG.md, W2.
   const f4 = JSON.parse(readFileSync(new URL('./fixtures/F4.json', import.meta.url), 'utf8'));
   const c = structuredClone(f4);
   c.requested_claim.domain.name = 'A_DOMAIN_NEVER_COVERED';
-  assert.equal(isAuthority(adapt(c).token), true,
-    'the claim domain changed and the COVERAGE witness was not re-checked against it');
+  const out = adapt(c);
+  assert.equal(out.minted, false,
+    'REPAIRED IN v1.3: the COVERAGE witness is now re-checked against the claim domain');
+  assert.deepEqual(out.missing, ['COVERAGE']);
 });
 
 test('the registry was NOT expanded for this experiment', () => {
