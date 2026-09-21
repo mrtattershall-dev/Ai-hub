@@ -75,3 +75,28 @@ unit, and state the mapping between them. Where the mapping is many-to-one (reco
 files → processes, calls → inputs, edges → classes, snapshots → replications), report **both**
 cardinalities or the smaller one. Tonight that rule would have caught all three corrections at
 the moment of writing rather than one, two and six hours later.
+
+## Named future experiment (recorded 2026-09-21, not started, not architecture)
+
+**Can changing only the grouping key change an authority-bearing conclusion?**
+
+Check #1 showed that "distinct count" is not meaningful without stating the equivalence
+relation: 34 byte-distinct mutants, 31 distinct (family, site) pairs. Neither number is more
+truthful — they answer different questions. The same shape sits behind every correction in this
+ledger:
+
+    276 records        vs  17 behavioural classes
+     87 calls          vs  57 inputs
+    298 coverage files vs  33 processes
+    568 edges          vs  21 classes
+     10 resolutions    vs   5 evaluations        (found at step 7)
+
+The experiment is NOT "count more carefully". It is: take a conclusion this project actually
+relied on, recompute it under a different but defensible equivalence relation, and see whether
+the conclusion flips. If one does, the primitive that earns its existence is roughly *every
+cardinality claim carries its unit AND its equivalence relation* — and it would be earned by a
+demonstrated flip, not by the elegance of the sentence.
+
+Deliberately not started, and deliberately not mechanised: the standing check at the end of this
+document is prose discipline, and check #10 proved prose discipline is not sufficient. That is
+an argument for an experiment, not yet for a mechanism.
