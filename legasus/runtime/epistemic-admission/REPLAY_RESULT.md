@@ -41,21 +41,26 @@ recorded before the run and unchanged after it; a claim recovered by replay carr
 currency its evidence carried when recorded. No freshness rule was invented after seeing replay
 succeed.
 
-## The uncomfortable part: nine green arms are not nine proofs
+## What the mutants actually show
 
-Two mutants were run against `replay.mjs` to find out what the suite actually senses.
+Two mutants were run against `replay.mjs` to find out what the suite senses.
 
 | mutant | caught by |
 |---|---|
-| trust `record.state === 'ESTABLISHED'` and skip re-execution | **R4 only** (1 of 9) |
-| keep the dead address instead of re-pointing the witness | **R2 only** (1 of 9) |
+| trust `record.state === 'ESTABLISHED'` and skip re-execution | **R4 only** |
+| keep the dead address instead of re-pointing the witness | **R2 only** |
 
-The first is the important one. The verdict-trusting replayer — the exact defect this whole step
-exists to prevent — sailed past R1, R2, R3, R5, R6, R7, R8 and R-CONTRACT, because an ordinary
-journal entry does not carry a `state` field for it to trust. **R4 is the only arm holding that
-boundary**, and it holds it only because it plants a verdict deliberately. The count of green arms
-says almost nothing; the mutation table says what is actually guarded. Recorded here rather than
-fixed by adding arms after the fact.
+**Read correctly** (this replaces a wrong reading in the first version of this document): one arm
+catching a mutant is sufficient to kill it. The seven arms that survived each mutant are not seven
+failures — they test other properties, and an arm that does not sense a defect outside its subject
+is behaving correctly.
+
+What the table does establish is narrower and worth keeping: **R4 is the sole demonstrated
+protection against verdict laundering.** Every other arm passed with a replayer that trusted a saved
+`ESTABLISHED` and skipped re-execution, because an ordinary journal entry carries no `state` field
+for it to trust. That is a fact about where the guard lives, not a count of failures — and its
+generality is untested here. Testing it belongs in its own frozen experiment, not in an arm added to
+this one after the fact.
 
 ## One apparatus defect, preserved
 
