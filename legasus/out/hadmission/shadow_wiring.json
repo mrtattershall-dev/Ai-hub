@@ -1,0 +1,79 @@
+{
+  "w1_candidates": 60,
+  "chain": [
+    {
+      "step": "E0 full record",
+      "vector": [
+        true,
+        true,
+        true
+      ],
+      "rank": [
+        3,
+        1
+      ],
+      "licensed": {
+        "form": "UNIVERSAL",
+        "predicate": "closure extends beyond the function body",
+        "scope": "SAMPLE",
+        "run": "reach1"
+      }
+    },
+    {
+      "step": "E1 reachability evidence removed",
+      "vector": [
+        true,
+        true,
+        true
+      ],
+      "rank": [
+        3,
+        1
+      ],
+      "licensed": {
+        "form": "UNIVERSAL",
+        "predicate": "closure extends beyond the function body",
+        "scope": "SAMPLE",
+        "run": "reach1"
+      }
+    },
+    {
+      "step": "E2 positive control removed",
+      "vector": [
+        true,
+        true,
+        false
+      ],
+      "rank": [
+        0,
+        0
+      ],
+      "licensed": {
+        "form": "OBSERVATIONAL",
+        "predicate": "reach1 tracer emitted this result",
+        "scope": "THIS_RUN",
+        "run": "reach1"
+      }
+    },
+    {
+      "step": "E3 a required premise opened",
+      "vector": [
+        true,
+        false,
+        false
+      ],
+      "rank": [
+        0,
+        0
+      ],
+      "licensed": {
+        "form": "OBSERVATIONAL",
+        "predicate": "reach1 tracer emitted this result",
+        "scope": "THIS_RUN",
+        "run": "reach1"
+      }
+    }
+  ],
+  "mintable_E0": true,
+  "failures": []
+}
