@@ -1,0 +1,109 @@
+{
+  "S3": {
+    "indistinguishable_pairs": 3,
+    "witnesses": [
+      {
+        "site_visible_input": {
+          "attr_tail": "get",
+          "n_args": 1
+        },
+        "differing_domains": {
+          "dict-like": {
+            "file": "setup.py",
+            "line": 53,
+            "code": "FORWARDS.get(command)",
+            "receiver": "FORWARDS"
+          },
+          "ContextVar": {
+            "file": "test\\dynamo\\test_contextvars.py",
+            "line": 35,
+            "code": "cv.get('fallback')",
+            "receiver": "cv"
+          }
+        }
+      },
+      {
+        "site_visible_input": {
+          "attr_tail": "get",
+          "n_args": 2
+        },
+        "differing_domains": {
+          "dict-like": {
+            "file": "scripts\\lintrunner.py",
+            "line": 111,
+            "code": "env.get('PATH', '')",
+            "receiver": "env"
+          },
+          "ContextVar": {
+            "file": "test\\dynamo\\test_contextvars.py",
+            "line": 60,
+            "code": "cv.get(1, 2)",
+            "receiver": "cv"
+          }
+        }
+      },
+      {
+        "site_visible_input": {
+          "attr_tail": "get",
+          "n_args": 0
+        },
+        "differing_domains": {
+          "ContextVar": {
+            "file": "test\\test_autograd.py",
+            "line": 8363,
+            "code": "active_context.get()",
+            "receiver": "active_context"
+          },
+          "dict-like": {
+            "file": "test\\test_monitor.py",
+            "line": 61,
+            "code": "s.get()",
+            "receiver": "s"
+          }
+        }
+      }
+    ]
+  },
+  "S2": {
+    "site": "S2 is_in_domain_const",
+    "all_decidable": true,
+    "probes": [
+      {
+        "label": "empty list literal",
+        "code": "[]",
+        "in_domain": true,
+        "decidable_from_node": true
+      },
+      {
+        "label": "empty set as call",
+        "code": "set()",
+        "in_domain": false,
+        "decidable_from_node": true
+      },
+      {
+        "label": "constant",
+        "code": "False",
+        "in_domain": true,
+        "decidable_from_node": true
+      }
+    ]
+  },
+  "S1": {
+    "site": "S1 forwards",
+    "all_decidable": true,
+    "probes": [
+      {
+        "label": "direct return of call",
+        "code": "f(x)",
+        "in_domain": true,
+        "decidable_from_node": true
+      },
+      {
+        "label": "awaited call",
+        "code": "await f(x)",
+        "in_domain": false,
+        "decidable_from_node": true
+      }
+    ]
+  }
+}
