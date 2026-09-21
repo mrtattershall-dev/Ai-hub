@@ -1,0 +1,5087 @@
+{
+  "root": "C:\\Users\\tatte\\AppData\\Local\\Temp\\stageb-target\\pt",
+  "parsed": 4942,
+  "unparsed": 0,
+  "results": [
+    {
+      "id": "docker_helper.py::local_image_exists::image_name",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 3,
+      "defs": 6,
+      "edges": 14,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 14,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\docker_helper.py",
+          "line": 26,
+          "text": "def local_image_exists",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 20,
+          "text": "ok = local_image_exists(\"repo:tag\", client=mock_client)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 20,
+          "text": "'repo:tag'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 27,
+          "text": "ok = local_image_exists(\"missing:latest\", client=mock_client)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 27,
+          "text": "'missing:latest'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 34,
+          "text": "ok = local_image_exists(\"broken:tag\", client=mock_client)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 34,
+          "text": "'broken:tag'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 62,
+          "text": "local_image_exists(\"repo:tag\")",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 62,
+          "text": "'repo:tag'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 64,
+          "text": "local_image_exists(\"repo:tag2\")",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 64,
+          "text": "'repo:tag2'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 260,
+          "text": "if local_image_exists(base_image):",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 254,
+          "text": "base_image = inputs.base_image",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 254,
+          "text": "inputs.base_image",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "path_helper.py::get_path::path",
+      "verdict": "REACHABLE",
+      "radius": 3,
+      "files": 5,
+      "defs": 10,
+      "edges": 19,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": true,
+      "beyond_locality": true,
+      "n_facts": 19,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\path_helper.py",
+          "line": 13,
+          "text": "def get_path",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\utils\\cpp_extension.py",
+          "line": 3060,
+          "text": "python_include_path = sysconfig.get_path('include', scheme='nt' if IS_WINDOWS else 'posix_prefix')",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\utils\\cpp_extension.py",
+          "line": 3060,
+          "text": "'include'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\utils\\cpp_extension.py",
+          "line": 2125,
+          "text": "\"-I {}\".format(sysconfig.get_path(\"include\")),",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\utils\\cpp_extension.py",
+          "line": 2125,
+          "text": "'include'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_inductor\\codecache.py",
+          "line": 600,
+          "text": "basename, _subdir, path = get_path(key, extension, specified_dir)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "torch\\_inductor\\codecache.py",
+          "line": 599,
+          "text": "key = get_hash(content.strip(), extra, hash_type)",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": "torch\\utils\\_config_module.py",
+          "line": 1106,
+          "text": "def get_hash",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": "torch\\utils\\_config_module.py",
+          "line": 1119,
+          "text": "result = self._hash_cache_var.get()",
+          "radius": 2
+        },
+        {
+          "kind": "trusted_primitive",
+          "file": "torch\\utils\\_config_module.py",
+          "line": 1119,
+          "text": "self._hash_cache_var.get()",
+          "radius": 2
+        },
+        {
+          "kind": "callee_def",
+          "file": "torch\\_inductor\\codecache.py",
+          "line": 542,
+          "text": "def get_hash",
+          "radius": 2
+        },
+        {
+          "kind": "callee_def",
+          "file": "torch\\_inductor\\codecache.py",
+          "line": 522,
+          "text": "def code_hash",
+          "radius": 3
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\_inductor\\codecache.py",
+          "line": 525,
+          "text": "CODE_CACHE_KEY_STRATEGY.key(code)",
+          "radius": 3
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\_inductor\\codecache.py",
+          "line": 524,
+          "text": "CODE_CACHE_KEY_STRATEGY.key(code, extra)",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_inductor\\codecache.py",
+          "line": 4719,
+          "text": "get_path(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_inductor\\cpp_builder.py",
+          "line": 1502,
+          "text": "python_include_path = sysconfig.get_path(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_inductor\\cpp_builder.py",
+          "line": 1503,
+          "text": "'include'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_inductor\\cpp_builder.py",
+          "line": 1488,
+          "text": "include_dir = Path(sysconfig.get_path(\"include\"))",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_inductor\\cpp_builder.py",
+          "line": 1488,
+          "text": "'include'",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "path_helper.py::remove_dir::path",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 8,
+      "defs": 9,
+      "edges": 21,
+      "blocking": [
+        "dynamic_dispatch",
+        "external_call"
+      ],
+      "trusted_terminal": true,
+      "beyond_locality": true,
+      "n_facts": 21,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\path_helper.py",
+          "line": 28,
+          "text": "def remove_dir",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_path_helper.py",
+          "line": 72,
+          "text": "remove_dir(None)  # type: ignore[arg-type]",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_path_helper.py",
+          "line": 72,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_path_helper.py",
+          "line": 76,
+          "text": "remove_dir(ghost)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\lumen_cli\\tests\\test_path_helper.py",
+          "line": 75,
+          "text": "ghost = self.tmp_path / \"ghost\"",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_path_helper.py",
+          "line": 81,
+          "text": "remove_dir(str(d))",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": "torch\\nested\\_internal\\nested_int.py",
+          "line": 68,
+          "text": "def str",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\nested\\_internal\\nested_int.py",
+          "line": 69,
+          "text": "self._str()",
+          "radius": 2
+        },
+        {
+          "kind": "callee_def",
+          "file": "torch\\fx\\experimental\\sym_node.py",
+          "line": 327,
+          "text": "def str",
+          "radius": 2
+        },
+        {
+          "kind": "callee_def",
+          "file": "test\\cpython\\v3_13\\test_scope.py",
+          "line": 179,
+          "text": "def str",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\git_helper.py",
+          "line": 42,
+          "text": "remove_dir(dst)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\git_helper.py",
+          "line": 36,
+          "text": "dst = dst or target",
+          "radius": 1
+        },
+        {
+          "kind": "or_fallback",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\git_helper.py",
+          "line": 36,
+          "text": "dst or target",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\path_helper.py",
+          "line": 39,
+          "text": "remove_dir(path)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_path_helper.py",
+          "line": 67,
+          "text": "force_create_dir(d)",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\lumen_cli\\tests\\test_path_helper.py",
+          "line": 64,
+          "text": "d = self.tmp_path / \"fresh\"",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 211,
+          "text": "force_create_dir(tmp_path)",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 210,
+          "text": "tmp_path = Path(tmp_dir)",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_extern_call",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 210,
+          "text": "Path(tmp_dir)",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_test.py",
+          "line": 116,
+          "text": "remove_dir(Path(\"vllm\"))",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_extern_call",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_test.py",
+          "line": 116,
+          "text": "Path('vllm')",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "utils.py::run_command::use_shell",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 7,
+      "defs": 12,
+      "edges": 13,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 13,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\utils.py",
+          "line": 19,
+          "text": "def run_command",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\actionlint_linter.py",
+          "line": 71,
+          "text": "proc = run_command(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\actionlint_linter.py",
+          "line": 21,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\clangformat_linter.py",
+          "line": 102,
+          "text": "proc = run_command(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\clangformat_linter.py",
+          "line": 21,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\clangtidy_linter.py",
+          "line": 180,
+          "text": "proc = run_command(cmd)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\clangtidy_linter.py",
+          "line": 21,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\cmake_linter.py",
+          "line": 76,
+          "text": "proc = run_command(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\cmake_linter.py",
+          "line": 21,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\flake8_linter.py",
+          "line": 266,
+          "text": "proc = run_command(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\flake8_linter.py",
+          "line": 21,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\grep_linter.py",
+          "line": 135,
+          "text": "proc = run_command([\"grep\", \"-nEHI\", allowlist_pattern, filename])",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\grep_linter.py",
+          "line": 21,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "utils.py::run_command::log_cmd",
+      "verdict": "UNREACHABLE",
+      "radius": 1,
+      "files": 7,
+      "defs": 12,
+      "edges": 13,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 13,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\utils.py",
+          "line": 19,
+          "text": "def run_command",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\actionlint_linter.py",
+          "line": 71,
+          "text": "proc = run_command(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\actionlint_linter.py",
+          "line": 22,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\clangformat_linter.py",
+          "line": 102,
+          "text": "proc = run_command(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\clangformat_linter.py",
+          "line": 22,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\clangtidy_linter.py",
+          "line": 180,
+          "text": "proc = run_command(cmd)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\clangtidy_linter.py",
+          "line": 22,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\cmake_linter.py",
+          "line": 76,
+          "text": "proc = run_command(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\cmake_linter.py",
+          "line": 22,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\flake8_linter.py",
+          "line": 266,
+          "text": "proc = run_command(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\flake8_linter.py",
+          "line": 22,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\linter\\adapters\\grep_linter.py",
+          "line": 135,
+          "text": "proc = run_command([\"grep\", \"-nEHI\", allowlist_pattern, filename])",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\linter\\adapters\\grep_linter.py",
+          "line": 22,
+          "text": "True",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "utils.py::str2bool::value",
+      "verdict": "UNREACHABLE",
+      "radius": 2,
+      "files": 2,
+      "defs": 3,
+      "edges": 5,
+      "blocking": [],
+      "trusted_terminal": true,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\utils.py",
+          "line": 65,
+          "text": "def str2bool",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\envs_helper.py",
+          "line": 53,
+          "text": "return str2bool(val)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\envs_helper.py",
+          "line": 50,
+          "text": "val = get_env(name)",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\envs_helper.py",
+          "line": 15,
+          "text": "def get_env",
+          "radius": 2
+        },
+        {
+          "kind": "or_fallback",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\envs_helper.py",
+          "line": 17,
+          "text": "os.environ.get(name) or default",
+          "radius": 2
+        }
+      ]
+    },
+    {
+      "id": "utils.py::working_directory::path",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 7,
+      "defs": 6,
+      "edges": 15,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": true,
+      "beyond_locality": true,
+      "n_facts": 15,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\utils.py",
+          "line": 106,
+          "text": "def working_directory",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_utils.py",
+          "line": 112,
+          "text": "with working_directory(\"\"):",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_utils.py",
+          "line": 112,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_utils.py",
+          "line": 105,
+          "text": "with working_directory(str(target)):",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": "torch\\nested\\_internal\\nested_int.py",
+          "line": 68,
+          "text": "def str",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\nested\\_internal\\nested_int.py",
+          "line": 69,
+          "text": "self._str()",
+          "radius": 2
+        },
+        {
+          "kind": "callee_def",
+          "file": "torch\\fx\\experimental\\sym_node.py",
+          "line": 327,
+          "text": "def str",
+          "radius": 2
+        },
+        {
+          "kind": "callee_def",
+          "file": "test\\cpython\\v3_13\\test_scope.py",
+          "line": 179,
+          "text": "def str",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_utils.py",
+          "line": 124,
+          "text": "with working_directory(str(target)):",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_utils.py",
+          "line": 137,
+          "text": "with working_directory(str(missing)):",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\torchtitan\\lib.py",
+          "line": 65,
+          "text": "working_directory(tests.get(\"working_directory\", \"\")),",
+          "radius": 1
+        },
+        {
+          "kind": "trusted_primitive",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\torchtitan\\lib.py",
+          "line": 65,
+          "text": "tests.get('working_directory', '')",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\torchtitan\\lib.py",
+          "line": 65,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\torchtitan\\torchtitan_test.py",
+          "line": 54,
+          "text": "with working_directory(self.work_directory):",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\torchtitan\\torchtitan_test.py",
+          "line": 54,
+          "text": "self.work_directory",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "vllm_build.py::get_result_path::path",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 230,
+          "text": "def get_result_path",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "vllm_build.py::_get_torch_wheel_path_arg::torch_whl_dir",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 2,
+      "blocking": [
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 2,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 239,
+          "text": "def _get_torch_wheel_path_arg",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 275,
+          "text": "torch_arg = self._get_torch_wheel_path_arg(inputs.torch_whls_path)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "_common.py::_to_posix_path_list::windows_path_list",
+      "verdict": "UNKNOWN",
+      "radius": 2,
+      "files": 1,
+      "defs": 2,
+      "edges": 5,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\wheel\\_common.py",
+          "line": 68,
+          "text": "def _to_posix_path_list",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\wheel\\_common.py",
+          "line": 121,
+          "text": "v = _to_posix_path_list(v)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\wheel\\_common.py",
+          "line": 121,
+          "text": "v = _to_posix_path_list(v)",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": ".ci\\wheel\\_common.py",
+          "line": 68,
+          "text": "def _to_posix_path_list",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": ".ci\\wheel\\_common.py",
+          "line": 91,
+          "text": "result.stdout.strip()",
+          "radius": 2
+        }
+      ]
+    },
+    {
+      "id": "repair_wheel.py::arch_extra_deps::use_cuda",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 1,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 131,
+          "text": "def arch_extra_deps",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 529,
+          "text": "arch_deps = arch_extra_deps(arch, use_cuda)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 468,
+          "text": "use_cuda = os.environ.get(\"USE_CUDA\", \"0\") == \"1\"",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "repair_wheel.py::set_rpath::force_rpath",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 1,
+      "defs": 10,
+      "edges": 14,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 14,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 324,
+          "text": "def set_rpath",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 448,
+          "text": "set_rpath(sofile, c_so_rpath, force_rpath)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 540,
+          "text": "repair_wheel(",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 484,
+          "text": "force_rpath = True",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 484,
+          "text": "True",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 490,
+          "text": "force_rpath = True",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 490,
+          "text": "True",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 527,
+          "text": "force_rpath = False",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 527,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 500,
+          "text": "force_rpath = True",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 500,
+          "text": "True",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 523,
+          "text": "force_rpath = True",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 523,
+          "text": "True",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\wheel\\linux\\repair_wheel.py",
+          "line": 451,
+          "text": "set_rpath(sofile, lib_so_rpath, force_rpath)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "cherry_pick.py::create_cherry_pick_branch::trunk_revert_sha",
+      "verdict": "REACHABLE",
+      "radius": 4,
+      "files": 4,
+      "defs": 16,
+      "edges": 28,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": true,
+      "beyond_locality": true,
+      "n_facts": 28,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 244,
+          "text": "def create_cherry_pick_branch",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 182,
+          "text": "cherry_pick_branch = create_cherry_pick_branch(",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 175,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 175,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 453,
+          "text": "cherry_pick(",
+          "radius": 2
+        },
+        {
+          "kind": "or_fallback",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 462,
+          "text": "trunk_revert_sha or ''",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 451,
+          "text": "trunk_revert_sha = resolve_trunk_revert(repo, pr, args.onto_branch, commit_sha)",
+          "radius": 2
+        },
+        {
+          "kind": "callee_def",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 102,
+          "text": "def resolve_trunk_revert",
+          "radius": 3
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 114,
+          "text": "revert_sha = find_revert_commit_sha(repo, pr, commit_sha)",
+          "radius": 3
+        },
+        {
+          "kind": "callee_def",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 76,
+          "text": "def find_revert_commit_sha",
+          "radius": 4
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 99,
+          "text": "revert_shas.split('\\n')[0]",
+          "radius": 4
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 96,
+          "text": "None",
+          "radius": 4
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 116,
+          "text": "None",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 462,
+          "text": "''",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\gitutils.py",
+          "line": 303,
+          "text": "self.cherry_pick(commit)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\gitutils.py",
+          "line": 175,
+          "text": "''",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1456,
+          "text": "repo.cherry_pick(rev)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 175,
+          "text": "''",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 179,
+          "text": "create_cherry_pick_branch(\"actor\", repo, make_pr(), LANDED, \"release/2.14\")",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 250,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 186,
+          "text": "create_cherry_pick_branch(",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 187,
+          "text": "REVERT",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 197,
+          "text": "create_cherry_pick_branch(",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 198,
+          "text": "REVERT",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 208,
+          "text": "create_cherry_pick_branch(",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 209,
+          "text": "REVERT",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 229,
+          "text": "create_cherry_pick_branch(",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 230,
+          "text": "REVERT",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "cherry_pick.py::submit_pr::trunk_revert_sha",
+      "verdict": "REACHABLE",
+      "radius": 4,
+      "files": 3,
+      "defs": 14,
+      "edges": 18,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": true,
+      "beyond_locality": true,
+      "n_facts": 18,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 301,
+          "text": "def submit_pr",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 191,
+          "text": "cherry_pick_pr = submit_pr(",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 175,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 175,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 453,
+          "text": "cherry_pick(",
+          "radius": 2
+        },
+        {
+          "kind": "or_fallback",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 462,
+          "text": "trunk_revert_sha or ''",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 451,
+          "text": "trunk_revert_sha = resolve_trunk_revert(repo, pr, args.onto_branch, commit_sha)",
+          "radius": 2
+        },
+        {
+          "kind": "callee_def",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 102,
+          "text": "def resolve_trunk_revert",
+          "radius": 3
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 114,
+          "text": "revert_sha = find_revert_commit_sha(repo, pr, commit_sha)",
+          "radius": 3
+        },
+        {
+          "kind": "callee_def",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 76,
+          "text": "def find_revert_commit_sha",
+          "radius": 4
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 99,
+          "text": "revert_shas.split('\\n')[0]",
+          "radius": 4
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 96,
+          "text": "None",
+          "radius": 4
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 116,
+          "text": "None",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 462,
+          "text": "''",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\gitutils.py",
+          "line": 303,
+          "text": "self.cherry_pick(commit)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\gitutils.py",
+          "line": 175,
+          "text": "''",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1456,
+          "text": "repo.cherry_pick(rev)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 175,
+          "text": "''",
+          "radius": 2
+        }
+      ]
+    },
+    {
+      "id": "filter_test_configs.py::filter::ignore_test_config_labels",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 7,
+      "edges": 8,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 152,
+          "text": "def filter",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\run_test.py",
+          "line": 1781,
+          "text": "filter(lambda test_name: \"jit\" in test_name, selected_tests)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\run_test.py",
+          "line": 155,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\run_test.py",
+          "line": 1786,
+          "text": "filter(lambda test_name: test_name in DISTRIBUTED_TESTS, selected_tests)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\run_test.py",
+          "line": 1792,
+          "text": "filter(lambda test_name: test_name in CORE_TEST_LIST, selected_tests)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\run_test.py",
+          "line": 1797,
+          "text": "filter(lambda test_name: test_name in CPYTHON_TESTS, selected_tests)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\run_test.py",
+          "line": 1803,
+          "text": "filter(lambda test_name: test_name in DYNAMO_CORE_TESTS, selected_tests)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\run_test.py",
+          "line": 1809,
+          "text": "filter(lambda test_name: test_name in INDUCTOR_TESTS, selected_tests)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "filter_test_configs.py::filter_selected_test_configs::selected_test_configs",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 2,
+      "edges": 5,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 199,
+          "text": "def filter_selected_test_configs",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 657,
+          "text": "filtered_test_matrix = filter_selected_test_configs(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 652,
+          "text": "selected_test_configs = {",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 345,
+          "text": "filtered_test_matrix = filter_selected_test_configs(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 340,
+          "text": "selected_test_configs = {",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "filter_test_configs.py::parse_reenabled_issues::s",
+      "verdict": "REACHABLE",
+      "radius": 3,
+      "files": 2,
+      "defs": 24,
+      "edges": 36,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": true,
+      "beyond_locality": true,
+      "n_facts": 36,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 478,
+          "text": "def parse_reenabled_issues",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 507,
+          "text": "return parse_reenabled_issues(pr_body) + parse_reenabled_issues(commit_messages)",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 493,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 493,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 598,
+          "text": "set_output(\"reenabled-issues\", \",\".join(get_reenabled_issues(pr_body=pr_body)))",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 698,
+          "text": "perform_misc_tasks(",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 795,
+          "text": "perform_misc_tasks(labels, test_matrix, job_name, pr_body)",
+          "radius": 3
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 791,
+          "text": "pr_body = case.get(\"pr_body\", \"\")",
+          "radius": 3
+        },
+        {
+          "kind": "trusted_primitive",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 791,
+          "text": "case.get('pr_body', '')",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 791,
+          "text": "''",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 849,
+          "text": "get_reenabled_issues(pr_body=\"Resolves #789\"), [\"789\", \"123\", \"456\"]",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 849,
+          "text": "'Resolves #789'",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 868,
+          "text": "self.assertEqual(get_reenabled_issues(pr_body=\"Fixes #123\"), [\"123\"])",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 868,
+          "text": "'Fixes #123'",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 499,
+          "text": "commit_messages = subprocess.check_output(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 499,
+          "text": "subprocess.check_output(['git', 'log', '--format=%s', f'{default_branch}..HEAD'], env={**os.environ, 'GIT_NO_LAZY_FETCH'",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 506,
+          "text": "commit_messages = \"\"",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\filter_test_configs.py",
+          "line": 506,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 804,
+          "text": "parse_reenabled_issues(pr_body), [\"123\", \"143\", \"345\", \"10283\"]",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 802,
+          "text": "pr_body = \"closes #123 Close #143 ClOsE #345 closed #10283\"",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 802,
+          "text": "'closes #123 Close #143 ClOsE #345 closed #10283'",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 808,
+          "text": "pr_body = \"fix #123 FixEd #143 fixes #345 FiXeD #10283\"",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 808,
+          "text": "'fix #123 FixEd #143 fixes #345 FiXeD #10283'",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 814,
+          "text": "pr_body = \"resolve #123 resolveS #143 REsolved #345 RESOLVES #10283\"",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 814,
+          "text": "'resolve #123 resolveS #143 REsolved #345 RESOLVES #10283'",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 820,
+          "text": "pr_body = \"closes https://github.com/pytorch/pytorch/issues/75198 fixes https://github.com/pytorch/pytorch/issues/75123\"",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 820,
+          "text": "'closes https://github.com/pytorch/pytorch/issues/75198 fixes https://github.com/pytorch/pytorch/issues/75123'",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 824,
+          "text": "pr_body = (",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 825,
+          "text": "'resolve #123,resolveS #143Resolved #345\\nRESOLVES #10283 Fixed #2348fixes https://github.com/pytorch/pytorch/issues/75123resolveS #2134'",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 834,
+          "text": "pr_body = (",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 835,
+          "text": "'fixes189 fixeshttps://github.com/pytorch/pytorch/issues/75123 closedhttps://githubcom/pytorch/pytorch/issues/75123fix 234, fixes # 45, fixing #123, close 234, closes#45, closing #123 resolve 234, resolves  #45, resolving #123'",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 842,
+          "text": "pr_body = None",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 842,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 810,
+          "text": "parse_reenabled_issues(pr_body), [\"123\", \"143\", \"345\", \"10283\"]",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 816,
+          "text": "parse_reenabled_issues(pr_body), [\"123\", \"143\", \"345\", \"10283\"]",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_filter_test_configs.py",
+          "line": 821,
+          "text": "self.assertEqual(parse_reenabled_issues(pr_body), [\"75198\", \"75123\"])",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "github_utils.py::_gh_post_comment::dry_run",
+      "verdict": "REACHABLE",
+      "radius": 4,
+      "files": 12,
+      "defs": 35,
+      "edges": 57,
+      "blocking": [
+        "dynamic_dispatch",
+        "star_args"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 57,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\github_utils.py",
+          "line": 159,
+          "text": "def _gh_post_comment",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\github_utils.py",
+          "line": 171,
+          "text": "return _gh_post_comment(",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": ".github\\scripts\\github_utils.py",
+          "line": 169,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\github_utils.py",
+          "line": 169,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 391,
+          "text": "return gh_post_pr_comment(org, project, pr_num, comment, dry_run)",
+          "radius": 2
+        },
+        {
+          "kind": "param_default",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 367,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 367,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 237,
+          "text": "post_pr_comment(org, project, pr.pr_num, msg, dry_run)",
+          "radius": 3
+        },
+        {
+          "kind": "param_default",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 174,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 174,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 453,
+          "text": "cherry_pick(",
+          "radius": 4
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 461,
+          "text": "args.dry_run",
+          "radius": 4
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\gitutils.py",
+          "line": 303,
+          "text": "self.cherry_pick(commit)",
+          "radius": 4
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\gitutils.py",
+          "line": 174,
+          "text": "False",
+          "radius": 4
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1456,
+          "text": "repo.cherry_pick(rev)",
+          "radius": 4
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 174,
+          "text": "False",
+          "radius": 4
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 467,
+          "text": "post_pr_comment(org, project, pr_num, str(error))",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 432,
+          "text": "return gh_post_pr_comment(org, project, issue_num, comment, dry_run)",
+          "radius": 2
+        },
+        {
+          "kind": "param_default",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 402,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 402,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\cherry_pick.py",
+          "line": 204,
+          "text": "post_tracker_issue_comment(",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 252,
+          "text": "post_tracker_issue_comment(",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_cherry_pick.py",
+          "line": 260,
+          "text": "True",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\comment_on_pr.py",
+          "line": 32,
+          "text": "gh_post_pr_comment(org, project, args.pr_num, msg)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\comment_on_pr.py",
+          "line": 169,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 2284,
+          "text": "gh_post_pr_comment(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3142,
+          "text": "post_starting_merge_comment(",
+          "radius": 3
+        },
+        {
+          "kind": "param_default",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_inductor\\scheduler.py",
+          "line": 2584,
+          "text": "result[id(use.node)] = use.merge(result[id(use.node)])",
+          "radius": 4
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_inductor\\scheduler.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 4
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 422,
+          "text": "merged = merge(tuple(f[v] for f in frags), others)",
+          "radius": 4
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 4
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 444,
+          "text": "merged = merge(tuple(f[b] for f in frags), others)",
+          "radius": 4
+        },
+        {
+          "kind": "call_site_star",
+          "file": "torch\\_dynamo\\polyfills\\heapq.py",
+          "line": 78,
+          "text": "return py_heapq.merge(*iterables, key=key, reverse=reverse)",
+          "radius": 4
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\utils\\benchmark\\utils\\compare.py",
+          "line": 327,
+          "text": "results = common.Measurement.merge(self._results)",
+          "radius": 4
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\utils\\benchmark\\utils\\compare.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 4
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\code_coverage\\package\\oss\\cov_json.py",
+          "line": 17,
+          "text": "clang_coverage.merge(test_list, TestPlatform.OSS)",
+          "radius": 4
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\code_coverage\\package\\oss\\cov_json.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 4
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3114,
+          "text": "post_starting_merge_comment(repo, pr, explainer, dry_run)",
+          "radius": 3
+        }
+      ]
+    },
+    {
+      "id": "github_utils.py::gh_close_pr::dry_run",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\github_utils.py",
+          "line": 188,
+          "text": "def gh_close_pr",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 2313,
+          "text": "gh_close_pr(pr.org, pr.project, pr.pr_num, dry_run)",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 2313,
+          "text": "dry_run",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "greenlight_messages.py::render_refusal::suffix",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 2,
+      "defs": 6,
+      "edges": 10,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 10,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\greenlight_messages.py",
+          "line": 139,
+          "text": "def render_refusal",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\greenlight_guard.py",
+          "line": 362,
+          "text": "return GuardResult(GuardVerdict.DENY, render_refusal([*denials, *waits]))",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\greenlight_guard.py",
+          "line": 139,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\greenlight_guard.py",
+          "line": 365,
+          "text": "return GuardResult(GuardVerdict.DENY, render_refusal(waits, FORCE_SUFFIX))",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": ".github\\scripts\\greenlight_guard.py",
+          "line": 365,
+          "text": "FORCE_SUFFIX",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\greenlight_guard.py",
+          "line": 377,
+          "text": "return GuardResult(GuardVerdict.DENY, render_refusal(waits, suffix))",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\greenlight_guard.py",
+          "line": 368,
+          "text": "suffix = transport_timeout_suffix(TRANSPORT_MAX_WAIT_MINUTES)",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": ".github\\scripts\\greenlight_messages.py",
+          "line": 103,
+          "text": "def transport_timeout_suffix",
+          "radius": 2
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\greenlight_guard.py",
+          "line": 373,
+          "text": "suffix = timeout_suffix(MAX_WAIT_MINUTES)",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": ".github\\scripts\\greenlight_messages.py",
+          "line": 99,
+          "text": "def timeout_suffix",
+          "radius": 2
+        }
+      ]
+    },
+    {
+      "id": "greenlight_preflight.py::_apps_removed::candidates",
+      "verdict": "UNKNOWN",
+      "radius": 2,
+      "files": 1,
+      "defs": 2,
+      "edges": 6,
+      "blocking": [
+        "dynamic_dispatch",
+        "external_call"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 6,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\greenlight_preflight.py",
+          "line": 130,
+          "text": "def _apps_removed",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\greenlight_preflight.py",
+          "line": 151,
+          "text": "return _apps_removed(",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": ".github\\scripts\\greenlight_preflight.py",
+          "line": 120,
+          "text": "def _named_bots_removed",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_extern_call",
+          "file": ".github\\scripts\\greenlight_preflight.py",
+          "line": 121,
+          "text": "sorted({login for login in logins if not is_known_bot(login) and (not is_greenlight(login))})",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\greenlight_preflight.py",
+          "line": 168,
+          "text": "return _apps_removed(listed, apps)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\greenlight_preflight.py",
+          "line": 167,
+          "text": "listed = [login for login in candidates if normalize_login(login) in authorized]",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "label_utils.py::gh_add_labels::dry_run",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 8,
+      "defs": 15,
+      "edges": 28,
+      "blocking": [
+        "omitted_no_default",
+        "star_args"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 28,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\label_utils.py",
+          "line": 82,
+          "text": "def gh_add_labels",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3240,
+          "text": "gh_add_labels(pr.org, pr.project, pr.pr_num, [\"land-failed\"], dry_run)",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_inductor\\scheduler.py",
+          "line": 2584,
+          "text": "result[id(use.node)] = use.merge(result[id(use.node)])",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_inductor\\scheduler.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 422,
+          "text": "merged = merge(tuple(f[v] for f in frags), others)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 444,
+          "text": "merged = merge(tuple(f[b] for f in frags), others)",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_star",
+          "file": "torch\\_dynamo\\polyfills\\heapq.py",
+          "line": 78,
+          "text": "return py_heapq.merge(*iterables, key=key, reverse=reverse)",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\utils\\benchmark\\utils\\compare.py",
+          "line": 327,
+          "text": "results = common.Measurement.merge(self._results)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\utils\\benchmark\\utils\\compare.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\code_coverage\\package\\oss\\cov_json.py",
+          "line": 17,
+          "text": "clang_coverage.merge(test_list, TestPlatform.OSS)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\code_coverage\\package\\oss\\cov_json.py",
+          "line": 3080,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 841,
+          "text": "gh_add_labels(pr.org, pr.project, pr.pr_num, [NOT_USER_FACING_LABEL], dry_run)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 540,
+          "text": "ensure_mergeable_labels(pr, 456, dry_run=False)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 540,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 584,
+          "text": "ensure_mergeable_labels(pr, 456, dry_run=False)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 584,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 562,
+          "text": "ensure_mergeable_labels(pr, 456, dry_run=False)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 562,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 574,
+          "text": "ensure_mergeable_labels(pr, 456, dry_run=False)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 574,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3128,
+          "text": "ensure_mergeable_labels(pr, comment_id, dry_run)",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1507,
+          "text": "gh_add_labels(self.org, self.project, self.pr_num, [label], dry_run)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1504,
+          "text": "self.add_label(full_label, dry_run)",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 2858,
+          "text": "pr.add_label(\"ci-no-td\", dry_run)",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3091,
+          "text": "gh_add_labels(pr.org, pr.project, pr.pr_num, [MERGE_IN_PROGRESS_LABEL], dry_run)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "label_utils.py::gh_remove_label::dry_run",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\label_utils.py",
+          "line": 94,
+          "text": "def gh_remove_label",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3395,
+          "text": "gh_remove_label(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3396,
+          "text": "args.dry_run",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "pytest_caching_utils.py::upload_pytest_cache::bucket",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 59,
+          "text": "def upload_pytest_cache",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 90,
+          "text": "upload_pytest_cache(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 98,
+          "text": "args.bucket",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "pytest_caching_utils.py::download_pytest_cache::bucket",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 97,
+          "text": "def download_pytest_cache",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 104,
+          "text": "download_pytest_cache(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 109,
+          "text": "args.bucket",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "pytest_caching_utils.py::_get_s3_key_prefix::sha",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 2,
+      "defs": 2,
+      "edges": 6,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 6,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 141,
+          "text": "def _get_s3_key_prefix",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 89,
+          "text": "obj_key_prefix = _get_s3_key_prefix(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 90,
+          "text": "upload_pytest_cache(",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 94,
+          "text": "args.sha",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 121,
+          "text": "obj_key_prefix = _get_s3_key_prefix(pr_identifier, repo, job_identifier)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 145,
+          "text": "''",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "pytest_caching_utils.py::_get_s3_key_prefix::test_config",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 2,
+      "defs": 2,
+      "edges": 6,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 6,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 141,
+          "text": "def _get_s3_key_prefix",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 89,
+          "text": "obj_key_prefix = _get_s3_key_prefix(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 90,
+          "text": "upload_pytest_cache(",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 95,
+          "text": "args.test_config",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 121,
+          "text": "obj_key_prefix = _get_s3_key_prefix(pr_identifier, repo, job_identifier)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 146,
+          "text": "''",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "pytest_caching_utils.py::_get_s3_key_prefix::shard",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 2,
+      "defs": 2,
+      "edges": 6,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 6,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 141,
+          "text": "def _get_s3_key_prefix",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 89,
+          "text": "obj_key_prefix = _get_s3_key_prefix(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 90,
+          "text": "upload_pytest_cache(",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 96,
+          "text": "args.shard",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 121,
+          "text": "obj_key_prefix = _get_s3_key_prefix(pr_identifier, repo, job_identifier)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 147,
+          "text": "''",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "trymerge.py::check_for_sev::skip_mandatory_checks",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 6,
+      "defs": 11,
+      "edges": 15,
+      "blocking": [
+        "star_args"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 15,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 2917,
+          "text": "def check_for_sev",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3111,
+          "text": "check_for_sev(pr.org, pr.project, skip_mandatory_checks)",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3081,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3081,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_inductor\\scheduler.py",
+          "line": 2584,
+          "text": "result[id(use.node)] = use.merge(result[id(use.node)])",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_inductor\\scheduler.py",
+          "line": 3081,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 422,
+          "text": "merged = merge(tuple(f[v] for f in frags), others)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 3081,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 444,
+          "text": "merged = merge(tuple(f[b] for f in frags), others)",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_star",
+          "file": "torch\\_dynamo\\polyfills\\heapq.py",
+          "line": 78,
+          "text": "return py_heapq.merge(*iterables, key=key, reverse=reverse)",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\utils\\benchmark\\utils\\compare.py",
+          "line": 327,
+          "text": "results = common.Measurement.merge(self._results)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\utils\\benchmark\\utils\\compare.py",
+          "line": 3081,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\code_coverage\\package\\oss\\cov_json.py",
+          "line": 17,
+          "text": "clang_coverage.merge(test_list, TestPlatform.OSS)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\code_coverage\\package\\oss\\cov_json.py",
+          "line": 3081,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3157,
+          "text": "check_for_sev(pr.org, pr.project, skip_mandatory_checks)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "trymerge.py::merge::skip_mandatory_checks",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 6,
+      "defs": 9,
+      "edges": 11,
+      "blocking": [
+        "star_args"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3076,
+          "text": "def merge",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_inductor\\scheduler.py",
+          "line": 2584,
+          "text": "result[id(use.node)] = use.merge(result[id(use.node)])",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_inductor\\scheduler.py",
+          "line": 3081,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 422,
+          "text": "merged = merge(tuple(f[v] for f in frags), others)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 3081,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 444,
+          "text": "merged = merge(tuple(f[b] for f in frags), others)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_star",
+          "file": "torch\\_dynamo\\polyfills\\heapq.py",
+          "line": 78,
+          "text": "return py_heapq.merge(*iterables, key=key, reverse=reverse)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\utils\\benchmark\\utils\\compare.py",
+          "line": 327,
+          "text": "results = common.Measurement.merge(self._results)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\utils\\benchmark\\utils\\compare.py",
+          "line": 3081,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\code_coverage\\package\\oss\\cov_json.py",
+          "line": 17,
+          "text": "clang_coverage.merge(test_list, TestPlatform.OSS)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\code_coverage\\package\\oss\\cov_json.py",
+          "line": 3081,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "trymerge.py::merge::ignore_current",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 6,
+      "defs": 9,
+      "edges": 11,
+      "blocking": [
+        "star_args"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3076,
+          "text": "def merge",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_inductor\\scheduler.py",
+          "line": 2584,
+          "text": "result[id(use.node)] = use.merge(result[id(use.node)])",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_inductor\\scheduler.py",
+          "line": 3084,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 422,
+          "text": "merged = merge(tuple(f[v] for f in frags), others)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 3084,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_vendor\\quack\\reduce.py",
+          "line": 444,
+          "text": "merged = merge(tuple(f[b] for f in frags), others)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_star",
+          "file": "torch\\_dynamo\\polyfills\\heapq.py",
+          "line": 78,
+          "text": "return py_heapq.merge(*iterables, key=key, reverse=reverse)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\utils\\benchmark\\utils\\compare.py",
+          "line": 327,
+          "text": "results = common.Measurement.merge(self._results)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\utils\\benchmark\\utils\\compare.py",
+          "line": 3084,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "tools\\code_coverage\\package\\oss\\cov_json.py",
+          "line": 17,
+          "text": "clang_coverage.merge(test_list, TestPlatform.OSS)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\code_coverage\\package\\oss\\cov_json.py",
+          "line": 3084,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "trymerge.py::gen_commit_message::filter_ghstack",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 8,
+      "edges": 12,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 12,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1461,
+          "text": "def gen_commit_message",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 1370,
+          "text": "msg = pr.gen_commit_message(filter_ghstack=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 1370,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 1383,
+          "text": "msg = pr.gen_commit_message(filter_ghstack=True, ghstack_deps=[pr0, pr1, pr2])",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 1383,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 749,
+          "text": "self.assertIn(\"Co-authored-by:\", pr.gen_commit_message())",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 1463,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1626,
+          "text": "msg = self.gen_commit_message()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1463,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1668,
+          "text": "msg = self.gen_commit_message()",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1439,
+          "text": "commit_msg = pr.gen_commit_message(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1440,
+          "text": "True",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "trymerge.py::gen_commit_message::ghstack_deps",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 7,
+      "edges": 10,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 10,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1461,
+          "text": "def gen_commit_message",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 1370,
+          "text": "msg = pr.gen_commit_message(filter_ghstack=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 1464,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 1383,
+          "text": "msg = pr.gen_commit_message(filter_ghstack=True, ghstack_deps=[pr0, pr1, pr2])",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\test_trymerge.py",
+          "line": 749,
+          "text": "self.assertIn(\"Co-authored-by:\", pr.gen_commit_message())",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1626,
+          "text": "msg = self.gen_commit_message()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1464,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1668,
+          "text": "msg = self.gen_commit_message()",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1439,
+          "text": "commit_msg = pr.gen_commit_message(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1433,
+          "text": "pr_dependencies = []",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "trymerge.py::merge_changes_locally::comment_id",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 1,
+      "defs": 3,
+      "edges": 4,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 4,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1639,
+          "text": "def merge_changes_locally",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 3335,
+          "text": "pr.merge_changes_locally(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1643,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\trymerge.py",
+          "line": 1565,
+          "text": "additional_merged_prs = self.merge_changes_locally(",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "tryrebase.py::rebase_onto::dry_run",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 7,
+      "edges": 9,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 9,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\tryrebase.py",
+          "line": 54,
+          "text": "def rebase_onto",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\test_tryrebase.py",
+          "line": 48,
+          "text": "rebase_onto(pr, repo, MAIN_BRANCH)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_tryrebase.py",
+          "line": 55,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".github\\scripts\\test_tryrebase.py",
+          "line": 82,
+          "text": "rebase_onto(pr, repo, VIABLE_STRICT_BRANCH, False)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_tryrebase.py",
+          "line": 82,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\test_tryrebase.py",
+          "line": 118,
+          "text": "rebase_onto(pr, repo, MAIN_BRANCH)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\test_tryrebase.py",
+          "line": 155,
+          "text": "rebase_onto(pr, repo, VIABLE_STRICT_BRANCH)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\test_tryrebase.py",
+          "line": 208,
+          "text": "rebase_onto(pr, repo, VIABLE_STRICT_BRANCH)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\test_tryrebase.py",
+          "line": 176,
+          "text": "rebase_onto(pr, repo, MAIN_BRANCH)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "tryrebase.py::rebase_ghstack_onto::dry_run",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 2,
+      "edges": 5,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\tryrebase.py",
+          "line": 101,
+          "text": "def rebase_ghstack_onto",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": ".github\\scripts\\test_tryrebase.py",
+          "line": 178,
+          "text": "rebase_ghstack_onto(pr, repo, MAIN_BRANCH)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".github\\scripts\\test_tryrebase.py",
+          "line": 102,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\tryrebase.py",
+          "line": 248,
+          "text": "rc = rebase_ghstack_onto(pr, repo, onto_branch, dry_run=args.dry_run)",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\tryrebase.py",
+          "line": 248,
+          "text": "args.dry_run",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "cmds.py::_run_lintrunner::return_json_output",
+      "verdict": "UNKNOWN",
+      "radius": 2,
+      "files": 2,
+      "defs": 2,
+      "edges": 6,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 6,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".spin\\cmds.py",
+          "line": 371,
+          "text": "def _run_lintrunner",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".spin\\cmds.py",
+          "line": 437,
+          "text": "lint_found_all, json_output_all = _run_lintrunner(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".spin\\cmds.py",
+          "line": 436,
+          "text": "write_json_output = bool(tee_file)",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": "torch\\storage.py",
+          "line": 332,
+          "text": "def bool",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\storage.py",
+          "line": 334,
+          "text": "self._to(torch.bool)",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".spin\\cmds.py",
+          "line": 449,
+          "text": "lint_found_changed, json_output_changed = _run_lintrunner(",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "cmds.py::_pip_install_cmd::editable",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 1,
+      "defs": 2,
+      "edges": 5,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".spin\\cmds.py",
+          "line": 564,
+          "text": "def _pip_install_cmd",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".spin\\cmds.py",
+          "line": 592,
+          "text": "spin.util.run(_pip_install_cmd(editable=True))",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".spin\\cmds.py",
+          "line": 592,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".spin\\cmds.py",
+          "line": 610,
+          "text": "spin.util.run(_pip_install_cmd(editable=False))",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".spin\\cmds.py",
+          "line": 610,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "generate_test_torchscripts.py::conv2d::toChannelsLast",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 5,
+      "defs": 1,
+      "edges": 8,
+      "blocking": [
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "android\\pytorch_android\\generate_test_torchscripts.py",
+          "line": 122,
+          "text": "def conv2d",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_autograd.py",
+          "line": 13346,
+          "text": "out = torch.nn.functional.conv2d(inp, weight)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_cpp_extensions_aot.py",
+          "line": 358,
+          "text": "out = torch.nn.functional.conv2d(input, weight, bias, 2, 0, 1, 1)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_cpp_extensions_aot.py",
+          "line": 358,
+          "text": "2",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_cuda.py",
+          "line": 3024,
+          "text": "results[t] = torch.nn.functional.conv2d(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_fake_tensor.py",
+          "line": 1530,
+          "text": "out = torch.nn.functional.conv2d(inputs, filters, padding=1)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_fake_tensor.py",
+          "line": 1545,
+          "text": "out = torch.nn.functional.conv2d(inputs, filters, padding=1)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_fake_tensor.py",
+          "line": 1539,
+          "text": "torch.nn.functional.conv2d(inputs, filters, padding=1)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "generate_test_torchscripts.py::conv3d::toChannelsLast",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 3,
+      "defs": 0,
+      "edges": 7,
+      "blocking": [
+        "no_call_site",
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 7,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "android\\pytorch_android\\generate_test_torchscripts.py",
+          "line": 131,
+          "text": "def conv3d",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_mps.py",
+          "line": 10851,
+          "text": "y = F.conv3d(x, w)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_mps.py",
+          "line": 10867,
+          "text": "y = F.conv3d(x, w, stride=2)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_mps.py",
+          "line": 14510,
+          "text": "expected = F.conv3d(x, weight, bias, stride=stride, padding=padding)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_mps.py",
+          "line": 14511,
+          "text": "actual = F.conv3d(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\onnx\\_internal\\torchscript_exporter\\symbolic_opset10.py",
+          "line": 1024,
+          "text": "output = opset9.conv3d(g, input, weight, bias, stride, padding, dilation, groups)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\onnx\\_internal\\torchscript_exporter\\symbolic_opset10.py",
+          "line": 1094,
+          "text": "output = opset9.conv3d(g, input, weight, bias, stride, padding, dilation, groups)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "hp_emblookup_codegen.py::unroll::use_offsets",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 11,
+      "blocking": [
+        "dynamic_dispatch",
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 11,
+          "text": "def unroll",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 509,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 510,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 513,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 514,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 517,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 518,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 521,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 522,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "caffe2\\perfkernels\\sve_emblookup_codegen.py",
+          "line": 189,
+          "text": "code += unroll(16, IndexType, InType, OutType)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "caffe2\\perfkernels\\sve_emblookup_codegen.py",
+          "line": 190,
+          "text": "code += unroll(8, IndexType, InType, OutType)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "hp_emblookup_codegen.py::unroll::use_offsets",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 11,
+      "blocking": [
+        "dynamic_dispatch",
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 11,
+          "text": "def unroll",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 509,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 510,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 513,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 514,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 517,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 518,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 521,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 522,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "caffe2\\perfkernels\\sve_emblookup_codegen.py",
+          "line": 189,
+          "text": "code += unroll(16, IndexType, InType, OutType)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "caffe2\\perfkernels\\sve_emblookup_codegen.py",
+          "line": 190,
+          "text": "code += unroll(8, IndexType, InType, OutType)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "hp_emblookup_codegen.py::unroll::use_offsets",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 11,
+      "blocking": [
+        "dynamic_dispatch",
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 11,
+          "text": "def unroll",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 509,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 510,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 513,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 514,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 517,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 518,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 521,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 522,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "caffe2\\perfkernels\\sve_emblookup_codegen.py",
+          "line": 189,
+          "text": "code += unroll(16, IndexType, InType, OutType)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "caffe2\\perfkernels\\sve_emblookup_codegen.py",
+          "line": 190,
+          "text": "code += unroll(8, IndexType, InType, OutType)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "hp_emblookup_codegen.py::unroll::use_offsets",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 11,
+      "blocking": [
+        "dynamic_dispatch",
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 11,
+          "text": "def unroll",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 509,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 510,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 513,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 514,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 517,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 518,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 521,
+          "text": "code += unroll(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 522,
+          "text": "opts.use_offsets",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "caffe2\\perfkernels\\sve_emblookup_codegen.py",
+          "line": 189,
+          "text": "code += unroll(16, IndexType, InType, OutType)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "caffe2\\perfkernels\\sve_emblookup_codegen.py",
+          "line": 190,
+          "text": "code += unroll(8, IndexType, InType, OutType)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "hp_emblookup_codegen.py::generic::use_offsets",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 200,
+          "text": "def generic",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 529,
+          "text": "code += generic(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 530,
+          "text": "opts.use_offsets",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "hp_emblookup_codegen.py::generic::use_offsets",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 200,
+          "text": "def generic",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 529,
+          "text": "code += generic(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 530,
+          "text": "opts.use_offsets",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "hp_emblookup_codegen.py::generic::use_offsets",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 200,
+          "text": "def generic",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 529,
+          "text": "code += generic(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 530,
+          "text": "opts.use_offsets",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "hp_emblookup_codegen.py::compute::prefetch",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 3,
+      "defs": 0,
+      "edges": 7,
+      "blocking": [
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 7,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 12,
+          "text": "def compute",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\autograd\\gradcheck.py",
+          "line": 393,
+          "text": "return tuple(compute(a, b) for (a, b) in zip(outa, outb))",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\_inductor\\codegen\\simd_kernel_features.py",
+          "line": 764,
+          "text": "reads = StatsForReadsOrWrites.compute(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\_inductor\\codegen\\simd_kernel_features.py",
+          "line": 767,
+          "text": "writes = StatsForReadsOrWrites.compute(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\_inductor\\codegen\\simd_kernel_features.py",
+          "line": 789,
+          "text": "persistent = StatsForKernelType.compute([estimator.persistent], estimator)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\_inductor\\codegen\\simd_kernel_features.py",
+          "line": 394,
+          "text": "self._stats_cache[groups] = result = MemoryStats.compute(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\_inductor\\codegen\\simd_kernel_features.py",
+          "line": 795,
+          "text": "looped = StatsForKernelType.compute(",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "__init__.py::stack::tensors",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 3,
+      "defs": 5,
+      "edges": 13,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 13,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "functorch\\dim\\__init__.py",
+          "line": 1141,
+          "text": "def stack",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_autograd.py",
+          "line": 9235,
+          "text": "out1 = torch.stack([a, b], dim=0)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_autograd.py",
+          "line": 16514,
+          "text": "return torch.stack((x1, x2), dim=-1)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_autograd.py",
+          "line": 8135,
+          "text": "mean_combined = torch.stack(feat_combined).mean()",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "test\\test_autograd.py",
+          "line": 8126,
+          "text": "feat_combined = []",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_autograd.py",
+          "line": 8832,
+          "text": "mean_combined = torch.stack(feat_combined).mean()",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "test\\test_autograd.py",
+          "line": 8819,
+          "text": "feat_combined = []",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_autograd.py",
+          "line": 8834,
+          "text": "mean_combined_no_checkpoint = torch.stack(feat_combined_no_checkpoint).mean()",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "test\\test_autograd.py",
+          "line": 8820,
+          "text": "feat_combined_no_checkpoint = []",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_binary_ufuncs.py",
+          "line": 702,
+          "text": "actual = torch.stack(actual)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "test\\test_binary_ufuncs.py",
+          "line": 699,
+          "text": "actual = []",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "test\\test_binary_ufuncs.py",
+          "line": 702,
+          "text": "actual = torch.stack(actual)",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "test\\test_binary_ufuncs.py",
+          "line": 702,
+          "text": "torch.stack(actual)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "_dim_entry.py::_match_levels::drop_levels",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 4,
+      "defs": 9,
+      "edges": 10,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 10,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "functorch\\dim\\_dim_entry.py",
+          "line": 84,
+          "text": "def _match_levels",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "functorch\\dim\\_getsetitem.py",
+          "line": 210,
+          "text": "matched_rhs = _match_levels(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "functorch\\dim\\_getsetitem.py",
+          "line": 88,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "functorch\\dim\\_getsetitem.py",
+          "line": 548,
+          "text": "flat_inputs[i] = _match_levels(t, tensor_inputs[i].levels, index_levels)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "functorch\\dim\\_order.py",
+          "line": 159,
+          "text": "ndata = _match_levels(data, orig_levels, new_levels)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "functorch\\dim\\_order.py",
+          "line": 88,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "functorch\\dim\\__init__.py",
+          "line": 1374,
+          "text": "result = _match_levels(tensor_info.tensor, tensor_info.levels, new_levels)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "functorch\\dim\\__init__.py",
+          "line": 88,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "functorch\\dim\\__init__.py",
+          "line": 1181,
+          "text": "matched_tensor = _match_levels(info.tensor, info.levels, result_levels)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "functorch\\dim\\__init__.py",
+          "line": 830,
+          "text": "rearranged = _match_levels(self_info.tensor, self_info.levels, new_levels)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "cifar10_opacus.py::save_checkpoint::is_best",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 2,
+      "edges": 5,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "functorch\\examples\\dp_cifar10\\cifar10_opacus.py",
+          "line": 35,
+          "text": "def save_checkpoint",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "functorch\\examples\\dp_cifar10\\cifar10_opacus.py",
+          "line": 254,
+          "text": "save_checkpoint(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "functorch\\examples\\dp_cifar10\\cifar10_opacus.py",
+          "line": 248,
+          "text": "is_best = top1_acc > best_acc1",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "functorch\\examples\\dp_cifar10\\cifar10_transforms.py",
+          "line": 286,
+          "text": "save_checkpoint(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "functorch\\examples\\dp_cifar10\\cifar10_transforms.py",
+          "line": 280,
+          "text": "is_best = top1_acc > best_acc1",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "cifar10_transforms.py::save_checkpoint::is_best",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 2,
+      "edges": 5,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "functorch\\examples\\dp_cifar10\\cifar10_transforms.py",
+          "line": 35,
+          "text": "def save_checkpoint",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "functorch\\examples\\dp_cifar10\\cifar10_opacus.py",
+          "line": 254,
+          "text": "save_checkpoint(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "functorch\\examples\\dp_cifar10\\cifar10_opacus.py",
+          "line": 248,
+          "text": "is_best = top1_acc > best_acc1",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "functorch\\examples\\dp_cifar10\\cifar10_transforms.py",
+          "line": 286,
+          "text": "save_checkpoint(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "functorch\\examples\\dp_cifar10\\cifar10_transforms.py",
+          "line": 280,
+          "text": "is_best = top1_acc > best_acc1",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "check_taxonomy.py::print_failure_entries::entries",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 3,
+      "edges": 12,
+      "blocking": [
+        "dynamic_dispatch",
+        "external_call"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 12,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 278,
+          "text": "def print_failure_entries",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 346,
+          "text": "print_failure_entries(title, entries)",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 346,
+          "text": "entries",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 414,
+          "text": "print_failure_entries(\"Missing effective surfaces\", missing_groups)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 400,
+          "text": "missing_groups = sorted(declared_group_set - report.groups)",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_extern_call",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 400,
+          "text": "sorted(declared_group_set - report.groups)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 415,
+          "text": "print_failure_entries(\"Missing grouped sections\", missing_sections)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 401,
+          "text": "missing_sections = sorted(declared_group_set - section_group_set)",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_extern_call",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 401,
+          "text": "sorted(declared_group_set - section_group_set)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 416,
+          "text": "print_failure_entries(\"Undeclared grouped sections\", undeclared_sections)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 402,
+          "text": "undeclared_sections = sorted(section_group_set - declared_group_set)",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_extern_call",
+          "file": "scripts\\codeowners\\check_taxonomy.py",
+          "line": 402,
+          "text": "sorted(section_group_set - declared_group_set)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "update_failures.py::update::also_remove_skips",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 5,
+      "defs": 0,
+      "edges": 7,
+      "blocking": [
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 7,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "scripts\\compile_tests\\update_failures.py",
+          "line": 142,
+          "text": "def update",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": ".spin\\cmds.py",
+          "line": 33,
+          "text": "hash.update(chunk)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "scripts\\lintrunner.py",
+          "line": 45,
+          "text": "hasher.update(chunk)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\run_test.py",
+          "line": 1110,
+          "text": "os.environ.update(env_vars)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\run_test.py",
+          "line": 1160,
+          "text": "os.environ.update(old_environ)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_cuda.py",
+          "line": 329,
+          "text": "baseline.update(torch.cuda.host_memory_stats())",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_cuda.py",
+          "line": 10872,
+          "text": "scaler.update()",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "emit_row.py::read_json::path",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "scripts\\pr_review\\emit_row.py",
+          "line": 130,
+          "text": "def read_json",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "scripts\\pr_review\\emit_row.py",
+          "line": 219,
+          "text": "verdict = read_json(args.verdict_file)",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "scripts\\pr_review\\emit_row.py",
+          "line": 219,
+          "text": "args.verdict_file",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "validate_findings.py::_ranges::lines",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "scripts\\pr_review\\validate_findings.py",
+          "line": 91,
+          "text": "def _ranges",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "scripts\\pr_review\\validate_findings.py",
+          "line": 257,
+          "text": "f\"{_ranges(touched[path])}\",",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "scripts\\pr_review\\validate_findings.py",
+          "line": 257,
+          "text": "touched[path]",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "categorize.py::__init__::use_classifier",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 7,
+      "defs": 8,
+      "edges": 11,
+      "blocking": [
+        "star_args"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "scripts\\release_notes\\categorize.py",
+          "line": 12,
+          "text": "def __init__",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "benchmarks\\upload_scribe.py",
+          "line": 75,
+          "text": "super().__init__(\"perfpipe_pytorch_benchmarks\")",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "benchmarks\\upload_scribe.py",
+          "line": 12,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_star",
+          "file": "test\\conftest.py",
+          "line": 214,
+          "text": "super().__init__(*args, **kwargs)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\create_dummy_torchscript_model.py",
+          "line": 10,
+          "text": "super().__init__()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\create_dummy_torchscript_model.py",
+          "line": 12,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_star",
+          "file": "test\\linear.py",
+          "line": 6,
+          "text": "super().__init__(*args, **kwargs)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\mkldnn_verbose.py",
+          "line": 8,
+          "text": "super().__init__()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\mkldnn_verbose.py",
+          "line": 12,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\run_test.py",
+          "line": 155,
+          "text": "super().__init__(args[0])",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\run_test.py",
+          "line": 12,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "classifier.py::train::resample",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 3,
+      "defs": 0,
+      "edges": 7,
+      "blocking": [
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 7,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "scripts\\release_notes\\classifier.py",
+          "line": 326,
+          "text": "def train",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_cpp_extensions_jit.py",
+          "line": 1029,
+          "text": "net.train()",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_jit.py",
+          "line": 4078,
+          "text": "w.train(False)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_jit.py",
+          "line": 7821,
+          "text": "script_mod.train()",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_jit.py",
+          "line": 7826,
+          "text": "eager_mod.train()",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_jit.py",
+          "line": 6714,
+          "text": "self.checkModule(module().train(), ())",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_jit.py",
+          "line": 1878,
+          "text": "scripted.train()",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "create_alerts.py::filter_job_names::job_name_regex",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 2,
+      "defs": 5,
+      "edges": 14,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 14,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "tools\\alerts\\create_alerts.py",
+          "line": 235,
+          "text": "def filter_job_names",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "tools\\alerts\\create_alerts.py",
+          "line": 248,
+          "text": "filtered_job_names = set(filter_job_names(job_names, job_name_regex))",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "tools\\alerts\\create_alerts.py",
+          "line": 320,
+          "text": "get_recurrently_failing_jobs_alerts(args.repo, args.branch, args.job_name_regex)",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_access",
+          "file": "tools\\alerts\\create_alerts.py",
+          "line": 320,
+          "text": "args.job_name_regex",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "tools\\test\\test_create_alerts.py",
+          "line": 56,
+          "text": "filter_job_names(job_names, \"\"),",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\test\\test_create_alerts.py",
+          "line": 56,
+          "text": "''",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "tools\\test\\test_create_alerts.py",
+          "line": 60,
+          "text": "self.assertListEqual(filter_job_names(job_names, \".*\"), job_names)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\test\\test_create_alerts.py",
+          "line": 60,
+          "text": "'.*'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "tools\\test\\test_create_alerts.py",
+          "line": 61,
+          "text": "self.assertListEqual(filter_job_names(job_names, \".*xenial.*\"), job_names)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\test\\test_create_alerts.py",
+          "line": 61,
+          "text": "'.*xenial.*'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "tools\\test\\test_create_alerts.py",
+          "line": 63,
+          "text": "filter_job_names(job_names, \".*xenial.*test2\"),",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\test\\test_create_alerts.py",
+          "line": 63,
+          "text": "'.*xenial.*test2'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "tools\\test\\test_create_alerts.py",
+          "line": 66,
+          "text": "self.assertListEqual(filter_job_names(job_names, \".*xenial.*test3\"), [])",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "tools\\test\\test_create_alerts.py",
+          "line": 66,
+          "text": "'.*xenial.*test3'",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "create_alerts.py::get_recurrently_failing_jobs_alerts::job_name_regex",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "tools\\alerts\\create_alerts.py",
+          "line": 243,
+          "text": "def get_recurrently_failing_jobs_alerts",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "tools\\alerts\\create_alerts.py",
+          "line": 320,
+          "text": "get_recurrently_failing_jobs_alerts(args.repo, args.branch, args.job_name_regex)",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "tools\\alerts\\create_alerts.py",
+          "line": 320,
+          "text": "args.job_name_regex",
+          "radius": 1
+        }
+      ]
+    }
+  ]
+}

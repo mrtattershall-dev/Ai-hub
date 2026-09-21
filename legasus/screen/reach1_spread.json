@@ -1,0 +1,482 @@
+[
+  {
+    "id": "docker_helper.py::local_image_exists::image_name",
+    "file": ".ci\\lumen_cli\\cli\\lib\\common\\docker_helper.py",
+    "func": "local_image_exists",
+    "param": "image_name",
+    "decisive": "FALSY",
+    "guard_line": 30
+  },
+  {
+    "id": "pytest_caching_utils.py::upload_pytest_cache::bucket",
+    "file": ".github\\scripts\\pytest_caching_utils.py",
+    "func": "upload_pytest_cache",
+    "param": "bucket",
+    "decisive": "FALSY",
+    "guard_line": 85
+  },
+  {
+    "id": "hp_emblookup_codegen.py::generic::use_offsets",
+    "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+    "func": "generic",
+    "param": "use_offsets",
+    "decisive": "FALSY",
+    "guard_line": 394
+  },
+  {
+    "id": "utils_init.py::have_option::have_stage",
+    "file": "tools\\code_coverage\\package\\util\\utils_init.py",
+    "func": "have_option",
+    "param": "have_stage",
+    "decisive": "FALSY",
+    "guard_line": 64
+  },
+  {
+    "id": "grep_linter.py::lint_file::line_allowlist_pattern",
+    "file": "tools\\linter\\adapters\\grep_linter.py",
+    "func": "lint_file",
+    "param": "line_allowlist_pattern",
+    "decisive": "FALSY",
+    "guard_line": 190
+  },
+  {
+    "id": "__init__.py::_assert::condition",
+    "file": "torch\\__init__.py",
+    "func": "_assert",
+    "param": "condition",
+    "decisive": "FALSY",
+    "guard_line": 2695
+  },
+  {
+    "id": "decompositions.py::mkldnn_one_layer_lstm::has_biases",
+    "file": "torch\\_decomp\\decompositions.py",
+    "func": "mkldnn_one_layer_lstm",
+    "param": "has_biases",
+    "decisive": "FALSY",
+    "guard_line": 3999
+  },
+  {
+    "id": "codegen.py::add_push_null::call_function_ex",
+    "file": "torch\\_dynamo\\codegen.py",
+    "func": "add_push_null",
+    "param": "call_function_ex",
+    "decisive": "FALSY",
+    "guard_line": 186
+  },
+  {
+    "id": "guards.py::writeline::skip_prefix",
+    "file": "torch\\_dynamo\\guards.py",
+    "func": "writeline",
+    "param": "skip_prefix",
+    "decisive": "FALSY",
+    "guard_line": 293
+  },
+  {
+    "id": "symbolic_convert.py::_call::call_kw",
+    "file": "torch\\_dynamo\\symbolic_convert.py",
+    "func": "_call",
+    "param": "call_kw",
+    "decisive": "FALSY",
+    "guard_line": 4731
+  },
+  {
+    "id": "base.py::_wrap_binaryfunc_r::kwargs",
+    "file": "torch\\_dynamo\\variables\\base.py",
+    "func": "_wrap_binaryfunc_r",
+    "param": "kwargs",
+    "decisive": "FALSY",
+    "guard_line": 653
+  },
+  {
+    "id": "ctx_manager.py::call_function::kwargs",
+    "file": "torch\\_dynamo\\variables\\ctx_manager.py",
+    "func": "call_function",
+    "param": "kwargs",
+    "decisive": "FALSY",
+    "guard_line": 1822
+  },
+  {
+    "id": "misc.py::call_apply::kwargs",
+    "file": "torch\\_dynamo\\variables\\misc.py",
+    "func": "call_apply",
+    "param": "kwargs",
+    "decisive": "FALSY",
+    "guard_line": 1298
+  },
+  {
+    "id": "serialize.py::__init__::expected_opset_version",
+    "file": "torch\\_export\\serde\\serialize.py",
+    "func": "__init__",
+    "param": "expected_opset_version",
+    "decisive": "FALSY",
+    "guard_line": 3566
+  },
+  {
+    "id": "subclass_codegen.py::_codegen_unwrap_subclass::include_symints",
+    "file": "torch\\_functorch\\_aot_autograd\\subclass_codegen.py",
+    "func": "_codegen_unwrap_subclass",
+    "param": "include_symints",
+    "decisive": "FALSY",
+    "guard_line": 167
+  },
+  {
+    "id": "invoke_subgraph.py::mark_compile_region::fn",
+    "file": "torch\\_higher_order_ops\\invoke_subgraph.py",
+    "func": "mark_compile_region",
+    "param": "fn",
+    "decisive": "FALSY",
+    "guard_line": 547
+  },
+  {
+    "id": "_internal.py::register_artifact_name::off_by_default",
+    "file": "torch\\_logging\\_internal.py",
+    "func": "register_artifact_name",
+    "param": "off_by_default",
+    "decisive": "FALSY",
+    "guard_line": 125
+  },
+  {
+    "id": "_meta_registrations.py::meta__flash_attention_forward::return_debug_mask",
+    "file": "torch\\_meta_registrations.py",
+    "func": "meta__flash_attention_forward",
+    "param": "return_debug_mask",
+    "decisive": "FALSY",
+    "guard_line": 6971
+  },
+  {
+    "id": "_ops.py::__init__::tags",
+    "file": "torch\\_ops.py",
+    "func": "__init__",
+    "param": "tags",
+    "decisive": "FALSY",
+    "guard_line": 859
+  },
+  {
+    "id": "__init__.py::selu::inplace",
+    "file": "torch\\_refs\\nn\\functional\\__init__.py",
+    "func": "selu",
+    "param": "inplace",
+    "decisive": "FALSY",
+    "guard_line": 448
+  },
+  {
+    "id": "version.py::_parse_letter_version::letter",
+    "file": "torch\\_vendor\\packaging\\version.py",
+    "func": "_parse_letter_version",
+    "param": "letter",
+    "decisive": "FALSY",
+    "guard_line": 456
+  },
+  {
+    "id": "gemm_sm100.py::mma::is_leader_cta",
+    "file": "torch\\_vendor\\quack\\gemm_sm100.py",
+    "func": "mma",
+    "param": "is_leader_cta",
+    "decisive": "FALSY",
+    "guard_line": 2324
+  },
+  {
+    "id": "conv_fused.py::__init__::qconfig",
+    "file": "torch\\ao\\nn\\intrinsic\\qat\\modules\\conv_fused.py",
+    "func": "__init__",
+    "param": "qconfig",
+    "decisive": "FALSY",
+    "guard_line": 762
+  },
+  {
+    "id": "base_data_sparsifier.py::get_data::return_original",
+    "file": "torch\\ao\\pruning\\_experimental\\data_sparsifier\\base_data_sparsifier.py",
+    "func": "get_data",
+    "param": "return_original",
+    "decisive": "FALSY",
+    "guard_line": 147
+  },
+  {
+    "id": "convert.py::convert::qconfig_mapping",
+    "file": "torch\\ao\\quantization\\fx\\convert.py",
+    "func": "convert",
+    "param": "qconfig_mapping",
+    "decisive": "FALSY",
+    "guard_line": 1136
+  },
+  {
+    "id": "quantize.py::quantize_dynamic::inplace",
+    "file": "torch\\ao\\quantization\\quantize.py",
+    "func": "quantize_dynamic",
+    "param": "inplace",
+    "decisive": "FALSY",
+    "guard_line": 566
+  },
+  {
+    "id": "gradcheck.py::_compute_numerical_jvps_wrt_specific_input::input_is_complex",
+    "file": "torch\\autograd\\gradcheck.py",
+    "func": "_compute_numerical_jvps_wrt_specific_input",
+    "param": "input_is_complex",
+    "decisive": "FALSY",
+    "guard_line": 407
+  },
+  {
+    "id": "__init__.py::enabled::value",
+    "file": "torch\\backends\\python_native\\__init__.py",
+    "func": "enabled",
+    "param": "value",
+    "decisive": "FALSY",
+    "guard_line": 162
+  },
+  {
+    "id": "tunable.py::_pack_dynamic_dims_mask::N",
+    "file": "torch\\cuda\\tunable.py",
+    "func": "_pack_dynamic_dims_mask",
+    "param": "N",
+    "decisive": "FALSY",
+    "guard_line": 347
+  },
+  {
+    "id": "sac_estimator.py::_get_sac_tradeoff_pwlf_stats::save_tradeoff_graph",
+    "file": "torch\\distributed\\_tools\\sac_estimator.py",
+    "func": "_get_sac_tradeoff_pwlf_stats",
+    "param": "save_tradeoff_graph",
+    "decisive": "FALSY",
+    "guard_line": 662
+  },
+  {
+    "id": "distributed_c10d.py::_new_process_group_helper::device_id",
+    "file": "torch\\distributed\\distributed_c10d.py",
+    "func": "_new_process_group_helper",
+    "param": "device_id",
+    "decisive": "FALSY",
+    "guard_line": 2898
+  },
+  {
+    "id": "distributed_c10d.py::all_to_all::async_op",
+    "file": "torch\\distributed\\distributed_c10d.py",
+    "func": "all_to_all",
+    "param": "async_op",
+    "decisive": "FALSY",
+    "guard_line": 6411
+  },
+  {
+    "id": "c10d_rendezvous_backend.py::__init__::run_id",
+    "file": "torch\\distributed\\elastic\\rendezvous\\c10d_rendezvous_backend.py",
+    "func": "__init__",
+    "param": "run_id",
+    "decisive": "FALSY",
+    "guard_line": 53
+  },
+  {
+    "id": "_init_utils.py::_check_ignored_states::passed_as_ignored_states",
+    "file": "torch\\distributed\\fsdp\\_init_utils.py",
+    "func": "_check_ignored_states",
+    "param": "passed_as_ignored_states",
+    "decisive": "FALSY",
+    "guard_line": 330
+  },
+  {
+    "id": "fully_sharded_data_parallel.py::fsdp_modules::root_only",
+    "file": "torch\\distributed\\fsdp\\fully_sharded_data_parallel.py",
+    "func": "fsdp_modules",
+    "param": "root_only",
+    "decisive": "FALSY",
+    "guard_line": 565
+  },
+  {
+    "id": "api.py::_rref_typeof_on_user::blocking",
+    "file": "torch\\distributed\\rpc\\api.py",
+    "func": "_rref_typeof_on_user",
+    "param": "blocking",
+    "decisive": "FALSY",
+    "guard_line": 475
+  },
+  {
+    "id": "_utils.py::_get_shard_size_and_offsets::skip_offset",
+    "file": "torch\\distributed\\tensor\\_utils.py",
+    "func": "_get_shard_size_and_offsets",
+    "param": "skip_offset",
+    "decisive": "FALSY",
+    "guard_line": 175
+  },
+  {
+    "id": "utils.py::logits_to_probs::is_binary",
+    "file": "torch\\distributions\\utils.py",
+    "func": "logits_to_probs",
+    "param": "is_binary",
+    "decisive": "FALSY",
+    "guard_line": 97
+  },
+  {
+    "id": "symbolic_shapes.py::_sympy_from_args::sort",
+    "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+    "func": "_sympy_from_args",
+    "param": "sort",
+    "decisive": "FALSY",
+    "guard_line": 830
+  },
+  {
+    "id": "split_module.py::split_module::keep_original_order",
+    "file": "torch\\fx\\passes\\split_module.py",
+    "func": "split_module",
+    "param": "keep_original_order",
+    "decisive": "FALSY",
+    "guard_line": 593
+  },
+  {
+    "id": "frontend.py::get_jit_def::is_classmethod",
+    "file": "torch\\jit\\frontend.py",
+    "func": "get_jit_def",
+    "param": "is_classmethod",
+    "decisive": "FALSY",
+    "guard_line": 343
+  },
+  {
+    "id": "flex_attention.py::flex_attention::enable_gqa",
+    "file": "torch\\nn\\attention\\flex_attention.py",
+    "func": "flex_attention",
+    "param": "enable_gqa",
+    "decisive": "FALSY",
+    "guard_line": 2472
+  },
+  {
+    "id": "functional.py::multi_head_attention_forward::add_zero_attn",
+    "file": "torch\\nn\\functional.py",
+    "func": "multi_head_attention_forward",
+    "param": "add_zero_attn",
+    "decisive": "FALSY",
+    "guard_line": 7042
+  },
+  {
+    "id": "distributed.py::_tree_unflatten_with_rref::output_is_rref",
+    "file": "torch\\nn\\parallel\\distributed.py",
+    "func": "_tree_unflatten_with_rref",
+    "param": "output_is_rref",
+    "decisive": "FALSY",
+    "guard_line": 277
+  },
+  {
+    "id": "_input_observer.py::infer_arguments::as_args_kwargs",
+    "file": "torch\\onnx\\_internal\\exporter\\_input_observer.py",
+    "func": "infer_arguments",
+    "param": "as_args_kwargs",
+    "decisive": "FALSY",
+    "guard_line": 777
+  },
+  {
+    "id": "symbolic_opset9.py::batch_norm::training",
+    "file": "torch\\onnx\\_internal\\torchscript_exporter\\symbolic_opset9.py",
+    "func": "batch_norm",
+    "param": "training",
+    "decisive": "FALSY",
+    "guard_line": 2733
+  },
+  {
+    "id": "_adafactor.py::adafactor::foreach",
+    "file": "torch\\optim\\_adafactor.py",
+    "func": "adafactor",
+    "param": "foreach",
+    "decisive": "FALSY",
+    "guard_line": 636
+  },
+  {
+    "id": "profiler.py::__init__::enable_event_node_ids",
+    "file": "torch\\profiler\\_cuspy\\observers\\profiler.py",
+    "func": "__init__",
+    "param": "enable_event_node_ids",
+    "decisive": "FALSY",
+    "guard_line": 281
+  },
+  {
+    "id": "semi_structured.py::to_sparse_semi_structured::transposed",
+    "file": "torch\\sparse\\semi_structured.py",
+    "func": "to_sparse_semi_structured",
+    "param": "transposed",
+    "decisive": "FALSY",
+    "guard_line": 362
+  },
+  {
+    "id": "common_fsdp.py::_test_fsdp_parity::use_pure_fp16",
+    "file": "torch\\testing\\_internal\\common_fsdp.py",
+    "func": "_test_fsdp_parity",
+    "param": "use_pure_fp16",
+    "decisive": "FALSY",
+    "guard_line": 1452
+  },
+  {
+    "id": "common_methods_invocations.py::shape::with_batch_channel",
+    "file": "torch\\testing\\_internal\\common_methods_invocations.py",
+    "func": "shape",
+    "param": "with_batch_channel",
+    "decisive": "FALSY",
+    "guard_line": 5185
+  },
+  {
+    "id": "common_quantization.py::_checkScriptable::check_save_load",
+    "file": "torch\\testing\\_internal\\common_quantization.py",
+    "func": "_checkScriptable",
+    "param": "check_save_load",
+    "decisive": "FALSY",
+    "guard_line": 889
+  },
+  {
+    "id": "common_utils.py::skipIfRocm_BUGGY::func",
+    "file": "torch\\testing\\_internal\\common_utils.py",
+    "func": "skipIfRocm_BUGGY",
+    "param": "func",
+    "decisive": "FALSY",
+    "guard_line": 2475
+  },
+  {
+    "id": "distributed_test.py::_test_ddp_logging_data::is_gpu",
+    "file": "torch\\testing\\_internal\\distributed\\distributed_test.py",
+    "func": "_test_ddp_logging_data",
+    "param": "is_gpu",
+    "decisive": "FALSY",
+    "guard_line": 6183
+  },
+  {
+    "id": "inductor_utils.py::skipDeviceIf::cond",
+    "file": "torch\\testing\\_internal\\inductor_utils.py",
+    "func": "skipDeviceIf",
+    "param": "cond",
+    "decisive": "FALSY",
+    "guard_line": 161
+  },
+  {
+    "id": "nested.py::unbind_reference::wrap_output_as_njt",
+    "file": "torch\\testing\\_internal\\opinfo\\definitions\\nested.py",
+    "func": "unbind_reference",
+    "param": "wrap_output_as_njt",
+    "decisive": "FALSY",
+    "guard_line": 406
+  },
+  {
+    "id": "_mode.py::dispatch_hooks::log_hook",
+    "file": "torch\\utils\\_debug_mode\\_mode.py",
+    "func": "dispatch_hooks",
+    "param": "log_hook",
+    "decisive": "FALSY",
+    "guard_line": 694
+  },
+  {
+    "id": "cpp_extension.py::load_inline::sycl_sources",
+    "file": "torch\\utils\\cpp_extension.py",
+    "func": "load_inline",
+    "param": "sycl_sources",
+    "decisive": "FALSY",
+    "guard_line": 2347
+  },
+  {
+    "id": "cpp_extension.py::win_wrap_ninja_compile::debug",
+    "file": "torch\\utils\\cpp_extension.py",
+    "func": "win_wrap_ninja_compile",
+    "param": "debug",
+    "decisive": "FALSY",
+    "guard_line": 1232
+  },
+  {
+    "id": "train.py::add_real_datasets::other_datasets",
+    "file": "torchgen\\_autoheuristic\\train.py",
+    "func": "add_real_datasets",
+    "param": "other_datasets",
+    "decisive": "FALSY",
+    "guard_line": 108
+  }
+]

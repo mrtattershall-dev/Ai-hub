@@ -1,0 +1,29 @@
+[
+  {
+    "id": "calib-3-validate_cuda",
+    "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_test.py",
+    "func": "validate_cuda",
+    "param": "value",
+    "decisive": "FALSY",
+    "known": "UNREACHABLE",
+    "note": "decisive state EMPTY; retracted in P-IDENTITY because get_env is `os.environ.get(name) or default`"
+  },
+  {
+    "id": "calib-1-gh_summary_path",
+    "file": ".ci\\lumen_cli\\cli\\lib\\common\\gh_summary.py",
+    "func": "gh_summary_path",
+    "param": null,
+    "decisive": "ENVIRONMENT",
+    "known": "UNKNOWN",
+    "note": "decisive state SET_unwritable is a filesystem property, not a value-domain state"
+  },
+  {
+    "id": "calib-2-local_image_exists",
+    "file": ".ci\\lumen_cli\\cli\\lib\\common\\docker_helper.py",
+    "func": "local_image_exists",
+    "param": null,
+    "decisive": "EXCEPTION",
+    "known": "UNKNOWN",
+    "note": "decisive state API_ERROR is raised by a dependency; UNOBSERVABLE in Stage B (docker absent)"
+  }
+]

@@ -1,0 +1,482 @@
+[
+  {
+    "id": "docker_helper.py::local_image_exists::image_name",
+    "file": ".ci\\lumen_cli\\cli\\lib\\common\\docker_helper.py",
+    "func": "local_image_exists",
+    "param": "image_name",
+    "decisive": "FALSY",
+    "guard_line": 30
+  },
+  {
+    "id": "path_helper.py::get_path::path",
+    "file": ".ci\\lumen_cli\\cli\\lib\\common\\path_helper.py",
+    "func": "get_path",
+    "param": "path",
+    "decisive": "FALSY",
+    "guard_line": 15
+  },
+  {
+    "id": "path_helper.py::remove_dir::path",
+    "file": ".ci\\lumen_cli\\cli\\lib\\common\\path_helper.py",
+    "func": "remove_dir",
+    "param": "path",
+    "decisive": "FALSY",
+    "guard_line": 30
+  },
+  {
+    "id": "utils.py::run_command::use_shell",
+    "file": ".ci\\lumen_cli\\cli\\lib\\common\\utils.py",
+    "func": "run_command",
+    "param": "use_shell",
+    "decisive": "FALSY",
+    "guard_line": 28
+  },
+  {
+    "id": "utils.py::run_command::log_cmd",
+    "file": ".ci\\lumen_cli\\cli\\lib\\common\\utils.py",
+    "func": "run_command",
+    "param": "log_cmd",
+    "decisive": "FALSY",
+    "guard_line": 37
+  },
+  {
+    "id": "utils.py::str2bool::value",
+    "file": ".ci\\lumen_cli\\cli\\lib\\common\\utils.py",
+    "func": "str2bool",
+    "param": "value",
+    "decisive": "FALSY",
+    "guard_line": 67
+  },
+  {
+    "id": "utils.py::working_directory::path",
+    "file": ".ci\\lumen_cli\\cli\\lib\\common\\utils.py",
+    "func": "working_directory",
+    "param": "path",
+    "decisive": "FALSY",
+    "guard_line": 110
+  },
+  {
+    "id": "vllm_build.py::get_result_path::path",
+    "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+    "func": "get_result_path",
+    "param": "path",
+    "decisive": "FALSY",
+    "guard_line": 234
+  },
+  {
+    "id": "vllm_build.py::_get_torch_wheel_path_arg::torch_whl_dir",
+    "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+    "func": "_get_torch_wheel_path_arg",
+    "param": "torch_whl_dir",
+    "decisive": "FALSY",
+    "guard_line": 240
+  },
+  {
+    "id": "_common.py::_to_posix_path_list::windows_path_list",
+    "file": ".ci\\wheel\\_common.py",
+    "func": "_to_posix_path_list",
+    "param": "windows_path_list",
+    "decisive": "FALSY",
+    "guard_line": 83
+  },
+  {
+    "id": "repair_wheel.py::arch_extra_deps::use_cuda",
+    "file": ".ci\\wheel\\linux\\repair_wheel.py",
+    "func": "arch_extra_deps",
+    "param": "use_cuda",
+    "decisive": "FALSY",
+    "guard_line": 146
+  },
+  {
+    "id": "repair_wheel.py::set_rpath::force_rpath",
+    "file": ".ci\\wheel\\linux\\repair_wheel.py",
+    "func": "set_rpath",
+    "param": "force_rpath",
+    "decisive": "FALSY",
+    "guard_line": 326
+  },
+  {
+    "id": "cherry_pick.py::create_cherry_pick_branch::trunk_revert_sha",
+    "file": ".github\\scripts\\cherry_pick.py",
+    "func": "create_cherry_pick_branch",
+    "param": "trunk_revert_sha",
+    "decisive": "FALSY",
+    "guard_line": 267
+  },
+  {
+    "id": "cherry_pick.py::submit_pr::trunk_revert_sha",
+    "file": ".github\\scripts\\cherry_pick.py",
+    "func": "submit_pr",
+    "param": "trunk_revert_sha",
+    "decisive": "FALSY",
+    "guard_line": 318
+  },
+  {
+    "id": "filter_test_configs.py::filter::ignore_test_config_labels",
+    "file": ".github\\scripts\\filter_test_configs.py",
+    "func": "filter",
+    "param": "ignore_test_config_labels",
+    "decisive": "FALSY",
+    "guard_line": 168
+  },
+  {
+    "id": "filter_test_configs.py::filter_selected_test_configs::selected_test_configs",
+    "file": ".github\\scripts\\filter_test_configs.py",
+    "func": "filter_selected_test_configs",
+    "param": "selected_test_configs",
+    "decisive": "FALSY",
+    "guard_line": 206
+  },
+  {
+    "id": "filter_test_configs.py::parse_reenabled_issues::s",
+    "file": ".github\\scripts\\filter_test_configs.py",
+    "func": "parse_reenabled_issues",
+    "param": "s",
+    "decisive": "FALSY",
+    "guard_line": 481
+  },
+  {
+    "id": "github_utils.py::_gh_post_comment::dry_run",
+    "file": ".github\\scripts\\github_utils.py",
+    "func": "_gh_post_comment",
+    "param": "dry_run",
+    "decisive": "FALSY",
+    "guard_line": 162
+  },
+  {
+    "id": "github_utils.py::gh_close_pr::dry_run",
+    "file": ".github\\scripts\\github_utils.py",
+    "func": "gh_close_pr",
+    "param": "dry_run",
+    "decisive": "FALSY",
+    "guard_line": 190
+  },
+  {
+    "id": "greenlight_messages.py::render_refusal::suffix",
+    "file": ".github\\scripts\\greenlight_messages.py",
+    "func": "render_refusal",
+    "param": "suffix",
+    "decisive": "FALSY",
+    "guard_line": 146
+  },
+  {
+    "id": "greenlight_preflight.py::_apps_removed::candidates",
+    "file": ".github\\scripts\\greenlight_preflight.py",
+    "func": "_apps_removed",
+    "param": "candidates",
+    "decisive": "FALSY",
+    "guard_line": 136
+  },
+  {
+    "id": "label_utils.py::gh_add_labels::dry_run",
+    "file": ".github\\scripts\\label_utils.py",
+    "func": "gh_add_labels",
+    "param": "dry_run",
+    "decisive": "FALSY",
+    "guard_line": 85
+  },
+  {
+    "id": "label_utils.py::gh_remove_label::dry_run",
+    "file": ".github\\scripts\\label_utils.py",
+    "func": "gh_remove_label",
+    "param": "dry_run",
+    "decisive": "FALSY",
+    "guard_line": 97
+  },
+  {
+    "id": "pytest_caching_utils.py::upload_pytest_cache::bucket",
+    "file": ".github\\scripts\\pytest_caching_utils.py",
+    "func": "upload_pytest_cache",
+    "param": "bucket",
+    "decisive": "FALSY",
+    "guard_line": 85
+  },
+  {
+    "id": "pytest_caching_utils.py::download_pytest_cache::bucket",
+    "file": ".github\\scripts\\pytest_caching_utils.py",
+    "func": "download_pytest_cache",
+    "param": "bucket",
+    "decisive": "FALSY",
+    "guard_line": 113
+  },
+  {
+    "id": "pytest_caching_utils.py::_get_s3_key_prefix::sha",
+    "file": ".github\\scripts\\pytest_caching_utils.py",
+    "func": "_get_s3_key_prefix",
+    "param": "sha",
+    "decisive": "FALSY",
+    "guard_line": 155
+  },
+  {
+    "id": "pytest_caching_utils.py::_get_s3_key_prefix::test_config",
+    "file": ".github\\scripts\\pytest_caching_utils.py",
+    "func": "_get_s3_key_prefix",
+    "param": "test_config",
+    "decisive": "FALSY",
+    "guard_line": 157
+  },
+  {
+    "id": "pytest_caching_utils.py::_get_s3_key_prefix::shard",
+    "file": ".github\\scripts\\pytest_caching_utils.py",
+    "func": "_get_s3_key_prefix",
+    "param": "shard",
+    "decisive": "FALSY",
+    "guard_line": 159
+  },
+  {
+    "id": "trymerge.py::check_for_sev::skip_mandatory_checks",
+    "file": ".github\\scripts\\trymerge.py",
+    "func": "check_for_sev",
+    "param": "skip_mandatory_checks",
+    "decisive": "FALSY",
+    "guard_line": 2918
+  },
+  {
+    "id": "trymerge.py::merge::skip_mandatory_checks",
+    "file": ".github\\scripts\\trymerge.py",
+    "func": "merge",
+    "param": "skip_mandatory_checks",
+    "decisive": "FALSY",
+    "guard_line": 3113
+  },
+  {
+    "id": "trymerge.py::merge::ignore_current",
+    "file": ".github\\scripts\\trymerge.py",
+    "func": "merge",
+    "param": "ignore_current",
+    "decisive": "FALSY",
+    "guard_line": 3130
+  },
+  {
+    "id": "trymerge.py::gen_commit_message::filter_ghstack",
+    "file": ".github\\scripts\\trymerge.py",
+    "func": "gen_commit_message",
+    "param": "filter_ghstack",
+    "decisive": "FALSY",
+    "guard_line": 1475
+  },
+  {
+    "id": "trymerge.py::gen_commit_message::ghstack_deps",
+    "file": ".github\\scripts\\trymerge.py",
+    "func": "gen_commit_message",
+    "param": "ghstack_deps",
+    "decisive": "FALSY",
+    "guard_line": 1482
+  },
+  {
+    "id": "trymerge.py::merge_changes_locally::comment_id",
+    "file": ".github\\scripts\\trymerge.py",
+    "func": "merge_changes_locally",
+    "param": "comment_id",
+    "decisive": "FALSY",
+    "guard_line": 1673
+  },
+  {
+    "id": "tryrebase.py::rebase_onto::dry_run",
+    "file": ".github\\scripts\\tryrebase.py",
+    "func": "rebase_onto",
+    "param": "dry_run",
+    "decisive": "FALSY",
+    "guard_line": 81
+  },
+  {
+    "id": "tryrebase.py::rebase_ghstack_onto::dry_run",
+    "file": ".github\\scripts\\tryrebase.py",
+    "func": "rebase_ghstack_onto",
+    "param": "dry_run",
+    "decisive": "FALSY",
+    "guard_line": 136
+  },
+  {
+    "id": "cmds.py::_run_lintrunner::return_json_output",
+    "file": ".spin\\cmds.py",
+    "func": "_run_lintrunner",
+    "param": "return_json_output",
+    "decisive": "FALSY",
+    "guard_line": 381
+  },
+  {
+    "id": "cmds.py::_pip_install_cmd::editable",
+    "file": ".spin\\cmds.py",
+    "func": "_pip_install_cmd",
+    "param": "editable",
+    "decisive": "FALSY",
+    "guard_line": 570
+  },
+  {
+    "id": "generate_test_torchscripts.py::conv2d::toChannelsLast",
+    "file": "android\\pytorch_android\\generate_test_torchscripts.py",
+    "func": "conv2d",
+    "param": "toChannelsLast",
+    "decisive": "FALSY",
+    "guard_line": 124
+  },
+  {
+    "id": "generate_test_torchscripts.py::conv3d::toChannelsLast",
+    "file": "android\\pytorch_android\\generate_test_torchscripts.py",
+    "func": "conv3d",
+    "param": "toChannelsLast",
+    "decisive": "FALSY",
+    "guard_line": 133
+  },
+  {
+    "id": "hp_emblookup_codegen.py::unroll::use_offsets",
+    "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+    "func": "unroll",
+    "param": "use_offsets",
+    "decisive": "FALSY",
+    "guard_line": 63
+  },
+  {
+    "id": "hp_emblookup_codegen.py::unroll::use_offsets",
+    "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+    "func": "unroll",
+    "param": "use_offsets",
+    "decisive": "FALSY",
+    "guard_line": 82
+  },
+  {
+    "id": "hp_emblookup_codegen.py::unroll::use_offsets",
+    "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+    "func": "unroll",
+    "param": "use_offsets",
+    "decisive": "FALSY",
+    "guard_line": 169
+  },
+  {
+    "id": "hp_emblookup_codegen.py::unroll::use_offsets",
+    "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+    "func": "unroll",
+    "param": "use_offsets",
+    "decisive": "FALSY",
+    "guard_line": 178
+  },
+  {
+    "id": "hp_emblookup_codegen.py::generic::use_offsets",
+    "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+    "func": "generic",
+    "param": "use_offsets",
+    "decisive": "FALSY",
+    "guard_line": 258
+  },
+  {
+    "id": "hp_emblookup_codegen.py::generic::use_offsets",
+    "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+    "func": "generic",
+    "param": "use_offsets",
+    "decisive": "FALSY",
+    "guard_line": 283
+  },
+  {
+    "id": "hp_emblookup_codegen.py::generic::use_offsets",
+    "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+    "func": "generic",
+    "param": "use_offsets",
+    "decisive": "FALSY",
+    "guard_line": 394
+  },
+  {
+    "id": "hp_emblookup_codegen.py::compute::prefetch",
+    "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+    "func": "compute",
+    "param": "prefetch",
+    "decisive": "FALSY",
+    "guard_line": 48
+  },
+  {
+    "id": "__init__.py::stack::tensors",
+    "file": "functorch\\dim\\__init__.py",
+    "func": "stack",
+    "param": "tensors",
+    "decisive": "FALSY",
+    "guard_line": 1153
+  },
+  {
+    "id": "_dim_entry.py::_match_levels::drop_levels",
+    "file": "functorch\\dim\\_dim_entry.py",
+    "func": "_match_levels",
+    "param": "drop_levels",
+    "decisive": "FALSY",
+    "guard_line": 108
+  },
+  {
+    "id": "cifar10_opacus.py::save_checkpoint::is_best",
+    "file": "functorch\\examples\\dp_cifar10\\cifar10_opacus.py",
+    "func": "save_checkpoint",
+    "param": "is_best",
+    "decisive": "FALSY",
+    "guard_line": 37
+  },
+  {
+    "id": "cifar10_transforms.py::save_checkpoint::is_best",
+    "file": "functorch\\examples\\dp_cifar10\\cifar10_transforms.py",
+    "func": "save_checkpoint",
+    "param": "is_best",
+    "decisive": "FALSY",
+    "guard_line": 37
+  },
+  {
+    "id": "check_taxonomy.py::print_failure_entries::entries",
+    "file": "scripts\\codeowners\\check_taxonomy.py",
+    "func": "print_failure_entries",
+    "param": "entries",
+    "decisive": "FALSY",
+    "guard_line": 280
+  },
+  {
+    "id": "update_failures.py::update::also_remove_skips",
+    "file": "scripts\\compile_tests\\update_failures.py",
+    "func": "update",
+    "param": "also_remove_skips",
+    "decisive": "FALSY",
+    "guard_line": 171
+  },
+  {
+    "id": "emit_row.py::read_json::path",
+    "file": "scripts\\pr_review\\emit_row.py",
+    "func": "read_json",
+    "param": "path",
+    "decisive": "FALSY",
+    "guard_line": 131
+  },
+  {
+    "id": "validate_findings.py::_ranges::lines",
+    "file": "scripts\\pr_review\\validate_findings.py",
+    "func": "_ranges",
+    "param": "lines",
+    "decisive": "FALSY",
+    "guard_line": 93
+  },
+  {
+    "id": "categorize.py::__init__::use_classifier",
+    "file": "scripts\\release_notes\\categorize.py",
+    "func": "__init__",
+    "param": "use_classifier",
+    "decisive": "FALSY",
+    "guard_line": 15
+  },
+  {
+    "id": "classifier.py::train::resample",
+    "file": "scripts\\release_notes\\classifier.py",
+    "func": "train",
+    "param": "resample",
+    "decisive": "FALSY",
+    "guard_line": 346
+  },
+  {
+    "id": "create_alerts.py::filter_job_names::job_name_regex",
+    "file": "tools\\alerts\\create_alerts.py",
+    "func": "filter_job_names",
+    "param": "job_name_regex",
+    "decisive": "FALSY",
+    "guard_line": 236
+  },
+  {
+    "id": "create_alerts.py::get_recurrently_failing_jobs_alerts::job_name_regex",
+    "file": "tools\\alerts\\create_alerts.py",
+    "func": "get_recurrently_failing_jobs_alerts",
+    "param": "job_name_regex",
+    "decisive": "FALSY",
+    "guard_line": 249
+  }
+]

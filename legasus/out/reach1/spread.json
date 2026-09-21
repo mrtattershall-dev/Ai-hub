@@ -1,0 +1,4072 @@
+{
+  "root": "C:\\Users\\tatte\\AppData\\Local\\Temp\\stageb-target\\pt",
+  "parsed": 4942,
+  "unparsed": 0,
+  "results": [
+    {
+      "id": "docker_helper.py::local_image_exists::image_name",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 3,
+      "defs": 6,
+      "edges": 14,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 14,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\docker_helper.py",
+          "line": 26,
+          "text": "def local_image_exists",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 20,
+          "text": "ok = local_image_exists(\"repo:tag\", client=mock_client)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 20,
+          "text": "'repo:tag'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 27,
+          "text": "ok = local_image_exists(\"missing:latest\", client=mock_client)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 27,
+          "text": "'missing:latest'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 34,
+          "text": "ok = local_image_exists(\"broken:tag\", client=mock_client)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 34,
+          "text": "'broken:tag'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 62,
+          "text": "local_image_exists(\"repo:tag\")",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 62,
+          "text": "'repo:tag'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 64,
+          "text": "local_image_exists(\"repo:tag2\")",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": ".ci\\lumen_cli\\tests\\test_docker_helper.py",
+          "line": 64,
+          "text": "'repo:tag2'",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 260,
+          "text": "if local_image_exists(base_image):",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 254,
+          "text": "base_image = inputs.base_image",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_build.py",
+          "line": 254,
+          "text": "inputs.base_image",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "pytest_caching_utils.py::upload_pytest_cache::bucket",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".github\\scripts\\pytest_caching_utils.py",
+          "line": 59,
+          "text": "def upload_pytest_cache",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 90,
+          "text": "upload_pytest_cache(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": ".github\\scripts\\pytest_cache.py",
+          "line": 98,
+          "text": "args.bucket",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "hp_emblookup_codegen.py::generic::use_offsets",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 200,
+          "text": "def generic",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 529,
+          "text": "code += generic(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "caffe2\\perfkernels\\hp_emblookup_codegen.py",
+          "line": 530,
+          "text": "opts.use_offsets",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "utils_init.py::have_option::have_stage",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "tools\\code_coverage\\package\\util\\utils_init.py",
+          "line": 63,
+          "text": "def have_option",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "grep_linter.py::lint_file::line_allowlist_pattern",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 1,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "tools\\linter\\adapters\\grep_linter.py",
+          "line": 164,
+          "text": "def lint_file",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "tools\\linter\\adapters\\grep_linter.py",
+          "line": 426,
+          "text": "lint_file(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "tools\\linter\\adapters\\grep_linter.py",
+          "line": 418,
+          "text": "line_allowlist_re = (",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "__init__.py::_assert::condition",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 3,
+      "defs": 2,
+      "edges": 11,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\__init__.py",
+          "line": 2687,
+          "text": "def _assert",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_fx.py",
+          "line": 2047,
+          "text": "torch._assert(x.shape[1] > 4, \"assert_foobar\")",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_utils.py",
+          "line": 764,
+          "text": "torch._assert(True, \"foo\")",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_utils.py",
+          "line": 764,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_utils.py",
+          "line": 768,
+          "text": "torch._assert(torch.tensor([True], dtype=torch.bool), \"foo\")",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "test\\test_utils.py",
+          "line": 768,
+          "text": "torch.tensor([True], dtype=torch.bool)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_utils.py",
+          "line": 766,
+          "text": "torch._assert(False, \"bar\")",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_utils.py",
+          "line": 766,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_utils.py",
+          "line": 770,
+          "text": "torch._assert(torch.tensor([False], dtype=torch.bool), \"bar\")",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "test\\test_utils.py",
+          "line": 770,
+          "text": "torch.tensor([False], dtype=torch.bool)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_utils.py",
+          "line": 775,
+          "text": "torch._assert(x.sum() > 0, \"foo\")",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "decompositions.py::mkldnn_one_layer_lstm::has_biases",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_decomp\\decompositions.py",
+          "line": 3996,
+          "text": "def mkldnn_one_layer_lstm",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "codegen.py::add_push_null::call_function_ex",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 8,
+      "edges": 9,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 9,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_dynamo\\codegen.py",
+          "line": 163,
+          "text": "def add_push_null",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_dynamo\\bytecode_transformation.py",
+          "line": 635,
+          "text": "*add_push_null(create_instruction(\"LOAD_CONST\", argval=print)),",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_dynamo\\bytecode_transformation.py",
+          "line": 164,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_dynamo\\bytecode_transformation.py",
+          "line": 645,
+          "text": "*add_push_null(create_instruction(\"LOAD_CONST\", argval=print)),",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_dynamo\\codegen.py",
+          "line": 189,
+          "text": "self._output.extend(add_push_null(added_insts))",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_dynamo\\codegen.py",
+          "line": 164,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_dynamo\\codegen.py",
+          "line": 604,
+          "text": "output.extend(add_push_null(self.create_load_global(fn_name, add=True)))",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_dynamo\\codegen.py",
+          "line": 809,
+          "text": "self.add_push_null(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_dynamo\\codegen.py",
+          "line": 343,
+          "text": "self.add_push_null(",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "guards.py::writeline::skip_prefix",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 7,
+      "edges": 8,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_dynamo\\guards.py",
+          "line": 292,
+          "text": "def writeline",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_precompile.py",
+          "line": 1143,
+          "text": "buf.writeline(\"# \" + \"=\" * 70)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_precompile.py",
+          "line": 292,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_precompile.py",
+          "line": 1144,
+          "text": "buf.writeline(\"# 2. Calling-convention metadata\")",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_precompile.py",
+          "line": 1145,
+          "text": "buf.writeline(\"# \" + \"=\" * 70)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_precompile.py",
+          "line": 1146,
+          "text": "buf.writeline(\"import torch as _torch\")",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_precompile.py",
+          "line": 1147,
+          "text": "buf.writeline(\"import torch.utils._pytree as _pytree\")",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_precompile.py",
+          "line": 1148,
+          "text": "buf.writeline(\"\")",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "symbolic_convert.py::_call::call_kw",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 6,
+      "edges": 8,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_dynamo\\symbolic_convert.py",
+          "line": 4728,
+          "text": "def _call",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributions\\transforms.py",
+          "line": 161,
+          "text": "y = self._call(x)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributions\\transforms.py",
+          "line": 4728,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributions\\transforms.py",
+          "line": 157,
+          "text": "return self._call(x)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_dynamo\\symbolic_convert.py",
+          "line": 4790,
+          "text": "self._call(inst)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_dynamo\\symbolic_convert.py",
+          "line": 4728,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\_dynamo\\symbolic_convert.py",
+          "line": 5043,
+          "text": "self._call(inst, call_kw=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_dynamo\\symbolic_convert.py",
+          "line": 5043,
+          "text": "True",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "base.py::_wrap_binaryfunc_r::kwargs",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_dynamo\\variables\\base.py",
+          "line": 645,
+          "text": "def _wrap_binaryfunc_r",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "ctx_manager.py::call_function::kwargs",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 4,
+      "defs": 0,
+      "edges": 7,
+      "blocking": [
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 7,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_dynamo\\variables\\ctx_manager.py",
+          "line": 135,
+          "text": "def call_function",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_dynamic_shapes.py",
+          "line": 4146,
+          "text": "node = graph.call_function(operator.add, args=(1, 1))",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_flop_counter.py",
+          "line": 1405,
+          "text": "fwd = graph.call_function(torch.ops.higher_order.flex_attention, args=(q, k, v))",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_flop_counter.py",
+          "line": 1416,
+          "text": "mm = graph.call_function(torch.ops.aten.mm.default, args=(q, q))",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_flop_counter.py",
+          "line": 1540,
+          "text": "fwd = graph.call_function(torch.ops.higher_order.flex_attention, args=(q, k, v))",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_fx.py",
+          "line": 393,
+          "text": "c = graph.call_function(a_non_torch_leaf, (a, b))",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\test_fx.py",
+          "line": 394,
+          "text": "d = graph.call_function(torch.sin, (c,))",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "misc.py::call_apply::kwargs",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 2,
+      "blocking": [
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 2,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_dynamo\\variables\\misc.py",
+          "line": 1277,
+          "text": "def call_apply",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\_dynamo\\variables\\misc.py",
+          "line": 1467,
+          "text": "return self.call_apply(tx, args, kwargs)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "serialize.py::__init__::expected_opset_version",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_export\\serde\\serialize.py",
+          "line": 246,
+          "text": "def __init__",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "subclass_codegen.py::_codegen_unwrap_subclass::include_symints",
+      "verdict": "UNKNOWN",
+      "radius": 9,
+      "files": 1,
+      "defs": 5,
+      "edges": 8,
+      "blocking": [
+        "depth_cap"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_functorch\\_aot_autograd\\subclass_codegen.py",
+          "line": 79,
+          "text": "def _codegen_unwrap_subclass",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\_functorch\\_aot_autograd\\subclass_codegen.py",
+          "line": 157,
+          "text": "_codegen_unwrap_subclass(",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": "torch\\_functorch\\_aot_autograd\\subclass_codegen.py",
+          "line": 84,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_functorch\\_aot_autograd\\subclass_codegen.py",
+          "line": 84,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\_functorch\\_aot_autograd\\subclass_codegen.py",
+          "line": 483,
+          "text": "_codegen_unwrap_subclass(",
+          "radius": 9
+        },
+        {
+          "kind": "param_default",
+          "file": "torch\\_functorch\\_aot_autograd\\subclass_codegen.py",
+          "line": 445,
+          "text": "True",
+          "radius": 8
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_functorch\\_aot_autograd\\subclass_codegen.py",
+          "line": 526,
+          "text": "_emit_input_unwrapping(",
+          "radius": 9
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_functorch\\_aot_autograd\\subclass_codegen.py",
+          "line": 445,
+          "text": "True",
+          "radius": 7
+        }
+      ]
+    },
+    {
+      "id": "invoke_subgraph.py::mark_compile_region::fn",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_higher_order_ops\\invoke_subgraph.py",
+          "line": 508,
+          "text": "def mark_compile_region",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "benchmarks\\diffusion\\compile_benchmark.py",
+          "line": 44,
+          "text": "submod.__class__.forward = mark_compile_region(submod.__class__.forward)",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "benchmarks\\diffusion\\compile_benchmark.py",
+          "line": 44,
+          "text": "submod.__class__.forward",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "_internal.py::register_artifact_name::off_by_default",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 2,
+      "defs": 9,
+      "edges": 11,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_logging\\_internal.py",
+          "line": 115,
+          "text": "def register_artifact_name",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_logging\\_internal.py",
+          "line": 651,
+          "text": "log_registry.register_artifact_name(",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": "torch\\_logging\\_internal.py",
+          "line": 640,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_logging\\_internal.py",
+          "line": 640,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_logging\\_registrations.py",
+          "line": 32,
+          "text": "register_artifact(",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_logging\\_registrations.py",
+          "line": 640,
+          "text": "None",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_logging\\_registrations.py",
+          "line": 51,
+          "text": "register_artifact(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_logging\\_registrations.py",
+          "line": 71,
+          "text": "register_artifact(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_logging\\_registrations.py",
+          "line": 76,
+          "text": "register_artifact(\"verbose_guards\", \"\", off_by_default=True)",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_logging\\_registrations.py",
+          "line": 77,
+          "text": "register_artifact(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_logging\\_registrations.py",
+          "line": 82,
+          "text": "register_artifact(",
+          "radius": 2
+        }
+      ]
+    },
+    {
+      "id": "_meta_registrations.py::meta__flash_attention_forward::return_debug_mask",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_meta_registrations.py",
+          "line": 6928,
+          "text": "def meta__flash_attention_forward",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_meta_registrations.py",
+          "line": 7026,
+          "text": "_, logsumexp, _, _, _ = meta__flash_attention_forward(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_meta_registrations.py",
+          "line": 7071,
+          "text": "return meta__flash_attention_forward(",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "_ops.py::__init__::tags",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_ops.py",
+          "line": 68,
+          "text": "def __init__",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "__init__.py::selu::inplace",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 6,
+      "defs": 7,
+      "edges": 11,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_refs\\nn\\functional\\__init__.py",
+          "line": 444,
+          "text": "def selu",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\nn\\functional.py",
+          "line": 1908,
+          "text": "result = torch.selu(input)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\nn\\functional.py",
+          "line": 444,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\testing\\_internal\\common_methods_invocations.py",
+          "line": 17272,
+          "text": "inplace_variant=lambda x: torch.nn.functional.selu(x, inplace=True),",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\testing\\_internal\\common_methods_invocations.py",
+          "line": 17272,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\nn\\modules\\activation.py",
+          "line": 727,
+          "text": "return F.selu(input, self.inplace)",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "torch\\nn\\modules\\activation.py",
+          "line": 727,
+          "text": "self.inplace",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\dynamo\\test_activation_checkpointing.py",
+          "line": 1474,
+          "text": "return torch.sigmoid(torch.selu(torch.matmul(torch.matmul(x, y), y))).relu()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\dynamo\\test_activation_checkpointing.py",
+          "line": 444,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\onnx\\test_onnxscript_no_runtime.py",
+          "line": 130,
+          "text": "y = self.selu(x)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\onnx\\test_onnxscript_no_runtime.py",
+          "line": 444,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "version.py::_parse_letter_version::letter",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 7,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 7,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_vendor\\packaging\\version.py",
+          "line": 452,
+          "text": "def _parse_letter_version",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_vendor\\packaging\\version.py",
+          "line": 206,
+          "text": "pre=_parse_letter_version(match.group(\"pre_l\"), match.group(\"pre_n\")),",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\_vendor\\packaging\\version.py",
+          "line": 206,
+          "text": "match.group('pre_l')",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_vendor\\packaging\\version.py",
+          "line": 207,
+          "text": "post=_parse_letter_version(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\_vendor\\packaging\\version.py",
+          "line": 208,
+          "text": "match.group('post_l')",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_vendor\\packaging\\version.py",
+          "line": 210,
+          "text": "dev=_parse_letter_version(match.group(\"dev_l\"), match.group(\"dev_n\")),",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\_vendor\\packaging\\version.py",
+          "line": 210,
+          "text": "match.group('dev_l')",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "gemm_sm100.py::mma::is_leader_cta",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 3,
+      "defs": 1,
+      "edges": 6,
+      "blocking": [
+        "dynamic_dispatch",
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 6,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\_vendor\\quack\\gemm_sm100.py",
+          "line": 2209,
+          "text": "def mma",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_vendor\\quack\\gemm_sm100.py",
+          "line": 1806,
+          "text": "ab_consumer_state, acc_producer_state, tiled_mma = self.mma(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "torch\\_vendor\\quack\\gemm_sm100.py",
+          "line": 1167,
+          "text": "cta_rank_in_cluster = cute.arch.make_warp_uniform(cute.arch.block_idx_in_cluster())",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\_vendor\\quack\\gemm_sm100.py",
+          "line": 1167,
+          "text": "cute.arch.make_warp_uniform(cute.arch.block_idx_in_cluster())",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\_vendor\\quack\\gemm_sm120.py",
+          "line": 1367,
+          "text": "ab_read_state = self.mma(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\_vendor\\quack\\gemm_sm90.py",
+          "line": 1305,
+          "text": "ab_read_state = self.mma(",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "conv_fused.py::__init__::qconfig",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 7,
+      "defs": 8,
+      "edges": 11,
+      "blocking": [
+        "star_args"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\ao\\nn\\intrinsic\\qat\\modules\\conv_fused.py",
+          "line": 40,
+          "text": "def __init__",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "benchmarks\\upload_scribe.py",
+          "line": 75,
+          "text": "super().__init__(\"perfpipe_pytorch_benchmarks\")",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "benchmarks\\upload_scribe.py",
+          "line": 62,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_star",
+          "file": "test\\conftest.py",
+          "line": 214,
+          "text": "super().__init__(*args, **kwargs)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\create_dummy_torchscript_model.py",
+          "line": 10,
+          "text": "super().__init__()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\create_dummy_torchscript_model.py",
+          "line": 62,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_star",
+          "file": "test\\linear.py",
+          "line": 6,
+          "text": "super().__init__(*args, **kwargs)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\mkldnn_verbose.py",
+          "line": 8,
+          "text": "super().__init__()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\mkldnn_verbose.py",
+          "line": 62,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\run_test.py",
+          "line": 155,
+          "text": "super().__init__(args[0])",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\run_test.py",
+          "line": 62,
+          "text": "None",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "base_data_sparsifier.py::get_data::return_original",
+      "verdict": "UNREACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 7,
+      "edges": 8,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\ao\\pruning\\_experimental\\data_sparsifier\\base_data_sparsifier.py",
+          "line": 137,
+          "text": "def get_data",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_maskedtensor.py",
+          "line": 32,
+          "text": "mt_result_data = mt_result.get_data()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_maskedtensor.py",
+          "line": 137,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_maskedtensor.py",
+          "line": 43,
+          "text": "mt_data1 = mt1.get_data()",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_maskedtensor.py",
+          "line": 44,
+          "text": "mt_data2 = mt2.get_data()",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_maskedtensor.py",
+          "line": 274,
+          "text": "self.assertEqual(mt_dtype.get_data().dtype, new_dtype)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_maskedtensor.py",
+          "line": 428,
+          "text": "self.assertEqual(now_contiguous_mt.get_data().is_contiguous(), True)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_maskedtensor.py",
+          "line": 261,
+          "text": "self.assertEqual(mt_device.get_data().device.type, new_device.type)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "convert.py::convert::qconfig_mapping",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 5,
+      "defs": 10,
+      "edges": 11,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\ao\\quantization\\fx\\convert.py",
+          "line": 1033,
+          "text": "def convert",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_mobile_optimizer.py",
+          "line": 306,
+          "text": "torch.ao.quantization.convert(model, inplace=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_mobile_optimizer.py",
+          "line": 1039,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_mobile_optimizer.py",
+          "line": 469,
+          "text": "torch.ao.quantization.convert(model, inplace=True)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_nnapi.py",
+          "line": 563,
+          "text": "model = torch.ao.quantization.convert(model)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_nnapi.py",
+          "line": 1039,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\autograd\\profiler_util.py",
+          "line": 664,
+          "text": "fields[field_name] = convert(v)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\autograd\\profiler_util.py",
+          "line": 1039,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_export\\converter.py",
+          "line": 1464,
+          "text": "gm = graph_converter.convert()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\_export\\converter.py",
+          "line": 1039,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\_export\\converter.py",
+          "line": 494,
+          "text": "subgraph = subgraph_converter.convert()",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "quantize.py::quantize_dynamic::inplace",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 7,
+      "edges": 8,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\ao\\quantization\\quantize.py",
+          "line": 484,
+          "text": "def quantize_dynamic",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\quantization\\eager\\test_numeric_suite_eager.py",
+          "line": 164,
+          "text": "q_model = quantize_dynamic(model)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\quantization\\eager\\test_numeric_suite_eager.py",
+          "line": 485,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\quantization\\eager\\test_numeric_suite_eager.py",
+          "line": 188,
+          "text": "q_model = quantize_dynamic(model)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\quantization\\eager\\test_numeric_suite_eager.py",
+          "line": 341,
+          "text": "q_model = quantize_dynamic(model)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\quantization\\eager\\test_numeric_suite_eager.py",
+          "line": 371,
+          "text": "q_model = quantize_dynamic(model)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\quantization\\eager\\test_numeric_suite_eager.py",
+          "line": 476,
+          "text": "q_model = quantize_dynamic(model)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\quantization\\eager\\test_numeric_suite_eager.py",
+          "line": 511,
+          "text": "q_model = quantize_dynamic(model)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "gradcheck.py::_compute_numerical_jvps_wrt_specific_input::input_is_complex",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 5,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\autograd\\gradcheck.py",
+          "line": 396,
+          "text": "def _compute_numerical_jvps_wrt_specific_input",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\autograd\\gradcheck.py",
+          "line": 684,
+          "text": "return _compute_numerical_jvps_wrt_specific_input(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\autograd\\gradcheck.py",
+          "line": 685,
+          "text": "input.is_complex()",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\autograd\\gradcheck.py",
+          "line": 502,
+          "text": "jacobian_cols[d_idx] = _compute_numerical_jvps_wrt_specific_input(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\autograd\\gradcheck.py",
+          "line": 503,
+          "text": "x.is_complex()",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "__init__.py::enabled::value",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\backends\\python_native\\__init__.py",
+          "line": 149,
+          "text": "def enabled",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "tunable.py::_pack_dynamic_dims_mask::N",
+      "verdict": "REACHABLE",
+      "radius": 3,
+      "files": 3,
+      "defs": 10,
+      "edges": 15,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 15,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\cuda\\tunable.py",
+          "line": 337,
+          "text": "def _pack_dynamic_dims_mask",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\cuda\\tunable.py",
+          "line": 378,
+          "text": "bits = _pack_dynamic_dims_mask(M=M, N=N, K=K, BATCH=BATCH)",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": "torch\\cuda\\tunable.py",
+          "line": 358,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\cuda\\tunable.py",
+          "line": 358,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\cuda\\tunable.py",
+          "line": 399,
+          "text": "handle = _push_dynamic_dims_mask(M=M, N=N, K=K, BATCH=BATCH)",
+          "radius": 2
+        },
+        {
+          "kind": "param_default",
+          "file": "torch\\cuda\\tunable.py",
+          "line": 389,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\cuda\\tunable.py",
+          "line": 389,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\_inductor\\select_algorithm.py",
+          "line": 3644,
+          "text": "with torch.cuda.tunable.dynamic_dims_mask(",
+          "radius": 3
+        },
+        {
+          "kind": "blocked_access",
+          "file": "torch\\_inductor\\select_algorithm.py",
+          "line": 3645,
+          "text": "mask[1]",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\inductor\\test_dynamic_tunable_ops.py",
+          "line": 354,
+          "text": "with torch.cuda.tunable.dynamic_dims_mask(M=True):",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "test\\inductor\\test_dynamic_tunable_ops.py",
+          "line": 389,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\inductor\\test_dynamic_tunable_ops.py",
+          "line": 435,
+          "text": "with torch.cuda.tunable.dynamic_dims_mask(M=True):",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\inductor\\test_dynamic_tunable_ops.py",
+          "line": 498,
+          "text": "with torch.cuda.tunable.dynamic_dims_mask(M=True):",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\inductor\\test_dynamic_tunable_ops.py",
+          "line": 598,
+          "text": "with torch.cuda.tunable.dynamic_dims_mask(M=True):",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\inductor\\test_dynamic_tunable_ops.py",
+          "line": 644,
+          "text": "with torch.cuda.tunable.dynamic_dims_mask(M=True):",
+          "radius": 3
+        }
+      ]
+    },
+    {
+      "id": "sac_estimator.py::_get_sac_tradeoff_pwlf_stats::save_tradeoff_graph",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 3,
+      "defs": 5,
+      "edges": 8,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\distributed\\_tools\\sac_estimator.py",
+          "line": 553,
+          "text": "def _get_sac_tradeoff_pwlf_stats",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributed\\_tools\\sac_estimator.py",
+          "line": 892,
+          "text": "self.sac_mod_tradeoff_stats[mod_fqn] = self._get_sac_tradeoff_pwlf_stats(",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": "torch\\distributed\\_tools\\sac_estimator.py",
+          "line": 878,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\_tools\\sac_estimator.py",
+          "line": 878,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\_tools\\ilp_utils.py",
+          "line": 119,
+          "text": "sac_estimator.pwlf_sac_tradeoff_curve()",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\_tools\\ilp_utils.py",
+          "line": 878,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "test\\distributed\\_tools\\test_sac_estimator.py",
+          "line": 26,
+          "text": "sace.pwlf_sac_tradeoff_curve(n_segments=2, save_tradeoff_graphs=False)",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "test\\distributed\\_tools\\test_sac_estimator.py",
+          "line": 26,
+          "text": "False",
+          "radius": 2
+        }
+      ]
+    },
+    {
+      "id": "distributed_c10d.py::_new_process_group_helper::device_id",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 6,
+      "edges": 13,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 13,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\distributed\\distributed_c10d.py",
+          "line": 2786,
+          "text": "def _new_process_group_helper",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributed\\distributed_c10d.py",
+          "line": 7166,
+          "text": "pg_or_nonmember, pg_store = _new_process_group_helper(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "torch\\distributed\\distributed_c10d.py",
+          "line": 7067,
+          "text": "device_id = default_pg.bound_device_id",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "torch\\distributed\\distributed_c10d.py",
+          "line": 7067,
+          "text": "default_pg.bound_device_id",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\distributed_c10d.py",
+          "line": 2604,
+          "text": "default_pg, _ = _new_process_group_helper(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\distributed_c10d.py",
+          "line": 2796,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributed\\distributed_c10d.py",
+          "line": 2633,
+          "text": "default_pg, _ = _new_process_group_helper(",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "torch\\distributed\\distributed_c10d.py",
+          "line": 2519,
+          "text": "device_id = torch.device(acc.type, device_id)",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_attr_call",
+          "file": "torch\\distributed\\distributed_c10d.py",
+          "line": 2519,
+          "text": "torch.device(acc.type, device_id)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\distributed\\test_c10d_torchcomms.py",
+          "line": 720,
+          "text": "res = c10d._new_process_group_helper(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\distributed\\test_c10d_torchcomms.py",
+          "line": 2796,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "test\\distributed\\test_c10d_torchcomms.py",
+          "line": 614,
+          "text": "c10d._new_process_group_helper(",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": "test\\distributed\\test_c10d_torchcomms.py",
+          "line": 622,
+          "text": "device_id",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "distributed_c10d.py::all_to_all::async_op",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 10,
+      "defs": 11,
+      "edges": 19,
+      "blocking": [
+        "omitted_no_default"
+      ],
+      "trusted_terminal": true,
+      "beyond_locality": true,
+      "n_facts": 19,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\distributed\\distributed_c10d.py",
+          "line": 6279,
+          "text": "def all_to_all",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\testing\\_internal\\distributed\\distributed_test.py",
+          "line": 3841,
+          "text": "dist.all_to_all(out_tensors, in_tensors, group=group_id)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\testing\\_internal\\distributed\\distributed_test.py",
+          "line": 6283,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\nn\\functional.py",
+          "line": 473,
+          "text": "dist.all_to_all(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\nn\\functional.py",
+          "line": 6283,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\_shard\\sharded_tensor\\reshard.py",
+          "line": 232,
+          "text": "output_tensor_list = all_to_all(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\_shard\\sharded_tensor\\reshard.py",
+          "line": 6283,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributed\\algorithms\\_quantization\\quantization.py",
+          "line": 128,
+          "text": "dist.all_to_all(out_tensors, input_tensors, group=group, async_op=async_op)",
+          "radius": 1
+        },
+        {
+          "kind": "assignment",
+          "file": "torch\\distributed\\algorithms\\_quantization\\quantization.py",
+          "line": 111,
+          "text": "async_op = kwargs.get(\"async_op\", False)",
+          "radius": 1
+        },
+        {
+          "kind": "trusted_primitive",
+          "file": "torch\\distributed\\algorithms\\_quantization\\quantization.py",
+          "line": 111,
+          "text": "kwargs.get('async_op', False)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\algorithms\\_quantization\\quantization.py",
+          "line": 111,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "test\\distributed\\test_c10d_collectives.py",
+          "line": 191,
+          "text": "work = dist.all_to_all(outputs, inputs, async_op=async_op)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\distributed\\test_c10d_spawn_gloo.py",
+          "line": 189,
+          "text": "self._test_all_to_all(\"gloo\")",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\distributed\\test_c10d_spawn_nccl.py",
+          "line": 64,
+          "text": "self._test_all_to_all(\"nccl\")",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\distributed\\test_c10d_spawn_ucc.py",
+          "line": 67,
+          "text": "self._test_all_to_all(\"ucc\")",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\distributed\\algorithms\\quantization\\test_quantization.py",
+          "line": 135,
+          "text": "self._test_all_to_all(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\distributed\\algorithms\\quantization\\test_quantization.py",
+          "line": 159,
+          "text": "self._test_all_to_all(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\distributed\\test_c10d_collectives.py",
+          "line": 350,
+          "text": "dist.all_to_all(outputs, inputs)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\distributed\\test_c10d_collectives.py",
+          "line": 6283,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "c10d_rendezvous_backend.py::__init__::run_id",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 7,
+      "defs": 0,
+      "edges": 7,
+      "blocking": [
+        "omitted_no_default",
+        "star_args"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 7,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\distributed\\elastic\\rendezvous\\c10d_rendezvous_backend.py",
+          "line": 52,
+          "text": "def __init__",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "benchmarks\\upload_scribe.py",
+          "line": 75,
+          "text": "super().__init__(\"perfpipe_pytorch_benchmarks\")",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_star",
+          "file": "test\\conftest.py",
+          "line": 214,
+          "text": "super().__init__(*args, **kwargs)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\create_dummy_torchscript_model.py",
+          "line": 10,
+          "text": "super().__init__()",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_star",
+          "file": "test\\linear.py",
+          "line": 6,
+          "text": "super().__init__(*args, **kwargs)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\mkldnn_verbose.py",
+          "line": 8,
+          "text": "super().__init__()",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\run_test.py",
+          "line": 155,
+          "text": "super().__init__(args[0])",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "_init_utils.py::_check_ignored_states::passed_as_ignored_states",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 1,
+      "defs": 2,
+      "edges": 5,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\distributed\\fsdp\\_init_utils.py",
+          "line": 320,
+          "text": "def _check_ignored_states",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\distributed\\fsdp\\_init_utils.py",
+          "line": 291,
+          "text": "_check_ignored_states(ignored_states_list, True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\fsdp\\_init_utils.py",
+          "line": 291,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\distributed\\fsdp\\_init_utils.py",
+          "line": 294,
+          "text": "_check_ignored_states(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\fsdp\\_init_utils.py",
+          "line": 295,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "fully_sharded_data_parallel.py::fsdp_modules::root_only",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 8,
+      "edges": 9,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 9,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\distributed\\fsdp\\fully_sharded_data_parallel.py",
+          "line": 547,
+          "text": "def fsdp_modules",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\checkpoint\\state_dict.py",
+          "line": 338,
+          "text": "fsdp_modules = FSDP.fsdp_modules(model)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\checkpoint\\state_dict.py",
+          "line": 549,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\fsdp\\fully_sharded_data_parallel.py",
+          "line": 768,
+          "text": "for submodule in FullyShardedDataParallel.fsdp_modules(module):",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\fsdp\\fully_sharded_data_parallel.py",
+          "line": 549,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\fsdp\\fully_sharded_data_parallel.py",
+          "line": 1290,
+          "text": "use_orig_params = FullyShardedDataParallel.fsdp_modules(model)[",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\fsdp\\fully_sharded_data_parallel.py",
+          "line": 1346,
+          "text": "use_orig_params = FullyShardedDataParallel.fsdp_modules(model)[",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\fsdp\\fully_sharded_data_parallel.py",
+          "line": 1295,
+          "text": "for m in FullyShardedDataParallel.fsdp_modules(model)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\fsdp\\fully_sharded_data_parallel.py",
+          "line": 1351,
+          "text": "for m in FullyShardedDataParallel.fsdp_modules(model)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "api.py::_rref_typeof_on_user::blocking",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\distributed\\rpc\\api.py",
+          "line": 471,
+          "text": "def _rref_typeof_on_user",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "_utils.py::_get_shard_size_and_offsets::skip_offset",
+      "verdict": "REACHABLE",
+      "radius": 3,
+      "files": 8,
+      "defs": 19,
+      "edges": 24,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 24,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\distributed\\tensor\\_utils.py",
+          "line": 152,
+          "text": "def _get_shard_size_and_offsets",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\distributed\\tensor\\_utils.py",
+          "line": 272,
+          "text": "shard_size, shard_offsets = _get_shard_size_and_offsets(",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": "torch\\distributed\\tensor\\_utils.py",
+          "line": 204,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\tensor\\_utils.py",
+          "line": 204,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\distributed\\tensor\\_utils.py",
+          "line": 146,
+          "text": "return _compute_local_shape_and_global_offset(",
+          "radius": 2
+        },
+        {
+          "kind": "param_default",
+          "file": "torch\\distributed\\tensor\\_utils.py",
+          "line": 97,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\tensor\\_utils.py",
+          "line": 97,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\_state_dict_utils.py",
+          "line": 614,
+          "text": "shape, offset = compute_local_shape_and_global_offset(",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\_state_dict_utils.py",
+          "line": 97,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\checkpoint\\planner_helpers.py",
+          "line": 185,
+          "text": "sizes, offsets = compute_local_shape_and_global_offset(",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\checkpoint\\planner_helpers.py",
+          "line": 97,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\checkpoint\\planner_helpers.py",
+          "line": 443,
+          "text": "sizes, offsets = compute_local_shape_and_global_offset(",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributed\\tensor\\_api.py",
+          "line": 1450,
+          "text": "local_shape, global_offset = compute_local_shape_and_global_offset(",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\tensor\\_nonlinear_redux.py",
+          "line": 142,
+          "text": "local_shape, global_offset = compute_local_shape_and_global_offset(",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\tensor\\_nonlinear_redux.py",
+          "line": 97,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributed\\tensor\\_sharding_prop.py",
+          "line": 1064,
+          "text": "local_shape, _ = compute_local_shape_and_global_offset(",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\tensor\\_sharding_prop.py",
+          "line": 1065,
+          "text": "True",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributed\\tensor\\debug\\_visualize_sharding.py",
+          "line": 189,
+          "text": "device_index: _compute_local_shape_and_global_offset(",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributed\\tensor\\debug\\_visualize_sharding.py",
+          "line": 204,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\distributed\\tensor\\test_utils.py",
+          "line": 133,
+          "text": "local_shape, global_offset = _compute_local_shape_and_global_offset(",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "test\\distributed\\tensor\\test_utils.py",
+          "line": 204,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\distributed\\tensor\\test_utils.py",
+          "line": 157,
+          "text": "local_shape, global_offset = _compute_local_shape_and_global_offset(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\distributed\\tensor\\test_utils.py",
+          "line": 195,
+          "text": "local_shape, global_offset = _compute_local_shape_and_global_offset(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\distributed\\tensor\\test_utils.py",
+          "line": 234,
+          "text": "local_shape, global_offset = _compute_local_shape_and_global_offset(",
+          "radius": 2
+        }
+      ]
+    },
+    {
+      "id": "utils.py::logits_to_probs::is_binary",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 7,
+      "defs": 7,
+      "edges": 13,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 13,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\distributions\\utils.py",
+          "line": 90,
+          "text": "def logits_to_probs",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributions\\bernoulli.py",
+          "line": 110,
+          "text": "return logits_to_probs(self.logits, is_binary=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributions\\bernoulli.py",
+          "line": 110,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributions\\binomial.py",
+          "line": 127,
+          "text": "return logits_to_probs(self.logits, is_binary=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributions\\binomial.py",
+          "line": 127,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\distributions\\categorical.py",
+          "line": 116,
+          "text": "return logits_to_probs(self.logits)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributions\\categorical.py",
+          "line": 90,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributions\\continuous_bernoulli.py",
+          "line": 170,
+          "text": "return clamp_probs(logits_to_probs(self.logits, is_binary=True))",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributions\\continuous_bernoulli.py",
+          "line": 170,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributions\\geometric.py",
+          "line": 118,
+          "text": "return logits_to_probs(self.logits, is_binary=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributions\\geometric.py",
+          "line": 118,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\distributions\\negative_binomial.py",
+          "line": 110,
+          "text": "return logits_to_probs(self.logits, is_binary=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\distributions\\negative_binomial.py",
+          "line": 110,
+          "text": "True",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "symbolic_shapes.py::_sympy_from_args::sort",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 1,
+      "defs": 5,
+      "edges": 9,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 9,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+          "line": 799,
+          "text": "def _sympy_from_args",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+          "line": 898,
+          "text": "rhs = _sympy_from_args(sympy.Add, pos, sort=False, is_commutative=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+          "line": 898,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+          "line": 900,
+          "text": "lhs = _sympy_from_args(sympy.Add, neg, sort=True, is_commutative=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+          "line": 900,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+          "line": 948,
+          "text": "return _sympy_from_args(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+          "line": 949,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+          "line": 937,
+          "text": "return _sympy_from_args(sympy.Mul, args, is_commutative=x.is_commutative)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\fx\\experimental\\symbolic_shapes.py",
+          "line": 802,
+          "text": "True",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "split_module.py::split_module::keep_original_order",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 7,
+      "edges": 8,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\fx\\passes\\split_module.py",
+          "line": 55,
+          "text": "def split_module",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_fx_experimental.py",
+          "line": 841,
+          "text": "split = split_module(traced, mod, split, keep_original_input_name=False)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_fx_experimental.py",
+          "line": 60,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_fx_experimental.py",
+          "line": 886,
+          "text": "split = split_module(traced, mod, split_callback)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_fx_experimental.py",
+          "line": 902,
+          "text": "sp_gm = split_module(gm, None, cb)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_fx_experimental.py",
+          "line": 925,
+          "text": "sp = split_module(gm, None, partition_fn)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_fx_experimental.py",
+          "line": 937,
+          "text": "sp_boxed = split_module(gm, None, partition_fn, tuple_return=True)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_fx_experimental.py",
+          "line": 962,
+          "text": "split = split_module(traced, mod, split_callback)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "frontend.py::get_jit_def::is_classmethod",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 2,
+      "defs": 8,
+      "edges": 10,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 10,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\jit\\frontend.py",
+          "line": 324,
+          "text": "def get_jit_def",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_jit.py",
+          "line": 5934,
+          "text": "ast = torch.jit.frontend.get_jit_def(fn, fn.__name__)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_jit.py",
+          "line": 324,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_jit.py",
+          "line": 5940,
+          "text": "ast = torch.jit.frontend.get_jit_def(fn, fn.__name__)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_jit.py",
+          "line": 5951,
+          "text": "ast = torch.jit.frontend.get_jit_def(fn, fn.__name__)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\jit\\frontend.py",
+          "line": 308,
+          "text": "get_jit_def(obj, name, self_name=self_name, is_classmethod=is_classmethod(obj))",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": "torch\\jit\\frontend.py",
+          "line": 267,
+          "text": "def is_classmethod",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\jit\\frontend.py",
+          "line": 214,
+          "text": "getter = get_jit_def(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\jit\\frontend.py",
+          "line": 324,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\jit\\frontend.py",
+          "line": 218,
+          "text": "get_jit_def(prop[1].fset, f\"__{prop[0]}_setter\", self_name=self_name)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "flex_attention.py::flex_attention::enable_gqa",
+      "verdict": "UNKNOWN",
+      "radius": 2,
+      "files": 3,
+      "defs": 4,
+      "edges": 11,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\nn\\attention\\flex_attention.py",
+          "line": 2312,
+          "text": "def flex_attention",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_flop_counter.py",
+          "line": 1468,
+          "text": "return flex_attention(q, k, v)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_flop_counter.py",
+          "line": 2319,
+          "text": "Ellipsis",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_flop_counter.py",
+          "line": 1439,
+          "text": "return flex_attention(q, k, v)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_flop_counter.py",
+          "line": 1473,
+          "text": "return flex_attention(q, k, v)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_higher_order_ops\\flex_attention.py",
+          "line": 428,
+          "text": "example_out = flex_attention(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_higher_order_ops\\flex_attention.py",
+          "line": 500,
+          "text": "return trace_flex_attention(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_higher_order_ops\\flex_attention.py",
+          "line": 318,
+          "text": "return flex_attention(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_higher_order_ops\\flex_attention.py",
+          "line": 343,
+          "text": "return _flex_attention_autocast_impl(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_higher_order_ops\\flex_attention.py",
+          "line": 368,
+          "text": "return _flex_attention_autocast_impl(",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\_higher_order_ops\\flex_attention.py",
+          "line": 588,
+          "text": "out = flex_attention(",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "functional.py::multi_head_attention_forward::add_zero_attn",
+      "verdict": "REACHABLE",
+      "radius": 2,
+      "files": 4,
+      "defs": 1,
+      "edges": 14,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 14,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\nn\\functional.py",
+          "line": 6701,
+          "text": "def multi_head_attention_forward",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_jit.py",
+          "line": 15087,
+          "text": "return torch.nn.functional.multi_head_attention_forward(query, key, value,",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_jit.py",
+          "line": 15108,
+          "text": "jit_out = jit_multihead_attn_forward(query, key, value,",
+          "radius": 2
+        },
+        {
+          "kind": "blocked_access",
+          "file": "test\\test_jit.py",
+          "line": 15113,
+          "text": "multi_head_attn.add_zero_attn",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_jit.py",
+          "line": 15117,
+          "text": "py_out = torch.nn.functional.multi_head_attention_forward(query, key, value,",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "test\\test_jit.py",
+          "line": 15123,
+          "text": "multi_head_attn.add_zero_attn",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_jit.py",
+          "line": 15175,
+          "text": "py_out = torch.nn.functional.multi_head_attention_forward(q, kv, kv,",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_jit.py",
+          "line": 15179,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\nn\\modules\\activation.py",
+          "line": 1469,
+          "text": "attn_output, attn_output_weights = F.multi_head_attention_forward(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "torch\\nn\\modules\\activation.py",
+          "line": 1479,
+          "text": "self.add_zero_attn",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\nn\\modules\\activation.py",
+          "line": 1495,
+          "text": "attn_output, attn_output_weights = F.multi_head_attention_forward(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "torch\\nn\\modules\\activation.py",
+          "line": 1505,
+          "text": "self.add_zero_attn",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\nn\\test_multihead_attention.py",
+          "line": 783,
+          "text": "result_ref, _ = torch.nn.functional.multi_head_attention_forward(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "test\\nn\\test_multihead_attention.py",
+          "line": 793,
+          "text": "mta_model.add_zero_attn",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "distributed.py::_tree_unflatten_with_rref::output_is_rref",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\nn\\parallel\\distributed.py",
+          "line": 275,
+          "text": "def _tree_unflatten_with_rref",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torch\\nn\\parallel\\distributed.py",
+          "line": 1885,
+          "text": "output = _tree_unflatten_with_rref(",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": "torch\\nn\\parallel\\distributed.py",
+          "line": 1886,
+          "text": "output_is_rref",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "_input_observer.py::infer_arguments::as_args_kwargs",
+      "verdict": "REACHABLE",
+      "radius": 9,
+      "files": 2,
+      "defs": 10,
+      "edges": 12,
+      "blocking": [
+        "depth_cap"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 12,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\onnx\\_internal\\exporter\\_input_observer.py",
+          "line": 651,
+          "text": "def infer_arguments",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\onnx\\_internal\\exporter\\_input_observer.py",
+          "line": 1108,
+          "text": "return self.info.infer_arguments(",
+          "radius": 1
+        },
+        {
+          "kind": "param_default",
+          "file": "torch\\onnx\\_internal\\exporter\\_input_observer.py",
+          "line": 1039,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\onnx\\_internal\\exporter\\_input_observer.py",
+          "line": 1039,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\onnx\\_internal\\exporter\\_input_observer.py",
+          "line": 1174,
+          "text": "feeds = dict(zip(input_names, self.info.infer_arguments(inputs, flat=True)))",
+          "radius": 9
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\onnx\\exporter\\test_input_observer.py",
+          "line": 46,
+          "text": "args = observer.infer_arguments()",
+          "radius": 9
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\onnx\\exporter\\test_input_observer.py",
+          "line": 76,
+          "text": "args = observer.infer_arguments()",
+          "radius": 9
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\onnx\\exporter\\test_input_observer.py",
+          "line": 107,
+          "text": "args = observer.infer_arguments()",
+          "radius": 9
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\onnx\\exporter\\test_input_observer.py",
+          "line": 141,
+          "text": "args = observer.infer_arguments()",
+          "radius": 9
+        },
+        {
+          "kind": "literal",
+          "file": "test\\onnx\\exporter\\test_input_observer.py",
+          "line": 1039,
+          "text": "False",
+          "radius": 8
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\onnx\\_internal\\exporter\\_input_observer.py",
+          "line": 656,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\onnx\\exporter\\test_input_observer.py",
+          "line": 656,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "symbolic_opset9.py::batch_norm::training",
+      "verdict": "UNREACHABLE",
+      "radius": 1,
+      "files": 4,
+      "defs": 6,
+      "edges": 13,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 13,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\onnx\\_internal\\torchscript_exporter\\symbolic_opset9.py",
+          "line": 2689,
+          "text": "def batch_norm",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "test\\test_autograd.py",
+          "line": 12971,
+          "text": "y = torch.nn.functional.batch_norm(x, None, None, training=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_autograd.py",
+          "line": 12971,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_functionalization.py",
+          "line": 2017,
+          "text": "return torch.batch_norm(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_functionalization.py",
+          "line": 2018,
+          "text": "0.1",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_jit_fuser_te.py",
+          "line": 2418,
+          "text": "return torch.batch_norm(i, x, x, x, rv, False, 0.1, 1e-4, False).relu()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_jit_fuser_te.py",
+          "line": 2418,
+          "text": "0.1",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_jit_fuser_te.py",
+          "line": 2421,
+          "text": "return torch.batch_norm(i, None, x, x, rv, False, 0.1, 1e-4, False).relu()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_jit_fuser_te.py",
+          "line": 2421,
+          "text": "0.1",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_jit_fuser_te.py",
+          "line": 2424,
+          "text": "return torch.batch_norm(i, x, None, x, rv, False, 0.1, 1e-4, False).relu()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_jit_fuser_te.py",
+          "line": 2424,
+          "text": "0.1",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "test\\test_jit_fuser_te.py",
+          "line": 2427,
+          "text": "return torch.batch_norm(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_jit_fuser_te.py",
+          "line": 2428,
+          "text": "0.1",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "_adafactor.py::adafactor::foreach",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 1,
+      "defs": 0,
+      "edges": 3,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 3,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\optim\\_adafactor.py",
+          "line": 607,
+          "text": "def adafactor",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\optim\\_adafactor.py",
+          "line": 156,
+          "text": "adafactor(",
+          "radius": 1
+        },
+        {
+          "kind": "blocked_access",
+          "file": "torch\\optim\\_adafactor.py",
+          "line": 169,
+          "text": "group['foreach']",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "profiler.py::__init__::enable_event_node_ids",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 7,
+      "defs": 8,
+      "edges": 11,
+      "blocking": [
+        "star_args"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 11,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\profiler\\_cuspy\\observers\\profiler.py",
+          "line": 248,
+          "text": "def __init__",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "benchmarks\\upload_scribe.py",
+          "line": 75,
+          "text": "super().__init__(\"perfpipe_pytorch_benchmarks\")",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "benchmarks\\upload_scribe.py",
+          "line": 259,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_star",
+          "file": "test\\conftest.py",
+          "line": 214,
+          "text": "super().__init__(*args, **kwargs)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\create_dummy_torchscript_model.py",
+          "line": 10,
+          "text": "super().__init__()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\create_dummy_torchscript_model.py",
+          "line": 259,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_star",
+          "file": "test\\linear.py",
+          "line": 6,
+          "text": "super().__init__(*args, **kwargs)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\mkldnn_verbose.py",
+          "line": 8,
+          "text": "super().__init__()",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\mkldnn_verbose.py",
+          "line": 259,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\run_test.py",
+          "line": 155,
+          "text": "super().__init__(args[0])",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\run_test.py",
+          "line": 259,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "semi_structured.py::to_sparse_semi_structured::transposed",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 7,
+      "edges": 8,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\sparse\\semi_structured.py",
+          "line": 310,
+          "text": "def to_sparse_semi_structured",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_semi_structured.py",
+          "line": 356,
+          "text": "A_sparse = to_sparse_semi_structured(A)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_sparse_semi_structured.py",
+          "line": 312,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_semi_structured.py",
+          "line": 381,
+          "text": "A_sparse = to_sparse_semi_structured(A)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_semi_structured.py",
+          "line": 424,
+          "text": "A_sparse = to_sparse_semi_structured(A)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_semi_structured.py",
+          "line": 478,
+          "text": "A_sparse = to_sparse_semi_structured(A)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_semi_structured.py",
+          "line": 499,
+          "text": "B_sparse = to_sparse_semi_structured(B)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_semi_structured.py",
+          "line": 524,
+          "text": "B_sparse = to_sparse_semi_structured(B)",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "common_fsdp.py::_test_fsdp_parity::use_pure_fp16",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 3,
+      "defs": 3,
+      "edges": 5,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\testing\\_internal\\common_fsdp.py",
+          "line": 1351,
+          "text": "def _test_fsdp_parity",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "test\\distributed\\fsdp\\test_fsdp_pure_fp16.py",
+          "line": 55,
+          "text": "self._test_fsdp_parity(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\distributed\\fsdp\\test_fsdp_pure_fp16.py",
+          "line": 62,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\distributed\\fsdp\\test_fsdp_sharded_grad_scaler.py",
+          "line": 207,
+          "text": "self._test_fsdp_parity(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\distributed\\fsdp\\test_fsdp_sharded_grad_scaler.py",
+          "line": 1366,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "common_methods_invocations.py::shape::with_batch_channel",
+      "verdict": "UNREACHABLE",
+      "radius": 1,
+      "files": 2,
+      "defs": 7,
+      "edges": 8,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 8,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\testing\\_internal\\common_methods_invocations.py",
+          "line": 5062,
+          "text": "def shape",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_csr.py",
+          "line": 767,
+          "text": "shape((2, 3)),",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_sparse_csr.py",
+          "line": 5062,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_csr.py",
+          "line": 774,
+          "text": "shape((2, 3)),",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_csr.py",
+          "line": 781,
+          "text": "shape((2, 3)),",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_csr.py",
+          "line": 788,
+          "text": "shape((2, 3)),",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_csr.py",
+          "line": 817,
+          "text": "shape((2, 2, 3), 1),",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_sparse_csr.py",
+          "line": 841,
+          "text": "shape((2, 3)),",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "common_quantization.py::_checkScriptable::check_save_load",
+      "verdict": "UNKNOWN",
+      "radius": 1,
+      "files": 2,
+      "defs": 0,
+      "edges": 4,
+      "blocking": [
+        "omitted_no_default"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 4,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\testing\\_internal\\common_quantization.py",
+          "line": 878,
+          "text": "def _checkScriptable",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\testing\\_internal\\common_quantization.py",
+          "line": 871,
+          "text": "self._checkScriptable(orig_mod, scripted, calib_data, check_save_load)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "torch\\testing\\_internal\\common_quantization.py",
+          "line": 875,
+          "text": "self._checkScriptable(orig_mod, traced, calib_data, check_save_load)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_nodefault",
+          "file": "test\\quantization\\eager\\test_quantize_eager_ptq.py",
+          "line": 1574,
+          "text": "self._checkScriptable(",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "common_utils.py::skipIfRocm_BUGGY::func",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\testing\\_internal\\common_utils.py",
+          "line": 2463,
+          "text": "def skipIfRocm_BUGGY",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "distributed_test.py::_test_ddp_logging_data::is_gpu",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 1,
+      "defs": 2,
+      "edges": 5,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\testing\\_internal\\distributed\\distributed_test.py",
+          "line": 6180,
+          "text": "def _test_ddp_logging_data",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\testing\\_internal\\distributed\\distributed_test.py",
+          "line": 6258,
+          "text": "model_DDP = self._test_ddp_logging_data(is_gpu=False)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\testing\\_internal\\distributed\\distributed_test.py",
+          "line": 6258,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\testing\\_internal\\distributed\\distributed_test.py",
+          "line": 6405,
+          "text": "model_DDP = self._test_ddp_logging_data(is_gpu=True)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\testing\\_internal\\distributed\\distributed_test.py",
+          "line": 6405,
+          "text": "True",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "inductor_utils.py::skipDeviceIf::cond",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\testing\\_internal\\inductor_utils.py",
+          "line": 160,
+          "text": "def skipDeviceIf",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "nested.py::unbind_reference::wrap_output_as_njt",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 1,
+      "defs": 6,
+      "edges": 9,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 9,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\testing\\_internal\\opinfo\\definitions\\nested.py",
+          "line": 332,
+          "text": "def unbind_reference",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\testing\\_internal\\opinfo\\definitions\\nested.py",
+          "line": 446,
+          "text": "return unbind_reference(op, sample)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\testing\\_internal\\opinfo\\definitions\\nested.py",
+          "line": 332,
+          "text": "True",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\testing\\_internal\\opinfo\\definitions\\nested.py",
+          "line": 519,
+          "text": "return unbind_reference(op, sample)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\testing\\_internal\\opinfo\\definitions\\nested.py",
+          "line": 986,
+          "text": "return unbind_reference(matmul_op, modified_sample)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\testing\\_internal\\opinfo\\definitions\\nested.py",
+          "line": 1250,
+          "text": "output = unbind_reference(op, sample, wrap_output_as_njt=False)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\testing\\_internal\\opinfo\\definitions\\nested.py",
+          "line": 1250,
+          "text": "False",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\testing\\_internal\\opinfo\\definitions\\nested.py",
+          "line": 499,
+          "text": "out_ref_components = unbind_reference(op, sample, wrap_output_as_njt=False)",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\testing\\_internal\\opinfo\\definitions\\nested.py",
+          "line": 499,
+          "text": "False",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "_mode.py::dispatch_hooks::log_hook",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 1,
+      "defs": 2,
+      "edges": 5,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 5,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\utils\\_debug_mode\\_mode.py",
+          "line": 675,
+          "text": "def dispatch_hooks",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "torch\\utils\\_debug_mode\\_mode.py",
+          "line": 724,
+          "text": "with DebugMode.dispatch_hooks(record_hook=dispatch_hook):",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "torch\\utils\\_debug_mode\\_mode.py",
+          "line": 677,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_keyword",
+          "file": "torch\\utils\\_debug_mode\\_mode.py",
+          "line": 807,
+          "text": "with DebugMode.dispatch_hooks(",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": "torch\\utils\\_debug_mode\\_mode.py",
+          "line": 808,
+          "text": "_dispatch_post_hook",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "cpp_extension.py::load_inline::sycl_sources",
+      "verdict": "REACHABLE",
+      "radius": 1,
+      "files": 3,
+      "defs": 8,
+      "edges": 9,
+      "blocking": [],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 9,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\utils\\cpp_extension.py",
+          "line": 2162,
+          "text": "def load_inline",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_autograd.py",
+          "line": 12513,
+          "text": "module = load_inline(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_autograd.py",
+          "line": 2165,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_cpp_extensions_jit.py",
+          "line": 500,
+          "text": "module = torch.utils.cpp_extension.load_inline(",
+          "radius": 1
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_cpp_extensions_jit.py",
+          "line": 2165,
+          "text": "None",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_cpp_extensions_jit.py",
+          "line": 522,
+          "text": "module = torch.utils.cpp_extension.load_inline(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_cpp_extensions_jit.py",
+          "line": 624,
+          "text": "module = torch.utils.cpp_extension.load_inline(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_cpp_extensions_jit.py",
+          "line": 663,
+          "text": "module = torch.utils.cpp_extension.load_inline(",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_cpp_extensions_jit.py",
+          "line": 713,
+          "text": "torch.utils.cpp_extension.load_inline(",
+          "radius": 1
+        }
+      ]
+    },
+    {
+      "id": "cpp_extension.py::win_wrap_ninja_compile::debug",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "no_call_site"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torch\\utils\\cpp_extension.py",
+          "line": 1201,
+          "text": "def win_wrap_ninja_compile",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "train.py::add_real_datasets::other_datasets",
+      "verdict": "REACHABLE",
+      "radius": 3,
+      "files": 9,
+      "defs": 14,
+      "edges": 19,
+      "blocking": [
+        "dynamic_dispatch"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": true,
+      "n_facts": 19,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": "torchgen\\_autoheuristic\\train.py",
+          "line": 107,
+          "text": "def add_real_datasets",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torchgen\\_autoheuristic\\train_decision.py",
+          "line": 264,
+          "text": "self.add_real_datasets(datasets, other_datasets, cat_feature2cats, ranking)",
+          "radius": 1
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torchgen\\_autoheuristic\\train_decision.py",
+          "line": 313,
+          "text": "datasets = self.prepare_datasets(df, other_datasets, cat_feature2cats, ranking)",
+          "radius": 2
+        },
+        {
+          "kind": "param_default",
+          "file": "torchgen\\_autoheuristic\\train_decision.py",
+          "line": 303,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "literal",
+          "file": "torchgen\\_autoheuristic\\train_decision.py",
+          "line": 303,
+          "text": "False",
+          "radius": 2
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "setup.py",
+          "line": 64,
+          "text": "sys.exit(main())",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "setup.py",
+          "line": 303,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "scripts\\lintrunner.py",
+          "line": 179,
+          "text": "main()",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "scripts\\lintrunner.py",
+          "line": 303,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\bench_mps_ops.py",
+          "line": 279,
+          "text": "main()",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "test\\bench_mps_ops.py",
+          "line": 303,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\run_test.py",
+          "line": 2464,
+          "text": "main()",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "test\\run_test.py",
+          "line": 303,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "test\\test_show_pickle.py",
+          "line": 29,
+          "text": "torch.utils.show_pickle.main(",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "test\\test_show_pickle.py",
+          "line": 303,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_defaulted",
+          "file": "third_party\\generate-xnnpack-wrappers.py",
+          "line": 220,
+          "text": "main(sys.argv[1:])",
+          "radius": 3
+        },
+        {
+          "kind": "literal",
+          "file": "third_party\\generate-xnnpack-wrappers.py",
+          "line": 303,
+          "text": "False",
+          "radius": 3
+        },
+        {
+          "kind": "call_site_positional",
+          "file": "torchgen\\_autoheuristic\\train_regression.py",
+          "line": 54,
+          "text": "self.add_real_datasets(datasets, other_datasets, cat_feature2cats)",
+          "radius": 1
+        },
+        {
+          "kind": "unresolved_name",
+          "file": "torchgen\\_autoheuristic\\train_regression.py",
+          "line": 54,
+          "text": "cat_feature2cats",
+          "radius": 1
+        }
+      ]
+    }
+  ]
+}

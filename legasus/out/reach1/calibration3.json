@@ -1,0 +1,95 @@
+{
+  "root": "C:\\Users\\tatte\\AppData\\Local\\Temp\\stageb-target\\pt",
+  "parsed": 4942,
+  "unparsed": 0,
+  "results": [
+    {
+      "id": "calib-3-validate_cuda",
+      "verdict": "UNREACHABLE",
+      "radius": 2,
+      "files": 2,
+      "defs": 2,
+      "edges": 4,
+      "blocking": [],
+      "trusted_terminal": true,
+      "beyond_locality": true,
+      "n_facts": 4,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_test.py",
+          "line": 291,
+          "text": "def validate_cuda",
+          "radius": 0
+        },
+        {
+          "kind": "call_site_positional",
+          "file": ".ci\\lumen_cli\\cli\\lib\\core\\vllm\\vllm_test.py",
+          "line": 221,
+          "text": "if not validate_cuda(get_env(\"TORCH_CUDA_ARCH_LIST\")):",
+          "radius": 1
+        },
+        {
+          "kind": "callee_def",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\envs_helper.py",
+          "line": 15,
+          "text": "def get_env",
+          "radius": 2
+        },
+        {
+          "kind": "or_fallback",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\envs_helper.py",
+          "line": 17,
+          "text": "os.environ.get(name) or default",
+          "radius": 2
+        }
+      ]
+    },
+    {
+      "id": "calib-1-gh_summary_path",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "environment"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\gh_summary.py",
+          "line": 55,
+          "text": "def gh_summary_path",
+          "radius": 0
+        }
+      ]
+    },
+    {
+      "id": "calib-2-local_image_exists",
+      "verdict": "UNKNOWN",
+      "radius": 0,
+      "files": 1,
+      "defs": 0,
+      "edges": 1,
+      "blocking": [
+        "environment"
+      ],
+      "trusted_terminal": false,
+      "beyond_locality": false,
+      "n_facts": 1,
+      "facts": [
+        {
+          "kind": "decision_site",
+          "file": ".ci\\lumen_cli\\cli\\lib\\common\\docker_helper.py",
+          "line": 26,
+          "text": "def local_image_exists",
+          "radius": 0
+        }
+      ]
+    }
+  ]
+}
