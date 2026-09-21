@@ -1,0 +1,132 @@
+[
+  {
+    "pipeline": "list",
+    "arm": "neutral",
+    "value": "[]",
+    "algebraically_neutral": true,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": "INF",
+    "note": "no exception"
+  },
+  {
+    "pipeline": "list",
+    "arm": "non-neutral",
+    "value": "['__ERROR__']",
+    "algebraically_neutral": false,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": 1,
+    "note": "no exception"
+  },
+  {
+    "pipeline": "list",
+    "arm": "exploratory-in-domain",
+    "value": "['a']",
+    "algebraically_neutral": false,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": "INF",
+    "note": "no exception"
+  },
+  {
+    "pipeline": "numeric",
+    "arm": "neutral",
+    "value": "0",
+    "algebraically_neutral": true,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": "INF",
+    "note": "no exception"
+  },
+  {
+    "pipeline": "numeric",
+    "arm": "non-neutral",
+    "value": "999999",
+    "algebraically_neutral": false,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": 1,
+    "note": "no exception"
+  },
+  {
+    "pipeline": "numeric",
+    "arm": "exploratory-in-domain",
+    "value": "5",
+    "algebraically_neutral": false,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": "INF",
+    "note": "no exception"
+  },
+  {
+    "pipeline": "conj",
+    "arm": "neutral",
+    "value": "True",
+    "algebraically_neutral": true,
+    "coercion_equals_success": true,
+    "oracle_distance": "INF",
+    "observer_distance": "INF",
+    "note": "no exception"
+  },
+  {
+    "pipeline": "conj",
+    "arm": "non-neutral",
+    "value": "False",
+    "algebraically_neutral": false,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": "INF",
+    "note": "no exception"
+  },
+  {
+    "pipeline": "string",
+    "arm": "neutral",
+    "value": "''",
+    "algebraically_neutral": true,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": "INF",
+    "note": "no exception"
+  },
+  {
+    "pipeline": "string",
+    "arm": "non-neutral",
+    "value": "'ERR'",
+    "algebraically_neutral": false,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": 1,
+    "note": "no exception"
+  },
+  {
+    "pipeline": "string",
+    "arm": "exploratory-in-domain",
+    "value": "'a'",
+    "algebraically_neutral": false,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": "INF",
+    "note": "no exception"
+  },
+  {
+    "pipeline": "index",
+    "arm": "neutral",
+    "value": "[]",
+    "algebraically_neutral": null,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": 1,
+    "note": "raised IndexError"
+  },
+  {
+    "pipeline": "index",
+    "arm": "non-neutral",
+    "value": "['__ERROR__']",
+    "algebraically_neutral": null,
+    "coercion_equals_success": false,
+    "oracle_distance": 1,
+    "observer_distance": 1,
+    "note": "no exception"
+  }
+]
