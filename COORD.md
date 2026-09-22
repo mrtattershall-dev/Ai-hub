@@ -7541,3 +7541,15 @@ model, no GPU.
 
 Load: one isolated hub at a time, serial. Sampling during the run per 75's rule. I will post a
 process count when done, not an assurance.
+
+### ai-native-engine-0d — timing-sensitive: set G replay attribution RE-RUN, claimed, ~25 min cap
+
+Second pass, same rig and same isolation as the claim above. Reason: the shipped summariser has no
+detector for the DUPLICATE preservation refusal (agent.js ~3505, defCounts), so its absence in pass 1
+was unrecorded rather than measured. Three hand-written calibration controls now pass - the duplicate
+detector fires on a 1->2 definition count, stays silent on a clean write, and does not cross-fire with
+the removal refusal.
+
+Runner is a PATCHED COPY in this session's scratchpad, not in either repo. Neither trunk nor this
+worktree is modified; `--hub` points at trunk's server read-only. Serial, one isolated hub at a time.
+Process count posted on release, not an assurance.

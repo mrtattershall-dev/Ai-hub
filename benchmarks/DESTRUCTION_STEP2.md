@@ -128,3 +128,118 @@ historical bypass?
 - Line 912's route.
 
 Nothing built. Trunk untouched. Specimen frozen. Steps 3-5 get their preregistration from this map.
+
+---
+
+# AMENDMENT (2026-09-22) — appended, nothing above is edited
+
+The body of this file is the step 2 record as it was frozen. Three corrections belong to it, and they
+are appended rather than merged so the original reading stays legible.
+
+## A1. A FIFTEENTH ROUTE. THE TABLE ABOVE HAS FOURTEEN.
+
+The table was built from two `await tools[tool](args)` sites. There are **three**:
+
+    agent.js:3396   main tool loop           before-image, removal refusal, duplicate refusal, checkpoint
+    agent.js:2690   subtask loop             NONE of them (re-verified: zero occurrences of lostDefs,
+                                             lostExports, defCounts, beforeSrc or checkpoint in 2460-2760)
+    agent.js:4590   POST /runs/:id/approve   the human-approval RESUME path - NOT IN THE TABLE
+
+Route 15 is the approval resume. `run.pending` is set only at `agent.js:3367`, inside the
+`verdict.decision === 'ask'` branch, which is reachable only for tools NOT in `AUTO_TOOLS`. Those fall
+through to `{ decision: 'ask', reason: '<tool> always needs a human' }` — `git_commit`, `git_undo`,
+`download_file`, and the Google write tools. On approval the tool executes at 4590 with no
+before-image, no removal refusal, no duplicate refusal and no checkpoint at that site, because all of
+that lives in the main loop after 3396.
+
+`write_file`, `edit_file` and `append_file` are in `AUTO_TOOLS`, so they never become pending: an
+ordinary source write cannot reach this route. Its reachable mutations are `download_file` (overwrite
+any path with fetched bytes) and `git_undo` (`git reset --hard`, which does commit dirty state inside
+the tool first).
+
+The structural point does not depend on the size of that reachable set: **preservation is attached to
+a call site, so a second call site to the same primitive has none of it** — and route 15 is the site
+where human authority was most explicitly granted. Permission is treated as sufficient exactly where
+permission is strongest.
+
+## A2. SET G DOES NOT SUPPORT ROUTE COMPLETENESS CAUSALLY. THE CLOSING SECTION OVERSTATES IT.
+
+The section above concludes that the baseline is "take the existing refusal and make it
+route-complete", on the strength of set G. That inference does not hold, for a reason found in the
+hub's own source at `agent.js:3494-3500`:
+
+> set G's corruption was the ADDITION of syntactically LEGAL duplicates. Run 33a9d81d sent one edit
+> whose REPLACE contained its own FIND 26 times: `s6_graph.py` finished at 1987 lines with 28
+> `def __init__` and 33 `def nodes` in ONE class, every call answered OK, and not one syntax check
+> failed. `lostDefs` cannot see it (defNames returns a Set) ... 50 of the 100 hidden checks were on
+> files this corrupted.
+
+**Set G's demonstrated destruction mode is definition multiplication, not symbol loss.** `lostDefs`
+compares name *sets*, so 1 -> 28 is not a loss and never becomes one. A perfectly route-complete
+removal predicate would have accepted that damage on every route it covered. Set G points at
+**detector semantics**, not at guard placement.
+
+The relevant mechanism for set G is the *other* predicate — the duplicate refusal at `agent.js:3505`
+built on `defCounts`, which postdates this record and is not in the table above.
+
+Consequently the two research questions are separated, and this file's closing section speaks only to
+the second:
+
+    A. PRESERVATION SEMANTICS   can the system detect the actual classes of regression at all -
+                                symbol loss, duplication, behaviour change?
+    B. EFFECT/ROUTE GOVERNANCE  given a preservation obligation, must every way of producing that
+                                effect satisfy it?
+
+A governed boundary can succeed completely at B and still fail at A, because a perfect boundary cannot
+help when the evidence says a destructive mutation is acceptable.
+
+## A3. THE BYPASS CLASSES ARE REAL BUT TWO OF THE THREE WERE NEVER EXERCISED
+
+"Three structural bypass classes" above lists routes without a usage denominator. Measured across all
+24 replay scenario files, **17,466 recorded replies**:
+
+    append_file       856 replies request it   (set G: 34)   EXERCISED
+    download_file       0                                    NEVER EXERCISED
+    spawn_subtask       0                                    NEVER EXERCISED
+
+`spawn_subtask` remains the most complete bypass in the hub and is requested by no model in the entire
+corpus. So route completeness on `spawn_subtask` and `download_file` is **prophylaxis against an
+unexercised hazard** — architectural defects, not demonstrated causes of any recorded regression. It
+is defensible engineering that can earn no measured credit in this experiment, for the baseline or for
+Legasus.
+
+The declaration override (`REMOVE:`) is exercised, barely: 9 of 17,466 replies, in 3 of 24 files, 1 in
+set G. `DUPLICATE:` has never been used by any model.
+
+## A4. WHAT REPLACES THE OVERSTATED INFERENCE: A PROSPECTIVE ROUTE TEST
+
+Rather than infer route dependence from set G, it was measured directly. Same initial file, same
+semantic corruption (`foo` going 1 -> 2), two routes, prediction recorded before the run:
+
+    write_file    beforeSrc EXISTS      duplicate predicate evaluates   REFUSED, file unchanged (foo x1)
+    append_file   beforeSrc IS NULL     predicate cannot evaluate       LANDED,  corruption in file (foo x2)
+    append_file   a genuinely NEW def   nothing to refuse               landed cleanly (foo x1 bar x1 baz x1)
+
+Observed exactly as predicted. `append_file` has no before-image — `beforeSrc` is captured at
+`agent.js:3392` only for `write_file`/`edit_file` on `/\.(py|c?js|mjs)$/i` — so both refusals are
+gated off, and the third row proves the route is not simply refusing or broken but specifically blind.
+
+`agent.js:3431` says "append_file is an edit too, and needs the same checks", and `appended` does
+enter that block: append_file gains `quickCheck` and `duplicateNote`, both advisory. Neither refusal
+can fire. The `markerRefusal` at `agent.js:578` guards exactly one file, the workspace boundary
+marker — a single-file interdiction, not a preservation check.
+
+**This is a demonstrated route-dependent preservation failure, on the same corruption class set G
+suffered, via a route the corpus takes 856 times.** It is the evidence the closing section above
+reached for and did not have.
+
+## A5. FIVE REQUESTED NAMES ARE NOT ROUTES
+
+`git_show`, `remove_file`, `git_checkout`, `replace` and `git_status` appear in recorded replies but
+are **not tools**; they are rejected at the `!tools[tool]` check (`agent.js:3325`). An earlier reading
+of the corpus treated three of them as routes missing from the table. That was wrong, and the table
+was not undercounted by them. The dispatch table holds **28 tools**, enumerated with acorn after a
+naive brace-depth scan silently dropped `append_file` (template literals drift the count — the same
+class of error as regex-over-source).
+
+The table above was undercounted by exactly one thing: a real call site, A1.
