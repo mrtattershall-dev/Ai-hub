@@ -267,6 +267,150 @@ does **not** make the design independent of the original defect. Any write-up sa
 
 PR3 stands. PR4b remains my expectation.
 
+---
+
+# AMENDMENT 2 — frozen 2026-09-22, still before implementation
+
+Governor redirect. `71969bb` and `e8ef76d` preserved unedited.
+
+## A2.1 — The unresolved stratum is about the analysis, not the world
+
+**Supersedes A1.2's `NOT_STATICALLY_ESTABLISHABLE`.** Dynamic access does not by itself
+establish that a claim cannot be settled statically: some dynamic expressions resolve, and
+others can be bounded tightly enough to prove absence. Asserting otherwise repeats the exact
+error under study — treating "the analysis I ran cannot settle it" as "it is unsettleable."
+
+The label is **`UNRESOLVED_UNDER_FROZEN_ANALYSIS`**. The stronger label may be used only with
+an independent argument, recorded per claim.
+
+This makes the frozen capability list load-bearing, because allowing extra searches does not
+remove unresolved cases — it means the **permitted analyses and their budget** must be frozen,
+and each unresolved case must record **why it exceeds those specific capabilities**. No arm is
+required to search without limit before stopping; stopping at the budget is a correct outcome,
+not a failure.
+
+### Permitted analyses (frozen) and budget
+
+| Analysis | Unit cost |
+|---|---|
+| `grep(query, {ci, from, to})` | 1 analysis |
+| `identifierSet(from, to)` — enumerate identifiers in a range | 1 analysis |
+| `computedAccessSites(from, to)` — bracket access, `eval`, string-built property names | 1 analysis |
+| `readRange(from, to)` — human or arm reads the code | 1 analysis |
+| `askHuman(question)` | 1 analysis **and** 1 annotation |
+
+**Budget per claim: 12 analysis units, 2 annotation units.** Identical for both arms. On
+exhaustion an arm must return `UNRESOLVED_UNDER_FROZEN_ANALYSIS` with the reason recorded.
+
+## A2.2 — Claim meaning is frozen per claim, and the answer key uses the same meaning
+
+**Supersedes A1.3's adequacy rule as stated.** That rule establishes **lexical search
+coverage**, which is not semantic absence. Exhaustive case-insensitive enumeration checks
+direct identifier occurrences; computed property names, aliases, and generated strings need
+different evidence.
+
+Every claim therefore carries a frozen `meaning`:
+
+| `meaning` | What absence asserts | What counts as adequate |
+|---|---|---|
+| `LITERAL` | no literal occurrence of the token | lexical enumeration over the asserted scope |
+| `DIRECT_REF` | no direct syntactic reference to the binding | lexical enumeration **plus** alias check on the binding |
+| `RUNTIME` | the access never occurs when the program runs | lexical evidence is **insufficient by construction**; needs computed-access bounding or execution |
+
+The answer key is built **under the same `meaning`**. A claim may not be graded as `RUNTIME`
+and answered with `LITERAL` evidence, or the reverse.
+
+## A2.3 — Human input does not by itself decide the comparison
+
+**Supersedes decision criterion 4 and PR4b's loss condition.** Charging Legasus for human
+coverage input while the baseline gets it free would rig the comparison. Both arms are charged
+equally for establishing coverage.
+
+The experiment now reports **two separated answers**, per the governor:
+
+**Q1 — who establishes adequacy?** Can the arm establish coverage itself, without supplied
+fact? Reported for each arm. Legasus failing this loses only the **stronger claim** of
+independently establishing coverage. It is **not** a verdict on the comparison.
+
+**Q2 — does Legasus reduce the cost or the mistakes of using that evidence?** Given the *same*
+supplied coverage fact, measured.
+
+### Revised decision rule
+
+Legasus wins **Q2** iff all hold:
+
+1. false acceptance strictly lower than BASELINE; **and**
+2. unnecessary refusal not higher; **and**
+3. total cost (analysis units + annotation units) not higher.
+
+Q1 is reported separately and never substitutes for Q2. A tie on Q2 still closes the candidate
+negative — no advantage demonstrated — but is reported as a tie, not as a failure to establish
+coverage.
+
+**PR4b′** Legasus will not establish coverage independently (Q1 negative). Whether it enforces
+containment more cheaply once coverage is supplied (Q2) is **genuinely open, and is the
+measurement.** I no longer predict a Q2 outcome; recording that I have no prediction is more
+honest than manufacturing one.
+
+## The question, as now formed
+
+> Who establishes the adequacy of the search, and does Legasus reduce the cost or the mistakes
+> of *using* that evidence? Keep the answer about **establishing** coverage separate from the
+> answer about **enforcing** it.
+
+## Sequence (frozen)
+
+1. Build both arms from the preserved development case.
+2. Freeze implementations, permitted inspections, budgets, and claim meanings.
+3. Select and seal evaluation cases independently of arm outputs.
+4. Run once; report correctness alongside effort.
+
+---
+
+# AMENDMENT 3 — after the development run, before any evaluation case exists
+
+Not a redirect. A defect in the frozen naive generator, found by running the development case,
+recorded here rather than patched quietly.
+
+## A3.1 — The generator reproduced only one of the two defects
+
+Frozen rule: *query = the longest alphabetic run of the subject, in its original case.* On the
+development subject `_bondForeclosureFired` that yields **`bondForeclosureFired`** — the whole
+name, which is perfectly adequate. The rule reproduced the **region** defect exactly
+(25560–25900, zero hits, the naive reading being "never saved and never restored") but produced
+the spelling defect only incidentally, through the `jg`-prefixed variant.
+
+That is a real underpowering. What I actually searched was `foreclosureFired` — the *concept
+word*, a suffix of the identifier with the leading segment dropped. A camelCase symbol never
+produces that under the frozen rule, so the `CASE_MISMATCH` axis-2 value would be
+under-represented in evaluation and the spelling stratum would test almost nothing.
+
+## A3.2 — A second frozen generator, declared before evaluation cases exist
+
+| Generator | Rule | Reproduces |
+|---|---|---|
+| **G1** *(existing)* | longest alphabetic run of the subject, original case | region-narrow records |
+| **G2** *(added)* | the subject with its **leading camelCase segment removed**, original case — `_bondForeclosureFired` → `foreclosureFired` | case/spelling-mismatch records |
+
+G2 is exactly what I did, stated as a rule. Assignment is **by the case's axis-2 value**, which
+is fixed by the fixture before any arm runs — not by me choosing per case. Both generators are
+mechanical; neither is hand-tuned to a claim.
+
+This does not make the design independent of the original defect. A1.5 already records that,
+and A3.2 deepens it: the second generator is derived *directly* from the failure under study.
+Any write-up states that the spelling stratum is **modelled on** the observed failure, not
+sampled from an unrelated population.
+
+## A3.3 — Development-case result (carries no comparative evidence)
+
+All three reach the correct answer, REFUSE, via `jgBondForeclosureFired` at line 32705.
+BASELINE and LEGASUS cost 4 analysis units each; the non-arm checker costs 3. LEGASUS reached
+it with `coverage ESTABLISHED`, `FRONTIER_OPEN` on the absence certificate, and **no new rule**
+— `universal-from-exhaustive-coverage` sufficed, which is early support for **PR4a**.
+
+This is what the arms were built to do. It is reported for completeness and is **not** evidence
+about the comparison.
+
 ## Standing context
 
 This runs **after** the consumer search closed negative, and does not reopen it. Whatever the
