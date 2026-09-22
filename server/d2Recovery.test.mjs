@@ -19,7 +19,7 @@
  * recovery.
  */
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, rmSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -34,6 +34,25 @@ const WS = mkdtempSync(join(tmpdir(), 'd2rec-'));
 const git = (...a) => execFileSync('git', ['-C', WS, ...a], { encoding: 'utf8' }).trim();
 const put = (f, s) => writeFileSync(join(WS, f), s, 'utf8');
 const commit = (m) => { git('add', '-A'); git('-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '-m', m); return git('rev-parse', '--short', 'HEAD'); };
+/**
+ * Recover one file from the audit bundle, the way an auditor would.
+ *
+ * Returns BOTH the checked-out text and the stored blob id. "Survives byte-for-byte" must be
+ * asserted on the BLOB ID: git's Windows autocrlf converts LF to CRLF on checkout, so a
+ * working-tree comparison fails on a file whose stored bytes are identical. Asserting on the
+ * checkout would be testing the platform's line-ending policy, not preservation.
+ */
+const recoverFile = (q, name) => {
+  const d = mkdtempSync(join(tmpdir(), 'rec-'));
+  try {
+    execFileSync('git', ['clone', '-q', '-b', q.branch, q.bundle, join(d, 'r')], { encoding: 'utf8' });
+    const r = join(d, 'r');
+    const blob = execFileSync('git', ['-C', r, 'rev-parse', `HEAD:${name}`], { encoding: 'utf8' }).trim();
+    return { text: readFileSync(join(r, name), 'utf8'), blob };
+  } catch { return { text: '(unrecoverable)', blob: null }; }
+  finally { try { rmSync(d, { recursive: true, force: true }); } catch {} }
+};
+
 const TARGETS = ['s3_matrix.js', 's7_cache.js'];
 
 try {
@@ -52,10 +71,13 @@ try {
   const CAND = commit('candidate: breaks s3, adds newwork');
   const CAND_TREE = await treeOf(WS, CAND);
   const q = await quarantine(WS, 'run-1', CAND);
-  say(q.ok, `quarantine succeeded and self-verified (${q.ok ? q.ref : q.error})`);
-  say(await treeOf(WS, q.ref) === CAND_TREE, 'quarantine ref resolves to the candidate TREE');
-  say(git('show', `${q.ref}:newwork.js`) === 'module.exports = { valuable: true };',
-    'good work inside the refused candidate survives byte-for-byte');
+  say(q.ok, `quarantine succeeded and self-verified (${q.ok ? q.bundle : q.error})`);
+  // The artifact lives OUTSIDE the workspace now (audit-only), so it is verified through the
+  // bundle rather than an in-workspace ref - the ref WAS the cross-run leak.
+  say(q.tree === CAND_TREE, 'the audit artifact holds the candidate TREE');
+  const srcBlob = git('rev-parse', `${CAND}:newwork.js`);
+  const rec = recoverFile(q, 'newwork.js');
+  say(rec.blob === srcBlob, `good work inside the refused candidate survives BYTE-FOR-BYTE (blob ${String(rec.blob).slice(0, 8)} vs ${srcBlob.slice(0, 8)})`);
 
   // ── 2. restore returns the authoritative tree EXACTLY, and observations bind to it ──
   const r = await restoreTo(WS, START);
@@ -76,8 +98,8 @@ try {
   say(await treeOf(WS, 'HEAD') === GOOD_TREE, 'on PASS the candidate is still HEAD - nothing was quarantined or reset');
 
   // ── 4. the quarantined candidate remains recoverable AFTER the reset ──
-  say(git('cat-file', '-t', q.ref) === 'commit', 'the quarantine ref still exists after a later reset');
-  say(git('show', `${q.ref}:newwork.js`).includes('valuable'), 'and its contents are still readable');
+  say(existsSync(q.bundle), 'the audit artifact still exists after a later reset');
+  say(recoverFile(q, 'newwork.js').text.includes('valuable'), 'and its contents are still recoverable');
 
   // ── 5. FAIL CLOSED: quarantine that cannot be verified must NOT reset ──
   // A ref that does not resolve to the candidate is exactly the state where resetting would

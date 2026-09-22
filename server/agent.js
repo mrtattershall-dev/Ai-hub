@@ -3039,6 +3039,11 @@ async function drive(loadDb, run) {
   if (run.busy) return;
   run.busy = true;
   _loadDb = loadDb;          // sub-tasks call the model through this
+  // d2: the run's STARTING PROPERTY must be established before any tool can execute. It used
+  // to be captured detached, so a fast first write could be observed as the "start" - START
+  // read THROWS, no LOADS->THROWS transition existed, and a real regression went unattributed
+  // with no error anywhere. Awaited here, once, at the only point that precedes every tool.
+  if (run.d2StartReady) { try { await run.d2StartReady; } catch { /* the error is recorded on the run */ } }
   try {
     // VISUAL BASELINE, once per run, before anything is changed: what the existing pages already
     // get wrong. The finish gate then blocks only on problems that are new (see webPageFor).
@@ -4562,10 +4567,17 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
   // start" is only sound if run start was itself established - a state is not safe merely for
   // being earlier. Recording here means the finish comparison CONSUMES this property instead
   // of re-deriving it, which is the cf6dffd rule applied to the hub's own boundary.
-  // Fire-and-forget: it must not delay the run, and a failure leaves d2Start unset, which the
-  // gate treats as "nothing established" rather than inventing one.
+  // NOT fire-and-forget, and this was a REAL RACE with a silent failure mode. The capture used
+  // to run detached while the run proceeded, so a model whose first write landed first had its
+  // "established starting state" recorded from the ALREADY-MUTATED workspace. START then read
+  // as THROWS, no LOADS->THROWS transition existed, and the regression was never attributable.
+  // Caught by d2Integration: ARM A reported `violated:false` for a lib.js that demonstrably
+  // did not load, and only because the slower bundle capture lost a race the earlier run won.
+  //
+  // The promise is awaited at the top of drive(), BEFORE any tool can execute, so the property
+  // is established against the state the run actually started from.
   if (D2_ON) {
-    (async () => {
+    run.d2StartReady = (async () => {
       try {
         await ensureRepo(WORKSPACE);
         // Non-invasive, for the same reason as the candidate: a ref the model cannot see

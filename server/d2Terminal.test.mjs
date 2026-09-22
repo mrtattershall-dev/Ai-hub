@@ -29,10 +29,25 @@
  * MAPPING as agent.js applies it. The mapping is asserted explicitly rather than by driving a
  * whole run, because a failure here must point at the rule, not at a model's mood.
  */
-import { mkdtempSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, rmSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+
+/**
+ * Recover a file from the AUDIT BUNDLE, the way an auditor would. The artifact lives outside
+ * the workspace now, so preservation is checked through the bundle rather than through an
+ * in-workspace ref - that ref was the cross-run leak this replaced.
+ */
+const recoverText = (branch, bundle, name) => {
+  if (!branch || !bundle) return '(no artifact)';
+  const d = mkdtempSync(join(tmpdir(), 'trec-'));
+  try {
+    execFileSync('git', ['clone', '-q', '-b', branch, bundle, join(d, 'r')], { encoding: 'utf8' });
+    return readFileSync(join(d, 'r', name), 'utf8');
+  } catch { return '(unrecoverable)'; }
+  finally { try { rmSync(d, { recursive: true, force: true }); } catch {} }
+};
 
 const { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, captureState } =
   await import('./d2.js');
@@ -77,12 +92,15 @@ async function atBoundary(status, breakIt) {
   const cand = await captureState(WS, 'd2 candidate', 'refs/legasus/candidate/RID');
   const v = await evaluateD2(WS, { startRef: start.sha, candidateRef: cand.sha, written: ['lib.js', 'partial_work.js'], targets: TARGETS, startObservations: startObs.observations });
 
-  let quarantineRef = null, restored = false;
+  let quarantineRef = null, quarantineBranch = null, restored = false;
   if (v.violated) {
     const q = await quarantine(WS, 'RID', cand.sha);
-    if (q.ok) { quarantineRef = q.ref; const r = await restoreTo(WS, start.sha); restored = r.ok && (await verifyAt(WS, start.sha)).ok; }
+    if (q.ok) {
+      quarantineRef = q.bundle; quarantineBranch = q.branch;
+      const r = await restoreTo(WS, start.sha); restored = r.ok && (await verifyAt(WS, start.sha)).ok;
+    }
   }
-  return { WS, g, v, quarantineRef, restored, startTree, candTree: cand.tree, finalStatus: terminalStatus(status, !v.violated) };
+  return { WS, g, v, quarantineRef, quarantineBranch, restored, startTree, candTree: cand.tree, finalStatus: terminalStatus(status, !v.violated) };
 }
 
 const dirs = [];
@@ -109,9 +127,9 @@ try {
     say(r.restored, 'the authoritative start state was restored AND verified');
     say(r.finalStatus === 'stopped_d2_restored', `status becomes 'stopped_d2_restored', NOT refused_d2 (got ${r.finalStatus})`);
     say(await treeOf(r.WS, 'HEAD') === r.startTree, 'HEAD tree is byte-identical to the run-start tree');
-    say(r.g('show', `${r.quarantineRef}:partial_work.js`).includes('useful'),
+    say(recoverText(r.quarantineBranch, r.quarantineRef, 'partial_work.js').includes('useful'),
       'the stopped run\'s partial work is PRESERVED in quarantine, not destroyed');
-    say(r.g('cat-file', '-t', r.quarantineRef) === 'commit', 'the quarantine ref survives the reset');
+    say(existsSync(r.quarantineRef), 'the audit artifact survives the reset');
   }
 
   // ── CONTROL 3: done + d2 PASS -> unchanged ──

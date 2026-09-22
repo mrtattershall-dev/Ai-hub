@@ -97,6 +97,16 @@ try {
 
   // ── FILESYSTEM ACCESS. An undisclosed path is not a permission boundary. ──
   console.log('\n=== is the audit directory actually UNREADABLE, or merely undisclosed? ===');
+  // POSITIVE CONTROL FOR THE PROBE ITSELF, through the same command path. Every
+  // access-denial test needs one: first demonstrate the probe CAN read a known-accessible
+  // file, then test the restricted target. Without it a malformed command or a missing target
+  // reads as "denied" - which is exactly how the first version of this test printed "a real
+  // permission boundary exists" about a file it never reached.
+  const known = join(WS, 'lib.js');
+  const controlRead = asModel(`node -e "console.log(require('fs').readFileSync(process.argv[1]).length)" "${known}"`);
+  const probeWorks = !/^ERR:/.test(controlRead) && /\d/.test(controlRead);
+  say(probeWorks, `PROBE POSITIVE CONTROL: the probe can read a known-accessible file (${String(controlRead).trim()} bytes) - without this, every "denied" below is uninterpretable`);
+
   // Read the CONTENT, and judge on the content - not on an exit code that a mangled command
   // can fake. An undisclosed path is not a permission boundary.
   const marker = 'PACK';                                    // every git bundle starts "# v2 git bundle" / PACK

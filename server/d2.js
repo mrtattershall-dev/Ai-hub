@@ -395,6 +395,17 @@ export async function quarantine(workspace, runId, candidateRef, auditDir = null
   try { mkdirSync(dir, { recursive: true }); } catch (e) { return { ok: false, error: `audit dir: ${e.message}` }; }
   const bundle = join(dir, `${runId}.bundle`);
 
+  // RESOLVE ONCE, to a FULL commit id, and use that same id for capture AND verification.
+  // The caller may pass a symbolic ref ('HEAD'), a short sha or a ref name; resolving at the
+  // point of use instead meant capture and verification could disagree about which commit was
+  // meant, and a prefix comparison could not tell them apart. Full ids also remove any
+  // ambiguity about WHICH commit ended up in the artifact.
+  const resolved = await git(workspace, ['rev-parse', '--verify', `${candidateRef}^{commit}`]);
+  if (!resolved.ok || !/^[0-9a-f]{40}$/.test(resolved.out)) {
+    return { ok: false, error: `could not resolve ${candidateRef} to a commit (${resolved.err || resolved.out})` };
+  }
+  const candidateSha = resolved.out;
+
   // A bundle needs a REF to name, and the ref must not persist in the workspace. It must also
   // be a BRANCH: a bundle whose only ref is outside refs/heads has no HEAD, so `git clone` of
   // it checks out nothing and an auditor cannot recover the candidate - which is the artifact's
@@ -404,7 +415,7 @@ export async function quarantine(workspace, runId, candidateRef, auditDir = null
   // The branch exists only between these two calls, after the run has already terminated, so
   // no model is executing while it is present.
   const tmpRef = `refs/heads/legasus-audit-${runId}`;
-  const mk = await git(workspace, ['update-ref', tmpRef, candidateRef]);
+  const mk = await git(workspace, ['update-ref', tmpRef, candidateSha]);
   if (!mk.ok) return { ok: false, error: `temp ref: ${mk.err}` };
   const b = await git(workspace, ['bundle', 'create', bundle, tmpRef]);
   await git(workspace, ['update-ref', '-d', tmpRef]);           // leave no trace in the repo
@@ -415,12 +426,16 @@ export async function quarantine(workspace, runId, candidateRef, auditDir = null
   // reset destroys the only copy. `bundle verify` proves it is readable and complete.
   const v = await git(workspace, ['bundle', 'verify', bundle]);
   if (!v.ok) return { ok: false, error: `bundle verify: ${v.err}` };
-  const want = await treeOf(workspace, candidateRef);
+  const want = await treeOf(workspace, candidateSha);
   const listed = await git(workspace, ['bundle', 'list-heads', bundle]);
-  if (!listed.ok || !listed.out.includes(candidateRef.slice(0, 7))) {
-    // list-heads prints the commit sha; compare on the prefix we were given.
-    const heads = listed.ok ? listed.out : listed.err;
-    return { ok: false, error: `bundle does not name the candidate (${String(heads).slice(0, 120)})` };
+  // FULL object id, never a prefix. The earlier check compared `candidateRef.slice(0, 7)`
+  // against list-heads output, which silently assumed the caller had passed a sha - hand it
+  // 'HEAD' and it compared the literal string "HEAD" to a sha listing and called a perfectly
+  // correct bundle invalid. Fail-closed, so nothing was destroyed, but the caller was told a
+  // falsehood. A prefix comparison is also ambiguous about WHICH commit was captured.
+  const bundledIds = listed.ok ? listed.out.split('\n').map((l) => l.trim().split(/\s+/)[0]) : [];
+  if (!bundledIds.includes(candidateSha)) {
+    return { ok: false, error: `bundle names [${bundledIds.join(', ').slice(0, 80)}], expected ${candidateSha}` };
   }
   // RECOVERY PROCEDURE, recorded with the artifact. A bundle whose only ref is a branch still
   // carries no HEAD, so a plain `git clone <bundle>` warns "remote HEAD refers to nonexistent

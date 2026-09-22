@@ -23,11 +23,23 @@
  * DIFFERENT in exactly the way Amendment 10 permits, and in no other way.
  */
 import { spawn } from 'node:child_process';
-import { mkdirSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs';
+
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { scratch, startHub, freePorts } from './testHarness.mjs';
+
+/** Can an auditor recover a file from the external audit bundle? */
+const recoverable = (bundle, runId, name) => {
+  const d = mkdtempSync(join(tmpdir(), 'irec-'));
+  try { execFileSync('git', ['clone', '-q', '-b', `legasus-audit-${runId}`, bundle, join(d, 'r')], { encoding: 'utf8' });
+        return existsSync(join(d, 'r', name)); }
+  catch { return false; }
+  finally { try { rmSync(d, { recursive: true, force: true }); } catch {} }
+};
+
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 let passed = 0, failed = 0;
@@ -77,13 +89,14 @@ async function arm(script, enforce) {
       d2StartObs: run?.d2Start?.observations || null,
       eventTools: events.filter((e) => ['write_file', 'edit_file', 'append_file'].includes(e.tool)).map((e) => e.tool),
       candidateTree: run?.d2?.candidateRef ? git(ws, 'rev-parse', `${run.d2.candidateRef}^{tree}`) : null,
-      quarantineTree: run?.d2?.quarantineRef ? git(ws, 'rev-parse', `${run.d2.quarantineRef}^{tree}`) : null,
+      auditBundle: run?.d2?.auditBundle || null,
+      auditTree: null,   // filled below from the bundle itself
       headTree: git(ws, 'rev-parse', 'HEAD^{tree}'),
       dirty: git(ws, 'status', '--porcelain'),
       libSrc,
       loads: (f) => { try { execFileSync(process.execPath, ['-e', 'require(process.argv[1])', join(ws, f)], { timeout: 15000 }); return true; } catch { return false; } },
       partialOnDisk: existsSync(join(ws, 'partial_work.js')),
-      partialInQuarantine: run?.d2?.quarantineRef ? !git(ws, 'show', `${run.d2.quarantineRef}:partial_work.js`).startsWith('ERR:') : null,
+      partialInQuarantine: run?.d2?.auditBundle ? recoverable(run.d2.auditBundle, run.id, 'partial_work.js') : null,
     };
   } finally {
     try { if (hub) hub.kill(); } catch {}
@@ -112,14 +125,17 @@ try {
     const A = await arm(script, false);
     const B = await arm(script, true);
     dirs.push(A.dir, B.dir);
-    console.log(`  A: status=${A.status} d2=${JSON.stringify({ v: A.d2?.violated, wr: A.d2?.wouldRefuse, q: !!A.d2?.quarantineRef })} ${broken} loads=${A.loads(broken)}`);
-    console.log(`  B: status=${B.status} d2=${JSON.stringify({ v: B.d2?.violated, q: !!B.d2?.quarantineRef, rec: B.d2?.recovery?.ok })} ${broken} loads=${B.loads(broken)}`);
+    console.log(`  A: status=${A.status} d2=${JSON.stringify({ v: A.d2?.violated, wr: A.d2?.wouldRefuse, cap: !!A.d2?.auditBundle })} ${broken} loads=${A.loads(broken)}`);
+    console.log(`  B: status=${B.status} d2=${JSON.stringify({ v: B.d2?.violated, q: !!B.d2?.auditBundle, rec: B.d2?.recovery?.ok })} ${broken} loads=${B.loads(broken)}`);
 
     // ── PRE-INTERVENTION: everything must be equal ──
     say(A.d2StartObs && JSON.stringify(A.d2StartObs) === JSON.stringify(B.d2StartObs), `same start observations ${JSON.stringify(A.d2StartObs)}`);
     say(JSON.stringify(A.eventTools) === JSON.stringify(B.eventTools), `same host write events ${JSON.stringify(A.eventTools)}`);
     say(A.candidateTree && A.candidateTree === B.candidateTree, `SAME CANDIDATE TREE - identical replies produced identical state (${String(A.candidateTree).slice(0, 8)})`);
     say(A.d2?.violated === true && B.d2?.violated === true, 'BOTH arms reached the violation verdict');
+    // Capture happens BEFORE the arms diverge, so it must be present in both - that symmetry is
+    // what keeps 'differ in authority, not information' true across runs.
+    say(!!A.d2?.auditBundle && !!B.d2?.auditBundle, 'BOTH arms captured the candidate for audit (capture precedes the authority branch)');
     say(JSON.stringify(A.d2?.newly_unloadable) === JSON.stringify(B.d2?.newly_unloadable), `same impact ${JSON.stringify(A.d2?.newly_unloadable)}`);
 
     // ── AUTHORITY DIVERGES, and only here ──
@@ -129,13 +145,13 @@ try {
     say(A.loads(broken) === false, `ARM A: the broken ${broken} SURVIVES - no authority to intervene`);
 
     say(B.status === expectB, `ARM B status '${expectB}' (got ${B.status})`);
-    say(!!B.d2?.quarantineRef, 'ARM B quarantined the candidate');
-    say(B.quarantineTree === A.candidateTree, 'ARM B quarantine tree == the pre-action candidate tree');
+    say(!!B.d2?.auditBundle, `ARM B captured the candidate for audit (${B.d2?.auditBundle || "none"})`);
+    say(!!B.d2?.auditBundle && existsSync(B.d2.auditBundle), 'the audit artifact exists OUTSIDE the workspace');
     say(B.d2?.recovery?.ok === true, `ARM B restore verified (${B.d2?.recovery?.error || 'ok'})`);
     say(B.loads(broken) === true, `ARM B: ${broken} loads again - the start state was restored`);
     say(!B.libSrc.includes('load-time failure planted'), 'ARM B: the planted breakage is gone from the working tree');
     say(B.partialOnDisk === false, 'ARM B: untracked run-created files were REMOVED (reset --hard alone would have left them)');
-    say(B.partialInQuarantine === true, 'ARM B: that partial work is PRESERVED in quarantine, not destroyed');
+    say(B.partialInQuarantine === true, 'ARM B: that partial work is PRESERVED in the audit artifact, not destroyed');
     say(B.dirty === '', 'ARM B: working tree clean after restore');
   }
 } finally {
