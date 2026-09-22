@@ -75,9 +75,18 @@ try {
   // The artifact lives OUTSIDE the workspace now (audit-only), so it is verified through the
   // bundle rather than an in-workspace ref - the ref WAS the cross-run leak.
   say(q.tree === CAND_TREE, 'the audit artifact holds the candidate TREE');
+  // TWO SEPARATE CLAIMS, and the first must not stand in for the second just because checkout
+  // conversion makes the second awkward to assert:
+  //   STORED CONTENT  the blob git holds is identical
+  //   WORKING TREE    the checked-out file meets the byte/behavioural requirement
   const srcBlob = git('rev-parse', `${CAND}:newwork.js`);
   const rec = recoverFile(q, 'newwork.js');
-  say(rec.blob === srcBlob, `good work inside the refused candidate survives BYTE-FOR-BYTE (blob ${String(rec.blob).slice(0, 8)} vs ${srcBlob.slice(0, 8)})`);
+  say(rec.blob === srcBlob, `STORED: the refused candidate's work is byte-identical in git (blob ${String(rec.blob).slice(0, 8)} vs ${srcBlob.slice(0, 8)})`);
+  // The recovered CHECKOUT, compared on content rather than on raw bytes - git's Windows
+  // autocrlf rewrites line endings on checkout, so the requirement is that the recovered file
+  // says the same thing, not that it is the same byte sequence as the original working copy.
+  say(rec.text.replace(/\r\n/g, '\n') === 'module.exports = { valuable: true };\n',
+    'WORKING TREE: the recovered checkout is the same file, modulo the platform\'s line endings');
 
   // ── 2. restore returns the authoritative tree EXACTLY, and observations bind to it ──
   const r = await restoreTo(WS, START);

@@ -44,7 +44,7 @@ import { emitHostEvent, attachFileSink } from './hostEvent.js';
 // LEGASUS PHASE 2 - d2, the first LOAD-BEARING decision. See PHASE2-INTERVENTION_PREREG.md.
 // Off unless AGENT_D2_TARGETS names the campaign's protected deliverables, so ARM A of the
 // paired campaign is the hub exactly as Phase 1 left it.
-import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState } from './d2.js';
+import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState, mayMutate } from './d2.js';
 
 // The Phase 1 consumer, attached once at module load and only when asked for. Guarded because
 // a sink that cannot be created must not stop the hub booting: observation is never allowed to
@@ -3044,6 +3044,19 @@ async function drive(loadDb, run) {
   // read THROWS, no LOADS->THROWS transition existed, and a real regression went unattributed
   // with no error anywhere. Awaited here, once, at the only point that precedes every tool.
   if (run.d2StartReady) { try { await run.d2StartReady; } catch { /* the error is recorded on the run */ } }
+  // AN OBSERVATION ERROR MUST STOP THE RUN BEFORE IT MUTATES, not be discovered at the terminal
+  // boundary. By then there is no established state to restore TO - the one thing recovery
+  // depends on - so a run that cannot be judged must not be allowed to damage anything first.
+  {
+    const may = mayMutate(run, D2_ON);
+    if (!may.ok) {
+      run.status = 'error';
+      run.busy = false;
+      pushStep(run, { type: 'error', text: `d2: refusing to start — ${may.reason}. No tool ran; the workspace is untouched.` });
+      persist(run);
+      return;
+    }
+  }
   try {
     // VISUAL BASELINE, once per run, before anything is changed: what the existing pages already
     // get wrong. The finish gate then blocks only on problems that are new (see webPageFor).

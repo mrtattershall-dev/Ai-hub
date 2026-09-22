@@ -453,6 +453,29 @@ export async function quarantine(workspace, runId, candidateRef, auditDir = null
   };
 }
 
+/**
+ * May this run be allowed to MUTATE anything?
+ *
+ * The starting-state observation and the restoration snapshot must describe the SAME state,
+ * established BEFORE mutation is permitted. Awaiting the observation fixed the ordering; it did
+ * not by itself make the property true - naming a field `d2Start` never guaranteed it.
+ *
+ * So this is the gate, and it is deliberately a pure function of the run: if the observation
+ * did not succeed, the run may not begin mutating. A failed measurement must stop the run at
+ * the START, not be discovered at the terminal boundary after the damage is done - by then
+ * there is no established state to restore TO, which is the one thing recovery depends on.
+ *
+ *   { ok: true }                      observation succeeded; mutation may proceed
+ *   { ok: false, reason }             it did not; the run must not mutate
+ */
+export function mayMutate(run, d2On) {
+  if (!d2On) return { ok: true };
+  if (run?.d2StartError) return { ok: false, reason: run.d2StartError };
+  if (!run?.d2Start) return { ok: false, reason: 'the starting property was never recorded' };
+  if (!run.d2Start.tree) return { ok: false, reason: 'the starting observation carries no tree to bind it to' };
+  return { ok: true };
+}
+
 /** Restore the authoritative workspace to the run's established starting state. */
 export async function restoreTo(workspace, startRef) {
   // `reset --hard` IS NOT ENOUGH, and the terminal control caught it: reset restores tracked
