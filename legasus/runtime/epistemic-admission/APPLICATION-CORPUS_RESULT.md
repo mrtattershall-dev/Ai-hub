@@ -1,16 +1,20 @@
 # Application-corpus refusal search — result. H1..H6 against `APPLICATION-CORPUS_PREREG.md`.
 
     Selection frozen and committed at 9a48009, BEFORE any repository was fetched.
-    3 repositories, 3,882 eligible files at the recorded revisions, 3,437 evaluated,
-    1 candidate finding, 0 consequential external refusals.
+    3 repositories, 3,882 eligible files at the recorded revisions, 3,438 evaluated,
+    1 rule violation found, 0 established as consequential.
+    ACCOUNTING CORRECTED after review; every count below reconciles exactly.
 
 ## The headline
 
-> **No consequential external refusal was found. The question stays open.**
+> **One external rule violation was found. Its consequence is unestablished, so no consequential
+> external refusal is established. The question stays open.**
 
-One candidate finding surfaced, and independent examination disqualifies it: it is in a **3.5 MB
-bundled, minified vendor distribution**, not application code anyone wrote or would act on. The
-corpus and budget are **not changed** — the frozen clause forbids searching until success.
+The violation is in a **3.5 MB bundled, minified vendor distribution** — outside the intended target
+of *authored application code*, though inside the frozen eligibility filter. **Generated provenance
+is not evidence that the finding is inconsequential**; consequence and intent are simply not
+established either way. The corpus and budget are **not changed** — the frozen clause forbids
+searching until success.
 
 ## The corpus, at the recorded revisions
 
@@ -22,25 +26,49 @@ corpus and budget are **not changed** — the frozen clause forbids searching un
 
 All three clones succeeded; no repository was replaced.
 
-## Both denominators, as frozen
+## Both denominators, as frozen — accounting corrected
+
+**The first version of this table labelled a column "EVALUATED" that in fact counted *evaluated
+without a violation*.** That made the candidate look like it sat outside the evaluated set. It did
+not: the file was evaluated, and a violation was the outcome. Corrected:
 
 | | etherpad-lite | Ghost | NodeBB | **total** |
 |---|---|---|---|---|
 | eligible at the revision | 41 | 2,896 | 945 | **3,882** |
 | **absent from disk** (checkout failed) | 0 | **175** | 0 | **175** |
 | eligible on disk = scanned | 41 | 2,721 | 945 | **3,707** |
-| **EVALUATED** | 37 | 2,462 | 938 | **3,437** |
-| **INCOMPLETE** | 3 | 259 | 7 | **269** |
-| **EXCLUDED** | 0 | 0 | 0 | **0** |
-| **VIOLATION (candidate)** | **1** | 0 | 0 | **1** |
+| evaluated, **no violation** | 37 | 2,462 | 938 | **3,437** |
+| evaluated, **violation found** | **1** | 0 | 0 | **1** |
+| **TOTAL EVALUATED** | **38** | **2,462** | **938** | **3,438** |
+| INCOMPLETE | 3 | 259 | 7 | **269** |
+| EXCLUDED | 0 | 0 | 0 | **0** |
 
-**3,437 of 3,882 eligible files were actually evaluated — 88.5%.** The gap is 269 incomplete and 175
+Each repository reconciles: `evaluated + violation + incomplete + excluded = eligible on disk`
+(41, 2,721, 945). Corpus-wide: **3,438 + 269 = 3,707 on disk**, and **3,707 + 175 absent = 3,882
+eligible at the revisions**.
+
+**3,438 of 3,882 eligible files were actually evaluated — 88.6%.** The gap is 269 incomplete and 175
 that never reached disk. Reporting only the evaluated subset would have shown a clean sweep and
 hidden both.
 
-`INCOMPLETE` breaks down as **249 `analysisIncomplete`** (parse failures — JSX, Flow, and files
-written for parsers other than the default one, as predicted) and **26 `coverageIncomplete`**
-(suppression directives). **None** was silently converted into acceptance.
+### The INCOMPLETE breakdown — corrected, and its overlap limit stated
+
+    analysisIncomplete   243     parse failures: JSX, Flow, files for other parsers
+    coverageIncomplete    26     suppression directives
+    ruleNotRun             0
+                         ---
+                         269     exactly the INCOMPLETE bucket
+
+**The first version said 249 parse failures. That was an arithmetic error on my part** — the figure
+is **243** (3 + 239 + 1), and 243 + 26 = 269 with nothing left over.
+
+**Overlap is not measured, and cannot be read off these numbers.** The scanner assigns each file
+**one** reason by priority — `analysisIncomplete`, else `coverageIncomplete`, else `ruleNotRun` —
+so a file that both fails to parse *and* carries a suppression is counted once, under the first.
+The reasons therefore sum to the bucket **by construction**, not because they are disjoint. What is
+established is the bucket total; the joint distribution is not.
+
+**None** of the 269 was silently converted into acceptance.
 
 ### Two integrity facts about the corpus, recorded
 
@@ -49,10 +77,13 @@ eligible files never reached disk, all under deep `ghost/core/core/server/data/m
 paths — consistent with Windows path limits. They are in the denominator as **absent**, not as
 passes.
 
-**The working trees are CRLF-normalised relative to the revisions.** `core.autocrlf=true`. A
-12-file digest sample against `HEAD` gave 10 exact matches and 2 differing **only** in line endings
-(verified: identical after stripping `\r`). Line endings are irrelevant to this rule, but the
-analysed bytes are not the repositories' bytes, and that is stated rather than assumed away.
+**The experiment ran on working-tree bytes associated with the frozen revisions, not on the
+repositories' bytes.** `core.autocrlf=true`, so checkout rewrote line endings.
+
+**Scope of what was checked, stated precisely:** a **12-file sample** from Ghost was digested against
+`HEAD` — 10 exact matches, 2 differing **only** in line endings (verified identical after stripping
+`\r`). **That establishes line-ending equivalence for those twelve files. It does not establish it
+for the corpus.** The other 3,695 files were not digested against their revisions at all.
 
 ## The candidate finding, examined independently
 
@@ -68,11 +99,27 @@ returns nothing. Under the frozen eligibility filter this file **is** eligible: 
 `dist/`, `build/`, `out/`, `coverage/` and `*.min.js`, and **not** `vendor/`. The filter was frozen
 before the corpus was fetched and **is not being changed now**.
 
-**3. Whether the behaviour is intentional — and the honest limit.** This is **generated bundler
-output**. The diagnostic is an artefact of minification, not a decision by etherpad's authors, and
-nobody would act on it in this file. **I cannot determine intentionality in the original sources
-from the minified bundle** — there is no source map — so what I can establish is provenance and
-generation, not intent. On provenance alone this **does not qualify as a consequential finding**.
+**3. Whether the behaviour is intentional — and what provenance does NOT settle.** This is
+**generated bundler output**, and there is no source map, so I cannot reach the original sources to
+ask what the callbacks were meant to do.
+
+**Corrected after review: generated provenance does not establish that a finding is inconsequential.**
+Bundled code executes, and a callback that fails to return in a bundle can carry consequence exactly
+as one in hand-written source can. The first version of this document slid from *"generated"* to
+*"nobody would act on it"* — that is turning **inability to establish consequence** into **evidence
+of no consequence**, and it is withdrawn.
+
+What the evidence supports, exactly:
+
+> **One external rule violation, in generated vendor code. Behavioural consequence: unestablished.
+> Intentionality: unestablished.**
+
+**The target and the eligibility filter are different things, and the difference is mine.** The
+experiment was aimed at *authored application code*; the frozen filter admitted any `.js`/`.mjs`/
+`.cjs` outside `dist/`, `build/`, `out/`, `coverage/` and `*.min.js`, which lets vendored bundles
+through. The filter was frozen before the corpus was fetched and **is not being changed now** — but
+the finding lands outside the intended target, and that is a property of my filter, not a verdict on
+the finding.
 
 **4. The adapter preserves the diagnostic.** All three messages verbatim, with line numbers.
 
@@ -105,19 +152,36 @@ tool's own reason preserved — while clean files from the same repository estab
 none of them and added no finding of its own. That sentence was frozen into the preregistration
 before the run and stands unchanged.
 
-**No consequential external refusal.** The single candidate is generated vendor output. **The result
-stays open.** The corpus selection and the scan budget are unchanged; no fourth repository was added
-and no filter was widened after seeing the outcome.
+**No consequential external refusal is ESTABLISHED** — not because the finding was shown harmless,
+but because its consequence was never determined. **The result stays open.** The corpus selection and
+the scan budget are unchanged; no fourth repository was added and no filter was widened after seeing
+the outcome.
+
+**The strongest practical finding in this run is the harness defect above.** The repaired coverage
+interface made a real mistake *visible* — 41 files that a pass/fail interface would have reported as
+clean admissions — instead of converting it into acceptance. That is a demonstrated benefit of
+representing incomplete analysis explicitly. **The coverage checks that produced it remain the
+adapter's**, not Legasus's: Legasus enforced the account it was given, and still does not
+independently establish that account's truth.
 
 ## Predictions
 
-- **"I expect at least one candidate finding" — held, weakly.** One appeared, and it does not
-  survive examination as consequential. I recorded that I had no evidence for this beyond the
-  libraries result, and that stands.
+- **"I expect at least one candidate finding" — held.** One appeared. Whether it is consequential is
+  unestablished, so the prediction is confirmed at the level it was made and no further.
 - **"I expect the INCOMPLETE bucket to be non-trivial, mostly parse failures" — held.** 269, of
-  which 249 are parse failures.
+  which **243** are parse failures.
 - **"I expect the evaluated subset to be substantially smaller than the eligible denominator" —
-  held.** 3,437 of 3,882, and the 175-file checkout gap was not something I anticipated.
+  held.** 3,438 of 3,882, and the 175-file checkout gap was not something I anticipated.
+
+## Closed
+
+**This experiment is closed.** No repository is added. The next useful step is **independent
+reproduction of this pipeline and its candidate** — not another search chosen to produce a positive
+headline.
+
+**The 0/15 registry result is preserved alongside this.** It is a historical result about fifteen
+declarations from this project's own past; this is a separate, successful **external mapping** of one
+obligation. Neither is added to the other's denominator.
 
 ## Untouched
 
