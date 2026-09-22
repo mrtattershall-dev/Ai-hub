@@ -50,6 +50,16 @@ export const MODE = Object.freeze({
 // insensitive. JSON encoding is unambiguous and printable.
 const key = (origin, ref) => JSON.stringify([origin, ref]);
 
+// THE SUBJECT OF GOVERNANCE: a RECORD OCCURRENCE - this record, as merged from this origin.
+//
+// Not a positional label (A6: an unchanged label can name a different record after reordering),
+// not bytes (two byte-identical records in different origins are two occurrences, and content
+// equality establishes neither common origin nor ownership nor independent evidence), and not a
+// lineage. A governance entry written against an occurrence cannot silently land on a different
+// consumer, because the occurrence changes when the record or its origin does.
+export const occurrenceOf = (origin, entry) =>
+  createHash('sha256').update(JSON.stringify([origin, entry.ref, entry])).digest('hex');
+
 /** Combine journals under merger-assigned origins. A PURE DATA OPERATION: it touches no store,
  *  calls no constructor, and cannot mint. Conflicts are REPORTED, never resolved. */
 export function merge(sources) {
@@ -69,7 +79,10 @@ export function merge(sources) {
     for (const e of (journal && journal.entries) || []) {
       const k = key(origin, e.ref);
       const prev = records.get(k);
-      if (!prev) { records.set(k, { origin, ref: e.ref, entry: e }); continue; }
+      if (!prev) {
+        records.set(k, { origin, ref: e.ref, entry: e, occurrence: occurrenceOf(origin, e) });
+        continue;
+      }
       // IDENTICAL CONTENT IS THE SAME RECORD, NOT A CONFLICT. Duplication is not ambiguity.
       if (JSON.stringify(prev.entry) === JSON.stringify(e)) continue;
       prev.ambiguous = true;
@@ -117,7 +130,7 @@ function orderWithinOrigins(records) {
 /** Re-execute the merged set. Every outcome names the (origin, ref) it belongs to, so a caller can
  *  never read a neighbour's result by position. */
 export function replayMerged(merged, { authorityStore: st, witnessModes, governingByRecord,
-  requestedModes, obligationContractId } = {}) {
+  governingByOccurrence, requestedModes, obligationContractId } = {}) {
   // TWO CHANNELS, AND ONLY ONE OF THEM DECIDES.
   //
   //     governing   the authorized obligation. Decides. Named in every outcome it decides.
@@ -135,11 +148,14 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
   // Absent governance means the DEFAULT, which is none of the three modes and never had a name: try
   // the designated address within its own origin, and failing that fall back to candidates found by
   // claim, requiring exactly one eligible, else refuse. T1 pins it so vocabulary cannot move it.
-  const governingFor = (r, c) => (governingByRecord && governingByRecord[key(r.origin, r.ref)])
+  const governingFor = (r, c) => (governingByOccurrence && governingByOccurrence[r.occurrence])
+    || (governingByRecord && governingByRecord[key(r.origin, r.ref)])
     || (witnessModes && witnessModes[c.relation]) || null;
-  const basisFor = (r, c) => (governingByRecord && governingByRecord[key(r.origin, r.ref)])
-    ? 'GOVERNING_BY_RECORD'
-    : ((witnessModes && witnessModes[c.relation]) ? 'GOVERNING_BY_RELATION' : 'DEFAULT');
+  const basisFor = (r, c) => (governingByOccurrence && governingByOccurrence[r.occurrence])
+    ? 'GOVERNING_BY_OCCURRENCE'
+    : ((governingByRecord && governingByRecord[key(r.origin, r.ref)])
+      ? 'GOVERNING_BY_RECORD'
+      : ((witnessModes && witnessModes[c.relation]) ? 'GOVERNING_BY_RELATION' : 'DEFAULT'));
   const obligationOf = (r, c) => {
     const mode = governingFor(r, c);
     const requested = (requestedModes && requestedModes[c.relation]) || null;
@@ -193,7 +209,7 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
 
   const run = (r) => {
     const e = r.entry;
-    const at = { origin: r.origin, ref: r.ref };
+    const at = { origin: r.origin, ref: r.ref, occurrence: r.occurrence };
     if (r.ambiguous) {
       push({ ...at, state: STATE.UNRESOLVED, minted: false,
         why: 'this identity is ambiguous in the merged set; nothing is chosen' });
@@ -355,8 +371,26 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
   // stopped. A cycle lands here, as do records waiting on a supplier that never established.
   for (const r of pending) run(r);
 
-  return { ok: true, outcomes,
-    obligationContract: contractOf(obligationContractId, witnessModes, governingByRecord) };
+  // A GOVERNANCE ENTRY THAT DENOTES NOTHING IS REPORTED, NEVER SILENTLY IGNORED. An obligation that
+  // quietly matches no record is the same defect class as a guard that fires into nothing: the run
+  // looks governed and is not.
+  const unresolvedGovernance = [];
+  for (const [k, mode] of Object.entries(governingByOccurrence || {})) {
+    if (!merged.records.some((r) => r.occurrence === k)) {
+      unresolvedGovernance.push({ by: 'OCCURRENCE', denoting: k, mode,
+        why: 'this occurrence is not in the merged set. The governed subject is absent, so this'
+          + ' obligation governed nothing - it did not fall through to the default' });
+    }
+  }
+  for (const [k, mode] of Object.entries(governingByRecord || {})) {
+    if (!merged.records.some((r) => key(r.origin, r.ref) === k)) {
+      unresolvedGovernance.push({ by: 'RECORD', denoting: k, mode,
+        why: 'no record sits at these coordinates in this merged set' });
+    }
+  }
+  return { ok: true, outcomes, unresolvedGovernance,
+    obligationContract: contractOf(obligationContractId, witnessModes, governingByRecord,
+      governingByOccurrence, merged) };
 }
 
 /** WHICH OBLIGATION CONTRACT AN OUTCOME WAS PRODUCED UNDER.
@@ -364,12 +398,19 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
  *  Without this, two runs under different governing obligations are indistinguishable after the
  *  fact - a result that looks like reproduction because nothing recorded what it was reproducing.
  *  That is the replay defect R3 guards against, one level up. */
-function contractOf(id, byRelation, byRecord) {
+function contractOf(id, byRelation, byRecord, byOccurrence, merged) {
   const canonical = JSON.stringify({
     byRelation: Object.entries(byRelation || {}).sort(),
     byRecord: Object.entries(byRecord || {}).sort(),
+    byOccurrence: Object.entries(byOccurrence || {}).sort(),
   });
-  return { id: id || null, fingerprint: createHash('sha256').update(canonical).digest('hex') };
+  // TWO FINGERPRINTS, BECAUSE THEY ANSWER DIFFERENT QUESTIONS. G3 predicted that a digest of the
+  // governance MAP is insufficient on its own: two runs can share a map and govern different
+  // subjects. `fingerprint` is the map; `subjects` is what the map actually landed on.
+  const landed = (merged.records || []).map((r) => [r.origin, r.ref, r.occurrence]).sort();
+  return { id: id || null,
+    fingerprint: createHash('sha256').update(canonical).digest('hex'),
+    subjects: createHash('sha256').update(JSON.stringify(landed)).digest('hex') };
 }
 
 /** Do two results rest on the SAME governing obligations? A replay under a different contract is
@@ -377,6 +418,13 @@ function contractOf(id, byRelation, byRecord) {
 export function sameObligationContract(a, b) {
   return !!(a && b && a.obligationContract && b.obligationContract
     && a.obligationContract.fingerprint === b.obligationContract.fingerprint);
+}
+
+/** Did two runs govern the SAME SUBJECTS? An identical governance map over a different assignment
+ *  of records to origins is not the same admission contract, however well the maps match. */
+export function sameGovernedSubjects(a, b) {
+  return !!(a && b && a.obligationContract && b.obligationContract
+    && a.obligationContract.subjects === b.obligationContract.subjects);
 }
 
 /** THE APPARATUS REQUIREMENT from the seventh wrong-referent defect: an assertion names the record

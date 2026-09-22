@@ -2,12 +2,22 @@
 
     6 arms, all green.  132 -> 138 tests in this directory.  5 mutants run, 5 caught.
 
-## The answer
+## The answer, with its boundary attached
 
-**The party seeking admission cannot choose which burden applies.** A requested mode that differs
-from the governing one is refused as a substitution and recorded as refused; the refusal says so in
-words: *the party seeking admission does not choose which burden applies*. Asking changes nothing —
-A1 asserts the outcome is identical to not asking at all.
+> **Under the tested separation, a requester cannot override the governing obligation supplied by
+> the call-site governor.**
+
+That is the whole claim. It does **not** establish who may act as governor, nor that governance
+remains attached to the intended record across runs — the latter is now the named next boundary.
+
+A requested mode that differs from the governing one is refused as a substitution and recorded as
+refused, in words: *the party seeking admission does not choose which burden applies*.
+
+**What "asking changes nothing" means, exactly.** It is the **admission projection** — state,
+minting, binding, supply and the enforced mode — that is identical whether or not a request was
+made. The obligation record is deliberately *not* identical: the request is documented. And
+**refusing the request is not refusing the admission**: A1 carries a case where the admission
+succeeds while the request to change the burden is still refused.
 
 ## The trust decision, and the claim it does and does not support
 

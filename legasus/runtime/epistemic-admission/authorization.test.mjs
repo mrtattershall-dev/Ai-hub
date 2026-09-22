@@ -77,10 +77,28 @@ test('A1 — a caller cannot turn DESIGNATED into EXISTENTIAL by asking', () => 
   assert.match(a.why, /does not choose which burden applies/);
   assert.match(a.why, /request for EXISTENTIAL was recorded and REFUSED/);
 
-  // and the ask changed nothing at all: identical to not asking
+  // WHAT IS IDENTICAL, NAMED EXACTLY. "The request is refused" and "asking is identical to not
+  // asking" cannot both describe the WHOLE outcome, because the request metadata differs. The
+  // identical projection is the ADMISSION projection - state, minting, binding, supply - and the
+  // difference is confined to the recorded request.
   const plain = outcomeFor(play(sources, GOVERN_DESIGNATED), 'A', 'auth:2:a');
-  assert.equal(a.state, plain.state);
-  assert.equal(a.minted, plain.minted);
+  const admission = (o) => ({ state: o.state, minted: o.minted, bound: o.bound || [],
+    supply: (o.supply || []).map((x) => x.origin + '/' + x.ref + '/' + x.by),
+    mode: o.obligation.mode });
+  assert.deepEqual(admission(a), admission(plain),
+    'the ADMISSION projection is identical whether or not a request was made');
+  assert.notDeepEqual(a.obligation, plain.obligation,
+    'and the obligation record is NOT identical: the request is documented, which is the point');
+  assert.equal(plain.obligation.requested, null);
+
+  // REJECTING THE REQUEST IS NOT REJECTING THE ADMISSION. Here both happen, for different reasons,
+  // so the two are shown to be independent: a request is refused while an admission succeeds.
+  const succeeds = outcomeFor(play([src('A', ...history('auth:1:a', 'auth:2:a'))],
+    { ...GOVERN_DESIGNATED, requestedModes: { COVERAGE: MODE.EXISTENTIAL } }), 'A', 'auth:2:a');
+  assert.equal(succeeds.state, STATE.ESTABLISHED, 'the admission succeeds');
+  assert.equal(succeeds.supply[0].obligation.requestAccepted, false,
+    'while the request to change the burden was still refused');
+  assert.equal(succeeds.supply[0].obligation.mode, MODE.DESIGNATED);
 });
 
 test('A2 — omitting the request cannot inherit a weaker default', () => {
