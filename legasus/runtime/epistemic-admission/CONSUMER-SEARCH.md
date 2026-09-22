@@ -21,9 +21,11 @@ model results this project has been publishing all along (`run5 vs base`, `14B v
 | the **local hub verifier** (`server/gameVerify.js`) | in-process |
 | the **asset library** | changes underneath both as packs are imported |
 
-**Same owner, different deployments.** That is version drift between components, not two mutually
-distrusting parties. It is weaker than the case the multi-party machinery was built for, and calling
-it "separately controlled producers" would be overstating it.
+**Same owner, different deployments — and the terminology needs care in both directions.** Common
+ownership does **not** by itself mean common control; independent deployment does **not** by itself
+establish separate authority boundaries. Neither inference is licensed. **What the evidence supports
+is version drift between components.** That is weaker than the case the multi-party machinery was
+built for, and calling it "separately controlled producers" would be overstating it.
 
 ## Its requirement, in its own words
 
@@ -105,7 +107,8 @@ The user's question was: *can you name a real consumer who needs evidence from s
 sources and currently struggles to enforce its requirements?*
 
 **A consumer that struggles: yes, precisely located.**
-**Separately *controlled* sources: no — separately deployed, same owner.**
+**Separately *controlled* sources: not established.** Separately deployed, same owner — which
+supports version drift between components, and neither more nor less.
 
 On that reading the condition for evaluating the multi-party hypothesis is **not met by this
 environment**, and the disciplined conclusion is the one already on the table: **retain Legasus as an
