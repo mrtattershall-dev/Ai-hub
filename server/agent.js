@@ -98,7 +98,7 @@ const D2_ENFORCE = process.env.AGENT_D2_ENFORCE === '1';
  * proof that state is correct; today alone this session has seen a shell report 0 for a node
  * process that exited 1, and a rig read an output file without checking its child's status.
  */
-async function d2FinishGate(run) {
+async function d2TerminalGate(run) {
   if (!D2_ON) return true;
   // FAIL CLOSED ON MEASUREMENT FAILURE. "The property did not exist to preserve"
   // (UNESTABLISHED - a target created during the run) and "we could not determine the
@@ -151,7 +151,12 @@ async function d2FinishGate(run) {
     });
     run.d2 = { ...v, candidateRef };
 
-    if (!v.violated) return true;                      // PASS: candidate is already HEAD
+    // PASS. On `done` the candidate is already HEAD; on `stopped` the hub's ordinary
+    // stopped-run behaviour is preserved EXACTLY - nothing quarantined, nothing reset.
+    // Stopped runs can still hold useful partial work, and d2 has no authority over work it
+    // has no complaint about. Restoring every stopped run would be a wholesale rollback
+    // policy rather than a load-preservation judgement, and would confound the A/B.
+    if (!v.violated) return true;
 
     // THE ONE PLACE THE ARMS DIFFER. ARM A has reached an identical verdict, from identical
     // observations, having created identical refs - and simply lacks the authority to act on
@@ -3472,13 +3477,9 @@ async function drive(loadDb, run) {
         // satisfy it does not hang - but it used to be recorded exactly like a clean finish. Set B goal 14
         // (Qwen3-Coder) wrote a page whose script never existed, test_web reported the 404 four times, and the
         // run ended 'done'. The status stays 'done' (harnesses and the UI key on it); the run says plainly what it is.
-        // d2: a forced finish is still a finish. A run that gave up after three blocked
-        // attempts must not promote a load regression just because the gate stopped asking.
-        if (!(await d2FinishGate(run))) {
-          run.status = 'refused_d2';
-          pushStep(run, { type: 'finish', thought, summary: args.summary || '' });
-          break turn;
-        }
+        // d2 used to be evaluated HERE. It now runs at the single terminal boundary in the
+        // finally below, which reaches `stopped` runs too - the path all six historical Set G
+        // violations took, and which this inline placement could never have seen.
         if ((run.finishBlocks || 0) >= 3) {
           run.forcedFinish = true;
           // The note is for a human reading the run; finishKind is for the two records that outlive it. The note text
@@ -3877,7 +3878,9 @@ async function drive(loadDb, run) {
             // d2 applies HERE TOO. This route already bypasses every other gate - that bypass
             // is an open defect with its own reproduction - so it is exactly the path a load
             // regression would otherwise escape through.
-            run.status = (await d2FinishGate(run)) ? 'done' : 'refused_d2';
+            // d2 is evaluated at the terminal boundary in the finally below, which covers
+            // this bypass route along with every other way a run can end.
+            run.status = 'done';
             break turn;
           }
         }
@@ -4042,6 +4045,32 @@ async function drive(loadDb, run) {
         }
       } catch { /* never let the repair take the run down */ }
     }
+    // ── LEGASUS d2, AT EVERY TERMINAL BOUNDARY (Amendment 10) ─────────────────────────
+    //
+    // HERE, not on the `done` path, because of a measured falsification: the original
+    // finish-only wiring would have intervened on 0 of the 6 historical Set G violations.
+    // All six terminated `stopped` - 44 of those 78 runs did - so a gate hung on promotion
+    // never saw the failure class it was built from.
+    //
+    // The abstraction was wrong, not just the placement. The hub lets state persist even
+    // when a run is not promoted, so the authority boundary is not "may this run be called
+    // complete?" but "may this candidate state remain authoritative after this run
+    // terminates?" - which is what the compounding question actually asks.
+    //
+    // AFTER the hub's own syntax repair above, deliberately: d2 must judge the state that
+    // will actually persist, not one the hub is about to rewrite underneath it.
+    if (D2_ON && ['done', 'error', 'stopped'].includes(run.status)) {
+      const mayPersist = await d2TerminalGate(run);
+      if (!mayPersist) {
+        // Authority is narrow and boundary-dependent. On `done` a violation refuses
+        // promotion. On `stopped` it only stops the newly regressed state PERSISTING - it
+        // does not declare stopped work disposable. Rolling back every stopped run would be
+        // a wholesale rollback policy, and any A/B difference could then come from that
+        // policy rather than from d2's judgement.
+        run.status = run.status === 'done' ? 'refused_d2' : 'stopped_d2_restored';
+      }
+    }
+
     // The workspace is settled - release it. Before the queue hand-off below, which calls
     // autoStart and needs the workspace free. No await between the parked-run break and
     // here, so awaiting_approval/interrupted release exactly as promptly as before.

@@ -390,6 +390,22 @@ export async function quarantine(workspace, runId, candidateRef) {
 
 /** Restore the authoritative workspace to the run's established starting state. */
 export async function restoreTo(workspace, startRef) {
+  // `reset --hard` IS NOT ENOUGH, and the terminal control caught it: reset restores tracked
+  // content but leaves UNTRACKED files exactly where they are. A run that created new files
+  // would "restore" to a tree byte-identical to the start commit while the working directory
+  // still held everything the run invented. That is not the start state, and verifyAt was
+  // right to refuse to call it one - which is precisely why verifyAt checks the working tree
+  // and not just the tree object.
   const r = await git(workspace, ['reset', '--hard', startRef]);
-  return r.ok ? { ok: true } : { ok: false, error: r.err };
+  if (!r.ok) return { ok: false, error: r.err };
+  // SAFE ONLY BECAUSE QUARANTINE RAN FIRST. captureState indexes with `add -A`, so those
+  // untracked files are already inside the quarantined candidate commit and stay recoverable.
+  // Calling this without a PROVEN quarantine would destroy them - which is why the caller
+  // fails closed when quarantine cannot be verified.
+  //
+  // `-fd`, deliberately not `-x`: ignored paths (node_modules and friends) are left alone.
+  // They are not the run's work and re-creating them is expensive.
+  const c = await git(workspace, ['clean', '-fd']);
+  if (!c.ok) return { ok: false, error: `reset succeeded but clean failed: ${c.err}` };
+  return { ok: true, cleaned: c.out || '(nothing untracked)' };
 }
