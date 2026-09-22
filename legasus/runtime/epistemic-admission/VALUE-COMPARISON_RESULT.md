@@ -100,8 +100,13 @@ it was redundant; the control shows there was nothing to attribute in the first 
 
 **Where it stands after this comparison:** for a single-party, single-file "analyse, save, restart,
 reuse" workflow, a 42-line content/config/tool digest is the right tool, and Legasus is 3.4× the code
-for the same result. **Its value, if it has one, must come from the properties this workflow does not
-touch** — and demonstrating that requires a workflow with more than one party in it.
+for the same result.
+
+**NARROWED, replacing this document's first wording.** I wrote that demonstrating its value
+*requires* a workflow with more than one party. **That is not established.** What this comparison
+shows is that value was not demonstrated *here*; a multi-party workflow is a **reasonable next
+hypothesis**, not a proven location. More parties could equally mean **more custom checks with no
+advantage** — the TC control would apply there too, and might give the same answer.
 
 **Where it does not stand:** nothing here shows Legasus is wrong, unsound, or that its internal
 results are invalidated. It shows that on *this* problem it is not the economical answer.
