@@ -91,6 +91,13 @@ Eight untouched files from **eslint's own source** (`lib/rules/*.js`, first eigh
 **all ACCEPT, all `ESTABLISHED`, all agree.** `array-callback-return.js` — the rule's own
 implementation — is among them.
 
+> **FOUND BY THE COVERAGE REPAIR (R6), attached here.** eslint 10's default configuration ignores
+> `node_modules/**`, and these eight files live there. The adapter used for this result never
+> checked `isPathIgnored`, so it linted files **the configuration excludes**. The observed
+> agreement stands; what it was agreement *under* was a configuration that does not apply to those
+> paths by default. The repaired adapter reports them `EXCLUDED`, and evaluates byte-identical
+> copies outside the ignored path instead — see `COVERAGE-REPAIR_RESULT.md`.
+
 ## F6 — consequential refusal: NOT achieved on external code
 
 **This is the shortfall, and it is reported as one.** I scanned **3,154 untouched third-party files**
