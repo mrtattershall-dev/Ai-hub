@@ -42,7 +42,13 @@ and at line 138:
 The requirement is explicit and correct: **verdicts being compared must come from the same asset
 library.**
 
-## How it currently enforces that requirement — it doesn't
+> **FIXED 2026-09-22, independently of Legasus.** Comparability is now an enforced precondition in
+> the scorer — `comparability.mjs`, unit 8/8, smoke 3/3 through the real report path — and the
+> affected historical records are marked *unestablished* in
+> `ai-coding-hub/training-data/factory/COMPARABILITY-AUDIT.md`. The section below describes the
+> defect as it stood when this document was written.
+
+## How it enforced that requirement at the time of writing — it didn't
 
 `score_run.mjs:465`:
 
