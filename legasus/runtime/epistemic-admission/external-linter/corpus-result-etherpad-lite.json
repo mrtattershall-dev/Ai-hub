@@ -1,0 +1,48 @@
+{
+  "rule": "array-callback-return",
+  "budgetFiles": 6000,
+  "scanned": 41,
+  "tally": {
+    "EVALUATED": 37,
+    "INCOMPLETE": 3,
+    "EXCLUDED": 0,
+    "VIOLATION": 1
+  },
+  "byRepo": {
+    "etherpad-lite": {
+      "eligibleOnDisk": 41,
+      "EVALUATED": 37,
+      "INCOMPLETE": 3,
+      "EXCLUDED": 0,
+      "VIOLATION": 1,
+      "notScannedBudget": 0
+    }
+  },
+  "incompleteReasons": {
+    "analysisIncomplete": 3
+  },
+  "candidates": [
+    {
+      "repo": "etherpad-lite",
+      "file": "etherpad-lite/src/static/vendor/scalar/standalone.js",
+      "findings": [
+        {
+          "ruleId": "array-callback-return",
+          "line": 16,
+          "message": "Array.prototype.map() expects a value to be returned at the end of arrow function."
+        },
+        {
+          "ruleId": "array-callback-return",
+          "line": 276,
+          "message": "Array.prototype.reduce() expects a value to be returned at the end of arrow function."
+        },
+        {
+          "ruleId": "array-callback-return",
+          "line": 516,
+          "message": "Array.prototype.map() expects a return value from function."
+        }
+      ]
+    }
+  ],
+  "seconds": 5
+}

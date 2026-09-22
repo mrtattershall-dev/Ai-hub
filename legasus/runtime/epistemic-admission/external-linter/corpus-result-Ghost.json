@@ -1,0 +1,27 @@
+{
+  "rule": "array-callback-return",
+  "budgetFiles": 6000,
+  "scanned": 2721,
+  "tally": {
+    "EVALUATED": 2462,
+    "INCOMPLETE": 259,
+    "EXCLUDED": 0,
+    "VIOLATION": 0
+  },
+  "byRepo": {
+    "Ghost": {
+      "eligibleOnDisk": 2721,
+      "EVALUATED": 2462,
+      "INCOMPLETE": 259,
+      "EXCLUDED": 0,
+      "VIOLATION": 0,
+      "notScannedBudget": 0
+    }
+  },
+  "incompleteReasons": {
+    "coverageIncomplete": 20,
+    "analysisIncomplete": 239
+  },
+  "candidates": [],
+  "seconds": 12
+}
