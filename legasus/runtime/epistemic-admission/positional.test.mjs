@@ -62,8 +62,12 @@ assert.equal(JSON.stringify(AUTHORIZED), JSON.stringify(OTHER),
 
 const J = (entries) => ({ entries });
 const src = (origin, e) => ({ origin, journal: J(e) });
+// P1..P5 MEASURE THE PRESERVED SPECIMEN, deliberately and by an unmistakable name. The live path
+// now contains this failure (CONTAINMENT_PREREG.md); the specimen is kept because a failure
+// repaired everywhere stops being evidence, and these arms are what keep it evidence.
 const play = (sources, opts = {}) => replayMerged(merge(sources).merged,
-  { authorityStore: store(), ...opts });
+  { authorityStore: store(), __specimenUncontainedContinuity: 'YES-I-WANT-THE-KNOWN-DEFECT',
+    ...opts });
 const AUTH_ORIGIN = 'origin-0';
 const authorization = { [PRED_OCC]: { successorOrigin: AUTH_ORIGIN,
   successorContent: contentOf(AUTHORIZED), transferGovernance: true } };

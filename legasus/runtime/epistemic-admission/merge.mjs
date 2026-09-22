@@ -90,7 +90,13 @@ export const contentOf = (entry) =>
 // whether the predecessor obligations transfer at all. Continuity and governance transfer are
 // SEPARATE PERMISSIONS: an authorized revision can change precisely the content an obligation
 // governed, and a reorder revises nothing.
-export function resolveContinuity(merged, continuity) {
+// THE SPECIMEN, PRESERVED BYTE-UNCHANGED IN ITS BODY AND NEVER CALLED BY THE LIVE PATH.
+//
+// P2 demonstrated that this function attaches an authorized continuity to the WRONG one of two
+// byte-identical histories when the merger assigns origins by position. It is kept because a
+// failure repaired everywhere stops being evidence - the same discipline as legacyDigestOf and the
+// deliberate Python specimens. C4 asserts it still fails, so a later "fix" would be loud.
+export function resolveContinuityUNCONTAINED(merged, continuity) {
   const findings = [];
   for (const [predecessor, auth] of Object.entries(continuity || {})) {
     const claimants = merged.records.filter((r) => r.entry.continuity
@@ -200,9 +206,40 @@ function orderWithinOrigins(records) {
 
 /** Re-execute the merged set. Every outcome names the (origin, ref) it belongs to, so a caller can
  *  never read a neighbour's result by position. */
+// THE CONTAINED PATH. The runtime cannot know that origins were derived from position. What it CAN
+// observe is when the ORIGIN IS THE ONLY THING SELECTING AMONG CLAIMANTS: if more than one claimant
+// carries the authorized content, nothing but the merger-assigned origin distinguishes them, and a
+// merger that assigns by position can therefore hand the authorization to whichever history landed
+// in that slot.
+//
+// This CONTAINS the failure; it does not solve it. The missing input is still missing (P5), and it
+// deliberately sacrifices legitimate transfers - a governor's genuine intent for one of two
+// byte-identical histories is now refused, because the alternative is a path that attaches an
+// obligation to the wrong history and reports it as authorized.
+export function resolveContinuity(merged, continuity) {
+  const findings = resolveContinuityUNCONTAINED(merged, continuity);
+  return findings.map((f) => {
+    if (!f.ok) return f;
+    const auth = continuity[f.predecessor];
+    const sameContent = merged.records.filter((r) => r.entry.continuity
+      && r.entry.continuity.predecessor === f.predecessor
+      && contentOf(r.entry) === auth.successorContent);
+    if (sameContent.length <= 1) return f;
+    return { predecessor: f.predecessor, ok: false, kind: 'INDISTINGUISHABLE',
+      claimants: sameContent.map((r) => ({ origin: r.origin, ref: r.ref }))
+        .sort((x, y) => (x.origin + ' ' + x.ref).localeCompare(y.origin + ' ' + y.ref)),
+      why: sameContent.length + ' claimants carry the authorized content, so nothing but the'
+        + ' MERGER-ASSIGNED ORIGIN selects between them. A merger that assigns origins by input'
+        + ' position would hand this authorization to whichever history landed in that slot, and'
+        + ' the inputs contain nothing that says which history the governor intended. The transfer'
+        + ' is refused. This CONTAINS a demonstrated misattachment; it does not solve it' };
+  });
+}
+
 export function replayMerged(merged, { authorityStore: st, witnessModes, governingByRecord,
   governingByOccurrence, requestedModes, obligationContractId,
-  unattachedPolicy, requestedUnattachedPolicy, continuity } = {}) {
+  unattachedPolicy, requestedUnattachedPolicy, continuity,
+  __specimenUncontainedContinuity } = {}) {
   // TWO CHANNELS, AND ONLY ONE OF THEM DECIDES.
   //
   //     governing   the authorized obligation. Decides. Named in every outcome it decides.
@@ -240,7 +277,13 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
   // CONTINUITY IS RESOLVED BEFORE GOVERNANCE, because an authorized transfer decides which
   // occurrence an obligation attaches to. A transfer happens only where the governor authorized
   // BOTH the continuity and the governance transfer.
-  const continuityFindings = resolveContinuity(merged, continuity);
+  // The specimen is reachable ONLY through a name that cannot be typed by accident, and only the
+  // P-suite passes it - so P1..P5 keep measuring the demonstrated failure end to end rather than
+  // being demoted to a unit test of a function nothing calls. C4 asserts the live default does not
+  // take this path.
+  const continuityFindings = __specimenUncontainedContinuity === 'YES-I-WANT-THE-KNOWN-DEFECT'
+    ? resolveContinuityUNCONTAINED(merged, continuity)
+    : resolveContinuity(merged, continuity);
   const inherited = {};
   for (const f of continuityFindings) {
     if (f.ok && f.transferGovernance && governingByOccurrence

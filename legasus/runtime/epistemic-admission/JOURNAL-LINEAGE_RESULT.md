@@ -23,6 +23,17 @@ Authorization comes from the governor and names what it authorizes: the **merger
 the successor must sit under, the **content** it must have, and **whether governance transfers at
 all**.
 
+## NARROWED, after `POSITIONAL-MISATTACHMENT_RESULT.md`
+
+The claim this run may make is:
+
+> **Authorized continuity preserved governance in the tested cases, but positional origin assignment
+> permits transfer to a different, byte-identical history.**
+
+The **content-change protection remains demonstrated** (L3, L4). **History-specific authorization
+does not.** P2 selects the unauthorized one of two byte-identical histories and reports it as a
+successful continuity. Read everything below with that narrowing attached.
+
 ## The decisive pair, across a fresh process boundary
 
 **L2 — the positive control held.** An authorized continuity operation preserved the intended

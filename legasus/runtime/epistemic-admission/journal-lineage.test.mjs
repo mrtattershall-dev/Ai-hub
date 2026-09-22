@@ -220,16 +220,24 @@ test('L6 — identical content in separate histories is two histories', () => {
   const auth = { [OCC_PRED]: { successorOrigin: 'S', successorContent: contentOf(s),
     transferGovernance: true } };
   const r = run([src('S', s), src('T', copy), src('X', supplier('auth:1:x'))],
-    { governingByOccurrence: GOVERN, continuity: auth });
-  assert.equal(r.continuity[0].kind, 'CONTINUED');
-  assert.equal(r.continuity[0].successor.origin, 'S', 'the authorized origin, not the copy');
+    { governingByOccurrence: GOVERN, continuity: auth, unattachedPolicy: UNATTACHED.DIAGNOSE });
+
   assert.notEqual(occurrenceOf('S', s), occurrenceOf('T', copy),
     'equality alone merges nothing: two occurrences, two histories');
 
-  assert.equal(modeOf(outcomeFor(r, 'S', s.ref)), MODE.DESIGNATED, 'the authorized one is governed');
-  assert.equal(modeOf(outcomeFor(r, 'T', copy.ref)), null,
-    'and the byte-identical copy inherits nothing by being identical');
-  assert.notEqual(basisOf(outcomeFor(r, 'T', copy.ref)), 'GOVERNING_BY_AUTHORIZED_CONTINUITY');
+  // CHANGED BY THE CONTAINMENT, and disclosed rather than tuned away. The preregistration for that
+  // change predicted no existing arm would move; this one did, so the rule is BROADER than
+  // predicted. Both claimants carry the authorized content here, so the merger-assigned origin is
+  // the only thing selecting between them - which is exactly the condition the containment refuses.
+  assert.equal(r.continuity[0].kind, 'INDISTINGUISHABLE');
+  assert.match(r.continuity[0].why, /nothing but the\n?\s*MERGER-ASSIGNED ORIGIN selects between them/);
+
+  // The arm's original required observation still holds, and is now stronger: the copy inherits
+  // nothing by being identical - and neither does the authorized one, because the inputs cannot
+  // say which was meant.
+  assert.equal(modeOf(outcomeFor(r, 'T', copy.ref)), null, 'the copy inherits nothing');
+  assert.equal(modeOf(outcomeFor(r, 'S', s.ref)), null, 'and neither does the other claimant');
+  assert.equal(r.unresolvedGovernance.length, 1, 'the obligation is left unattached, and says so');
 });
 
 test('L7 — continuity without governance transfer: the permissions are separable', () => {
