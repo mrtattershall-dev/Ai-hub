@@ -12,6 +12,7 @@ import { journalEntry } from './replay.mjs';
 import { merge, replayMerged, resolveContinuity, occurrenceOf,
   contentOf, MODE, UNATTACHED } from './merge.mjs';
 import { resolveContinuityUNCONTAINED } from './_specimen-support.mjs';
+import { replayMergedForTests } from './_test-entry.mjs';
 
 const load = (n) => JSON.parse(readFileSync(new URL('./natural/' + n + '.json', import.meta.url), 'utf8'));
 const REL2 = load('REL2'), ORD2 = load('ORD2');
@@ -87,10 +88,9 @@ test('C2 — THE ACCEPTED COST: a legitimate transfer is refused too', () => {
   assert.equal(r.unresolvedGovernance.length, 1, 'the intended obligation does not attach');
 
   // and the SPECIMEN shows what was given up: it would have transferred, to one of them
-  const spec = play([src('S', A), src('T', B)],
-    { governingByOccurrence: GOVERN, continuity: authFor('S', A),
-      continuityResolver: resolveContinuityUNCONTAINED,
-      unattachedPolicy: UNATTACHED.DIAGNOSE });
+  const spec = replayMergedForTests(merge([src('S', A), src('T', B)]).merged,
+    { authorityStore: store(), governingByOccurrence: GOVERN, continuity: authFor('S', A),
+      unattachedPolicy: UNATTACHED.DIAGNOSE }, resolveContinuityUNCONTAINED);
   assert.equal(spec.continuity[0].kind, 'CONTINUED',
     'the cost is real: this transfer used to succeed, and the sacrifice is recorded not hidden');
 });

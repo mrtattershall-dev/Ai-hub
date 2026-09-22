@@ -14,6 +14,7 @@ import { journalEntry } from './replay.mjs';
 import { merge, replayMerged, outcomeFor, occurrenceOf, contentOf, MODE,
   UNATTACHED } from './merge.mjs';
 import { resolveContinuityUNCONTAINED } from './_specimen-support.mjs';
+import { replayMergedForTests } from './_test-entry.mjs';
 
 const load = (n) => JSON.parse(readFileSync(new URL('./natural/' + n + '.json', import.meta.url), 'utf8'));
 const REL2 = load('REL2'), ORD2 = load('ORD2');
@@ -66,9 +67,10 @@ const src = (origin, e) => ({ origin, journal: J(e) });
 // P1..P5 MEASURE THE PRESERVED SPECIMEN, deliberately and by an unmistakable name. The live path
 // now contains this failure (CONTAINMENT_PREREG.md); the specimen is kept because a failure
 // repaired everywhere stops being evidence, and these arms are what keep it evidence.
-const play = (sources, opts = {}) => replayMerged(merge(sources).merged,
-  { authorityStore: store(), continuityResolver: resolveContinuityUNCONTAINED,
-    ...opts });
+// P1..P5 measure the PRESERVED SPECIMEN, through the separate testing entry point. Resolver
+// injection is not available on the production call surface.
+const play = (sources, opts = {}) => replayMergedForTests(merge(sources).merged,
+  { authorityStore: store(), ...opts }, resolveContinuityUNCONTAINED);
 const AUTH_ORIGIN = 'origin-0';
 const authorization = { [PRED_OCC]: { successorOrigin: AUTH_ORIGIN,
   successorContent: contentOf(AUTHORIZED), transferGovernance: true } };

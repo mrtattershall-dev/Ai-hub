@@ -13,6 +13,7 @@ import { journalEntry } from './replay.mjs';
 import { merge, replayMerged, outcomeFor, occurrenceOf, contentOf, MODE,
   UNATTACHED } from './merge.mjs';
 import { resolveContinuityUNCONTAINED } from './_specimen-support.mjs';
+import { replayMergedForTests } from './_test-entry.mjs';
 
 const load = (n) => JSON.parse(readFileSync(new URL('./natural/' + n + '.json', import.meta.url), 'utf8'));
 const REL2 = load('REL2'), ORD2 = load('ORD2');
@@ -119,10 +120,32 @@ test('X4 — the specimen survives relocation and still exhibits the failure', (
   assert.equal(spec[0].successor.origin, 'origin-0');
 
   // and it is still injectable, so P1..P5 measure it end to end
-  const viaInjection = play([src('origin-0', B), src('origin-1', A)],
-    { governingByOccurrence: GOVERN, continuity: auth,
-      continuityResolver: resolveContinuityUNCONTAINED, unattachedPolicy: UNATTACHED.DIAGNOSE });
+  const viaInjection = replayMergedForTests(merge([src('origin-0', B), src('origin-1', A)]).merged,
+    { authorityStore: store(), governingByOccurrence: GOVERN, continuity: auth,
+      unattachedPolicy: UNATTACHED.DIAGNOSE }, resolveContinuityUNCONTAINED);
   assert.equal(viaInjection.continuity[0].kind, 'CONTINUED');
+});
+
+test('X6 — resolver injection is not on the production call surface', () => {
+  // ADDED after a correction: replacing the magic flag with a caller-supplied `continuityResolver`
+  // option did NOT remove the bypass capability. A caller who can inject the function that DECIDES
+  // continuity can replace the check. Injection now belongs to the trusted runtime-author boundary
+  // and lives in _test-entry.mjs; replayMerged PINS the contained resolver.
+  const merged = merge([src('origin-0', B), src('origin-1', A)]).merged;
+  const auth = { [PRED_OCC]: { successorOrigin: 'origin-0', successorContent: contentOf(A),
+    transferGovernance: true } };
+  const viaProduction = replayMerged(merged, { authorityStore: store(),
+    governingByOccurrence: GOVERN, continuity: auth, unattachedPolicy: UNATTACHED.DIAGNOSE,
+    continuityResolver: resolveContinuityUNCONTAINED });
+  assert.equal(viaProduction.continuity[0].kind, 'INDISTINGUISHABLE',
+    'the production entry point ignores a supplied resolver and uses the contained one');
+
+  // the testing entry point demands one explicitly and refuses to be used as a general shortcut
+  assert.throws(() => replayMergedForTests(merged, { authorityStore: store() }),
+    /requires an explicit resolver/);
+
+  // STATED LIMIT, not softened: this moves the capability behind a boundary. In JavaScript a bypass
+  // that exists is callable by anyone who imports it - X4 imports it deliberately.
 });
 
 test('X5 — the old flag is gone from the production options surface', () => {

@@ -230,9 +230,23 @@ export function resolveContinuity(merged, continuity) {
   return findings;
 }
 
-export function replayMerged(merged, { authorityStore: st, witnessModes, governingByRecord,
-  governingByOccurrence, requestedModes, obligationContractId,
-  unattachedPolicy, requestedUnattachedPolicy, continuity, continuityResolver } = {}) {
+// THE PRODUCTION ENTRY POINT. It FIXES the continuity resolver.
+//
+// An earlier version took a `continuityResolver` option. That was a correction of the wrong thing:
+// removing the defect-named flag removed the defect-specific option and the import dependency, but
+// a caller who can inject the function that DECIDES continuity can still replace the check. Resolver
+// injection therefore belongs to the trusted runtime-author boundary, not to the production call
+// surface - so it lives in the internal function below, which the test entry point reaches and this
+// export does not expose.
+export function replayMerged(merged, opts = {}) {
+  return replayMergedWithResolver(merged, opts, resolveContinuity);
+}
+
+// INTERNAL. Exported only for the test entry point in _test-entry.mjs; production callers use
+// replayMerged above, which pins the resolver.
+export function replayMergedWithResolver(merged, { authorityStore: st, witnessModes,
+  governingByRecord, governingByOccurrence, requestedModes, obligationContractId,
+  unattachedPolicy, requestedUnattachedPolicy, continuity } = {}, continuityResolver) {
   // TWO CHANNELS, AND ONLY ONE OF THEM DECIDES.
   //
   //     governing   the authorized obligation. Decides. Named in every outcome it decides.
@@ -270,11 +284,10 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
   // CONTINUITY IS RESOLVED BEFORE GOVERNANCE, because an authorized transfer decides which
   // occurrence an obligation attaches to. A transfer happens only where the governor authorized
   // BOTH the continuity and the governance transfer.
-  // AN ORDINARY INJECTION POINT, NOT A FLAG NAMING A DEFECT. The production options surface no
-  // longer carries a way to ask for the known-bad resolver; the preserved specimen lives in
-  // _specimen-support.mjs and is supplied by the arms that measure it. STATED LIMIT: in JavaScript
-  // a bypass that exists is callable by anyone who imports it. This reduces accidental selection;
-  // it does not make selection impossible, and is not reported as if it did.
+  // The resolver is supplied by the caller of THIS internal function, which is either replayMerged
+  // (pinning the contained one) or the test entry point. STATED LIMIT, unchanged and not softened:
+  // in JavaScript a bypass that exists is callable by anyone who imports it. This moves the
+  // capability behind a boundary; it does not remove it.
   const continuityFindings = (continuityResolver || resolveContinuity)(merged, continuity);
   const inherited = {};
   for (const f of continuityFindings) {
