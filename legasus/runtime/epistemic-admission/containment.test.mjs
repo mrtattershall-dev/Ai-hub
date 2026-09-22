@@ -9,8 +9,9 @@ import { adapt } from './adapter.mjs';
 import { admit } from './admission.mjs';
 import { store } from './authority-store.mjs';
 import { journalEntry } from './replay.mjs';
-import { merge, replayMerged, resolveContinuity, resolveContinuityUNCONTAINED, occurrenceOf,
+import { merge, replayMerged, resolveContinuity, occurrenceOf,
   contentOf, MODE, UNATTACHED } from './merge.mjs';
+import { resolveContinuityUNCONTAINED } from './_specimen-support.mjs';
 
 const load = (n) => JSON.parse(readFileSync(new URL('./natural/' + n + '.json', import.meta.url), 'utf8'));
 const REL2 = load('REL2'), ORD2 = load('ORD2');
@@ -49,7 +50,6 @@ const authFor = (origin, entry) => ({ [PRED_OCC]: { successorOrigin: origin,
   successorContent: contentOf(entry), transferGovernance: true } });
 const play = (sources, opts = {}) => replayMerged(merge(sources).merged,
   { authorityStore: store(), ...opts });
-const SPECIMEN = 'YES-I-WANT-THE-KNOWN-DEFECT';
 
 test('C1 — two claimants at the authorized content: the transfer is refused, both orders alike', () => {
   const auth = authFor('origin-0', A);
@@ -89,7 +89,8 @@ test('C2 — THE ACCEPTED COST: a legitimate transfer is refused too', () => {
   // and the SPECIMEN shows what was given up: it would have transferred, to one of them
   const spec = play([src('S', A), src('T', B)],
     { governingByOccurrence: GOVERN, continuity: authFor('S', A),
-      __specimenUncontainedContinuity: SPECIMEN, unattachedPolicy: UNATTACHED.DIAGNOSE });
+      continuityResolver: resolveContinuityUNCONTAINED,
+      unattachedPolicy: UNATTACHED.DIAGNOSE });
   assert.equal(spec.continuity[0].kind, 'CONTINUED',
     'the cost is real: this transfer used to succeed, and the sacrifice is recorded not hidden');
 });

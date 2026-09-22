@@ -13,6 +13,7 @@ import { store } from './authority-store.mjs';
 import { journalEntry } from './replay.mjs';
 import { merge, replayMerged, outcomeFor, occurrenceOf, contentOf, MODE,
   UNATTACHED } from './merge.mjs';
+import { resolveContinuityUNCONTAINED } from './_specimen-support.mjs';
 
 const load = (n) => JSON.parse(readFileSync(new URL('./natural/' + n + '.json', import.meta.url), 'utf8'));
 const REL2 = load('REL2'), ORD2 = load('ORD2');
@@ -66,7 +67,7 @@ const src = (origin, e) => ({ origin, journal: J(e) });
 // now contains this failure (CONTAINMENT_PREREG.md); the specimen is kept because a failure
 // repaired everywhere stops being evidence, and these arms are what keep it evidence.
 const play = (sources, opts = {}) => replayMerged(merge(sources).merged,
-  { authorityStore: store(), __specimenUncontainedContinuity: 'YES-I-WANT-THE-KNOWN-DEFECT',
+  { authorityStore: store(), continuityResolver: resolveContinuityUNCONTAINED,
     ...opts });
 const AUTH_ORIGIN = 'origin-0';
 const authorization = { [PRED_OCC]: { successorOrigin: AUTH_ORIGIN,

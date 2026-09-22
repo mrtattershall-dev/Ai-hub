@@ -90,53 +90,6 @@ export const contentOf = (entry) =>
 // whether the predecessor obligations transfer at all. Continuity and governance transfer are
 // SEPARATE PERMISSIONS: an authorized revision can change precisely the content an obligation
 // governed, and a reorder revises nothing.
-// THE SPECIMEN, PRESERVED BYTE-UNCHANGED IN ITS BODY AND NEVER CALLED BY THE LIVE PATH.
-//
-// P2 demonstrated that this function attaches an authorized continuity to the WRONG one of two
-// byte-identical histories when the merger assigns origins by position. It is kept because a
-// failure repaired everywhere stops being evidence - the same discipline as legacyDigestOf and the
-// deliberate Python specimens. C4 asserts it still fails, so a later "fix" would be loud.
-export function resolveContinuityUNCONTAINED(merged, continuity) {
-  const findings = [];
-  for (const [predecessor, auth] of Object.entries(continuity || {})) {
-    const claimants = merged.records.filter((r) => r.entry.continuity
-      && r.entry.continuity.predecessor === predecessor);
-    const qualified = claimants.filter((r) => r.origin === auth.successorOrigin
-      && contentOf(r.entry) === auth.successorContent);
-    if (qualified.length > 1) {
-      findings.push({ predecessor, ok: false, kind: 'FORK',
-        claimants: qualified.map((r) => ({ origin: r.origin, ref: r.ref, occurrence: r.occurrence })),
-        // Sorted, because L5 found the DECISION order-invariant while the MESSAGE was not: the
-        // claimants were listed in record order, so the same refusal read differently under a
-        // permutation. A refusal that changes with input order is not a refusal anyone can compare.
-        why: 'more than one record satisfies this continuity authorization ('
-          + qualified.map((r) => r.origin + '/' + r.ref).sort().join(', ') + '). NEITHER inherits:'
-          + ' an ambiguous authorization is not resolved by insertion order' });
-      continue;
-    }
-    if (qualified.length === 0) {
-      findings.push({ predecessor, ok: false, kind: claimants.length ? 'UNAUTHORIZED' : 'ABSENT',
-        claimants: claimants.map((r) => ({ origin: r.origin, ref: r.ref })),
-        why: claimants.length
-          ? 'record(s) assert continuity from this predecessor but none matches the authorized'
-            + ' successor (origin ' + auth.successorOrigin + ', content '
-            + String(auth.successorContent).slice(0, 12) + '...). Identifying a predecessor is not'
-            + ' being authorized to continue it'
-          : 'no record asserts continuity from this predecessor' });
-      continue;
-    }
-    const r = qualified[0];
-    findings.push({ predecessor, ok: true, kind: 'CONTINUED',
-      successor: { origin: r.origin, ref: r.ref, occurrence: r.occurrence },
-      transferGovernance: auth.transferGovernance === true,
-      why: auth.transferGovernance === true
-        ? 'continuity authorized AND the predecessor obligations transfer to this successor'
-        : 'continuity authorized; governance does NOT transfer. Continuing a history and'
-          + ' inheriting its obligations are different permissions' });
-  }
-  return findings;
-}
-
 /** Combine journals under merger-assigned origins. A PURE DATA OPERATION: it touches no store,
  *  calls no constructor, and cannot mint. Conflicts are REPORTED, never resolved. */
 export function merge(sources) {
@@ -206,40 +159,80 @@ function orderWithinOrigins(records) {
 
 /** Re-execute the merged set. Every outcome names the (origin, ref) it belongs to, so a caller can
  *  never read a neighbour's result by position. */
-// THE CONTAINED PATH. The runtime cannot know that origins were derived from position. What it CAN
-// observe is when the ORIGIN IS THE ONLY THING SELECTING AMONG CLAIMANTS: if more than one claimant
-// carries the authorized content, nothing but the merger-assigned origin distinguishes them, and a
-// merger that assigns by position can therefore hand the authorization to whichever history landed
-// in that slot.
+// WHO MAY ESTABLISH CONTINUITY, and the containment on top of it.
 //
-// This CONTAINS the failure; it does not solve it. The missing input is still missing (P5), and it
-// deliberately sacrifices legitimate transfers - a governor's genuine intent for one of two
-// byte-identical histories is now refused, because the alternative is a path that attaches an
-// obligation to the wrong history and reports it as authorized.
+// A journal may carry { predecessor, content } - that IDENTIFIES a predecessor and authorizes
+// nothing. Authorization comes from the governor and names the merger-assigned origin, the content,
+// and whether governance transfers at all. Continuity and governance transfer are SEPARATE
+// PERMISSIONS.
+//
+// THE CONTAINMENT, from P2: if more than one PRESENTED claimant carries the authorized content,
+// nothing but the merger-assigned origin selects between them, and a merger assigning by position
+// would hand the authorization to whichever history landed in that slot. Refuse.
+//
+// ITS SCOPE, measured rather than intended: this detects CO-PRESENCE. It cannot detect an ABSENT
+// intended history, and uniqueness among presented claimants does not establish that the sole
+// claimant is the intended one. See SUBSTITUTION_RESULT.md.
+//
+// The pre-containment body is preserved as a specimen in _specimen-support.mjs. It is not reachable
+// from this module and not selectable through replayMerged's options.
 export function resolveContinuity(merged, continuity) {
-  const findings = resolveContinuityUNCONTAINED(merged, continuity);
-  return findings.map((f) => {
-    if (!f.ok) return f;
-    const auth = continuity[f.predecessor];
-    const sameContent = merged.records.filter((r) => r.entry.continuity
-      && r.entry.continuity.predecessor === f.predecessor
+  const findings = [];
+  for (const [predecessor, auth] of Object.entries(continuity || {})) {
+    const claimants = merged.records.filter((r) => r.entry.continuity
+      && r.entry.continuity.predecessor === predecessor);
+    const qualified = claimants.filter((r) => r.origin === auth.successorOrigin
       && contentOf(r.entry) === auth.successorContent);
-    if (sameContent.length <= 1) return f;
-    return { predecessor: f.predecessor, ok: false, kind: 'INDISTINGUISHABLE',
-      claimants: sameContent.map((r) => ({ origin: r.origin, ref: r.ref }))
-        .sort((x, y) => (x.origin + ' ' + x.ref).localeCompare(y.origin + ' ' + y.ref)),
-      why: sameContent.length + ' claimants carry the authorized content, so nothing but the'
-        + ' MERGER-ASSIGNED ORIGIN selects between them. A merger that assigns origins by input'
-        + ' position would hand this authorization to whichever history landed in that slot, and'
-        + ' the inputs contain nothing that says which history the governor intended. The transfer'
-        + ' is refused. This CONTAINS a demonstrated misattachment; it does not solve it' };
-  });
+    const sameContent = claimants.filter((r) => contentOf(r.entry) === auth.successorContent);
+    if (qualified.length && sameContent.length > 1) {
+      findings.push({ predecessor, ok: false, kind: 'INDISTINGUISHABLE',
+        claimants: sameContent.map((r) => ({ origin: r.origin, ref: r.ref }))
+          .sort((x, y) => (x.origin + ' ' + x.ref).localeCompare(y.origin + ' ' + y.ref)),
+        why: sameContent.length + ' claimants carry the authorized content, so nothing but the'
+          + ' MERGER-ASSIGNED ORIGIN selects between them. A merger that assigns origins by input'
+          + ' position would hand this authorization to whichever history landed in that slot, and'
+          + ' the inputs contain nothing that says which history the governor intended. The transfer'
+          + ' is refused. This CONTAINS a demonstrated misattachment; it does not solve it' });
+      continue;
+    }
+    // UNREACHABLE UNDER THE CURRENT RULES, kept and labelled rather than deleted. Two QUALIFIED
+    // claimants necessarily share the authorized content, so the co-presence containment above
+    // always fires first. L5's earlier result rested on this branch and stays legible because the
+    // branch is still here to read.
+    if (qualified.length > 1) {
+      findings.push({ predecessor, ok: false, kind: 'FORK',
+        claimants: qualified.map((r) => ({ origin: r.origin, ref: r.ref, occurrence: r.occurrence })),
+        why: 'more than one record satisfies this continuity authorization ('
+          + qualified.map((r) => r.origin + '/' + r.ref).sort().join(', ') + '). NEITHER inherits:'
+          + ' an ambiguous authorization is not resolved by insertion order' });
+      continue;
+    }
+    if (qualified.length === 0) {
+      findings.push({ predecessor, ok: false, kind: claimants.length ? 'UNAUTHORIZED' : 'ABSENT',
+        claimants: claimants.map((r) => ({ origin: r.origin, ref: r.ref })),
+        why: claimants.length
+          ? 'record(s) assert continuity from this predecessor but none matches the authorized'
+            + ' successor (origin ' + auth.successorOrigin + ', content '
+            + String(auth.successorContent).slice(0, 12) + '...). Identifying a predecessor is not'
+            + ' being authorized to continue it'
+          : 'no record asserts continuity from this predecessor' });
+      continue;
+    }
+    const r = qualified[0];
+    findings.push({ predecessor, ok: true, kind: 'CONTINUED',
+      successor: { origin: r.origin, ref: r.ref, occurrence: r.occurrence },
+      transferGovernance: auth.transferGovernance === true,
+      why: auth.transferGovernance === true
+        ? 'continuity authorized AND the predecessor obligations transfer to this successor'
+        : 'continuity authorized; governance does NOT transfer. Continuing a history and'
+          + ' inheriting its obligations are different permissions' });
+  }
+  return findings;
 }
 
 export function replayMerged(merged, { authorityStore: st, witnessModes, governingByRecord,
   governingByOccurrence, requestedModes, obligationContractId,
-  unattachedPolicy, requestedUnattachedPolicy, continuity,
-  __specimenUncontainedContinuity } = {}) {
+  unattachedPolicy, requestedUnattachedPolicy, continuity, continuityResolver } = {}) {
   // TWO CHANNELS, AND ONLY ONE OF THEM DECIDES.
   //
   //     governing   the authorized obligation. Decides. Named in every outcome it decides.
@@ -277,13 +270,12 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
   // CONTINUITY IS RESOLVED BEFORE GOVERNANCE, because an authorized transfer decides which
   // occurrence an obligation attaches to. A transfer happens only where the governor authorized
   // BOTH the continuity and the governance transfer.
-  // The specimen is reachable ONLY through a name that cannot be typed by accident, and only the
-  // P-suite passes it - so P1..P5 keep measuring the demonstrated failure end to end rather than
-  // being demoted to a unit test of a function nothing calls. C4 asserts the live default does not
-  // take this path.
-  const continuityFindings = __specimenUncontainedContinuity === 'YES-I-WANT-THE-KNOWN-DEFECT'
-    ? resolveContinuityUNCONTAINED(merged, continuity)
-    : resolveContinuity(merged, continuity);
+  // AN ORDINARY INJECTION POINT, NOT A FLAG NAMING A DEFECT. The production options surface no
+  // longer carries a way to ask for the known-bad resolver; the preserved specimen lives in
+  // _specimen-support.mjs and is supplied by the arms that measure it. STATED LIMIT: in JavaScript
+  // a bypass that exists is callable by anyone who imports it. This reduces accidental selection;
+  // it does not make selection impossible, and is not reported as if it did.
+  const continuityFindings = (continuityResolver || resolveContinuity)(merged, continuity);
   const inherited = {};
   for (const f of continuityFindings) {
     if (f.ok && f.transferGovernance && governingByOccurrence

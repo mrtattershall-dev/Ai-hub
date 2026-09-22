@@ -207,11 +207,26 @@ test('L5 — a fork: neither inherits, and insertion order does not decide', () 
           transferGovernance: true } } });
   };
   const fwd = synthetic(false), rev = synthetic(true);   // reverse() mutates; each call rebuilds
-  assert.equal(fwd.ok, false, 'a fork refuses');
-  assert.match(fwd.why, /NEITHER inherits/);
-  assert.match(fwd.why, /not resolved by insertion order/);
-  assert.deepEqual(fwd.outcomes, [], 'and nothing is admitted');
-  assert.equal(fwd.why, rev.why, 'the refusal is identical under both orders');
+
+  // CHANGED BY THE CONTAINMENT, disclosed rather than tuned away, and in TWO ways.
+  //
+  // 1. Two QUALIFIED claimants necessarily share the authorized content, so the co-presence
+  //    containment fires FIRST and the FORK branch this arm used to exercise is now unreachable.
+  //    The branch is kept and labelled rather than deleted, so the earlier result stays legible.
+  // 2. The old FORK guard refused the WHOLE RUN unconditionally. The containment does not: it
+  //    refuses the TRANSFER, and whether the run refuses is then decided by the frozen unattached
+  //    -governance policy. Where no governance depended on the transfer, refusing everything was
+  //    disproportionate, and that stricter behaviour is not reinstated to keep an assertion green.
+  //    C5 covers the case where governance DID depend on it and the run does refuse.
+  assert.equal(fwd.continuity[0].kind, 'INDISTINGUISHABLE');
+  assert.equal(fwd.continuity[0].ok, false, 'neither claimant inherits');
+  assert.equal(fwd.continuity.some((f) => f.successor), false, 'no successor is selected at all');
+  assert.match(fwd.continuity[0].why, /MERGER-ASSIGNED ORIGIN selects between them/);
+  assert.equal(fwd.continuity[0].why, rev.continuity[0].why,
+    'and the refusal is identical under both orders');
+  assert.deepEqual(fwd.continuity[0].claimants, rev.continuity[0].claimants);
+  assert.equal(fwd.ok, true,
+    'the RUN proceeds, because no governance depended on this transfer - see C5 for when it does');
 });
 
 test('L6 — identical content in separate histories is two histories', () => {
