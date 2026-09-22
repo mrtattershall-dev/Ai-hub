@@ -158,3 +158,31 @@ test('U7 — subjectOf prevents two mistakes and does not establish a third thin
   assert.throws(() => outcomeFor(r, 'A', 'auth:2:d'), /no outcome was produced/,
     'and a coordinate that names no record still fails loudly');
 });
+
+// ADDED after the result was reported, because "no admissions returned" and "no usable authority
+// escaped" are different observations and only the first had been measured. The probes call
+// adapt(), which calls derive(), which mints - so suppressing results afterwards would not be the
+// same as never running.
+test('U8 — invalidation happens BEFORE anything can mint, not after', () => {
+  const st = store();
+  const before = st.size();
+  const r = replayMerged(merge([src('A', consumer('auth:2:a')), src('B', supplier('auth:1:b'))]).merged,
+    { authorityStore: st, governingByOccurrence: { [ABSENT]: MODE.DESIGNATED } });
+
+  assert.equal(r.ok, false, 'the run is invalidated');
+  assert.deepEqual(r.outcomes, [], 'no admissions are returned');
+
+  // AND NO AUTHORITY ESCAPED: the store this run was handed is untouched. Nothing was filed, so
+  // nothing is resolvable, so no token reached anywhere it could be consumed.
+  assert.equal(st.size(), before, 'not one entry was filed into the authority store');
+  assert.equal(JSON.stringify(r).includes('auth:'), false,
+    'and no issued address appears anywhere in the result');
+
+  // the control that gives this arm teeth: the SAME journals, governed so that attachment
+  // succeeds, do file entries - so an empty store is the invalidation, not an inert fixture.
+  const st2 = store();
+  const ok = replayMerged(merge([src('A', consumer('auth:2:a')), src('B', supplier('auth:1:b'))]).merged,
+    { authorityStore: st2, witnessModes: { COVERAGE: MODE.EXISTENTIAL } });
+  assert.equal(ok.ok, true);
+  assert.ok(st2.size() > 0, 'the same journals do mint and file when governance attaches');
+});

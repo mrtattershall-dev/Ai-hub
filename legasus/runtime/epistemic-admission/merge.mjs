@@ -77,6 +77,60 @@ const key = (origin, ref) => JSON.stringify([origin, ref]);
 export const occurrenceOf = (origin, entry) =>
   createHash('sha256').update(JSON.stringify([origin, entry.ref, entry])).digest('hex');
 
+// CONTENT IDENTITY, WITHOUT THE ORIGIN. Stable under reordering; different after a revision. It is
+// deliberately NOT an identity: two byte-identical records are two occurrences in two histories,
+// and equality alone merges nothing. It is one half of what a governor names when authorizing a
+// successor - the other half is the merger-assigned origin, which a copied journal cannot supply.
+export const contentOf = (entry) =>
+  createHash('sha256').update(JSON.stringify(entry)).digest('hex');
+
+// WHO MAY ESTABLISH CONTINUITY. A journal may carry { predecessor, content } - that IDENTIFIES a
+// predecessor and authorizes nothing. Authorization comes from the governor and names what it is
+// authorizing: which origin the successor must be merged under, what content it must have, and
+// whether the predecessor obligations transfer at all. Continuity and governance transfer are
+// SEPARATE PERMISSIONS: an authorized revision can change precisely the content an obligation
+// governed, and a reorder revises nothing.
+export function resolveContinuity(merged, continuity) {
+  const findings = [];
+  for (const [predecessor, auth] of Object.entries(continuity || {})) {
+    const claimants = merged.records.filter((r) => r.entry.continuity
+      && r.entry.continuity.predecessor === predecessor);
+    const qualified = claimants.filter((r) => r.origin === auth.successorOrigin
+      && contentOf(r.entry) === auth.successorContent);
+    if (qualified.length > 1) {
+      findings.push({ predecessor, ok: false, kind: 'FORK',
+        claimants: qualified.map((r) => ({ origin: r.origin, ref: r.ref, occurrence: r.occurrence })),
+        // Sorted, because L5 found the DECISION order-invariant while the MESSAGE was not: the
+        // claimants were listed in record order, so the same refusal read differently under a
+        // permutation. A refusal that changes with input order is not a refusal anyone can compare.
+        why: 'more than one record satisfies this continuity authorization ('
+          + qualified.map((r) => r.origin + '/' + r.ref).sort().join(', ') + '). NEITHER inherits:'
+          + ' an ambiguous authorization is not resolved by insertion order' });
+      continue;
+    }
+    if (qualified.length === 0) {
+      findings.push({ predecessor, ok: false, kind: claimants.length ? 'UNAUTHORIZED' : 'ABSENT',
+        claimants: claimants.map((r) => ({ origin: r.origin, ref: r.ref })),
+        why: claimants.length
+          ? 'record(s) assert continuity from this predecessor but none matches the authorized'
+            + ' successor (origin ' + auth.successorOrigin + ', content '
+            + String(auth.successorContent).slice(0, 12) + '...). Identifying a predecessor is not'
+            + ' being authorized to continue it'
+          : 'no record asserts continuity from this predecessor' });
+      continue;
+    }
+    const r = qualified[0];
+    findings.push({ predecessor, ok: true, kind: 'CONTINUED',
+      successor: { origin: r.origin, ref: r.ref, occurrence: r.occurrence },
+      transferGovernance: auth.transferGovernance === true,
+      why: auth.transferGovernance === true
+        ? 'continuity authorized AND the predecessor obligations transfer to this successor'
+        : 'continuity authorized; governance does NOT transfer. Continuing a history and'
+          + ' inheriting its obligations are different permissions' });
+  }
+  return findings;
+}
+
 /** Combine journals under merger-assigned origins. A PURE DATA OPERATION: it touches no store,
  *  calls no constructor, and cannot mint. Conflicts are REPORTED, never resolved. */
 export function merge(sources) {
@@ -148,7 +202,7 @@ function orderWithinOrigins(records) {
  *  never read a neighbour's result by position. */
 export function replayMerged(merged, { authorityStore: st, witnessModes, governingByRecord,
   governingByOccurrence, requestedModes, obligationContractId,
-  unattachedPolicy, requestedUnattachedPolicy } = {}) {
+  unattachedPolicy, requestedUnattachedPolicy, continuity } = {}) {
   // TWO CHANNELS, AND ONLY ONE OF THEM DECIDES.
   //
   //     governing   the authorized obligation. Decides. Named in every outcome it decides.
@@ -166,11 +220,11 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
   // Absent governance means the DEFAULT, which is none of the three modes and never had a name: try
   // the designated address within its own origin, and failing that fall back to candidates found by
   // claim, requiring exactly one eligible, else refuse. T1 pins it so vocabulary cannot move it.
-  const governingFor = (r, c) => (governingByOccurrence && governingByOccurrence[r.occurrence])
+  const governingFor = (r, c) => governedOccurrences[r.occurrence]
     || (governingByRecord && governingByRecord[key(r.origin, r.ref)])
     || (witnessModes && witnessModes[c.relation]) || null;
-  const basisFor = (r, c) => (governingByOccurrence && governingByOccurrence[r.occurrence])
-    ? 'GOVERNING_BY_OCCURRENCE'
+  const basisFor = (r, c) => (governedOccurrences[r.occurrence] !== undefined)
+    ? (inheritedFor(r.occurrence) ? 'GOVERNING_BY_AUTHORIZED_CONTINUITY' : 'GOVERNING_BY_OCCURRENCE')
     : ((governingByRecord && governingByRecord[key(r.origin, r.ref)])
       ? 'GOVERNING_BY_RECORD'
       : ((witnessModes && witnessModes[c.relation]) ? 'GOVERNING_BY_RELATION' : 'DEFAULT'));
@@ -183,9 +237,24 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
       requestAccepted: requested === null ? null : requested === mode };
   };
   const modeFor = (c) => (witnessModes && witnessModes[c.relation]) || null;
+  // CONTINUITY IS RESOLVED BEFORE GOVERNANCE, because an authorized transfer decides which
+  // occurrence an obligation attaches to. A transfer happens only where the governor authorized
+  // BOTH the continuity and the governance transfer.
+  const continuityFindings = resolveContinuity(merged, continuity);
+  const inherited = {};
+  for (const f of continuityFindings) {
+    if (f.ok && f.transferGovernance && governingByOccurrence
+        && governingByOccurrence[f.predecessor] !== undefined) {
+      inherited[f.successor.occurrence] = governingByOccurrence[f.predecessor];
+    }
+  }
+  const governedOccurrences = { ...(governingByOccurrence || {}), ...inherited };
+  const inheritedFor = (occ) => Object.prototype.hasOwnProperty.call(inherited, occ);
+
   const unresolvedGovernance = [];
   for (const [k, mode] of Object.entries(governingByOccurrence || {})) {
-    if (!merged.records.some((r) => r.occurrence === k)) {
+    if (!merged.records.some((r) => r.occurrence === k)
+        && !continuityFindings.some((f) => f.ok && f.transferGovernance && f.predecessor === k)) {
       unresolvedGovernance.push({ by: 'OCCURRENCE', denoting: k, mode,
         why: 'this occurrence is not in the merged set. The governed subject is absent, so this'
           + ' obligation governed nothing - it did not fall through to the default' });
@@ -207,14 +276,20 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
 
   if (policy === UNATTACHED.BLOCK) {
     return { ok: false, outcomes: [], unresolvedGovernance, unattached: policyRecord,
-      obligationContract: contract(),
+      continuity: continuityFindings, obligationContract: contract(),
       why: 'BLOCK is refused, not approximated. An unresolved governance entry denotes nothing in'
         + ' this merged set, so which consumers it was meant to govern is UNKNOWN - not merely'
         + ' unenumerated. Blocking whatever seemed nearby would read as precision and be invention' };
   }
+  const forks = continuityFindings.filter((f) => f.kind === 'FORK');
+  if (forks.length) {
+    return { ok: false, outcomes: [], unresolvedGovernance, unattached: policyRecord,
+      continuity: continuityFindings, obligationContract: contract(),
+      why: forks.map((f) => f.why).join(' | ') };
+  }
   if (unresolvedGovernance.length && policy === UNATTACHED.INVALIDATE) {
     return { ok: false, outcomes: [], unresolvedGovernance, unattached: policyRecord,
-      obligationContract: contract(),
+      continuity: continuityFindings, obligationContract: contract(),
       why: 'governance did not attach: ' + unresolvedGovernance.length + ' obligation(s) denote no'
         + ' record here (' + unresolvedGovernance.map((u) => u.by + ' ' + u.denoting).join('; ')
         + '). No admission is produced. The governor intended a burden that was not applied, and'
@@ -429,7 +504,7 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
   for (const r of pending) run(r);
 
   return { ok: true, outcomes, unresolvedGovernance, unattached: policyRecord,
-    obligationContract: contract() };
+    continuity: continuityFindings, obligationContract: contract() };
 }
 
 /** WHICH OBLIGATION CONTRACT AN OUTCOME WAS PRODUCED UNDER.
