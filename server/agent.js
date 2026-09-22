@@ -35,6 +35,20 @@ import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
 import { lostDefs, lostExports, defCounts } from './defNames.js';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
+// LEGASUS PHASE 1 - OBSERVATION ONLY. See legasus/screen/PHASE1-OBSERVATION_PREREG.md.
+// Emits a canonical host execution event from the one place where the whole truth of a tool
+// call is already in scope. It decides nothing, prevents nothing, permits nothing. With
+// HOST_EVENT_LOG unset there are zero sinks and emitHostEvent returns on its first line, so
+// the hub behaves exactly as it did at 3f5a8ff - which is what C4 checks.
+import { emitHostEvent, attachFileSink } from './hostEvent.js';
+
+// The Phase 1 consumer, attached once at module load and only when asked for. Guarded because
+// a sink that cannot be created must not stop the hub booting: observation is never allowed to
+// cost availability.
+if (process.env.HOST_EVENT_LOG) {
+  try { attachFileSink(process.env.HOST_EVENT_LOG); }
+  catch (e) { console.error(`[hostEvent] sink not attached: ${e.message}`); }
+}
 
 /**
  * The database handle the Google tools use, filled in by agentRouter.
@@ -3406,6 +3420,16 @@ async function drive(loadDb, run) {
       // loop-break downstream unreachable - a decorating fix disabling an acting one.
       let rawAnswer = String(result ?? '');
       const callKey = tool + ' ' + JSON.stringify(args || {});
+      // LEGASUS PHASE 1 - THE EMIT. Here and nowhere else, for a reason: this is the last
+      // point at which `result` is still exactly what the TOOL returned. Eleven lines below,
+      // the duplicate-call guard appends a warning to `result`, and a consumer reading it
+      // after that would be told the hub's commentary instead of the tool's answer - the
+      // same "decorating a value another mechanism keys on" mistake the comment above records.
+      // `beforeSrc` is passed through verbatim, including null: hostEvent.js turns an absent
+      // before-image into a REASON (new-file / append / uncovered extension), because those
+      // are different facts and collapsing them is the information destruction this whole
+      // line of work exists to stop.
+      emitHostEvent({ tool, args, beforeSrc, result: rawAnswer, run, callKey });
       // A plain object, NOT a Map: this is persisted with the run and read back after a restart, and
       // JSON.stringify(new Map()) is {} - which is truthy, so `|| new Map()` never repaired it. The first tool
       // call of a resumed run threw, the throw was uncaught inside drive(), and the finally then ran with the
@@ -4268,7 +4292,10 @@ function autoStart(loadDb, item) {
     // actually START; charging it for an attempt that was declined would let a busy
     // workspace silently eat the budget and throttle work nobody ever ran.
     autoStarts.push(Date.now());
-    try { startRun(loadDb, item.goal, { queueItemId: item.id, source: 'queue', generation: item.generation || 0 }); }
+    // entrance 'supervisor': autoStart is the ONLY path by which the agent starts work on
+    // its own. That distinction is the whole point of the field - a run nobody asked for,
+    // reached while nobody is watching, is not the same chain as one a human pressed.
+    try { startRun(loadDb, item.goal, { queueItemId: item.id, source: 'queue', generation: item.generation || 0, entrance: 'supervisor' }); }
     catch { workQueue.release(item.id); }
   }, 250);
 }
@@ -4277,14 +4304,25 @@ function autoStart(loadDb, item) {
  * Create and start a run. Shared by the HTTP route and the supervisor, so a
  * self-started run is identical to a human-started one in every respect.
  */
-function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0 } = {}) {
+// LEGASUS PHASE 1: `entrance` is LINEAGE - which route began this causal chain. It is stamped
+// HERE, at run creation, and never inferred at the tool site, because by the time a tool runs
+// the entrance is no longer observable from anything in scope.
+//
+// It is deliberately NOT the same field as `source`. `source` says what originated the GOAL
+// ('human' | 'queue' | 'agent' | 'repair'); `entrance` says which door the chain came through.
+// One string cannot carry both without destroying one of them - and "who performed the
+// immediate action" is a third fact again, carried by the event's `actor`.
+//
+// Default 'unknown' rather than guessing: an unstamped caller is a gap to be seen, not a
+// value to be invented.
+function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown' } = {}) {
   ensureWorkspace();
   const id = randomUUID();
   const now = Date.now();
   const run = {
     id, goal, status: 'running', busy: false, modelCalls: 0, tokens: 0,
     steps: [], pending: null, createdAt: now, budgetStart: now,
-    queueItemId, source, generation: Math.max(0, Number(generation) || 0),
+    queueItemId, source, entrance, generation: Math.max(0, Number(generation) || 0),
     history: [
       { role: 'system', content: SYSTEM_PROMPT },
       // Carry memory across runs: NOTES.md is the only thing that survives a run
@@ -4436,7 +4474,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       });
     }
 
-    const run = startRun(loadDb, goal.trim());
+    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start' });
     res.json({ runId: run.id });
   });
 
@@ -4529,7 +4567,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     if (!next) return res.status(404).json({ error: 'the queue is empty' });
     // Carry the hop count, or starting an item by hand would silently reset the chain
     // depth the supervisor's brake relies on.
-    const run = startRun(loadDb, next.goal, { queueItemId: next.id, source: 'queue', generation: next.generation || 0 });
+    const run = startRun(loadDb, next.goal, { queueItemId: next.id, source: 'queue', generation: next.generation || 0, entrance: 'http:queue-run' });
     res.json({ runId: run.id, item: next });
   });
 
