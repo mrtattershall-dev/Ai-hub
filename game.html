@@ -32775,7 +32775,11 @@ setTimeout(function _patchLoadForDebtStatement() {
       const raw = localStorage.getItem('dustAndHarvest_save_' + s);
       if (!raw) return;
       const d = JSON.parse(raw);
-      if (d.jgBondForeclosureFired) _bondForeclosureFired = d.jgBondForeclosureFired;
+      // Same defect as the main loader, opposite consequence: this latch means "enforcement
+      // has already fired, do not fire again" (_checkBondForeclosure returns early on it).
+      // The truthy guard meant a save recording false could not clear a session's true, so a
+      // save where enforcement had never fired inherited a spent latch and could never fire.
+      _bondForeclosureFired = d.jgBondForeclosureFired || false;
     } catch(e) {}
   };
 }, 0);
