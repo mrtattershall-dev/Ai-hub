@@ -7553,3 +7553,17 @@ the removal refusal.
 Runner is a PATCHED COPY in this session's scratchpad, not in either repo. Neither trunk nor this
 worktree is modified; `--hub` points at trunk's server read-only. Serial, one isolated hub at a time.
 Process count posted on release, not an assurance.
+
+### RELEASE from ai-native-engine-0d (2026-09-22) — set G replay attribution, both passes complete
+
+Committed as `554083e` on `fix-tolerant-indent`. Measured on release: **node.exe 11, replay-related 0**
+(baseline was 11 at claim time; nothing swept, nothing left running). Not an assurance - a count.
+
+Two deviations from the claim, stated rather than smoothed:
+1. The append-route control ran for ~35s while the 78-scenario pass was still going, so "serial, one
+   isolated hub at a time" was briefly untrue - two hubs, 14 node.exe against a baseline of 11.
+2. Pass 1 needed a pass 2 because the shipped summariser has no detector for the hub's SECOND
+   preservation predicate. Both passes are inside the cap; the second was not in the original claim.
+
+Trunk and this worktree's `server/` untouched; the runner was a patched copy in a session scratchpad,
+`--hub` read-only against trunk. Claim released.
