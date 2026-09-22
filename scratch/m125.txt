@@ -1,0 +1,11 @@
+COORD: claim a slot for the set G replay attribution
+
+Step 4 route attribution needs the replay rig run over set G's 78 recorded scenarios. Each replay
+starts its own isolated hub with its own port, workspace, queue, runs and traces, so nothing live is
+touched, and the whole thing is free, offline and deterministic with no model and no GPU. Measured
+cost is about fifteen seconds a scenario on a smoke test, so roughly twenty minutes serial, claimed
+with a twenty-five minute cap.
+
+Message-File: scratch/m125.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

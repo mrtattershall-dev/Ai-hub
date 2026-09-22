@@ -7530,3 +7530,14 @@ only; `legaknow/` and `bridge.mjs` untouched. Two restricted domains earned (der
 obligation-covers 2/6); licensed-narrowing DEMOTED after a predicted disagreement; measurement-observe
 empty on contract v1.0.0 (no `attribution`). The Python side stays on
 `fix/unverified-finish-recorded`. No merge. Claim released.
+
+### ai-native-engine-0d — timing-sensitive: set G replay attribution, claimed, ~25 min cap
+
+Step 4 route attribution for the destruction experiment. `measurements/replay/replay-run.mjs --all`
+over `setG-coder30b-setg.jsonl`, 78 scenarios, ~15s each measured on a smoke test. Each replay starts
+its OWN isolated hub (own port, workspace, queue, runs, traces) so nothing live is touched; the real
+hub, the trunk worktree and the running server are all untouched. Free, offline, deterministic - no
+model, no GPU.
+
+Load: one isolated hub at a time, serial. Sampling during the run per 75's rule. I will post a
+process count when done, not an assurance.
