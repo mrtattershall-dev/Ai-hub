@@ -159,5 +159,65 @@ function harness(files = { 'lib.js': 'function double(n) { return n * 2; }\n' })
     'and the same intent against the same state is mechanically refused, not warned about');
 }
 
+// ── the REAL-HUB interface: validate / notifyResult, with the hub executing ──
+//
+// This is the path the integration uses, and it exists because the controller MUST NOT own
+// execution. The hub's shared tool site emits host events, captures beforeSrc and runs the
+// lost-definition guards, the repeat guards and the syntax rollback. A controller that applied
+// its own mutations would give the TREATMENT arm a privileged path around all of that, and
+// around d2 - so an A/B difference could come from the shortcut rather than the contract.
+{
+  console.log('\n=== real-hub interface: the controller validates, the HUB executes ===');
+  const fs = { 'lib.js': 'function double(n) { return n * 2; }\n' };
+  const c = new ProtocolController({ readFile: (p) => (p in fs ? fs[p] : null), targets: ['lib.js'] });
+  say(c.applyEdit === null && c.verify === null, 'the integration constructs it with NO execution capability at all');
+
+  // OBSERVE
+  // WRONG_PHASE, not STALE_EVIDENCE: R2 catches it first, and in OBSERVE a write is simply
+  // not this turn's job. Asserting the specific downstream reason would have been testing my
+  // expectation of the order rather than the contract.
+  say(c.validate('write_file', { path: 'lib.js' }).refusal === REFUSAL.WRONG_PHASE,
+    'cannot mutate while in OBSERVE - refused as WRONG_PHASE');
+  say(c.validate('read_file', { path: 'lib.js' }).ok === true, 'may read in OBSERVE');
+  const ins = c.instruction();
+  say(/PHASE: OBSERVE/.test(ins) && /lib\.js/.test(ins), 'the OBSERVE instruction names only this turn\'s job');
+
+  // the hub executes the read; the controller is told
+  c.notifyResult('read_file', { path: 'lib.js' }, '[lib.js — 1 lines] ...');
+  say(c.state().observed.includes('lib.js'), 'evidence recorded from the REAL file, not from the tool\'s formatted output');
+  // The pathology is blocked on BOTH routes, and the reason differs by where the loop is:
+  // immediately after a read the phase is DECIDE, so a re-read is WRONG_PHASE; back in
+  // OBSERVE with unchanged state it is EVIDENCE_UNCHANGED. Assert the CONTRACT (refused),
+  // then each reason at the point it actually applies.
+  say(c.validate('read_file', { path: 'lib.js' }).refusal === REFUSAL.WRONG_PHASE,
+    're-reading right after a read is refused (phase has moved to DECIDE)');
+  {
+    const back = new ProtocolController({ readFile: (p) => (p in fs ? fs[p] : null), targets: ['lib.js'] });
+    back.notifyResult('read_file', { path: 'lib.js' }, 'ok');
+    back.phase = PHASE.OBSERVE;                       // the loop returned here unchanged
+    say(back.validate('read_file', { path: 'lib.js' }).refusal === REFUSAL.EVIDENCE_UNCHANGED,
+      'and re-reading unchanged evidence FROM OBSERVE is refused too (outline_file x6, as a consequence)');
+  }
+  const ins2 = c.instruction();
+  say(/PHASE: DECIDE/.test(ins2) && ins2.includes('function double(n)'),
+    'the DECIDE instruction carries the EXACT file text, so nothing is recalled');
+
+  // mutate: the hub applies, then tells the controller
+  say(c.validate('write_file', { path: 'lib.js' }).ok === true, 'may now mutate what it has been shown');
+  fs['lib.js'] = 'function double(n) { return n * 2; }\nfunction halve(n) { return n / 2; }\n';   // the HUB wrote this
+  c.notifyResult('write_file', { path: 'lib.js' }, 'OK: wrote lib.js.');
+  say(c.state().pendingObligations === 1, 'the mutation created a verification obligation, unasked (R4)');
+  say(!c.state().observed.includes('lib.js'), 'evidence for the changed file is void by definition (R1)');
+  c.obligationsDischarged();
+  say(c.state().pendingObligations === 0 && c.state().phase === PHASE.OBSERVE, 'the hub discharged it and the loop continued');
+
+  // a refused write is derived from the REAL result, never from the model's claim
+  const c2 = new ProtocolController({ readFile: (p) => (p in fs ? fs[p] : null), targets: ['lib.js'] });
+  c2.notifyResult('read_file', { path: 'lib.js' }, 'ok');
+  c2.notifyResult('write_file', { path: 'lib.js' }, 'ERROR: the FIND snippet was not found');
+  say(c2.state().phase === PHASE.OBSERVE, 'a failed mutation transitions back to OBSERVE');
+  say(c2.state().deadKeys === 1, 'and the dead key stops it being resent against the same state');
+}
+
 console.log(`\n  protocol control: ${passed} passed, ${failed} failed -> ${failed ? 'DO NOT SPEND GPU' : 'protocol qualified deterministically'}`);
 process.exit(failed ? 1 : 0);

@@ -57,10 +57,23 @@ export const hashOf = (s) => createHash('sha256').update(String(s ?? ''), 'utf8'
  * anything between calls - which is the property the monolithic loop could not provide.
  */
 export class ProtocolController {
-  constructor({ readFile, applyEdit, verify, targets = [] }) {
+  /**
+   * `applyEdit` and `verify` are OPTIONAL, and the real-hub integration passes NEITHER.
+   *
+   * THE CONTROLLER MUST NOT OWN EXECUTION. The hub's shared tool site (agent.js:3566) is what
+   * emits host events, captures beforeSrc, and runs the lost-definition guards, the repeat
+   * guards and the syntax rollback. A controller that applied its own mutations would hand the
+   * TREATMENT arm a privileged path around all of that - and around d2 - so any A/B difference
+   * could come from the shortcut rather than from the interaction contract. The arms must
+   * differ ONLY in what is asked of the model and which actions are legal.
+   *
+   * So the integration uses validate()/notifyResult() and lets the hub execute. The injected
+   * forms remain for the standalone control, which tests the state machine in isolation.
+   */
+  constructor({ readFile, applyEdit = null, verify = null, targets = [] }) {
     this.readFile = readFile;       // (path) -> string | null
-    this.applyEdit = applyEdit;     // ({path, content}) -> {ok, error?}
-    this.verify = verify;           // ({path}) -> {ok, detail}
+    this.applyEdit = applyEdit;     // standalone control only; null in the real hub
+    this.verify = verify;           // standalone control only; null in the real hub
     this.targets = targets;
 
     this.phase = PHASE.OBSERVE;
@@ -201,6 +214,141 @@ export class ProtocolController {
     this.phase = PHASE.OBSERVE;
     this._record('verified', { results: results.map((r) => `${r.path}:${r.ok ? 'ok' : 'FAIL'}`) });
     return { ok: true, results, phase: this.phase };
+  }
+
+  // ── the real-hub interface: VALIDATE, then be TOLD what happened ─────────────────────
+  //
+  // The hub executes; the controller never does. Everything below only inspects and records.
+
+  /**
+   * Is this tool call legal in the current phase, against current evidence?
+   *
+   * Returns a refusal rather than throwing, because the caller's job is to feed the refusal
+   * back as the next instruction - not to end the run. The action set is small by
+   * construction (R2), so "illegal" here means the model reached outside its current
+   * responsibility, which is information worth returning to it.
+   */
+  validate(tool, args = {}) {
+    const READ = new Set(['read_file', 'outline_file', 'search_file', 'list_dir']);
+    const WRITE = new Set(['write_file', 'edit_file', 'append_file']);
+    const path = args.path;
+
+    if (tool === 'finish') return this.phase === PHASE.DECIDE
+      ? { ok: true }
+      : { ok: false, refusal: REFUSAL.WRONG_PHASE, phase: this.phase };
+
+    if (READ.has(tool)) {
+      if (this.phase !== PHASE.OBSERVE) return { ok: false, refusal: REFUSAL.WRONG_PHASE, phase: this.phase };
+      // R3 as a general law: a completed evidence-acquisition step cannot be repeated while
+      // its underlying evidence is unchanged. Not a warning - a refusal the caller turns into
+      // a transition.
+      const live = this.readFile(path);
+      const ev = this.evidence.get(path);
+      if (live !== null && ev && ev.hash === hashOf(live)) {
+        return { ok: false, refusal: REFUSAL.EVIDENCE_UNCHANGED, phase: this.phase, path };
+      }
+      return { ok: true };
+    }
+
+    if (WRITE.has(tool)) {
+      if (this.phase !== PHASE.PRODUCE && this.phase !== PHASE.DECIDE) {
+        return { ok: false, refusal: REFUSAL.WRONG_PHASE, phase: this.phase };
+      }
+      // R1: it may only change what it has been shown, at the hash it was shown.
+      const ev = this.evidence.get(path);
+      if (!ev) return { ok: false, refusal: REFUSAL.STALE_EVIDENCE, phase: this.phase, path };
+      const live = this.readFile(path);
+      if (live === null || hashOf(live) !== ev.hash) {
+        this.evidence.delete(path);
+        return { ok: false, refusal: REFUSAL.STALE_EVIDENCE, phase: this.phase, path, transitioned: true };
+      }
+      // R3 at the mutation level: the same edit against the same state, twice.
+      if (this.attempted.has(this._key(tool, args, path))) {
+        return { ok: false, refusal: REFUSAL.EVIDENCE_UNCHANGED, phase: this.phase, path };
+      }
+      return { ok: true };
+    }
+    return { ok: false, refusal: REFUSAL.UNKNOWN_INTENT, phase: this.phase };
+  }
+
+  /**
+   * Told what the hub's shared execution site did. The controller derives everything from the
+   * OBSERVED result and the file's real hash - never from what the model claimed.
+   */
+  notifyResult(tool, args = {}, result = '') {
+    const path = args.path;
+    const failed = /^ERROR/.test(String(result ?? ''));
+    const READ = new Set(['read_file', 'outline_file', 'search_file', 'list_dir']);
+    const WRITE = new Set(['write_file', 'edit_file', 'append_file']);
+
+    if (READ.has(tool) && !failed && path) {
+      const content = this.readFile(path);
+      if (content !== null) {
+        this.evidence.set(path, { hash: hashOf(content), content, at: Date.now() });
+        this._record('observed', { path });
+      }
+      this.phase = PHASE.DECIDE;
+      return this.state();
+    }
+
+    if (WRITE.has(tool) && path) {
+      const before = this.evidence.get(path)?.hash ?? null;
+      const after = this.readFile(path);
+      const changed = !failed && after !== null && hashOf(after) !== before;
+      if (changed) {
+        // R4: mutation CREATES a verification obligation. The model is never asked whether to
+        // test. Evidence for a changed file is void by definition.
+        this.obligations.push({ path, from: before });
+        this.evidence.delete(path);
+        this.phase = PHASE.VERIFY;
+        this._record('applied', { path });
+      } else {
+        // No progress: mark the key dead so it cannot be resent against the same state, and
+        // transition rather than warn.
+        this.attempted.add(this._key(tool, args, path));
+        this.evidence.delete(path);
+        this.phase = PHASE.OBSERVE;
+        this._record('no-progress', { path, failed });
+      }
+      return this.state();
+    }
+    return this.state();
+  }
+
+  /** The hub has discharged the obligations its own verifier ran. */
+  obligationsDischarged() {
+    this.obligations = [];
+    if (this.phase === PHASE.VERIFY) this.phase = PHASE.OBSERVE;
+    this._record('verified');
+    return this.state();
+  }
+
+  /**
+   * The phase-scoped instruction the hub puts in front of the model instead of the monolithic
+   * "emit ACTION blocks until done". Carries the exact evidence (R1) so nothing is recalled.
+   */
+  instruction() {
+    switch (this.phase) {
+      case PHASE.OBSERVE: {
+        const need = this.targets.filter((p) => {
+          const live = this.readFile(p);
+          const ev = this.evidence.get(p);
+          return live !== null && (!ev || ev.hash !== hashOf(live));
+        });
+        if (!need.length) { this.phase = PHASE.DECIDE; return this.instruction(); }
+        return `PHASE: OBSERVE\nYour only job this turn is to read ONE of these files: ${need.join(', ')}\nUse read_file. Nothing else is available in this phase.`;
+      }
+      case PHASE.DECIDE:
+      case PHASE.PRODUCE: {
+        const shown = [...this.evidence.entries()]
+          .map(([p, e]) => `--- ${p} (hash ${e.hash}) ---\n${e.content}`).join('\n');
+        return `PHASE: DECIDE AND PRODUCE\nHere is the EXACT current content of what you have observed. Do not rely on memory of any other file.\n\n${shown}\n\nEither write_file ONE of these files with its complete new contents, or finish. Nothing else is available in this phase.`;
+      }
+      case PHASE.VERIFY:
+        return 'PHASE: VERIFY\nThe hub is verifying the change automatically. Nothing is required from you.';
+      default:
+        return 'PHASE: DONE';
+    }
   }
 
   /** Progress state the model never has to carry. */
