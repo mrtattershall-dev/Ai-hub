@@ -100,7 +100,9 @@ is a fact about the corpus, not evidence about Legasus.
 
 ## Discrepancies and unsupported translations
 
-- **Discrepancies: none.** 11 of 11 cases agree, in both directions.
+- **Discrepancies: none.** **11 of 11 evaluation cases** agree, in both directions. The denominator
+  is **3 reserved cases + 8 untouched external files = 11**; the **development case is explicitly
+  OUTSIDE it**, because the adapter was built against it.
 - **Unsupported: the per-finding negative.** eslint reports *these specific callbacks violate*.
   Legasus represents the **universal** and refuses it; it does not carry each violation as its own
   admitted claim. The findings survive only as `frontier` text, not as structured claims. Expressing
@@ -110,9 +112,9 @@ is a fact about the corpus, not evidence about Legasus.
 ## What this establishes, and what it does not
 
 **Establishes:** one externally selected, rule-identified obligation about source code was
-translated into the existing registry without adding a rule, agreed with the external verifier on 11
-of 11 cases including 8 untouched external files, and produced refusals that carry the external
-tool's own reason.
+translated into the existing registry without adding a rule, agreed with the external verifier on
+**11 of 11 evaluation cases** (3 reserved + 8 untouched external; development case excluded from the
+denominator), and produced refusals that carry the external tool's own reason.
 
 **Does not establish:** that the framework transfers generally; that the coverage assumption
 (steering 3) holds; that Legasus adds anything the linter did not already provide — on this rule it
