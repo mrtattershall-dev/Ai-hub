@@ -59,6 +59,12 @@ What the registry could **not** supply, and the adapter had to:
 some case, the coverage certificate is false and every acceptance built on it is unlicensed. Nothing
 here establishes that it is exhaustive; it is asserted by me, from knowledge of the tool.
 
+> **ATTACKED AND FALSIFIED — see `COVERAGE-AUDIT_RESULT.md`.** A file-level suppression, a
+> line-level suppression and a **parse failure** each make the adapter certify the universal claim
+> over a file that violates it. The acceptances below were **sound by the luck of the corpus, not
+> warranted by the adapter's reasoning**: the same acceptance would have been produced had those
+> files been suppressed or unparseable. Read every "agree" below with that attached.
+
 ## F3 — development
 
 One case, declared before evaluation: **`a-dev-clean-and-violating.js`** (alphabetically first).
