@@ -25727,12 +25727,12 @@ function loadGame() {
     if (d.jgDebt !== undefined)      gameState._jgDebt          = d.jgDebt;
     if (d.jgDebtStartDay != null)    gameState._jgDebtStartDay   = d.jgDebtStartDay;
     // A saved `false` is a value, not an absence. The truthy guards that were here skipped the
-    // restore whenever the save recorded false, leaving the CURRENT session's flag in place — so
+    // restore whenever the save recorded false, leaving the CURRENT session's flag in place - so
     // loading an indebted save after clearing the Bond kept _jgDebtFree true, producing a state
     // that owes money and is simultaneously debt-free, and permanently suppressing
     // _checkBondForeclosure (it returns early on _jgDebtFree).
-    // Assign unconditionally, as postEnding and inJungle already are above; `|| false` also gives
-    // saves that predate these fields a deterministic default instead of inheriting the session.
+    // Assign unconditionally, as postEnding and inJungle already are above; `|| false` also
+    // gives saves predating these fields a deterministic default rather than the session's.
     gameState._jgDebtFree        = d.jgDebtFree        || false;
     gameState._jgAltaverdeWarned = d.jgAltaverdeWarned || false;
     if (d.craneSellCount != null) _craneSellCount = d.craneSellCount;

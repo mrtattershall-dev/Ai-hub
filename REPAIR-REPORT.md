@@ -128,6 +128,22 @@ title screen does `location.reload()` (the Return to Title button at 753, forecl
 `startNewGame()` directly. Reported as latent, **not fixed** — it was not the assigned task and it
 cannot currently bite a player.
 
+## A mistake in my own patch, caught and fixed
+
+The first version of `patch.py` used `pathlib.read_text`/`write_text`. Python's universal-newline
+handling silently rewrote **all 40,926 line endings** from LF to CRLF: **+41,532 bytes, 81,859
+changed lines** for a two-line change.
+
+**The game still ran and every test still passed** — which is exactly why it was worth catching. It
+was found by noticing the output file was 41 KB larger than the input, not by any test.
+
+`patch.py` now operates on **bytes**, asserts the source is pure-LF before touching it, and reports
+the byte delta and any CRLF it introduced. The delivered diff is:
+
+    2 lines removed, 9 added (7 comment + 2 code), +586 bytes, 0 line endings altered
+
+A patch must change what it says it changes and nothing else.
+
 ## Files
 
     game.html            the patched build — this is the deliverable
