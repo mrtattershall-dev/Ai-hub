@@ -121,13 +121,46 @@ axis score.
 
 **What "unestablished" changes in practice.** The 32B-control memory's conclusion — *reach for the
 adapter for Phaser* — currently rests on a 4/6-vs-2/6 whose comparability cannot be shown. It is not
-shown to be wrong. It is shown to be unshown. A rescore of `basefull run5 run6 coder32b` under the
-fixed scorer, against one pinned library, would settle it either way; until then the claim should be
-quoted with that qualifier attached.
+shown to be wrong. It is shown to be unshown. Until that is addressed (see the next section), the
+claim should be quoted with that qualifier attached.
+
+## Do the original generations survive? Yes — checked 2026-09-22
+
+**All four runs the 32B control compared are on disk**, with the model's actual output text:
+
+    eval/eval_basefull.jsonl   32 rows   2026-09-09
+    eval/eval_run5.jsonl       32 rows   2026-09-09
+    eval/eval_run6.jsonl       50 rows   2026-09-09
+    eval/eval_coder32b.jsonl   75 rows   2026-09-09
+
+Each row carries `{id, axis, prompt, text}` — `text` being the generation itself, which is what the
+verifier consumes. The **18 shared prompt ids** break down as **code 9, godot 3, phaser 6**, exactly
+the shape the 32B-control table reports.
+
+**So reverification is possible without regenerating anything.** Re-scoring those same four files
+against one pinned asset library costs verifier time, not a generation window — no GPU, no model
+serving, no new sampling. That is a much cheaper path than the rescore this audit originally
+contemplated, and it is the path to take **if** the asset-axis rankings would change the next model
+decision.
+
+### What reverification would and would not establish
+
+**Would:** a new, controlled comparison of those exact generations under one known library — enough
+to settle whether the 14B fine-tune beats 32B on Phaser *under that library*.
+
+**Would not:** recover which asset bytes the historical verifiers actually loaded. That information
+was never recorded and does not exist anywhere. **The 2026-09-09/10 numbers therefore remain
+unestablished permanently** — reverification produces a *new* result beside them, it does not
+validate them. Anyone reading a reverified table must not treat it as confirmation of the old one.
+
+**If the generations had not survived**, fresh generations would have been a new experiment
+outright — different sampling, possibly different weights — and not a reconstruction of anything.
+They survived, so that distinction does not bite here.
 
 ## Not done here
 
-- No historical run was rescored. That is a GPU-window decision.
+- **No historical run was rescored, and the decision is deferred**: reverify only if the asset-axis
+  rankings would change the next model decision. The affected claims stay qualified until then.
 - The remote Modal verifier reports `assetVersion` on `/api/game/verify` (same source as
   `gameVerify.js:250`), so real runs *will* carry per-verdict versions — but the gate will correctly
   land on `UNESTABLISHED` for any run scored against a verifier build that predates that field.
@@ -135,3 +168,16 @@ quoted with that qualifier attached.
   step**. The gate now makes that check unnecessary for *comparability* — a mismatch shows up in the
   verdicts themselves — but the manual script remains the way to check the verifier is serving the
   whole library.
+
+## Credit, stated exactly
+
+This result was produced by three mechanisms, and by nothing else:
+
+1. **the comparability gate** — `comparability.mjs`, a pure decision with three outcomes where the
+   third had previously been collapsed into the first;
+2. **its wiring** — the gate reaching *every* table the scorer prints, including the per-variant
+   table that is the only table when prompt sets match;
+3. **persisted verdict evidence** — `eval/scores-*.json`, without which no future run could be
+   audited for this defect either.
+
+No framework contributed to it. Legasus remains experimental and was not involved.
