@@ -246,6 +246,7 @@ export async function evaluateD2(workspace, { startRef, candidateRef, written = 
  */
 const HUB_PRIVATE = [
   'AGENT_D2_ENFORCE',    // THE arm marker: the only intended difference between A and B
+  'AGENT_D2_AUDIT_DIR',  // where quarantined candidates live - audit only, not a model resource
   'AGENT_D2_TARGETS',    // identical in both arms, but there is no reason to expose it
   'HOST_EVENT_LOG',      // Phase 1 sink path - also reveals the harness
   'HUB_TOKEN',           // the hub's own API credential
@@ -373,19 +374,68 @@ export async function verifyAt(workspace, ref) {
  * because one obligation failed: the candidate stays inspectable, repairable and
  * cherry-pickable, and the campaign's GOOD_TRAPPED metric is scored against it.
  */
-export async function quarantine(workspace, runId, candidateRef) {
-  const ref = `refs/legasus/quarantine/${runId}`;
-  const r = await git(workspace, ['update-ref', ref, candidateRef]);
-  if (!r.ok) return { ok: false, error: r.err };
+export async function quarantine(workspace, runId, candidateRef, auditDir = null) {
+  // OUTSIDE THE MODEL-VISIBLE ENVIRONMENT. Quarantine used to write
+  // refs/legasus/quarantine/<runid> INTO the workspace repo, which leaked two ways:
+  //
+  //   1. across runs, a later model could `git show-ref` and find a namespace that exists
+  //      only where enforcement acted - authority from an earlier run becoming information
+  //      for the next one, which is NOT the intended divergence (that is "A keeps damaged
+  //      code, B keeps restored code");
+  //   2. it would have handed whichever arm had it a RECOVERY RESOURCE - a preserved
+  //      candidate to mine - making quarantine part of the tested workflow rather than an
+  //      audit artifact.
+  //
+  // Here quarantine is for AUDIT ONLY, so neither model may reach it. A bundle outside the
+  // workspace holds the commit; nothing is written into the repo the agent can see.
+  //
+  // Symmetric by construction: the CALLER invokes this identically in both arms on a
+  // violation. Only restoration authority differs.
+  const dir = auditDir || join(tmpdir(), 'legasus-audit');
+  try { mkdirSync(dir, { recursive: true }); } catch (e) { return { ok: false, error: `audit dir: ${e.message}` }; }
+  const bundle = join(dir, `${runId}.bundle`);
+
+  // A bundle needs a REF to name, and the ref must not persist in the workspace. It must also
+  // be a BRANCH: a bundle whose only ref is outside refs/heads has no HEAD, so `git clone` of
+  // it checks out nothing and an auditor cannot recover the candidate - which is the artifact's
+  // only purpose here. `bundle verify` still passes in that state, so the defect is invisible
+  // unless recovery itself is tested. Created, bundled, then deleted.
+  //
+  // The branch exists only between these two calls, after the run has already terminated, so
+  // no model is executing while it is present.
+  const tmpRef = `refs/heads/legasus-audit-${runId}`;
+  const mk = await git(workspace, ['update-ref', tmpRef, candidateRef]);
+  if (!mk.ok) return { ok: false, error: `temp ref: ${mk.err}` };
+  const b = await git(workspace, ['bundle', 'create', bundle, tmpRef]);
+  await git(workspace, ['update-ref', '-d', tmpRef]);           // leave no trace in the repo
+  if (!b.ok) return { ok: false, error: `bundle: ${b.err}` };
+
   // VERIFY, do not assume. The caller's next act is a hard reset, and it must not happen on
-  // the strength of update-ref's exit code alone: if the quarantine does not actually hold
-  // the candidate's bytes, resetting destroys the only copy.
+  // the strength of an exit code: if the bundle does not actually hold the candidate, the
+  // reset destroys the only copy. `bundle verify` proves it is readable and complete.
+  const v = await git(workspace, ['bundle', 'verify', bundle]);
+  if (!v.ok) return { ok: false, error: `bundle verify: ${v.err}` };
   const want = await treeOf(workspace, candidateRef);
-  const have = await treeOf(workspace, ref);
-  if (!want || !have || want !== have) {
-    return { ok: false, error: `quarantine ref ${ref} resolves to tree ${have}, candidate is ${want}` };
+  const listed = await git(workspace, ['bundle', 'list-heads', bundle]);
+  if (!listed.ok || !listed.out.includes(candidateRef.slice(0, 7))) {
+    // list-heads prints the commit sha; compare on the prefix we were given.
+    const heads = listed.ok ? listed.out : listed.err;
+    return { ok: false, error: `bundle does not name the candidate (${String(heads).slice(0, 120)})` };
   }
-  return { ok: true, ref, tree: have };
+  // RECOVERY PROCEDURE, recorded with the artifact. A bundle whose only ref is a branch still
+  // carries no HEAD, so a plain `git clone <bundle>` warns "remote HEAD refers to nonexistent
+  // ref, unable to checkout" and produces an EMPTY tree - while `git bundle verify` passes.
+  // An audit artifact that verifies but cannot be recovered is worthless, and the failure is
+  // invisible unless recovery itself is tested. The branch name is discoverable from the
+  // bundle (`git bundle list-heads`), so an auditor needs nothing out of band.
+  return {
+    ok: true,
+    bundle,
+    branch: tmpRef.replace('refs/heads/', ''),
+    recover: `git clone -b ${tmpRef.replace('refs/heads/', '')} "${bundle}" <dir>`,
+    tree: want,
+    visibleInWorkspace: false,
+  };
 }
 
 /** Restore the authoritative workspace to the run's established starting state. */

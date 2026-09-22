@@ -79,6 +79,12 @@ const D2_ON = D2_TARGETS.length > 0;
 // runs the hub would otherwise have promoted. Set G could not answer that; this can.
 const D2_ENFORCE = process.env.AGENT_D2_ENFORCE === '1';
 
+// Where quarantined candidates are kept: OUTSIDE the workspace, in BOTH arms. AUDIT ONLY -
+// neither model may reach it, or the preserved candidate becomes a recovery resource and part
+// of the tested workflow rather than a record of it. Defaults beside the server, never inside
+// WORKSPACE: a value in there would reintroduce exactly the cross-run leak this replaced.
+const D2_AUDIT_DIR = process.env.AGENT_D2_AUDIT_DIR || join(__dirname, 'legasus-audit');
+
 /**
  * The finish gate. Returns true when the run may be promoted, false when d2 refused.
  *
@@ -161,34 +167,43 @@ async function d2TerminalGate(run) {
     // THE ONE PLACE THE ARMS DIFFER. ARM A has reached an identical verdict, from identical
     // observations, having created identical refs - and simply lacks the authority to act on
     // it. The counterfactual is recorded so the campaign can count what d2 WOULD have refused.
+    // 3. QUARANTINE - IN BOTH ARMS, IDENTICALLY. Same capture procedure, same access
+    //    restrictions, out of the model-visible environment. It is an AUDIT artifact: neither
+    //    arm may gain a recovery resource from it, or quarantine becomes part of the tested
+    //    workflow rather than a record of it.
+    //
+    //    Doing this before the arms diverge is what keeps "differ in authority, not
+    //    information" true ACROSS runs. The earlier design wrote refs/legasus/quarantine into
+    //    the workspace only when enforcing, so a later model could `git show-ref` and see a
+    //    namespace that existed only where enforcement had acted.
+    const q = await quarantine(WORKSPACE, run.id, candidateRef, D2_AUDIT_DIR);
+    if (!q.ok) {
+      // FAIL CLOSED, in both arms. Observational cannot proceed to "promote" having failed to
+      // record the candidate either - that would silently lose the audit evidence the
+      // campaign is built on.
+      run.d2.recovery = { ok: false, reset: false, error: q.error };
+      pushStep(run, { type: D2_ENFORCE ? 'error' : 'note', text: `d2: the candidate could not be preserved for audit (${q.error}).${D2_ENFORCE ? ' REFUSED, and the workspace was NOT reset: the candidate is the only copy of this work.' : ' Not enforcing; the run promotes, but this episode has no audit record.'}` });
+      return !D2_ENFORCE;
+    }
+    run.d2.auditBundle = q.bundle;          // a path OUTSIDE the workspace, never a ref inside it
+
+    // THE ARMS DIVERGE HERE, AND ONLY HERE. Identical verdict, identical audit capture; only
+    // the authority to change what survives differs.
     if (!D2_ENFORCE) {
       run.d2.wouldRefuse = true;
       pushStep(run, { type: 'note', text: `d2 WOULD REFUSE (observational): ${v.newly_unloadable.join(', ')} loaded at run start and does not at finish. Not enforcing; the run promotes.` });
       return true;
     }
 
-    // 3. QUARANTINE, AND PROVE IT. quarantine() verifies the ref resolves to the candidate's
-    //    tree before returning ok.
-    const q = await quarantine(WORKSPACE, run.id, candidateRef);
-    if (!q.ok) {
-      // FAIL CLOSED. The candidate is not provably preserved, so the workspace is left exactly
-      // as the run made it. The run is still refused - a state that failed d2 must not be
-      // promoted - but nothing is destroyed to achieve that.
-      run.d2.recovery = { ok: false, reset: false, error: q.error };
-      pushStep(run, { type: 'error', text: `d2 REFUSED and could not quarantine the candidate (${q.error}). The workspace was NOT reset: the candidate is the only copy of this work.` });
-      return false;
-    }
-    run.d2.quarantineRef = q.ref;
-
     // 4. RESTORE, AND PROVE IT.
     const r = await restoreTo(WORKSPACE, run.d2Start.ref);
     const ver = r.ok ? await verifyAt(WORKSPACE, run.d2Start.ref) : { ok: false, error: r.error };
-    run.d2.recovery = { ok: ver.ok, reset: r.ok, quarantineRef: q.ref, error: ver.ok ? null : ver.error };
+    run.d2.recovery = { ok: ver.ok, reset: r.ok, auditBundle: q.bundle, error: ver.ok ? null : ver.error };
     pushStep(run, {
       type: 'error',
       text: ver.ok
-        ? `d2 REFUSED: ${v.newly_unloadable.join(', ')} loaded at run start and does not at finish. Candidate preserved at ${q.ref}; workspace restored to ${run.d2Start.ref}.`
-        : `d2 REFUSED: candidate preserved at ${q.ref}, but the restore could NOT be verified (${ver.error}). The workspace is in an unverified state and needs a human.`,
+        ? `d2 REFUSED: ${v.newly_unloadable.join(', ')} loaded at run start and does not at finish. Candidate preserved for audit at ${q.bundle}; workspace restored to ${run.d2Start.ref}.`
+        : `d2 REFUSED: candidate preserved for audit at ${q.bundle}, but the restore could NOT be verified (${ver.error}). The workspace is in an unverified state and needs a human.`,
     });
     return false;
   } catch (e) {
@@ -328,7 +343,29 @@ const CMD_TIMEOUT_MS = 60_000;   // per shell command
 // NUM_CTX to 8192 if you OOM; a 7B has room to spare either way.
 const NUM_CTX = parseInt(process.env.NUM_CTX, 10) || 24_576;
 const NUM_PREDICT = parseInt(process.env.NUM_PREDICT, 10) || -1; // -1 = generate until done; never truncate a long file mid-write
-const TEMPERATURE = 0.2;
+// SAMPLING-1. This was `const TEMPERATURE = 0.2` and nothing else: no top_p, no top_k and NO
+// REPETITION PENALTY were ever sent, so the server applied vLLM's defaults (top_k disabled,
+// repetition_penalty 1.0). The 7B campaign's dominant termination mode was repetitive output,
+// which makes the generation regime a live rival explanation for a stall otherwise attributed
+// to the protocol.
+//
+// Qwen2.5-Coder-7B-Instruct's own generation_config.json: temperature 0.7, top_p 0.8,
+// top_k 20, repetition_penalty 1.1. (1.05 is the NON-Coder Qwen2.5-7B-Instruct - a different
+// model card, and exactly the near-miss read-the-model-card-first exists to catch.)
+//
+// Defaults preserve the previous behaviour EXACTLY - temp 0.2, the rest unset - so nothing
+// changes unless an experiment asks for it.
+const TEMPERATURE = process.env.AGENT_TEMPERATURE ? parseFloat(process.env.AGENT_TEMPERATURE) : 0.2;
+const TOP_P = process.env.AGENT_TOP_P ? parseFloat(process.env.AGENT_TOP_P) : null;
+const TOP_K = process.env.AGENT_TOP_K ? parseInt(process.env.AGENT_TOP_K, 10) : null;
+const REPEAT_PENALTY = process.env.AGENT_REPEAT_PENALTY ? parseFloat(process.env.AGENT_REPEAT_PENALTY) : null;
+// Only keys that were explicitly asked for. Sending nulls would make "unset" and "explicitly
+// default" indistinguishable at the server - which is how the last set of knobs got lost.
+const SAMPLING_EXTRA = {
+  ...(TOP_P !== null ? { top_p: TOP_P } : {}),
+  ...(TOP_K !== null ? { top_k: TOP_K } : {}),
+  ...(REPEAT_PENALTY !== null ? { repeat_penalty: REPEAT_PENALTY } : {}),
+};
 const MAX_HISTORY_MSGS = 16;     // keep recent context dense; older tool dumps are pruned
 
 // ── Workspace sandbox helpers ────────────────────────────────────────────────
@@ -2043,7 +2080,7 @@ async function callModel(loadDb, messages, signal, override) {
   // at all: silence becomes observable.
   const payload = isOllama
     ? { model, messages, stream: true, keep_alive: KEEP_ALIVE,
-        options: { temperature: TEMPERATURE, num_ctx: NUM_CTX, num_predict: NUM_PREDICT } }
+        options: { temperature: TEMPERATURE, num_ctx: NUM_CTX, num_predict: NUM_PREDICT, ...SAMPLING_EXTRA } }
     // OpenAI-compatible. num_ctx/num_predict are Ollama options and are ignored here, so
     // an explicit max_tokens is the ONLY generation bound this path has.
     : { model, messages, stream: true, temperature: TEMPERATURE,
