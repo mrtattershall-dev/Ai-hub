@@ -1,0 +1,856 @@
+{
+  "takenAt": "2026-09-22T15:11:12.499Z",
+  "node": "v24.15.0",
+  "files": 94,
+  "passed": 91,
+  "failed": 3,
+  "totalSecs": 994,
+  "rows": [
+    {
+      "file": "apiErrors.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 6,
+      "why": "",
+      "tail": "6 passed, 0 failed"
+    },
+    {
+      "file": "appendFile.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "5 passed, 0 failed"
+    },
+    {
+      "file": "appendFragment.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "7 passed, 0 failed"
+    },
+    {
+      "file": "appendSyntax.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 12,
+      "why": "",
+      "tail": "4 passed, 0 failed"
+    },
+    {
+      "file": "assertEvidence.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 14,
+      "why": "",
+      "tail": "4 passed, 0 failed"
+    },
+    {
+      "file": "auth.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "10 passed, 0 failed"
+    },
+    {
+      "file": "autoStart.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 2,
+      "why": "",
+      "tail": "autoStart: 4 passed"
+    },
+    {
+      "file": "batchActions.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 311,
+      "why": "",
+      "tail": "15 passed, 0 failed"
+    },
+    {
+      "file": "budgetAccounting.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 7,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "chatTimeout.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 7,
+      "why": "",
+      "tail": "2 passed, 0 failed"
+    },
+    {
+      "file": "checkpointResilience.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 9,
+      "why": "",
+      "tail": "5 passed, 0 failed"
+    },
+    {
+      "file": "commandOutputTail.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 5,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "connRetry.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 3,
+      "why": "",
+      "tail": "3 passed, 0 failed"
+    },
+    {
+      "file": "d2.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 8,
+      "why": "",
+      "tail": "  CONTROLS: 10 passed, 0 failed -> controls hold"
+    },
+    {
+      "file": "d2ArmIsolation.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 6,
+      "why": "",
+      "tail": "  arm isolation: 16 passed, 0 failed -> arms differ in authority only"
+    },
+    {
+      "file": "d2Recovery.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 7,
+      "why": "",
+      "tail": "  d2 recovery: 27 passed, 0 failed -> dangerous transitions qualified"
+    },
+    {
+      "file": "dataIntegrity.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "9 passed, 0 failed"
+    },
+    {
+      "file": "defLoss.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 10,
+      "why": "",
+      "tail": "6 passed, 0 failed"
+    },
+    {
+      "file": "destructiveWrite.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 12,
+      "why": "",
+      "tail": "8 passed, 0 failed"
+    },
+    {
+      "file": "duplicateDecls.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 3,
+      "why": "",
+      "tail": "9 passed, 0 failed"
+    },
+    {
+      "file": "editAddress.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 16,
+      "why": "",
+      "tail": "9 passed, 0 failed"
+    },
+    {
+      "file": "editParse.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "4 passed, 0 failed"
+    },
+    {
+      "file": "editTruth.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 30,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "emptyReplace.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 14,
+      "why": "",
+      "tail": "8 passed, 0 failed"
+    },
+    {
+      "file": "exportLoss.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 4,
+      "why": "",
+      "tail": "7 passed, 0 failed"
+    },
+    {
+      "file": "failReason.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "failReason: 7 passed"
+    },
+    {
+      "file": "finishGateEntry.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 2,
+      "why": "",
+      "tail": "  still open: a Python project is detected as Python, not as Node | a failing Python goal is not passed by an unrelated leftover .js | and the evidence does not"
+    },
+    {
+      "file": "finishGateGoalEntry.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 6,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "forcedFinish.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 7,
+      "why": "",
+      "tail": "3 passed, 0 failed"
+    },
+    {
+      "file": "fuzzInvariants.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 2,
+      "why": "",
+      "tail": "32 passed, 0 failed"
+    },
+    {
+      "file": "gateSoundness.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 12,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "gitUndo.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 4,
+      "why": "",
+      "tail": "2 passed, 0 failed"
+    },
+    {
+      "file": "godotProject.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "godotProject: 35 passed"
+    },
+    {
+      "file": "godotVerify.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 7,
+      "why": "",
+      "tail": "godotVerify: 14 passed"
+    },
+    {
+      "file": "googleAuth.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "google auth: 16 passed"
+    },
+    {
+      "file": "googleE2E.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 3,
+      "why": "",
+      "tail": "google e2e: 8 passed"
+    },
+    {
+      "file": "googleRefresh.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "google refresh: 5 passed"
+    },
+    {
+      "file": "googleTools.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "google tools: 30 passed"
+    },
+    {
+      "file": "hostEvent.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 3,
+      "why": "",
+      "tail": "host event (Phase 1 C1-C5): 20 passed"
+    },
+    {
+      "file": "hostileModel.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 49,
+      "why": "",
+      "tail": "14 passed, 0 failed"
+    },
+    {
+      "file": "ledgerAtomic.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "6 passed, 0 failed"
+    },
+    {
+      "file": "ledgerScope.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "11 passed, 0 failed"
+    },
+    {
+      "file": "ledgerScopeHub.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 2,
+      "why": "",
+      "tail": "3 passed, 0 failed"
+    },
+    {
+      "file": "lineNumberStrip.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "11 passed, 0 failed"
+    },
+    {
+      "file": "loopSmoke.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 2,
+      "why": "",
+      "tail": "9 passed, 0 failed"
+    },
+    {
+      "file": "markerGuard.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "7 passed, 0 failed"
+    },
+    {
+      "file": "markerGuardBypass.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 5,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "mockLoop.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 14,
+      "why": "",
+      "tail": "7 passed, 0 failed"
+    },
+    {
+      "file": "modelBudget.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 12,
+      "why": "",
+      "tail": "13 passed, 0 failed"
+    },
+    {
+      "file": "noopEdit.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 5,
+      "why": "",
+      "tail": "4 passed, 0 failed"
+    },
+    {
+      "file": "parseActions.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "10 passed, 0 failed"
+    },
+    {
+      "file": "parserCorpus.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "7 passed, 0 failed"
+    },
+    {
+      "file": "parserFields.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "17 passed, 0 failed"
+    },
+    {
+      "file": "parserPath.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "7 passed, 0 failed"
+    },
+    {
+      "file": "planFiles.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "12 passed, 0 failed"
+    },
+    {
+      "file": "planFilesGate.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 5,
+      "why": "",
+      "tail": "3 passed, 0 failed"
+    },
+    {
+      "file": "planTasks.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "6 passed, 0 failed"
+    },
+    {
+      "file": "planToExecution.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 4,
+      "why": "",
+      "tail": "plan to execution: 10 passed"
+    },
+    {
+      "file": "plannerFrame.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "7 passed, 0 failed"
+    },
+    {
+      "file": "queueChain.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "queue chain: 7 passed"
+    },
+    {
+      "file": "queueLock.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "queueLock: 5 passed"
+    },
+    {
+      "file": "readTruncation.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 2,
+      "why": "",
+      "tail": "6 passed, 0 failed"
+    },
+    {
+      "file": "realChain.test.mjs",
+      "ok": false,
+      "status": 2,
+      "signal": null,
+      "secs": 0,
+      "why": "exit 2",
+      "tail": ""
+    },
+    {
+      "file": "realGame.test.mjs",
+      "ok": false,
+      "status": 2,
+      "signal": null,
+      "secs": 0,
+      "why": "exit 2",
+      "tail": ""
+    },
+    {
+      "file": "realModel.test.mjs",
+      "ok": false,
+      "status": 2,
+      "signal": null,
+      "secs": 0,
+      "why": "exit 2",
+      "tail": ""
+    },
+    {
+      "file": "repairChain.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "repair chain: 14 passed"
+    },
+    {
+      "file": "repeatCall.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 4,
+      "why": "",
+      "tail": "6 passed, 0 failed"
+    },
+    {
+      "file": "repeatGuardFairness.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 9,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "replacementLiteral.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 7,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "resetGuard.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "reset guard: 6 passed"
+    },
+    {
+      "file": "resumeAfterRestart.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 5,
+      "why": "",
+      "tail": "7 passed, 0 failed"
+    },
+    {
+      "file": "retention.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "6 passed, 0 failed"
+    },
+    {
+      "file": "rollbackBounded.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 7,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "rollbackCarryover.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 3,
+      "why": "",
+      "tail": "3 passed, 0 failed"
+    },
+    {
+      "file": "runLifecycle.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 38,
+      "why": "",
+      "tail": "9 passed, 0 failed"
+    },
+    {
+      "file": "searchLiteral.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "shadowHint.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 6,
+      "why": "",
+      "tail": "4 passed, 0 failed"
+    },
+    {
+      "file": "statVanish.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "4 passed, 0 failed"
+    },
+    {
+      "file": "substitutionHonesty.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "KNOWN-OPEN: 0 of 0 expected"
+    },
+    {
+      "file": "supervisorChain.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 5,
+      "why": "",
+      "tail": "supervisor chain: 7 passed"
+    },
+    {
+      "file": "supervisorTick.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 166,
+      "why": "",
+      "tail": "5 passed, 0 failed"
+    },
+    {
+      "file": "syntaxRollback.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "6 passed, 0 failed"
+    },
+    {
+      "file": "teardownSettles.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 2,
+      "why": "",
+      "tail": "5 passed, 0 failed"
+    },
+    {
+      "file": "tracesIsolation.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "6 passed, 0 failed"
+    },
+    {
+      "file": "transcript.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 11,
+      "why": "",
+      "tail": "7 passed, 0 failed"
+    },
+    {
+      "file": "truncatedFence.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 1,
+      "why": "",
+      "tail": "7 passed, 0 failed"
+    },
+    {
+      "file": "unattendedApproval.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 4,
+      "why": "",
+      "tail": "4 passed, 0 failed"
+    },
+    {
+      "file": "unverifiedFinishRecorded.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 13,
+      "why": "",
+      "tail": "  still open: an open ledger task blocks the auto-finish the same way it blocks a finish"
+    },
+    {
+      "file": "verifierInfra.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 12,
+      "why": "",
+      "tail": "verifier infra: 3 passed"
+    },
+    {
+      "file": "verifyGoal.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 6,
+      "why": "",
+      "tail": "3 passed, 0 failed"
+    },
+    {
+      "file": "verifyGodotTool.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "verify_godot tool: 9 passed, 3 skipped"
+    },
+    {
+      "file": "visualBaseline.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 44,
+      "why": "",
+      "tail": "4 passed, 0 failed"
+    },
+    {
+      "file": "wiring.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 0,
+      "why": "",
+      "tail": "wiring: 2 passed"
+    },
+    {
+      "file": "workspaceGitConfine.test.mjs",
+      "ok": true,
+      "status": 0,
+      "signal": null,
+      "secs": 2,
+      "why": "",
+      "tail": "6 passed, 0 failed"
+    }
+  ]
+}

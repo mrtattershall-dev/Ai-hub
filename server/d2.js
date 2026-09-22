@@ -156,7 +156,7 @@ export async function loadableAt(workspace, ref, file, { timeout = 20_000, trees
  * observations at run start for that reason - so this comparison CONSUMES the starting
  * property rather than reconstructing it afterwards.
  */
-export async function evaluateD2(workspace, { startRef, candidateRef, written = [], targets = [] }) {
+export async function evaluateD2(workspace, { startRef, candidateRef, written = [], targets = [], startObservations = null }) {
   const changed = [...new Set(written.filter((f) => LOADABLE_EXT.test(f)))];
   // The protected universe is CAMPAIGN-OWNED, not model-owned: a file the model created
   // during the run is not protected merely because it exists. Passed in, frozen before the
@@ -184,7 +184,12 @@ export async function evaluateD2(workspace, { startRef, candidateRef, written = 
   const observations = [];
   try {
     for (const f of closure) {
-      const before = await loadableAt(workspace, startRef, f, { trees });
+      // CONSUME the property recorded at run start when we have it; only re-derive when the
+      // run predates the recording (an unobserved target is `undefined` in the map, which is
+      // NOT the same as an observed `null`).
+      const recorded = startObservations && Object.prototype.hasOwnProperty.call(startObservations, f)
+        ? startObservations[f] : undefined;
+      const before = recorded !== undefined ? recorded : await loadableAt(workspace, startRef, f, { trees });
       const after = await loadableAt(workspace, candidateRef, f, { trees });
       // before === null: the target did not exist at the recorded run start, so there is no
       // preservation property to lose. UNESTABLISHED, never manufactured into START=THROWS -
@@ -227,6 +232,140 @@ export async function evaluateD2(workspace, { startRef, candidateRef, written = 
 }
 
 /**
+ * The environment a MODEL-CONTROLLED subprocess may see.
+ *
+ * EXPERIMENTAL ISOLATION, not a feature. `run_command` and `run_python` exec with no `env`
+ * option, so node hands them `process.env` in full - and in the paired campaign ARM B sets
+ * AGENT_D2_TARGETS while ARM A does not. A model that runs `env` would then be able to tell
+ * which arm it is in, and the arms would differ by a model-visible marker as well as by the
+ * intervention under test. That is a confound in the treatment, discovered before the campaign
+ * rather than after it.
+ *
+ * HUB_TOKEN is stripped for a second reason: it is the hub's API credential, and there is no
+ * version of "the model runs a shell command" that needs it.
+ */
+const HUB_PRIVATE = [
+  'AGENT_D2_ENFORCE',    // THE arm marker: the only intended difference between A and B
+  'AGENT_D2_TARGETS',    // identical in both arms, but there is no reason to expose it
+  'HOST_EVENT_LOG',      // Phase 1 sink path - also reveals the harness
+  'HUB_TOKEN',           // the hub's own API credential
+  'HUB_DB', 'AGENT_QUEUE_FILE', 'AGENT_RUNS_DIR', 'AGENT_TRACES_DIR', 'RUN_INDEX',
+];
+export function modelEnv(base = process.env) {
+  const out = { ...base };
+  for (const k of HUB_PRIVATE) delete out[k];
+  return out;
+}
+
+/**
+ * Record the run's ESTABLISHED starting property: does each protected target load, right now.
+ *
+ * Called at run start, not reconstructed at finish. That ordering is the point: a finish-time
+ * comparison that re-derives the starting state is RECONSTRUCTING the producer's answer
+ * instead of consuming it - the 2026-09-19 cf6dffd error in a new place. Recording it here
+ * also means a later change to the materialisation code cannot silently rewrite history.
+ *
+ * `null` for a target that does not exist yet - never conflated with `false`.
+ */
+export async function observeTargets(workspace, ref, targets) {
+  const mods = targets.filter((f) => LOADABLE_EXT.test(f));
+  // BIND the observations to the exact tree they were measured against. Without this a
+  // perfectly implemented finish comparison can still compare observations taken on tree A
+  // against a startRef that now resolves to tree B - two different baselines, and no error
+  // anywhere.
+  const tree = await treeOf(workspace, ref);
+  if (!tree) throw new Error(`could not resolve a tree for ${ref}`);
+  const trees = new Map();
+  const out = {};
+  try {
+    for (const f of mods) out[f] = await loadableAt(workspace, ref, f, { trees });
+  } finally {
+    for (const dir of trees.values()) { if (dir) { try { rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ } } }
+  }
+  return { ref, tree, observations: out, at: Date.now() };
+}
+
+/**
+ * Capture the working tree as a commit WITHOUT touching the branch, the index or HEAD.
+ *
+ * PRESERVATION INSTRUMENTATION MUST NOT BECOME THE TREATMENT. The obvious implementation -
+ * `commitAll()` at run start and at finish - works, but those commits land on the branch and
+ * the model can read them with `git_log`. ARM B's history would then differ from ARM A's by
+ * two visible commits per run, and the arms would differ by more than the intervention under
+ * test. The same reasoning as stripping AGENT_D2_TARGETS from the model's environment.
+ *
+ * So: a temporary index, `write-tree`, and `commit-tree -p HEAD`. The result is a real commit
+ * object, reachable only through the ref we give it, invisible to `git log` (which walks HEAD)
+ * and to `git status`. Parented on HEAD so that a later `reset --hard` to it is an ordinary
+ * history move rather than a detached jump.
+ *
+ * Returns { ok, sha, tree } or { ok:false, error } - never a partial success, because the
+ * caller's next act may be a hard reset.
+ */
+export async function captureState(workspace, message, refName = null) {
+  const idx = join(mkdtempSync(join(tmpdir(), 'd2idx-')), 'index');
+  try {
+    // Its OWN identity, not the repo's. commit-tree requires an author, and a workspace with
+    // no user.name configured would otherwise make capture fail - turning a missing git config
+    // into an unjudgeable run. Instrumentation supplies what instrumentation needs.
+    const env = {
+      ...process.env,
+      GIT_INDEX_FILE: idx,
+      GIT_AUTHOR_NAME: 'legasus-d2', GIT_AUTHOR_EMAIL: 'd2@legasus.local',
+      GIT_COMMITTER_NAME: 'legasus-d2', GIT_COMMITTER_EMAIL: 'd2@legasus.local',
+    };
+    const run = async (args) => {
+      try {
+        const { stdout } = await exec('git', args, { cwd: workspace, encoding: 'utf8', env, maxBuffer: 64 * 1024 * 1024, windowsHide: true });
+        return { ok: true, out: String(stdout).trim() };
+      } catch (e) { return { ok: false, err: String(e.stderr || e.message).trim() }; }
+    };
+    // --ignore-errors: one unindexable filename must not lose the whole capture. A model-made
+    // file named "10 + 20 = 35." once ended an entire undo history on Windows.
+    const add = await run(['add', '-A', '--ignore-errors']);
+    if (!add.ok && !/ignore-errors/.test(String(add.err))) { /* continue: partial index is still better than none */ }
+    const tree = await run(['write-tree']);
+    if (!tree.ok) return { ok: false, error: `write-tree: ${tree.err}` };
+    const head = await git(workspace, ['rev-parse', 'HEAD']);
+    const args = ['commit-tree', tree.out, '-m', String(message).slice(0, 200)];
+    if (head.ok && head.out) args.splice(2, 0, '-p', head.out);
+    const commit = await run(args);
+    if (!commit.ok) return { ok: false, error: `commit-tree: ${commit.err}` };
+    if (refName) {
+      const u = await git(workspace, ['update-ref', refName, commit.out]);
+      if (!u.ok) return { ok: false, error: `update-ref: ${u.err}` };
+    }
+    return { ok: true, sha: commit.out, tree: tree.out, ref: refName };
+  } finally {
+    try { rmSync(join(idx, '..'), { recursive: true, force: true }); } catch { /* best effort */ }
+  }
+}
+
+/** The tree object a ref resolves to. Two refs with the same tree have identical content. */
+export async function treeOf(workspace, ref) {
+  const r = await git(workspace, ['rev-parse', `${ref}^{tree}`]);
+  return r.ok ? r.out : null;
+}
+
+/**
+ * Prove the workspace really is at `ref` - same tree AND nothing uncommitted.
+ *
+ * A command returning exit 0 is not proof that state is correct. This project has repeatedly
+ * paid for inferring an effect from a report of the effect: a rig that read an output file
+ * without checking the child's status, a shell reporting 0 for a node process that exited 1.
+ * Recovery claims get the same treatment - verified, not reported.
+ */
+export async function verifyAt(workspace, ref) {
+  const want = await treeOf(workspace, ref);
+  const have = await treeOf(workspace, 'HEAD');
+  if (!want || !have) return { ok: false, error: 'could not resolve a tree to compare' };
+  if (want !== have) return { ok: false, error: `HEAD tree ${have} != ${ref} tree ${want}` };
+  const dirty = await git(workspace, ['status', '--porcelain']);
+  if (dirty.ok && dirty.out) return { ok: false, error: `workspace has uncommitted changes after restore: ${dirty.out.split('\n').length} path(s)` };
+  return { ok: true, tree: have };
+}
+
+/**
  * Preserve the candidate under an immutable quarantine ref.
  *
  * MUST be called BEFORE any restore. `undo({hard:true})` is `git reset --hard`, which discards
@@ -237,7 +376,16 @@ export async function evaluateD2(workspace, { startRef, candidateRef, written = 
 export async function quarantine(workspace, runId, candidateRef) {
   const ref = `refs/legasus/quarantine/${runId}`;
   const r = await git(workspace, ['update-ref', ref, candidateRef]);
-  return r.ok ? { ok: true, ref } : { ok: false, error: r.err };
+  if (!r.ok) return { ok: false, error: r.err };
+  // VERIFY, do not assume. The caller's next act is a hard reset, and it must not happen on
+  // the strength of update-ref's exit code alone: if the quarantine does not actually hold
+  // the candidate's bytes, resetting destroys the only copy.
+  const want = await treeOf(workspace, candidateRef);
+  const have = await treeOf(workspace, ref);
+  if (!want || !have || want !== have) {
+    return { ok: false, error: `quarantine ref ${ref} resolves to tree ${have}, candidate is ${want}` };
+  }
+  return { ok: true, ref, tree: have };
 }
 
 /** Restore the authoritative workspace to the run's established starting state. */

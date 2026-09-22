@@ -41,6 +41,10 @@ import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_W
 // HOST_EVENT_LOG unset there are zero sinks and emitHostEvent returns on its first line, so
 // the hub behaves exactly as it did at 3f5a8ff - which is what C4 checks.
 import { emitHostEvent, attachFileSink } from './hostEvent.js';
+// LEGASUS PHASE 2 - d2, the first LOAD-BEARING decision. See PHASE2-INTERVENTION_PREREG.md.
+// Off unless AGENT_D2_TARGETS names the campaign's protected deliverables, so ARM A of the
+// paired campaign is the hub exactly as Phase 1 left it.
+import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState } from './d2.js';
 
 // The Phase 1 consumer, attached once at module load and only when asked for. Guarded because
 // a sink that cannot be created must not stop the hub booting: observation is never allowed to
@@ -48,6 +52,146 @@ import { emitHostEvent, attachFileSink } from './hostEvent.js';
 if (process.env.HOST_EVENT_LOG) {
   try { attachFileSink(process.env.HOST_EVENT_LOG); }
   catch (e) { console.error(`[hostEvent] sink not attached: ${e.message}`); }
+}
+
+// ── LEGASUS PHASE 2: d2, the protected deliverable universe ───────────────────────────────
+//
+// CAMPAIGN-OWNED, not model-owned (Amendment 8). Supplied as a frozen list before the campaign
+// begins; a file the model creates during a run is never protected merely because it exists.
+// Empty => d2 is OFF and every path below short-circuits, which is what makes ARM A of the
+// paired campaign the Phase 1 hub unchanged.
+const D2_TARGETS = String(process.env.AGENT_D2_TARGETS || '').split(',').map((s) => s.trim()).filter(Boolean);
+const D2_ON = D2_TARGETS.length > 0;
+
+// ARM A AND ARM B DIFFER IN AUTHORITY, NOT INFORMATION.
+//
+// Both arms run the SAME machinery: start observations, candidate capture, d2 evaluation, the
+// recorded verdict. Only ARM B lets that verdict decide what becomes authoritative.
+//
+// This is treatment isolation, and it was not the first design. Capture originally ran in ARM
+// B alone - which meant ARM B created `refs/legasus/*` that ARM A did not, and the model has
+// shell access: `git show-ref`, `git for-each-ref` and `git fsck` would each have revealed the
+// arm. Moving the snapshot out of `git log` had merely relocated the marker into git
+// internals. Symmetric instrumentation REMOVES the marker rather than hiding it.
+//
+// It also buys a free counterfactual: ARM A records what d2 WOULD have refused, without
+// refusing it. That is the only way to measure INCREMENTAL PREVENTION - whether d2 fires on
+// runs the hub would otherwise have promoted. Set G could not answer that; this can.
+const D2_ENFORCE = process.env.AGENT_D2_ENFORCE === '1';
+
+/**
+ * The finish gate. Returns true when the run may be promoted, false when d2 refused.
+ *
+ * ORDER IS LOAD-BEARING, and the failure ordering more so:
+ *
+ *     capture candidate FIRST      (nothing below may run without a candidate to protect)
+ *     evaluate d2
+ *     PASS -> promote, candidate untouched
+ *     FAIL -> quarantine + VERIFY  -> restore + VERIFY -> REFUSED_D2
+ *
+ * If the candidate cannot be PROVEN preserved, DO NOT RESET. An ugly retained workspace is
+ * strictly better than destroying the only copy of the work in the name of recovery - the
+ * failure mode `bounded-authority-trades-destruction-for-refusal` records, where removing
+ * deletion authority turned 12 wrong commits into 12 refusals.
+ *
+ * Every verification compares TREES, never a command's exit code. A command returning 0 is not
+ * proof that state is correct; today alone this session has seen a shell report 0 for a node
+ * process that exited 1, and a rig read an output file without checking its child's status.
+ */
+async function d2FinishGate(run) {
+  if (!D2_ON) return true;
+  // FAIL CLOSED ON MEASUREMENT FAILURE. "The property did not exist to preserve"
+  // (UNESTABLISHED - a target created during the run) and "we could not determine the
+  // property" (OBSERVATION_ERROR) are different facts, and only the first may let a run
+  // through. Treating an apparatus failure as UNESTABLISHED would be a fail-OPEN path: the
+  // gate would wave through exactly the runs it could not judge. A genuinely already-broken
+  // target is recorded normally as START=THROWS and simply has no LOADS->THROWS property to
+  // lose - that is not this case.
+  if (!run.d2Start) {
+    run.d2 = { violated: false, invalid: true, reason: run.d2StartError || 'start observation missing' };
+    pushStep(run, { type: D2_ENFORCE ? 'error' : 'note', text: `d2 INVALID: the run's starting property was never recorded (${run.d2.reason}).${D2_ENFORCE ? ' Refusing promotion - an unjudgeable run is not a passed one. The workspace was NOT altered.' : ' Not enforcing; the run promotes.'}` });
+    // An unjudgeable run is not a passed one - but only ARM B may act on that. In ARM A the
+    // invalidity is recorded and the run proceeds, so a measurement failure does not silently
+    // become a behavioural difference between the arms.
+    return !D2_ENFORCE;
+  }
+  try {
+    // 1. CAPTURE THE CANDIDATE FIRST - NON-INVASIVELY. captureState writes a commit object
+    //    reachable only through its own ref, so nothing new appears in the model's `git_log`
+    //    and ARM B's agent-visible history stays identical to ARM A's. Using commitAll here
+    //    would have made the preservation instrumentation part of the treatment.
+    const c = await captureState(WORKSPACE, `d2 candidate: run ${run.id}`, `refs/legasus/candidate/${run.id}`);
+    if (!c.ok) {
+      // Cannot capture => cannot judge. Fail CLOSED, and alter nothing.
+      run.d2 = { violated: false, invalid: true, reason: `candidate capture failed: ${c.error}` };
+      pushStep(run, { type: D2_ENFORCE ? 'error' : 'note', text: `d2 INVALID: ${run.d2.reason}.${D2_ENFORCE ? ' Refusing promotion; the workspace was NOT altered.' : ' Not enforcing; the run promotes.'}` });
+      return !D2_ENFORCE;
+    }
+    const candidateRef = c.sha;
+
+    // 2. EVALUATE, consuming the start property recorded at run start.
+    const written = [...new Set((run.steps || [])
+      .filter((s) => ['write_file', 'edit_file', 'append_file'].includes(s.tool) && s.args?.path)
+      .map((s) => s.args.path))];
+    // The observations are bound to the tree they were measured on. If startRef no longer
+    // resolves to that tree, the two halves of the comparison are different baselines - refuse
+    // rather than compare them.
+    const startTreeNow = await treeOf(WORKSPACE, run.d2Start.ref);
+    if (startTreeNow !== run.d2Start.tree) {
+      run.d2 = { violated: false, invalid: true, reason: `startRef ${run.d2Start.ref} now resolves to tree ${startTreeNow}, observations were taken on ${run.d2Start.tree}` };
+      pushStep(run, { type: D2_ENFORCE ? 'error' : 'note', text: `d2 INVALID: ${run.d2.reason}.${D2_ENFORCE ? ' Refusing promotion without altering the workspace.' : ' Not enforcing; the run promotes.'}` });
+      return !D2_ENFORCE;
+    }
+    const v = await evaluateD2(WORKSPACE, {
+      startRef: run.d2Start.ref,
+      candidateRef,
+      written,
+      targets: D2_TARGETS,
+      startObservations: run.d2Start.observations,
+    });
+    run.d2 = { ...v, candidateRef };
+
+    if (!v.violated) return true;                      // PASS: candidate is already HEAD
+
+    // THE ONE PLACE THE ARMS DIFFER. ARM A has reached an identical verdict, from identical
+    // observations, having created identical refs - and simply lacks the authority to act on
+    // it. The counterfactual is recorded so the campaign can count what d2 WOULD have refused.
+    if (!D2_ENFORCE) {
+      run.d2.wouldRefuse = true;
+      pushStep(run, { type: 'note', text: `d2 WOULD REFUSE (observational): ${v.newly_unloadable.join(', ')} loaded at run start and does not at finish. Not enforcing; the run promotes.` });
+      return true;
+    }
+
+    // 3. QUARANTINE, AND PROVE IT. quarantine() verifies the ref resolves to the candidate's
+    //    tree before returning ok.
+    const q = await quarantine(WORKSPACE, run.id, candidateRef);
+    if (!q.ok) {
+      // FAIL CLOSED. The candidate is not provably preserved, so the workspace is left exactly
+      // as the run made it. The run is still refused - a state that failed d2 must not be
+      // promoted - but nothing is destroyed to achieve that.
+      run.d2.recovery = { ok: false, reset: false, error: q.error };
+      pushStep(run, { type: 'error', text: `d2 REFUSED and could not quarantine the candidate (${q.error}). The workspace was NOT reset: the candidate is the only copy of this work.` });
+      return false;
+    }
+    run.d2.quarantineRef = q.ref;
+
+    // 4. RESTORE, AND PROVE IT.
+    const r = await restoreTo(WORKSPACE, run.d2Start.ref);
+    const ver = r.ok ? await verifyAt(WORKSPACE, run.d2Start.ref) : { ok: false, error: r.error };
+    run.d2.recovery = { ok: ver.ok, reset: r.ok, quarantineRef: q.ref, error: ver.ok ? null : ver.error };
+    pushStep(run, {
+      type: 'error',
+      text: ver.ok
+        ? `d2 REFUSED: ${v.newly_unloadable.join(', ')} loaded at run start and does not at finish. Candidate preserved at ${q.ref}; workspace restored to ${run.d2Start.ref}.`
+        : `d2 REFUSED: candidate preserved at ${q.ref}, but the restore could NOT be verified (${ver.error}). The workspace is in an unverified state and needs a human.`,
+    });
+    return false;
+  } catch (e) {
+    // An exception in the gate must not promote a run it never judged, and must not destroy
+    // anything either. Refuse, say why, touch nothing.
+    try { pushStep(run, { type: D2_ENFORCE ? 'error' : 'note', text: `d2 gate threw (${e.message})${D2_ENFORCE ? ' — refusing promotion without altering the workspace.' : ' — not enforcing; the run promotes.'}` }); } catch { /* the run may be unusable */ }
+    return !D2_ENFORCE;
+  }
 }
 
 /**
@@ -1060,7 +1204,11 @@ const tools = {
       // stdout/stderr/exit-code triple, which you cannot parse back out of a shell
       // byte stream. Mirroring gives visibility without costing reliability.
       mirrorAgentCommand('run_command', cmd);
-      exec(cmd, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true }, (err, stdout, stderr) => {
+      // modelEnv(): hub-private vars are stripped before any model-controlled process sees
+      // them. Without this the paired campaign leaks its own treatment - ARM B sets
+      // AGENT_D2_TARGETS and ARM A does not, so `run_command: env` would tell the model which
+      // arm it is in. It also keeps HUB_TOKEN out of a shell the model drives.
+      exec(cmd, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true, env: modelEnv() }, (err, stdout, stderr) => {
         // TRIM THE MIDDLE, NEVER THE ENDS. This used to build the whole string and then slice(0, 8_000) from
         // the FRONT, so a command printing more than 8k of stdout and then failing handed the model a wall of
         // passing lines with no STDERR, no EXIT line, and no sign anything was missing. batchStepFailed decides
@@ -1107,7 +1255,7 @@ const tools = {
       // Mirror python runs too - run_command was visible in the terminal and this
       // was not, which made the agent look like it did half its work invisibly.
       mirrorAgentCommand('run_python', target);
-      exec(`python "${full}"`, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true }, (err, stdout, stderr) => {
+      exec(`python "${full}"`, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true, env: modelEnv() }, (err, stdout, stderr) => {
         // TRIM THE MIDDLE, NEVER THE ENDS. This used to build the whole string and then slice(0, 8_000) from
         // the FRONT, so a command printing more than 8k of stdout and then failing handed the model a wall of
         // passing lines with no STDERR, no EXIT line, and no sign anything was missing. batchStepFailed decides
@@ -3324,6 +3472,13 @@ async function drive(loadDb, run) {
         // satisfy it does not hang - but it used to be recorded exactly like a clean finish. Set B goal 14
         // (Qwen3-Coder) wrote a page whose script never existed, test_web reported the 404 four times, and the
         // run ended 'done'. The status stays 'done' (harnesses and the UI key on it); the run says plainly what it is.
+        // d2: a forced finish is still a finish. A run that gave up after three blocked
+        // attempts must not promote a load regression just because the gate stopped asking.
+        if (!(await d2FinishGate(run))) {
+          run.status = 'refused_d2';
+          pushStep(run, { type: 'finish', thought, summary: args.summary || '' });
+          break turn;
+        }
         if ((run.finishBlocks || 0) >= 3) {
           run.forcedFinish = true;
           // The note is for a human reading the run; finishKind is for the two records that outlive it. The note text
@@ -3719,7 +3874,10 @@ async function drive(loadDb, run) {
             run.finishKind = 'auto_clean_tests';
             pushStep(run, { type: 'note', text: `Finished UNVERIFIED: auto-finished on ${run.cleanTests} clean browser tests from inside test_web — the finish gate (ledger, plan files, visual check, runtime verifier) never ran.` });
             pushStep(run, { type: 'finish', thought: 'auto', summary: 'App passed browser tests with no errors (auto-finished after repeated clean tests).' });
-            run.status = 'done';
+            // d2 applies HERE TOO. This route already bypasses every other gate - that bypass
+            // is an open defect with its own reproduction - so it is exactly the path a load
+            // regression would otherwise escape through.
+            run.status = (await d2FinishGate(run)) ? 'done' : 'refused_d2';
             break turn;
           }
         }
@@ -4334,6 +4492,28 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
       { role: 'user', content: `Files currently in the workspace (these are the ONLY files — use these EXACT names, never invent one):\n${tools.list_dir({ path: '.' })}\n\nGOAL: ${goal}\n\nBegin step by step. For any large file, outline_file it FIRST, then read_file the slice you need — never try to read a whole big file at once.` },
     ],
   };
+  // d2: record the run's ESTABLISHED starting state, now, not at finish. "Restore to run
+  // start" is only sound if run start was itself established - a state is not safe merely for
+  // being earlier. Recording here means the finish comparison CONSUMES this property instead
+  // of re-deriving it, which is the cf6dffd rule applied to the hub's own boundary.
+  // Fire-and-forget: it must not delay the run, and a failure leaves d2Start unset, which the
+  // gate treats as "nothing established" rather than inventing one.
+  if (D2_ON) {
+    (async () => {
+      try {
+        await ensureRepo(WORKSPACE);
+        // Non-invasive, for the same reason as the candidate: a ref the model cannot see
+        // rather than a commit on the branch it can read with git_log.
+        const c = await captureState(WORKSPACE, `d2 start: run ${id}`, `refs/legasus/start/${id}`);
+        if (!c.ok) { run.d2StartError = `start capture failed: ${c.error}`; return; }
+        run.d2Start = await observeTargets(WORKSPACE, c.sha, D2_TARGETS);
+      } catch (e) {
+        // An apparatus failure, recorded AS one. The gate refuses an unjudgeable run rather
+        // than treating a failed measurement as "nothing to preserve".
+        run.d2StartError = `start observation failed: ${e.message}`;
+      }
+    })();
+  }
   // Anything still open in TASKS.md belongs to an earlier run. Mark it inherited so it
   // stays visible without gating THIS run's finish. Only here, never on a follow-up: a
   // follow-up is the same commitment continuing.
