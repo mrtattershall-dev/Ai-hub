@@ -23,8 +23,14 @@ premise Legasus appears to verify.**
 
 ## G1, G2, G4 — each false for a different reason, all indistinguishable to the adapter
 
-Every one of these files **contains a callback that violates the obligation**, and in each case
-Legasus **established the universal claim that no such callback exists**.
+G1 and G2 each **contain a callback that violates the obligation**, and in each case Legasus
+**established the universal claim that no such callback exists**.
+
+**G4 is narrower, and the narrower claim is enough.** Calling G4 a *false universal claim* would need
+a defined callback domain for malformed source, and none is defined. What G4 establishes without
+that is sufficient: **analysis failed, and admission proceeded anyway.** Failed analysis defeats the
+asserted exhaustive coverage by itself; whether the universal is true or false of an unparseable
+file does not need deciding.
 
 The mechanism is the adapter's own filter: it keeps messages with
 `ruleId === 'array-callback-return'` and treats the empty list as *clean*. A suppression comment, a
@@ -32,8 +38,8 @@ line-level suppression and a **fatal parse error** all produce an empty filtered
 different reasons, and the adapter cannot tell them apart.
 
 **G4 is the worst.** eslint *did* emit a message — `Parsing error: Unexpected token return`, with
-`ruleId: null`. The adapter's filter discarded it, and Legasus then certified a universal claim
-about a file **that does not parse**. Nothing in the run said the file had not been analysed.
+`ruleId: null`. The adapter's filter discarded it, and Legasus then admitted a coverage premise for
+a file **whose analysis had failed**. Nothing in the run said the file had not been analysed.
 
 ## G8 — the measured gap between the frozen domain and the behavioural one
 
@@ -61,17 +67,17 @@ configuration**, and a claim read as *"this project's lint gate passes"* would b
 
 ## What this does to the external experiment's result
 
-The eleven evaluation cases contained **no suppression comments, no ignored files and no parse
-failures**, so their acceptances were **correct**. But they were not correct *for the reason the
-adapter gave*: the adapter would have accepted them identically had they been suppressed or
-unparseable.
+The eleven evaluation cases **retain their observed agreement** with the linter. What this audit
+adds is that the adapter **would have produced identical acceptances** had those files been
+suppressed or unparseable — so the agreement does not rest on the adapter's reasoning.
 
-> **The acceptances were sound by the luck of the corpus, not warranted by the adapter's reasoning.**
+**Narrowed, replacing the first version's wording.** I had written that the acceptances were
+*"correct by the luck of the corpus"*. That overclaims: I did not independently check the eleven
+cases, and agreement with the linter alone does not establish that their acceptances were correct.
+The defensible statement is exactly: **agreement was observed; the adapter's basis for it was
+unsupported; whether each acceptance was correct is not established here.**
 
-`EXTERNAL-LINTER_RESULT.md` stands with that attached. Nothing in it is withdrawn — the agreement
-counts are what they were — but *"agreed with the external verifier on 11 of 11"* must now be read
-as *"agreed on a corpus that contained none of the three conditions under which the adapter agrees
-with nothing at all."*
+`EXTERNAL-LINTER_RESULT.md` stands with that attached. The agreement counts are what they were.
 
 ## Predictions
 
@@ -97,5 +103,17 @@ incomplete. That is a separate, separately frozen decision.
 
 On this obligation Legasus **agreed with the linter everywhere and found nothing the linter did not
 find** — and this audit shows it would also have agreed where the linter said nothing because it had
-not looked. **The adapter, not Legasus, was doing the epistemic work, and it was doing it wrongly.**
-That is the most useful thing the external experiment has produced so far.
+not looked.
+
+**Narrowed, because the first version said more than the evidence supports.** I had written that
+*the adapter, not Legasus, was doing the epistemic work*. That is accurate **for coverage** and
+broader than the evidence for Legasus overall. Legasus **did** check the supplied derivation
+structure — rule identity, witness binding, world identity, premise settlement — and refused
+correctly wherever those failed. What it did **not** independently establish was **whether the
+adapter was entitled to supply its coverage premise**. The boundary failed at exactly one place: where
+an external tool's output became evidence for a universal claim.
+
+That is the most useful thing the external experiment has produced so far, and it is now the
+concrete next test: **translating a verifier's result into a stronger claim can introduce an error
+the verifier itself never made. Whether Legasus can reliably prevent that translation error is the
+question.**
