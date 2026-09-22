@@ -13,6 +13,8 @@
 // imports it. This reduces accidental selection; it does not make selection impossible.
 import { contentOf } from './merge.mjs';
 
+// Signature note: the specimen predates the contract distinction and ignores it, which is
+// part of what it is a specimen OF.
 export function resolveContinuityUNCONTAINED(merged, continuity) {
   const findings = [];
   for (const [predecessor, auth] of Object.entries(continuity || {})) {

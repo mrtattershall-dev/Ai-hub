@@ -13,7 +13,7 @@ import { admit, STATE } from './admission.mjs';
 import { store } from './authority-store.mjs';
 import { journalEntry } from './replay.mjs';
 import { merge, replayMerged, outcomeFor, occurrenceOf, contentOf, MODE,
-  UNATTACHED } from './merge.mjs';
+  UNATTACHED, CONTINUITY_CONTRACT } from './merge.mjs';
 
 const load = (n) => JSON.parse(readFileSync(new URL('./natural/' + n + '.json', import.meta.url), 'utf8'));
 const REL2 = load('REL2'), ORD2 = load('ORD2');
@@ -46,8 +46,13 @@ function consumer(ref, tag) {
 }
 const J = (entries) => ({ entries });
 const src = (origin, ...entries) => ({ origin, journal: J(entries) });
+// CONTRACT NOTE, disclosed rather than tuned away: the default continuity contract is now
+// HISTORY_SPECIFIC, which REFUSES under today's inputs (X1, audit-x1.mjs). The arms below measure
+// TRANSFER MECHANICS, so they name CONTENT_MATCH explicitly - the contract that says "whichever
+// record carries exactly this content may continue", which a byte-identical replacement satisfies
+// by design. Choosing it here is choosing it, not avoiding X1.
 const run = (sources, opts = {}) => replayMerged(merge(sources).merged,
-  { authorityStore: store(), ...opts });
+  { authorityStore: store(), continuityContract: CONTINUITY_CONTRACT.CONTENT_MATCH, ...opts });
 
 // The predecessor, and a successor that IDENTIFIES it. The assertion is data in the journal.
 const PRED = consumer('auth:2:a', 'V1');
@@ -99,7 +104,9 @@ test('L1 — identifying a predecessor is not being authorized to continue it', 
 test('L2 — authorized continuity preserves the obligation across reordered inputs, cross-process', () => {
   const s = successorOf(OCC_PRED);
   const x = src('X', supplier('auth:1:x')), S = src('S', s);
+  // the child process gets the contract explicitly too: L2 measures transfer mechanics
   const opts = { governingByOccurrence: GOVERN,
+    continuityContract: CONTINUITY_CONTRACT.CONTENT_MATCH,
     continuity: { [OCC_PRED]: { successorOrigin: 'S', successorContent: contentOf(s),
       transferGovernance: true } } };
 

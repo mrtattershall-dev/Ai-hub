@@ -11,7 +11,7 @@ import { admit } from './admission.mjs';
 import { store } from './authority-store.mjs';
 import { journalEntry } from './replay.mjs';
 import { merge, replayMerged, outcomeFor, occurrenceOf, contentOf, MODE,
-  UNATTACHED } from './merge.mjs';
+  UNATTACHED, CONTINUITY_CONTRACT } from './merge.mjs';
 import { resolveContinuityUNCONTAINED } from './_specimen-support.mjs';
 import { replayMergedForTests } from './_test-entry.mjs';
 
@@ -57,8 +57,13 @@ const src = (origin, e) => ({ origin, journal: J([e]) });
 const GOVERN = { [PRED_OCC]: MODE.DESIGNATED };
 const AUTH = { [PRED_OCC]: { successorOrigin: 'S', successorContent: contentOf(A),
   transferGovernance: true } };
+// CONTRACT NOTE, disclosed rather than tuned away: the default continuity contract is now
+// HISTORY_SPECIFIC, which REFUSES under today's inputs (X1, audit-x1.mjs). The arms below measure
+// TRANSFER MECHANICS, so they name CONTENT_MATCH explicitly - the contract that says "whichever
+// record carries exactly this content may continue", which a byte-identical replacement satisfies
+// by design. Choosing it here is choosing it, not avoiding X1.
 const play = (sources, opts = {}) => replayMerged(merge(sources).merged,
-  { authorityStore: store(), ...opts });
+  { authorityStore: store(), continuityContract: CONTINUITY_CONTRACT.CONTENT_MATCH, ...opts });
 
 test('X1 — THE ATTACK: remove A, present byte-identical B in its place', () => {
   // A is authorized. A is gone. B sits in A's former position. The authorization is unchanged.

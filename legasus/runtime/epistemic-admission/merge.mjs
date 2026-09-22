@@ -49,6 +49,23 @@ export const MERGE_VERSION = 'merged-journal-1.0.0-frozen-2026-09-21';
 // INVALIDATE is the default, because proceeding under a weaker default is an unauthorized reduction
 // of the burden the governor intended - the same defect A1 refuses on the request channel, arriving
 // through absence rather than through asking.
+// THE TWO CONTINUITY CONTRACTS. They are different claims, and one may never stand in for the other.
+//
+//   HISTORY_SPECIFIC  "this particular history continues." Under today's inputs a presented record
+//                     carries NOTHING separating it from a byte-identical replacement (X1, and the
+//                     audit in audit-x1.mjs), so the intended history cannot be distinguished from
+//                     a substitute and the transfer REFUSES. Not a theorem that such transfers are
+//                     unsafe in general - what follows from THESE inputs, and it changes the moment
+//                     an independent binding exists.
+//
+//   CONTENT_MATCH     "whichever record carries exactly this content may continue." Satisfied by a
+//                     byte-identical replacement BY DESIGN. A governor choosing it has ACCEPTED X1,
+//                     not avoided it, and the outcome records that it was chosen.
+export const CONTINUITY_CONTRACT = Object.freeze({
+  HISTORY_SPECIFIC: 'HISTORY_SPECIFIC',
+  CONTENT_MATCH: 'CONTENT_MATCH',
+});
+
 export const UNATTACHED = Object.freeze({
   INVALIDATE: 'INVALIDATE',   // default: no admissions at all
   DIAGNOSE: 'DIAGNOSE',       // report and proceed. AUTHORIZED DOWNGRADE, never the default
@@ -176,7 +193,7 @@ function orderWithinOrigins(records) {
 //
 // The pre-containment body is preserved as a specimen in _specimen-support.mjs. It is not reachable
 // from this module and not selectable through replayMerged's options.
-export function resolveContinuity(merged, continuity) {
+export function resolveContinuity(merged, continuity, contract) {
   const findings = [];
   for (const [predecessor, auth] of Object.entries(continuity || {})) {
     const claimants = merged.records.filter((r) => r.entry.continuity
@@ -219,11 +236,27 @@ export function resolveContinuity(merged, continuity) {
       continue;
     }
     const r = qualified[0];
+    if (contract !== CONTINUITY_CONTRACT.CONTENT_MATCH) {
+      findings.push({ predecessor, ok: false, kind: 'INDISTINGUISHABLE_FROM_REPLACEMENT',
+        contract: CONTINUITY_CONTRACT.HISTORY_SPECIFIC,
+        candidate: { origin: r.origin, ref: r.ref, occurrence: r.occurrence },
+        why: 'this authorization claims that THIS PARTICULAR HISTORY continues, and the record'
+          + ' presented carries nothing that separates it from a byte-identical replacement - see'
+          + ' X1 and audit-x1.mjs. The intended history cannot be distinguished from a substitute,'
+          + ' so the transfer is refused. A governor who instead means "whichever record carries'
+          + ' exactly this content" must choose CONTENT_MATCH explicitly: that is a DIFFERENT claim,'
+          + ' satisfied by a replacement by design' });
+      continue;
+    }
     findings.push({ predecessor, ok: true, kind: 'CONTINUED',
+      contract: CONTINUITY_CONTRACT.CONTENT_MATCH,
+      contractChosenBy: 'GOVERNOR',
       successor: { origin: r.origin, ref: r.ref, occurrence: r.occurrence },
       transferGovernance: auth.transferGovernance === true,
       why: auth.transferGovernance === true
-        ? 'continuity authorized AND the predecessor obligations transfer to this successor'
+        ? 'CONTENT_MATCH was chosen by the governor: whichever record carries exactly this content'
+          + ' may continue, and the predecessor obligations transfer to it. A byte-identical'
+          + ' replacement satisfies this by design'
         : 'continuity authorized; governance does NOT transfer. Continuing a history and'
           + ' inheriting its obligations are different permissions' });
   }
@@ -246,7 +279,8 @@ export function replayMerged(merged, opts = {}) {
 // replayMerged above, which pins the resolver.
 export function replayMergedWithResolver(merged, { authorityStore: st, witnessModes,
   governingByRecord, governingByOccurrence, requestedModes, obligationContractId,
-  unattachedPolicy, requestedUnattachedPolicy, continuity } = {}, continuityResolver) {
+  unattachedPolicy, requestedUnattachedPolicy, continuity, continuityContract,
+  requestedContinuityContract } = {}, continuityResolver) {
   // TWO CHANNELS, AND ONLY ONE OF THEM DECIDES.
   //
   //     governing   the authorized obligation. Decides. Named in every outcome it decides.
@@ -288,7 +322,14 @@ export function replayMergedWithResolver(merged, { authorityStore: st, witnessMo
   // (pinning the contained one) or the test entry point. STATED LIMIT, unchanged and not softened:
   // in JavaScript a bypass that exists is callable by anyone who imports it. This moves the
   // capability behind a boundary; it does not remove it.
-  const continuityFindings = (continuityResolver || resolveContinuity)(merged, continuity);
+  // THE CONTRACT IS GOVERNED, NEVER REQUESTED - the A1 separation, applied here too.
+  const contract = continuityContract || CONTINUITY_CONTRACT.HISTORY_SPECIFIC;
+  const contractRecord = { contract,
+    chosenBy: continuityContract ? 'GOVERNOR' : 'DEFAULT',
+    requested: requestedContinuityContract || null,
+    requestAccepted: requestedContinuityContract
+      ? requestedContinuityContract === contract : null };
+  const continuityFindings = (continuityResolver || resolveContinuity)(merged, continuity, contract);
   const inherited = {};
   for (const f of continuityFindings) {
     if (f.ok && f.transferGovernance && governingByOccurrence
@@ -314,8 +355,8 @@ export function replayMergedWithResolver(merged, { authorityStore: st, witnessMo
         why: 'no record sits at these coordinates in this merged set' });
     }
   }
-  const contract = () => contractOf(obligationContractId, witnessModes, governingByRecord,
-    governingByOccurrence, merged);
+  const contractFingerprint = () => contractOf(obligationContractId, witnessModes,
+    governingByRecord, governingByOccurrence, merged);
   const policy = unattachedPolicy || UNATTACHED.INVALIDATE;
   const requestedPolicy = requestedUnattachedPolicy || null;
   const policyRecord = { policy, governedBy: unattachedPolicy ? 'GOVERNOR' : 'DEFAULT',
@@ -324,7 +365,8 @@ export function replayMergedWithResolver(merged, { authorityStore: st, witnessMo
 
   if (policy === UNATTACHED.BLOCK) {
     return { ok: false, outcomes: [], unresolvedGovernance, unattached: policyRecord,
-      continuity: continuityFindings, obligationContract: contract(),
+      continuity: continuityFindings, continuityContract: contractRecord,
+      obligationContract: contractFingerprint(),
       why: 'BLOCK is refused, not approximated. An unresolved governance entry denotes nothing in'
         + ' this merged set, so which consumers it was meant to govern is UNKNOWN - not merely'
         + ' unenumerated. Blocking whatever seemed nearby would read as precision and be invention' };
@@ -332,12 +374,14 @@ export function replayMergedWithResolver(merged, { authorityStore: st, witnessMo
   const forks = continuityFindings.filter((f) => f.kind === 'FORK');
   if (forks.length) {
     return { ok: false, outcomes: [], unresolvedGovernance, unattached: policyRecord,
-      continuity: continuityFindings, obligationContract: contract(),
+      continuity: continuityFindings, continuityContract: contractRecord,
+      obligationContract: contractFingerprint(),
       why: forks.map((f) => f.why).join(' | ') };
   }
   if (unresolvedGovernance.length && policy === UNATTACHED.INVALIDATE) {
     return { ok: false, outcomes: [], unresolvedGovernance, unattached: policyRecord,
-      continuity: continuityFindings, obligationContract: contract(),
+      continuity: continuityFindings, continuityContract: contractRecord,
+      obligationContract: contractFingerprint(),
       why: 'governance did not attach: ' + unresolvedGovernance.length + ' obligation(s) denote no'
         + ' record here (' + unresolvedGovernance.map((u) => u.by + ' ' + u.denoting).join('; ')
         + '). No admission is produced. The governor intended a burden that was not applied, and'
@@ -552,7 +596,8 @@ export function replayMergedWithResolver(merged, { authorityStore: st, witnessMo
   for (const r of pending) run(r);
 
   return { ok: true, outcomes, unresolvedGovernance, unattached: policyRecord,
-    continuity: continuityFindings, obligationContract: contract() };
+    continuity: continuityFindings, continuityContract: contractRecord,
+    obligationContract: contractFingerprint() };
 }
 
 /** WHICH OBLIGATION CONTRACT AN OUTCOME WAS PRODUCED UNDER.
