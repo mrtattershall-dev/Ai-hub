@@ -43,3 +43,16 @@ cd etherpad-lite && node /path/to/corpus-scan.mjs /path/to/corpus etherpad-lite
 ```
 
 `candidate.mjs <file>` runs one file through the repaired adapter and production admission.
+
+## Value comparison (V1..V8)
+
+Frozen procedure: `../VALUE-COMPARISON_PREREG.md`.  Result: `../VALUE-COMPARISON_RESULT.md`.
+
+```bash
+node value-compare.mjs      # four arms x four scenarios, each step in its own process
+```
+
+`arm-b0` ordinary path-keyed storage · `arm-b1` the hardened baseline, no Legasus ·
+`arm-t` the same plus Legasus admission/provenance/replay · **`arm-tc`** arm T with the eight lines
+of explicit world comparison removed — the control that shows where arm T's safety actually comes
+from.
