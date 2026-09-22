@@ -91,12 +91,18 @@ Eight untouched files from **eslint's own source** (`lib/rules/*.js`, first eigh
 **all ACCEPT, all `ESTABLISHED`, all agree.** `array-callback-return.js` — the rule's own
 implementation — is among them.
 
-> **FOUND BY THE COVERAGE REPAIR (R6), attached here.** eslint 10's default configuration ignores
+> **WITHDRAWN AS EXTERNAL EVALUATIONS.** eslint 10's default configuration ignores
 > `node_modules/**`, and these eight files live there. The adapter used for this result never
-> checked `isPathIgnored`, so it linted files **the configuration excludes**. The observed
-> agreement stands; what it was agreement *under* was a configuration that does not apply to those
-> paths by default. The repaired adapter reports them `EXCLUDED`, and evaluates byte-identical
-> copies outside the ignored path instead — see `COVERAGE-REPAIR_RESULT.md`.
+> checked `isPathIgnored`, so it forced files through a configuration that **excludes** them.
+>
+> **These eight files do not count as external source-code evaluations.** What survives is
+> historical **output agreement**: the two tools produced matching outputs on those runs. That is
+> preserved and is not withdrawn. What it is not is evidence that an external source file was
+> evaluated under an applicable configuration.
+>
+> **R6's relocated copies are a NEW evaluation, not a reproduction of this one.** Their matching
+> digests establish identical source bytes; relocation deliberately changes the path conditions, so
+> the analysis context differs by construction. See `COVERAGE-REPAIR_RESULT.md`.
 
 ## F6 — consequential refusal: NOT achieved on external code
 
@@ -113,9 +119,13 @@ is a fact about the corpus, not evidence about Legasus.
 
 ## Discrepancies and unsupported translations
 
-- **Discrepancies: none.** **11 of 11 evaluation cases** agree, in both directions. The denominator
-  is **3 reserved cases + 8 untouched external files = 11**; the **development case is explicitly
-  OUTSIDE it**, because the adapter was built against it.
+- **Discrepancies: none** among the outputs compared. **11 of 11 cases** agree, in both directions —
+  **3 reserved cases + 8 external files**; the **development case is explicitly OUTSIDE** the
+  denominator, because the adapter was built against it.
+- **CORRECTED: this is historical OUTPUT AGREEMENT, and only 3 of the 11 are source-code
+  evaluations.** The 8 external files were excluded by the applicable configuration (see F5), so
+  they were never evaluated under one. The evaluated external subset in this experiment is
+  **0 of 8**; R6 supplies 3 external evaluations separately, on relocated copies.
 - **Unsupported: the per-finding negative.** eslint reports *these specific callbacks violate*.
   Legasus represents the **universal** and refuses it; it does not carry each violation as its own
   admitted claim. The findings survive only as `frontier` text, not as structured claims. Expressing

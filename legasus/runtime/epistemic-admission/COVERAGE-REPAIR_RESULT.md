@@ -71,6 +71,12 @@ apply to them. The observed agreement stands; `EXTERNAL-LINTER_RESULT.md` now ca
 F5. R6 evaluates **byte-identical copies** moved outside the ignored path, with each digest asserted
 against its original, and also asserts that the originals are `EXCLUDED`.
 
+**R6 is a new evaluation, not a reproduction.** The matching digests establish **identical source
+bytes**. Relocation **deliberately changes the path conditions**, which is the whole point of the
+move — so the analysis context is different by construction, and R6 must not be read as
+re-running F5's analysis. F5's eight files are withdrawn as external source-code evaluations and
+survive as historical output agreement only.
+
 ## Mutation table
 
 | mutant | predicted | caught by |
