@@ -28,6 +28,7 @@
  * as if it were.
  */
 import { readFileSync, existsSync, writeFileSync, mkdirSync, rmSync } from 'fs';
+import { assetComparability, ASSET_AXES, COMPARABILITY } from './comparability.mjs';
 import { execFileSync, execFile } from 'child_process';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -51,11 +52,19 @@ const EVAL_DIR = process.env.EVAL_DIR || join(__dirname, 'eval');
 // guess (app-method, no class) returns "modal-http: invalid function call", which this
 // scorer would have recorded as "verifier unreachable" for every Phaser prompt - i.e. a
 // clean 0/6 that says nothing about the model. Verify /api/health before trusting a run.
-const CHROMIUM = process.env.CHROMIUM_VERIFY || 'https://mr-tattershall--chromium-verify-verifier-web.modal.run';
+const CHROMIUM_DEFAULT = process.env.CHROMIUM_VERIFY || 'https://mr-tattershall--chromium-verify-verifier-web.modal.run';
+// The LOCAL hub serves the identical `/api/game/verify` contract, so it is a real fallback
+// rather than a lesser one - and since 2026-09-10 it caches the engine scripts under
+// server/.engine-cache/, which makes it MORE deterministic than a CDN-fetching remote.
+const CHROMIUM_LOCAL = process.env.CHROMIUM_LOCAL || 'http://localhost:3001';
+let CHROMIUM = CHROMIUM_DEFAULT;
+let CHROMIUM_NOTE = '';
 
-// Every distinct asset-library version the verifier reported while scoring. More than one
-// means the library changed mid-run and the Phaser column is not internally comparable.
-const ASSET_VERSIONS = new Set();
+// The asset-library version is now recorded PER VERDICT (see scorePhaser / scoreGodot) and
+// judged by comparability.mjs. The old module-level Set had two holes: it lived only inside
+// the `differs` branch of the report, so same-prompt-set comparisons never even saw the
+// warning; and `if (j.assetVersion) SET.add(...)` let rows with NO version contribute
+// nothing, so absent evidence read as agreement.
 
 const names = process.argv.slice(2);
 if (!names.length) {
@@ -129,11 +138,11 @@ async function scorePhaser(row) {
     });
     if (!r.ok) return { pass: null, why: `verifier HTTP ${r.status}` };
     const j = await r.json();
-    // Record which asset library this was scored against. A Phaser score is only comparable
-    // across runs if the code loaded the same bytes, and the library changes as packs are
-    // imported - so an unpinned score silently compares two different worlds.
-    if (j.assetVersion) ASSET_VERSIONS.add(j.assetVersion);
-    return { pass: !!j.ok, why: (j.verdict || '').slice(0, 90) };
+    // Record which asset library this was scored against, ON THE VERDICT. A Phaser score is
+    // only comparable across runs if the code loaded the same bytes, and the library changes
+    // as packs are imported - so an unpinned score silently compares two different worlds.
+    // A verifier that reports no version yields null here, and null is NOT agreement.
+    return { pass: !!j.ok, why: (j.verdict || '').slice(0, 90), assetVersion: j.assetVersion ?? null };
   } catch (e) {
     // A harness failure is NOT a model failure. Tonight we cached 356 of those as real
     // verdicts and had to throw them away; never again.
@@ -182,7 +191,11 @@ async function scoreGodot(row, tmp) {
     // something unusable, which IS a result.
     if (v.status >= 500) return { pass: null, why: `verifier: ${String(v.error || v.verdict).slice(0, 60)}`, legacy };
     if (v.status === 400 || v.status === 413) return { pass: false, why: String(v.error).slice(0, 90), legacy };
-    return { pass: !!v.ok, why: (v.verdict || '').slice(0, 90), legacy };
+    // The Godot verdict depends on the asset library exactly as the Phaser one does (a missing
+    // asset FAILS verification), and verifyGodotFiles already reports the version. It was
+    // being discarded here, so the Godot column had the same comparability hole with no
+    // warning at all.
+    return { pass: !!v.ok, why: (v.verdict || '').slice(0, 90), legacy, assetVersion: v.assetVersion ?? null };
   } catch (e) {
     return { pass: null, why: `godot harness failed: ${e.message.slice(0, 60)}`, legacy };
   }
@@ -278,6 +291,57 @@ function scoreInterpret(row) {
   return { pass: true, why: 'states its interpretation, right domain' };
 }
 
+/**
+ * Decide which Chromium verifier to use, once, and warm it - before a single prompt is
+ * scored.
+ *
+ * WHY. Scoring run6 on 2026-09-10 produced 15 '?' on the phaser axis and a loud warning
+ * that the verifier was unreachable. It was not unreachable; it was ASLEEP. Modal scales
+ * the verifier to zero, the first request pays a cold start, and that exceeded the 90s
+ * per-request budget - so every phaser prompt in the run was written off as a harness
+ * failure. One warm-up request would have cost 30 seconds and saved the axis.
+ *
+ * Discovering that after burning 15 prompts is the bug. A grader should establish that its
+ * instrument works BEFORE it starts measuring, and should say which instrument it used, so
+ * two runs scored against different verifiers are never silently compared.
+ */
+async function pickVerifier() {
+  const ping = async (base, ms) => {
+    try {
+      const r = await fetch(`${base}/api/health`, { signal: AbortSignal.timeout(ms) });
+      return r.ok;
+    } catch { return false; }
+  };
+  // A generous budget on purpose: this call IS the cold start, and paying it here once is
+  // the entire point.
+  if (await ping(CHROMIUM_DEFAULT, 120_000)) {
+    CHROMIUM = CHROMIUM_DEFAULT;
+    CHROMIUM_NOTE = `verifier: ${CHROMIUM_DEFAULT}`;
+    return true;
+  }
+  if (!process.env.CHROMIUM_VERIFY && await ping(CHROMIUM_LOCAL, 5_000)) {
+    CHROMIUM = CHROMIUM_LOCAL;
+    // Stated loudly rather than silently substituted: which verifier answered is part of
+    // what a phaser number means.
+    CHROMIUM_NOTE = `verifier: ${CHROMIUM_LOCAL} (LOCAL - the configured remote did not answer)`;
+    return true;
+  }
+  CHROMIUM_NOTE = `verifier: NONE REACHABLE (tried ${CHROMIUM_DEFAULT}`
+    + (process.env.CHROMIUM_VERIFY ? '' : ` and ${CHROMIUM_LOCAL}`) + ')';
+  return false;
+}
+
+const VERIFIER_UP = await pickVerifier();
+console.error('');
+if (VERIFIER_UP) {
+  console.error(CHROMIUM_NOTE);
+} else {
+  console.error('!! ' + CHROMIUM_NOTE);
+  console.error('   Every phaser prompt will score "?" - a HARNESS failure, not a model result.');
+  console.error('   Start the hub (start-hub.bat) or set CHROMIUM_VERIFY, then re-score.');
+  console.error('');
+}
+
 // ── run ───────────────────────────────────────────────────────────────────────
 /**
  * WHICH WEIGHTS PRODUCED THIS NUMBER?
@@ -371,8 +435,9 @@ for (const name of names) {
       bucket.legacy.total++;
       if (r.legacy) bucket.legacy.pass++;
     }
-    bucket.detail.push({ id: row.id, pass: r.pass, why: r.why });
-    byId[row.id] = { axis, pass: r.pass, why: r.why };
+    const assetVersion = ASSET_AXES.includes(axis) ? (r.assetVersion ?? null) : undefined;
+    bucket.detail.push({ id: row.id, pass: r.pass, why: r.why, assetVersion });
+    byId[row.id] = { axis, pass: r.pass, why: r.why, assetVersion };
     process.stderr.write(r.pass === null ? '?' : r.pass ? '.' : 'x');
   }
   process.stderr.write('\n');
@@ -380,6 +445,48 @@ for (const name of names) {
   results[name] = per;
   scoredById[name] = byId;
 }
+
+// ── comparability: an ENFORCED precondition, not a warning ─────────────────────
+// For each asset-dependent axis, judge the verdicts of ALL runs being reported together.
+// Computed once, before any table, and applied to every table below - including the
+// per-variant one, which is the ONLY table when prompt sets match and is read side by side.
+const COMPARABILITY_BY_AXIS = {};
+for (const a of ASSET_AXES) {
+  const rows = {};
+  for (const n of names) rows[n] = results[n][a].detail;
+  COMPARABILITY_BY_AXIS[a] = assetComparability(rows);
+}
+// Gate only where there is something to withhold. An axis with no verdicts at all (unscored, or
+// every row a harness '?') is not a comparability problem - it is the pre-existing 0/0 (n?) row,
+// and the '?' warning at the foot of the report already covers it. Found by running the scorer
+// with no verifier: godot, never scored, came out WITHHELD.
+const gated = (a) => COMPARABILITY_BY_AXIS[a]
+  && Object.values(COMPARABILITY_BY_AXIS[a].counted).some((n) => n)
+  && COMPARABILITY_BY_AXIS[a].status !== COMPARABILITY.COMPARABLE;
+const gateCell = (a) => {
+  const c = COMPARABILITY_BY_AXIS[a];
+  return c.status === COMPARABILITY.MISMATCH ? 'BLOCKED: mixed libraries - RESCORE'
+    : 'WITHHELD: comparability unestablished';
+};
+function printComparability() {
+  console.log('');
+  for (const a of ASSET_AXES) {
+    const c = COMPARABILITY_BY_AXIS[a];
+    if (!Object.values(c.counted).some((n) => n)) continue;    // axis not scored at all
+    const mark = c.status === COMPARABILITY.COMPARABLE ? '  ' : '!!';
+    console.log(`${mark} ${a}: ${c.status} - ${c.why}`);
+  }
+}
+
+// RAW RESULTS ARE PRESERVED for diagnosis regardless of the gate: every verdict, with the
+// asset version it was scored against, goes to disk. Until now the scorer wrote nothing,
+// which is why no historical comparison can be audited for this defect today.
+const RAW_OUT = join(EVAL_DIR, `scores-${names.join('_')}-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+writeFileSync(RAW_OUT, JSON.stringify({
+  scoredAt: new Date().toISOString(), runs: names, model: MODEL_ID, verifier: CHROMIUM_NOTE,
+  comparability: COMPARABILITY_BY_AXIS,
+  results: Object.fromEntries(names.map((n) => [n, Object.fromEntries(AXES.map((a) => [a, results[n][a].detail]))])),
+}, null, 2));
 
 // ── report ────────────────────────────────────────────────────────────────────
 const pad = (s, n) => String(s).padEnd(n);
@@ -405,19 +512,20 @@ if (differs) {
   console.log(`  ${pad('shared', 12)} ${shared.length} prompts  <- the only comparable subset`);
 
   console.log(`\n${'='.repeat(76)}`);
-  if (ASSET_VERSIONS.size === 1) {
-    console.log(`  asset library: ${[...ASSET_VERSIONS][0]}`);
-  } else if (ASSET_VERSIONS.size > 1) {
-    console.log(`  !! asset library CHANGED during scoring (${[...ASSET_VERSIONS].join(', ')})`);
-    console.log('     the phaser column is not internally comparable - rescore.');
-  }
   console.log(`COMPARABLE — the ${shared.length} prompts every variant answered`);
+  console.log('   (asset-dependent axes are shown only if their comparability is ESTABLISHED)');
   console.log('='.repeat(76));
+  printComparability();
   console.log(`\n${pad('axis', 13)}${names.map((n) => pad(n, 14)).join('')}`);
   console.log('-'.repeat(76));
   for (const a of AXES) {
     const ids = shared.filter((id) => scoredById[names[0]][id].axis === a);
     if (!ids.length) continue;
+    if (gated(a)) {
+      // The numbers exist (see the raw file) but are NOT presented as a comparison.
+      console.log(`${pad(a, 13)}${gateCell(a)}`);
+      continue;
+    }
     const cells = names.map((n) => {
       const p = ids.filter((id) => scoredById[n][id].pass === true).length;
       const sk = ids.filter((id) => scoredById[n][id].pass === null).length;
@@ -425,18 +533,25 @@ if (differs) {
     });
     console.log(`${pad(a, 13)}${cells.join('')}`);
   }
+  const comparableIds = shared.filter((id) => !gated(scoredById[names[0]][id].axis));
   const tot = names.map((n) => {
-    const p = shared.filter((id) => scoredById[n][id].pass === true).length;
-    const sk = shared.filter((id) => scoredById[n][id].pass === null).length;
-    return pad(`${p}/${shared.length - sk}`, 14);
+    const p = comparableIds.filter((id) => scoredById[n][id].pass === true).length;
+    const sk = comparableIds.filter((id) => scoredById[n][id].pass === null).length;
+    return pad(`${p}/${comparableIds.length - sk}`, 14);
   });
   console.log('-'.repeat(76));
-  console.log(`${pad('TOTAL', 13)}${tot.join('')}`);
+  const excluded = shared.length - comparableIds.length;
+  console.log(`${pad('TOTAL', 13)}${tot.join('')}${excluded ? `(${excluded} prompts on gated axes excluded)` : ''}`);
 
   console.log(`\n${'='.repeat(76)}`);
   console.log('EACH VARIANT ON ITS OWN FULL SET (columns are NOT comparable)');
   console.log('='.repeat(76));
 }
+// Which verifier answered is part of what the phaser column MEANS - two runs scored
+// against different verifiers are not comparable, and that has to be visible in the
+// report rather than only in the operator's memory.
+console.log(`
+${CHROMIUM_NOTE}`);
 console.log(`\n${pad('axis', 13)}${names.map((n) => pad(n, 14)).join('')}how it was scored`);
 console.log('-'.repeat(76));
 const HOW = {
@@ -446,7 +561,14 @@ const HOW = {
   structured: 'headers present, in order',
   interpret: 'stated interpretation + domain',
 };
+if (!differs) printComparability();
 for (const a of AXES) {
+  if (names.length > 1 && gated(a)) {
+    // Side-by-side columns ARE read as a comparison even under this heading - that is how
+    // every historical run5/base/32B table was reported. Gate it the same way.
+    console.log(`${pad(a, 13)}${gateCell(a)}  (${HOW[a]}; per-prompt verdicts in the raw file)`);
+    continue;
+  }
   const cells = names.map((n) => {
     const b = results[n][a];
     const total = b.pass + b.fail;
@@ -472,7 +594,8 @@ for (const n of names) {
   for (const a of AXES) {
     for (const d of results[n][a].detail) {
       const mark = d.pass === null ? ' ?  ' : d.pass ? ' ok ' : 'FAIL';
-      console.log(`  ${mark} ${pad(a, 11)} ${pad(d.id, 20)} ${d.why}`);
+      const lib = d.assetVersion === undefined ? '' : d.assetVersion === null ? ' [no asset version]' : ` [${d.assetVersion}]`;
+      console.log(`  ${mark} ${pad(a, 11)} ${pad(d.id, 20)} ${d.why}${lib}`);
     }
   }
 }
@@ -482,5 +605,11 @@ for (const n of names) {
 const skipped = names.flatMap((n) => AXES.map((a) => results[n][a].skip)).reduce((x, y) => x + y, 0);
 if (skipped) {
   console.log(`\n⚠️  ${skipped} prompt(s) could not be scored (marked ?). Those are HARNESS failures — an unreachable verifier or a missing binary — NOT model failures. Fix the harness and re-score; do not report them as results.`);
+}
+console.log(`raw verdicts (with asset versions): ${RAW_OUT}`);
+for (const a of ASSET_AXES) {
+  if (gated(a) && Object.values(COMPARABILITY_BY_AXIS[a].counted).some((n) => n)) {
+    console.log(`!! ${a} column ${COMPARABILITY_BY_AXIS[a].status}: ${COMPARABILITY_BY_AXIS[a].why}`);
+  }
 }
 console.log('');
