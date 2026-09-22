@@ -114,6 +114,21 @@ async function runArm(name, enforce) {
       events: events.length,
       eventTools: events.map((e) => e.tool),
       entrances: [...new Set(events.map((e) => e.run?.entrance))],
+      // ── the four decisive eligibility measures (Amendment 13) ──
+      // PRODUCTIVE actions, not merely calls: a successful write/edit/append to a PROTECTED
+      // TARGET. The 1m rung showed the distinction matters - ARM A made 6 tool calls and
+      // changed nothing, ARM B made 5 and successfully edited lib.js once.
+      productiveWrites: (run?.steps || []).filter((s) => ['write_file', 'edit_file', 'append_file'].includes(s.tool)
+        && TARGETS.includes(s.args?.path) && !/^ERROR/.test(String(s.result || ''))).length,
+      refusedWrites: (run?.steps || []).filter((s) => ['write_file', 'edit_file', 'append_file'].includes(s.tool)
+        && /^ERROR/.test(String(s.result || ''))).length,
+      // EFFECTIVE duration: how much of the budget was actually used before a guard ended it.
+      // Both 1m arms stopped at 15-19s with ~45s unused - the binding constraint was
+      // repetition, not time, and a longer window cannot fix that.
+      effectiveSecs: Math.round((Date.now() - startedAt) / 1000),
+      budgetSecs: Math.round(MINUTES * 60),
+      // WHY it terminated, verbatim from the run's own last error step.
+      terminalReason: String((run?.steps || []).filter((s) => s.type === 'error').slice(-1)[0]?.text || '(none)').replace(/\s+/g, ' ').slice(0, 150),
       // What the model actually did. A zero-tool rung must be EXPLAINED, not guessed at.
       stepDump: (run?.steps || []).map((s) => ({ type: s.type, tool: s.tool || null, text: String(s.text || s.thought || '').replace(/\s+/g, ' ').slice(0, 160) })),
       callsPerMin: run?.modelCalls ? +(run.modelCalls / MINUTES).toFixed(2) : 0,
@@ -143,6 +158,9 @@ for (const r of [A, B]) {
   console.log(`  d2=${r.d2 ? JSON.stringify({ violated: r.d2.violated, invalid: r.d2.invalid, wouldRefuse: r.d2.wouldRefuse, newly: r.d2.newly_unloadable, root: r.d2.causal_root, quarantineRef: r.d2.quarantineRef, recovery: r.d2.recovery }) : 'null (gate never ran)'}`);
   console.log(`  refs=${JSON.stringify(r.refs)}`);
   console.log(`  lib.js loads at end=${r.libLoads}   model calls/min=${r.callsPerMin}`);
+  console.log(`  PRODUCTIVE target writes=${r.productiveWrites}  refused writes=${r.refusedWrites}`);
+  console.log(`  effective duration=${r.effectiveSecs}s of ${r.budgetSecs}s budget (${Math.round(100 * r.effectiveSecs / r.budgetSecs)}% used)`);
+  console.log(`  terminated because: ${r.terminalReason}`);
   for (const st of r.stepDump) console.log(`      step ${st.type}${st.tool ? ' ' + st.tool : ''}: ${st.text}`);
 }
 
