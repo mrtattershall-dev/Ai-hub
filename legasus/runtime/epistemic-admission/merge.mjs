@@ -38,6 +38,23 @@ export const MERGE_VERSION = 'merged-journal-1.0.0-frozen-2026-09-21';
 // explicit RUNTIME policy, because no registry rule may be added or changed in this run - a
 // recorded hazard: that is weaker than the registry, and the runtime author can still choose the
 // burden. The producer still cannot.
+// WHAT HAPPENS WHEN GOVERNANCE FAILS TO ATTACH.
+//
+// G5 made an unattached obligation visible; it did not prevent its consequence. An unresolved entry
+// denotes NOTHING in this merged set, so there is no way to determine which consumers it meant:
+// THE AFFECTED SET IS UNKNOWN, not merely unenumerated. BLOCK therefore cannot be implemented as an
+// approximation and is refused instead - a plausible-looking BLOCK that blocked whatever seemed
+// nearby would read as precision and be invention.
+//
+// INVALIDATE is the default, because proceeding under a weaker default is an unauthorized reduction
+// of the burden the governor intended - the same defect A1 refuses on the request channel, arriving
+// through absence rather than through asking.
+export const UNATTACHED = Object.freeze({
+  INVALIDATE: 'INVALIDATE',   // default: no admissions at all
+  DIAGNOSE: 'DIAGNOSE',       // report and proceed. AUTHORIZED DOWNGRADE, never the default
+  BLOCK: 'BLOCK',             // refused: the affected set is not computable
+});
+
 export const MODE = Object.freeze({
   DESIGNATED: 'DESIGNATED',     // only that exact source satisfies. Designation REDUCES the search.
   EXISTENTIAL: 'EXISTENTIAL',   // any one admissible support that actually binds. A further
@@ -130,7 +147,8 @@ function orderWithinOrigins(records) {
 /** Re-execute the merged set. Every outcome names the (origin, ref) it belongs to, so a caller can
  *  never read a neighbour's result by position. */
 export function replayMerged(merged, { authorityStore: st, witnessModes, governingByRecord,
-  governingByOccurrence, requestedModes, obligationContractId } = {}) {
+  governingByOccurrence, requestedModes, obligationContractId,
+  unattachedPolicy, requestedUnattachedPolicy } = {}) {
   // TWO CHANNELS, AND ONLY ONE OF THEM DECIDES.
   //
   //     governing   the authorized obligation. Decides. Named in every outcome it decides.
@@ -165,10 +183,49 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
       requestAccepted: requested === null ? null : requested === mode };
   };
   const modeFor = (c) => (witnessModes && witnessModes[c.relation]) || null;
+  const unresolvedGovernance = [];
+  for (const [k, mode] of Object.entries(governingByOccurrence || {})) {
+    if (!merged.records.some((r) => r.occurrence === k)) {
+      unresolvedGovernance.push({ by: 'OCCURRENCE', denoting: k, mode,
+        why: 'this occurrence is not in the merged set. The governed subject is absent, so this'
+          + ' obligation governed nothing - it did not fall through to the default' });
+    }
+  }
+  for (const [k, mode] of Object.entries(governingByRecord || {})) {
+    if (!merged.records.some((r) => key(r.origin, r.ref) === k)) {
+      unresolvedGovernance.push({ by: 'RECORD', denoting: k, mode,
+        why: 'no record sits at these coordinates in this merged set' });
+    }
+  }
+  const contract = () => contractOf(obligationContractId, witnessModes, governingByRecord,
+    governingByOccurrence, merged);
+  const policy = unattachedPolicy || UNATTACHED.INVALIDATE;
+  const requestedPolicy = requestedUnattachedPolicy || null;
+  const policyRecord = { policy, governedBy: unattachedPolicy ? 'GOVERNOR' : 'DEFAULT',
+    requested: requestedPolicy,
+    requestAccepted: requestedPolicy === null ? null : requestedPolicy === policy };
+
+  if (policy === UNATTACHED.BLOCK) {
+    return { ok: false, outcomes: [], unresolvedGovernance, unattached: policyRecord,
+      obligationContract: contract(),
+      why: 'BLOCK is refused, not approximated. An unresolved governance entry denotes nothing in'
+        + ' this merged set, so which consumers it was meant to govern is UNKNOWN - not merely'
+        + ' unenumerated. Blocking whatever seemed nearby would read as precision and be invention' };
+  }
+  if (unresolvedGovernance.length && policy === UNATTACHED.INVALIDATE) {
+    return { ok: false, outcomes: [], unresolvedGovernance, unattached: policyRecord,
+      obligationContract: contract(),
+      why: 'governance did not attach: ' + unresolvedGovernance.length + ' obligation(s) denote no'
+        + ' record here (' + unresolvedGovernance.map((u) => u.by + ' ' + u.denoting).join('; ')
+        + '). No admission is produced. The governor intended a burden that was not applied, and'
+        + ' proceeding under the default would substitute a weaker one without authorization' };
+  }
+
   const ord = orderWithinOrigins(merged.records);
   if (ord.cycle) {
     return { ok: false, why: 'records refer to one another in a cycle within one origin: '
       + ord.cycle.map((k) => JSON.parse(k).join('/')).join(' -> '),
+    unresolvedGovernance, unattached: policyRecord,
     outcomes: merged.records.map((r) => ({ origin: r.origin, ref: r.ref, state: STATE.UNRESOLVED,
       minted: false, why: 'part of a cycle of records' })) };
   }
@@ -371,26 +428,8 @@ export function replayMerged(merged, { authorityStore: st, witnessModes, governi
   // stopped. A cycle lands here, as do records waiting on a supplier that never established.
   for (const r of pending) run(r);
 
-  // A GOVERNANCE ENTRY THAT DENOTES NOTHING IS REPORTED, NEVER SILENTLY IGNORED. An obligation that
-  // quietly matches no record is the same defect class as a guard that fires into nothing: the run
-  // looks governed and is not.
-  const unresolvedGovernance = [];
-  for (const [k, mode] of Object.entries(governingByOccurrence || {})) {
-    if (!merged.records.some((r) => r.occurrence === k)) {
-      unresolvedGovernance.push({ by: 'OCCURRENCE', denoting: k, mode,
-        why: 'this occurrence is not in the merged set. The governed subject is absent, so this'
-          + ' obligation governed nothing - it did not fall through to the default' });
-    }
-  }
-  for (const [k, mode] of Object.entries(governingByRecord || {})) {
-    if (!merged.records.some((r) => key(r.origin, r.ref) === k)) {
-      unresolvedGovernance.push({ by: 'RECORD', denoting: k, mode,
-        why: 'no record sits at these coordinates in this merged set' });
-    }
-  }
-  return { ok: true, outcomes, unresolvedGovernance,
-    obligationContract: contractOf(obligationContractId, witnessModes, governingByRecord,
-      governingByOccurrence, merged) };
+  return { ok: true, outcomes, unresolvedGovernance, unattached: policyRecord,
+    obligationContract: contract() };
 }
 
 /** WHICH OBLIGATION CONTRACT AN OUTCOME WAS PRODUCED UNDER.

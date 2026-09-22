@@ -15,7 +15,7 @@ import { admit, STATE } from './admission.mjs';
 import { store } from './authority-store.mjs';
 import { journalEntry } from './replay.mjs';
 import { merge, replayMerged, outcomeFor, occurrenceOf, sameObligationContract,
-  sameGovernedSubjects, MODE } from './merge.mjs';
+  sameGovernedSubjects, MODE, UNATTACHED } from './merge.mjs';
 
 const load = (n) => JSON.parse(readFileSync(new URL('./natural/' + n + '.json', import.meta.url), 'utf8'));
 const REL2 = load('REL2'), ORD2 = load('ORD2');
@@ -49,8 +49,12 @@ function consumer(ref, tag) {
 }
 const J = (entries) => ({ entries });
 const src = (origin, ...entries) => ({ origin, journal: J(entries) });
+// THIS SUITE MEASURES DETECTION, NOT POLICY, so it names the policy it observes under rather than
+// inheriting one. When these arms were written, reporting-and-proceeding was the only behaviour;
+// UNATTACHED-GOVERNANCE_PREREG.md then made INVALIDATE the default and DIAGNOSE an explicitly
+// authorized downgrade. The required observations here are unchanged; only the policy is now named.
 const play = (sources, opts = {}) => replayMerged(merge(sources).merged,
-  { authorityStore: store(), ...opts });
+  { authorityStore: store(), unattachedPolicy: UNATTACHED.DIAGNOSE, ...opts });
 
 /** BOTH the identifier and the object it resolves to. Never a coordinate on its own. */
 function subjectOf(result, origin, ref) {
