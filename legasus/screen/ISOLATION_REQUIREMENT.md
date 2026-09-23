@@ -1,6 +1,6 @@
 # ISOLATED EXECUTION ENVIRONMENT — capability survey and requirement
 
-Date: 2026-09-23
+Date: 2026-09-23 (corrected same day)
 Status of step 3: **BLOCKED ON THIS LAPTOP.** Same-user ACLs are abandoned; the bypass is
 demonstrated and preserved (`server/d2Revoke.test.mjs`, red by design).
 
@@ -27,36 +27,56 @@ worker; `server/workerIsolation.test.mjs` is the qualification and currently can
 
 Virtualization is **not** the blocker.
 
-## The two blockers found, in order
+## The blocker, corrected twice
 
-**1. Docker Desktop crashed at startup — identified and fixed.**
+**CORRECTION 1 — "the crash is fixed" was wrong.** Setting `EnableDockerAI: false` did **not**
+stop it. I checked `docker-desktop.exe.log` (the GUI log) and reported the crash gone; the
+backend log `com.docker.backend.exe.log` shows it recurring on every launch since:
 
-    starting services: initializing Inference manager:
+    [04:59:46] backend crashed ... starting services: initializing Inference manager:
     listening on unix://C:/Users/.../Docker/run/dockerInference:
-    The filename, directory name, or volume label syntax is incorrect.
+    remove ...: The file cannot be accessed by the system.
 
-The Docker AI inference manager could not create its socket. `EnableDockerAI` was set to false
-in `settings-store.json` (backed up alongside as `.bak-legasus`). The crash no longer appears in
-the host log.
+**CORRECTION 2 — the cause is not terms acceptance.** The earlier record said provisioning
+"needs GUI interaction and acceptance of terms". **Nothing in the UI or the logs said that.** It
+was inferred from "no distro + empty VM logs", which establish only that the backend never
+booted. Retracted.
 
-**2. The Linux backend has never booted — still blocking.** There is no WSL distribution, and
-`log/vm/` contains no logs at all, so the VM has not started once. Docker Desktop must provision
-its own `docker-desktop` WSL distro, and that has not happened unattended.
+**The actual cause, from Docker's own log.** Three orphaned entries in
+`%LOCALAPPDATA%\Docker\run\` cannot be stat'd or deleted at all:
+
+    -????????? ? ? ? ? dockerEthernetVfkit
+    -????????? ? ? ? ? dockerInference
+    -????????? ? ? ? ? userAnalyticsOtlpHttp.sock
+
+Docker `remove`s that path before listening on it, the remove fails, and the backend dies before
+any engine starts. That is why there is no distro and no VM log — those are **downstream** of the
+crash, not independent evidence of a setup requirement.
+
+(An earlier `rm -f` on that path appeared to succeed only because its stderr was discarded —
+the same class of mistake as reading the wrong log.)
+
+**Attempted fix:** the entries resist `rm`, `Remove-Item -Force` and `File.Delete` alike
+("The file cannot be accessed by the system"), so the **directory was renamed aside**
+(`run.broken-<timestamp>`) for Docker to recreate. Non-destructive and reversible. Whether it
+works is an empirical question answered by the engine starting, not by this paragraph.
 
 ## Concrete setup needed
 
 Rather than substituting another cosmetic restriction, the requirement is stated plainly. Any
 **one** of these unblocks step 3:
 
-1. **Finish Docker Desktop's backend provisioning** — open the Docker Desktop window and
-   complete whatever it is waiting on (sign-in, onboarding, or an engine-start prompt), and let
-   it install its WSL distro. A reboot may be required. This is a GUI interaction and an
-   acceptance of terms, so it is the operator's action, not mine.
+1. **Docker Desktop starts after the orphaned-socket fix.** The crash cause is identified and
+   a non-destructive fix is applied. No user action is known to be required — the earlier
+   "acceptance of terms" claim is retracted, and nothing should be treated as needing your
+   attention unless a prompt is actually observed and shown to you.
    Then: `node server/workerIsolation.test.mjs`.
-2. **Install a WSL distribution** (`wsl --install -d Ubuntu`) and run the worker there instead.
-   Requires creating a Linux user account inside the distro — again the operator's action.
-   `/mnt/c` automount must be disabled in `/etc/wsl.conf`, or the host drive is visible and the
-   isolation claim fails exactly as the ACL one did.
+2. **Install a WSL distribution** (`wsl --install -d Ubuntu`) and run the worker there.
+   **RETRACTED: disabling `/mnt/c` automount is NOT sufficient.** An ordinary WSL distro needs
+   its own full qualification — Windows interoperability (`/init`, launching `.exe`s, which
+   reaches the host as the host user), any ability to mount host filesystems from inside, and
+   `\\wsl.localhost` paths in the other direction. Turning off one automount addresses one
+   route out of several. Do not treat a WSL distro as isolated without qualifying it.
 3. **A remote worker** (Modal or equivalent) holding only the workspace, with audit storage and
    other runs on the host it cannot reach. Costs GPU-account spend and needs its own
    qualification; the credential the worker holds must not grant read access to audit storage.
@@ -82,13 +102,18 @@ re-run on the host and must still work. Without it, "the worker could not read t
 is indistinguishable from "this probe cannot read anything" — the failure that once printed
 *"a real permission boundary exists"* over a mangled command.
 
-### One rule inverts, deliberately
+### What ENOENT does and does not show
 
-`d2Access` had to reject `ENOENT` as a denial signal, because it was denying reads of a path that
-existed. Here the audit store is **not present in the worker's filesystem namespace at all**, so
-absence *is* the isolation and `ENOENT` is the correct, stronger signal. That only holds because
-the qualification also shows the worker cannot **make** the path appear. Absence plus inability
-to obtain is the claim; absence alone would not be.
+`d2Access` had to reject `ENOENT` as a denial signal, because it was denying reads of a path
+that existed. Under namespace isolation the audit store is simply **not present** in the worker's
+filesystem, so `ENOENT` is the expected result.
+
+**It is not inherently stronger evidence.** A mistyped path produces exactly the same `ENOENT`.
+The result means something only because of what surrounds it: the **positive controls** (the
+worker reads, writes and runs tools in its workspace, and the write lands on the host) show the
+probe works, and the **escape probes** (no mount, no docker socket, non-root, no network) show
+the worker cannot make the path appear. `ENOENT` is consistent with isolation; the controls and
+escape probes are what give it meaning.
 
 ## Scope
 

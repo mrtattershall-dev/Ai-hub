@@ -17,12 +17,14 @@
  * is the exact failure that once printed "a real permission boundary exists" over a mangled
  * command. A boundary claim needs a demonstration that the probe can still detect success.
  *
- * ENOENT IS THE RIGHT SIGNAL HERE, AND THAT IS NOT A CONTRADICTION. d2Access had to reject
+ * ENOENT IS CONSISTENT WITH ISOLATION - IT IS NOT, BY ITSELF, STRONGER EVIDENCE. d2Access had to reject
  * ENOENT because it was denying reads of a path that existed; absence there would have meant a
- * broken probe. This mechanism is different in kind: the audit store is NOT PRESENT in the
- * worker's filesystem namespace at all. Absence is the isolation. It only counts as isolation
- * because section 4 also shows the worker cannot MAKE the path appear - no mount, no docker
- * socket, no network. Absence plus inability to obtain is the claim; absence alone would not be.
+ * broken probe. Here the audit store is NOT PRESENT in the worker's namespace, so ENOENT is the
+ * expected result - but a mistyped path yields the identical ENOENT. The result means something
+ * only because of what surrounds it: the path is first shown to name a real artifact ON THE HOST,
+ * the positive controls show the probe can read and write, and section 4 shows the worker cannot
+ * MAKE the path appear. Absence, a valid path, working controls, and inability to obtain - that
+ * conjunction is the claim. Absence alone is not.
  *
  * NOT CLAIMED: container escape resistance against a kernel-level attack. The claim is scoped to
  * what the campaign needs - an agent command route that cannot reach host audit storage, other
@@ -106,6 +108,13 @@ try {
   // ── 3. AUDIT STORAGE AND OTHER RUNS ARE NOT REACHABLE ──
   console.log('\n=== 3. known-path audit reads and cross-run reads FAIL ===');
   const bundleIn = q.bundle.replace(/\\/g, '/');
+  // PATH VALIDITY, first. A mistyped or non-existent path produces exactly the same ENOENT
+  // as real namespace isolation, so the probe path must be shown to name something real
+  // BEFORE its absence in the worker means anything. Checked on the host, where it exists.
+  const hostSees = existsSync(q.bundle) && readFileSync(q.bundle).length > 0;
+  say(hostSees, `the probe path names a real, non-empty artifact ON THE HOST (${q.bundle})`);
+  say(bundleIn.startsWith('/') === false && /:/.test(bundleIn), 'and it is passed to the worker in a well-formed absolute form');
+  note('Without these two, an ENOENT below would be indistinguishable from a typo.');
   const a1 = await runInWorker(WS, `cat "${bundleIn}" 2>&1; ls "${q.dir.replace(/\\/g, '/')}" 2>&1`);
   say(!/PACK|v2 git bundle/.test(a1.out), `the known audit path yields nothing (${a1.out.replace(/\s+/g, ' ').trim().slice(0, 60)})`);
   const a2 = await runInWorker(WS, `cat "${join(OTHER, 'other-secret.txt').replace(/\\/g, '/')}" 2>&1`);
