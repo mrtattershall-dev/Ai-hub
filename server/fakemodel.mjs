@@ -29,6 +29,7 @@
  *
  * Nothing here is intelligent, and that is the point. It tests the LOOP, not the model.
  */
+import fs from 'node:fs';
 import { createServer } from 'http';
 
 const argv = process.argv.slice(2);
@@ -259,6 +260,13 @@ const server = createServer((req, res) => {
     try {
       const j = JSON.parse(body || '{}');
       const msgs = j.messages || [];
+      // PROMPT LOG, for integration tests that must prove WHAT REACHED THE MODEL.
+      // Without it, "the controller prompt was inserted" can only be inferred from behaviour,
+      // and an insertion point that silently did nothing would look the same as one that
+      // worked. Off unless a path is given, so ordinary runs are unaffected.
+      if (process.env.FAKE_PROMPT_LOG) {
+        try { fs.appendFileSync(process.env.FAKE_PROMPT_LOG, JSON.stringify({ at: Date.now(), messages: msgs }) + String.fromCharCode(10)); } catch {}
+      }
       const sys = msgs.find((m) => m.role === 'system');
       isPlanner = /architect/i.test(sys?.content || '');
       // Reset on a FRESH run. The script pointer is stateful, so after one run it sits

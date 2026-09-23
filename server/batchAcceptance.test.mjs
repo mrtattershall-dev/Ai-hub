@@ -162,8 +162,17 @@ try {
     const n = events.filter((e) => e.event === 'task_end' && e.task === id).length;
     say(n === 1, `${id}: exactly one terminal record (${n})`);
   }
+  // The invariant is ONE RECORD PER TASK INCLUDING EARLY EXITS - not that one function
+  // owns the write. Five early-exit paths write their own and never reach finalise().
+  for (const [label, evs, ids] of [['forced-failure batch', ev4, ['evalerr', 'after']]]) {
+    for (const id of ids) {
+      const n = evs.filter((e) => e.event === 'task_end' && e.task === id).length;
+      say(n === 1, label + ': ' + id + ' has exactly one terminal record, via an EARLY EXIT (' + n + ')');
+    }
+  }
   note('Two call sites used to write their own task_end before calling the acceptance step,');
-  note('which produced two terminal records per task. finalise() is now the sole writer.');
+  note('which produced two terminal records per task. finalise() is not the SOLE writer -');
+  note('five early-exit paths write their own - but every task has exactly one.');
 } finally {
   for (const d of dirs) { try { rmSync(d, { recursive: true, force: true }); } catch { /* best effort */ } }
 }

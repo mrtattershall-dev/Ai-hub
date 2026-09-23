@@ -45,6 +45,7 @@ import { emitHostEvent, attachFileSink } from './hostEvent.js';
 // Off unless AGENT_D2_TARGETS names the campaign's protected deliverables, so ARM A of the
 // paired campaign is the hub exactly as Phase 1 left it.
 import { runInWorker, WorkerUnavailable, WorkerUnconfirmed, workerAvailable, WORKER_IMAGE } from './worker.js';
+import { ProtocolController } from './protocol.js';
 import { ROUTES_BOUNDED, noteUncoveredTraversal, refuseAtDetachedSite } from './routeBound.js';
 import { lockAuditDir } from './d2.js';
 import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState, mayMutate } from './d2.js';
@@ -124,6 +125,37 @@ const D2_AUDIT_DIR = process.env.AGENT_D2_AUDIT_DIR || join(__dirname, 'legasus-
 // Route model-chosen execution through the isolated worker. OFF by default, so the ordinary
 // hub is unchanged; the campaign turns it on and then has NO host-execution fallback.
 const WORKER_EXEC = process.env.AGENT_WORKER_EXEC === '1';
+
+// PROTOCOL-1 TREATMENT. Off by default: with it off the existing route is untouched, which
+// is the control arm. Exactly three insertion points, all guarded by this flag, and no
+// refactoring of this file.
+const PROTOCOL_ON = process.env.AGENT_PROTOCOL === '1';
+
+/**
+ * One controller per run. It owns STATE and SEQUENCING only.
+ *
+ * applyEdit and verify are deliberately NOT passed: the controller must not own execution, or
+ * the treatment arm would get a privileged path around the host events, the before-images and
+ * the guards, and any difference could come from the shortcut instead of the contract.
+ */
+function protocolFor(run) {
+  if (!PROTOCOL_ON) return null;
+  if (run.protocol) return run.protocol;
+  const targets = (run.protocolTargets && run.protocolTargets.length)
+    ? run.protocolTargets
+    : safeList().filter((f) => /\.(c?js|mjs|py)$/i.test(f));
+  run.protocol = new ProtocolController({
+    readFile: (rel) => { try { return readFileSync(safePath(rel), 'utf8'); } catch { return null; } },
+    targets,
+  });
+  run.controllerRefusals = [];
+  return run.protocol;
+}
+
+/** The files in the workspace, for the controller's target set. Never throws. */
+function safeList() {
+  try { return readdirSync(WORKSPACE).filter((f) => !f.startsWith('.')); } catch { return []; }
+}
 
 /**
  * The finish gate. Returns true when the run may be promoted, false when d2 refused.
@@ -3286,6 +3318,11 @@ async function drive(loadDb, run) {
       // never in the history), and it is always the CURRENT state rather than a stale
       // copy taken at step 1.
       const msgs = withLedger(run.history);
+      // INSERTION 1 of 3: the controller states the phase and the ONE bounded decision open
+      // now. The goal, the tools and the testing guidance are unchanged - the model is given
+      // less to coordinate, not less to work with.
+      const pc1 = protocolFor(run);
+      if (pc1) msgs.push({ role: 'user', content: pc1.instruction() });
       try {
         raw = await callModel(loadDb, msgs, run.abort.signal);
         noteModelCall(run);
@@ -3415,6 +3452,19 @@ async function drive(loadDb, run) {
       // to happen. The raw text is right here and it is the same information.
       const extraActions = Math.max(0, (raw.match(/ACTION:\s*[a-z_]+/gi) || []).length - 1);
       const action = parseAction(raw, run.lastPath);
+      // INSERTION 2 of 3: the action gate. A refusal does NOT execute the tool, and it is a
+      // RECORDED outcome rather than a silent drop. It refuses BEFORE execution, so nothing
+      // the model completed is ever destroyed after the fact.
+      const pc2 = protocolFor(run);
+      if (pc2 && action && action.tool && action.tool !== 'finish') {
+        const gate = pc2.validate(action.tool, action.args || {});
+        if (!gate.ok) {
+          run.controllerRefusals.push({ at: Date.now(), tool: action.tool, reason: gate.refusal, phase: gate.phase ?? null });
+          pushStep(run, { type: 'note', text: `PROTOCOL: refused ${action.tool} (${gate.refusal})` });
+          run.history.push({ role: 'user', content: `${pc2.instruction()}\n\nThat action was not available in this phase (${gate.refusal}). Nothing was executed and nothing was lost.` });
+          continue;
+        }
+      }
       if (!action || !action.tool || !tools[action.tool] && action.tool !== 'finish') {
         run.parseLog = (run.parseLog || []).concat(false).slice(-10);
         if (run.parseLog.filter((ok) => !ok).length >= 5) {
@@ -4038,6 +4088,14 @@ async function drive(loadDb, run) {
       }
 
       let feedback = substituted || `TOOL RESULT (${tool}):\n${result}${syntaxNote}`;
+      // INSERTION 3 of 3: the controller sees the result and advances its phase, then states
+      // what is open next. The raw result still reaches the model - the controller adds the
+      // sequencing it owns, it does not replace the evidence.
+      const pc3 = protocolFor(run);
+      if (pc3) {
+        pc3.notifyResult(tool, args || {}, result);
+        feedback = `${feedback}\n\n${pc3.instruction()}`;
+      }
 
       // Say so when we dropped the rest of a batch. Silence here is what created the loop:
       // the model got no signal that its 2nd..Nth actions never happened, so it re-sent the

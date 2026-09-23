@@ -149,9 +149,13 @@ export async function runBatch(tasks, opts) {
   /**
    * Apply the acceptance policy and decide what the NEXT task receives.
    *
-   * THE SOLE WRITER OF task_end. Two call sites used to record their own terminal event before
-   * calling this, which produced TWO terminal records for one task - the precise thing the
-   * one-record invariant forbids.
+   * WRITES THE TERMINAL RECORD for any task that reaches acceptance. Two call sites used to
+   * record their own terminal event before calling this, producing TWO records for one task.
+   *
+   * It is NOT the only writer, and claiming so would be wrong: five early-exit paths
+   * (interrupted, halted, budget-exhausted, unstoppable worker, worker-never-started) write
+   * their own terminal record and never reach here. The invariant that actually matters is
+   * EXACTLY ONE TERMINAL RECORD PER TASK, early exits included - not that one function owns it.
    *
    * The baseline advances ONLY on RETAIN. Preserved-incomplete work, restored damage and
    * held candidates all leave the baseline exactly where it was - passing a limited
