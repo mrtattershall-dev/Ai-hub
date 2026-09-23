@@ -28,8 +28,12 @@ work was done. This run wrote its own report and it reconciled.
 regression in each arm was caught and restored, and on the replayed t5 candidate. It is **not**
 evidenced by this run, and a run in which nothing broke cannot evidence it.
 
-All 15 runs retained protected behaviour (15/15), which is a real result about the model's
-behaviour on these tasks — not about the rollback machinery.
+All 15 runs passed their protected checks (15/15).
+
+**CORRECTED WORDING.** That establishes only that **the checked behaviour survived**. It does
+not establish that the model preserved everything — unchecked behaviour is unmeasured — nor
+that the hub's own guards contributed nothing. PILOT-2 showed a guard refusing a write that
+would have removed round2, so guards demonstrably do act on this path.
 
 ## Work produced
 
@@ -53,9 +57,11 @@ the same instability PROTOCOL-2 measured, in a fourth independent set of runs.
 
 PROTOCOL-2's control arm (same tasks, same model, no controller, 15 runs) accepted **6**. This
 run, in the same configuration, accepted **4**. Nothing was changed between them that should
-affect completion. That 6-vs-4 spread across two 15-run sets is further evidence that
-single-campaign completion counts are unreliable estimates of repeatable performance — and a
-reason not to read PROTOCOL-2's 6-vs-7 as a treatment signal.
+affect completion. **CORRECTED WORDING.** This is **another observed difference across runs**. It is not
+necessarily an independent replication — the two sets differ in orchestration and were not run
+as a designed repeat — and two numbers cannot quantify variability. What it does support: a
+single campaign's completion count is an unreliable estimate of repeatable performance, which is
+a reason not to read PROTOCOL-2's 6-vs-7 as a treatment signal.
 
 ## What this earns
 

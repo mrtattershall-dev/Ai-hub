@@ -35,19 +35,50 @@ const MODEL_URL = process.argv[2];
 if (!MODEL_URL) { console.error('usage: node server/endurance.mjs <modelBaseUrl>'); process.exit(2); }
 
 const PER_TASK_SEC = 300;
-const TOTAL_SEC = 30 * 60;
+const TOTAL_SEC = parseInt(process.env.ENDURANCE_TOTAL_SEC || String(30 * 60), 10);
 const RESERVE_SEC = 120;
-const REPLICATES = 3;               // the five frozen tasks, three times
+const REPLICATES = parseInt(process.env.ENDURANCE_REPLICATES || '3', 10);
+const PROBE_EVERY = parseInt(process.env.ENDURANCE_PROBE_EVERY || '1', 10);
 
 const ROOT = mkdtempSync(join(tmpdir(), 'endurance-'));
 const SUMMARY = join(ROOT, 'summary.jsonl');
 const T0 = Date.now();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** THE FROZEN QUEUE: the five qualified tasks, three replicates, each from its own seed. */
+/**
+ * A SCRIPTED FAULT PROBE, to exercise the rollback path under load.
+ *
+ * NOT a task chosen because the model tends to break it - that would bias the workload and
+ * still would not guarantee the restore path executes. This is a deterministic scripted edit
+ * that breaks protected behaviour on purpose, run through the SAME batch path, in its own
+ * disposable workspace.
+ *
+ * It is EXCLUDED from the productivity totals. It measures the machinery, not the model, and
+ * counting it either way would corrupt both numbers.
+ */
+const FAULT_PROBE = {
+  id: 'FAULT-PROBE#scripted',
+  faultProbe: true,
+  goal: '(scripted fault probe - no model involved)',
+  seed: {
+    'package.json': '{"name":"probe","type":"commonjs"}\n',
+    'pricing.js': 'function round2(n) { return Math.round(n * 100) / 100; }\nmodule.exports = { round2 };\n',
+    'cart.js': "const { round2 } = require('./pricing');\nfunction cartTotal(items) { return round2(items.reduce((a, i) => a + i.price * i.qty, 0)); }\nmodule.exports = { cartTotal };\n",
+  },
+  // the deterministic break: cartTotal(items) becomes NaN
+  brokenEdit: { 'cart.js': "const { round2 } = require('./pricing');\nfunction cartTotal(items, percent) {\n  return round2(items.reduce((a, i) => a + i.price * i.qty, 0) * (1 - percent / 100));\n}\nmodule.exports = { cartTotal };\n" },
+  requested: { script: 'node -e "const p=require(\'/candidate/pricing.js\'); process.exit(typeof p.applyDiscount===\'function\'?0:1)"' },
+  protected: { script: 'node -e "const c=require(\'/candidate/cart.js\'); process.exit(c.cartTotal([{price:10,qty:2},{price:5,qty:1}])===25?0:1)"' },
+};
+
+/** THE FROZEN QUEUE: the five qualified tasks x replicates, each from its own seed. */
 const QUEUE = [];
 for (let rep = 1; rep <= REPLICATES; rep++) {
   for (const t of PILOT_TASKS) QUEUE.push({ ...t, id: `${t.id}#r${rep}`, rep, baseTask: t.id });
+  // Probes are SPACED through the run, so the rollback path is exercised repeatedly over
+  // hours rather than only at the start - without spending a meaningful share of the budget
+  // on machinery checks.
+  if (rep % PROBE_EVERY === 0) QUEUE.push({ ...FAULT_PROBE, id: `${FAULT_PROBE.id}#r${rep}`, rep });
 }
 
 let port = 39900;
@@ -59,6 +90,14 @@ const api = async (base, path, init) => {
 
 /** One task through the real hub, in the fully integrated configuration. */
 async function runTask(ws, task, ctx) {
+  // THE FAULT PROBE BYPASSES THE MODEL ENTIRELY. It applies its scripted break and returns,
+  // so the batch path, the evaluator and the acceptance policy all run exactly as they do
+  // for a real task - and no generation is spent on it.
+  if (task.faultProbe) {
+    for (const [f, body] of Object.entries(task.brokenEdit || {})) writeFileSync(join(ws, f), body, 'utf8');
+    return { status: 'COMPLETED', ok: true, exit: 0, timedOut: false, attemptId: ctx.attemptId,
+      elapsedSec: 0, terminationReason: 'scripted fault probe', modelCalls: 0, tokens: 0, toolExecutions: 0, faultProbe: true };
+  }
   const p = port++;
   const started = Date.now();
   const dbPath = join(ROOT, `hub-${p}.json`);
@@ -128,10 +167,12 @@ const out = await runBatch(QUEUE, {
 });
 
 // ── durable summary, then the automatic report ──
+// PROBES ARE RECORDED UNDER THEIR OWN ARM, so they never touch the productivity totals.
 for (const r of out.results) {
   const task = QUEUE.find((q) => q.id === r.task);
   recordRun(SUMMARY, {
-    idx: out.results.indexOf(r) + 1, rep: task?.rep ?? 0, task: r.task, arm: 'SINGLE',
+    idx: out.results.indexOf(r) + 1, rep: task?.rep ?? 0, task: r.task,
+    arm: task?.faultProbe ? 'FAULT_PROBE' : 'SINGLE',
     termination: r.termination || r.state,
     requested: r.verdict?.requested?.verdict ?? null,
     protected: r.verdict?.protected?.verdict ?? null,
@@ -166,7 +207,11 @@ console.log(`elapsed: ${Math.floor(elapsedSec / 60)}m ${elapsedSec % 60}s of a $
 console.log(`1. stopped within budget, nothing still running : ${stopped.ok ? 'YES' : 'NO - ' + stopped.reason}`);
 console.log(`2. accounted for every task                     : ${out.accounting.complete ? 'YES' : 'NO'} (${out.accounting.accountedFor}/${out.accounting.queued})`);
 console.log(`3. report produced automatically                : YES (integrity ${report.integrity.ok}, reconciliation ${report.reconciliation.ok})`);
+const probes = report.runs.filter((r) => r.arm === 'FAULT_PROBE');
+const restored = probes.filter((r) => r.disposition === 'RESTORED').length;
 console.log(`4. accepted work / rollbacks                    : see below`);
+console.log(`   scripted fault probes: ${probes.length}, RESTORED ${restored}/${probes.length}` + (probes.length && restored === probes.length ? '  (rollback exercised under load)' : ''));
+console.log('   (probes are excluded from the productivity totals below)');
 console.log(JSON.stringify(report.arms, null, 2));
 console.log(`\nsummary: ${SUMMARY}`);
 console.log(`report:  ${join(ROOT, 'ENDURANCE_REPORT.json')}`);
