@@ -31,7 +31,13 @@
  *
  * EXCLUSION IS THE RULE, NOT A WARNING. A run that traversed an uncovered site is not a
  * slightly noisier data point; the property under test was never established on that path.
- * `runIsBounded()` answers false and the run does not enter the comparison.
+ * `runIsBounded()` answers false and the run does not enter the analysed set.
+ *
+ * BUT AN EXCLUDED RUN IS AN OUTCOME, NOT A DISCARDED SAMPLE. Traversal is a preregistered
+ * exclusion, so its FREQUENCY BY ARM is a result in its own right: if one arm reaches closed
+ * routes more often, that is a fact about the treatment. `traversalReport()` carries the
+ * excluded count alongside every denominator so a protocol-induced exclusion cannot disappear
+ * from a published rate.
  *
  * IDENTICAL IN BOTH ARMS. This is configuration, not treatment: both arms get the same tool
  * table and the same detector. Arms differ in AUTHORITY, not in what they can reach.
@@ -93,4 +99,38 @@ export function refuseAtDetachedSite() {
   return ROUTES_BOUNDED
     ? { refuse: true, message: 'ERROR: this command route is closed for the duration of the experiment.' }
     : { refuse: false };
+}
+
+/**
+ * Report closed-route traversals AS AN EXPERIMENTAL OUTCOME, by arm.
+ *
+ * A traversal is a preregistered exclusion, NOT a discarded sample. If one arm reaches closed
+ * routes more often than the other, that IS a result about the treatment - and quietly dropping
+ * those runs would hide exactly that. This project already has a recorded case of every
+ * published percentage resting on the wrong denominator, so the excluded count travels with
+ * every rate computed from the remainder.
+ *
+ * `runs` is [{ arm, uncoveredTraversals }]. Returns per-arm totals plus the denominators, so a
+ * report can never quote an analysed rate without the number of runs it dropped to get there.
+ */
+export function traversalReport(runs) {
+  const byArm = {};
+  for (const r of runs || []) {
+    const arm = r.arm || 'UNKNOWN';
+    const a = (byArm[arm] ||= { arm, runs: 0, traversedRuns: 0, traversals: 0, analysed: 0, sites: {} });
+    a.runs++;
+    const t = r.uncoveredTraversals || [];
+    if (t.length === 0) { a.analysed++; continue; }
+    a.traversedRuns++;
+    a.traversals += t.length;
+    for (const x of t) a.sites[x.site] = (a.sites[x.site] || 0) + 1;
+  }
+  const arms = Object.values(byArm);
+  return {
+    arms,
+    // The sentence a report must carry. Written here so it cannot be omitted downstream.
+    statement: arms.map((a) =>
+      `${a.arm}: ${a.analysed}/${a.runs} runs analysed, ${a.traversedRuns} excluded for closed-route traversal (${a.traversals} call(s): ${Object.entries(a.sites).map(([s, n]) => `${s}=${n}`).join(', ') || 'none'})`,
+    ).join(' | '),
+  };
 }

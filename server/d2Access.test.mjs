@@ -12,6 +12,11 @@
  *     PERMITTED workspace reads SUCCEED
  *     KNOWN-PATH reads of audit storage FAIL, for ACCESS reasons
  *
+ * NARROWED 2026-09-22. Every assertion below still holds, but they establish READS ONLY.
+ * d2Revoke.test.mjs showed the model can run icacls itself and LIFT the deny, because it owns
+ * the directory and therefore holds WRITE_DAC. The honest claim is "reads are denied until the
+ * caller changes the ACL", NOT inaccessible audit storage.
+ *
  * WHY EVERY PROBE CARRIES A POSITIVE CONTROL. An earlier version of this probe ran its reads
  * through execFileSync('cmd', ['/c', ...]), which mangled quoted Windows paths - so an existing
  * file reported MISSING, every probe returned DENIED, and the run printed "a real permission
@@ -152,5 +157,5 @@ try {
   try { rmSync(BASE, { recursive: true, force: true }); } catch { /* best effort */ }
 }
 
-console.log(`\n  d2 access boundary: ${passed} passed, ${failed} failed -> ${failed ? 'NO QUALIFIED BOUNDARY - DO NOT RUN THE CAMPAIGN' : 'access boundary qualified'}`);
+console.log(`\n  d2 access boundary: ${passed} passed, ${failed} failed -> ${failed ? 'NO QUALIFIED BOUNDARY - DO NOT RUN THE CAMPAIGN' : 'reads denied to the model (revocability: see d2Revoke.test.mjs)'}`);
 process.exit(failed ? 1 : 0);

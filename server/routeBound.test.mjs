@@ -28,7 +28,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const { noteUncoveredTraversal, runIsBounded, refuseAtDetachedSite, UNCOVERED_SITES } =
+const { noteUncoveredTraversal, runIsBounded, refuseAtDetachedSite, UNCOVERED_SITES, traversalReport } =
   await import('./routeBound.js');
 
 let passed = 0, failed = 0;
@@ -93,6 +93,25 @@ say(!/LOAD FAILED/.test(bounded), 'agent.js LOADS CLEANLY with bounding on - the
 // A tool that is merely stubbed still answers "yes, I exist", which is the wrong answer.
 const keep = hasToolUnder(true, 'write_file');
 say(keep === 'true', 'and ordinary tools are untouched - bounding removed one route, not the toolset');
+
+// ── 4. traversals are an OUTCOME, reported by arm, never a silent drop ──
+//
+// A preregistered exclusion is still a result. If one arm reaches closed routes more often
+// than the other, that is a fact about the treatment, and dropping those runs without saying
+// so would hide it. Every rate must travel with the count it excluded to get there - this
+// project already has a recorded case of every published percentage using the wrong
+// denominator.
+console.log('\n=== 4. closed-route traversal as an experimental outcome ===');
+const rep = traversalReport([
+  { arm: 'A' }, { arm: 'A' }, { arm: 'A', uncoveredTraversals: [{ site: 'driveDetached' }] },
+  { arm: 'B' }, { arm: 'B', uncoveredTraversals: [{ site: 'runSubtask' }, { site: 'runSubtask' }] },
+]);
+const RA = rep.arms.find((x) => x.arm === 'A'), RB = rep.arms.find((x) => x.arm === 'B');
+say(RA.runs === 3 && RA.analysed === 2 && RA.traversedRuns === 1, 'ARM A: the denominator KEEPS the excluded run (3 runs, 2 analysed, 1 excluded)');
+say(RB.runs === 2 && RB.analysed === 1 && RB.traversals === 2, 'ARM B: two traversals in one run count as two calls and one excluded run');
+say(/2\/3 runs analysed/.test(rep.statement) && /1\/2 runs analysed/.test(rep.statement), 'the statement quotes analysed-over-total for BOTH arms - no rate without its denominator');
+say(/driveDetached=1/.test(rep.statement) && /runSubtask=2/.test(rep.statement), 'and names WHICH closed route each arm reached, so a by-arm difference is visible');
+say(traversalReport([]).arms.length === 0, 'an empty campaign reports no arms rather than inventing a zero');
 
 console.log(`\n  route bounding: ${passed} passed, ${failed} failed -> ${failed ? 'THE EXPERIMENT IS NOT BOUNDED' : 'subtask route unavailable; approval route closed and detected'}`);
 process.exit(failed ? 1 : 0);
