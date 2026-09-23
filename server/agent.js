@@ -82,6 +82,39 @@ const D2_ON = D2_TARGETS.length > 0;
 // runs the hub would otherwise have promoted. Set G could not answer that; this can.
 const D2_ENFORCE = process.env.AGENT_D2_ENFORCE === '1';
 
+// ENFORCEMENT WITH NO TARGETS MUST REFUSE TO START.
+//
+// Both pilots ran with AGENT_D2_ENFORCE=1 and no AGENT_D2_TARGETS. d2 therefore had no target
+// set to establish, evaluated nothing, and recorded nothing - while both records said
+// "enforced configuration". Asking for enforcement and silently getting observation of
+// nothing is the worst available outcome: the run looks protected and is not.
+//
+// Refusing at startup is the only place this can be caught before a campaign spends its
+// budget believing a guard is armed.
+if (D2_ENFORCE && D2_TARGETS.length === 0) {
+  throw new Error(
+    'AGENT_D2_ENFORCE=1 was set but AGENT_D2_TARGETS is empty. Enforcement with no targets is '
+    + 'not enforcement - d2 would establish nothing and refuse nothing, while the run reported '
+    + 'itself as enforced. Set AGENT_D2_TARGETS, or do not ask for enforcement.',
+  );
+}
+
+/**
+ * The EFFECTIVE d2 configuration, for the record.
+ *
+ * A run must record what was actually checked, not merely which environment flag was set -
+ * that distinction is exactly what let two pilots describe themselves as enforced while
+ * checking nothing.
+ */
+export const d2Effective = () => ({
+  enforce: D2_ENFORCE,
+  targets: [...D2_TARGETS],
+  targetCount: D2_TARGETS.length,
+  check: 'load-time preservation (START=LOADS + FINISH=THROWS -> refuse)',
+  auditDir: D2_AUDIT_DIR,
+  sealAudit: process.env.AGENT_D2_SEAL_AUDIT === '1',
+});
+
 // Where quarantined candidates are kept: OUTSIDE the workspace, in BOTH arms. AUDIT ONLY -
 // neither model may reach it, or the preserved candidate becomes a recovery resource and part
 // of the tested workflow rather than a record of it. Defaults beside the server, never inside
