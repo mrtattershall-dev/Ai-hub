@@ -57,7 +57,7 @@ export const DISPOSITION = Object.freeze({
  * `startRef` must be the state ALREADY VERIFIED as the task's starting point - the seed commit.
  * Restoring to an unverified earlier state would only move the problem.
  */
-export async function applyAcceptance(ws, task, candidateVerdict, { startRef, captureDir, taskId }) {
+export async function applyAcceptance(ws, task, candidateVerdict, { startRef, captureDir, taskId, image }) {
   const out = {
     task: taskId || task.id,
     candidateVerdict: {
@@ -97,7 +97,7 @@ export async function applyAcceptance(ws, task, candidateVerdict, { startRef, ca
       return out;
     }
     // THE RECHECK. Without it, "restored" is an assumption about a git command's exit code.
-    const after = await evaluate(ws, task);
+    const after = await evaluate(ws, task, { image });
     out.survivingWorkspaceVerdict = {
       overall: after.verdict,
       requested: after.requested?.verdict ?? null,
@@ -110,7 +110,7 @@ export async function applyAcceptance(ws, task, candidateVerdict, { startRef, ca
   }
 
   // ── PROTECTED PASSED ──
-  const after = await evaluate(ws, task);
+  const after = await evaluate(ws, task, { image });
   out.survivingWorkspaceVerdict = {
     overall: after.verdict,
     requested: after.requested?.verdict ?? null,

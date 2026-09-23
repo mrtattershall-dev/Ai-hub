@@ -33,10 +33,11 @@
  * EVALUATION ERRORS ARE NOT CODE FAILURES. They are counted in their own column, always.
  */
 import { appendFileSync, mkdirSync, writeFileSync, readFileSync, existsSync, cpSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, sep } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { confirmStopped, confirmNoneRunning, attemptExists, newAttemptId } from './worker.js';
 import { evaluate, VERDICT } from './evaluator.js';
+import { applyAcceptance, DISPOSITION } from './acceptance.js';
 
 /** Terminal states. Every queued task must end in exactly one of them. */
 export const TASK_STATE = Object.freeze({
@@ -126,7 +127,7 @@ export async function reconcile(entry) {
  * any model compute.
  */
 export async function runBatch(tasks, opts) {
-  const { workspacesDir, auditDir, perTaskSec = 300, totalSec = 1800, runTask } = opts;
+  const { workspacesDir, auditDir, perTaskSec = 300, totalSec = 1800, runTask, evalImage } = opts;
   const journal = new Journal(opts.journalPath);
   mkdirSync(workspacesDir, { recursive: true });
   mkdirSync(auditDir, { recursive: true });
@@ -136,7 +137,66 @@ export async function runBatch(tasks, opts) {
   const results = [];
   let halted = null;
 
-  journal.record({ event: 'batch_start', tasks: tasks.length, perTaskSec, totalSec });
+  // THE ACCEPTED BASELINE. Updated only by an acceptance decision, never by a task merely
+  // finishing. `chain` is off by default so independent task sets are unaffected.
+  const chain = !!opts.chain;
+  const acceptedBaselineDir = join(workspacesDir, '.accepted-baseline');
+  let acceptedBaselineTask = 'none';
+  let acceptedBaselineTree = null;
+
+  journal.record({ event: 'batch_start', tasks: tasks.length, perTaskSec, totalSec, chain });
+
+  /**
+   * Apply the acceptance policy and decide what the NEXT task receives.
+   *
+   * THE SOLE WRITER OF task_end. Two call sites used to record their own terminal event before
+   * calling this, which produced TWO terminal records for one task - the precise thing the
+   * one-record invariant forbids.
+   *
+   * The baseline advances ONLY on RETAIN. Preserved-incomplete work, restored damage and
+   * held candidates all leave the baseline exactly where it was - passing a limited
+   * preservation suite does not make a partial change fit to build upon.
+   */
+  async function finalise(ws, task, candidateVerdict, startRef, termination) {
+    const acceptance = await applyAcceptance(ws, task, candidateVerdict, {
+      startRef, captureDir: join(auditDir, 'rejected'), taskId: task.id, image: evalImage,
+    });
+
+    let halt = null;
+    if (acceptance.disposition === DISPOSITION.RETAIN) {
+      // The only path that advances the baseline.
+      try {
+        rmSync(acceptedBaselineDir, { recursive: true, force: true });
+        cpSync(ws, acceptedBaselineDir, { recursive: true, filter: (src) => !src.includes(`${sep}.git`) });
+        acceptedBaselineTree = acceptance.survivingWorkspaceVerdict?.candidateTree || null;
+        acceptedBaselineTask = task.id;
+      } catch (e) {
+        halt = `the accepted baseline could not be stored: ${e.message}`;
+      }
+    } else if (acceptance.disposition === DISPOSITION.RESTORE_FAILED || acceptance.disposition === DISPOSITION.HELD) {
+      // Damage that could not be undone, or a verdict that was never established. Either way
+      // the batch must stop rather than advance on an unknown state.
+      halt = acceptance.disposition === DISPOSITION.HELD
+        ? 'the evaluation failed, so nothing may be promoted'
+        : 'the workspace could not be restored after a protected-behaviour failure';
+    }
+
+    const state = acceptance.countsAsCompletion ? TASK_STATE.COMPLETED
+      : acceptance.disposition === DISPOSITION.HELD ? TASK_STATE.EVAL_ERROR
+        : TASK_STATE.FAILED;
+
+    journal.record({
+      event: 'task_end', task: task.id, state, finalState: state, termination,
+      disposition: acceptance.disposition,
+      candidateVerdict: acceptance.candidateVerdict,
+      survivingWorkspaceVerdict: acceptance.survivingWorkspaceVerdict,
+      capturedAt: acceptance.capturedAt,
+      baselineTree: acceptedBaselineTree,
+      baselineTask: acceptedBaselineTask,
+      promotable: acceptance.promotable,
+    });
+    return { state, acceptance, halt };
+  }
 
   for (const task of tasks) {
     // RESUME: a task the previous run left in flight is reconciled, never blindly repeated.
@@ -162,13 +222,31 @@ export async function runBatch(tasks, opts) {
       continue;
     }
 
-    // FRESH WORKSPACE PER TASK.
+    // THE NEXT TASK STARTS FROM THE ACCEPTED BASELINE - never from whatever files happened
+    // to remain in the previous workspace.
+    //
+    // This is the link PILOT-2 was missing. It detected a regression and then left the broken
+    // workspace in place; nothing connected the verdict to what the next task would receive.
+    // When chaining, the starting content comes from the baseline directory, which is updated
+    // ONLY by an acceptance decision - never by a task simply finishing.
     const ws = join(workspacesDir, task.id);
     rmSync(ws, { recursive: true, force: true });
     mkdirSync(ws, { recursive: true });
-    if (task.seed) for (const [f, body] of Object.entries(task.seed)) writeFileSync(join(ws, f), body, 'utf8');
+    const fromBaseline = chain && acceptedBaselineDir && existsSync(acceptedBaselineDir);
+    if (fromBaseline) {
+      cpSync(acceptedBaselineDir, ws, { recursive: true, filter: (src) => !src.includes(`${sep}.git`) });
+    } else if (task.seed) {
+      for (const [f, body] of Object.entries(task.seed)) writeFileSync(join(ws, f), body, 'utf8');
+    }
     git(ws, 'init', '-q'); git(ws, 'add', '-A');
-    git(ws, '-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'seed');
+    git(ws, '-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'verified starting state');
+    const startRef = git(ws, 'rev-parse', 'HEAD');
+    const startTree = git(ws, 'rev-parse', 'HEAD^{tree}');
+    journal.record({
+      event: 'task_baseline', task: task.id,
+      baselineSource: fromBaseline ? `accepted baseline from ${acceptedBaselineTask}` : 'task seed',
+      startTree,
+    });
 
     // IDENTITY RECORDED BEFORE THE WORK IS ATTEMPTED.
     const attemptId = newAttemptId();
@@ -242,40 +320,29 @@ export async function runBatch(tasks, opts) {
       git(ws, 'add', '-A');
       git(ws, '-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'terminal candidate as it survived the budget');
       try {
-        terminalEval = await evaluate(ws, task, { timeoutSec: Math.min(120, perTaskSec) });
+        terminalEval = await evaluate(ws, task, { timeoutSec: Math.min(120, perTaskSec), image: evalImage });
       } catch (e) {
         terminalEval = { verdict: VERDICT.EVALUATION_ERROR, reason: String((e && e.name) || e) };
       }
 
       const termination = outcome.timedOut ? 'TIMEOUT' : 'COMPLETION_UNCONFIRMED';
-      // The STATE reflects the behavioural verdict; the termination reason is carried
-      // alongside it rather than folded into it.
-      const state = terminalEval.verdict === VERDICT.PASS ? TASK_STATE.COMPLETED
-        : terminalEval.verdict === VERDICT.FAIL ? TASK_STATE.FAILED
-          : TASK_STATE.EVAL_ERROR;
-      journal.record({
-        event: 'task_end', task: task.id, state, finalState: state,
-        termination, verdict: terminalEval.verdict,
-        candidateTree: terminalEval.candidateTree || null,
-        requested: terminalEval.requested?.verdict ?? null,
-        protected: terminalEval.protected?.verdict ?? null,
-        reason: `terminated by ${termination}; the surviving candidate was evaluated`,
-      });
-      results.push({ task: task.id, state, termination, verdict: terminalEval, partialAt: keep, outcome });
+      // ACCEPTANCE IS MANDATORY, including for a task that ran out of budget.
+      const acc = await finalise(ws, task, terminalEval, startRef, termination);
+      results.push({ task: task.id, state: acc.state, termination, verdict: terminalEval, partialAt: keep, outcome, acceptance: acc.acceptance, baselineTree: acceptedBaselineTree });
+      if (acc.halt) { halted = acc.halt; journal.record({ event: 'batch_halt', task: task.id, reason: halted }); }
       continue;
     }
     // EVALUATE - the same independent evaluator in both arms.
     let verdict;
     try {
-      verdict = await evaluate(ws, task, { timeoutSec: Math.min(120, perTaskSec) });
+      verdict = await evaluate(ws, task, { timeoutSec: Math.min(120, perTaskSec), image: evalImage });
     } catch (e) {
       verdict = { verdict: VERDICT.EVALUATION_ERROR, reason: String(e && e.name || e) };
     }
-    const state = verdict.verdict === VERDICT.PASS ? TASK_STATE.COMPLETED
-      : verdict.verdict === VERDICT.FAIL ? TASK_STATE.FAILED
-        : TASK_STATE.EVAL_ERROR;
-    journal.record({ event: 'task_end', task: task.id, state, finalState: state, termination: 'ENDED', verdict: verdict.verdict, candidateTree: verdict.candidateTree || null, requested: verdict.requested?.verdict ?? null, protected: verdict.protected?.verdict ?? null });
-    results.push({ task: task.id, state, termination: 'ENDED', verdict, outcome });
+    // ACCEPTANCE IS MANDATORY. No task is finalised without it.
+    const acc = await finalise(ws, task, verdict, startRef, 'ENDED');
+    results.push({ task: task.id, state: acc.state, termination: 'ENDED', verdict, outcome, acceptance: acc.acceptance, baselineTree: acceptedBaselineTree });
+    if (acc.halt) { halted = acc.halt; journal.record({ event: 'batch_halt', task: task.id, reason: halted }); }
   }
 
   const accounting = accountFor(tasks, results);
