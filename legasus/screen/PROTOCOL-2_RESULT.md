@@ -35,8 +35,11 @@ Spend counts **every attempted run, successes and failures alike**.
 
 ## Question 1 — does v2 change verified completion?
 
-6 vs 7 of 15. **Not answered.** A one-run difference at this scale is not a result, and the
-replicate data shows why.
+6 vs 7 of 15. **Inconclusive.**
+
+**CORRECTED**: I described this verbally as "a coin-flip difference". That asserts a
+distribution nothing here measured. The supportable statement is that this design does not
+distinguish 6 from 7, and the variable cells show why.
 
 ## What three replicates DID show: the variability, directly
 
@@ -47,10 +50,27 @@ Same task, same arm, different replicates:
     t3 TREATMENT  −  +  +
     t4 TREATMENT  +  −  +
 
-**Six of ten task×arm cells are unstable across replicates.** This is the thing PROTOCOL-1 could
-not see and that I previously asserted without measuring. Three replicates is a **chosen
-budget, not a statistical threshold**, and this supports no significance claim — but it does
-establish that single-run differences of this size are uninformative.
+**CORRECTED COUNT.** I first wrote "six of ten cells are unstable". Recounted directly from the
+report: **4 of 10 cells are VARIABLE, 6 are STABLE.** I overstated the instability, in the
+direction that flattered the point I was making.
+
+    t1 CONTROL    + + +   stable        t3 CONTROL    - - -   stable
+    t1 TREATMENT  + + +   stable        t3 TREATMENT  - + +   VARIABLE
+    t2 CONTROL    + - +   VARIABLE      t4 CONTROL    - - +   VARIABLE
+    t2 TREATMENT  - - -   stable        t4 TREATMENT  + - +   VARIABLE
+    t5 CONTROL    - - -   stable        t5 TREATMENT  - - -   stable
+
+Two tasks are stable in BOTH arms - t1 always accepted, t5 never - which is 4 of the 6 stable
+cells. The other two stable cells are t2 TREATMENT and t3 CONTROL. All four variable cells sit
+in t2, t3 and t4.
+
+This is still the thing PROTOCOL-1 could not see and that I previously asserted without
+measuring. Three replicates is a **chosen budget, not a statistical threshold**, and this supports no
+significance claim.
+
+**CORRECTED.** The flips demonstrate variability. They do **not** establish that single-run
+comparisons "can tell you nothing" — they show that a single outcome is an **unreliable
+estimate of repeatable performance**. A single run still reports what happened in that run.
 
 Two cells were stable: **t1 accepted in all six runs** (both arms, every replicate), and **t5
 accepted in none**. The interesting variation is entirely in t2, t3, t4.
@@ -62,8 +82,12 @@ accepted in none**. The interesting variation is entirely in t2, t3, t4.
     seconds          517 vs 584     treatment −11%
     tool executions   44 vs 101     treatment −56%
 
-The activity reduction from PROTOCOL-1 **persisted at 3× the sample**, and the tool-execution
-gap is the largest: the treatment arm did its work with **fewer than half** the executed
+**CORRECTED**: "persisted at 3x the sample" implies a replication. **v1 and v2 are different
+treatments** - v2 admits the testing tools in VERIFY and rewrites the VERIFY instruction - so
+PROTOCOL-2 is not a repetition of PROTOCOL-1. What is supportable: an activity reduction
+appeared in **both** experiments, under two related but distinct controllers.
+
+The tool-execution gap is the largest: the treatment arm did its work with **fewer than half** the executed
 actions, against 32 controller refusals.
 
 These are **measurements from these runs**, not estimates of repeatable savings.
@@ -102,7 +126,8 @@ and is never exercised by the tests that pass beforehand.
 ## Not established
 
 - No claim that v2 helps or hurts completion. 6 vs 7 with six unstable cells settles nothing.
-- No efficiency *advantage* — a consistent, substantial activity reduction was measured twice;
-  whether it is repeatable, and whether it costs work on other tasks, is open.
+- No efficiency *advantage*. An activity reduction was measured in two experiments running
+  DIFFERENT controller versions, which is not a replication. Whether it is repeatable, and
+  whether it costs work on other tasks, is open.
 - Nothing about held-out performance. These five tasks remain development cases.
 - No claim that the controller prevents regressions. It did not prevent the one in its own arm.

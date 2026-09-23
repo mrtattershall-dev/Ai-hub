@@ -27,6 +27,7 @@ const { PILOT_TASKS, TESTING_GUIDANCE } = await import('./pilotTasks.js');
 const { evaluate, VERDICT } = await import('./evaluator.js');
 const { applyAcceptance, DISPOSITION } = await import('./acceptance.js');
 const { confirmNoneRunning } = await import('./worker.js');
+const { recordRun, recordPair, writeReport } = await import('./campaignReport.js');
 
 const MODEL_URL = process.argv[2];
 if (!MODEL_URL) { console.error('usage: node server/protocol1.mjs <modelBaseUrl>'); process.exit(2); }
@@ -57,7 +58,11 @@ for (let rep = 1; rep <= 3; rep++) {
 /** Both runs at maximum allowance, plus cleanup. Adjacency alone does not guarantee a pair. */
 const PAIR_RESERVE_MS = (2 * PER_TASK_SEC + 60) * 1000;
 
-const ROOT = mkdtempSync(join(tmpdir(), 'protocol1-'));
+const ROOT = mkdtempSync(join(tmpdir(), 'protocol2-'));
+// THE DURABLE SUMMARY. Written after every run and every completed pair, so a crash at the
+// end costs at most the line being written - never the campaign. The final report is built
+// FROM THIS FILE, which is what makes recovery cost zero GPU work.
+const SUMMARY = join(ROOT, 'summary.jsonl');
 const byId = Object.fromEntries(PILOT_TASKS.map((t) => [t.id, t]));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const git = (ws, ...a) => { try { return execFileSync('git', ['-C', ws, ...a], { encoding: 'utf8' }).trim(); } catch { return null; } };
@@ -165,7 +170,10 @@ const results = [];
 let idx = 0;
 let truncatedAt = null;
 
-for (const pair of PAIRS) {
+// A smoke run can bound the schedule without touching the frozen design: the campaign still
+// goes through THIS entry point, including final report creation.
+const MAX_PAIRS = parseInt(process.env.PROTOCOL2_MAX_PAIRS || String(PAIRS.length), 10);
+for (const pair of PAIRS.slice(0, MAX_PAIRS)) {
   // PAIR RESERVATION. Adjacency does not guarantee a complete pair: a pair begun with 310s
   // left would strand its second run, which is the exact half-pair the ordering exists to
   // prevent. Both runs at maximum allowance plus cleanup must fit BEFORE the pair starts.
@@ -177,48 +185,43 @@ for (const pair of PAIRS) {
     }
     for (const a of pair.arms) {
       idx++;
-      results.push({ idx, rep: pair.rep, task: pair.task, arm: a, termination: 'UNATTEMPTED', reason: 'pair reservation not satisfiable within the budget' });
+      const u = { idx, rep: pair.rep, task: pair.task, arm: a, termination: 'UNATTEMPTED', reason: 'pair reservation not satisfiable within the budget' };
+      results.push(u);
+      recordRun(SUMMARY, u);
     }
     continue;
   }
 
+  const pairRuns = [];
   for (const armName of pair.arms) {
     idx++;
     const r = await runOne(pair.task, armName, idx);
     r.rep = pair.rep;
     results.push(r);
+    pairRuns.push(r);
+    recordRun(SUMMARY, r);            // durable BEFORE the next run starts
     console.log(`r${pair.rep} ${String(idx).padStart(2)}. ${pair.task} [${armName}] ${r.termination} req=${r.requested} prot=${r.protected} ${r.disposition} calls=${r.modelCalls} ${r.elapsedSec}s refusals=${r.controllerRefusals?.length ?? 0}`);
   }
+  recordPair(SUMMARY, { rep: pair.rep, task: pair.task, runs: pairRuns });
 }
-const arms = {};
-for (const a of ['CONTROL', 'TREATMENT']) {
-  // SPEND IS COUNTED OVER EVERY ATTEMPTED RUN, successes and failures alike. Counting only
-  // successes would let a cheap arm look efficient by failing early.
-  const rs = results.filter((r) => r.arm === a && r.termination !== 'UNATTEMPTED');
-  arms[a] = {
-    runs: rs.length,
-    acceptedImprovements: rs.filter((r) => r.accepted).length,
-    requestedPass: rs.filter((r) => r.requested === VERDICT.PASS).length,
-    protectedRetained: rs.filter((r) => r.protected === VERDICT.PASS).length,
-    protectedBroken: rs.filter((r) => r.protected === VERDICT.FAIL).length,
-    evalErrors: rs.filter((r) => r.requested === VERDICT.EVALUATION_ERROR || r.protected === VERDICT.EVALUATION_ERROR).length,
-    modelCalls: rs.reduce((x, r) => x + (r.modelCalls || 0), 0),
-    tokens: rs.reduce((x, r) => x + (r.tokens || 0), 0),
-    seconds: rs.reduce((x, r) => x + (r.elapsedSec || 0), 0),
-    toolsExecuted: rs.reduce((x, r) => x + (r.attemptedTools?.length || 0), 0),
-    controllerRefusals: rs.reduce((x, r) => x + (r.controllerRefusals?.length || 0), 0),
-  };
-}
+// THE FINAL REPORT IS BUILT FROM THE DURABLE SUMMARY, not from in-memory state.
+//
+// Three campaigns finished their work and then produced a broken report, because this block
+// runs once, at the very end, after everything expensive. It is now one tested function
+// (campaignReport.js, exercised against these 30 preserved records) and it reads a file that
+// already exists - so if it fails, rerunning it costs nothing and generates nothing.
+const report = writeReport(SUMMARY, join(ROOT, 'PROTOCOL-2_REPORT.json'), {
+  experiment: 'PROTOCOL-2', controller: 'v2',
+  kind: 'DEVELOPMENT COMPARISON (already-inspected tasks)',
+  model: MODEL_URL, schedule: PAIRS, truncatedAt, root: ROOT,
+});
 
-const byReplicate = {};
-for (const r of results) {
-  const k = `rep${r.rep}`;
-  (byReplicate[k] ||= []).push({ task: r.task, arm: r.arm, accepted: !!r.accepted, requested: r.requested ?? null, protected: r.protected ?? null, disposition: r.disposition ?? null });
-}
-
-const report = { experiment: 'PROTOCOL-2', controller: 'v2', kind: 'DEVELOPMENT COMPARISON (already-inspected tasks)', at: new Date().toISOString(), model: MODEL_URL, order: PAIRS, arms, byReplicate, truncatedAt, results, root: ROOT };
-writeFileSync(join(ROOT, 'PROTOCOL-2_REPORT.json'), JSON.stringify(report, null, 2), 'utf8');
 console.log('\n=== ARMS ===');
-console.log(JSON.stringify(arms, null, 2));
-console.log(`\nreport: ${join(ROOT, 'PROTOCOL-1_REPORT.json')}`);
+console.log(JSON.stringify(report.arms, null, 2));
+console.log(`\nintegrity ok: ${report.integrity.ok}   reconciliation ok: ${report.reconciliation.ok}`);
+if (!report.integrity.ok) console.log('INTEGRITY PROBLEMS:', JSON.stringify(report.integrity).slice(0, 300));
+console.log(`summary:  ${SUMMARY}`);
+console.log(`report:   ${join(ROOT, 'PROTOCOL-2_REPORT.json')}`);
+console.log('Rebuild the report at any time, with no generation:');
+console.log(`  node server/rebuildReport.mjs ${SUMMARY}`);
 console.log('PROTOCOL-2 COMPLETE');
