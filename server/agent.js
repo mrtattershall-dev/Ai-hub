@@ -44,7 +44,7 @@ import { emitHostEvent, attachFileSink } from './hostEvent.js';
 // LEGASUS PHASE 2 - d2, the first LOAD-BEARING decision. See PHASE2-INTERVENTION_PREREG.md.
 // Off unless AGENT_D2_TARGETS names the campaign's protected deliverables, so ARM A of the
 // paired campaign is the hub exactly as Phase 1 left it.
-import { runInWorker, WorkerUnavailable, workerAvailable, WORKER_IMAGE } from './worker.js';
+import { runInWorker, WorkerUnavailable, WorkerUnconfirmed, workerAvailable, WORKER_IMAGE } from './worker.js';
 import { ROUTES_BOUNDED, noteUncoveredTraversal, refuseAtDetachedSite } from './routeBound.js';
 import { lockAuditDir } from './d2.js';
 import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState, mayMutate } from './d2.js';
@@ -627,6 +627,18 @@ function execAgentCommand(cmd, opts, cb) {
       cb(err, r.out, '');
     })
     .catch((e) => {
+      // COMPLETION UNCONFIRMED is NOT "never ran". The container started, so the workspace may
+      // already be half-written. Reported as such, and explicitly NOT retryable: re-running the
+      // same command against a workspace that was partially modified is how a run corrupts its
+      // own state while looking like it recovered.
+      if (e instanceof WorkerUnconfirmed) {
+        if (_activeRun) { (_activeRun.unconfirmed ||= []).push({ at: Date.now(), detail: e.detail || null }); }
+        return cb(Object.assign(new Error('completion unconfirmed'), { unconfirmed: true }),
+          '',
+          'COMPLETION UNCONFIRMED: this command STARTED but its completion could not be confirmed. '
+          + 'It may have partially run, so the workspace may already have changed. Do NOT simply repeat it - '
+          + 'inspect the current state first.');
+      }
       if (!(e instanceof WorkerUnavailable)) return cb(e, '', String(e.message || e));
       // Recorded on the run so a campaign can EXCLUDE it, and reported to the model as an
       // infrastructure fault rather than a failing command - a model told "exit 1" would

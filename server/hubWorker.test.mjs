@@ -96,7 +96,7 @@ try {
   console.log('\n=== 6. POSITIVE CONTROL for the no-effect claim ===');
   const ok = callTool(WS, 'run_command', { cmd: 'printf LEAKED_TO_HOST > leaked.txt; cat leaked.txt' });
   say(/LEAKED_TO_HOST/.test(ok) && existsSync(join(WS, 'leaked.txt')),
-    'the SAME command does create that file when the worker works - so its absence above means the command never ran');
+    'the SAME command does create that file when the worker works - so its absence above means the container was NEVER STARTED (NOT_STARTED, not merely unconfirmed)');
 } finally {
   try { rmSync(BASE, { recursive: true, force: true }); } catch { /* best effort */ }
 }

@@ -73,7 +73,11 @@ export async function workerAvailable() {
  */
 export function workerArgs(workspace, cmd, { image = WORKER_IMAGE } = {}) {
   return [
-    'run', '--rm',
+    'run',
+    // NO --rm. The detached flow asks the DAEMON for the exit status, and --rm deletes the
+    // container the instant it exits, so  reported "No such container" for every
+    // command that finished normally - an authoritative status destroyed by a cleanup flag.
+    // Removal is explicit in the finally block instead.
     '--network', 'none',              // no credentials, no APIs, no remote anything
     '--cap-drop', 'ALL',
     '--security-opt', 'no-new-privileges',
@@ -90,68 +94,113 @@ export function workerArgs(workspace, cmd, { image = WORKER_IMAGE } = {}) {
   ];
 }
 
-/** Marks output produced INSIDE the container. Absence means the command never ran there. */
-const RAN_SENTINEL = '__LEGASUS_WORKER_EXIT__';
+/**
+ * Outcome of an attempt to run a command in the worker. THREE states, not two.
+ *
+ *   COMPLETED     the daemon reported an exit status. An ordinary result.
+ *   UNCONFIRMED   the container STARTED but no authoritative status came back. The command may
+ *                 have run partially. EFFECTS ARE POSSIBLE.
+ *   NOT_STARTED   the container was never created or started. No effects are possible.
+ *
+ * WHY THREE. An earlier version had two, and inferred "never ran" from a missing completion
+ * sentinel printed by the command itself. That was wrong twice over:
+ *
+ *   1. A missing sentinel does NOT prove the command never ran. It is equally consistent with
+ *      partial execution before a timeout, a kill, or lost output - after which the workspace
+ *      may already have been modified. Treating that as "never ran" would invite a retry
+ *      against a workspace that had already been half-written.
+ *   2. The sentinel sat on COMMAND-CONTROLLED stdout. The model's command runs as a child of
+ *      the wrapper shell and can read the wrapper's argv from /proc, so it could print the
+ *      sentinel and any exit code it liked. Status must never come from the thing being judged.
+ *
+ * Status now comes from the DAEMON (`docker wait`), which the command cannot influence.
+ */
+export const WORKER_STATUS = Object.freeze({ COMPLETED: 'COMPLETED', UNCONFIRMED: 'UNCONFIRMED', NOT_STARTED: 'NOT_STARTED' });
 
 /**
- * Thrown when the worker itself could not run the command.
+ * Thrown when the worker could not run the command AT ALL (NOT_STARTED).
  *
  * THE FROZEN RULE: worker failure is an EXECUTION ERROR, never permission to retry on the host.
- * A fallback would silently move model-written code outside the qualified boundary at exactly
- * the moment something was already wrong - and the run would look normal. There is no host
- * fallback anywhere in this module, and the run must fail instead.
+ * There is no host fallback in this module.
  */
 export class WorkerUnavailable extends Error {
   constructor(detail) {
-    // Deliberately terse and argv-free. Docker's own failure text embeds the full command line,
-    // including the host workspace path and every isolation flag.
+    // Terse and argv-free: docker's own failure text embeds the full command line, including
+    // the host workspace path and every isolation flag.
     super('the isolated worker could not run this command');
     this.name = 'WorkerUnavailable';
-    this.detail = detail;          // host-side diagnostics, for the run record only
+    this.detail = detail;
   }
 }
+
+/** Raised when the container ran but its completion could not be confirmed. */
+export class WorkerUnconfirmed extends Error {
+  constructor(detail) {
+    super('the command started but its completion could not be confirmed');
+    this.name = 'WorkerUnconfirmed';
+    this.effectsPossible = true;      // the workspace may already have been modified
+    this.detail = detail;
+  }
+}
+
+const dockerRaw = async (args, timeoutMs = 60_000) => {
+  try {
+    const { stdout, stderr } = await exec('docker', args, { timeout: timeoutMs, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, windowsHide: true });
+    return { ok: true, out: String(stdout), err: String(stderr) };
+  } catch (e) {
+    // NEVER e.message: execFile puts the ENTIRE argv in it, leaking the workspace path and the
+    // isolation flags. This already made a probe report the host filesystem as visible.
+    return { ok: false, out: String(e.stdout || ''), err: String(e.stderr || ''), code: e.code ?? null };
+  }
+};
 
 /**
  * Run one model-chosen command inside the isolated worker.
  *
- * TWO OUTCOMES THAT MUST NOT BE CONFUSED:
- *
- *   the command RAN in the worker and exited non-zero   -> an ordinary result the model sees
- *   the worker could not run it at all                  -> WorkerUnavailable, the run errors
- *
- * Exit codes cannot make that distinction reliably: docker reuses the command's status, and its
- * own 125/126/127 conventions overlap with statuses a real command can return. So the container
- * PRINTS A SENTINEL carrying the true exit code. Output containing it was produced inside the
- * worker; output without it never got there, whatever the exit code says.
- *
- * The sentinel is stripped before the model sees anything.
+ * Detached start + `docker wait` deliberately, rather than a single blocking `docker run`:
+ * it separates "the container never started" from "it started and we lost the answer", and it
+ * takes the exit status from the daemon instead of from the command's own output.
  */
 export async function runInWorker(workspace, cmd, opts = {}) {
-  // Single-quote the model's command so nothing in it is reinterpreted by the wrapper, and
-  // run it under `timeout` INSIDE the container. A command killed by the timeout still ran
-  // in the worker, so it reports an exit code rather than an infrastructure failure.
-  const quoted = "'" + String(cmd).replace(/'/g, `'\\''`) + "'";
   const sec = opts.timeoutSec || 600;
-  const wrapped = `timeout ${sec} sh -c ${quoted}; printf '%s%d' '${RAN_SENTINEL}' "$?"`;
-  const args = workerArgs(workspace, wrapped, opts);
-  let raw, failure = null;
-  try {
-    const { stdout, stderr } = await exec('docker', args, { timeout: (opts.timeoutSec || 600) * 1000 + 30_000, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, windowsHide: true });
-    raw = String(stdout) + String(stderr);
-  } catch (e) {
-    // NEVER read e.message here: execFile puts the ENTIRE argv in it, which would leak the host
-    // workspace path and the isolation flags into model-visible output. This already caused a
-    // probe to report the host filesystem as visible when it was not.
-    raw = String(e.stdout || '') + String(e.stderr || '');
-    failure = { code: e.code ?? null, killed: !!e.killed };
+  // The command goes in UNWRAPPED. An in-container `timeout` was tried and abandoned: BusyBox
+  // returns 143 rather than coreutils' 124, and nested under `sh -c` the container still
+  // reported exit 0 for a command that was demonstrably killed mid-way. In-container status is
+  // not a reliable instrument - which is the same lesson as the sentinel, one layer down.
+  // The timeout is enforced HOST-side instead, and every status comes from the daemon.
+  const args = workerArgs(workspace, cmd, opts);
+  const started = await dockerRaw(['run', '-d', ...args.slice(1)], 120_000);
+  const cid = started.ok ? started.out.trim().split(/\s+/).pop() : '';
+  if (!started.ok || !/^[0-9a-f]{12,64}$/.test(cid)) {
+    // Never created or started, so no effect on the workspace is possible.
+    throw new WorkerUnavailable({ phase: 'start', code: started.code ?? null, stderrHead: started.err.replace(/\s+/g, ' ').trim().slice(0, 300) });
   }
 
-  const at = raw.lastIndexOf(RAN_SENTINEL);
-  if (at < 0) {
-    // No sentinel: the command never executed inside the worker. Infrastructure, not a result.
-    throw new WorkerUnavailable({ ...failure, stderrHead: raw.replace(/\s+/g, ' ').trim().slice(0, 300) });
+  let timedOut = false;
+  try {
+    // Race the daemon's own wait against a host timer.
+    let timer;
+    const waited = await Promise.race([
+      dockerRaw(['wait', cid], sec * 1000 + 60_000),
+      new Promise((r) => { timer = setTimeout(() => r('TIMEOUT'), sec * 1000); }),
+    ]).finally(() => clearTimeout(timer));
+
+    let result = waited;
+    if (waited === 'TIMEOUT') {
+      timedOut = true;
+      await dockerRaw(['kill', cid], 60_000);
+      result = await dockerRaw(['wait', cid], 60_000);   // authoritative status after the kill
+    }
+
+    const logs = await dockerRaw(['logs', cid], 60_000);
+    const out = logs.out + logs.err;
+    const exit = parseInt(String(result.out || '').trim(), 10);
+    if (!result.ok || Number.isNaN(exit)) {
+      // It STARTED. Its writes may be half-applied. This is not "never ran".
+      throw new WorkerUnconfirmed({ phase: 'wait', timedOut, cid: cid.slice(0, 12), outHead: out.replace(/\s+/g, ' ').trim().slice(0, 300) });
+    }
+    return { status: WORKER_STATUS.COMPLETED, ok: exit === 0 && !timedOut, exit, timedOut, out };
+  } finally {
+    await dockerRaw(['rm', '-f', cid], 60_000);
   }
-  const exit = parseInt(raw.slice(at + RAN_SENTINEL.length), 10);
-  const out = raw.slice(0, at);
-  return { ok: exit === 0, ran: true, exit: Number.isNaN(exit) ? null : exit, out };
 }
