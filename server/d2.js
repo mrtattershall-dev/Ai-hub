@@ -36,7 +36,7 @@
  */
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync } from 'node:fs';
 import { join, basename, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -391,9 +391,19 @@ export async function quarantine(workspace, runId, candidateRef, auditDir = null
   //
   // Symmetric by construction: the CALLER invokes this identically in both arms on a
   // violation. Only restoration authority differs.
-  const dir = auditDir || join(tmpdir(), 'legasus-audit');
+  // ONE DIRECTORY PER RUN, so the access boundary can be applied per capture.
+  //
+  // With every bundle in one shared directory, `lockAuditDir` would deny READ on the whole
+  // store - including the `bundle verify` of the NEXT run's capture. The only way to capture
+  // again would be to unlock, which re-exposes EVERY earlier run's artifact for the duration
+  // of that capture. A per-run subdirectory is locked on its own the moment it is verified, so
+  // no already-locked artifact is ever unlocked again and no shared re-exposure window exists.
+  // The run id is sanitised because it becomes a path segment.
+  const root = auditDir || join(tmpdir(), 'legasus-audit');
+  const safeId = String(runId).replace(/[^A-Za-z0-9._-]/g, '_');
+  const dir = join(root, safeId);
   try { mkdirSync(dir, { recursive: true }); } catch (e) { return { ok: false, error: `audit dir: ${e.message}` }; }
-  const bundle = join(dir, `${runId}.bundle`);
+  const bundle = join(dir, 'candidate.bundle');
 
   // RESOLVE ONCE, to a FULL commit id, and use that same id for capture AND verification.
   // The caller may pass a symbolic ref ('HEAD'), a short sha or a ref name; resolving at the
@@ -446,11 +456,54 @@ export async function quarantine(workspace, runId, candidateRef, auditDir = null
   return {
     ok: true,
     bundle,
+    dir,                    // the per-run audit directory - the unit lockAuditDir() denies
     branch: tmpRef.replace('refs/heads/', ''),
     recover: `git clone -b ${tmpRef.replace('refs/heads/', '')} "${bundle}" <dir>`,
     tree: want,
     visibleInWorkspace: false,
   };
+}
+
+/**
+ * Make the audit store UNREADABLE to the run host's user, while leaving it writable.
+ *
+ * An external directory and a stripped environment variable are DISCOVERABILITY measures, not
+ * access control: the model's commands run as the same OS user and can read anything that user
+ * can. This is the actual boundary.
+ *
+ * Deny READ only. Writes still succeed, so the hub can keep capturing; nothing on this host can
+ * read the captures back, including the hub. That is the right shape for an audit artifact:
+ * recovery is an offline act by someone with different access, not something the campaign's own
+ * machinery can reach.
+ *
+ * MUST be applied AFTER verification - `bundle verify` and `list-heads` need to read.
+ *
+ * Returns { ok, applied } and NEVER claims a boundary it did not establish: a failure here is
+ * reported so the caller can refuse to treat the store as isolated.
+ */
+export async function lockAuditDir(dir) {
+  const user = process.env.USERNAME || process.env.USER;
+  if (!user) return { ok: false, error: 'no user to deny' };
+  try {
+    if (process.platform === 'win32') {
+      await exec('icacls', [dir, '/deny', `${user}:(OI)(CI)(R)`, '/T'], { windowsHide: true });
+    } else {
+      await exec('chmod', ['-R', 'a-r', dir]);
+    }
+  } catch (e) {
+    // icacls reports failures per-object and still applies others, so the exit code alone is
+    // not the answer - VERIFY by trying to read, below.
+    void e;
+  }
+  // PROVE it, the same way the probes do: attempt a read and require it to fail for an ACCESS
+  // reason. A missing file would also "fail", so read the directory we just wrote to.
+  try {
+    readdirSync(dir);
+    return { ok: false, error: 'the audit directory is still readable after the deny' };
+  } catch (e) {
+    const denied = e.code === 'EPERM' || e.code === 'EACCES';
+    return denied ? { ok: true, applied: true, code: e.code } : { ok: false, error: `unreadable for the wrong reason: ${e.code}` };
+  }
 }
 
 /**

@@ -167,5 +167,6 @@ console.log('  ESTABLISHED: no quarantine refs, no workspace-local bundle files,
 console.log('               environment variable were found by the listed probes.');
 console.log('  NOT ESTABLISHED: that the candidate is inaccessible. Its objects are readable by sha');
 console.log('               inside the workspace, and the audit store is readable by the same OS user.');
+console.log('               ACCESS denial is a separate, now-qualified claim: see d2Access.test.mjs.');
 console.log(`  -> ${failed ? 'A PROBE FAILED - investigate before any campaign.' : 'discoverability reduced; access NOT restricted.'}`);
 process.exit(failed ? 1 : 0);
