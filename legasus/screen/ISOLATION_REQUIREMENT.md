@@ -1,7 +1,8 @@
 # ISOLATED EXECUTION ENVIRONMENT — capability survey and requirement
 
 Date: 2026-09-23 (corrected same day)
-Status of step 3: **BLOCKED ON THIS LAPTOP.** Same-user ACLs are abandoned; the bypass is
+Status: **ISOLATION QUALIFIED 2026-09-23, 21/21** (`server/workerIsolation.test.mjs`).
+Step 3 was blocked; the blocker is resolved and the qualification has run. Same-user ACLs are abandoned; the bypass is
 demonstrated and preserved (`server/d2Revoke.test.mjs`, red by design).
 
 ## The arrangement being implemented
@@ -126,3 +127,62 @@ policy: isolation is apparatus, never treatment.
 
 The paired prevention result stands. The failed ACL experiment limits the **campaign
 environment**, not that completed local result.
+
+---
+
+# RESOLVED — 2026-09-23, 21/21
+
+## The blocker, finally
+
+Not terms acceptance, not provisioning, not virtualization. Socket files Docker must remove
+before listening on them could not be accessed at all, in two directories:
+
+    %LOCALAPPDATA%\Docker\run\                       (Inference manager)
+    %LOCALAPPDATA%\docker-secrets-engine\engine.sock (Secrets Engine)
+
+Each launch died at the first such socket, so the engine never started, so there was no WSL
+distro and no VM log. Renaming both directories aside — non-destructive, originals kept as
+`*.broken-*` — let Docker recreate them. Engine up: `server=29.6.1 os=linux`.
+
+Nothing here needed the operator, and nothing needed a reboot.
+
+## The image is pinned by digest
+
+    node@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85   # node:22-alpine
+
+A tag is a moving pointer. `node:22-alpine` resolving to a different build between ARM A and
+ARM B would make the arms differ in their toolchain while every record still said they matched.
+Both arms run the same digest, the same mounts, the same limits, the same `--network none`.
+
+## A probe artifact caught by the failing assertion
+
+The first run reported **the host filesystem is visible** — and it was wrong. On a non-zero exit
+`runInWorker` fell back to `e.message`, which execFile fills with the **entire argv**, including
+`-v C:\Users\tatte\...`. The probe matched `Users` in its own harness output, not in the
+container.
+
+Two things follow, and the second matters more:
+
+1. The isolation was fine all along — `/mnt` is empty, `/host_mnt` and `/c` do not exist.
+2. **That fallback was a real leak.** Any failing command would have handed the model the host
+   workspace path and every isolation flag. Removed: worker output is now stdout+stderr only.
+
+## What is qualified
+
+    permitted workspace operations   READ, WRITE (landing on the host), run tools    PASS
+    known-path audit read            nothing returned                                PASS
+    cross-run repository read        nothing returned                                PASS
+    host filesystem visible          no                                              PASS
+    mount from inside                permission denied                               PASS
+    docker CLI / socket              absent                                          PASS
+    root inside                      no (uid 1000)                                   PASS
+    network                          none                                            PASS
+    NEGATIVE CONTROL: same-user ACL revoke on the host                    STILL WORKS PASS
+
+The last line is what makes the rest mean anything: the probe can still detect success where
+success exists.
+
+## Still not claimed
+
+Container escape resistance against a kernel-level attack. The claim is scoped to the campaign's
+need — an agent command route that cannot reach host audit storage, other runs, or credentials.

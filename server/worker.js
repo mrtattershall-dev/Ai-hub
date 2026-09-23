@@ -43,7 +43,12 @@ import { promisify } from 'node:util';
 const exec = promisify(execFile);
 
 /** The image the worker runs. Pinned, because "node:latest" is a different experiment later. */
-export const WORKER_IMAGE = process.env.AGENT_WORKER_IMAGE || 'node:22-alpine';
+// PINNED BY DIGEST, not by tag. A tag is a moving pointer: node:22-alpine resolving to a
+// different build between ARM A and ARM B would make the two arms differ in their toolchain
+// while every record still said they matched. The digest makes the image an experimental
+// constant. Changing it is a deliberate act that shows up in a diff.
+export const WORKER_IMAGE = process.env.AGENT_WORKER_IMAGE
+  || 'node@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85';  // node:22-alpine
 
 /** Is an isolated worker available at all? The campaign must refuse to start without one. */
 export async function workerAvailable() {
@@ -87,6 +92,12 @@ export async function runInWorker(workspace, cmd, opts = {}) {
     const { stdout, stderr } = await exec('docker', args, { timeout: (opts.timeoutSec || 600) * 1000 + 30_000, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, windowsHide: true });
     return { ok: true, out: String(stdout) + String(stderr) };
   } catch (e) {
-    return { ok: false, out: String(e.stdout || '') + String(e.stderr || e.message || '') };
+    // NEVER fall back to e.message. execFile puts the ENTIRE argv in it, so a failing command
+    // would hand back the host workspace path and every isolation flag - leaking the mount
+    // location into model-visible output, and giving a probe something to match on that came
+    // from the harness rather than from the container. That is exactly how this probe first
+    // reported the host filesystem as visible when it was not.
+    const out = String(e.stdout || '') + String(e.stderr || '');
+    return { ok: false, out: out || `ERROR: command failed (exit ${e.code ?? 'unknown'})` };
   }
 }
