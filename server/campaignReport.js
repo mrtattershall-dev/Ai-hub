@@ -24,13 +24,36 @@
 import { appendFileSync, writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 
-/** Every field a run must carry into the report. Missing ones are reported, never silent. */
-export const REQUIRED_RUN_FIELDS = Object.freeze([
-  'idx', 'rep', 'task', 'arm', 'termination',
-  'requested', 'protected', 'disposition',
-  'modelCalls', 'elapsedSec',
-]);
+/**
+ * REQUIRED FIELDS, BY STATUS. Not one list for every run.
+ *
+ * ENDURANCE-2 reported integrity:false because 77 UNATTEMPTED runs had no verdict - which is
+ * correct for a run that never happened. One flat list made correct data look broken, and a
+ * check that fires on correct data teaches its reader to ignore it.
+ *
+ * Skipping UNATTEMPTED entirely would be the opposite error: it would stop checking that an
+ * unattempted run carries the fields it SHOULD have - its identity and why it was skipped.
+ * So each status has its own list.
+ */
+export const REQUIRED_FIELDS_BY_STATUS = Object.freeze({
+  // a run that produced a verdict must carry the whole record
+  COMPLETED: ['idx', 'rep', 'task', 'arm', 'termination', 'requested', 'protected', 'disposition', 'modelCalls', 'elapsedSec'],
+  // interrupted: identity and reason, but no verdict is owed - it was never established
+  INTERRUPTED: ['idx', 'rep', 'task', 'arm', 'termination', 'reason'],
+  // never ran: identity and why, and nothing else
+  UNATTEMPTED: ['idx', 'rep', 'task', 'arm', 'termination', 'reason'],
+});
 
+/** Back-compat for callers that want the completed-run list. */
+export const REQUIRED_RUN_FIELDS = REQUIRED_FIELDS_BY_STATUS.COMPLETED;
+
+/** Which list applies to a run. Anything unrecognised is held to the COMPLETED standard. */
+export function requiredFieldsFor(run) {
+  const t = String(run?.termination || '').toUpperCase();
+  if (t === 'UNATTEMPTED') return REQUIRED_FIELDS_BY_STATUS.UNATTEMPTED;
+  if (t === 'INTERRUPTED') return REQUIRED_FIELDS_BY_STATUS.INTERRUPTED;
+  return REQUIRED_FIELDS_BY_STATUS.COMPLETED;
+}
 /**
  * Append one run to the durable summary. Called after EVERY run, before anything else.
  *
@@ -82,12 +105,8 @@ export function buildReport(summaryPath, meta = {}) {
   }
   const missingFields = [];
   for (const r of runs) {
-    // AN UNATTEMPTED RUN HAS NO VERDICT, and that is correct rather than missing. ENDURANCE-2
-    // reported integrity:false purely because 77 UNATTEMPTED runs had null requested/protected -
-    // the CHECK was wrong, not the campaign. A check that fires on correct data trains its
-    // reader to ignore it.
-    if (r.termination === 'UNATTEMPTED') continue;
-    const gaps = REQUIRED_RUN_FIELDS.filter((f) => r[f] === undefined || r[f] === null);
+    // Each status is held to ITS OWN standard - see REQUIRED_FIELDS_BY_STATUS.
+    const gaps = requiredFieldsFor(r).filter((f) => r[f] === undefined || r[f] === null);
     if (gaps.length) missingFields.push({ run: `${r.rep}/${r.task}/${r.arm}`, gaps });
   }
 
@@ -123,12 +142,24 @@ export function buildReport(summaryPath, meta = {}) {
   reconciliation.ok = reconciliation.runsInSummary === reconciliation.runsCounted
     && reconciliation.callsInSummary === reconciliation.callsCounted;
 
+  // AUTOMATIC STATUS ACCOUNTING. Completed, interrupted and unattempted are counted here so
+  // no one has to reconstruct them from the results by hand.
+  const byStatus = { COMPLETED: 0, INTERRUPTED: 0, UNATTEMPTED: 0, OTHER: 0 };
+  for (const r of runs) {
+    const t = String(r.termination || '').toUpperCase();
+    if (t === 'UNATTEMPTED') byStatus.UNATTEMPTED++;
+    else if (t === 'INTERRUPTED') byStatus.INTERRUPTED++;
+    else byStatus.COMPLETED++;
+  }
+  byStatus.total = runs.length;
+
   const byReplicate = {};
   for (const r of runs) (byReplicate[`rep${r.rep}`] ||= []).push({ task: r.task, arm: r.arm, accepted: !!r.accepted, requested: r.requested ?? null, protected: r.protected ?? null, disposition: r.disposition ?? null });
 
   return {
     ...meta,
     builtAt: new Date().toISOString(),
+    byStatus,
     integrity: { duplicates, missingFields, ok: duplicates.length === 0 && missingFields.length === 0 },
     reconciliation,
     arms, byReplicate, pairs, runs,

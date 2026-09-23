@@ -126,8 +126,21 @@ export async function reconcile(entry) {
  * It is supplied by the caller so this module can be qualified with scripted commands, before
  * any model compute.
  */
+/**
+ * Record a result AND notify the caller, in that order.
+ *
+ * The hook is how a campaign persists its report input as it goes rather than at the end.
+ * A throwing hook must not take the campaign down with it - the batch is the thing that
+ * matters, and a failed summary line is recoverable from the journal.
+ */
+function pushResult(results, onTaskEnd, r) {
+  results.push(r);
+  if (typeof onTaskEnd === 'function') { try { onTaskEnd(r); } catch { /* never fatal */ } }
+  return r;
+}
+
 export async function runBatch(tasks, opts) {
-  const { workspacesDir, auditDir, perTaskSec = 300, totalSec = 1800, runTask, evalImage } = opts;
+  const { workspacesDir, auditDir, perTaskSec = 300, totalSec = 1800, runTask, evalImage, onTaskEnd } = opts;
   const journal = new Journal(opts.journalPath);
   mkdirSync(workspacesDir, { recursive: true });
   mkdirSync(auditDir, { recursive: true });
@@ -209,20 +222,20 @@ export async function runBatch(tasks, opts) {
       const r = await reconcile(before);
       if (r.action === 'interrupt') {
         journal.record({ event: 'task_end', task: task.id, state: TASK_STATE.INTERRUPTED, reason: r.reason });
-        results.push({ task: task.id, state: TASK_STATE.INTERRUPTED, reason: r.reason });
+        pushResult(results, onTaskEnd, { task: task.id, state: TASK_STATE.INTERRUPTED, reason: r.reason });
         continue;
       }
-      if (before.state === 'ended') { results.push({ task: task.id, state: before.finalState, resumedFromJournal: true }); continue; }
+      if (before.state === 'ended') { pushResult(results, onTaskEnd, { task: task.id, state: before.finalState, resumedFromJournal: true }); continue; }
     }
 
     if (halted) {
       journal.record({ event: 'task_end', task: task.id, state: TASK_STATE.UNATTEMPTED, reason: `batch halted: ${halted}` });
-      results.push({ task: task.id, state: TASK_STATE.UNATTEMPTED, reason: `batch halted: ${halted}` });
+      pushResult(results, onTaskEnd, { task: task.id, state: TASK_STATE.UNATTEMPTED, reason: `batch halted: ${halted}` });
       continue;
     }
     if (Date.now() >= deadline) {
       journal.record({ event: 'task_end', task: task.id, state: TASK_STATE.UNATTEMPTED, reason: 'total budget exhausted' });
-      results.push({ task: task.id, state: TASK_STATE.UNATTEMPTED, reason: 'total budget exhausted' });
+      pushResult(results, onTaskEnd, { task: task.id, state: TASK_STATE.UNATTEMPTED, reason: 'total budget exhausted' });
       continue;
     }
 
@@ -279,7 +292,7 @@ export async function runBatch(tasks, opts) {
       halted = `could not confirm the worker stopped: ${stopped.reason}`;
       journal.record({ event: 'batch_halt', task: task.id, reason: halted });
       journal.record({ event: 'task_end', task: task.id, state: TASK_STATE.INTERRUPTED, reason: halted });
-      results.push({ task: task.id, state: TASK_STATE.INTERRUPTED, reason: halted });
+      pushResult(results, onTaskEnd, { task: task.id, state: TASK_STATE.INTERRUPTED, reason: halted });
       continue;
     }
 
@@ -298,7 +311,7 @@ export async function runBatch(tasks, opts) {
       halted = `the worker could not run the task: ${outcome.error || outcome.status}`;
       journal.record({ event: 'batch_halt', task: task.id, reason: halted });
       journal.record({ event: 'task_end', task: task.id, state: TASK_STATE.UNATTEMPTED, finalState: TASK_STATE.UNATTEMPTED, reason: halted });
-      results.push({ task: task.id, state: TASK_STATE.UNATTEMPTED, reason: halted });
+      pushResult(results, onTaskEnd, { task: task.id, state: TASK_STATE.UNATTEMPTED, reason: halted });
       continue;
     }
 
@@ -332,7 +345,7 @@ export async function runBatch(tasks, opts) {
       const termination = outcome.timedOut ? 'TIMEOUT' : 'COMPLETION_UNCONFIRMED';
       // ACCEPTANCE IS MANDATORY, including for a task that ran out of budget.
       const acc = await finalise(ws, task, terminalEval, startRef, termination);
-      results.push({ task: task.id, state: acc.state, termination, verdict: terminalEval, partialAt: keep, outcome, acceptance: acc.acceptance, baselineTree: acceptedBaselineTree });
+      pushResult(results, onTaskEnd, { task: task.id, state: acc.state, termination, verdict: terminalEval, partialAt: keep, outcome, acceptance: acc.acceptance, baselineTree: acceptedBaselineTree });
       if (acc.halt) { halted = acc.halt; journal.record({ event: 'batch_halt', task: task.id, reason: halted }); }
       continue;
     }
@@ -345,7 +358,7 @@ export async function runBatch(tasks, opts) {
     }
     // ACCEPTANCE IS MANDATORY. No task is finalised without it.
     const acc = await finalise(ws, task, verdict, startRef, 'ENDED');
-    results.push({ task: task.id, state: acc.state, termination: 'ENDED', verdict, outcome, acceptance: acc.acceptance, baselineTree: acceptedBaselineTree });
+    pushResult(results, onTaskEnd, { task: task.id, state: acc.state, termination: 'ENDED', verdict, outcome, acceptance: acc.acceptance, baselineTree: acceptedBaselineTree });
     if (acc.halt) { halted = acc.halt; journal.record({ event: 'batch_halt', task: task.id, reason: halted }); }
   }
 

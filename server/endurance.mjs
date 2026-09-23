@@ -88,6 +88,25 @@ const api = async (base, path, init) => {
   try { return JSON.parse(t); } catch { return { raw: t.slice(0, 300) }; }
 };
 
+/** The summary row for one result. One definition, used incrementally AND at the end. */
+function toSummaryRow(r, task, idx) {
+  return {
+    idx, rep: task?.rep ?? 0, task: r.task,
+    arm: task?.faultProbe ? 'FAULT_PROBE' : 'SINGLE',
+    termination: r.termination || r.state,
+    requested: r.verdict?.requested?.verdict ?? null,
+    protected: r.verdict?.protected?.verdict ?? null,
+    disposition: r.acceptance?.disposition ?? r.state,
+    accepted: !!r.acceptance?.countsAsCompletion,
+    reason: r.reason ?? null,
+    modelCalls: r.outcome?.modelCalls ?? 0,
+    tokens: r.outcome?.tokens ?? 0,
+    elapsedSec: r.outcome?.elapsedSec ?? 0,
+    toolExecutions: r.outcome?.toolExecutions ?? 0,
+    state: r.state,
+  };
+}
+
 /** One task through the real hub, in the fully integrated configuration. */
 async function runTask(ws, task, ctx) {
   // THE FAULT PROBE BYPASSES THE MODEL ENTIRELY. It applies its scripted break and returns,
@@ -163,29 +182,27 @@ const out = await runBatch(QUEUE, {
   perTaskSec: PER_TASK_SEC,
   totalSec: TOTAL_SEC - RESERVE_SEC,
   chain: false,                       // each task from its own seed
+  // PERSIST INCREMENTALLY. This used to write the summary AFTER runBatch returned, so a
+  // crash at minute 110 would have left the report with no input at all - the exact defect
+  // fixed in protocol2.mjs and not carried here. It did not bite in ENDURANCE-2; it was
+  // recorded as a weakness the run passed WITH, not because it was absent.
+  onTaskEnd: (r) => {
+    const task = QUEUE.find((q) => q.id === r.task);
+    recordRun(SUMMARY, toSummaryRow(r, task, QUEUE.findIndex((q) => q.id === r.task) + 1));
+  },
   runTask,
 });
 
 // ── durable summary, then the automatic report ──
-// PROBES ARE RECORDED UNDER THEIR OWN ARM, so they never touch the productivity totals.
+// BACKFILL ONLY. Every attempt was already persisted as it finished; this catches anything
+// the hook could not see (for example results produced by an early-exit path).
+const { readSummary } = await import('./campaignReport.js');
+const already = new Set(readSummary(SUMMARY).runs.map((r) => r.task));
 for (const r of out.results) {
+  if (already.has(r.task)) continue;
   const task = QUEUE.find((q) => q.id === r.task);
-  recordRun(SUMMARY, {
-    idx: out.results.indexOf(r) + 1, rep: task?.rep ?? 0, task: r.task,
-    arm: task?.faultProbe ? 'FAULT_PROBE' : 'SINGLE',
-    termination: r.termination || r.state,
-    requested: r.verdict?.requested?.verdict ?? null,
-    protected: r.verdict?.protected?.verdict ?? null,
-    disposition: r.acceptance?.disposition ?? r.state,
-    accepted: !!r.acceptance?.countsAsCompletion,
-    modelCalls: r.outcome?.modelCalls ?? 0,
-    tokens: r.outcome?.tokens ?? 0,
-    elapsedSec: r.outcome?.elapsedSec ?? 0,
-    toolExecutions: r.outcome?.toolExecutions ?? 0,
-    state: r.state,
-  });
+  recordRun(SUMMARY, toSummaryRow(r, task, out.results.indexOf(r) + 1));
 }
-
 const elapsedSec = Math.round((Date.now() - T0) / 1000);
 const stopped = await confirmNoneRunning({ timeoutMs: 30_000 });
 

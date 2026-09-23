@@ -11,7 +11,7 @@ No operator intervention at any point.
 | 1 | stops within budget, no active work left behind | **YES** — `confirmNoneRunning` asked the daemon |
 | 2 | preserves accepted work / rolls back regressions | **YES — and fully exercised this time** |
 | 3 | accounts for every attempt | **YES** — 208/208, including 77 UNATTEMPTED |
-| 4 | final report produced automatically | **YES** — written unaided, reconciliation true |
+| 4 | final report produced automatically | **YES, with a caveat** — written unaided, but two of its own checks were wrong and needed human investigation |
 
 ## Criterion 2 was exercised properly, and by the model
 
@@ -19,7 +19,8 @@ ENDURANCE-1 could not demonstrate rollback because nothing broke. This run had *
 protected-behaviour failures, and all fourteen were restored**:
 
     model runs that broke protected behaviour   9   ->  RESTORED 9/9
-    scripted fault probes attempted             5   ->  RESTORED 5/5
+    scripted fault probes:  5 of 8 scheduled ATTEMPTED (3 unattempted, budget)
+                            5 of 5 attempted RESTORED
 
 The nine are the important ones: **real regressions, produced by the model, during unattended
 operation, every one detected and rolled back** with the candidate preserved. The five probes
@@ -39,8 +40,10 @@ confirm the machinery fires on demand; the nine confirm it fires on the thing it
 
 The scripted probes are excluded from every number above; they are recorded under their own arm.
 
-**The accepted count is not evidence of capability.** The five tasks repeat forty times over.
-54 of 126 is what repetition of five already-inspected tasks produced, nothing more.
+**CORRECTED WORDING.** These are **54 successful attempts on five repeated tasks**, not 54
+distinct improvements accumulating in a project. Each ran from its own frozen seed and was
+discarded afterwards; nothing built on anything. They are evidence of performance on THIS
+workload. Generalisation is untested.
 
 ## Two reporting defects, both in MY checks rather than the campaign
 
@@ -78,3 +81,29 @@ NOT ESTABLISHED
 - Nothing about two days. This establishes two hours.
 - Protected checks passing shows the **checked** behaviour survived — not that the model
   preserved everything, nor that the hub's guards contributed nothing.
+
+---
+
+# NARROWING: "clean, unaided reporting" was too strong
+
+The report **was generated automatically** — that part stands, and it is the criterion that had
+failed three times.
+
+But it then required **human investigation and two check fixes** before it could be read
+correctly: `integrity: false` was a phantom, and the probe line understated recovery. Automatic
+generation and trustworthy output are different properties, and only the first was demonstrated
+on the night.
+
+**Both versions are preserved:**
+
+    ENDURANCE-2_REPORT-AS-GENERATED.json   integrity.ok false, 77 runs flagged
+    ENDURANCE-2_REPORT-corrected.json      integrity.ok true,   0 runs flagged
+
+The arm totals are **byte-identical** between them. Only the checks changed.
+
+## And the remaining flag is real
+
+Replayed through the repaired path, the `requested`/`protected` false alarm is gone — but the
+same 77 runs are still flagged, now for a missing **`reason`**. That is correct: the old row
+writer never recorded WHY a run was skipped, so the historical records genuinely cannot say.
+The check now reports a real omission instead of a phantom one, and the new writer records it.
