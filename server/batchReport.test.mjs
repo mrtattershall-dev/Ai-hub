@@ -68,6 +68,16 @@ try {
   note('On the unfixed batch.js every one of these was undefined - which is how the pilot');
   note('reported eleven null columns while the journal held the data all along.');
 
+  // ── 1b. TERMINATION AND BEHAVIOUR ARE SEPARATE AXES ──
+  console.log('\n=== 1b. a timeout still gets a behavioural verdict, on its own axis ===');
+  const slow = out.results.find((r) => r.task === 'slow');
+  say(slow?.termination === 'TIMEOUT', 'the timed-out task records termination=TIMEOUT (' + slow?.termination + ')');
+  say(!!slow?.verdict?.verdict, 'AND it still received a behavioural verdict (' + slow?.verdict?.verdict + ')');
+  say(['PASS','FAIL','EVALUATION_ERROR'].includes(slow?.verdict?.verdict || ''), 'which is one of PASS / FAIL / EVALUATION_ERROR');
+  say(out.results.find((r) => r.task === 'ok')?.termination === 'ENDED', 'a task that finished records termination=ENDED');
+  note('A timeout does not imply a behavioural failure, and a behavioural pass does not erase');
+  note('the timeout. PILOT-1 skipped this evaluation entirely and reported nulls.');
+
   // ── 2. TIMESTAMPS ARE TIMESTAMPS ──
   console.log('\n=== 2. every journal event carries a real ISO timestamp ===');
   const events = new Journal(join(root, 'j.jsonl')).read();

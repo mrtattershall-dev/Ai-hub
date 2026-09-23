@@ -193,6 +193,7 @@ const report = {
     return {
       task: r.task,
       state: r.state,
+      termination: r.termination || end.termination || null,
       terminationReason: r.reason || o.terminationReason || end.reason || null,
       requestedBehavior: end.requested ?? r.verdict?.requested?.verdict ?? null,
       protectedBehavior: end.protected ?? r.verdict?.protected?.verdict ?? null,

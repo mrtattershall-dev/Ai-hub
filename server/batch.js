@@ -221,17 +221,49 @@ export async function runBatch(tasks, opts) {
     }
 
     // A TIMED-OUT TASK'S PARTIAL STATE IS PRESERVED FOR AUDIT, and does not travel forward.
+    //
+    // AND IT IS STILL EVALUATED. Skipping evaluation here was wrong: once execution is
+    // CONFIRMED STOPPED (above), the preserved workspace is not an arbitrary mid-edit
+    // snapshot - it is exactly what survived the allotted budget, which is what the budget
+    // was there to measure. A model can also write working code and never call task_done;
+    // skipping evaluation would score that delivered behaviour as no completion.
+    //
+    // TERMINATION AND BEHAVIOUR STAY SEPARATE. The task is recorded as having terminated by
+    // TIMEOUT regardless of what the evaluator then finds, and the behavioural verdict is
+    // recorded on its own axis. A timeout does not imply a behavioural failure, and a
+    // behavioural pass does not erase the timeout.
+    let terminalEval = null;
     if (outcome.timedOut || outcome.status === 'UNCONFIRMED') {
       const keep = join(auditDir, `${task.id}-partial`);
       try { cpSync(ws, keep, { recursive: true }); } catch { /* audit copy is best effort */ }
       journal.record({ event: 'partial_preserved', task: task.id, preservedAt: keep, why: outcome.timedOut ? 'timed out' : 'completion unconfirmed' });
-      const state = outcome.timedOut ? TASK_STATE.FAILED : TASK_STATE.INTERRUPTED;
-      // A timeout IS an outcome of the attempt; an unconfirmed completion is not.
-      journal.record({ event: 'task_end', task: task.id, state, finalState: state, reason: outcome.timedOut ? 'the task timed out; partial state preserved for audit' : 'completion could not be confirmed' });
-      results.push({ task: task.id, state, partialAt: keep, outcome });
+
+      // Give the surviving candidate an IDENTITY before judging it.
+      git(ws, 'add', '-A');
+      git(ws, '-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'terminal candidate as it survived the budget');
+      try {
+        terminalEval = await evaluate(ws, task, { timeoutSec: Math.min(120, perTaskSec) });
+      } catch (e) {
+        terminalEval = { verdict: VERDICT.EVALUATION_ERROR, reason: String((e && e.name) || e) };
+      }
+
+      const termination = outcome.timedOut ? 'TIMEOUT' : 'COMPLETION_UNCONFIRMED';
+      // The STATE reflects the behavioural verdict; the termination reason is carried
+      // alongside it rather than folded into it.
+      const state = terminalEval.verdict === VERDICT.PASS ? TASK_STATE.COMPLETED
+        : terminalEval.verdict === VERDICT.FAIL ? TASK_STATE.FAILED
+          : TASK_STATE.EVAL_ERROR;
+      journal.record({
+        event: 'task_end', task: task.id, state, finalState: state,
+        termination, verdict: terminalEval.verdict,
+        candidateTree: terminalEval.candidateTree || null,
+        requested: terminalEval.requested?.verdict ?? null,
+        protected: terminalEval.protected?.verdict ?? null,
+        reason: `terminated by ${termination}; the surviving candidate was evaluated`,
+      });
+      results.push({ task: task.id, state, termination, verdict: terminalEval, partialAt: keep, outcome });
       continue;
     }
-
     // EVALUATE - the same independent evaluator in both arms.
     let verdict;
     try {
@@ -242,8 +274,8 @@ export async function runBatch(tasks, opts) {
     const state = verdict.verdict === VERDICT.PASS ? TASK_STATE.COMPLETED
       : verdict.verdict === VERDICT.FAIL ? TASK_STATE.FAILED
         : TASK_STATE.EVAL_ERROR;
-    journal.record({ event: 'task_end', task: task.id, state, finalState: state, verdict: verdict.verdict, candidateTree: verdict.candidateTree || null, requested: verdict.requested?.verdict ?? null, protected: verdict.protected?.verdict ?? null });
-    results.push({ task: task.id, state, verdict, outcome });
+    journal.record({ event: 'task_end', task: task.id, state, finalState: state, termination: 'ENDED', verdict: verdict.verdict, candidateTree: verdict.candidateTree || null, requested: verdict.requested?.verdict ?? null, protected: verdict.protected?.verdict ?? null });
+    results.push({ task: task.id, state, termination: 'ENDED', verdict, outcome });
   }
 
   const accounting = accountFor(tasks, results);
