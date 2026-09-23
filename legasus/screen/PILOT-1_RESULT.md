@@ -2,7 +2,11 @@
 
 Ran 2026-09-23 06:28:54Z → 06:55:01Z (26m 06s). Unattended throughout.
 Model: local `qwen2.5-coder:1.5b` (Modal did not serve — see MODAL-PILOT_FAILURE.md).
-Worker image: `sha256:fa49b576…` | enforced configuration | no retries | **interventions: none**.
+Worker image: `sha256:fa49b576…` | no retries | **interventions: none**.
+
+> **CORRECTION (2026-09-23): "enforced configuration" was wrong.** AGENT_D2_ENFORCE=1 was set
+> but **AGENT_D2_TARGETS was never set**, so d2 had no target set and evaluated nothing. `d2` is
+> null in every task for that reason. **This pilot says nothing about d2.** See PILOT-2_RESULT.md.
 
 ## Verdict, in two separate parts
 

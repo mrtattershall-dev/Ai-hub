@@ -1,0 +1,151 @@
+{
+  "pilot": "unattended-runner-30min",
+  "startedAt": "2026-09-23T07:44:24.348Z",
+  "endedAt": "2026-09-23T07:50:19.061Z",
+  "configuration": {
+    "model": "https://mr-tattershall--legasus-7b-server-web.modal.run",
+    "workerImage": "sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3",
+    "enforced": true,
+    "arms": "ENFORCED ONLY - not a PROTOCOL-1 comparison",
+    "perTaskSec": 300,
+    "totalSec": 1800,
+    "reserveSec": 120,
+    "retries": "none",
+    "toolSet": {
+      "removed": [
+        "spawn_subtask",
+        "verify_project",
+        "verify_godot",
+        "see_screen"
+      ],
+      "why": "each executes model-written code on the host, outside the qualified worker boundary",
+      "retained_for_testing": [
+        "run_command",
+        "run_python",
+        "read_file",
+        "write_file",
+        "edit_file",
+        "list_dir",
+        "search_file",
+        "outline_file"
+      ]
+    },
+    "testingGuidance": "Work only in the supplied workspace. Use run_command or run_python to inspect and test your changes. Node, Python 3 and Git are available offline; network access and package installation are unavailable. Preserve existing required behavior. Before declaring completion, run relevant checks and report what passed, failed, or could not be tested. A completion declaration does not determine the evaluator's result."
+  },
+  "halted": null,
+  "accounting": {
+    "queued": 5,
+    "accountedFor": 5,
+    "complete": true,
+    "missing": [],
+    "counts": {
+      "COMPLETED": 2,
+      "FAILED": 3,
+      "INTERRUPTED": 0,
+      "UNATTEMPTED": 0,
+      "EVAL_ERROR": 0
+    }
+  },
+  "tasks": [
+    {
+      "task": "t1-repair-node-average",
+      "state": "FAILED",
+      "termination": "ENDED",
+      "terminationReason": "stopped",
+      "requestedBehavior": "FAIL",
+      "protectedBehavior": "PASS",
+      "startingCandidate": "373037f01c920f190ffebe770397ae0af887893c",
+      "survivingCandidate": "373037f01c920f190ffebe770397ae0af887893c",
+      "elapsedSec": 29,
+      "modelCalls": 7,
+      "tokens": 39072,
+      "modelCallsIsLowerBound": false,
+      "partialPreservedAt": null,
+      "d2": null,
+      "workerFailures": 0,
+      "unconfirmed": 0,
+      "uncoveredTraversals": 0
+    },
+    {
+      "task": "t2-repair-python-parse",
+      "state": "COMPLETED",
+      "termination": "ENDED",
+      "terminationReason": "stopped",
+      "requestedBehavior": "PASS",
+      "protectedBehavior": "PASS",
+      "startingCandidate": "449e6af3e02b75963343dd14fe056bd1242e7fb2",
+      "survivingCandidate": "1a0cf6b1791025d3a4aeff159613bcc52f15ca04",
+      "elapsedSec": 47,
+      "modelCalls": 9,
+      "tokens": 50590,
+      "modelCallsIsLowerBound": false,
+      "partialPreservedAt": null,
+      "d2": null,
+      "workerFailures": 0,
+      "unconfirmed": 0,
+      "uncoveredTraversals": 0
+    },
+    {
+      "task": "t3-add-node-median",
+      "state": "COMPLETED",
+      "termination": "ENDED",
+      "terminationReason": "stopped",
+      "requestedBehavior": "PASS",
+      "protectedBehavior": "PASS",
+      "startingCandidate": "63a3a0fecd9a2b7fbb5ac2e1d5c029b1748cb9b1",
+      "survivingCandidate": "371edbe81f59a50edaa520017f8426193231eb30",
+      "elapsedSec": 206,
+      "modelCalls": 31,
+      "tokens": 196331,
+      "modelCallsIsLowerBound": false,
+      "partialPreservedAt": null,
+      "d2": null,
+      "workerFailures": 0,
+      "unconfirmed": 0,
+      "uncoveredTraversals": 0
+    },
+    {
+      "task": "t4-add-python-slugify",
+      "state": "FAILED",
+      "termination": "ENDED",
+      "terminationReason": "stopped",
+      "requestedBehavior": "FAIL",
+      "protectedBehavior": "PASS",
+      "startingCandidate": "68e9e56c6849891be1cdee16633c85871943306b",
+      "survivingCandidate": "68e9e56c6849891be1cdee16633c85871943306b",
+      "elapsedSec": 19,
+      "modelCalls": 7,
+      "tokens": 37156,
+      "modelCallsIsLowerBound": false,
+      "partialPreservedAt": null,
+      "d2": null,
+      "workerFailures": 0,
+      "unconfirmed": 0,
+      "uncoveredTraversals": 0
+    },
+    {
+      "task": "t5-multifile-node-discount",
+      "state": "FAILED",
+      "termination": "ENDED",
+      "terminationReason": "stopped",
+      "requestedBehavior": "FAIL",
+      "protectedBehavior": "FAIL",
+      "startingCandidate": "016e94fdd524923e51f0d10fcd8cb26e056ba444",
+      "survivingCandidate": "8591a392747be4fd05a93ab1b94d1f58e232e1b1",
+      "elapsedSec": 37,
+      "modelCalls": 11,
+      "tokens": 62240,
+      "modelCallsIsLowerBound": false,
+      "partialPreservedAt": null,
+      "d2": null,
+      "workerFailures": 0,
+      "unconfirmed": 0,
+      "uncoveredTraversals": 0
+    }
+  ],
+  "interventions": [
+    "none - the pilot ran unattended from start to final accounting"
+  ],
+  "journal": "C:\\Users\\tatte\\AppData\\Local\\Temp\\legasus-pilot-DOP7Tq\\journal.jsonl",
+  "root": "C:\\Users\\tatte\\AppData\\Local\\Temp\\legasus-pilot-DOP7Tq"
+}
