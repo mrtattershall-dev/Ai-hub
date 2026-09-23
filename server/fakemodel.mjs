@@ -198,6 +198,18 @@ const SCRIPTS = {
   // controller and a model that struggles to follow a workable one look identical.
   //
   // OBSERVE -> read lib.js | DECIDE/PRODUCE -> write it whole | re-observe | finish
+  // v2 POSITIVE CONTROL: the same compliant flow, but it TESTS in VERIFY.
+  //
+  // v1 never admitted run_python in any phase, so this sequence was impossible. Exercising
+  // it end to end is what shows the repair reaches the real route rather than only the
+  // state machine.
+  protocolv2: [
+    'THOUGHT: Observing first.\nACTION: read_file\nPATH: calc.py',
+    'THOUGHT: Writing the complete file.\nACTION: write_file\nPATH: calc.py\n```python\ndef double(n):\n    return n * 2\n\ndef halve(n):\n    return n / 2\n```',
+    'THOUGHT: Now testing it as instructed.\nACTION: run_python\nPATH: calc.py',
+    'THOUGHT: The test ran. Finishing.\nACTION: finish\nTEXT:\nhalve added and tested',
+  ],
+
   protocolok: [
     'THOUGHT: The phase says observe. Reading the file.\nACTION: read_file\nPATH: lib.js',
     'THOUGHT: I have the exact content. Writing the complete new file.\nACTION: write_file\nPATH: lib.js\n```javascript\nfunction double(n) { return n * 2; }\nfunction halve(n) { return n / 2; }\nmodule.exports = { double, halve };\n```',

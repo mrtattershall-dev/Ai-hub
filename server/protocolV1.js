@@ -1,4 +1,11 @@
 /**
+ * FROZEN v1, as used by PROTOCOL-1 (legasus/screen/PROTOCOL-1_RESULT.md). DO NOT EDIT.
+ *
+ * Kept byte-intact so the v1 result stays reproducible. Its known defect - the phase
+ * vocabulary does not admit run_python or run_command, the testing tools the shared
+ * instructions promise - is repaired in protocol.js as v2, not here.
+ */
+/**
  * protocol.js - the gated micro-loop controller. PROTOCOL-1's TREATMENT arm.
  *
  * See legasus/screen/PROTOCOL-1_PREREG.md. The CONTROL arm is the hub's existing monolithic
@@ -56,18 +63,6 @@ export const hashOf = (s) => createHash('sha256').update(String(s ?? ''), 'utf8'
  * The controller. Holds ALL progress state, so nothing depends on the model remembering
  * anything between calls - which is the property the monolithic loop could not provide.
  */
-/**
- * TOOLS THE SHARED INSTRUCTIONS PROMISE. v2.
- *
- * PROTOCOL-1 refused `run_python` SIX times and `run_command` implicitly: the tasks tell both
- * arms "use run_command or run_python to inspect and test your changes", and v1 admitted
- * neither in any phase. The treatment was partly measuring that mismatch rather than the
- * responsibility split.
- *
- * A controller may bound WHEN a promised tool is available. It may not promise a tool in the
- * shared instructions and then never admit it.
- */
-const TEST = new Set(['run_python', 'run_command']);
 export class ProtocolController {
   /**
    * `applyEdit` and `verify` are OPTIONAL, and the real-hub integration passes NEITHER.
@@ -241,14 +236,6 @@ export class ProtocolController {
    * responsibility, which is information worth returning to it.
    */
   validate(tool, args = {}) {
-    // v2: the testing tools are legal in VERIFY, which is the phase whose whole purpose is
-    // checking the change. Still bounded - they are not available in OBSERVE or DECIDE - but
-    // they are reachable, which under v1 they never were.
-    if (TEST.has(tool)) {
-      return this.phase === PHASE.VERIFY
-        ? { ok: true }
-        : { ok: false, refusal: REFUSAL.WRONG_PHASE, phase: this.phase };
-    }
     const READ = new Set(['read_file', 'outline_file', 'search_file', 'list_dir']);
     const WRITE = new Set(['write_file', 'edit_file', 'append_file']);
     const path = args.path;
@@ -297,15 +284,6 @@ export class ProtocolController {
    */
   notifyResult(tool, args = {}, result = '') {
     const path = args.path;
-    // v2: a test that RAN advances out of VERIFY. A failing test is not an apparatus problem -
-    // it is information, and it sends the model back to DECIDE with that information rather
-    // than leaving it stuck in a phase with nothing legal to do.
-    if (TEST.has(tool)) {
-      const failed = /^ERROR|EXIT:\s*[1-9]/.test(String(result ?? ''));
-      this.lastTest = { tool, failed, at: Date.now() };
-      this.phase = failed ? PHASE.DECIDE : PHASE.DECIDE;
-      return this.state();
-    }
     const failed = /^ERROR/.test(String(result ?? ''));
     const READ = new Set(['read_file', 'outline_file', 'search_file', 'list_dir']);
     const WRITE = new Set(['write_file', 'edit_file', 'append_file']);
@@ -374,11 +352,7 @@ export class ProtocolController {
         return `PHASE: DECIDE AND PRODUCE\nHere is the EXACT current content of what you have observed. Do not rely on memory of any other file.\n\n${shown}\n\nEither write_file ONE of these files with its complete new contents, or finish. Nothing else is available in this phase.`;
       }
       case PHASE.VERIFY:
-        // v1 said "the hub is verifying automatically, nothing is required from you". That
-        // invited the model to wait, and it invented `wait_for_verification` - a tool the hub
-        // does not have - twice. A controller instruction must never imply a tool that does
-        // not exist, and must not tell the model to do nothing when a turn is expected.
-        return 'PHASE: VERIFY\nTest the change you just made. Use run_python or run_command - for example run the file, or run its tests. Report what passed or failed. Those two tools are the only ones available in this phase.';
+        return 'PHASE: VERIFY\nThe hub is verifying the change automatically. Nothing is required from you.';
       default:
         return 'PHASE: DONE';
     }
