@@ -219,3 +219,81 @@ sample. It is a preregistered exclusion, so:
 If one arm traverses closed routes more often than the other, that IS a result about the
 treatment, and silently dropping those runs would hide it. This project already has a recorded
 case of every published percentage resting on the wrong denominator.
+
+---
+
+# AMENDMENT 2 — the integration, frozen before generation
+
+Date: 2026-09-23. Status: **PROSPECTIVE.** No PROTOCOL-1 generation has run.
+
+Amendment 1 fixed the responsibility split. This fixes the mechanism, the shared conditions and
+the measurement, so none of them can be settled after seeing a result.
+
+## Treatment — exactly three insertion points
+
+No refactoring of `agent.js`. Three call sites, each gated by `AGENT_PROTOCOL=1`, and nothing
+else changes.
+
+**1. PROMPT, at the model-call site.** When the controller is on, it prepends a single block
+stating the current phase and the one bounded decision now open. The model still receives the
+same goal, the same tools and the same testing guidance. **Frozen text lives in
+`server/protocolPrompt.js` and is quoted in the result.**
+
+**2. ACTION GATE, after `parseAction`.** The controller `validate()`s the parsed action against
+the current phase. A refusal does **not** execute the tool; it returns a refusal message and
+increments `controllerRefusals`. A refusal is a **recorded outcome**, never a silent drop.
+
+**3. FEEDBACK, after the tool result.** The controller receives the result via `notifyResult()`
+and advances its phase. The message pushed into history is the controller's, not a second copy
+of the raw result.
+
+**WHAT THE CONTROLLER MAY NOT DO.** It may not discard completed work because of an unexpected
+tool name, format or phrasing (Amendment 1). Non-conformance is recorded about the attempt and
+the attempt is refused *before execution* — no artifact is destroyed after the fact.
+
+## Shared conditions — identical in both arms
+
+| | |
+|---|---|
+| model / backend | Qwen2.5-Coder-7B-Instruct, A10G, Modal app `legasus-7b`, `mycoder` |
+| tasks | the five frozen PILOT tasks, unchanged |
+| starting snapshot | **each task from its own seed, in both arms** |
+| accumulation | **OFF.** `chain: false` |
+| tools | identical; `spawn_subtask`, `verify_project`, `verify_godot`, `see_screen` removed in both |
+| worker | `sha256:fa49b576…`, `--network none`, identical |
+| budgets | 300s per task, 30 min total, 120s reserve, no retries |
+| evaluator | identical, same checks |
+| acceptance policy | **identical**, `chain: false`, baseline never advances between tasks |
+
+**Accumulation is off on purpose.** With it on, an early success changes the difficulty of later
+tasks, and the two arms would stop being comparable after the first divergence.
+
+## Measurement — reported separately, never summed
+
+1. **requested behaviour achieved** — per task, PASS / FAIL / EVALUATION_ERROR
+2. **protected behaviour retained** — per task, independently
+3. **accepted improvements** — RETAIN dispositions; the headline number
+4. **effort** — model calls, wall-clock seconds, tokens
+5. **controller refusals and discarded actions** — per task, by reason
+
+(5) is mandatory. A controller that "wins" by refusing most of the model's actions is a different
+finding from one that helps, and summing them would hide it.
+
+## What this design can and cannot establish
+
+CAN: whether, on these five tasks with everything else held fixed, controller-owned state and
+sequencing changes the number of **accepted** improvements.
+
+CANNOT:
+- Generalisation. Five tasks, one model, one backend.
+- **These five tasks are already-inspected development cases.** Their failure modes have been
+  read in detail. Any result is a **DEVELOPMENT COMPARISON**, not a held-out evaluation, and must
+  be labelled as such wherever it is cited.
+- Isolation of *which* narrowed responsibility mattered. The treatment moves prompt, sequencing
+  and gating together.
+
+## Stopping rule
+
+Both arms run the same five tasks once. No reruns, no task substitution, no budget extension.
+If the treatment arm errors out for apparatus reasons, that is reported as an apparatus failure
+and not as a result about the controller.
