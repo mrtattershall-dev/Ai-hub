@@ -48,7 +48,13 @@ const exec = promisify(execFile);
 // while every record still said they matched. The digest makes the image an experimental
 // constant. Changing it is a deliberate act that shows up in a diff.
 export const WORKER_IMAGE = process.env.AGENT_WORKER_IMAGE
-  || 'node@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85';  // node:22-alpine
+  || 'sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3';  // legasus-worker:1
+//
+// Built from docker/worker.Dockerfile, itself FROM node@sha256:b6f26b36...  The base image had
+// NO PYTHON - checked, not inferred from Node being present - so run_python would have failed
+// inside the worker while passing on the host. python3 and git are baked in at BUILD time
+// because the worker runs with --network none: both arms resolve identical dependencies
+// because they are the same image layer, not two network fetches.
 
 /** Is an isolated worker available at all? The campaign must refuse to start without one. */
 export async function workerAvailable() {
@@ -65,7 +71,7 @@ export async function workerAvailable() {
  * list rather than on a description of it - a comment claiming "--network none" is not evidence
  * that the flag is passed, and this project has already asserted a bug from the wrong side twice.
  */
-export function workerArgs(workspace, cmd, { image = WORKER_IMAGE, timeoutSec = 600 } = {}) {
+export function workerArgs(workspace, cmd, { image = WORKER_IMAGE } = {}) {
   return [
     'run', '--rm',
     '--network', 'none',              // no credentials, no APIs, no remote anything
@@ -76,28 +82,76 @@ export function workerArgs(workspace, cmd, { image = WORKER_IMAGE, timeoutSec = 
     '-v', `${workspace}:/work`,       // THE ONLY MOUNT. No audit store, no other runs, no socket.
     '-w', '/work',
     image,
-    'sh', '-c', `timeout ${timeoutSec} ${cmd}`,
+    // The script arrives FULLY FORMED. workerArgs must not wrap it further: an earlier version
+    // prepended `timeout N` here, which turned the sentinel wrapper into
+    // `timeout 600 { cmd; }` - a shell syntax error that looked exactly like infrastructure
+    // failure. Timeout now lives inside the script, where it can be quoted correctly.
+    'sh', '-c', cmd,
   ];
+}
+
+/** Marks output produced INSIDE the container. Absence means the command never ran there. */
+const RAN_SENTINEL = '__LEGASUS_WORKER_EXIT__';
+
+/**
+ * Thrown when the worker itself could not run the command.
+ *
+ * THE FROZEN RULE: worker failure is an EXECUTION ERROR, never permission to retry on the host.
+ * A fallback would silently move model-written code outside the qualified boundary at exactly
+ * the moment something was already wrong - and the run would look normal. There is no host
+ * fallback anywhere in this module, and the run must fail instead.
+ */
+export class WorkerUnavailable extends Error {
+  constructor(detail) {
+    // Deliberately terse and argv-free. Docker's own failure text embeds the full command line,
+    // including the host workspace path and every isolation flag.
+    super('the isolated worker could not run this command');
+    this.name = 'WorkerUnavailable';
+    this.detail = detail;          // host-side diagnostics, for the run record only
+  }
 }
 
 /**
  * Run one model-chosen command inside the isolated worker.
  *
- * Returns combined output like the hub's run_command does, so the model sees the same shape of
- * result in both arms and the isolation is not itself a visible difference.
+ * TWO OUTCOMES THAT MUST NOT BE CONFUSED:
+ *
+ *   the command RAN in the worker and exited non-zero   -> an ordinary result the model sees
+ *   the worker could not run it at all                  -> WorkerUnavailable, the run errors
+ *
+ * Exit codes cannot make that distinction reliably: docker reuses the command's status, and its
+ * own 125/126/127 conventions overlap with statuses a real command can return. So the container
+ * PRINTS A SENTINEL carrying the true exit code. Output containing it was produced inside the
+ * worker; output without it never got there, whatever the exit code says.
+ *
+ * The sentinel is stripped before the model sees anything.
  */
 export async function runInWorker(workspace, cmd, opts = {}) {
-  const args = workerArgs(workspace, cmd, opts);
+  // Single-quote the model's command so nothing in it is reinterpreted by the wrapper, and
+  // run it under `timeout` INSIDE the container. A command killed by the timeout still ran
+  // in the worker, so it reports an exit code rather than an infrastructure failure.
+  const quoted = "'" + String(cmd).replace(/'/g, `'\\''`) + "'";
+  const sec = opts.timeoutSec || 600;
+  const wrapped = `timeout ${sec} sh -c ${quoted}; printf '%s%d' '${RAN_SENTINEL}' "$?"`;
+  const args = workerArgs(workspace, wrapped, opts);
+  let raw, failure = null;
   try {
     const { stdout, stderr } = await exec('docker', args, { timeout: (opts.timeoutSec || 600) * 1000 + 30_000, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, windowsHide: true });
-    return { ok: true, out: String(stdout) + String(stderr) };
+    raw = String(stdout) + String(stderr);
   } catch (e) {
-    // NEVER fall back to e.message. execFile puts the ENTIRE argv in it, so a failing command
-    // would hand back the host workspace path and every isolation flag - leaking the mount
-    // location into model-visible output, and giving a probe something to match on that came
-    // from the harness rather than from the container. That is exactly how this probe first
-    // reported the host filesystem as visible when it was not.
-    const out = String(e.stdout || '') + String(e.stderr || '');
-    return { ok: false, out: out || `ERROR: command failed (exit ${e.code ?? 'unknown'})` };
+    // NEVER read e.message here: execFile puts the ENTIRE argv in it, which would leak the host
+    // workspace path and the isolation flags into model-visible output. This already caused a
+    // probe to report the host filesystem as visible when it was not.
+    raw = String(e.stdout || '') + String(e.stderr || '');
+    failure = { code: e.code ?? null, killed: !!e.killed };
   }
+
+  const at = raw.lastIndexOf(RAN_SENTINEL);
+  if (at < 0) {
+    // No sentinel: the command never executed inside the worker. Infrastructure, not a result.
+    throw new WorkerUnavailable({ ...failure, stderrHead: raw.replace(/\s+/g, ' ').trim().slice(0, 300) });
+  }
+  const exit = parseInt(raw.slice(at + RAN_SENTINEL.length), 10);
+  const out = raw.slice(0, at);
+  return { ok: exit === 0, ran: true, exit: Number.isNaN(exit) ? null : exit, out };
 }

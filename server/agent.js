@@ -44,6 +44,7 @@ import { emitHostEvent, attachFileSink } from './hostEvent.js';
 // LEGASUS PHASE 2 - d2, the first LOAD-BEARING decision. See PHASE2-INTERVENTION_PREREG.md.
 // Off unless AGENT_D2_TARGETS names the campaign's protected deliverables, so ARM A of the
 // paired campaign is the hub exactly as Phase 1 left it.
+import { runInWorker, WorkerUnavailable, workerAvailable, WORKER_IMAGE } from './worker.js';
 import { ROUTES_BOUNDED, noteUncoveredTraversal, refuseAtDetachedSite } from './routeBound.js';
 import { lockAuditDir } from './d2.js';
 import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState, mayMutate } from './d2.js';
@@ -86,6 +87,10 @@ const D2_ENFORCE = process.env.AGENT_D2_ENFORCE === '1';
 // of the tested workflow rather than a record of it. Defaults beside the server, never inside
 // WORKSPACE: a value in there would reintroduce exactly the cross-run leak this replaced.
 const D2_AUDIT_DIR = process.env.AGENT_D2_AUDIT_DIR || join(__dirname, 'legasus-audit');
+
+// Route model-chosen execution through the isolated worker. OFF by default, so the ordinary
+// hub is unchanged; the campaign turns it on and then has NO host-execution fallback.
+const WORKER_EXEC = process.env.AGENT_WORKER_EXEC === '1';
 
 /**
  * The finish gate. Returns true when the run may be promoted, false when d2 refused.
@@ -593,6 +598,48 @@ function markerRefusal(path, tool) {
     + `Nothing about your goal requires editing ${MARKER}. Carry on with the actual work.`;
 }
 
+
+/**
+ * Execute a model-chosen command, in the ISOLATED WORKER when the campaign says so.
+ *
+ * Same callback contract as child_process.exec, so run_command and run_python are routed by a
+ * single substitution rather than a rewrite of either tool - the output formatting, trimming,
+ * EXIT line and assert-evidence handling downstream are untouched and identical in both arms.
+ *
+ * THE FROZEN RULE, implemented here: worker failure is an EXECUTION ERROR, never permission to
+ * retry on the host. There is NO host fallback on this path. A fallback would move
+ * model-written code outside the qualified boundary at exactly the moment something was
+ * already wrong, and the run would look normal afterwards.
+ *
+ * The two failures stay distinguishable to the model AND in the record:
+ *   ran in the worker, exited non-zero  -> an ordinary result, with its real exit code
+ *   never ran                           -> INFRASTRUCTURE ERROR, no host-side effect
+ * and neither exposes docker's host-side argv, which carries the workspace path and every
+ * isolation flag.
+ */
+function execAgentCommand(cmd, opts, cb) {
+  if (!WORKER_EXEC) return exec(cmd, opts, cb);
+  runInWorker(WORKSPACE, cmd, { timeoutSec: Math.ceil((opts.timeout || CMD_TIMEOUT_MS) / 1000) })
+    .then((r) => {
+      // Shape it like exec: a non-zero exit becomes an Error carrying that code, which is
+      // exactly what the callback below already knows how to report.
+      const err = r.exit === 0 ? null : Object.assign(new Error(`Command failed (exit ${r.exit})`), { code: r.exit });
+      cb(err, r.out, '');
+    })
+    .catch((e) => {
+      if (!(e instanceof WorkerUnavailable)) return cb(e, '', String(e.message || e));
+      // Recorded on the run so a campaign can EXCLUDE it, and reported to the model as an
+      // infrastructure fault rather than a failing command - a model told "exit 1" would
+      // reasonably retry, and there is nothing to retry.
+      if (_activeRun) {
+        (_activeRun.workerFailures ||= []).push({ at: Date.now(), detail: e.detail || null });
+      }
+      cb(Object.assign(new Error('worker unavailable'), { workerUnavailable: true }),
+        '',
+        'INFRASTRUCTURE ERROR: the isolated execution environment could not run this command. '
+        + 'This is NOT a failure of your command and retrying it will not help.');
+    });
+}
 
 const tools = {
   list_dir({ path = '.' }) {
@@ -1284,7 +1331,7 @@ const tools = {
       // them. Without this the paired campaign leaks its own treatment - ARM B sets
       // AGENT_D2_TARGETS and ARM A does not, so `run_command: env` would tell the model which
       // arm it is in. It also keeps HUB_TOKEN out of a shell the model drives.
-      exec(cmd, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true, env: modelEnv() }, (err, stdout, stderr) => {
+      execAgentCommand(cmd, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true, env: modelEnv() }, (err, stdout, stderr) => {
         // TRIM THE MIDDLE, NEVER THE ENDS. This used to build the whole string and then slice(0, 8_000) from
         // the FRONT, so a command printing more than 8k of stdout and then failing handed the model a wall of
         // passing lines with no STDERR, no EXIT line, and no sign anything was missing. batchStepFailed decides
@@ -1331,7 +1378,7 @@ const tools = {
       // Mirror python runs too - run_command was visible in the terminal and this
       // was not, which made the agent look like it did half its work invisibly.
       mirrorAgentCommand('run_python', target);
-      exec(`python "${full}"`, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true, env: modelEnv() }, (err, stdout, stderr) => {
+      execAgentCommand(WORKER_EXEC ? `python3 "${target}"` : `python "${full}"`, { cwd: WORKSPACE, timeout: CMD_TIMEOUT_MS, windowsHide: true, env: modelEnv() }, (err, stdout, stderr) => {
         // TRIM THE MIDDLE, NEVER THE ENDS. This used to build the whole string and then slice(0, 8_000) from
         // the FRONT, so a command printing more than 8k of stdout and then failing handed the model a wall of
         // passing lines with no STDERR, no EXIT line, and no sign anything was missing. batchStepFailed decides
@@ -1851,6 +1898,23 @@ const AUTO_TOOLS = new Set(['list_dir', 'read_file', 'search_file', 'outline_fil
 // this earlier throws a TDZ ReferenceError at load - and only when bounding is ON, which
 // is the shape of failure that passes every check unable to reach the line.
 if (ROUTES_BOUNDED) { delete tools.spawn_subtask; AUTO_TOOLS.delete('spawn_subtask'); }
+
+// The VERIFICATION routes execute model-written code ON THE HOST, so they are closed too.
+//
+//   verify_project  verifyProject.js runs the entry point and python -m py_compile
+//   verify_godot    runs the candidate project in Godot
+//   see_screen      loads model-written HTML/JS in a headless browser
+//
+// Routing only run_command and run_python would have left three paths around the boundary.
+// Closed rather than routed because each needs its own runtime in the image and its own
+// qualification; adding them unqualified would be a claim this campaign has not earned.
+// The independent evaluator still measures behaviour - through the worker, at measurement
+// time - so what is removed is the MODEL's host-side execution, not the evaluation.
+//
+// Identical in both arms.
+if (ROUTES_BOUNDED) {
+  for (const t of ['verify_project', 'verify_godot', 'see_screen']) { delete tools[t]; AUTO_TOOLS.delete(t); }
+}
 
 // Sub-task recursion bounds. Depth 2 is enough for "build the thing" -> "build this
 // part" -> "fix this file"; deeper is almost always a model losing the plot, and each

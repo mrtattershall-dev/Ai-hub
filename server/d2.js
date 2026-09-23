@@ -42,6 +42,13 @@ import { tmpdir } from 'node:os';
 
 const exec = promisify(execFile);
 
+import { runInWorker, WorkerUnavailable } from './worker.js';
+
+// Executing a CANDIDATE module is running model-written code. Routing only run_command and
+// run_python would have left this path around the boundary - and it is d2's own measurement,
+// so it runs on every governed finish. Gated by the same switch as the tools, off by default.
+const WORKER_EXEC = () => process.env.AGENT_WORKER_EXEC === '1';
+
 const git = async (cwd, args) => {
   try {
     const { stdout } = await exec('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true });
@@ -139,9 +146,24 @@ export async function loadableAt(workspace, ref, file, { timeout = 20_000, trees
   const dir = cache.get(ref);
   if (!dir) return null;
   try {
+    if (WORKER_EXEC()) {
+      // THE CANDIDATE RUNS INSIDE THE WORKER. The materialised tree is mounted as the
+      // workspace, so requiring the module resolves its relative dependencies exactly as on
+      // the host - but the code itself never executes outside the qualified boundary.
+      //
+      // A load failure and an INFRASTRUCTURE failure must not collapse into the same "false".
+      // "the module throws" and "we could not run the check" are different facts, and treating
+      // the second as the first would report a regression that was never measured. So
+      // WorkerUnavailable propagates; only a genuine non-zero exit means "does not load".
+      const r = await runInWorker(dir, `node -e "require('/work/${file.replace(/\\/g, '/')}')"`, { timeoutSec: Math.ceil(timeout / 1000) });
+      return r.exit === 0;
+    }
     await exec(process.execPath, ['-e', 'require(process.argv[1])', join(dir, file)], { timeout, encoding: 'utf8', windowsHide: true });
     return true;
-  } catch { return false; }
+  } catch (e) {
+    if (e instanceof WorkerUnavailable) throw e;   // apparatus failure, never a verdict
+    return false;
+  }
   finally {
     if (own) { try { rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ } }
   }
