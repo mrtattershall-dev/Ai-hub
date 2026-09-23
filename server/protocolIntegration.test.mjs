@@ -104,6 +104,33 @@ try {
   const sawFeedback = /TOOL RESULT[\s\S]{0,400}PHASE:/.test(on.prompts);
   say(sawFeedback || sawPhase, 'INSERTION 3: the controller\'s instruction follows the tool result in the history');
 
+  // ── POSITIVE CONTROL: A PHASE-COMPLIANT SEQUENCE MUST COMPLETE ──
+  //
+  // Zero execution from a deliberately noncompliant script shows the REFUSAL path works. It
+  // shows nothing about whether the controller can be satisfied at all. Without this, an
+  // IMPOSSIBLE controller and a model that struggles to follow a WORKABLE one look identical -
+  // and the whole comparison would rest on that ambiguity.
+  console.log('\n=== POSITIVE CONTROL: a phase-compliant sequence completes the route ===');
+  const ok = await arm({ protocolOn: true, script: 'protocolok' });
+  dirs.push(ok.dir);
+  const okSteps = ok.run?.steps || [];
+  const okTools = okSteps.filter((s) => s.tool).map((s) => s.tool);
+  const okRefusals = ok.run?.controllerRefusals || [];
+
+  say(okTools.includes('read_file'), `an ALLOWED action executed in OBSERVE (tools: ${okTools.join(', ') || 'none'})`);
+  say(okTools.includes('write_file'), 'and the write executed once the phase advanced to DECIDE');
+  // the workspace really changed - behaviour, not a step record
+  const libAfter = existsSync(join(ok.ws, 'lib.js')) ? readFileSync(join(ok.ws, 'lib.js'), 'utf8') : '';
+  say(/function halve/.test(libAfter), 'the requested change is actually in the workspace');
+  say(/function double/.test(libAfter), 'and the existing behaviour is still there');
+  say(!!ok.run?.status && ok.run.status !== 'running', `the run reached termination (${ok.run?.status})`);
+  // phase advancement is what distinguishes "satisfied" from "got lucky once"
+  const phasesSeen = (ok.prompts.match(/PHASE: [A-Z ]+/g) || []).map((x) => x.trim());
+  say(new Set(phasesSeen).size >= 2, `the controller ADVANCED through phases (${[...new Set(phasesSeen)].join(' -> ') || 'none'})`);
+  say(okRefusals.length < okTools.length + okRefusals.length, `not everything was refused (${okRefusals.length} refusals, ${okTools.length} executed)`);
+  note('So the controller is satisfiable on the real route. Whether the 7B can satisfy it is');
+  note('the open question the comparison answers.');
+
   // ── TREATMENT OFF — the control must be the UNCHANGED route ──
   console.log('\n=== treatment OFF: the existing route is preserved ===');
   const off = await arm({ protocolOn: false, script: 'd2break' });
