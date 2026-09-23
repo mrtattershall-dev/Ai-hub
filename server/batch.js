@@ -35,7 +35,7 @@
 import { appendFileSync, mkdirSync, writeFileSync, readFileSync, existsSync, cpSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { confirmStopped, attemptExists, newAttemptId } from './worker.js';
+import { confirmStopped, confirmNoneRunning, attemptExists, newAttemptId } from './worker.js';
 import { evaluate, VERDICT } from './evaluator.js';
 
 /** Terminal states. Every queued task must end in exactly one of them. */
@@ -53,9 +53,25 @@ export class Journal {
     mkdirSync(join(path, '..'), { recursive: true });
   }
 
-  /** Append and FLUSH. Written before the act it describes, never after. */
+  /**
+   * Append and FLUSH. Written before the act it describes, never after.
+   *
+   * THE ENVELOPE WINS. This used to spread the payload OVER the timestamp, so any field named
+   * "at" replaced it - and one did: partial_preserved recorded a Windows path where the time
+   * should have been. Renaming that one field fixed the instance and left the SHAPE intact,
+   * so the next collision would have done exactly the same thing, just as silently.
+   *
+   * A colliding payload key is not dropped either - it is kept under a payload_ prefix,
+   * because silently discarding recorded data is the same class of fault as overwriting it.
+   */
   record(event) {
-    const line = JSON.stringify({ at: new Date().toISOString(), ...event }) + '\n';
+    const envelope = { at: new Date().toISOString() };
+    const body = {};
+    for (const [k, v] of Object.entries(event || {})) {
+      if (k in envelope) body["payload_" + k] = v;
+      else body[k] = v;
+    }
+    const line = JSON.stringify({ ...body, ...envelope }) + '\n';
     appendFileSync(this.path, line, 'utf8');   // appendFileSync opens, writes and closes
     return event;
   }
@@ -169,7 +185,14 @@ export async function runBatch(tasks, opts) {
 
     // TIMEOUT CLEANUP, CONFIRMED. Nothing may read or reuse this workspace until the container
     // that was writing to it is provably gone.
-    const stopped = await confirmStopped(outcome.attemptId || attemptId);
+    // TERMINATION EVIDENCE MUST BE ABOUT THE CONTAINERS THAT EXIST.
+    //
+    // This used to call confirmStopped(attemptId) alone - but agent.js generates its OWN
+    // container names, so that id was never attached to anything. It confirmed the absence of
+    // a container that was never created, and reported success. A stop request returning 200
+    // plus a vacuous confirmation is not evidence that execution stopped.
+    await confirmStopped(outcome.attemptId || attemptId);   // harmless if it was never used
+    const stopped = await confirmNoneRunning({ timeoutMs: 30_000 });
     if (!stopped.ok) {
       halted = `could not confirm the worker stopped: ${stopped.reason}`;
       journal.record({ event: 'batch_halt', task: task.id, reason: halted });

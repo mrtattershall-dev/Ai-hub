@@ -90,3 +90,86 @@ defects are fixed rather than noted.
 ## Cost
 
 No GPU spend. Modal was deployed, never served a request, and was stopped.
+
+---
+
+# CORRECTIONS AND TERMINAL EVALUATION — 2026-09-23
+
+## "RUNNER: PASS" was broader than the result supports
+
+Narrowed to what was actually demonstrated:
+
+| property | demonstrated? |
+|---|---|
+| queue execution | YES — all five attempted and accounted for |
+| deadline handling | YES — termination reported at 302–303s per 300s limit |
+| workspace separation | YES — partial changes preserved and absent from the next task |
+| automatic reporting | **NO — it failed and required manual reconstruction** |
+| live evaluation | **UNEXERCISED in this pilot** (no task reached a finish boundary) |
+| verified task completion | 0/5 |
+
+A pass on three of six properties is not "the runner passes".
+
+## The preserved terminal candidates ARE evaluated (0/5 verified)
+
+Skipping evaluation for timed-out tasks was wrong. Once execution is confirmed stopped, the
+preserved workspace is not an arbitrary mid-edit snapshot — **it is exactly what survived the
+allotted budget**, which is what the budget was there to measure. It also closes a real gap: a
+model can write working code and never call `task_done`, and skipping evaluation would score that
+delivered behaviour as no completion.
+
+Termination and behaviour are separate axes and stay separate:
+
+| task | termination | requested | protected | terminal tree | why requested failed |
+|---|---|---|---|---|---|
+| t1-repair-node-average | TIMEOUT | FAIL | PASS | `1e1b4346` | `average([2,4,6]) = 3`, expected 4 |
+| t2-repair-python-parse | TIMEOUT | FAIL | PASS | `42ab814d` | assertion failed in `parse_pairs` |
+| t3-add-node-median | TIMEOUT | FAIL | PASS | `875897ca` | `median is not exported` |
+| t4-add-python-slugify | TIMEOUT | FAIL | PASS | `0ff4aa38` | assertion failed — no `slugify` |
+| t5-multifile-node-discount | TIMEOUT | FAIL | PASS | `53efcf15` | `applyDiscount is not exported` |
+
+**VERIFIED COMPLETIONS: 0/5.** Now supported by evaluation rather than by its absence.
+
+**Protected behaviour PASSED in all five.** Nothing that already worked was destroyed. Note the
+attribution: in t5 that is partly because a hub guard refused a `write_file` which would have
+removed `round2` — the guard preserved it, not the model.
+
+## "A competent plan establishes comprehension" — withdrawn
+
+What was observed is **plausible planning followed by little usable execution**. That is all.
+Candidate explanations remain open and this pilot separates none of them:
+
+    responsibility overload | action formatting | model capability | loop behaviour
+
+PROTOCOL-1 tests one of them. The others need their own designs.
+
+## A third defect, found by testing for the first two
+
+Renaming `at` → `preservedAt` fixed the instance and left the **shape** intact: `Journal.record`
+spread the payload OVER the envelope, so the next colliding key would have silently overwritten
+the timestamp exactly the same way. The envelope now wins, and a colliding payload key is kept
+under a `payload_` prefix rather than dropped — discarding recorded data silently is the same
+class of fault as overwriting it.
+
+## Termination evidence was vacuous, and is now real
+
+`confirmStopped(attemptId)` was passed the BATCH's attempt id. `agent.js` generates its own
+container names, so that id was never attached to anything: it confirmed the absence of a
+container that was never created, and reported success. A stop request returning 200 plus a
+vacuous confirmation is not evidence that execution stopped.
+
+`confirmNoneRunning()` now requires that **no worker container is still running** before a
+workspace is evaluated or reused, and distinguishes "none running" from "the daemon could not be
+asked".
+
+## Evidence preserved
+
+    PILOT-1_report-AS-GENERATED.json   the ORIGINAL broken report, 11 null fields per task
+    PILOT-1_journal.jsonl              the journal as written during the run
+    PILOT-1_RESULT.md                  this reconstruction
+
+The broken report is kept deliberately. It is the evidence for the reporting failure, and a
+reconstruction that replaced it would erase the finding.
+
+Tests that FAIL on the unfixed code: `batchReport.test.mjs` (14/14 now). The existing 24 batch
+checks passed straight through all three defects, so re-running them proves nothing about these.

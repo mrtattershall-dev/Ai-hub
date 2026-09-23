@@ -269,3 +269,38 @@ export async function confirmStopped(name) {
   if (exists === true) return { ok: false, reason: 'the container still exists after a forced removal' };
   return { ok: true };
 }
+
+/**
+ * Names of worker containers still RUNNING.
+ *
+ * Termination evidence needs this. `confirmStopped(id)` answers "that one id is gone", and in
+ * the pilot the id it was given was the BATCH's attempt id, which agent.js never uses for its
+ * containers - so it confirmed the absence of something that was never created and reported
+ * success. A stop REQUEST plus a vacuous confirmation is not evidence that execution stopped.
+ *
+ * Returns null when the daemon cannot be asked, because "no containers" and "I could not look"
+ * must not collapse into the same answer.
+ */
+export async function runningAttempts() {
+  const q = await dockerRaw(['ps', '--filter', 'name=legasus-', '--format', '{{.Names}}'], 60_000);
+  if (!q.ok) return null;
+  return q.out.split('\n').map((s) => s.trim()).filter(Boolean);
+}
+
+/**
+ * Wait until no worker container is still running, and SAY whether that was established.
+ *
+ * Tasks run one at a time, so "nothing of ours is running" is the invariant that means this
+ * task's execution has actually stopped - not merely that a stop request returned 200.
+ */
+export async function confirmNoneRunning({ timeoutMs = 30_000, pollMs = 1000 } = {}) {
+  const deadline = Date.now() + timeoutMs;
+  let last = null;
+  for (;;) {
+    last = await runningAttempts();
+    if (last === null) return { ok: false, reason: 'the daemon could not be asked which containers are running' };
+    if (last.length === 0) return { ok: true, running: [] };
+    if (Date.now() >= deadline) return { ok: false, reason: `worker containers are still running after ${Math.round(timeoutMs / 1000)}s: ${last.join(', ')}`, running: last };
+    await new Promise((r) => setTimeout(r, pollMs));
+  }
+}
