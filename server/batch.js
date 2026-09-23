@@ -201,11 +201,11 @@ export async function runBatch(tasks, opts) {
     if (outcome.timedOut || outcome.status === 'UNCONFIRMED') {
       const keep = join(auditDir, `${task.id}-partial`);
       try { cpSync(ws, keep, { recursive: true }); } catch { /* audit copy is best effort */ }
-      journal.record({ event: 'partial_preserved', task: task.id, at: keep, why: outcome.timedOut ? 'timed out' : 'completion unconfirmed' });
+      journal.record({ event: 'partial_preserved', task: task.id, preservedAt: keep, why: outcome.timedOut ? 'timed out' : 'completion unconfirmed' });
       const state = outcome.timedOut ? TASK_STATE.FAILED : TASK_STATE.INTERRUPTED;
       // A timeout IS an outcome of the attempt; an unconfirmed completion is not.
       journal.record({ event: 'task_end', task: task.id, state, finalState: state, reason: outcome.timedOut ? 'the task timed out; partial state preserved for audit' : 'completion could not be confirmed' });
-      results.push({ task: task.id, state, partialAt: keep });
+      results.push({ task: task.id, state, partialAt: keep, outcome });
       continue;
     }
 
@@ -220,7 +220,7 @@ export async function runBatch(tasks, opts) {
       : verdict.verdict === VERDICT.FAIL ? TASK_STATE.FAILED
         : TASK_STATE.EVAL_ERROR;
     journal.record({ event: 'task_end', task: task.id, state, finalState: state, verdict: verdict.verdict, candidateTree: verdict.candidateTree || null, requested: verdict.requested?.verdict ?? null, protected: verdict.protected?.verdict ?? null });
-    results.push({ task: task.id, state, verdict });
+    results.push({ task: task.id, state, verdict, outcome });
   }
 
   const accounting = accountFor(tasks, results);
