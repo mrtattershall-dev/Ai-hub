@@ -46,6 +46,7 @@ export const TASK_STATE = Object.freeze({
   INTERRUPTED: 'INTERRUPTED',   // started, outcome not established - never silently retried
   UNATTEMPTED: 'UNATTEMPTED',   // never started (budget, halt, or batch end)
   EVAL_ERROR: 'EVAL_ERROR',     // the instrument failed, NOT the code
+  BLOCKED: 'BLOCKED',           // a prerequisite was not accepted, so this was never attempted
 });
 
 export class Journal {
@@ -156,6 +157,7 @@ export async function runBatch(tasks, opts) {
   const acceptedBaselineDir = join(workspacesDir, '.accepted-baseline');
   let acceptedBaselineTask = 'none';
   let acceptedBaselineTree = null;
+  const acceptedTasks = new Set();   // which task ids reached RETAIN - the chain depends on it
 
   journal.record({ event: 'batch_start', tasks: tasks.length, perTaskSec, totalSec, chain });
 
@@ -187,6 +189,7 @@ export async function runBatch(tasks, opts) {
         cpSync(ws, acceptedBaselineDir, { recursive: true, filter: (src) => !src.includes(`${sep}.git`) });
         acceptedBaselineTree = acceptance.survivingWorkspaceVerdict?.candidateTree || null;
         acceptedBaselineTask = task.id;
+        acceptedTasks.add(task.id);
       } catch (e) {
         halt = `the accepted baseline could not be stored: ${e.message}`;
       }
@@ -233,6 +236,18 @@ export async function runBatch(tasks, opts) {
       pushResult(results, onTaskEnd, { task: task.id, state: TASK_STATE.UNATTEMPTED, reason: `batch halted: ${halted}` });
       continue;
     }
+    // A DEPENDENT TASK WHOSE PREREQUISITE WAS NOT ACCEPTED IS BLOCKED, NEVER RUN.
+    //
+    // Running it from a seed instead would silently convert a chain into independent tasks:
+    // step 3 would be attempted against a project that never got step 2, and its result would
+    // be reported as if the chain had held.
+    if (task.dependsOn && !acceptedTasks.has(task.dependsOn)) {
+      const why = 'prerequisite ' + task.dependsOn + ' was not accepted';
+      journal.record({ event: 'task_end', task: task.id, state: TASK_STATE.BLOCKED, finalState: TASK_STATE.BLOCKED, reason: why });
+      pushResult(results, onTaskEnd, { task: task.id, state: TASK_STATE.BLOCKED, termination: 'BLOCKED', reason: why });
+      continue;
+    }
+
     if (Date.now() >= deadline) {
       journal.record({ event: 'task_end', task: task.id, state: TASK_STATE.UNATTEMPTED, reason: 'total budget exhausted' });
       pushResult(results, onTaskEnd, { task: task.id, state: TASK_STATE.UNATTEMPTED, reason: 'total budget exhausted' });
@@ -375,7 +390,7 @@ export async function runBatch(tasks, opts) {
  * task that silently vanished shows up as a mismatch instead of as a smaller denominator.
  */
 export function accountFor(tasks, results) {
-  const counts = { COMPLETED: 0, FAILED: 0, INTERRUPTED: 0, UNATTEMPTED: 0, EVAL_ERROR: 0 };
+  const counts = { COMPLETED: 0, FAILED: 0, INTERRUPTED: 0, UNATTEMPTED: 0, EVAL_ERROR: 0, BLOCKED: 0 };
   const seen = new Set();
   for (const r of results) { counts[r.state] = (counts[r.state] || 0) + 1; seen.add(r.task); }
   const missing = tasks.filter((t) => !seen.has(t.id)).map((t) => t.id);
