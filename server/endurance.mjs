@@ -28,7 +28,7 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const { PILOT_TASKS, TESTING_GUIDANCE, TOOL_SET_NOTE } = await import('./pilotTasks.js');
 const { runBatch, TASK_STATE } = await import('./batch.js');
-const { recordRun, recordPair, writeReport } = await import('./campaignReport.js');
+const { recordRun, recordPlan, recordPair, writeReport } = await import('./campaignReport.js');
 const { confirmNoneRunning, WORKER_IMAGE } = await import('./worker.js');
 
 const MODEL_URL = process.argv[2];

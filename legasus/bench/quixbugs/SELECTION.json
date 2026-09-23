@@ -1,0 +1,193 @@
+{
+  "source": "QuixBugs (github.com/jkoppel/QuixBugs)",
+  "sourceRevision": "4257f44b0ff1181dedaedee6a447e133219fcebf",
+  "selectionRule": "alphabetical by program name; first N eligible; eligibility evaluated before any model run",
+  "adapter": "upstream test DATA preserved; pytest runner replaced with plain python3 (the frozen worker has no pytest)",
+  "requestedRule": "all upstream cases pass",
+  "protectedRule": "the subset already passing on the buggy seed must still pass (discovered from the seed, not designed)",
+  "target": 15,
+  "eligibleCount": 22,
+  "selected": [
+    {
+      "name": "bucketsort",
+      "upstreamCases": 7,
+      "protectedIdx": [
+        0
+      ],
+      "failingOnSeed": 6
+    },
+    {
+      "name": "find_in_sorted",
+      "upstreamCases": 7,
+      "protectedIdx": [
+        0,
+        2,
+        3,
+        4,
+        5
+      ],
+      "failingOnSeed": 2
+    },
+    {
+      "name": "flatten",
+      "upstreamCases": 7,
+      "protectedIdx": [
+        1
+      ],
+      "failingOnSeed": 6
+    },
+    {
+      "name": "gcd",
+      "upstreamCases": 6,
+      "protectedIdx": [
+        0
+      ],
+      "failingOnSeed": 5
+    },
+    {
+      "name": "get_factors",
+      "upstreamCases": 11,
+      "protectedIdx": [
+        0
+      ],
+      "failingOnSeed": 10
+    },
+    {
+      "name": "is_valid_parenthesization",
+      "upstreamCases": 3,
+      "protectedIdx": [
+        0,
+        1
+      ],
+      "failingOnSeed": 1
+    },
+    {
+      "name": "kheapsort",
+      "upstreamCases": 4,
+      "protectedIdx": [
+        0
+      ],
+      "failingOnSeed": 3
+    },
+    {
+      "name": "kth",
+      "upstreamCases": 7,
+      "protectedIdx": [
+        2,
+        3,
+        4
+      ],
+      "failingOnSeed": 4
+    },
+    {
+      "name": "lcs_length",
+      "upstreamCases": 9,
+      "protectedIdx": [
+        2
+      ],
+      "failingOnSeed": 8
+    },
+    {
+      "name": "lis",
+      "upstreamCases": 12,
+      "protectedIdx": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "failingOnSeed": 4
+    },
+    {
+      "name": "longest_common_subsequence",
+      "upstreamCases": 10,
+      "protectedIdx": [
+        0,
+        1,
+        2,
+        4,
+        8,
+        9
+      ],
+      "failingOnSeed": 4
+    },
+    {
+      "name": "max_sublist_sum",
+      "upstreamCases": 6,
+      "protectedIdx": [
+        2,
+        4
+      ],
+      "failingOnSeed": 4
+    },
+    {
+      "name": "mergesort",
+      "upstreamCases": 14,
+      "protectedIdx": [
+        0
+      ],
+      "failingOnSeed": 13
+    },
+    {
+      "name": "next_palindrome",
+      "upstreamCases": 5,
+      "protectedIdx": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "failingOnSeed": 1
+    },
+    {
+      "name": "pascal",
+      "upstreamCases": 5,
+      "protectedIdx": [
+        0
+      ],
+      "failingOnSeed": 4
+    }
+  ],
+  "excluded": [
+    {
+      "task": "bitcount",
+      "why": "could not execute the program with the offline harness"
+    },
+    {
+      "task": "find_first_in_sorted",
+      "why": "could not execute the program with the offline harness"
+    },
+    {
+      "task": "hanoi",
+      "why": "the upstream reference does not pass its own cases under this harness"
+    },
+    {
+      "task": "knapsack",
+      "why": "could not execute the program with the offline harness"
+    },
+    {
+      "task": "levenshtein",
+      "why": "could not execute the program with the offline harness"
+    },
+    {
+      "task": "next_permutation",
+      "why": "no case passes on the seed - nothing to protect"
+    },
+    {
+      "task": "rpn_eval",
+      "why": "no case passes on the seed - nothing to protect"
+    },
+    {
+      "task": "sqrt",
+      "why": "could not execute the program with the offline harness"
+    },
+    {
+      "task": "wrap",
+      "why": "no case passes on the seed - nothing to protect"
+    }
+  ]
+}

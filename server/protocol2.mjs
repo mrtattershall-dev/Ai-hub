@@ -27,7 +27,7 @@ const { PILOT_TASKS, TESTING_GUIDANCE } = await import('./pilotTasks.js');
 const { evaluate, VERDICT } = await import('./evaluator.js');
 const { applyAcceptance, DISPOSITION } = await import('./acceptance.js');
 const { confirmNoneRunning } = await import('./worker.js');
-const { recordRun, recordPair, writeReport } = await import('./campaignReport.js');
+const { recordRun, recordPlan, recordPair, writeReport } = await import('./campaignReport.js');
 
 const MODEL_URL = process.argv[2];
 if (!MODEL_URL) { console.error('usage: node server/protocol1.mjs <modelBaseUrl>'); process.exit(2); }

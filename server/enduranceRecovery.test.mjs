@@ -25,7 +25,7 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const { recordRun, readSummary, buildReport, requiredFieldsFor, REQUIRED_FIELDS_BY_STATUS } =
+const { recordRun, recordPlan, readSummary, buildReport, requiredFieldsFor, REQUIRED_FIELDS_BY_STATUS } =
   await import('./campaignReport.js');
 const { runBatch } = await import('./batch.js');
 
@@ -74,11 +74,12 @@ try {
   const script = join(root2, 'camp.mjs');
   writeFileSync(script, `
 import { runBatch } from ${JSON.stringify('file:///' + join(HERE, 'batch.js').replace(/\\\\/g, '/'))};
-import { recordRun } from ${JSON.stringify('file:///' + join(HERE, 'campaignReport.js').replace(/\\\\/g, '/'))};
+import { recordRun, recordPlan } from ${JSON.stringify('file:///' + join(HERE, 'campaignReport.js').replace(/\\\\/g, '/'))};
 const SUMMARY = ${JSON.stringify(summary2.replace(/\\\\/g, '/'))};
 const LIB = ${JSON.stringify(LIB)}, PKG = ${JSON.stringify(PKG)};
 const check = ${JSON.stringify(check)};
 const tasks = Array.from({ length: 12 }, (_, i) => ({ id: 'k' + (i + 1), seed: { 'lib.js': LIB, 'package.json': PKG }, requested: check, protected: check }));
+recordPlan(SUMMARY, tasks.map(t => t.id));
 let n = 0;
 await runBatch(tasks, {
   journalPath: ${JSON.stringify(join(root2, 'j.jsonl').replace(/\\\\/g, '/'))},
@@ -111,10 +112,29 @@ console.log('CAMPAIGN FINISHED');
   const out = execFileSync(process.execPath, [join(HERE, 'rebuildReport.mjs'), summary2, join(root2, 'recovered.json')], { encoding: 'utf8', timeout: 60_000 });
   say(existsSync(join(root2, 'recovered.json')), 'rebuildReport.mjs produced a report from the survivors');
   const rec = JSON.parse(readFileSync(join(root2, 'recovered.json'), 'utf8'));
-  say(rec.runs.length === completedBeforeKill, `it accounts for every survivor (${rec.runs.length}/${completedBeforeKill})`);
-  say(rec.reconciliation.ok, 'and its totals reconcile');
-  say(/integrity ok: true/.test(out), 'the command reports integrity ok');
-  note('No model, no workspace, no live process. The summary file is the only input.');
+  say(rec.runs.length === completedBeforeKill, `the survivors are all there (${rec.runs.length}/${completedBeforeKill})`);
+
+  // THE WHOLE PLANNED QUEUE, not just what survived.
+  //
+  // Reconciling against surviving records alone is SELF-CONFIRMING: it can never reveal work
+  // that is missing. This campaign planned 12 tasks; 4 completed, 1 was in flight when it was
+  // killed, 7 never started. A report saying "4 runs, reconciliation ok" would have hidden 8.
+  const planned = 12;
+  say(rec.reconciliation.planned === planned, `the recovered report knows the PLANNED queue size (${rec.reconciliation.planned})`);
+  say(rec.byStatus.UNACCOUNTED === planned - completedBeforeKill,
+    `and reports the ${planned - completedBeforeKill} tasks it has no record of as UNACCOUNTED (${rec.byStatus.UNACCOUNTED})`);
+  say(rec.byStatus.total === planned, `every planned task is in exactly one bucket (${JSON.stringify(rec.byStatus)})`);
+  say(rec.integrity.ok === false, "and integrity is FALSE - missing work must not read as a clean report");
+  say(rec.integrity.unaccounted.length === planned - completedBeforeKill,
+    `the missing tasks are NAMED, not just counted (${rec.integrity.unaccounted.slice(0, 3).join(", ")}...)`);
+  note("The interrupted task and the untouched remainder are both visible. A survivors-only");
+  note("reconciliation would have called this complete.");
+
+  // a plan-less summary must not be able to claim integrity either
+  const noPlan = buildReport(summary);   // section 1 wrote no plan
+  say(noPlan.integrity.planRecorded === false && noPlan.integrity.ok === false,
+    'a summary with NO recorded plan cannot claim integrity - it cannot detect missing work');
+  note("No model, no workspace, no live process. The summary file is the only input.");
 
   // ── 4. STATUS-SPECIFIC FIELDS ──
   console.log('\n=== 4. each status is held to its own standard ===');
@@ -132,10 +152,10 @@ console.log('CAMPAIGN FINISHED');
   const s4 = join(d4, 's.jsonl');
   recordRun(s4, { idx: 1, rep: 1, task: 'u1', arm: 'SINGLE', termination: 'UNATTEMPTED', reason: 'budget exhausted' });
   const clean = buildReport(s4);
-  say(clean.integrity.ok, 'a correctly-recorded UNATTEMPTED run does NOT trip the integrity check');
+  say(clean.integrity.missingFields.length === 0, 'a correctly-recorded UNATTEMPTED run does NOT trip the field check');
   recordRun(s4, { idx: 2, rep: 1, task: 'u2', arm: 'SINGLE', termination: 'UNATTEMPTED' });   // no reason
   const dirty = buildReport(s4);
-  say(!dirty.integrity.ok, 'POSITIVE CONTROL: an UNATTEMPTED run with no reason IS caught');
+  say(dirty.integrity.missingFields.length > 0, 'POSITIVE CONTROL: an UNATTEMPTED run with no reason IS caught');
 
   // ── 5. AUTOMATIC STATUS ACCOUNTING ──
   console.log('\n=== 5. completed / interrupted / unattempted, counted automatically ===');
@@ -169,6 +189,7 @@ console.log('CAMPAIGN FINISHED');
     say(gapKinds.length === 1 && gapKinds[0] === 'reason',
       `what remains is a REAL omission: the old writer never recorded WHY a run was skipped (${rep.integrity.missingFields.length} runs)`);
     say(rep.reconciliation.ok, 'reconciliation holds');
+    say(rep.integrity.planRecorded === false, 'and it correctly reports that ENDURANCE-2 recorded no plan - that campaign predates the requirement');
     say(rep.byStatus.UNATTEMPTED === 77 && rep.byStatus.COMPLETED === 131,
       `status accounting matches the run (${JSON.stringify(rep.byStatus)})`);
     const probes = rep.runs.filter((r) => r.arm === 'FAULT_PROBE');

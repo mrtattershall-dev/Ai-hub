@@ -74,16 +74,32 @@ export function recordPair(summaryPath, { rep, task, runs }) {
   }) + '\n', 'utf8');
 }
 
+/**
+ * Record the PLANNED QUEUE, before any task runs.
+ *
+ * Without it, a recovered report reconciles against the records that SURVIVED - which can
+ * never reveal work that is missing. A campaign killed after 4 of 12 tasks rebuilt cleanly
+ * as "4 runs, reconciliation ok", silently losing the interrupted task and the 7 never
+ * started. Reconciliation against survivors alone is self-confirming.
+ *
+ * The plan is the denominator. Anything planned and not recorded is UNACCOUNTED, and that
+ * fails integrity.
+ */
+export function recordPlan(summaryPath, taskIds) {
+  mkdirSync(dirname(summaryPath), { recursive: true });
+  appendFileSync(summaryPath, JSON.stringify({ kind: 'plan', at: new Date().toISOString(), tasks: [...taskIds] }) + '\n', 'utf8');
+}
+
 /** Read a durable summary back. The ONLY input the final report needs. */
 export function readSummary(summaryPath) {
   if (!existsSync(summaryPath)) return { runs: [], pairs: [] };
   const lines = readFileSync(summaryPath, 'utf8').split('\n').filter(Boolean);
-  const runs = [], pairs = [];
+  const runs = [], pairs = []; let plan = null;
   for (const l of lines) {
-    try { const e = JSON.parse(l); if (e.kind === 'run') runs.push(e); else if (e.kind === 'pair') pairs.push(e); }
+    try { const e = JSON.parse(l); if (e.kind === 'run') runs.push(e); else if (e.kind === 'pair') pairs.push(e); else if (e.kind === 'plan') plan = e.tasks; }
     catch { /* a torn final line - the rest of the summary is still usable */ }
   }
-  return { runs, pairs };
+  return { runs, pairs, plan };
 }
 
 /**
@@ -93,7 +109,7 @@ export function readSummary(summaryPath) {
  * exist, which is what makes recovery cost nothing.
  */
 export function buildReport(summaryPath, meta = {}) {
-  const { runs, pairs } = readSummary(summaryPath);
+  const { runs, pairs, plan } = readSummary(summaryPath);
 
   // INTEGRITY, checked rather than assumed.
   const seen = new Map();
@@ -109,6 +125,11 @@ export function buildReport(summaryPath, meta = {}) {
     const gaps = requiredFieldsFor(r).filter((f) => r[f] === undefined || r[f] === null);
     if (gaps.length) missingFields.push({ run: `${r.rep}/${r.task}/${r.arm}`, gaps });
   }
+
+  // PLANNED BUT NEVER RECORDED. This is the work a survivors-only reconciliation hides: the
+  // task that was in flight when the process died, and everything after it in the queue.
+  const recorded = new Set(runs.map((r) => r.task));
+  const unaccounted = (plan || []).filter((t) => !recorded.has(t));
 
   const arms = {};
   for (const a of [...new Set(runs.map((r) => r.arm))]) {
@@ -139,6 +160,9 @@ export function buildReport(summaryPath, meta = {}) {
     callsCounted: Object.values(arms).reduce((x, a) => x + a.modelCalls, 0),
     pairsRecorded: pairs.length,
   };
+  reconciliation.planned = plan ? plan.length : null;
+  reconciliation.unaccounted = unaccounted.length;
+  reconciliation.accountsForPlan = plan ? (runs.length + unaccounted.length === plan.length) : false;
   reconciliation.ok = reconciliation.runsInSummary === reconciliation.runsCounted
     && reconciliation.callsInSummary === reconciliation.callsCounted;
 
@@ -151,7 +175,9 @@ export function buildReport(summaryPath, meta = {}) {
     else if (t === 'INTERRUPTED') byStatus.INTERRUPTED++;
     else byStatus.COMPLETED++;
   }
-  byStatus.total = runs.length;
+  byStatus.UNACCOUNTED = unaccounted.length;
+  byStatus.total = runs.length + unaccounted.length;
+  byStatus.planned = plan ? plan.length : null;
 
   const byReplicate = {};
   for (const r of runs) (byReplicate[`rep${r.rep}`] ||= []).push({ task: r.task, arm: r.arm, accepted: !!r.accepted, requested: r.requested ?? null, protected: r.protected ?? null, disposition: r.disposition ?? null });
@@ -160,7 +186,13 @@ export function buildReport(summaryPath, meta = {}) {
     ...meta,
     builtAt: new Date().toISOString(),
     byStatus,
-    integrity: { duplicates, missingFields, ok: duplicates.length === 0 && missingFields.length === 0 },
+    integrity: {
+      duplicates, missingFields, unaccounted,
+      // NO PLAN RECORDED is itself a problem: without it nothing can say whether work is
+      // missing, and a report that cannot detect missing work should not claim integrity.
+      planRecorded: !!plan,
+      ok: duplicates.length === 0 && missingFields.length === 0 && unaccounted.length === 0 && !!plan,
+    },
     reconciliation,
     arms, byReplicate, pairs, runs,
   };
