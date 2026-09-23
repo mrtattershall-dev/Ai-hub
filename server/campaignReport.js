@@ -42,6 +42,11 @@ export const REQUIRED_FIELDS_BY_STATUS = Object.freeze({
   INTERRUPTED: ['idx', 'rep', 'task', 'arm', 'termination', 'reason'],
   // never ran: identity and why, and nothing else
   UNATTEMPTED: ['idx', 'rep', 'task', 'arm', 'termination', 'reason'],
+  // BLOCKED: a prerequisite was not accepted, so it was never attempted and owes no verdict.
+  // Added after BENCH-1 flagged four BLOCKED chain steps for missing requested/protected -
+  // the THIRD time a status without its own field list produced a false alarm, and this one
+  // was a status added in the same session as the check it broke.
+  BLOCKED: ['idx', 'rep', 'task', 'arm', 'termination', 'reason'],
 });
 
 /** Back-compat for callers that want the completed-run list. */
@@ -52,6 +57,7 @@ export function requiredFieldsFor(run) {
   const t = String(run?.termination || '').toUpperCase();
   if (t === 'UNATTEMPTED') return REQUIRED_FIELDS_BY_STATUS.UNATTEMPTED;
   if (t === 'INTERRUPTED') return REQUIRED_FIELDS_BY_STATUS.INTERRUPTED;
+  if (t === 'BLOCKED') return REQUIRED_FIELDS_BY_STATUS.BLOCKED;
   return REQUIRED_FIELDS_BY_STATUS.COMPLETED;
 }
 /**
@@ -168,11 +174,12 @@ export function buildReport(summaryPath, meta = {}) {
 
   // AUTOMATIC STATUS ACCOUNTING. Completed, interrupted and unattempted are counted here so
   // no one has to reconstruct them from the results by hand.
-  const byStatus = { COMPLETED: 0, INTERRUPTED: 0, UNATTEMPTED: 0, OTHER: 0 };
+  const byStatus = { COMPLETED: 0, INTERRUPTED: 0, UNATTEMPTED: 0, BLOCKED: 0, OTHER: 0 };
   for (const r of runs) {
     const t = String(r.termination || '').toUpperCase();
     if (t === 'UNATTEMPTED') byStatus.UNATTEMPTED++;
     else if (t === 'INTERRUPTED') byStatus.INTERRUPTED++;
+    else if (t === 'BLOCKED') byStatus.BLOCKED++;
     else byStatus.COMPLETED++;
   }
   byStatus.UNACCOUNTED = unaccounted.length;
