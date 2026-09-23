@@ -36,7 +36,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 const exec = promisify(execCb);
-const { quarantine, lockAuditDir, modelEnv, treeOf } = await import('./d2.js');
+const { quarantine, lockAuditDir, unlockAuditDir, modelEnv, treeOf } = await import('./d2.js');
 
 let passed = 0, failed = 0;
 const say = (ok, m) => { console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${m}`); ok ? passed++ : failed++; };
@@ -147,7 +147,7 @@ try {
   // Unlock before cleanup, or the temp tree cannot be removed.
   for (const d of [auditDir, ...dirsToUnlock, OTHER, BASE]) {
     if (!d) continue;
-    try { execFileSync('icacls', [d, '/remove:d', USER, '/T'], { windowsHide: true, stdio: 'ignore' }); } catch { /* best effort */ }
+    await unlockAuditDir(d);   // directory first, then recurse - /T alone cannot enumerate a denied tree
   }
   try { rmSync(BASE, { recursive: true, force: true }); } catch { /* best effort */ }
 }

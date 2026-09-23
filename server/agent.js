@@ -44,6 +44,8 @@ import { emitHostEvent, attachFileSink } from './hostEvent.js';
 // LEGASUS PHASE 2 - d2, the first LOAD-BEARING decision. See PHASE2-INTERVENTION_PREREG.md.
 // Off unless AGENT_D2_TARGETS names the campaign's protected deliverables, so ARM A of the
 // paired campaign is the hub exactly as Phase 1 left it.
+import { ROUTES_BOUNDED, noteUncoveredTraversal, refuseAtDetachedSite } from './routeBound.js';
+import { lockAuditDir } from './d2.js';
 import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState, mayMutate } from './d2.js';
 
 // The Phase 1 consumer, attached once at module load and only when asked for. Guarded because
@@ -186,6 +188,38 @@ async function d2TerminalGate(run) {
       return !D2_ENFORCE;
     }
     run.d2.auditBundle = q.bundle;          // a path OUTSIDE the workspace, never a ref inside it
+
+    // SEAL IT. Being outside the workspace and absent from the model's environment are
+    // DISCOVERABILITY measures, not access control: the model's commands run as the same OS
+    // user and can read anything that user can - demonstrated, not assumed, in
+    // d2Access.test.mjs, where a known-path read of the bundle SUCCEEDED before the lock.
+    //
+    // Applied AFTER quarantine's own verification, because verifying a bundle requires
+    // reading it. The lock denies READ only, so later runs keep capturing into their own
+    // per-run directories while nothing on this host reads a capture back. Recovery becomes
+    // an offline act by someone with different access - which is what makes this an audit
+    // artifact rather than a recovery resource either arm could use.
+    //
+    // A FAILED LOCK IS RECORDED, NEVER ASSUMED. lockAuditDir proves the deny by attempting a
+    // read and requiring EPERM; if it could not, the run says so rather than carrying an
+    // isolation claim it did not establish.
+    // READ AT CALL TIME, not at import. Sealing is campaign-scoped, and a flag fixed at
+    // import cannot be exercised in both configurations from one test process - which is how
+    // a campaign-only code path goes unrun until the campaign runs it.
+    //
+    // THE COST OF SEALING, stated rather than discovered later: once the deny ACE is on, this
+    // host cannot read the artifact back - not its contents, not even its existence, because
+    // stat() returns EPERM too. After this point "the candidate's work was preserved" rests
+    // on quarantine's own pre-seal verification (bundle verify + tree match), NOT on any
+    // post-hoc recovery. That is the intended trade: an audit artifact neither arm can reach.
+    const sealed = process.env.AGENT_D2_SEAL_AUDIT === '1'
+      ? await lockAuditDir(q.dir)
+      : { ok: false, error: 'not sealed: AGENT_D2_SEAL_AUDIT is off (the ordinary hub keeps its audit readable)' };
+    run.d2.auditSealed = sealed.ok;
+    if (!sealed.ok && process.env.AGENT_D2_SEAL_AUDIT === '1') {
+      run.d2.auditSealError = sealed.error;
+      pushStep(run, { type: 'note', text: `d2: the audit capture could NOT be sealed (${sealed.error}). It is readable by this run's own commands, so this run's isolation claim is UNESTABLISHED.` });
+    }
 
     // THE ARMS DIVERGE HERE, AND ONLY HERE. Identical verdict, identical audit capture; only
     // the authority to change what survives differs.
@@ -1634,6 +1668,17 @@ const tools = {
   },
 };
 
+// ROUTE BOUNDING - remove the only entry to the uncovered subtask dispatch.
+//
+// runSubtask() runs its own tool loop, which d2's host events, before-images and terminal
+// gate never see. Deleting the tool makes that site UNREACHABLE rather than merely unused:
+// the model is not offered it, and the existing unknown-tool branch rejects the name if it
+// emits one anyway. Identical in both arms - this is configuration, not treatment.
+//
+// Deleted rather than stubbed so `hasTool` reports the truth. A stub that returns an error
+// still answers 'yes, that tool exists', and this project has already been burned by a
+// guard that reported a state it was not in.
+
 // The Google tools join the same table, at load time. safePath confines drive_upload to the
 // workspace by exactly the check that confines write_file - without it, PATH: ../../.ssh/id_rsa
 // is a one-line exfiltration that the approval prompt would ask about in a form nobody reads
@@ -1801,6 +1846,11 @@ const AUTO_TOOLS = new Set(['list_dir', 'read_file', 'search_file', 'outline_fil
   'queue_task', 'spawn_subtask',
   // Reading the asset manifest is a lookup, nothing more.
   'list_assets']);
+
+// Applied HERE, not next to the tool table: AUTO_TOOLS is declared below it, so running
+// this earlier throws a TDZ ReferenceError at load - and only when bounding is ON, which
+// is the shape of failure that passes every check unable to reach the line.
+if (ROUTES_BOUNDED) { delete tools.spawn_subtask; AUTO_TOOLS.delete('spawn_subtask'); }
 
 // Sub-task recursion bounds. Depth 2 is enough for "build the thing" -> "build this
 // part" -> "fix this file"; deeper is almost always a model losing the plot, and each
@@ -2891,6 +2941,10 @@ async function runSubtask(goal, depth, parent) {
       }
     }
     let result;
+    // UNCOVERED SITE. d2's host events, before-images and terminal gate all live in
+    // drive(); none of them see this dispatch. Recorded BEFORE the call, because a tool
+    // that throws still traversed the route.
+    noteUncoveredTraversal(parent, 'runSubtask', tool);
     try { result = await tools[tool](args); } catch (e) { result = `ERROR: ${e.message}`; }
     if (tool === 'write_file' || tool === 'edit_file') { sub.lastPath = args.path; done.push(`${tool} ${args.path}`); }
     if (parent) pushStep(parent, { type: 'subtask_step', tool, args, text: `  ↳ ${tool} ${args.path || args.cmd || ''}`.slice(0, 160) });
@@ -4895,12 +4949,25 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       pushStep(run, { type: 'approval_denied', tool, args });
       run.history.push({ role: 'user', content: `The human DENIED running: ${args.cmd}. Do not run it. Continue another way or finish.` });
     } else {
-      let result;
-      try { result = await tools[tool](args); }
-      catch (e) { result = `ERROR: ${e.message}`; }
-      result = await withAssertEvidence(tool, result);   // same evidence for a human-approved run
-      pushStep(run, { type: 'tool', tool, args, result, approved: true });
-      run.history.push({ role: 'user', content: `TOOL RESULT (${tool}):\n${result}` });
+      // UNCOVERED SITE - the human-approved command path. Closed outright during a
+      // campaign; instrumented always, because "no approver was watching" is not the
+      // same claim as "this route cannot execute".
+      // A refusal here behaves like the DENY branch above - the run is told, then resumes.
+      // It must NOT return early: this is an Express handler, so returning would leave the
+      // request without a response and the run parked with nothing driving it.
+      const bound = refuseAtDetachedSite();
+      if (bound.refuse) {
+        pushStep(run, { type: 'route_closed', tool, args });
+        run.history.push({ role: 'user', content: bound.message });
+      } else {
+        noteUncoveredTraversal(run, 'driveDetached', tool);
+        let result;
+        try { result = await tools[tool](args); }
+        catch (e) { result = `ERROR: ${e.message}`; }
+        result = await withAssertEvidence(tool, result);   // same evidence for a human-approved run
+        pushStep(run, { type: 'tool', tool, args, result, approved: true });
+        run.history.push({ role: 'user', content: `TOOL RESULT (${tool}):\n${result}` });
+      }
     }
     run.status = 'running';
     driveDetached(loadDb, run);

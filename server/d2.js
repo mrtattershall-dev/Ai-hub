@@ -507,6 +507,33 @@ export async function lockAuditDir(dir) {
 }
 
 /**
+ * Release a lock applied by lockAuditDir(), so the directory can be read or deleted again.
+ *
+ * TWO STAGES, AND THE ORDER IS THE WHOLE POINT. `icacls <dir> /remove:d <user> /T` on a
+ * sealed directory reports "Successfully processed 0 files" and changes NOTHING: /T has to
+ * enumerate the tree, and the deny ACE is precisely what stops it from doing so. It exits 0
+ * while doing nothing - a success report over an unperformed action, which is the failure
+ * class this project watches for.
+ *
+ * So the deny on the DIRECTORY is removed first, without /T; only then can the recursive pass
+ * see the children. Verified by reading the directory afterwards rather than by exit codes.
+ *
+ * For auditors and cleanup, never for a run: nothing in the agent path calls this.
+ */
+export async function unlockAuditDir(dir) {
+  const user = process.env.USERNAME || process.env.USER;
+  if (!user) return { ok: false, error: 'no user to un-deny' };
+  if (process.platform === 'win32') {
+    try { await exec('icacls', [dir, '/remove:d', user], { windowsHide: true }); } catch { /* may already be clear */ }
+    try { await exec('icacls', [dir, '/remove:d', user, '/T'], { windowsHide: true }); } catch { /* best effort */ }
+  } else {
+    try { await exec('chmod', ['-R', 'u+r', dir]); } catch { /* best effort */ }
+  }
+  try { readdirSync(dir); return { ok: true }; }
+  catch (e) { return { ok: false, error: `still unreadable after unlock: ${e.code}` }; }
+}
+
+/**
  * May this run be allowed to MUTATE anything?
  *
  * The starting-state observation and the restoration snapshot must describe the SAME state,

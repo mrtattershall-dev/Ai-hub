@@ -23,13 +23,14 @@
  * DIFFERENT in exactly the way Amendment 10 permits, and in no other way.
  */
 import { spawn } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync, readdirSync } from 'node:fs';
 
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { scratch, startHub, freePorts } from './testHarness.mjs';
+import { unlockAuditDir } from './d2.js';
 
 /** Can an auditor recover a file from the external audit bundle? */
 const recoverable = (bundle, runId, name) => {
@@ -50,7 +51,7 @@ const TARGETS = ['lib.js', 'consumer.js'];
 const git = (ws, ...a) => { try { return execFileSync('git', ['-C', ws, ...a], { encoding: 'utf8' }).trim(); } catch (e) { return `ERR:${String(e.message).slice(0, 50)}`; } };
 
 /** One arm: real hub, real route, scripted model. */
-async function arm(script, enforce) {
+async function arm(script, enforce, seal = false) {
   const [hubPort, fakePort] = await freePorts(2);
   const dir = scratch(`d2int-${enforce ? 'b' : 'a'}`, { baseUrl: `http://127.0.0.1:${fakePort}`, model: 'fake' });
   const ws = join(dir, 'workspace');
@@ -70,6 +71,7 @@ async function arm(script, enforce) {
         HOST_EVENT_LOG: eventLog,                      // identical in both arms
         AGENT_APPROVAL_MODE: 'build',
         ...(enforce ? { AGENT_D2_ENFORCE: '1' } : {}), // the ONLY intended difference
+        ...(seal ? { AGENT_D2_SEAL_AUDIT: '1' } : {}), // campaign sealing, exercised below
       },
     });
     hub = started.hub;
@@ -90,6 +92,8 @@ async function arm(script, enforce) {
       eventTools: events.filter((e) => ['write_file', 'edit_file', 'append_file'].includes(e.tool)).map((e) => e.tool),
       candidateTree: run?.d2?.candidateRef ? git(ws, 'rev-parse', `${run.d2.candidateRef}^{tree}`) : null,
       auditBundle: run?.d2?.auditBundle || null,
+      auditSealed: run?.d2?.auditSealed ?? null,
+      auditSealError: run?.d2?.auditSealError || null,
       auditTree: null,   // filled below from the bundle itself
       headTree: git(ws, 'rev-parse', 'HEAD^{tree}'),
       dirty: git(ws, 'status', '--porcelain'),
@@ -153,8 +157,44 @@ try {
     say(B.partialOnDisk === false, 'ARM B: untracked run-created files were REMOVED (reset --hard alone would have left them)');
     say(B.partialInQuarantine === true, 'ARM B: that partial work is PRESERVED in the audit artifact, not destroyed');
     say(B.dirty === '', 'ARM B: working tree clean after restore');
+
+    // ── THE CAMPAIGN CONFIGURATION: sealing ON ──
+    //
+    // Sealing is campaign-scoped, so without this it would be a code path that nothing runs
+    // until the campaign runs it - the same shape as the TDZ error that only fired with route
+    // bounding on. This drives the REAL hub with AGENT_D2_SEAL_AUDIT=1 and asserts the seal
+    // through the run record the hub itself produced.
+    //
+    // WHAT SEALING COSTS, asserted rather than described: after the lock this host cannot read
+    // the artifact back - not its contents, and not even its existence, because stat() returns
+    // EPERM too. So "the work was preserved" rests here on quarantine's PRE-SEAL verification
+    // (bundle verify + tree match, already asserted above with sealing off), NOT on a post-hoc
+    // recovery. Both claims are kept separate on purpose.
+    console.log(String.fromCharCode(10) + "=== campaign configuration: the audit capture is SEALED ===");
+    const S = await arm('d2break', true, true);
+    dirs.push(S.dir);
+    say(S.d2 && S.d2.violated === true, `sealed ARM B still detects the regression (violated=${S.d2 && S.d2.violated})`);
+    say(S.auditSealed === true, `the audit capture was SEALED by the run itself (${S.auditSealError || 'no error'})`);
+    // POSITIVE CONTROL: the unsealed ARM B above read its artifact back successfully. If that
+    // had failed, "unreadable" here would prove nothing about the lock.
+    say(B.partialInQuarantine === true, 'POSITIVE CONTROL: the UNSEALED run\'s artifact was readable - so unreadability below is the lock, not a broken probe');
+    const sealedReadable = S.auditBundle ? existsSync(S.auditBundle) : null;
+    say(sealedReadable === false, `and the sealed artifact is not even stat-able afterwards (existsSync=${sealedReadable})`);
+    say(S.dirty === '' && S.loads('lib.js') === true, 'sealing changed nothing about restoration - the workspace is still restored and loadable');
   }
 } finally {
+  // UNSEAL BEFORE CLEANUP. A sealed audit directory cannot be removed by the user that was
+  // denied read on it, so without this every sealed run leaves an undeletable directory in
+  // the source tree. The test that creates the lock is responsible for releasing it.
+  try {
+    const root = join(HERE, 'legasus-audit');
+    if (existsSync(root)) {
+      for (const d of readdirSync(root)) {
+        await unlockAuditDir(join(root, d));   // /T alone reports success and does nothing
+      }
+      rmSync(root, { recursive: true, force: true });
+    }
+  } catch { /* best effort */ }
   for (const d of dirs) { try { rmSync(d, { recursive: true, force: true }); } catch {} }
 }
 
