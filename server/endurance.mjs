@@ -210,7 +210,8 @@ console.log(`3. report produced automatically                : YES (integrity ${
 const probes = report.runs.filter((r) => r.arm === 'FAULT_PROBE');
 const restored = probes.filter((r) => r.disposition === 'RESTORED').length;
 console.log(`4. accepted work / rollbacks                    : see below`);
-console.log(`   scripted fault probes: ${probes.length}, RESTORED ${restored}/${probes.length}` + (probes.length && restored === probes.length ? '  (rollback exercised under load)' : ''));
+const probesAttempted = probes.filter((r) => r.termination !== 'UNATTEMPTED').length;
+console.log(`   scripted fault probes: ${probesAttempted} attempted (${probes.length} queued), RESTORED ${restored}/${probesAttempted}` + (probesAttempted && restored === probesAttempted ? '  (rollback exercised under load)' : ''));
 console.log('   (probes are excluded from the productivity totals below)');
 console.log(JSON.stringify(report.arms, null, 2));
 console.log(`\nsummary: ${SUMMARY}`);

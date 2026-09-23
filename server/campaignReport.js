@@ -82,6 +82,11 @@ export function buildReport(summaryPath, meta = {}) {
   }
   const missingFields = [];
   for (const r of runs) {
+    // AN UNATTEMPTED RUN HAS NO VERDICT, and that is correct rather than missing. ENDURANCE-2
+    // reported integrity:false purely because 77 UNATTEMPTED runs had null requested/protected -
+    // the CHECK was wrong, not the campaign. A check that fires on correct data trains its
+    // reader to ignore it.
+    if (r.termination === 'UNATTEMPTED') continue;
     const gaps = REQUIRED_RUN_FIELDS.filter((f) => r[f] === undefined || r[f] === null);
     if (gaps.length) missingFields.push({ run: `${r.rep}/${r.task}/${r.arm}`, gaps });
   }
