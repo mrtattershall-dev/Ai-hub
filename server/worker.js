@@ -71,9 +71,14 @@ export async function workerAvailable() {
  * list rather than on a description of it - a comment claiming "--network none" is not evidence
  * that the flag is passed, and this project has already asserted a bug from the wrong side twice.
  */
-export function workerArgs(workspace, cmd, { image = WORKER_IMAGE } = {}) {
+export function workerArgs(workspace, cmd, { image = WORKER_IMAGE, name = null } = {}) {
   return [
     'run',
+    // IDENTITY BEFORE CREATION. The name is chosen by the caller and recorded before the
+    // create request is sent, so a lost response can be RECONCILED against it rather than
+    // guessed at. Without this, "docker run failed" and "docker run succeeded but the answer
+    // never came back" are indistinguishable - the sentinel's ambiguity moved one layer out.
+    ...(name ? ['--name', name] : []),
     // NO --rm. The detached flow asks the DAEMON for the exit status, and --rm deletes the
     // container the instant it exits, so  reported "No such container" for every
     // command that finished normally - an authoritative status destroyed by a cleanup flag.
@@ -161,24 +166,70 @@ const dockerRaw = async (args, timeoutMs = 60_000) => {
  * it separates "the container never started" from "it started and we lost the answer", and it
  * takes the exit status from the daemon instead of from the command's own output.
  */
+/**
+ * Does a container with this identity exist?
+ *
+ * Returns true / false / null, and NULL IS NOT FALSE: null means the question could not be
+ * answered, which must become UNCONFIRMED rather than "no". Collapsing them would reintroduce
+ * exactly the ambiguity this identity exists to remove.
+ */
+export async function attemptExists(name) {
+  const q = await dockerRaw(['ps', '-a', '--filter', `name=^${name}$`, '--format', '{{.ID}}'], 60_000);
+  if (!q.ok) return null;                       // the daemon could not be asked
+  return q.out.trim().length > 0;
+}
+
+/** A fresh attempt identity. Recorded by the caller BEFORE the create request is sent. */
+export function newAttemptId() {
+  return 'legasus-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+}
+
+/**
+ * Run one model-chosen command inside the isolated worker.
+ *
+ * The command goes in UNWRAPPED. An in-container `timeout` was tried and abandoned: BusyBox
+ * returns 143 rather than coreutils' 124, and nested under `sh -c` the container still reported
+ * exit 0 for a command demonstrably killed mid-way. In-container status is not an instrument.
+ * The timeout is enforced HOST-side and every status comes from the daemon.
+ *
+ * `onAttempt` is called with the attempt id BEFORE creation is requested, so a caller keeping a
+ * journal can reconcile after a crash. It is the caller's only chance to record the identity.
+ */
 export async function runInWorker(workspace, cmd, opts = {}) {
   const sec = opts.timeoutSec || 600;
-  // The command goes in UNWRAPPED. An in-container `timeout` was tried and abandoned: BusyBox
-  // returns 143 rather than coreutils' 124, and nested under `sh -c` the container still
-  // reported exit 0 for a command that was demonstrably killed mid-way. In-container status is
-  // not a reliable instrument - which is the same lesson as the sentinel, one layer down.
-  // The timeout is enforced HOST-side instead, and every status comes from the daemon.
-  const args = workerArgs(workspace, cmd, opts);
+  const name = opts.attemptId || newAttemptId();
+  if (typeof opts.onAttempt === 'function') await opts.onAttempt(name);
+
+  const args = workerArgs(workspace, cmd, { ...opts, name });
   const started = await dockerRaw(['run', '-d', ...args.slice(1)], 120_000);
-  const cid = started.ok ? started.out.trim().split(/\s+/).pop() : '';
-  if (!started.ok || !/^[0-9a-f]{12,64}$/.test(cid)) {
-    // Never created or started, so no effect on the workspace is possible.
-    throw new WorkerUnavailable({ phase: 'start', code: started.code ?? null, stderrHead: started.err.replace(/\s+/g, ' ').trim().slice(0, 300) });
+  let cid = started.ok ? started.out.trim().split(/\s+/).pop() : '';
+
+  if (!/^[0-9a-f]{12,64}$/.test(cid)) {
+    // THE CREATE REQUEST FAILED - which does NOT establish that nothing was created. The daemon
+    // may have created and started the container while the response was lost. Reconcile against
+    // the identity recorded above.
+    const exists = await attemptExists(name);
+    if (exists === null) {
+      throw new WorkerUnconfirmed({ phase: 'start-unreconcilable', attemptId: name,
+        reason: 'the create request failed AND the daemon could not be asked whether it ran anyway' });
+    }
+    if (exists === true) {
+      // It DID start. Fall through and read its real status.
+      const q = await dockerRaw(['ps', '-a', '--filter', `name=^${name}$`, '--format', '{{.ID}}'], 60_000);
+      cid = q.out.trim().split(/\s+/)[0] || '';
+      if (!/^[0-9a-f]{12,64}$/.test(cid)) {
+        throw new WorkerUnconfirmed({ phase: 'start-raced', attemptId: name,
+          reason: 'a container with this identity exists but its id could not be read' });
+      }
+    } else {
+      // CONFIRMED absent. Only now is "never created" a fact rather than an inference.
+      throw new WorkerUnavailable({ phase: 'start', attemptId: name, confirmedAbsent: true,
+        code: started.code ?? null, stderrHead: started.err.replace(/\s+/g, ' ').trim().slice(0, 300) });
+    }
   }
 
   let timedOut = false;
   try {
-    // Race the daemon's own wait against a host timer.
     let timer;
     const waited = await Promise.race([
       dockerRaw(['wait', cid], sec * 1000 + 60_000),
@@ -189,18 +240,32 @@ export async function runInWorker(workspace, cmd, opts = {}) {
     if (waited === 'TIMEOUT') {
       timedOut = true;
       await dockerRaw(['kill', cid], 60_000);
-      result = await dockerRaw(['wait', cid], 60_000);   // authoritative status after the kill
+      result = await dockerRaw(['wait', cid], 60_000);
     }
 
     const logs = await dockerRaw(['logs', cid], 60_000);
     const out = logs.out + logs.err;
     const exit = parseInt(String(result.out || '').trim(), 10);
     if (!result.ok || Number.isNaN(exit)) {
-      // It STARTED. Its writes may be half-applied. This is not "never ran".
-      throw new WorkerUnconfirmed({ phase: 'wait', timedOut, cid: cid.slice(0, 12), outHead: out.replace(/\s+/g, ' ').trim().slice(0, 300) });
+      throw new WorkerUnconfirmed({ phase: 'wait', attemptId: name, timedOut, cid: cid.slice(0, 12), outHead: out.replace(/\s+/g, ' ').trim().slice(0, 300) });
     }
-    return { status: WORKER_STATUS.COMPLETED, ok: exit === 0 && !timedOut, exit, timedOut, out };
+    return { status: WORKER_STATUS.COMPLETED, ok: exit === 0 && !timedOut, exit, timedOut, out, attemptId: name };
   } finally {
     await dockerRaw(['rm', '-f', cid], 60_000);
   }
+}
+
+/**
+ * CONFIRM a container is stopped and gone. Used before a workspace is reused or evaluated.
+ *
+ * A container still running against the workspace would keep writing to it while the evaluator
+ * read it, so "probably finished" is not good enough: if this cannot be confirmed, the caller
+ * must halt rather than proceed.
+ */
+export async function confirmStopped(name) {
+  await dockerRaw(['rm', '-f', name], 60_000);
+  const exists = await attemptExists(name);
+  if (exists === null) return { ok: false, reason: 'the daemon could not be asked whether the container is gone' };
+  if (exists === true) return { ok: false, reason: 'the container still exists after a forced removal' };
+  return { ok: true };
 }
