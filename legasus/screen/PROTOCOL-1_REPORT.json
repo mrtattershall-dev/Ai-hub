@@ -1,0 +1,374 @@
+{
+  "experiment": "PROTOCOL-1",
+  "kind": "DEVELOPMENT COMPARISON (already-inspected tasks)",
+  "at": "2026-09-23T10:10:48.659Z",
+  "model": "https://mr-tattershall--legasus-7b-server-web.modal.run",
+  "order": [
+    [
+      "t1-repair-node-average",
+      "CONTROL"
+    ],
+    [
+      "t1-repair-node-average",
+      "TREATMENT"
+    ],
+    [
+      "t2-repair-python-parse",
+      "TREATMENT"
+    ],
+    [
+      "t2-repair-python-parse",
+      "CONTROL"
+    ],
+    [
+      "t3-add-node-median",
+      "CONTROL"
+    ],
+    [
+      "t3-add-node-median",
+      "TREATMENT"
+    ],
+    [
+      "t4-add-python-slugify",
+      "TREATMENT"
+    ],
+    [
+      "t4-add-python-slugify",
+      "CONTROL"
+    ],
+    [
+      "t5-multifile-node-discount",
+      "CONTROL"
+    ],
+    [
+      "t5-multifile-node-discount",
+      "TREATMENT"
+    ]
+  ],
+  "arms": {
+    "CONTROL": {
+      "runs": 5,
+      "acceptedImprovements": 3,
+      "requestedPass": 3,
+      "protectedRetained": 5,
+      "protectedBroken": 0,
+      "evalErrors": 0,
+      "modelCalls": 35,
+      "tokens": 195082,
+      "seconds": 218,
+      "toolsExecuted": 32,
+      "controllerRefusals": 0
+    },
+    "TREATMENT": {
+      "runs": 5,
+      "acceptedImprovements": 3,
+      "requestedPass": 3,
+      "protectedRetained": 5,
+      "protectedBroken": 0,
+      "evalErrors": 0,
+      "modelCalls": 27,
+      "tokens": 148454,
+      "seconds": 160,
+      "toolsExecuted": 10,
+      "controllerRefusals": 12
+    }
+  },
+  "results": [
+    {
+      "idx": 1,
+      "task": "t1-repair-node-average",
+      "arm": "CONTROL",
+      "termination": "stopped",
+      "stoppedConfirmed": true,
+      "requested": "FAIL",
+      "protected": "PASS",
+      "disposition": "PRESERVE_INCOMPLETE",
+      "accepted": false,
+      "startTree": "373037f01c920f190ffebe770397ae0af887893c",
+      "candidateTree": "3dd65e3c1ed8f5a541b9aed8b8a82a000ea6b612",
+      "survivingVerdict": "FAIL",
+      "elapsedSec": 34,
+      "modelCalls": 7,
+      "tokens": 39072,
+      "attemptedTools": [
+        "read_file",
+        "outline_file",
+        "outline_file",
+        "outline_file",
+        "outline_file",
+        "outline_file"
+      ],
+      "controllerRefusals": []
+    },
+    {
+      "idx": 2,
+      "task": "t1-repair-node-average",
+      "arm": "TREATMENT",
+      "termination": "stopped",
+      "stoppedConfirmed": true,
+      "requested": "PASS",
+      "protected": "PASS",
+      "disposition": "RETAIN",
+      "accepted": true,
+      "startTree": "373037f01c920f190ffebe770397ae0af887893c",
+      "candidateTree": "879ba0175b1d8689437675152f14218fad7d8023",
+      "survivingVerdict": "PASS",
+      "elapsedSec": 26,
+      "modelCalls": 5,
+      "tokens": 26950,
+      "attemptedTools": [
+        "read_file",
+        "edit_file"
+      ],
+      "controllerRefusals": [
+        {
+          "tool": "run_python",
+          "reason": "UNKNOWN_INTENT"
+        },
+        {
+          "tool": "run_python",
+          "reason": "UNKNOWN_INTENT"
+        }
+      ]
+    },
+    {
+      "idx": 3,
+      "task": "t2-repair-python-parse",
+      "arm": "TREATMENT",
+      "termination": "stopped",
+      "stoppedConfirmed": true,
+      "requested": "PASS",
+      "protected": "PASS",
+      "disposition": "RETAIN",
+      "accepted": true,
+      "startTree": "449e6af3e02b75963343dd14fe056bd1242e7fb2",
+      "candidateTree": "a0dc37d23c76b4ffd4b311287233f48b65e23a6a",
+      "survivingVerdict": "PASS",
+      "elapsedSec": 38,
+      "modelCalls": 6,
+      "tokens": 34060,
+      "attemptedTools": [
+        "read_file",
+        "edit_file"
+      ],
+      "controllerRefusals": [
+        {
+          "tool": "outline_file",
+          "reason": "WRONG_PHASE"
+        },
+        {
+          "tool": "run_python",
+          "reason": "UNKNOWN_INTENT"
+        },
+        {
+          "tool": "run_python",
+          "reason": "UNKNOWN_INTENT"
+        }
+      ]
+    },
+    {
+      "idx": 4,
+      "task": "t2-repair-python-parse",
+      "arm": "CONTROL",
+      "termination": "stopped",
+      "stoppedConfirmed": true,
+      "requested": "PASS",
+      "protected": "PASS",
+      "disposition": "RETAIN",
+      "accepted": true,
+      "startTree": "449e6af3e02b75963343dd14fe056bd1242e7fb2",
+      "candidateTree": "72ccb858d66152593bd782188a5066491503a8d8",
+      "survivingVerdict": "PASS",
+      "elapsedSec": 38,
+      "modelCalls": 7,
+      "tokens": 38568,
+      "attemptedTools": [
+        "outline_file",
+        "read_file",
+        "edit_file",
+        "edit_file",
+        "edit_file",
+        "edit_file"
+      ],
+      "controllerRefusals": []
+    },
+    {
+      "idx": 5,
+      "task": "t3-add-node-median",
+      "arm": "CONTROL",
+      "termination": "stopped",
+      "stoppedConfirmed": true,
+      "requested": "FAIL",
+      "protected": "PASS",
+      "disposition": "PRESERVE_INCOMPLETE",
+      "accepted": false,
+      "startTree": "63a3a0fecd9a2b7fbb5ac2e1d5c029b1748cb9b1",
+      "candidateTree": "ec0f4ef761c30b3c9aac663ae8becf41ca8b1b1a",
+      "survivingVerdict": "FAIL",
+      "elapsedSec": 40,
+      "modelCalls": 5,
+      "tokens": 27397,
+      "attemptedTools": [
+        "outline_file",
+        "write_file",
+        "write_file",
+        "write_file"
+      ],
+      "controllerRefusals": []
+    },
+    {
+      "idx": 6,
+      "task": "t3-add-node-median",
+      "arm": "TREATMENT",
+      "termination": "stopped",
+      "stoppedConfirmed": true,
+      "requested": "FAIL",
+      "protected": "PASS",
+      "disposition": "PRESERVE_INCOMPLETE",
+      "accepted": false,
+      "startTree": "63a3a0fecd9a2b7fbb5ac2e1d5c029b1748cb9b1",
+      "candidateTree": "88816300a1a2085dcbb0ba5c1c97b1a233c665c1",
+      "survivingVerdict": "FAIL",
+      "elapsedSec": 43,
+      "modelCalls": 6,
+      "tokens": 33315,
+      "attemptedTools": [
+        "read_file",
+        "write_file"
+      ],
+      "controllerRefusals": [
+        {
+          "tool": "edit_file",
+          "reason": "WRONG_PHASE"
+        },
+        {
+          "tool": "run_python",
+          "reason": "UNKNOWN_INTENT"
+        },
+        {
+          "tool": "run_python",
+          "reason": "UNKNOWN_INTENT"
+        }
+      ]
+    },
+    {
+      "idx": 7,
+      "task": "t4-add-python-slugify",
+      "arm": "TREATMENT",
+      "termination": "stopped",
+      "stoppedConfirmed": true,
+      "requested": "PASS",
+      "protected": "PASS",
+      "disposition": "RETAIN",
+      "accepted": true,
+      "startTree": "68e9e56c6849891be1cdee16633c85871943306b",
+      "candidateTree": "e948e85318b132e4fc69ca090765ad468fa54ae4",
+      "survivingVerdict": "PASS",
+      "elapsedSec": 23,
+      "modelCalls": 5,
+      "tokens": 26496,
+      "attemptedTools": [
+        "read_file",
+        "write_file"
+      ],
+      "controllerRefusals": [
+        {
+          "tool": "wait_for_verification",
+          "reason": "UNKNOWN_INTENT"
+        },
+        {
+          "tool": "wait_for_verification",
+          "reason": "UNKNOWN_INTENT"
+        }
+      ]
+    },
+    {
+      "idx": 8,
+      "task": "t4-add-python-slugify",
+      "arm": "CONTROL",
+      "termination": "stopped",
+      "stoppedConfirmed": true,
+      "requested": "PASS",
+      "protected": "PASS",
+      "disposition": "RETAIN",
+      "accepted": true,
+      "startTree": "68e9e56c6849891be1cdee16633c85871943306b",
+      "candidateTree": "8494b488e33626ac32fcb5ac672d2e733f4fc048",
+      "survivingVerdict": "PASS",
+      "elapsedSec": 56,
+      "modelCalls": 6,
+      "tokens": 33356,
+      "attemptedTools": [
+        "read_file",
+        "edit_file",
+        "edit_file",
+        "edit_file",
+        "edit_file"
+      ],
+      "controllerRefusals": []
+    },
+    {
+      "idx": 9,
+      "task": "t5-multifile-node-discount",
+      "arm": "CONTROL",
+      "termination": "stopped",
+      "stoppedConfirmed": true,
+      "requested": "PASS",
+      "protected": "PASS",
+      "disposition": "RETAIN",
+      "accepted": true,
+      "startTree": "016e94fdd524923e51f0d10fcd8cb26e056ba444",
+      "candidateTree": "69d4f52af9894dc8a490d97361d879ae4bcae9e4",
+      "survivingVerdict": "PASS",
+      "elapsedSec": 50,
+      "modelCalls": 10,
+      "tokens": 56689,
+      "attemptedTools": [
+        "outline_file",
+        "read_file",
+        "outline_file",
+        "list_assets",
+        "edit_file",
+        "read_file",
+        "edit_file",
+        "run_python",
+        "run_python",
+        "run_python",
+        "run_python"
+      ],
+      "controllerRefusals": []
+    },
+    {
+      "idx": 10,
+      "task": "t5-multifile-node-discount",
+      "arm": "TREATMENT",
+      "termination": "stopped",
+      "stoppedConfirmed": true,
+      "requested": "FAIL",
+      "protected": "PASS",
+      "disposition": "PRESERVE_INCOMPLETE",
+      "accepted": false,
+      "startTree": "016e94fdd524923e51f0d10fcd8cb26e056ba444",
+      "candidateTree": "4f4a07da7eaf04a6b9e1b4bfb61004df92d768dd",
+      "survivingVerdict": "FAIL",
+      "elapsedSec": 30,
+      "modelCalls": 5,
+      "tokens": 27633,
+      "attemptedTools": [
+        "read_file",
+        "write_file"
+      ],
+      "controllerRefusals": [
+        {
+          "tool": "outline_file",
+          "reason": "WRONG_PHASE"
+        },
+        {
+          "tool": "outline_file",
+          "reason": "WRONG_PHASE"
+        }
+      ]
+    }
+  ],
+  "root": "C:\\Users\\tatte\\AppData\\Local\\Temp\\protocol1-4g0ARN"
+}
