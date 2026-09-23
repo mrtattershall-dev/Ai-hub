@@ -216,7 +216,7 @@ for (const r of results) {
   (byReplicate[k] ||= []).push({ task: r.task, arm: r.arm, accepted: !!r.accepted, requested: r.requested ?? null, protected: r.protected ?? null, disposition: r.disposition ?? null });
 }
 
-const report = { experiment: 'PROTOCOL-2', controller: 'v2', kind: 'DEVELOPMENT COMPARISON (already-inspected tasks)', at: new Date().toISOString(), model: MODEL_URL, order: ORDER, arms, byReplicate, truncatedAt, results, root: ROOT };
+const report = { experiment: 'PROTOCOL-2', controller: 'v2', kind: 'DEVELOPMENT COMPARISON (already-inspected tasks)', at: new Date().toISOString(), model: MODEL_URL, order: PAIRS, arms, byReplicate, truncatedAt, results, root: ROOT };
 writeFileSync(join(ROOT, 'PROTOCOL-2_REPORT.json'), JSON.stringify(report, null, 2), 'utf8');
 console.log('\n=== ARMS ===');
 console.log(JSON.stringify(arms, null, 2));
