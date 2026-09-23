@@ -31,11 +31,15 @@ No second copy of any of these files exists in any other worktree — checked ac
 
 What does exist is **git commit history whose messages name these records**, with timestamps
 written by git rather than by the filesystem. That is genuine independent evidence that a
-document of that name **governed work at that time**.
+document or design of that name was **referenced** at that time.
+
+It does **not** establish that the contents of that document governed execution. A commit may
+name a record it only partly followed, or followed in a form since edited. Reference is the
+most these commits can carry.
 
 It is **not** evidence about the bytes below. A commit message proves a design by that name
-was in force; it cannot fix what the document said. Anyone citing these records for priority
-must rely on the commit trail for *existence and timing*, and on this manifest only for
+was referenced; it cannot fix what the document said, nor show that it was followed. Anyone citing these records for priority
+must rely on the commit trail for *reference and timing*, and on this manifest only for
 *content from this date forward*.
 
 Filesystem mtimes are recorded below for completeness. They are **not** independent: they come
