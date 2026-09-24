@@ -1,0 +1,55 @@
+CHECK-1 START 2026-09-24T16:28:08.966Z hub 39800a3
+model: https://mr-tattershall--legasus-7b-server-web.modal.run
+worker: sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3
+queue: 5 external + 1 sequential
+limits: 300s/task, 7200s total, 180s reserve, no retries
+
+ 1. [EXTERNAL] ext-find_in_sorted ENDED req=FAIL prot=FAIL RESTORED
+ 2. [EXTERNAL] ext-is_valid_parenthesization ENDED req=PASS prot=PASS RETAIN
+ 3. [EXTERNAL] ext-lcs_length ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 4. [EXTERNAL] ext-lis ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 5. [EXTERNAL] ext-pascal ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 6. [SEQUENTIAL] seq-1-count ENDED req=FAIL prot=FAIL RESTORED
+
+=== CHECK-1 RESULT ===
+elapsed 8m 41s of 120m
+stopped cleanly: YES
+integrity true  reconciliation true
+status {"COMPLETED":6,"INTERRUPTED":0,"UNATTEMPTED":0,"BLOCKED":0,"OTHER":0,"UNACCOUNTED":0,"total":6,"planned":6}
+
+EXTERNAL   accepted 1/5
+SEQUENTIAL accepted 0/1   CONSECUTIVE steps accumulated: 0
+   (different questions - never summed)
+{
+  "EXTERNAL": {
+    "runs": 5,
+    "acceptedImprovements": 1,
+    "requestedPass": 1,
+    "protectedRetained": 4,
+    "protectedBroken": 1,
+    "evalErrors": 0,
+    "modelCalls": 61,
+    "tokens": 382482,
+    "seconds": 444,
+    "toolExecutions": 68,
+    "controllerRefusals": 0
+  },
+  "SEQUENTIAL": {
+    "runs": 1,
+    "acceptedImprovements": 0,
+    "requestedPass": 0,
+    "protectedRetained": 0,
+    "protectedBroken": 1,
+    "evalErrors": 0,
+    "modelCalls": 4,
+    "tokens": 20715,
+    "seconds": 39,
+    "toolExecutions": 5,
+    "controllerRefusals": 0
+  }
+}
+
+summary: C:\Users\tatte\AppData\Local\Temp\bench1-Nkt49N\summary.jsonl
+report:  C:\Users\tatte\AppData\Local\Temp\bench1-Nkt49N\CHECK-1_REPORT.json
+CHECK-1 COMPLETE
+EXIT 0

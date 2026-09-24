@@ -1,0 +1,307 @@
+{
+  "experiment": "CHECK-1",
+  "definition": "BENCH-1 (legasus/screen/BENCH-1_DEFINITION.md), unchanged",
+  "comparisonArm": "NONE - this measures one configuration, not a comparison",
+  "taskSource": {
+    "external": "QuixBugs - independently authored, but PUBLIC and plausibly in training data",
+    "sequential": "internally authored"
+  },
+  "config": {
+    "model": "https://mr-tattershall--legasus-7b-server-web.modal.run",
+    "workerImage": "sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3",
+    "hubCommit": "39800a3",
+    "sampling": {
+      "temperature": "0.2 (default)",
+      "top_p": "unset",
+      "top_k": "unset",
+      "repeat_penalty": "unset"
+    },
+    "supplyMaxBytes": "8192 (default)",
+    "workerIsolation": true,
+    "routeBounding": true,
+    "acceptance": true,
+    "d2": false,
+    "protocolController": false,
+    "perTaskSec": 300,
+    "totalSec": 7200,
+    "retries": "none"
+  },
+  "elapsedSec": 521,
+  "noActiveWorkLeftBehind": true,
+  "externalAccounting": {
+    "queued": 5,
+    "accountedFor": 5,
+    "complete": true,
+    "missing": [],
+    "counts": {
+      "COMPLETED": 1,
+      "FAILED": 4,
+      "INTERRUPTED": 0,
+      "UNATTEMPTED": 0,
+      "EVAL_ERROR": 0,
+      "BLOCKED": 0
+    }
+  },
+  "sequentialAccounting": {
+    "queued": 1,
+    "accountedFor": 1,
+    "complete": true,
+    "missing": [],
+    "counts": {
+      "COMPLETED": 0,
+      "FAILED": 1,
+      "INTERRUPTED": 0,
+      "UNATTEMPTED": 0,
+      "EVAL_ERROR": 0,
+      "BLOCKED": 0
+    }
+  },
+  "interventions": [
+    "none - unattended from launch to final report"
+  ],
+  "root": "C:\\Users\\tatte\\AppData\\Local\\Temp\\bench1-Nkt49N",
+  "builtAt": "2026-09-24T16:36:50.455Z",
+  "byStatus": {
+    "COMPLETED": 6,
+    "INTERRUPTED": 0,
+    "UNATTEMPTED": 0,
+    "BLOCKED": 0,
+    "OTHER": 0,
+    "UNACCOUNTED": 0,
+    "total": 6,
+    "planned": 6
+  },
+  "integrity": {
+    "duplicates": [],
+    "missingFields": [],
+    "unaccounted": [],
+    "planRecorded": true,
+    "ok": true
+  },
+  "reconciliation": {
+    "runsInSummary": 6,
+    "runsCounted": 6,
+    "callsInSummary": 65,
+    "callsCounted": 65,
+    "pairsRecorded": 0,
+    "planned": 6,
+    "unaccounted": 0,
+    "accountsForPlan": true,
+    "ok": true
+  },
+  "arms": {
+    "EXTERNAL": {
+      "runs": 5,
+      "acceptedImprovements": 1,
+      "requestedPass": 1,
+      "protectedRetained": 4,
+      "protectedBroken": 1,
+      "evalErrors": 0,
+      "modelCalls": 61,
+      "tokens": 382482,
+      "seconds": 444,
+      "toolExecutions": 68,
+      "controllerRefusals": 0
+    },
+    "SEQUENTIAL": {
+      "runs": 1,
+      "acceptedImprovements": 0,
+      "requestedPass": 0,
+      "protectedRetained": 0,
+      "protectedBroken": 1,
+      "evalErrors": 0,
+      "modelCalls": 4,
+      "tokens": 20715,
+      "seconds": 39,
+      "toolExecutions": 5,
+      "controllerRefusals": 0
+    }
+  },
+  "byReplicate": {
+    "rep1": [
+      {
+        "task": "ext-find_in_sorted",
+        "arm": "EXTERNAL",
+        "accepted": false,
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "disposition": "RESTORED"
+      },
+      {
+        "task": "ext-is_valid_parenthesization",
+        "arm": "EXTERNAL",
+        "accepted": true,
+        "requested": "PASS",
+        "protected": "PASS",
+        "disposition": "RETAIN"
+      },
+      {
+        "task": "ext-lcs_length",
+        "arm": "EXTERNAL",
+        "accepted": false,
+        "requested": "FAIL",
+        "protected": "PASS",
+        "disposition": "PRESERVE_INCOMPLETE"
+      },
+      {
+        "task": "ext-lis",
+        "arm": "EXTERNAL",
+        "accepted": false,
+        "requested": "FAIL",
+        "protected": "PASS",
+        "disposition": "PRESERVE_INCOMPLETE"
+      },
+      {
+        "task": "ext-pascal",
+        "arm": "EXTERNAL",
+        "accepted": false,
+        "requested": "FAIL",
+        "protected": "PASS",
+        "disposition": "PRESERVE_INCOMPLETE"
+      },
+      {
+        "task": "seq-1-count",
+        "arm": "SEQUENTIAL",
+        "accepted": false,
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "disposition": "RESTORED"
+      }
+    ]
+  },
+  "pairs": [],
+  "runs": [
+    {
+      "kind": "run",
+      "at": "2026-09-24T16:33:17.568Z",
+      "idx": 1,
+      "rep": 1,
+      "task": "ext-find_in_sorted",
+      "arm": "EXTERNAL",
+      "termination": "ENDED",
+      "requested": "FAIL",
+      "protected": "FAIL",
+      "disposition": "RESTORED",
+      "accepted": false,
+      "reason": null,
+      "candidateTree": "3c7d9d2897c97b2a08259100cc4fed2bc6fc0ad9",
+      "survivingTree": "bdedca58eb7c202d8c278979139d57e89b8d5a0e",
+      "modelCalls": 40,
+      "tokens": 272880,
+      "elapsedSec": 300,
+      "toolExecutions": 41,
+      "unconfirmedRemoteCalls": 1,
+      "state": "FAILED"
+    },
+    {
+      "kind": "run",
+      "at": "2026-09-24T16:34:13.446Z",
+      "idx": 2,
+      "rep": 1,
+      "task": "ext-is_valid_parenthesization",
+      "arm": "EXTERNAL",
+      "termination": "ENDED",
+      "requested": "PASS",
+      "protected": "PASS",
+      "disposition": "RETAIN",
+      "accepted": true,
+      "reason": null,
+      "candidateTree": "274aca449fe6f0ea6a3f014476aeaf1ccb74bac3",
+      "survivingTree": "274aca449fe6f0ea6a3f014476aeaf1ccb74bac3",
+      "modelCalls": 6,
+      "tokens": 32669,
+      "elapsedSec": 49,
+      "toolExecutions": 7,
+      "unconfirmedRemoteCalls": 0,
+      "state": "COMPLETED"
+    },
+    {
+      "kind": "run",
+      "at": "2026-09-24T16:34:52.247Z",
+      "idx": 3,
+      "rep": 1,
+      "task": "ext-lcs_length",
+      "arm": "EXTERNAL",
+      "termination": "ENDED",
+      "requested": "FAIL",
+      "protected": "PASS",
+      "disposition": "PRESERVE_INCOMPLETE",
+      "accepted": false,
+      "reason": null,
+      "candidateTree": "2b6bd1e7b83624e76aebdd9a129d4215f1328a9b",
+      "survivingTree": "2b6bd1e7b83624e76aebdd9a129d4215f1328a9b",
+      "modelCalls": 4,
+      "tokens": 20398,
+      "elapsedSec": 33,
+      "toolExecutions": 5,
+      "unconfirmedRemoteCalls": 0,
+      "state": "FAILED"
+    },
+    {
+      "kind": "run",
+      "at": "2026-09-24T16:35:20.266Z",
+      "idx": 4,
+      "rep": 1,
+      "task": "ext-lis",
+      "arm": "EXTERNAL",
+      "termination": "ENDED",
+      "requested": "FAIL",
+      "protected": "PASS",
+      "disposition": "PRESERVE_INCOMPLETE",
+      "accepted": false,
+      "reason": null,
+      "candidateTree": "6958cc5b20641cd8a403caa5117aed3f3b372ece",
+      "survivingTree": "6958cc5b20641cd8a403caa5117aed3f3b372ece",
+      "modelCalls": 4,
+      "tokens": 20617,
+      "elapsedSec": 23,
+      "toolExecutions": 5,
+      "unconfirmedRemoteCalls": 0,
+      "state": "FAILED"
+    },
+    {
+      "kind": "run",
+      "at": "2026-09-24T16:36:05.328Z",
+      "idx": 5,
+      "rep": 1,
+      "task": "ext-pascal",
+      "arm": "EXTERNAL",
+      "termination": "ENDED",
+      "requested": "FAIL",
+      "protected": "PASS",
+      "disposition": "PRESERVE_INCOMPLETE",
+      "accepted": false,
+      "reason": null,
+      "candidateTree": "c1c7d53de2512f66c09a8b80f2b0b59d6b81aeea",
+      "survivingTree": "c1c7d53de2512f66c09a8b80f2b0b59d6b81aeea",
+      "modelCalls": 7,
+      "tokens": 35918,
+      "elapsedSec": 39,
+      "toolExecutions": 10,
+      "unconfirmedRemoteCalls": 0,
+      "state": "FAILED"
+    },
+    {
+      "kind": "run",
+      "at": "2026-09-24T16:36:50.237Z",
+      "idx": 6,
+      "rep": 1,
+      "task": "seq-1-count",
+      "arm": "SEQUENTIAL",
+      "termination": "ENDED",
+      "requested": "FAIL",
+      "protected": "FAIL",
+      "disposition": "RESTORED",
+      "accepted": false,
+      "reason": null,
+      "candidateTree": "fc649738a9c3d8a831448d5f47a0677588bb323c",
+      "survivingTree": "b06199e365eaecd733f61e4fddf33a214d6f6d35",
+      "modelCalls": 4,
+      "tokens": 20715,
+      "elapsedSec": 39,
+      "toolExecutions": 5,
+      "unconfirmedRemoteCalls": 0,
+      "state": "FAILED"
+    }
+  ]
+}
