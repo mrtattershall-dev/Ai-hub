@@ -270,7 +270,7 @@ export async function runBatch(tasks, opts) {
     } else if (task.seed) {
       for (const [f, body] of Object.entries(task.seed)) writeFileSync(join(ws, f), body, 'utf8');
     }
-    git(ws, 'init', '-q'); git(ws, 'add', '-A');
+    git(ws, 'init', '-q'); git(ws, 'config', 'core.autocrlf', 'false'); git(ws, 'add', '-A');   // autocrlf off: a restore must reproduce the verified BYTES (governedRun.test)
     git(ws, '-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'verified starting state');
     const startRef = git(ws, 'rev-parse', 'HEAD');
     const startTree = git(ws, 'rev-parse', 'HEAD^{tree}');

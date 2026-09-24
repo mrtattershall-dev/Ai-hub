@@ -48,6 +48,7 @@ import { emitHostEvent, attachFileSink } from './hostEvent.js';
 import { runInWorker, WorkerUnavailable, WorkerUnconfirmed, workerAvailable, WORKER_IMAGE } from './worker.js';
 import { ProtocolController } from './protocol.js';
 import { ROUTES_BOUNDED, noteUncoveredTraversal, refuseAtDetachedSite } from './routeBound.js';
+import { prepareGoverned, concludeGoverned, PROTECTION, NO_PROTECTION_NOTE } from './governance.js';
 import { lockAuditDir } from './d2.js';
 import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState, mayMutate } from './d2.js';
 
@@ -4512,6 +4513,19 @@ async function drive(loadDb, run) {
       }
     }
 
+    // GOVERNED RUNS: evaluate, disposition, and (if protected behaviour broke) restore - the
+    // campaign's acceptance path, at the same terminal boundary, while the workspace is still
+    // held (busy). Both verdicts are recorded; a failure to conclude is recorded as such.
+    if (run.governed && ['done', 'error', 'stopped', 'refused_d2', 'stopped_d2_restored'].includes(run.status)) {
+      const concluded = await concludeGoverned(WORKSPACE, run, { captureDir: join(RUNS_DIR, 'rejected') });
+      run.governance = concluded;
+      run.protection = concluded.protection;
+      run.protectionNote = concluded.protection === PROTECTION.FAILED_TO_APPLY
+        ? `Governed, but the acceptance step failed to apply: ${concluded.error}. The workspace state is NOT evaluated.`
+        : `Behavioral acceptance applied: ${concluded.disposition} (candidate requested=${concluded.candidateVerdict?.requested} protected=${concluded.candidateVerdict?.protected}; surviving protected=${concluded.survivingWorkspaceVerdict?.protected}).`;
+      pushStep(run, { type: 'acceptance', disposition: concluded.disposition || null, text: run.protectionNote });
+    }
+
     // The workspace is settled - release it. Before the queue hand-off below, which calls
     // autoStart and needs the workspace free. No await between the parked-run break and
     // here, so awaiting_approval/interrupted release exactly as promptly as before.
@@ -4943,7 +4957,7 @@ function autoStart(loadDb, item) {
 //
 // Default 'unknown' rather than guessing: an unstamped caller is a gap to be seen, not a
 // value to be invented.
-function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown', budgetSec = null, callDeadlineSec = null } = {}) {
+function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown', budgetSec = null, callDeadlineSec = null, governed = null } = {}) {
   ensureWorkspace();
   const id = randomUUID();
   const now = Date.now();
@@ -4959,6 +4973,14 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
     // deadlines derive from these; with neither set, the pre-existing stall/ceiling timers apply.
     budgetEndsAt: budgetSec > 0 ? now + budgetSec * 1000 : null,
     callDeadlineSec: callDeadlineSec > 0 ? callDeadlineSec : null,
+    // PROTECTION STATUS, on every run. A governed run carries its declared checks and its
+    // verified starting state (established BEFORE this literal, by prepareGoverned); every
+    // other run says, in words, that it has no behavioral acceptance protection.
+    governed: governed || null,
+    protection: governed ? PROTECTION.BEHAVIORAL_ACCEPTANCE : PROTECTION.NONE,
+    protectionNote: governed
+      ? `Behavioral acceptance: declared checks, starting state verified (tree ${String(governed.startTree).slice(0, 12)}), result will be evaluated in the isolated worker and rolled back if protected behaviour breaks.`
+      : NO_PROTECTION_NOTE,
     queueItemId, source, entrance, generation: Math.max(0, Number(generation) || 0),
     history: [
       { role: 'system', content: SYSTEM_PROMPT },
@@ -5113,8 +5135,8 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
   }));
 
   // Start a new run; returns immediately, loop runs in the background.
-  router.post('/start', (req, res) => {
-    const { goal, queueIfBusy, budgetSec, callDeadlineSec } = req.body || {};
+  router.post('/start', async (req, res) => {
+    const { goal, queueIfBusy, budgetSec, callDeadlineSec, governed } = req.body || {};
     if (!goal || !goal.trim()) return res.status(400).json({ error: 'goal required' });
 
     // ONE TOP-LEVEL RUN AT A TIME. There is a single shared WORKSPACE, and sharing it is
@@ -5149,7 +5171,16 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       });
     }
 
-    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null });
+    // GOVERNED: the starting state is verified BEFORE a run exists. A refusal here is a
+    // BLOCKED start with a reason - never a run quietly downgraded to unprotected.
+    let gov = null;
+    if (governed) {
+      const runId = randomUUID();
+      const prep = await prepareGoverned(WORKSPACE, runId, governed.checks, { qualifiedPath: WORKER_EXEC && ROUTES_BOUNDED });
+      if (!prep.ok) return res.status(409).json({ error: `governed run BLOCKED: ${prep.reason}`, blocked: true, protection: PROTECTION.NONE, startVerdict: prep.startVerdict || null });
+      gov = { checks: governed.checks, startRef: prep.startRef, startTree: prep.startTree, startVerdict: prep.startVerdict, requestedAlreadyPasses: prep.requestedAlreadyPasses, declaredAt: new Date().toISOString() };
+    }
+    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null, governed: gov });
     res.json({ runId: run.id });
   });
 

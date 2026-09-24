@@ -217,6 +217,10 @@ function StepRow({ step, n }) {
 export default function AgentPage() {
   const addToast = useStore(s => s.addToast);
   const [goal, setGoal] = useState('');
+  // Declared checks for a GOVERNED run (JSON: { requested: { script, files? }, protected: { script, files? } }).
+  // Empty = ordinary run, which the server labels as having no behavioral acceptance protection.
+  const [checksText, setChecksText] = useState('');
+  const [showChecks, setShowChecks] = useState(false);
   const [run, setRun] = useState(null);
   const [runId, setRunId] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -334,17 +338,25 @@ export default function AgentPage() {
 
   const handleStart = async () => {
     if (!goal.trim() || busy) return;
+    let governed = null;
+    if (checksText.trim()) {
+      try { governed = { checks: JSON.parse(checksText) }; }
+      catch (e) { addToast(`Declared checks are not valid JSON: ${e.message}`, 'error'); return; }
+    }
     setBusy(true);
     try {
-      const { runId: id } = await agentStart(goal.trim());
+      const { runId: id } = await agentStart(goal.trim(), false, governed);
       setRunId(id);
-      setRun({ status: 'running', goal: goal.trim(), steps: [] });
+      setRun({ status: 'running', goal: goal.trim(), steps: [], protection: governed ? 'BEHAVIORAL_ACCEPTANCE' : 'NONE' });
       setGoal('');
       startPolling(id);
     } catch (e) {
       // The server refuses a second concurrent run because both would share one
       // workspace, ledger and NOTES.md and corrupt each other. That is not a dead end -
       // the queue is exactly where this goal belongs, so put it there and say so.
+      // A governed start the server could not verify is BLOCKED with a reason - it is never
+      // downgraded to an unprotected run behind the user's back.
+      if (e.status === 409 && e.body?.blocked) { addToast(e.body.error || e.message, 'error'); return; }
       if (e.status === 409 && e.body?.busy) {
         try {
           const q = await agentStart(goal.trim(), true);
@@ -475,6 +487,20 @@ export default function AgentPage() {
           {isRunning && <Loader2 size={14} className="spin" style={{ color: 'var(--accent)' }} />}
           <span style={{ fontWeight: 600, fontSize: 13, color: run.status === 'done' ? 'var(--success)' : run.status === 'error' ? 'var(--danger)' : run.status === 'interrupted' ? '#f59e0b' : 'var(--text)' }}>{STATUS_LABEL[run.status] || run.status}</span>
           {typeof run.modelCalls === 'number' && <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>· {run.steps?.length || 0} steps</span>}
+          {/* PROTECTION STATUS - on every run. Unprotected says so in words, not by omission. */}
+          <span
+            title={run.protectionNote || ''}
+            style={{
+              fontSize: 11, padding: '2px 7px', borderRadius: 4, fontWeight: 600,
+              color: run.protection === 'BEHAVIORAL_ACCEPTANCE' ? 'var(--success)' : run.protection === 'FAILED_TO_APPLY' ? 'var(--danger)' : '#b45309',
+              border: `1px solid ${run.protection === 'BEHAVIORAL_ACCEPTANCE' ? 'var(--success)' : run.protection === 'FAILED_TO_APPLY' ? 'var(--danger)' : '#b45309'}`,
+            }}
+          >
+            {run.protection === 'BEHAVIORAL_ACCEPTANCE'
+              ? (run.governance?.disposition ? `PROTECTED · ${run.governance.disposition}` : 'PROTECTED · behavioral acceptance')
+              : run.protection === 'FAILED_TO_APPLY' ? 'PROTECTION FAILED TO APPLY'
+                : 'NO BEHAVIORAL ACCEPTANCE PROTECTION'}
+          </span>
           {interrupted && (
             <button className="btn btn-sm btn-primary" style={{ marginLeft: 'auto' }} onClick={() => handleResume()} disabled={busy} title="Continue this run from where the tunnel dropped">
               <Play size={13} /> Resume
@@ -680,9 +706,28 @@ export default function AgentPage() {
           onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); handleSend(); } }}
           disabled={isRunning || awaiting}
         />
+        {/* GOVERNED RUN: declared checks. With these, the start state is verified, the result is evaluated
+            in the isolated worker, and protected behaviour that breaks is rolled back. Without them the
+            run is ordinary and is labelled as unprotected. */}
+        <div style={{ marginTop: 6 }}>
+          <button className="btn btn-sm" onClick={() => setShowChecks(v => !v)} disabled={isRunning || awaiting}
+            title="Declare requested and protected checks to run this goal with behavioral acceptance protection">
+            {showChecks ? 'Hide' : (checksText.trim() ? 'Governed run · checks declared' : 'Governed run · declare checks')}
+          </button>
+          {showChecks && (
+            <textarea
+              className="chat-input"
+              style={{ width: '100%', minHeight: 90, resize: 'vertical', marginTop: 6, fontFamily: 'monospace', fontSize: 12 }}
+              placeholder={'{ "requested": { "script": "python3 /check/req.py", "files": { "req.py": "..." } },\n  "protected": { "script": "python3 /check/prot.py", "files": { "prot.py": "..." } } }\nScripts run in the isolated worker with the candidate mounted read-only at /candidate. Protected must PASS on the starting state or the start is BLOCKED.'}
+              value={checksText}
+              onChange={e => setChecksText(e.target.value)}
+              disabled={isRunning || awaiting}
+            />
+          )}
+        </div>
         <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
           <button className="btn btn-primary" onClick={handleSend} disabled={busy || isRunning || awaiting || !goal.trim()}>
-            <Play size={14} /> {isRunning || awaiting ? 'Running…' : finished ? 'Continue building' : 'Build it'}
+            <Play size={14} /> {isRunning || awaiting ? 'Running…' : finished ? 'Continue building' : (checksText.trim() ? 'Build it (governed)' : 'Build it')}
           </button>
           {(isRunning || awaiting) && (
             <button className="btn btn-sm" onClick={handleStop}><Square size={13} /> Stop</button>
