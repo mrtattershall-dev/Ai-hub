@@ -207,7 +207,8 @@ const chainDepth = (() => {
   return n;
 })();
 
-console.log('\n=== BENCH-1 RESULT ===');
+console.log(`
+=== ${EXPERIMENT} RESULT ===`);
 console.log(`elapsed ${Math.floor(elapsedSec / 60)}m ${elapsedSec % 60}s of ${TOTAL_SEC / 60}m`);
 console.log(`stopped cleanly: ${stopped.ok ? 'YES' : 'NO - ' + stopped.reason}`);
 console.log(`integrity ${report.integrity.ok}  reconciliation ${report.reconciliation.ok}`);

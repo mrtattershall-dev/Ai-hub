@@ -1,0 +1,81 @@
+BENCH-2 START 2026-09-24T13:47:40.796Z hub 7584b4f
+model: https://mr-tattershall--legasus-7b-server-web.modal.run
+worker: sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3
+queue: 15 external + 5 sequential
+limits: 300s/task, 7200s total, 180s reserve, no retries
+
+ 1. [EXTERNAL] ext-bucketsort ENDED req=FAIL prot=FAIL RESTORED
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+ 2. [EXTERNAL] ext-find_in_sorted TIMEOUT req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 3. [EXTERNAL] ext-flatten ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 4. [EXTERNAL] ext-gcd ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+warning: in the working copy of 'get_factors.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+ 5. [EXTERNAL] ext-get_factors TIMEOUT req=FAIL prot=PASS PRESERVE_INCOMPLETE
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+ 6. [EXTERNAL] ext-is_valid_parenthesization TIMEOUT req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 7. [EXTERNAL] ext-kheapsort ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 8. [EXTERNAL] ext-kth ENDED req=FAIL prot=FAIL RESTORED
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'TASKS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+ 9. [EXTERNAL] ext-lcs_length TIMEOUT req=FAIL prot=PASS PRESERVE_INCOMPLETE
+warning: in the working copy of 'ESCALATIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '_snippet.py', LF will be replaced by CRLF the next time Git touches it
+10. [EXTERNAL] ext-lis TIMEOUT req=FAIL prot=PASS PRESERVE_INCOMPLETE
+11. [EXTERNAL] ext-longest_common_subsequence ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+12. [EXTERNAL] ext-max_sublist_sum ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+13. [EXTERNAL] ext-mergesort ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+warning: in the working copy of 'next_palindrome.py', LF will be replaced by CRLF the next time Git touches it
+14. [EXTERNAL] ext-next_palindrome TIMEOUT req=FAIL prot=FAIL RESTORED
+15. [EXTERNAL] ext-pascal ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+warning: in the working copy of 'ledger.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+16. [SEQUENTIAL] seq-1-count ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+17. [SEQUENTIAL] seq-2-largest BLOCKED req=- prot=- BLOCKED
+18. [SEQUENTIAL] seq-3-byitem BLOCKED req=- prot=- BLOCKED
+19. [SEQUENTIAL] seq-4-remove BLOCKED req=- prot=- BLOCKED
+20. [SEQUENTIAL] seq-5-summary BLOCKED req=- prot=- BLOCKED
+
+=== BENCH-1 RESULT ===
+elapsed 45m 17s of 120m
+stopped cleanly: YES
+integrity true  reconciliation true
+status {"COMPLETED":16,"INTERRUPTED":0,"UNATTEMPTED":0,"BLOCKED":4,"OTHER":0,"UNACCOUNTED":0,"total":20,"planned":20}
+
+EXTERNAL   accepted 0/15
+SEQUENTIAL accepted 0/5   CONSECUTIVE steps accumulated: 0
+   (different questions - never summed)
+{
+  "EXTERNAL": {
+    "runs": 15,
+    "acceptedImprovements": 0,
+    "requestedPass": 0,
+    "protectedRetained": 12,
+    "protectedBroken": 3,
+    "evalErrors": 0,
+    "modelCalls": 107,
+    "tokens": 662926,
+    "seconds": 2605,
+    "toolExecutions": 128,
+    "controllerRefusals": 0
+  },
+  "SEQUENTIAL": {
+    "runs": 5,
+    "acceptedImprovements": 0,
+    "requestedPass": 0,
+    "protectedRetained": 1,
+    "protectedBroken": 0,
+    "evalErrors": 0,
+    "modelCalls": 3,
+    "tokens": 15406,
+    "seconds": 13,
+    "toolExecutions": 0,
+    "controllerRefusals": 0
+  }
+}
+
+summary: C:\Users\tatte\AppData\Local\Temp\bench1-7te8gB\summary.jsonl
+report:  C:\Users\tatte\AppData\Local\Temp\bench1-7te8gB\BENCH-2_REPORT.json
+BENCH-2 COMPLETE
+EXIT 0
