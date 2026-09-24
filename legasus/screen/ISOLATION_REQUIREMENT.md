@@ -186,3 +186,12 @@ success exists.
 
 Container escape resistance against a kernel-level attack. The claim is scoped to the campaign's
 need — an agent command route that cannot reach host audit storage, other runs, or credentials.
+
+---
+
+## CORRECTION — 2026-09-24
+
+"Verification routes that execute generated code" were accounted for as TOOLS. The finish
+gate's host verifier was not a tool and was missed; see ROUTE-BOUNDING_QUALIFICATION.md's
+correction and EXECUTION-DEFECTS_RESULT.md §3. Closed under bounding; `test_web` remains open
+for web goals.

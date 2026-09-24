@@ -106,3 +106,45 @@ call never completed" — the precondition the user set for any further paid ben
 NOT SETTLED: why the four BENCH-2 calls never returned (runaway generation vs. lost request).
 The serving side still keeps only a tail of its log; a server-side request log is still needed
 for that question. Nothing here changes what the model generates.
+
+---
+
+## Follow-up — 2026-09-24, the three bounded items
+
+**1. The contradictory prompt is corrected.** `systemPromptFor(effectiveTools)` renders the
+system prompt from the tool set the hub actually has: a removed tool's doc block is dropped and
+the two finishing rules that named `see_screen` / `verify_project` are replaced by the rule for
+what is available (`run_python` / `run_command`). With every tool available the output is
+byte-identical to `SYSTEM_PROMPT`. Proven on what reaches the model (`effectivePrompt.test.mjs`
+9/9): bounded, none of the four removed tools is mentioned; unbounded control documents all
+four and equals `SYSTEM_PROMPT` exactly. One slip on the way: the first patch anchored on
+`export function lerp`, which also occurs inside the prompt's example code, so the renderer was
+inserted INTO the prompt text; caught because the import came back `undefined`, reverted,
+appended at end of file.
+
+**2. A genuinely late response is exercised.** `fakemodel --hold-ms N` sends the complete
+reply at once and holds the stream open; the stop lands with the bytes already in hand; the
+abort ends the stream and the hub keeps the partial-that-is-complete. Proven
+(`callDeadline.test.mjs` case 3b, suite 34/34): ledger `COMPLETED_NOT_ACTED_ON` with the byte
+count, transcript keeps the reply marked `discarded`, **no tool executed, the workspace was
+not mutated** (the reply was a `write_file`).
+
+**3. The finish-gate escape has its own regression test** with a positive control
+(`finishGateHost.test.mjs` 10/10; the marker names the OS the entry ran on).
+
+**Distinctions kept explicit:**
+- `run.unconfirmedRemoteCalls` counts every call whose `serverOutcome` is UNKNOWN and is never
+  decremented; the deadline step says the request may still be computing and a replacement
+  call can overlap it; `bench1.mjs` carries the count per run.
+- `RESTORED` now requires three checked things: reset succeeded, protected recheck PASS, and
+  **every byte** on disk equals the start commit's blob with nothing extra (`survivingBytes:
+  IDENTICAL_TO_START`); otherwise `RESTORE_FAILED` with the differing paths. Earlier RESTORED
+  claims stand at tree-equality + recheck level only. `core.autocrlf false` is set repo-locally
+  before every restore.
+
+**Badge:** running → "BEHAVIORAL ACCEPTANCE ENABLED · verdict pending"; finished → "ACCEPTANCE
+· <disposition>". It never shows success before the verdict exists.
+
+Sweep: callDeadline 34 · effectivePrompt 9 · finishGateHost 10 · governedRun 24 · acceptance 27
+· batchAcceptance 27 · repeatWarning 15 · suppliedFile 16 · removedTool 12 · wiringBoundary 9 ·
+routeBound 18 · protocolIntegration 23. Client rebuilt.

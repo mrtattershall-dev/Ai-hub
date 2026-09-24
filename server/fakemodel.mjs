@@ -47,6 +47,10 @@ const SCRIPT = val('script', 'happy');
 // never acted on" from the server's side as well as the hub's.
 const NEVER = argv.includes('--never');
 const DELAY_MS = parseInt(val('delay-ms', '0'), 10);
+//   --hold-ms N      send the COMPLETE reply immediately, then keep the stream open N ms before
+//                    ending it. The hub has the whole answer in hand while a stop can land - the
+//                    genuinely-late-arrival case: bytes delivered, run already stopped.
+const HOLD_MS = parseInt(val('hold-ms', '0'), 10);
 const event = (e) => { if (process.env.FAKE_EVENT_LOG) { try { fs.appendFileSync(process.env.FAKE_EVENT_LOG, JSON.stringify({ at: Date.now(), ...e }) + String.fromCharCode(10)); } catch {} } };
 
 // ── the scripts ───────────────────────────────────────────────────────────────
@@ -374,6 +378,15 @@ const server = createServer((req, res) => {
       event({ event: 'never-dispatched', seq });
       const hb = setInterval(() => { try { res.write(JSON.stringify({ message: { role: 'assistant', content: '' }, done: false }) + '\n'); } catch {} }, 1000);
       res.on('close', () => { clearInterval(hb); event({ event: 'client-aborted', seq }); });   // res, not req: IncomingMessage 'close' fires when the REQUEST is fully read, long before the client goes away
+      return;
+    }
+    if (HOLD_MS > 0 && !isPlanner) {
+      res.writeHead(200, { 'Content-Type': 'application/x-ndjson' });
+      res.write(JSON.stringify({ message: { role: 'assistant', content }, done: false }) + '\n');
+      event({ event: 'held-reply-bytes-sent', seq });
+      let ended = false;
+      res.on('close', () => { if (!ended) event({ event: 'client-gone-during-hold', seq }); });
+      setTimeout(() => { ended = true; try { res.end(JSON.stringify({ message: { role: 'assistant', content: '' }, done: true }) + '\n'); } catch {} event({ event: 'held-stream-ended', seq }); }, HOLD_MS);
       return;
     }
     if (DELAY_MS > 0 && !isPlanner) {

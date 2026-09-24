@@ -33,7 +33,7 @@
  */
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { cpSync, mkdirSync, rmSync, existsSync } from 'node:fs';
+import { cpSync, mkdirSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { evaluate, VERDICT } from './evaluator.js';
 
@@ -42,6 +42,31 @@ const git = async (ws, args) => {
   try { const { stdout } = await exec('git', ['-C', ws, ...args], { encoding: 'utf8', windowsHide: true }); return { ok: true, out: String(stdout).trim() }; }
   catch (e) { return { ok: false, err: String(e.stderr || '').trim() }; }
 };
+
+/**
+ * ACTUAL BYTES, not git's opinion. Tree equality and a passing recheck supported the earlier
+ * RESTORED claims at those levels; they did not support byte-identical restoration, and with
+ * core.autocrlf on they were not (governedRun.test, 2026-09-24). This reads every blob of the
+ * start commit and compares it to the file on disk, and requires no extra files.
+ */
+async function bytesIdentical(ws, startRef) {
+  const ls = await git(ws, ['ls-tree', '-r', '-z', startRef]);
+  if (!ls.ok) return { identical: false, reason: 'ls-tree failed: ' + ls.err };
+  const differing = [];
+  for (const line of ls.out.split('\0').filter(Boolean)) {
+    const m = line.match(/^\d+ blob ([0-9a-f]+)\t(.+)$/);
+    if (!m) continue;
+    let want;
+    try { const { stdout } = await exec('git', ['-C', ws, 'cat-file', 'blob', m[1]], { encoding: 'buffer', maxBuffer: 64 * 1024 * 1024, windowsHide: true }); want = stdout; }
+    catch { differing.push(m[2] + ' (blob unreadable)'); continue; }
+    let got;
+    try { got = readFileSync(join(ws, m[2])); } catch { differing.push(m[2] + ' (missing)'); continue; }
+    if (!got.equals(want)) differing.push(m[2]);
+  }
+  const st = await git(ws, ['status', '--porcelain']);
+  const extra = st.ok ? st.out.split('\n').filter(Boolean) : ['status unavailable'];
+  return { identical: differing.length === 0 && extra.length === 0, differing, extra };
+}
 
 export const DISPOSITION = Object.freeze({
   RETAIN: 'RETAIN',                          // verified completion, kept
@@ -89,6 +114,7 @@ export async function applyAcceptance(ws, task, candidateVerdict, { startRef, ca
   // ── PROTECTED FAILED: capture, restore, RECHECK ──
   if (prot === VERDICT.FAIL) {
     out.capturedAt = capture(ws, captureDir, `${out.task}-rejected`);
+    await git(ws, ['config', 'core.autocrlf', 'false']);   // restore the BYTES that were verified, not a line-ending translation of them
     const reset = await git(ws, ['reset', '--hard', startRef]);
     const clean = await git(ws, ['clean', '-fd']);
     if (!reset.ok || !clean.ok) {
@@ -104,7 +130,12 @@ export async function applyAcceptance(ws, task, candidateVerdict, { startRef, ca
       protected: after.protected?.verdict ?? null,
       candidateTree: after.candidateTree ?? null,
     };
-    out.disposition = after.protected?.verdict === VERDICT.PASS ? DISPOSITION.RESTORED : DISPOSITION.RESTORE_FAILED;
+    const bytes = await bytesIdentical(ws, startRef);
+    out.survivingBytes = bytes.identical ? 'IDENTICAL_TO_START' : `DIFFER: ${[...(bytes.differing || []), ...(bytes.extra || [])].slice(0, 5).join(', ') || bytes.reason}`;
+    // RESTORED now claims three things, each checked: git reset succeeded, the protected check
+    // passes again, and every byte matches the start commit with nothing extra on disk.
+    out.disposition = after.protected?.verdict === VERDICT.PASS && bytes.identical ? DISPOSITION.RESTORED : DISPOSITION.RESTORE_FAILED;
+    if (!bytes.identical) out.survivingWorkspaceVerdict.note = 'the recheck passed but the bytes on disk are not those of the verified start: ' + out.survivingBytes;
     // Restored means the damage is gone. It does NOT mean the task was completed.
     return out;
   }

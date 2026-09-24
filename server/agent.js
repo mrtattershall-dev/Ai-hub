@@ -31,7 +31,7 @@ import { escalate, estimateTokens, tokenBudgetExceeded } from './escalate.js';
 import * as workQueue from './queue.js';
 import * as assetLib from './assets.js';
 import { canonicalSummary } from './canonicalAssets.mjs';
-import { SYSTEM_PROMPT } from './agentPrompt.js';
+import { SYSTEM_PROMPT, systemPromptFor } from './agentPrompt.js';
 import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
 import { lostDefs, lostExports, defCounts } from './defNames.js';
@@ -2042,6 +2042,10 @@ if (ROUTES_BOUNDED) {
   for (const t of ['verify_project', 'verify_godot', 'see_screen']) { delete tools[t]; AUTO_TOOLS.delete(t); REMOVED_TOOLS.add(t); }
 }
 
+// THE PROMPT THE MODEL ACTUALLY RECEIVES describes the tools it actually has. Computed once,
+// here, AFTER route bounding has removed what it removes. Unbounded: identical to SYSTEM_PROMPT.
+const EFFECTIVE_SYSTEM_PROMPT = systemPromptFor(new Set([...Object.keys(tools), 'finish']));   // finish is an action, not a tools entry; it is always available
+
 // Sub-task recursion bounds. Depth 2 is enough for "build the thing" -> "build this
 // part" -> "fix this file"; deeper is almost always a model losing the plot, and each
 // level multiplies cost.
@@ -2741,6 +2745,10 @@ function beginCall(run, kind) {
 function endCall(run, call, fields) {
   Object.assign(call, { completedAt: Date.now() }, fields);
   call.elapsedMs = call.completedAt - call.dispatchedAt;
+  // LOCAL ABORT IS NOT REMOTE TERMINATION. A call the hub gave up on may still be computing on
+  // the server; a replacement call can overlap it, and both can be billed. That count stays
+  // on the run, visible in reports, and is never decremented - nothing here can confirm it.
+  run.unconfirmedRemoteCalls = (run.calls || []).filter((c) => c.serverOutcome === 'UNKNOWN').length;
   appendTranscript(run, { ...call, kind: 'call' });
   persist(run);
   return call;
@@ -3142,7 +3150,7 @@ async function runSubtask(goal, depth, parent) {
     goal, depth, status: 'running', modelCalls: 0, steps: [],
     createdAt: started, budgetStart: started, maxSteps: SUBTASK_MAX_STEPS,
     history: [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: EFFECTIVE_SYSTEM_PROMPT },
       { role: 'user', content:
         `You are a SUB-AGENT. You have been given ONE self-contained job, not the whole project.\n\n`
         + `Files currently in the workspace (these are the ONLY files — use these EXACT names):\n${tools.list_dir({ path: '.' })}\n\n`
@@ -3440,11 +3448,15 @@ async function drive(loadDb, run) {
       try {
         raw = await callModel(loadDb, msgs, run.abort.signal, undefined, { deadlineMs: call.deadlineMs });
         noteModelCall(run);
-        endCall(run, call, { outcome: raw.trim() ? 'COMPLETED' : 'COMPLETED_EMPTY', chars: raw.length });
+        // A reply can ARRIVE after the run was stopped (the stream delivered its bytes, then
+        // the abort landed). It completed; it is recorded; it is NOT acted on - the status
+        // check below discards it before any tool can run. Say which in the ledger.
+        const arrivedAfterStop = run.status !== 'running';
+        endCall(run, call, { outcome: arrivedAfterStop ? 'COMPLETED_NOT_ACTED_ON' : raw.trim() ? 'COMPLETED' : 'COMPLETED_EMPTY', chars: raw.length, ...(arrivedAfterStop ? { note: 'the reply arrived after the run was stopped; it was recorded and discarded, no tool ran' } : {}) });
         const lastSaid = msgs.map((m) => m.role).lastIndexOf('assistant');
         // A genuinely empty reply is recorded AS a reply (with empty: true). A timeout never
         // writes a reply field at all - it is an error record with an outcome.
-        appendTranscript(run, { n: run.modelCalls, kind: 'turn', sent: run.transcribed ? msgs.slice(lastSaid + 1) : msgs, reply: raw, ...(raw.trim() ? {} : { empty: true }) });
+        appendTranscript(run, { n: run.modelCalls, kind: 'turn', sent: run.transcribed ? msgs.slice(lastSaid + 1) : msgs, reply: raw, ...(raw.trim() ? {} : { empty: true }), ...(arrivedAfterStop ? { discarded: true } : {}) });
         run.transcribed = true;
       } catch (e) {
         const oc = endCall(run, call, outcomeOf(run, e));
@@ -3452,7 +3464,7 @@ async function drive(loadDb, run) {
         if (run.status === 'stopped') break;        // Stop aborted the call — exit quietly
 
         if (e.code === 'CALL_DEADLINE') {
-          pushStep(run, { type: 'error', text: `Model call ${run.modelCalls} exceeded its ${Math.round(call.deadlineMs / 1000)}s deadline and was aborted locally (${e.chars || 0} chars arrived). Server outcome unknown - not a confirmed cancellation.` });
+          pushStep(run, { type: 'error', text: `Model call ${run.modelCalls} exceeded its ${Math.round(call.deadlineMs / 1000)}s deadline and was aborted locally (${e.chars || 0} chars arrived). Server outcome unknown - not a confirmed cancellation; the request may still be computing on the server, and a replacement call can overlap it (unconfirmed remote calls on this run: ${run.unconfirmedRemoteCalls || 0}).` });
           const left = run.budgetEndsAt ? run.budgetEndsAt - Date.now() : Infinity;
           if (left < CALL_DEADLINE_MARGIN_MS * 2) {
             run.status = 'error';
@@ -4983,7 +4995,7 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
       : NO_PROTECTION_NOTE,
     queueItemId, source, entrance, generation: Math.max(0, Number(generation) || 0),
     history: [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: EFFECTIVE_SYSTEM_PROMPT },
       // Carry memory across runs: NOTES.md is the only thing that survives a run
       // ending, so it goes into the opening context rather than waiting for the agent
       // to think of calling recall.

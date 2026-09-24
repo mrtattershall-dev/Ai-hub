@@ -71,7 +71,7 @@ async function drive({ replies, fakeArgs = [], start, until, label, afterStart }
     const transcript = existsSync(tpath) ? readFileSync(tpath, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)) : [];
     const events = existsSync(eventLog) ? readFileSync(eventLog, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)) : [];
     const onDisk = existsSync(join(dir, 'runs', `${runId}.json`)) ? JSON.parse(readFileSync(join(dir, 'runs', `${runId}.json`), 'utf8')) : null;
-    return { run, transcript, events, onDisk, elapsedMs: Date.now() - t0, runId };
+    return { run, transcript, events, onDisk, elapsedMs: Date.now() - t0, runId, ws: join(dir, 'workspace') };
   } finally {
     try { hub && hub.kill('SIGKILL'); } catch { /* best effort */ }
     try { fake.kill('SIGKILL'); } catch { /* best effort */ }
@@ -146,6 +146,35 @@ try {
   const lateSent = c.events.filter((e) => e.event === 'late-reply-sent' && e.seq > 1);
   say(c.events.some((e) => e.event === 'late-reply-not-sent-client-gone' && e.seq > 1) && lateSent.length === 0,
     `the server found the client gone and never sent the turn's late reply (${c.events.map((e) => e.event + '#' + e.seq).join(' ')})`);
+
+  // ── 3b. GENUINELY LATE ARRIVAL: the bytes are in hand when the stop lands ──
+  console.log('\n=== 3b. a complete reply that ARRIVES after the stop is recorded and never acted on ===');
+  const WRITE = 'THOUGHT: Writing.\nACTION: write_file\nPATH: late.txt\n```text\nthis must never land\n```';
+  const h = await drive({
+    replies: [PLAN, WRITE], fakeArgs: ['--hold-ms', '6000'], start: { budgetSec: 120 }, until: 30_000, label: 'hold',
+    afterStart: async (api, id) => {
+      // wait until a turn call is in flight AND the stub has sent the bytes, then stop
+      for (let i = 0; i < 120; i++) {
+        const r = await api(`/agent/${id}`).catch(() => null);
+        if ((r?.calls || []).some((x) => x.callKind === 'turn' && x.outcome === 'IN_FLIGHT')) break;
+        await sleep(250);
+      }
+      await sleep(1500);
+      await api(`/agent/${id}/stop`, { method: 'POST' });
+      await sleep(8_000);
+    },
+  });
+  const hc = turnCalls(h)[0];
+  say(h.events.some((e) => e.event === 'held-reply-bytes-sent' && e.seq > 1), 'the stub had sent the complete reply before the stop');
+  say(h.run?.status === 'stopped', `the run is stopped (${h.run?.status})`);
+  say(hc?.outcome === 'COMPLETED_NOT_ACTED_ON' && hc.chars > 0, `the ledger says COMPLETED_NOT_ACTED_ON with ${hc?.chars} chars (${hc?.outcome})`);
+  say(toolSteps(h).length === 0, `no tool executed (${toolSteps(h).length} tool steps)`);
+  say(!existsSync(join(h.ws, 'late.txt')), 'the workspace was not mutated');
+  const hRec = h.transcript.find((t) => t.kind === 'turn' && t.discarded === true);
+  note(`transcript: ${h.transcript.map((t) => `${t.kind}${t.callKind ? ':' + t.callKind + ':' + t.outcome : ''}${t.discarded ? ':discarded' : ''}${t.error ? ':err=' + t.error : ''}`).join(' | ')}`);
+  // (the stub re-serves the PLAN on the first turn, so the discarded reply's TEXT is the plan; what
+  // matters is that the bytes the ledger counted are the bytes the transcript kept)
+  say(!!hRec && typeof hRec.reply === 'string' && hRec.reply.length === hc?.chars && hRec.reply.length > 0, `the transcript keeps the reply (${hRec?.reply?.length} chars), marked discarded`);
 
   // ── 4. GENUINELY EMPTY REPLY ──
   console.log('\n=== 4. a genuinely empty reply is a reply, not a timeout ===');

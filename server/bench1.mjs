@@ -103,16 +103,23 @@ async function runTask(ws, task, ctx) {
     modelCalls: calls.length,
     tokens: calls.reduce((a, c) => a + (c.outTok || 0) + (c.promptTok || 0), 0),
     toolExecutions: (run?.steps || []).filter((s) => s.tool).length,
+    unconfirmedRemoteCalls: run?.unconfirmedRemoteCalls || 0,   // aborted locally; may still be computing and billing
   };
 }
 
-const EXTERNAL = externalTasks();
-const ALL = [...EXTERNAL, ...SEQUENTIAL_TASKS];
+// A FROZEN SUBSET, by id, for a small check (CHECK-1). The ids are listed in the check's
+// definition before the run; the filter changes WHICH tasks run and nothing about how.
+const ONLY = String(process.env.BENCH_TASK_IDS || '').split(',').map((x) => x.trim()).filter(Boolean);
+const pick = (list) => (ONLY.length ? list.filter((t) => ONLY.includes(t.id)) : list);
+const EXTERNAL = pick(externalTasks());
+const SEQ = pick(SEQUENTIAL_TASKS);
+const ALL = [...EXTERNAL, ...SEQ];
+if (ONLY.length && ALL.length !== ONLY.length) { console.error(`BENCH_TASK_IDS names ${ONLY.length} tasks but ${ALL.length} matched: ${ALL.map((t) => t.id).join(',')}`); process.exit(2); }
 
 console.log(`${EXPERIMENT} START ${new Date().toISOString()} hub ${HUB_COMMIT}`);
 console.log(`model: ${MODEL_URL}`);
 console.log(`worker: ${WORKER_IMAGE}`);
-console.log(`queue: ${EXTERNAL.length} external + ${SEQUENTIAL_TASKS.length} sequential`);
+console.log(`queue: ${EXTERNAL.length} external + ${SEQ.length} sequential`);
 console.log(`limits: ${PER_TASK_SEC}s/task, ${TOTAL_SEC}s total, ${RESERVE_SEC}s reserve, no retries\n`);
 
 // THE PLAN IS RECORDED FIRST. Without it a recovered report reconciles only against the records
@@ -133,6 +140,7 @@ const rowOf = (r, task, idx) => ({
   tokens: r.outcome?.tokens ?? 0,
   elapsedSec: r.outcome?.elapsedSec ?? 0,
   toolExecutions: r.outcome?.toolExecutions ?? 0,
+  unconfirmedRemoteCalls: r.outcome?.unconfirmedRemoteCalls ?? 0,
   state: r.state,
 });
 
@@ -158,7 +166,7 @@ const extOut = await runBatch(EXTERNAL, {
 });
 
 // ── SEQUENTIAL: chained, advancing only from accepted states ──
-const seqOut = await runBatch(SEQUENTIAL_TASKS, {
+const seqOut = await runBatch(SEQ, {
   journalPath: join(ROOT, 'journal-seq.jsonl'),
   workspacesDir: join(ROOT, 'ws-seq'),
   auditDir: join(ROOT, 'audit'),
@@ -200,7 +208,7 @@ const acc = (g) => byGroup(g).filter((r) => r.accepted).length;
 // CONSECUTIVE depth, not a count: the chain question is how far it got before stopping.
 const chainDepth = (() => {
   let n = 0;
-  for (const t of SEQUENTIAL_TASKS) {
+  for (const t of SEQ) {
     const r = report.runs.find((x) => x.task === t.id);
     if (r && r.accepted) n++; else break;
   }
@@ -214,7 +222,7 @@ console.log(`stopped cleanly: ${stopped.ok ? 'YES' : 'NO - ' + stopped.reason}`)
 console.log(`integrity ${report.integrity.ok}  reconciliation ${report.reconciliation.ok}`);
 console.log(`status ${JSON.stringify(report.byStatus)}`);
 console.log(`\nEXTERNAL   accepted ${acc('EXTERNAL')}/${EXTERNAL.length}`);
-console.log(`SEQUENTIAL accepted ${acc('SEQUENTIAL')}/${SEQUENTIAL_TASKS.length}   CONSECUTIVE steps accumulated: ${chainDepth}`);
+console.log(`SEQUENTIAL accepted ${acc('SEQUENTIAL')}/${SEQ.length}   CONSECUTIVE steps accumulated: ${chainDepth}`);
 console.log('   (different questions - never summed)');
 console.log(JSON.stringify(report.arms, null, 2));
 console.log(`\nsummary: ${SUMMARY}`);

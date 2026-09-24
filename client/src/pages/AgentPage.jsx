@@ -496,8 +496,10 @@ export default function AgentPage() {
               border: `1px solid ${run.protection === 'BEHAVIORAL_ACCEPTANCE' ? 'var(--success)' : run.protection === 'FAILED_TO_APPLY' ? 'var(--danger)' : '#b45309'}`,
             }}
           >
+            {/* STATUS, not selection: while running, acceptance is ENABLED and the verdict is pending;
+                afterwards the badge shows the actual disposition. It never implies success in advance. */}
             {run.protection === 'BEHAVIORAL_ACCEPTANCE'
-              ? (run.governance?.disposition ? `PROTECTED · ${run.governance.disposition}` : 'PROTECTED · behavioral acceptance')
+              ? (run.governance?.disposition ? `ACCEPTANCE · ${run.governance.disposition}` : 'BEHAVIORAL ACCEPTANCE ENABLED · verdict pending')
               : run.protection === 'FAILED_TO_APPLY' ? 'PROTECTION FAILED TO APPLY'
                 : 'NO BEHAVIORAL ACCEPTANCE PROTECTION'}
           </span>

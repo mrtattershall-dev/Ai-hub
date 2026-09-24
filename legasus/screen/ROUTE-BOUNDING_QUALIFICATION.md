@@ -103,3 +103,25 @@ sealed test run was leaving undeletable directories in the source tree while rep
 verifies by reading the directory rather than by an exit code. `server/legasus-audit/` is now
 gitignored — a bundle in git history would be readable by anyone who can read the repo, which
 defeats the lock entirely.
+
+---
+
+## CORRECTION — 2026-09-24 (EXECUTION-DEFECTS_RESULT.md §3, finishGateHost.test.mjs)
+
+The claim above that model-chosen host execution was closed under bounding was **incomplete**.
+The finish gate (`agent.js`, `if (!run.verified)`) called `verifier.verify(WORKSPACE)`, which
+runs `python <entry>` / `node <entry>` on the HOST without a tool call. Every campaign that
+reached a finish (PILOT-2, ENDURANCE-1/2, PROTOCOL-1/2, BENCH-1) executed model-edited code on
+the host at that point. **This is a confirmed execution path outside isolation, not evidence
+that any compromise occurred.** The campaigns' recovery and behavioural results stand at the
+level they were measured (evaluator in the worker, acceptance dispositions, restorations); what
+they did not demonstrate is that all generated code stayed inside the worker.
+
+Closed 2026-09-24 under bounding (`route_closed` step; finish UNVERIFIED by the hub, judged by
+the evaluator). Proven by `finishGateHost.test.mjs` 10/10: the bounded finish path is reached
+and writes no host marker; the unbounded positive control reaches the same gate and does.
+
+**Still open, recorded here so the claim stays narrow:** `test_web` loads model-written
+HTML/JS in a headless browser on the host and is NOT removed under bounding. No campaign task
+so far was a web page, so it did not fire; it remains an unclosed host-side execution route
+for web goals.

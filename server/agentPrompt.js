@@ -293,3 +293,31 @@ CORRECTNESS RULES (avoid the common bugs):
 - Build the SIMPLEST fully-working version first; don't add features that aren't wired up.
 - Put your <script> at the END of <body> (or wrap DOM code in a DOMContentLoaded handler) so every element exists before your JS runs — this avoids "Cannot read properties of null".
 - Prefer wiring buttons with onclick="fn()" attributes (functions defined in the script) over addEventListener on elements fetched at load time.`;
+
+/**
+ * THE PROMPT MUST DESCRIBE THE TOOLS THAT EXIST. BENCH-2's chain step asked for verify_project
+ * three times because this prompt told it to ("EVERYTHING ELSE ... run verify_project") while
+ * route bounding had removed the tool. Telling a model it must use a tool it cannot have is a
+ * configuration defect, not a model failure. So the system prompt is rendered from the
+ * effective tool set: each tool's doc block (the paragraph opening "<name> — ") is kept only
+ * if the tool is available, and the two VERIFY BEFORE FINISHING rules that name removed
+ * tools are replaced by the rule for what IS available. With every tool available the output
+ * is byte-identical to SYSTEM_PROMPT (effectivePrompt.test.mjs holds that as its control).
+ */
+export function systemPromptFor(available) {
+  const has = (t) => available.has(t);
+  const paras = SYSTEM_PROMPT.split('\n\n').filter((p) => {
+    const m = p.match(/^([a-z_]+) — /);
+    return !m || has(m[1]);
+  });
+  let out = paras.join('\n\n');
+  if (!has('see_screen')) {
+    out = out.replace(/^- ANY GAME OR VISUAL APP: also run see_screen\..*$/m,
+      '- ANY GAME OR VISUAL APP: test_web reports errors and on-screen text; a page that runs cleanly and draws nothing is still a BUG - check the visible text it reports.');
+  }
+  if (!has('verify_project')) {
+    out = out.replace(/^- EVERYTHING ELSE \(Python, Node, a CLI, Godot\): run verify_project\..*$/m,
+      "- EVERYTHING ELSE (Python, Node, a CLI): run your own checks with run_python or run_command (for example python3 -m py_compile <file>.py, node <file>.js, or the project's test command). A project you have never executed is not finished, no matter how correct it looks.");
+  }
+  return out;
+}
