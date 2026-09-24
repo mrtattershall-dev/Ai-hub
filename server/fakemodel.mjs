@@ -258,7 +258,11 @@ const SCRIPTS = {
   ],
 };
 
-const script = SCRIPTS[SCRIPT];
+// --replies <file.json>: serve a RECORDED sequence of replies verbatim, in order. This is how
+// a preserved failing run is replayed through the real Hub without a model: the replies are
+// exactly what the model said, so what is under test is what the Hub SENDS back, not the model.
+const REPLIES_FILE = (() => { const i = process.argv.indexOf('--replies'); return i >= 0 ? process.argv[i + 1] : null; })();
+const script = REPLIES_FILE ? JSON.parse(fs.readFileSync(REPLIES_FILE, 'utf8')) : SCRIPTS[SCRIPT];
 if (!script) {
   console.error(`unknown script "${SCRIPT}". one of: ${Object.keys(SCRIPTS).join(', ')}`);
   process.exit(1);
