@@ -82,11 +82,13 @@ most stalls the model is stopped before it is ever told it is repeating.
 held constant, one model stalls in three runs out of four and the other almost never.
 BENCH-1's 7B (10/15, 67%) sits with the 14B.
 
-This does not exonerate the workflow: a workflow can be *sufficient* for a weaker model to stall
-while a stronger one steps past it. But it locates the dominant factor in the **model's
-behaviour after a tool result**, and it shows the current workflow is already adequate for a
-model that handles that transition. A workflow change that helps the 7B would be helping it
-around a limitation the 30B does not have.
+**CORRECTED.** An earlier draft said this "locates the dominant factor in the model." That is
+too strong. 75% versus 3% is a **historical association across two models on one workflow** —
+not proof that the model rather than the workflow causes the stalls. Model sensitivity and a
+workflow defect can coexist, and here they demonstrably do: the warning-delivery bug is a
+workflow defect independent of any model, and the 14B/7B are more sensitive to whatever the
+workflow presents than the 30B is. Neither reading excludes the other. The bug is real
+regardless of the association and was repaired first (`repeatWarning.test.mjs`).
 
 Representative traces (result reached, warning reached, still repeated):
 `measurements/2026-09-11-setG/runs/coder14b-setg/runs/071d5478…`, `0b66a858…`, `16869c97…`.

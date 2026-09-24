@@ -4087,7 +4087,20 @@ async function drive(loadDb, run) {
         }
       }
 
-      let feedback = substituted || `TOOL RESULT (${tool}):\n${result}${syntaxNote}`;
+      // THE WARNING MUST SURVIVE THE SUBSTITUTION.
+      //
+      // The repeat guard appends its warning to `result`. The substitution above REPLACES
+      // `result` with the whole file - so for exactly the two calls where the model was
+      // repeating, the warning never went out. It first reached the model on call 4; the guard
+      // stops the run after 3 identical replies. Historically 151 of 202 stalled runs were
+      // killed before the model was ever told it was repeating (BENCH-1_BOUNDARY.md).
+      //
+      // Both go: the file content the substitution exists to provide, AND the warning. The
+      // repeat limit itself is unchanged.
+      const repeatWarning = (String(result).match(/\n\n⚠️ You already ran this exact[\s\S]*$/) || [''])[0];
+      let feedback = substituted
+        ? substituted + (repeatWarning && !substituted.includes('⚠️ You already ran') ? repeatWarning : '')
+        : `TOOL RESULT (${tool}):\n${result}${syntaxNote}`;
       // INSERTION 3 of 3: the controller sees the result and advances its phase, then states
       // what is open next. The raw result still reaches the model - the controller adds the
       // sequencing it owns, it does not replace the evidence.
