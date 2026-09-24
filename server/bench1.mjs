@@ -35,7 +35,13 @@ const HUB_COMMIT = process.env.BENCH_HUB_COMMIT || 'unrecorded';
 if (!MODEL_URL) { console.error('usage: node server/bench1.mjs <modelBaseUrl>'); process.exit(2); }
 
 const PER_TASK_SEC = 300;
-const TOTAL_SEC = 2 * 60 * 60;
+// REPLICATES (BENCH-3). Every earlier count was n=1 per task, which is descriptive only. With
+// BENCH_REPS=N the EXTERNAL group runs N times, each replicate from the same frozen seeds in
+// fresh workspaces, recorded as its own planned unit (task@rN) so the report's denominator and
+// duplicate check stay exact. The sequential chain runs once regardless - accumulation
+// replicates are a different design and are not smuggled in here.
+const REPS = Math.max(1, parseInt(process.env.BENCH_REPS || '1', 10));
+const TOTAL_SEC = parseInt(process.env.BENCH_TOTAL_SEC || String(2 * 60 * 60), 10);
 const RESERVE_SEC = 180;
 const T0 = Date.now();
 const DEADLINE = T0 + (TOTAL_SEC - RESERVE_SEC) * 1000;
@@ -83,14 +89,22 @@ async function runTask(ws, task, ctx) {
     if (!start.runId) return { status: 'NOT_STARTED', error: 'the hub did not start a run', attemptId: ctx.attemptId };
     while (Date.now() < hardStop) {
       run = await api(base, `/agent/${start.runId}`).catch(() => null);
-      if (run && run.status && run.status !== 'running' && !run.busy) break;
+      // Settled AND FINALIZED: finalizedAt is the hub's acknowledgment that the terminal
+      // state has been persisted. Killing the hub before it produced CHECK-1's contradictory
+      // status:"running" record for completed work.
+      if (run && run.status && run.status !== 'running' && !run.busy && run.finalizedAt) break;
       await sleep(2000);
     }
     if (run && run.status === 'running') {
       aborted = Date.now() >= DEADLINE ? 'total budget' : 'per-task limit';
       await api(base, `/agent/${start.runId}/stop`, { method: 'POST' }).catch(() => null);
-      await sleep(1500);
-      run = await api(base, `/agent/${start.runId}`).catch(() => run);
+      // After a forced stop, wait (bounded) for the finalization ack too - the teardown still
+      // has acceptance/d2 to run, and killing under it is exactly the demonstrated defect.
+      for (let i = 0; i < 60; i++) {
+        run = await api(base, `/agent/${start.runId}`).catch(() => run);
+        if (run && run.finalizedAt && !run.busy) break;
+        await sleep(1000);
+      }
     }
   } finally {
     try { hub.kill('SIGKILL'); } catch { /* best effort */ }
@@ -119,15 +133,18 @@ if (ONLY.length && ALL.length !== ONLY.length) { console.error(`BENCH_TASK_IDS n
 console.log(`${EXPERIMENT} START ${new Date().toISOString()} hub ${HUB_COMMIT}`);
 console.log(`model: ${MODEL_URL}`);
 console.log(`worker: ${WORKER_IMAGE}`);
-console.log(`queue: ${EXTERNAL.length} external + ${SEQ.length} sequential`);
+console.log(`queue: ${EXTERNAL.length} external x ${REPS} replicate(s) + ${SEQ.length} sequential`);
 console.log(`limits: ${PER_TASK_SEC}s/task, ${TOTAL_SEC}s total, ${RESERVE_SEC}s reserve, no retries\n`);
 
 // THE PLAN IS RECORDED FIRST. Without it a recovered report reconciles only against the records
 // that survived, which can never reveal work that is missing.
-recordPlan(SUMMARY, ALL.map((t) => t.id));
+recordPlan(SUMMARY, [
+  ...EXTERNAL.flatMap((t) => Array.from({ length: REPS }, (_, r) => `${t.id}@r${r + 1}`)),
+  ...SEQ.map((t) => t.id),
+]);
 
-const rowOf = (r, task, idx) => ({
-  idx, rep: 1, task: r.task, arm: task?.group || 'UNKNOWN',
+const rowOf = (r, task, idx, rep) => ({
+  idx, rep, task: rep ? `${r.task}@r${rep}` : r.task, arm: task?.group || 'UNKNOWN',
   termination: r.termination || r.state,
   requested: r.verdict?.requested?.verdict ?? null,
   protected: r.verdict?.protected?.verdict ?? null,
@@ -145,25 +162,31 @@ const rowOf = (r, task, idx) => ({
 });
 
 let idx = 0;
-const persist = (group) => (r) => {
+const persist = (group, rep) => (r) => {
   const task = ALL.find((t) => t.id === r.task) || { group };
-  recordRun(SUMMARY, rowOf(r, task, ++idx));
+  recordRun(SUMMARY, rowOf(r, task, ++idx, rep));
   const req = r.verdict?.requested?.verdict ?? '-';
   const prot = r.verdict?.protected?.verdict ?? '-';
   console.log(`${String(idx).padStart(2)}. [${task.group}] ${r.task} ${r.termination || r.state} req=${req} prot=${prot} ${r.acceptance?.disposition ?? r.state}`);
 };
 
-// ── EXTERNAL: independent, each from its own frozen seed ──
-const extOut = await runBatch(EXTERNAL, {
-  journalPath: join(ROOT, 'journal-ext.jsonl'),
-  workspacesDir: join(ROOT, 'ws-ext'),
-  auditDir: join(ROOT, 'audit'),
-  perTaskSec: PER_TASK_SEC,
-  totalSec: Math.max(1, Math.round((DEADLINE - Date.now()) / 1000)),
-  chain: false,
-  onTaskEnd: persist('EXTERNAL'),
-  runTask,
-});
+// ── EXTERNAL: independent, each replicate from the same frozen seeds in fresh workspaces ──
+const extAccounting = [];
+for (let rep = 1; rep <= REPS; rep++) {
+  if (Date.now() >= DEADLINE) { console.log(`replicate ${rep} not started: total budget reached`); break; }
+  console.log(`\n-- external replicate ${rep} of ${REPS} --`);
+  const out = await runBatch(EXTERNAL, {
+    journalPath: join(ROOT, `journal-ext-r${rep}.jsonl`),
+    workspacesDir: join(ROOT, `ws-ext-r${rep}`),
+    auditDir: join(ROOT, 'audit'),
+    perTaskSec: PER_TASK_SEC,
+    totalSec: Math.max(1, Math.round((DEADLINE - Date.now()) / 1000)),
+    chain: false,
+    onTaskEnd: persist('EXTERNAL', rep),
+    runTask,
+  });
+  extAccounting.push({ rep, accounting: out.accounting });
+}
 
 // ── SEQUENTIAL: chained, advancing only from accepted states ──
 const seqOut = await runBatch(SEQ, {
@@ -173,7 +196,7 @@ const seqOut = await runBatch(SEQ, {
   perTaskSec: PER_TASK_SEC,
   totalSec: Math.max(1, Math.round((DEADLINE - Date.now()) / 1000)),
   chain: true,
-  onTaskEnd: persist('SEQUENTIAL'),
+  onTaskEnd: persist('SEQUENTIAL', 0),
   runTask,
 });
 
@@ -197,7 +220,7 @@ const report = writeReport(SUMMARY, join(ROOT, `${EXPERIMENT}_REPORT.json`), {
   },
   elapsedSec,
   noActiveWorkLeftBehind: stopped.ok,
-  externalAccounting: extOut.accounting,
+  externalAccounting: extAccounting,
   sequentialAccounting: seqOut.accounting,
   interventions: ['none - unattended from launch to final report'],
   root: ROOT,

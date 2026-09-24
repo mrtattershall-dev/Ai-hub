@@ -2655,7 +2655,14 @@ function loadRuns() {
       try {
         const run = JSON.parse(readFileSync(join(RUNS_DIR, name), 'utf8'));
         run.busy = false; run.abort = null;
-        if (['running', 'awaiting_approval'].includes(run.status)) run.status = 'interrupted';
+        if (['running', 'awaiting_approval'].includes(run.status)) {
+          // EXPLICIT RECONCILIATION, not silence: this record was on disk as active with no
+          // finalization stamp - the process died (or was killed) before the terminal persist.
+          // It is never presented as still running; it becomes 'interrupted' and says why.
+          run.status = 'interrupted';
+          run.reconciled = 'recovered as interrupted: the run record was unfinalized (no terminal persist) when the hub last exited';
+          (run.steps ||= []).push({ type: 'note', text: run.reconciled });
+        }
         runs.set(run.id, run);
         evictOldRuns();
       } catch {}
@@ -4538,13 +4545,22 @@ async function drive(loadDb, run) {
       pushStep(run, { type: 'acceptance', disposition: concluded.disposition || null, text: run.protectionNote });
     }
 
-    // The workspace is settled - release it. Before the queue hand-off below, which calls
-    // autoStart and needs the workspace free. No await between the parked-run break and
-    // here, so awaiting_approval/interrupted release exactly as promptly as before.
-    run.busy = false;
+    // TERMINAL STATE IS DURABLE BEFORE THE RUN IS RELEASED. CHECK-1: the runner watches
+    // busy over the API and, once the run reads settled, kills the hub - and find_in_sorted's
+    // run file was left saying status:"running" for completed, dispositioned work, because
+    // persist() came AFTER busy=false. Anything a caller can observe as finished must already
+    // be on disk when it observes it, so: finalizedAt stamped, persisted, THEN released.
+    // finalizedAt is the acknowledgment a runner waits for; a run record without it and with
+    // a non-terminal status is by definition unfinalized, and recovery treats it as such.
+    if (['done', 'error', 'stopped', 'refused_d2', 'stopped_d2_restored'].includes(run.status)) {
+      run.finalizedAt = Date.now();
+      saveTrace(run); recordRunIndex(run);
+    }
+    persist(run);   // durable BEFORE release (incl. 'interrupted' and 'awaiting_approval')
 
-    if (['done', 'error', 'stopped'].includes(run.status)) { saveTrace(run); recordRunIndex(run); }
-    persist(run);   // capture final/paused state (incl. 'interrupted' and 'awaiting_approval')
+    // The workspace is settled - release it. Before the queue hand-off below, which calls
+    // autoStart and needs the workspace free.
+    run.busy = false;
 
     // ── Tell someone ────────────────────────────────────────────────────────────
     // A run that gave up used to flip a status field and go quiet. Fine when a human
