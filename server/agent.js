@@ -2015,7 +2015,14 @@ const AUTO_TOOLS = new Set(['list_dir', 'read_file', 'search_file', 'outline_fil
 // Applied HERE, not next to the tool table: AUTO_TOOLS is declared below it, so running
 // this earlier throws a TDZ ReferenceError at load - and only when bounding is ON, which
 // is the shape of failure that passes every check unable to reach the line.
-if (ROUTES_BOUNDED) { delete tools.spawn_subtask; AUTO_TOOLS.delete('spawn_subtask'); }
+// Tools bounding REMOVES, remembered by name. BENCH-2's chain step asked for verify_project
+// three times and was told "could not parse an action" each time - the action was perfectly
+// well formed; the tool had been removed. A removed tool is answered as what it is:
+// unavailable in this configuration, with the alternatives that ARE here. The tool stays
+// removed; only the feedback changes. The repeat guard still bounds a model that keeps asking.
+const REMOVED_TOOLS = new Set();
+const removedToolMessage = (tool) => `TOOL UNAVAILABLE in this configuration: ${tool}. Your action was understood - this is NOT a parse error - and it was NOT executed, because ${tool} is not available here. Supported testing alternatives: run_python (run your own test code against the file) and run_command (for example "python3 -m py_compile <file>.py", "node <file>.js", or the project's own test command). Use one of those instead.`;
+if (ROUTES_BOUNDED) { delete tools.spawn_subtask; AUTO_TOOLS.delete('spawn_subtask'); REMOVED_TOOLS.add('spawn_subtask'); }
 
 // The VERIFICATION routes execute model-written code ON THE HOST, so they are closed too.
 //
@@ -2031,7 +2038,7 @@ if (ROUTES_BOUNDED) { delete tools.spawn_subtask; AUTO_TOOLS.delete('spawn_subta
 //
 // Identical in both arms.
 if (ROUTES_BOUNDED) {
-  for (const t of ['verify_project', 'verify_godot', 'see_screen']) { delete tools[t]; AUTO_TOOLS.delete(t); }
+  for (const t of ['verify_project', 'verify_godot', 'see_screen']) { delete tools[t]; AUTO_TOOLS.delete(t); REMOVED_TOOLS.add(t); }
 }
 
 // Sub-task recursion bounds. Depth 2 is enough for "build the thing" -> "build this
@@ -2294,7 +2301,20 @@ function overflowError(detail) {
   return e;
 }
 
-async function callModel(loadDb, messages, signal, override) {
+// CALL DEADLINE (BENCH-2). Four runs ended on a model request that never returned: the server
+// streamed heartbeats, so the inter-token stall timer never fired; the first-byte window
+// (420s) and the ceiling (1800s) both exceed a 300s task; and the run was stopped by the
+// runner with the request still open. What the record could say afterwards was only "empty
+// reply". A per-call deadline BELOW the remaining task budget is the fix - and when it fires,
+// the outcome is a LOCAL abort: the server may still be generating, may have finished, or may
+// never have received the request. Nothing here can tell, so nothing here may claim to.
+class CallDeadlineError extends Error {
+  constructor(deadlineMs, chars) {
+    super(`Model call exceeded its ${Math.round(deadlineMs / 1000)}s deadline and was aborted locally (${chars} chars had arrived). Server outcome UNKNOWN - this is not a confirmed server-side cancellation.`);
+    this.code = 'CALL_DEADLINE'; this.deadlineMs = deadlineMs; this.chars = chars;
+  }
+}
+async function callModel(loadDb, messages, signal, override, { deadlineMs = null } = {}) {
   const db = loadDb();
   const prov = agentProvider(db);
   const o = prov.row || {};
@@ -2322,6 +2342,13 @@ async function callModel(loadDb, messages, signal, override) {
   const promptTok = estimateTokens(messages);
   let full = '', buf = '', attempts = 0, firstByteMs = null;
   let ac = null, stallTimer = null, stalled = false;
+  let deadlineHit = false, deadlineTimer = null;
+  const deadlineSignal = (() => {
+    if (!deadlineMs || deadlineMs <= 0) return null;
+    const dc = new AbortController();
+    deadlineTimer = setTimeout(() => { deadlineHit = true; try { dc.abort(); } catch {} }, deadlineMs);
+    return dc.signal;
+  })();
 
   const disarm = () => { if (stallTimer) { clearTimeout(stallTimer); stallTimer = null; } };
   // Generous until the first byte (cold start), tight afterwards (a live stream).
@@ -2345,6 +2372,7 @@ async function callModel(loadDb, messages, signal, override) {
       stalled = false;
       const sigs = [ac.signal, AbortSignal.timeout(MODEL_TIMEOUT_MS)];
       if (signal) sigs.push(signal);
+      if (deadlineSignal) sigs.push(deadlineSignal);
       const merged = AbortSignal.any(sigs);
       armStall();
       try {
@@ -2352,6 +2380,7 @@ async function callModel(loadDb, messages, signal, override) {
       } catch (fetchErr) {
         disarm();
         if (signal && signal.aborted) throw new Error('stopped');
+        if (deadlineHit) throw new CallDeadlineError(deadlineMs, 0);
         if (stalled) throw new Error(`No response from the model for ${MODEL_FIRST_BYTE_MS / 1000}s (nothing arrived at all)`);
         throw fetchErr;
       }
@@ -2422,11 +2451,13 @@ async function callModel(loadDb, messages, signal, override) {
       // class of silent damage the write_file guard exists to prevent. So a stall always
       // fails the call; isConnError classes it resumable and the run retries with its
       // history intact. Caught by modelBudget.test.mjs 'a SILENT stream fails fast'.
+      if (deadlineHit) throw new CallDeadlineError(deadlineMs, full.length);
       if (stalled) throw new Error(`Model stream went silent for ${(full.length ? MODEL_STALL_MS : MODEL_FIRST_BYTE_MS) / 1000}s after ${full.length} chars`);
       if (!full) throw new Error('Model stream failed before any content: ' + streamErr.message);
       console.warn(`[agent] stream ended early (${stalled ? 'went silent' : streamErr.message}) - keeping ${full.length} chars already received`);
     }
 
+    if (deadlineTimer) clearTimeout(deadlineTimer);
     const ms = Date.now() - t0;
     const outTok = Math.ceil(full.length / 4);
     const tokPerSec = ms > 0 ? +(outTok / (ms / 1000)).toFixed(1) : 0;
@@ -2440,7 +2471,9 @@ async function callModel(loadDb, messages, signal, override) {
     return full;
   } catch (e) {
     disarm();
+    if (deadlineTimer) clearTimeout(deadlineTimer);
     if (e.code === 'CONTEXT_OVERFLOW') throw e;
+    if (e.code === 'CALL_DEADLINE' || deadlineHit) throw (e.code === 'CALL_DEADLINE' ? e : new CallDeadlineError(deadlineMs, full.length));
     if (e.message === 'stopped' || (signal && signal.aborted)) throw e;
 
     const timedOut = e.name === 'TimeoutError' || stalled || /No response from the model|sent nothing/.test(e.message);
@@ -2683,6 +2716,39 @@ function pauseAdvice(e) {
  * Fold the last call's rate into the run so throughput is visible in the product, not
  * only in a benchmark script someone remembered to write.
  */
+// THE CALL LEDGER. Every model request gets a durable record: id, dispatch time, deadline,
+// and how it ended - COMPLETED, COMPLETED_EMPTY (the server answered with nothing: a real
+// reply, distinct from a timeout), DEADLINE_LOCAL_ABORT, ABORTED_BY_STOP, or ERROR. For
+// every non-completed outcome serverOutcome is UNKNOWN: the hub aborted its side, and that
+// is all it knows. Kept on the run (persisted with it) and appended to the transcript.
+const CALL_DEADLINE_S = parseInt(process.env.AGENT_CALL_DEADLINE_S || '0', 10);   // 0 = no fixed cap
+const CALL_DEADLINE_MARGIN_MS = 5_000;   // leave the runner time to see the result before its own stop
+function callDeadlineMs(run) {
+  const c = [];
+  if (CALL_DEADLINE_S > 0) c.push(CALL_DEADLINE_S * 1000);
+  if (run.callDeadlineSec > 0) c.push(run.callDeadlineSec * 1000);
+  if (run.budgetEndsAt) c.push(run.budgetEndsAt - Date.now() - CALL_DEADLINE_MARGIN_MS);
+  if (!c.length) return null;
+  return Math.max(1000, Math.min(...c));
+}
+function beginCall(run, kind) {
+  const call = { callId: randomUUID(), callKind: kind, n: run.modelCalls, dispatchedAt: Date.now(), deadlineMs: callDeadlineMs(run), outcome: 'IN_FLIGHT' };
+  (run.calls ||= []).push(call);
+  appendTranscript(run, { ...call, kind: 'call' });
+  return call;
+}
+function endCall(run, call, fields) {
+  Object.assign(call, { completedAt: Date.now() }, fields);
+  call.elapsedMs = call.completedAt - call.dispatchedAt;
+  appendTranscript(run, { ...call, kind: 'call' });
+  persist(run);
+  return call;
+}
+function outcomeOf(run, e) {
+  if (e && e.code === 'CALL_DEADLINE') return { outcome: 'DEADLINE_LOCAL_ABORT', serverOutcome: 'UNKNOWN', chars: e.chars || 0, error: e.message.slice(0, 300) };
+  if (run.status === 'stopped') return { outcome: 'ABORTED_BY_STOP', serverOutcome: 'UNKNOWN', error: 'stopped' };
+  return { outcome: 'ERROR', serverOutcome: 'UNKNOWN', error: (e && (e.code || e.message) || String(e)).slice(0, 300) };
+}
 function noteModelCall(run) {
   const st = getLastModelCall();
   if (!st) return;
@@ -3100,6 +3166,7 @@ async function runSubtask(goal, depth, parent) {
     sub.history.push({ role: 'assistant', content: raw });
 
     const action = parseAction(raw, sub.lastPath);
+    if (action && action.tool && REMOVED_TOOLS.has(action.tool)) { sub.history.push({ role: 'user', content: removedToolMessage(action.tool) }); continue; }
     if (!action || !action.tool || (!tools[action.tool] && action.tool !== 'finish')) {
       sub.history.push({ role: 'user', content: 'Your last response had no valid ACTION. Reply with a THOUGHT line, an ACTION line, then its fields.' });
       continue;
@@ -3311,8 +3378,12 @@ async function drive(loadDb, run) {
           { role: 'system', content: plannerSystemFor(run.goal) },
           { role: 'user', content: `${run.history[1]?.content || ('GOAL: ' + run.goal)}\n\n${planTaskFor(run.goal)}` },
         ];
-        const planText = await callModel(loadDb, planMsgs, run.abort.signal, planner);
-        appendTranscript(run, { n: 0, kind: 'plan', sent: planMsgs, reply: planText });
+        const planCall = beginCall(run, 'plan');
+        let planText;
+        try { planText = await callModel(loadDb, planMsgs, run.abort.signal, planner, { deadlineMs: planCall.deadlineMs }); }
+        catch (e) { endCall(run, planCall, outcomeOf(run, e)); throw e; }
+        endCall(run, planCall, { outcome: planText.trim() ? 'COMPLETED' : 'COMPLETED_EMPTY', chars: planText.length });
+        appendTranscript(run, { n: 0, kind: 'plan', sent: planMsgs, reply: planText, ...(planText.trim() ? {} : { empty: true }) });
         if (planText && planText.trim()) {
           run.plan = planText.trim();
           pushStep(run, { type: 'plan', text: run.plan });
@@ -3364,15 +3435,31 @@ async function drive(loadDb, run) {
       // less to coordinate, not less to work with.
       const pc1 = protocolFor(run);
       if (pc1) msgs.push({ role: 'user', content: pc1.instruction() });
+      const call = beginCall(run, 'turn');
       try {
-        raw = await callModel(loadDb, msgs, run.abort.signal);
+        raw = await callModel(loadDb, msgs, run.abort.signal, undefined, { deadlineMs: call.deadlineMs });
         noteModelCall(run);
+        endCall(run, call, { outcome: raw.trim() ? 'COMPLETED' : 'COMPLETED_EMPTY', chars: raw.length });
         const lastSaid = msgs.map((m) => m.role).lastIndexOf('assistant');
-        appendTranscript(run, { n: run.modelCalls, kind: 'turn', sent: run.transcribed ? msgs.slice(lastSaid + 1) : msgs, reply: raw });
+        // A genuinely empty reply is recorded AS a reply (with empty: true). A timeout never
+        // writes a reply field at all - it is an error record with an outcome.
+        appendTranscript(run, { n: run.modelCalls, kind: 'turn', sent: run.transcribed ? msgs.slice(lastSaid + 1) : msgs, reply: raw, ...(raw.trim() ? {} : { empty: true }) });
         run.transcribed = true;
       } catch (e) {
-        appendTranscript(run, { n: run.modelCalls, kind: 'turn', error: e.code || String(e.message || e).slice(0, 300) });
+        const oc = endCall(run, call, outcomeOf(run, e));
+        appendTranscript(run, { n: run.modelCalls, kind: 'turn', error: e.code || String(e.message || e).slice(0, 300), outcome: oc.outcome, serverOutcome: oc.serverOutcome });
         if (run.status === 'stopped') break;        // Stop aborted the call — exit quietly
+
+        if (e.code === 'CALL_DEADLINE') {
+          pushStep(run, { type: 'error', text: `Model call ${run.modelCalls} exceeded its ${Math.round(call.deadlineMs / 1000)}s deadline and was aborted locally (${e.chars || 0} chars arrived). Server outcome unknown - not a confirmed cancellation.` });
+          const left = run.budgetEndsAt ? run.budgetEndsAt - Date.now() : Infinity;
+          if (left < CALL_DEADLINE_MARGIN_MS * 2) {
+            run.status = 'error';
+            pushStep(run, { type: 'error', text: 'Stopped: the last model call did not complete within the task budget. This is a call that never returned, not a task the model failed.' });
+            break;
+          }
+          continue;   // budget remains: a fresh call, counted in the ledger like any other
+        }
 
         // The BACKEND is the authority on its own context window, not our estimate. When
         // it says the request was too long, squash and retry instead of stopping for a
@@ -3505,6 +3592,11 @@ async function drive(loadDb, run) {
           run.history.push({ role: 'user', content: `${pc2.instruction()}\n\nThat action was not available in this phase (${gate.refusal}). Nothing was executed and nothing was lost.` });
           continue;
         }
+      }
+      if (action && action.tool && REMOVED_TOOLS.has(action.tool)) {
+        pushStep(run, { type: 'route_unavailable', route: action.tool, text: `${action.tool} is not available in this configuration; nothing was executed.` });
+        run.history.push({ role: 'user', content: removedToolMessage(action.tool) });
+        continue;
       }
       if (!action || !action.tool || !tools[action.tool] && action.tool !== 'finish') {
         run.parseLog = (run.parseLog || []).concat(false).slice(-10);
@@ -3766,6 +3858,19 @@ async function drive(loadDb, run) {
                 // had fixed - it could pass a goal on the strength of a leftover file from another goal.
                 // Reproduced in finishGateEntry.test.mjs before this change.
                 const goalEntry = ledger.namedFiles(run.goal || '').find((f) => /\.(py|c?js|mjs)$/i.test(f) && existsSync(join(WORKSPACE, f)));
+                // THE FINISH GATE EXECUTES MODEL-WRITTEN CODE ON THE HOST. verifier.verify runs
+                // `python <entry>` / `node <entry>` (verifyProject.js) - the same host execution
+                // route bounding closes for the verify_project TOOL, reached here without a tool
+                // call. Found 2026-09-24 by callDeadline.test's ordinary-path case: under
+                // AGENT_BOUND_ROUTES=1 the gate reported "`python m.py` ran" on the host. So in
+                // the bounded configuration the gate is CLOSED, recorded as such, and the finish
+                // proceeds UNVERIFIED BY THE HUB - behaviour is measured afterwards by the
+                // independent evaluator in the worker, which is where the campaigns already
+                // take their verdicts from. The ordinary hub keeps the gate.
+                if (ROUTES_BOUNDED) {
+                  pushStep(run, { type: 'route_closed', route: 'finish-gate verify', text: 'Finish-time host verification is closed in this configuration; the finish is recorded UNVERIFIED by the hub and judged by the independent evaluator.' });
+                  run.finishVerification = 'CLOSED_UNDER_BOUNDING';
+                } else {
                 const v = await verifier.verify(WORKSPACE, { entry: goalEntry });
                 if (!v.ok) {
                   blocked(`Project does not run (${v.kind}) — not finished.`,
@@ -3777,6 +3882,7 @@ async function drive(loadDb, run) {
                 run.verified = true;    // passed — do not pay for it again
                 run.verifiedAt = workspaceStamp();
                 pushStep(run, { type: 'note', text: `Verified (${v.kind}): ${v.evidence.join('; ')}` });
+                }   // end: unbounded finish-gate verification
               }
             } catch { /* verification is evidence, not a gate that can hang a run */ }
           }
@@ -3801,6 +3907,11 @@ async function drive(loadDb, run) {
         break turn;
       }
 
+      if (!tools[tool] && REMOVED_TOOLS.has(tool)) {
+        pushStep(run, { type: 'route_unavailable', route: tool, thought, text: `${tool} is not available in this configuration; nothing was executed.` });
+        run.history.push({ role: 'user', content: removedToolMessage(tool) });
+        continue turn;
+      }
       if (!tools[tool]) {
         pushStep(run, { type: 'error', thought, text: `Unknown tool: ${tool}` });
         run.history.push({ role: 'user', content: `TOOL ERROR: unknown tool "${tool}". Use only the listed tools.` });
@@ -4832,7 +4943,7 @@ function autoStart(loadDb, item) {
 //
 // Default 'unknown' rather than guessing: an unstamped caller is a gap to be seen, not a
 // value to be invented.
-function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown' } = {}) {
+function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown', budgetSec = null, callDeadlineSec = null } = {}) {
   ensureWorkspace();
   const id = randomUUID();
   const now = Date.now();
@@ -4844,6 +4955,10 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
     id, goal, status: 'running', busy: false, modelCalls: 0, tokens: 0,
     suppliedFiles: supplied.supplied,     // what the opening context handed over, with hashes
     steps: [], pending: null, createdAt: now, budgetStart: now,
+    // Declared by the caller (a runner knows its per-task budget; the UI may not). Per-call
+    // deadlines derive from these; with neither set, the pre-existing stall/ceiling timers apply.
+    budgetEndsAt: budgetSec > 0 ? now + budgetSec * 1000 : null,
+    callDeadlineSec: callDeadlineSec > 0 ? callDeadlineSec : null,
     queueItemId, source, entrance, generation: Math.max(0, Number(generation) || 0),
     history: [
       { role: 'system', content: SYSTEM_PROMPT },
@@ -4999,7 +5114,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
 
   // Start a new run; returns immediately, loop runs in the background.
   router.post('/start', (req, res) => {
-    const { goal, queueIfBusy } = req.body || {};
+    const { goal, queueIfBusy, budgetSec, callDeadlineSec } = req.body || {};
     if (!goal || !goal.trim()) return res.status(400).json({ error: 'goal required' });
 
     // ONE TOP-LEVEL RUN AT A TIME. There is a single shared WORKSPACE, and sharing it is
@@ -5034,7 +5149,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       });
     }
 
-    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start' });
+    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null });
     res.json({ runId: run.id });
   });
 

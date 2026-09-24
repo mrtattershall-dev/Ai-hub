@@ -36,6 +36,18 @@ const argv = process.argv.slice(2);
 const val = (n, d) => { const i = argv.indexOf('--' + n); return i > -1 && argv[i + 1] ? argv[i + 1] : d; };
 const PORT = parseInt(val('port', '11500'), 10);
 const SCRIPT = val('script', 'happy');
+// FAULT MODES for the call-deadline tests (callDeadline.test.mjs). Neither touches the
+// replies: they change WHEN (or whether) the answer arrives.
+//   --never          never answer: stream an empty heartbeat frame every second, forever, the
+//                    way a serving container does while it is still generating. The hub's
+//                    inter-token stall timer cannot fire on this - which is exactly BENCH-2.
+//   --delay-ms N     answer normally, but only after N ms.
+// Both record what the SERVER saw to FAKE_EVENT_LOG: whether the client went away first,
+// and whether a late answer was ever sent. That is how a test proves "the late reply was
+// never acted on" from the server's side as well as the hub's.
+const NEVER = argv.includes('--never');
+const DELAY_MS = parseInt(val('delay-ms', '0'), 10);
+const event = (e) => { if (process.env.FAKE_EVENT_LOG) { try { fs.appendFileSync(process.env.FAKE_EVENT_LOG, JSON.stringify({ at: Date.now(), ...e }) + String.fromCharCode(10)); } catch {} } };
 
 // ── the scripts ───────────────────────────────────────────────────────────────
 // Each is a list of replies. Once exhausted the last one repeats, so a guard that
@@ -277,6 +289,7 @@ const replyAt = (i) => (generative ? script(i) : script[Math.min(i, script.lengt
 
 let n = 0;
 const served = [];
+let reqSeq = 0;   // per-request, never reset: the event log's identity (n is the script pointer)
 
 // ── the Ollama /api/chat contract, minimally ──────────────────────────────────
 // The hub streams NDJSON and concatenates message.content, so one final frame with
@@ -284,6 +297,7 @@ const served = [];
 // and would otherwise hang.
 const server = createServer((req, res) => {
   if (req.method !== 'POST') { res.writeHead(404).end(); return; }
+  const seq = ++reqSeq;
   let body = '';
   req.on('data', (d) => { body += d; });
   req.on('end', () => {
@@ -352,6 +366,25 @@ const server = createServer((req, res) => {
       res.write('data: ' + JSON.stringify({ choices: [{ delta: { content } }] }) + String.fromCharCode(10, 10));
       res.write('data: [DONE]' + String.fromCharCode(10, 10));
       res.end();
+      return;
+    }
+    if (NEVER && !isPlanner) {
+      // Heartbeats until the client hangs up. Never a reply.
+      res.writeHead(200, { 'Content-Type': 'application/x-ndjson' });
+      event({ event: 'never-dispatched', seq });
+      const hb = setInterval(() => { try { res.write(JSON.stringify({ message: { role: 'assistant', content: '' }, done: false }) + '\n'); } catch {} }, 1000);
+      res.on('close', () => { clearInterval(hb); event({ event: 'client-aborted', seq }); });   // res, not req: IncomingMessage 'close' fires when the REQUEST is fully read, long before the client goes away
+      return;
+    }
+    if (DELAY_MS > 0 && !isPlanner) {
+      let gone = false;
+      res.on('close', () => { if (!res.writableEnded) { gone = true; event({ event: 'client-gone-before-reply', seq }); } });
+      setTimeout(() => {
+        if (gone || res.destroyed || !res.socket || res.socket.destroyed) { event({ event: 'late-reply-not-sent-client-gone', seq }); try { res.destroy(); } catch {} return; }
+        event({ event: 'late-reply-sent', seq });
+        res.writeHead(200, { 'Content-Type': 'application/x-ndjson' });
+        res.end(JSON.stringify({ message: { role: 'assistant', content }, done: true }) + '\n');
+      }, DELAY_MS);
       return;
     }
     res.writeHead(200, { 'Content-Type': 'application/x-ndjson' });

@@ -78,7 +78,7 @@ async function runTask(ws, task, ctx) {
     }
     const start = await api(base, '/agent/start', {
       method: 'POST',
-      body: JSON.stringify({ goal: `${task.goal}\n\n${BENCH_GUIDANCE}` }),
+      body: JSON.stringify({ goal: `${task.goal}\n\n${BENCH_GUIDANCE}`, budgetSec: ctx.timeoutSec }),
     });
     if (!start.runId) return { status: 'NOT_STARTED', error: 'the hub did not start a run', attemptId: ctx.attemptId };
     while (Date.now() < hardStop) {
