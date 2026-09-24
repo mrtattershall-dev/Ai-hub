@@ -52,4 +52,4 @@ user asked for them separately, not because this design can read them.
 
 Only the A10G container; stopped with `modal app stop --yes` and confirmed after the run;
 scaledown 900s; 2-hour wall clock in the runner. Expected ≈ 40 minutes of GPU ≈ $1. **Cap:
-to be authorized before deploy.**
+$10, authorized by tatte 2026-09-24 before deploy.**
