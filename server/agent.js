@@ -6,6 +6,7 @@
 // Safety model (v1): file/list operations run automatically; run_command pauses
 // and waits for explicit human approval. Everything is confined to WORKSPACE.
 
+import { createHash } from 'node:crypto';
 import express from 'express';
 import { launchOptions } from './browser.js';
 import { serveScriptsFromCache } from './engineCache.js';
@@ -718,6 +719,46 @@ function execAgentCommand(cmd, opts, cb) {
     });
 }
 
+/**
+ * Small files the GOAL names, supplied in full in the opening context.
+ *
+ * BENCH-1: 10 of 15 runs asked for an outline of a ~30-line file and never advanced to
+ * reading it. The outline supplied one line and added a transition the model repeatedly
+ * failed to make. This removes that transition for files that fit: the complete, numbered
+ * contents go in up front, labelled with the path and a content hash, and the model is told
+ * it may proceed to inspect, edit or test.
+ *
+ * LARGER FILES ARE LEFT EXACTLY AS BEFORE. A file over the limit is not inlined and is never
+ * cut into a partial presented as the whole - that is the beheading the substitution path
+ * already had to be cured of. The limit is fixed and recorded, not adaptive.
+ *
+ * Recorded on the run (path, bytes, lines, sha256) so a report can say what the model was
+ * given. This removes one opportunity to stall; it does not make the model act.
+ */
+const SUPPLY_MAX_BYTES = parseInt(process.env.AGENT_SUPPLY_MAX_BYTES || '8192', 10);
+function suppliedFileMessages(goal) {
+  const out = [];
+  const supplied = [];
+  for (const rel of ledger.namedFiles(goal || '')) {
+    let full;
+    try { full = safePath(rel); } catch { continue; }
+    if (!existsSync(full)) continue;
+    let raw;
+    try { raw = readFileSync(full); } catch { continue; }
+    if (raw.length > SUPPLY_MAX_BYTES) continue;            // larger: prior behaviour, untouched
+    const text = raw.toString('utf8');
+    const sha256 = createHash('sha256').update(raw).digest('hex');
+    const lines = text.split('\n');
+    const numbered = lines.map((l, i) => `${i + 1}: ${l}`).join('\n');
+    supplied.push({ path: rel, bytes: raw.length, lines: lines.length, sha256 });
+    out.push({ role: 'user', content:
+      `SUPPLIED FILE: ${rel} (sha256 ${sha256.slice(0, 16)}, ${lines.length} lines, ${raw.length} bytes, COMPLETE):\n`
+      + '```\n' + numbered + '\n```\n'
+      + `This file has already been supplied in full above - you do not need to outline_file or read_file it. `
+      + `Proceed directly to inspecting it, editing it, or testing it.` });
+  }
+  return { messages: out, supplied };
+}
 const tools = {
   list_dir({ path = '.' }) {
     const full = safePath(path);
@@ -4795,8 +4836,13 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
   ensureWorkspace();
   const id = randomUUID();
   const now = Date.now();
+  // Computed BEFORE the run literal: referencing `run` from inside its own initialiser is a
+  // TDZ ReferenceError, and that is exactly what the first version did - every run failed to
+  // start, and the feature's negative checks passed because nothing ran at all.
+  const supplied = suppliedFileMessages(goal);
   const run = {
     id, goal, status: 'running', busy: false, modelCalls: 0, tokens: 0,
+    suppliedFiles: supplied.supplied,     // what the opening context handed over, with hashes
     steps: [], pending: null, createdAt: now, budgetStart: now,
     queueItemId, source, entrance, generation: Math.max(0, Number(generation) || 0),
     history: [
@@ -4807,6 +4853,15 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
       ...(existsSync(join(WORKSPACE, 'NOTES.md'))
         ? [{ role: 'user', content: `Your notes from earlier work (NOTES.md):\n${readFileSync(join(WORKSPACE, 'NOTES.md'), 'utf8').slice(-4000)}` }]
         : []),
+      // SUPPLY SMALL NAMED FILES UP FRONT. BENCH-1: 10 of 15 runs stalled asking for an outline
+      // of a ~30-line file and never advanced to reading it - the outline returned one line,
+      // and the read that should have followed never came. For a file the goal names that
+      // fits a fixed limit, the transition is removed: the complete contents go into the
+      // opening context, labelled with the path and a content hash, and the model is told so.
+      // Larger files are left EXACTLY as before - not inlined, never truncated into a partial
+      // that would be presented as the whole. This removes one place to stall; it does not
+      // make the model act, and is recorded on the run so a report can say what was supplied.
+      ...supplied.messages,
       { role: 'user', content: `Files currently in the workspace (these are the ONLY files — use these EXACT names, never invent one):\n${tools.list_dir({ path: '.' })}\n\nGOAL: ${goal}\n\nBegin step by step. For any large file, outline_file it FIRST, then read_file the slice you need — never try to read a whole big file at once.` },
     ],
   };
