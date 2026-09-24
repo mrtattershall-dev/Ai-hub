@@ -27,6 +27,11 @@ const { recordRun, recordPlan, writeReport } = await import('./campaignReport.js
 const { confirmNoneRunning, WORKER_IMAGE } = await import('./worker.js');
 
 const MODEL_URL = process.argv[2];
+// The same frozen definition can be run again under a new label. Everything else - tasks,
+// seeds, limits, order, guidance - is fixed in this file and benchTasks.js. Label the RUN, not
+// the definition: BENCH-2 is BENCH-1's definition on a later hub commit.
+const EXPERIMENT = process.env.BENCH_EXPERIMENT || 'BENCH-1';
+const HUB_COMMIT = process.env.BENCH_HUB_COMMIT || 'unrecorded';
 if (!MODEL_URL) { console.error('usage: node server/bench1.mjs <modelBaseUrl>'); process.exit(2); }
 
 const PER_TASK_SEC = 300;
@@ -104,7 +109,7 @@ async function runTask(ws, task, ctx) {
 const EXTERNAL = externalTasks();
 const ALL = [...EXTERNAL, ...SEQUENTIAL_TASKS];
 
-console.log(`BENCH-1 START ${new Date().toISOString()}`);
+console.log(`${EXPERIMENT} START ${new Date().toISOString()} hub ${HUB_COMMIT}`);
 console.log(`model: ${MODEL_URL}`);
 console.log(`worker: ${WORKER_IMAGE}`);
 console.log(`queue: ${EXTERNAL.length} external + ${SEQUENTIAL_TASKS.length} sequential`);
@@ -167,15 +172,17 @@ const seqOut = await runBatch(SEQUENTIAL_TASKS, {
 const elapsedSec = Math.round((Date.now() - T0) / 1000);
 const stopped = await confirmNoneRunning({ timeoutMs: 30_000 });
 
-const report = writeReport(SUMMARY, join(ROOT, 'BENCH-1_REPORT.json'), {
-  experiment: 'BENCH-1',
+const report = writeReport(SUMMARY, join(ROOT, `${EXPERIMENT}_REPORT.json`), {
+  experiment: EXPERIMENT, definition: 'BENCH-1 (legasus/screen/BENCH-1_DEFINITION.md), unchanged',
   comparisonArm: 'NONE - this measures one configuration, not a comparison',
   taskSource: {
     external: 'QuixBugs - independently authored, but PUBLIC and plausibly in training data',
     sequential: 'internally authored',
   },
   config: {
-    model: MODEL_URL, workerImage: WORKER_IMAGE,
+    model: MODEL_URL, workerImage: WORKER_IMAGE, hubCommit: HUB_COMMIT,
+    sampling: { temperature: process.env.AGENT_TEMPERATURE || '0.2 (default)', top_p: process.env.AGENT_TOP_P || 'unset', top_k: process.env.AGENT_TOP_K || 'unset', repeat_penalty: process.env.AGENT_REPEAT_PENALTY || 'unset' },
+    supplyMaxBytes: process.env.AGENT_SUPPLY_MAX_BYTES || '8192 (default)',
     workerIsolation: true, routeBounding: true, acceptance: true,
     d2: false, protocolController: false,
     perTaskSec: PER_TASK_SEC, totalSec: TOTAL_SEC, retries: 'none',
@@ -210,5 +217,5 @@ console.log(`SEQUENTIAL accepted ${acc('SEQUENTIAL')}/${SEQUENTIAL_TASKS.length}
 console.log('   (different questions - never summed)');
 console.log(JSON.stringify(report.arms, null, 2));
 console.log(`\nsummary: ${SUMMARY}`);
-console.log(`report:  ${join(ROOT, 'BENCH-1_REPORT.json')}`);
-console.log('BENCH-1 COMPLETE');
+console.log(`report:  ${join(ROOT, `${EXPERIMENT}_REPORT.json`)}`);
+console.log(`${EXPERIMENT} COMPLETE`);
