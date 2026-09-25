@@ -1,0 +1,19 @@
+{
+  "base": "https://mr-tattershall--legasus-7b-server-web.modal.run",
+  "seed": 101,
+  "allOk": true,
+  "statuses": [
+    200,
+    200,
+    200
+  ],
+  "ms": [
+    3447,
+    4193,
+    3630
+  ],
+  "seededPairIdentical": true,
+  "seededDiffersFromUnseeded": true,
+  "sampleA": "```python\ndef second_largest(lst):\n    if len(lst) < 2:\n        raise ValueError(\"List must contain at least two element",
+  "sampleB": "```python\ndef second_largest(lst):\n    if len(lst) < 2:\n        raise ValueError(\"List must contain at least two element"
+}

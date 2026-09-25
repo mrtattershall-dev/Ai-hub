@@ -142,6 +142,11 @@ try {
   say(!!complete && !Number.isNaN(Date.parse(complete[1])), `COMPLETE is timestamped (${complete?.[1]})`);
   say(/report written \S+Z: /.test(out), 'the report write is timestamped');
   say(new RegExp(`${EXPERIMENT} EXIT \\S+Z code 0`).test(out), 'the process exit is timestamped');
+  // The process must EXIT promptly after COMPLETE. Uncleared per-unit wall timers once kept it
+  // alive for up to per-task + grace seconds - the shutdown latency seen after AUTODIAG-2/MECH-1.
+  const exitAt = out.match(new RegExp(`${EXPERIMENT} EXIT (\\S+Z)`));
+  const exitLag = complete && exitAt ? (Date.parse(exitAt[1]) - Date.parse(complete[1])) / 1000 : null;
+  say(exitLag !== null && exitLag < 15, `the process exited ${exitLag}s after COMPLETE (bound 15s; per-task bound here is 120s, so a leaked timer would show)`);
   const done = existsSync(doneFile) ? JSON.parse(readFileSync(doneFile, 'utf8')) : null;
   say(!!done && done.completedAt === complete?.[1] && done.experiment === EXPERIMENT, 'the DONE file exists and says the same thing the log says');
   say(existsSync(join(root, `${EXPERIMENT}_DONE`)), 'and a copy sits in the campaign root');

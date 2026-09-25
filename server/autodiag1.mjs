@@ -184,7 +184,13 @@ async function runTask(ws, task, ctx) {
   // polling loop only tested its deadline BETWEEN iterations: one await that never settled
   // escaped it entirely and the unit ran 99 minutes. A wall-clock race cannot be escaped by
   // an await that ignores cancellation - the race resolves whether or not the other side does.
-  const wall = new Promise((resolve) => setTimeout(() => resolve('WALL'), Math.max(1000, hardStop - Date.now()) + UNIT_GRACE_MS));
+  // The timer is CLEARED after the race. Until MECH-1 it was not: every unit left a pending
+  // timer of up to per-task + grace seconds, and the campaign process stayed alive after
+  // COMPLETE until the last one fired - the ~5-minute "shutdown latency" seen after AUTODIAG-2
+  // and the 300s+ exit delay seen after MECH-1. The watchdog made shutdown independent of it;
+  // this makes the process exit when it is done.
+  let wallTimer = null;
+  const wall = new Promise((resolve) => { wallTimer = setTimeout(() => resolve('WALL'), Math.max(1000, hardStop - Date.now()) + UNIT_GRACE_MS); });
   const body = (async () => {
     for (let i = 0; i < 60 && Date.now() < hardStop; i++) {
       try { const h = await api(base, '/agent'); if (h && !h.error) break; } catch { /* not up */ }
@@ -229,6 +235,7 @@ async function runTask(ws, task, ctx) {
   try {
     wallHit = (await Promise.race([body, wall])) === 'WALL';
   } catch { /* the body's own errors are handled inside it */ }
+  if (wallTimer) clearTimeout(wallTimer);
 
   // TAKE THE UNIT APART, AND CONFIRM IT. Killing the hub is not evidence that execution
   // stopped: the model's containers outlive their parent. So the process is killed, its exit
