@@ -120,7 +120,7 @@ for (const f of readdirSync(join(ROOT, 'runs')).filter((x) => x.endsWith('.json'
     : j.status === 'done' ? 'finished' : j.status;
 
   runs.push({
-    task, file: f.slice(0, 8), status: j.status, instr, createdAt: j.createdAt || 0,
+    task, id: j.id || f.replace(".json",""), file: f.slice(0, 8), status: j.status, instr, createdAt: j.createdAt || 0,
     confirmed: count('CONFIRMED_RUNNER'), named: count('NAMED_NO_OUTPUT'),
     unknownExec: count('UNKNOWN_EXEC'), otherRoute: count('OTHER_ROUTE'), totalExec: execSteps.length,
     firstAction, delivered, nextAfter, stoppedBy,
@@ -129,24 +129,27 @@ for (const f of readdirSync(join(ROOT, 'runs')).filter((x) => x.endsWith('.json'
 
 // join the acceptance outcome from the durable summary
 const rows = readFileSync(join(ROOT, 'summary.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l)).filter((r) => r.kind === 'run');
-// LINK EACH RUN TO ITS OWN SUMMARY ROW. The first version took the first row matching the
-// task name, so both replicates of a task showed replicate 1's outcome - which would have
-// corrupted the very comparison this file exists for. Runs and summary rows are both in
-// execution order, so they are zipped per task: Nth run of a task <-> Nth TEST_PACKAGE row.
-const byTask = {};
-for (const r of runs) (byTask[r.task] ||= []).push(r);
-for (const [task, list] of Object.entries(byTask)) {
-  list.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-  const cand = rows.filter((x) => x.arm === 'TEST_PACKAGE' && x.task.startsWith(`ext-${task}@`))
-    .sort((a, b) => a.idx - b.idx);
-  list.forEach((r, i) => {
-    const pick = cand[i];
-    r.rep = pick ? pick.rep : null;
-    r.outcome = pick
-      ? `${pick.baselineCasesPass}->${pick.candidateCasesPass ?? '?'}/${pick.casesTotal ?? '?'} ${pick.disposition}${pick.caseMeasurementError ? ' [' + pick.caseMeasurementError + ']' : ''}`
-      : '(no summary row - UNMATCHED)';
-  });
+// MECHANICAL JOIN, OR REFUSE. Task names are not a key when a task is replicated - joining
+// on them is the defect that changed a substantive conclusion. linkRuns asserts one-to-one and
+// reports every unmatched, ambiguous or double-claimed row; on any error this file stops
+// rather than publishing per-run conclusions.
+const { linkRuns } = await import("./linkRuns.js");
+const link = linkRuns(ROOT, rows);
+if (!link.ok) {
+  console.error("REFUSING to report: the run/summary join is not one-to-one (" + link.method + ")");
+  for (const e of link.errors) console.error("  " + e);
+  process.exit(3);
 }
+const rowFor = new Map();
+for (const [k, rec] of link.links) rowFor.set(rec.id, rows.find((r) => r.task === k));
+for (const r of runs) {
+  const row = rowFor.get(r.id);
+  r.rep = row ? row.rep : null;
+  r.outcome = row
+    ? `${row.baselineCasesPass}->${row.candidateCasesPass ?? "?"}/${row.casesTotal ?? "?"} ${row.disposition}${row.caseMeasurementError ? " [" + row.caseMeasurementError + "]" : ""}`
+    : "(UNMATCHED - should be impossible after the assertion above)";
+}
+console.log(`join: ${link.method}, ${link.links.size} of ${rows.length} rows, one-to-one asserted\n`);
 
 runs.sort((a, b) => (b.confirmed - a.confirmed) || a.task.localeCompare(b.task));
 console.log('TESTCMD-1 TREATMENT RUNS - one row each, from preserved records only\n');

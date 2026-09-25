@@ -226,6 +226,7 @@ async function runTask(ws, task, ctx) {
   return {
     feedbackDelivered,
     status: 'COMPLETED', ok: true, exit: 0, timedOut: !!aborted, attemptId: ctx.attemptId,
+    runId,   // THE join key. Task names are not one when a task is replicated (linkRuns.js).
     elapsedSec: Math.round((Date.now() - started) / 1000),
     terminationReason: aborted || run?.status || 'ended',
     modelCalls: calls.length,
@@ -277,6 +278,7 @@ async function recordUnit(r, arm, rep, wsDir) {
   const { newlyPassing, newlyFailing } = caseDiff(b, after);
   const row = {
     idx: ++idx, rep, task: `${r.task}@${arm}r${rep}`, arm,
+    runId: r.outcome?.runId ?? null,
     termination: r.termination || r.state,
     requested: r.verdict?.requested?.verdict ?? null,
     protected: r.verdict?.protected?.verdict ?? null,

@@ -49,6 +49,7 @@ import { runInWorker, WorkerUnavailable, WorkerUnconfirmed, workerAvailable, WOR
 import { ProtocolController } from './protocol.js';
 import { ROUTES_BOUNDED, noteUncoveredTraversal, refuseAtDetachedSite } from './routeBound.js';
 import { prepareGoverned, concludeGoverned, PROTECTION, NO_PROTECTION_NOTE } from './governance.js';
+import { runDiagnostic, diagnosticMessage, DIAG } from './autodiag.js';
 import { lockAuditDir } from './d2.js';
 import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState, mayMutate } from './d2.js';
 
@@ -2765,6 +2766,47 @@ function outcomeOf(run, e) {
   if (run.status === 'stopped') return { outcome: 'ABORTED_BY_STOP', serverOutcome: 'UNKNOWN', error: 'stopped' };
   return { outcome: 'ERROR', serverOutcome: 'UNKNOWN', error: (e && (e.code || e.message) || String(e)).slice(0, 300) };
 }
+// AUTOMATIC DIAGNOSTIC. TESTCMD-1: the model was handed the runner's source and a sentence
+// naming the command, and executed it in 5 of 27 runs. Receiving the SOURCE is not receiving
+// the RESULTS. When a run declares a diagnostic, the Hub runs it and delivers the result -
+// before the first model call, and again after a successful edit to the target file.
+//
+// It NEVER runs past the task budget: a diagnostic that eats the time the model needed to act
+// would trade one kind of uselessness for another. Skipped-for-budget is recorded, not hidden.
+const DIAG_MIN_BUDGET_MS = 30_000;
+async function deliverDiagnostic(run, when) {
+  if (!run.diagnostic) return;
+  if (run.budgetEndsAt && run.budgetEndsAt - Date.now() < DIAG_MIN_BUDGET_MS) {
+    pushStep(run, { type: 'note', text: `Automatic diagnostic skipped (${when}): under ${DIAG_MIN_BUDGET_MS / 1000}s of task budget remains.` });
+    (run.diagnostics ||= []).push({ when, skipped: 'insufficient budget', at: Date.now() });
+    return;
+  }
+  let result;
+  try {
+    result = await runDiagnostic(WORKSPACE, run.diagnostic, { timeoutSec: run.diagnostic.timeoutSec || 60 });
+  } catch (e) {
+    result = { status: DIAG.UNAVAILABLE, identity: null, reason: `the diagnostic threw: ${String(e.message || e).slice(0, 120)}` };
+  }
+  const msg = diagnosticMessage(result, run.diagnostic.moduleName, when);
+  run.history.push({ role: 'user', content: msg });
+  // Recorded on the run, bound to the content tested, so a report can say exactly what the
+  // model was told and about which bytes.
+  (run.diagnostics ||= []).push({
+    when, at: Date.now(), status: result.status,
+    sha256: result.identity?.sha256 || null,
+    attempted: result.attempted ?? null, passed: result.passed ?? null, failed: result.failed ?? null,
+    omitted: result.omitted ?? 0, reason: result.reason || null, importError: result.importError || null,
+  });
+  pushStep(run, {
+    type: 'diagnostic', when,
+    text: result.status === DIAG.OK
+      ? (result.importError !== undefined
+        ? `Automatic diagnostic (${when}): the file does not import.`
+        : `Automatic diagnostic (${when}): ${result.passed}/${result.attempted} cases pass, ${result.failed} fail.`)
+      : `Automatic diagnostic (${when}) UNAVAILABLE: ${result.reason}`,
+  });
+}
+
 function noteModelCall(run) {
   const st = getLastModelCall();
   if (!st) return;
@@ -3437,6 +3479,18 @@ async function drive(loadDb, run) {
     // Labelled for the per-action loop further down: every exit that used to end this model
     // turn is now `continue turn` / `break turn`, so it still means exactly what it meant.
     turn: while (run.status === 'running' && !budgetExhausted(run)) {
+      // BEFORE THE MODEL CALL, in both cases: the opening report (once, before the first
+      // call) and the post-edit re-run. Pushed into history here so the very next request
+      // carries it - delivery is not left to a later turn.
+      if (run.diagnostic && !run.diagnosticOpened) {
+        run.diagnosticOpened = true;
+        await deliverDiagnostic(run, 'start');
+        if (run.status !== 'running') break;
+      } else if (run.diagnosticStale) {
+        run.diagnosticStale = false;
+        await deliverDiagnostic(run, 'after-edit');
+        if (run.status !== 'running') break;
+      }
       run.modelCalls++;
       pruneHistory(run, historyBudget(loadDb()));   // fit the PROVIDER's window, in tokens
       let raw;
@@ -4269,6 +4323,15 @@ async function drive(loadDb, run) {
       //
       // Both go: the file content the substitution exists to provide, AND the warning. The
       // repeat limit itself is unchanged.
+      // A SUCCESSFUL edit to the diagnostic's target invalidates the last report. Marked here,
+      // delivered at the top of the next turn - so the model sees the consequence of its own
+      // change before it decides what to do next. An edit that FAILED does not mark it: the
+      // file is unchanged, and a fresh report would say the same thing while implying action.
+      if (run.diagnostic && /^(edit_file|write_file|append_file)$/.test(tool)
+          && String(args?.path || '').includes(`${run.diagnostic.moduleName}.py`)
+          && /^OK:/.test(String(result))) {
+        run.diagnosticStale = true;
+      }
       const repeatWarning = (String(result).match(/\n\n⚠️ You already ran this exact[\s\S]*$/) || [''])[0];
       let feedback = substituted
         ? substituted + (repeatWarning && !substituted.includes('⚠️ You already ran') ? repeatWarning : '')
@@ -4985,7 +5048,7 @@ function autoStart(loadDb, item) {
 //
 // Default 'unknown' rather than guessing: an unstamped caller is a gap to be seen, not a
 // value to be invented.
-function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown', budgetSec = null, callDeadlineSec = null, governed = null } = {}) {
+function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown', budgetSec = null, callDeadlineSec = null, governed = null, diagnostic = null } = {}) {
   ensureWorkspace();
   const id = randomUUID();
   const now = Date.now();
@@ -5005,6 +5068,9 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
     // verified starting state (established BEFORE this literal, by prepareGoverned); every
     // other run says, in words, that it has no behavioral acceptance protection.
     governed: governed || null,
+    // { moduleName, casesJsonl, timeoutSec? } - the Hub runs this FOR the model and delivers
+    // the result. Absent = nothing changes; the model is on its own as before.
+    diagnostic: diagnostic && diagnostic.moduleName && diagnostic.casesJsonl ? diagnostic : null,
     protection: governed ? PROTECTION.BEHAVIORAL_ACCEPTANCE : PROTECTION.NONE,
     protectionNote: governed
       ? `Behavioral acceptance: declared checks, starting state verified (tree ${String(governed.startTree).slice(0, 12)}), result will be evaluated in the isolated worker and rolled back if protected behaviour breaks.`
@@ -5164,7 +5230,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
 
   // Start a new run; returns immediately, loop runs in the background.
   router.post('/start', async (req, res) => {
-    const { goal, queueIfBusy, budgetSec, callDeadlineSec, governed } = req.body || {};
+    const { goal, queueIfBusy, budgetSec, callDeadlineSec, governed, diagnostic } = req.body || {};
     if (!goal || !goal.trim()) return res.status(400).json({ error: 'goal required' });
 
     // ONE TOP-LEVEL RUN AT A TIME. There is a single shared WORKSPACE, and sharing it is
@@ -5208,7 +5274,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       if (!prep.ok) return res.status(409).json({ error: `governed run BLOCKED: ${prep.reason}`, blocked: true, protection: PROTECTION.NONE, startVerdict: prep.startVerdict || null });
       gov = { checks: governed.checks, startRef: prep.startRef, startTree: prep.startTree, startVerdict: prep.startVerdict, requestedAlreadyPasses: prep.requestedAlreadyPasses, declaredAt: new Date().toISOString() };
     }
-    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null, governed: gov });
+    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null, governed: gov, diagnostic: diagnostic || null });
     res.json({ runId: run.id });
   });
 
