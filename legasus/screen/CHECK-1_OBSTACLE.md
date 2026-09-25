@@ -59,3 +59,62 @@ at case-selection rather than at test-writing.
   behaviour or noise.
 
 No claim that fixing this raises scores; that would need a live comparison.
+
+---
+
+# CORRECTION — 2026-09-25. Two claims above are wrong, and the real obstacle is different.
+
+## 1. "json_testcases sits in the workspace" is FALSE
+
+A task workspace contained **only the buggy module** (plus hub artifacts: `package.json`,
+`TASKS.md`, `_snippet.py`, `__pycache__`). Verified across all 45 BENCH-3 workspaces: no
+`json_testcases`, no `.jsonl`, nothing. The vendored cases live on the HOST
+(`legasus/bench/quixbugs/<name>/cases.jsonl`), and the acceptance cases are materialised into
+`/check` at EVALUATION time, after the run. The worker bind-mounts the workspace and nothing
+else (`worker.js`: "THE ONLY MOUNT").
+
+**The model could not have run the task's tests.** Host-side availability is not workspace
+availability. My "it never ran the test data although the seed ships with it" was an inference
+from the vendored tree, never checked against a workspace. Retracted.
+
+## 2. "the one success ran a whole suite" — checked, and it is not what happened
+
+The CHECK-1 success (`is_valid_parenthesization`) ran `doctest`. **That route is a false pass.**
+Every QuixBugs seed carries its examples in a string literal placed AFTER the function at
+module level — neither the module docstring nor the function docstring, just a discarded
+expression. Proved in the worker on the buggy `lcs_length` seed:
+
+    doctest.testmod(lcs_length)  ->  attempted 0, failed 0, exit 0
+    module __doc__ is None: True     function __doc__ is None: True
+    actual output for witch/sandwich: 1   (the text in the file says 2)
+
+Zero tests found, zero failures reported, clean exit — on definitively broken code. Two BENCH-3
+runs took exactly this route; one of them (`lcs_length` r1) ended in `error` having learned
+nothing. And as the user notes: even when a doctest suite does run, "all its cases ran" is not
+"all required behaviour" — the requested check here is 9 cases, the docstring shows 2.
+
+## 3. What the BENCH-3 lcs_length replicates actually show
+
+Same task, same seed, same model, three runs:
+
+    r2  ACCEPTED   ran the file's two written examples (witch/sandwich, meow/homeowner), saw
+                   1,1 against the 2,4 printed in the file, made the correct single-token edit
+                   (dp[i-1,j] -> dp[i-1,j-1]), re-ran, got 2,4. THEN invented six more calls.
+    r1  error      ran doctest.testmod -> silent exit 0 -> no signal at all
+    r3  stopped    ran the SAME two examples, got the SAME 1,1, then looped on search_file
+                   six times without ever editing
+
+The success had **an oracle**: expected values written in the file, next to the call. The
+failure at r3 had the identical oracle and the identical observation and did not act. So the
+oracle is necessary, not sufficient — and where there is no oracle (`lis`: one invented call,
+output `2`, no expected value anywhere) a wrong answer is indistinguishable from an answer.
+
+## The obstacle, restated
+
+**The model has no usable failing-test signal.** Not "it samples too few cases": there were no
+cases to sample, only whatever it could invent, and the one mechanical oracle available to it
+(`doctest`) silently reports success on broken code. What it did have — hand-written examples
+in the file — worked when it used them (r2) and was ignored when it did not (r3).
+
+That is a feedback-availability defect in the task setup, fixable without touching the model.
+It does NOT explain r3, where the signal was present and unused; that remains open.
