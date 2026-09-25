@@ -38,24 +38,51 @@ regressions, costs and delivered diagnostics reported separately and never summe
       starting the next unit on top of live execution
     every unexecuted queue entry gets its own UNATTEMPTED row carrying the reason it never ran
 
-Proven through the real campaign entry point against a backend that accepts the request, sends
-nothing, never closes and ignores the client going away — `deadlineRecovery.test.mjs`, 14/14.
+Proven through the real campaign entry point, by two separate tests:
+`deadlineRecovery.test.mjs` 14/14 (recovery via the Hub's inner deadline, against a backend
+that never settles) and `outerDeadline.test.mjs` 15/15 (the outer wall itself, against an
+injected uncancellable never-settling await).
 
-**What that test does NOT prove**, stated here as it is stated in the test's own output: that
-the runner's outer wall fires when the Hub's inner per-call deadline does not. Against that
-backend the inner deadline recovers the unit first. AUTODIAG-1's actual failure — a deadline
-firing while its await ran on for 5,964s — cannot be reproduced with this stub. The outer wall
-and the confirm-stopped step are defence in depth whose necessity is argued, not demonstrated.
-**If AUTODIAG-2 overruns again, that is the evidence this test could not supply.**
+The first establishes recovery through the Hub's INNER per-call deadline, and says plainly in
+its own output that it does not exercise the outer wall.
+
+**The outer wall is demonstrated by the second** — `outerDeadline.test.mjs`, 15/15. It does
+not try to reproduce AUTODIAG-1's backend failure; it injects that failure's relevant
+condition, an operation the campaign runner awaits that never settles and cannot be cancelled,
+and leaves the real outer timer, SIGKILL, bounded exit wait, `confirmNoneRunning`, halt path,
+UNATTEMPTED rows and report untouched:
+
+    the outer deadline FIRED          the unit records hitHardWall=true; the campaign finished
+                                      in 67s instead of never
+    the hub exited after SIGKILL      hubExited=true
+    worker shutdown CONFIRMED         executionConfirmedStopped=true - confirmed, not assumed
+    no next task while unresolved     the later unit is recorded only after that confirmation
+    full accounting                   all 4 planned units have rows; UNACCOUNTED 0
+
+So the fallback intended to prevent another 99-minute wait has direct evidence, rather than
+waiting for a paid run to discover whether it works.
 
 ## Pre-registered readings
 
 - **8-vs-0 recurring** would make the productivity result a two-replicate observation rather
   than a single one. It would still be about this model, these tasks, and supplied test
   results — never held-out generalization.
-- **A much smaller or absent difference** would place AUTODIAG-1's result within run-to-run
-  variability and withdraw it. That outcome is as informative as the first and must be
-  reported with the same prominence.
+- **A much smaller or absent difference** would NOT erase AUTODIAG-1's observed 8-versus-0.
+  That result happened and stands as an observation. A repeat can only do one of three things,
+  and the report must say which:
+    - **fail to reproduce it** - the observation stands, the evidence for a reliable benefit
+      weakens, and no repeat rate can be claimed in either direction;
+    - **weaken the evidence for a reliable benefit** - a smaller difference in the same
+      direction, reported as such rather than averaged into a single figure;
+    - **reveal that it depended on particular conditions** - if the difference tracks task,
+      seed, or ordering, that dependency is the finding.
+  An earlier draft of this line said a repeat would "withdraw" the first result. That was
+  wrong: a second experiment cannot un-observe a first one.
+
+- **BOTH EXPERIMENTS ARE REPORTED PROMINENTLY**, with matched task results and costs side by
+  side - never AUTODIAG-2 alone, and never a pooled figure that hides which run produced what.
+  Matched pairing is by task, so a task repaired in one run and not the other is visible as
+  that, not absorbed into a total.
 - **Any result at all requires the campaign to complete.** If units are lost again, the
   productivity numbers are reported with their denominators and the operational failure is
   reported beside them, exactly as in AUTODIAG-1. Neither cancels the other.

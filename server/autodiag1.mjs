@@ -169,6 +169,17 @@ async function runTask(ws, task, ctx) {
     });
     if (!start.runId) return { status: 'NOT_STARTED', error: 'the hub did not start a run', attemptId: ctx.attemptId };
     runId = start.runId;
+    // ── FAULT INJECTION, TEST ONLY ────────────────────────────────────────────────────
+    // AUTODIAG-1 lost 31 of 60 units to an operation the runner awaited that never settled
+    // even after its cancellation fired. That exact backend failure cannot be reproduced on
+    // demand, but its RELEVANT CONDITION can be injected: await something that never settles
+    // and cannot be cancelled. Everything downstream - the outer wall, SIGKILL, the bounded
+    // exit wait, confirmNoneRunning, the explicit halt, the UNATTEMPTED rows and the final
+    // report - is the real path, untouched. Off unless the env names a task.
+    if (process.env.AUTODIAG_INJECT_HANG_TASK && task.id === process.env.AUTODIAG_INJECT_HANG_TASK) {
+      console.log(`   [fault injection] awaiting an operation that will never settle for ${task.id}`);
+      await new Promise(() => {});          // never resolves, never rejects, ignores abort
+    }
     while (Date.now() < hardStop) {
       run = await api(base, `/agent/${start.runId}`).catch(() => null);
       if (run && run.status && run.status !== 'running' && !run.busy && run.finalizedAt) break;
@@ -346,6 +357,13 @@ async function recordUnit(r, arm, rep, wsDir) {
     sawFailingTest: !!r.outcome?.sawFailingTest,
     editAfterFailure: !!r.outcome?.editAfterFailure,
     feedbackDelivered: !!r.outcome?.feedbackDelivered,
+    // OPERATIONAL RELIABILITY on the row itself, not only on the outcome - a field that
+    // never reaches the durable summary cannot be reported or asserted. outerDeadline.test
+    // caught these arriving as undefined.
+    hitHardWall: !!r.outcome?.hitHardWall,
+    hubExited: r.outcome?.hubExited ?? null,
+    executionConfirmedStopped: r.outcome?.executionConfirmedStopped ?? null,
+    overranBySec: r.outcome?.overranBySec ?? 0,
     diagnosticsDelivered: r.outcome?.diagnosticsDelivered ?? 0,
     diagnosticsSkipped: r.outcome?.diagnosticsSkipped ?? 0,
     diagnosticsUnavailable: r.outcome?.diagnosticsUnavailable ?? 0,
