@@ -46,10 +46,18 @@ const { caseSet, caseDiff } = await import('./caseSet.js');
 const { recordRun, recordPlan, writeReport } = await import('./campaignReport.js');
 const { confirmNoneRunning, WORKER_IMAGE } = await import('./worker.js');
 
+/** Halt reason set when the runner cannot CONFIRM a unit stopped. Never silently continued. */
+let halted = null;
+
 const MODEL_URL = process.argv[2];
 if (!MODEL_URL) { console.error('usage: node server/autodiag1.mjs <modelBaseUrl>'); process.exit(2); }
 
-const PER_TASK_SEC = 300;
+// Operational knob, not a design change: the deadline-recovery test needs a bound it can
+// exercise in seconds rather than minutes.
+const PER_TASK_SEC = parseInt(process.env.AUTODIAG_PER_TASK_SEC || '300', 10);
+// How long after the per-task bound the runner will wait for a unit to wind itself up before
+// it stops waiting and takes the unit apart itself.
+const UNIT_GRACE_MS = parseInt(process.env.AUTODIAG_UNIT_GRACE_MS || '45000', 10);
 const TOTAL_SEC = parseInt(process.env.AUTODIAG_TOTAL_SEC || String(3 * 60 * 60), 10);
 const REPS = Math.max(1, parseInt(process.env.AUTODIAG_REPS || '2', 10));
 const RESERVE_SEC = 180;
@@ -143,7 +151,13 @@ async function runTask(ws, task, ctx) {
   const base = `http://127.0.0.1:${p}/api`;
   const hardStop = Math.min(started + ctx.timeoutSec * 1000, DEADLINE);
   let run = null, aborted = null, runId = null;   // hoisted: the transcript is read after the finally
-  try {
+
+  // THE BOUND MUST HOLD REGARDLESS OF ANY AWAIT. AUTODIAG-1 lost 31 of 60 units because the
+  // polling loop only tested its deadline BETWEEN iterations: one await that never settled
+  // escaped it entirely and the unit ran 99 minutes. A wall-clock race cannot be escaped by
+  // an await that ignores cancellation - the race resolves whether or not the other side does.
+  const wall = new Promise((resolve) => setTimeout(() => resolve('WALL'), Math.max(1000, hardStop - Date.now()) + UNIT_GRACE_MS));
+  const body = (async () => {
     for (let i = 0; i < 60 && Date.now() < hardStop; i++) {
       try { const h = await api(base, '/agent'); if (h && !h.error) break; } catch { /* not up */ }
       await sleep(500);
@@ -163,20 +177,44 @@ async function runTask(ws, task, ctx) {
     if (run && run.status === 'running') {
       aborted = Date.now() >= DEADLINE ? 'total budget' : 'per-task limit';
       await api(base, `/agent/${start.runId}/stop`, { method: 'POST' }).catch(() => null);
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < 30 && Date.now() < hardStop + UNIT_GRACE_MS; i++) {
         run = await api(base, `/agent/${start.runId}`).catch(() => run);
         if (run && run.finalizedAt && !run.busy) break;
         await sleep(1000);
       }
     }
-  } finally {
-    try { hub.kill('SIGKILL'); } catch { /* best effort */ }
+    return 'BODY';
+  })();
+
+  let wallHit = false;
+  try {
+    wallHit = (await Promise.race([body, wall])) === 'WALL';
+  } catch { /* the body's own errors are handled inside it */ }
+
+  // TAKE THE UNIT APART, AND CONFIRM IT. Killing the hub is not evidence that execution
+  // stopped: the model's containers outlive their parent. So the process is killed, its exit
+  // is awaited under a bound, and the worker is asked to CONFIRM no attempt is still running.
+  try { hub.kill('SIGKILL'); } catch { /* best effort */ }
+  const exited = await new Promise((resolve) => {
+    if (hub.exitCode !== null || hub.signalCode !== null) return resolve(true);
+    const t = setTimeout(() => resolve(false), 10_000);
+    hub.once('exit', () => { clearTimeout(t); resolve(true); });
+  });
+  const stopped = await confirmNoneRunning({ timeoutMs: 30_000 }).catch((e) => ({ ok: false, reason: String(e.message || e).slice(0, 120) }));
+
+  const elapsed = Math.round((Date.now() - started) / 1000);
+  const overran = elapsed - (ctx.timeoutSec + Math.round(UNIT_GRACE_MS / 1000));
+  if (wallHit) console.log(`   !! unit hit the hard wall at ${elapsed}s - taken apart by the runner`);
+  if (overran > 0) console.log(`   !! unit ran ${overran}s past its bound`);
+
+  // EXPLICIT HALT, never a silent continue. If the process would not die or containers cannot
+  // be confirmed gone, the next unit would start on top of live execution - so it does not.
+  if (!exited || !stopped.ok) {
+    halted = !exited
+      ? `the hub for ${task.id} did not exit after SIGKILL - refusing to start another unit on top of it`
+      : `execution could not be confirmed stopped after ${task.id}: ${stopped.reason || 'unconfirmed'}`;
+    console.error(`   !! HALTING: ${halted}`);
   }
-  // A UNIT MAY NOT OUTLIVE ITS BUDGET. The polling loop and the post-stop wait are both
-  // bounded, but AUTODIAG-1 still produced a 99-minute unit - so the overrun is recorded
-  // rather than trusted away, and the next unit starts regardless.
-  const overran = Math.round((Date.now() - started) / 1000) - (ctx.timeoutSec + 120);
-  if (overran > 0) console.log(`   !! unit overran its budget by ${overran}s - recorded`);
 
   // ── the behavioural measures, from the run's own steps, in ORDER ──
   const steps = (run?.steps || []).filter((s) => s.type === 'tool');
@@ -231,6 +269,9 @@ async function runTask(ws, task, ctx) {
     feedbackDelivered,
     status: 'COMPLETED', ok: true, exit: 0, timedOut: !!aborted, attemptId: ctx.attemptId,
     runId,   // THE join key. Task names are not one when a task is replicated (linkRuns.js).
+    // OPERATIONAL RELIABILITY, recorded per unit and reported beside productivity.
+    hitHardWall: wallHit, hubExited: exited, executionConfirmedStopped: !!stopped.ok,
+    overranBySec: Math.max(0, overran),
     // Reported SEPARATELY from repairs. More delivered feedback is not a win.
     diagnosticsDelivered: (run?.diagnostics || []).filter((d) => !d.skipped).length,
     diagnosticsSkipped: (run?.diagnostics || []).filter((d) => d.skipped).length,
@@ -327,14 +368,20 @@ async function recordUnit(r, arm, rep, wsDir) {
     + (arm === 'AUTODIAG_ARM' ? ` cmd=${row.commandInvoked} delivered=${row.feedbackDelivered}` : ''));
 }
 
+// Every planned unit, in the order it would run. Anything still here at the end never started.
+const REMAINING = new Set();
+for (let rep = 1; rep <= REPS; rep++) for (const t of BASE) for (const a of ['CONTROL', 'AUTODIAG_ARM']) REMAINING.add(`${t.id}@${a}r${rep}`);
+
+outer:
 for (let rep = 1; rep <= REPS; rep++) {
   for (let ti = 0; ti < BASE.length; ti++) {
-    if (Date.now() >= DEADLINE) { console.log('deadline reached; remaining units are UNATTEMPTED'); break; }
+    if (halted) { console.error(`halted: ${halted}`); break outer; }
+    if (Date.now() >= DEADLINE) { console.log('deadline reached; remaining units are UNATTEMPTED'); break outer; }
     const task = BASE[ti];
     // ALTERNATING ORDER: even task index runs CONTROL first, odd runs AUTODIAG_ARM first.
     const order = ti % 2 === 0 ? ['CONTROL', 'AUTODIAG_ARM'] : ['AUTODIAG_ARM', 'CONTROL'];
     for (const arm of order) {
-      if (Date.now() >= DEADLINE) break;
+      if (halted || Date.now() >= DEADLINE) break outer;
       const wsDir = join(ROOT, `ws-${arm}-r${rep}`);
       currentDiagnostic = armDiagnostic(task, arm);
       pending.length = 0;
@@ -349,10 +396,27 @@ for (let rep = 1; rep <= REPS; rep++) {
         runTask,
       });
       // Measured HERE, after the batch has finished with the workspace.
-      for (const r of pending) await recordUnit(r, arm, rep, join(wsDir, r.task));
+      for (const r of pending) { REMAINING.delete(`${r.task}@${arm}r${rep}`); await recordUnit(r, arm, rep, join(wsDir, r.task)); }
     }
   }
 }
+
+// EVERY UNEXECUTED QUEUE ENTRY GETS ITS OWN ROW, with the reason it never ran. Without this
+// they appear only as UNACCOUNTED in the reconciliation - a true signal, but not an account.
+for (const key of REMAINING) {
+  const [task, tail] = key.split('@');
+  const arm = tail.replace(/rd+$/, ''), rep = +(tail.match(/r(d+)$/) || [0, 0])[1];
+  const row = {
+    idx: ++idx, rep, task: key, arm, termination: 'UNATTEMPTED', state: 'UNATTEMPTED',
+    disposition: 'UNATTEMPTED', accepted: false,
+    reason: halted ? `never started: ${halted}` : 'never started: the campaign wall clock expired first',
+    requested: null, protected: null,
+  };
+  rows.push(row);
+  recordRun(SUMMARY, row);
+}
+if (REMAINING.size) console.log(`
+${REMAINING.size} planned unit(s) never started - each recorded as UNATTEMPTED with its reason`);
 
 const elapsedSec = Math.round((Date.now() - T0) / 1000);
 const stopped = await confirmNoneRunning({ timeoutMs: 30_000 });

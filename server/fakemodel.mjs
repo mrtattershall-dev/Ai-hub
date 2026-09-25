@@ -46,6 +46,11 @@ const SCRIPT = val('script', 'happy');
 // and whether a late answer was ever sent. That is how a test proves "the late reply was
 // never acted on" from the server's side as well as the hub's.
 const NEVER = argv.includes('--never');
+//   --blackhole      accept the request, send NOTHING, never close, and IGNORE the client
+//                    going away. The closest a stub can get to an operation that neither
+//                    settles nor honours cancellation - the shape that cost AUTODIAG-1 half
+//                    its units (a call whose deadline fired while its await ran on for 5,964s).
+const BLACKHOLE = argv.includes('--blackhole');
 const DELAY_MS = parseInt(val('delay-ms', '0'), 10);
 //   --hold-ms N      send the COMPLETE reply immediately, then keep the stream open N ms before
 //                    ending it. The hub has the whole answer in hand while a stop can land - the
@@ -370,6 +375,12 @@ const server = createServer((req, res) => {
       res.write('data: ' + JSON.stringify({ choices: [{ delta: { content } }] }) + String.fromCharCode(10, 10));
       res.write('data: [DONE]' + String.fromCharCode(10, 10));
       res.end();
+      return;
+    }
+    if (BLACKHOLE) {
+      // No head, no body, no end, and the close handler deliberately does nothing: the
+      // socket is held open even after the client has gone.
+      event({ event: 'blackhole-holding', seq });
       return;
     }
     if (NEVER && !isPlanner) {
