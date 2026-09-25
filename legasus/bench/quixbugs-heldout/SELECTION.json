@@ -1,0 +1,198 @@
+{
+  "source": "QuixBugs (github.com/jkoppel/QuixBugs)",
+  "sourceRevision": "4257f44b0ff1181dedaedee6a447e133219fcebf",
+  "selectionRule": "alphabetical by program name; first N eligible; eligibility evaluated before any model run",
+  "adapter": "upstream test DATA preserved; pytest runner replaced with plain python3 (the frozen worker has no pytest)",
+  "requestedRule": "all upstream cases pass",
+  "protectedRule": "the subset already passing on the buggy seed must still pass (discovered from the seed, not designed)",
+  "target": 7,
+  "skipped": [
+    "bucketsort",
+    "find_in_sorted",
+    "flatten",
+    "gcd",
+    "get_factors",
+    "is_valid_parenthesization",
+    "kheapsort",
+    "kth",
+    "lcs_length",
+    "lis",
+    "longest_common_subsequence",
+    "max_sublist_sum",
+    "mergesort",
+    "next_palindrome",
+    "pascal"
+  ],
+  "eligibleCount": 7,
+  "selected": [
+    {
+      "name": "possible_change",
+      "upstreamCases": 10,
+      "protectedIdx": [
+        0
+      ],
+      "failingOnSeed": 9
+    },
+    {
+      "name": "powerset",
+      "upstreamCases": 5,
+      "protectedIdx": [
+        3
+      ],
+      "failingOnSeed": 4
+    },
+    {
+      "name": "quicksort",
+      "upstreamCases": 13,
+      "protectedIdx": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "failingOnSeed": 1
+    },
+    {
+      "name": "shunting_yard",
+      "upstreamCases": 6,
+      "protectedIdx": [
+        0,
+        1
+      ],
+      "failingOnSeed": 4
+    },
+    {
+      "name": "sieve",
+      "upstreamCases": 6,
+      "protectedIdx": [
+        0
+      ],
+      "failingOnSeed": 5
+    },
+    {
+      "name": "subsequences",
+      "upstreamCases": 12,
+      "protectedIdx": [
+        1,
+        2
+      ],
+      "failingOnSeed": 10
+    },
+    {
+      "name": "to_base",
+      "upstreamCases": 10,
+      "protectedIdx": [
+        0,
+        1,
+        2
+      ],
+      "failingOnSeed": 7
+    }
+  ],
+  "excluded": [
+    {
+      "task": "bitcount",
+      "why": "could not execute the program with the offline harness"
+    },
+    {
+      "task": "bucketsort",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "find_first_in_sorted",
+      "why": "could not execute the program with the offline harness"
+    },
+    {
+      "task": "find_in_sorted",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "flatten",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "gcd",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "get_factors",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "hanoi",
+      "why": "the upstream reference does not pass its own cases under this harness"
+    },
+    {
+      "task": "is_valid_parenthesization",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "kheapsort",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "knapsack",
+      "why": "could not execute the program with the offline harness"
+    },
+    {
+      "task": "kth",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "lcs_length",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "levenshtein",
+      "why": "could not execute the program with the offline harness"
+    },
+    {
+      "task": "lis",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "longest_common_subsequence",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "max_sublist_sum",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "mergesort",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "next_palindrome",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "next_permutation",
+      "why": "no case passes on the seed - nothing to protect"
+    },
+    {
+      "task": "pascal",
+      "why": "skipped: already selected by an earlier selection (held-out rule)"
+    },
+    {
+      "task": "rpn_eval",
+      "why": "no case passes on the seed - nothing to protect"
+    },
+    {
+      "task": "sqrt",
+      "why": "could not execute the program with the offline harness"
+    },
+    {
+      "task": "wrap",
+      "why": "no case passes on the seed - nothing to protect"
+    }
+  ]
+}

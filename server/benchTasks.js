@@ -30,6 +30,10 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BENCH = join(HERE, '..', 'legasus', 'bench', 'quixbugs');
+// BENCH_DIRS: comma-separated bench directories (each with its own SELECTION.json), so a
+// HELD-OUT set selected later can be loaded beside - or instead of - the original 15.
+// Default: the original directory only, exactly as every earlier campaign ran.
+const BENCH_DIRS = String(process.env.BENCH_DIRS || '').split(',').map((x) => x.trim()).filter(Boolean).map((d) => (d.startsWith('/') || /^[A-Za-z]:/.test(d) ? d : join(HERE, '..', d)));
 
 /** Identical testing guidance for every task in both groups. */
 export const BENCH_GUIDANCE = [
@@ -69,16 +73,21 @@ const RUNNER = (name, onlyIdx) => [
 
 /** The 15 external tasks, built from the vendored material and the frozen selection record. */
 export function externalTasks() {
-  const selPath = join(BENCH, 'SELECTION.json');
+  const dirs = BENCH_DIRS.length ? BENCH_DIRS : [BENCH];
+  return dirs.flatMap((dir) => externalTasksFrom(dir));
+}
+function externalTasksFrom(dir) {
+  const selPath = join(dir, 'SELECTION.json');
   if (!existsSync(selPath)) return [];
   const sel = JSON.parse(readFileSync(selPath, 'utf8'));
   return sel.selected.map((t) => {
-    const cases = readFileSync(join(BENCH, t.name, 'cases.jsonl'), 'utf8');
-    const seed = readFileSync(join(BENCH, t.name, 'seed.py'), 'utf8');
+    const cases = readFileSync(join(dir, t.name, 'cases.jsonl'), 'utf8');
+    const seed = readFileSync(join(dir, t.name, 'seed.py'), 'utf8');
     return {
       id: `ext-${t.name}`,
       group: 'EXTERNAL',
       source: 'QuixBugs',
+      benchDir: dir,
       language: 'python',
       kind: 'bug-fix',
       goal: `The file ${t.name}.py contains a bug: it does not produce the correct result for all inputs. Fix ${t.name}() so that it is correct for every input. Keep the behaviour it already gets right.`,

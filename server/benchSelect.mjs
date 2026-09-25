@@ -35,14 +35,18 @@
  * if at least one case fails (there is real work) and at least one passes (there is something
  * to preserve).
  */
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 
 const [SRC, OUT] = process.argv.slice(2);
 if (!SRC || !OUT) { console.error('usage: node server/benchSelect.mjs <quixbugs-dir> <out.json>'); process.exit(2); }
 
-const TARGET = 15;
+// BENCH_TARGET: how many eligible programs to select (default 15, the original set).
+// BENCH_SKIP: comma-separated program names to leave out BEFORE selection - used to select a
+// HELD-OUT set that excludes everything an earlier selection already took. Both are recorded.
+const TARGET = parseInt(process.env.BENCH_TARGET || '15', 10);
+const SKIP = new Set(String(process.env.BENCH_SKIP || '').split(',').map((x) => x.trim()).filter(Boolean));
 
 /** Run every upstream case against one program file. Returns per-case pass/fail. */
 function runCases(programFile, fnName, cases) {
@@ -86,6 +90,7 @@ for (const name of names) {
   const casesFile = join(caseDir, `${name}.json`);
   const reject = (why) => excluded.push({ task: name, why });
 
+  if (SKIP.has(name)) { reject('skipped: already selected by an earlier selection (held-out rule)'); continue; }
   if (!existsSync(buggy) || !existsSync(fixed)) { reject('no buggy or no reference program'); continue; }
 
   let cases;
@@ -123,11 +128,28 @@ const result = {
   requestedRule: 'all upstream cases pass',
   protectedRule: 'the subset already passing on the buggy seed must still pass (discovered from the seed, not designed)',
   target: TARGET,
+  skipped: [...SKIP],
   eligibleCount: eligible.length,
   selected,
   excluded,
 };
 writeFileSync(OUT, JSON.stringify(result, null, 2), 'utf8');
+
+// VENDORING, recorded as part of selection: the buggy program as seed.py, the upstream
+// correction as reference.py (never mounted into a task; acceptance's oracle only), and the
+// upstream cases as cases.jsonl, each into <dir of OUT>/<name>/. The original 15 were vendored
+// this way by hand for BENCH-1; a held-out set must be reproducible from one command.
+if (process.env.BENCH_VENDOR === '1') {
+  const outDir = dirname(OUT);
+  for (const t of selected) {
+    const d = join(outDir, t.name);
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, 'seed.py'), readFileSync(join(progDir, `${t.name}.py`), 'utf8'), 'utf8');
+    writeFileSync(join(d, 'reference.py'), readFileSync(join(fixDir, `${t.name}.py`), 'utf8'), 'utf8');
+    writeFileSync(join(d, 'cases.jsonl'), readFileSync(join(caseDir, `${t.name}.json`), 'utf8').trim().split('\n').filter(Boolean).join('\n') + '\n', 'utf8');
+  }
+  console.log(`vendored ${selected.length} task(s) under ${outDir}`);
+}
 
 console.log(`inspected ${names.length} upstream programs`);
 console.log(`eligible  ${eligible.length}`);

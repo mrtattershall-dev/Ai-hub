@@ -73,7 +73,12 @@ const ARM_DESC = {
   INIT_ONLY: 'full opening report; after an edit the diagnostic is re-run and recorded but NOTHING is delivered',
   INIT_COUNTS: 'full opening report; after an edit only the counts are delivered',
   INIT_FULL: 'full opening report; after an edit the full result is delivered (identical to AUTODIAG_ARM)',
+  // PILOT: the full diagnostic AND the recovery controller (recovery.js) - restores rejected
+  // edits, refuses repeats, stops on exhausted attempts / provisionals. Policy from
+  // AUTODIAG_RECOVERY_POLICY (JSON), default {maxAttempts:2,maxRepeats:2,maxProvisional:3}.
+  RECOVERY_ARM: 'full diagnostic (opening + after every edit) PLUS the recovery controller: verified checkpoint, exact rollback of rejected edits, repeat refusal, attempt/provisional bounds',
 };
+const RECOVERY_POLICY = (() => { try { return process.env.AUTODIAG_RECOVERY_POLICY ? JSON.parse(process.env.AUTODIAG_RECOVERY_POLICY) : { maxAttempts: 2, maxRepeats: 2, maxProvisional: 3 }; } catch { console.error('AUTODIAG_RECOVERY_POLICY is not JSON'); process.exit(2); } })();
 const ARMS = String(process.env.AUTODIAG_ARMS || 'CONTROL,AUTODIAG_ARM').split(',').map((x) => x.trim()).filter(Boolean);
 for (const a of ARMS) if (!ARM_DESC[a]) { console.error(`unknown arm "${a}" - one of ${Object.keys(ARM_DESC).join(', ')}`); process.exit(2); }
 if (new Set(ARMS).size !== ARMS.length) { console.error('AUTODIAG_ARMS repeats an arm'); process.exit(2); }
@@ -98,6 +103,7 @@ let port = 41300;
 // threaded through batch.js - which owns ctx and must stay identical in both arms.
 let currentDiagnostic = null;
 let currentSeed = null;
+let currentRecovery = null;
 
 // NO UNBOUNDED WAITS. AUTODIAG-1 lost 31 of 60 units to a single unit that ran 99 minutes:
 // a model call whose local deadline fired at 295s but whose await did not unwind for 5,964s.
@@ -205,7 +211,7 @@ async function runTask(ws, task, ctx) {
     const start = await api(base, '/agent/start', {
       method: 'POST',
       // The diagnostic spec travels with the start request; the Hub runs it and delivers.
-      body: JSON.stringify({ goal: task.goal, budgetSec: ctx.timeoutSec, ...(currentDiagnostic ? { diagnostic: currentDiagnostic } : {}) }),
+      body: JSON.stringify({ goal: task.goal, budgetSec: ctx.timeoutSec, ...(currentDiagnostic ? { diagnostic: currentDiagnostic } : {}), ...(currentRecovery ? { recovery: currentRecovery } : {}) }),
     });
     if (!start.runId) return { status: 'NOT_STARTED', error: 'the hub did not start a run', attemptId: ctx.attemptId };
     runId = start.runId;
@@ -336,6 +342,18 @@ async function runTask(ws, task, ctx) {
   return {
     feedbackDelivered, diagnosticMessagesSeen, caseDetailLinesSeen, afterEditCaseLinesSeen,
     diagnosticsMeasuredSilently: (run?.diagnostics || []).filter((d) => !d.skipped && d.delivered === false).length,
+    // THE CONTROLLER'S OWN ACCOUNT, from the run record: what it decided, whether every
+    // restore was byte-exact, and whether it stopped the run. Compared with acceptance below.
+    recovery: run?.recovery ? {
+      enabled: !!run.recovery.enabled, state: run.recovery.state || null,
+      attempts: run.recovery.attempts ?? 0, repeats: run.recovery.repeats ?? 0, provisionals: run.recovery.provisionals ?? 0,
+      rejected: (run.recovery.rejected || []).length,
+      decisions: (run.recovery.decisions || []).map((d) => d.action),
+      restores: (run.steps || []).filter((s) => s.type === 'recovery' && /^(RESTORE|DISCARD|REPEAT)$/.test(s.action)).length,
+      restoresExact: (run.steps || []).filter((s) => s.type === 'recovery' && /^(RESTORE|DISCARD|REPEAT)$/.test(s.action) && s.restoredExact === true).length,
+      stoppedByController: (run.steps || []).some((s) => s.type === 'error' && /recovery controller/.test(String(s.text || ''))),
+      verifiedSha: run.recovery.verified?.sha256 || null,
+    } : null,
     seedSent: currentSeed, samplingRecorded: run?.sampling ?? null,
     status: 'COMPLETED', ok: true, exit: 0, timedOut: !!aborted, attemptId: ctx.attemptId,
     runId,   // THE join key. Task names are not one when a task is replicated (linkRuns.js).
@@ -408,6 +426,13 @@ async function recordUnit(r, arm, rep, wsDir, { position = null, workspaceFresh 
     caseDetailLinesSeen: r.outcome?.caseDetailLinesSeen ?? null,
     afterEditCaseLinesSeen: r.outcome?.afterEditCaseLinesSeen ?? null,
     diagnosticsMeasuredSilently: r.outcome?.diagnosticsMeasuredSilently ?? 0,
+    recovery: r.outcome?.recovery ?? null,
+    // AN UNVERIFIED PROVISIONAL CANDIDATE MUST NEVER BE DELIVERED AS ACCEPTED. RETAIN comes
+    // from the independent evaluator; if the controller never reached ACCEPT and the unit is
+    // RETAIN, either the evaluator and the diagnostic disagree or something delivered an
+    // unverified state - flagged on the row either way, never silently counted.
+    provisionalDeliveredAsAccepted: !!(r.outcome?.recovery?.enabled && r.acceptance?.countsAsCompletion && r.outcome.recovery.state !== 'ACCEPTED'),
+    controllerAcceptNotRetained: !!(r.outcome?.recovery?.enabled && r.outcome.recovery.state === 'ACCEPTED' && !r.acceptance?.countsAsCompletion),
     isolationOk: r.outcome ? (
       arm === 'CONTROL' ? (r.outcome.diagnosticMessagesSeen === 0)
         : arm === 'NOTIFY' ? (r.outcome.caseDetailLinesSeen === 0)
@@ -459,7 +484,10 @@ async function recordUnit(r, arm, rep, wsDir, { position = null, workspaceFresh 
     + ` cases ${b.passing.size}->${after.passing.size}/${b.total ?? '?'}${gained}${lost}`
     + ` edits=${row.editsOnTarget} ${row.disposition}`
     + (arm !== 'CONTROL' ? ` delivered=${row.feedbackDelivered} msgs=${row.diagnosticMessagesSeen} caseLines=${row.caseDetailLinesSeen}` : '')
-    + (row.isolationOk === false ? '  !! ISOLATION VIOLATED' : ''));
+    + (row.isolationOk === false ? '  !! ISOLATION VIOLATED' : '')
+    + (row.recovery ? ` ctl=${row.recovery.state} ${row.recovery.decisions.join('>') || '-'} restores=${row.recovery.restoresExact}/${row.recovery.restores}` : '')
+    + (row.provisionalDeliveredAsAccepted ? '  !! PROVISIONAL DELIVERED AS ACCEPTED' : '')
+    + (row.controllerAcceptNotRetained ? '  !! CONTROLLER ACCEPT NOT RETAINED' : ''));
 }
 
 // Every planned unit, in the order it would run. Anything still here at the end never started.
@@ -482,6 +510,7 @@ for (let rep = 1; rep <= REPS; rep++) {
       const wsDir = join(ROOT, `ws-${arm}-r${rep}`);
       currentDiagnostic = armDiagnostic(task, arm);
       currentSeed = seedFor(rep);
+      currentRecovery = arm === 'RECOVERY_ARM' ? RECOVERY_POLICY : null;
       const position = order.indexOf(arm);
       const workspaceFresh = !existsSync(join(wsDir, task.id));
       pending.length = 0;

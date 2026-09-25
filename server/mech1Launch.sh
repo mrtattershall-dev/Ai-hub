@@ -4,6 +4,11 @@
 #   bash server/mech1Launch.sh stage1 <workdir>    deploy, watchdog, wait, seed probe
 #   bash server/mech1Launch.sh stage2 <workdir>    the campaign
 #
+# Campaign parameters come from the environment so a frozen definition can name them
+# exactly (defaults = MECH-1): CAMPAIGN_EXPERIMENT, CAMPAIGN_ARMS, CAMPAIGN_REPS, CAMPAIGN_SEEDS,
+# CAMPAIGN_TOTAL_SEC, CAMPAIGN_TASK_IDS, CAMPAIGN_PER_TASK_SEC, CAMPAIGN_WATCHDOG_SEC,
+# AGENT_MAX_STEPS, AUTODIAG_RECOVERY_POLICY.
+#
 # <workdir> holds: watchdog.log, DONE (the campaign's sentinel), probe.json, campaign.log.
 # Nothing here retries a paid step. If a step fails the script exits non-zero and says so.
 set -u
@@ -14,6 +19,13 @@ export PYTHONIOENCODING=utf-8
 APP=legasus-7b
 URL="https://mr-tattershall--${APP}-server-web.modal.run"
 DONE="$WORK/DONE"
+EXPERIMENT="${CAMPAIGN_EXPERIMENT:-MECH-1}"
+ARMS="${CAMPAIGN_ARMS:-CONTROL,NOTIFY,AUTODIAG_ARM}"
+REPS="${CAMPAIGN_REPS:-2}"
+SEEDS="${CAMPAIGN_SEEDS:-101,202}"
+TOTAL_SEC="${CAMPAIGN_TOTAL_SEC:-12600}"
+PER_TASK_SEC="${CAMPAIGN_PER_TASK_SEC:-300}"
+WATCHDOG_SEC="${CAMPAIGN_WATCHDOG_SEC:-13800}"
 stamp() { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
 
 if [ "$STAGE" = "stage1" ]; then
@@ -23,8 +35,8 @@ if [ "$STAGE" = "stage1" ]; then
   MYCODER_APP=$APP MYCODER_BASE=Qwen/Qwen2.5-Coder-7B-Instruct MYCODER_GPU=A10G \
   MYCODER_MIN_CONTAINERS=0 MYCODER_SCALEDOWN_S=900 MYCODER_MAXLEN=16384 \
     python -m modal deploy training-data/factory/modal_serve_vllm.py 2>&1 | tail -3 || { echo "[$(stamp)] DEPLOY FAILED"; exit 4; }
-  echo "[$(stamp)] deployed; starting the watchdog (deadline 13800s, sentinel $DONE)"
-  node server/gpuWatchdog.mjs --app $APP --deadline-sec 13800 --sentinel "$DONE" --log "$WORK/watchdog.log" \
+  echo "[$(stamp)] deployed; starting the watchdog (deadline ${WATCHDOG_SEC}s, sentinel $DONE)"
+  node server/gpuWatchdog.mjs --app $APP --deadline-sec "$WATCHDOG_SEC" --sentinel "$DONE" --log "$WORK/watchdog.log" \
     --poll-sec 15 --verify-sec 600 --stop-retries 3 --detach || { echo "[$(stamp)] WATCHDOG DID NOT START"; exit 5; }
   echo "[$(stamp)] waiting for $URL/api/tags"
   ok=0
@@ -43,8 +55,10 @@ fi
 if [ "$STAGE" = "stage2" ]; then
   echo "[$(stamp)] STAGE2 start; HEAD $(git rev-parse --short HEAD)"
   git diff --quiet || { echo "[$(stamp)] REFUSING: uncommitted changes"; exit 3; }
-  AUTODIAG_EXPERIMENT=MECH-1 AUTODIAG_ARMS=CONTROL,NOTIFY,AUTODIAG_ARM AUTODIAG_REPS=2 AUTODIAG_SEEDS=101,202 \
-  AUTODIAG_TOTAL_SEC=12600 AUTODIAG_DONE_FILE="$DONE" AUTODIAG_HUB_COMMIT=$(git rev-parse --short HEAD) \
+  echo "[$(stamp)] experiment $EXPERIMENT arms $ARMS reps $REPS seeds $SEEDS total ${TOTAL_SEC}s per-task ${PER_TASK_SEC}s tasks ${CAMPAIGN_TASK_IDS:-all} max-steps ${AGENT_MAX_STEPS:-default} policy ${AUTODIAG_RECOVERY_POLICY:-default}"
+  AUTODIAG_EXPERIMENT="$EXPERIMENT" AUTODIAG_ARMS="$ARMS" AUTODIAG_REPS="$REPS" AUTODIAG_SEEDS="$SEEDS" \
+  AUTODIAG_TOTAL_SEC="$TOTAL_SEC" AUTODIAG_PER_TASK_SEC="$PER_TASK_SEC" AUTODIAG_TASK_IDS="${CAMPAIGN_TASK_IDS:-}" \
+  AUTODIAG_DONE_FILE="$DONE" AUTODIAG_HUB_COMMIT=$(git rev-parse --short HEAD) \
     node server/autodiag1.mjs "$URL"
   rc=$?
   echo "[$(stamp)] campaign process exited $rc"
