@@ -2879,6 +2879,12 @@ async function applyRecovery(run, candidateSha) {
   } else if (d.action === 'PROVISIONAL') {
     recoveryProvisional(rec, result, candidateSha);
     pushStep(run, { type: 'recovery', action: 'PROVISIONAL', text: `Recovery controller: PROVISIONAL - ${d.reason}.`, candidateSha });
+    if (d.stop) {
+      // The overall bound on continuation. The provisional candidate stays in the workspace
+      // (never fully verified; acceptance judges it) and nothing further executes.
+      run.status = 'stopped';
+      pushStep(run, { type: 'error', text: `Stopped: recovery controller - ${d.stop}.` });
+    }
   } else if (d.action === 'RESTORE' || d.action === 'DISCARD') {
     recoveryRestore(run, d);
   }
@@ -5175,7 +5181,7 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
     // about what the backend did with them.
     sampling: { temperature: TEMPERATURE, seed: SEED },
     // { maxAttempts, maxRepeats } - the recovery controller, only meaningful with a diagnostic.
-    recoveryPolicy: recovery && diagnostic && diagnostic.moduleName ? { maxAttempts: Number(recovery.maxAttempts) || 2, maxRepeats: Number(recovery.maxRepeats) || 2 } : null,
+    recoveryPolicy: recovery && diagnostic && diagnostic.moduleName ? { maxAttempts: Number(recovery.maxAttempts) || 2, maxRepeats: Number(recovery.maxRepeats) || 2, maxProvisional: Number.isInteger(Number(recovery.maxProvisional)) ? Number(recovery.maxProvisional) : 3 } : null,
     recovery: null,
     protection: governed ? PROTECTION.BEHAVIORAL_ACCEPTANCE : PROTECTION.NONE,
     protectionNote: governed

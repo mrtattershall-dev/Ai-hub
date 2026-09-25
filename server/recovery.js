@@ -27,7 +27,12 @@
  */
 import { createHash } from 'node:crypto';
 
-export const DEFAULT_POLICY = Object.freeze({ maxAttempts: 2, maxRepeats: 2 });
+// maxProvisional: an OVERALL bound on continuation. A provisional step consumes no attempt, so
+// without this a run could evade termination by producing small improvements forever. (The
+// strictly-increasing rule already bounds it by the number of cases; this is explicit and
+// smaller.) Exceeding it STOPS the run; the provisional candidate is left in place for
+// acceptance to judge - it was never fully verified, and acceptance says so.
+export const DEFAULT_POLICY = Object.freeze({ maxAttempts: 2, maxRepeats: 2, maxProvisional: 3 });
 export const MAX_RESIDUAL_SHOWN = 6;
 
 const sha = (s) => createHash('sha256').update(s).digest('hex');
@@ -50,7 +55,7 @@ export function initRecovery(startResult, targetBytes, policy = {}) {
     enabled: true, policy: p, state: 'ACTIVE',
     verified: { sha256: sha(targetBytes), bytes: targetBytes, passing: [...passing], passed: startResult.passed, attempted: startResult.attempted, failures: startResult.failures || [] },
     provisional: null,
-    attempts: 0, freshPlans: 0, repeats: 0,
+    attempts: 0, freshPlans: 0, repeats: 0, provisionals: 0,
     rejected: [],          // { sha256, reason, kind, passed, brokeProtected: [...], at }
     decisions: [],         // { action, reason, sha256, at }
   };
@@ -90,7 +95,13 @@ export function decide(rec, result, candidateSha) {
     return record({ action: 'ACCEPT', reason: `every case passes (${result.passed}/${result.attempted}) and protected behaviour held` });
   }
   if (result.passed > best) {
-    return record({ action: 'PROVISIONAL', reason: `progress: ${result.passed}/${result.attempted} pass (was ${best}); protected behaviour held; the verified checkpoint stays available`, countsAsAttempt: false });
+    rec.provisionals++;
+    const d = record({ action: 'PROVISIONAL', reason: `progress: ${result.passed}/${result.attempted} pass (was ${best}); protected behaviour held; the verified checkpoint stays available`, countsAsAttempt: false });
+    if (rec.provisionals > rec.policy.maxProvisional) {
+      rec.state = 'STOPPED';
+      d.stop = `provisional continuations exhausted (${rec.provisionals} > ${rec.policy.maxProvisional}): progress without completion does not earn unbounded compute`;
+    }
+    return d;
   }
   return afterRejection(rec, record({ action: 'DISCARD', kind: 'NO_PROGRESS', reason: `no measurable progress: ${result.passed}/${result.attempted} pass (best so far ${best})`, countsAsAttempt: true }), result, candidateSha);
 }

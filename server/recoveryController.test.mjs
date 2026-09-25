@@ -143,6 +143,18 @@ try {
     say(rs.some((s) => s.action === 'ACCEPT') && run.recovery.verified.sha256 === sha(FIXED_SRC) && file === FIXED_SRC, 'the follow-up fix was ACCEPTED from the provisional state');
   }
 
+  console.log('\n=== 2b. PROVISIONAL steps cannot evade termination: an overall bound ===');
+  {
+    // maxProvisional 0: the very first provisional step exceeds the bound. The scripted fix
+    // that follows must never run, and the run must end.
+    const { run, file } = await drive([PLAN, PROGRESS, FIXED_FROM_PROGRESS, FINISH], { label: 'provbound', recovery: { maxAttempts: 5, maxRepeats: 2, maxProvisional: 0 } });
+    const rs = rsteps(run);
+    say(rs.some((s) => s.action === 'PROVISIONAL') && run.recovery.provisionals === 1 && run.recovery.state === 'STOPPED', `one provisional step (${run.recovery.provisionals}) exceeded maxProvisional 0 -> controller ${run.recovery.state}`);
+    say(run.status === 'stopped' && /provisional continuations exhausted/.test(String((run.steps || []).find((s) => s.type === 'error' && /recovery controller/.test(s.text))?.text || '')), `the run STOPPED with the reason (${run.status})`);
+    say(edits(run).length === 1 && /\+ 2/.test(file) && sha(file) !== SEED_SHA, 'the scripted fix never executed; the provisional candidate is left in place for acceptance (never fully verified)');
+    say(!rs.some((s) => s.action === 'ACCEPT') && run.recovery.verified.sha256 === SEED_SHA, 'the verified checkpoint is still the seed - the provisional state was never promoted');
+  }
+
   console.log('\n=== 3. STOPPING: exhausted attempts end the run; nothing further executes ===');
   {
     const { run, file } = await drive([PLAN, BREAK, BREAK2, FIXED, FINISH], { label: 'budget', recovery: { maxAttempts: 2, maxRepeats: 2 } });

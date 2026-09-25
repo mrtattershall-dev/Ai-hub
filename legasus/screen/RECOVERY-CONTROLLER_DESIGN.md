@@ -105,6 +105,16 @@ real Hub path with scripted replies and the worker diagnostic:
 What is NOT established: any effect on a live model (no paid run has used it); the packet
 carries no code LOCATION (only cases, expected vs actual and the rejection); the FIM/local
 patch path is not wired in - the model still edits with edit_file; "bounded continuation"
-after PROVISIONAL is bounded only by the attempt count and the task budget; the policy
-numbers (2 attempts, 2 repeats) are the starting point, not measured. RECOV-1 (continued
+after PROVISIONAL is now bounded explicitly by `maxProvisional` (default 3; a provisional
+step consumes no attempt, so without it repeated small improvements could evade
+termination - tatte's point after the first validation). Exceeding it STOPS the run; the
+provisional candidate stays in the workspace for acceptance to judge, the verified
+checkpoint is never promoted (tested, 30/30 now). The policy numbers (2 attempts, 2
+repeats, 3 provisionals) are the starting point, not measured.
+
+**Claim supported, exactly:** under the scripted replay conditions, the controller enforced
+the tested rollback, retry, provisional-bound and stopping behaviour through the real hub
+path, and the controller-off comparison attributes that protection to the controller. Not
+supported: better repair rates with a live model, or protection against failures outside the
+tested cases. RECOV-1 (continued
 feedback) and any live test of this controller remain separate, unauthorized experiments.
