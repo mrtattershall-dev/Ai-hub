@@ -1,0 +1,106 @@
+BENCH-3 START 2026-09-24T23:03:00.498Z hub 96c6adb
+model: https://mr-tattershall--legasus-7b-server-web.modal.run
+worker: sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3
+queue: 15 external x 3 replicate(s) + 5 sequential
+limits: 300s/task, 18000s total, 180s reserve, no retries
+
+
+-- external replicate 1 of 3 --
+ 1. [EXTERNAL] ext-bucketsort ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 2. [EXTERNAL] ext-find_in_sorted ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 3. [EXTERNAL] ext-flatten ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 4. [EXTERNAL] ext-gcd ENDED req=PASS prot=PASS RETAIN
+ 5. [EXTERNAL] ext-get_factors ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 6. [EXTERNAL] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 7. [EXTERNAL] ext-kheapsort ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 8. [EXTERNAL] ext-kth ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+ 9. [EXTERNAL] ext-lcs_length ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+10. [EXTERNAL] ext-lis ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+11. [EXTERNAL] ext-longest_common_subsequence ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+12. [EXTERNAL] ext-max_sublist_sum ENDED req=FAIL prot=FAIL RESTORED
+13. [EXTERNAL] ext-mergesort ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+14. [EXTERNAL] ext-next_palindrome ENDED req=FAIL prot=FAIL RESTORED
+15. [EXTERNAL] ext-pascal ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+
+-- external replicate 2 of 3 --
+16. [EXTERNAL] ext-bucketsort ENDED req=FAIL prot=FAIL RESTORED
+17. [EXTERNAL] ext-find_in_sorted ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+18. [EXTERNAL] ext-flatten ENDED req=PASS prot=PASS RETAIN
+19. [EXTERNAL] ext-gcd ENDED req=PASS prot=PASS RETAIN
+20. [EXTERNAL] ext-get_factors ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+21. [EXTERNAL] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+22. [EXTERNAL] ext-kheapsort ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+23. [EXTERNAL] ext-kth ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+24. [EXTERNAL] ext-lcs_length ENDED req=PASS prot=PASS RETAIN
+25. [EXTERNAL] ext-lis ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+26. [EXTERNAL] ext-longest_common_subsequence ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+27. [EXTERNAL] ext-max_sublist_sum ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+28. [EXTERNAL] ext-mergesort ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+29. [EXTERNAL] ext-next_palindrome ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+30. [EXTERNAL] ext-pascal ENDED req=FAIL prot=FAIL RESTORED
+
+-- external replicate 3 of 3 --
+31. [EXTERNAL] ext-bucketsort ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+32. [EXTERNAL] ext-find_in_sorted ENDED req=FAIL prot=FAIL RESTORED
+33. [EXTERNAL] ext-flatten ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+34. [EXTERNAL] ext-gcd ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+35. [EXTERNAL] ext-get_factors ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+36. [EXTERNAL] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+37. [EXTERNAL] ext-kheapsort ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+38. [EXTERNAL] ext-kth ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+39. [EXTERNAL] ext-lcs_length ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+40. [EXTERNAL] ext-lis ENDED req=PASS prot=PASS RETAIN
+41. [EXTERNAL] ext-longest_common_subsequence ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+42. [EXTERNAL] ext-max_sublist_sum ENDED req=FAIL prot=FAIL RESTORED
+43. [EXTERNAL] ext-mergesort ENDED req=FAIL prot=FAIL RESTORED
+44. [EXTERNAL] ext-next_palindrome ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+45. [EXTERNAL] ext-pascal ENDED req=FAIL prot=PASS PRESERVE_INCOMPLETE
+46. [SEQUENTIAL] seq-1-count ENDED req=FAIL prot=FAIL RESTORED
+47. [SEQUENTIAL] seq-2-largest BLOCKED req=- prot=- BLOCKED
+48. [SEQUENTIAL] seq-3-byitem BLOCKED req=- prot=- BLOCKED
+49. [SEQUENTIAL] seq-4-remove BLOCKED req=- prot=- BLOCKED
+50. [SEQUENTIAL] seq-5-summary BLOCKED req=- prot=- BLOCKED
+
+=== BENCH-3 RESULT ===
+elapsed 89m 18s of 300m
+stopped cleanly: YES
+integrity true  reconciliation true
+status {"COMPLETED":46,"INTERRUPTED":0,"UNATTEMPTED":0,"BLOCKED":4,"OTHER":0,"UNACCOUNTED":0,"total":50,"planned":50}
+
+EXTERNAL   accepted 5/15
+SEQUENTIAL accepted 0/5   CONSECUTIVE steps accumulated: 0
+   (different questions - never summed)
+{
+  "EXTERNAL": {
+    "runs": 45,
+    "acceptedImprovements": 5,
+    "requestedPass": 5,
+    "protectedRetained": 38,
+    "protectedBroken": 7,
+    "evalErrors": 0,
+    "modelCalls": 416,
+    "tokens": 2426645,
+    "seconds": 4992,
+    "toolExecutions": 456,
+    "controllerRefusals": 0
+  },
+  "SEQUENTIAL": {
+    "runs": 5,
+    "acceptedImprovements": 0,
+    "requestedPass": 0,
+    "protectedRetained": 0,
+    "protectedBroken": 1,
+    "evalErrors": 0,
+    "modelCalls": 5,
+    "tokens": 25975,
+    "seconds": 41,
+    "toolExecutions": 7,
+    "controllerRefusals": 0
+  }
+}
+
+summary: C:\Users\tatte\AppData\Local\Temp\bench1-yGkG5x\summary.jsonl
+report:  C:\Users\tatte\AppData\Local\Temp\bench1-yGkG5x\BENCH-3_REPORT.json
+BENCH-3 COMPLETE
+EXIT 0
+APP STOPPED Fri Sep 25 00:32:24 UTC 2026
