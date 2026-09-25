@@ -80,5 +80,31 @@ against the checkpoint).
     - the controller must be a DECIDING path, not an advisory sentence (every earlier Hub
       recovery was a sentence the 7B ignored).
 
-Nothing above is implemented. `afterEditMode` and the RECOV arms are the only code that
-exists for it, and they exist to run RECOV-1, not the controller.
+## Status (2026-09-25, later the same day): IMPLEMENTED as an opt-in, REPLAY-VALIDATED, never run live
+
+`server/recovery.js` (decision logic, pure) with hooks in `agent.js`, enabled per run by a
+`recovery: { maxAttempts, maxRepeats }` field beside the diagnostic on the start request.
+Off by default; no earlier campaign used it. `recoveryController.test.mjs`, 26/26, through the
+real Hub path with scripted replies and the worker diagnostic:
+
+    CONTROL (no controller)   a protected-breaking edit stays in the file and read_file shows it
+    ROLLBACK                  three rejected changes (breaking edit, truncated rewrite, rewrite
+                              that fails to import) each RESTORED byte-exact (sha256 equal);
+                              every read_file after a rejection showed the restored bytes; the
+                              later fix ACCEPTED and the checkpoint advanced to it
+    FRESH-PLAN RETRIES        the packet names the rejecting check (case 3), the residual
+                              failures (8 of 9, bounded to 6 shown, 2 withheld and said so) and
+                              the refusal rule, and does not carry the rejected code; an
+                              identical resubmission is REFUSED without spending a diagnostic;
+                              partial progress (1 -> 2 cases, protected held) is kept
+                              PROVISIONALLY, consumes no attempt, and the later fix is accepted
+    STOPPING                  attempts exhausted (2 of 2 rejected candidates) and repeats
+                              exhausted both END the run: the scripted fix that followed never
+                              executed, the file is the checkpoint byte-exact, the run finalized
+
+What is NOT established: any effect on a live model (no paid run has used it); the packet
+carries no code LOCATION (only cases, expected vs actual and the rejection); the FIM/local
+patch path is not wired in - the model still edits with edit_file; "bounded continuation"
+after PROVISIONAL is bounded only by the attempt count and the task budget; the policy
+numbers (2 attempts, 2 repeats) are the starting point, not measured. RECOV-1 (continued
+feedback) and any live test of this controller remain separate, unauthorized experiments.

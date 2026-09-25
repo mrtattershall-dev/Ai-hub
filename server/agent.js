@@ -50,6 +50,7 @@ import { ProtocolController } from './protocol.js';
 import { ROUTES_BOUNDED, noteUncoveredTraversal, refuseAtDetachedSite } from './routeBound.js';
 import { prepareGoverned, concludeGoverned, PROTECTION, NO_PROTECTION_NOTE } from './governance.js';
 import { runDiagnostic, diagnosticMessage, DIAG } from './autodiag.js';
+import { initRecovery, isRejected, decide as recoveryDecide, repeat as recoveryRepeat, accept as recoveryAccept, provisional as recoveryProvisional, packetMessage } from './recovery.js';
 import { lockAuditDir } from './d2.js';
 import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState, mayMutate } from './d2.js';
 
@@ -2800,12 +2801,12 @@ function deliveryModeFor(run, when) {
 }
 
 async function deliverDiagnostic(run, when) {
-  if (!run.diagnostic) return;
+  if (!run.diagnostic) return null;
   const mode = deliveryModeFor(run, when);
   if (run.budgetEndsAt && run.budgetEndsAt - Date.now() < DIAG_MIN_BUDGET_MS) {
     pushStep(run, { type: 'note', text: `Automatic diagnostic skipped (${when}): under ${DIAG_MIN_BUDGET_MS / 1000}s of task budget remains.` });
     (run.diagnostics ||= []).push({ when, skipped: 'insufficient budget', at: Date.now() });
-    return;
+    return null;
   }
   let result;
   try {
@@ -2834,6 +2835,54 @@ async function deliverDiagnostic(run, when) {
         : `Automatic diagnostic (${when}): ${result.passed}/${result.attempted} cases pass, ${result.failed} fail.`)
       : `Automatic diagnostic (${when}) UNAVAILABLE: ${result.reason}`),
   });
+  return result;
+}
+
+// ── THE RECOVERY CONTROLLER (recovery.js) - a deciding path over verified facts ──────────
+// Opted in per run (`recovery` on the start request, alongside a diagnostic). It restores
+// bytes, refuses repeats and stops runs; the model is told what happened in a bounded packet.
+function recoveryTargetPath(run) { return safePath(`${run.diagnostic.moduleName}.py`); }
+function recoveryRestore(run, d) {
+  const rec = run.recovery;
+  writeFileSync(recoveryTargetPath(run), rec.verified.bytes, 'utf8');
+  const restoredSha = diagTargetHash(run);
+  const exact = restoredSha === rec.verified.sha256;
+  pushStep(run, { type: 'recovery', action: d.action, kind: d.kind || null, text: `Recovery controller: ${d.action} - ${d.reason}. ${run.diagnostic.moduleName}.py restored to the verified checkpoint (${exact ? 'byte-exact, sha ' + restoredSha.slice(0, 12) : 'RESTORE MISMATCH ' + String(restoredSha).slice(0, 12)}).`, restoredExact: exact, candidateSha: d.sha256 });
+  // The packet is recorded on the step as well as pushed into history: history is pruned and
+  // not served by the API, and a record of what the model was told must be durable.
+  const packet = packetMessage(rec, d, run.diagnostic.moduleName);
+  run.history.push({ role: 'user', content: packet });
+  run.steps[run.steps.length - 1].packet = packet;
+  if (d.stop) {
+    run.status = 'stopped';
+    pushStep(run, { type: 'error', text: `Stopped: recovery controller - ${d.stop}.` });
+  }
+}
+/** After a content change: refuse a repeat, or verify and decide. Returns true if the run continues. */
+async function applyRecovery(run, candidateSha) {
+  const rec = run.recovery;
+  if (!rec || !rec.enabled || rec.state !== 'ACTIVE') return true;
+  if (isRejected(rec, candidateSha)) {
+    // Refused BEFORE it runs: no diagnostic is spent on a candidate already judged.
+    run.diagnosticStale = false;
+    recoveryRestore(run, recoveryRepeat(rec, candidateSha));
+    return run.status === 'running';
+  }
+  run.diagnosticStale = false;
+  const result = await deliverDiagnostic(run, 'after-edit');
+  if (run.status !== 'running') return false;
+  const d = recoveryDecide(rec, result, candidateSha);
+  if (d.action === 'ACCEPT') {
+    recoveryAccept(rec, result, readFileSync(recoveryTargetPath(run), 'utf8'));
+    pushStep(run, { type: 'recovery', action: 'ACCEPT', text: `Recovery controller: ACCEPT - ${d.reason}. Checkpoint advanced to sha ${rec.verified.sha256.slice(0, 12)}.`, candidateSha });
+    run.history.push({ role: 'user', content: `RECOVERY CONTROLLER - ACCEPTED: ${d.reason}. This state is the verified checkpoint now. Finish.` });
+  } else if (d.action === 'PROVISIONAL') {
+    recoveryProvisional(rec, result, candidateSha);
+    pushStep(run, { type: 'recovery', action: 'PROVISIONAL', text: `Recovery controller: PROVISIONAL - ${d.reason}.`, candidateSha });
+  } else if (d.action === 'RESTORE' || d.action === 'DISCARD') {
+    recoveryRestore(run, d);
+  }
+  return run.status === 'running';
 }
 
 function noteModelCall(run) {
@@ -3513,12 +3562,25 @@ async function drive(loadDb, run) {
       // carries it - delivery is not left to a later turn.
       if (run.diagnostic && !run.diagnosticOpened) {
         run.diagnosticOpened = true;
-        await deliverDiagnostic(run, 'start');
+        const startResult = await deliverDiagnostic(run, 'start');
+        if (run.recoveryPolicy) {
+          let bytes = null;
+          try { bytes = readFileSync(recoveryTargetPath(run), 'utf8'); } catch { /* absent */ }
+          run.recovery = bytes === null ? { enabled: false, reason: 'target absent', policy: run.recoveryPolicy } : initRecovery(startResult, bytes, run.recoveryPolicy);
+          pushStep(run, { type: 'recovery', action: 'INIT', text: run.recovery.enabled
+            ? `Recovery controller ON: verified checkpoint sha ${run.recovery.verified.sha256.slice(0, 12)}, ${run.recovery.verified.passing.length} protected case(s), policy ${JSON.stringify(run.recovery.policy)}.`
+            : `Recovery controller OFF: ${run.recovery.reason}.` });
+        }
         if (run.status !== 'running') break;
       } else if (run.diagnosticStale) {
-        run.diagnosticStale = false;
-        await deliverDiagnostic(run, 'after-edit');
-        if (run.status !== 'running') break;
+        if (run.recovery && run.recovery.enabled) {
+          const cont = await applyRecovery(run, diagTargetHash(run));
+          if (!cont || run.status !== 'running') break;
+        } else {
+          run.diagnosticStale = false;
+          await deliverDiagnostic(run, 'after-edit');
+          if (run.status !== 'running') break;
+        }
       }
       run.modelCalls++;
       pruneHistory(run, historyBudget(loadDb()));   // fit the PROVIDER's window, in tokens
@@ -5086,7 +5148,7 @@ function autoStart(loadDb, item) {
 //
 // Default 'unknown' rather than guessing: an unstamped caller is a gap to be seen, not a
 // value to be invented.
-function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown', budgetSec = null, callDeadlineSec = null, governed = null, diagnostic = null } = {}) {
+function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown', budgetSec = null, callDeadlineSec = null, governed = null, diagnostic = null, recovery = null } = {}) {
   ensureWorkspace();
   const id = randomUUID();
   const now = Date.now();
@@ -5112,6 +5174,9 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
     // What this process SENT as sampling settings - provenance for a replicate, not a claim
     // about what the backend did with them.
     sampling: { temperature: TEMPERATURE, seed: SEED },
+    // { maxAttempts, maxRepeats } - the recovery controller, only meaningful with a diagnostic.
+    recoveryPolicy: recovery && diagnostic && diagnostic.moduleName ? { maxAttempts: Number(recovery.maxAttempts) || 2, maxRepeats: Number(recovery.maxRepeats) || 2 } : null,
+    recovery: null,
     protection: governed ? PROTECTION.BEHAVIORAL_ACCEPTANCE : PROTECTION.NONE,
     protectionNote: governed
       ? `Behavioral acceptance: declared checks, starting state verified (tree ${String(governed.startTree).slice(0, 12)}), result will be evaluated in the isolated worker and rolled back if protected behaviour breaks.`
@@ -5315,7 +5380,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       if (!prep.ok) return res.status(409).json({ error: `governed run BLOCKED: ${prep.reason}`, blocked: true, protection: PROTECTION.NONE, startVerdict: prep.startVerdict || null });
       gov = { checks: governed.checks, startRef: prep.startRef, startTree: prep.startTree, startVerdict: prep.startVerdict, requestedAlreadyPasses: prep.requestedAlreadyPasses, declaredAt: new Date().toISOString() };
     }
-    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null, governed: gov, diagnostic: diagnostic || null });
+    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null, governed: gov, diagnostic: diagnostic || null, recovery: req.body.recovery || null });
     res.json({ runId: run.id });
   });
 
