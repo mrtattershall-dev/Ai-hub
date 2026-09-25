@@ -118,6 +118,10 @@ say(plan.every((t) => recorded.has(t)), `every planned unit has a row (${rows.le
 const unatt = rows.filter((r) => r.termination === 'UNATTEMPTED');
 say(unatt.every((r) => r.reason), `every unattempted entry carries a reason (${unatt.length} unattempted)`);
 if (unatt.length) note(`e.g. ${unatt[0].task}: ${unatt[0].reason}`);
+// The arm and replicate are PARSED from the queue key; a mangled regex once left arm
+// "AUTODIAG_ARMr1" and rep 0 on every such row.
+if (unatt.length) say(unatt.every((r) => ['CONTROL', 'AUTODIAG_ARM'].includes(r.arm) && r.rep >= 1), `unattempted rows carry a real arm and replicate (${unatt.map((r) => `${r.arm}/r${r.rep}`).join(', ')})`);
+else note('no unattempted rows this run (the hung unit was bounded in time); unattemptedRows.test.mjs asserts the parse directly');
 const reportPath = root ? join(dirname(root), 'AUTODIAG-1_REPORT.json') : null;
 if (reportPath && existsSync(reportPath)) {
   const rep = JSON.parse(readFileSync(reportPath, 'utf8'));

@@ -125,7 +125,12 @@ export async function runDiagnostic(workspace, { moduleName, casesJsonl }, { ima
  * The message the model actually receives. Bounded, content-bound, and explicit about
  * anything withheld. `when` distinguishes the opening report from a post-edit re-run.
  */
-export function diagnosticMessage(result, moduleName, when = 'start') {
+export function diagnosticMessage(result, moduleName, when = 'start', { mode = 'full' } = {}) {
+  // mode 'full' (default): counts plus up to MAX_SHOWN failing cases with expected vs actual.
+  // mode 'summary': the SAME delivery points, header and counts, but no case is listed - a
+  // truthful generic notification that tests were run and how many fail. It exists so an
+  // experiment can separate "the model was told tests fail, now" from "the model was told
+  // WHICH inputs fail and what came out". Nothing in it is fabricated or hand-authored.
   const head = when === 'start'
     ? 'AUTOMATIC DIAGNOSTIC - run for you before you started. You did not need to run it, and you do not need to run it yourself.'
     : 'AUTOMATIC DIAGNOSTIC - re-run for you just now, against the file as you have just left it.';
@@ -141,7 +146,9 @@ export function diagnosticMessage(result, moduleName, when = 'start') {
 
   if (result.importError !== undefined) {
     return `${head}\n\nTESTED: ${id}\n`
-      + `RESULT: the file does not import - ${result.importError}\n`
+      + (mode === 'summary'
+        ? 'RESULT: the file does not import.\n'
+        : `RESULT: the file does not import - ${result.importError}\n`)
       + 'No case could be attempted. Fix the import/syntax error first; until it imports, nothing else can be checked.';
   }
   const shown = result.failures.slice(0, MAX_SHOWN);
@@ -152,6 +159,8 @@ export function diagnosticMessage(result, moduleName, when = 'start') {
   ];
   if (result.failed === 0) {
     lines.push('', 'Every case passes on the file as it now stands.');
+  } else if (mode === 'summary') {
+    lines.push('', 'This notification carries the counts only. Which cases fail, their inputs, what was expected and what your code produced are NOT included here.');
   } else {
     lines.push('', 'Failing cases (expected versus what your code actually produced):');
     for (const f of shown) lines.push(`  ${f.kind} case ${f.n}  ${f.text}`);

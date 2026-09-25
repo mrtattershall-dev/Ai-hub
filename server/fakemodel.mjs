@@ -319,7 +319,7 @@ const server = createServer((req, res) => {
       // and an insertion point that silently did nothing would look the same as one that
       // worked. Off unless a path is given, so ordinary runs are unaffected.
       if (process.env.FAKE_PROMPT_LOG) {
-        try { fs.appendFileSync(process.env.FAKE_PROMPT_LOG, JSON.stringify({ at: Date.now(), messages: msgs }) + String.fromCharCode(10)); } catch {}
+        try { fs.appendFileSync(process.env.FAKE_PROMPT_LOG, JSON.stringify({ at: Date.now(), messages: msgs, options: j.options || null, seed: j.seed ?? (j.options && j.options.seed) ?? null }) + String.fromCharCode(10)); } catch {}
       }
       const sys = msgs.find((m) => m.role === 'system');
       isPlanner = /architect/i.test(sys?.content || '');

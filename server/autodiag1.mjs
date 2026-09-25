@@ -60,6 +60,28 @@ const PER_TASK_SEC = parseInt(process.env.AUTODIAG_PER_TASK_SEC || '300', 10);
 const UNIT_GRACE_MS = parseInt(process.env.AUTODIAG_UNIT_GRACE_MS || '45000', 10);
 const TOTAL_SEC = parseInt(process.env.AUTODIAG_TOTAL_SEC || String(3 * 60 * 60), 10);
 const REPS = Math.max(1, parseInt(process.env.AUTODIAG_REPS || '2', 10));
+// THE EXPERIMENT'S NAME, from the launch, never hard-coded: the AUTODIAG-2 campaign printed
+// "AUTODIAG-1 START/RESULT/COMPLETE" and wrote AUTODIAG-1_REPORT.json because it was.
+const EXPERIMENT = process.env.AUTODIAG_EXPERIMENT || 'AUTODIAG-1';
+// ARMS. Every arm gets the IDENTICAL seed files and the IDENTICAL guidance; arms differ only in
+// the diagnostic spec attached to the start request, which the Hub runs and delivers itself.
+const ARM_DESC = {
+  CONTROL: 'nothing delivered',
+  NOTIFY: 'the Hub runs the graded cases and delivers ONLY the counts (attempted/passed/failed) - no case, input, expected or actual value',
+  AUTODIAG_ARM: 'the Hub runs the graded cases and delivers the full result (counts plus up to 6 failing cases, expected vs actual)',
+};
+const ARMS = String(process.env.AUTODIAG_ARMS || 'CONTROL,AUTODIAG_ARM').split(',').map((x) => x.trim()).filter(Boolean);
+for (const a of ARMS) if (!ARM_DESC[a]) { console.error(`unknown arm "${a}" - one of ${Object.keys(ARM_DESC).join(', ')}`); process.exit(2); }
+if (new Set(ARMS).size !== ARMS.length) { console.error('AUTODIAG_ARMS repeats an arm'); process.exit(2); }
+// SEEDS. One sampling seed per replicate, sent to the backend on every request of that
+// replicate (AGENT_SEED). Unset = nothing sent, as every earlier campaign ran.
+const SEEDS = String(process.env.AUTODIAG_SEEDS || '').split(',').map((x) => x.trim()).filter(Boolean).map(Number);
+if (SEEDS.length && (SEEDS.length !== REPS || SEEDS.some((x) => !Number.isInteger(x)))) { console.error(`AUTODIAG_SEEDS must name exactly ${REPS} integer seed(s)`); process.exit(2); }
+const seedFor = (rep) => (SEEDS.length ? SEEDS[rep - 1] : null);
+// A file the campaign writes the moment it is COMPLETE, for an external watchdog that must
+// not depend on this process exiting (gpuWatchdog.mjs).
+const DONE_FILE = process.env.AUTODIAG_DONE_FILE || null;
+const stamp = () => new Date().toISOString();
 const RESERVE_SEC = 180;
 const T0 = Date.now();
 const DEADLINE = T0 + (TOTAL_SEC - RESERVE_SEC) * 1000;
@@ -71,6 +93,7 @@ let port = 41300;
 // One task runs per runBatch call, so the arm's diagnostic is carried here rather than
 // threaded through batch.js - which owns ctx and must stay identical in both arms.
 let currentDiagnostic = null;
+let currentSeed = null;
 
 // NO UNBOUNDED WAITS. AUTODIAG-1 lost 31 of 60 units to a single unit that ran 99 minutes:
 // a model call whose local deadline fired at 295s but whose await did not unwind for 5,964s.
@@ -101,7 +124,11 @@ function armTask(task, arm) {
 /** The diagnostic the Hub runs FOR the model. Null in control - nothing is delivered there. */
 function armDiagnostic(task, arm) {
   if (arm === 'CONTROL') return null;
-  return { moduleName: task.id.replace(/^ext-/, ''), casesJsonl: task.requested.files['cases.jsonl'] };
+  return {
+    moduleName: task.id.replace(/^ext-/, ''), casesJsonl: task.requested.files['cases.jsonl'],
+    // NOTIFY: the same diagnostic, the same delivery points, counts only. See autodiag.js.
+    ...(arm === 'NOTIFY' ? { mode: 'summary' } : {}),
+  };
 }
 
 /** Graded case counts from the evaluator's own runner output ("OK 9/9" / "FAILED 2/9"). */
@@ -145,6 +172,7 @@ async function runTask(ws, task, ctx) {
       AGENT_RUNS_DIR: join(ROOT, 'runs'), AGENT_TRACES_DIR: join(ROOT, 'traces'),
       AGENT_QUEUE_FILE: join(ROOT, `q-${p}.json`),
       AGENT_WORKER_EXEC: '1', AGENT_BOUND_ROUTES: '1', AGENT_APPROVAL_MODE: 'build',
+      ...(currentSeed !== null ? { AGENT_SEED: String(currentSeed) } : {}),
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -255,6 +283,10 @@ async function runTask(ws, task, ctx) {
   // transcript's `sent` field is the per-turn delta - the messages new since the model last
   // spoke - so the runner's output having reached a LATER request is readable directly.
   let feedbackDelivered = false;
+  // WHAT THE ARM ACTUALLY SAW, counted from the transcript rather than assumed from the arm
+  // name: how many diagnostic messages reached a request, and how many case-detail lines.
+  // CONTROL must see none of either; NOTIFY must see messages but no case lines.
+  let diagnosticMessagesSeen = 0, caseDetailLinesSeen = 0;
   try {
     const tpath = join(ROOT, 'runs', `${runId}.transcript.jsonl`);
     if (runId && existsSync(tpath)) {
@@ -272,12 +304,23 @@ async function runTask(ws, task, ctx) {
       // generated and then substituted away before it was sent.
       feedbackDelivered = lines.some((e) => e && e.kind === 'turn' && Array.isArray(e.sent)
         && e.sent.some((msg) => /^AUTOMATIC DIAGNOSTIC/.test(String(msg?.content || ''))));
+      for (const e of lines) {
+        if (!e || e.kind !== 'turn' || !Array.isArray(e.sent)) continue;
+        for (const msg of e.sent) {
+          const c = String(msg?.content || '');
+          if (/^AUTOMATIC DIAGNOSTIC/.test(c)) {
+            diagnosticMessagesSeen++;
+            caseDetailLinesSeen += (c.match(/^ {2}(FAIL|ERROR) case \d+ /gm) || []).length;
+          }
+        }
+      }
     }
   } catch { /* evidence, never a reason to fail the unit */ }
 
   const calls = Array.isArray(run?.callStats) ? run.callStats : [];
   return {
-    feedbackDelivered,
+    feedbackDelivered, diagnosticMessagesSeen, caseDetailLinesSeen,
+    seedSent: currentSeed, samplingRecorded: run?.sampling ?? null,
     status: 'COMPLETED', ok: true, exit: 0, timedOut: !!aborted, attemptId: ctx.attemptId,
     runId,   // THE join key. Task names are not one when a task is replicated (linkRuns.js).
     // OPERATIONAL RELIABILITY, recorded per unit and reported beside productivity.
@@ -300,11 +343,12 @@ async function runTask(ws, task, ctx) {
   };
 }
 
-console.log(`AUTODIAG-1 START ${new Date().toISOString()} hub ${process.env.AUTODIAG_HUB_COMMIT || 'unrecorded'}`);
+console.log(`${EXPERIMENT} START ${stamp()} hub ${process.env.AUTODIAG_HUB_COMMIT || 'unrecorded'}`);
 console.log(`model: ${MODEL_URL}`);
 console.log(`worker: ${WORKER_IMAGE}`);
-console.log('arms: CONTROL (seed + guidance) vs AUTODIAG_ARM (THE SAME seed + guidance; the Hub runs the cases and delivers the result)');
-console.log(`queue: ${BASE.length} tasks x 2 arms x ${REPS} replicate(s) = ${BASE.length * 2 * REPS} units`);
+console.log(`arms (identical seed + guidance in every arm): ${ARMS.map((a) => `${a} = ${ARM_DESC[a]}`).join(' | ')}`);
+console.log(`seeds: ${SEEDS.length ? SEEDS.join(',') : 'none sent (backend default)'}   order: arm order for task index ti in replicate r starts at (ti + r - 1) mod ${ARMS.length}`);
+console.log(`queue: ${BASE.length} tasks x ${ARMS.length} arms x ${REPS} replicate(s) = ${BASE.length * ARMS.length * REPS} units`);
 console.log(`limits: ${PER_TASK_SEC}s/task, ${TOTAL_SEC}s total, no retries\n`);
 
 console.log('measuring seed baselines (no model involved):');
@@ -312,7 +356,7 @@ await measureBaselines();
 
 // THE PLAN FIRST, as always: anything planned and not recorded is UNACCOUNTED.
 recordPlan(SUMMARY, BASE.flatMap((t) => Array.from({ length: REPS }, (_, r) =>
-  ['CONTROL', 'AUTODIAG_ARM'].map((a) => `${t.id}@${a}r${r + 1}`)).flat()));
+  ARMS.map((a) => `${t.id}@${a}r${r + 1}`)).flat()));
 
 let idx = 0;
 const rows = [];
@@ -322,7 +366,7 @@ const rows = [];
 const pending = [];
 const capture = () => (r) => { pending.push(r); };
 
-async function recordUnit(r, arm, rep, wsDir) {
+async function recordUnit(r, arm, rep, wsDir, { position = null, workspaceFresh = null } = {}) {
   const b = baseline.get(r.task) || { passing: new Set(), failing: new Set(), total: null };
   const name = String(r.task).replace(/^ext-/, '');
   const cases = (BASE.find((t) => t.id === r.task) || {}).requested?.files['cases.jsonl'] || '';
@@ -339,6 +383,17 @@ async function recordUnit(r, arm, rep, wsDir) {
   const row = {
     idx: ++idx, rep, task: `${r.task}@${arm}r${rep}`, arm,
     runId: r.outcome?.runId ?? null,
+    // DESIGN PROVENANCE on the row: where this arm sat in the task's order, which sampling
+    // seed was sent, and whether the workspace was fresh before the unit started.
+    position, seedSent: r.outcome?.seedSent ?? null, samplingRecorded: r.outcome?.samplingRecorded ?? null,
+    workspaceFresh,
+    // ISOLATION, measured: what the transcript shows this arm was actually sent.
+    diagnosticMessagesSeen: r.outcome?.diagnosticMessagesSeen ?? null,
+    caseDetailLinesSeen: r.outcome?.caseDetailLinesSeen ?? null,
+    isolationOk: r.outcome ? (
+      arm === 'CONTROL' ? (r.outcome.diagnosticMessagesSeen === 0)
+        : arm === 'NOTIFY' ? (r.outcome.caseDetailLinesSeen === 0)
+          : true) : null,
     termination: r.termination || r.state,
     requested: r.verdict?.requested?.verdict ?? null,
     protected: r.verdict?.protected?.verdict ?? null,
@@ -383,12 +438,13 @@ async function recordUnit(r, arm, rep, wsDir) {
     + ` req=${row.requested ?? '-'} prot=${row.protected ?? '-'}`
     + ` cases ${b.passing.size}->${after.passing.size}/${b.total ?? '?'}${gained}${lost}`
     + ` edits=${row.editsOnTarget} ${row.disposition}`
-    + (arm === 'AUTODIAG_ARM' ? ` cmd=${row.commandInvoked} delivered=${row.feedbackDelivered}` : ''));
+    + (arm !== 'CONTROL' ? ` delivered=${row.feedbackDelivered} msgs=${row.diagnosticMessagesSeen} caseLines=${row.caseDetailLinesSeen}` : '')
+    + (row.isolationOk === false ? '  !! ISOLATION VIOLATED' : ''));
 }
 
 // Every planned unit, in the order it would run. Anything still here at the end never started.
 const REMAINING = new Set();
-for (let rep = 1; rep <= REPS; rep++) for (const t of BASE) for (const a of ['CONTROL', 'AUTODIAG_ARM']) REMAINING.add(`${t.id}@${a}r${rep}`);
+for (let rep = 1; rep <= REPS; rep++) for (const t of BASE) for (const a of ARMS) REMAINING.add(`${t.id}@${a}r${rep}`);
 
 outer:
 for (let rep = 1; rep <= REPS; rep++) {
@@ -396,12 +452,18 @@ for (let rep = 1; rep <= REPS; rep++) {
     if (halted) { console.error(`halted: ${halted}`); break outer; }
     if (Date.now() >= DEADLINE) { console.log('deadline reached; remaining units are UNATTEMPTED'); break outer; }
     const task = BASE[ti];
-    // ALTERNATING ORDER: even task index runs CONTROL first, odd runs AUTODIAG_ARM first.
-    const order = ti % 2 === 0 ? ['CONTROL', 'AUTODIAG_ARM'] : ['AUTODIAG_ARM', 'CONTROL'];
+    // COUNTERBALANCED ORDER: a rotation of the arm list that advances with the task index and
+    // the replicate, so every arm runs first (and last) equally often across the campaign.
+    // With two arms this is exactly the earlier alternation.
+    const rot = (ti + rep - 1) % ARMS.length;
+    const order = ARMS.slice(rot).concat(ARMS.slice(0, rot));
     for (const arm of order) {
       if (halted || Date.now() >= DEADLINE) break outer;
       const wsDir = join(ROOT, `ws-${arm}-r${rep}`);
       currentDiagnostic = armDiagnostic(task, arm);
+      currentSeed = seedFor(rep);
+      const position = order.indexOf(arm);
+      const workspaceFresh = !existsSync(join(wsDir, task.id));
       pending.length = 0;
       await runBatch([armTask(task, arm)], {
         journalPath: join(ROOT, `journal-${arm}-r${rep}.jsonl`),
@@ -414,7 +476,7 @@ for (let rep = 1; rep <= REPS; rep++) {
         runTask,
       });
       // Measured HERE, after the batch has finished with the workspace.
-      for (const r of pending) { REMAINING.delete(`${r.task}@${arm}r${rep}`); await recordUnit(r, arm, rep, join(wsDir, r.task)); }
+      for (const r of pending) { REMAINING.delete(`${r.task}@${arm}r${rep}`); await recordUnit(r, arm, rep, join(wsDir, r.task), { position, workspaceFresh }); }
     }
   }
 }
@@ -423,7 +485,11 @@ for (let rep = 1; rep <= REPS; rep++) {
 // they appear only as UNACCOUNTED in the reconciliation - a true signal, but not an account.
 for (const key of REMAINING) {
   const [task, tail] = key.split('@');
-  const arm = tail.replace(/rd+$/, ''), rep = +(tail.match(/r(d+)$/) || [0, 0])[1];
+  // (An earlier version of these two regexes had lost their backslashes - /rd+$/ - so an
+  // UNATTEMPTED row carried arm "AUTODIAG_ARMr1" and rep 0. No live campaign wrote such a
+  // row: AUTODIAG-1 predates UNATTEMPTED rows and AUTODIAG-2 had none. outerDeadline.test
+  // now asserts the parse.)
+  const arm = tail.replace(/r\d+$/, ''), rep = +(tail.match(/r(\d+)$/) || [0, 0])[1];
   const row = {
     idx: ++idx, rep, task: key, arm, termination: 'UNATTEMPTED', state: 'UNATTEMPTED',
     disposition: 'UNATTEMPTED', accepted: false,
@@ -439,15 +505,18 @@ ${REMAINING.size} planned unit(s) never started - each recorded as UNATTEMPTED w
 const elapsedSec = Math.round((Date.now() - T0) / 1000);
 const stopped = await confirmNoneRunning({ timeoutMs: 30_000 });
 
-const report = writeReport(SUMMARY, join(ROOT, 'AUTODIAG-1_REPORT.json'), {
-  experiment: 'AUTODIAG-1',
-  comparisonArm: 'CONTROL (current guidance, seed only) vs AUTODIAG_ARM (seed + graded cases + run_tests.py + two sentences naming it)',
+const REPORT_PATH = join(ROOT, `${EXPERIMENT}_REPORT.json`);
+const report = writeReport(SUMMARY, REPORT_PATH, {
+  experiment: EXPERIMENT,
+  comparisonArm: ARMS.map((a) => `${a}: ${ARM_DESC[a]}`).join(' | '),
   label: 'REPAIR WITH SUPPLIED TEST RESULTS - the diagnostic runs the graded cases; not held-out generalization',
   config: {
     model: MODEL_URL, workerImage: WORKER_IMAGE, hubCommit: process.env.AUTODIAG_HUB_COMMIT || 'unrecorded',
     workerIsolation: true, routeBounding: true, acceptance: true, d2: false, protocolController: false,
     perTaskSec: PER_TASK_SEC, totalSec: TOTAL_SEC, replicates: REPS, retries: 'none',
-    armDifference: 'two seed files (the graded cases, and a runner over them) and two sentences naming the runner. Nothing else. The result is about the PACKAGE; it cannot attribute an effect to any one part.',
+    arms: ARMS, seeds: SEEDS.length ? SEEDS : 'none sent (backend default)',
+    order: `arm order for task index ti in replicate r is the arm list rotated by (ti + r - 1) mod ${ARMS.length}`,
+    armDifference: 'ONLY the diagnostic spec attached to the start request (none / counts only / full result). Seed files, guidance, model, sampling, worker and acceptance are identical in every arm.',
   },
   elapsedSec,
   noActiveWorkLeftBehind: stopped.ok,
@@ -488,15 +557,24 @@ const summarise = (a) => {
   };
 };
 
-console.log('\n=== AUTODIAG-1 RESULT ===');
+console.log(`report written ${stamp()}: ${REPORT_PATH}`);
+console.log(`\n=== ${EXPERIMENT} RESULT ===`);
 console.log(`elapsed ${Math.floor(elapsedSec / 60)}m ${elapsedSec % 60}s of ${Math.round(TOTAL_SEC / 60)}m`);
 console.log(`stopped cleanly: ${stopped.ok ? 'YES' : 'NO - ' + stopped.reason}`);
 console.log(`integrity ${report.integrity.ok}  reconciliation ${report.reconciliation.ok}`);
 console.log(`status ${JSON.stringify(report.byStatus)}`);
 console.log('\nLABEL: repair with SUPPLIED tests. The exposed cases are the graded cases.');
-console.log(`\nCONTROL       ${JSON.stringify(summarise('CONTROL'), null, 1)}`);
-console.log(`AUTODIAG_ARM  ${JSON.stringify(summarise('AUTODIAG_ARM'), null, 1)}`);
-writeFileSync(join(ROOT, 'arms.json'), JSON.stringify({ CONTROL: summarise('CONTROL'), AUTODIAG_ARM: summarise('AUTODIAG_ARM'), rows }, null, 2), 'utf8');
+const armSummaries = Object.fromEntries(ARMS.map((a) => [a, summarise(a)]));
+for (const a of ARMS) console.log(`\n${a.padEnd(13)} ${JSON.stringify(armSummaries[a], null, 1)}`);
+const violations = rows.filter((r) => r.isolationOk === false);
+console.log(`\nisolation: ${violations.length ? 'VIOLATED in ' + violations.map((r) => r.task).join(', ') : 'held in every recorded unit'}`);
+writeFileSync(join(ROOT, 'arms.json'), JSON.stringify({ ...armSummaries, rows }, null, 2), 'utf8');
 console.log(`\nsummary: ${SUMMARY}`);
-console.log(`report:  ${join(ROOT, 'AUTODIAG-1_REPORT.json')}`);
-console.log('AUTODIAG-1 COMPLETE');
+console.log(`report:  ${REPORT_PATH}`);
+// COMPLETE, with a clock, and a file for the watchdog. Written BEFORE the final line so a
+// reader of the file never sees "complete" that the log does not also show.
+const done = { experiment: EXPERIMENT, completedAt: stamp(), elapsedSec, integrity: report.integrity.ok, root: ROOT };
+try { writeFileSync(join(ROOT, `${EXPERIMENT}_DONE`), JSON.stringify(done) + '\n', 'utf8'); } catch { /* best effort */ }
+if (DONE_FILE) { try { writeFileSync(DONE_FILE, JSON.stringify(done) + '\n', 'utf8'); } catch (e) { console.error(`could not write ${DONE_FILE}: ${e.message}`); } }
+console.log(`${EXPERIMENT} COMPLETE ${done.completedAt}`);
+process.on('exit', (code) => console.log(`${EXPERIMENT} EXIT ${stamp()} code ${code}`));

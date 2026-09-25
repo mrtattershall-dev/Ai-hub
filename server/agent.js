@@ -466,12 +466,17 @@ const TEMPERATURE = process.env.AGENT_TEMPERATURE ? parseFloat(process.env.AGENT
 const TOP_P = process.env.AGENT_TOP_P ? parseFloat(process.env.AGENT_TOP_P) : null;
 const TOP_K = process.env.AGENT_TOP_K ? parseInt(process.env.AGENT_TOP_K, 10) : null;
 const REPEAT_PENALTY = process.env.AGENT_REPEAT_PENALTY ? parseFloat(process.env.AGENT_REPEAT_PENALTY) : null;
+// Per-request sampling seed. Unset = not sent, exactly as before. Set = every request from
+// this process carries it, so a replicate can be NAMED by its seed rather than by its order.
+// Whether the backend honours it is the backend's business and is recorded, not assumed.
+const SEED = process.env.AGENT_SEED !== undefined && process.env.AGENT_SEED !== '' ? parseInt(process.env.AGENT_SEED, 10) : null;
 // Only keys that were explicitly asked for. Sending nulls would make "unset" and "explicitly
 // default" indistinguishable at the server - which is how the last set of knobs got lost.
 const SAMPLING_EXTRA = {
   ...(TOP_P !== null ? { top_p: TOP_P } : {}),
   ...(TOP_K !== null ? { top_k: TOP_K } : {}),
   ...(REPEAT_PENALTY !== null ? { repeat_penalty: REPEAT_PENALTY } : {}),
+  ...(SEED !== null ? { seed: SEED } : {}),
 };
 const MAX_HISTORY_MSGS = 16;     // keep recent context dense; older tool dumps are pruned
 
@@ -2341,7 +2346,7 @@ async function callModel(loadDb, messages, signal, override, { deadlineMs = null
         options: { temperature: TEMPERATURE, num_ctx: NUM_CTX, num_predict: NUM_PREDICT, ...SAMPLING_EXTRA } }
     // OpenAI-compatible. num_ctx/num_predict are Ollama options and are ignored here, so
     // an explicit max_tokens is the ONLY generation bound this path has.
-    : { model, messages, stream: true, temperature: TEMPERATURE,
+    : { model, messages, stream: true, temperature: TEMPERATURE, ...(SEED !== null ? { seed: SEED } : {}),
         ...(NUM_PREDICT > 0 ? { max_tokens: NUM_PREDICT } : {}) };
 
   const t0 = Date.now();
@@ -2793,12 +2798,12 @@ async function deliverDiagnostic(run, when) {
   } catch (e) {
     result = { status: DIAG.UNAVAILABLE, identity: null, reason: `the diagnostic threw: ${String(e.message || e).slice(0, 120)}` };
   }
-  const msg = diagnosticMessage(result, run.diagnostic.moduleName, when);
+  const msg = diagnosticMessage(result, run.diagnostic.moduleName, when, { mode: run.diagnostic.mode || 'full' });
   run.history.push({ role: 'user', content: msg });
   // Recorded on the run, bound to the content tested, so a report can say exactly what the
   // model was told and about which bytes.
   (run.diagnostics ||= []).push({
-    when, at: Date.now(), status: result.status,
+    when, at: Date.now(), status: result.status, mode: run.diagnostic.mode || 'full',
     sha256: result.identity?.sha256 || null,
     attempted: result.attempted ?? null, passed: result.passed ?? null, failed: result.failed ?? null,
     omitted: result.omitted ?? 0, reason: result.reason || null, importError: result.importError || null,
@@ -5086,6 +5091,9 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
     // { moduleName, casesJsonl, timeoutSec? } - the Hub runs this FOR the model and delivers
     // the result. Absent = nothing changes; the model is on its own as before.
     diagnostic: diagnostic && diagnostic.moduleName && diagnostic.casesJsonl ? diagnostic : null,
+    // What this process SENT as sampling settings - provenance for a replicate, not a claim
+    // about what the backend did with them.
+    sampling: { temperature: TEMPERATURE, seed: SEED },
     protection: governed ? PROTECTION.BEHAVIORAL_ACCEPTANCE : PROTECTION.NONE,
     protectionNote: governed
       ? `Behavioral acceptance: declared checks, starting state verified (tree ${String(governed.startTree).slice(0, 12)}), result will be evaluated in the isolated worker and rolled back if protected behaviour breaks.`

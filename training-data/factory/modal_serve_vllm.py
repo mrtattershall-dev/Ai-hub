@@ -174,18 +174,42 @@ class Server:
         self._gen_lock = threading.Lock()
         print("[vllm] ready", flush=True)
 
-    def _params(self, temp, max_new):
+    def _params(self, temp, max_new, top_p=None, top_k=None, rep=None, seed=None):
+        # SAMPLING-1. top_p was hard-coded at 0.95, and top_k / repetition_penalty were never
+        # passed AT ALL - so vLLM applied its defaults (top_k disabled, repetition_penalty
+        # 1.0) no matter what a caller sent. The entire 7B campaign therefore ran with NO
+        # repetition penalty, while its dominant termination mode was repetitive output.
+        #
+        # Qwen2.5-Coder-7B-Instruct's own generation_config.json specifies
+        # temperature 0.7, top_p 0.8, top_k 20, repetition_penalty 1.1.
+        #
+        # Silently dropping a caller's parameters is the exact defect this file's comments
+        # record having been fixed once before in _opts ("Silently ignoring a caller's
+        # parameters is worse than rejecting them: nothing fails, and the knobs simply do not
+        # work"). It was still true here. None means "unchanged", so a caller that sends
+        # nothing behaves exactly as before.
         from vllm import SamplingParams
-        return SamplingParams(
+        kw = dict(
             temperature=max(float(temp), 0.0),
-            top_p=0.95 if float(temp) > 0 else 1.0,
+            top_p=float(top_p) if top_p is not None else (0.95 if float(temp) > 0 else 1.0),
             max_tokens=int(max_new),
         )
+        if top_k is not None:
+            kw["top_k"] = int(top_k)
+        if rep is not None:
+            kw["repetition_penalty"] = float(rep)
+        # Per-request seed. vLLM seeds its sampler per request when this is set, so two
+        # requests with the same prompt and the same seed draw the same samples on the same
+        # build. Unset = unseeded, as every earlier campaign ran. Sent by the hub as
+        # options.seed (AGENT_SEED); recorded by the hub as run.sampling.seed.
+        if seed is not None:
+            kw["seed"] = int(seed)
+        return SamplingParams(**kw)
 
-    def _chat(self, messages, temp, max_new):
+    def _chat(self, messages, temp, max_new, top_p=None, top_k=None, rep=None, seed=None):
         prompt = self.tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         with self._gen_lock:
-            out = self.llm.generate([prompt], self._params(temp, max_new), lora_request=self.lora)
+            out = self.llm.generate([prompt], self._params(temp, max_new, top_p, top_k, rep, seed), lora_request=self.lora)
         return out[0].outputs[0].text
 
     @modal.asgi_app()
@@ -226,11 +250,20 @@ class Server:
             npred = int(npred)
             if npred <= 0:
                 npred = MAX_LEN                      # -1 => as much as the window allows
-            return temp, min(npred, MAX_LEN)
+            # SAMPLING-1: read these from the Ollama-shaped `options` too, so a caller can
+            # send the model card's own regime instead of inheriting server defaults. The
+            # comment above says silently dropping a caller's parameters is worse than
+            # rejecting them - that was still happening to top_p, top_k and the repetition
+            # penalty. `repeat_penalty` is Ollama's spelling; both are accepted.
+            top_p = o.get("top_p", b.get("top_p", None))
+            top_k = o.get("top_k", b.get("top_k", None))
+            rep = o.get("repeat_penalty", o.get("repetition_penalty", b.get("repetition_penalty", None)))
+            seed = o.get("seed", b.get("seed", None))
+            return temp, min(npred, MAX_LEN), top_p, top_k, rep, seed
 
-        def _run(messages, temp, max_new, stream, chat_shape):
+        def _run(messages, temp, max_new, stream, chat_shape, top_p=None, top_k=None, rep=None, seed=None):
             if not stream:
-                text = self._chat(messages, temp, max_new)
+                text = self._chat(messages, temp, max_new, top_p, top_k, rep, seed)
                 body = ({"model": MODEL_NAME, "message": {"role": "assistant", "content": text}, "done": True}
                         if chat_shape else
                         {"model": MODEL_NAME, "response": text, "done": True})
@@ -259,7 +292,11 @@ class Server:
                 box = {}
 
                 def work():
-                    box["text"] = self._chat(messages, temp, max_new)
+                    # THE STREAMING PATH, which is the one the hub actually uses (it always
+                    # sends stream:true). Missing it here would have dropped the sampling
+                    # regime for every real request while the non-streaming branch looked
+                    # correct - the same silent-drop defect in a new place.
+                    box["text"] = self._chat(messages, temp, max_new, top_p, top_k, rep, seed)
 
                 with ThreadPoolExecutor(max_workers=1) as ex:
                     fut = ex.submit(work)
@@ -286,14 +323,14 @@ class Server:
         @api.post("/api/chat")
         async def chat(req: Request):
             b = await req.json()
-            temp, max_new = _opts(b)
-            return _run(b.get("messages") or [], temp, max_new, bool(b.get("stream")), True)
+            temp, max_new, top_p, top_k, rep, seed = _opts(b)
+            return _run(b.get("messages") or [], temp, max_new, bool(b.get("stream")), True, top_p, top_k, rep, seed)
 
         @api.post("/api/generate")
         async def generate(req: Request):
             b = await req.json()
-            temp, max_new = _opts(b)
+            temp, max_new, top_p, top_k, rep, seed = _opts(b)
             msgs = [{"role": "user", "content": b.get("prompt", "")}]
-            return _run(msgs, temp, max_new, bool(b.get("stream")), False)
+            return _run(msgs, temp, max_new, bool(b.get("stream")), False, top_p, top_k, rep, seed)
 
         return api
