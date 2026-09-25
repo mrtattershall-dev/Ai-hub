@@ -67,9 +67,13 @@ against the checkpoint).
 
 ## What must be established BEFORE this is claimed to work
 
-    - RECOV-1 (frozen, not launched): whether fresh full feedback after an edit adds repair
-      power at all, holding the opening report constant. If INIT_ONLY ≈ INIT_FULL, the
-      controller's first job is the packet, not the loop.
+    - RECOV-1 (frozen, not launched) INFORMS this design; it is not its sole gate. It tests
+      one mechanism - continued feedback after an edit - holding the opening report constant.
+      A near-even result means no advantage detected at that sample size, not that the loop
+      is unnecessary; it would move priority toward the packet while the loop stays open.
+    - rollback, fresh-plan retries and the stopping rules are SEPARATE mechanisms; each needs
+      its own validation (replay proofs first, then a bounded live comparison), and RECOV-1
+      says nothing about them.
     - a replay proof with scripted replies through the real Hub path: reject → restore →
       packet carries the rejection → next proposal differs → accept; and the negative control:
       identical diff refused.

@@ -21,7 +21,9 @@ not separate them because every diagnostic arm changed both at once.
     held      the opening message (byte-identical across arms for the same seed), seed files,
     constant  guidance, model, sampling seed, worker, acceptance, evaluator, repeat guard,
               300 s per task, no retries; the diagnostic RUNS after every edit in all three
-              arms, so container time and the first-edit MEASUREMENT are the same everywhere
+              arms, so the diagnostic PROCEDURE and the first-edit MEASUREMENT are the same
+              everywhere. This does not equalize container time or the actual first edit:
+              later model behaviour differs by arm and changes execution time and resources
     tasks     the same 15 QuixBugs tasks (reused; no generalization claim)
     seeds     2, sent per replicate (AUTODIAG_SEEDS), e.g. 303 and 404
     order     the 3-arm rotation by (task index + replicate − 1) mod 3, position on every row
@@ -32,6 +34,9 @@ not separate them because every diagnostic arm changed both at once.
 Implemented and tested locally before this file was written: `afterEditMode` on the
 diagnostic spec ('full' | 'summary' | 'silent'), the three arms in `autodiag1.mjs`, and the
 per-row isolation fields — `recovArms.test.mjs` through the real entry point.
+
+**MECH-1's two accepted recoveries** show that recovery after a poor first edit HAPPENED
+there; whether fresh feedback CAUSED them is exactly what this run asks.
 
 ## Primary outcome and comparisons
 
@@ -57,8 +62,11 @@ giving up earlier.
 
 ## Pre-registered readings
 
-- **Initial specification carries it** if INIT_FULL ≈ INIT_ONLY on repairs (discordant pairs
-  near-even). Then the engineering priority is how the first problem statement is built.
+- **No advantage of continued feedback detected** if INIT_FULL and INIT_ONLY finish with
+  near-even discordant pairs. That is what it means: no advantage detected AT THIS SAMPLE
+  SIZE. It does not establish equivalence and does not prove the loop unnecessary. It would
+  shift engineering priority toward how the first problem statement is built, while the
+  loop's value stays open.
 - **The loop adds power** if INIT_FULL-only clearly exceeds INIT_ONLY-only, AND the recovery
   subgroup shows recoveries in INIT_FULL that INIT_ONLY lacks. Both are needed: more repairs
   without recoveries would suggest the after-edit report helps some other way (e.g. stopping a

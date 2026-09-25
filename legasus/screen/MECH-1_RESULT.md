@@ -184,8 +184,12 @@ of that message (examples, expected outputs, localization, task framing) is not 
 First-action shift and first-edit improvement are associated with repair, not shown to
 cause it. And note the shape of the evidence: this looks more like a better initial
 PROBLEM SPECIFICATION than a working recovery loop — recovery after an unproductive first
-edit was 2 of 13 here (both accepted) and 1 of 13 in the audit (not accepted). Cost per
-retained repair: control 611 s, counts-only 418 s, full 216 s of task time.
+edit was 2 of 13 here (both accepted) and 1 of 13 in the audit (not accepted). The two
+accepted recoveries show recovery HAPPENED; whether fresh feedback caused them is not
+established (RECOV-1's question). Task seconds per retained repair: control 611 s,
+counts-only 418 s, full 216 s - about 2.8x less task time per repair for the full arm, an
+AGGREGATE efficiency measure over this campaign, not end-to-end billed cost and not a
+guaranteed future speedup.
 
 SETTLED, operational: a 90-unit three-arm campaign completes bounded and fully accounted,
 and the GPU stop is observed within half a minute of completion without depending on the
