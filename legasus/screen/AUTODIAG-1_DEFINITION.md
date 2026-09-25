@@ -59,7 +59,7 @@ inputs. TESTCMD-1 supplied the first; AUTODIAG-1 supplies the second.
     acceptance                      UNCHANGED - the evaluator materialises its own checks at
                                     evaluation time and mounts the candidate read-only
 
-## Proven without compute — `server/autodiag.test.mjs`, 28/28
+## Proven without compute — `server/autodiag.test.mjs`, 36/36
 
 The scripted sequence deliberately includes a wrong edit and an unchanged file, because a test
 that only drove a correct repair would pass even if the Hub echoed "all pass" at every step:
