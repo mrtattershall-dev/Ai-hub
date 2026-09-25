@@ -60,11 +60,13 @@ Maximum exposure: watchdog deadline 3000 s + 3 × 10 min verify + 15 min scaledo
 ## Overnight run (separate $5; defined now, launched only if the pilot behaves)
 
     OVERNIGHT-1   same two arms; all 22 tasks (15 original + 7 held-out); 2 seeds (606, 707);
-                  88 units; per task 300 s; campaign wall 9000 s (2.5 h); watchdog 9900 s;
-                  same policy and call cap. Planned ~88 × 90 s ≈ 2.2 h → ~$2.4–3.4.
-                  Maximum exposure ≈ 2.75 h + 30 min + 15 min ≈ 3.5 h → $3.9 GPU-only /
-                  **$4.9 conservative** < $5. Unattended; the same records; original vs
-                  held-out tasks reported separately.
+                  88 units; AMENDED BEFORE LAUNCH (the first figures put the conservative
+                  maximum at ~$5.4, over the cap): per task 240 s; campaign wall 7800 s
+                  (2.17 h); watchdog 8400 s; same policy and call cap. Planned ~88 × 70 s
+                  ≈ 1.7 h → ~$1.9–2.7. Maximum exposure ≈ 2.33 h + 30 min + 15 min ≈ 3.1 h
+                  → $3.4 GPU-only / **$4.8 conservative** < $5. Unattended; the same
+                  records; original vs held-out tasks reported separately; units the wall
+                  does not reach are UNATTEMPTED rows.
 
 Procedure: `server/mech1Launch.sh` with CAMPAIGN_* variables as above; seed probe before;
 `mech1Analyze.mjs` and `mechanismAudit.mjs` after. Everything that runs is committed first.

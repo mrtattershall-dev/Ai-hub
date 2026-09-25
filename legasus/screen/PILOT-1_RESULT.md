@@ -1,179 +1,93 @@
-# PILOT-1 RESULT — the unattended runner, 30 minutes
+# PILOT-1 RESULT — the replay-tested protections held with a live model, in 14 supervised units
 
-Ran 2026-09-23 06:28:54Z → 06:55:01Z (26m 06s). Unattended throughout.
-Model: local `qwen2.5-coder:1.5b` (Modal did not serve — see MODAL-PILOT_FAILURE.md).
-Worker image: `sha256:fa49b576…` | no retries | **interventions: none**.
+Ran 2026-09-25 19:36Z → 19:58:13Z (22 min 13 s of the 40 min bound), supervised throughout.
+**Interventions: none.** Definition frozen at ac765d1 (also the hub commit).
 
-> **CORRECTION (2026-09-23): "enforced configuration" was wrong.** AGENT_D2_ENFORCE=1 was set
-> but **AGENT_D2_TARGETS was never set**, so d2 had no target set and evaluated nothing. `d2` is
-> null in every task for that reason. **This pilot says nothing about d2.** See PILOT-2_RESULT.md.
+    planned 14   completed 14   UNATTEMPTED 0   UNACCOUNTED 0   integrity TRUE
+    integrity flags raised 0 of 14   isolation violations 0   hard-wall hits 0
+    execution confirmed stopped 14/14   task-level timeouts 0 (two units ran to the 240 s
+    per-task limit in the controller-off arm; two call-level deadline aborts there)
 
-## Verdict, in two separate parts
+**Spend: ESTIMATE ~$0.42 GPU-only** (app live 19:33:41Z → 19:58:24Z = 1,483 s × $0.000306/s),
+**≤ ~$0.65** conservative. Against the pilot's $5 cap. Estimates until invoiced.
 
-**RUNNER: PASS.** Every queued task ended in a known state, every limit was respected, the batch
-stopped itself inside its window, and nothing was lost.
+**GPU shutdown: OBSERVED stopped 11 s after COMPLETE** (COMPLETE 19:58:13.255Z; process EXIT
+19:58:13.265Z — the wall-timer fix holds live; watchdog trigger 19:58:17Z; stop issued
+19:58:20Z; Modal `stopped_at` 19:58:24Z; observed 19:58:45Z).
 
-**PRODUCTIVITY: ZERO.** 0 of 5 tasks completed. Not a single requested behaviour was delivered.
+## The behaviour that had to hold (pre-registered conditions for the overnight run)
 
-These are different findings and neither substitutes for the other.
+    every restore byte-exact              7 of 7 (sha256 equal to the checkpoint)        HELD
+    no integrity flag                     provisionalDeliveredAsAccepted 0;
+                                          controllerAcceptNotRetained 0                  HELD
+    every controller STOP ended the run   2 stops, no later action in either             HELD
+    campaign within bounds                22 min of 40; longest unit 241 s of 240+45     HELD
+    shutdown observed                     yes, 11 s after COMPLETE                        HELD
 
-## Accounting
+All five held. The overnight run is authorized by these conditions and by tatte's separate
+$5 cap.
 
-    queued 5 | accounted for 5 | complete: true | missing: none
-    COMPLETED 0 | FAILED 5 | INTERRUPTED 0 | UNATTEMPTED 0 | EVAL_ERROR 0
+## Per arm (7 held-out tasks, one seed, descriptive)
 
-No evaluator errors: the instrument did not fail, and no infrastructure failure was scored as a
-coding failure.
+    arm             repairs   regressions   edits   calls   task s   controller
+    RECOVERY_ARM     3 / 7     0 / 0 surv.    12      21      248    restores 7 (7 exact),
+                                                                    stops 2, states ACCEPTED 3
+                                                                    STOPPED 2 ACTIVE 2
+    AUTODIAG_ARM     3 / 7     1 / 0 surv.    68      82      941    (off)
 
-## Per task
+    task              RECOVERY_ARM                        AUTODIAG_ARM
+    possible_change   RETAIN  1 edit   48 s  ACCEPT       RETAIN  1 edit   52 s
+    powerset          RETAIN  1 edit   22 s  ACCEPT       RETAIN  1 edit   76 s
+    quicksort         PRESERVE 3 edits 38 s  DISCARD>REPEAT>REPEAT STOP   PRESERVE 20 edits 239 s
+    shunting_yard     PRESERVE 3 edits 34 s  DISCARD>REPEAT>REPEAT STOP   RESTORED 25 edits 241 s
+                                                                          (protected broke; end-of-
+                                                                          run restore; candidate
+                                                                          did not import)
+    sieve             PRESERVE 3 edits 40 s  DISCARD (then hub guard)     PRESERVE 4 edits 46 s
+    subsequences      PRESERVE 0 edits 34 s  no decision                  PRESERVE 3 edits 48 s
+    to_base           RETAIN  1 edit   32 s  ACCEPT                       RETAIN 14 edits 239 s
 
-| task | state | termination | requested | protected | start tree | surviving tree | elapsed | tool calls |
-|---|---|---|---|---|---|---|---|---|
-| t1-repair-node-average | FAILED | per-task limit (300s), partial preserved | not evaluated | not evaluated | `373037f0` | none promoted | 302s | 0 |
-| t2-repair-python-parse | FAILED | per-task limit (300s), partial preserved | not evaluated | not evaluated | `449e6af3` | none promoted | 302s | 1 |
-| t3-add-node-median | FAILED | per-task limit (300s), partial preserved | not evaluated | not evaluated | `63a3a0fe` | none promoted | 303s | 2 |
-| t4-add-python-slugify | FAILED | per-task limit (300s), partial preserved | not evaluated | not evaluated | `68e9e56c` | none promoted | 303s | 0 |
-| t5-multifile-node-discount | FAILED | per-task limit (300s), partial preserved | not evaluated | not evaluated | `016e94fd` | none promoted | 303s | 2 |
+**Same repairs (3 and 3, the same three tasks), one regression fewer, a quarter of the task
+time, a fifth of the edits.** Both arms repaired the tasks the model fixed on its first edit;
+neither repaired a task whose first edit failed. The controller's contribution in this pilot
+was containment, not repair: on quicksort and shunting_yard it restored the checkpoint after
+one unproductive edit, refused the same edit twice, and stopped — where the controller-off
+arm spent 20 and 25 edits, and on shunting_yard broke protected behaviour and left an
+unparseable candidate for end-of-run restoration.
 
-**"not evaluated" is deliberate and is not a missing number.** A task stopped at its limit never
-finished, so the evaluator was never run against it — evaluating an unfinished workspace would
-measure an arbitrary mid-edit state. Its partial state is preserved for audit instead.
+**Held-out note.** These seven tasks had never been seen by any arm or by the controller. Both
+arms repaired 3 of 7 on the first attempt; descriptive only (7 tasks, 1 seed).
 
-**"none promoted"**: no task reached a finish boundary, so no candidate was ever promoted. Each
-starting identity is recorded above; the partial trees sit under `audit-partial/`.
+## First observations outside the replay
 
-Timing is the cleanest signal here: 302, 302, 303, 303, 303 seconds against a 300s limit. The
-per-task deadline stopped **active work** within ~3s every time.
+- **Live REPEAT refusals happened** (4, in two units): the 7B did resubmit byte-identical
+  rejected candidates after the packet told it not to. The refusal cost no diagnostic.
+- **No PROVISIONAL decision occurred live**: no unit made partial progress with protected
+  behaviour held. The provisional bound is therefore untested against this model.
+- **No UNVERIFIABLE restore and no import-error restore occurred** in the controller arm.
+- **sieve** ended by the hub's own repeat guard after one DISCARD (the controller was still
+  ACTIVE with one attempt left): the two termination mechanisms coexist; which one fires
+  first depends on what the model repeats.
 
-## Why productivity was zero
+## What this pilot does and does not establish
 
-Five runs, 1500 seconds, **5 tool calls in total** and **0 files correctly changed**:
+ESTABLISHED: under live conditions, in these 14 units, the controller restored exactly,
+refused repeats, stopped runs, and never delivered an unverified state as accepted; the
+campaign, watchdog and shutdown behaved as in MECH-1.
 
-- **2 runs never emitted a parseable action at all** — "Could not parse an action" and nothing
-  after it. The model planned and then stopped producing usable output.
-- **1 run** attempted a `write_file` on `pricing.js` that would have **removed `round2`**. The
-  hub's own guard refused it and the file was left unchanged. That is the protected behaviour
-  surviving because a guard caught the model, not because the model preserved it.
-- **1 run** called `task_done` twice with an empty argument, then repeated it identically.
-- **1 run** wrote `main.py` — **a file no task mentioned** — twice, identically.
+NOT ESTABLISHED: any repair-rate effect (3 vs 3 on 7 tasks is not evidence of one either
+way); the provisional path live; behaviour on the original 15 tasks; anything about
+2 seeds. The efficiency figures are this pilot's aggregates, not billed cost or a speedup.
 
-Every run produced a competent-looking BUILD PLAN first. The failure is not comprehension of the
-task; it is the step from plan to execution. That is consistent with the recorded 12–19s stall,
-in a different shape: here the loop consumed its whole budget without acting rather than quitting
-early.
+Records: `PILOT-1_REPORT.json`, `PILOT-1_summary.jsonl`, `PILOT-1_arms.json`,
+`PILOT-1_MECHANISM-AUDIT.json`, `PILOT-1_console.log`, `PILOT-1_stage1.log`,
+`PILOT-1_seedprobe.json`, `PILOT-1_watchdog.log`, `PILOT-1_gate.log`. Root: `autodiag1-8jxGIY`.
 
-## What this does and does not support
+## Overnight run, as launched (amended bounds)
 
-SUPPORTED
-- The unattended loop accounts for its work: 5/5, one terminal record each, nothing dropped.
-- Per-task and total limits hold, and the deadline stops active work rather than just new starts.
-- Timed-out partial state is preserved for audit and never becomes the next task's start state.
-- Fresh workspace per task; no host-side execution; no uncovered-route traversals.
-
-NOT SUPPORTED
-- Nothing about PROTOCOL-1. One arm, five different tasks: no causal comparison exists here.
-- Nothing new about productivity beyond what was already recorded. A 1.5B was used because Modal
-  failed; this is not evidence about larger models.
-- The evaluator's PASS path was never exercised **in this pilot** (no task finished). It is
-  qualified separately at 17/17, including that path.
-
-## Two reporting defects found by running it
-
-1. **The report was mostly null.** `batch.js` dropped the per-task `outcome`, so elapsed time,
-   model calls, tokens and d2 state never reached the report — exactly the columns that were
-   required. The data existed in the journal and run records the whole time; the generator did
-   not carry it. Fixed: `outcome` is now attached to every result.
-2. **A journal field clobbered its own timestamp.** `partial_preserved` recorded `at: <path>`,
-   overwriting the event's `at` timestamp, so three journal lines carried a Windows path where
-   the time should have been. Renamed to `preservedAt`.
-
-The table above was reconstructed from the journal and run records, which is legitimate because
-those records survived. But a report that needs reconstruction is a report that failed, and both
-defects are fixed rather than noted.
-
-## Cost
-
-No GPU spend. Modal was deployed, never served a request, and was stopped.
-
----
-
-# CORRECTIONS AND TERMINAL EVALUATION — 2026-09-23
-
-## "RUNNER: PASS" was broader than the result supports
-
-Narrowed to what was actually demonstrated:
-
-| property | demonstrated? |
-|---|---|
-| queue execution | YES — all five attempted and accounted for |
-| deadline handling | YES — termination reported at 302–303s per 300s limit |
-| workspace separation | YES — partial changes preserved and absent from the next task |
-| automatic reporting | **NO — it failed and required manual reconstruction** |
-| live evaluation | **UNEXERCISED in this pilot** (no task reached a finish boundary) |
-| verified task completion | 0/5 |
-
-A pass on three of six properties is not "the runner passes".
-
-## The preserved terminal candidates ARE evaluated (0/5 verified)
-
-Skipping evaluation for timed-out tasks was wrong. Once execution is confirmed stopped, the
-preserved workspace is not an arbitrary mid-edit snapshot — **it is exactly what survived the
-allotted budget**, which is what the budget was there to measure. It also closes a real gap: a
-model can write working code and never call `task_done`, and skipping evaluation would score that
-delivered behaviour as no completion.
-
-Termination and behaviour are separate axes and stay separate:
-
-| task | termination | requested | protected | terminal tree | why requested failed |
-|---|---|---|---|---|---|
-| t1-repair-node-average | TIMEOUT | FAIL | PASS | `1e1b4346` | `average([2,4,6]) = 3`, expected 4 |
-| t2-repair-python-parse | TIMEOUT | FAIL | PASS | `42ab814d` | assertion failed in `parse_pairs` |
-| t3-add-node-median | TIMEOUT | FAIL | PASS | `875897ca` | `median is not exported` |
-| t4-add-python-slugify | TIMEOUT | FAIL | PASS | `0ff4aa38` | assertion failed — no `slugify` |
-| t5-multifile-node-discount | TIMEOUT | FAIL | PASS | `53efcf15` | `applyDiscount is not exported` |
-
-**VERIFIED COMPLETIONS: 0/5.** Now supported by evaluation rather than by its absence.
-
-**Protected behaviour PASSED in all five.** Nothing that already worked was destroyed. Note the
-attribution: in t5 that is partly because a hub guard refused a `write_file` which would have
-removed `round2` — the guard preserved it, not the model.
-
-## "A competent plan establishes comprehension" — withdrawn
-
-What was observed is **plausible planning followed by little usable execution**. That is all.
-Candidate explanations remain open and this pilot separates none of them:
-
-    responsibility overload | action formatting | model capability | loop behaviour
-
-PROTOCOL-1 tests one of them. The others need their own designs.
-
-## A third defect, found by testing for the first two
-
-Renaming `at` → `preservedAt` fixed the instance and left the **shape** intact: `Journal.record`
-spread the payload OVER the envelope, so the next colliding key would have silently overwritten
-the timestamp exactly the same way. The envelope now wins, and a colliding payload key is kept
-under a `payload_` prefix rather than dropped — discarding recorded data silently is the same
-class of fault as overwriting it.
-
-## Termination evidence was vacuous, and is now real
-
-`confirmStopped(attemptId)` was passed the BATCH's attempt id. `agent.js` generates its own
-container names, so that id was never attached to anything: it confirmed the absence of a
-container that was never created, and reported success. A stop request returning 200 plus a
-vacuous confirmation is not evidence that execution stopped.
-
-`confirmNoneRunning()` now requires that **no worker container is still running** before a
-workspace is evaluated or reused, and distinguishes "none running" from "the daemon could not be
-asked".
-
-## Evidence preserved
-
-    PILOT-1_report-AS-GENERATED.json   the ORIGINAL broken report, 11 null fields per task
-    PILOT-1_journal.jsonl              the journal as written during the run
-    PILOT-1_RESULT.md                  this reconstruction
-
-The broken report is kept deliberately. It is the evidence for the reporting failure, and a
-reconstruction that replaced it would erase the finding.
-
-Tests that FAIL on the unfixed code: `batchReport.test.mjs` (14/14 now). The existing 24 batch
-checks passed straight through all three defects, so re-running them proves nothing about these.
+The definition planned a 9000 s wall and 9900 s watchdog; at the conservative rate that
+maximum (2.75 h + 45 min) is ~$5.4, over the $5 cap. Launched instead with per task 240 s,
+wall 7800 s, watchdog 8400 s: maximum ≈ 2.33 h + 45 min ≈ 3.1 h → ~$3.4 GPU-only,
+**~$4.8 conservative** < $5; planned 88 × ~70 s ≈ 1.7 h → ~$1.9–2.7. Units the wall does
+not reach are UNATTEMPTED rows, accounted. Everything else as defined: 22 tasks (15 original
++ 7 held-out, reported separately), 2 arms, seeds 606 and 707, policy unchanged, call cap 25.
