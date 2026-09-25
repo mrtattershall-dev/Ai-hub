@@ -9,8 +9,9 @@ Unattended; interventions none.
 **Spend: ESTIMATE ~$1.95** (1.75h A10G incl. warm-up at ~$1.10/hr). **Authorized $5.** Estimate,
 labelled as one; actual charges to follow.
 
-**GPU shutdown: see the operational section — the scripted stop did not fire, and I stopped the
-app manually.** Confirmed `stopped` at 12:23:27Z.
+**GPU shutdown: the scripted stop DID fire, ~5 minutes late; I had already stopped the app
+manually at 12:23:12Z.** See the operational section — my first account of this was wrong and
+is corrected there.
 
 **LABEL: repair with SUPPLIED TEST RESULTS.** The diagnostic runs the graded cases.
 
@@ -94,21 +95,42 @@ against a 300s bound, `executionConfirmedStopped` **60/60**. The campaign finish
 queue in 93 minutes with `integrity: true` and `UNACCOUNTED: 0` — the accounting failure from
 AUTODIAG-1 did not recur, and every planned unit has a row.
 
-**But one operational failure did occur, and it is mine.** The scripted `modal app stop --yes`
-in the launch job never executed: the log ends at `AUTODIAG-1 COMPLETE` with no `STOP ISSUED`
-line and no app-state line. The app was still `deployed` with a live container when I checked,
-about 45 seconds after the campaign finished. I stopped it manually and confirmed `stopped`.
+### Shutdown: the real finding, after I got it wrong once
 
-The cause is in how I launched it, not in the runner: the shell chain that runs the campaign
-and then the stop did not reach its second command. **The scripted-shutdown guarantee I have
-been reporting after every run did not hold this time**, and it was caught by looking rather
-than by any mechanism. The exposure was small (~45s of idle GPU, inside the estimate) but the
-property was not what I said it was.
+**CORRECTED.** My first account of this said "the scripted `modal app stop --yes` never
+executed" and blamed the shell chain for not reaching its second command. **That was wrong.**
+The chain did continue, and the scripted stop did run — it ran LATE. The full timeline:
+
+    12:22:03Z   campaign printed COMPLETE (93m25s)
+    12:22:42Z   I checked: the app was still `deployed` with 1 live container
+    12:23:10Z   I issued a manual stop
+    12:23:12Z   the app actually stopped (Modal's own record)
+    12:27:13Z   the SCRIPTED stop finally ran, reporting "App is already stopped"
+
+So the defect is **shutdown latency, not shutdown failure**: ~5m10s between the campaign
+finishing and the scripted stop being issued. I reached a worse conclusion than the evidence
+supported, from a log I read before its last lines had been written — the same mistake as
+reading a running campaign through a filter and concluding the treatment was absent.
+
+What is true either way:
+
+- **The "scripted shutdown" guarantee is weaker than I have been reporting it.** After every
+  prior run I described the GPU as stopped by the job immediately afterwards. In practice
+  there is a multi-minute window between completion and the stop taking effect, during which
+  the container is live and billing.
+- **Actual idle exposure this run: ~69 seconds**, because I intervened. Without intervention
+  it would have been ~5m10s, with `scaledown_window=900` as the backstop behind that.
+- **Nothing but looking caught it.** No mechanism reports the gap; the log's own `STOP ISSUED`
+  line appears only once the stop has already run.
+
+The honest statement for future runs is: *the job issues a stop after the campaign, typically
+within several minutes; the app state must be checked directly to know it has taken effect.*
 
 ## What this settles, and what it does not
 
 SETTLED: the operational repairs work — a campaign that previously lost half its queue ran all
-60 units, bounded, confirmed stopped, fully accounted.
+60 units, bounded, confirmed stopped, fully accounted. The remaining operational gap is
+shutdown LATENCY (~5 minutes), not shutdown failure, and it is outside the runner.
 
 SETTLED: the direction is consistent across two experiments and 44 complete pairs — 18
 treatment-only repairs, 0 control-only, 0 control repairs in 45 runs.
