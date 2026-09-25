@@ -1,0 +1,430 @@
+{
+  "root": "C:/Users/tatte/AppData/Local/Temp/autodiag1-FVZVJG",
+  "arms": [
+    "RECOVERY_ARM",
+    "AUTODIAG_ARM"
+  ],
+  "replicates": [
+    1,
+    2
+  ],
+  "tasks": 22,
+  "unitsPlanned": 88,
+  "unitsCompleted": 83,
+  "contrasts": [
+    {
+      "pooled": {
+        "X": "AUTODIAG_ARM",
+        "Y": "RECOVERY_ARM",
+        "xOnly": 4,
+        "yOnly": 5,
+        "both": 14,
+        "neither": 18,
+        "incomplete": [
+          "ext-sieve/r2",
+          "ext-subsequences/r2",
+          "ext-to_base/r2"
+        ],
+        "pairs": 41,
+        "discordant": 9,
+        "signTestP": 1
+      },
+      "perRep": {
+        "r1": {
+          "X": "AUTODIAG_ARM",
+          "Y": "RECOVERY_ARM",
+          "xOnly": 3,
+          "yOnly": 2,
+          "both": 10,
+          "neither": 7,
+          "incomplete": [],
+          "pairs": 22,
+          "discordant": 5,
+          "signTestP": 1
+        },
+        "r2": {
+          "X": "AUTODIAG_ARM",
+          "Y": "RECOVERY_ARM",
+          "xOnly": 1,
+          "yOnly": 3,
+          "both": 4,
+          "neither": 11,
+          "incomplete": [
+            "ext-sieve/r2",
+            "ext-subsequences/r2",
+            "ext-to_base/r2"
+          ],
+          "pairs": 19,
+          "discordant": 4,
+          "signTestP": 0.625
+        }
+      },
+      "taskLevel": {
+        "X": "AUTODIAG_ARM",
+        "Y": "RECOVERY_ARM",
+        "xWinsBothReps": [],
+        "xWinsOneRep": [
+          "ext-kth",
+          "ext-lcs_length",
+          "ext-possible_change"
+        ],
+        "yWinsBothReps": [
+          "ext-flatten"
+        ],
+        "yWinsOneRep": [
+          "ext-is_valid_parenthesization",
+          "ext-powerset"
+        ],
+        "mixed": [
+          "ext-get_factors"
+        ],
+        "neither": [
+          "ext-bucketsort",
+          "ext-find_in_sorted",
+          "ext-gcd",
+          "ext-kheapsort",
+          "ext-lis",
+          "ext-longest_common_subsequence",
+          "ext-max_sublist_sum",
+          "ext-mergesort",
+          "ext-next_palindrome",
+          "ext-pascal",
+          "ext-quicksort",
+          "ext-shunting_yard"
+        ],
+        "incomplete": [
+          "ext-sieve",
+          "ext-subsequences",
+          "ext-to_base"
+        ]
+      }
+    }
+  ],
+  "secondary": {
+    "RECOVERY_ARM": {
+      "pooled": {
+        "planned": 44,
+        "completed": 42,
+        "repairs": 19,
+        "dispositions": {
+          "RETAIN": 19,
+          "PRESERVE_INCOMPLETE": 23
+        },
+        "regressionsProduced": 0,
+        "regressionsSurviving": 0,
+        "runsThatEdited": 39,
+        "elapsedSec": 2172,
+        "modelCalls": 173,
+        "secondsPerRetainedRepair": 114,
+        "badFirstEdit": 18,
+        "recoveredAfterBadFirstEdit": 0,
+        "recoveredAndRetained": 0,
+        "diagnosticsMeasuredSilently": 0,
+        "hardWall": 0,
+        "isolationViolations": 0,
+        "diagnosticsDelivered": 83,
+        "firstAction": {
+          "edit_file": 39,
+          "outline_file": 1,
+          "read_file": 1,
+          "run_python": 1
+        },
+        "firstEdit": {
+          "up": 20,
+          "down": 11,
+          "flat": 7,
+          "na": 4
+        },
+        "termination": {
+          "FINISH": 6,
+          "OTHER": 19,
+          "REPEAT_RESPONSE": 15,
+          "CALL_DEADLINE": 2
+        },
+        "byPosition": {
+          "0": {
+            "n": 21,
+            "repairs": 10
+          },
+          "1": {
+            "n": 21,
+            "repairs": 9
+          }
+        },
+        "seedSent": [
+          606,
+          707
+        ]
+      },
+      "perRep": {
+        "r1": {
+          "planned": 22,
+          "completed": 22,
+          "repairs": 12,
+          "dispositions": {
+            "RETAIN": 12,
+            "PRESERVE_INCOMPLETE": 10
+          },
+          "regressionsProduced": 0,
+          "regressionsSurviving": 0,
+          "runsThatEdited": 21,
+          "elapsedSec": 1106,
+          "modelCalls": 105,
+          "secondsPerRetainedRepair": 92,
+          "badFirstEdit": 9,
+          "recoveredAfterBadFirstEdit": 0,
+          "recoveredAndRetained": 0,
+          "diagnosticsMeasuredSilently": 0,
+          "hardWall": 0,
+          "isolationViolations": 0,
+          "diagnosticsDelivered": 44,
+          "firstAction": {
+            "edit_file": 21,
+            "outline_file": 1
+          },
+          "firstEdit": {
+            "up": 12,
+            "down": 5,
+            "flat": 4,
+            "na": 1
+          },
+          "termination": {
+            "FINISH": 4,
+            "OTHER": 10,
+            "REPEAT_RESPONSE": 8
+          },
+          "byPosition": {
+            "0": {
+              "n": 11,
+              "repairs": 8
+            },
+            "1": {
+              "n": 11,
+              "repairs": 4
+            }
+          },
+          "seedSent": [
+            606
+          ]
+        },
+        "r2": {
+          "planned": 22,
+          "completed": 20,
+          "repairs": 7,
+          "dispositions": {
+            "RETAIN": 7,
+            "PRESERVE_INCOMPLETE": 13
+          },
+          "regressionsProduced": 0,
+          "regressionsSurviving": 0,
+          "runsThatEdited": 18,
+          "elapsedSec": 1066,
+          "modelCalls": 68,
+          "secondsPerRetainedRepair": 152,
+          "badFirstEdit": 9,
+          "recoveredAfterBadFirstEdit": 0,
+          "recoveredAndRetained": 0,
+          "diagnosticsMeasuredSilently": 0,
+          "hardWall": 0,
+          "isolationViolations": 0,
+          "diagnosticsDelivered": 39,
+          "firstAction": {
+            "edit_file": 18,
+            "read_file": 1,
+            "run_python": 1
+          },
+          "firstEdit": {
+            "up": 8,
+            "down": 6,
+            "flat": 3,
+            "na": 3
+          },
+          "termination": {
+            "CALL_DEADLINE": 2,
+            "OTHER": 9,
+            "FINISH": 2,
+            "REPEAT_RESPONSE": 7
+          },
+          "byPosition": {
+            "0": {
+              "n": 10,
+              "repairs": 2
+            },
+            "1": {
+              "n": 10,
+              "repairs": 5
+            }
+          },
+          "seedSent": [
+            707
+          ]
+        }
+      }
+    },
+    "AUTODIAG_ARM": {
+      "pooled": {
+        "planned": 44,
+        "completed": 41,
+        "repairs": 18,
+        "dispositions": {
+          "RETAIN": 18,
+          "RESTORED": 11,
+          "PRESERVE_INCOMPLETE": 12
+        },
+        "regressionsProduced": 11,
+        "regressionsSurviving": 0,
+        "runsThatEdited": 37,
+        "elapsedSec": 4678,
+        "modelCalls": 331,
+        "secondsPerRetainedRepair": 260,
+        "badFirstEdit": 17,
+        "recoveredAfterBadFirstEdit": 0,
+        "recoveredAndRetained": 0,
+        "diagnosticsMeasuredSilently": 0,
+        "hardWall": 1,
+        "isolationViolations": 0,
+        "diagnosticsDelivered": 228,
+        "firstAction": {
+          "edit_file": 37,
+          "outline_file": 1,
+          "read_file": 1,
+          "search_file": 1,
+          "run_python": 1
+        },
+        "firstEdit": {
+          "up": 20,
+          "down": 10,
+          "flat": 7,
+          "na": 4
+        },
+        "termination": {
+          "REPEAT_TOOL": 10,
+          "CALL_DEADLINE": 4,
+          "REPEAT_RESPONSE": 23,
+          "OTHER": 4
+        },
+        "byPosition": {
+          "0": {
+            "n": 21,
+            "repairs": 10
+          },
+          "1": {
+            "n": 20,
+            "repairs": 8
+          }
+        },
+        "seedSent": [
+          606,
+          707
+        ]
+      },
+      "perRep": {
+        "r1": {
+          "planned": 22,
+          "completed": 22,
+          "repairs": 13,
+          "dispositions": {
+            "RETAIN": 13,
+            "RESTORED": 4,
+            "PRESERVE_INCOMPLETE": 5
+          },
+          "regressionsProduced": 4,
+          "regressionsSurviving": 0,
+          "runsThatEdited": 21,
+          "elapsedSec": 3449,
+          "modelCalls": 194,
+          "secondsPerRetainedRepair": 265,
+          "badFirstEdit": 7,
+          "recoveredAfterBadFirstEdit": 0,
+          "recoveredAndRetained": 0,
+          "diagnosticsMeasuredSilently": 0,
+          "hardWall": 1,
+          "isolationViolations": 0,
+          "diagnosticsDelivered": 139,
+          "firstAction": {
+            "edit_file": 21,
+            "outline_file": 1
+          },
+          "firstEdit": {
+            "up": 14,
+            "down": 3,
+            "flat": 4,
+            "na": 1
+          },
+          "termination": {
+            "REPEAT_TOOL": 4,
+            "CALL_DEADLINE": 4,
+            "REPEAT_RESPONSE": 12,
+            "OTHER": 2
+          },
+          "byPosition": {
+            "0": {
+              "n": 11,
+              "repairs": 6
+            },
+            "1": {
+              "n": 11,
+              "repairs": 7
+            }
+          },
+          "seedSent": [
+            606
+          ]
+        },
+        "r2": {
+          "planned": 22,
+          "completed": 19,
+          "repairs": 5,
+          "dispositions": {
+            "RETAIN": 5,
+            "RESTORED": 7,
+            "PRESERVE_INCOMPLETE": 7
+          },
+          "regressionsProduced": 7,
+          "regressionsSurviving": 0,
+          "runsThatEdited": 16,
+          "elapsedSec": 1229,
+          "modelCalls": 137,
+          "secondsPerRetainedRepair": 246,
+          "badFirstEdit": 10,
+          "recoveredAfterBadFirstEdit": 0,
+          "recoveredAndRetained": 0,
+          "diagnosticsMeasuredSilently": 0,
+          "hardWall": 0,
+          "isolationViolations": 0,
+          "diagnosticsDelivered": 89,
+          "firstAction": {
+            "edit_file": 16,
+            "read_file": 1,
+            "search_file": 1,
+            "run_python": 1
+          },
+          "firstEdit": {
+            "up": 6,
+            "down": 7,
+            "flat": 3,
+            "na": 3
+          },
+          "termination": {
+            "REPEAT_RESPONSE": 11,
+            "REPEAT_TOOL": 6,
+            "OTHER": 2
+          },
+          "byPosition": {
+            "0": {
+              "n": 10,
+              "repairs": 4
+            },
+            "1": {
+              "n": 9,
+              "repairs": 1
+            }
+          },
+          "seedSent": [
+            707
+          ]
+        }
+      }
+    }
+  }
+}
