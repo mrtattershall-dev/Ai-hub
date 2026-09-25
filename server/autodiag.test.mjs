@@ -150,6 +150,30 @@ try {
   say(cmsgs.length === 1, `exactly one report - the failed edit changed nothing, so nothing was re-reported (${cmsgs.length})`);
   say(readFileSync(join(c.ws, 'lcs_length.py'), 'utf8') === SEED, 'and the file really is unchanged');
 
+  // ── 4b. FRESHNESS FOLLOWS CONTENT: a write via run_python must refresh too ──
+  console.log('\n=== 4b. a write through run_python triggers a fresh diagnostic ===');
+  const REWRITE = ['THOUGHT: Rewriting the file with a script.', 'ACTION: run_python', 'CODE:', '```python',
+    'src = open("lcs_length.py").read()',
+    'open("lcs_length.py","w").write(src.replace("dp[i - 1, j] + 1", "dp[i - 1, j - 1] + 1"))',
+    'print("rewritten")', '```'].join('\n');
+  const d = await drive([PLAN, REWRITE, FINISH], { label: 'pywrite' });
+  const dmsgs = diagMessagesSeen(d.reqs);
+  const dRecs = d.run?.diagnostics || [];
+  say(dmsgs.length === 2, `two reports: the opening one, and one after the run_python write (${dmsgs.length})`);
+  say(dRecs.length === 2 && dRecs[1].when === 'after-edit', `the second is recorded as a post-change re-run (${dRecs.map((r) => r.when).join(', ')})`);
+  say(dRecs.length === 2 && dRecs[0].sha256 !== dRecs[1].sha256, 'the two reports are bound to different content');
+  say(dRecs.length === 2 && dRecs[1].failed === 0, `and the second tells the truth about the rewritten file (${dRecs[1]?.passed}/${dRecs[1]?.attempted} pass)`);
+  say(d.run?.diagnosticStaleBy === 'run_python', `the route that changed the file is recorded (${d.run?.diagnosticStaleBy})`);
+  note('watching edit_file / write_file / append_file alone would have missed this write entirely');
+
+  // ── 4c. DIAGNOSTIC TIME IS CHARGED TO THE TASK ALLOWANCE ──
+  console.log('\n=== 4c. diagnostics are charged to the task allowance ===');
+  const e = await drive([PLAN, edit(BUGGY, WRONG), FINISH], { label: 'budget' });
+  say(typeof e.run?.budgetEndsAt === 'number', 'the run carries the caller-declared task budget');
+  say((e.run?.diagnostics || []).length >= 1, `${(e.run?.diagnostics || []).length} diagnostic(s) ran inside the run's own wall clock - there is no separate allowance`);
+  const spans = (e.run?.diagnostics || []).map((x) => x.at).filter(Boolean);
+  say(spans.every((t) => t <= e.run.budgetEndsAt), 'every diagnostic completed within the declared task budget, not after it');
+
   // ── 5. INFRASTRUCTURE FAILURE IS NOT A FAILING CASE ──
   console.log('\n=== 5. infrastructure failure is reported as that, never as a test failure ===');
   const bad = await runDiagnostic(join(dirs[0], 'workspace'), { moduleName: MODULE, casesJsonl: CASES }, { image: 'legasus-worker@sha256:' + '0'.repeat(64) });

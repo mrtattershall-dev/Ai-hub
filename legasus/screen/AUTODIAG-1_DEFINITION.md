@@ -1,6 +1,13 @@
 # AUTODIAG-1 — definition, frozen before any generation
 
-2026-09-25. **Not launched. No paid run until one is authorized and I choose to launch it.**
+2026-09-25.
+
+## AUTHORIZATION, RECORDED BEFORE DEPLOYMENT
+
+**Micheal authorized $5 total for AUTODIAG-1** (2026-09-25: "I authorize 5 dollar cap"),
+covering startup, execution, idle time and shutdown, with the frozen runtime limit and no
+added retries. This is a NEW authorization for a new run: the earlier $15 applied to TESTCMD-1
+and is not carried over.
 
 ## The hypothesis, stated precisely
 
@@ -25,11 +32,23 @@ inputs. TESTCMD-1 supplied the first; AUTODIAG-1 supplies the second.
 
     before the first model call     run the pristine diagnostic against the starting candidate
                                     in the worker; push the result into the opening context
-    after a SUCCESSFUL edit to the  re-run it and deliver the fresh result BEFORE the next
-    target file                     model call - so the model sees the consequence of its own
-                                    change before deciding what to do next
-    budget                          never runs with under 30s of task budget left; a skip is
-                                    recorded as a skip, not hidden
+    whenever the target's CONTENT   re-run it and deliver the fresh result BEFORE the next
+    actually changes                model call - so the model sees the consequence of its own
+                                    change before deciding what to do next.
+                                    FRESHNESS FOLLOWS CONTENT, NOT TOOL NAMES: the target's
+                                    sha256 is compared before and after EVERY tool, so a write
+                                    through run_python or run_command refreshes the report
+                                    exactly as edit_file does. Watching edit_file alone would
+                                    have missed every other write route - the same defect class
+                                    as joining runs by task name. A tool that changes no bytes
+                                    (a failed edit, a read, a listing) refreshes nothing, and
+                                    the report the model already holds stays the current one.
+    budget                          CHARGED TO THE TASK ALLOWANCE. The diagnostic runs inside
+                                    the task's own 300s wall clock; there is no separate
+                                    allowance, and its execution time is spent from the same
+                                    budget the model has to work in. One that would start with
+                                    under 30s left is skipped and RECORDED as skipped, never
+                                    silently dropped.
     binding                         every result names the sha256 and line count of the file
                                     it judged; a result that cannot name what it judged is not
                                     a result, and a stale one presented as current is worse
@@ -53,8 +72,12 @@ that only drove a correct repair would pass even if the Hub echoed "all pass" at
     CORRECT edit        fresh report: 9 attempted, 9 passed, 0 failed
     terminal            acceptance untouched
 
+    write via run_python    fresh report delivered, recorded as diagnosticStaleBy: run_python,
+                            bound to the new sha - a tool-name watcher would have missed it
+    budget                  every diagnostic completed inside the declared task budget
+
 Plus: infrastructure failure reported as infrastructure with no counts and no pass claim;
-withheld failures counted out loud.
+withheld failures counted out loud. **36/36.**
 
 Regression sweep after the change: repeatWarning 15, suppliedFile 16, removedTool 12,
 callDeadline 34, governedRun 24, finishGateHost 10, persistTerminal 9, effectivePrompt 9.
@@ -68,9 +91,27 @@ callDeadline 34, governedRun 24, finishGateHost 10, persistTerminal 9, effective
                 model is not told to run anything and is given no runner source.
 
 Same model, sampling, limits, worker, isolation, acceptance policy, evaluator, repeat guard.
-Interleaved with alternating arm order. Measured exactly as TESTCMD-1 measured:
-`verifiedRepairs` and the acceptance disposition first, then `newlyPassing` / `newlyFailing`
-per task as case numbers, never netted and never pooled across tasks.
+Interleaved with alternating arm order. Runner: `server/autodiag1.mjs`, which reuses the
+TESTCMD-1 runner unchanged and differs only in what the treatment arm receives.
+
+### SUCCESS IS ACCEPTED REPAIRS
+
+`verifiedRepairs` (acceptance RETAIN) and the disposition breakdown are the result. Everything
+else is reported **separately and never summed into a win**:
+
+    verifiedRepairs, dispositions          THE result
+    newlyPassing / newlyFailing            per task, as case numbers, never netted against
+                                           each other and never pooled across tasks
+    regressionsProduced / surviving        the cost side
+    runsWithDiagnosticDelivered,           delivered feedback - evidence the treatment was
+    diagnosticsDelivered,                  actually applied, NOT evidence that it worked
+    diagnosticsSkippedForBudget,
+    diagnosticsUnavailable
+    modelCalls, tokens, elapsedSec         cost
+
+**More delivered feedback is not a win. More passing cases is not a win.** A run that gains
+four cases and is still PRESERVE_INCOMPLETE did not repair anything, and an arm that delivered
+sixty diagnostics and produced no additional accepted repairs has produced a null result.
 
 **LABEL: the diagnostic runs the graded cases.** So any AUTODIAG result is **repair with
 supplied test results** - not held-out generalization, and not comparable to a configuration
@@ -97,7 +138,19 @@ remain causal hypotheses requiring their own tests - the same limit recorded in
 
 ## Spend
 
-Not launched. No figure is authorized for it yet. When launched: the same mechanisms as
-TESTCMD-1 - a fixed runtime bound enforced in the runner, no retries, `modal app stop --yes`
-in the same job with the stopped state confirmed, and every cost figure labelled an estimate
-until actual charges are available.
+**Authorized: $5 total**, including startup, execution, idle time and shutdown.
+
+    fixed runtime bound    AUTODIAG_TOTAL_SEC=9000 (2.5h), enforced in the runner, which stops
+                           active work rather than only new starts
+    no added retries       retries: none, unchanged
+    ESTIMATE (planning)    60 units at TESTCMD-1's observed pace ~ 2.4h ~ $2.70, plus the
+                           diagnostics' own container time, which is charged to the same task
+                           budget and so does not extend the wall clock
+    CONDITIONAL figure     2.5h plus warm-up ~ $2.90 - CONDITIONAL on the runner's wall clock
+                           stopping active work, `modal app stop --yes` succeeding, and no
+                           request remaining in flight afterwards
+
+**Automatic scaledown is not a spending ceiling**: it releases an IDLE container, and one still
+serving a request is not idle. It is a backstop against a missed stop, not a proof of a maximum.
+
+Every figure is an ESTIMATE and stays labelled as one until actual charges are available.

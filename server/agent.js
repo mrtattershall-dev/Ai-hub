@@ -2774,6 +2774,12 @@ function outcomeOf(run, e) {
 // It NEVER runs past the task budget: a diagnostic that eats the time the model needed to act
 // would trade one kind of uselessness for another. Skipped-for-budget is recorded, not hidden.
 const DIAG_MIN_BUDGET_MS = 30_000;
+/** sha256 of the diagnostic target as it stands right now, or null if it is not there. */
+function diagTargetHash(run) {
+  if (!run.diagnostic) return null;
+  try { return createHash('sha256').update(readFileSync(safePath(`${run.diagnostic.moduleName}.py`))).digest('hex'); }
+  catch { return null; }
+}
 async function deliverDiagnostic(run, when) {
   if (!run.diagnostic) return;
   if (run.budgetEndsAt && run.budgetEndsAt - Date.now() < DIAG_MIN_BUDGET_MS) {
@@ -4056,6 +4062,9 @@ async function drive(loadDb, run) {
       if ((tool === 'write_file' || tool === 'edit_file') && args.path && /\.(py|c?js|mjs)$/i.test(args.path)) {
         try { beforeSrc = readFileSync(safePath(args.path), 'utf8'); } catch { /* a new file */ }
       }
+      // The diagnostic target as it stands BEFORE this tool. Compared after, so freshness
+      // follows the BYTES rather than the tool name - every write route is covered.
+      const beforeDiagHash = run.diagnostic ? diagTargetHash(run) : null;
       let result;
       try { result = await tools[tool](args); }
       catch (e) { result = `ERROR: ${e.message}`; }
@@ -4323,14 +4332,20 @@ async function drive(loadDb, run) {
       //
       // Both go: the file content the substitution exists to provide, AND the warning. The
       // repeat limit itself is unchanged.
-      // A SUCCESSFUL edit to the diagnostic's target invalidates the last report. Marked here,
-      // delivered at the top of the next turn - so the model sees the consequence of its own
-      // change before it decides what to do next. An edit that FAILED does not mark it: the
-      // file is unchanged, and a fresh report would say the same thing while implying action.
-      if (run.diagnostic && /^(edit_file|write_file|append_file)$/.test(tool)
-          && String(args?.path || '').includes(`${run.diagnostic.moduleName}.py`)
-          && /^OK:/.test(String(result))) {
-        run.diagnosticStale = true;
+      // FRESHNESS FOLLOWS CONTENT, NOT TOOL NAMES. The first version watched edit_file /
+      // write_file / append_file, which misses every other write route: run_python opening the
+      // target for writing, run_command with a redirect or sed, a script the model wrote that
+      // rewrites it. That is the same defect class as joining runs by task name - a proxy
+      // standing in for the thing itself. So the target's sha256 is compared before and after
+      // EVERY tool, and any real change marks the report stale. An edit that failed changes no
+      // bytes and marks nothing; a write that happens to restore the previous bytes marks
+      // nothing either, because nothing the diagnostic would say has changed.
+      if (run.diagnostic) {
+        const afterHash = diagTargetHash(run);
+        if (afterHash !== beforeDiagHash) {
+          run.diagnosticStale = true;
+          run.diagnosticStaleBy = tool;        // which route actually changed it, for the record
+        }
       }
       const repeatWarning = (String(result).match(/\n\n⚠️ You already ran this exact[\s\S]*$/) || [''])[0];
       let feedback = substituted
