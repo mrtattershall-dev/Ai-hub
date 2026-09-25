@@ -81,7 +81,9 @@ export async function runDiagnostic(workspace, { moduleName, casesJsonl }, { ima
       'sh', '-c', `timeout ${timeoutSec} python3 run_tests.py`];
     let out = '', exitCode = 0;
     try {
-      const r = await exec('docker', args, { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, windowsHide: true });
+      // HOST-SIDE timeout too: `timeout N` inside the container cannot help if docker
+      // itself never returns. Same unbounded-wait class that cost AUTODIAG-1 half its units.
+      const r = await exec('docker', args, { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, windowsHide: true, timeout: (timeoutSec + 30) * 1000 });
       out = String(r.stdout) + String(r.stderr);
     } catch (e) {
       out = String(e.stdout || '') + String(e.stderr || '');

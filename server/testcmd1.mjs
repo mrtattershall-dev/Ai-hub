@@ -78,8 +78,13 @@ const SUMMARY = join(ROOT, 'summary.jsonl');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let port = 41200;
 
+// NO UNBOUNDED WAITS. AUTODIAG-1 lost 31 of 60 units to a single unit that ran 99 minutes:
+// a model call whose local deadline fired at 295s but whose await did not unwind for 5,964s.
+// Whatever stalled underneath, a runner that polls with an untimed fetch cannot bound a unit.
+// Every request now carries its own timeout.
+const API_TIMEOUT_MS = 30_000;
 const api = async (base, path, init) => {
-  const r = await fetch(base + path, { headers: { 'content-type': 'application/json' }, ...init });
+  const r = await fetch(base + path, { headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(API_TIMEOUT_MS), ...init });
   const t = await r.text();
   try { return JSON.parse(t); } catch { return { raw: t.slice(0, 300) }; }
 };
@@ -176,6 +181,11 @@ async function runTask(ws, task, ctx) {
   } finally {
     try { hub.kill('SIGKILL'); } catch { /* best effort */ }
   }
+  // A UNIT MAY NOT OUTLIVE ITS BUDGET. The polling loop and the post-stop wait are both
+  // bounded, but AUTODIAG-1 still produced a 99-minute unit - so the overrun is recorded
+  // rather than trusted away, and the next unit starts regardless.
+  const overran = Math.round((Date.now() - started) / 1000) - (ctx.timeoutSec + 120);
+  if (overran > 0) console.log(`   !! unit overran its budget by ${overran}s - recorded`);
 
   // ── the behavioural measures, from the run's own steps, in ORDER ──
   const steps = (run?.steps || []).filter((s) => s.type === 'tool');

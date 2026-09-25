@@ -51,8 +51,13 @@ const SUMMARY = join(ROOT, 'summary.jsonl');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let port = 40100;
 
+// NO UNBOUNDED WAITS. AUTODIAG-1 lost 31 of 60 units to a single unit that ran 99 minutes:
+// a model call whose local deadline fired at 295s but whose await did not unwind for 5,964s.
+// Whatever stalled underneath, a runner that polls with an untimed fetch cannot bound a unit.
+// Every request now carries its own timeout.
+const API_TIMEOUT_MS = 30_000;
 const api = async (base, path, init) => {
-  const r = await fetch(base + path, { headers: { 'content-type': 'application/json' }, ...init });
+  const r = await fetch(base + path, { headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(API_TIMEOUT_MS), ...init });
   const t = await r.text();
   try { return JSON.parse(t); } catch { return { raw: t.slice(0, 300) }; }
 };
