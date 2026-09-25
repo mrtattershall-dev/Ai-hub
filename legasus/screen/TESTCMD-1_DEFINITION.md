@@ -1,8 +1,16 @@
 # TESTCMD-1 — definition, frozen before any generation
 
-2026-09-25, committed before deploy. **Authorized allowance: $5 total including startup and
-shutdown** (tatte, 2026-09-25), with a fixed runtime bound and no extra retries. The ~$2
-estimate below is planning information, not a spending guarantee.
+2026-09-25, committed before deploy.
+
+## AUTHORIZATION, RECORDED BEFORE DEPLOYMENT
+
+**Micheal authorized TESTCMD-1 for up to $5 total, including startup and shutdown, with the
+frozen 2.5-hour limit and no extra retries** (2026-09-25, in answer to that exact question).
+
+A $15 figure appeared earlier in the same exchange from a non-authorizing voice, which then
+withdrew it: *"My $5 figure was a suggested cap, not spending authorization from Micheal."*
+**$5 is the authorization in force.** The larger figure is not headroom and is not used. No
+tasks added, no model change, no retries - the experiment runs exactly as frozen.
 
 **AMENDED 2026-09-25** before launch, on three points: the treatment is named as a package;
 newly-passing and newly-failing cases are reported separately alongside accepted repairs and
@@ -36,13 +44,28 @@ So: **does a usable failing-test signal change what the model does?**
                     Run `python3 run_tests.py` to see, for every case, the expected value
                     against what your code actually produces."
 
-**THE TREATMENT IS A PACKAGE: supplied tests + a runner + instructions.** A result here is
-about that whole bundle and cannot attribute an effect to any one part - separating the cases
-from the runner from the instruction would take three more arms, which this does not have.
+**THE TREATMENT IS A PACKAGE, AND IT IS LARGER THAN TWO SENTENCES.** Measured, not assumed:
 
-Verified before freezing: the arms' `requested` and `protected` checks are byte-identical, and
-the goal differs by exactly those two sentences. Same model, sampling, limits, worker,
-isolation, acceptance policy, evaluator, repeat guard.
+    goal text delta                          +176 bytes (the two sentences)
+    files added to the workspace             run_tests.py (3,741 B), task_cases.jsonl (247 B)
+    ADDITIONAL OPENING-CONTEXT CONTENT       run_tests.py inlined IN FULL - 98 numbered lines,
+                                             3,741 bytes, with a sha256 header
+
+The last line is the part that is easy to miss. The guidance names `run_tests.py`, so the
+Hub's supplied-file feature treats it as a goal-named file under the 8,192-byte limit and
+inlines its entire source into the opening context. So the treatment arm receives the two
+sentences AND ~3.7 KB of extra prompt content that the control does not - including the
+runner's own docstring, which states that these are the graded cases. `task_cases.jsonl` is
+NOT named in the goal and is NOT inlined; it exists on disk only.
+
+The package is therefore: supplied tests on disk + a runner on disk + that runner's full
+source in the prompt + two sentences of instruction. A result here is about the whole bundle
+and cannot attribute an effect to any one part - separating them would take three more arms,
+which this does not have. Describing the arm difference as "two sentences" would be wrong.
+
+Verified before freezing: the arms' `requested` and `protected` checks are byte-identical.
+Same model, sampling, limits, worker, isolation, acceptance policy, evaluator, repeat guard.
+The arms differ by the package described above, and by nothing else.
 
 15 tasks × 2 arms × 2 replicates = **60 units**, interleaved, **arm order alternating by task**
 (even index CONTROL first, odd index TEST_PACKAGE first) so a drifting backend cannot favour one arm.
@@ -100,14 +123,22 @@ obstacle is not feedback availability at all.
 
 ## Spend bounding
 
-**Authorized allowance: $5 total, including startup and shutdown.** A10G ~ $1.10/hr.
+**Authorized: $5 total, including startup, execution, idle time and shutdown.** A10G ~ $1.10/hr.
 
     fixed runtime bound    TESTCMD_TOTAL_SEC=9000 (2.5h), enforced in the runner, which stops
                            active work rather than only new starts
     no extra retries       retries: none, unchanged from every prior campaign
-    expected               60 units at BENCH-3's observed pace (~110s/unit) ~ 1.8h ~ $2
-    worst case             2.5h wall clock plus warm-up ~ $2.90; the container is released by
-                           scaledown 900s even if the stop is missed
+    ESTIMATE (planning)    60 units at BENCH-3's observed pace (~110s/unit) ~ 1.8h ~ $2
+    CONDITIONAL figure     2.5h wall clock plus warm-up ~ $2.90 - CONDITIONAL ON THE STATED
+                           SHUTDOWN ASSUMPTIONS HOLDING: that the runner's wall clock stops
+                           active work, that `modal app stop --yes` succeeds, and that no
+                           request remains in flight afterwards
 
-The ~$2 figure is planning information, not a spending guarantee. The app is stopped with
-`modal app stop --yes` in the same job and confirmed after.
+**Automatic scaledown is not by itself a spending ceiling.** `scaledown_window=900` releases
+an IDLE container; a container still serving a request is not idle, so scaledown bounds idle
+time, not total spend. It is a backstop against a missed stop, not a proof of a maximum.
+
+Every figure above is an ESTIMATE and is labelled as such until actual charges are available.
+The app is stopped with `modal app stop --yes` in the same job and the stopped state confirmed
+after; actual charges will be reported when Modal exposes them, and estimates stay labelled
+estimates until then.
