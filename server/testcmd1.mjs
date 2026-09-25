@@ -181,7 +181,15 @@ async function runTask(ws, task, ctx) {
   const steps = (run?.steps || []).filter((s) => s.type === 'tool');
   const name = task.id.replace(/^ext-/, '');
   const isEdit = (s) => /^(edit_file|write_file|append_file)$/.test(s.tool) && String(s.args?.path || '').includes(`${name}.py`);
-  const ranCommand = (s) => /^(run_python|run_command)$/.test(s.tool) && /run_tests\.py/.test(JSON.stringify(s.args || ''));
+  // MATCH EVERY WAY THE RUNNER CAN BE INVOKED, not just the one the guidance suggests.
+  // The first version required the literal "run_tests.py" and therefore MISSED
+  // `import run_tests; run_tests.main()` - which is how the model actually reached it in the
+  // mergesort unit of the first live run. That produced commandInvoked=0 with
+  // feedbackDelivered=true, an internally inconsistent pair that exposed the gap. A bare
+  // module reference counts: what is being measured is "did the supplied runner execute",
+  // not "did it type the documented command".
+  const ranCommand = (s) => /^(run_python|run_command)$/.test(s.tool)
+    && /\brun_tests\b/.test(JSON.stringify(s.args || ''));
   // A FAILING OBSERVATION: any executed test whose output carries a failure signal.
   const isFailingTest = (s) => /^(run_python|run_command)$/.test(s.tool)
     && /(FAIL|ERROR|Traceback|EXPECTED|FAILED \d+\/)/.test(String(s.result || ''));

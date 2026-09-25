@@ -1,0 +1,141 @@
+TESTCMD-1 START 2026-09-25T03:22:07.977Z hub 4a3cc67
+model: https://mr-tattershall--legasus-7b-server-web.modal.run
+worker: sha256:fa49b576430b1288a585522bbf011fbd218cedcb379eb7bb57e3a69fec08a8c3
+arms: CONTROL (seed only) vs TEST_PACKAGE (seed + graded cases + runner + instruction)
+queue: 15 tasks x 2 arms x 2 replicate(s) = 60 units
+limits: 300s/task, 9000s total, no retries
+
+measuring seed baselines (no model involved):
+  baseline ext-bucketsort: 1/7 graded cases pass on the seed
+  baseline ext-find_in_sorted: 5/7 graded cases pass on the seed
+  baseline ext-flatten: 1/7 graded cases pass on the seed
+  baseline ext-gcd: 1/6 graded cases pass on the seed
+  baseline ext-get_factors: 1/11 graded cases pass on the seed
+  baseline ext-is_valid_parenthesization: 2/3 graded cases pass on the seed
+  baseline ext-kheapsort: 1/4 graded cases pass on the seed
+  baseline ext-kth: 3/7 graded cases pass on the seed
+  baseline ext-lcs_length: 1/9 graded cases pass on the seed
+  baseline ext-lis: 8/12 graded cases pass on the seed
+  baseline ext-longest_common_subsequence: 6/10 graded cases pass on the seed
+  baseline ext-max_sublist_sum: 2/6 graded cases pass on the seed
+  baseline ext-mergesort: 1/14 graded cases pass on the seed
+  baseline ext-next_palindrome: 4/5 graded cases pass on the seed
+  baseline ext-pascal: 1/5 graded cases pass on the seed
+  1. [CONTROL] ext-bucketsort ENDED req=PASS prot=PASS cases 1->7/7 +[2,3,4,5,6,7] edits=3 RETAIN
+  2. [TEST_PACKAGE] ext-bucketsort ENDED req=FAIL prot=PASS cases 1->1/7 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+  3. [TEST_PACKAGE] ext-find_in_sorted ENDED req=FAIL prot=PASS cases 5->5/7 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+  4. [CONTROL] ext-find_in_sorted ENDED req=FAIL prot=PASS cases 5->5/7 edits=0 PRESERVE_INCOMPLETE
+  5. [CONTROL] ext-flatten ENDED req=PASS prot=PASS cases 1->7/7 +[1,3,4,5,6,7] edits=3 RETAIN
+  6. [TEST_PACKAGE] ext-flatten ENDED req=PASS prot=PASS cases 1->7/7 +[1,3,4,5,6,7] edits=3 RETAIN cmd=3 delivered=false
+  7. [TEST_PACKAGE] ext-gcd ENDED req=FAIL prot=PASS cases 1->1/6 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+  8. [CONTROL] ext-gcd ENDED req=FAIL prot=PASS cases 1->1/6 edits=0 PRESERVE_INCOMPLETE
+  9. [CONTROL] ext-get_factors ENDED req=FAIL prot=PASS cases 1->1/11 edits=0 PRESERVE_INCOMPLETE
+ 10. [TEST_PACKAGE] ext-get_factors ENDED req=FAIL prot=PASS cases 1->1/11 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 11. [TEST_PACKAGE] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS cases 2->2/3 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 12. [CONTROL] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS cases 2->2/3 edits=0 PRESERVE_INCOMPLETE
+ 13. [CONTROL] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE
+ 14. [TEST_PACKAGE] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 15. [TEST_PACKAGE] ext-kth ENDED req=FAIL prot=PASS cases 3->3/7 edits=3 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 16. [CONTROL] ext-kth ENDED req=FAIL prot=PASS cases 3->3/7 edits=22 PRESERVE_INCOMPLETE
+ 17. [CONTROL] ext-lcs_length ENDED req=FAIL prot=PASS cases 1->5/9 +[2,4,6,7] edits=1 PRESERVE_INCOMPLETE
+ 18. [TEST_PACKAGE] ext-lcs_length ENDED req=PASS prot=PASS cases 1->9/9 +[1,2,4,5,6,7,8,9] edits=1 RETAIN cmd=0 delivered=false
+ 19. [TEST_PACKAGE] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 20. [CONTROL] ext-lis ENDED req=PASS prot=PASS cases 8->12/12 +[9,10,11,12] edits=23 RETAIN
+ 21. [CONTROL] ext-longest_common_subsequence ENDED req=FAIL prot=PASS cases 6->6/10 edits=0 PRESERVE_INCOMPLETE
+ 22. [TEST_PACKAGE] ext-longest_common_subsequence ENDED req=FAIL prot=PASS cases 6->6/10 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 23. [TEST_PACKAGE] ext-max_sublist_sum ENDED req=FAIL prot=PASS cases 2->2/6 edits=0 PRESERVE_INCOMPLETE cmd=1 delivered=true
+ 24. [CONTROL] ext-max_sublist_sum ENDED req=FAIL prot=FAIL cases 2->0/6 edits=38 RESTORED
+ 25. [CONTROL] ext-mergesort ENDED req=FAIL prot=PASS cases 1->1/14 edits=12 PRESERVE_INCOMPLETE
+ 26. [TEST_PACKAGE] ext-mergesort ENDED req=FAIL prot=PASS cases 1->1/14 edits=33 PRESERVE_INCOMPLETE cmd=0 delivered=true
+ 27. [TEST_PACKAGE] ext-next_palindrome ENDED req=FAIL prot=PASS cases 4->4/5 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 28. [CONTROL] ext-next_palindrome ENDED req=FAIL prot=FAIL cases 4->1/5 +[5] -[1,2,3,4] edits=4 RESTORED
+ 29. [CONTROL] ext-pascal ENDED req=FAIL prot=PASS cases 1->1/5 edits=0 PRESERVE_INCOMPLETE
+ 30. [TEST_PACKAGE] ext-pascal ENDED req=FAIL prot=PASS cases 1->1/5 edits=3 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 31. [CONTROL] ext-bucketsort ENDED req=PASS prot=PASS cases 1->7/7 +[2,3,4,5,6,7] edits=5 RETAIN
+ 32. [TEST_PACKAGE] ext-bucketsort ENDED req=FAIL prot=PASS cases 1->1/7 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 33. [TEST_PACKAGE] ext-find_in_sorted ENDED req=FAIL prot=FAIL cases 5->0/7 -[1,3,4,5,6] edits=13 RESTORED cmd=0 delivered=false
+ 34. [CONTROL] ext-find_in_sorted ENDED req=FAIL prot=FAIL cases 5->0/7 edits=12 RESTORED
+ 35. [CONTROL] ext-flatten ENDED req=PASS prot=PASS cases 1->7/7 +[1,3,4,5,6,7] edits=3 RETAIN
+ 36. [TEST_PACKAGE] ext-flatten ENDED req=FAIL prot=PASS cases 1->1/7 edits=1 PRESERVE_INCOMPLETE cmd=5 delivered=true
+ 37. [TEST_PACKAGE] ext-gcd ENDED req=FAIL prot=FAIL cases 1->0/6 edits=56 RESTORED cmd=0 delivered=false
+ 38. [CONTROL] ext-gcd ENDED req=PASS prot=PASS cases 1->6/6 +[2,3,4,5,6] edits=1 RETAIN
+ 39. [CONTROL] ext-get_factors ENDED req=FAIL prot=PASS cases 1->1/11 edits=0 PRESERVE_INCOMPLETE
+ 40. [TEST_PACKAGE] ext-get_factors ENDED req=FAIL prot=PASS cases 1->1/11 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 41. [TEST_PACKAGE] ext-is_valid_parenthesization ENDED req=FAIL prot=PASS cases 2->2/3 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 42. [CONTROL] ext-is_valid_parenthesization ENDED req=PASS prot=PASS cases 2->3/3 +[3] edits=1 RETAIN
+ 43. [CONTROL] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE
+ 44. [TEST_PACKAGE] ext-kheapsort ENDED req=FAIL prot=PASS cases 1->1/4 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 45. [TEST_PACKAGE] ext-kth ENDED req=FAIL prot=FAIL cases 3->0/7 edits=5 RESTORED cmd=1 delivered=true
+ 46. [CONTROL] ext-kth ENDED req=PASS prot=PASS cases 3->7/7 +[1,2,6,7] edits=29 RETAIN
+ 47. [CONTROL] ext-lcs_length ENDED req=FAIL prot=PASS cases 1->1/9 edits=0 PRESERVE_INCOMPLETE
+ 48. [TEST_PACKAGE] ext-lcs_length ENDED req=PASS prot=PASS cases 1->9/9 +[1,2,4,5,6,7,8,9] edits=1 RETAIN cmd=0 delivered=false
+ 49. [TEST_PACKAGE] ext-lis ENDED req=FAIL prot=PASS cases 8->8/12 edits=0 PRESERVE_INCOMPLETE cmd=0 delivered=false
+ 50. [CONTROL] ext-lis ENDED req=FAIL prot=FAIL cases 8->7/12 -[3] edits=27 RESTORED
+ 51. [CONTROL] ext-longest_common_subsequence ENDED req=FAIL prot=FAIL cases 6->0/10 edits=1 RESTORED
+ 52. [TEST_PACKAGE] ext-longest_common_subsequence ENDED req=PASS prot=PASS cases 6->10/10 +[4,6,7,8] edits=1 RETAIN cmd=4 delivered=true
+ 53. [TEST_PACKAGE] ext-max_sublist_sum ENDED req=FAIL prot=FAIL cases 2->0/6 edits=3 RESTORED cmd=0 delivered=false
+ 54. [CONTROL] ext-max_sublist_sum ENDED req=FAIL prot=FAIL cases 2->0/6 edits=4 RESTORED
+ 55. [CONTROL] ext-mergesort ENDED req=FAIL prot=PASS cases 1->1/14 edits=0 PRESERVE_INCOMPLETE
+deadline reached; remaining units are UNATTEMPTED
+
+=== TESTCMD-1 RESULT ===
+elapsed 147m 6s of 150m
+stopped cleanly: YES
+integrity false  reconciliation true
+status {"COMPLETED":55,"INTERRUPTED":0,"UNATTEMPTED":0,"BLOCKED":0,"OTHER":0,"UNACCOUNTED":5,"total":60,"planned":60}
+
+LABEL: repair with SUPPLIED tests. The exposed cases are the graded cases.
+
+CONTROL       {
+ "runs": 28,
+ "verifiedRepairs": 8,
+ "dispositions": {
+  "RETAIN": 8,
+  "PRESERVE_INCOMPLETE": 14,
+  "RESTORED": 6
+ },
+ "regressionsProduced": 6,
+ "regressionsSurviving": 0,
+ "runsWithNewlyPassing": 10,
+ "runsWithNewlyFailing": 2,
+ "runsWithBoth": 1,
+ "runsAllCasesPassing": 8,
+ "caseMeasurementErrors": 4,
+ "editsOnTarget": 189,
+ "runsThatEdited": 17,
+ "sawFailingTest": 7,
+ "editAfterFailure": 6,
+ "commandInvoked": 0,
+ "feedbackDelivered": 0,
+ "invokedButNotDelivered": 0
+}
+TEST_PACKAGE  {
+ "runs": 27,
+ "verifiedRepairs": 4,
+ "dispositions": {
+  "PRESERVE_INCOMPLETE": 19,
+  "RETAIN": 4,
+  "RESTORED": 4
+ },
+ "regressionsProduced": 4,
+ "regressionsSurviving": 0,
+ "runsWithNewlyPassing": 4,
+ "runsWithNewlyFailing": 1,
+ "runsWithBoth": 0,
+ "runsAllCasesPassing": 4,
+ "caseMeasurementErrors": 3,
+ "editsOnTarget": 123,
+ "runsThatEdited": 12,
+ "sawFailingTest": 9,
+ "editAfterFailure": 8,
+ "commandInvoked": 5,
+ "feedbackDelivered": 5,
+ "invokedButNotDelivered": 1
+}
+
+summary: C:\Users\tatte\AppData\Local\Temp\testcmd1-I38o23\summary.jsonl
+report:  C:\Users\tatte\AppData\Local\Temp\testcmd1-I38o23\TESTCMD-1_REPORT.json
+TESTCMD-1 COMPLETE
+EXIT 0
+STOP ISSUED Fri Sep 25 05:49:21 UTC 2026
+│ ap-IgUHHuCK9B1iKvvQLUXmfE │ legasus-7b   │ stopping... │ 1     │ 2026-09-24  
