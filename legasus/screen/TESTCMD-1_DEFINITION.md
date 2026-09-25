@@ -1,6 +1,12 @@
 # TESTCMD-1 — definition, frozen before any generation
 
-2026-09-25, committed before deploy. **Cap: not yet authorized — do not launch until it is.**
+2026-09-25, committed before deploy. **Authorized allowance: $5 total including startup and
+shutdown** (tatte, 2026-09-25), with a fixed runtime bound and no extra retries. The ~$2
+estimate below is planning information, not a spending guarantee.
+
+**AMENDED 2026-09-25** before launch, on three points: the treatment is named as a package;
+newly-passing and newly-failing cases are reported separately alongside accepted repairs and
+the acceptance disposition; and feedback *delivery* is recorded, not just invocation.
 
 ## The question
 
@@ -22,55 +28,86 @@ So: **does a usable failing-test signal change what the model does?**
 
 ## The two arms
 
-    CONTROL    the seed exactly as BENCH-1/2/3 ran it (buggy module alone), BENCH_GUIDANCE verbatim
-    TESTCMD    the same seed PLUS run_tests.py and task_cases.jsonl, and two sentences:
-               "This workspace contains run_tests.py and the task's test cases.
-                Run `python3 run_tests.py` to see, for every case, the expected value against
-                what your code actually produces."
+    CONTROL        the seed exactly as BENCH-1/2/3 ran it (buggy module alone),
+                   BENCH_GUIDANCE verbatim
+    TEST_PACKAGE   the same seed PLUS the graded cases (task_cases.jsonl), PLUS a runner over
+                   them (run_tests.py), PLUS two sentences:
+                   "This workspace contains run_tests.py and the task's test cases.
+                    Run `python3 run_tests.py` to see, for every case, the expected value
+                    against what your code actually produces."
+
+**THE TREATMENT IS A PACKAGE: supplied tests + a runner + instructions.** A result here is
+about that whole bundle and cannot attribute an effect to any one part - separating the cases
+from the runner from the instruction would take three more arms, which this does not have.
 
 Verified before freezing: the arms' `requested` and `protected` checks are byte-identical, and
 the goal differs by exactly those two sentences. Same model, sampling, limits, worker,
 isolation, acceptance policy, evaluator, repeat guard.
 
 15 tasks × 2 arms × 2 replicates = **60 units**, interleaved, **arm order alternating by task**
-(even index CONTROL first, odd index TESTCMD first) so a drifting backend cannot favour one arm.
-300s per task, no retries, 3-hour wall clock, plan recorded first so an unrun unit is
+(even index CONTROL first, odd index TEST_PACKAGE first) so a drifting backend cannot favour one arm.
+300s per task, no retries, 2.5-hour wall clock, plan recorded first so an unrun unit is
 UNATTEMPTED rather than missing.
 
 ## The label, which is not negotiable
 
 **The exposed cases ARE the graded cases.** `taskTests.test.mjs` asserts byte-identity with the
-requested check's case file. Any TESTCMD result is therefore **repair with supplied tests** and
+requested check's case file. Any TEST_PACKAGE result is therefore **repair with supplied tests** and
 is never evidence of generalization to unseen inputs. The protected check remains a subset of
 those cases, so passing them does not automatically satisfy protected behaviour — but it is not
 independent evidence either.
 
 ## What is measured, and what would count
 
+**Accepted repairs and the acceptance disposition are reported beside the case movement,
+always** - more passing cases can coexist with a protected regression, so neither number is
+shown alone.
+
 | measure | what it is | reading |
 |---|---|---|
-| `verifiedRepairs` | acceptance RETAIN | the outcome question |
-| **`caseDelta`** | graded cases passed by **the candidate the model produced**, minus the seed's baseline | **the real question: do failures lead to useful edits?** A run moving 2/9 → 7/9 did work even without finishing. Candidate-side, so a rolled-back run is not scored as inert; regressions counted separately |
+| `verifiedRepairs`, `dispositions` | acceptance RETAIN, and the full disposition breakdown | the outcome question, never omitted |
+| **`newlyPassing` / `newlyFailing`** | WHICH graded cases the candidate turned from failing to passing, and which from passing to failing - as case numbers, **never netted against each other** | **the real question: do failures lead to useful edits?** A run moving 2/9 to 7/9 did work even without finishing - and a run that gained four and lost one is a different thing from a run that gained three |
+| `runsWithNewlyPassing` / `runsWithNewlyFailing` / `runsWithBoth` | counts of RUNS, not of cases | **case counts are never pooled across tasks.** The 15 tasks carry 3-14 cases each, so a summed case total weights the wide tasks and reads as progress the per-task view does not support |
 | `editsOnTarget`, `runsThatEdited` | writes that hit the module under test | did it act at all |
-| `sawFailingTest` → `editAfterFailure` | an edit to the target following a failing observation, in order | the transition the traces showed missing |
-| `regressionsProduced` / surviving | protected FAIL / RESTORE_FAILED | the cost side |
-| `commandInvoked` | did it run `run_tests.py` | **recorded last, deliberately.** Invoked-and-unchanged and never-invoked are different negative results; a treatment is not validated by being used |
+| `sawFailingTest` to `editAfterFailure` | an edit to the target following a failing observation, in order | the transition the traces showed missing |
+| `regressionsProduced` / `regressionsSurviving` | protected FAIL / RESTORE_FAILED | the cost side |
+| `commandInvoked` | did it run `run_tests.py` | recorded last, deliberately |
+| **`feedbackDelivered`**, `invokedButNotDelivered` | did the runner's OUTPUT reach a later model request - read from the transcript deltas | **invoking a command does not prove usable feedback reached the next request.** This Hub has already shipped a defect where a warning was generated and substituted away before it was sent. Without this, "invoked but no effect" and "invoked but never delivered" are indistinguishable, and only the first is about the model |
 
-Pre-registered readings: TESTCMD raising `caseDelta` and `editAfterFailure` without raising
-`verifiedRepairs` is a real but partial effect and must be reported as such. TESTCMD raising
-nothing, with `commandInvoked` high, locates the obstacle after feedback availability — which
-would be the more valuable result, and is the one my current hypothesis does **not** predict.
-Two replicates is a variance floor, not a significance test: BENCH-3 showed per-replicate
-spread of 1–3 on 15 tasks, so a difference of one or two repairs reads as noise.
+Case measurement runs a pristine runner on a scratch copy of the candidate, with the runner
+and case file overwritten before execution - a candidate that edited its own tests changes
+nothing in the measurement, and nothing in the evaluator's verdict either
+(`taskTests.test.mjs` case 6).
+
+Pre-registered readings:
+
+- TEST_PACKAGE raising newly-passing cases and `editAfterFailure` **without** raising
+  `verifiedRepairs` is a real but partial effect, and must be reported as such.
+- TEST_PACKAGE raising nothing **while `feedbackDelivered` is high** would show that **this
+  feedback package was insufficient under these conditions**. It would NOT locate the whole
+  obstacle after feedback availability: a different package - held-out cases, a different
+  report format, more or fewer cases - is untested, and so is every other model.
+- TEST_PACKAGE raising nothing **with `invokedButNotDelivered` high** is a delivery defect in
+  the Hub, not a result about the model, and would need fixing before the arm means anything.
+- Two replicates is a variance floor, not a significance test: BENCH-3 showed per-replicate
+  spread of 1-3 on 15 tasks, so a difference of one or two repairs reads as noise.
 
 ## What it cannot settle
 
 Nothing about held-out generalization. Nothing about other models. Nothing about `lcs_length`
-r3, where the signal was present and unused — if that pattern persists under TESTCMD, the
+r3, where the signal was present and unused - if that pattern persists under TEST_PACKAGE, the
 obstacle is not feedback availability at all.
 
 ## Spend bounding
 
-A10G ≈ $1.10/hr. 60 units at BENCH-3's observed pace (~110s/unit) ≈ 1.8h ≈ $2; worst case
-(every unit to its 300s limit) 5h, bounded by the 3-hour wall clock ≈ $3.30. App stopped with
-`modal app stop --yes` in the same job, confirmed after; scaledown 900s regardless.
+**Authorized allowance: $5 total, including startup and shutdown.** A10G ~ $1.10/hr.
+
+    fixed runtime bound    TESTCMD_TOTAL_SEC=9000 (2.5h), enforced in the runner, which stops
+                           active work rather than only new starts
+    no extra retries       retries: none, unchanged from every prior campaign
+    expected               60 units at BENCH-3's observed pace (~110s/unit) ~ 1.8h ~ $2
+    worst case             2.5h wall clock plus warm-up ~ $2.90; the container is released by
+                           scaledown 900s even if the stop is missed
+
+The ~$2 figure is planning information, not a spending guarantee. The app is stopped with
+`modal app stop --yes` in the same job and confirmed after.

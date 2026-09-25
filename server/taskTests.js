@@ -48,7 +48,10 @@ const MAX_REPORTED = 12;
  *   ERROR case 5  pascal(3) raised IndexError: list index out of range
  *   SUMMARY 7/9 cases pass, 2 fail  (these are the cases the task is graded on)
  */
-export const RUN_TESTS_PY = (name, casesRel = 'task_cases.jsonl') => [
+// maxReported: what the MODEL sees is capped so a wide failure cannot flood its context.
+// MEASUREMENT passes a large cap instead, so every case appears and the per-case sets are
+// exact rather than inferred from a summary line (caseSet.js).
+export const RUN_TESTS_PY = (name, casesRel = 'task_cases.jsonl', maxReported = MAX_REPORTED) => [
   '#!/usr/bin/env python3',
   '"""Run the task\'s tests and report case-level expected vs actual.',
   '',
@@ -64,7 +67,7 @@ export const RUN_TESTS_PY = (name, casesRel = 'task_cases.jsonl') => [
   '',
   `MODULE = ${JSON.stringify(name)}`,
   `CASES = ${JSON.stringify(casesRel)}`,
-  `MAX_REPORTED = ${MAX_REPORTED}`,
+  `MAX_REPORTED = ${maxReported}`,
   '',
   '',
   'def load():',

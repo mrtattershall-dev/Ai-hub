@@ -1,17 +1,22 @@
 /**
- * testcmd1.mjs - TESTCMD-1: current guidance vs an explicit test command.
+ * testcmd1.mjs - TESTCMD-1: current guidance vs a SUPPLIED TEST PACKAGE.
+ *
+ * THE TREATMENT IS A PACKAGE, NOT A COMMAND: the graded cases, plus a runner that reports
+ * them case by case, plus two sentences of instruction naming it. A result here is about
+ * that whole bundle. It cannot say which part carried the effect - separating the cases from
+ * the runner from the instruction would need three more arms, which this does not have.
  *
  *   node server/testcmd1.mjs <modelBaseUrl>
  *
  * ONE DIFFERENCE BETWEEN THE ARMS, and it is declared here:
  *
- *   CONTROL    the task seed exactly as BENCH-1/2/3 ran it (the buggy module alone), with
- *              BENCH_GUIDANCE verbatim.
- *   TESTCMD    the same seed PLUS run_tests.py and task_cases.jsonl, and two sentences of
- *              guidance naming the command. Nothing else differs: same model, same sampling,
- *              same limits, same worker, same acceptance policy, same evaluator, same order.
+ *   CONTROL        the task seed exactly as BENCH-1/2/3 ran it (the buggy module alone),
+ *                  with BENCH_GUIDANCE verbatim.
+ *   TEST_PACKAGE   the same seed PLUS the graded cases (task_cases.jsonl), PLUS a runner over
+ *                  them (run_tests.py), PLUS two sentences naming it. Nothing else differs:
+ *                  same model, sampling, limits, worker, acceptance policy, evaluator, order.
  *
- * THE EXPOSED CASES ARE THE GRADED CASES. So a TESTCMD result is REPAIR WITH SUPPLIED TESTS.
+ * THE EXPOSED CASES ARE THE GRADED CASES. So a TEST_PACKAGE result is REPAIR WITH SUPPLIED TESTS.
  * It is not evidence of generalization to unseen inputs, and must never be reported as such.
  * (The PROTECTED check remains a subset of those cases, so protected behaviour is not
  * automatically satisfied by passing them - but it is not independent evidence either.)
@@ -22,21 +27,28 @@
  * WHAT IS MEASURED - the second one is the point, and it is not "did it run the command":
  *
  *   verifiedRepairs      acceptance RETAIN (requested PASS and protected PASS)
- *   caseDelta            how many graded cases THE CANDIDATE THE MODEL PRODUCED passes,
- *                        against the seed's baseline. A run that moves 2/9 -> 7/9 did useful
- *                        work even if it never finished; 2/9 -> 2/9 did not. Measured on the
- *                        candidate rather than the surviving workspace, so a rolled-back run
- *                        is not scored as having done nothing - regressions are counted
- *                        separately, so nothing is double-credited. This is the "failures
- *                        lead to useful edits" measure, and it is graded, not binary.
+ *   newlyPassing /       WHICH graded cases the candidate turned from failing to passing, and
+ *   newlyFailing         WHICH it turned from passing to failing - as case numbers, never
+ *                        netted against each other. More passing cases can coexist with a
+ *                        protected regression, and a net figure hides exactly that. Measured
+ *                        on THE CANDIDATE the model produced (a rolled-back run is not scored
+ *                        as inert), by a pristine runner on a scratch copy, so a candidate
+ *                        that edited its own tests changes nothing here.
+ *                        PER TASK ONLY. The tasks carry 5-12 cases each, so a pooled case
+ *                        total weights the wide tasks and reads as progress the per-task view
+ *                        does not support. verifiedRepairs stays beside these, always.
  *   editsOnTarget        writes that actually targeted the module under test
  *   editAfterFailure     did an edit to the target follow a failing test observation, in order
- *   commandInvoked       (TESTCMD only) did it run run_tests.py at all - recorded LAST,
- *                        because a treatment that is invoked and changes nothing is a
- *                        negative result, and a treatment that is never invoked is a
- *                        different negative result. Both are distinguishable here.
+ *   commandInvoked       (TEST_PACKAGE only) did it run run_tests.py at all
+ *   feedbackDelivered    did the runner's OUTPUT actually reach a subsequent model request -
+ *                        read from the run's transcript deltas, not inferred from the tool
+ *                        call. Invoking a command is not the same as being fed its result:
+ *                        this Hub has already shipped one defect where a warning was
+ *                        generated and substituted away before it was sent. Without this,
+ *                        "invoked but no effect" and "invoked but never delivered" are
+ *                        indistinguishable, and only the first is about the model.
  */
-import { mkdtempSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync, cpSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -47,6 +59,7 @@ const { externalTasks, BENCH_GUIDANCE } = await import('./benchTasks.js');
 const { testCommandFiles, TEST_COMMAND_GUIDANCE } = await import('./taskTests.js');
 const { runBatch } = await import('./batch.js');
 const { evaluate } = await import('./evaluator.js');
+const { caseSet, caseDiff } = await import('./caseSet.js');
 const { recordRun, recordPlan, writeReport } = await import('./campaignReport.js');
 const { confirmNoneRunning, WORKER_IMAGE } = await import('./worker.js');
 
@@ -71,7 +84,10 @@ const api = async (base, path, init) => {
   try { return JSON.parse(t); } catch { return { raw: t.slice(0, 300) }; }
 };
 
-const BASE = externalTasks();
+// A frozen subset by id, for smoke tests and for re-running a named task. Empty = all 15.
+const ONLY = String(process.env.TESTCMD_TASK_IDS || '').split(',').map((x) => x.trim()).filter(Boolean);
+const BASE = externalTasks().filter((t) => !ONLY.length || ONLY.includes(t.id));
+if (ONLY.length && BASE.length !== ONLY.length) { console.error(`TESTCMD_TASK_IDS named ${ONLY.length} but ${BASE.length} matched`); process.exit(2); }
 
 /** A task as one arm presents it. The ONLY differences are seed files and two sentences. */
 function armTask(task, arm) {
@@ -105,9 +121,11 @@ async function measureBaselines() {
     await ex('git', ['-C', dir, 'config', 'core.autocrlf', 'false'], { windowsHide: true }).catch(() => {});
     await ex('git', ['-C', dir, 'add', '-A'], { windowsHide: true }).catch(() => {});
     await ex('git', ['-C', dir, '-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'seed'], { windowsHide: true }).catch(() => {});
-    const v = await evaluate(dir, t, { timeoutSec: 90 });
-    baseline.set(t.id, casesFrom(v.requested));
-    console.log(`  baseline ${t.id}: ${baseline.get(t.id).pass}/${baseline.get(t.id).total} graded cases pass on the seed`);
+    const name = t.id.replace(/^ext-/, '');
+    const cs = await caseSet(dir, name, t.requested.files['cases.jsonl']);
+    baseline.set(t.id, cs);
+    console.log(`  baseline ${t.id}: ${cs.passing.size}/${cs.total} graded cases pass on the seed${cs.error ? ' [' + cs.error + ']' : ''}`);
+    try { rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ }
   }
 }
 
@@ -130,7 +148,7 @@ async function runTask(ws, task, ctx) {
   });
   const base = `http://127.0.0.1:${p}/api`;
   const hardStop = Math.min(started + ctx.timeoutSec * 1000, DEADLINE);
-  let run = null, aborted = null;
+  let run = null, aborted = null, runId = null;   // hoisted: the transcript is read after the finally
   try {
     for (let i = 0; i < 60 && Date.now() < hardStop; i++) {
       try { const h = await api(base, '/agent'); if (h && !h.error) break; } catch { /* not up */ }
@@ -140,6 +158,7 @@ async function runTask(ws, task, ctx) {
       method: 'POST', body: JSON.stringify({ goal: task.goal, budgetSec: ctx.timeoutSec }),
     });
     if (!start.runId) return { status: 'NOT_STARTED', error: 'the hub did not start a run', attemptId: ctx.attemptId };
+    runId = start.runId;
     while (Date.now() < hardStop) {
       run = await api(base, `/agent/${start.runId}`).catch(() => null);
       if (run && run.status && run.status !== 'running' && !run.busy && run.finalizedAt) break;
@@ -171,8 +190,33 @@ async function runTask(ws, task, ctx) {
     if (isFailingTest(s)) sawFailure = true;
     else if (sawFailure && isEdit(s)) { editAfterFailure = true; break; }
   }
+  // ── DID THE FEEDBACK ACTUALLY REACH THE MODEL? ──
+  // Invoking the command is not the same as being fed its result. This Hub has already
+  // shipped a defect where a warning was generated and then substituted away before it was
+  // sent, so "the tool ran" is not evidence about what the next request contained. The
+  // transcript's `sent` field is the per-turn delta - the messages new since the model last
+  // spoke - so the runner's output having reached a LATER request is readable directly.
+  let feedbackDelivered = false;
+  try {
+    const tpath = join(ROOT, 'runs', `${runId}.transcript.jsonl`);
+    if (runId && existsSync(tpath)) {
+      const lines = readFileSync(tpath, 'utf8').split('\n').filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } });
+      // MATCH THE DELIVERED RESULT, NOT THE SOURCE CODE. The first version also matched
+      // "FIRST FAILING CASE:", which appears verbatim inside run_tests.py itself - and the
+      // supplied-file feature inlines that file into the opening context, because the new
+      // guidance names it. So delivery read TRUE on a run whose command never executed.
+      // Caught by the fake-backend smoke test, before any spend. A delivered result is
+      // identified by its TOOL RESULT framing plus a NUMERIC summary line; neither appears
+      // in the runner source, which carries %d placeholders.
+      feedbackDelivered = lines.some((e) => e && e.kind === 'turn' && Array.isArray(e.sent)
+        && e.sent.some((msg) => /TOOL RESULT \((?:run_command|run_python)\)[\s\S]{0,4000}?SUMMARY \d+\/\d+ cases pass/
+          .test(String(msg?.content || ''))));
+    }
+  } catch { /* evidence, never a reason to fail the unit */ }
+
   const calls = Array.isArray(run?.callStats) ? run.callStats : [];
   return {
+    feedbackDelivered,
     status: 'COMPLETED', ok: true, exit: 0, timedOut: !!aborted, attemptId: ctx.attemptId,
     elapsedSec: Math.round((Date.now() - started) / 1000),
     terminationReason: aborted || run?.status || 'ended',
@@ -190,7 +234,7 @@ async function runTask(ws, task, ctx) {
 console.log(`TESTCMD-1 START ${new Date().toISOString()} hub ${process.env.TESTCMD_HUB_COMMIT || 'unrecorded'}`);
 console.log(`model: ${MODEL_URL}`);
 console.log(`worker: ${WORKER_IMAGE}`);
-console.log(`arms: CONTROL (seed only) vs TESTCMD (seed + run_tests.py + cases)`);
+console.log('arms: CONTROL (seed only) vs TEST_PACKAGE (seed + graded cases + runner + instruction)');
 console.log(`queue: ${BASE.length} tasks x 2 arms x ${REPS} replicate(s) = ${BASE.length * 2 * REPS} units`);
 console.log(`limits: ${PER_TASK_SEC}s/task, ${TOTAL_SEC}s total, no retries\n`);
 
@@ -199,17 +243,30 @@ await measureBaselines();
 
 // THE PLAN FIRST, as always: anything planned and not recorded is UNACCOUNTED.
 recordPlan(SUMMARY, BASE.flatMap((t) => Array.from({ length: REPS }, (_, r) =>
-  ['CONTROL', 'TESTCMD'].map((a) => `${t.id}@${a}r${r + 1}`)).flat()));
+  ['CONTROL', 'TEST_PACKAGE'].map((a) => `${t.id}@${a}r${r + 1}`)).flat()));
 
 let idx = 0;
 const rows = [];
-const persist = (arm, rep) => async (r) => {
-  const b = baseline.get(r.task) || { pass: null, total: null };
-  // THE CANDIDATE the model produced, not the surviving workspace. A run that broke
-  // protected behaviour is rolled back, so its surviving tree is the seed again - measuring
-  // there would score every restored run as "did nothing" and hide the edits it did make.
-  // Regressions are counted separately (regressionsProduced), so nothing is double-credited.
-  const candidateCases = casesFrom(r.verdict?.requested);
+// onTaskEnd is called SYNCHRONOUSLY by the batch and is not awaited, so the case measurement
+// (which runs a container) cannot live there - it would race the batch's own cleanup. The
+// raw result is captured here and measured after runBatch returns.
+const pending = [];
+const capture = () => (r) => { pending.push(r); };
+
+async function recordUnit(r, arm, rep, wsDir) {
+  const b = baseline.get(r.task) || { passing: new Set(), failing: new Set(), total: null };
+  const name = String(r.task).replace(/^ext-/, '');
+  const cases = (BASE.find((t) => t.id === r.task) || {}).requested?.files['cases.jsonl'] || '';
+  // WHERE THE CANDIDATE IS. A run whose protected behaviour broke has been rolled back, so
+  // the workspace now holds the seed; acceptance kept a full copy of what the model produced.
+  // Measuring the workspace there would score every restored run as "did nothing" and hide
+  // the edits it actually made. Regressions are reported separately, so nothing is
+  // double-credited.
+  const candidateDir = r.acceptance?.capturedAt || wsDir;
+  let after = { passing: new Set(), failing: new Set(), total: null, error: 'not measured' };
+  try { if (candidateDir && existsSync(candidateDir)) after = await caseSet(candidateDir, name, cases); }
+  catch (e) { after = { passing: new Set(), failing: new Set(), total: null, error: String(e.message || e).slice(0, 120) }; }
+  const { newlyPassing, newlyFailing } = caseDiff(b, after);
   const row = {
     idx: ++idx, rep, task: `${r.task}@${arm}r${rep}`, arm,
     termination: r.termination || r.state,
@@ -229,34 +286,48 @@ const persist = (arm, rep) => async (r) => {
     commandInvoked: r.outcome?.commandInvoked ?? 0,
     sawFailingTest: !!r.outcome?.sawFailingTest,
     editAfterFailure: !!r.outcome?.editAfterFailure,
-    baselineCasesPass: b.pass, casesTotal: b.total,
-    candidateCasesPass: candidateCases.pass,
-    caseDelta: (candidateCases.pass !== null && b.pass !== null) ? candidateCases.pass - b.pass : null,
+    feedbackDelivered: !!r.outcome?.feedbackDelivered,
+    // CASE-LEVEL, per task, never pooled and never netted against each other.
+    casesTotal: b.total,
+    baselineCasesPass: b.passing.size,
+    candidateCasesPass: after.passing.size,
+    newlyPassing, newlyFailing,
+    caseMeasurementError: after.error || null,
     state: r.state,
   };
   rows.push(row);
   recordRun(SUMMARY, row);
-  console.log(`${String(idx).padStart(3)}. [${arm}] ${r.task} ${r.termination || r.state} req=${row.requested ?? '-'} cases ${b.pass}->${candidateCases.pass ?? '?'}/${b.total} edits=${row.editsOnTarget} ${row.disposition}`);
-};
+  const gained = newlyPassing.length ? ` +[${newlyPassing.join(',')}]` : '';
+  const lost = newlyFailing.length ? ` -[${newlyFailing.join(',')}]` : '';
+  console.log(`${String(idx).padStart(3)}. [${arm}] ${r.task} ${r.termination || r.state}`
+    + ` req=${row.requested ?? '-'} prot=${row.protected ?? '-'}`
+    + ` cases ${b.passing.size}->${after.passing.size}/${b.total ?? '?'}${gained}${lost}`
+    + ` edits=${row.editsOnTarget} ${row.disposition}`
+    + (arm === 'TEST_PACKAGE' ? ` cmd=${row.commandInvoked} delivered=${row.feedbackDelivered}` : ''));
+}
 
 for (let rep = 1; rep <= REPS; rep++) {
   for (let ti = 0; ti < BASE.length; ti++) {
     if (Date.now() >= DEADLINE) { console.log('deadline reached; remaining units are UNATTEMPTED'); break; }
     const task = BASE[ti];
-    // ALTERNATING ORDER: even task index runs CONTROL first, odd runs TESTCMD first.
-    const order = ti % 2 === 0 ? ['CONTROL', 'TESTCMD'] : ['TESTCMD', 'CONTROL'];
+    // ALTERNATING ORDER: even task index runs CONTROL first, odd runs TEST_PACKAGE first.
+    const order = ti % 2 === 0 ? ['CONTROL', 'TEST_PACKAGE'] : ['TEST_PACKAGE', 'CONTROL'];
     for (const arm of order) {
       if (Date.now() >= DEADLINE) break;
+      const wsDir = join(ROOT, `ws-${arm}-r${rep}`);
+      pending.length = 0;
       await runBatch([armTask(task, arm)], {
         journalPath: join(ROOT, `journal-${arm}-r${rep}.jsonl`),
-        workspacesDir: join(ROOT, `ws-${arm}-r${rep}`),
+        workspacesDir: wsDir,
         auditDir: join(ROOT, 'audit'),
         perTaskSec: PER_TASK_SEC,
         totalSec: Math.max(1, Math.round((DEADLINE - Date.now()) / 1000)),
         chain: false,
-        onTaskEnd: persist(arm, rep),
+        onTaskEnd: capture(),
         runTask,
       });
+      // Measured HERE, after the batch has finished with the workspace.
+      for (const r of pending) await recordUnit(r, arm, rep, join(wsDir, r.task));
     }
   }
 }
@@ -266,13 +337,13 @@ const stopped = await confirmNoneRunning({ timeoutMs: 30_000 });
 
 const report = writeReport(SUMMARY, join(ROOT, 'TESTCMD-1_REPORT.json'), {
   experiment: 'TESTCMD-1',
-  comparisonArm: 'CONTROL (current guidance, seed only) vs TESTCMD (seed + run_tests.py + graded cases)',
+  comparisonArm: 'CONTROL (current guidance, seed only) vs TEST_PACKAGE (seed + graded cases + run_tests.py + two sentences naming it)',
   label: 'REPAIR WITH SUPPLIED TESTS - the exposed cases ARE the graded cases; not held-out generalization',
   config: {
     model: MODEL_URL, workerImage: WORKER_IMAGE, hubCommit: process.env.TESTCMD_HUB_COMMIT || 'unrecorded',
     workerIsolation: true, routeBounding: true, acceptance: true, d2: false, protocolController: false,
     perTaskSec: PER_TASK_SEC, totalSec: TOTAL_SEC, replicates: REPS, retries: 'none',
-    armDifference: 'two seed files (run_tests.py, task_cases.jsonl) and two sentences of guidance. Nothing else.',
+    armDifference: 'two seed files (the graded cases, and a runner over them) and two sentences naming the runner. Nothing else. The result is about the PACKAGE; it cannot attribute an effect to any one part.',
   },
   elapsedSec,
   noActiveWorkLeftBehind: stopped.ok,
@@ -283,19 +354,31 @@ const arm = (a) => rows.filter((r) => r.arm === a);
 const sum = (xs, f) => xs.reduce((n, x) => n + (f(x) || 0), 0);
 const summarise = (a) => {
   const g = arm(a);
-  const withDelta = g.filter((r) => r.caseDelta !== null);
+  const measured = g.filter((r) => !r.caseMeasurementError);
   return {
     runs: g.length,
+    // OUTCOME FIRST, always. Case movement never appears without it.
     verifiedRepairs: g.filter((r) => r.accepted).length,
+    dispositions: g.reduce((acc, r) => (acc[r.disposition] = (acc[r.disposition] || 0) + 1, acc), {}),
     regressionsProduced: g.filter((r) => r.protected === 'FAIL').length,
-    casesGained: sum(withDelta, (r) => r.caseDelta),   // on the CANDIDATE, before any rollback
-    runsThatGainedCases: withDelta.filter((r) => r.caseDelta > 0).length,
-    runsThatLostCases: withDelta.filter((r) => r.caseDelta < 0).length,
+    regressionsSurviving: g.filter((r) => r.disposition === 'RESTORE_FAILED').length,
+    // CASE MOVEMENT: runs, not pooled cases. The tasks carry 5-12 cases each, so a summed
+    // case count weights the wide tasks; a count of RUNS does not. Gains and losses are
+    // reported apart, and a run can appear in both.
+    runsWithNewlyPassing: measured.filter((r) => r.newlyPassing?.length).length,
+    runsWithNewlyFailing: measured.filter((r) => r.newlyFailing?.length).length,
+    runsWithBoth: measured.filter((r) => r.newlyPassing?.length && r.newlyFailing?.length).length,
+    runsAllCasesPassing: measured.filter((r) => r.casesTotal && r.candidateCasesPass === r.casesTotal).length,
+    caseMeasurementErrors: g.length - measured.length,
+    // ACTION
     editsOnTarget: sum(g, (r) => r.editsOnTarget),
     runsThatEdited: g.filter((r) => r.editsOnTarget > 0).length,
     sawFailingTest: g.filter((r) => r.sawFailingTest).length,
     editAfterFailure: g.filter((r) => r.editAfterFailure).length,
+    // DELIVERY - last, and only meaningful for the treatment arm.
     commandInvoked: g.filter((r) => r.commandInvoked > 0).length,
+    feedbackDelivered: g.filter((r) => r.feedbackDelivered).length,
+    invokedButNotDelivered: g.filter((r) => r.commandInvoked > 0 && !r.feedbackDelivered).length,
   };
 };
 
@@ -305,9 +388,9 @@ console.log(`stopped cleanly: ${stopped.ok ? 'YES' : 'NO - ' + stopped.reason}`)
 console.log(`integrity ${report.integrity.ok}  reconciliation ${report.reconciliation.ok}`);
 console.log(`status ${JSON.stringify(report.byStatus)}`);
 console.log('\nLABEL: repair with SUPPLIED tests. The exposed cases are the graded cases.');
-console.log(`\nCONTROL  ${JSON.stringify(summarise('CONTROL'), null, 1)}`);
-console.log(`TESTCMD  ${JSON.stringify(summarise('TESTCMD'), null, 1)}`);
-writeFileSync(join(ROOT, 'arms.json'), JSON.stringify({ CONTROL: summarise('CONTROL'), TESTCMD: summarise('TESTCMD'), rows }, null, 2), 'utf8');
+console.log(`\nCONTROL       ${JSON.stringify(summarise('CONTROL'), null, 1)}`);
+console.log(`TEST_PACKAGE  ${JSON.stringify(summarise('TEST_PACKAGE'), null, 1)}`);
+writeFileSync(join(ROOT, 'arms.json'), JSON.stringify({ CONTROL: summarise('CONTROL'), TEST_PACKAGE: summarise('TEST_PACKAGE'), rows }, null, 2), 'utf8');
 console.log(`\nsummary: ${SUMMARY}`);
 console.log(`report:  ${join(ROOT, 'TESTCMD-1_REPORT.json')}`);
 console.log('TESTCMD-1 COMPLETE');
