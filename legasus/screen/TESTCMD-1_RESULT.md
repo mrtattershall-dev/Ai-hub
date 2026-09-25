@@ -4,9 +4,9 @@ Ran 2026-09-25 03:22:07Z → 05:49:13Z. **147m 6s of the frozen 150m bound** —
 stopped the run, not the queue. Unattended; interventions none. GPU stopped by the scripted
 `modal app stop --yes` at 05:49:21Z, **confirmed `stopped`**.
 
-**Spend: ESTIMATE ~$2.75** (2.45h of A10G at ~$1.10/hr plus ~2 min warm-up), against the **$5
-authorized by Micheal**. This remains an estimate and is labelled as one; actual charges will
-be reported when Modal exposes them.
+**Spend: ESTIMATE ~$2.75** (2.45h of A10G at ~$1.10/hr plus ~2 min warm-up). **Authorized:
+$15. Operating limit I chose: $5.** This remains an estimate and is labelled as one; actual
+charges will be reported when Modal exposes them.
 
 **LABEL: repair with SUPPLIED tests.** The exposed cases are the graded cases. Nothing here is
 evidence about held-out generalization.
@@ -24,12 +24,34 @@ evidence about held-out generalization.
     regressions produced             6 / 28          4 / 27
     regressions surviving            0                0
 
-**The package did not raise verified repairs. The numbers run against it.** But they do not
-establish that it hurt: BENCH-3 measured this pipeline's own per-replicate spread at 1–3 of 15
-on these same tasks, and CONTROL's replicates here are 3 and 5 — the control arm is itself
-running above BENCH-3's observed range. Against that variance, {3,5} versus {2,2} is a
-difference this design cannot resolve. The honest statement is **no demonstrated benefit**,
-not a demonstrated cost.
+**Observed: 8/28 versus 4/27, favouring the control arm descriptively.**
+
+**CORRECTED 2026-09-25.** This paragraph previously said the difference was "inside
+demonstrated variance" because BENCH-3 measured a 1-3/15 per-replicate spread. That was
+unsupported: BENCH-3 is a separate experiment on a different configuration, and its range does
+not license a noise claim about this difference. The observed result is reported as observed,
+with its limits stated rather than converted into a verdict:
+
+    observed                 8/28 (CONTROL) versus 4/27 (TEST_PACKAGE)
+    repetitions              2 planned per cell; replicate 2 is short on both arms
+    task coverage            UNEQUAL - see the complete-pair table below
+    what it supports         a descriptive difference favouring the control arm
+    what it does not         that the package hurt, that the difference is noise, or any
+                             estimate of how often it would recur
+
+### Complete pairs only (both arms ran the same task in the same replicate)
+
+All attempts and costs are retained above. This is a narrower view shown because unequal
+coverage makes the headline ratio hard to read - not a replacement for it.
+
+    complete pairs (both arms, same task, same replicate)   27 of 30 planned
+    CONTROL repairs within those pairs                       8
+    TEST_PACKAGE repairs within those pairs                  4
+    both arms repaired                                       1   (flatten r1)
+    only CONTROL repaired                                    7
+    only TEST_PACKAGE repaired                               3
+    neither repaired                                        16
+    incomplete (one arm only)                                1   (mergesort r2, CONTROL only)
 
 ## The finding that actually matters: it was mostly not used
 
@@ -38,19 +60,32 @@ ran it — so for those, the "treatment" reduced to extra files on disk and ~3.7
 opening context. The pre-registered distinction applies: this is the **never-invoked** negative
 result, not the "insufficient feedback" one.
 
-The 6 runs where it did execute, with what followed:
+**CORRECTED 2026-09-25 - the table that stood here was wrong.** It linked each run to the
+FIRST summary row matching its task name, so both replicates of a task were shown with
+replicate 1's outcome. Re-derived by zipping runs to rows in execution order
+(`TESTCMD-1_TRACE-ANALYSIS.md`):
 
-    longest_common_subsequence   4 invocations, 4 with real SUMMARY output, 0 edits, PRESERVE_INCOMPLETE
-    flatten (r1)                 5 invocations, 1 with real output,        3 edits, RETAIN
-    flatten (r2)                 3 invocations, 0 with real output,        3 edits, RETAIN
-    max_sublist_sum              1 invocation,  1 with real output,        0 edits, PRESERVE_INCOMPLETE
-    mergesort                    1 invocation,  1 with real output,       33 edits, PRESERVE_INCOMPLETE
-    kth                          1 invocation,  1 with real output,        3 edits, PRESERVE_INCOMPLETE
+    run                            confirmed/named  delivered   next action     outcome
+    longest_common_subsequence r2      4 / 0        4 requests  edited target   6->10/10  RETAIN
+    flatten r2                         1 / 4        1 request   edited target   1->1/7    PRESERVE_INCOMPLETE
+    kth r2                             1 / 0        1 request   edited target   3->0/7    RESTORED (no import)
+    max_sublist_sum r1                 1 / 0        1 request   outline_file    2->2/6    PRESERVE_INCOMPLETE
+    mergesort r1                       1 / 0        1 request   edited target   1->1/14   PRESERVE_INCOMPLETE
 
-So where feedback was both produced and delivered, it was followed by a repair in 2 of 6 and by
-nothing useful in 4 — including one run that saw four consecutive correct failure reports and
-made **zero** edits. That is a real observation about this model on these tasks, and it is
-based on six runs.
+**1 success in 5 confirmed-runner runs**, not "2 of 6". The treatment arm's other three
+successes (flatten r1, lcs_length r1 and r2) used the runner **not at all**. The claim that a
+run "saw four consecutive correct failure reports and made zero edits" was the same artifact:
+that run is longest_common_subsequence r2, it did edit, and it is the one success.
+
+Execution evidence, classified without inferring non-execution from syntax:
+
+    CONFIRMED_RUNNER  8 steps / 5 runs    execution OBSERVED
+    NAMED_NO_OUTPUT   7 steps             invoked; usefulness UNKNOWN - NOT ruled out
+    UNKNOWN_EXEC      1 step              cannot be ruled in or out
+    OTHER_ROUTE      32 steps             clearly ad-hoc code of the model's own
+
+Execution was **observed** in 5 runs. That is not the same as all other execution being ruled
+out.
 
 ## A hypothesis I raised mid-run and then falsified
 
@@ -99,12 +134,20 @@ NOT SETTLED, and explicitly not claimed:
 - That feedback availability is not the obstacle. **This package** was insufficient here. A
   different one — held-out cases, a different report format, fewer cases, the runner invoked
   for the model rather than offered to it — is untested, as is every other model.
-- That the package hurt. The difference sits inside demonstrated run-to-run variance.
+- That the package hurt. The observed difference favours the control arm descriptively; with
+  2 planned repetitions, unequal task coverage and no repeat-rate estimate, this design does
+  not support a claim that the package caused harm - nor that the difference is noise.
 - Anything about generalization: the exposed cases are the graded cases.
 
 The most actionable thing in this record is the invocation rate, not the repair count. The
-model was handed a working diagnostic and used it 6 times in 27. Whether that is an
-instruction-following failure, a prompt-position problem, or a capability limit is the next
-question, and it is answerable from these transcripts without buying anything.
+model was handed a working diagnostic and execution was observed in 5 of 27 runs.
 
-Records: `TESTCMD-1_REPORT.json`, `TESTCMD-1_summary.jsonl`, `TESTCMD-1_console.log`.
+**CORRECTED 2026-09-25.** I previously wrote that whether this is "an instruction-following
+failure, a prompt-position problem, or a capability limit ... is answerable from these
+transcripts". It is not. Transcripts establish **what instruction reached the model and what
+happened afterwards**; those three remain causal hypotheses needing their own tests. See
+`TESTCMD-1_TRACE-ANALYSIS.md`, scoped accordingly - it finds the instruction present, intact
+and identically positioned in all 25 capturable runs.
+
+Records: `TESTCMD-1_REPORT.json`, `TESTCMD-1_summary.jsonl`, `TESTCMD-1_console.log`,
+`TESTCMD-1_TRACE-ANALYSIS.md`.

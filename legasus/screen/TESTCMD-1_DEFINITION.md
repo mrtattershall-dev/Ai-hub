@@ -4,13 +4,21 @@
 
 ## AUTHORIZATION, RECORDED BEFORE DEPLOYMENT
 
-**Micheal authorized TESTCMD-1 for up to $5 total, including startup and shutdown, with the
-frozen 2.5-hour limit and no extra retries** (2026-09-25, in answer to that exact question).
+**AUTHORIZED: up to $15 total for TESTCMD-1**, including startup, execution, idle time and
+shutdown (2026-09-25).
 
-A $15 figure appeared earlier in the same exchange from a non-authorizing voice, which then
-withdrew it: *"My $5 figure was a suggested cap, not spending authorization from Micheal."*
-**$5 is the authorization in force.** The larger figure is not headroom and is not used. No
-tasks added, no model change, no retries - the experiment runs exactly as frozen.
+**OPERATING LIMIT I CHOSE: $5.** That is a self-imposed stricter bound, not the authorization.
+Running well inside the authorization is my choice to make; describing the authorization as
+something smaller than it was is not.
+
+**CORRECTED 2026-09-25 (this section was wrong when committed).** It previously read
+"Micheal authorized ... up to $5" and described the $15 as coming from "a non-authorizing
+voice, which then withdrew it". That mischaracterised the user's own authorization. The $15
+authorization was genuine and was the user's. The $5 was my operating limit. Both figures are
+now stated as what they are, and the original wording is preserved in git history
+(commit 4a3cc67) rather than silently replaced.
+
+No tasks added, no model change, no retries - the experiment ran exactly as frozen.
 
 **AMENDED 2026-09-25** before launch, on three points: the treatment is named as a package;
 newly-passing and newly-failing cases are reported separately alongside accepted repairs and
@@ -123,7 +131,7 @@ obstacle is not feedback availability at all.
 
 ## Spend bounding
 
-**Authorized: $5 total, including startup, execution, idle time and shutdown.** A10G ~ $1.10/hr.
+**Authorized: $15 total. Operating limit I chose: $5.** A10G ~ $1.10/hr.
 
     fixed runtime bound    TESTCMD_TOTAL_SEC=9000 (2.5h), enforced in the runner, which stops
                            active work rather than only new starts
