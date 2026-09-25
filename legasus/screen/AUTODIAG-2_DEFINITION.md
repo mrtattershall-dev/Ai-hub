@@ -1,6 +1,6 @@
 # AUTODIAG-2 — definition, frozen before any generation
 
-2026-09-25. **Not launched. No spend authorized for it.**
+2026-09-25. **$5 authorized (see Spend). Not launched until deploy.**
 
 ## The question
 
@@ -67,17 +67,28 @@ waiting for a paid run to discover whether it works.
 - **8-vs-0 recurring** would make the productivity result a two-replicate observation rather
   than a single one. It would still be about this model, these tasks, and supplied test
   results — never held-out generalization.
-- **A much smaller or absent difference** would NOT erase AUTODIAG-1's observed 8-versus-0.
-  That result happened and stands as an observation. A repeat can only do one of three things,
-  and the report must say which:
-    - **fail to reproduce it** - the observation stands, the evidence for a reliable benefit
-      weakens, and no repeat rate can be claimed in either direction;
-    - **weaken the evidence for a reliable benefit** - a smaller difference in the same
-      direction, reported as such rather than averaged into a single figure;
-    - **reveal that it depended on particular conditions** - if the difference tracks task,
-      seed, or ordering, that dependency is the finding.
-  An earlier draft of this line said a repeat would "withdraw" the first result. That was
-  wrong: a second experiment cannot un-observe a first one.
+- **Whatever AUTODIAG-2 shows, it does not erase AUTODIAG-1's observed 8-versus-0.** That
+  result happened and stands as an observation.
+
+  **No interpretation is pre-assigned to any outcome.** What the report must do is set the two
+  experiments side by side - paired by task, with their denominators, their operational
+  failures and their costs - and assess them, including the uncertainty, rather than sorting
+  the result into a category chosen in advance. Specifically:
+
+    - **A smaller difference is not automatically weaker evidence.** Two runs both favouring
+      the treatment can be more evidence than one, even when the margins differ. Whether the
+      evidence strengthened, weakened or did neither depends on the paired outcomes and on how
+      much they could have varied - not on whether the second number is lower than the first.
+    - **An apparent task or ordering pattern does not by itself establish
+      condition-dependence.** With 15 tasks and 2 replicates, patterns will appear by chance.
+      A pattern is a hypothesis worth naming and testing separately; it is not a finding.
+    - **"Failed to reproduce" is a claim that needs its own support.** Two runs differing is
+      also what noise looks like at this sample size, and this design has no repeat-rate
+      estimate to distinguish the two.
+
+  An earlier draft of this line said a repeat would "withdraw" the first result, and a later
+  draft offered a menu of three predetermined readings. Both were wrong: a second experiment
+  cannot un-observe a first one, and the interpretation has to come from the data.
 
 - **BOTH EXPERIMENTS ARE REPORTED PROMINENTLY**, with matched task results and costs side by
   side - never AUTODIAG-2 alone, and never a pooled figure that hides which run produced what.
@@ -97,8 +108,18 @@ waiting for a paid run to discover whether it works.
 
 ## Spend
 
-Not authorized. When launched: a fixed runtime bound enforced in the runner, no added retries,
-`modal app stop --yes` in the same job with the stopped state confirmed, and every cost figure
-labelled an estimate until actual charges are available. AUTODIAG-1 cost an estimated $2.75 for
-29 units in 147 minutes; a completing 60-unit run would need materially more wall clock, which
-is a decision for whoever authorizes it, not an assumption to build in here.
+**AUTHORIZED: $5 total, including startup, execution, idle time and shutdown** (2026-09-25,
+for this new run; the earlier $5 covered AUTODIAG-1 and is not reused).
+
+    fixed runtime bound    AUTODIAG_TOTAL_SEC=9000 (2.5h), enforced in the runner, which stops
+                           active work rather than only new starts
+    no added retries       unchanged
+    ESTIMATE (planning)    AUTODIAG-1 completed 28 units in ~48 minutes once its one hung unit
+                           is set aside - about 1.7 min/unit. 60 units at that pace is ~1.7h
+                           ~ $1.90. At the 2.5h bound, ~$2.75.
+    CONDITIONAL figure     the above holds only if the runner's wall clock stops active work,
+                           `modal app stop --yes` succeeds, and no request remains in flight.
+                           Automatic scaledown releases an IDLE container and is a backstop
+                           against a missed stop, not a spending ceiling.
+
+Every figure is an ESTIMATE and stays labelled as one until actual charges are available.
