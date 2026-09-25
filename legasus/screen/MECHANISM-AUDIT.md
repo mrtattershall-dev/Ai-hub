@@ -106,8 +106,14 @@ After a bad first edit the pattern is the same each time: the after-edit diagnos
 improvement, the model re-issues the SAME edit, the tool refuses it or the response repeats,
 and the repeat guard ends the run within 2–4 more calls.
 
-**So the "more retained + more restored + fewer calls + less elapsed" combination has one
-explanation, not four.** The diagnostic moves the first action from probing to editing.
+**So the "more retained + more restored + fewer calls + less elapsed" combination is
+consistent with one account rather than four.** CORRECTED (2026-09-25, after review): the
+earlier wording said "has one explanation" — too strong. First-action choice and first-edit
+improvement are ASSOCIATED with the outcome; the records do not establish that they caused
+the whole efficiency and regression pattern. A first edit that improves the cases could
+equally mark an easier task or a better sampled plan. What follows is the account the
+records support, not a demonstrated cause. The diagnostic moves the first action from
+probing to editing.
 Edits either fix (RETAIN) or break protected behaviour (RESTORED — 9 vs 3, all caught). Runs
 end sooner because the repeat guard stops a model that repeats an edit faster than it stops a
 model that repeats a probe, and because SEVEN control units burned their whole 300s on a hung
@@ -134,12 +140,18 @@ What differs between replicate 1 and replicate 2 of the SAME arm, from the recor
   evidence in the records, not proof — the design had no way to show it positively.
 
 **The records cannot distinguish sampling variance from a task-order or replicate-order
-effect with two unseeded draws.** That is the gap the next experiment closes.
+effect with two unseeded draws.** CORRECTED: the missing seeds explain why the replicates
+were not controlled as intended; they do not by themselves explain the SIZE of the 8-to-2
+swing. (MECH-1 later sent seeds and still saw 5 vs 8 within one arm.) The seed probe
+establishes reproducibility only under the conditions it tested.
 
 ## 4. Hypothesis table
 
     #  explanation                          predicted signature              evidence AGAINST so far           cheapest discriminating check
-    H1 SEMANTIC: the failing inputs and    C(full) > B(counts only) ≈ A     none - B never existed            arm B: same delivery, counts only
+    H1 "SEMANTIC" - a BUNDLE: concrete   C(full) > B(counts only) ≈ A     none - B never existed            arm B: same delivery, counts only
+       examples, expected outputs,                                                                            (removes several things at once;
+       localization, a more actionable                                                                        cannot isolate WHICH component)
+       task description; the failing inputs and
        expected/actual values let the                                                                         (built, tested; MECH-1)
        model localize the bug
     H2 NOTIFICATION / WHERE-TO-ACT: being  B ≈ C > A; first action shifts   none - B never existed            same arm B; first-action and

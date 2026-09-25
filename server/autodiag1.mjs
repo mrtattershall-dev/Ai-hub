@@ -69,6 +69,10 @@ const ARM_DESC = {
   CONTROL: 'nothing delivered',
   NOTIFY: 'the Hub runs the graded cases and delivers ONLY the counts (attempted/passed/failed) - no case, input, expected or actual value',
   AUTODIAG_ARM: 'the Hub runs the graded cases and delivers the full result (counts plus up to 6 failing cases, expected vs actual)',
+  // RECOV-1: the SAME full opening report in all three; only the feedback after an edit differs.
+  INIT_ONLY: 'full opening report; after an edit the diagnostic is re-run and recorded but NOTHING is delivered',
+  INIT_COUNTS: 'full opening report; after an edit only the counts are delivered',
+  INIT_FULL: 'full opening report; after an edit the full result is delivered (identical to AUTODIAG_ARM)',
 };
 const ARMS = String(process.env.AUTODIAG_ARMS || 'CONTROL,AUTODIAG_ARM').split(',').map((x) => x.trim()).filter(Boolean);
 for (const a of ARMS) if (!ARM_DESC[a]) { console.error(`unknown arm "${a}" - one of ${Object.keys(ARM_DESC).join(', ')}`); process.exit(2); }
@@ -128,6 +132,8 @@ function armDiagnostic(task, arm) {
     moduleName: task.id.replace(/^ext-/, ''), casesJsonl: task.requested.files['cases.jsonl'],
     // NOTIFY: the same diagnostic, the same delivery points, counts only. See autodiag.js.
     ...(arm === 'NOTIFY' ? { mode: 'summary' } : {}),
+    ...(arm === 'INIT_ONLY' ? { afterEditMode: 'silent' } : {}),
+    ...(arm === 'INIT_COUNTS' ? { afterEditMode: 'summary' } : {}),
   };
 }
 
@@ -293,7 +299,7 @@ async function runTask(ws, task, ctx) {
   // WHAT THE ARM ACTUALLY SAW, counted from the transcript rather than assumed from the arm
   // name: how many diagnostic messages reached a request, and how many case-detail lines.
   // CONTROL must see none of either; NOTIFY must see messages but no case lines.
-  let diagnosticMessagesSeen = 0, caseDetailLinesSeen = 0;
+  let diagnosticMessagesSeen = 0, caseDetailLinesSeen = 0, afterEditCaseLinesSeen = 0;
   try {
     const tpath = join(ROOT, 'runs', `${runId}.transcript.jsonl`);
     if (runId && existsSync(tpath)) {
@@ -317,7 +323,9 @@ async function runTask(ws, task, ctx) {
           const c = String(msg?.content || '');
           if (/^AUTOMATIC DIAGNOSTIC/.test(c)) {
             diagnosticMessagesSeen++;
-            caseDetailLinesSeen += (c.match(/^ {2}(FAIL|ERROR) case \d+ /gm) || []).length;
+            const lines = (c.match(/^ {2}(FAIL|ERROR) case \d+ /gm) || []).length;
+            caseDetailLinesSeen += lines;
+            if (diagnosticMessagesSeen > 1) afterEditCaseLinesSeen += lines;
           }
         }
       }
@@ -326,7 +334,8 @@ async function runTask(ws, task, ctx) {
 
   const calls = Array.isArray(run?.callStats) ? run.callStats : [];
   return {
-    feedbackDelivered, diagnosticMessagesSeen, caseDetailLinesSeen,
+    feedbackDelivered, diagnosticMessagesSeen, caseDetailLinesSeen, afterEditCaseLinesSeen,
+    diagnosticsMeasuredSilently: (run?.diagnostics || []).filter((d) => !d.skipped && d.delivered === false).length,
     seedSent: currentSeed, samplingRecorded: run?.sampling ?? null,
     status: 'COMPLETED', ok: true, exit: 0, timedOut: !!aborted, attemptId: ctx.attemptId,
     runId,   // THE join key. Task names are not one when a task is replicated (linkRuns.js).
@@ -397,10 +406,14 @@ async function recordUnit(r, arm, rep, wsDir, { position = null, workspaceFresh 
     // ISOLATION, measured: what the transcript shows this arm was actually sent.
     diagnosticMessagesSeen: r.outcome?.diagnosticMessagesSeen ?? null,
     caseDetailLinesSeen: r.outcome?.caseDetailLinesSeen ?? null,
+    afterEditCaseLinesSeen: r.outcome?.afterEditCaseLinesSeen ?? null,
+    diagnosticsMeasuredSilently: r.outcome?.diagnosticsMeasuredSilently ?? 0,
     isolationOk: r.outcome ? (
       arm === 'CONTROL' ? (r.outcome.diagnosticMessagesSeen === 0)
         : arm === 'NOTIFY' ? (r.outcome.caseDetailLinesSeen === 0)
-          : true) : null,
+          : arm === 'INIT_ONLY' ? (r.outcome.diagnosticMessagesSeen <= 1)
+            : arm === 'INIT_COUNTS' ? (r.outcome.afterEditCaseLinesSeen === 0)
+              : true) : null,
     termination: r.termination || r.state,
     requested: r.verdict?.requested?.verdict ?? null,
     protected: r.verdict?.protected?.verdict ?? null,

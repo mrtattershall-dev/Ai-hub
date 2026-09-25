@@ -112,6 +112,14 @@ function secondary(arm, rep = null) {
     runsThatEdited: done.filter((r) => r.editsOnTarget > 0).length,
     elapsedSec: done.reduce((a, r) => a + (r.elapsedSec || 0), 0),
     modelCalls: done.reduce((a, r) => a + (r.modelCalls || 0), 0),
+    // COST PER RETAINED REPAIR - fewer calls alone can mean giving up earlier.
+    secondsPerRetainedRepair: done.filter(won).length ? Math.round(done.reduce((a, r) => a + (r.elapsedSec || 0), 0) / done.filter(won).length) : null,
+    // RECOVERY AFTER AN UNPRODUCTIVE FIRST EDIT (descriptive subgroup: arms produce different
+    // first edits, so denominators differ). Measured from run.diagnostics, delivered or silent.
+    badFirstEdit: done.filter((r) => { const d = (runs[r.runId]?.diagnostics || []).filter((x) => !x.skipped); return d.length >= 2 && d[0].passed != null && (d[1].passed ?? -1) <= d[0].passed; }).length,
+    recoveredAfterBadFirstEdit: done.filter((r) => { const d = (runs[r.runId]?.diagnostics || []).filter((x) => !x.skipped); if (d.length < 3 || d[0].passed == null) return false; const a = d[1].passed ?? -1; if (a > d[0].passed) return false; return Math.max(...d.slice(2).map((x) => x.passed ?? -1)) > Math.max(a, d[0].passed); }).length,
+    recoveredAndRetained: done.filter((r) => { const d = (runs[r.runId]?.diagnostics || []).filter((x) => !x.skipped); if (d.length < 3 || d[0].passed == null) return false; const a = d[1].passed ?? -1; if (a > d[0].passed) return false; return won(r) && Math.max(...d.slice(2).map((x) => x.passed ?? -1)) > Math.max(a, d[0].passed); }).length,
+    diagnosticsMeasuredSilently: done.reduce((a, r) => a + (r.diagnosticsMeasuredSilently || 0), 0),
     hardWall: done.filter((r) => r.hitHardWall).length,
     isolationViolations: done.filter((r) => r.isolationOk === false).length,
     diagnosticsDelivered: done.reduce((a, r) => a + (r.diagnosticsDelivered || 0), 0),
@@ -129,6 +137,7 @@ for (const a of ARMS) {
   const s = arms[a];
   console.log(`\n${a}: repairs ${s.pooled.repairs}/${s.pooled.completed}` + reps.map((r) => `  r${r} ${s.perRep[`r${r}`].repairs}/${s.perRep[`r${r}`].completed}`).join('')
     + `  regressions ${s.pooled.regressionsProduced} (surviving ${s.pooled.regressionsSurviving})  edited ${s.pooled.runsThatEdited}  elapsed ${s.pooled.elapsedSec}s  calls ${s.pooled.modelCalls}  seeds ${JSON.stringify(s.pooled.seedSent)}`);
+  console.log(`   s/retained-repair ${s.pooled.secondsPerRetainedRepair}  badFirstEdit ${s.pooled.badFirstEdit}  recovered ${s.pooled.recoveredAfterBadFirstEdit} (retained ${s.pooled.recoveredAndRetained})  silentDiagnostics ${s.pooled.diagnosticsMeasuredSilently}`);
   console.log(`   firstAction ${JSON.stringify(s.pooled.firstAction)}  firstEdit ${JSON.stringify(s.pooled.firstEdit)}`);
   console.log(`   termination ${JSON.stringify(s.pooled.termination)}  byPosition ${JSON.stringify(s.pooled.byPosition)}`);
 }

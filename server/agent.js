@@ -2785,8 +2785,23 @@ function diagTargetHash(run) {
   try { return createHash('sha256').update(readFileSync(safePath(`${run.diagnostic.moduleName}.py`))).digest('hex'); }
   catch { return null; }
 }
+/**
+ * What the model is SENT at each delivery point, from the run's diagnostic spec:
+ *   mode           'full' | 'summary'            the opening report (default 'full')
+ *   afterEditMode  'full' | 'summary' | 'silent'  re-runs after the target changes
+ *                                                 (default: same as mode)
+ * 'silent' still RUNS the diagnostic and records its result on run.diagnostics with
+ * delivered:false - the measurement is identical in every arm; only the message is withheld.
+ */
+function deliveryModeFor(run, when) {
+  const d = run.diagnostic || {};
+  const base = d.mode || 'full';
+  return when === 'start' ? base : (d.afterEditMode || base);
+}
+
 async function deliverDiagnostic(run, when) {
   if (!run.diagnostic) return;
+  const mode = deliveryModeFor(run, when);
   if (run.budgetEndsAt && run.budgetEndsAt - Date.now() < DIAG_MIN_BUDGET_MS) {
     pushStep(run, { type: 'note', text: `Automatic diagnostic skipped (${when}): under ${DIAG_MIN_BUDGET_MS / 1000}s of task budget remains.` });
     (run.diagnostics ||= []).push({ when, skipped: 'insufficient budget', at: Date.now() });
@@ -2798,23 +2813,26 @@ async function deliverDiagnostic(run, when) {
   } catch (e) {
     result = { status: DIAG.UNAVAILABLE, identity: null, reason: `the diagnostic threw: ${String(e.message || e).slice(0, 120)}` };
   }
-  const msg = diagnosticMessage(result, run.diagnostic.moduleName, when, { mode: run.diagnostic.mode || 'full' });
-  run.history.push({ role: 'user', content: msg });
+  const deliver = mode !== 'silent';
+  if (deliver) {
+    const msg = diagnosticMessage(result, run.diagnostic.moduleName, when, { mode });
+    run.history.push({ role: 'user', content: msg });
+  }
   // Recorded on the run, bound to the content tested, so a report can say exactly what the
   // model was told and about which bytes.
   (run.diagnostics ||= []).push({
-    when, at: Date.now(), status: result.status, mode: run.diagnostic.mode || 'full',
+    when, at: Date.now(), status: result.status, mode, delivered: deliver,
     sha256: result.identity?.sha256 || null,
     attempted: result.attempted ?? null, passed: result.passed ?? null, failed: result.failed ?? null,
     omitted: result.omitted ?? 0, reason: result.reason || null, importError: result.importError || null,
   });
   pushStep(run, {
-    type: 'diagnostic', when,
-    text: result.status === DIAG.OK
+    type: 'diagnostic', when, delivered: deliver,
+    text: (deliver ? '' : '[measured, not delivered] ') + (result.status === DIAG.OK
       ? (result.importError !== undefined
         ? `Automatic diagnostic (${when}): the file does not import.`
         : `Automatic diagnostic (${when}): ${result.passed}/${result.attempted} cases pass, ${result.failed} fail.`)
-      : `Automatic diagnostic (${when}) UNAVAILABLE: ${result.reason}`,
+      : `Automatic diagnostic (${when}) UNAVAILABLE: ${result.reason}`),
   });
 }
 

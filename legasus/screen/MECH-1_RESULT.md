@@ -62,8 +62,12 @@ repairs to C's level. The first action in B stayed where A's is:
 
 and B's repairs (5/30) sit beside A's (4/30), not C's (13/30). So the counts-only message
 changed little about what the model did first, and nothing measurable about what it
-repaired. **The effect is in the failing inputs and expected-versus-actual values, not in
-being told that tests were run.**
+repaired. **The effect travels with the full message, not with the fact of being told that
+tests were run.** CORRECTED (after review): "semantic content" is a BUNDLE. The full
+diagnostic supplies concrete examples, expected outputs, some localization and a more
+actionable task description at once; the counts-only arm removes all of those at once. Its
+near-control result weakens a notification-only explanation. It does not isolate which of
+the richer components carries the advantage.
 
 **Not claimed.** That B has no effect at all (4 vs 3 discordant pairs is as consistent with
 a small effect as with none); a repair RATE for any arm; anything about tasks outside these
@@ -75,7 +79,8 @@ fifteen.
     runs that edited the target      11            15            25
     first-edit effect (B, C)          -      up 6 / down 4 /   up 11 / down 8 /
                                               flat 4 / n-a 16   flat 5 / n-a 6
-    recovery after a bad first edit   -             0             2 (neither accepted)
+    recovery after a bad first edit   -             0             2 (BOTH accepted)
+    seconds per retained repair     611           418           216
     regressions produced / surviving  1 / 0        4 / 0          7 / 0
     Hub end-of-run parse rollback     1             2             6
     model calls                     144           196           168
@@ -89,7 +94,9 @@ fifteen.
     repairs by order position     2 / 1 / 1     3 / 1 / 1      5 / 4 / 4   (first/second/third)
 
 **The first-edit pattern from the audit held in C** (up 11 → all RETAIN; down/flat 13 → 2
-recoveries, neither accepted) **and appeared in B in miniature** (up 6, all RETAIN — but B
+recoveries, and CORRECTED: both of those ended RETAIN — is_valid_parenthesization 2→1→3 and
+next_palindrome 4→4→5 under seed 202. An earlier draft said "neither accepted"; that was
+carried over from the audit's single unaccepted recovery and was wrong here) **and appeared in B in miniature** (up 6, all RETAIN — but B
 edited in only 15 units and half of those went nowhere).
 
 **NOTIFY churns.** Two B units ran 28 and 20 edits, each edit re-triggering a counts-only
@@ -171,9 +178,14 @@ Records: `MECH-1_REPORT.json`, `MECH-1_summary.jsonl`, `MECH-1_arms.json`,
 SETTLED, for this model / these tasks / supplied test results: the full diagnostic beats
 the counts-only notification (10 vs 2 discordant pairs; both-seed wins on gcd and
 get_factors) and beats control (13 vs 4). The counts-only notification does not move the
-first action and sits beside control on repairs. The mechanism that survives is the
-CONTENT of the failing cases — inputs and expected-versus-actual — being in front of the
-model before its first action.
+first action and sits beside control on repairs. What survives is that the full message,
+in front of the model before its first action, is where the advantage is; which component
+of that message (examples, expected outputs, localization, task framing) is not isolated.
+First-action shift and first-edit improvement are associated with repair, not shown to
+cause it. And note the shape of the evidence: this looks more like a better initial
+PROBLEM SPECIFICATION than a working recovery loop — recovery after an unproductive first
+edit was 2 of 13 here (both accepted) and 1 of 13 in the audit (not accepted). Cost per
+retained repair: control 611 s, counts-only 418 s, full 216 s of task time.
 
 SETTLED, operational: a 90-unit three-arm campaign completes bounded and fully accounted,
 and the GPU stop is observed within half a minute of completion without depending on the
