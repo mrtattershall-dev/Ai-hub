@@ -164,6 +164,22 @@ const FARM_INCREMENTS = [
   { id: 'farm-i3', steps: [1, 2, 3, 4, 5, 6], ask: 'Increment 3: harvesting. h on a grown tile (stage 3 or more) removes the tile and adds one to inventory.crops.' },
   { id: 'farm-i4', steps: [1, 2, 3, 4, 5, 6, 7, 8], ask: 'Increment 4: saving. s writes the whole state to localStorage; when the page loads, a saved state is restored. No console errors anywhere.' },
 ];
+// ONE NAMED HANDLER, WITH A STOPPING RULE. INC3-1: twenty attempts at increment 2 (planting AND
+// growth, over an existing page) produced no implementation at all. farm-plant asks for ONE
+// handler and states what must NOT happen as explicitly as what must: on an empty tile with seeds
+// available, create a crop and spend exactly one seed; in every other case leave the state
+// untouched. Its play checks the negative clause on its own - pressing p again on the same tile,
+// and pressing p with no seeds left - so "it plants" cannot be scored without "it stops planting".
+// Movement is checked as the protected set, separately from the handler.
+const FARM_PLANT = {
+  id: 'farm-plant', steps: [1, 2, 3, 4, 5, 6], protectedSteps: [1, 2, 3],
+  ask: "One change only: make the p key plant. When the player's tile is empty AND inventory.seeds "
+    + "is greater than zero, add a tile entry { crop: 'wheat', stage: 0 } at the player's tile and "
+    + 'reduce inventory.seeds by exactly one. In every other case - the tile already has a crop, or '
+    + 'there are no seeds left - p must change nothing at all. Do not add growth, harvesting or '
+    + 'saving. Do not change how the arrow keys move the player.',
+};
+
 export function farmTasks() {
   const playPath = join(FARM_DIR, 'play.json');
   if (!existsSync(playPath)) return [];
@@ -184,6 +200,27 @@ export function farmTasks() {
       upstreamCases: inc.steps.length, protectedCases: prevSteps.length,
     });
     prev = inc.id; prevSteps = inc.steps;
+  }
+
+  // farm-plant rides its own play spec (play-plant.json), which carries the negative clauses.
+  const plantPath = join(FARM_DIR, 'play-plant.json');
+  if (existsSync(plantPath)) {
+    const pspec = JSON.parse(readFileSync(plantPath, 'utf8'));
+    const psub = (steps) => ({ ...pspec, name: `plant-steps-${steps.join('')}`, steps: pspec.steps.filter((x) => steps.includes(x.n)) });
+    const mine = psub(FARM_PLANT.steps);
+    out.push({
+      id: FARM_PLANT.id, group: 'FARM', source: 'internal', language: 'javascript', kind: 'build',
+      dependsOn: 'farm-i1',
+      // NOT `base`: that carries play.json's contract, which lists every key including t, h and s,
+      // and handing back the whole feature list would contradict "one change only". play-plant's
+      // own contract states the state shape and nothing else.
+      goal: `Continue the farming game already in index.html. ${FARM_PLANT.ask} The game is a single self-contained web page, index.html: plain HTML5 canvas and JavaScript, no frameworks, no external files or CDNs. ${pspec.contract} Everything that already works must keep working.`,
+      seed: {},
+      requested: { play: { spec: mine, steps: FARM_PLANT.steps } },
+      protected: { play: { spec: psub(FARM_PLANT.protectedSteps), steps: FARM_PLANT.protectedSteps } },
+      diagnostic: { kind: 'play', spec: mine, timeoutSec: 90 },
+      upstreamCases: FARM_PLANT.steps.length, protectedCases: FARM_PLANT.protectedSteps.length,
+    });
   }
   return out;
 }
