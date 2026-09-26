@@ -36,7 +36,7 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { createHash } from 'node:crypto';
-import { mkdtempSync, writeFileSync, readFileSync, rmSync, cpSync, existsSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, rmSync, cpSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { WORKER_IMAGE } from './worker.js';
@@ -53,6 +53,34 @@ export const DIAG = Object.freeze({
 });
 
 /** sha256 + line count of the file under test, so a result names exactly what it judged. */
+/**
+ * GAME SNAPSHOT: the tracked files of a browser game (html/js/css/json at the top level and
+ * one level down; never node_modules or dotfiles), their contents, and one sha256 over all of
+ * them in name order. This is the play kind's "target": freshness, checkpoints and exact
+ * restoration work over the SET, not a single module.
+ */
+export function gameSnapshot(workspace) {
+  const files = {};
+  const walk = (dir, rel, depth) => {
+    let names = [];
+    try { names = readdirSync(dir).sort(); } catch { return; }
+    for (const n of names.slice(0, 400)) {
+      if (n === 'node_modules' || n.startsWith('.')) continue;
+      const p = join(dir, n), r = rel ? `${rel}/${n}` : n;
+      let st; try { st = statSync(p); } catch { continue; }
+      if (st.isDirectory()) { if (depth < 1) walk(p, r, depth + 1); continue; }
+      // html/js/css only: package.json is written by the Hub itself when it prepares a workspace
+      // and would make the game's identity churn with the Hub's bookkeeping.
+      if (/\.(html|js|mjs|css)$/i.test(n) && st.size <= 512 * 1024) files[r] = readFileSync(p, 'utf8');
+    }
+  };
+  walk(workspace, '', 0);
+  const h = createHash('sha256');
+  let bytes = 0;
+  for (const k of Object.keys(files).sort()) { h.update(k).update('\0').update(files[k]).update('\0'); bytes += Buffer.byteLength(files[k]); }
+  return { files, sha256: h.digest('hex'), count: Object.keys(files).length, bytes };
+}
+
 function identify(workspace, moduleName) {
   const p = join(workspace, `${moduleName}.py`);
   if (!existsSync(p)) return null;
@@ -64,7 +92,9 @@ function identify(workspace, moduleName) {
  * Run the pristine diagnostic against the workspace as it currently stands.
  * Returns { status, identity, attempted, passed, failed, failures[], omitted, raw, reason }.
  */
-export async function runDiagnostic(workspace, { moduleName, casesJsonl }, { image = WORKER_IMAGE, timeoutSec = 60 } = {}) {
+export async function runDiagnostic(workspace, diag, { image = WORKER_IMAGE, timeoutSec = 60 } = {}) {
+  if (diag && diag.kind === 'play') return runPlayDiagnostic(workspace, diag, { timeoutSec });
+  const { moduleName, casesJsonl } = diag;
   const identity = identify(workspace, moduleName);
   if (!identity) {
     return { status: DIAG.UNAVAILABLE, identity: null, reason: `${moduleName}.py is not in the workspace` };
@@ -122,6 +152,30 @@ export async function runDiagnostic(workspace, { moduleName, casesJsonl }, { ima
 }
 
 /**
+ * The PLAY kind: the declared play (playCheck.js) against the workspace as it stands. Same
+ * result shape as the python kind - counts, failing cases with what was expected and what was
+ * observed, an identity bound to the game's tracked files - so delivery, freshness, the
+ * controller and acceptance treat a browser game exactly like a module.
+ */
+async function runPlayDiagnostic(workspace, diag, { timeoutSec = 60 } = {}) {
+  const spec = diag.spec || {};
+  const snap = gameSnapshot(workspace);
+  const identity = { sha256: snap.sha256, bytes: snap.bytes, lines: snap.count };
+  const entry = spec.entry || 'index.html';
+  const label = `the game at ${entry}`;
+  if (!snap.files[entry]) {
+    return { status: DIAG.OK, identity, targetLabel: label, attempted: 0, passed: 0, failed: null, importError: `${entry} does not exist yet, so nothing can be played`, failures: [], omitted: 0, raw: '' };
+  }
+  let playCheck;
+  try { playCheck = (await import('./playCheck.js')).playCheck; }
+  catch (e) { return { status: DIAG.UNAVAILABLE, identity, targetLabel: label, reason: `the play runner could not load: ${String(e.message || e).slice(0, 120)}` }; }
+  const r = await playCheck(workspace, spec, { timeoutMs: timeoutSec * 1000 });
+  if (r.status !== 'OK') return { status: DIAG.UNAVAILABLE, identity, targetLabel: label, reason: r.reason || 'the play could not run', raw: r.log };
+  const failures = r.cases.filter((c) => c.kind !== 'PASS').map((c) => ({ n: c.n, kind: c.kind, text: `${c.name}${c.text ? ' -> ' + c.text : ''}` }));
+  return { status: DIAG.OK, identity, targetLabel: label, attempted: r.total, passed: r.passing.size, failed: r.failing.size, failures, omitted: Math.max(0, failures.length - MAX_SHOWN), raw: String(r.log).slice(0, 4000) };
+}
+
+/**
  * The message the model actually receives. Bounded, content-bound, and explicit about
  * anything withheld. `when` distinguishes the opening report from a post-edit re-run.
  */
@@ -140,16 +194,18 @@ export function diagnosticMessage(result, moduleName, when = 'start', { mode = '
       + 'This is an INFRASTRUCTURE failure, not a test failure. NOTHING is known about whether '
       + `${moduleName}.py behaves correctly - do not treat this as a pass or a fail. Test it yourself if you can.`;
   }
-  const id = result.identity
-    ? `${moduleName}.py (sha256 ${result.identity.sha256.slice(0, 16)}, ${result.identity.lines} lines)`
-    : `${moduleName}.py`;
+  const id = result.targetLabel
+    ? `${result.targetLabel}${result.identity ? ` (${result.identity.lines} tracked file(s), sha256 ${result.identity.sha256.slice(0, 16)})` : ''}`
+    : result.identity
+      ? `${moduleName}.py (sha256 ${result.identity.sha256.slice(0, 16)}, ${result.identity.lines} lines)`
+      : `${moduleName}.py`;
 
   if (result.importError !== undefined) {
     return `${head}\n\nTESTED: ${id}\n`
       + (mode === 'summary'
-        ? 'RESULT: the file does not import.\n'
-        : `RESULT: the file does not import - ${result.importError}\n`)
-      + 'No case could be attempted. Fix the import/syntax error first; until it imports, nothing else can be checked.';
+        ? (result.targetLabel ? 'RESULT: the game cannot be played.\n' : 'RESULT: the file does not import.\n')
+        : (result.targetLabel ? `RESULT: the game cannot be played - ${result.importError}\n` : `RESULT: the file does not import - ${result.importError}\n`))
+      + (result.targetLabel ? 'No step could be attempted. Make the entry page load first; until it does, nothing else can be checked.' : 'No case could be attempted. Fix the import/syntax error first; until it imports, nothing else can be checked.');
   }
   const shown = result.failures.slice(0, MAX_SHOWN);
   const lines = [

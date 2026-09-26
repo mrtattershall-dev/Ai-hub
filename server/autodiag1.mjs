@@ -38,7 +38,7 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const { externalTasks, BENCH_GUIDANCE } = await import('./benchTasks.js');
+const { externalTasks, farmTasks, BENCH_GUIDANCE } = await import('./benchTasks.js');
 const { testCommandFiles, TEST_COMMAND_GUIDANCE } = await import('./taskTests.js');
 const { runBatch } = await import('./batch.js');
 const { evaluate } = await import('./evaluator.js');
@@ -133,7 +133,9 @@ const api = async (base, path, init) => {
 
 // A frozen subset by id, for smoke tests and for re-running a named task. Empty = all 15.
 const ONLY = String(process.env.AUTODIAG_TASK_IDS || '').split(',').map((x) => x.trim()).filter(Boolean);
-const BASE = externalTasks().filter((t) => !ONLY.length || ONLY.includes(t.id));
+// BENCH_GROUP=farm runs the builder's own target (benchTasks.farmTasks) instead of QuixBugs.
+const POOL = process.env.BENCH_GROUP === 'farm' ? farmTasks() : externalTasks();
+const BASE = POOL.filter((t) => !ONLY.length || ONLY.includes(t.id));
 if (ONLY.length && BASE.length !== ONLY.length) { console.error(`AUTODIAG_TASK_IDS named ${ONLY.length} but ${BASE.length} matched`); process.exit(2); }
 
 /**
@@ -149,6 +151,9 @@ function armTask(task, arm) {
 /** The diagnostic the Hub runs FOR the model. Null in control - nothing is delivered there. */
 function armDiagnostic(task, arm) {
   if (arm === 'CONTROL') return null;
+  if (task.diagnostic) {
+    return { ...task.diagnostic, ...(arm === 'NOTIFY' ? { mode: 'summary' } : {}), ...(arm === 'INIT_ONLY' ? { afterEditMode: 'silent' } : {}), ...(arm === 'INIT_COUNTS' ? { afterEditMode: 'summary' } : {}) };
+  }
   return {
     moduleName: task.id.replace(/^ext-/, ''), casesJsonl: task.requested.files['cases.jsonl'],
     // NOTIFY: the same diagnostic, the same delivery points, counts only. See autodiag.js.
@@ -164,6 +169,18 @@ const casesFrom = (part) => {
   return m ? { pass: +m[1], total: +m[2] } : { pass: null, total: null };
 };
 
+/** Case measurement for either task kind: the declared play, or the pristine case runner. */
+async function measureCases(t, dir) {
+  if (t.requested?.play) {
+    const { playCheck } = await import('./playCheck.js');
+    const r = await playCheck(dir, t.requested.play.spec, { timeoutMs: 90_000 });
+    if (r.status !== 'OK') return { passing: new Set(), failing: new Set(), total: null, error: r.reason || 'play unavailable' };
+    return { passing: r.passing, failing: r.failing, total: r.total, error: null, exact: true };
+  }
+  const name = t.id.replace(/^ext-/, '');
+  return caseSet(dir, name, t.requested.files['cases.jsonl']);
+}
+
 /** The seed's own baseline, measured once per task, before any model runs. */
 const baseline = new Map();
 async function measureBaselines() {
@@ -177,8 +194,7 @@ async function measureBaselines() {
     await ex('git', ['-C', dir, 'config', 'core.autocrlf', 'false'], { windowsHide: true }).catch(() => {});
     await ex('git', ['-C', dir, 'add', '-A'], { windowsHide: true }).catch(() => {});
     await ex('git', ['-C', dir, '-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'seed'], { windowsHide: true }).catch(() => {});
-    const name = t.id.replace(/^ext-/, '');
-    const cs = await caseSet(dir, name, t.requested.files['cases.jsonl']);
+    const cs = await measureCases(t, dir);
     baseline.set(t.id, cs);
     console.log(`  baseline ${t.id}: ${cs.passing.size}/${cs.total} graded cases pass on the seed${cs.error ? ' [' + cs.error + ']' : ''}`);
     try { rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ }
@@ -447,7 +463,7 @@ async function recordUnit(r, arm, rep, wsDir, { position = null, workspaceFresh 
   }
   const b = baseline.get(r.task) || { passing: new Set(), failing: new Set(), total: null };
   const name = String(r.task).replace(/^ext-/, '');
-  const cases = (BASE.find((t) => t.id === r.task) || {}).requested?.files['cases.jsonl'] || '';
+  const taskDef = BASE.find((t) => t.id === r.task) || {};
   // WHERE THE CANDIDATE IS. A run whose protected behaviour broke has been rolled back, so
   // the workspace now holds the seed; acceptance kept a full copy of what the model produced.
   // Measuring the workspace there would score every restored run as "did nothing" and hide
@@ -455,7 +471,7 @@ async function recordUnit(r, arm, rep, wsDir, { position = null, workspaceFresh 
   // double-credited.
   const candidateDir = r.acceptance?.capturedAt || wsDir;
   let after = { passing: new Set(), failing: new Set(), total: null, error: 'not measured' };
-  try { if (candidateDir && existsSync(candidateDir)) after = await caseSet(candidateDir, name, cases); }
+  try { if (candidateDir && existsSync(candidateDir)) after = await measureCases(taskDef, candidateDir); }
   catch (e) { after = { passing: new Set(), failing: new Set(), total: null, error: String(e.message || e).slice(0, 120) }; }
   const { newlyPassing, newlyFailing } = caseDiff(b, after);
   const row = {

@@ -141,6 +141,22 @@ export async function evaluate(workspace, task, { timeoutSec = 120, image = WORK
     for (const kind of ['requested', 'protected']) {
       const spec = task[kind];
       if (!spec) { parts[kind] = { verdict: null, reason: 'not specified for this task' }; continue; }
+      // A PLAY spec: the declared browser play (playCheck.js) against the candidate, in the
+      // machine's headless Chrome - the candidate's JS runs in the browser sandbox, not in the
+      // worker container. requested = every listed step; protected = the steps it names.
+      if (spec.play) {
+        try {
+          const { playCheck } = await import('./playCheck.js');
+          const r = await playCheck(workspace, spec.play.spec, { timeoutMs: timeoutSec * 1000 });
+          if (r.status !== 'OK') { parts[kind] = { verdict: VERDICT.EVALUATION_ERROR, reason: `the ${kind} play could not run: ${r.reason}` }; continue; }
+          const needed = Array.isArray(spec.play.steps) && spec.play.steps.length ? spec.play.steps : (spec.play.spec.steps || []).map((s) => s.n);
+          const ok = needed.every((n) => r.passing.has(n));
+          parts[kind] = { verdict: ok ? VERDICT.PASS : VERDICT.FAIL, exit: ok ? 0 : 1, out: String(r.log).slice(0, 2000), isolation: 'headless browser on the host (not the worker container)', steps: needed, passing: [...r.passing], failing: [...r.failing] };
+        } catch (e) {
+          parts[kind] = { verdict: VERDICT.EVALUATION_ERROR, reason: `the ${kind} play threw: ${String(e.message || e).slice(0, 160)}` };
+        }
+        continue;
+      }
       const file = join(checkDir, `${kind}.sh`);
       mkdirSync(dirname(file), { recursive: true });
       writeFileSync(file, spec.script, 'utf8');

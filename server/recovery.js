@@ -45,7 +45,7 @@ const passingSet = (result) => {
 };
 
 /** Build the controller state from the OPENING diagnostic and the target's current bytes. */
-export function initRecovery(startResult, targetBytes, policy = {}) {
+export function initRecovery(startResult, targetBytes, policy = {}, targetSha = null) {
   const p = { ...DEFAULT_POLICY, ...(policy || {}) };
   if (!startResult || startResult.status !== 'OK' || startResult.importError !== undefined || !startResult.attempted) {
     return { enabled: false, reason: 'the opening diagnostic could not establish a protected set', policy: p };
@@ -53,7 +53,9 @@ export function initRecovery(startResult, targetBytes, policy = {}) {
   const passing = passingSet(startResult);
   return {
     enabled: true, policy: p, state: 'ACTIVE',
-    verified: { sha256: sha(targetBytes), bytes: targetBytes, passing: [...passing], passed: startResult.passed, attempted: startResult.attempted, failures: startResult.failures || [] },
+    // The checkpoint's identity is the DIAGNOSTIC's identity for this target (a module's file
+    // bytes, or a game's snapshot over its tracked files) - the same hash freshness compares.
+    verified: { sha256: targetSha || sha(targetBytes), bytes: targetBytes, passing: [...passing], passed: startResult.passed, attempted: startResult.attempted, failures: startResult.failures || [] },
     provisional: null,
     attempts: 0, freshPlans: 0, repeats: 0, provisionals: 0,
     rejected: [],          // { sha256, reason, kind, passed, brokeProtected: [...], at }
@@ -127,8 +129,8 @@ export function repeat(rec, candidateSha) {
 }
 
 /** Advance the verified checkpoint to an ACCEPTED candidate. */
-export function accept(rec, result, targetBytes) {
-  rec.verified = { sha256: sha(targetBytes), bytes: targetBytes, passing: [...passingSet(result)], passed: result.passed, attempted: result.attempted, failures: [] };
+export function accept(rec, result, targetBytes, targetSha = null) {
+  rec.verified = { sha256: targetSha || sha(targetBytes), bytes: targetBytes, passing: [...passingSet(result)], passed: result.passed, attempted: result.attempted, failures: [] };
   rec.provisional = null;
 }
 export function provisional(rec, result, candidateSha) {
@@ -144,7 +146,7 @@ export function provisional(rec, result, candidateSha) {
 export function packetMessage(rec, d, moduleName) {
   const v = rec.verified;
   const lines = [
-    `RECOVERY CONTROLLER - your last change was ${d.action === 'REPEAT' ? 'REFUSED' : d.action === 'DISCARD' ? 'DISCARDED' : 'REJECTED'} and ${moduleName}.py was RESTORED to the verified checkpoint (sha256 ${v.sha256.slice(0, 16)}).`,
+    `RECOVERY CONTROLLER - your last change was ${d.action === 'REPEAT' ? 'REFUSED' : d.action === 'DISCARD' ? 'DISCARDED' : 'REJECTED'} and ${/\.[a-z0-9]+$|^the game/i.test(moduleName) ? moduleName : moduleName + '.py'} was RESTORED to the verified checkpoint (sha256 ${v.sha256.slice(0, 16)}).`,
     '',
     `WHY: ${d.reason}.`,
   ];

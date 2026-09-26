@@ -49,7 +49,7 @@ import { runInWorker, WorkerUnavailable, WorkerUnconfirmed, workerAvailable, WOR
 import { ProtocolController } from './protocol.js';
 import { ROUTES_BOUNDED, noteUncoveredTraversal, refuseAtDetachedSite } from './routeBound.js';
 import { prepareGoverned, concludeGoverned, PROTECTION, NO_PROTECTION_NOTE } from './governance.js';
-import { runDiagnostic, diagnosticMessage, DIAG } from './autodiag.js';
+import { runDiagnostic, diagnosticMessage, DIAG, gameSnapshot } from './autodiag.js';
 import { languageOf, errorSignature, recordLesson, retrieve as retrieveLessons, lessonsForOpening, renderLessons } from './lessons.js';
 import { initRecovery, isRejected, decide as recoveryDecide, repeat as recoveryRepeat, accept as recoveryAccept, provisional as recoveryProvisional, packetMessage } from './recovery.js';
 import { lockAuditDir } from './d2.js';
@@ -2793,8 +2793,30 @@ const DIAG_MIN_BUDGET_MS = 30_000;
 /** sha256 of the diagnostic target as it stands right now, or null if it is not there. */
 function diagTargetHash(run) {
   if (!run.diagnostic) return null;
+  if (run.diagnostic.kind === 'play') { try { return gameSnapshot(WORKSPACE).sha256; } catch { return null; } }
   try { return createHash('sha256').update(readFileSync(safePath(`${run.diagnostic.moduleName}.py`))).digest('hex'); }
   catch { return null; }
+}
+/** What the diagnostic is about, for messages: a module file, or the game's entry page. */
+function diagTargetLabel(run) { return run.diagnostic?.kind === 'play' ? `the game at ${run.diagnostic.spec?.entry || 'index.html'}` : `${run.diagnostic?.moduleName}.py`; }
+/**
+ * THE CHECKPOINT BYTES. A module: its file. A game: a JSON map of every tracked file (html,
+ * js, css, json) - restoration writes them all back and removes tracked files that were not
+ * in the checkpoint, so "byte-exact" means the whole set, verified by the snapshot sha.
+ */
+function recoveryTargetBytes(run) {
+  if (run.diagnostic?.kind === 'play') return JSON.stringify(gameSnapshot(WORKSPACE).files);
+  return readFileSync(safePath(`${run.diagnostic.moduleName}.py`), 'utf8');
+}
+function recoveryWriteTarget(run, bytes) {
+  if (run.diagnostic?.kind === 'play') {
+    const files = JSON.parse(bytes);
+    const now = gameSnapshot(WORKSPACE).files;
+    for (const k of Object.keys(now)) if (!(k in files)) { try { rmSync(safePath(k)); } catch { /* best effort */ } }
+    for (const [k, v] of Object.entries(files)) { const p = safePath(k); mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, v, 'utf8'); }
+    return;
+  }
+  writeFileSync(safePath(`${run.diagnostic.moduleName}.py`), bytes, 'utf8');
 }
 /**
  * What the model is SENT at each delivery point, from the run's diagnostic spec:
@@ -2851,16 +2873,15 @@ async function deliverDiagnostic(run, when) {
 // ── THE RECOVERY CONTROLLER (recovery.js) - a deciding path over verified facts ──────────
 // Opted in per run (`recovery` on the start request, alongside a diagnostic). It restores
 // bytes, refuses repeats and stops runs; the model is told what happened in a bounded packet.
-function recoveryTargetPath(run) { return safePath(`${run.diagnostic.moduleName}.py`); }
 function recoveryRestore(run, d) {
   const rec = run.recovery;
-  writeFileSync(recoveryTargetPath(run), rec.verified.bytes, 'utf8');
+  recoveryWriteTarget(run, rec.verified.bytes);
   const restoredSha = diagTargetHash(run);
   const exact = restoredSha === rec.verified.sha256;
-  pushStep(run, { type: 'recovery', action: d.action, kind: d.kind || null, text: `Recovery controller: ${d.action} - ${d.reason}. ${run.diagnostic.moduleName}.py restored to the verified checkpoint (${exact ? 'byte-exact, sha ' + restoredSha.slice(0, 12) : 'RESTORE MISMATCH ' + String(restoredSha).slice(0, 12)}).`, restoredExact: exact, candidateSha: d.sha256 });
+  pushStep(run, { type: 'recovery', action: d.action, kind: d.kind || null, text: `Recovery controller: ${d.action} - ${d.reason}. ${diagTargetLabel(run)} restored to the verified checkpoint (${exact ? 'byte-exact, sha ' + restoredSha.slice(0, 12) : 'RESTORE MISMATCH ' + String(restoredSha).slice(0, 12)}).`, restoredExact: exact, candidateSha: d.sha256 });
   // The packet is recorded on the step as well as pushed into history: history is pruned and
   // not served by the API, and a record of what the model was told must be durable.
-  const packet = packetMessage(rec, d, run.diagnostic.moduleName);
+  const packet = packetMessage(rec, d, diagTargetLabel(run));
   run.history.push({ role: 'user', content: packet });
   run.steps[run.steps.length - 1].packet = packet;
   if (d.stop) {
@@ -2883,7 +2904,7 @@ async function applyRecovery(run, candidateSha) {
   if (run.status !== 'running') return false;
   const d = recoveryDecide(rec, result, candidateSha);
   if (d.action === 'ACCEPT') {
-    recoveryAccept(rec, result, readFileSync(recoveryTargetPath(run), 'utf8'));
+    recoveryAccept(rec, result, recoveryTargetBytes(run), diagTargetHash(run));
     pushStep(run, { type: 'recovery', action: 'ACCEPT', text: `Recovery controller: ACCEPT - ${d.reason}. Checkpoint advanced to sha ${rec.verified.sha256.slice(0, 12)}.`, candidateSha });
     run.history.push({ role: 'user', content: `RECOVERY CONTROLLER - ACCEPTED: ${d.reason}. This state is the verified checkpoint now. Finish.` });
   } else if (d.action === 'PROVISIONAL') {
@@ -3581,8 +3602,8 @@ async function drive(loadDb, run) {
         const startResult = await deliverDiagnostic(run, 'start');
         if (run.recoveryPolicy) {
           let bytes = null;
-          try { bytes = readFileSync(recoveryTargetPath(run), 'utf8'); } catch { /* absent */ }
-          run.recovery = bytes === null ? { enabled: false, reason: 'target absent', policy: run.recoveryPolicy } : initRecovery(startResult, bytes, run.recoveryPolicy);
+          try { bytes = recoveryTargetBytes(run); } catch { /* absent */ }
+          run.recovery = bytes === null ? { enabled: false, reason: 'target absent', policy: run.recoveryPolicy } : initRecovery(startResult, bytes, run.recoveryPolicy, diagTargetHash(run));
           pushStep(run, { type: 'recovery', action: 'INIT', text: run.recovery.enabled
             ? `Recovery controller ON: verified checkpoint sha ${run.recovery.verified.sha256.slice(0, 12)}, ${run.recovery.verified.passing.length} protected case(s), policy ${JSON.stringify(run.recovery.policy)}.`
             : `Recovery controller OFF: ${run.recovery.reason}.` });
@@ -3962,7 +3983,12 @@ async function drive(loadDb, run) {
           // 2. web apps: a browser test since the last edit.
           //    Gated on touchedWeb, not merely "index.html exists" — otherwise a Node or
           //    Python build in a workspace that once held a web app is blocked forever.
-          if (hasWeb && run.touchedWeb && run.needsTest) {
+          // A run with a PLAY diagnostic has already been verified in a browser after its last
+          // change - by the declared play, which is stricter than a click-through - so the
+          // browser gates below do not apply while that report is fresh.
+          const playVerified = !!(run.diagnostic && run.diagnostic.kind === 'play' && !run.diagnosticStale && (run.diagnostics || []).some((d) => !d.skipped && d.status === 'OK'));
+          if (playVerified && hasWeb && run.touchedWeb) pushStep(run, { type: 'note', text: 'Finish: the declared play already verified the page in a browser after the last change; the click-through gate is not required.' });
+          if (hasWeb && run.touchedWeb && run.needsTest && !playVerified) {
             blocked('Verifying in a browser before finishing…',
               'Do NOT finish yet — you changed files since the last clean browser test. Run test_web, read the report, fix any [JS ERROR]/console errors or wrong on-screen values, and only finish once test_web is clean.');
             continue turn;
@@ -3970,7 +3996,7 @@ async function drive(loadDb, run) {
 
           // 3. anything visual: is there actually something on the screen? test_web
           //    reads the console, so "no errors, blank canvas" passes it clean.
-          if (hasWeb && run.touchedWeb && !run.sawScreen) {
+          if (hasWeb && run.touchedWeb && !run.sawScreen && !playVerified) {
             // The flag is set only when the check PASSES.
             //
             // It used to be set BEFORE the check, so a FAILING check was never re-run:
@@ -5237,12 +5263,12 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
     governed: governed || null,
     // { moduleName, casesJsonl, timeoutSec? } - the Hub runs this FOR the model and delivers
     // the result. Absent = nothing changes; the model is on its own as before.
-    diagnostic: diagnostic && diagnostic.moduleName && diagnostic.casesJsonl ? diagnostic : null,
+    diagnostic: diagnostic && ((diagnostic.moduleName && diagnostic.casesJsonl) || (diagnostic.kind === 'play' && diagnostic.spec)) ? diagnostic : null,
     // What this process SENT as sampling settings - provenance for a replicate, not a claim
     // about what the backend did with them.
     sampling: { temperature: TEMPERATURE, seed: SEED },
     // { maxAttempts, maxRepeats } - the recovery controller, only meaningful with a diagnostic.
-    recoveryPolicy: recovery && diagnostic && diagnostic.moduleName ? { maxAttempts: Number(recovery.maxAttempts) || 2, maxRepeats: Number(recovery.maxRepeats) || 2, maxProvisional: Number.isInteger(Number(recovery.maxProvisional)) ? Number(recovery.maxProvisional) : 3 } : null,
+    recoveryPolicy: recovery && diagnostic && (diagnostic.moduleName || diagnostic.kind === 'play') ? { maxAttempts: Number(recovery.maxAttempts) || 2, maxRepeats: Number(recovery.maxRepeats) || 2, maxProvisional: Number.isInteger(Number(recovery.maxProvisional)) ? Number(recovery.maxProvisional) : 3 } : null,
     recovery: null,
     protection: governed ? PROTECTION.BEHAVIORAL_ACCEPTANCE : PROTECTION.NONE,
     protectionNote: governed

@@ -149,6 +149,26 @@ export const SEQUENTIAL_TASKS = [
   seed: { 'package.json': PKG, 'ledger.js': LEDGER0 },
 }));
 
+// ── THE FARM: the builder's own target. A request, a declared play the model did not write,
+// and a state contract the request names. Built from NOTHING (empty seed); the first increment
+// has nothing to protect, later increments protect every step the previous one passed.
+const FARM_DIR = join(HERE, '..', 'legasus', 'bench', 'farm');
+export function farmTasks() {
+  const playPath = join(FARM_DIR, 'play.json');
+  if (!existsSync(playPath)) return [];
+  const spec = JSON.parse(readFileSync(playPath, 'utf8'));
+  const allSteps = (spec.steps || []).map((s) => s.n);
+  return [{
+    id: 'farm-v1', group: 'FARM', source: 'internal', language: 'javascript', kind: 'build',
+    goal: `Build me a small farming game as a single web page: index.html (plain HTML5 canvas and JavaScript, no frameworks, no external files or CDNs). ${spec.contract} Start with the player moving on a tile grid, then planting, time passing, harvesting, an inventory, and saving. Keep index.html self-contained.`,
+    seed: {},
+    requested: { play: { spec, steps: allSteps } },
+    protected: null,
+    diagnostic: { kind: 'play', spec, timeoutSec: 90 },
+    upstreamCases: allSteps.length, protectedCases: 0,
+  }];
+}
+
 export function benchQueue() {
   return [...externalTasks(), ...SEQUENTIAL_TASKS];
 }
