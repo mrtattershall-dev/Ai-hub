@@ -122,5 +122,40 @@ console.log('\n=== 5. a clean fence with a page that throws on load ===');
   say((r?.play?.failing || []).length === 3, `all three of increment 1's steps failed (${JSON.stringify(r?.play?.failing)})`);
 }
 
+console.log('\n=== 6. the protocol versions differ in the REQUEST, and only there ===');
+{
+  // A fake that records the prompt it was given, so a missing v2 seam cannot go unnoticed.
+  const seen = [];
+  const srv = createServer((req, res) => {
+    let body = '';
+    req.on('data', (d) => { body += d; });
+    req.on('end', () => {
+      try { seen.push(JSON.parse(body)); } catch { seen.push(null); }
+      res.writeHead(200, { 'content-type': 'application/x-ndjson' });
+      res.end(JSON.stringify({ model: 'fake', message: { role: 'assistant', content: '```html\n' + GOOD + '\n```' }, done: true, done_reason: 'stop', eval_count: 9, prompt_eval_count: 9 }) + '\n');
+    });
+  });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const port = srv.address().port;
+  const call = (proto) => new Promise((resolve) => {
+    const dir = mkdtempSync(join(tmpdir(), 'na-proto-' + proto + '-'));
+    const out = join(dir, 'r.json');
+    const p = spawn(process.execPath, [join(HERE, 'narrowArtifact.mjs'), '--model-url', 'http://127.0.0.1:' + port, '--model', 'fake', '--task', 'farm-i1', '--protocol', proto, '--out', out], { stdio: 'ignore' });
+    p.on('exit', () => { const rec = existsSync(out) ? JSON.parse(readFileSync(out, 'utf8')) : null; try { rmSync(dir, { recursive: true, force: true }); } catch {} resolve(rec); });
+  });
+  const r1 = await call('v1');
+  const r2 = await call('v2');
+  srv.close();
+  const prompt = (req) => JSON.stringify((req && req.messages) || []);
+  const p1 = prompt(seen[0]), p2 = prompt(seen[1]);
+  // v1 already NAMES window.game.state() inside the contract prose - that is what NARROW-1
+  // showed the model ignoring. What v1 lacks is the verbatim line and where to put it.
+  say(p1.includes('window.game.state()') && !p1.includes('Include it verbatim') && !p1.includes('state: () =>'), 'v1 names the seam in prose only - no verbatim line, no placement');
+  say(p2.includes('state: () =>') && p2.includes('Include it verbatim') && p2.includes('last'), 'v2 gives the verbatim line AND where to put it');
+  say(r1 && r2 && r1.protocol === 'narrow-artifact-v1' && r2.protocol === 'narrow-artifact-v2', 'each record names its protocol (' + (r1 && r1.protocol) + ' / ' + (r2 && r2.protocol) + ')');
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  say(r1 && r2 && same(r1.requestedSteps, r2.requestedSteps) && same(r1.play && r1.play.passing, r2.play && r2.play.passing) && (r1.acceptance && r1.acceptance.disposition) === (r2.acceptance && r2.acceptance.disposition), 'the task, the play verdict and the acceptance are identical under both - only the request changed');
+}
+
 console.log(`\n  narrow artifact: ${passed} passed, ${failed} failed -> ${failed ? 'THE MEASUREMENT IS NOT ESTABLISHED' : 'each boundary passes and fails on its own, and the gate is unchanged'}`);
 process.exit(failed ? 1 : 0);

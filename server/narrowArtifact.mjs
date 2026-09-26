@@ -57,6 +57,13 @@ const TEMPERATURE = parseFloat(opt('temperature', '0.2'));
 const OUT = opt('out', null);
 const KEEP = flag('keep');
 const WS_IN = opt('workspace', null);       // an existing workspace (a later increment's seed)
+// PROTOCOL VERSION. v1: the state contract is described in prose, as the request always did.
+// v2: the required observability INTERFACE is stated literally (a declared seam, like a
+// function signature) - NARROW-1 found all five attempts built the game and omitted the seam.
+// The behaviour under test, the play, the evaluator and the acceptance policy are identical in
+// both; only the request differs.
+const PROTOCOL = opt('protocol', 'v1');
+if (!['v1', 'v2'].includes(PROTOCOL)) { console.error(`unknown protocol ${PROTOCOL} (v1 | v2)`); process.exit(2); }
 
 const { farmTasks } = await import('./benchTasks.js');
 const { evaluate } = await import('./evaluator.js');

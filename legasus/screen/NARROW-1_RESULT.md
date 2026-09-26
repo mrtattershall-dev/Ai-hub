@@ -28,6 +28,11 @@ HTML file every time, in 50–62 s, and the unchanged verifier executed all five
 
 ## Why all five failed B5, named exactly
 
+**The request did name the seam.** The state contract carried in every attempt says, in
+prose: *"The page must expose window.game.state() returning { player: {x, y}, tiles: ...,
+inventory: ..., day }."* So this is not a case of the model never being told. It was told, in
+prose, and did not build it.
+
 Every one of the five built the game's substance — a canvas with `getContext`, a `keydown`
 handler in 4 of 5, `player`, `tiles`, `inventory`, `day` as real variables, and
 `localStorage` save/load — and **none implemented the observability seam the request
@@ -76,14 +81,16 @@ increments; anything about the 7B.
 The remaining failure is a single interface the request described in prose and the model did
 not build. Two readings, and one free experiment separates them:
 
-- it did not UNDERSTAND the seam from prose -> stating the exact interface should fix it
-- it cannot build a seam over its own state -> stating it will not help
+- prose naming an interface is not enough for a 1.5B, but a verbatim line with a placement
+  is -> NARROW-2 should move B5 above zero
+- it cannot build a seam over its own state at all -> NARROW-2 changes nothing, and the
+  remaining gap is capability, not instruction form
 
-NARROW-2 (frozen separately, $0) states the required interface literally in the request and
-changes nothing else. The seam is a declared interface, like a function signature; the
+NARROW-2 (frozen separately, $0) adds the verbatim line and where to put it - the contract
+already named the interface in prose - and changes nothing else. The seam is a declared interface, like a function signature; the
 behaviour under test (movement changes x, planting spends a seed) stays entirely the model's
 work and the play is untouched.
 
 Records: `NARROW-1_seed1..5.json` (verbatim replies, extraction, play logs, verdicts, timings),
 `NARROW-1_run.log`, `NARROW-1_gate.log`. Instrument: `server/narrowArtifact.mjs`, proven able
-to fail at every boundary by `server/narrowArtifact.test.mjs` 23/23.
+to fail at every boundary by `server/narrowArtifact.test.mjs` 27/27.
