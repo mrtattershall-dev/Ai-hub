@@ -112,6 +112,16 @@ recall — read your notes back. Do this at the START of a run, and whenever you
 THOUGHT: <why>
 ACTION: recall
 
+lesson — record a SCOPED lesson from a failure: which language and tool it applies to, what went wrong, what fixed it. Lessons are retrieved later only in a matching context, so keep the scope exact (not "avoid backslashes" but where they broke). DETECT is optional: a regular expression over the content of a future edit that would repeat the mistake; a matching edit is refused once with this lesson:
+THOUGHT: <what failed and what worked>
+ACTION: lesson
+LANGUAGE: javascript
+TOOL: write_file
+ERROR: <the first line of the error, if there was one>
+MISTAKE: a template literal inside a Python-generated JS string lost its backslashes
+FIX: build the JS in a plain string and escape backslashes once
+DETECT: <optional regex>
+
 git_diff — see what you changed. Use this before finishing, and after any edit you are unsure about:
 THOUGHT: <why>
 ACTION: git_diff

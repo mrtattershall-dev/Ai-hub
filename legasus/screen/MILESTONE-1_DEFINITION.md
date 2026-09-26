@@ -47,18 +47,37 @@ pre-committed (the threshold is a product decision once the numbers exist).
                recovery controller (exact rollback, repeat refusal,      diagnostic and evaluator
                bounded retries); acceptance RETAIN/RESTORED             run python cases, not a
                                                                          scripted play of a page
-    REMEMBER   NOTES.md (free text, tail injected at start); TASKS.md    IMPLEMENTED as free text;
-               ledger; git history; campaign records                     UNESTABLISHED as lessons:
-                                                                         no context key, no
-                                                                         retrieval by relevance,
-                                                                         no evidence of a lesson
-                                                                         changing a later action
-    IMPROVE    nothing                                                   UNESTABLISHED
+    REMEMBER   NOTES.md (free text, tail injected at start); TASKS.md    IMPLEMENTED: lessons.js
+               ledger; git history; campaign records; NOW: LESSONS.jsonl  (context-keyed, status
+               with context {language, tool, errorSignature}, status       suspected|confirmed,
+               suspected|confirmed, recorded by the model (`lesson`) and    replay-proven 20/20 -
+               by the Hub (a failure followed by a success on the same     scoped retrieval,
+               file), retrieved at the opening by the project's languages   restart survival)
+               and at the moment a matching failure recurs
+    IMPROVE    the lesson GUARD: a lesson with a DETECT pattern refuses    IMPLEMENTED as a
+               a matching edit ONCE in its language/tool, before the       mechanism (replay-
+               edit reaches the files                                       proven); UNESTABLISHED
+                                                                            with a live model -
+                                                                            M4 measures it
     CONTINUE   batch runner picks the next queued task; the controller   IMPLEMENTED for a queue
                decides whether another attempt deserves compute          the operator wrote;
                                                                          UNESTABLISHED for
                                                                          choosing the next
                                                                          increment itself
+
+## The builder and the manager (tatte, same day)
+
+The same loop, seen from the other side, is a plug-and-play manager for software: OBSERVE
+(traces, errors, resource use, retries, outcomes) -> UNDERSTAND (connect failures to the code
+paths and conditions that produce them) -> REMEMBER (project knowledge, with explanations
+marked confirmed vs suspected) -> EXPERIMENT (a targeted change in an isolated copy, compared
+with the original) -> APPLY AND MONITOR (adopt on agreed checks, watch, roll back). The
+repair controller is one mechanism inside that manager; the campaign records, the acceptance
+policy and the isolated worker are its observe/experiment/roll-back substrate. The lessons
+mechanism is its first REMEMBER with a status field, and its DETECT guard is the canonical
+example made mechanical: a repeated parse failure after a kind of generated edit, scoped to
+the escaping context, caught before the edit reaches the working files. Watching is not
+expertise: a lesson counts only when it predicts a failure and demonstrably prevents it (M4).
 
 ## What this milestone requires that does not exist
 
@@ -70,7 +89,10 @@ pre-committed (the threshold is a product decision once the numbers exist).
    and a JS-capable image, or test_web extended to run a declared play script. This is the
    first engineering item because M1, M3 and the controller all hang on it.
 
-2. **Context-keyed lessons** (REMEMBER + IMPROVE). `LESSONS.jsonl` in the workspace; a lesson is
+2. **Context-keyed lessons** (REMEMBER + IMPROVE) - BUILT (server/lessons.js, `lesson` tool,
+   auto-capture, opening + recurrence retrieval, DETECT guard; lessons.test.mjs 20/20 across
+   two hub processes on one workspace). Remaining for M4: a live model using them. Design as
+   written: `LESSONS.jsonl` in the workspace; a lesson is
    `{ context: { language, tool, phase, errorSignature }, mistake, fix, evidence }`. Two
    producers: the model proposes one with the `lesson` tool; the Hub records one automatically
    when a tool call fails with a signature and a later call on the same file succeeds. Two

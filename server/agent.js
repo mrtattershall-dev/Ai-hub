@@ -50,6 +50,7 @@ import { ProtocolController } from './protocol.js';
 import { ROUTES_BOUNDED, noteUncoveredTraversal, refuseAtDetachedSite } from './routeBound.js';
 import { prepareGoverned, concludeGoverned, PROTECTION, NO_PROTECTION_NOTE } from './governance.js';
 import { runDiagnostic, diagnosticMessage, DIAG } from './autodiag.js';
+import { languageOf, errorSignature, recordLesson, retrieve as retrieveLessons, lessonsForOpening, renderLessons } from './lessons.js';
 import { initRecovery, isRejected, decide as recoveryDecide, repeat as recoveryRepeat, accept as recoveryAccept, provisional as recoveryProvisional, packetMessage } from './recovery.js';
 import { lockAuditDir } from './d2.js';
 import { evaluateD2, observeTargets, quarantine, restoreTo, verifyAt, treeOf, modelEnv, captureState, mayMutate } from './d2.js';
@@ -1254,6 +1255,15 @@ const tools = {
     } catch (e) { return `ERROR: ${e.message}`; }
   },
 
+  // A SCOPED lesson (lessons.js): language, tool, error signature, mistake, fix, optional
+  // detection pattern. Model-proposed lessons are SUSPECTED until a fix demonstrably worked.
+  async lesson({ language, tool: forTool, error, mistake, fix, detect }) {
+    try {
+      const rec = recordLesson(WORKSPACE, { source: 'model', context: { language: language || null, tool: forTool || null, errorSignature: error ? errorSignature(error) : null }, mistake, fix, detect: detect || null });
+      return `OK: lesson ${rec.id} recorded (${rec.status}; scope ${[rec.context.language, rec.context.tool].filter(Boolean).join(' / ') || 'any'}${rec.detect ? '; detect /' + rec.detect + '/' : ''}). It will be shown again only in a matching context.`;
+    } catch (e) { return `ERROR: ${e.message}`; }
+  },
+
   // Read the notes back. Cheap - it is one file, not a re-derivation.
   async recall() {
     const full = join(WORKSPACE, 'NOTES.md');
@@ -1432,7 +1442,7 @@ const tools = {
       // all. Measured 2026-09-10: right after the http.server refusal the 32B tried
       // `open index.html` with the thought "verify the game loads" - the goal test_web
       // already serves. The policy correctly asked a human, which stalls an unattended run.
-      [/^\s*(open|start|xdg-open|explorer)\s+\S+\.html?/i, 'open/start (a desktop browser the agent cannot read)'],
+      [/^\s*(open|start|xdg-open|explorer)\s+\S+\.html?\b/i, 'open/start (a desktop browser the agent cannot read)'],
     ];
     const hit = blocking.find(([rx]) => rx.test(String(cmd || '')));
     if (hit) {
@@ -2000,7 +2010,7 @@ const AUTO_TOOLS = new Set(['list_dir', 'read_file', 'search_file', 'outline_fil
   // so they stay gated.
   'git_diff', 'git_log',
   // Notes are the agent's own memory - gating them would defeat the purpose.
-  'remember', 'recall',
+  'remember', 'recall', 'lesson',
   // The ledger is bookkeeping about work, not the work itself.
   'task_list', 'task_add', 'task_done',
   // Reading a connected Google account changes nothing in it. The WRITE half
@@ -4156,10 +4166,60 @@ async function drive(loadDb, run) {
       // The diagnostic target as it stands BEFORE this tool. Compared after, so freshness
       // follows the BYTES rather than the tool name - every write route is covered.
       const beforeDiagHash = run.diagnostic ? diagTargetHash(run) : null;
+      // THE LESSON GUARD (lessons.js): a lesson with a DETECT pattern, in this language and for
+      // this tool, whose pattern matches the content about to be written/run, refuses the call
+      // ONCE and hands the lesson over - the condition is caught before the edit reaches the
+      // files. An unchanged resubmission then runs: the model was told and decided.
+      const lessonCtx = { language: languageOf(args?.path), tool };
+      let guardedBy = null;
+      if (/^(write_file|edit_file|append_file|run_command|run_python)$/.test(tool)) {
+        const content = String(args?.content ?? args?.replace ?? args?.cmd ?? args?.code ?? '');
+        if (content) {
+          for (const l of retrieveLessons(WORKSPACE, lessonCtx, { limit: 8 }).filter((l) => l.detect)) {
+            let re; try { re = new RegExp(l.detect); } catch { continue; }
+            const onceKey = `${l.id}|${tool}|${args?.path || ''}`;
+            if (re.test(content) && !(run.lessonGuardShown ||= {})[onceKey]) {
+              run.lessonGuardShown[onceKey] = true;
+              guardedBy = l;
+              break;
+            }
+          }
+        }
+      }
       let result;
-      try { result = await tools[tool](args); }
-      catch (e) { result = `ERROR: ${e.message}`; }
+      if (guardedBy) {
+        result = `REFUSED ONCE by lesson ${guardedBy.id} (${[guardedBy.context.language, guardedBy.context.tool].filter(Boolean).join(' / ')}; ${guardedBy.status}): the content matches /${guardedBy.detect}/.\nMISTAKE: ${guardedBy.mistake}\nFIX: ${guardedBy.fix}\nApply the fix and resubmit. If you resubmit unchanged, it will run - and this lesson will be marked as overridden.`;
+        pushStep(run, { type: 'lesson_guard', lessonId: guardedBy.id, tool, path: args?.path || null, text: `Lesson guard: ${tool} on ${args?.path || '-'} refused once by ${guardedBy.id} (/${guardedBy.detect}/): ${guardedBy.mistake}` });
+      } else {
+        try { result = await tools[tool](args); }
+        catch (e) { result = `ERROR: ${e.message}`; }
+      }
       result = await withAssertEvidence(tool, result);   // a failing Python assert gains both sides
+      // RECURRENCE and AUTO-CAPTURE (lessons.js). A failing result whose signature matches a
+      // lesson in this language/tool gets that lesson appended at the moment of recurrence
+      // (into the feedback below, not into rawAnswer - the repeat guard keys on rawAnswer). A
+      // success on a file whose previous call failed records a CONFIRMED lesson automatically.
+      let lessonNote = '';
+      try {
+        const resStr = String(result ?? '');
+        const failed = /^ERROR/.test(resStr);
+        if (failed) {
+          const sig = errorSignature(resStr);
+          const hits = retrieveLessons(WORKSPACE, { ...lessonCtx, errorSignature: sig });
+          if (hits.length) { lessonNote = '\n\n' + renderLessons(hits, 'LESSONS THAT APPLY (earlier work, same language/tool/error):'); pushStep(run, { type: 'lesson_recalled', tool, text: `Lesson(s) recalled on a matching failure: ${hits.map((l) => l.id).join(', ')}` }); }
+          run.lastToolError = { tool, path: args?.path || null, sig, args: JSON.stringify(args || {}).slice(0, 400), at: Date.now() };
+        } else if (!guardedBy && run.lastToolError && run.lastToolError.tool === tool && run.lastToolError.path === (args?.path || null)) {
+          const rec = recordLesson(WORKSPACE, {
+            source: 'hub', status: 'confirmed',
+            context: { language: lessonCtx.language, tool, errorSignature: run.lastToolError.sig },
+            mistake: `${tool} on ${run.lastToolError.path || 'a file'} failed: ${run.lastToolError.sig}`,
+            fix: `a later ${tool} on the same file succeeded; what worked (args): ${JSON.stringify(args || {}).slice(0, 240)}`,
+            evidence: { runId: run.id, failedArgs: run.lastToolError.args, workedArgs: JSON.stringify(args || {}).slice(0, 400) },
+          });
+          pushStep(run, { type: 'lesson_recorded', lessonId: rec.id, tool, text: `Lesson ${rec.id} recorded automatically (confirmed): ${rec.mistake}` });
+          run.lastToolError = null;
+        }
+      } catch { /* lessons never break a tool call */ }
 
       // THE SAME CALL, THE SAME ANSWER, AGAIN. Set E (2026-09-11): 155 such calls for the base 14B and 221 for
       // Qwen3-Coder - a file re-read unchanged, a command re-run to the same failure, an edit re-applied. The
@@ -4442,6 +4502,7 @@ async function drive(loadDb, run) {
       let feedback = substituted
         ? substituted + (repeatWarning && !substituted.includes('⚠️ You already ran') ? repeatWarning : '')
         : `TOOL RESULT (${tool}):\n${result}${syntaxNote}`;
+      if (lessonNote) feedback += lessonNote;   // the recalled lesson rides with the failing result
       // INSERTION 3 of 3: the controller sees the result and advances its phase, then states
       // what is open next. The raw result still reaches the model - the controller adds the
       // sequencing it owns, it does not replace the evidence.
@@ -5196,6 +5257,9 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
       ...(existsSync(join(WORKSPACE, 'NOTES.md'))
         ? [{ role: 'user', content: `Your notes from earlier work (NOTES.md):\n${readFileSync(join(WORKSPACE, 'NOTES.md'), 'utf8').slice(-4000)}` }]
         : []),
+      // LESSONS keyed to the languages this project uses (LESSONS.jsonl, lessons.js). Bounded;
+      // retrieved by context, not recency. Generic lessons (no language) always qualify.
+      ...(() => { try { const ls = lessonsForOpening(WORKSPACE); return ls.length ? [{ role: 'user', content: renderLessons(ls, 'LESSONS FROM EARLIER WORK that apply to this project (scoped; each names where it applies):') }] : []; } catch { return []; } })(),
       // SUPPLY SMALL NAMED FILES UP FRONT. BENCH-1: 10 of 15 runs stalled asking for an outline
       // of a ~30-line file and never advanced to reading it - the outline returned one line,
       // and the read that should have followed never came. For a file the goal names that

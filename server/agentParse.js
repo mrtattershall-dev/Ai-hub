@@ -281,6 +281,10 @@ function parseAction(text, lastPath) {
     return { tool, thought, args: { text: t } };
   }
   if (tool === 'recall') return { tool, thought, args: {} };
+  if (tool === 'lesson') {
+    const f = (k) => (text.match(new RegExp(`^[ \\t]*${k}:\\s*(.+)$`, 'im'))?.[1] || '').trim();
+    return { tool, thought, args: { language: f('LANGUAGE'), tool: f('TOOL'), error: f('ERROR'), mistake: f('MISTAKE'), fix: f('FIX'), detect: f('DETECT') } };
+  }
   if (tool === 'git_diff')   return { tool, thought, args: { ref: (text.match(/REF:\s*(\S+)/i)?.[1] || '').trim() || undefined } };
   if (tool === 'git_log')    return { tool, thought, args: { n: (text.match(/N:\s*(\d+)/i)?.[1] || '').trim() || undefined } };
   if (tool === 'git_commit') return { tool, thought, args: { message: (text.match(/MESSAGE:\s*(.+)/i)?.[1] || '').trim() } };
