@@ -1,0 +1,49 @@
+Open the consolidation branch: scope frozen, commit authorization blocked, end-to-end test defined before any merge
+
+THIRD CLAIM, SEPARATED FROM THE OTHER TWO. Controller economics has live evidence and is tagged
+controller-v1. R4 transfer is unstarted and belongs to integration/epistemic-admission. Whether the
+separately tested components WORK TOGETHER had no home until this branch, and that is all this branch
+claims. Basing on the controller branch preserves a live-tested starting point; it transfers none of its
+validation to the combined version.
+
+BASE f7df108, the controller branch's recorded current commit, clean tree - TWO COMMITS PAST the
+validated tag. controller-v1 (d1449a06) remains an ancestor and is not modified, moved or recreated.
+
+THE TRIAL MERGES WERE REVERSIBLE AND THEY OVERTURNED MY OWN FRAMING. git merge-tree, no worktree, index
+or ref touched:
+
+    integration + indent      CLEAN, zero conflicts      42 vs   6 commits
+    integration + phase2      4 conflicted paths        471 vs 199 commits
+    indent      + phase2      3 conflicted paths        435 vs 199 commits
+
+I had called the controller reconciliation "closer to a port" on the strength of commit counts. 670
+commits of divergence produce FOUR conflicted paths, two of them mechanical. COMMIT COUNTS ESTABLISHED
+NOTHING ABOUT DIFFICULTY and the scope file says so where someone might otherwise cite them.
+
+AND CLEAN MERGE MEANS NO TEXTUAL CONFLICTS, NOT ZERO RISK. The integration+indent result is unvalidated
+until exercised, not safe because git was quiet.
+
+THE CONSEQUENTIAL FINDING IS CONSUMER-OWNED OBLIGATIONS. The certificate add/add is a strict superset -
+byte-identical through line 120, phase2 appending v1.2 - and v1.2 exists because derive() computed its
+missing witnesses from rule.requires while THE ADAPTER WROTE requires: [] ITSELF, so the witness check
+passed VACUOUSLY: the calculus enforcing correctly against a rule that asked for nothing. Keeping v1.2's
+TEXT does not establish that the adapter and consumer ENFORCE it, and that check is this branch's work.
+
+So the end-to-end test has a fourth leg that is not optional. NON-BYPASS: an empty adapter-supplied
+requirement list must not bypass a nonempty consumer requirement. Without it, ACCEPT, REJECT and RESTORE
+can all pass while admission means nothing. REJECT must name the constructor that failed rather than
+merely failing; RESTORE must assert a content digest rather than absence of error.
+
+COMMIT AUTHORIZATION IS BLOCKED ON THIS BRANCH, BY CONSTRUCTION. A legitimate KNOWLEDGE certificate is
+not permission to COMMIT. admission.mjs admits knowledge only and commit() refuses epistemic tokens;
+that refusal stays. The epistemic x normative join needs a separately defined normative obligation and
+its own validation, and is out of scope here - so that "combine existing work" cannot quietly become
+"invent and validate the missing authority model." The connected path terminates at admission plus
+controller handling and is reported as ending there.
+
+Nothing merged yet. Scope frozen first, deliberately, because the test definition changes what the merge
+has to preserve.
+
+Message-File: scratch/c01-scope.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
