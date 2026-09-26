@@ -1,0 +1,59 @@
+Make the integration+indent tree reproducible: checkout-local imports, declared acorn, locked eslint, and one coordinated suite
+
+THE MERGE ITSELF WAS CLEAN - ba70a92, zero conflicts, 8495c86 (integration) + 94df7cb (indent), both
+source commits recorded and unmoved from the trial. Every failure found afterwards was ENVIRONMENT and
+INVOCATION, not merge defect. Three defects, in descending severity.
+
+1 CROSS-WORKTREE IMPORTS, the consequential one. EIGHTEEN absolute file:/// specifiers across five files
+  in external-linter/, every one hard-coded to the ai-coding-hub-integration checkout. Tests in THIS
+  worktree were loading ANOTHER worktree's modules, so no claim about what this tree does was supportable.
+  Rewritten to ../ and VERIFIED BY RESOLUTION rather than by the rewrite succeeding: all five targets now
+  resolve inside ai-coding-hub-mii and all five exist here.
+
+2 acorn UNDECLARED. Imported by legasus/legascreen/ancestry.mjs - Legasus SOURCE, not a test - while
+  present in the root lockfile ONLY as a dev:true TRANSITIVE of webpack, terser and acorn-import-phases.
+  npm ci --omit=dev would have broken Legasus, and a webpack bump could have, with no manifest change to
+  show why. Now declared in root dependencies; the lock records it dev=false at the same resolved 8.17.0,
+  so nothing on disk changed except that the dependency is now stated. ^8.17.0 is a RANGE; the lockfile is
+  what fixes the version for a locked install.
+
+3 eslint DECLARED BUT NEVER LOCKED - and I reported this wrongly first. I said "declared in NO manifest",
+  which was a FALSE NEGATIVE FROM AN INCOMPLETE SEARCH: I grepped root, server and client manifests and
+  missed external-linter/package.json, which is tracked and declares eslint ^10.11.0. I then installed it
+  at the root, the wrong owner. Reverted, installed in the package that declares it, which generated the
+  local package-lock.json that was the actual missing piece. Records specify 10.11.0 in both the
+  COVERAGE-REPAIR prereg and result, and that result explicitly lists "generalises beyond eslint 10.11.0"
+  as NOT established - so the version is load-bearing, not incidental. 10.11.0 is published and its engine
+  range accepts local node v24.15.0.
+
+WHICH ESLINT PRODUCED THE HISTORICAL RESULTS REMAINS A SEPARATE PROVENANCE QUESTION. Restoring the
+documented dependency is reproduction work; it establishes nothing about the past.
+
+THE FROZEN CHECKER IS NOT ALTERED. coverage-repair.test.mjs resolves its attack/ fixtures AND
+node_modules/eslint/lib/rules/** against the PROCESS CWD. That is location dependence, and the fix is to
+invoke it from the directory it requires and RECORD THE WORKING DIRECTORY AS PART OF THE INVOCATION. A
+portability fix would change the experiment's checker and belongs in its own versioned change.
+
+So benchmarks/consolidation-suite.mjs runs every package from the directory it needs and PROPAGATES EVERY
+FAILURE - nonzero exit if any package fails, times out, cannot run, or reports zero tests. A runner that
+prints red packages and exits 0 manufactures a clean headline, which is worse than no runner. It records
+branch, HEAD, node version, the four dependency lock digests, per-package cwd and file count, and it
+PRINTS THE UNCOMMITTED PATHS so a result can never be read as belonging to HEAD alone.
+
+    legasus (root invocation)              890/890
+    external-linter (own directory)         10/10
+    COMBINED                               900/900   exit 0
+
+TWO REPORTING CORRECTIONS I OWED. 892/900 was a VALID result for the root invocation and its eight
+failures were real failures OF THAT INVOCATION - location dependence explains them, it does not erase
+them, and the separate 10/10 run was a diagnosis rather than a combined result. And 877 -> 900 is 23
+ADDITIONAL REPORTED tests, not proof they had never run: they were not REACHED in the earlier
+environment, and their historical execution is unknown.
+
+Also removed a root external/ directory that my own wrong-CWD run created, and gitignored the legitimate
+one under external-linter/ - R6 copies eslint rule files there deliberately, to evaluate them outside a
+path eslint 10 ignores by default.
+
+Message-File: scratch/mii-01.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

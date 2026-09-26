@@ -12,11 +12,11 @@ import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { analyse, makeLinter, RULE, DOMAIN } from './adapter-eslint-repaired.mjs';
-import { admit } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/admission.mjs';
-import { adapt } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/adapter.mjs';
-import { store } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/authority-store.mjs';
+import { admit } from '../admission.mjs';
+import { adapt } from '../adapter.mjs';
+import { store } from '../authority-store.mjs';
 import { journalEntry, serialize, parse, replayJournal }
-  from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/replay.mjs';
+  from '../replay.mjs';
 import { certificatesFor } from './arm-t-certificates.mjs';
 
 const STORE = 'arm-t-journal.json';

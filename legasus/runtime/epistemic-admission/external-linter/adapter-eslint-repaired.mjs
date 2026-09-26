@@ -8,10 +8,10 @@
 // THE INTENDED DOMAIN IS PRESERVED. A suppressed region is still part of the domain; it was not
 // evaluated, and the certificate says so - the domain is not shrunk around it.
 import { ESLint } from 'eslint';
-import { adapt } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/adapter.mjs';
-import { admit } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/admission.mjs';
-import { store, relationClaim } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/authority-store.mjs';
-import { ADMITTED_RULES, digestOf } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/rules.mjs';
+import { adapt } from '../adapter.mjs';
+import { admit } from '../admission.mjs';
+import { store, relationClaim } from '../authority-store.mjs';
+import { ADMITTED_RULES, digestOf } from '../rules.mjs';
 
 export const RULE = 'array-callback-return';
 // The domain name STATES THE RECOGNITION SCOPE. It is the frozen, narrow domain: callbacks this

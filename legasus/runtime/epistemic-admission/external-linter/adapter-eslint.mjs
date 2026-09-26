@@ -16,10 +16,10 @@
 //
 // EVERY PLACE A HUMAN CHOSE SOMETHING THE FROZEN RULES DID NOT DETERMINE IS MARKED `STEERING:`.
 import { ESLint } from 'eslint';
-import { adapt } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/adapter.mjs';
-import { admit, STATE } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/admission.mjs';
-import { store, relationClaim } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/authority-store.mjs';
-import { ADMITTED_RULES, digestOf } from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/rules.mjs';
+import { adapt } from '../adapter.mjs';
+import { admit, STATE } from '../admission.mjs';
+import { store, relationClaim } from '../authority-store.mjs';
+import { ADMITTED_RULES, digestOf } from '../rules.mjs';
 
 // TRANSLATION OBSTACLE 1, recorded rather than smoothed over.
 //

@@ -74,3 +74,6 @@ server/yolo-index.jsonl
 server/agent-queue.json.prerestart
 server/cycle1-mixed-index.jsonl
 modal-serve/__pycache__/
+
+# test debris: R6 copies eslint rule files here to evaluate them outside an ignored path
+legasus/runtime/epistemic-admission/external-linter/external/

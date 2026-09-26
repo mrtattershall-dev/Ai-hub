@@ -3,9 +3,9 @@
 // must not be modified during this run. B0 and B1 need none of this.
 import { RULE, DOMAIN } from './adapter-eslint-repaired.mjs';
 import { relationClaim }
-  from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/authority-store.mjs';
+  from '../authority-store.mjs';
 import { ADMITTED_RULES, digestOf }
-  from 'file:///C:/Users/tatte/Projects/ai-coding-hub-integration/legasus/runtime/epistemic-admission/rules.mjs';
+  from '../rules.mjs';
 
 const CONTRACT = '1.4.0-frozen-2026-09-21';
 const digest = (id) => digestOf(ADMITTED_RULES[id]);
