@@ -725,6 +725,10 @@ const summarise = (a) => {
     dispositions: g.reduce((acc, r) => (acc[r.disposition] = (acc[r.disposition] || 0) + 1, acc), {}),
     regressionsProduced: g.filter((r) => r.protected === 'FAIL').length,
     regressionsSurviving: g.filter((r) => r.disposition === 'RESTORE_FAILED').length,
+    // NOT a surviving regression: the start state never satisfied the protected spec, so there
+    // was no damage and nothing to restore to. Counted on its own so it can neither inflate the
+    // regression count nor disappear into the totals.
+    runsWithNoVerifiedBaseline: g.filter((r) => r.disposition === 'NO_VERIFIED_BASELINE').length,
     // CASE MOVEMENT: runs, not pooled cases. The tasks carry 5-12 cases each, so a summed
     // case count weights the wide tasks; a count of RUNS does not. Gains and losses are
     // reported apart, and a run can appear in both.

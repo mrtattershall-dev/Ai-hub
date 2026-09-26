@@ -1,0 +1,96 @@
+{
+  "at": "2026-09-26T10:56:33.854Z",
+  "task": "farm-i2",
+  "model": "qwen2.5-coder:1.5b",
+  "modelUrl": "http://127.0.0.1:11434",
+  "seed": 2,
+  "protocol": "narrow-artifact-v2",
+  "strict": true,
+  "deadlineSec": 900,
+  "maxTokens": 4000,
+  "requestedSteps": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "protectedSteps": [
+    1,
+    2,
+    3
+  ],
+  "boundaries": {
+    "artifactProduced": true,
+    "artifactComplete": true,
+    "contractClean": true,
+    "artifactChangedFile": true,
+    "reachedExecution": true,
+    "passedDiagnostic": false,
+    "passedProtected": false,
+    "accepted": false,
+    "acceptedIfLenient": false,
+    "acceptedStrict": false
+  },
+  "timing": {
+    "generateMs": 51132,
+    "firstTokenMs": 380,
+    "writtenMs": 52255,
+    "playMs": 55937,
+    "acceptanceMs": 64567
+  },
+  "tokens": {
+    "output": 726,
+    "prompt": 481,
+    "replyChars": 3230
+  },
+  "workspace": "C:\\Users\\tatte\\AppData\\Local\\Temp\\narrow-farm-i2-qzTnZ3",
+  "terminationReason": "stop",
+  "naturalStop": true,
+  "reply": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n\n        // Game state\n        let player = { x: 0, y: 0 };\n        let tiles = {};\n        let inventory = { seeds: 10, crops: 0 };\n        let day = 0;\n\n        // Game loop\n        function gameLoop() {\n            requestAnimationFrame(gameLoop);\n\n            // Update game state\n            player.x += (event.key === 'ArrowRight') ? 1 : (event.key === 'ArrowLeft') ? -1 : 0;\n            player.y += (event.key === 'ArrowDown') ? 1 : (event.key === 'ArrowUp') ? -1 : 0;\n\n            // Plant seed\n            if (event.key === 'p') {\n                const seed = { crop: 'corn', stage: 0 };\n                tiles[player.x + ',' + player.y] = seed;\n                inventory.seeds--;\n            }\n\n            // Harvest crop\n            if (event.key === 'h') {\n                if (tiles[player.x + ',' + player.y] && tiles[player.x + ',' + player.y].crop === 'corn' && tiles[player.x + ',' + player.y].stage === 3) {\n                    tiles[player.x + ',' + player.y] = null;\n                    inventory.crops++;\n                }\n            }\n\n            // Update tile stages\n            for (const tile in tiles) {\n                if (tiles[tile]) {\n                    tiles[tile].stage++;\n                    if (tiles[tile].stage === 3) {\n                        tiles[tile] = null;\n                    }\n                }\n            }\n\n            // Draw tiles\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            for (const tile in tiles) {\n                if (tiles[tile]) {\n                    ctx.fillStyle = tiles[tile].crop === 'corn' ? 'green' : 'red';\n                    ctx.fillRect(tile.split(',')[0], tile.split(',')[1], 1, 1);\n                }\n            }\n\n            // Update day\n            day++;\n        }\n\n        // Save game to localStorage\n        function saveGame() {\n            localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n        }\n\n        // Load game from localStorage\n        function loadGame() {\n            const savedGame = localStorage.getItem('game');\n            if (savedGame) {\n                const state = JSON.parse(savedGame);\n                player = state.player;\n                tiles = state.tiles;\n                inventory = state.inventory;\n                day = state.day;\n            }\n        }\n\n        // Event listeners\n        document.addEventListener('keydown', (event) => {\n            if (event.key === 'p' || event.key === 'h') {\n                event.preventDefault();\n            }\n        });\n\n        // Game loop\n        gameLoop();\n\n        // Save game on window load\n        window.addEventListener('load', saveGame);\n\n        // Load game on page load\n        loadGame();\n    </script>\n</body>\n</html>\n```",
+  "extraction": {
+    "fences": 2,
+    "artifactChars": 3219,
+    "outsideChars": 0,
+    "outsideSample": ""
+  },
+  "play": {
+    "status": "OK",
+    "reason": null,
+    "passing": [],
+    "failing": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "total": 5,
+    "log": "FAIL case 1  loads with no page or console errors and exposes state -> expected errors.length === 0 && state && state.player && typeof state.player.x === 'number'; state null; errors: [JS ERROR] Cannot read properties of undefined (reading 'key') | [JS ERROR] Cannot read properties of undefined (reading 'key')\nERROR case 2  ArrowRight moves the player right: Cannot read properties of null (reading 'player')\nERROR case 3  ArrowDown moves the player down: Cannot read properties of null (reading 'player')\nERROR case 4  p plants a seed on the player's tile and spends a seed: Cannot read properties of null (reading 'player')\nERROR case 5  t advances time and the crop grows: Cannot read properties of null (reading 'player')\nSUMMARY 0/5 cases pass, 5 fail"
+  },
+  "verdict": {
+    "overall": "FAIL",
+    "requested": "FAIL",
+    "protected": "FAIL",
+    "requestedFailing": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "acceptance": {
+    "disposition": "NO_VERIFIED_BASELINE",
+    "countsAsCompletion": false,
+    "promotable": false,
+    "survivingWorkspaceVerdict": {
+      "overall": "EVALUATION_ERROR",
+      "requested": "EVALUATION_ERROR",
+      "protected": "EVALUATION_ERROR",
+      "candidateTree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+      "note": "the workspace was restored to startRef byte for byte and the protected check still FAILS, so the starting state never satisfied it: nothing was damaged and there is nothing to restore to. startRef must be a state already verified against this task."
+    },
+    "survivingBytes": "IDENTICAL_TO_START"
+  }
+}

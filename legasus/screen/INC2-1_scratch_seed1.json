@@ -1,0 +1,96 @@
+{
+  "at": "2026-09-26T10:55:31.039Z",
+  "task": "farm-i2",
+  "model": "qwen2.5-coder:1.5b",
+  "modelUrl": "http://127.0.0.1:11434",
+  "seed": 1,
+  "protocol": "narrow-artifact-v2",
+  "strict": true,
+  "deadlineSec": 900,
+  "maxTokens": 4000,
+  "requestedSteps": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "protectedSteps": [
+    1,
+    2,
+    3
+  ],
+  "boundaries": {
+    "artifactProduced": true,
+    "artifactComplete": true,
+    "contractClean": true,
+    "artifactChangedFile": true,
+    "reachedExecution": true,
+    "passedDiagnostic": false,
+    "passedProtected": false,
+    "accepted": false,
+    "acceptedIfLenient": false,
+    "acceptedStrict": false
+  },
+  "timing": {
+    "generateMs": 48833,
+    "firstTokenMs": 1579,
+    "writtenMs": 49491,
+    "playMs": 53608,
+    "acceptanceMs": 62465
+  },
+  "tokens": {
+    "output": 678,
+    "prompt": 481,
+    "replyChars": 2980
+  },
+  "workspace": "C:\\Users\\tatte\\AppData\\Local\\Temp\\narrow-farm-i2-CQNCwL",
+  "terminationReason": "stop",
+  "naturalStop": true,
+  "reply": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n\n        // Game state\n        let player = { x: 0, y: 0 };\n        let tiles = {};\n        let inventory = { seeds: 10, crops: 0 };\n        let day = 0;\n\n        // Game loop\n        function gameLoop() {\n            requestAnimationFrame(gameLoop);\n\n            // Update game state\n            player.x += 0; // No movement\n            player.y += 0; // No movement\n\n            // Update tiles\n            for (const tile in tiles) {\n                const { crop, stage } = tiles[tile];\n                if (stage < 3) {\n                    tiles[tile].stage++;\n                }\n            }\n\n            // Update inventory\n            if (keyIsDown('p')) {\n                const seed = { crop: 'corn', stage: 0 };\n                tiles[player.x + ',' + player.y] = seed;\n            }\n\n            if (keyIsDown('t')) {\n                day++;\n            }\n\n            if (keyIsDown('h')) {\n                const tile = `${player.x},${player.y}`;\n                if (tiles[tile] && tiles[tile].stage === 3) {\n                    tiles[tile] = null;\n                    inventory.crops++;\n                }\n            }\n\n            // Draw game\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            for (const tile in tiles) {\n                const { crop, stage } = tiles[tile];\n                if (crop) {\n                    drawCrop(ctx, tile, crop, stage);\n                }\n            }\n\n            // Save game to localStorage\n            localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n        }\n\n        // Draw crop\n        function drawCrop(ctx, tile, crop, stage) {\n            const { x, y } = tile.split(',');\n            const size = 50;\n            ctx.fillStyle = crop.color;\n            ctx.fillRect(x * size, y * size, size, size);\n            ctx.fillStyle = 'black';\n            ctx.font = '16px Arial';\n            ctx.fillText(`${crop.name} (${stage})`, x * size + 10, y * size + 20);\n        }\n\n        // Keydown event handler\n        function keyIsDown(key) {\n            return window.event.key === key;\n        }\n\n        // Load game from localStorage\n        if (localStorage.getItem('game')) {\n            const savedState = JSON.parse(localStorage.getItem('game'));\n            player = savedState.player;\n            tiles = savedState.tiles;\n            inventory = savedState.inventory;\n            day = savedState.day;\n        }\n\n        // Start game loop\n        gameLoop();\n    </script>\n</body>\n</html>\n```",
+  "extraction": {
+    "fences": 2,
+    "artifactChars": 2969,
+    "outsideChars": 0,
+    "outsideSample": ""
+  },
+  "play": {
+    "status": "OK",
+    "reason": null,
+    "passing": [],
+    "failing": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "total": 5,
+    "log": "FAIL case 1  loads with no page or console errors and exposes state -> expected errors.length === 0 && state && state.player && typeof state.player.x === 'number'; state null; errors: [JS ERROR] Cannot read properties of undefined (reading 'key') | [JS ERROR] Cannot read properties of undefined (reading 'key')\nERROR case 2  ArrowRight moves the player right: Cannot read properties of null (reading 'player')\nERROR case 3  ArrowDown moves the player down: Cannot read properties of null (reading 'player')\nERROR case 4  p plants a seed on the player's tile and spends a seed: Cannot read properties of null (reading 'player')\nERROR case 5  t advances time and the crop grows: Cannot read properties of null (reading 'player')\nSUMMARY 0/5 cases pass, 5 fail"
+  },
+  "verdict": {
+    "overall": "FAIL",
+    "requested": "FAIL",
+    "protected": "FAIL",
+    "requestedFailing": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "acceptance": {
+    "disposition": "NO_VERIFIED_BASELINE",
+    "countsAsCompletion": false,
+    "promotable": false,
+    "survivingWorkspaceVerdict": {
+      "overall": "EVALUATION_ERROR",
+      "requested": "EVALUATION_ERROR",
+      "protected": "EVALUATION_ERROR",
+      "candidateTree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+      "note": "the workspace was restored to startRef byte for byte and the protected check still FAILS, so the starting state never satisfied it: nothing was damaged and there is nothing to restore to. startRef must be a state already verified against this task."
+    },
+    "survivingBytes": "IDENTICAL_TO_START"
+  }
+}

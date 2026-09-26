@@ -231,7 +231,12 @@ async function main() {
 
     const acc = await applyAcceptance(ws, task, verdict, { startRef, captureDir: join(ws, '.rejected'), taskId: task.id });
     rec.boundaries.accepted = acc.disposition === DISPOSITION.RETAIN;
-    rec.acceptance = { disposition: acc.disposition, countsAsCompletion: acc.countsAsCompletion, promotable: acc.promotable };
+    rec.acceptance = {
+      disposition: acc.disposition, countsAsCompletion: acc.countsAsCompletion, promotable: acc.promotable,
+      // what SURVIVED matters as much as the label: a rollback that reports success while the
+      // workspace no longer passes is the failure this whole record exists to make visible.
+      survivingWorkspaceVerdict: acc.survivingWorkspaceVerdict ?? null, survivingBytes: acc.survivingBytes ?? null,
+    };
     rec.timing.acceptanceMs = Date.now() - T0;
     // Strict is what the protocol says; lenient is recorded so one run answers both readings.
     rec.boundaries.acceptedIfLenient = rec.boundaries.accepted;

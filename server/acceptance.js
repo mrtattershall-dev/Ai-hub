@@ -73,6 +73,9 @@ export const DISPOSITION = Object.freeze({
   PRESERVE_INCOMPLETE: 'PRESERVE_INCOMPLETE', // kept, but not a completion and not a baseline
   RESTORED: 'RESTORED',                      // damage rolled back, starting state re-verified
   RESTORE_FAILED: 'RESTORE_FAILED',          // damage detected and NOT undone - must halt
+  NO_VERIFIED_BASELINE: 'NO_VERIFIED_BASELINE', // the START state does not satisfy the protected
+                                             // spec, so nothing was damaged and there is nothing
+                                             // to restore TO - must halt, for a different reason
   HELD: 'HELD',                              // evaluation error: candidate held, nothing promoted
 });
 
@@ -134,8 +137,21 @@ export async function applyAcceptance(ws, task, candidateVerdict, { startRef, ca
     out.survivingBytes = bytes.identical ? 'IDENTICAL_TO_START' : `DIFFER: ${[...(bytes.differing || []), ...(bytes.extra || [])].slice(0, 5).join(', ') || bytes.reason}`;
     // RESTORED now claims three things, each checked: git reset succeeded, the protected check
     // passes again, and every byte matches the start commit with nothing extra on disk.
-    out.disposition = after.protected?.verdict === VERDICT.PASS && bytes.identical ? DISPOSITION.RESTORED : DISPOSITION.RESTORE_FAILED;
-    if (!bytes.identical) out.survivingWorkspaceVerdict.note = 'the recheck passed but the bytes on disk are not those of the verified start: ' + out.survivingBytes;
+    if (after.protected?.verdict === VERDICT.PASS && bytes.identical) {
+      out.disposition = DISPOSITION.RESTORED;
+    } else if (bytes.identical) {
+      // The bytes ARE the start commit's and the protected check STILL fails. So the candidate
+      // damaged nothing: the start state never satisfied the protected spec in the first place,
+      // and `startRef`'s documented precondition ("already verified as the task's starting
+      // point") was violated by the caller. Reporting that as RESTORE_FAILED - "damage detected
+      // and NOT undone" - names a regression that did not happen and would send a recovery
+      // controller hunting for damage instead of for its missing baseline.
+      out.disposition = DISPOSITION.NO_VERIFIED_BASELINE;
+      out.survivingWorkspaceVerdict.note = 'the workspace was restored to startRef byte for byte and the protected check still FAILS, so the starting state never satisfied it: nothing was damaged and there is nothing to restore to. startRef must be a state already verified against this task.';
+    } else {
+      out.disposition = DISPOSITION.RESTORE_FAILED;
+      out.survivingWorkspaceVerdict.note = 'the recheck passed but the bytes on disk are not those of the verified start: ' + out.survivingBytes;
+    }
     // Restored means the damage is gone. It does NOT mean the task was completed.
     return out;
   }

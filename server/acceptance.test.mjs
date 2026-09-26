@@ -137,6 +137,27 @@ try {
     say(r.promotable === false && r.countsAsCompletion === false, 'nothing is promoted and nothing is counted');
     say(r.survivingWorkspaceVerdict.overall === VERDICT.EVALUATION_ERROR, 'and the surviving verdict says the instrument failed, not that the code did');
   }
+  // ── 5. the START state never satisfied the protected spec -> NO_VERIFIED_BASELINE ──
+  console.log('\n=== 5. a candidate cannot be blamed for damage that never happened ===');
+  {
+    // Found by a real run: an increment-2 attempt started from an EMPTY workspace, so the
+    // protected spec had never passed. The policy restored startRef byte for byte, saw the
+    // protected check still failing, and called it RESTORE_FAILED - "damage detected and NOT
+    // undone". No damage existed. The caller had violated startRef's precondition, and the label
+    // would send a recovery controller looking for a regression instead of a baseline.
+    const { ws, task, startRef } = stage('t2-repair-python-parse');
+    const cap = mkdtempSync(join(tmpdir(), 'cap-')); dirs.push(cap);
+    // A protected spec the START state cannot satisfy, and a candidate that changes nothing.
+    const unsatisfiable = { ...task, protected: { script: 'exit 1' } };
+    const v = await evaluate(ws, unsatisfiable);
+    say(v.protected?.verdict === VERDICT.FAIL, `the protected check fails for the start state itself (${v.protected?.verdict})`);
+    const r = await applyAcceptance(ws, unsatisfiable, v, { startRef, captureDir: cap, taskId: 'no-baseline-case' });
+    say(r.disposition === DISPOSITION.NO_VERIFIED_BASELINE, `NO_VERIFIED_BASELINE, not RESTORE_FAILED (${r.disposition})`);
+    say(r.survivingBytes === 'IDENTICAL_TO_START', `the workspace IS the start commit byte for byte (${r.survivingBytes})`);
+    say(/never satisfied it/.test(r.survivingWorkspaceVerdict.note || ''), 'the note says the starting state never satisfied the protected spec');
+    say(r.promotable === false && r.countsAsCompletion === false, 'it still halts: nothing promoted, nothing counted');
+    say(!!r.capturedAt && existsSync(r.capturedAt), 'the candidate is still captured before the rollback');
+  }
 } finally {
   for (const d of dirs) { try { rmSync(d, { recursive: true, force: true }); } catch { /* best effort */ } }
 }

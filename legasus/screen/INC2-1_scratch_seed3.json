@@ -1,0 +1,92 @@
+{
+  "at": "2026-09-26T10:57:38.814Z",
+  "task": "farm-i2",
+  "model": "qwen2.5-coder:1.5b",
+  "modelUrl": "http://127.0.0.1:11434",
+  "seed": 3,
+  "protocol": "narrow-artifact-v2",
+  "strict": true,
+  "deadlineSec": 900,
+  "maxTokens": 4000,
+  "requestedSteps": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "protectedSteps": [
+    1,
+    2,
+    3
+  ],
+  "boundaries": {
+    "artifactProduced": true,
+    "artifactComplete": true,
+    "contractClean": true,
+    "artifactChangedFile": true,
+    "reachedExecution": true,
+    "passedDiagnostic": false,
+    "passedProtected": true,
+    "accepted": false,
+    "acceptedIfLenient": false,
+    "acceptedStrict": false
+  },
+  "timing": {
+    "generateMs": 49167,
+    "firstTokenMs": 465,
+    "writtenMs": 49977,
+    "playMs": 55508,
+    "acceptanceMs": 65422
+  },
+  "tokens": {
+    "output": 704,
+    "prompt": 481,
+    "replyChars": 3232
+  },
+  "workspace": "C:\\Users\\tatte\\AppData\\Local\\Temp\\narrow-farm-i2-muRMcR",
+  "terminationReason": "stop",
+  "naturalStop": true,
+  "reply": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n\n        // Game state\n        let player = { x: 0, y: 0 };\n        let tiles = {};\n        let inventory = { seeds: 10, crops: 0 };\n        let day = 0;\n\n        // Game logic\n        function update() {\n            // Move player\n            if (event.key === 'ArrowUp') player.y -= 1;\n            if (event.key === 'ArrowDown') player.y += 1;\n            if (event.key === 'ArrowLeft') player.x -= 1;\n            if (event.key === 'ArrowRight') player.x += 1;\n\n            // Plant seed\n            if (event.key === 'p') {\n                const seed = { crop: 'corn', stage: 0 };\n                tiles[player.x + ',' + player.y] = seed;\n                inventory.seeds--;\n            }\n\n            // Harvest crop\n            if (event.key === 'h') {\n                const tile = tiles[player.x + ',' + player.y];\n                if (tile && tile.crop === 'corn' && tile.stage === 3) {\n                    tiles[player.x + ',' + player.y] = null;\n                    inventory.crops++;\n                }\n            }\n\n            // Update time\n            day++;\n            for (const tile in tiles) {\n                const seed = tiles[tile];\n                if (seed) {\n                    seed.stage++;\n                    if (seed.stage === 3) {\n                        delete tiles[tile];\n                        inventory.crops++;\n                    }\n                }\n            }\n\n            // Draw tiles\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            for (const tile in tiles) {\n                const seed = tiles[tile];\n                if (seed) {\n                    drawSeed(seed);\n                }\n            }\n\n            // Save game\n            if (event.key === 's') {\n                localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n            }\n\n            // Load game\n            if (event.key === 'l') {\n                const savedGame = localStorage.getItem('game');\n                if (savedGame) {\n                    const state = JSON.parse(savedGame);\n                    player = state.player;\n                    tiles = state.tiles;\n                    inventory = state.inventory;\n                    day = state.day;\n                }\n            }\n\n            requestAnimationFrame(update);\n        }\n\n        function drawSeed(seed) {\n            const x = seed.x * 50;\n            const y = seed.y * 50;\n            ctx.fillStyle = 'green';\n            ctx.fillRect(x, y, 50, 50);\n        }\n\n        // Event listener for key presses\n        document.addEventListener('keydown', update);\n\n        // Initial state\n        window.game = { state: () => JSON.parse(JSON.stringify({ player, tiles, inventory, day })) };\n    </script>\n</body>\n</html>\n```",
+  "extraction": {
+    "fences": 2,
+    "artifactChars": 3221,
+    "outsideChars": 0,
+    "outsideSample": ""
+  },
+  "play": {
+    "status": "OK",
+    "reason": null,
+    "passing": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "failing": [
+      5
+    ],
+    "total": 5,
+    "log": "PASS case 1  loads with no page or console errors and exposes state\nPASS case 2  ArrowRight moves the player right\nPASS case 3  ArrowDown moves the player down\nPASS case 4  p plants a seed on the player's tile and spends a seed\nFAIL case 5  t advances time and the crop grows -> expected (function(){ const k = state.player.x + ',' + state.player.y; return !!state.tiles[k] && state.tiles[k].stage > before.tiles[k].stage; })(); state {\"player\":{\"x\":3,\"y\":2},\"tiles\":{},\"inventory\":{\"seeds\":9,\"crops\":1},\"day\":11}; errors: [JS ERROR] Cannot read properties of undefined (reading 'key') | [JS ERROR] Cannot read properties of undefined (reading 'key')\nSUMMARY 4/5 cases pass, 1 fail"
+  },
+  "verdict": {
+    "overall": "FAIL",
+    "requested": "FAIL",
+    "protected": "PASS",
+    "requestedFailing": [
+      5
+    ]
+  },
+  "acceptance": {
+    "disposition": "PRESERVE_INCOMPLETE",
+    "countsAsCompletion": false,
+    "promotable": false,
+    "survivingWorkspaceVerdict": {
+      "overall": "FAIL",
+      "requested": "FAIL",
+      "protected": "PASS",
+      "candidateTree": "32ca1004aa8c0e7fffdaf0eb5c7c32f5ebe36173"
+    },
+    "survivingBytes": null
+  }
+}
