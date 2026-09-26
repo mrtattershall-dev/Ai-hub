@@ -90,7 +90,7 @@ function fakeOllama(reply, doneReason = 'stop') {
   });
 }
 
-async function run(label, reply, protocol, doneReason = 'stop') {
+async function run(label, reply, protocol, doneReason = 'stop', extra = []) {
   const { srv, port } = await fakeOllama(reply, doneReason);
   const base = mkdtempSync(join(tmpdir(), `le-base-${label}-`));
   writeFileSync(join(base, 'index.html'), START, 'utf8');
@@ -99,7 +99,7 @@ async function run(label, reply, protocol, doneReason = 'stop') {
   await new Promise((resolve) => {
     const p = spawn(process.execPath, [join(HERE, 'localEdit.mjs'), '--model-url', `http://127.0.0.1:${port}`,
       '--model', 'fake', '--task', 'farm-i2', '--protocol', protocol, '--seed', '7',
-      '--workspace', base, '--deadline-sec', '120', '--out', out], { stdio: ['ignore', 'pipe', 'pipe'] });
+      '--workspace', base, '--deadline-sec', '120', '--out', out, ...extra], { stdio: ['ignore', 'pipe', 'pipe'] });
     let o = ''; p.stdout.on('data', (d) => { o += d; }); p.stderr.on('data', (d) => { o += d; });
     p.on('exit', () => { console.log(o.split('\n').filter(Boolean).map((l) => '        ' + l).join('\n')); resolve(); });
   });
@@ -195,6 +195,54 @@ console.log('\n=== 8. fim: an empty completion ===');
   const { rec, startUntouched } = await run('fimempty', '   \n', 'fim');
   say(rec?.boundaries?.editProduced === false, 'E1 no: an empty infill is not an edit');
   say(startUntouched, 'and nothing is written');
+}
+
+console.log('\n=== 9. a whole-file FIND is followed as a format and refused as an edit ===');
+{
+  // What the 1.5B actually did on every anchor attempt: copy the ENTIRE file into FIND, then
+  // replace it with a few characters. The block is well formed and applicable, so E1 and E2 say
+  // yes; E2b must say no, or "changed the program" would read as a localized change when the
+  // program was in fact deleted.
+  const destroy = ['<<<<<<< FIND', START.replace(/\n$/, ''), '=======', '=======', '>>>>>>> END'].join('\n');
+  const { rec } = await run('whole-find', destroy, 'anchor');
+  const b = rec?.boundaries || {};
+  say(b.editProduced === true && b.editApplicable === true, 'E1-E2: the block is well formed and its FIND matches');
+  say(b.editIsLocalized === false, 'E2b: it is NOT a localized edit - the FIND is the whole file');
+  say(b.changedProgram === true && b.passedProtected === false, 'E4 yes and E6 no: the program changed because it was destroyed');
+  say(rec?.acceptance?.disposition === 'RESTORED', `and the rollback put the accepted page back (${rec?.acceptance?.disposition})`);
+  say(rec?.edit?.localization?.[0]?.findIsWholeFile === true, 'the record says the FIND was the whole file');
+}
+
+console.log('\n=== 10. the SMALLER fim region, with the movement wiring left intact ===');
+{
+  // The first fim region ran from plantSeed through the last listener, which swallowed
+  // addEventListener('keydown', movePlayer) - so an infill that did not re-add it lost movement,
+  // and four of five attempts failed the protected steps for that reason. This region starts one
+  // line later, leaving movement wired, and must still be passable by a correct edit.
+  const FROM = "        document.addEventListener('p', plantSeed);";
+  const TO = "        document.addEventListener('load', loadGame);";
+  const region = cutRegion(START, FROM, TO);
+  say(region.ok && region.prefix.includes("addEventListener('keydown', movePlayer)"), 'the smaller region leaves the movement wiring in the prefix');
+  const GOOD_SMALL = [
+    "        document.addEventListener('keydown', (e) => {",
+    "            if (e.key === 'p') {",
+    '                const k = `${player.x},${player.y}`;',
+    '                if (!tiles[k] && inventory.seeds > 0) {',
+    "                    tiles[k] = { crop: 'wheat', stage: 0 };",
+    '                    inventory.seeds--;',
+    '                }',
+    "            } else if (e.key === 't') {",
+    '                day++;',
+    '                for (const k of Object.keys(tiles)) if (tiles[k].stage < 3) tiles[k].stage++;',
+    '            }',
+    '            try { draw(); } catch (err) { /* draw throws on a missing element, outside this region */ }',
+    '        });',
+  ].join('\n');
+  const { rec } = await run('fimsmall', GOOD_SMALL + '\n', 'fim', 'stop', ['--region-from', FROM, '--region-to', TO]);
+  const b = rec?.boundaries || {};
+  say(b.passedProtected === true, 'movement and existing behaviour survive (steps 1-3)');
+  say(b.passedDiagnostic === true && b.accepted === true, `planting and growth work, RETAIN (${rec?.acceptance?.disposition})`);
+  say(rec?.assistance?.region?.removedLines <= 6, `the hole is ${rec?.assistance?.region?.removedLines} lines, not 42`);
 }
 
 console.log(`\n  localized edit: ${passed} passed, ${failed} failed -> ${failed ? 'THE PROTOCOL IS NOT ESTABLISHED' : 'a correct edit reaches RETAIN through both protocols, and every refusal is deterministic'}`);

@@ -36,7 +36,13 @@
  *   E2 editApplicable    every FIND matched the file exactly once (anchor); a non-empty
  *                        completion arrived (fim)
  *   E3 editApplied       the harness wrote the edited file
- *   E4 changedProgram    the result DIFFERS from the starting file - INC2-1's failure was here
+ *   E2b editIsLocalized   no block claims the whole file (or even half of it). The first anchor
+ *                        run obeyed the FORMAT and defeated its PURPOSE: every attempt copied the
+ *                        entire file into FIND and replaced it with a few characters, so the
+ *                        "edit" deleted the page. A protocol can be followed and still not be
+ *                        used, and that has to be visible as its own boundary.
+ *   E4 changedProgram    the result DIFFERS from the starting file - INC2-1's failure was here.
+ *                        A deletion changes the program too: read E4 with E2b and E6.
  *   E5 reachedExecution  the page loaded and the play produced verdicts
  *   E6 passedProtected   movement and the existing behaviour still pass (steps 1-3)
  *   E7 passedDiagnostic  planting and growth work too (steps 1-5)
@@ -283,6 +289,19 @@ async function main() {
       rec.boundaries.editProduced = parsed.blocks.length > 0;
       rec.boundaries.editContractClean = parsed.blocks.length > 0 && parsed.outside.length === 0 && !parsed.incomplete;
       if (!parsed.blocks.length) return rec;
+      // HOW LOCALIZED WAS IT? The first anchor run answered the format and ignored its point:
+      // every attempt copied the ENTIRE file into FIND and replaced it with a few characters,
+      // deleting the page. "changed the program" must never be readable as "made a localized
+      // change", so the size of what each block claims and leaves behind is recorded.
+      rec.edit.localization = parsed.blocks.map((b) => ({
+        findChars: b.find.length, findLines: b.find.split('\n').length,
+        replaceChars: b.replace.length, replaceLines: b.replace.split('\n').length,
+        findFractionOfFile: +(b.find.length / startFile.length).toFixed(3),
+        findIsWholeFile: b.find.trim() === startFile.trim(),
+        netChars: b.replace.length - b.find.length,
+      }));
+      rec.boundaries.editIsLocalized = parsed.blocks.length > 0
+        && parsed.blocks.every((b) => b.find.trim() !== startFile.trim() && b.find.length < startFile.length * 0.5);
       const applied = applyEditBlocks(startFile, parsed.blocks);
       rec.edit.results = applied.results;
       rec.boundaries.editApplicable = applied.applicable;
@@ -328,7 +347,7 @@ console.log(`${TASK_ID} ${MODEL} ${rec.protocol} seed=${rec.seed}  termination=$
 console.log(`  E1 edit produced       ${mark(b.editProduced)}   E1b contract clean ${mark(b.editContractClean)}   E2 applicable ${mark(b.editApplicable)}`);
 console.log(`  E3 applied             ${mark(b.editApplied)}   E4 changed the program ${mark(b.changedProgram)}`);
 console.log(`  E5 reached execution   ${mark(b.reachedExecution)}   E6 protected ${mark(b.passedProtected)}   E7 requested ${mark(b.passedDiagnostic)}   E8 accepted ${mark(b.accepted)}`);
-if (rec.edit) console.log(`  edit: ${rec.edit.blocks} block(s)${rec.edit.incomplete ? ' (one INCOMPLETE)' : ''}, outside=${rec.edit.outsideChars} chars${rec.edit.results ? ', ' + rec.edit.results.map((r) => r.status).join('/') : ''}`);
+if (rec.edit) console.log(`  edit: ${rec.edit.blocks} block(s)${rec.edit.incomplete ? ' (one INCOMPLETE)' : ''}, outside=${rec.edit.outsideChars} chars${rec.edit.results ? ', ' + rec.edit.results.map((r) => r.status).join('/') : ''}${rec.edit.localization ? ', localized ' + mark(b.editIsLocalized) + ' [' + rec.edit.localization.map((l) => `${l.findChars}->${l.replaceChars}ch`).join(' ') + ']' : ''}`);
 console.log(`  chars=${rec.tokens.replyChars} outTok=${rec.tokens.output} promptTok=${rec.tokens.prompt} gen=${rec.timing.generateMs}ms`);
 if (rec.play) console.log(`  play: ${rec.play.status} passing [${rec.play.passing.join(',')}] failing [${rec.play.failing.join(',')}]`);
 if (rec.acceptance) console.log(`  acceptance: ${rec.acceptance.disposition}`);
