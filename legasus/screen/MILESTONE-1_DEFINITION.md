@@ -42,11 +42,15 @@ pre-committed (the threshold is a product decision once the numbers exist).
                                                                          in early runs (set D-K),
                                                                          with a 14B/30B model
     CHECK      independent evaluator in the worker (requested +          IMPLEMENTED for python
-               protected checks); automatic diagnostic (graded cases     cases; UNESTABLISHED for
-               before the first action and after every edit); the        a browser game - the
-               recovery controller (exact rollback, repeat refusal,      diagnostic and evaluator
-               bounded retries); acceptance RETAIN/RESTORED             run python cases, not a
-                                                                         scripted play of a page
+               protected checks); automatic diagnostic (graded cases     cases AND for a browser
+               before the first action and after every edit); the        game: the PLAY kind
+               recovery controller (exact rollback, repeat refusal,      (playCheck.js, a declared
+               bounded retries); acceptance RETAIN/RESTORED;             play the model did not
+               NOW: the declared play (legasus/bench/farm/play.json)     write, positive + two
+               as diagnostic, checkpoint identity and acceptance         negative controls;
+                                                                         playDiagnostic 16/16;
+                                                                         farmCampaign 9/9 with a
+                                                                         scripted builder)
     REMEMBER   NOTES.md (free text, tail injected at start); TASKS.md    IMPLEMENTED: lessons.js
                ledger; git history; campaign records; NOW: LESSONS.jsonl  (context-keyed, status
                with context {language, tool, errorSignature}, status       suspected|confirmed,
@@ -81,7 +85,9 @@ expertise: a lesson counts only when it predicts a failure and demonstrably prev
 
 ## What this milestone requires that does not exist
 
-1. **A game check the model did not write** (CHECK for a browser game). A scripted play in
+1. **A game check the model did not write** - BUILT (server/playCheck.js; legasus/bench/farm/
+   play.json; controls; the play as diagnostic/checkpoint/acceptance; farm-v1 in
+   benchTasks.farmTasks(); BENCH_GROUP=farm in the runner). Design as written: a scripted play in
    headless Chromium: load, press keys, observe state (player position, a planted tile, an
    inventory count, a save round-trip). Declared like the QuixBugs cases: a spec the evaluator
    runs; requested = the new increment's checks, protected = every earlier increment's checks.
