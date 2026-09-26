@@ -46,6 +46,7 @@ import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const exec = promisify(execFile);
 const argv = process.argv.slice(2);
@@ -74,6 +75,7 @@ const { farmTasks } = await import('./benchTasks.js');
 const { evaluate } = await import('./evaluator.js');
 const { applyAcceptance, DISPOSITION } = await import('./acceptance.js');
 const { playCheck } = await import('./playCheck.js');
+const { judgeCandidate } = await import('./judgeCandidate.mjs');
 
 const task = farmTasks().find((t) => t.id === TASK_ID);
 if (!task) { console.error(`unknown task ${TASK_ID}; have ${farmTasks().map((t) => t.id).join(', ')}`); process.exit(2); }
@@ -219,35 +221,22 @@ async function main() {
     rec.timing.writtenMs = Date.now() - T0;
 
     // ── B4..B6: the UNCHANGED play, evaluator and acceptance ──
-    const play = await playCheck(ws, spec, { timeoutMs: 90_000 });
-    rec.boundaries.reachedExecution = play.status === 'OK';
-    rec.play = { status: play.status, reason: play.reason ?? null, passing: [...(play.passing || [])], failing: [...(play.failing || [])], total: play.total ?? null, log: String(play.log || '').slice(0, 4000) };
-    rec.timing.playMs = Date.now() - T0;
-
-    const verdict = await evaluate(ws, task, { timeoutSec: 120 });
-    rec.boundaries.passedDiagnostic = verdict.requested?.verdict === 'PASS';
-    rec.boundaries.passedProtected = !task.protected || verdict.protected?.verdict === 'PASS';
-    rec.verdict = { overall: verdict.verdict, requested: verdict.requested?.verdict ?? null, protected: verdict.protected?.verdict ?? null, requestedFailing: verdict.requested?.failing ?? null };
-
-    const acc = await applyAcceptance(ws, task, verdict, { startRef, captureDir: join(ws, '.rejected'), taskId: task.id });
-    rec.boundaries.accepted = acc.disposition === DISPOSITION.RETAIN;
-    rec.acceptance = {
-      disposition: acc.disposition, countsAsCompletion: acc.countsAsCompletion, promotable: acc.promotable,
-      // what SURVIVED matters as much as the label: a rollback that reports success while the
-      // workspace no longer passes is the failure this whole record exists to make visible.
-      survivingWorkspaceVerdict: acc.survivingWorkspaceVerdict ?? null, survivingBytes: acc.survivingBytes ?? null,
-    };
-    rec.timing.acceptanceMs = Date.now() - T0;
+    // Shared with the localized-edit harness, so the two protocols cannot be judged by two
+    // different standards. This suite passing over the extraction is the evidence for that.
+    await judgeCandidate(ws, task, spec, startRef, rec, T0, { playCheck, evaluate, applyAcceptance, join, readFileSync });
     // Strict is what the protocol says; lenient is recorded so one run answers both readings.
     rec.boundaries.acceptedIfLenient = rec.boundaries.accepted;
     rec.boundaries.acceptedStrict = rec.boundaries.accepted && rec.boundaries.contractClean;
-    if (rec.boundaries.accepted) rec.acceptedFile = readFileSync(join(ws, ENTRY), 'utf8');
     return rec;
   } finally {
     if (!KEEP) { try { rmSync(ws, { recursive: true, force: true }); } catch { /* best effort */ } }
   }
 }
 
+// Run ONLY when invoked directly. A test that imports this module for its parsers must
+// not launch a generation run as a side effect of the import.
+const DIRECT = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
+if (DIRECT) {
 const rec = await main();
 if (OUT) { mkdirSync(dirname(OUT), { recursive: true }); writeFileSync(OUT, JSON.stringify(rec, null, 2), 'utf8'); }
 const b = rec.boundaries || {};
@@ -259,3 +248,4 @@ console.log(`  chars=${rec.tokens.replyChars} outTok=${rec.tokens.output ?? '-'}
 if (rec.play) console.log(`  play: ${rec.play.status} passing [${rec.play.passing.join(',')}] failing [${rec.play.failing.join(',')}]`);
 if (rec.acceptance) console.log(`  acceptance: ${rec.acceptance.disposition}`);
 if (OUT) console.log(`  written: ${OUT}`);
+}
