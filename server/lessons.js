@@ -89,10 +89,13 @@ export function currentLessons(workspace) {
  * a matching error signature is the strongest signal. A lesson with no language is generic
  * and matches any language at a lower score. Returns 0 for "does not apply".
  */
+/** html pages carry inline javascript: a lesson keyed to either applies to both. */
+const LANG_ALIAS = { html: 'javascript', javascript: 'javascript', typescript: 'javascript' };
+export function sameLanguage(a, b) { return a === b || (LANG_ALIAS[a] && LANG_ALIAS[a] === LANG_ALIAS[b]); }
 export function relevance(lesson, ctx) {
   const c = lesson.context || {};
   let score = 0;
-  if (c.language && ctx.language) { if (c.language !== ctx.language) return 0; score += 2; }
+  if (c.language && ctx.language) { if (!sameLanguage(c.language, ctx.language)) return 0; score += c.language === ctx.language ? 2 : 1.5; }
   else if (!c.language) score += 0.5;
   if (c.tool && ctx.tool) { if (c.tool !== ctx.tool) return 0; score += 1; }
   if (c.errorSignature && ctx.errorSignature) {
@@ -134,9 +137,9 @@ export function projectLanguages(workspace) {
 
 /** Lessons for the opening context: those keyed to a language the project uses, plus generic ones. */
 export function lessonsForOpening(workspace, { limit = MAX_LESSONS_SHOWN } = {}) {
-  const langs = new Set(projectLanguages(workspace));
+  const langs = [...new Set(projectLanguages(workspace))];
   return currentLessons(workspace)
-    .filter((l) => !l.context?.language || langs.has(l.context.language))
+    .filter((l) => !l.context?.language || langs.some((x) => sameLanguage(x, l.context.language)))
     .sort((a, b) => (b.seen || 1) - (a.seen || 1) || String(b.at).localeCompare(String(a.at)))
     .slice(0, limit);
 }

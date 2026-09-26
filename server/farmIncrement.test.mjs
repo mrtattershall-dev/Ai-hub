@@ -77,7 +77,9 @@ try {
   say(/RESULT: 11 cases attempted, 8 passed, 3 failed/.test(dm2[0] || '') && /FAIL case 9 /.test(dm2[0]) && /FAIL case 10 /.test(dm2[0]) && /FAIL case 11 /.test(dm2[0]), 'the opening diagnostic under v2: 8/11 - the v1 steps pass, the three new ones fail');
   const init2 = rsteps(s2.run).find((s) => s.action === 'INIT');
   say(/8 protected case/.test(init2?.text || ''), `the controller protects the 8 v1 steps (${(init2?.text || '').match(/\d+ protected case/)?.[0]})`);
-  const opening = s2.reqs[0]?.messages?.map((m) => String(m.content || '')) || [];
+  // The planner call comes first and carries only the goal and notes; the action loop's opening
+  // context (notes + lessons) is in the requests that follow. Look across all of them.
+  const opening = s2.reqs.flatMap((r) => (r.messages || []).map((m) => String(m.content || '')));
   say(opening.some((c) => /^Your notes from earlier work/.test(c) && /farm-save/.test(c)), 'the opening context carries session 1\'s notes');
   say(opening.some((c) => /^LESSONS FROM EARLIER WORK/.test(c) && /forgot to persist/.test(c)), 'and session 1\'s scoped lesson');
   say(s2.run.recovery?.state === 'ACCEPTED' && /RESULT: 11 cases attempted, 11 passed/.test(dm2[1] || '') && s2.file === V2, 'the v2 write passes 11/11 and is ACCEPTED - added without breaking v1');

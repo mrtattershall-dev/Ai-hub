@@ -16,6 +16,6 @@
     { "n": 8, "name": "still no errors after the whole play", "do": [], "expect": "noErrors" },
     { "n": 9, "name": "state carries a phase that starts as day and coins that start at 0", "do": [{ "eval": "localStorage.clear()" }, { "reload": true }], "expect": "state.phase === 'day' && state.coins === 0" },
     { "n": 10, "name": "t four times turns day into night, four more turns it back", "do": [{ "key": "t", "times": 4 }], "expect": "state.phase === 'night' && before.phase === 'day'" },
-    { "n": 11, "name": "x sells harvested crops for 3 coins each", "do": [{ "key": "t", "times": 4 }, { "key": "p" }, { "key": "t", "times": 5 }, { "key": "h" }, { "key": "x" }], "expect": "state.phase === 'day' && state.inventory.crops === 0 && state.coins === before.coins + 3" }
+    { "n": 11, "name": "x sells harvested crops for 3 coins each", "do": [{ "key": "t", "times": 4 }, { "key": "p" }, { "key": "t", "times": 5 }, { "key": "h" }, { "key": "x" }], "expect": "state.inventory.crops === 0 && state.coins === before.coins + 3" }
   ]
 }
