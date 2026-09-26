@@ -1,6 +1,6 @@
-# EVAL-1 — paired evaluation of controller-v1 with complete pairs and measured cost. Frozen. NOT LAUNCHED.
+# EVAL-1 — paired evaluation of controller-v1 with complete pairs and measured cost. Frozen.
 
-2026-09-26. **No spending authorized for this run.** Modal stays off until it is.
+2026-09-26. **AUTHORIZED by tatte: the 2.5 h-wall option, conservative maximum ~$5.4** ("I'd favor complete pairs over squeezing the evaluation into a shorter deadline. The $5.4 option is given authorization"). Recorded here before deploy. Per task 240 s, campaign wall 9000 s, watchdog 9900 s, seeds 808 and 909, keep-awake armed, supervised relaunch on the same root.
 
 ## Purpose
 
