@@ -1,0 +1,53 @@
+Make the duplicate refusal reachable on append_file, with 9 controls that discriminate
+
+Both preservation refusals are gated on beforeSrc, and agent.js:3392 captured it only for write_file
+and edit_file. So the duplicate refusal was not weakened on the append route, it was UNREACHABLE. One
+functional line changes that; the rest of this commit is the evidence that the line is sufficient for
+the cases tested and the statement of which cases were not tested.
+
+Cut from fix/unverified-finish-recorded at c952cbc so before and after hold the revision constant.
+Reproduced on the unmodified tree first: write_file taking foo from one to two is REFUSED and the file
+is unchanged, while append_file making the identical change LANDS def foo twice.
+
+Nine controls, every expectation written down before the fix was applied, scored against ON-DISK file
+state rather than counters because the file is the ground truth and a counter is a report about it.
+Three must refuse and six must not. Baseline scores 6 of 9 - exactly the three duplication cases land
+the corruption - and the fixed tree scores 9 of 9.
+
+The six legitimate cases are the point, because a fix that refused everything would satisfy all three
+positives and be worthless. ap4-NEWFILE guards the obvious way to break this change, since a file that
+does not exist yet still leaves beforeSrc null through the existing catch, so creating a file by append
+is unaffected. ap7-DECLARED proves the refusal still has an exit and cannot become a loop. ap5 covers a
+non-source extension outside the gate, ap6 an append containing no definitions at all. The removal
+refusal stayed vacuous on this route before and after, as the new comment predicts, rather than firing
+falsely.
+
+am1-METHOD-DUP is the real shape rather than a synthetic one. Set H recorded append_file 22 times on
+s8_grades.py ending with set_weight twenty times, an INDENTED method - the shape column-0
+duplicateDecls can never see and defCounts was built for. Python's own ast confirms the appended text
+lands inside the class, giving two set_weight methods with the second silently winning. Baseline lands
+it, the fix refuses it.
+
+Eight directly relevant existing suites pass on the fixed tree, 50 assertions, zero failures:
+appendFile, appendFragment, appendSyntax, defLoss, destructiveWrite, duplicateDecls, exportLoss,
+noopEdit. A broader sweep of the remaining suites was still running when this was committed, so no
+regressions is NOT claimed beyond those eight. The one non-zero exit seen so far, batchActions, is
+rc 124 from a 90 second timeout with its last line reading ok, and that test never references
+append_file, so it cannot be reached by this change.
+
+Not established, and recorded as such: appending syntactically BROKEN content is untested, and since
+the removal refusal is now reachable here it could fire where it previously could not if defNames sees
+earlier definitions as absent in an unparseable file. That this changes any score is also not claimed -
+set G's own history is twenty fixes that stopped destruction without raising it. spawn_subtask at 2690
+and the human-approval resume at 4590 still write with no preservation machinery and are deliberately
+left alone, because no model requested either in 17466 recorded replies and closing them would be
+prophylaxis rather than a measured fix.
+
+One defect in the measuring instrument is worth naming: replay-run.mjs detects refusals by regex over
+the prompts served to the model, and the duplicate refusal's message is too long to survive into prompt
+text, so it reads zero while the refusal actually fired. These controls read run steps and disk
+instead. That is the single thing most likely to stop another developer using this rig unaided.
+
+Message-File: scratch-append-msg.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

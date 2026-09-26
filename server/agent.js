@@ -3388,8 +3388,16 @@ async function drive(loadDb, run) {
       _toolGoal = run.goal || null;
       if (tool === 'spawn_subtask') { args.depth = (run.depth || 0) + 1; _activeRun = run; }
       // The file as it was BEFORE this write/edit, so a write that silently drops definitions can say so (defNames.js).
+      //
+      // append_file IS IN THIS LIST because both preservation refusals are gated on beforeSrc, so leaving it
+      // out did not merely skip a warning - it made the duplicate refusal UNREACHABLE on this route. Measured
+      // 2026-09-26: append_file executed 31 times in set G alone, and a control appending a definition the
+      // file already has landed `def foo` twice, while the identical change made by write_file was refused.
+      // Appending cannot REMOVE a definition, so the removal refusal below is expected to be vacuous here;
+      // it is the duplicate refusal (defCounts) that this line makes reachable. A file that does not exist
+      // yet still leaves beforeSrc null through the catch, so creating a file by append is unaffected.
       let beforeSrc = null;
-      if ((tool === 'write_file' || tool === 'edit_file') && args.path && /\.(py|c?js|mjs)$/i.test(args.path)) {
+      if ((tool === 'write_file' || tool === 'edit_file' || tool === 'append_file') && args.path && /\.(py|c?js|mjs)$/i.test(args.path)) {
         try { beforeSrc = readFileSync(safePath(args.path), 'utf8'); } catch { /* a new file */ }
       }
       let result;
