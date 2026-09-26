@@ -12,10 +12,17 @@
  *   4. prose AND a good fence                                 -> B3 no; strict not accepted,
  *                                                                lenient accepted (both recorded)
  *   5. a clean fence with a page that throws on load          -> B4 yes, B5 no, not accepted
+ *   7. a later increment where the reply is the SEEDED FILE, byte for byte
+ *                                                              -> no crash (git has nothing to
+ *                                                                 commit), B3b changed-the-file
+ *                                                                 NO, protected steps still pass,
+ *                                                                 the increment is not accepted;
+ *                                                                 and a control where the reply
+ *                                                                 does differ records B3b YES
  */
 import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
-import { readFileSync, existsSync, rmSync, mkdtempSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, rmSync, mkdtempSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -46,12 +53,15 @@ function fakeOllama(reply, doneReason = 'stop') {
   });
 }
 
-async function run(label, reply, doneReason) {
+async function run(label, reply, doneReason, opts = {}) {
   const { srv, port } = await fakeOllama(reply, doneReason);
   const dir = mkdtempSync(join(tmpdir(), `na-${label}-`));
   const out = join(dir, 'result.json');
+  const extra = [];
+  if (opts.workspace) extra.push('--workspace', opts.workspace);
+  if (opts.protocol) extra.push('--protocol', opts.protocol);
   await new Promise((resolve) => {
-    const p = spawn(process.execPath, [join(HERE, 'narrowArtifact.mjs'), '--model-url', `http://127.0.0.1:${port}`, '--model', 'fake', '--task', 'farm-i1', '--seed', '7', '--deadline-sec', '120', '--out', out], { stdio: ['ignore', 'pipe', 'pipe'] });
+    const p = spawn(process.execPath, [join(HERE, 'narrowArtifact.mjs'), '--model-url', `http://127.0.0.1:${port}`, '--model', 'fake', '--task', opts.task || 'farm-i1', '--seed', '7', '--deadline-sec', '120', '--out', out, ...extra], { stdio: ['ignore', 'pipe', 'pipe'] });
     let o = ''; p.stdout.on('data', (d) => { o += d; }); p.stderr.on('data', (d) => { o += d; });
     p.on('exit', () => { console.log(o.split('\n').filter(Boolean).map((l) => '        ' + l).join('\n')); resolve(); });
   });
@@ -155,6 +165,37 @@ console.log('\n=== 6. the protocol versions differ in the REQUEST, and only ther
   say(r1 && r2 && r1.protocol === 'narrow-artifact-v1' && r2.protocol === 'narrow-artifact-v2', 'each record names its protocol (' + (r1 && r1.protocol) + ' / ' + (r2 && r2.protocol) + ')');
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   say(r1 && r2 && same(r1.requestedSteps, r2.requestedSteps) && same(r1.play && r1.play.passing, r2.play && r2.play.passing) && (r1.acceptance && r1.acceptance.disposition) === (r2.acceptance && r2.acceptance.disposition), 'the task, the play verdict and the acceptance are identical under both - only the request changed');
+}
+
+console.log('\n=== 7. a later increment answered with the seeded file, unchanged ===');
+{
+  // The 1.5B did exactly this on its first attempt at increment 2: it returned the accepted
+  // increment-1 page byte for byte. `git commit` exits 1 on an empty tree change, so the harness
+  // used to die with an unhandled error and record nothing. "The model did nothing" is a
+  // measurement, and it must survive to the record.
+  // The seed must be a page that satisfies increment 1 and NOT increment 2, or echoing it back
+  // would pass for a legitimate reason and the cell would prove nothing. The bench's positive
+  // control is not that page - it already passes steps 1-5. The real accepted increment-1
+  // artifact is, so this cell uses it, and checks that FIRST rather than assuming it.
+  const INC1 = readFileSync(join(HERE, '..', 'legasus', 'screen', 'NARROW-2_accepted_index.html'), 'utf8');
+  const base = mkdtempSync(join(tmpdir(), 'na-seeded-'));
+  writeFileSync(join(base, 'index.html'), INC1, 'utf8');
+
+  const echo = await run('echo', '```html\n' + INC1 + '\n```', 'stop', { task: 'farm-i2', protocol: 'v2', workspace: base });
+  const eb = echo?.boundaries || {};
+  const passing = (echo?.play?.passing) || [];
+  say(eb.reachedExecution === true && passing.includes(3) && !passing.includes(4), 'FIXTURE: the seeded page satisfies increment 1 and not increment 2 (passing [' + passing.join(',') + '])');
+  say(!!echo, 'the run completed and wrote a record instead of dying on "nothing to commit"');
+  say(eb.artifactProduced === true && eb.artifactComplete === true && eb.contractClean === true, 'B1-B3 still pass: the reply was a clean, complete fence');
+  say(eb.artifactChangedFile === false, 'B3b records that the artifact did NOT change the file it was asked to extend');
+  say(eb.passedProtected === true, 'the seeded increment-1 behaviour still runs and still passes the protected steps');
+  say(eb.passedDiagnostic === false && eb.accepted === false, 'doing nothing is NOT accepted as increment 2 (' + (echo?.acceptance?.disposition) + ')');
+
+  // The control: a reply that does differ must record B3b YES, or the boundary would be a
+  // constant rather than a measurement.
+  const changed = await run('changed', '```html\n' + INC1.replace('</body>', '<!-- one added line -->\n</body>') + '\n```', 'stop', { task: 'farm-i2', protocol: 'v2', workspace: base });
+  say(changed?.boundaries?.artifactChangedFile === true, 'CONTROL: a reply that differs from the seeded file records B3b YES');
+  try { rmSync(base, { recursive: true, force: true }); } catch { /* best effort */ }
 }
 
 console.log(`\n  narrow artifact: ${passed} passed, ${failed} failed -> ${failed ? 'THE MEASUREMENT IS NOT ESTABLISHED' : 'each boundary passes and fails on its own, and the gate is unchanged'}`);

@@ -27,6 +27,11 @@
  *                           model stopped naturally (done_reason) rather than hitting the token
  *                           ceiling or this harness's deadline
  *   B3 contractClean        nothing but whitespace outside the fence (the protocol's own rule)
+ *   B3b artifactChangedFile  the artifact DIFFERS from the file it was asked to extend. For a
+ *                           later increment, returning the current file unchanged is a real and
+ *                           nameable outcome ("the model did nothing"), not a crash and not a
+ *                           behaviour failure - the 1.5B did exactly this on its first attempt
+ *                           at increment 2.
  *   B4 reachedExecution     the page loaded in the browser and the play produced verdicts
  *   B5 passedDiagnostic     every requested step passed
  *   B6 passedProtected      the protected spec passed (or none was specified)
@@ -202,9 +207,15 @@ async function main() {
     if (!ex.produced || !ex.complete) return rec;                    // nothing usable to write
 
     // ── write it (the harness, not the model) ──
-    writeFileSync(join(ws, ENTRY), ex.artifact.endsWith('\n') ? ex.artifact : ex.artifact + '\n', 'utf8');
+    const artifactText = ex.artifact.endsWith('\n') ? ex.artifact : ex.artifact + '\n';
+    // DID IT CHANGE ANYTHING? For a later increment the model is handed the current file; giving
+    // it back unchanged means it did no work, which is a boundary of its own rather than an
+    // error. `git commit` exits 1 on an empty tree change, so this must never be fatal.
+    rec.boundaries.artifactChangedFile = currentFile === null ? true : artifactText.trim() !== String(currentFile).trim();
+    writeFileSync(join(ws, ENTRY), artifactText, 'utf8');
     await git(ws, ['add', '-A']);
-    await git(ws, ['-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'candidate']);
+    await git(ws, ['-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'candidate'])
+      .catch((e) => { if (!/nothing to commit/i.test(String(e.stdout || '') + String(e.stderr || ''))) throw e; });
     rec.timing.writtenMs = Date.now() - T0;
 
     // ── B4..B6: the UNCHANGED play, evaluator and acceptance ──
@@ -237,7 +248,7 @@ if (OUT) { mkdirSync(dirname(OUT), { recursive: true }); writeFileSync(OUT, JSON
 const b = rec.boundaries || {};
 const mark = (v) => (v === true ? 'YES' : v === false ? 'no ' : ' - ');
 console.log(`${rec.task} ${rec.model} seed=${rec.seed ?? '-'}  termination=${rec.terminationReason} natural=${rec.naturalStop ? 'yes' : 'no'}`);
-console.log(`  B1 artifact produced   ${mark(b.artifactProduced)}   B2 complete ${mark(b.artifactComplete)}   B3 contract clean ${mark(b.contractClean)}`);
+console.log(`  B1 artifact produced   ${mark(b.artifactProduced)}   B2 complete ${mark(b.artifactComplete)}   B3 contract clean ${mark(b.contractClean)}   B3b changed the file ${mark(b.artifactChangedFile)}`);
 console.log(`  B4 reached execution   ${mark(b.reachedExecution)}   B5 diagnostic ${mark(b.passedDiagnostic)}   B6 protected ${mark(b.passedProtected)}   B7 accepted ${mark(b.accepted)}`);
 console.log(`  chars=${rec.tokens.replyChars} outTok=${rec.tokens.output ?? '-'} promptTok=${rec.tokens.prompt ?? '-'} firstToken=${rec.timing.firstTokenMs ?? '-'}ms gen=${rec.timing.generateMs}ms`);
 if (rec.play) console.log(`  play: ${rec.play.status} passing [${rec.play.passing.join(',')}] failing [${rec.play.failing.join(',')}]`);
