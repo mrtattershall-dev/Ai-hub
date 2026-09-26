@@ -29,22 +29,35 @@ const exec = promisify(execFile);
  * Run the pristine case runner against a candidate directory inside the worker.
  * Returns { passing: Set<number>, failing: Set<number>, total, error }.
  */
-export async function caseSet(candidateDir, moduleName, casesJsonl, { image = WORKER_IMAGE, timeoutSec = 90 } = {}) {
+export async function caseSet(candidateDir, moduleName, casesJsonl, { image = WORKER_IMAGE, timeoutSec = 90, dockerCmd = 'docker' } = {}) {
+  // EVAL-1 hung for two hours here: Docker stopped returning from containers and this call had
+  // no host-side timeout, so the campaign's post-processing waited forever - outside every
+  // per-unit wall. The container's own `timeout` cannot help when docker itself does not
+  // return. Now: a bounded exec, a NAMED container, and a forced removal on timeout.
+  const name = `caseset-${process.pid}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   const scratch = mkdtempSync(join(tmpdir(), 'caseset-'));
   try {
     cpSync(candidateDir, scratch, { recursive: true, filter: (src) => !src.includes('.git') });
     // PRISTINE, always - written after the copy so a tampered workspace copy is overwritten.
     writeFileSync(join(scratch, 'run_tests.py'), RUN_TESTS_PY(moduleName, 'task_cases.jsonl', 100000), 'utf8');   // uncapped: every case listed, so the sets are exact
     writeFileSync(join(scratch, 'task_cases.jsonl'), casesJsonl, 'utf8');
-    const args = ['run', '--rm', '--network', 'none', '--cap-drop', 'ALL',
+    const args = ['run', '--rm', '--name', name, '--network', 'none', '--cap-drop', 'ALL',
       '--security-opt', 'no-new-privileges', '--user', '1000:1000',
       '-v', `${scratch}:/work`, '-w', '/work', image,
       'sh', '-c', `timeout ${timeoutSec} python3 run_tests.py`];
     let out = '';
     try {
-      const r = await exec('docker', args, { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024, windowsHide: true });
+      // dockerCmd may be a string or [cmd, ...prefixArgs] (a test double is a node script).
+      const [dCmd, ...dPre] = Array.isArray(dockerCmd) ? dockerCmd : [dockerCmd];
+      const r = await exec(dCmd, [...dPre, ...args], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024, windowsHide: true, timeout: (timeoutSec + 30) * 1000 });
       out = String(r.stdout) + String(r.stderr);
     } catch (e) {
+      if (e && e.killed) {
+        // The host-side bound fired: docker did not return. Say so, and do not leave the
+        // container behind (bounded too - a wedged daemon must not wedge the caller).
+        try { const [c2, ...p2] = Array.isArray(dockerCmd) ? dockerCmd : [dockerCmd]; await exec(c2, [...p2, 'rm', '-f', name], { timeout: 30_000, windowsHide: true }); } catch { /* best effort */ }
+        return { passing: new Set(), failing: new Set(), total: null, error: `case measurement timed out after ${timeoutSec + 30}s (docker did not return)`, timedOut: true };
+      }
       out = String(e.stdout || '') + String(e.stderr || '');
       if (/CANNOT RUN/.test(out)) {
         // The candidate does not import. Every case is failing, and saying so is the point:

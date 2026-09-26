@@ -17,7 +17,7 @@ STAGE="${1:-}"; WORK="${2:-}"
 mkdir -p "$WORK"
 export PYTHONIOENCODING=utf-8
 APP=legasus-7b
-URL="https://mr-tattershall--${APP}-server-web.modal.run"
+URL="${CAMPAIGN_URL:-https://mr-tattershall--${APP}-server-web.modal.run}"
 DONE="$WORK/DONE"
 EXPERIMENT="${CAMPAIGN_EXPERIMENT:-MECH-1}"
 ARMS="${CAMPAIGN_ARMS:-CONTROL,NOTIFY,AUTODIAG_ARM}"
@@ -72,7 +72,7 @@ fi
 
 if [ "$STAGE" = "stage2" ]; then
   echo "[$(stamp)] STAGE2 start; HEAD $(git rev-parse --short HEAD)"
-  git diff --quiet || { echo "[$(stamp)] REFUSING: uncommitted changes"; exit 3; }
+  [ "${CAMPAIGN_ALLOW_DIRTY:-0}" = "1" ] || git diff --quiet || { echo "[$(stamp)] REFUSING: uncommitted changes"; exit 3; }
   echo "[$(stamp)] experiment $EXPERIMENT arms $ARMS reps $REPS seeds $SEEDS total ${TOTAL_SEC}s per-task ${PER_TASK_SEC}s tasks ${CAMPAIGN_TASK_IDS:-all} max-steps ${AGENT_MAX_STEPS:-default} policy ${AUTODIAG_RECOVERY_POLICY:-default}"
   # SUPERVISED: if the runner exits without COMPLETE (no DONE file), relaunch it on the SAME
   # root up to CAMPAIGN_MAX_RELAUNCH times (default 2); it resumes past the recorded units. The
@@ -90,8 +90,26 @@ if [ "$STAGE" = "stage2" ]; then
     AUTODIAG_ROOT="$root_env" AUTODIAG_EXPERIMENT="$EXPERIMENT" AUTODIAG_ARMS="$ARMS" AUTODIAG_REPS="$REPS" AUTODIAG_SEEDS="$SEEDS" \
     AUTODIAG_TOTAL_SEC="$remaining" AUTODIAG_PER_TASK_SEC="$PER_TASK_SEC" AUTODIAG_TASK_IDS="${CAMPAIGN_TASK_IDS:-}" \
     AUTODIAG_DONE_FILE="$DONE" AUTODIAG_HUB_COMMIT=$(git rev-parse --short HEAD) AUTODIAG_ROOT_FILE="$ROOT_FILE" \
-      node server/autodiag1.mjs "$URL"
-    rc=$?
+      node server/autodiag1.mjs "$URL" &
+    runner_pid=$!
+    # STALL DETECTION. A runner that is alive but making no progress (EVAL-1: two hours in an
+    # unbounded docker wait) is killed BY PID and relaunched on its root. Progress = the summary
+    # file changing; the allowance is one unit's bound plus CAMPAIGN_STALL_SLACK_SEC.
+    stall_allow=$(( PER_TASK_SEC + ${CAMPAIGN_STALL_SLACK_SEC:-420} ))
+    last_change=$(date +%s)
+    last_size=-1
+    while kill -0 "$runner_pid" 2>/dev/null; do
+      sleep 15
+      sf=""; [ -f "$ROOT_FILE" ] && sf="$(cat "$ROOT_FILE")/summary.jsonl"
+      size=-1; [ -n "$sf" ] && [ -f "$sf" ] && size=$(stat -c %s "$sf" 2>/dev/null || echo -1)
+      if [ "$size" != "$last_size" ]; then last_size=$size; last_change=$(date +%s); fi
+      if [ $(( $(date +%s) - last_change )) -gt "$stall_allow" ]; then
+        echo "[$(stamp)] STALL: no summary progress for ${stall_allow}s - killing runner pid $runner_pid"
+        kill -9 "$runner_pid" 2>/dev/null
+        break
+      fi
+    done
+    wait "$runner_pid"; rc=$?
     echo "[$(stamp)] runner attempt $attempt exited $rc"
     [ -f "$DONE" ] && break
     [ "$attempt" -le "$MAX_RELAUNCH" ] || { echo "[$(stamp)] relaunch limit reached without COMPLETE"; break; }

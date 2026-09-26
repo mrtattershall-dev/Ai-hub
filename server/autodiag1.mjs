@@ -116,6 +116,8 @@ let port = 41300;
 // threaded through batch.js - which owns ctx and must stay identical in both arms.
 let currentDiagnostic = null;
 let currentSeed = null;
+// The unit whose post-processing (acceptance capture, case measurement, row) is running now.
+let inFlight = null;
 let currentRecovery = null;
 
 // NO UNBOUNDED WAITS. AUTODIAG-1 lost 31 of 60 units to a single unit that ran 99 minutes:
@@ -436,6 +438,13 @@ const pending = [];
 const capture = () => (r) => { pending.push(r); };
 
 async function recordUnit(r, arm, rep, wsDir, { position = null, workspaceFresh = null } = {}) {
+  // FAULT INJECTION, TEST ONLY: post-processing that never returns, after unit N - EVAL-1's
+  // failure condition (an unbounded docker wait in case measurement). Everything downstream -
+  // the campaign wall, the UNATTEMPTED rows, the report, the exit code - is the real path.
+  if (process.env.AUTODIAG_INJECT_HANG_IN_RECORD && idx + 1 >= parseInt(process.env.AUTODIAG_INJECT_HANG_IN_RECORD, 10) && !process.env.AUTODIAG_ROOT) {
+    console.log(`   [fault injection] post-processing of unit ${idx + 1} will never return`);
+    await new Promise(() => {});
+  }
   const b = baseline.get(r.task) || { passing: new Set(), failing: new Set(), total: null };
   const name = String(r.task).replace(/^ext-/, '');
   const cases = (BASE.find((t) => t.id === r.task) || {}).requested?.files['cases.jsonl'] || '';
@@ -532,6 +541,20 @@ const REMAINING = new Set();
 for (let rep = 1; rep <= REPS; rep++) for (const t of BASE) for (const a of ARMS) if (!ALREADY.has(`${t.id}@${a}r${rep}`)) REMAINING.add(`${t.id}@${a}r${rep}`);
 idx = idxBase;
 
+// THE CAMPAIGN WALL, armed BEFORE the loop: deadline + one unit's bound + grace + a minute.
+// If it fires, whatever is still awaited is abandoned, the account is written by
+// finalizeCampaign (declared below; function declarations hoist), and the process exits 3 so a
+// supervisor can tell the wall from completion. Cleared by a normal finish.
+let finalized = false;
+// Registered here, not after the loop: a handler after the loop is never reached when the
+// loop hangs, and the EXIT line is exactly what a supervisor reads then.
+process.on('exit', (code) => console.log(`${EXPERIMENT} EXIT ${stamp()} code ${code}`));
+const CAMPAIGN_WALL_MS = Math.max(5_000, DEADLINE - Date.now()) + PER_TASK_SEC * 1000 + UNIT_GRACE_MS + 60_000;
+const campaignWall = setTimeout(async () => {
+  await finalizeCampaign(`the campaign wall clock (${Math.round(CAMPAIGN_WALL_MS / 1000)}s from start) hit while work was still in flight - a unit or its post-processing did not return`);
+  process.exit(3);
+}, CAMPAIGN_WALL_MS);
+
 outer:
 for (let rep = 1; rep <= REPS; rep++) {
   for (let ti = 0; ti < BASE.length; ti++) {
@@ -564,7 +587,13 @@ for (let rep = 1; rep <= REPS; rep++) {
         runTask,
       });
       // Measured HERE, after the batch has finished with the workspace.
-      for (const r of pending) { REMAINING.delete(`${r.task}@${arm}r${rep}`); await recordUnit(r, arm, rep, join(wsDir, r.task), { position, workspaceFresh }); }
+      for (const r of pending) {
+        const key = `${r.task}@${arm}r${rep}`;
+        REMAINING.delete(key);
+        inFlight = { key, arm, rep, since: Date.now() };
+        await recordUnit(r, arm, rep, join(wsDir, r.task), { position, workspaceFresh });
+        inFlight = null;
+      }
       // FAULT INJECTION, TEST ONLY: die the way OVERNIGHT-1 attempt 1 died - silently, with
       // exit 127, right after a unit was recorded - so the resume path can be proven.
       if (process.env.AUTODIAG_INJECT_EXIT_AFTER_UNIT && idx >= parseInt(process.env.AUTODIAG_INJECT_EXIT_AFTER_UNIT, 10)) {
@@ -575,6 +604,26 @@ for (let rep = 1; rep <= REPS; rep++) {
   }
 }
 
+// FINALIZATION, callable from the normal end of the loop OR from the campaign wall below.
+// EVAL-1 hung for two hours in a unit's post-processing (an unbounded docker wait in case
+// measurement): the per-unit wall covers the unit, not what the runner does after it, and the
+// campaign deadline was only tested between units. This timer fires regardless, writes every
+// unexecuted unit as UNATTEMPTED with the reason, reports, and exits.
+async function finalizeCampaign(wallReason) {
+  if (finalized) return;
+  finalized = true;
+  if (wallReason) { halted = halted || wallReason; console.error(`   !! CAMPAIGN WALL: ${wallReason}`); }
+  // A unit taken out of the queue whose row was never written: it ran, and its post-processing
+  // did not return. It is INTERRUPTED with that reason - never silently missing.
+  if (wallReason && inFlight) {
+    const row = {
+      idx: ++idx, rep: inFlight.rep, task: inFlight.key, arm: inFlight.arm, termination: 'INTERRUPTED', state: 'INTERRUPTED',
+      disposition: 'INTERRUPTED', accepted: false, requested: null, protected: null,
+      reason: `post-processing did not return within the campaign wall (in flight ${Math.round((Date.now() - inFlight.since) / 1000)}s): ${wallReason}`,
+    };
+    rows.push(row); recordRun(SUMMARY, row);
+    inFlight = null;
+  }
 // EVERY UNEXECUTED QUEUE ENTRY GETS ITS OWN ROW, with the reason it never ran. Without this
 // they appear only as UNACCOUNTED in the reconciliation - a true signal, but not an account.
 for (const key of REMAINING) {
@@ -670,5 +719,10 @@ console.log(`report:  ${REPORT_PATH}`);
 const done = { experiment: EXPERIMENT, completedAt: stamp(), elapsedSec, integrity: report.integrity.ok, root: ROOT };
 try { writeFileSync(join(ROOT, `${EXPERIMENT}_DONE`), JSON.stringify(done) + '\n', 'utf8'); } catch { /* best effort */ }
 if (DONE_FILE) { try { writeFileSync(DONE_FILE, JSON.stringify(done) + '\n', 'utf8'); } catch (e) { console.error(`could not write ${DONE_FILE}: ${e.message}`); } }
-console.log(`${EXPERIMENT} COMPLETE ${done.completedAt}`);
-process.on('exit', (code) => console.log(`${EXPERIMENT} EXIT ${stamp()} code ${code}`));
+console.log(`${EXPERIMENT} COMPLETE ${done.completedAt}${wallReason ? ' (HALTED BY THE CAMPAIGN WALL - see UNATTEMPTED rows)' : ''}`);
+}
+// THE CAMPAIGN WALL: deadline + one unit's bound + grace + a minute, armed now, cleared by a
+// normal finish. If it fires, whatever is still awaited is abandoned, the account is written,
+// and the process exits 3 so a supervisor can see it was the wall, not completion.
+await finalizeCampaign(null);
+clearTimeout(campaignWall);
