@@ -31,7 +31,7 @@
  * after every tool, so a write via run_python or run_command refreshes the report exactly as
  * an edit_file does.
  */
-import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync, cpSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync, cpSync, appendFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -95,8 +95,21 @@ const RESERVE_SEC = 180;
 const T0 = Date.now();
 const DEADLINE = T0 + (TOTAL_SEC - RESERVE_SEC) * 1000;
 
-const ROOT = mkdtempSync(join(tmpdir(), 'autodiag1-'));
+// RESUME. AUTODIAG_ROOT names an existing campaign root: units already recorded there are
+// skipped, the plan is not rewritten, and the summary is appended. This is how a campaign whose
+// PROCESS died (OVERNIGHT-1 attempt 1: exit 127 after unit 1, no message) completes its pairs
+// instead of starting over. Without it, a fresh root as before.
+const ROOT = process.env.AUTODIAG_ROOT ? process.env.AUTODIAG_ROOT : mkdtempSync(join(tmpdir(), 'autodiag1-'));
+const RESUMING = !!process.env.AUTODIAG_ROOT && existsSync(join(ROOT, 'summary.jsonl'));
 const SUMMARY = join(ROOT, 'summary.jsonl');
+// CRASH LOG. A process that dies without a message leaves nothing to diagnose; every abnormal
+// path now writes to <root>/crash.log before the process goes.
+const CRASH_LOG = join(ROOT, 'crash.log');
+const crash = (kind, detail) => { try { appendFileSync(CRASH_LOG, JSON.stringify({ at: new Date().toISOString(), kind, detail: String(detail && (detail.stack || detail.message || detail)).slice(0, 2000) }) + '\n'); } catch { /* nothing left to do */ } };
+process.on('uncaughtException', (e) => { crash('uncaughtException', e); console.error('uncaughtException', e); process.exit(70); });
+process.on('unhandledRejection', (e) => { crash('unhandledRejection', e); console.error('unhandledRejection', e); process.exit(71); });
+for (const sig of ['SIGTERM', 'SIGINT', 'SIGHUP', 'SIGBREAK']) { try { process.on(sig, () => { crash('signal', sig); process.exit(72); }); } catch { /* not on this platform */ } }
+process.on('exit', (code) => { if (code !== 0) crash('exit', `code ${code}`); });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let port = 41300;
 // One task runs per runBatch call, so the arm's diagnostic is carried here rather than
@@ -191,6 +204,7 @@ async function runTask(ws, task, ctx) {
   const base = `http://127.0.0.1:${p}/api`;
   const hardStop = Math.min(started + ctx.timeoutSec * 1000, DEADLINE);
   let run = null, aborted = null, runId = null;   // hoisted: the transcript is read after the finally
+  const clockJumps = [];
 
   // THE BOUND MUST HOLD REGARDLESS OF ANY AWAIT. AUTODIAG-1 lost 31 of 60 units because the
   // polling loop only tested its deadline BETWEEN iterations: one await that never settled
@@ -226,8 +240,15 @@ async function runTask(ws, task, ctx) {
       console.log(`   [fault injection] awaiting an operation that will never settle for ${task.id}`);
       await new Promise(() => {});          // never resolves, never rejects, ignores abort
     }
+    let lastTick = Date.now();
     while (Date.now() < hardStop) {
       run = await api(base, `/agent/${start.runId}`).catch(() => null);
+      // A SLEEPING MACHINE shows up as a jump in wall clock between two iterations that should
+      // be ~2s apart. Timers do not run while asleep, so the outer wall cannot fire; the jump
+      // is recorded so the unit's elapsed time is not mistaken for model work.
+      const now = Date.now();
+      if (now - lastTick > 60_000) clockJumps.push({ at: new Date(now).toISOString(), jumpSec: Math.round((now - lastTick) / 1000) });
+      lastTick = now;
       if (run && run.status && run.status !== 'running' && !run.busy && run.finalizedAt) break;
       await sleep(2000);
     }
@@ -263,7 +284,7 @@ async function runTask(ws, task, ctx) {
   const elapsed = Math.round((Date.now() - started) / 1000);
   const overran = elapsed - (ctx.timeoutSec + Math.round(UNIT_GRACE_MS / 1000));
   if (wallHit) console.log(`   !! unit hit the hard wall at ${elapsed}s - taken apart by the runner`);
-  if (overran > 0) console.log(`   !! unit ran ${overran}s past its bound`);
+  if (overran > 0) console.log(`   !! unit ran ${overran}s past its bound${clockJumps.length ? ' (wall clock jumped ' + clockJumps.map((j) => j.jumpSec + 's').join('+') + ' - the machine was asleep)' : ''}`);
 
   // EXPLICIT HALT, never a silent continue. If the process would not die or containers cannot
   // be confirmed gone, the next unit would start on top of live execution - so it does not.
@@ -355,6 +376,7 @@ async function runTask(ws, task, ctx) {
       verifiedSha: run.recovery.verified?.sha256 || null,
     } : null,
     seedSent: currentSeed, samplingRecorded: run?.sampling ?? null,
+    clockJumps,
     status: 'COMPLETED', ok: true, exit: 0, timedOut: !!aborted, attemptId: ctx.attemptId,
     runId,   // THE join key. Task names are not one when a task is replicated (linkRuns.js).
     // OPERATIONAL RELIABILITY, recorded per unit and reported beside productivity.
@@ -377,7 +399,9 @@ async function runTask(ws, task, ctx) {
   };
 }
 
-console.log(`${EXPERIMENT} START ${stamp()} hub ${process.env.AUTODIAG_HUB_COMMIT || 'unrecorded'}`);
+console.log(`${EXPERIMENT} START ${stamp()} hub ${process.env.AUTODIAG_HUB_COMMIT || 'unrecorded'}${RESUMING ? ' (RESUMED)' : ''}`);
+// Publish the root for a supervisor that may need to resume this campaign after a crash.
+if (process.env.AUTODIAG_ROOT_FILE) { try { writeFileSync(process.env.AUTODIAG_ROOT_FILE, ROOT, 'utf8'); } catch { /* best effort */ } }
 console.log(`model: ${MODEL_URL}`);
 console.log(`worker: ${WORKER_IMAGE}`);
 console.log(`arms (identical seed + guidance in every arm): ${ARMS.map((a) => `${a} = ${ARM_DESC[a]}`).join(' | ')}`);
@@ -388,9 +412,20 @@ console.log(`limits: ${PER_TASK_SEC}s/task, ${TOTAL_SEC}s total, no retries\n`);
 console.log('measuring seed baselines (no model involved):');
 await measureBaselines();
 
-// THE PLAN FIRST, as always: anything planned and not recorded is UNACCOUNTED.
-recordPlan(SUMMARY, BASE.flatMap((t) => Array.from({ length: REPS }, (_, r) =>
-  ARMS.map((a) => `${t.id}@${a}r${r + 1}`)).flat()));
+// THE PLAN FIRST, as always: anything planned and not recorded is UNACCOUNTED. On a resume the
+// plan already stands; the units already recorded are read back and skipped.
+const ALREADY = new Set();
+if (RESUMING) {
+  for (const line of readFileSync(SUMMARY, 'utf8').split('\n').filter(Boolean)) {
+    try { const r = JSON.parse(line); if (r.kind === 'run' && r.state !== 'UNATTEMPTED') ALREADY.add(r.task); } catch { /* skip */ }
+  }
+  console.log(`RESUMING ${ROOT}: ${ALREADY.size} unit(s) already recorded will be skipped`);
+} else {
+  recordPlan(SUMMARY, BASE.flatMap((t) => Array.from({ length: REPS }, (_, r) =>
+    ARMS.map((a) => `${t.id}@${a}r${r + 1}`)).flat()));
+}
+let idxBase = 0;
+if (RESUMING) idxBase = ALREADY.size;
 
 let idx = 0;
 const rows = [];
@@ -421,6 +456,8 @@ async function recordUnit(r, arm, rep, wsDir, { position = null, workspaceFresh 
     // seed was sent, and whether the workspace was fresh before the unit started.
     position, seedSent: r.outcome?.seedSent ?? null, samplingRecorded: r.outcome?.samplingRecorded ?? null,
     workspaceFresh,
+    clockJumps: r.outcome?.clockJumps ?? [],
+    clockJumpSec: (r.outcome?.clockJumps || []).reduce((a, j) => a + j.jumpSec, 0),
     // ISOLATION, measured: what the transcript shows this arm was actually sent.
     diagnosticMessagesSeen: r.outcome?.diagnosticMessagesSeen ?? null,
     caseDetailLinesSeen: r.outcome?.caseDetailLinesSeen ?? null,
@@ -492,7 +529,8 @@ async function recordUnit(r, arm, rep, wsDir, { position = null, workspaceFresh 
 
 // Every planned unit, in the order it would run. Anything still here at the end never started.
 const REMAINING = new Set();
-for (let rep = 1; rep <= REPS; rep++) for (const t of BASE) for (const a of ARMS) REMAINING.add(`${t.id}@${a}r${rep}`);
+for (let rep = 1; rep <= REPS; rep++) for (const t of BASE) for (const a of ARMS) if (!ALREADY.has(`${t.id}@${a}r${rep}`)) REMAINING.add(`${t.id}@${a}r${rep}`);
+idx = idxBase;
 
 outer:
 for (let rep = 1; rep <= REPS; rep++) {
@@ -507,6 +545,7 @@ for (let rep = 1; rep <= REPS; rep++) {
     const order = ARMS.slice(rot).concat(ARMS.slice(0, rot));
     for (const arm of order) {
       if (halted || Date.now() >= DEADLINE) break outer;
+      if (ALREADY.has(`${task.id}@${arm}r${rep}`)) continue;     // resumed: already recorded
       const wsDir = join(ROOT, `ws-${arm}-r${rep}`);
       currentDiagnostic = armDiagnostic(task, arm);
       currentSeed = seedFor(rep);
@@ -526,6 +565,12 @@ for (let rep = 1; rep <= REPS; rep++) {
       });
       // Measured HERE, after the batch has finished with the workspace.
       for (const r of pending) { REMAINING.delete(`${r.task}@${arm}r${rep}`); await recordUnit(r, arm, rep, join(wsDir, r.task), { position, workspaceFresh }); }
+      // FAULT INJECTION, TEST ONLY: die the way OVERNIGHT-1 attempt 1 died - silently, with
+      // exit 127, right after a unit was recorded - so the resume path can be proven.
+      if (process.env.AUTODIAG_INJECT_EXIT_AFTER_UNIT && idx >= parseInt(process.env.AUTODIAG_INJECT_EXIT_AFTER_UNIT, 10)) {
+        console.log(`   [fault injection] exiting 127 after unit ${idx}`);
+        process.exit(127);
+      }
     }
   }
 }

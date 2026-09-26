@@ -108,6 +108,49 @@ run ends while it is current. Worth a decision, not changed here.
 regressions; roughly half the time). Seven held-out tasks with one to two seeds are
 descriptive only.
 
+## Measured cost per accepted repair (added after review; `costAccount.mjs`)
+
+Phases from the campaign's own clocks, at the verified A10 rate ($1.1016/h GPU-only) and the
+conservative rate ($1.55/h with CPU and memory); ESTIMATES until invoiced:
+
+    startup (deploy -> model up)        109 s   $0.03 / $0.05
+    probe + gate + failed attempt 1     243 s   $0.07 / $0.10
+    baselines                            67 s   $0.02 / $0.03
+    units (model work)                 5941 s   $1.82 / $2.56
+    unit OVERRUN while asleep           909 s   $0.28 / $0.39   (pascal, controller-off, seed 606)
+    per-unit overhead                   709 s   $0.22 / $0.30   (hub spawn, acceptance, case measurement)
+    shutdown (COMPLETE -> stopped_at)    12 s   $0.00 / $0.01
+    TOTAL                              7989 s   $2.44 / $3.44
+
+    arm            repairs   own s   s/repair (own)   s/repair (incl. shared)   $/repair own       $/repair incl. shared
+    controller ON    19      2172       114                 154                $0.035 / $0.049     $0.047 / $0.066
+    controller OFF   18      3769       209                 282                $0.064 / $0.090     $0.086 / $0.121
+
+With the 909 s of sleep taken out of the controller-off arm's time (it was not model work),
+the own-time figure is 114 vs 209 s per retained repair (about 45% less), and 154 vs 282 s
+with startup, overhead and shutdown attributed by share of unit time. Inference, diagnostics
+and acceptance all run inside those seconds; they are not separately metered here.
+Interventions cost wall-clock time on the GPU (the 243 s line includes the failed first
+attempt) and are in the total.
+
+## The claim, as reviewed
+
+**In this QuixBugs campaign, Legasus's controller used roughly half the task time per
+retained repair, with similar observed repair counts and reliable rollback and stopping.**
+
+Two distinctions keep it defensible:
+
+- Similar observed repair counts do not establish equivalent repair capability. This sample
+  leaves uncertainty, and stopping demonstrably sacrificed some recoveries (kth, lcs_length,
+  possible_change under seed 606).
+- Both arms delivered zero surviving regressions. The controller's demonstrated advantage is
+  earlier containment and less wasted work; the off arm's end-of-run acceptance also
+  protected delivery.
+
+The sleep-related overrun means this overnight execution did not fully validate reliable
+unattended bounds, despite the controller's own checks holding. It compares the same model
+with and without the controller; it says nothing about a larger model.
+
 ## What this run does and does not establish
 
 ESTABLISHED, live, 42 controller units on 22 tasks: exact rollback (52/52), repeat refusal

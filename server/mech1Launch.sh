@@ -27,10 +27,28 @@ TOTAL_SEC="${CAMPAIGN_TOTAL_SEC:-12600}"
 PER_TASK_SEC="${CAMPAIGN_PER_TASK_SEC:-300}"
 WATCHDOG_SEC="${CAMPAIGN_WATCHDOG_SEC:-13800}"
 stamp() { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
+# KEEP-AWAKE: an application-level request (SetThreadExecutionState), no power setting changed.
+# OVERNIGHT-1 lost ~19 GPU-minutes and one unit's bound to the machine sleeping mid-campaign.
+keepawake_start() {
+  local secs="$1"
+  cat > "$WORK/keepawake.ps1" <<'PS'
+Add-Type -Namespace KA -Name P -MemberDefinition '[DllImport("kernel32.dll")] public static extern uint SetThreadExecutionState(uint f);'
+$secs = [int]$args[0]; $until = [DateTime]::UtcNow.AddSeconds($secs)
+"keepawake start $([DateTime]::UtcNow.ToString('o')) for ${secs}s"
+while ([DateTime]::UtcNow -lt $until -and (Test-Path $env:KA_FLAG)) { [KA.P]::SetThreadExecutionState([uint32]2147483651) | Out-Null; Start-Sleep -Seconds 30 }
+[KA.P]::SetThreadExecutionState([uint32]2147483648) | Out-Null
+"keepawake end $([DateTime]::UtcNow.ToString('o'))"
+PS
+  touch "$WORK/keepawake.flag"
+  KA_FLAG="$WORK/keepawake.flag" powershell -NoProfile -ExecutionPolicy Bypass -File "$WORK/keepawake.ps1" "$secs" > "$WORK/keepawake.log" 2>&1 &
+  echo "[$(stamp)] keep-awake armed for ${secs}s (flag $WORK/keepawake.flag)"
+}
+keepawake_stop() { rm -f "$WORK/keepawake.flag"; echo "[$(stamp)] keep-awake released"; }
 
 if [ "$STAGE" = "stage1" ]; then
   echo "[$(stamp)] STAGE1 start; HEAD $(git rev-parse --short HEAD)"
   git diff --quiet || { echo "[$(stamp)] REFUSING: uncommitted changes"; git status --short; exit 3; }
+  keepawake_start "$WATCHDOG_SEC"
   echo "[$(stamp)] deploy"
   MYCODER_APP=$APP MYCODER_BASE=Qwen/Qwen2.5-Coder-7B-Instruct MYCODER_GPU=A10G \
   MYCODER_MIN_CONTAINERS=0 MYCODER_SCALEDOWN_S=900 MYCODER_MAXLEN=16384 \
@@ -56,11 +74,30 @@ if [ "$STAGE" = "stage2" ]; then
   echo "[$(stamp)] STAGE2 start; HEAD $(git rev-parse --short HEAD)"
   git diff --quiet || { echo "[$(stamp)] REFUSING: uncommitted changes"; exit 3; }
   echo "[$(stamp)] experiment $EXPERIMENT arms $ARMS reps $REPS seeds $SEEDS total ${TOTAL_SEC}s per-task ${PER_TASK_SEC}s tasks ${CAMPAIGN_TASK_IDS:-all} max-steps ${AGENT_MAX_STEPS:-default} policy ${AUTODIAG_RECOVERY_POLICY:-default}"
-  AUTODIAG_EXPERIMENT="$EXPERIMENT" AUTODIAG_ARMS="$ARMS" AUTODIAG_REPS="$REPS" AUTODIAG_SEEDS="$SEEDS" \
-  AUTODIAG_TOTAL_SEC="$TOTAL_SEC" AUTODIAG_PER_TASK_SEC="$PER_TASK_SEC" AUTODIAG_TASK_IDS="${CAMPAIGN_TASK_IDS:-}" \
-  AUTODIAG_DONE_FILE="$DONE" AUTODIAG_HUB_COMMIT=$(git rev-parse --short HEAD) \
-    node server/autodiag1.mjs "$URL"
-  rc=$?
+  # SUPERVISED: if the runner exits without COMPLETE (no DONE file), relaunch it on the SAME
+  # root up to CAMPAIGN_MAX_RELAUNCH times (default 2); it resumes past the recorded units. The
+  # campaign wall clock is shared across relaunches through CAMPAIGN_DEADLINE_EPOCH.
+  MAX_RELAUNCH="${CAMPAIGN_MAX_RELAUNCH:-2}"
+  DEADLINE_EPOCH=$(( $(date +%s) + TOTAL_SEC ))
+  ROOT_FILE="$WORK/root.txt"; rm -f "$ROOT_FILE"
+  attempt=0; rc=1
+  while :; do
+    attempt=$((attempt+1))
+    remaining=$(( DEADLINE_EPOCH - $(date +%s) ))
+    [ "$remaining" -gt 200 ] || { echo "[$(stamp)] no campaign time left for attempt $attempt"; break; }
+    root_env=""; [ -f "$ROOT_FILE" ] && root_env="$(cat "$ROOT_FILE")"
+    echo "[$(stamp)] runner attempt $attempt (remaining ${remaining}s${root_env:+, resuming $root_env})"
+    AUTODIAG_ROOT="$root_env" AUTODIAG_EXPERIMENT="$EXPERIMENT" AUTODIAG_ARMS="$ARMS" AUTODIAG_REPS="$REPS" AUTODIAG_SEEDS="$SEEDS" \
+    AUTODIAG_TOTAL_SEC="$remaining" AUTODIAG_PER_TASK_SEC="$PER_TASK_SEC" AUTODIAG_TASK_IDS="${CAMPAIGN_TASK_IDS:-}" \
+    AUTODIAG_DONE_FILE="$DONE" AUTODIAG_HUB_COMMIT=$(git rev-parse --short HEAD) AUTODIAG_ROOT_FILE="$ROOT_FILE" \
+      node server/autodiag1.mjs "$URL"
+    rc=$?
+    echo "[$(stamp)] runner attempt $attempt exited $rc"
+    [ -f "$DONE" ] && break
+    [ "$attempt" -le "$MAX_RELAUNCH" ] || { echo "[$(stamp)] relaunch limit reached without COMPLETE"; break; }
+    sleep 5
+  done
+  keepawake_stop
   echo "[$(stamp)] campaign process exited $rc"
   echo "[$(stamp)] app state now:"; python -m modal app list --json 2>&1 | grep -A3 "\"$APP\"" | head -6
   exit $rc

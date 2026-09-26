@@ -1,0 +1,106 @@
+{
+  "inputs": {
+    "stage1": "legasus/screen/PILOT-1_stage1.log",
+    "campaign": "legasus/screen/PILOT-1_console.log",
+    "watchdog": "legasus/screen/PILOT-1_watchdog.log",
+    "summary": "legasus/screen/PILOT-1_summary.jsonl"
+  },
+  "rates": {
+    "gpuOnlyPerHour": 1.1016,
+    "conservativePerHour": 1.55
+  },
+  "clocks": {
+    "deployAt": "2026-09-25T19:33:41.000Z",
+    "modelUpAt": "2026-09-25T19:35:28.000Z",
+    "campaignStartAt": "2026-09-25T19:36:00.067Z",
+    "completeAt": "2026-09-25T19:58:13.255Z",
+    "stoppedAt": "2026-09-25T19:58:24.000Z",
+    "stopObservedAt": "2026-09-25T19:58:45.115Z"
+  },
+  "phases": {
+    "startup": {
+      "sec": 107,
+      "gpuOnly": 0.033,
+      "conservative": 0.046
+    },
+    "probeAndGate": {
+      "sec": 32,
+      "gpuOnly": 0.01,
+      "conservative": 0.014
+    },
+    "campaignBaselines": {
+      "sec": 24,
+      "gpuOnly": 0.007,
+      "conservative": 0.01
+    },
+    "campaignUnits": {
+      "sec": 1189,
+      "gpuOnly": 0.364,
+      "conservative": 0.512
+    },
+    "campaignUnitOverrun": {
+      "sec": 0,
+      "units": [],
+      "gpuOnly": 0,
+      "conservative": 0
+    },
+    "campaignOverhead": {
+      "sec": 120,
+      "gpuOnly": 0.037,
+      "conservative": 0.052
+    },
+    "campaignIdle": {
+      "sec": 0,
+      "gaps": [],
+      "gpuOnly": 0,
+      "conservative": 0
+    },
+    "shutdown": {
+      "sec": 11,
+      "gpuOnly": 0.003,
+      "conservative": 0.005
+    },
+    "total": {
+      "sec": 1483,
+      "gpuOnly": 0.454,
+      "conservative": 0.639
+    }
+  },
+  "perArm": {
+    "RECOVERY_ARM": {
+      "units": 7,
+      "repairs": 3,
+      "unitSec": 248,
+      "shareOfUnitTime": 0.209,
+      "attributedSecInclShared": 309,
+      "secPerRepairOwnTime": 83,
+      "secPerRepairInclShared": 103,
+      "dollarsPerRepairOwnTime": {
+        "gpuOnly": 0.025,
+        "conservative": 0.036
+      },
+      "dollarsPerRepairInclShared": {
+        "gpuOnly": 0.032,
+        "conservative": 0.044
+      }
+    },
+    "AUTODIAG_ARM": {
+      "units": 7,
+      "repairs": 3,
+      "unitSec": 941,
+      "shareOfUnitTime": 0.791,
+      "attributedSecInclShared": 1174,
+      "secPerRepairOwnTime": 314,
+      "secPerRepairInclShared": 391,
+      "dollarsPerRepairOwnTime": {
+        "gpuOnly": 0.096,
+        "conservative": 0.135
+      },
+      "dollarsPerRepairInclShared": {
+        "gpuOnly": 0.12,
+        "conservative": 0.168
+      }
+    }
+  },
+  "note": "ESTIMATES from verified unit prices and observed clocks; the invoice is the authority. Shared time is split by each arm's share of unit time."
+}
