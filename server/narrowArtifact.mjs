@@ -87,6 +87,16 @@ function userMessage(currentFile) {
   if (currentFile) {
     lines.push('', `This is the current ${ENTRY}. Return the complete new version, not a patch:`, '```html', currentFile, '```');
   }
+  if (PROTOCOL === 'v2') {
+    lines.push('',
+      'The test harness reads your state through one seam. Include it verbatim, as the last',
+      'statement of your script, with YOUR state object in place of STATE:',
+      '',
+      '    window.game = { state: () => JSON.parse(JSON.stringify(STATE)) };',
+      '',
+      'STATE must be the object holding player (with x and y), tiles, inventory (with seeds and',
+      'crops) and day. Without that line nothing about the page can be observed.');
+  }
   lines.push('', `Reply with one fenced block containing ${ENTRY}. Nothing before it, nothing after it.`);
   return lines.join('\n');
 }
@@ -151,7 +161,7 @@ async function main() {
   const ws = mkdtempSync(join(tmpdir(), `narrow-${TASK_ID}-`));
   const rec = {
     at: new Date().toISOString(), task: TASK_ID, model: MODEL, modelUrl: MODEL_URL, seed: SEED === null ? null : parseInt(SEED, 10),
-    protocol: 'narrow-artifact-v1', strict: true, deadlineSec: DEADLINE_MS / 1000, maxTokens: MAX_TOKENS,
+    protocol: `narrow-artifact-${PROTOCOL}`, strict: true, deadlineSec: DEADLINE_MS / 1000, maxTokens: MAX_TOKENS,
     requestedSteps: task.requested.play.steps, protectedSteps: task.protected?.play?.steps ?? null,
     boundaries: {}, timing: {}, tokens: {}, workspace: ws,
   };
