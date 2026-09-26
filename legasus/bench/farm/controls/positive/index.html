@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Farm (positive control)</title>
+<style>body{margin:0;background:#233;color:#eee;font-family:sans-serif}canvas{display:block;margin:8px auto;background:#3a5}#hud{text-align:center}</style>
+</head>
+<body>
+<div id="hud"></div>
+<canvas id="c" width="480" height="320"></canvas>
+<script>
+// A hand-written farming page that satisfies the declared contract. It exists so the check
+// has a POSITIVE control: a page that must PASS every step. It was not written by the model.
+(function () {
+  const W = 12, H = 8, T = 40;
+  const GROW_TICKS = 3;
+  let S = { player: { x: 2, y: 2 }, tiles: {}, inventory: { seeds: 5, crops: 0 }, day: 0 };
+  const key = () => S.player.x + ',' + S.player.y;
+  function load() { try { const s = localStorage.getItem('farm-save'); if (s) S = JSON.parse(s); } catch (e) {} }
+  function save() { localStorage.setItem('farm-save', JSON.stringify(S)); }
+  function tick() { S.day++; for (const k in S.tiles) { const t = S.tiles[k]; if (t.stage < GROW_TICKS) t.stage++; } }
+  function plant() { const k = key(); if (S.tiles[k] || S.inventory.seeds <= 0) return; S.inventory.seeds--; S.tiles[k] = { crop: 'wheat', stage: 0 }; }
+  function harvest() { const k = key(); const t = S.tiles[k]; if (!t || t.stage < GROW_TICKS) return; delete S.tiles[k]; S.inventory.crops++; }
+  function move(dx, dy) { S.player.x = Math.max(0, Math.min(W - 1, S.player.x + dx)); S.player.y = Math.max(0, Math.min(H - 1, S.player.y + dy)); }
+  const cv = document.getElementById('c'), cx = cv.getContext('2d');
+  function draw() {
+    cx.fillStyle = '#3a5'; cx.fillRect(0, 0, cv.width, cv.height);
+    for (const k in S.tiles) { const [x, y] = k.split(',').map(Number); const t = S.tiles[k]; cx.fillStyle = t.stage >= GROW_TICKS ? '#fc3' : '#7a4'; cx.fillRect(x * T + 4, y * T + 4, T - 8, T - 8); }
+    cx.fillStyle = '#36f'; cx.fillRect(S.player.x * T + 8, S.player.y * T + 8, T - 16, T - 16);
+    document.getElementById('hud').textContent = 'Day ' + S.day + ' | seeds ' + S.inventory.seeds + ' | crops ' + S.inventory.crops + ' | arrows move, p plant, t time, h harvest, s save';
+  }
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') move(-1, 0); else if (e.key === 'ArrowRight') move(1, 0);
+    else if (e.key === 'ArrowUp') move(0, -1); else if (e.key === 'ArrowDown') move(0, 1);
+    else if (e.key === 'p') plant(); else if (e.key === 't') tick(); else if (e.key === 'h') harvest(); else if (e.key === 's') save();
+    draw();
+  });
+  window.game = { state: () => JSON.parse(JSON.stringify(S)) };
+  load(); draw();
+})();
+</script>
+</body>
+</html>
