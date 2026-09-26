@@ -1,0 +1,92 @@
+--- anchor seed 1 2026-09-26T11:21:04Z
+farm-i2 qwen2.5-coder:1.5b local-edit-anchor seed=1  termination=stop natural=yes
+  E1 edit produced       no    E1b contract clean no    E2 applicable  - 
+  E3 applied              -    E4 changed the program  - 
+  E5 reached execution    -    E6 protected  -    E7 requested  -    E8 accepted  - 
+  edit: 0 block(s) (one INCOMPLETE), outside=3899 chars
+  chars=3899 outTok=904 promptTok=1233 gen=87773ms
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/anchor_seed1.json
+--- anchor seed 2 2026-09-26T11:22:32Z
+farm-i2 qwen2.5-coder:1.5b local-edit-anchor seed=2  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  edit: 1 block(s), outside=0 chars, APPLIED
+  chars=4429 outTok=1029 promptTok=1233 gen=77882ms
+  play: OK passing [] failing [1,2,3,4,5]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/anchor_seed2.json
+--- anchor seed 3 2026-09-26T11:24:03Z
+farm-i2 qwen2.5-coder:1.5b local-edit-anchor seed=3  termination=null natural=NO
+  E1 edit produced       no    E1b contract clean no    E2 applicable  - 
+  E3 applied              -    E4 changed the program  - 
+  E5 reached execution    -    E6 protected  -    E7 requested  -    E8 accepted  - 
+  edit: 0 block(s) (one INCOMPLETE), outside=4131 chars
+  chars=4132 outTok=null promptTok=null gen=70055ms
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/anchor_seed3.json
+--- anchor seed 4 2026-09-26T11:25:13Z
+farm-i2 qwen2.5-coder:1.5b local-edit-anchor seed=4  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  edit: 1 block(s), outside=0 chars, APPLIED
+  chars=3911 outTok=904 promptTok=1233 gen=68158ms
+  play: OK passing [] failing [1,2,3,4,5]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/anchor_seed4.json
+--- anchor seed 5 2026-09-26T11:26:34Z
+farm-i2 qwen2.5-coder:1.5b local-edit-anchor seed=5  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  edit: 1 block(s), outside=0 chars, APPLIED
+  chars=3911 outTok=904 promptTok=1233 gen=68289ms
+  play: OK passing [] failing [1,2,3,4,5]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/anchor_seed5.json
+--- fim seed 1 2026-09-26T11:27:55Z
+farm-i2 qwen2.5-coder:1.5b local-edit-fim seed=1  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  chars=15382 outTok=4000 promptTok=720 gen=347218ms
+  play: OK passing [1] failing [2,3,4,5]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/fim_seed1.json
+--- fim seed 2 2026-09-26T11:33:54Z
+farm-i2 qwen2.5-coder:1.5b local-edit-fim seed=2  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  chars=784 outTok=208 promptTok=720 gen=25302ms
+  play: OK passing [1] failing [2,3,4,5]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/fim_seed2.json
+--- fim seed 3 2026-09-26T11:34:32Z
+farm-i2 qwen2.5-coder:1.5b local-edit-fim seed=3  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  chars=16637 outTok=4000 promptTok=720 gen=329041ms
+  play: OK passing [1] failing [2,3,4,5]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/fim_seed3.json
+--- fim seed 4 2026-09-26T11:40:16Z
+farm-i2 qwen2.5-coder:1.5b local-edit-fim seed=4  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  chars=18809 outTok=4000 promptTok=720 gen=335976ms
+  play: OK passing [1] failing [2,3,4,5]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/fim_seed4.json
+--- fim seed 5 2026-09-26T11:46:07Z
+farm-i2 qwen2.5-coder:1.5b local-edit-fim seed=5  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  chars=1883 outTok=465 promptTok=720 gen=40468ms
+  play: OK passing [1,2,3] failing [4,5]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/fim_seed5.json
+cell exit 0

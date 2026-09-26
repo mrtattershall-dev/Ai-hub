@@ -1,0 +1,106 @@
+{
+  "at": "2026-09-26T11:33:54.976Z",
+  "task": "farm-i2",
+  "model": "qwen2.5-coder:1.5b",
+  "modelUrl": "http://127.0.0.1:11434",
+  "seed": 2,
+  "protocol": "local-edit-fim",
+  "deadlineSec": 900,
+  "maxTokens": 4000,
+  "requestedSteps": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "protectedSteps": [
+    1,
+    2,
+    3
+  ],
+  "assistance": {
+    "editFormatGivenByHarness": true,
+    "editSiteChosenBy": "harness",
+    "featureSplitIntoSteps": false,
+    "region": {
+      "from": "        function plantSeed() {",
+      "to": "        document.addEventListener('load', loadGame);",
+      "removedChars": 1389,
+      "removedLines": 42
+    },
+    "instructionComment": "// Increment 2: planting and growth.\n// p plants a seed on the player's tile: tiles['x,y'] = { crop, stage: 0 } and seeds go down by one.\n// t advances one tick: day goes up by one and every planted tile's stage goes up by one until it is grown at stage 3.\n// Planted tiles are drawn. Arrow-key movement and everything already working must keep working."
+  },
+  "boundaries": {
+    "editProduced": true,
+    "editContractClean": true,
+    "editApplicable": true,
+    "editApplied": true,
+    "changedProgram": true,
+    "reachedExecution": true,
+    "passedDiagnostic": false,
+    "passedProtected": false,
+    "accepted": false
+  },
+  "timing": {
+    "generateMs": 25302,
+    "firstTokenMs": 10595,
+    "writtenMs": 25890,
+    "playMs": 28702,
+    "acceptanceMs": 37574
+  },
+  "tokens": {
+    "output": 208,
+    "prompt": 720,
+    "replyChars": 784
+  },
+  "workspace": "C:\\Users\\tatte\\AppData\\Local\\Temp\\edit-farm-i2-ESEC8L",
+  "startFileChars": 3871,
+  "fim": {
+    "prefixChars": 2348,
+    "suffixChars": 134,
+    "removed": "        function plantSeed() {\n            const tileKey = `${player.x},${player.y}`;\n            if (!tiles[tileKey]) {\n                tiles[tileKey] = { crop: 'seed', stage: 1 };\n                draw();\n            }\n        }\n\n        function advanceTime() {\n            day++;\n            draw();\n        }\n\n        function harvestCrop() {\n            const tileKey = `${player.x},${player.y}`;\n            if (tiles[tileKey] && tiles[tileKey].crop === 'seed') {\n                tiles[tileKey] = { crop: 'empty', stage: 0 };\n                inventory.seeds++;\n                inventory.crops--;\n                draw();\n            }\n        }\n\n        function saveGame() {\n            localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n        }\n\n        function loadGame() {\n            const savedGame = JSON.parse(localStorage.getItem('game'));\n            player = savedGame.player;\n            tiles = savedGame.tiles;\n            inventory = savedGame.inventory;\n            day = savedGame.day;\n            draw();\n        }\n\n        document.addEventListener('keydown', movePlayer);\n        document.addEventListener('p', plantSeed);\n        document.addEventListener('t', advanceTime);\n        document.addEventListener('h', harvestCrop);\n        document.addEventListener('s', saveGame);\n        document.addEventListener('load', loadGame);"
+  },
+  "terminationReason": "stop",
+  "naturalStop": true,
+  "reply": "function plant(event) {\n    const x = player.x;\n    const y = player.y;\n    if (tiles[x + ',' + y] === undefined) {\n        tiles[x + ',' + y] = { crop: 'seed', stage: 0 };\n        inventory.seeds--;\n        draw();\n    }\n}\n\nfunction grow(event) {\n    const x = player.x;\n    const y = player.y;\n    if (tiles[x + ',' + y] !== undefined && tiles[x + ',' + y].stage < 3) {\n        tiles[x + ',' + y].stage++;\n        draw();\n    }\n}\n\ncanvas.addEventListener('keydown', movePlayer);\ncanvas.addEventListener('keydown', plant);\ncanvas.addEventListener('keydown', grow);\n\nsetInterval(() => {\n    day++;\n    for (const [key, value] of Object.entries(tiles)) {\n        if (value.stage === 3) {\n            value.stage = 0;\n            inventory.crops++;\n        }\n    }\n    draw();\n}, 1000);",
+  "editedChars": 3620,
+  "play": {
+    "status": "OK",
+    "reason": null,
+    "passing": [
+      1
+    ],
+    "failing": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "total": 5,
+    "log": "PASS case 1  loads with no page or console errors and exposes state\nFAIL case 2  ArrowRight moves the player right -> expected state.player.x > before.player.x; state {\"player\":{\"x\":0,\"y\":0},\"tiles\":{},\"inventory\":{\"seeds\":5,\"crops\":0},\"day\":0}\nFAIL case 3  ArrowDown moves the player down -> expected state.player.y > before.player.y; state {\"player\":{\"x\":0,\"y\":0},\"tiles\":{},\"inventory\":{\"seeds\":5,\"crops\":0},\"day\":1}; errors: [JS ERROR] Cannot set properties of null (setting 'textContent')\nFAIL case 4  p plants a seed on the player's tile and spends a seed -> expected (function(){ const k = state.player.x + ',' + state.player.y; return !!state.tiles[k] && !(before.tiles || {})[k] && state.inventory.seeds === before.inventory.seeds - 1; })(); state {\"player\":{\"x\":0,\"y\":0},\"tiles\":{},\"inventory\":{\"seeds\":5,\"crops\":0},\"day\":1}; errors: [JS ERROR] Cannot set properties of null (setting 'textContent')\nFAIL case 5  t advances time and the crop grows -> expected (function(){ const k = state.player.x + ',' + state.player.y; return !!state.tiles[k] && state.tiles[k].stage > before.tiles[k].stage; })(); state {\"player\":{\"x\":0,\"y\":0},\"tiles\":{},\"inventory\":{\"seeds\":5,\"crops\":0},\"day\":1}; errors: [JS ERROR] Cannot set properties of null (setting 'textContent')\nSUMMARY 1/5 cases pass, 4 fail"
+  },
+  "verdict": {
+    "overall": "FAIL",
+    "requested": "FAIL",
+    "protected": "FAIL",
+    "requestedFailing": [
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "acceptance": {
+    "disposition": "RESTORED",
+    "countsAsCompletion": false,
+    "promotable": false,
+    "survivingWorkspaceVerdict": {
+      "overall": "FAIL",
+      "requested": "FAIL",
+      "protected": "PASS",
+      "candidateTree": "e3196a46205721d02f2543c8234b7f6550d14dbc"
+    },
+    "survivingBytes": "IDENTICAL_TO_START"
+  }
+}

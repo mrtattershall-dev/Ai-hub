@@ -36,6 +36,12 @@
  *   E2 editApplicable    every FIND matched the file exactly once (anchor); a non-empty
  *                        completion arrived (fim)
  *   E3 editApplied       the harness wrote the edited file
+ *   E1c editInsertsNonComment  the edit inserts something other than comments and blank lines.
+ *                        Four of five infills over a five-line hole filled the 4,000-token ceiling
+ *                        with one self-contradictory comment repeated and no statement at all, so
+ *                        "a non-empty completion arrived" is not enough to call an edit produced.
+ *                        This does NOT establish that the insertion is JavaScript - see
+ *                        nonCommentContent's own note.
  *   E2b editIsLocalized   no block claims the whole file (or even half of it). The first anchor
  *                        run obeyed the FORMAT and defeated its PURPOSE: every attempt copied the
  *                        entire file into FIND and replaced it with a few characters, so the
@@ -228,6 +234,33 @@ export function cutRegion(file, from, to) {
   return { ok: true, prefix: file.slice(0, i), removed: file.slice(i, end), suffix: file.slice(end) };
 }
 
+/**
+ * WHAT DOES THE EDIT ACTUALLY INSERT, once comments are set aside? Four of five infills over a
+ * five-line hole filled the token ceiling with one self-contradictory comment repeated - 15,000
+ * characters, no statement, no listener, no mention of the thing being changed. "A non-empty
+ * completion arrived" is far too weak a boundary to call an edit produced.
+ *
+ * THE LIMIT OF THIS MEASURE, stated because it nearly misled me: it only separates comments and
+ * blank lines from everything else. It does NOT check that what remains is JavaScript. Three
+ * anchor attempts scored one "non-comment line" each, and those lines were a stray `=======`
+ * separator twice and one paragraph of the instruction text - English, not code. Read this
+ * alongside the recorded replacement text, never on its own.
+ */
+export function nonCommentContent(text) {
+  const withoutBlocks = String(text ?? '').replace(/\/\*[\s\S]*?\*\//g, '');
+  const lines = withoutBlocks.split('\n');
+  const codeLines = lines.filter((l) => {
+    const t = l.trim();
+    return t.length > 0 && !t.startsWith('//');
+  });
+  const commentLines = lines.filter((l) => l.trim().startsWith('//')).length;
+  return {
+    nonCommentLines: codeLines.length, commentLines,
+    hasNonComment: codeLines.length > 0, nonCommentChars: codeLines.join('\n').length,
+    sample: codeLines.join('\n').slice(0, 300),      // so prose posing as code is visible
+  };
+}
+
 const git = (ws, args) => exec('git', ['-C', ws, ...args], { windowsHide: true });
 
 async function main() {
@@ -305,6 +338,9 @@ async function main() {
       const applied = applyEditBlocks(startFile, parsed.blocks);
       rec.edit.results = applied.results;
       rec.boundaries.editApplicable = applied.applicable;
+      const code = nonCommentContent(parsed.blocks.map((b) => b.replace).join('\n'));
+      rec.edit.code = code;
+      rec.boundaries.editInsertsNonComment = code.hasNonComment;
       if (!applied.applicable) return rec;                      // nothing partially spliced, ever
       edited = applied.text;
     } else {
@@ -313,6 +349,9 @@ async function main() {
       rec.boundaries.editProduced = middle.trim().length > 0;
       rec.boundaries.editContractClean = rec.boundaries.editProduced;   // no block format to violate
       rec.boundaries.editApplicable = rec.boundaries.editProduced;
+      const code = nonCommentContent(middle);
+      rec.edit = { code };
+      rec.boundaries.editInsertsNonComment = code.hasNonComment;
       if (!rec.boundaries.editProduced) return rec;
       edited = cut.prefix + FIM_INSTRUCTION + '\n' + middle + cut.suffix;
     }
@@ -345,6 +384,7 @@ const b = rec.boundaries || {};
 const mark = (v) => (v === true ? 'YES' : v === false ? 'no ' : ' - ');
 console.log(`${TASK_ID} ${MODEL} ${rec.protocol} seed=${rec.seed}  termination=${rec.terminationReason} natural=${rec.naturalStop ? 'yes' : 'NO'}`);
 console.log(`  E1 edit produced       ${mark(b.editProduced)}   E1b contract clean ${mark(b.editContractClean)}   E2 applicable ${mark(b.editApplicable)}`);
+console.log(`  E1c inserts non-comment ${mark(b.editInsertsNonComment)}${rec.edit && rec.edit.code ? `  (${rec.edit.code.nonCommentLines} non-comment / ${rec.edit.code.commentLines} comment lines)` : ''}`);
 console.log(`  E3 applied             ${mark(b.editApplied)}   E4 changed the program ${mark(b.changedProgram)}`);
 console.log(`  E5 reached execution   ${mark(b.reachedExecution)}   E6 protected ${mark(b.passedProtected)}   E7 requested ${mark(b.passedDiagnostic)}   E8 accepted ${mark(b.accepted)}`);
 if (rec.edit) console.log(`  edit: ${rec.edit.blocks} block(s)${rec.edit.incomplete ? ' (one INCOMPLETE)' : ''}, outside=${rec.edit.outsideChars} chars${rec.edit.results ? ', ' + rec.edit.results.map((r) => r.status).join('/') : ''}${rec.edit.localization ? ', localized ' + mark(b.editIsLocalized) + ' [' + rec.edit.localization.map((l) => `${l.findChars}->${l.replaceChars}ch`).join(' ') + ']' : ''}`);

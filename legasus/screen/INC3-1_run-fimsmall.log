@@ -1,0 +1,46 @@
+--- fimsmall seed 1 2026-09-26T11:55:35Z
+farm-i2 qwen2.5-coder:1.5b local-edit-fim seed=1  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  chars=20570 outTok=4000 promptTok=944 gen=358393ms
+  play: OK passing [1,2,3] failing [4,5]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/fimsmall_seed1.json
+--- fimsmall seed 2 2026-09-26T12:01:47Z
+farm-i2 qwen2.5-coder:1.5b local-edit-fim seed=2  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  chars=287 outTok=65 promptTok=944 gen=17650ms
+  play: OK passing [1,2,3] failing [4,5]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/fimsmall_seed2.json
+--- fimsmall seed 3 2026-09-26T12:02:18Z
+farm-i2 qwen2.5-coder:1.5b local-edit-fim seed=3  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  chars=17919 outTok=4000 promptTok=944 gen=334569ms
+  play: OK passing [1,2,3] failing [4,5]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/fimsmall_seed3.json
+--- fimsmall seed 4 2026-09-26T12:08:09Z
+farm-i2 qwen2.5-coder:1.5b local-edit-fim seed=4  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  chars=15063 outTok=4000 promptTok=944 gen=403640ms
+  play: OK passing [1,2,3] failing [4,5]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/fimsmall_seed4.json
+--- fimsmall seed 5 2026-09-26T12:15:08Z
+farm-i2 qwen2.5-coder:1.5b local-edit-fim seed=5  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  chars=18398 outTok=4000 promptTok=944 gen=434126ms
+  play: OK passing [1,2,3] failing [4,5]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc3/fimsmall_seed5.json
+cell exit 0
