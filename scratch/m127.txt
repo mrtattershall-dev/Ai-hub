@@ -1,0 +1,75 @@
+Step 4 route attribution: set G was a detector failure, append_file is the route failure
+
+Two questions were being mixed together and this separates them. A is preservation semantics - can
+the system detect the actual classes of regression at all. B is effect and route governance - given a
+preservation obligation, must every way of producing that effect satisfy it. Legasus could succeed at
+B and still fail at A, because a perfect boundary cannot help when the evidence it enforces says a
+destructive mutation is acceptable.
+
+SET G BELONGS ENTIRELY TO A. The hub's own comment at agent.js:3494 records the corruption mode: one
+edit whose REPLACE contained its own FIND 26 times left s6_graph.py at 1987 lines with 28 def
+__init__ and 33 def nodes in one class, every call answered OK, no syntax check failed. lostDefs
+compares name SETS, so 1 to 28 is not a loss and never becomes one. A perfectly route-complete
+removal predicate would have accepted that damage on every route it covered. Pass 2 then shows all six
+duplicate refusals arriving by edit_file and write_file - covered routes that DO capture a
+before-image. Set G's corruption did not escape through an unguarded route. It escaped because the
+predicate that could see it did not exist: defCounts arrived at 458db0b on 2026-09-12, after set G
+ran. So step 2's closing inference, that the baseline is the existing refusal made route-complete, is
+overstated on the evidence it cited, and DESTRUCTION_STEP2.md is AMENDED rather than rewritten - 130
+original lines intact, the correction appended beneath the sentence it corrects.
+
+APPEND_FILE BELONGS ENTIRELY TO B, AND IS NOW DEMONSTRATED RATHER THAN INFERRED. Same initial file,
+same semantic corruption, prediction recorded before the run: write_file has a before-image so the
+duplicate predicate evaluates and REFUSES, foo stays at one; append_file has no before-image so the
+predicate cannot evaluate and the duplication LANDS, foo at two. A third control appends a genuinely
+new definition and lands cleanly, which is what makes it a measurement - the route is not refusing
+everything and is not broken, it is specifically blind to the corruption the other route refuses. In
+set G alone append_file EXECUTED 31 times, every one with both predicates gated off, while
+spawn_subtask and download_file executed zero times across 17466 recorded replies. The two
+structurally worst bypasses are the two nothing has ever taken, so covering them is prophylaxis
+against an unexercised hazard and can earn no measured credit for the baseline or for Legasus.
+
+MY OWN MEASUREMENT LAYER DROPPED EVIDENCE AGAIN. Pass 1 classified on destructiveRefused alone, a
+detector for one of the hub's two predicates, and reported the other's silence as a measurement - the
+forward equals zero error, made after naming it. Three calibration controls now pass with outcomes
+fixed in advance and they do not cross-fire; the negative is not optional because a predicate that
+refuses everything passes both positives. The first control run also found a channel defect: the
+duplicate refusal fires but its message is too long to survive into the prompt text replay-run.mjs
+greps, so steps is the authoritative channel. Re-checking the removal counter through both channels on
+the preserved pass-1 rows gives 16 scenarios and 33 events either way, zero disagreement, so pass 1's
+16 stands and pass 2 reproduces it exactly.
+
+Pass 2: removal 16 scenarios / 33 events, duplicate 6 / 7, union 22, BOTH ZERO, neither spoke 56. The
+predicates are not two spellings of one check. Set G reported REGRESSED 6 and pass 2 reports 6
+duplicate scenarios; that is a coincidence of counts across incommensurable populations and is
+recorded as one - different populations, opposite kinds of event, and the mechanism producing the
+refusals did not exist when the regressions were measured. The 56 silent scenarios are not 56 clean
+runs and not 56 destructions; a replay runs no end-state checks, so they are left UNDECIDED.
+
+A FIFTEENTH ROUTE. There are three await tools[tool](args) sites, not two: the third is POST
+/runs/:id/approve at 4590, the human-approval resume, which executes with no before-image, no
+refusal and no checkpoint because all of that lives in the main loop after 3396. Source writes are in
+AUTO_TOOLS so they never pend; the reachable mutations are download_file and git_undo. The structure
+is the point - preservation is bound to a call site, so a second call site to the same primitive has
+none of it, and this is the site where human authority was most explicit. Correcting in the other
+direction too: git_show, remove_file, git_checkout, replace and git_status are NOT tools, they are
+rejected at agent.js:3325, so the table was not undercounted by them. The dispatch table holds 28
+tools, enumerated with acorn after a naive brace-depth scan silently dropped append_file.
+
+The REMOVE: override belongs to NEITHER question. In g007 the refusal held five times on s7_cache.js
+and every message ended with the hub's own instruction to add a line REMOVE: Cache, get, has,
+runTests, set, size - which the model then emitted verbatim, the file's whole API. The override text
+was authored by the hub and echoed back. The run died of budget exhaustion, sameAsOriginal true: the
+protection held and the cost was wasted budget, not destroyed code. Detection worked, the route was
+covered, and a contentless self-declaration was dispositive. That is action acceptability on its own
+axis. DUPLICATE: has never been used by any model in 17466 replies.
+
+No preregistration of steps 3 to 5 and no numerical win. s4_markdown.py stays the calibration control
+and is not pooled: it accounts for 2 of the 6 duplication scenarios with identical names and was
+destroyed three times in set F by symbol loss - one file, two destruction modes. Nothing built, trunk
+untouched, specimen frozen. The runner used was a patched copy in a scratchpad; the controls are
+committed here so both predicates now have a regression that can fail.
+
+Message-File: scratch/m127.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

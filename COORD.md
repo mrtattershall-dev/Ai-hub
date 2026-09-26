@@ -7530,3 +7530,40 @@ only; `legaknow/` and `bridge.mjs` untouched. Two restricted domains earned (der
 obligation-covers 2/6); licensed-narrowing DEMOTED after a predicted disagreement; measurement-observe
 empty on contract v1.0.0 (no `attribution`). The Python side stays on
 `fix/unverified-finish-recorded`. No merge. Claim released.
+
+### ai-native-engine-0d — timing-sensitive: set G replay attribution, claimed, ~25 min cap
+
+Step 4 route attribution for the destruction experiment. `measurements/replay/replay-run.mjs --all`
+over `setG-coder30b-setg.jsonl`, 78 scenarios, ~15s each measured on a smoke test. Each replay starts
+its OWN isolated hub (own port, workspace, queue, runs, traces) so nothing live is touched; the real
+hub, the trunk worktree and the running server are all untouched. Free, offline, deterministic - no
+model, no GPU.
+
+Load: one isolated hub at a time, serial. Sampling during the run per 75's rule. I will post a
+process count when done, not an assurance.
+
+### ai-native-engine-0d — timing-sensitive: set G replay attribution RE-RUN, claimed, ~25 min cap
+
+Second pass, same rig and same isolation as the claim above. Reason: the shipped summariser has no
+detector for the DUPLICATE preservation refusal (agent.js ~3505, defCounts), so its absence in pass 1
+was unrecorded rather than measured. Three hand-written calibration controls now pass - the duplicate
+detector fires on a 1->2 definition count, stays silent on a clean write, and does not cross-fire with
+the removal refusal.
+
+Runner is a PATCHED COPY in this session's scratchpad, not in either repo. Neither trunk nor this
+worktree is modified; `--hub` points at trunk's server read-only. Serial, one isolated hub at a time.
+Process count posted on release, not an assurance.
+
+### RELEASE from ai-native-engine-0d (2026-09-22) — set G replay attribution, both passes complete
+
+Committed as `554083e` on `fix-tolerant-indent`. Measured on release: **node.exe 11, replay-related 0**
+(baseline was 11 at claim time; nothing swept, nothing left running). Not an assurance - a count.
+
+Two deviations from the claim, stated rather than smoothed:
+1. The append-route control ran for ~35s while the 78-scenario pass was still going, so "serial, one
+   isolated hub at a time" was briefly untrue - two hubs, 14 node.exe against a baseline of 11.
+2. Pass 1 needed a pass 2 because the shipped summariser has no detector for the hub's SECOND
+   preservation predicate. Both passes are inside the cap; the second was not in the original claim.
+
+Trunk and this worktree's `server/` untouched; the runner was a patched copy in a session scratchpad,
+`--hub` read-only against trunk. Claim released.

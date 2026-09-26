@@ -1,0 +1,38 @@
+Step 4 part 1: the six survivors were nearly unrecoverable, and the replay rig is the substrate
+
+Attempting route attribution before intervention, as instructed, found a problem with the evidence
+base and then a better instrument.
+
+The six are not attributable from preserved analysis. Set G's regression file is a single summary
+line with no per-goal enumeration, and its own note records that it was recovered from a completed
+analysis task after being committed EMPTY because the regression tool parsed checker output without
+checking spawn status. The number survived; the identities did not. Nor can they be reconstructed
+from what set G preserved: its data directory holds only a final workspace with no .git, and no run
+records. Set F kept run records but set G did not, and set F's per-goal commit shas point into a
+workspace repository that no longer exists. Neither set kept what the other did. An analysis whose
+INPUT was discarded once its OUTPUT was summarised.
+
+The substrate that recovers them is the replay rig. Set G's 78 scenarios exist with the model's
+recorded replies and start states, and replay-run.mjs replays them through a REAL hub with a mock
+model - free, offline, deterministic, each in an isolated hub with its own port, workspace, queue,
+runs and traces so nothing live is touched. Its --hub flag points at a worktree's server, which makes
+it a purpose-built A/B rig for steps 3 through 5: baseline worktree, Legasus worktree, and removal
+control, on identical recorded inputs. Smoke-tested at fifteen seconds a scenario.
+
+The attribution fields are already in its output. Each replay emits destructiveRefused and
+refusedNamed for refusals that FIRED, and defLossWarnings, defLossNamed, exportLossWarnings and
+exportLossNamed for losses that were DETECTED AND ONLY WARNED, plus rollback notes, shell approvals,
+and whether behaviour matched the original recording. The discriminator falls straight out: a loss
+named while the refusal count is zero is detected-but-not-refused, which is the signature of route
+bypass or the advisory path.
+
+The owner's roles are unchanged - set G replies are the primary specimens and to_html remains a
+calibration control, not pooled - but two limits are stated before any numbers. A replay is not a
+re-run, because the mock cannot react, so a refusal the original model would have recovered from
+shows as refused plus exhausted rather than recovered. And post-fix under current code is not the
+same as the original six; any count here measures current code on set G's replies and will not be
+reported as a recovery of them.
+
+Message-File: scratch/m126.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

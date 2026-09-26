@@ -1,0 +1,13 @@
+COORD: release the set G attribution slot, node.exe 11 / replay-related 0
+
+Measured on release rather than asserted. Baseline was 11 at claim time, so nothing was swept and
+nothing is left running.
+
+Two deviations from the claim are recorded rather than smoothed: the append-route control overlapped
+the 78-scenario pass by about 35 seconds, so the "serial, one isolated hub at a time" line was briefly
+untrue at two hubs and 14 node.exe; and pass 1 needed a pass 2 because the shipped summariser has no
+detector for the hub's second preservation predicate, which was not in the original claim.
+
+Message-File: scratch/m128.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
