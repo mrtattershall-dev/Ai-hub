@@ -1,0 +1,77 @@
+{
+  "at": "2026-09-26T09:47:54.879Z",
+  "task": "farm-i1",
+  "model": "qwen2.5-coder:1.5b",
+  "modelUrl": "http://127.0.0.1:11434",
+  "seed": 4,
+  "protocol": "narrow-artifact-v2",
+  "strict": true,
+  "deadlineSec": 900,
+  "maxTokens": 4000,
+  "requestedSteps": [
+    1,
+    2,
+    3
+  ],
+  "protectedSteps": null,
+  "boundaries": {
+    "artifactProduced": true,
+    "artifactComplete": true,
+    "contractClean": true,
+    "reachedExecution": true,
+    "passedDiagnostic": false,
+    "passedProtected": true,
+    "accepted": false,
+    "acceptedIfLenient": false,
+    "acceptedStrict": false
+  },
+  "timing": {
+    "generateMs": 56268,
+    "firstTokenMs": 210,
+    "writtenMs": 56807,
+    "playMs": 60742,
+    "acceptanceMs": 65335
+  },
+  "tokens": {
+    "output": 825,
+    "prompt": 454,
+    "replyChars": 3245
+  },
+  "workspace": "C:\\Users\\tatte\\AppData\\Local\\Temp\\narrow-farm-i1-IBcXI6",
+  "terminationReason": "stop",
+  "naturalStop": true,
+  "reply": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n\n        const player = { x: 0, y: 0 };\n        const tiles = {};\n        const inventory = { seeds: 5, crops: 0 };\n        let day = 0;\n\n        const tileSize = 32;\n        const tileWidth = canvas.width / tileSize;\n        const tileHeight = canvas.height / tileSize;\n\n        const plantTile = (x, y) => {\n            tiles[`${x},${y}`] = { crop: null, stage: 0 };\n        };\n\n        const harvestTile = (x, y) => {\n            const tile = tiles[`${x},${y}`];\n            if (tile && tile.crop) {\n                inventory.crops++;\n                delete tiles[`${x},${y}`];\n            }\n        };\n\n        const drawPlayer = () => {\n            ctx.fillStyle = 'green';\n            ctx.fillRect(player.x * tileSize, player.y * tileSize, tileSize, tileSize);\n        };\n\n        const drawTiles = () => {\n            for (const tile in tiles) {\n                const [x, y] = tile.split(',');\n                const tileData = tiles[tile];\n                ctx.fillStyle = tileData.crop ? 'yellow' : 'gray';\n                ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);\n            }\n        };\n\n        const drawInventory = () => {\n            ctx.fillStyle = 'blue';\n            ctx.font = '16px Arial';\n            ctx.fillText(`Seeds: ${inventory.seeds}`, 10, 20);\n            ctx.fillText(`Crops: ${inventory.crops}`, 10, 40);\n        };\n\n        const drawDay = () => {\n            ctx.fillStyle = 'red';\n            ctx.font = '16px Arial';\n            ctx.fillText(`Day: ${day}`, 10, 60);\n        };\n\n        const update = () => {\n            const dx = 0;\n            const dy = 0;\n\n            if (event.key === 'ArrowUp') dy -= 1;\n            if (event.key === 'ArrowDown') dy += 1;\n            if (event.key === 'ArrowLeft') dx -= 1;\n            if (event.key === 'ArrowRight') dx += 1;\n\n            player.x += dx;\n            player.y += dy;\n\n            if (player.x < 0) player.x = 0;\n            if (player.x >= tileWidth) player.x = tileWidth - 1;\n            if (player.y < 0) player.y = 0;\n            if (player.y >= tileHeight) player.y = tileHeight - 1;\n\n            if (event.key === 'p') plantTile(player.x, player.y);\n            if (event.key === 't') day++;\n            if (event.key === 'h') harvestTile(player.x, player.y);\n\n            drawPlayer();\n            drawTiles();\n            drawInventory();\n            drawDay();\n\n            requestAnimationFrame(update);\n        };\n\n        document.addEventListener('keydown', update);\n\n        window.game = { state: () => JSON.parse(JSON.stringify({ player, tiles, inventory, day })) };\n\n        window.game = { state: () => JSON.parse(JSON.stringify({ player: {x: 0, y: 0}, tiles: {}, inventory: { seeds: 5, crops: 0 }, day: 0 })) };\n    </script>\n</body>\n</html>\n```",
+  "extraction": {
+    "fences": 2,
+    "artifactChars": 3234,
+    "outsideChars": 0,
+    "outsideSample": ""
+  },
+  "play": {
+    "status": "OK",
+    "reason": null,
+    "passing": [
+      1
+    ],
+    "failing": [
+      2,
+      3
+    ],
+    "total": 3,
+    "log": "PASS case 1  loads with no page or console errors and exposes state\nFAIL case 2  ArrowRight moves the player right -> expected state.player.x > before.player.x; state {\"player\":{\"x\":0,\"y\":0},\"tiles\":{},\"inventory\":{\"seeds\":5,\"crops\":0},\"day\":0}; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 3  ArrowDown moves the player down -> expected state.player.y > before.player.y; state {\"player\":{\"x\":0,\"y\":0},\"tiles\":{},\"inventory\":{\"seeds\":5,\"crops\":0},\"day\":0}; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nSUMMARY 1/3 cases pass, 2 fail"
+  },
+  "verdict": {
+    "overall": "FAIL",
+    "requested": "FAIL",
+    "protected": null,
+    "requestedFailing": [
+      2,
+      3
+    ]
+  },
+  "acceptance": {
+    "disposition": "PRESERVE_INCOMPLETE",
+    "countsAsCompletion": false,
+    "promotable": false
+  }
+}

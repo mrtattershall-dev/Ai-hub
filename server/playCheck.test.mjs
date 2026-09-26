@@ -8,7 +8,8 @@
  *
  * Uses the Chrome/Edge installed on this machine through puppeteer-core. No browser download.
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -52,6 +53,24 @@ console.log('\n=== NEGATIVE control 2: the page throws on load ===');
   say(r.failing.has(1) && r.failing.has(8), 'the load step and the final no-errors step FAIL');
   say(r.passing.size === 0, `nothing passes on a page with no state (${r.passing.size} passing)`);
   say(r.errors.some((e) => /undefinedFunction|ReferenceError/.test(e)), 'the recorded error names the thrown reference');
+}
+
+console.log('\n=== the served directory, and an entry page that cannot be served ===');
+{
+  // A forward-slash directory used to 404 every request: `join` normalises to backslashes on
+  // Windows and the containment guard compared that against the caller's raw string. The play
+  // then reported every step FAILING - blaming the candidate for the harness's own defect.
+  const fwd = join(FARM, 'controls', 'positive').replace(/\\/g, '/');
+  const r = await playCheck(fwd, spec, { timeoutMs: 60_000 });
+  say(r.status === 'OK' && r.passing.size === 8, `a forward-slash directory serves correctly (${r.passing.size}/${r.total})`);
+  say(!(r.errors || []).some((e) => /HTTP 404/.test(e)), 'and no 404 was recorded');
+
+  // An entry page that is not there is an APPARATUS failure, never failing steps.
+  const empty = mkdtempSync(join(tmpdir(), 'noentry-'));
+  const u = await playCheck(empty, spec, { timeoutMs: 30_000 });
+  say(u.status === 'UNAVAILABLE' && u.total === null && u.passing.size === 0, `a missing entry page is UNAVAILABLE, not a verdict (${u.status})`);
+  say(/could not be served \(HTTP 404\)/.test(String(u.reason)), `and the reason names it: ${String(u.reason).slice(0, 80)}`);
+  try { rmSync(empty, { recursive: true, force: true }); } catch { /* best effort */ }
 }
 
 console.log('\n=== apparatus failure is reported as UNAVAILABLE, never as a verdict ===');

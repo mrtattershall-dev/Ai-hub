@@ -32,7 +32,7 @@
  */
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
-import { join, extname, normalize } from 'node:path';
+import { join, extname, normalize, resolve } from 'node:path';
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.wav': 'audio/wav', '.mp3': 'audio/mpeg', '.ico': 'image/x-icon' };
 
@@ -46,19 +46,25 @@ export const BROWSER_CANDIDATES = [
 ].filter(Boolean);
 export function findBrowser() { return BROWSER_CANDIDATES.find((p) => { try { return existsSync(p); } catch { return false; } }) || null; }
 
-function serveDir(dir) {
-  return new Promise((resolve) => {
+function serveDir(dirIn) {
+  // RESOLVE FIRST. `join` normalises separators (on Windows to backslashes), so comparing the
+  // joined path against an unresolved caller string containing forward slashes made
+  // `startsWith` false for every request and served 404 for a file that was right there. A
+  // caller that passed a forward-slash directory got a page that never loaded and a play that
+  // blamed the candidate. Both halves of the comparison are now resolved.
+  const dir = resolve(dirIn);
+  return new Promise((resolve_) => {
     const srv = createServer((req, res) => {
       const rel = decodeURIComponent((req.url || '/').split('?')[0]);
       const safe = normalize(rel).replace(/^([.][.][\\/])+/, '');
-      let file = join(dir, safe === '/' || safe === '\\' ? 'index.html' : safe);
+      let file = resolve(join(dir, safe === '/' || safe === '\\' ? 'index.html' : safe));
       try {
         if (!file.startsWith(dir) || !existsSync(file) || statSync(file).isDirectory()) { res.writeHead(404); res.end('not found'); return; }
         res.writeHead(200, { 'content-type': MIME[extname(file).toLowerCase()] || 'application/octet-stream', 'cache-control': 'no-store' });
         res.end(readFileSync(file));
       } catch { res.writeHead(500); res.end('error'); }
     });
-    srv.listen(0, '127.0.0.1', () => resolve({ srv, port: srv.address().port }));
+    srv.listen(0, '127.0.0.1', () => resolve_({ srv, port: srv.address().port }));
   });
 }
 
@@ -103,7 +109,14 @@ export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browse
     };
     const readStorage = async () => { try { return await page.evaluate(() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); o[k] = localStorage.getItem(k); } return o; }); } catch { return {}; } };
 
-    await page.goto(url, { waitUntil: 'load', timeout: 15_000 });
+    // THE ENTRY PAGE MUST ACTUALLY BE SERVED. A 404 or 5xx here says nothing about the
+    // candidate's behaviour - it says the play could not run. Reporting it as failing steps
+    // would blame generated code for the harness's own inability to serve the file.
+    const nav = await page.goto(url, { waitUntil: 'load', timeout: 15_000 });
+    const navStatus = nav ? nav.status() : 0;
+    if (!nav || navStatus >= 400) {
+      throw new Error(`the entry page ${spec.entry || 'index.html'} could not be served (HTTP ${navStatus || 'no response'})`);
+    }
     await new Promise((r) => setTimeout(r, spec.loadSettleMs ?? 400));
 
     for (const step of spec.steps || []) {
