@@ -74,8 +74,29 @@ Eight directly relevant suites on the fixed tree, 50 assertions, 0 failures:
     appendFile 5   appendFragment 7   appendSyntax 4   defLoss 6
     destructiveWrite 8   duplicateDecls 9   exportLoss 7   noopEdit 4
 
-A broader sweep of the remaining suites was still running when this was written; its result belongs
-below, and "no regressions" is not claimed beyond the eight above until it lands.
+Broad sweep of all remaining suites: **77 passed, 3 non-zero, 10 skipped** (network/model/Godot
+suites skipped). All three non-zero results were then run on BOTH trees, swapping `agent.js` in place
+so trunk was never touched:
+
+    suite            sweep result                        FIXED tree        BASELINE c952cbc
+    ──────────────────────────────────────────────────────────────────────────────────────────
+    batchActions     rc=124, last line `ok`              rc=124, same line  rc=124, SAME LINE
+    supervisorTick   rc=124, last line `ok`              rc=124             rc=124
+    verifierInfra    rc=1, "2 passed (with failures)"    3 passed, rc=0     3 passed, rc=0
+
+`batchActions` and `supervisorTick` are **slow, not broken** — both exceed the sweep's 90s cap on the
+unmodified tree with identical output, and neither test contains a single reference to `append_file` or
+`beforeSrc`, so the changed code path is unreachable from them.
+
+`verifierInfra` was the only real assertion failure, and it does **not reproduce**: given 180s and no
+concurrent load it reports `3 passed` on both trees. It drives a headless browser against a
+deliberately unreachable `.invalid` domain, which is plausibly why it is sensitive to load. Stated
+precisely, because a flaky test cannot be fully exonerated: **it passes in isolation on both trees and
+references neither changed symbol.** That is weaker than "it is unrelated", and it is what was
+observed.
+
+So no regression is attributable to this change, on 80 suites. That is the claim, and it is not the
+same as "the suite is green" — three suites need more than 90s or an unloaded machine to say so.
 
 ## WHAT IS NOT ESTABLISHED
 

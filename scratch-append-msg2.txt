@@ -1,0 +1,27 @@
+Complete the regression evidence: 80 suites, no failure attributable to the change
+
+The previous commit deliberately did not claim "no regressions" beyond eight directly relevant suites.
+This records the rest.
+
+Broad sweep: 77 passed, 3 non-zero, 10 skipped (network, model and Godot suites). All three non-zero
+results were then run on BOTH trees by swapping agent.js in place inside this worktree, so trunk was
+never touched and the restore is verified by grepping the gate back to one occurrence.
+
+batchActions and supervisorTick are SLOW, not broken. Both exit 124 from the sweep's 90 second cap on
+the UNMODIFIED tree as well, batchActions with a byte-identical final line, and neither test contains a
+single reference to append_file or beforeSrc, so the changed path is unreachable from them.
+
+verifierInfra was the only real assertion failure, rc 1 with "2 passed (with failures above)", and it
+does NOT reproduce: given 180 seconds and no concurrent load it reports 3 passed on both trees. It
+drives a headless browser at a deliberately unreachable .invalid domain, which is a plausible reason to
+be load-sensitive. The claim recorded is the weaker true one - it passes in isolation on both trees and
+references neither changed symbol - rather than "unrelated", because a flaky test cannot be fully
+exonerated by a passing re-run.
+
+So: no regression is attributable to this change across 80 suites. That is deliberately not phrased as
+"the suite is green", because three of those suites need more than 90 seconds or an unloaded machine
+before anyone can say so.
+
+Message-File: scratch-append-msg2.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
