@@ -47,15 +47,18 @@ const passingSet = (result) => {
 /** Build the controller state from the OPENING diagnostic and the target's current bytes. */
 export function initRecovery(startResult, targetBytes, policy = {}, targetSha = null) {
   const p = { ...DEFAULT_POLICY, ...(policy || {}) };
-  if (!startResult || startResult.status !== 'OK' || startResult.importError !== undefined || !startResult.attempted) {
-    return { enabled: false, reason: 'the opening diagnostic could not establish a protected set', policy: p };
+  if (!startResult || startResult.status !== 'OK') {
+    return { enabled: false, reason: 'the opening diagnostic could not run, so no checkpoint could be established', policy: p };
   }
+  // BUILT FROM NOTHING: the target does not exist or does not load yet. The checkpoint is that
+  // empty state, the protected set is empty, and the first candidate that plays at all is
+  // progress. (A module that fails to import at the start is the same case.)
   const passing = passingSet(startResult);
   return {
     enabled: true, policy: p, state: 'ACTIVE',
     // The checkpoint's identity is the DIAGNOSTIC's identity for this target (a module's file
     // bytes, or a game's snapshot over its tracked files) - the same hash freshness compares.
-    verified: { sha256: targetSha || sha(targetBytes), bytes: targetBytes, passing: [...passing], passed: startResult.passed, attempted: startResult.attempted, failures: startResult.failures || [] },
+    verified: { sha256: targetSha || sha(targetBytes), bytes: targetBytes, passing: [...passing], passed: startResult.passed || 0, attempted: startResult.attempted || null, failures: startResult.failures || [], fromNothing: startResult.importError !== undefined || !startResult.attempted },
     provisional: null,
     attempts: 0, freshPlans: 0, repeats: 0, provisionals: 0,
     rejected: [],          // { sha256, reason, kind, passed, brokeProtected: [...], at }

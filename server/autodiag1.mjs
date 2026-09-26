@@ -316,7 +316,8 @@ async function runTask(ws, task, ctx) {
   // ── the behavioural measures, from the run's own steps, in ORDER ──
   const steps = (run?.steps || []).filter((s) => s.type === 'tool');
   const name = task.id.replace(/^ext-/, '');
-  const isEdit = (s) => /^(edit_file|write_file|append_file)$/.test(s.tool) && String(s.args?.path || '').includes(`${name}.py`);
+  // The TARGET: a module's file, or - for a play task - any tracked game file.
+  const isEdit = (s) => /^(edit_file|write_file|append_file)$/.test(s.tool) && (task.requested?.play ? /\.(html|js|mjs|css)$/i.test(String(s.args?.path || '')) : String(s.args?.path || '').includes(`${name}.py`));
   // MATCH EVERY WAY THE RUNNER CAN BE INVOKED, not just the one the guidance suggests.
   // The first version required the literal "run_tests.py" and therefore MISSED
   // `import run_tests; run_tests.main()` - which is how the model actually reached it in the
