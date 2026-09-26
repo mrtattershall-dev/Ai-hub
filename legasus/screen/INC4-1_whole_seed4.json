@@ -1,0 +1,95 @@
+{
+  "at": "2026-09-26T21:50:59.216Z",
+  "task": "farm-plant",
+  "model": "qwen2.5-coder:1.5b",
+  "modelUrl": "http://127.0.0.1:11434",
+  "seed": 4,
+  "protocol": "narrow-artifact-v2",
+  "strict": true,
+  "deadlineSec": 900,
+  "maxTokens": 2000,
+  "requestedSteps": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "protectedSteps": [
+    1,
+    2,
+    3
+  ],
+  "boundaries": {
+    "artifactProduced": true,
+    "artifactComplete": true,
+    "contractClean": true,
+    "artifactChangedFile": false,
+    "reachedExecution": true,
+    "passedDiagnostic": false,
+    "passedProtected": true,
+    "accepted": false,
+    "acceptedIfLenient": false,
+    "acceptedStrict": false
+  },
+  "timing": {
+    "generateMs": 72601,
+    "firstTokenMs": 1376,
+    "writtenMs": 73270,
+    "playMs": 79058,
+    "acceptanceMs": 91355
+  },
+  "tokens": {
+    "output": 901,
+    "prompt": 1334,
+    "replyChars": 3882
+  },
+  "workspace": "C:\\Users\\tatte\\AppData\\Local\\Temp\\narrow-farm-plant-Blsciz",
+  "terminationReason": "stop",
+  "naturalStop": true,
+  "reply": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n        const gridSize = 32;\n        const player = { x: 0, y: 0 };\n        const tiles = {};\n        const inventory = { seeds: 5, crops: 0 };\n        let day = 0;\n\n        function drawPlayer() {\n            ctx.fillStyle = 'green';\n            ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize, gridSize);\n        }\n\n        function drawTile(x, y, crop, stage) {\n            ctx.fillStyle = crop === 'seed' ? 'yellow' : 'green';\n            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Stage: ${stage}`, x * gridSize + 10, y * gridSize + 20);\n        }\n\n        function drawInventory() {\n            ctx.fillStyle = 'blue';\n            ctx.fillRect(0, 0, 100, 100);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Seeds: ${inventory.seeds}`, 10, 20);\n            ctx.fillText(`Crops: ${inventory.crops}`, 10, 40);\n        }\n\n        function draw() {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            drawPlayer();\n            for (const [key, value] of Object.entries(tiles)) {\n                drawTile(key.split(',')[0], key.split(',')[1], value.crop, value.stage);\n            }\n            drawInventory();\n            document.getElementById('day').textContent = `Day: ${day}`;\n        }\n\n        function movePlayer(event) {\n            const dx = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;\n            const dy = event.key === 'ArrowUp' ? -1 : event.key === 'ArrowDown' ? 1 : 0;\n            const newX = player.x + dx;\n            const newY = player.y + dy;\n            if (newX >= 0 && newX < 20 && newY >= 0 && newY < 15) {\n                player.x = newX;\n                player.y = newY;\n                draw();\n            }\n        }\n\n        function plantSeed() {\n            const tileKey = `${player.x},${player.y}`;\n            if (!tiles[tileKey]) {\n                tiles[tileKey] = { crop: 'seed', stage: 1 };\n                draw();\n            }\n        }\n\n        function advanceTime() {\n            day++;\n            draw();\n        }\n\n        function harvestCrop() {\n            const tileKey = `${player.x},${player.y}`;\n            if (tiles[tileKey] && tiles[tileKey].crop === 'seed') {\n                tiles[tileKey] = { crop: 'empty', stage: 0 };\n                inventory.seeds++;\n                inventory.crops--;\n                draw();\n            }\n        }\n\n        function saveGame() {\n            localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n        }\n\n        function loadGame() {\n            const savedGame = JSON.parse(localStorage.getItem('game'));\n            player = savedGame.player;\n            tiles = savedGame.tiles;\n            inventory = savedGame.inventory;\n            day = savedGame.day;\n            draw();\n        }\n\n        document.addEventListener('keydown', movePlayer);\n        document.addEventListener('p', plantSeed);\n        document.addEventListener('t', advanceTime);\n        document.addEventListener('h', harvestCrop);\n        document.addEventListener('s', saveGame);\n        document.addEventListener('load', loadGame);\n\n        window.game = { state: () => JSON.parse(JSON.stringify({ player, tiles, inventory, day })) };\n    </script>\n</body>\n</html>\n```",
+  "extraction": {
+    "fences": 2,
+    "artifactChars": 3871,
+    "outsideChars": 0,
+    "outsideSample": ""
+  },
+  "play": {
+    "status": "OK",
+    "reason": null,
+    "passing": [
+      1,
+      2,
+      3,
+      5
+    ],
+    "failing": [
+      4,
+      6
+    ],
+    "total": 6,
+    "log": "PASS case 1  loads with no page or console errors and exposes state\nPASS case 2  ArrowRight moves the player right\nPASS case 3  ArrowDown moves the player down\nFAIL case 4  p on an empty tile with seeds available creates a crop and spends exactly one seed -> expected (function(){ const k = state.player.x + ',' + state.player.y; const t = state.tiles[k]; return !!t && !(before.tiles || {})[k] && t.crop !== undefined && t.crop !== null && state.inventory.seeds === before.inventory.seeds - 1; })(); state {\"player\":{\"x\":3,\"y\":2},\"tiles\":{},\"inventory\":{\"seeds\":5,\"crops\":0},\"day\":0}; errors: [JS ERROR] Cannot set properties of null (setting 'textContent') | [JS ERROR] Cannot set properties of null (setting 'textContent')\nPASS case 5  p again on the SAME tile leaves the state unchanged - no second crop, no second seed spent\nFAIL case 6  with the seeds exhausted, p leaves the state unchanged -> expected (function(){ return state.inventory.seeds === 0 && Object.keys(state.tiles).length === before.inventory.seeds + Object.keys(before.tiles).length; })(); state {\"player\":{\"x\":8,\"y\":2},\"tiles\":{},\"inventory\":{\"seeds\":5,\"crops\":0},\"day\":0}; errors: [JS ERROR] Cannot set properties of null (setting 'textContent') | [JS ERROR] Cannot set properties of null (setting 'textContent')\nSUMMARY 4/6 cases pass, 2 fail"
+  },
+  "verdict": {
+    "overall": "FAIL",
+    "requested": "FAIL",
+    "protected": "PASS",
+    "requestedFailing": [
+      4,
+      6
+    ]
+  },
+  "acceptance": {
+    "disposition": "PRESERVE_INCOMPLETE",
+    "countsAsCompletion": false,
+    "promotable": false,
+    "survivingWorkspaceVerdict": {
+      "overall": "FAIL",
+      "requested": "FAIL",
+      "protected": "PASS",
+      "candidateTree": "e3196a46205721d02f2543c8234b7f6550d14dbc"
+    },
+    "survivingBytes": null
+  }
+}

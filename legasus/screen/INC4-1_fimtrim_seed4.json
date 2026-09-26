@@ -1,0 +1,125 @@
+{
+  "at": "2026-09-26T22:00:46.914Z",
+  "task": "farm-plant",
+  "model": "qwen2.5-coder:1.5b",
+  "modelUrl": "http://127.0.0.1:11434",
+  "seed": 4,
+  "protocol": "local-edit-fim",
+  "deadlineSec": 900,
+  "maxTokens": 1500,
+  "requestedSteps": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "protectedSteps": [
+    1,
+    2,
+    3
+  ],
+  "assistance": {
+    "editFormatGivenByHarness": true,
+    "infillTailTrimmedByHarness": true,
+    "editSiteChosenBy": "harness",
+    "featureSplitIntoSteps": false,
+    "region": {
+      "from": "        document.addEventListener('p', plantSeed);",
+      "to": "        document.addEventListener('load', loadGame);",
+      "removedChars": 259,
+      "removedLines": 5
+    },
+    "instructionComment": "// p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing."
+  },
+  "boundaries": {
+    "editProduced": true,
+    "editContractClean": true,
+    "editApplicable": true,
+    "editInsertsNonComment": true,
+    "editApplied": true,
+    "changedProgram": true,
+    "reachedExecution": true,
+    "passedDiagnostic": false,
+    "passedProtected": false,
+    "accepted": false
+  },
+  "timing": {
+    "generateMs": 19083,
+    "firstTokenMs": 766,
+    "writtenMs": 19658,
+    "playMs": 203070,
+    "acceptanceMs": 573048
+  },
+  "tokens": {
+    "output": 297,
+    "prompt": 905,
+    "replyChars": 1486
+  },
+  "workspace": "C:\\Users\\tatte\\AppData\\Local\\Temp\\edit-farm-plant-Gmr6Dg",
+  "startFileChars": 3871,
+  "fim": {
+    "prefixChars": 3478,
+    "suffixChars": 134,
+    "removed": "        document.addEventListener('p', plantSeed);\n        document.addEventListener('t', advanceTime);\n        document.addEventListener('h', harvestCrop);\n        document.addEventListener('s', saveGame);\n        document.addEventListener('load', loadGame);"
+  },
+  "terminationReason": "stop",
+  "naturalStop": true,
+  "reply": "        document.addEventListener('keydown', plantSeed);\n// a advances time: day++; draw();.\n        document.addEventListener('keydown', advanceTime);\n// h harvests crop: if the player's tile is 'wheat' and inventory.crops > 0, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.crops--; otherwise change nothing.\n        document.addEventListener('keydown', harvestCrop);\n// s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n        document.addEventListener('keydown', saveGame);\n// l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();.\n        document.addEventListener('keydown', loadGame);\n        document.addEventListener('keydown', () => {\n            if (inventory.seeds > 0) {\n                plantSeed();\n            } else {\n                alert('Not enough seeds!');\n            }\n        });\n        document.addEventListener('keydown', () => {\n            if (inventory.crops > 0) {\n                harvestCrop();\n            } else {\n                alert('Not enough crops!');\n            }\n        });\n        document.addEventListener('keydown', () => {\n            advanceTime();\n        });\n        document.addEventListener('keydown', () => {\n            saveGame();\n        });\n        document.addEventListener('keydown', () => {\n            loadGame();\n        });",
+  "fimTailTrimmed": {
+    "trimmed": false,
+    "droppedLines": 0,
+    "dropped": ""
+  },
+  "edit": {
+    "code": {
+      "nonCommentLines": 28,
+      "commentLines": 4,
+      "hasNonComment": true,
+      "nonCommentChars": 982,
+      "sample": "        document.addEventListener('keydown', plantSeed);\n        document.addEventListener('keydown', advanceTime);\n        document.addEventListener('keydown', harvestCrop);\n        document.addEventListener('keydown', saveGame);\n        document.addEventListener('keydown', loadGame);\n        docum"
+    }
+  },
+  "editedChars": 5267,
+  "play": {
+    "status": "OK",
+    "reason": null,
+    "passing": [
+      1
+    ],
+    "failing": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "total": 6,
+    "log": "PASS case 1  loads with no page or console errors and exposes state\nERROR case 2  ArrowRight moves the player right: Input.dispatchKeyEvent timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.\nERROR case 3  ArrowDown moves the player down: play timed out\nERROR case 4  p on an empty tile with seeds available creates a crop and spends exactly one seed: play timed out\nERROR case 5  p again on the SAME tile leaves the state unchanged - no second crop, no second seed spent: play timed out\nERROR case 6  with the seeds exhausted, p leaves the state unchanged: play timed out\nSUMMARY 1/6 cases pass, 5 fail"
+  },
+  "verdict": {
+    "overall": "FAIL",
+    "requested": "FAIL",
+    "protected": "FAIL",
+    "requestedFailing": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "acceptance": {
+    "disposition": "RESTORED",
+    "countsAsCompletion": false,
+    "promotable": false,
+    "survivingWorkspaceVerdict": {
+      "overall": "FAIL",
+      "requested": "FAIL",
+      "protected": "PASS",
+      "candidateTree": "e3196a46205721d02f2543c8234b7f6550d14dbc"
+    },
+    "survivingBytes": "IDENTICAL_TO_START"
+  }
+}

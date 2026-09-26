@@ -1,0 +1,119 @@
+{
+  "at": "2026-09-26T21:56:05.804Z",
+  "task": "farm-plant",
+  "model": "qwen2.5-coder:1.5b",
+  "modelUrl": "http://127.0.0.1:11434",
+  "seed": 3,
+  "protocol": "local-edit-fim",
+  "deadlineSec": 900,
+  "maxTokens": 1500,
+  "requestedSteps": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "protectedSteps": [
+    1,
+    2,
+    3
+  ],
+  "assistance": {
+    "editFormatGivenByHarness": true,
+    "editSiteChosenBy": "harness",
+    "featureSplitIntoSteps": false,
+    "region": {
+      "from": "        document.addEventListener('p', plantSeed);",
+      "to": "        document.addEventListener('load', loadGame);",
+      "removedChars": 259,
+      "removedLines": 5
+    },
+    "instructionComment": "// p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing."
+  },
+  "boundaries": {
+    "editProduced": true,
+    "editContractClean": true,
+    "editApplicable": true,
+    "editInsertsNonComment": true,
+    "editApplied": true,
+    "changedProgram": true,
+    "reachedExecution": true,
+    "passedDiagnostic": false,
+    "passedProtected": false,
+    "accepted": false
+  },
+  "timing": {
+    "generateMs": 12695,
+    "firstTokenMs": 2411,
+    "writtenMs": 13371,
+    "playMs": 18265,
+    "acceptanceMs": 28890
+  },
+  "tokens": {
+    "output": 139,
+    "prompt": 905,
+    "replyChars": 534
+  },
+  "workspace": "C:\\Users\\tatte\\AppData\\Local\\Temp\\edit-farm-plant-WBLPdz",
+  "startFileChars": 3871,
+  "fim": {
+    "prefixChars": 3478,
+    "suffixChars": 134,
+    "removed": "        document.addEventListener('p', plantSeed);\n        document.addEventListener('t', advanceTime);\n        document.addEventListener('h', harvestCrop);\n        document.addEventListener('s', saveGame);\n        document.addEventListener('load', loadGame);"
+  },
+  "terminationReason": "stop",
+  "naturalStop": true,
+  "reply": "// a advances time: day++; draw();.\n// h harvests crop: if the player's tile is 'wheat' and inventory.crops > 0, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.crops--; otherwise change nothing.\n// s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n// l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();.\n    </script>\n</body>\n</html>\n",
+  "edit": {
+    "code": {
+      "nonCommentLines": 3,
+      "commentLines": 4,
+      "hasNonComment": true,
+      "nonCommentChars": 29,
+      "sample": "    </script>\n</body>\n</html>"
+    }
+  },
+  "editedChars": 4315,
+  "play": {
+    "status": "OK",
+    "reason": null,
+    "passing": [],
+    "failing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "total": 6,
+    "log": "FAIL case 1  loads with no page or console errors and exposes state -> expected errors.length === 0 && state && state.player && typeof state.player.x === 'number' && typeof state.player.y === 'number' && state.tiles && state.inventory && typeof state.inventory.seeds === 'number'; state {\"__error\":\"Cannot read properties of undefined (reading 'state')\"}\nERROR case 2  ArrowRight moves the player right: Cannot read properties of undefined (reading 'x')\nERROR case 3  ArrowDown moves the player down: Cannot read properties of undefined (reading 'y')\nERROR case 4  p on an empty tile with seeds available creates a crop and spends exactly one seed: Cannot read properties of undefined (reading 'x')\nERROR case 5  p again on the SAME tile leaves the state unchanged - no second crop, no second seed spent: Cannot read properties of undefined (reading 'x')\nERROR case 6  with the seeds exhausted, p leaves the state unchanged: Cannot read properties of undefined (reading 'seeds')\nSUMMARY 0/6 cases pass, 6 fail"
+  },
+  "verdict": {
+    "overall": "FAIL",
+    "requested": "FAIL",
+    "protected": "FAIL",
+    "requestedFailing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "acceptance": {
+    "disposition": "RESTORED",
+    "countsAsCompletion": false,
+    "promotable": false,
+    "survivingWorkspaceVerdict": {
+      "overall": "FAIL",
+      "requested": "FAIL",
+      "protected": "PASS",
+      "candidateTree": "e3196a46205721d02f2543c8234b7f6550d14dbc"
+    },
+    "survivingBytes": "IDENTICAL_TO_START"
+  }
+}

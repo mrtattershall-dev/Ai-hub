@@ -1,0 +1,69 @@
+{
+  "at": "2026-09-26T21:37:36.701Z",
+  "task": "farm-plant",
+  "model": "qwen2.5-coder:1.5b",
+  "modelUrl": "http://127.0.0.1:11434",
+  "seed": 3,
+  "protocol": "local-edit-fim",
+  "deadlineSec": 900,
+  "maxTokens": 1500,
+  "requestedSteps": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "protectedSteps": [
+    1,
+    2,
+    3
+  ],
+  "assistance": {
+    "editFormatGivenByHarness": true,
+    "editSiteChosenBy": "harness",
+    "featureSplitIntoSteps": false,
+    "region": {
+      "from": "        document.addEventListener('p', plantSeed);",
+      "to": "        document.addEventListener('load', loadGame);",
+      "removedChars": 259,
+      "removedLines": 5
+    },
+    "instructionComment": "// Continue the farming game already in index.html. One change only: make the p key plant. When the\n// player's tile is empty AND inventory.seeds is greater than zero, add a tile entry { crop:\n// 'wheat', stage: 0 } at the player's tile and reduce inventory.seeds by exactly one. In every\n// other case - the tile already has a crop, or there are no seeds left - p must change nothing at\n// all. Do not add growth, harvesting or saving. Do not change how the arrow keys move the player.\n// The game is a single self-contained web page, index.html: plain HTML5 canvas and JavaScript, no\n// frameworks, no external files or CDNs. The page must expose window.game.state() returning {\n// player: {x, y}, tiles: { 'x,y': { crop, stage } }, inventory: { seeds, crops }, day }.\n// Everything that already works must keep working."
+  },
+  "boundaries": {
+    "editProduced": false,
+    "editContractClean": false,
+    "editApplicable": false,
+    "editInsertsNonComment": false
+  },
+  "timing": {
+    "generateMs": 155,
+    "firstTokenMs": null
+  },
+  "tokens": {
+    "output": 1,
+    "prompt": 1057,
+    "replyChars": 0
+  },
+  "workspace": "C:\\Users\\tatte\\AppData\\Local\\Temp\\edit-farm-plant-URMPmd",
+  "startFileChars": 3871,
+  "fim": {
+    "prefixChars": 3478,
+    "suffixChars": 134,
+    "removed": "        document.addEventListener('p', plantSeed);\n        document.addEventListener('t', advanceTime);\n        document.addEventListener('h', harvestCrop);\n        document.addEventListener('s', saveGame);\n        document.addEventListener('load', loadGame);"
+  },
+  "terminationReason": "stop",
+  "naturalStop": true,
+  "reply": "",
+  "edit": {
+    "code": {
+      "nonCommentLines": 0,
+      "commentLines": 0,
+      "hasNonComment": false,
+      "nonCommentChars": 0,
+      "sample": ""
+    }
+  }
+}

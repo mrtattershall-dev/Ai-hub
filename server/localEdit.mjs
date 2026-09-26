@@ -83,6 +83,7 @@ const PROTOCOL = opt('protocol', 'anchor');
 if (!['anchor', 'fim'].includes(PROTOCOL)) { console.error(`unknown protocol ${PROTOCOL} (anchor | fim)`); process.exit(2); }
 // The fim region, as literal first/last lines of the hole. Recorded in the result, because the
 // harness choosing them IS assistance and the reader must be able to see exactly how much.
+const TRIM_TAIL = flag('trim-tail');      // deterministic: cut the infill at a closing </script>
 const REGION_FROM = opt('region-from', '        function plantSeed() {');
 const REGION_TO = opt('region-to', "        document.addEventListener('load', loadGame);");
 
@@ -112,12 +113,22 @@ const ANCHOR_SYSTEM = [
   'Do not return the whole file. Do not explain. Do not use fenced code blocks.',
 ].join('\n');
 
-const FIM_INSTRUCTION = [
-  '// Increment 2: planting and growth.',
-  "// p plants a seed on the player's tile: tiles['x,y'] = { crop, stage: 0 } and seeds go down by one.",
-  '// t advances one tick: day goes up by one and every planted tile\'s stage goes up by one until it is grown at stage 3.',
-  '// Planted tiles are drawn. Arrow-key movement and everything already working must keep working.',
-].join('\n');
+// The instruction that goes at the top of the hole, DERIVED FROM THE TASK rather than hardcoded.
+// A defect found by running INC4-1 cell A: this constant used to spell out increment 2 (planting
+// AND growth), so pointing the harness at the narrower farm-plant task silently asked for the old
+// feature. Whatever the task says is what the hole is labelled with, and the text is recorded
+// verbatim in the result.
+const FIM_INSTRUCTION_OVERRIDE = opt('fim-instruction', null);
+const FIM_INSTRUCTION = FIM_INSTRUCTION_OVERRIDE !== null ? FIM_INSTRUCTION_OVERRIDE : (() => {
+  const words = String(task.goal || '').split(/\s+/);
+  const lines = [];
+  let line = '';
+  for (const w of words) {
+    if ((line + ' ' + w).trim().length > 96) { lines.push(line.trim()); line = w; } else { line += ' ' + w; }
+  }
+  if (line.trim()) lines.push(line.trim());
+  return lines.map((l) => '// ' + l).join('\n');
+})();
 
 function anchorUserMessage(currentFile) {
   return [
@@ -261,6 +272,31 @@ export function nonCommentContent(text) {
   };
 }
 
+/**
+ * THE INFILL RAN PAST THE HOLE. Given the site and a one-line instruction, this model wrote code in
+ * 3 of 3 attempts and then closed the document inside the hole - `</script></body></html>` - even
+ * though the suffix it was given already contains them. The model's ollama template does support
+ * infilling (`{{ if .Suffix }}<|fim_prefix|>...<|fim_suffix|>...<|fim_middle|>`), so the suffix did
+ * reach it; it simply did not respect the boundary. The result was a script closed early, a seam
+ * orphaned after it, and a page that exposed no state at all.
+ *
+ * So the harness truncates the middle at the first line that closes the script or the document.
+ * This is deterministic, it never adds anything, and it is ASSISTANCE - recorded per run as
+ * fimTailTrimmed with what was dropped.
+ */
+export function trimInfillTail(middle) {
+  const lines = String(middle ?? '').split('\n');
+  const closes = /^\s*(<\/script>|<\/body>|<\/html>)/i;
+  const at = lines.findIndex((l) => closes.test(l));
+  if (at === -1) return { text: String(middle ?? ''), trimmed: false, droppedLines: 0, dropped: '' };
+  return {
+    text: lines.slice(0, at).join('\n'),
+    trimmed: true,
+    droppedLines: lines.length - at,
+    dropped: lines.slice(at).join('\n').slice(0, 300),
+  };
+}
+
 const git = (ws, args) => exec('git', ['-C', ws, ...args], { windowsHide: true });
 
 async function main() {
@@ -274,6 +310,7 @@ async function main() {
     // EVERY piece of help the harness supplied, named, so this can never be read as autonomy.
     assistance: {
       editFormatGivenByHarness: true,
+      infillTailTrimmedByHarness: PROTOCOL === 'fim' ? TRIM_TAIL : false,
       editSiteChosenBy: PROTOCOL === 'fim' ? 'harness' : 'model',
       featureSplitIntoSteps: false,
       region: PROTOCOL === 'fim' ? { from: REGION_FROM, to: REGION_TO } : null,
@@ -345,7 +382,12 @@ async function main() {
       edited = applied.text;
     } else {
       const cut = cutRegion(startFile, REGION_FROM, REGION_TO);
-      const middle = String(gen.text || '');
+      let middle = String(gen.text || '');
+      if (TRIM_TAIL) {
+        const t = trimInfillTail(middle);
+        rec.fimTailTrimmed = { trimmed: t.trimmed, droppedLines: t.droppedLines, dropped: t.dropped };
+        middle = t.text;
+      }
       rec.boundaries.editProduced = middle.trim().length > 0;
       rec.boundaries.editContractClean = rec.boundaries.editProduced;   // no block format to violate
       rec.boundaries.editApplicable = rec.boundaries.editProduced;

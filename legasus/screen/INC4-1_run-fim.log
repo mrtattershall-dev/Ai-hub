@@ -1,0 +1,46 @@
+--- A fim seed 1 2026-09-26T21:37:29Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=1  termination=stop natural=yes
+  E1 edit produced       no    E1b contract clean no    E2 applicable no 
+  E1c inserts non-comment no   (0 non-comment / 0 comment lines)
+  E3 applied              -    E4 changed the program  - 
+  E5 reached execution    -    E6 protected  -    E7 requested  -    E8 accepted  - 
+  edit: undefined block(s), outside=undefined chars
+  chars=0 outTok=1 promptTok=1057 gen=5210ms
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc4/fim_seed1.json
+--- A fim seed 2 2026-09-26T21:37:35Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=2  termination=stop natural=yes
+  E1 edit produced       no    E1b contract clean no    E2 applicable no 
+  E1c inserts non-comment no   (0 non-comment / 0 comment lines)
+  E3 applied              -    E4 changed the program  - 
+  E5 reached execution    -    E6 protected  -    E7 requested  -    E8 accepted  - 
+  edit: undefined block(s), outside=undefined chars
+  chars=0 outTok=1 promptTok=1057 gen=504ms
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc4/fim_seed2.json
+--- A fim seed 3 2026-09-26T21:37:36Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=3  termination=stop natural=yes
+  E1 edit produced       no    E1b contract clean no    E2 applicable no 
+  E1c inserts non-comment no   (0 non-comment / 0 comment lines)
+  E3 applied              -    E4 changed the program  - 
+  E5 reached execution    -    E6 protected  -    E7 requested  -    E8 accepted  - 
+  edit: undefined block(s), outside=undefined chars
+  chars=0 outTok=1 promptTok=1057 gen=155ms
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc4/fim_seed3.json
+--- A fim seed 4 2026-09-26T21:37:37Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=4  termination=stop natural=yes
+  E1 edit produced       no    E1b contract clean no    E2 applicable no 
+  E1c inserts non-comment no   (0 non-comment / 0 comment lines)
+  E3 applied              -    E4 changed the program  - 
+  E5 reached execution    -    E6 protected  -    E7 requested  -    E8 accepted  - 
+  edit: undefined block(s), outside=undefined chars
+  chars=0 outTok=1 promptTok=1057 gen=155ms
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc4/fim_seed4.json
+--- A fim seed 5 2026-09-26T21:37:38Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=5  termination=stop natural=yes
+  E1 edit produced       no    E1b contract clean no    E2 applicable no 
+  E1c inserts non-comment no   (0 non-comment / 0 comment lines)
+  E3 applied              -    E4 changed the program  - 
+  E5 reached execution    -    E6 protected  -    E7 requested  -    E8 accepted  - 
+  edit: undefined block(s), outside=undefined chars
+  chars=0 outTok=1 promptTok=1057 gen=157ms
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/inc4/fim_seed5.json
+cell A exit 0
