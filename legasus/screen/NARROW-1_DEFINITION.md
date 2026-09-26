@@ -87,10 +87,46 @@ not tell them apart. Every attempt here says which.
 - The instrument itself is proven able to fail: `narrowArtifact.test.mjs` 23/23 shows every
   boundary passing and failing on scripted replies, with the gate unchanged.
 
-## The 7B cell, defined now, launched only with a cap
+## The 7B cell — AUTHORIZED: $3 total
 
-Identical harness, identical frozen chain, `--model-url` pointed at the hosted
-Qwen2.5-Coder-7B-Instruct, same 5 seeds, same bounds. Planned: 5 attempts x ~1 min of
-generation plus deploy and shutdown, well under 1 h -> ~$1.1 GPU-only / ~$1.6 conservative at
-the verified A10 rate, with the watchdog and the observed-stop discipline unchanged. **No
-spend authorized in this file.**
+**Authorized by tatte, 2026-09-26: a $3 cap for the hosted-7B cells** ("I authorize a 3 dollar
+cap then"), recorded here before any deploy. Identical harness, identical frozen chain,
+identical play / evaluator / acceptance; `--model-url` points at the hosted
+Qwen2.5-Coder-7B-Instruct (`mycoder`) on an A10.
+
+Three cells, all through `server/narrow7b.sh`:
+
+    A  narrow v2 (seam verbatim), farm-i1, seeds 1-5   the strongest cell of the 2x2
+    B  narrow v1 (seam in prose), farm-i1, seeds 1-5   is the instruction-FORM effect that
+                                                       NARROW-2 measured size-dependent, or
+                                                       general?
+    C  narrow v2 chain i1 -> i2 -> i3 -> i4, seed 2    the milestone shape with a capable
+                                                       model: each increment seeded from the
+                                                       previous ACCEPTED page, every earlier
+                                                       step protected, the chain stopping at
+                                                       the first increment not accepted
+
+    per-attempt bound   300 s deadline, 4000 max tokens (a 7B on an A10 emits a ~900-token
+                        file in well under a minute, so the ceiling and the deadline stay
+                        distinguishable)
+    planned             deploy + warm ~2 min, probe ~10 s, 14 attempts at well under a minute
+                        each, shutdown < 1 min  ->  ~0.3 h  ->  ~$0.33 GPU-only / ~$0.47
+                        conservative
+    MAXIMUM exposure    watchdog deadline 2700 s + 3 x 10 min verify + 15 min scaledown
+                        ~= 1.6 h  ->  $1.76 GPU-only / **$2.48 conservative**  <  $3  OK
+    gate                checked before the deploy and before the cells, with the figures of
+                        the moment; no automatic rerun; the campaign's DONE file stops the GPU
+                        without waiting on the shell
+
+Pre-registered readings for the 7B cells, fixed here:
+
+- **A high, B low** would show the instruction-FORM effect is general, not a 1.5B artifact:
+  the same interface stated verbatim versus in prose changes what a capable model builds too.
+- **A high, B also high** would localise the FORM effect to the small model: a 7B reads the
+  prose contract and builds the seam anyway. NARROW-2's finding would then be about model
+  size, not about protocols in general.
+- **A low** would mean the narrow protocol is not what carried the 1.5B result, and the
+  earlier cells need re-examination before anything is built on them.
+- **C** is descriptive at one seed: how far the chain gets, which increment stops it, and
+  whether every earlier step keeps passing at each step. No rate, no generalization claim; the
+  tasks are the same four increments throughout.
