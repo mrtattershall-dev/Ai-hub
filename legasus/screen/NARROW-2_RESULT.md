@@ -36,14 +36,26 @@ put it, and nothing else differs (`narrowArtifact.test.mjs`, cell 6).
    same interface, named in prose versus given as a line with a placement.
 2. **Observability: 0 of 5 versus 3 of 5.** Three v2 attempts exposed state well enough for
    the play to judge behaviour at all.
-3. **Acceptance: 0 of 5 versus 1 of 5.** One attempt, so this is the weakest of the three
-   numbers and must not be quoted as a rate. What it establishes is existence: a local
-   1.5B-produced increment passed an unchanged independent gate.
+3. **Acceptance: 0 of 5 versus 1 of 5.** **1 of 5 is the observed count in this sample, not a
+   dependable rate** — five attempts cannot estimate performance, and it must never be quoted
+   as "20%". What it establishes is existence: one local 1.5B-produced increment passed an
+   unchanged independent gate.
 
 **The residual failure is now the useful kind.** In v1 nothing could be observed, so nothing
 could be said about the game. In v2 two attempts (seeds 4, 5) exposed state and failed
 movement — a behaviour failure the diagnostic can describe case by case and a recovery loop
 can act on. The failure class changed from "unverifiable" to "verifiably wrong".
+
+## What the verbatim seam gives the model, stated plainly
+
+The v2 request carries the seam as a line to include:
+`window.game = { state: () => JSON.parse(JSON.stringify(STATE)) };` — **that is implementation
+help, not only a specification.** It supplies the exact expression; the model's remaining work
+is to have a state object worth exposing and to wire the behaviour. Recorded here because it
+bears on what the model is credited with: the movement, planting and save logic are its work,
+the one-line observability seam is not. Handing an implementer a declared interface is
+reasonable product engineering, but it must stay visible when reading "the model built
+increment 1".
 
 ## The accepted artifact, re-verified independently
 
@@ -89,12 +101,27 @@ Taken with NARROW-1, the whole progression on one model, one task and one unchan
     narrow artifact, given seam complete artifact, observable,  (5 of 5 / 3 of 5 / 1 of 5)
                                 one accepted
 
-**Apparent capability at this size is dominated by how much responsibility sits at one
-generation boundary, and by the FORM in which an interface requirement is stated.** That is
-now shown three times over, at $0, without touching the verifier or the acceptance standard.
+**In these three configurations, what the model produced depended heavily on how much
+responsibility sat at one generation boundary and on the FORM in which an interface requirement
+was stated** — one model, one task, one unchanged gate, $0. Stated as a pattern across three
+cells rather than a law: each pair of cells differs in more than one respect (see the
+throughput note in NARROW-1_RESULT), and the acceptance counts are small.
 
 NOT established: a pass rate (1 of 5); that the model can do increments 2-4; that a chain of
-four would hold; anything about the 7B. The 7B cell remains frozen and unauthorized.
+four would hold; anything about the 7B. The 7B cells are AUTHORIZED at a $3 cap but HELD and
+not launched ($0 spent on them) - see NARROW-1_DEFINITION.md.
+
+## Closing checks after the verifier fix (all $0)
+
+    the accepted artifact through every invocation path   playCheck direct [1,2,3];
+                                                          automatic diagnostic 3/3;
+                                                          independent evaluator requested PASS
+                                                          -> all three AGREE
+    all ten stored artifacts re-judged, corrected verifier 10 of 10 UNCHANGED; 0 classification
+                                                          changes
+
+`server/recheckArtifacts.mjs`, output in `NARROW_RECHECK.json`. The fix changed no earlier
+classification, and the one acceptance holds through every path that can judge it.
 
 Records: `NARROW-2_seed1..5.json`, `NARROW-2_run.log`, `NARROW-2_gate.log`,
-`NARROW-2_accepted_index.html` (the accepted artifact).
+`NARROW-2_accepted_index.html` (the accepted artifact), `NARROW_RECHECK.json`.

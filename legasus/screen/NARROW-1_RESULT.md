@@ -53,12 +53,19 @@ implement increment 1".
     prompt tokens   output tokens   generation   output tokens/s
     366             725-876         50-62 s      13.8 - 14.6
 
-M1-LIVE-2 measured 2.3 output tokens/s with a 15,290-token prompt through the agent loop, and
-M1-LIVE-1 produced ~25 chars/s under a prompt that grew all run. At 366 prompt tokens the same
-model on the same CPU emits at ~14 tokens/s, six times faster. **"2.3 tokens/s" was a property
-of the prompt size, not of the model or the machine**, and a complete increment-1 file is one
-minute of generation, not fifteen. Wall-clock truncation was never the binding constraint for
-one increment; it was for the whole game.
+**Two configurations, two throughputs — reported as that, not as a cause.**
+
+    configuration                     prompt tokens   output tokens/s
+    agent loop (M1-LIVE-2)            15,290          2.3
+    narrow artifact harness           366             13.8 - 14.6
+
+CORRECTED after review: the two configurations differ in more than prompt length — the system
+prompt, the message structure, the sampling call and whether tools are described all change
+together — so **this does not isolate prompt length as the cause.** Isolating it would need the
+same harness at several prompt sizes with everything else fixed, which has not been done. What
+the pair does establish is narrower and still useful: **in the configuration that produced
+complete artifacts, a complete increment-1 file is about one minute of generation**, so
+wall-clock truncation was not the binding constraint here, whatever drives the difference.
 
 ## Reading, against what was pre-registered
 
@@ -75,6 +82,12 @@ responsibility sits at a single generation boundary.
 NOT established: that the model can pass increment 1 (0 of 5 did); that its movement or
 planting logic is correct (unobservable through a missing seam); anything about later
 increments; anything about the 7B.
+
+**And one reading the frozen definition allowed that must be weakened** (corrected after
+review): the definition said continued failure to reach B2 would indicate "a capability or
+inference-performance limit". Continued failure would **not prove a capability ceiling** —
+other interface, sampling or implementation problems could remain unexamined. It would raise
+that as one live possibility, no more.
 
 ## What this makes the next question
 

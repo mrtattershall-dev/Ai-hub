@@ -1,0 +1,119 @@
+{
+  "rechecked": [
+    {
+      "record": "narrow1/seed1 (narrow-artifact-v1)",
+      "recordedPassing": [],
+      "recheckedPassing": [],
+      "recheckStatus": "OK",
+      "unchanged": true
+    },
+    {
+      "record": "narrow1/seed2 (narrow-artifact-v1)",
+      "recordedPassing": [],
+      "recheckedPassing": [],
+      "recheckStatus": "OK",
+      "unchanged": true
+    },
+    {
+      "record": "narrow1/seed3 (narrow-artifact-v1)",
+      "recordedPassing": [],
+      "recheckedPassing": [],
+      "recheckStatus": "OK",
+      "unchanged": true
+    },
+    {
+      "record": "narrow1/seed4 (narrow-artifact-v1)",
+      "recordedPassing": [],
+      "recheckedPassing": [],
+      "recheckStatus": "OK",
+      "unchanged": true
+    },
+    {
+      "record": "narrow1/seed5 (narrow-artifact-v1)",
+      "recordedPassing": [],
+      "recheckedPassing": [],
+      "recheckStatus": "OK",
+      "unchanged": true
+    },
+    {
+      "record": "narrow2/seed1 (narrow-artifact-v2)",
+      "recordedPassing": [],
+      "recheckedPassing": [],
+      "recheckStatus": "OK",
+      "unchanged": true
+    },
+    {
+      "record": "narrow2/seed2 (narrow-artifact-v2)",
+      "recordedPassing": [
+        1,
+        2,
+        3
+      ],
+      "recheckedPassing": [
+        1,
+        2,
+        3
+      ],
+      "recheckStatus": "OK",
+      "unchanged": true
+    },
+    {
+      "record": "narrow2/seed3 (narrow-artifact-v2)",
+      "recordedPassing": [],
+      "recheckedPassing": [],
+      "recheckStatus": "OK",
+      "unchanged": true
+    },
+    {
+      "record": "narrow2/seed4 (narrow-artifact-v2)",
+      "recordedPassing": [
+        1
+      ],
+      "recheckedPassing": [
+        1
+      ],
+      "recheckStatus": "OK",
+      "unchanged": true
+    },
+    {
+      "record": "narrow2/seed5 (narrow-artifact-v2)",
+      "recordedPassing": [
+        1
+      ],
+      "recheckedPassing": [
+        1
+      ],
+      "recheckStatus": "OK",
+      "unchanged": true
+    }
+  ],
+  "paths": {
+    "source": "narrow2/seed2.json",
+    "task": "farm-i1",
+    "requestedSteps": [
+      1,
+      2,
+      3
+    ],
+    "playCheckDirect": {
+      "status": "OK",
+      "passing": [
+        1,
+        2,
+        3
+      ]
+    },
+    "automaticDiagnostic": {
+      "status": "OK",
+      "passed": 3,
+      "attempted": 3,
+      "failing": []
+    },
+    "evaluator": {
+      "requested": "PASS",
+      "overall": "PASS"
+    },
+    "agree": true
+  },
+  "disagreements": []
+}

@@ -87,10 +87,17 @@ not tell them apart. Every attempt here says which.
 - The instrument itself is proven able to fail: `narrowArtifact.test.mjs` 23/23 shows every
   boundary passing and failing on scripted replies, with the gate unchanged.
 
-## The 7B cell — AUTHORIZED: $3 total
+## The 7B cell — AUTHORIZED: $3 total. **HELD, NOT LAUNCHED.**
 
 **Authorized by tatte, 2026-09-26: a $3 cap for the hosted-7B cells** ("I authorize a 3 dollar
-cap then"), recorded here before any deploy. Identical harness, identical frozen chain,
+cap then"), recorded here before any deploy.
+
+**HELD.** The next message directed the $0 increment-2 test first and stated that it authorizes
+no new paid run ("The 7B comparison can answer a separate model-size question. Its quoted cost
+is an estimate, and no new paid run is authorized here"). Nothing was deployed: **$0 spent on
+these cells.** The definition, the runner (`server/narrow7b.sh`) and the readings below stay
+frozen and ready; every cost figure below is an ESTIMATE from verified unit prices, not a quote.
+Launching needs a fresh go-ahead. Identical harness, identical frozen chain,
 identical play / evaluator / acceptance; `--model-url` points at the hosted
 Qwen2.5-Coder-7B-Instruct (`mycoder`) on an A10.
 
