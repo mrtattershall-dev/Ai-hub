@@ -1,0 +1,35 @@
+{
+  "run": "46c4b812-9d32-4bf6-97c7-d94758f3552c",
+  "status": "error",
+  "wallSec": 895,
+  "samples": 149,
+  "sampleWindowSec": 912,
+  "rssMb": {
+    "node": {
+      "peak": 360,
+      "mean": 161
+    },
+    "ollama": {
+      "peak": 41,
+      "mean": 23
+    },
+    "chrome": {
+      "peak": 570,
+      "mean": 62
+    },
+    "combinedPeak": 811
+  },
+  "cpuPct": {
+    "peak": 97,
+    "mean": 73
+  },
+  "model": {
+    "calls": 0,
+    "tokensPerSecMedian": null,
+    "longestCallSec": null,
+    "outputTokens": 0,
+    "promptTokens": 0
+  },
+  "diagnostics": 1,
+  "note": "measurements on this desktop during this run; no threshold is implied"
+}
