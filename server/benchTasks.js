@@ -153,20 +153,39 @@ export const SEQUENTIAL_TASKS = [
 // and a state contract the request names. Built from NOTHING (empty seed); the first increment
 // has nothing to protect, later increments protect every step the previous one passed.
 const FARM_DIR = join(HERE, '..', 'legasus', 'bench', 'farm');
+// M1-LIVE-1 (2026-09-26): asked for the whole game at once, the local 1.5B streamed 21,133
+// characters in 836 s and never finished the reply. The product is built in INCREMENTS: each
+// increment is a small request, a subset of the play as its requested check, and every
+// earlier step as protected. Each increment starts from the previous ACCEPTED workspace
+// (dependsOn); one that was not accepted blocks the next.
+const FARM_INCREMENTS = [
+  { id: 'farm-i1', steps: [1, 2, 3], ask: 'Increment 1: a player square that moves on a tile grid with the arrow keys, drawn on the canvas. Expose window.game.state() with player, tiles ({}), inventory ({ seeds: 5, crops: 0 }) and day (0).' },
+  { id: 'farm-i2', steps: [1, 2, 3, 4, 5], ask: 'Increment 2: planting and growth. p plants a seed on the player\'s tile (a tile entry { crop, stage: 0 }, seeds go down by one); t advances time by one tick (day goes up by one, every planted tile\'s stage goes up by one until it is grown at stage 3). Draw planted tiles.' },
+  { id: 'farm-i3', steps: [1, 2, 3, 4, 5, 6], ask: 'Increment 3: harvesting. h on a grown tile (stage 3 or more) removes the tile and adds one to inventory.crops.' },
+  { id: 'farm-i4', steps: [1, 2, 3, 4, 5, 6, 7, 8], ask: 'Increment 4: saving. s writes the whole state to localStorage; when the page loads, a saved state is restored. No console errors anywhere.' },
+];
 export function farmTasks() {
   const playPath = join(FARM_DIR, 'play.json');
   if (!existsSync(playPath)) return [];
   const spec = JSON.parse(readFileSync(playPath, 'utf8'));
-  const allSteps = (spec.steps || []).map((s) => s.n);
-  return [{
-    id: 'farm-v1', group: 'FARM', source: 'internal', language: 'javascript', kind: 'build',
-    goal: `Build me a small farming game as a single web page: index.html (plain HTML5 canvas and JavaScript, no frameworks, no external files or CDNs). ${spec.contract} Start with the player moving on a tile grid, then planting, time passing, harvesting, an inventory, and saving. Keep index.html self-contained.`,
-    seed: {},
-    requested: { play: { spec, steps: allSteps } },
-    protected: null,
-    diagnostic: { kind: 'play', spec, timeoutSec: 90 },
-    upstreamCases: allSteps.length, protectedCases: 0,
-  }];
+  const subset = (steps) => ({ ...spec, name: `${spec.name}-steps-${steps.join('')}`, steps: spec.steps.filter((s) => steps.includes(s.n)) });
+  const base = `The game is a single self-contained web page, index.html: plain HTML5 canvas and JavaScript, no frameworks, no external files or CDNs. ${spec.contract}`;
+  let prev = null, prevSteps = [];
+  const out = [];
+  for (const inc of FARM_INCREMENTS) {
+    const mine = subset(inc.steps);
+    out.push({
+      id: inc.id, group: 'FARM', source: 'internal', language: 'javascript', kind: 'build', dependsOn: prev,
+      goal: `${prev ? 'Continue the farming game already in index.html. ' : 'Build me a small farming game. '}${inc.ask} ${base}${prev ? ' Everything that already works must keep working.' : ''}`,
+      seed: {},                                                    // the runner seeds a chained increment from the previous ACCEPTED workspace
+      requested: { play: { spec: mine, steps: inc.steps } },
+      protected: prevSteps.length ? { play: { spec: subset(prevSteps), steps: prevSteps } } : null,
+      diagnostic: { kind: 'play', spec: mine, timeoutSec: 90 },
+      upstreamCases: inc.steps.length, protectedCases: prevSteps.length,
+    });
+    prev = inc.id; prevSteps = inc.steps;
+  }
+  return out;
 }
 
 export function benchQueue() {

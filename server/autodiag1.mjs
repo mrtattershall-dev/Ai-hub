@@ -147,6 +147,15 @@ if (ONLY.length && BASE.length !== ONLY.length) { console.error(`AUTODIAG_TASK_I
 function armTask(task, arm) {
   return { ...task, id: task.id, goal: `${task.goal}\n\n${BENCH_GUIDANCE}` };
 }
+// CHAINED INCREMENTS (dependsOn): the accepted files of the previous unit in the same arm and
+// replicate become this unit's seed. Recorded per (arm, rep) as the units complete.
+const acceptedFiles = new Map();   // `${arm}|r${rep}|${taskId}` -> { files } of the ACCEPTED workspace
+function chainedSeed(task, arm, rep) {
+  if (!task.dependsOn) return { ok: true, seed: task.seed };
+  const got = acceptedFiles.get(`${arm}|r${rep}|${task.dependsOn}`);
+  if (!got) return { ok: false, reason: `prerequisite ${task.dependsOn} was not accepted in this arm/replicate` };
+  return { ok: true, seed: got.files };
+}
 
 /** The diagnostic the Hub runs FOR the model. Null in control - nothing is delivered there. */
 function armDiagnostic(task, arm) {
@@ -504,7 +513,9 @@ async function recordUnit(r, arm, rep, wsDir, { position = null, workspaceFresh 
               : true) : null,
     termination: r.termination || r.state,
     requested: r.verdict?.requested?.verdict ?? null,
-    protected: r.verdict?.protected?.verdict ?? null,
+    // A task with NO protected spec (an increment built from nothing) owes no protected verdict:
+    // NOT_SPECIFIED is a value, not a gap, so the report's integrity check reads it as present.
+    protected: r.verdict?.protected?.verdict ?? (taskDef.protected ? null : 'NOT_SPECIFIED'),
     disposition: r.acceptance?.disposition ?? r.state,
     accepted: !!r.acceptance?.countsAsCompletion,
     reason: r.reason ?? null,
@@ -589,11 +600,25 @@ for (let rep = 1; rep <= REPS; rep++) {
       const wsDir = join(ROOT, `ws-${arm}-r${rep}`);
       currentDiagnostic = armDiagnostic(task, arm);
       currentSeed = seedFor(rep);
+      const chained = chainedSeed(task, arm, rep);
+      if (!chained.ok) {
+        // BLOCKED, never attempted from a seed: running it from an empty seed would silently
+        // turn a chain into independent tasks. Its own row says why.
+        const key = `${task.id}@${arm}r${rep}`;
+        REMAINING.delete(key);
+        const row = { idx: ++idx, rep, task: key, arm, termination: 'BLOCKED', state: 'BLOCKED', disposition: 'BLOCKED', accepted: false, reason: chained.reason, requested: null, protected: null, position: order.indexOf(arm) };
+        rows.push(row); recordRun(SUMMARY, row);
+        console.log(`${String(idx).padStart(3)}. [${arm}] ${task.id} BLOCKED - ${chained.reason}`);
+        continue;
+      }
       currentRecovery = arm === 'RECOVERY_ARM' ? RECOVERY_POLICY : null;
       const position = order.indexOf(arm);
       const workspaceFresh = !existsSync(join(wsDir, task.id));
       pending.length = 0;
-      await runBatch([armTask(task, arm)], {
+      // dependsOn is resolved HERE (seed from the previous accepted workspace); the batch's own
+      // per-call chain logic must not see it, or it blocks the unit for lacking a prerequisite
+      // inside a one-task batch.
+      await runBatch([{ ...armTask(task, arm), seed: chained.seed, dependsOn: null }], {
         journalPath: join(ROOT, `journal-${arm}-r${rep}.jsonl`),
         workspacesDir: wsDir,
         auditDir: join(ROOT, 'audit'),
@@ -610,6 +635,11 @@ for (let rep = 1; rep <= REPS; rep++) {
         inFlight = { key, arm, rep, since: Date.now() };
         await recordUnit(r, arm, rep, join(wsDir, r.task), { position, workspaceFresh });
         inFlight = null;
+        // The ACCEPTED workspace of a chained task feeds the next increment.
+        if (r.acceptance?.countsAsCompletion && task.requested?.play) {
+          try { const { gameSnapshot } = await import('./autodiag.js'); const snap = gameSnapshot(join(wsDir, r.task)); acceptedFiles.set(`${arm}|r${rep}|${task.id}`, { files: snap.files }); console.log(`     chain: ${task.id} accepted - ${snap.count} tracked file(s) carried to the next increment (sha ${snap.sha256.slice(0, 12)})`); }
+          catch (e) { console.error(`     chain: could not snapshot the accepted workspace of ${task.id}: ${e.message}`); }
+        }
       }
       // FAULT INJECTION, TEST ONLY: die the way OVERNIGHT-1 attempt 1 died - silently, with
       // exit 127, right after a unit was recorded - so the resume path can be proven.

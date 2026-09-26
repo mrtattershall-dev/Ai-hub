@@ -2892,7 +2892,7 @@ function recoveryRestore(run, d) {
 /** After a content change: refuse a repeat, or verify and decide. Returns true if the run continues. */
 async function applyRecovery(run, candidateSha) {
   const rec = run.recovery;
-  if (!rec || !rec.enabled || rec.state !== 'ACTIVE') return true;
+  if (!rec || !rec.enabled || rec.state === 'STOPPED') return true;   // ACCEPTED re-enters judgment on a new change (recovery.decide)
   if (isRejected(rec, candidateSha)) {
     // Refused BEFORE it runs: no diagnostic is spent on a candidate already judged.
     run.diagnosticStale = false;

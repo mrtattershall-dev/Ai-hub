@@ -1,5 +1,5 @@
 /**
- * farmCampaign.test.mjs - the FARM target through the real campaign entry point: an empty
+ * farmCampaign.test.mjs - the FIRST farm increment (farm-i1) through the real campaign entry point: an empty
  * workspace, the request, the declared play as diagnostic and as acceptance, the controller
  * on. Scripted replies; the machine's own Chrome; no model. The M1 shape of MILESTONE-1 with
  * the model replaced by a script that writes the positive-control page - proving the loop's
@@ -37,7 +37,7 @@ const fake = spawn(process.execPath, [join(HERE, 'fakemodel.mjs'), '--port', Str
 await new Promise((r) => setTimeout(r, 1500));
 let out = '';
 const runner = spawn(process.execPath, [join(HERE, 'autodiag1.mjs'), `http://127.0.0.1:${fakePort}`], {
-  env: { ...process.env, BENCH_GROUP: 'farm', AUTODIAG_EXPERIMENT: 'SMOKE-FARM', AUTODIAG_ARMS: 'RECOVERY_ARM', AUTODIAG_REPS: '1', AUTODIAG_SEEDS: '1', AUTODIAG_TASK_IDS: 'farm-v1', AUTODIAG_PER_TASK_SEC: '240', AUTODIAG_TOTAL_SEC: '1200', AGENT_MAX_STEPS: '25' },
+  env: { ...process.env, BENCH_GROUP: 'farm', AUTODIAG_EXPERIMENT: 'SMOKE-FARM', AUTODIAG_ARMS: 'RECOVERY_ARM', AUTODIAG_REPS: '1', AUTODIAG_SEEDS: '1', AUTODIAG_TASK_IDS: 'farm-i1', AUTODIAG_PER_TASK_SEC: '240', AUTODIAG_TOTAL_SEC: '1200', AGENT_MAX_STEPS: '25' },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
 runner.stdout.on('data', (d) => { out += d; }); runner.stderr.on('data', (d) => { out += d; });
@@ -50,13 +50,13 @@ const row = rows[0];
 const run = row && existsSync(join(root, 'runs', `${row.runId}.json`)) ? JSON.parse(readFileSync(join(root, 'runs', `${row.runId}.json`), 'utf8')) : null;
 try {
   say(code === 0 && rows.length === 1, `campaign ran (exit ${code}, ${rows.length} row)`);
-  say(/baseline farm-v1: 0\/8 graded cases pass on the seed/.test(out), 'baseline on the empty seed: 0/8');
+  say(/baseline farm-i1: 0\/3 graded cases pass on the seed/.test(out), 'baseline on the empty seed: 0/3');
   const d = (run?.diagnostics || []).filter((x) => !x.skipped);
   say(d.length >= 2 && d[0].importError && /does not exist yet/.test(d[0].importError), `the opening diagnostic said the entry page does not exist yet (${d[0]?.importError})`);
-  say(d[1] && d[1].passed === 8 && d[1].attempted === 8, `after the scripted build: ${d[1]?.passed}/${d[1]?.attempted}`);
+  say(d[1] && d[1].passed === 3 && d[1].attempted === 3, `after the scripted build: ${d[1]?.passed}/${d[1]?.attempted}`);
   say(row?.recovery?.state === 'ACCEPTED' && row.recovery.decisions.join('>') === 'ACCEPT', `controller: ${row?.recovery?.decisions?.join('>')} -> ${row?.recovery?.state}`);
   say(row?.disposition === 'RETAIN' && row.accepted === true && row.requested === 'PASS', `acceptance: ${row?.disposition} (requested ${row?.requested}, protected ${row?.protected})`);
-  say(row?.baselineCasesPass === 0 && row?.candidateCasesPass === 8 && row?.casesTotal === 8 && row?.newlyPassing?.length === 8, `case movement on the row: ${row?.baselineCasesPass} -> ${row?.candidateCasesPass}/${row?.casesTotal}`);
+  say(row?.baselineCasesPass === 0 && row?.candidateCasesPass === 3 && row?.casesTotal === 3 && row?.newlyPassing?.length === 3, `case movement on the row: ${row?.baselineCasesPass} -> ${row?.candidateCasesPass}/${row?.casesTotal}`);
   say(row?.provisionalDeliveredAsAccepted === false && row?.controllerAcceptNotRetained === false && row?.isolationOk === true, 'no integrity flag; isolation held');
   say(run?.status === 'done', `the run finished normally (${run?.status})`);
 } finally {

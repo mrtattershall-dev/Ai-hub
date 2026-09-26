@@ -94,8 +94,9 @@ try {
   say(/RECOVERY CONTROLLER - your last change was REJECTED and the game at index\.html was RESTORED/.test(restore?.packet || ''), 'the packet names the game, not a .py file');
 
   console.log('\n=== 4. the evaluator: play verdicts ===');
-  const task = farmTasks()[0];
-  say(!!task && task.requested.play.steps.length === 8 && task.protected === null, 'farm-v1: 8 requested steps, nothing protected (built from nothing)');
+  // The last increment requests all 8 steps; for the evaluator check, take it with nothing protected.
+  const task = { ...farmTasks()[3], id: 'farm-full', protected: null };
+  say(!!task && task.requested.play.steps.length === 8 && farmTasks()[0].protected === null, 'farm-i4 requests all 8 steps; farm-i1 protects nothing (built from nothing)');
   const gitDir = (html) => { const d = scratch('pd-eval'); dirs.push(d); const ws = join(d, 'ws'); mkdirSync(ws, { recursive: true }); writeFileSync(join(ws, 'index.html'), html, 'utf8'); for (const args of [['init', '-q'], ['config', 'core.autocrlf', 'false'], ['add', '-A'], ['-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '-m', 'c']]) execFileSync('git', ['-C', ws, ...args], { windowsHide: true }); return ws; };
   const good = await evaluate(gitDir(POSITIVE), task, { timeoutSec: 90 });
   console.log('        note: evaluate keys:', Object.keys(good).join(','), JSON.stringify(good).slice(0,300));

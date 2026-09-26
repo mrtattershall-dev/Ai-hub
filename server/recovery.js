@@ -54,15 +54,19 @@ export function initRecovery(startResult, targetBytes, policy = {}, targetSha = 
   // empty state, the protected set is empty, and the first candidate that plays at all is
   // progress. (A module that fails to import at the start is the same case.)
   const passing = passingSet(startResult);
+  // ALREADY SATISFIED: the target passes every case before the model touches it (an increment
+  // whose feature already exists). The checkpoint is that state and it is ACCEPTED as it
+  // stands; a later change is judged against it like any other candidate.
+  const alreadySatisfied = !!startResult.attempted && startResult.passed === startResult.attempted;
   return {
-    enabled: true, policy: p, state: 'ACTIVE',
+    enabled: true, policy: p, state: alreadySatisfied ? 'ACCEPTED' : 'ACTIVE',
+    decisions: alreadySatisfied ? [{ action: 'ALREADY_SATISFIED', reason: `every case passes on the opening state (${startResult.passed}/${startResult.attempted})`, at: Date.now() }] : [],
     // The checkpoint's identity is the DIAGNOSTIC's identity for this target (a module's file
     // bytes, or a game's snapshot over its tracked files) - the same hash freshness compares.
     verified: { sha256: targetSha || sha(targetBytes), bytes: targetBytes, passing: [...passing], passed: startResult.passed || 0, attempted: startResult.attempted || null, failures: startResult.failures || [], fromNothing: startResult.importError !== undefined || !startResult.attempted },
     provisional: null,
     attempts: 0, freshPlans: 0, repeats: 0, provisionals: 0,
     rejected: [],          // { sha256, reason, kind, passed, brokeProtected: [...], at }
-    decisions: [],         // { action, reason, sha256, at }
   };
 }
 
@@ -78,7 +82,8 @@ export function isRejected(rec, candidateSha) {
 export function decide(rec, result, candidateSha) {
   const now = Date.now();
   const record = (d) => { rec.decisions.push({ ...d, sha256: candidateSha, at: now }); return d; };
-  if (!rec.enabled || rec.state !== 'ACTIVE') return record({ action: 'NONE', reason: 'controller inactive' });
+  if (!rec.enabled || rec.state === 'STOPPED') return record({ action: 'NONE', reason: 'controller inactive' });
+  if (rec.state === 'ACCEPTED') rec.state = 'ACTIVE';   // a change after acceptance is a new candidate against the accepted checkpoint
   if (candidateSha === rec.verified.sha256) return record({ action: 'NONE', reason: 'the target is the verified checkpoint' });
 
   if (!result || result.status !== 'OK') {
