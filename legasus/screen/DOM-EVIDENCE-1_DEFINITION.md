@@ -1,7 +1,16 @@
 # DOM-EVIDENCE-1 DEFINITION — does additional runtime evidence improve repair under an otherwise identical loop?
 
-Frozen 2026-09-27, second version, before any round is run. **NOT RUN. This document authorizes no
-spending; the cost below is an estimate.**
+Frozen 2026-09-27, second version, before any round is run.
+
+**AUTHORIZED: $2 total cap.** Micheal, 2026-09-27: *"Yes I authorize a 2 dollar cap"*, in answer to
+this comparison and its estimate. Recorded here before any deploy, per standing practice. The cap
+covers startup, idle and shutdown. Prior hosted spend is about $0.57.
+
+**REVISED ESTIMATE, honestly larger than my first one.** I quoted $0.40-0.55. That under-counted two
+things: the diagnosis arm runs an extra play per round to collect its evidence, and the container idles
+through every local verification. Generation is a few minutes in total; the container window will be
+most of an hour if both arms run back to back. **Realistic estimate $0.80-1.10, against the $2 cap.**
+If the window approaches $1.60 the run stops and reports what it has.
 
 ## The question, stated as the comparison
 
@@ -116,6 +125,8 @@ enough to drive a repair nobody wrote for it.
 
 ## Estimate, not a request
 
-Eight runs (4 candidates x 2 arms: E0 re-run and E2), at most 3 rounds each, on the 7B: roughly 20-30
-minutes of A10G, **about $0.40-0.55**. Prior hosted spend is about $0.57. **Nothing is deployed and no authorization is
-implied by this estimate.**
+Eight runs (4 candidates x 2 arms: E0 re-run and E2), at most 3 rounds each, on the 7B. **Revised to
+$0.80-1.10** for the reasons in the authorization note above, against the authorized $2 cap. The split
+between generation seconds and idle-through-verification seconds is itself reported, because it bears
+directly on the escalation architecture: if the GPU idles through most of a repair attempt, an
+escalation budget is priced in verifications, not tokens.
