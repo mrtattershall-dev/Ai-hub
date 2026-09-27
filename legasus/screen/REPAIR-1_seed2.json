@@ -1,0 +1,118 @@
+{
+  "at": "2026-09-27T05:05:18.320Z",
+  "model": "qwen2.5-coder:7b",
+  "modelUrl": "https://mr-tattershall--legasus-ollama-1p5b-api.modal.run",
+  "task": "farm-plant",
+  "candidateSource": "legasus/screen/MODEL-CMP-1_armB_seed2.json",
+  "candidateSha": "afadb0898a3bbcb3daf39edf5379d62cd4ae61c9284e520a9072211e40152880",
+  "seed": 1,
+  "maxRounds": 3,
+  "rounds": [
+    {
+      "round": 0,
+      "kind": "the untouched candidate",
+      "fileSha": "afadb0898a3bbcb3daf39edf5379d62cd4ae61c9284e520a9072211e40152880",
+      "play": [],
+      "failing": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "diagnosis": {
+        "failureClass": "RUNTIME_EXCEPTION_AT_LOAD",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')"
+        ],
+        "threwDuringLoad": true,
+        "stateObserved": false,
+        "initializationCompleted": false,
+        "behaviouralVerdictsMeaningful": false,
+        "note": "the page threw while loading: the failing behavioural steps were NEVER REACHED, so no claim about the candidate behaviour follows from them"
+      },
+      "disposition": "RESTORED",
+      "accepted": false
+    },
+    {
+      "round": 1,
+      "kind": "repair attempt",
+      "generationMs": 14897,
+      "outputTokens": 335,
+      "promptTokens": 1365,
+      "termination": "stop",
+      "evidenceGiven": "It does not work. Repair it.\n\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n        const gridSize = 32;\n        const player = { x: 0, y: 0 };\n        const tiles = {};\n        const inventory = { seeds: 5, crops: 0 };\n        let day = 0;\n\n        function drawPlayer() {\n            ctx.fillStyle = 'green';\n            ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize, gridSize);\n        }\n\n        function drawTile(x, y, crop, stage) {\n            ctx.fillStyle = crop === 'seed' ? 'yellow' : 'green';\n            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Stage: ${stage}`, x * gridSize + 10, y * gridSize + 20);\n        }\n\n        function dra",
+      "rawReply": "<<<<<<< FIND\ndocument.addEventListener('keydown', movePlayer);\n// p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\ndocument.getElementById('plant').addEventListener('click', plantSeed);\n// a advances time: day++; draw();\ndocument.getElementById('advance').addEventListener('click', advanceTime);\n// h harvests: if the player's tile is a wheat plant and inventory.crops < 10, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.crops++; otherwise change nothing.\ndocument.getElementById('harvest').addEventListener('click', harvestCrop);\n// s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\ndocument.getElementById('save').addEventListener('click', saveGame);\n// l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();\ndocument.getElementById('load').addEventListener('click', loadGame);\n=======\ndocument.addEventListener('DOMContentLoaded', () => {\n    document.addEventListener('keydown', movePlayer);\n    document.getElementById('plant').addEventListener('click', plantSeed);\n    document.getElementById('advance').addEventListener('click', advanceTime);\n    document.getElementById('harvest').addEventListener('click', harvestCrop);\n    document.getElementById('save').addEventListener('click', saveGame);\n    document.getElementById('load').addEventListener('click', loadGame);\n});\n>>>>>>> END",
+      "blocks": 1,
+      "incomplete": false,
+      "outsideChars": 0,
+      "applyResults": [
+        {
+          "status": "NOT_FOUND",
+          "count": 0
+        }
+      ],
+      "outcome": "EDIT_NOT_APPLICABLE"
+    },
+    {
+      "round": 2,
+      "kind": "repair attempt",
+      "generationMs": 4189,
+      "outputTokens": 335,
+      "promptTokens": 1365,
+      "termination": "stop",
+      "evidenceGiven": "It does not work. Repair it.\n\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n        const gridSize = 32;\n        const player = { x: 0, y: 0 };\n        const tiles = {};\n        const inventory = { seeds: 5, crops: 0 };\n        let day = 0;\n\n        function drawPlayer() {\n            ctx.fillStyle = 'green';\n            ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize, gridSize);\n        }\n\n        function drawTile(x, y, crop, stage) {\n            ctx.fillStyle = crop === 'seed' ? 'yellow' : 'green';\n            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Stage: ${stage}`, x * gridSize + 10, y * gridSize + 20);\n        }\n\n        function dra",
+      "rawReply": "<<<<<<< FIND\ndocument.addEventListener('keydown', movePlayer);\n// p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\ndocument.getElementById('plant').addEventListener('click', plantSeed);\n// a advances time: day++; draw();\ndocument.getElementById('advance').addEventListener('click', advanceTime);\n// h harvests: if the player's tile is a wheat plant and inventory.crops < 10, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.crops++; otherwise change nothing.\ndocument.getElementById('harvest').addEventListener('click', harvestCrop);\n// s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\ndocument.getElementById('save').addEventListener('click', saveGame);\n// l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();\ndocument.getElementById('load').addEventListener('click', loadGame);\n=======\ndocument.addEventListener('DOMContentLoaded', () => {\n    document.addEventListener('keydown', movePlayer);\n    document.getElementById('plant').addEventListener('click', plantSeed);\n    document.getElementById('advance').addEventListener('click', advanceTime);\n    document.getElementById('harvest').addEventListener('click', harvestCrop);\n    document.getElementById('save').addEventListener('click', saveGame);\n    document.getElementById('load').addEventListener('click', loadGame);\n});\n>>>>>>> END",
+      "blocks": 1,
+      "incomplete": false,
+      "outsideChars": 0,
+      "applyResults": [
+        {
+          "status": "NOT_FOUND",
+          "count": 0
+        }
+      ],
+      "outcome": "EDIT_NOT_APPLICABLE"
+    },
+    {
+      "round": 3,
+      "kind": "repair attempt",
+      "generationMs": 4782,
+      "outputTokens": 335,
+      "promptTokens": 1365,
+      "termination": "stop",
+      "evidenceGiven": "It does not work. Repair it.\n\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n        const gridSize = 32;\n        const player = { x: 0, y: 0 };\n        const tiles = {};\n        const inventory = { seeds: 5, crops: 0 };\n        let day = 0;\n\n        function drawPlayer() {\n            ctx.fillStyle = 'green';\n            ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize, gridSize);\n        }\n\n        function drawTile(x, y, crop, stage) {\n            ctx.fillStyle = crop === 'seed' ? 'yellow' : 'green';\n            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Stage: ${stage}`, x * gridSize + 10, y * gridSize + 20);\n        }\n\n        function dra",
+      "rawReply": "<<<<<<< FIND\ndocument.addEventListener('keydown', movePlayer);\n// p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\ndocument.getElementById('plant').addEventListener('click', plantSeed);\n// a advances time: day++; draw();\ndocument.getElementById('advance').addEventListener('click', advanceTime);\n// h harvests: if the player's tile is a wheat plant and inventory.crops < 10, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.crops++; otherwise change nothing.\ndocument.getElementById('harvest').addEventListener('click', harvestCrop);\n// s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\ndocument.getElementById('save').addEventListener('click', saveGame);\n// l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();\ndocument.getElementById('load').addEventListener('click', loadGame);\n=======\ndocument.addEventListener('DOMContentLoaded', () => {\n    document.addEventListener('keydown', movePlayer);\n    document.getElementById('plant').addEventListener('click', plantSeed);\n    document.getElementById('advance').addEventListener('click', advanceTime);\n    document.getElementById('harvest').addEventListener('click', harvestCrop);\n    document.getElementById('save').addEventListener('click', saveGame);\n    document.getElementById('load').addEventListener('click', loadGame);\n});\n>>>>>>> END",
+      "blocks": 1,
+      "incomplete": false,
+      "outsideChars": 0,
+      "applyResults": [
+        {
+          "status": "NOT_FOUND",
+          "count": 0
+        }
+      ],
+      "outcome": "EDIT_NOT_APPLICABLE"
+    }
+  ],
+  "accepted": false,
+  "totals": {
+    "repairRounds": 3,
+    "generationSeconds": 23.9,
+    "outputTokens": 1005,
+    "wallClockSeconds": 53.8
+  },
+  "assistance": {
+    "evidenceIsMachineCaptured": true,
+    "humanAnalysisSupplied": false,
+    "editFormatGivenByHarness": true,
+    "fuzzyMatchingAllowed": false
+  },
+  "finalPlay": [],
+  "finalDisposition": "RESTORED"
+}
