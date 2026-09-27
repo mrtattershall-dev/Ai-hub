@@ -144,6 +144,37 @@ export async function evaluate(workspace, task, { timeoutSec = 120, image = WORK
       // A PLAY spec: the declared browser play (playCheck.js) against the candidate, in the
       // machine's headless Chrome - the candidate's JS runs in the browser sandbox, not in the
       // worker container. requested = every listed step; protected = the steps it names.
+      // SEVERAL SEQUENCES, EACH FROM A FRESH LOAD. Accumulated requirements cannot be concatenated
+      // into one sequence: these plays are stateful, so running the seed-exhaustion sequence and then
+      // a planting sequence would fail a perfectly good page. Each accumulated requirement is its own
+      // play, run independently, and ALL must pass.
+      if (spec.plays) {
+        const { playCheck } = await import('./playCheck.js');
+        const results = [];
+        let allOk = true, apparatus = null;
+        for (const entry of spec.plays) {
+          try {
+            const r = await playCheck(workspace, entry.spec, { timeoutMs: timeoutSec * 1000 });
+            if (r.status !== 'OK') { apparatus = `the ${kind} play from ${entry.from} could not run: ${r.reason}`; break; }
+            const needed = Array.isArray(entry.steps) && entry.steps.length ? entry.steps : (entry.spec.steps || []).map((x) => x.n);
+            const ok = needed.every((n) => r.passing.has(n));
+            if (!ok) allOk = false;
+            results.push({ from: entry.from, verdict: ok ? VERDICT.PASS : VERDICT.FAIL, steps: needed, passing: [...r.passing], failing: [...r.failing], errors: (r.errors || []).length });
+          } catch (e) {
+            apparatus = `the ${kind} play from ${entry.from} threw: ${String(e.message || e).slice(0, 160)}`;
+            break;
+          }
+        }
+        if (apparatus) { parts[kind] = { verdict: VERDICT.EVALUATION_ERROR, reason: apparatus, sequences: results }; continue; }
+        parts[kind] = {
+          verdict: allOk ? VERDICT.PASS : VERDICT.FAIL,
+          exit: allOk ? 0 : 1,
+          sequences: results,
+          isolation: 'headless browser on the host (not the worker container)',
+          out: results.map((r) => `${r.from}: ${r.verdict} passing [${r.passing.join(',')}] failing [${r.failing.join(',')}]`).join('\n'),
+        };
+        continue;
+      }
       if (spec.play) {
         try {
           const { playCheck } = await import('./playCheck.js');

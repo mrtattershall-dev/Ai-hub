@@ -14,6 +14,10 @@
  *   P6  ESCALATION - if the page throws at load the site was wrong, so switch rules; if the failure is
  *       behavioural, keep the site and spend the remaining seeds
  *
+ * AND THE BOUNDARY IS STRUCTURAL. A completion is refused when its own shape says it cannot sit in the
+ * slot: it closes blocks it did not open, ends mid-block, registers a listener, or exceeds the slot's
+ * line budget. ASSIST-2 is why - its boundary depended on the model reproducing a suffix line.
+ *
  * WHAT IT DOES NOT DECIDE: the requirement, the checks, or whether a candidate is acceptable. Those are
  * the task's and the gate's.
  *
@@ -157,7 +161,7 @@ async function main() {
   const { applyAcceptance } = await import('./acceptance.js');
   const { playCheck } = await import('./playCheck.js');
   const { judgeCandidate } = await import('./judgeCandidate.mjs');
-  const { cutRegion, trimInfillTail } = await import('./localEdit.mjs');
+  const { cutRegion, containToSlot } = await import('./localEdit.mjs');
 
   const task = farmTasks().find((t) => t.id === TASK_ID);
   if (!task) { console.error(`unknown task ${TASK_ID}`); process.exit(2); }
@@ -207,18 +211,25 @@ async function main() {
         const startRef = (await git(ws, ['rev-parse', 'HEAD'])).stdout.trim();
 
         const gen = await infill(cut.prefix + instruction + '\n', cut.suffix, seed);
-        const trimmed = trimInfillTail(String(gen.text || ''), cut.suffix);
-        const middle = trimmed.text;
+        const middle = String(gen.text || '');
         const rec = { choice, seed, rule: site.rule, generationMs: gen.ms, outputTokens: gen.outTok ?? null, boundaries: {}, timing: {} };
-        rec.rawReply = String(gen.text || '').slice(0, 4000);
+        rec.rawReply = middle.slice(0, 4000);
         rec.middleUsed = middle.slice(0, 2000);
-        rec.trimmed = trimmed.trimmed ? trimmed.trimmedAt : false;
-        if (!middle.trim().length) {
-          rec.outcome = 'NO_CODE'; out.attempts.push(rec);
-          console.log(`  seed ${seed}: no code produced`);
+        // STRUCTURAL CONTAINMENT, not trimming. ASSIST-2's boundary depended on the model reproducing a
+        // line of the suffix; it wrote a different one and 4,000 characters of invented handlers were
+        // accepted. A completion whose own shape says it cannot sit in the slot is now REFUSED, and
+        // nothing is cut into place to hide that the answer overshot the question.
+        const contained = containToSlot(middle, { maxLines: 20 });
+        rec.containment = contained;
+        if (!contained.ok) {
+          rec.outcome = `REFUSED_${contained.reason}`;
+          out.attempts.push(rec);
+          console.log(`  seed ${seed}: REFUSED - ${contained.reason}: ${contained.detail}`);
           continue;
         }
-        const candidate = cut.prefix + instruction + '\n' + middle + cut.suffix;
+        if (contained.truncatedAtLine) console.log(`  seed ${seed}: ${contained.how}`);
+        rec.middleUsed = contained.text.slice(0, 2000);
+        const candidate = cut.prefix + instruction + '\n' + contained.text + cut.suffix;
         writeFileSync(join(ws, ENTRY), candidate.endsWith('\n') ? candidate : candidate + '\n', 'utf8');
         await git(ws, ['add', '-A']);
         await git(ws, ['-c', 'user.email=g@g', '-c', 'user.name=g', 'commit', '-q', '-m', 'candidate']).catch((e) => {

@@ -74,7 +74,15 @@ async function judge(label, html, spec) {
 console.log('=== the task supplies a requirement and checks, not a site ===');
 say(!!task.requirement && task.requirement.trigger.key === 't', 'the requirement names the trigger key and the effects');
 say(!/addEventListener|plantSeed|advanceTime|line \d+/.test(task.goal), 'and the goal names no site, function or line');
-say(task.protected.play.steps.join() === '1,2,3', 'planting and movement are the protected set');
+// The protected set is now an ACCUMULATION of independent sequences, not one hand-picked list: the
+// previously accepted planting requirement in full, plus this task's own preserved subset. ASSIST-2 was
+// accepted while breaking planting precisely because this was a hand-picked list of three steps.
+say(Array.isArray(task.protected.plays) && task.protected.plays.length === 2,
+  `the protected set is accumulated, as independent sequences (${task.protected.plays.length})`);
+say(task.protected.plays.some((p) => p.from === 'farm-plant-v2' && p.steps.length === 7),
+  'it carries the whole previously accepted planting requirement, all seven steps');
+say(task.protected.plays.some((p) => p.steps.join() === '1,2,3'),
+  "and this task's own preserved subset");
 
 console.log('\n=== the correct implementation, and the page it starts from ===');
 {
@@ -101,8 +109,12 @@ console.log('\n=== one mutant per way growth can be wrong ===');
   say([...c.failing].includes(4), 'creating a tile as a side effect FAILS step 4, at the first press');
   const d = await judge('grows but forgets the day', FORGETS_DAY, task.diagnostic.spec);
   say([...d.failing].includes(4), 'growing without advancing the day FAILS step 4');
-  const e = await judge('growth added, planting broken', BREAKS_PLANTING, task.protected.play.spec);
-  say([...e.failing].includes(3), 'breaking planting while adding growth FAILS the PROTECTED set');
+  const plantSeq = task.protected.plays.find((p) => p.from === 'farm-plant-v2');
+  const e = await judge('growth added, planting broken', BREAKS_PLANTING, plantSeq.spec);
+  // Under the ACCUMULATED protected set this mutant is judged by the planting requirement's own
+  // numbering, where planting is step 4 and seed exhaustion is step 6 - not the grow spec's step 3.
+  say([...e.failing].length > 0 && [...e.failing].includes(4),
+    `breaking planting while adding growth FAILS the accumulated planting requirement, at step(s) ${[...e.failing].join(',')}`);
 }
 
 console.log(`\n  farm-grow spec: ${passed} passed, ${failed} failed -> ${failed ? 'THE FRESH TASK IS NOT VALIDATED' : 'every way growth can be wrong has a check that catches it, and the site is not supplied'}`);

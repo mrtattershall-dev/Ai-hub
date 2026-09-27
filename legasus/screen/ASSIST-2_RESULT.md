@@ -60,16 +60,26 @@ seeds run out — was accepted work, and it was not in that set. **The increment
 elsewhere is that the protected set is the union of every previously accepted check, and I did not
 apply it here.** The gate behaved exactly as instructed; the instruction was wrong.
 
-**3. Neither of these is the policy's fault.** The site, the scaffold and the instruction were all
-sound, and the scaffold's one judgement call — no tile-key line, because this requirement is about every
-tile rather than the player's — was correct and is the opposite of what the previous task needed.
+**3. The policy's own three decisions were sound** — the site, the scaffold and the instruction, including
+the judgement call to supply no tile-key line because this requirement is about every tile rather than
+the player's, which is the opposite of what the previous task needed.
+
+CORRECTED after review: I first wrote that "neither of these is the policy's fault", which draws the
+boundary too narrowly. **The output limit and the choice of protected checks are parts of the system
+being evaluated**, not context around it. Attributing the failure away from "the policy" while the
+system as a whole accepted a regression is the same move as calling a harness defect a model limit.
+**The system failed here.** Which component failed is useful for fixing it and is not a defence.
 
 ## So what does this establish
 
 - **The milestone's condition held: zero interventions.** The system chose the scope, wrote the
   scaffold, wrote the instruction, and working growth logic came out, verified through three paths with
-  no errors. On the axes that were frozen in advance it beat the hand-guided run: 2 attempts against 15,
-  126 seconds against 766.
+  no errors.
+- **The 2-against-15 comparison is NOT an efficiency result** (corrected after review): the tasks differ
+  and this run inherited the preparation ASSIST-1 paid for. The two are not comparable on effort.
+- **The task was fresh; the page informed the rules** (corrected after review). R2 fired because I had
+  read this page when writing the rule. This is automatic application on that page, not independent
+  generalisation.
 - **But the result is not a clean pass**, because the accepted page carries a regression and a heap of
   junk. **An acceptance gate that only checks the behaviours it was given will accept an incoherent
   change**, and this one did.

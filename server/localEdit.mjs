@@ -212,6 +212,113 @@ export function parseEditBlocks(reply) {
 }
 
 /**
+ * STRUCTURAL CONTAINMENT. Does this completion fit the slot it was given - judged by its own shape,
+ * not by whether the model happened to reproduce a line of the suffix?
+ *
+ * ASSIST-2 is why this exists. The slot was one line inside a listener the policy had just written. The
+ * completion began correctly, then closed the listener and appended twenty more, doubling the file and
+ * silently breaking a previously accepted behaviour. The trim did not catch it because it cut at the
+ * first line of the suffix and the model wrote `draw();` where the suffix said
+ * `try { draw(); } catch ...`. Relying on the model to reproduce a particular line is not containment.
+ *
+ * So the completion is REFUSED - not trimmed, not repaired - when it cannot be contained:
+ *
+ *   ESCAPES_ENCLOSING_BLOCK   it closes more blocks than it opens, so it reaches outside its slot
+ *   UNBALANCED                it ends mid-block, so splicing it leaves broken syntax
+ *   ADDS_A_LISTENER           it registers an event listener: the slot is a body, and the scaffold
+ *                             already supplies whatever binding was wanted
+ *   TOO_LARGE                 it exceeds the line budget for the slot
+ *
+ * Refusing is the point. A completion that cannot be contained is not evidence about the model's logic,
+ * and quietly cutting it into shape hides the fact that it did not answer the question asked.
+ */
+export function containsSafely(middle, { maxLines = 20 } = {}) {
+  const raw = String(middle ?? '');
+  const lines = raw.split('\n');
+  const code = lines.filter((l) => l.trim().length && !l.trim().startsWith('//'));
+  if (!code.length) return { ok: false, reason: 'EMPTY', detail: 'no code in the completion' };
+  if (code.length > maxLines) {
+    return { ok: false, reason: 'TOO_LARGE', detail: `${code.length} code lines for a slot budgeted at ${maxLines}` };
+  }
+  if (/addEventListener\s*\(/.test(raw)) {
+    return { ok: false, reason: 'ADDS_A_LISTENER', detail: 'the completion registers an event listener; the slot is a body and the scaffold already supplies the binding' };
+  }
+  // Depth over the whole completion, ignoring braces inside strings, template literals and comments.
+  let depth = 0, min = 0;
+  const stripped = raw
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n').map((l) => l.replace(/\/\/.*$/, '')).join('\n')
+    .replace(/`(?:\\.|[^`\\])*`/g, '``')
+    .replace(/'(?:\\.|[^'\\])*'/g, "''")
+    .replace(/"(?:\\.|[^"\\])*"/g, '""');
+  for (const ch of stripped) {
+    if (ch === '{' || ch === '(' || ch === '[') depth++;
+    else if (ch === '}' || ch === ')' || ch === ']') { depth--; if (depth < min) min = depth; }
+  }
+  if (min < 0) {
+    return { ok: false, reason: 'ESCAPES_ENCLOSING_BLOCK', detail: `the completion closes ${-min} more block(s) than it opens, so it reaches outside its slot` };
+  }
+  if (depth !== 0) {
+    return { ok: false, reason: 'UNBALANCED', detail: `the completion ends ${depth} block(s) deep, so splicing it would leave broken syntax` };
+  }
+  return { ok: true, codeLines: code.length, maxLines };
+}
+
+/**
+ * CONTAIN THE COMPLETION TO ITS SLOT, structurally.
+ *
+ * Two findings forced this shape. ASSIST-2: a boundary that cut at the first line of the suffix failed
+ * because the model wrote `draw();` where the suffix said `try { draw(); } catch ...`, and 4,000
+ * characters of invented handlers were accepted. ASSIST-4: refusing every over-long completion outright
+ * was safe and useless - all eight attempts were refused, because this model always writes past a small
+ * slot even when its first few lines are exactly right.
+ *
+ * So the cut is made on STRUCTURE, never on a line the model has to reproduce: the completion is
+ * truncated at the first point where it would close a block it did not open - the point where it leaves
+ * its slot. What remains is then checked, and REFUSED rather than repaired if it still cannot sit there.
+ *
+ *   truncated   at the escape point, if any - reported, with how much was dropped
+ *   refused     EMPTY, UNBALANCED, ADDS_A_LISTENER, or TOO_LARGE after truncation
+ *
+ * A completion whose FIRST statement already escapes is refused, not truncated to nothing.
+ */
+export function containToSlot(middle, { maxLines = 20 } = {}) {
+  const raw = String(middle ?? '');
+  const lines = raw.split('\n');
+  // Depth per line, computed over text with strings, template literals and comments removed so a brace
+  // inside a string cannot be mistaken for structure.
+  const strip = (t) => t
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\/.*$/g, '')
+    .replace(/`(?:\\.|[^`\\])*`/g, '``')
+    .replace(/'(?:\\.|[^'\\])*'/g, "''")
+    .replace(/"(?:\\.|[^"\\])*"/g, '""');
+  let depth = 0, escapeLine = -1;
+  for (let i = 0; i < lines.length; i++) {
+    for (const ch of strip(lines[i])) {
+      if (ch === '{' || ch === '(' || ch === '[') depth++;
+      else if (ch === '}' || ch === ')' || ch === ']') {
+        depth--;
+        if (depth < 0) { escapeLine = i; break; }
+      }
+    }
+    if (escapeLine !== -1) break;
+  }
+  const kept = escapeLine === -1 ? raw : lines.slice(0, escapeLine).join('\n');
+  const dropped = escapeLine === -1 ? 0 : lines.length - escapeLine;
+  const verdict = containsSafely(kept, { maxLines });
+  if (!verdict.ok) {
+    return { ok: false, reason: verdict.reason, detail: verdict.detail, truncatedAtLine: escapeLine === -1 ? null : escapeLine + 1, droppedLines: dropped };
+  }
+  return {
+    ok: true, text: kept, codeLines: verdict.codeLines,
+    truncatedAtLine: escapeLine === -1 ? null : escapeLine + 1,
+    droppedLines: dropped,
+    how: escapeLine === -1 ? 'the completion stayed inside its slot' : `truncated at the point where it would have closed a block it did not open (line ${escapeLine + 1}), dropping ${dropped} line(s)`,
+  };
+}
+
+/**
  * INDENTATION-TOLERANT, FILE-ANCHORED MATCHING. Opt-in, and the distinction matters.
  *
  * REPAIR-1: the 7B located the right region in 4 of 4 candidates and every edit was refused, because

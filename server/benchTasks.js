@@ -235,6 +235,8 @@ export function farmTasks() {
   // protected.
   const growPath = join(FARM_DIR, 'play-grow.json');
   if (existsSync(growPath)) {
+    // Every requirement already accepted, looked up rather than restated.
+    const v2Task = out.find((t) => t.id === 'farm-plant-v2');
     const g = JSON.parse(readFileSync(growPath, 'utf8'));
     const sub = (steps) => ({ ...g, name: `grow-steps-${steps.join('')}`, steps: g.steps.filter((x) => steps.includes(x.n)) });
     const requested = [1, 2, 3, 4, 5, 6];
@@ -251,9 +253,29 @@ export function farmTasks() {
       },
       seed: {},
       requested: { play: { spec: sub(requested), steps: requested } },
-      protected: { play: { spec: sub(protectedSteps), steps: protectedSteps } },
+      // THE PROTECTED SET IS COMPUTED, NOT CHOSEN. ASSIST-2 was accepted while breaking a previously
+      // accepted behaviour - planting stops when seeds run out - because I hand-picked three protected
+      // steps and that behaviour was not among them. The protected set is now the UNION of every
+      // previously accepted requirement plus this task's own preserved subset, and each accumulated
+      // requirement runs as its OWN sequence from a fresh load.
+      //
+      // INTENTIONAL CHANGES are explicit: `supersedes` names a requirement that a later one replaces,
+      // with the reason, so dropping a check is always a recorded decision rather than an omission.
+      accumulates: ['farm-plant-v2'],
+      supersedes: [{
+        requirement: 'farm-plant',
+        replacedBy: 'farm-plant-v2',
+        reason: 'the same planting requirement with the no-error clause added; checking both would test the same behaviour twice',
+      }],
+      protected: {
+        plays: [
+          ...(v2Task ? [{ from: 'farm-plant-v2', spec: v2Task.requested.play.spec, steps: v2Task.requested.play.steps }] : []),
+          { from: 'farm-grow (its own preserved subset)', spec: sub(protectedSteps), steps: protectedSteps },
+        ],
+      },
       diagnostic: { kind: 'play', spec: sub(requested), timeoutSec: 90 },
-      upstreamCases: requested.length, protectedCases: protectedSteps.length,
+      upstreamCases: requested.length,
+      protectedCases: protectedSteps.length + (v2Task ? v2Task.requested.play.steps.length : 0),
     });
   }
 
