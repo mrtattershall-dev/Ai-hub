@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farming Game</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="day"></div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 32;
+        const player = { x: 0, y: 0 };
+        const tiles = {};
+        const inventory = { seeds: 5, crops: 0 };
+        let day = 0;
+
+        function drawPlayer() {
+            ctx.fillStyle = 'green';
+            ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize, gridSize);
+        }
+
+        function drawTile(x, y, crop, stage) {
+            ctx.fillStyle = crop === 'seed' ? 'yellow' : 'green';
+            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+            ctx.fillStyle = 'black';
+            ctx.font = '12px Arial';
+            ctx.fillText(`Stage: ${stage}`, x * gridSize + 10, y * gridSize + 20);
+        }
+
+        function drawInventory() {
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(0, 0, 100, 100);
+            ctx.fillStyle = 'black';
+            ctx.font = '12px Arial';
+            ctx.fillText(`Seeds: ${inventory.seeds}`, 10, 20);
+            ctx.fillText(`Crops: ${inventory.crops}`, 10, 40);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            for (const [key, value] of Object.entries(tiles)) {
+                drawTile(key.split(',')[0], key.split(',')[1], value.crop, value.stage);
+            }
+            drawInventory();
+            document.getElementById('day').textContent = `Day: ${day}`;
+        }
+
+        function movePlayer(event) {
+            const dx = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;
+            const dy = event.key === 'ArrowUp' ? -1 : event.key === 'ArrowDown' ? 1 : 0;
+            const newX = player.x + dx;
+            const newY = player.y + dy;
+            if (newX >= 0 && newX < 20 && newY >= 0 && newY < 15) {
+                player.x = newX;
+                player.y = newY;
+                draw();
+            }
+        }
+
+        function plantSeed() {
+            const tileKey = `${player.x},${player.y}`;
+            if (!tiles[tileKey]) {
+                tiles[tileKey] = { crop: 'seed', stage: 1 };
+                draw();
+            }
+        }
+
+        function advanceTime() {
+            day++;
+            draw();
+        }
+
+        function harvestCrop() {
+            const tileKey = `${player.x},${player.y}`;
+            if (tiles[tileKey] && tiles[tileKey].crop === 'seed') {
+                tiles[tileKey] = { crop: 'empty', stage: 0 };
+                inventory.seeds++;
+                inventory.crops--;
+                draw();
+            }
+        }
+
+        function saveGame() {
+            localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));
+        }
+
+        function loadGame() {
+            const savedGame = JSON.parse(localStorage.getItem('game'));
+            player = savedGame.player;
+            tiles = savedGame.tiles;
+            inventory = savedGame.inventory;
+            day = savedGame.day;
+            draw();
+        }
+
+        document.addEventListener('keydown', movePlayer);
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'p') return;
+            const k = `${player.x},${player.y}`;
+// on an empty tile with seeds left: tiles[k] = { crop: 'wheat', stage: 0 } and inventory.seeds--; otherwise change nothing.
+            if (!tiles[k] && inventory.seeds > 0) {
+                tiles[k] = { crop: 'wheat', stage: 0 };
+                inventory.seeds--;
+            }
+            draw();
+        });
+
+        window.game = { state: () => JSON.parse(JSON.stringify({ player, tiles, inventory, day })) };
+    </script>
+</body>
+</html>

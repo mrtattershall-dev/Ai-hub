@@ -1,0 +1,56 @@
+--- round2 seed 1 2026-09-27T10:24:26Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=1  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E1c inserts non-comment YES  (23 non-comment / 0 comment lines)
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  edit: undefined block(s), outside=undefined chars
+  chars=3618 outTok=800 promptTok=936 gen=77669ms
+  play: OK passing [] failing [1,2,3,4,5,6]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/assist/r2_seed1.json
+--- round2 seed 2 2026-09-27T10:26:19Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=2  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E1c inserts non-comment YES  (74 non-comment / 0 comment lines)
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  edit: undefined block(s), outside=undefined chars
+  chars=3234 outTok=800 promptTok=936 gen=80088ms
+  play: OK passing [] failing [1,2,3,4,5,6]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/assist/r2_seed2.json
+--- round2 seed 3 2026-09-27T10:28:22Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=3  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E1c inserts non-comment YES  (15 non-comment / 0 comment lines)
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  edit: undefined block(s), outside=undefined chars
+  chars=3138 outTok=800 promptTok=936 gen=77739ms
+  play: OK passing [] failing [1,2,3,4,5,6]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/assist/r2_seed3.json
+--- round2 seed 4 2026-09-27T10:30:13Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=4  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E1c inserts non-comment YES  (21 non-comment / 0 comment lines)
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  edit: undefined block(s), outside=undefined chars
+  chars=866 outTok=176 promptTok=936 gen=25223ms
+  play: OK passing [1,2,3,5] failing [4,6]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/assist/r2_seed4.json
+--- round2 seed 5 2026-09-27T10:31:08Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=5  termination=length natural=NO
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E1c inserts non-comment YES  (147 non-comment / 0 comment lines)
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  edit: undefined block(s), outside=undefined chars
+  chars=4569 outTok=800 promptTok=936 gen=75396ms
+  play: OK passing [] failing [1,2,3,4,5,6]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/assist/r2_seed5.json
+round 2 exit 0

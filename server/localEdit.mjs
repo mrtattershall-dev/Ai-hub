@@ -355,15 +355,27 @@ export function nonCommentContent(text) {
  * This is deterministic, it never adds anything, and it is ASSISTANCE - recorded per run as
  * fimTailTrimmed with what was dropped.
  */
-export function trimInfillTail(middle) {
+export function trimInfillTail(middle, suffix = null) {
   const lines = String(middle ?? '').split('\n');
   const closes = /^\s*(<\/script>|<\/body>|<\/html>)/i;
-  const at = lines.findIndex((l) => closes.test(l));
+  // THE SAME ERROR, ONE LEVEL IN. The model also runs past a SMALL hole by re-emitting the lines that
+  // already follow it: given a hole inside a handler, it wrote 15 to 147 lines and re-closed the
+  // handler, so the spliced file had the suffix twice and the page broke 4 times in 5. The first line
+  // of the suffix is therefore a boundary too, and cutting there is the same deterministic rule as
+  // cutting at a closing </script> - it removes what the harness already supplies and never adds.
+  const suffixFirst = suffix === null ? null
+    : (String(suffix).split('\n').map((l) => l.trim()).find((l) => l.length) ?? null);
+  let at = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (closes.test(lines[i])) { at = i; break; }
+    if (suffixFirst && i > 0 && lines[i].trim() === suffixFirst) { at = i; break; }
+  }
   if (at === -1) return { text: String(middle ?? ''), trimmed: false, droppedLines: 0, dropped: '' };
   return {
     text: lines.slice(0, at).join('\n'),
     trimmed: true,
     droppedLines: lines.length - at,
+    trimmedAt: closes.test(lines[at]) ? 'document close' : 'the first line of the suffix',
     dropped: lines.slice(at).join('\n').slice(0, 300),
   };
 }
@@ -465,7 +477,7 @@ async function main() {
       const cut = cutRegion(startFile, REGION_FROM, REGION_TO);
       let middle = String(gen.text || '');
       if (TRIM_TAIL) {
-        const t = trimInfillTail(middle);
+        const t = trimInfillTail(middle, cutRegion(startFile, REGION_FROM, REGION_TO).suffix);
         rec.fimTailTrimmed = { trimmed: t.trimmed, droppedLines: t.droppedLines, dropped: t.dropped };
         middle = t.text;
       }
