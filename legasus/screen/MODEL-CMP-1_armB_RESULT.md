@@ -142,11 +142,16 @@ better one.
                              SEAM_MISSING               no throw, but the declared accessor is absent
                              BEHAVIOUR                  loaded and readable; the step verdicts mean
                                                         what they say
-                           plus `initializationCompleted`, which is a CONJUNCTION that can be false:
-                           the seam is the LAST statement in the file, so state being readable AND
-                           no page error having been raised together establish that execution reached
-                           the end. The seam therefore STAYS LAST; hoisting it would destroy exactly
-                           the property that makes this checkable.
+                           plus `noFailureObservedDuringInit`, which is an OPERATIONAL CHECK and not
+                           proof. CORRECTED after review: a readable accessor plus no captured page
+                           error establishes only that no failure was observed up to the point of
+                           measurement. It would be proof of completed initialization only if
+                           readiness were established explicitly, and it is not - a candidate may
+                           define the accessor anywhere, throw later inside a deferred callback, or
+                           swallow its own error. The record now also carries
+                           `initializationCompletedIsEstablished: false` so the stronger reading
+                           cannot be taken by accident. The seam still stays last; hoisting it would
+                           weaken the check further.
     tested                 four shapes classify correctly (arm B's own, a missing seam with no
                            throw, a genuine behaviour failure, and a clean pass)
 

@@ -82,14 +82,14 @@ function injectedRegion(candidateFile) {
   return text.slice(from, eol);
 }
 
-async function run(label, replies, candidate = join(SCREEN, 'MODEL-CMP-1_armB_seed3.json'), rounds = 3) {
+async function run(label, replies, candidate = join(SCREEN, 'MODEL-CMP-1_armB_seed3.json'), rounds = 3, extra = []) {
   const { srv, port, seen } = await fakeModel(replies);
   const dir = mkdtempSync(join(tmpdir(), `rl-${label}-`));
   const out = join(dir, 'r.json');
   await new Promise((resolve) => {
     const p = spawn(process.execPath, [join(HERE, 'repairLoop.mjs'), '--model-url', `http://127.0.0.1:${port}`,
       '--model', 'fake', '--task', 'farm-plant', '--candidate', candidate, '--max-rounds', String(rounds),
-      '--seed', '1', '--out', out], { stdio: ['ignore', 'pipe', 'pipe'] });
+      '--seed', '1', '--out', out, ...extra], { stdio: ['ignore', 'pipe', 'pipe'] });
     let o = ''; p.stdout.on('data', (d) => { o += d; }); p.stderr.on('data', (d) => { o += d; });
     p.on('exit', () => { console.log(o.split('\n').filter(Boolean).map((l) => '        ' + l).join('\n')); resolve(); });
   });
@@ -148,6 +148,50 @@ console.log('\n=== 3. a repair that breaks the protected behaviour is rolled bac
   const r2 = rec?.rounds?.find((r) => r.round === 2);
   say(!!r2, 'the loop continues to a further round');
   say(r2?.outcome === 'ACCEPTED' || r2?.blocks > 0, 'and round 2 can still edit the candidate, because the repair subject survived the revert');
+}
+
+console.log('\n=== 4. an identical reply ends the loop instead of being paid for again ===');
+{
+  // REPAIR-1 sent the same evidence over the same file three times and got the same refused patch
+  // three times. Either a repeated (file, evidence) pair or a repeated reply must stop the loop.
+  const { rec } = await run('norepeat', [block('a line that is nowhere in the file', 'x')], undefined, 3);
+  const stopped = rec?.rounds?.find((r) => r.outcome === 'NO_NEW_INFORMATION');
+  say(!!stopped, `the loop stops itself with NO_NEW_INFORMATION (round ${stopped?.round})`);
+  say(rec?.totals?.repairRounds < 3, `and does not spend the full budget (${rec?.totals?.repairRounds} rounds, not 3)`);
+  say(/identical|already sent/.test(stopped?.reason || ''), `with the reason recorded: ${JSON.stringify((stopped?.reason || '').slice(0, 60))}`);
+}
+
+console.log('\n=== 5. the original text, the applied diff and the match rule are all retained ===');
+{
+  const { rec } = await run('retain', [block(injectedRegion(join(SCREEN, 'MODEL-CMP-1_armB_seed3.json')), FIXED)], undefined, 1);
+  const r1 = rec?.rounds?.find((r) => r.round === 1);
+  say(!!rec?.originalCandidate?.sha256 && rec.originalCandidate.chars > 1000, 'the ORIGINAL candidate is retained with its sha256');
+  say(!!r1?.before?.sha256, 'the text before the round is retained with its sha256');
+  say(/^@@ line \d+: -\d+ \+\d+ @@/.test(r1?.appliedDiff || ''), `the applied diff is retained (${(r1?.appliedDiff || '').split('\n')[0]})`);
+  say(/exactly ONCE/.test(r1?.matchRule || '') && /no guessing|No similarity/i.test(r1?.matchRule || ''),
+    'the match rule is recorded, including that nothing is guessed');
+}
+
+console.log('\n=== 6. the DOM evidence mode adds only facts read off the page ===');
+{
+  const { rec, seen } = await run('domev', [block('a line that is nowhere in the file', 'x')], undefined, 1, ['--evidence', 'dom']);
+  const prompt = JSON.stringify(seen[0]?.messages || []);
+  say(rec?.evidenceMode === 'dom' && rec?.assistance?.domFactsSupplied === true, 'the record says DOM facts were supplied');
+  // The prompt is inspected as JSON, so an embedded quote arrives as a backslash-quote pair. Match
+  // the id with the escaping allowed for, not against it.
+  say(/lookups returned nothing.{0,20}plant/.test(prompt), 'the failing selector is named');
+  say(/ids the document contained at that moment/.test(prompt) && /gameCanvas/.test(prompt), 'the ids present at the failure are given');
+  say(/once it has finished loading/.test(prompt) && /readyState complete/.test(prompt),
+    'and the ids present AFTER readiness, with the readyState - the fact that separates "not yet" from "not at all"');
+  const leaks = ['does not exist', 'never exists', 'no such button', 'keydown', 'decrement', 'rewire'];
+  const candidateText = JSON.parse(readFileSync(join(SCREEN, 'MODEL-CMP-1_armB_seed3.json'), 'utf8')).candidate.text;
+  let added = prompt;
+  for (const line of candidateText.split('\n')) {
+    const t = line.trim();
+    if (t.length > 8) added = added.split(JSON.stringify(t).slice(1, -1)).join(' ');
+  }
+  const found = leaks.filter((w) => new RegExp(w, 'i').test(added));
+  say(found.length === 0, `and still none of my analysis${found.length ? ' -- LEAKED: ' + found.join(', ') : ''}`);
 }
 
 console.log(`\n  repair loop: ${passed} passed, ${failed} failed -> ${failed ? 'THE LOOP IS NOT ESTABLISHED' : 'a correct repair reaches RETAIN, the evidence carries no human analysis, and damage is rolled back between rounds'}`);

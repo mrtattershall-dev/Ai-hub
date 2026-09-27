@@ -1,4 +1,4 @@
-# REPAIR-1 and REPAIR-2 — the model was never given evidence that could select the right fix. 0 of 4 repaired, and one round moved a page from unobservable to observable.
+# REPAIR-1 and REPAIR-2 — 0 of 4 repaired. Two blockers were observed: the applier refused the model's transcription, and the error text did not distinguish "not there yet" from "not there at all".
 
 2026-09-27. Directed by Micheal; no cap was stated, and the bound was mine (4 candidates, at most 3
 rounds, stop at $0.50 of A10G). **Spent: $0.085 for REPAIR-1 and about $0.19 for REPAIR-2, so $0.28
@@ -88,11 +88,42 @@ file was in the prompt, and reading it would have settled the question — but n
 pointed at the document's contents. **This is the sharpest thing either run establishes: feeding back
 the error text alone selects a plausible repair family, not the right one.**
 
+CORRECTED after review: an earlier summary said this "located exactly why" the repairs failed. It
+does not. **These are the blockers that were OBSERVED** — a refused transcription, and an error
+message that underdetermines its own fix — **and observing them does not enumerate every cause.**
+Removing both could leave the repair failing for reasons no round has exposed yet: the handler
+semantics, the breadth of the edit required, the model's grasp of the negative clause, or something
+not yet named. What follows is a next experiment, not a diagnosis of the whole failure.
+
 The fix that follows is concrete, cheap and still machine-only: when a null-element error occurs,
 report the ids the document actually contains. That is a fact the harness can read off the page, not
 an analysis I would be supplying.
 
-## A latent defect in the accepted baseline, surfaced by a working candidate
+## The latent baseline defect, now reproduced on the untouched baseline
+
+**Reproduced directly** (`server/baselineValidity.mjs`): the untouched accepted increment-1 page
+raises **five** `Cannot set properties of null (setting 'textContent')` errors while performing
+`farm-i1`'s own required behaviour — the arrow-key movement it was accepted FOR — and still passes
+step 1, because step 1 is evaluated before any key is pressed.
+
+    farm-i1 (the spec it was accepted under)   passing [1,2,3]   errors raised during the run: 5
+    farm-plant (the current spec)              passing [1,2,3,5] errors raised during the run: 17
+
+**So the earlier acceptance rested on a check that could not see this: a test-coverage gap.** It is
+recorded as one, and the corrected check is **versioned rather than edited in place**:
+
+    farm-plant      UNCHANGED, 6 steps - every earlier result stays interpretable
+    farm-plant-v2   7 steps: the same, plus "no page or console error was raised at any point"
+
+`farmPlantV2Spec.test` 10/10 pins what that version is worth: the accepted baseline FAILS step 7; a
+correct planting handler alone STILL fails step 7, so step 7 is not a planting check in disguise;
+and supplying the missing `#day` element as well passes all seven, so the spec is satisfiable. The
+old spec still scores the baseline exactly as it did before.
+
+**Comparisons already under way stay on `farm-plant`.** Raising the bar mid-comparison would mix a
+second repair into the measurement.
+
+## How that defect first appeared: in a candidate's run
 
 The repaired page also logged four `Cannot set properties of null (setting 'textContent')` errors
 during movement. Those are **not the candidate's**: the accepted increment-1 page's own `draw()` ends

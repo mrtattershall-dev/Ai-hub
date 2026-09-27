@@ -53,6 +53,13 @@ const DEADLINE_MS = Math.max(10_000, parseFloat(opt('deadline-sec', '900')) * 10
 const OUT = opt('out', null);
 const MATCH = opt('match', 'exact');        // 'normalized' also accepts a FIND at the wrong indent
 if (!['exact', 'normalized'].includes(MATCH)) { console.error(`unknown --match ${MATCH}`); process.exit(2); }
+// EVIDENCE MODE, explicit so the comparison is a comparison. 'basic' is exactly what REPAIR-1 and
+// REPAIR-2 sent: the file, the error message, the contract. 'dom' adds the facts that separate "the
+// element is not there yet" from "it is not there at all" - the selector that came back null, the
+// ids the document actually had at that moment, the ids it had once ready, the readyState, and the
+// stack. All read off the page; none of it is anyone's opinion about the fix.
+const EVIDENCE = opt('evidence', 'basic');
+if (!['basic', 'dom'].includes(EVIDENCE)) { console.error(`unknown --evidence ${EVIDENCE}`); process.exit(2); }
 if (!CANDIDATE) { console.error('--candidate <record.json> is required: the UNTOUCHED candidate to repair'); process.exit(2); }
 
 const { farmTasks } = await import('./benchTasks.js');
@@ -97,8 +104,15 @@ function evidenceMessage(file, d, play, lastRefusal) {
   }
   if (d.failureClass === 'RUNTIME_EXCEPTION_AT_LOAD') {
     lines.push('When the page loads, it raises this error and stops running:', '',
-      ...d.loadErrors.map((e) => '    ' + e), '',
-      'Because the script stopped, this is also true:', '',
+      ...d.loadErrors.map((e) => '    ' + e), '');
+    if (EVIDENCE === 'dom' && d.dom) {
+      if ((d.stacks || []).length) lines.push('Where it was raised:', '', ...d.stacks.slice(0, 1).map((t) => '    ' + String(t).split('\n').join('\n    ')), '');
+      const look = (d.dom.nullLookups || []);
+      if (look.length) lines.push(`These element lookups returned nothing: ${look.map((x) => JSON.stringify(x)).join(', ')}`, '');
+      if (d.dom.idsAtFirstFailure) lines.push(`The ids the document contained at that moment: ${JSON.stringify(d.dom.idsAtFirstFailure)}`, '');
+      if (d.dom.idsAfterReady) lines.push(`The ids the document contains once it has finished loading (readyState ${d.dom.readyState || 'unknown'}): ${JSON.stringify(d.dom.idsAfterReady)}`, '');
+    }
+    lines.push('Because the script stopped, this is also true:', '',
       `    the page must expose the interface it declares: ${spec.contract}`, '',
       'Repair the cause of that error. Keep everything that already works.');
   } else if (d.failureClass === 'SEAM_MISSING') {
@@ -148,6 +162,20 @@ async function chat(messages) {
   return { ok: true, text, ms: Date.now() - t0, doneReason: aborted ? 'harness_deadline' : doneReason, outTok, promptTok };
 }
 
+/** A minimal line diff, enough to show exactly which lines an applied edit replaced. */
+function lineDiff(before, after) {
+  const a = String(before).split('\n'), b = String(after).split('\n');
+  let head = 0;
+  while (head < a.length && head < b.length && a[head] === b[head]) head++;
+  let tail = 0;
+  while (tail < a.length - head && tail < b.length - head && a[a.length - 1 - tail] === b[b.length - 1 - tail]) tail++;
+  const removed = a.slice(head, a.length - tail), added = b.slice(head, b.length - tail);
+  const out = [`@@ line ${head + 1}: -${removed.length} +${added.length} @@`];
+  for (const l of removed) out.push('- ' + l);
+  for (const l of added) out.push('+ ' + l);
+  return out.join('\n');
+}
+
 async function judge(ws, startRef) {
   const rec = { boundaries: {}, timing: {} };
   await judgeCandidate(ws, task, spec, startRef, rec, Date.now(), { playCheck, evaluate, applyAcceptance, join, readFileSync });
@@ -166,9 +194,12 @@ async function main() {
     candidateSource: CANDIDATE, candidateSha: sha(startFile), seed: SEED === null ? null : parseInt(SEED, 10),
     maxRounds: MAX_ROUNDS, rounds: [], accepted: false, totals: {},
     matchMode: MATCH,
+    evidenceMode: EVIDENCE,
+    originalCandidate: { sha256: null, chars: null },     // filled once the candidate is read
     assistance: {
       evidenceIsMachineCaptured: true,
       indentationToleranceByHarness: MATCH === 'normalized',
+      domFactsSupplied: EVIDENCE === 'dom',
       humanAnalysisSupplied: false,          // no rewiring, no corrected decrement, no DOM hint
       editFormatGivenByHarness: true,
       fuzzyMatchingAllowed: false,
@@ -177,6 +208,7 @@ async function main() {
   try {
     // The starting point for the ACCEPTANCE policy stays what it has always been: the accepted
     // increment-1 page. A repair that abandons movement is still a regression.
+    out.originalCandidate = { sha256: sha(startFile), chars: startFile.length, text: startFile.slice(0, 20000) };
     const baseline = readFileSync(join(dirname(CANDIDATE), 'NARROW-2_accepted_index.html'), 'utf8');
     writeFileSync(join(ws, ENTRY), baseline, 'utf8');
     await git(ws, ['init', '-q']); await git(ws, ['config', 'core.autocrlf', 'false']);
@@ -197,6 +229,10 @@ async function main() {
     if (judged.diagnosis.loadErrors.length) console.log(`         captured error: ${judged.diagnosis.loadErrors[0]}`);
 
     let genMs = 0, tokens = 0, lastRefusal = null;
+    // NO NEW INFORMATION. REPAIR-1 spent two thirds of its budget re-sending the same evidence over
+    // the same file and getting the same refused patch. A repeated (file, evidence) pair cannot
+    // produce anything new, and neither can a repeated reply, so either ends the loop.
+    const seenAsk = new Set(), seenReply = new Set();
     for (let round = 1; round <= MAX_ROUNDS && !judged.boundaries.accepted; round++) {
       // Re-read the play with cases, for the behavioural evidence.
       const beforeRound = current;
@@ -205,6 +241,13 @@ async function main() {
       writeFileSync(join(ws, ENTRY), current, 'utf8');
       const play = await playCheck(ws, spec, { timeoutMs: 90_000 });
       const msg = evidenceMessage(current, judged.diagnosis, play, lastRefusal);
+      const askKey = sha(current) + '|' + sha(msg);
+      if (seenAsk.has(askKey)) {
+        out.rounds.push({ round, kind: 'stopped', outcome: 'NO_NEW_INFORMATION', reason: 'this exact file and this exact evidence were already sent; a repeat cannot produce anything new' });
+        console.log(`round ${round}  STOPPED: same file, same evidence as an earlier round - no new information`);
+        break;
+      }
+      seenAsk.add(askKey);
       const gen = await chat([{ role: 'system', content: SYSTEM }, { role: 'user', content: msg }]);
       genMs += gen.ms || 0; tokens += gen.outTok || 0;
       const row = {
@@ -215,6 +258,15 @@ async function main() {
       };
       if (!gen.ok) { row.outcome = 'GENERATION_FAILED'; out.rounds.push(row); console.log(`round ${round}  generation failed: ${gen.reason}`); break; }
 
+      const replyKey = sha(String(gen.text || ''));
+      if (seenReply.has(replyKey)) {
+        row.outcome = 'NO_NEW_INFORMATION';
+        row.reason = 'the model returned a reply byte-identical to an earlier round';
+        out.rounds.push(row);
+        console.log(`round ${round}  STOPPED: reply identical to an earlier round - no new information`);
+        break;
+      }
+      seenReply.add(replyKey);
       const parsed = parseEditBlocks(gen.text);
       row.blocks = parsed.blocks.length; row.incomplete = parsed.incomplete; row.outsideChars = parsed.outside.length;
       if (!parsed.blocks.length) { row.outcome = 'NO_EDIT_PRODUCED'; out.rounds.push(row); console.log(`round ${round}  no edit block produced`); continue; }
@@ -231,6 +283,14 @@ async function main() {
         continue;
       }
 
+      // RETAIN BOTH SIDES. The record keeps the text before the round and a line-level diff of what
+      // the applied blocks actually did, so a reader never has to trust the harness's summary of an
+      // edit.
+      row.before = { sha256: sha(beforeRound), chars: beforeRound.length };
+      row.appliedDiff = lineDiff(beforeRound, applied.text).slice(0, 8000);
+      row.matchRule = MATCH === 'normalized'
+        ? 'a FIND matches only if its non-blank lines, each trimmed, appear as one contiguous run in the file and appear exactly ONCE; the FILE\'s lines are then replaced and the replacement re-indented to the file. No similarity scoring, no nearest match, no guessing which region was intended.'
+        : 'a FIND matches only as an exact substring beginning at the start of a line, and only if it appears exactly ONCE. No similarity scoring, no nearest match, no guessing which region was intended.';
       current = applied.text.endsWith('\n') ? applied.text : applied.text + '\n';
       writeFileSync(join(ws, ENTRY), current, 'utf8');
       await git(ws, ['add', '-A']);

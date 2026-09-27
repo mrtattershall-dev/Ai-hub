@@ -1,0 +1,98 @@
+{
+  "entry": "index.html",
+  "stateExpr": "window.game.state()",
+  "contract": "The page must expose window.game.state() returning { player: {x, y}, tiles: { 'x,y': { crop, stage } }, inventory: { seeds, crops }, day }.",
+  "steps": [
+    {
+      "n": 1,
+      "name": "loads with no page or console errors and exposes state",
+      "do": [],
+      "expect": "errors.length === 0 && state && state.player && typeof state.player.x === 'number' && typeof state.player.y === 'number' && state.tiles && state.inventory && typeof state.inventory.seeds === 'number'"
+    },
+    {
+      "n": 2,
+      "name": "ArrowRight moves the player right",
+      "do": [
+        {
+          "key": "ArrowRight",
+          "times": 3
+        }
+      ],
+      "expect": "state.player.x > before.player.x"
+    },
+    {
+      "n": 3,
+      "name": "ArrowDown moves the player down",
+      "do": [
+        {
+          "key": "ArrowDown",
+          "times": 2
+        }
+      ],
+      "expect": "state.player.y > before.player.y"
+    },
+    {
+      "n": 4,
+      "name": "p on an empty tile with seeds available creates a crop and spends exactly one seed",
+      "do": [
+        {
+          "key": "p"
+        }
+      ],
+      "expect": "(function(){ const k = state.player.x + ',' + state.player.y; const t = state.tiles[k]; return !!t && !(before.tiles || {})[k] && t.crop !== undefined && t.crop !== null && state.inventory.seeds === before.inventory.seeds - 1; })()"
+    },
+    {
+      "n": 5,
+      "name": "p again on the SAME tile leaves the state unchanged - no second crop, no second seed spent",
+      "do": [
+        {
+          "key": "p"
+        }
+      ],
+      "expect": "(function(){ const k = state.player.x + ',' + state.player.y; return state.inventory.seeds === before.inventory.seeds && JSON.stringify(state.tiles) === JSON.stringify(before.tiles); })()"
+    },
+    {
+      "n": 6,
+      "name": "with the seeds exhausted, p leaves the state unchanged",
+      "do": [
+        {
+          "key": "ArrowRight"
+        },
+        {
+          "key": "p"
+        },
+        {
+          "key": "ArrowRight"
+        },
+        {
+          "key": "p"
+        },
+        {
+          "key": "ArrowRight"
+        },
+        {
+          "key": "p"
+        },
+        {
+          "key": "ArrowRight"
+        },
+        {
+          "key": "p"
+        },
+        {
+          "key": "ArrowRight"
+        },
+        {
+          "key": "p"
+        }
+      ],
+      "expect": "(function(){ return state.inventory.seeds === 0 && Object.keys(state.tiles).length === before.inventory.seeds + Object.keys(before.tiles).length; })()"
+    },
+    {
+      "n": 7,
+      "name": "no page or console error was raised at any point during the run",
+      "do": [],
+      "expect": "noErrors"
+    }
+  ]
+}

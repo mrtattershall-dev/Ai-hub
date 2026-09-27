@@ -85,6 +85,14 @@ export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browse
   const { srv, port } = await serveDir(candidateDir);
   const url = `http://127.0.0.1:${port}/${spec.entry || 'index.html'}`;
   const errors = [];
+  const stacks = [];
+  // WHY THIS EXISTS. REPAIR-2: fed only "Cannot read properties of null (reading
+  // 'addEventListener')", the model applied the textbook fix for an element that is not there YET
+  // (defer to DOMContentLoaded) when the element is not there AT ALL. The message cannot tell those
+  // apart. These three facts can, and all three are read off the page rather than reasoned about:
+  // which ids were looked up and came back null, which ids the document actually has at that moment,
+  // and which it has once it is ready.
+  let dom = { nullLookups: [], idsAtFirstFailure: null, idsAfterReady: null };
   const cases = [];
   const lines = [];
   let browser = null;
@@ -100,7 +108,11 @@ export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browse
     // A favicon 404 surfaces as a console.error "Failed to load resource" on every page; the
     // HTTP filter below already names real 4xx/5xx on the page's own files. Same rule as test_web.
     page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/i.test(m.text())) errors.push(`[console.error] ${m.text()}`.slice(0, 300)); });
-    page.on('pageerror', (e) => errors.push(`[JS ERROR] ${String(e.message || e)}`.slice(0, 300)));
+    page.on('pageerror', (e) => {
+      errors.push(`[JS ERROR] ${String(e.message || e)}`.slice(0, 300));
+      // The stack names the line; the message alone does not.
+      if (e && e.stack) stacks.push(String(e.stack).split('\n').slice(0, 4).join('\n').slice(0, 600));
+    });
     page.on('response', (r) => { if (r.status() >= 400 && !/favicon/i.test(r.url())) errors.push(`[HTTP ${r.status()}] ${r.url().split('/').pop()}`); });
     const settle = spec.settleMs ?? 120;
     const readState = async () => {
@@ -112,6 +124,19 @@ export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browse
     // THE ENTRY PAGE MUST ACTUALLY BE SERVED. A 404 or 5xx here says nothing about the
     // candidate's behaviour - it says the play could not run. Reporting it as failing steps
     // would blame generated code for the harness's own inability to serve the file.
+    // Record every getElementById that returns null, without changing what it returns.
+    await page.evaluateOnNewDocument(() => {
+      window.__nullLookups = [];
+      const orig = document.getElementById.bind(document);
+      document.getElementById = function (id) {
+        const el = orig(id);
+        if (!el) {
+          window.__nullLookups.push({ id: String(id), ids: Array.from(document.querySelectorAll('[id]')).map((n) => n.id) });
+        }
+        return el;
+      };
+    });
+
     const nav = await page.goto(url, { waitUntil: 'load', timeout: 15_000 });
     const navStatus = nav ? nav.status() : 0;
     if (!nav || navStatus >= 400) {
@@ -134,6 +159,17 @@ export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browse
         await new Promise((r) => setTimeout(r, settle));
         const state = await readState();
         const storage = await readStorage();
+        if (dom.idsAtFirstFailure === null) {
+          dom = await page.evaluate(() => {
+            const lookups = (window.__nullLookups || []).slice(0, 10);
+            return {
+              nullLookups: lookups.map((l) => l.id),
+              idsAtFirstFailure: lookups.length ? lookups[0].ids : null,
+              idsAfterReady: Array.from(document.querySelectorAll('[id]')).map((n) => n.id),
+              readyState: document.readyState,
+            };
+          }).catch(() => dom);
+        }
         const ok = evaluateExpectation(step.expect, { state, before, errors: errors.slice(), storage, url });
         cases.push({ n: step.n, name: step.name, kind: ok ? 'PASS' : 'FAIL', text: ok ? '' : `expected ${step.expect}; state ${JSON.stringify(state).slice(0, 200)}${errors.length ? '; errors: ' + errors.slice(-2).join(' | ') : ''}` });
         lines.push(`${ok ? 'PASS' : 'FAIL'} case ${step.n}  ${step.name}${ok ? '' : ' -> ' + cases[cases.length - 1].text}`);
@@ -152,5 +188,5 @@ export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browse
   const failing = new Set(cases.filter((c) => c.kind !== 'PASS').map((c) => c.n));
   const total = cases.length;
   lines.push(`SUMMARY ${passing.size}/${total} cases pass, ${failing.size} fail`);
-  return { status: 'OK', passing, failing, total, cases, errors, log: lines.join('\n') };
+  return { status: 'OK', passing, failing, total, cases, errors, stacks, dom, log: lines.join('\n') };
 }

@@ -202,6 +202,32 @@ export function farmTasks() {
     prev = inc.id; prevSteps = inc.steps;
   }
 
+  // A VERSIONED CORRECTED CHECK. The accepted increment-1 page throws five times during the arrow-key
+  // movement it was accepted FOR - draw() ends with document.getElementById('day').textContent and
+  // there is no such element - and step 1 cannot see it, because step 1 is evaluated before any key
+  // is pressed. That is a test-coverage gap in the check, not a property of the page's successors,
+  // and the honest response is to version the check rather than edit the one earlier results were
+  // measured against. farm-plant-v2 adds a final step asserting that NO error was raised at any
+  // point in the run. The baseline FAILS it, which is the point: comparisons already under way stay
+  // on farm-plant, and new work can adopt the stricter spec deliberately.
+  const plantV2Path = join(FARM_DIR, 'play-plant-v2.json');
+  if (existsSync(plantV2Path)) {
+    const v2 = JSON.parse(readFileSync(plantV2Path, 'utf8'));
+    const sub = (steps) => ({ ...v2, name: `plant-v2-steps-${steps.join('')}`, steps: v2.steps.filter((x) => steps.includes(x.n)) });
+    const requested = [1, 2, 3, 4, 5, 6, 7];
+    const mine = sub(requested);
+    out.push({
+      id: 'farm-plant-v2', group: 'FARM', source: 'internal', language: 'javascript', kind: 'build',
+      dependsOn: 'farm-i1',
+      goal: `Continue the farming game already in index.html. ${FARM_PLANT.ask} No page or console error may be raised at any time. The game is a single self-contained web page, index.html: plain HTML5 canvas and JavaScript, no frameworks, no external files or CDNs. ${v2.contract} Everything that already works must keep working.`,
+      seed: {},
+      requested: { play: { spec: mine, steps: requested } },
+      protected: { play: { spec: sub(FARM_PLANT.protectedSteps), steps: FARM_PLANT.protectedSteps } },
+      diagnostic: { kind: 'play', spec: mine, timeoutSec: 90 },
+      upstreamCases: requested.length, protectedCases: FARM_PLANT.protectedSteps.length,
+    });
+  }
+
   // farm-plant rides its own play spec (play-plant.json), which carries the negative clauses.
   const plantPath = join(FARM_DIR, 'play-plant.json');
   if (existsSync(plantPath)) {

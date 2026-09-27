@@ -27,12 +27,20 @@ const VERDICT_RETAIN = 'RETAIN';
  *   BEHAVIOUR                  the page loaded, state was readable, and steps failed on their
  *                              own terms. Only here do the step verdicts describe the program.
  *
- * ON "INITIALIZATION COMPLETED": state being readable does NOT by itself establish that the
- * script finished. What does establish it here is a conjunction: the seam is the LAST statement in
- * the file, so if the seam is readable AND no page error was raised, execution reached the end.
- * Hoisting the seam earlier would DESTROY that property - it would make the seam readable while
- * later initialization could still have thrown. So the seam stays last and the exception is
- * recorded separately, which is the opposite of the fix I first proposed.
+ * ON "INITIALIZATION COMPLETED" - and this field's name promises more than it delivers, so read the
+ * caveat before using it. A readable state accessor plus no captured page error is an OPERATIONAL
+ * CHECK, not proof that initialization completed. It would be proof only if readiness were
+ * established explicitly, and it is not: the accessor's position in the file is a convention this
+ * harness happens to follow, not something verified per candidate; a candidate may define the
+ * accessor anywhere, may define it early and throw later inside a deferred callback, may swallow its
+ * own error in a try/catch, or may fail in a way that raises no page error at all. What the
+ * conjunction supports is the weaker claim that NO FAILURE WAS OBSERVED up to the point of
+ * measurement.
+ *
+ * Hoisting the accessor earlier would weaken it further - the accessor would be readable while later
+ * initialization could still throw - which is why the seam stays last and the exception is recorded
+ * separately. Establishing readiness properly needs an explicit signal from the page itself, which
+ * would be a change to the contract and is not one this experiment has made.
  */
 export function classifyFailure(play, rec) {
   const errors = [...(play.errors || [])];
@@ -47,10 +55,14 @@ export function classifyFailure(play, rec) {
   return {
     failureClass,
     loadErrors: errors.slice(0, 5),
+    stacks: [...(play.stacks || [])].slice(0, 3),
+    // The DOM facts that separate "the element is not there yet" from "it is not there at all".
+    dom: play.dom ?? null,
     threwDuringLoad: threw.length > 0,
     stateObserved: observed,
-    // The conjunction above, stated as a claim that can be false.
-    initializationCompleted: observed && threw.length === 0,
+    // An OPERATIONAL check, not proof - see the note above. Named so it cannot be misread.
+    noFailureObservedDuringInit: observed && threw.length === 0,
+    initializationCompletedIsEstablished: false,   // readiness is not explicitly established
     behaviouralVerdictsMeaningful: failureClass === 'BEHAVIOUR' || failureClass === 'NONE',
     note: failureClass === 'RUNTIME_EXCEPTION_AT_LOAD'
       ? 'the page threw while loading: the failing behavioural steps were NEVER REACHED, so no claim about the candidate behaviour follows from them'
@@ -87,6 +99,8 @@ export async function judgeCandidate(ws, task, spec, startRef, rec, T0, deps) {
     // 'addEventListener')`, and the record threw that message away, leaving only "every step
     // failed" - which is exactly the sentence a repair cannot be built from.
     errors: [...(play.errors || [])],
+    stacks: [...(play.stacks || [])],
+    dom: play.dom ?? null,
   };
   rec.diagnosis = classifyFailure(play, rec);
   rec.timing.playMs = Date.now() - T0;
