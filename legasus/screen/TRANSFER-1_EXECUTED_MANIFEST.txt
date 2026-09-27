@@ -1,0 +1,17 @@
+TRANSFER-1 EXECUTED MANIFEST - the hashes of what ACTUALLY RAN
+recorded 2026-09-27T14:14:15.194Z
+
+Unchanged rule hashes show rules were preserved. They do not show that the program that ran is the
+program in the frozen manifest. This records what executed, and flags every file that differs.
+
+CHANGED    cbf4983a7ba89e219a4cbb29cfe8977f51efa440bcc0d8763b44960bc314d732    19101  server/autoGuide.mjs
+CHANGED    978bc299e5660034605d2f0049b952b9e2e8e7e9adc63163d0e8c4d8d53f9ee2    37806  server/localEdit.mjs
+unchanged  df56ddc0180262307dec4eb0dd7d171b9a416e25238023e189047586f215e5b4     7484  server/judgeCandidate.mjs
+unchanged  99e50264209ad4002df979fbd6edde9a45e7a9f09fe3d2085f9f8f201fffd623    12253  server/evaluator.js
+unchanged  64aa3b7bcb1ad51b5eaba23f996095ab692abbf9f715f3dd29e4685a3caa2bf3     9908  server/acceptance.js
+unchanged  f62fa26c96e5b5896517c0a6b97a2b463692224e96efeb0a2f7fa04869216fd1    12541  server/playCheck.js
+CHANGED    6fe7664977f27e3b5576227a368116db3f3a4ea127be0f338db0881c71604245    23052  server/benchTasks.js
+
+The two CHANGED files are plumbing, and the parts that decide anything were hash-proved identical:
+  autoGuide.mjs   guidance functions  b65885c20bac8932c841deb388ad1593772930d7f56e0cc2ffaaeb686eda950f
+  localEdit.mjs   containment source  986c67a5465aa6765c7550f39ffb4970 (first 32)
