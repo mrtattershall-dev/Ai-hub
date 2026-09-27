@@ -1,9 +1,9 @@
 # MODEL-CMP-1 DEFINITION — one frozen assisted handler task, run identically across models
 
-Frozen 2026-09-26, before any arm is run. **NO PAID RUN IS AUTHORIZED BY THIS DOCUMENT.** The
-local 1.5B arm runs at **$0** to fix the baseline. Any hosted arm needs a fresh authorization from
-Micheal recorded here before deploying; the earlier $3 authorization for the 7B narrow cells is a
-different experiment and stays HELD and unlaunched.
+Frozen 2026-09-26, before any arm is run. The local 1.5B arm runs at **$0**. **Arm C (the same
+1.5B on a Modal GPU) is AUTHORIZED at $2 total — see below; the authorization was recorded here
+before deploying.** Arm B (a stronger model) is **NOT** authorized and is not run. The earlier $3
+authorization for the 7B narrow cells is a different experiment and stays HELD and unlaunched.
 
 ## Why this exists
 
@@ -76,8 +76,53 @@ transformation the harness performed is visible next to what the model actually 
 
 ## Arms
 
-    A  qwen2.5-coder:1.5b, local          $0      BASELINE - run now
-    B  a stronger model, to be chosen     needs authorization, NOT run
+    A  qwen2.5-coder:1.5b, local CPU      $0      BASELINE - run
+    C  qwen2.5-coder:1.5b, Modal GPU      AUTHORIZED $2 total - run under this definition
+    B  a stronger model, to be chosen     NOT authorized, NOT run
+
+## Arm C — AUTHORIZED: $2 total, recorded before deploying
+
+**Authorized by Micheal (tatte), 2026-09-26:** *"$2 total cap authorized for the 1.5B Modal
+comparison … Include startup, idle time, and shutdown in the $2 cap."* Recorded here before any
+deploy, per standing practice. The same message notes that the attempt to launch it from another
+workspace spent nothing, and that this session may act on the authorization without asking again.
+
+**What arm C changes: the hardware, and nothing else.** It is a BACKEND comparison, not a
+model-size comparison — the same 1.5B, the same five seeds, the same weights and quantization (the
+same ollama model tag, its digest compared against the local one before any attempt), the same
+prompt, suffix, decoding, output processing and acceptance gate. `server/modalOllama.py` runs the
+same ollama inside a Modal container on an A10G and exposes ollama's own HTTP API, so the harness
+reaches it through `--model-url` and differs only in latency.
+
+**Reading it, as directed:**
+
+    faster generation, same failures   a SPEED result only. It would show the GPU produces the same
+                                       wrong candidates sooner, and would not touch the coding
+                                       problem. This is the expected outcome.
+    better acceptance                  must NOT be attributed to GPU-versus-CPU before checking
+                                       BACKEND differences: ollama version, digest, context length,
+                                       sampler defaults, and whether the FIM rendering matches.
+                                       The digest and wire checks below exist for that.
+    slower or equal generation         possible, and worth reporting plainly: a cold start, the
+                                       proxy hop and network latency all sit inside arm C's clock.
+
+**Generation and verification are timed apart** in every record already (`timing.generateMs` against
+`timing.playMs` / `timing.acceptanceMs`), because arm A showed verification is about seven eighths
+of an attempt's wall clock and that part runs locally in both arms.
+
+**Cost control, inside the $2 cap:** `min_containers=0` so nothing idles between sessions; the
+weights are baked into the image so a cold start does not pay to download them; `scaledown_window`
+300 s to stay warm across the local verification gaps rather than cold-starting five times;
+`max_containers=1`; a 1800 s function timeout. **The app is stopped explicitly at the end** (`modal
+app stop --yes`, which must be non-interactive). Container seconds are costed at the verified A10
+unit price of $0.000306/s and reported with startup, idle and shutdown included.
+
+**Checks before the first attempt, both cheap:**
+
+    same weights          /api/tags digest on Modal must equal the local digest for the same tag
+    same wire rendering   fimWireCheck.mjs against the Modal URL must give the same verdict as
+                          locally: prompt+suffix renders like a hand-built infilling request and
+                          exceeds an empty-suffix request by the suffix's own token count
 
 ## Pre-registered readings
 
