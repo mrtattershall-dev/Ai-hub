@@ -78,9 +78,16 @@ deferring the lookup is the textbook fix. Its effect on the page was real and me
     after    play [2,3,5]     NONE                        state readable, movement working
 
 The script no longer throws at top level, so execution reaches the seam and the page becomes
-observable for the first time in this line of work. It still failed: the buttons **do not exist and
-never will**, so when `DOMContentLoaded` fires the lookup is still null and still throws, one error
-at load time, which fails step 1 and therefore the protected set. The round was reverted.
+observable for the first time in this line of work. It still failed: **in the state observed, the
+element is absent even after the document reports `readyState: complete`**, so when
+`DOMContentLoaded` fires the lookup is still null and still throws, one error at load time, which
+fails step 1 and therefore the protected set. The round was reverted.
+
+CORRECTED after review: an earlier wording said the buttons "do not exist and never will". The
+observation supports less than that. **`readyState: complete` with the id absent rules out "waiting
+for DOM readiness will create it" in that observed state.** It does not rule out every later dynamic
+insertion — another script, a timer, a fetch callback could add the element in a page that had one.
+This page has none, but that is read from its source, not established by the measurement.
 
 **So the evidence underdetermined the fix.** That error message is equally consistent with "the
 element is not there yet" and "the element is not there at all", and the model chose the first. The

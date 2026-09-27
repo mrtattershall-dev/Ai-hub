@@ -146,7 +146,10 @@ its own site scored zero JavaScript in ten attempts.**
 - Any rate. These are counts over five seeds per cell.
 - Anything about a larger model. The 7B cells remain **AUTHORIZED at $3 but HELD and not launched,
   $0 spent** (`NARROW-1_DEFINITION.md`). No paid run was launched for this record.
-- That the game advanced. It did not. Increment 1 is still the only accepted increment.
+- That the game advanced. It did not. Increment 1 is still the only increment to pass its gate -
+  and, as of 2026-09-27, it is known to throw five times during the movement it passed on, so it
+  should be described as "passed spec v1 with a known defect attached" rather than as working. See
+  the amendment in `NARROW-2_RESULT.md`.
 
 Records: `INC3-1_DEFINITION.md`, `INC3-1_{anchor,anchor2,fim,fimsmall}_seed1..5.json`,
 `INC3-1_run.log`, `INC3-1_run-fimsmall.log`, `INC3-1_run-anchor2.log`, `INC3-1_gate.log`.

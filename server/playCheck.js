@@ -89,9 +89,11 @@ export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browse
   // WHY THIS EXISTS. REPAIR-2: fed only "Cannot read properties of null (reading
   // 'addEventListener')", the model applied the textbook fix for an element that is not there YET
   // (defer to DOMContentLoaded) when the element is not there AT ALL. The message cannot tell those
-  // apart. These three facts can, and all three are read off the page rather than reasoned about:
-  // which ids were looked up and came back null, which ids the document actually has at that moment,
-  // and which it has once it is ready.
+  // apart. These three facts narrow it, and all three are read off the page rather than reasoned
+  // about: which ids were looked up and came back null, which ids the document actually has at that
+  // moment, and which it has once it is ready. An absent id at readyState complete rules out
+  // "readiness will create it" in the state observed - not a later dynamic insertion by some other
+  // script, so this narrows the question rather than settling it.
   let dom = { nullLookups: [], idsAtFirstFailure: null, idsAfterReady: null };
   const cases = [];
   const lines = [];

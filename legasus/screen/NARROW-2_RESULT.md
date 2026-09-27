@@ -1,4 +1,11 @@
-# NARROW-2 RESULT — stating the interface verbatim moved the failure from "unobservable" to "observed behaviour", and produced the first accepted increment from the local 1.5B
+# NARROW-2 RESULT — stating the interface verbatim moved the failure from "unobservable" to "observed behaviour", and produced the first increment from the local 1.5B to PASS SPEC v1
+
+> **AMENDED 2026-09-27 — the acceptance stands as "passed spec v1", and a defect found later is
+> attached to it.** This result is unchanged as a record of what the gate said. What changed is what
+> that verdict covers: the accepted page **throws five times during the arrow-key movement it was
+> accepted FOR**, and the check could not see it. Read the acceptance as **"passed farm-i1 under play
+> spec v1"**, never as "error-free" or "fully working". Details in the amendment at the foot of this
+> file and in `REPAIR-1_RESULT.md`.
 
 2026-09-26, **$0** (local ollama, qwen2.5-coder:1.5b, same laptop). Five seeded attempts at
 farm-i1, **the play, the evaluator and the acceptance policy byte-identical to NARROW-1** —
@@ -125,3 +132,36 @@ classification, and the one acceptance holds through every path that can judge i
 
 Records: `NARROW-2_seed1..5.json`, `NARROW-2_run.log`, `NARROW-2_gate.log`,
 `NARROW-2_accepted_index.html` (the accepted artifact), `NARROW_RECHECK.json`.
+
+---
+
+## AMENDMENT, 2026-09-27: what the acceptance did and did not cover
+
+**The verdict stands. Its scope was narrower than the wording suggested.**
+
+    what was established   the artifact passed farm-i1 under play spec v1: it loads, exposes the
+                           declared state seam, and the player moves on arrow keys. Three
+                           independent invocation paths agreed.
+    what was NOT           that the page is error-free while doing it. Reproduced on the untouched
+                           artifact (`server/baselineValidity.mjs`): it raises FIVE
+                           `Cannot set properties of null (setting 'textContent')` errors during
+                           farm-i1's own required movement. `draw()` ends with
+                           `document.getElementById('day').textContent` and no such element exists.
+    why the gate missed it play spec v1's error check is step 1, and step 1 is evaluated BEFORE any
+                           key is pressed. The errors are caused by the movement the later steps
+                           perform, so no assertion was ever in a position to see them.
+
+**This is a test-coverage gap in the check, not a retraction of the result.** The corrected check is
+versioned rather than edited in place, so every earlier number remains interpretable:
+
+    play spec v1 / farm-plant      6 steps, UNCHANGED - what this artifact was measured against
+    farm-plant-v2                  7 steps: the same, plus "no page or console error was raised at
+                                   any point". THIS ARTIFACT FAILS IT.
+
+`farmPlantV2Spec.test` 10/10 pins the new version: the accepted artifact fails the new step; a
+correct planting handler alone still fails it, so it is not a planting check in disguise; and
+supplying the missing `#day` element as well passes all seven, so it is satisfiable.
+
+**How to describe this artifact from now on:** the first increment from the local 1.5B to pass spec
+v1, carrying a known defect that spec v1 could not see. Any later result that reuses it as a baseline
+inherits that defect, and any successor that makes the keys work inherits its errors.

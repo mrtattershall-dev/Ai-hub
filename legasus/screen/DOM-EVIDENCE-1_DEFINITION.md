@@ -1,86 +1,102 @@
-# DOM-EVIDENCE-1 DEFINITION — does DOM evidence let the model repair the missing-element failure without human rewiring?
+# DOM-EVIDENCE-1 DEFINITION — does additional runtime evidence improve repair under an otherwise identical loop?
 
-Frozen 2026-09-27, before any round is run. **NOT RUN. No paid run is authorized by this document.**
+Frozen 2026-09-27, second version, before any round is run. **NOT RUN. This document authorizes no
+spending; the cost below is an estimate.**
 
-## The question, narrowly
+## The question, stated as the comparison
 
 REPAIR-2 seed 2: given the error text alone, the model applied the textbook fix for an element that
-is **not there yet** (defer to `DOMContentLoaded`) when the element is **not there at all**. The
-message cannot tell those apart. **Does supplying the facts that do tell them apart let the model
-repair it?**
+is **not there yet** (defer to `DOMContentLoaded`) when, in the state observed, the element was **not
+there at all**. The message cannot separate those. **Does adding runtime evidence that can separate
+them improve repair, with everything else held identical?**
 
-Nothing else changes. The candidates are the same untouched arm B outputs, the task is the same, the
-gate is the same, and no rewiring or corrected decrement is supplied in either arm.
+## Both arms run NOW, on the current harness
 
-## The two arms, differing in ONE thing
+    arm E0   evidence: basic   the file, the captured error message, the declared contract, and once
+                               the page runs, the failing step's name and observed state
+    arm E1   evidence: dom     the same, PLUS four facts read off the page at the failure
 
-    arm E0  evidence: basic   the file, the captured error message, the declared contract, and once
-                              the page runs, the failing step's name and observed state.
-                              THIS ARM IS ALREADY RUN: it is REPAIR-2, and its records stand.
-    arm E1  evidence: dom     the same, PLUS four facts read off the page at the failure:
-                                the element lookups that returned nothing (the failing selector)
-                                the ids the document contained AT THAT MOMENT
-                                the ids the document contains ONCE READY, with the readyState
-                                the stack of the raised error
+**E0 is re-run. It is not taken from REPAIR-2.** REPAIR-2 ran before repeat-stopping existed, before
+the match rule and diff retention were recorded, before line-aligned exact matching, and before the
+DOM capture was instrumented. Any of those can change how many repair opportunities a run gets, what
+it costs, and what it produces. **A historical run cannot serve as the control for a harness it did
+not execute on.** REPAIR-1 and REPAIR-2 stay in the record as context and as the reason this
+experiment exists.
 
-`--evidence basic|dom` selects between them and nothing else differs. Both are already implemented
-and tested (`repairLoop.test` 27/27, cell 6 asserts the four facts appear and that none of my
-analysis does).
+## Held identical across the two arms
+
+    candidates            the same four untouched arm B outputs (seeds 2-5), byte for byte, with
+                          their sha256 recorded per run
+    model                 qwen2.5-coder:7b, digest dae161e27b0e90dd, Q4_K_M
+    serving version       ollama PINNED to 0.33.3, verified in the build log and the startup line
+    matching              --match normalized, the same rule text recorded in every round
+    stopping rules        at most 3 rounds; a repeated (file, evidence) pair or a byte-identical
+                          reply ends the loop with NO_NEW_INFORMATION
+    budgets               the same round cap, the same 1500-token cap, the same 900 s deadline
+    decoding              temperature 0.2, seed 1
+    the loop's gate       farm-plant (6 steps), unchanged, for continuity with arm B
+    harness commit        one commit for both arms, recorded in the result
+
+**The ONLY difference is `--evidence basic` against `--evidence dom`.**
+
+## What the DOM arm adds, and what those facts do and do not establish
+
+    the element lookups that returned nothing        e.g. "plant"
+    the ids the document contained AT THAT MOMENT    e.g. ["gameCanvas"]
+    the ids it contains ONCE READY, with readyState  e.g. ["gameCanvas"], readyState complete
+    the stack of the raised error                    file and line
+
+**What `readyState: complete` plus the absent id establishes:** in the state observed, waiting for DOM
+readiness will not produce that element. **What it does not establish:** that the element can never
+appear. A later dynamic insertion — by another script, a timer, a fetch callback, a framework — is not
+ruled out by this observation. The evidence is a report of an observed state, not a proof about the
+page's future.
+
+## Reporting, kept separate
+
+    OLD-SPEC ACCEPTANCE          farm-plant, 6 steps: the acceptance policy says RETAIN. This is the
+                                 loop's result.
+    NEW-SPEC ERROR-FREE          farm-plant-v2, 7 steps, measured AFTERWARDS on the file the loop
+                                 ended with, via --post-check. It is recorded separately and it
+                                 decides nothing: it never reaches the model, the evidence, the
+                                 revert rule or the acceptance verdict.
+    intermediate improvement     failure class moved, steps newly passing, the page became observable
+                                 at all. Never summed with either acceptance figure.
+    cost of failure              rounds used, generation seconds, tokens, dollars, including rounds
+                                 that produced no applicable edit
+
+**A candidate that passes the old gate while still throwing during movement will be reported as
+"passed spec v1, not error-free", never as a working repair.** `repairLoop.test` cell 7 pins this: a
+repair the six-step gate accepts is shown failing the seven-step spec with 17 errors raised, and the
+stricter requirement is shown never to have appeared in anything the model was told.
 
 ## What is supplied, and what is not
 
-    supplied      the candidate, the task, the edit format, indentation tolerance, and in E1 the
-                  four DOM facts above - every one of them read off the page by the harness
-    NOT supplied  that the buttons do not exist; any mention of keydown or any event name; the
-                  rewiring; the corrected decrement; any description of the defect in my words
-    audited       the test suite strips the candidate's own text from the prompt and searches what
-                  remains for those words, failing if any appear
-
-## Measured, and reported APART
-
-    FULL ACCEPTANCE          the acceptance policy says RETAIN. This is the result. It is the only
-                             thing that counts as a repair.
-    intermediate improvement reported separately and never summed with it:
-                               failure class moved (e.g. RUNTIME_EXCEPTION_AT_LOAD -> BEHAVIOUR)
-                               steps newly passing
-                               the page became observable at all
-                             REPAIR-2 produced one such improvement and zero repairs, and the two
-                             must not be blended into a single score.
-    cost of failure          rounds used, generation seconds, tokens, dollars - including rounds
-                             that produced no applicable edit
-
-## Discipline carried in from the last run
-
-    no repeated cycles       a repeated (file, evidence) pair or a byte-identical reply ends the loop
-                             with NO_NEW_INFORMATION. REPAIR-1 spent two thirds of its budget on the
-                             same refusal three times.
-    explicit tolerance only  whitespace tolerance is opt-in, its rule is recorded verbatim in every
-                             round, a match must be UNIQUE, and reordered lines are still refused.
-                             Nothing is scored for similarity and no region is inferred.
-    both sides retained      the original candidate with its sha256, the text before each round with
-                             its sha256, and a line diff of what the applied blocks did.
-    baseline honesty         the comparison stays on `farm-plant` (6 steps). `farm-plant-v2` exists
-                             and is stricter, and the accepted baseline fails it; adopting it here
-                             would mix a second repair into the measurement.
+    supplied      the candidate, the task, the edit format, indentation tolerance, and in E1 the four
+                  DOM facts - each of them read off the page by the harness
+    NOT supplied  that the buttons do not exist; any event name; the rewiring; the corrected
+                  decrement; the stricter spec's requirement; any description of the defect in my
+                  words
+    audited       the suite strips the candidate's own text from the prompt and fails if any of those
+                  words appear in what remains
 
 ## Pre-registered readings
 
-- **E1 reaches RETAIN where E0 did not.** Then machine-captured DOM evidence is sufficient to drive
-  this repair, and the product has its first observed-failure-to-working-improvement. Still assisted:
-  the site, the format, the tolerance and the evidence selection are all the harness's work.
-- **E1 changes the repair family but still fails.** The most likely outcome, and the useful one: it
-  would show the evidence redirected the model, and the remaining obstacle would be named by
-  whatever the new failure is.
-- **E1 behaves like E0.** Then the error message was not the binding constraint, and my account of
-  why REPAIR-2 failed is wrong. That is worth knowing and is the reason this arm is worth running.
-- **E1 is worse.** More evidence can distract; that outcome would be reported as plainly as a win.
+- **E1 reaches RETAIN where E0 does not.** Additional runtime evidence improves repair under an
+  identical loop. Report the old-spec acceptance and the new-spec result separately, and expect the
+  new spec to still fail unless the model also fixed the inherited `#day` defect.
+- **E1 changes the repair family but still fails.** The likely outcome: the evidence redirected the
+  model and something else now binds. Whatever the new failure is, name it and stop.
+- **E1 behaves like E0.** The error message was not the binding constraint, and my account of
+  REPAIR-2 was wrong. This is the outcome that makes the experiment worth running.
+- **E1 is worse.** More evidence can distract. Reported as plainly as a win.
 
 **This does not test autonomy.** The candidate, the task, the decomposition, the edit format and the
-choice of which facts to capture are all mine. What it tests is whether a failure the system can
-observe is enough to drive a repair it did not have to be told.
+choice of which facts to capture are all mine. It tests whether a failure the system can observe is
+enough to drive a repair nobody wrote for it.
 
-## Estimated cost when authorized
+## Estimate, not a request
 
-Four candidates, at most 3 rounds each, on the 7B: about 12 rounds, roughly 10-15 minutes of A10G,
-**about $0.20-0.30**. Prior hosted spend is about $0.57. **Awaiting authorization; nothing is
-deployed.**
+Eight runs (4 candidates x 2 arms), at most 3 rounds each, on the 7B: roughly 20-30 minutes of A10G,
+**about $0.40-0.55**. Prior hosted spend is about $0.57. **Nothing is deployed and no authorization is
+implied by this estimate.**

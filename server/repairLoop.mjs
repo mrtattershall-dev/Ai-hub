@@ -54,12 +54,23 @@ const OUT = opt('out', null);
 const MATCH = opt('match', 'exact');        // 'normalized' also accepts a FIND at the wrong indent
 if (!['exact', 'normalized'].includes(MATCH)) { console.error(`unknown --match ${MATCH}`); process.exit(2); }
 // EVIDENCE MODE, explicit so the comparison is a comparison. 'basic' is exactly what REPAIR-1 and
-// REPAIR-2 sent: the file, the error message, the contract. 'dom' adds the facts that separate "the
-// element is not there yet" from "it is not there at all" - the selector that came back null, the
-// ids the document actually had at that moment, the ids it had once ready, the readyState, and the
-// stack. All read off the page; none of it is anyone's opinion about the fix.
+// REPAIR-2 sent: the file, the error message, the contract. 'dom' adds the selector that came back
+// null, the ids the document actually had at that moment, the ids it had once ready, the readyState,
+// and the stack. All read off the page; none of it is anyone's opinion about the fix.
+//
+// WHAT THOSE FACTS SUPPORT. An absent id at readyState complete rules out "waiting for readiness
+// will create it" IN THE STATE OBSERVED. It does not rule out a later dynamic insertion by another
+// script, a timer or a callback. The evidence reports an observed state; it proves nothing about the
+// page's future, and the message therefore states the observation rather than a conclusion.
 const EVIDENCE = opt('evidence', 'basic');
 if (!['basic', 'dom'].includes(EVIDENCE)) { console.error(`unknown --evidence ${EVIDENCE}`); process.exit(2); }
+// A SECOND CHECK, APPLIED AFTERWARDS AND NEVER FED BACK. The loop is driven entirely by --task. If
+// --post-check names another task, the file the loop ends with is judged against it once, at the
+// end, and recorded separately. Nothing about it reaches the model, the evidence, the revert rule or
+// the acceptance decision - otherwise a candidate that passes the old gate could be reported as a
+// working repair while it still throws during movement, or the loop would quietly be chasing a
+// stricter target than the one the comparison was frozen on.
+const POST_CHECK = opt('post-check', null);
 if (!CANDIDATE) { console.error('--candidate <record.json> is required: the UNTOUCHED candidate to repair'); process.exit(2); }
 
 const { farmTasks } = await import('./benchTasks.js');
@@ -195,6 +206,8 @@ async function main() {
     maxRounds: MAX_ROUNDS, rounds: [], accepted: false, totals: {},
     matchMode: MATCH,
     evidenceMode: EVIDENCE,
+    loopTask: TASK_ID,
+    postCheckTask: POST_CHECK,
     originalCandidate: { sha256: null, chars: null },     // filled once the candidate is read
     assistance: {
       evidenceIsMachineCaptured: true,
@@ -329,6 +342,28 @@ async function main() {
     out.accepted = !!judged.boundaries.accepted;
     out.finalPlay = judged.play.passing;
     out.finalDisposition = judged.acceptance.disposition;
+
+    // ── the post-hoc second check, on the file the loop ended with ──
+    if (POST_CHECK) {
+      const other = farmTasks().find((t) => t.id === POST_CHECK);
+      if (!other) { out.postCheck = { task: POST_CHECK, error: 'unknown task' }; }
+      else {
+        writeFileSync(join(ws, ENTRY), current, 'utf8');
+        const play2 = await playCheck(ws, other.diagnostic.spec, { timeoutMs: 90_000 });
+        const v2 = await evaluate(ws, other, { timeoutSec: 120 });
+        out.postCheck = {
+          task: POST_CHECK,
+          appliedAfterTheLoop: true,
+          fedBackToTheModel: false,
+          influencedAcceptance: false,
+          passing: [...(play2.passing || [])], failing: [...(play2.failing || [])],
+          errorsRaised: (play2.errors || []).length,
+          requested: v2.requested?.verdict ?? null, protected: v2.protected?.verdict ?? null,
+          note: 'measured after the loop finished, on the file it ended with. It decided nothing.',
+        };
+        console.log(`  post-check ${POST_CHECK}: passing [${out.postCheck.passing.join(',')}] failing [${out.postCheck.failing.join(',')}]  errors ${out.postCheck.errorsRaised}  requested ${out.postCheck.requested}`);
+      }
+    }
     out.totals = {
       repairRounds: out.rounds.filter((r) => r.kind === 'repair attempt').length,
       generationSeconds: +(genMs / 1000).toFixed(1), outputTokens: tokens,

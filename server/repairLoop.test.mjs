@@ -194,5 +194,21 @@ console.log('\n=== 6. the DOM evidence mode adds only facts read off the page ==
   say(found.length === 0, `and still none of my analysis${found.length ? ' -- LEAKED: ' + found.join(', ') : ''}`);
 }
 
+console.log('\n=== 7. the second check runs AFTER the loop and decides nothing ===');
+{
+  // A candidate that passes the old six-step gate must not be reported as a working repair while it
+  // still throws during movement. So the stricter spec is measured afterwards, on the file the loop
+  // ended with, and is kept out of the evidence, the revert rule and the acceptance decision.
+  const { rec, seen } = await run('postcheck', [block(injectedRegion(join(SCREEN, 'MODEL-CMP-1_armB_seed3.json')), FIXED)],
+    undefined, 1, ['--post-check', 'farm-plant-v2']);
+  say(rec?.accepted === true, `the loop's own gate (farm-plant, 6 steps) accepted the repair (${rec?.finalDisposition})`);
+  say(rec?.postCheck?.task === 'farm-plant-v2' && rec.postCheck.appliedAfterTheLoop === true, 'the second check ran, and is marked as applied after the loop');
+  say(rec?.postCheck?.fedBackToTheModel === false && rec.postCheck.influencedAcceptance === false, 'and is marked as having fed back nothing and decided nothing');
+  say([...(rec?.postCheck?.failing || [])].includes(7) && rec.postCheck.errorsRaised > 0,
+    `the SAME file fails the stricter spec's new step with ${rec?.postCheck?.errorsRaised} errors raised - so "accepted" here is not "error-free"`);
+  const prompt = JSON.stringify(seen.map((x) => x?.messages || []));
+  say(!/no page or console error may be raised/i.test(prompt), 'the stricter requirement never appeared in anything the model was told');
+}
+
 console.log(`\n  repair loop: ${passed} passed, ${failed} failed -> ${failed ? 'THE LOOP IS NOT ESTABLISHED' : 'a correct repair reaches RETAIN, the evidence carries no human analysis, and damage is rolled back between rounds'}`);
 process.exit(failed ? 1 : 0);
