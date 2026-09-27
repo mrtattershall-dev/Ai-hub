@@ -1,0 +1,56 @@
+--- armC seed 1 2026-09-27T03:23:09Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=1  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E1c inserts non-comment no   (0 non-comment / 4 comment lines)
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  edit: undefined block(s), outside=undefined chars
+  chars=549 outTok=142 promptTok=905 gen=1238ms
+  play: OK passing [1,2,3,5] failing [4,6]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/cmp1/armC_seed1.json
+--- armC seed 2 2026-09-27T03:23:34Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=2  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E1c inserts non-comment no   (0 non-comment / 4 comment lines)
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  edit: undefined block(s), outside=undefined chars
+  chars=534 outTok=139 promptTok=905 gen=1274ms
+  play: OK passing [1,2,3,5] failing [4,6]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/cmp1/armC_seed2.json
+--- armC seed 3 2026-09-27T03:23:58Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=3  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E1c inserts non-comment no   (0 non-comment / 4 comment lines)
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  edit: undefined block(s), outside=undefined chars
+  chars=534 outTok=139 promptTok=905 gen=1284ms
+  play: OK passing [1,2,3,5] failing [4,6]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/cmp1/armC_seed3.json
+--- armC seed 4 2026-09-27T03:24:22Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=4  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E1c inserts non-comment YES  (13 non-comment / 4 comment lines)
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected no    E7 requested no    E8 accepted no 
+  edit: undefined block(s), outside=undefined chars
+  chars=1081 outTok=233 promptTok=905 gen=1861ms
+  play: OK passing [] failing [1,2,3,4,5,6]
+  acceptance: RESTORED
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/cmp1/armC_seed4.json
+--- armC seed 5 2026-09-27T03:24:44Z
+farm-plant qwen2.5-coder:1.5b local-edit-fim seed=5  termination=stop natural=yes
+  E1 edit produced       YES   E1b contract clean YES   E2 applicable YES
+  E1c inserts non-comment no   (0 non-comment / 4 comment lines)
+  E3 applied             YES   E4 changed the program YES
+  E5 reached execution   YES   E6 protected YES   E7 requested no    E8 accepted no 
+  edit: undefined block(s), outside=undefined chars
+  chars=528 outTok=134 promptTok=905 gen=1221ms
+  play: OK passing [1,2,3,5] failing [4,6]
+  acceptance: PRESERVE_INCOMPLETE
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/cmp1/armC_seed5.json
+arm C exit 0

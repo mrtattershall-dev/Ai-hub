@@ -26,7 +26,8 @@ MODEL = "qwen2.5-coder:1.5b"
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
-    .apt_install("curl")
+    # zstd: ollama's installer extracts a zstd archive and fails with a bare "install zstd" error
+    .apt_install("curl", "zstd")
     .run_commands(
         "curl -fsSL https://ollama.com/install.sh | sh",
         # Bake the weights into the image: a cold start then loads from local disk instead of

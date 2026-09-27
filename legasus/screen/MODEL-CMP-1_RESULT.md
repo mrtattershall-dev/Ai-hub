@@ -25,10 +25,14 @@ seed for seed, including which two attempts inserted code and which one produced
 any later arm's difference will be about the model rather than about run-to-run drift — five seeds
 is still five seeds, but the configuration itself is not wandering.
 
-**Most of the wall clock is the gate, not the model.** 16 seconds of generation against 139 seconds
-end to end: the browser play, the independent evaluator and the acceptance re-check dominate. That
-matters for the escalation architecture, because the expensive part of an attempt is verifying it,
-and that cost is the same whichever model produced the candidate.
+**CORRECTED by arm C.** This section originally read "16 seconds of generation against 139 seconds
+end to end", concluding that verification is about seven eighths of an attempt. **That mean was
+driven by one outlier.** The five verification times were 19, 15, 13, **554** and 13 seconds; without
+the 554 s row the mean is **15 s**, and arm C measured 21 s for the same local code. The outlier
+matches a 9.5-minute gap before the next attempt, on a machine with a recorded history of sleeping
+mid-run. Verification here takes roughly **13 to 24 seconds**, so on this CPU generation and
+verification are comparable rather than 1:7. Verification only dominates once generation is fast:
+see `MODEL-CMP-1_armC_RESULT.md`.
 
 ## What arm A's failures are
 
@@ -48,6 +52,13 @@ accepted increment-1 page, unchanged.
 - **The model is the next variable, not the only explanation.** Prompt sensitivity, suffix handling
   and output processing stay live; this design holds them fixed rather than ruling them out.
 - Five seeds. This is a row, not a rate.
+
+## Arm C
+
+Run, and reported separately in `MODEL-CMP-1_armC_RESULT.md`: the same 1.5B on a Modal A10G
+generated **11.9x faster** (1.4 s against 16.4 s per attempt, 114 tok/s against 10.6) and produced
+**the same failures - 0 of 5 accepted, planting failed in all five.** Estimated cost under $0.10 of
+the authorized $2 cap, app stopped and verified idle.
 
 ## Arm B
 

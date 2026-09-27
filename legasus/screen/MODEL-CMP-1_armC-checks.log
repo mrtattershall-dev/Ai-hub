@@ -1,0 +1,19 @@
+=== cold start begins 2026-09-27T03:21:35Z ===
+{"ok":true,"model":"qwen2.5-coder:1.5b"}=== identity 2026-09-27T03:22:37Z ===
+REMOTE digest d7372fd828518a4d38b1eb196c673c31a85f2ed302b3d1e406c4c2d1b64a0668 
+quantization Q4_K_M params 1.5B
+LOCAL  ollama version: {"version":"0.33.3"}
+=== wire check on the GPU backend 2026-09-27T03:22:48Z ===
+  B prompt + suffix (the harness) prompt_eval_count =   26   first token "\n"
+  C raw FIM, by hand             prompt_eval_count =   26   first token "\n"
+  D raw FIM, EMPTY suffix        prompt_eval_count =   14   first token "\n"
+  (not comparable) no suffix     prompt_eval_count =   40   first token " It"
+  tokens in the suffix alone       12
+
+  B == C  (renders like a hand-built infilling request):        YES
+  B  > D  by the suffix's own length (12 vs 12 tokens):          YES
+  same first token at temperature 0 (same conditioning):        YES
+
+  => the suffix DID reach the model in this configuration.
+     Evidence is token accounting plus an identical greedy first token, NOT a dump of
+     the rendered request. It shows the same rendering, not the literal bytes.
