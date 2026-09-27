@@ -232,6 +232,56 @@ const named = (facts, n) => facts.constraints.find((c) => c.name === n);
     'an unknown name resolves to NOT_DECLARED_IN_THIS_FILE, by name');
 }
 
+// ══ 3c. syntax mode: a function declaration is not universally function-scoped ═════════
+{
+  console.log('\n3c. block-level function declarations are scoped by the mode, and the ambiguous case is admitted');
+  // In a bare block, a function declaration is block-scoped in strict code. In sloppy code Annex B can
+  // also hoist the NAME to the enclosing function, so this file's syntax does not settle its wider
+  // visibility. Both are handled; only one of them is certain, and the uncertain one says so.
+  const sloppy = page([
+    'let n = 0;',
+    '{ function inner() { n = 1; } }',
+    "document.addEventListener('keydown', (e) => { inner(); });",
+  ].join('\n'));
+  const f = factsFor(sloppy);
+  say(f.uncertainty.some((u) => /function declared inside a block in code that is not strict/.test(u)),
+    'a block-level function in sloppy code is reported as legacy-dependent');
+  say(f.uncertainty.some((u) => /wider visibility is NOT established/.test(u)),
+    'and the record says its wider visibility is not established rather than picking an answer');
+  say(f.uncertainty.some((u) => /`inner\(\)` is called from here/.test(u)),
+    'the call to it is reported as not followed, so the state it writes is not silently claimed');
+  say(!named(f, 'n'), 'and n is NOT reported, because the only path to it is through that call');
+
+  const strict = page([
+    "'use strict';",
+    'let n = 0;',
+    '{ function inner() { n = 1; } }',
+    "document.addEventListener('keydown', (e) => { inner(); });",
+  ].join('\n'));
+  const g = factsFor(strict);
+  say(!g.uncertainty.some((u) => /not strict/.test(u)), 'in strict code the legacy note is not raised, because the rule is determinate');
+  say(g.structure.scriptModes.every((m) => m.strict === true), 'and the record shows the block was read as strict');
+  say(factsFor(page('let n = 0;\n' + "document.addEventListener('keydown', (e) => { n = 1; });")).structure.scriptModes[0].strict === false,
+    'a classic script with no directive is recorded as NOT strict');
+
+  const mod = '<html><body>\n<script type="module">\nlet n = 0;\n' +
+    "document.addEventListener('keydown', (e) => { n = 1; });\n</script>\n</body></html>";
+  const m = extractFacts(mod, { rule: 'R1', insertAfterLine: 3 });
+  say(m.structure.scriptModes[0].sourceType === 'module' && m.structure.scriptModes[0].strict === true,
+    'a type="module" block is parsed as a module and recorded as strict');
+  say(!!named(m, 'n'), 'and its state is still read');
+
+  // A function declared in a function BODY is the ordinary case and must not be flagged.
+  const ordinary = page([
+    'let n = 0;',
+    'function outer() { function inner() { n = 1; } inner(); }',
+    "document.addEventListener('keydown', (e) => { outer(); });",
+  ].join('\n'));
+  const o = factsFor(ordinary);
+  say(!o.uncertainty.some((u) => /not strict/.test(u)), 'a function declared in a function BODY raises no mode note');
+  say(!!named(o, 'n'), 'and the state it writes is found through the call chain');
+}
+
 // ══ 6b. the compact style: facts, advice and what was delivered ══════════════════
 {
   console.log('\n6b. the compact style keeps a FACT and a PROPOSAL apart, and reports what it delivered');

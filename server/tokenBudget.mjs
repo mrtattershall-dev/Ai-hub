@@ -15,29 +15,50 @@
 // hundredfold difference for the same number, and the sizing search makes many of these calls, so the
 // obvious choice would have made the instrument unusable and looked like a hang.
 //
-// THE CACHE HAZARD, and what is done about it. A repeated prefix can be served from cache, and a
-// cached prompt can report FEWER evaluated tokens than it contains - which would silently corrupt
-// every match. So each measurement is taken twice with the pair interleaved, and any prompt whose two
-// readings disagree is reported as UNSTABLE rather than used. A number that cannot be reproduced is
-// not a measurement.
+// IT MUST SEND THE SUFFIX. Generation sends `prompt` AND `suffix`, which selects the infill template;
+// the first version of this file sent `prompt` alone. Measured on unique, never-seen prefixes, the two
+// branches disagree by 21-24 tokens for identical content - so every match made by the prompt-only
+// version was made on a template the run does not use. `countTokens` now takes the same prefix and
+// suffix the generation call will take, and refuses to guess when the suffix is withheld.
+//
+// THE CACHE HAZARD, measured rather than assumed. Repeating an identical request does NOT move
+// `prompt_eval_count` (60/60, 36/36, 37/37 on three unique prefixes), so the count is cache-safe. It
+// moves the TIME by an order of magnitude - 2243ms cold, 191ms warm on the same request - so these
+// calls warm the cache for whatever runs after them. Their time is therefore reported separately and
+// never folded into generation timing. Readings are still taken twice and interleaved, because
+// "stable" is the claim being checked, not one being assumed.
+//
+// STABLE IS NOT CORRECT. Agreement between two readings says the number reproduces; it says nothing
+// about whether it is the number the run will spend. That is what sending the real suffix is for.
 // ══════════════════════════════════════════════════════════════════════════════════════════════════
 import { pathToFileURL } from 'node:url';
 
-/** One measurement: how many tokens does this server make of this prompt? */
-export async function countTokens(text, { modelUrl = 'http://127.0.0.1:11434', model = 'qwen2.5-coder:1.5b', timeoutMs = 120_000 } = {}) {
+/**
+ * One measurement of the REQUEST THE RUN WILL MAKE: how many tokens does this server make of this
+ * prefix and this suffix together? `suffix` is required unless `allowNoSuffix` is set, because
+ * omitting it silently selects a different template.
+ */
+export async function countTokens(text, { modelUrl = 'http://127.0.0.1:11434', model = 'qwen2.5-coder:1.5b', timeoutMs = 120_000, suffix = null, allowNoSuffix = false } = {}) {
+  if (suffix === null && !allowNoSuffix) {
+    return { ok: false, reason: 'NO_SUFFIX_GIVEN: generation sends prompt AND suffix, and the two templates disagree by ~22 tokens; pass the suffix or set allowNoSuffix' };
+  }
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  const t0 = Date.now();
   try {
+    const body = { model, prompt: text, stream: false, options: { num_predict: 1, temperature: 0 } };
+    if (suffix !== null) body.suffix = suffix;
     const res = await fetch(`${modelUrl.replace(/\/$/, '')}/api/generate`, {
       method: 'POST', headers: { 'content-type': 'application/json' }, signal: ctrl.signal,
-      body: JSON.stringify({ model, prompt: text, stream: false, options: { num_predict: 1, temperature: 0 } }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) return { ok: false, reason: `HTTP ${res.status}` };
     const j = await res.json();
     if (j.prompt_eval_count === undefined || j.prompt_eval_count === null) return { ok: false, reason: 'THE_SERVER_REPORTED_NO_PROMPT_TOKEN_COUNT' };
-    return { ok: true, tokens: j.prompt_eval_count, raw: { done_reason: j.done_reason } };
+    // oracleMs is the COUNTING call's own cost, kept separate so it never lands in generation timing.
+    return { ok: true, tokens: j.prompt_eval_count, oracleMs: Date.now() - t0, withSuffix: suffix !== null, raw: { done_reason: j.done_reason } };
   } catch (e) {
-    return { ok: false, reason: ctrl.signal.aborted ? `TIMED_OUT_AFTER_${timeoutMs}MS` : String(e.message || e) };
+    return { ok: false, reason: ctrl.signal.aborted ? `TIMED_OUT_AFTER_${timeoutMs}MS` : String(e.message || e), oracleMs: Date.now() - t0 };
   } finally { clearTimeout(timer); }
 }
 
@@ -53,6 +74,8 @@ export async function countTokensStable(texts, opts = {}) {
     tokens: first[i].tokens,
     stable: first[i].ok && second[i].ok && first[i].tokens === second[i].tokens,
     readings: [first[i].tokens, second[i].tokens],
+    withSuffix: first[i].withSuffix === true,
+    oracleMs: (first[i].oracleMs || 0) + (second[i].oracleMs || 0),
   }));
 }
 
@@ -64,17 +87,19 @@ export async function countTokensStable(texts, opts = {}) {
 export async function growToTokens(make, targetTokens, { from = 40, to = 3000, step = 20, ...opts } = {}) {
   const tried = [];
   let best = null;
+  let oracleMs = 0, calls = 0;
   for (let size = from; size <= to; size += step) {
     const text = make(size);
     if (tried.length && tried[tried.length - 1].chars === text.length) continue;   // no new content
     const m = await countTokens(text, opts);
-    if (!m.ok) return { ok: false, reason: m.reason, tried };
+    oracleMs += m.oracleMs || 0; calls++;
+    if (!m.ok) return { ok: false, reason: m.reason, tried, oracleMs, calls };
     tried.push({ size, chars: text.length, tokens: m.tokens });
     if (m.tokens > targetTokens) break;
     best = { text, size, chars: text.length, tokens: m.tokens };
   }
-  if (!best) return { ok: false, reason: 'NOTHING_FITS_THE_TOKEN_TARGET', tried };
-  return { ok: true, ...best, tried };
+  if (!best) return { ok: false, reason: 'NOTHING_FITS_THE_TOKEN_TARGET', tried, oracleMs, calls };
+  return { ok: true, ...best, tried, oracleMs, calls };
 }
 
 const DIRECT = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
@@ -83,6 +108,13 @@ if (DIRECT) {
   const opt = (n, d) => { const i = argv.indexOf('--' + n); return i > -1 && argv[i + 1] !== undefined ? argv[i + 1] : d; };
   const probes = ['a', 'const a = 1;', '// FACT line 14: LAMPS is declared `const` and holds a container.',
     '            if (e.key === \'1\') toggleLamp(0);\n            if (e.key === \'2\') toggleLamp(1);'];
-  const r = await countTokensStable(probes, { model: opt('model', 'qwen2.5-coder:1.5b'), modelUrl: opt('model-url', 'http://127.0.0.1:11434') });
-  probes.forEach((t, i) => console.log(`${String(r[i].tokens).padStart(5)} tokens  ${r[i].stable ? 'stable  ' : 'UNSTABLE'}  ${JSON.stringify(t.slice(0, 60))}`));
+  const common = { model: opt('model', 'qwen2.5-coder:1.5b'), modelUrl: opt('model-url', 'http://127.0.0.1:11434') };
+  const withS = await countTokensStable(probes, { ...common, suffix: '\n}\n' });
+  const without = await countTokensStable(probes, { ...common, allowNoSuffix: true });
+  console.log('infill  prompt-only  diff  stable    text');
+  probes.forEach((t, i) => console.log(
+    `${String(withS[i].tokens).padStart(6)}  ${String(without[i].tokens).padStart(11)}  ${String(without[i].tokens - withS[i].tokens).padStart(4)}  ${withS[i].stable ? 'stable' : 'UNSTABLE'}    ${JSON.stringify(t.slice(0, 50))}`));
+  console.log(`\nthe two templates differ, which is why the suffix is mandatory. oracle time: ${withS.reduce((n, x) => n + x.oracleMs, 0)}ms for ${withS.length * 2} calls`);
+  const refused = await countTokens('x');
+  console.log(`withholding the suffix is refused: ${refused.reason.slice(0, 60)}`);
 }

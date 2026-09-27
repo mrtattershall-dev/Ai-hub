@@ -104,19 +104,25 @@ async function main() {
 
   // ── the arms, matched in TOKENS on the prompt the model will actually read ──
   const facts = extractFacts(startFile, site);
-  const baseline = await countTokens(fullPrompt(''), { modelUrl: MODEL_URL, model: MODEL });
+  // THE ORACLE MEASURES THE REQUEST THE RUN WILL MAKE. It is given the same prefix AND the same
+  // suffix as generation, because the infill template and the prompt-only template disagree by a
+  // measured 24 tokens for identical content. Its own time is accumulated separately below and never
+  // added to generation timing; it also warms the cache, which is why the first generation of a run
+  // is not a clean latency sample.
+  const oracle = { modelUrl: MODEL_URL, model: MODEL, suffix: cut0.suffix };
+  const baseline = await countTokens(fullPrompt(''), oracle);
   if (!baseline.ok) { console.error(`the token oracle is unavailable: ${baseline.reason}`); process.exit(4); }
   const target = baseline.tokens + TOKEN_BUDGET;
 
   const grownC = await growToTokens(
     (size) => fullPrompt(renderConstraints(facts, { budget: size, style: STYLE, includeStrategy: STRATEGY }).text),
-    target, { from: 60, to: 4000, step: 30, modelUrl: MODEL_URL, model: MODEL });
+    target, { from: 60, to: 4000, step: 30, ...oracle });
   if (!grownC.ok) { console.error(`the constraint arm could not be sized: ${grownC.reason}`); process.exit(4); }
   const constraints = renderConstraints(facts, { budget: grownC.size, style: STYLE, includeStrategy: STRATEGY });
 
   const grownN = await growToTokens(
     (size) => fullPrompt(commentOut(renderNearbyCode(startFile, site, { budget: size }).text)),
-    grownC.tokens, { from: 40, to: 6000, step: 30, modelUrl: MODEL_URL, model: MODEL });
+    grownC.tokens, { from: 40, to: 6000, step: 30, ...oracle });
   if (!grownN.ok) { console.error(`the nearby arm could not be sized: ${grownN.reason}`); process.exit(4); }
   const nearbyRaw = renderNearbyCode(startFile, site, { budget: grownN.size });
   const nearby = { text: commentOut(nearbyRaw.text), chars: commentOut(nearbyRaw.text).length, lines: nearbyRaw.lines, windowLines: nearbyRaw.windowLines };
@@ -129,8 +135,14 @@ async function main() {
     nearby: grownN.tokens - baseline.tokens,
   };
   // Re-measured once at the end, so a number that will not reproduce cannot pass as a measurement.
-  const recheck = await countTokensStable([fullPrompt(block.constraints), fullPrompt(block.nearby)], { modelUrl: MODEL_URL, model: MODEL });
+  const recheck = await countTokensStable([fullPrompt(block.constraints), fullPrompt(block.nearby)], oracle);
   const unstable = recheck.filter((r) => !r.stable);
+  const oracleCost = {
+    totalMs: (baseline.oracleMs || 0) + (grownC.oracleMs || 0) + (grownN.oracleMs || 0) + recheck.reduce((n, r) => n + (r.oracleMs || 0), 0),
+    calls: 1 + (grownC.calls || 0) + (grownN.calls || 0) + recheck.length * 2,
+    note: 'measured separately from generation, and these calls warm the cache the first generation then reads',
+    everyReadingUsedTheInfillTemplate: recheck.every((r) => r.withSuffix) && baseline.withSuffix === true,
+  };
 
   const out = {
     at: new Date().toISOString(), experiment: 'constraint arms', task: TASK_ID, model: MODEL,
@@ -146,6 +158,9 @@ async function main() {
       tokenDifference: Math.abs(blockTokens.constraints - blockTokens.nearby),
       tokenReadingsStable: unstable.length === 0,
       unstableReadings: unstable,
+      // Stable is not correct. This records that the readings ALSO came from the template the run uses.
+      measuredOnTheInfillTemplate: oracleCost.everyReadingUsedTheInfillTemplate,
+      oracleCost,
       constraints: {
         chars: constraints.text.length, lines: constraints.lines, complete: constraints.complete,
         dropped: constraints.dropped, delivered: constraints.delivered, factsDelivered: constraints.factsDelivered,
@@ -158,7 +173,17 @@ async function main() {
       ...(constraints.factsDelivered === 0 ? ['constraints: 0 facts delivered'] : []),
       ...(nearby.chars === 0 ? ['nearby: an empty window'] : []),
     ],
+    // THE RENDERED REQUESTS THEMSELVES. Equal token counts do not make two prompt arrangements
+    // equivalent, so the record keeps the exact text of each arm's block and of the full prompt head
+    // that was sent, for every arm. A reader can reconstruct what the model saw.
     armText: { nearby: nearby.text, constraints: constraints.text },
+    renderedRequests: Object.fromEntries(['none', 'nearby', 'constraints'].map((a) => [a, {
+      block: block[a],
+      promptHead: fullPrompt(block[a]),
+      promptHeadSha: sha(fullPrompt(block[a])),
+      suffix: cut0.suffix,
+      suffixSha: sha(cut0.suffix),
+    }])),
     facts: { constraints: facts.constraints, redraws: facts.redraws, uncertainty: facts.uncertainty, structure: facts.structure },
     arms: {},
   };
@@ -167,6 +192,7 @@ async function main() {
   console.log(`  constraints  ${blockTokens.constraints} block tokens, ${constraints.factsDelivered} facts delivered, ${constraints.text.length} chars`);
   console.log(`  nearby       ${blockTokens.nearby} block tokens, ${nearby.lines} lines, ${nearby.chars} chars`);
   console.log(`  token difference ${out.armSizes.tokenDifference}${unstable.length ? '  (WARNING: a reading did not reproduce)' : ''}`);
+  console.log(`  oracle: ${oracleCost.calls} counting calls, ${oracleCost.totalMs}ms, infill template ${oracleCost.everyReadingUsedTheInfillTemplate ? 'confirmed' : 'NOT CONFIRMED'} - not counted as generation time`);
   if (out.undeliveredTreatments.length) console.log(`  UNDELIVERED: ${out.undeliveredTreatments.join('; ')}`);
 
   const cut = cut0;
@@ -250,6 +276,9 @@ async function main() {
 
   out.totals = {
     wallClockSeconds: +((Date.now() - T0) / 1000).toFixed(1),
+    oracleSeconds: +(oracleCost.totalMs / 1000).toFixed(1),
+    generationSeconds: +(Object.values(out.arms).reduce((n, a) => n + (a.generationSeconds || 0), 0)).toFixed(1),
+    timingNote: 'wall clock includes the token-counting calls and verification; generationSeconds is the model calls only',
     dollars: 0,
     modelCalls: ARMS.length * SEEDS.length,
     interventionsByAPerson: 0,

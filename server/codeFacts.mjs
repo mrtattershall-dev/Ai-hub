@@ -40,18 +40,27 @@ const MUTATING_METHODS = new Set([
 
 // ══ 1. getting to an AST ═════════════════════════════════════════════════════════════════════════
 
-/** Every inline <script> block, with the file offset needed to map a node back to a file line. */
+/**
+ * Every inline <script> block, with the file offset needed to map a node back to a file line, and
+ * whether it is a MODULE. A module is strict code with its own top-level scope; a classic script is
+ * sloppy unless it says otherwise. That distinction decides how a block-level function declaration
+ * scopes, so it cannot be ignored.
+ */
 export function scriptBlocks(file) {
   const out = [];
   const re = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
   let m;
   while ((m = re.exec(file)) !== null) {
     if (/\bsrc\s*=/i.test(m[1])) continue;            // external: its text is not in this file
-    out.push({ offset: m.index + m[0].indexOf(m[2]), text: m[2] });
+    const isModule = /\btype\s*=\s*['"]?module['"]?/i.test(m[1]);
+    out.push({ offset: m.index + m[0].indexOf(m[2]), text: m[2], isModule });
   }
-  if (!out.length && !/<\w+/.test(file.slice(0, 200))) out.push({ offset: 0, text: file });
+  if (!out.length && !/<\w+/.test(file.slice(0, 200))) out.push({ offset: 0, text: file, isModule: false });
   return out;
 }
+
+/** A directive prologue is the only way a classic script declares itself strict. */
+const hasUseStrict = (text) => /^\s*(?:\/\*[\s\S]*?\*\/\s*|\/\/[^\n]*\n\s*)*(['"])use strict\1\s*;?/.test(text);
 
 const lineOf = (file, offset) => file.slice(0, offset).split('\n').length;   // 1-based
 
@@ -60,7 +69,9 @@ function parseBlocks(file) {
   const unparsed = [];
   for (const b of scriptBlocks(file)) {
     try {
-      asts.push({ ...b, ast: acorn.parse(b.text, { ecmaVersion: 2022, locations: false, ranges: true }) });
+      const sourceType = b.isModule ? 'module' : 'script';
+      const ast = acorn.parse(b.text, { ecmaVersion: 2022, locations: false, ranges: true, sourceType });
+      asts.push({ ...b, ast, sourceType, strict: b.isModule || hasUseStrict(b.text) });
     } catch (err) {
       unparsed.push({ atFileLine: lineOf(file, b.offset), message: String(err.message) });
     }
@@ -227,19 +238,27 @@ export function zeroArgLocalCalls(file, scope, decls, { maxDepth = 3 } = {}) {
 // the declaration of some OTHER function's variable as a fact about the state at this site.
 const BLOCK_SCOPES = new Set(['BlockStatement', 'ForStatement', 'ForOfStatement', 'ForInStatement', 'SwitchStatement', 'Program', 'StaticBlock']);
 
-/** Every scope in the file, as absolute offset ranges, so a declaration can be placed in one. */
+/**
+ * Every scope in the file, as absolute offset ranges, so a declaration can be placed in one. Also the
+ * set of blocks that are FUNCTION BODIES: a function declaration sitting in a function's own body is
+ * ordinary and function-scoped, while one sitting in a bare block is the case that scopes differently
+ * depending on strictness.
+ */
 function scopeRanges(parsed) {
   const fns = [], blocks = [];
+  const functionBodies = new Set();
   for (const blk of parsed.asts) {
     fns.push({ start: blk.offset, end: blk.offset + blk.text.length, kind: 'Program' });
     walk(blk.ast, (n) => {
       const r = { start: blk.offset + n.start, end: blk.offset + n.end, kind: n.type };
-      if (FUNCTIONS.has(n.type)) { fns.push(r); blocks.push(r); }
-      else if (BLOCK_SCOPES.has(n.type)) blocks.push(r);
+      if (FUNCTIONS.has(n.type)) {
+        fns.push(r); blocks.push(r);
+        if (n.body && n.body.type === 'BlockStatement') functionBodies.add(blk.offset + n.body.start);
+      } else if (BLOCK_SCOPES.has(n.type)) blocks.push(r);
     });
     blocks.push({ start: blk.offset, end: blk.offset + blk.text.length, kind: 'Program' });
   }
-  return { fns, blocks };
+  return { fns, blocks, functionBodies };
 }
 
 // STRICTLY containing: a range identical to the declaration's own is not its scope. `function a(){}`
@@ -267,7 +286,8 @@ export function resolveDeclaration(decls, name, offset) {
 /** Every declaration in the file, keyed by name, each placed in the scope that contains it. */
 export function declarations(file, parsed) {
   const byName = new Map();
-  const { fns, blocks } = scopeRanges(parsed);
+  const notes = [];
+  const { fns, blocks, functionBodies } = scopeRanges(parsed);
   const add = (name, d) => { if (!byName.has(name)) byName.set(name, []); byName.get(name).push(d); };
   const map = new Map();                     // kept for readers that only need "is there one at all"
   for (const blk of parsed.asts) {
@@ -291,7 +311,23 @@ export function declarations(file, parsed) {
         add(n.id.name, d); map.set(n.id.name, d);
       } else if (n.type === 'FunctionDeclaration' && n.id) {
         const abs = { start: blk.offset + n.start, end: blk.offset + n.end };
-        const scope = innermostContaining(fns, abs.start, abs.end) || { start: 0, end: file.length, kind: 'Program' };
+        // A FUNCTION DECLARATION IS NOT UNIVERSALLY FUNCTION-SCOPED. Inside a bare block it is
+        // block-scoped in strict code; in sloppy code Annex B's legacy semantics can also hoist the
+        // NAME to the enclosing function, so its visibility outside the block is genuinely not
+        // determined by this file's syntax alone. Strict code gets the block; sloppy code gets the
+        // block too - the narrower, safer reading - and the ambiguity is RECORDED rather than hidden
+        // behind a confident answer.
+        const inBareBlock = parent && parent.type === 'BlockStatement' && !functionBodies.has(blk.offset + parent.start);
+        const inSwitch = parent && parent.type === 'SwitchCase';
+        let scope;
+        if (inBareBlock || inSwitch) {
+          scope = innermostContaining(blocks, abs.start, abs.end) || { start: 0, end: file.length, kind: 'Program' };
+          if (!blk.strict) {
+            notes.push(`\`${n.id.name}\` is a function declared inside a ${inSwitch ? 'switch case' : 'block'} in code that is not strict; whether its name is visible outside that ${inSwitch ? 'case' : 'block'} is legacy-dependent, so it is treated as confined to it and its wider visibility is NOT established`);
+          }
+        } else {
+          scope = innermostContaining(fns, abs.start, abs.end) || { start: 0, end: file.length, kind: 'Program' };
+        }
         const d = {
           name: n.id.name, keyword: 'function', isFunction: true, arity: n.params.length,
           initKind: 'FunctionDeclaration', atLine: lineOf(file, blk.offset + n.start),
@@ -303,7 +339,7 @@ export function declarations(file, parsed) {
       }
     });
   }
-  return { byName, get: (n) => map.get(n), has: (n) => map.has(n) };
+  return { byName, notes, get: (n) => map.get(n), has: (n) => map.has(n) };
 }
 
 const CONTAINERS = new Set(['ArrayExpression', 'ObjectExpression', 'NewExpression', 'CallExpression']);
@@ -351,6 +387,7 @@ export function extractFacts(file, site) {
   }
 
   const decls = declarations(file, parsed);
+  for (const n of decls.notes) uncertainty.push(n);
   const { writes, calls } = reachableWrites(file, scope, decls);
   for (const c of calls) {
     if (!c.notFollowed) continue;
@@ -419,6 +456,9 @@ export function extractFacts(file, site) {
       enclosingFunctionLines: [scope.startLine, scope.endLine],
       enclosingKind: scope.node.type,
       keydownHandlersInFile: keydownHandlers,
+      // What syntax mode each readable block was parsed in. Scope rules differ between them, so a
+      // reader can see which rules were applied rather than inferring them.
+      scriptModes: parsed.asts.map((b) => ({ atFileLine: lineOf(file, b.offset), sourceType: b.sourceType, strict: b.strict })),
     },
     behaviour: writes.filter((w) => !w.unresolvableTarget).map((w) => ({ root: w.root, kind: w.kind, atLine: w.atLine, text: w.text })),
     constraints,
