@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const { parseEditBlocks, applyEditBlocks, cutRegion } = await import('./localEdit.mjs');
+const { parseEditBlocks, applyEditBlocks, cutRegion, findNormalizedSpan } = await import('./localEdit.mjs');
 let passed = 0, failed = 0;
 const say = (ok, m) => { console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${m}`); ok ? passed++ : failed++; };
 
@@ -249,6 +249,36 @@ console.log('\n=== 10. the SMALLER fim region, with the movement wiring left int
   say(rec?.transformed?.kind === 'fim-middle' && typeof rec.transformed.middleUsed === 'string', 'the TRANSFORMED middle the harness spliced is recorded beside it');
   say(!!rec?.candidate?.sha256 && rec.candidate.chars > rec.transformed.middleUsedChars, 'the CANDIDATE the gate judged is recorded with its sha256');
   say(rec.transformed.identicalToRaw === true, 'and this run reports the transformation as a no-op, because no trim was requested');
+}
+
+console.log('\n=== 11. indentation-tolerant matching, anchored on the FILE (opt-in) ===');
+{
+  // REPAIR-1: the 7B located the right region in 4 of 4 candidates and every edit was refused,
+  // because its FIND sat at column 0 while the file indents by eight spaces (2 of 4) or because it
+  // regrouped non-adjacent lines (2 of 4). The recorded danger is a tolerant matcher that splices at
+  // the MODEL's indentation and drops a method out of its class; this does the opposite, so the
+  // tests below check both that it helps and that it still refuses.
+  const FILE = ['<html>', '  <script>', '    function a() {', '      go();', '    }', '    bind(a);', '  </script>', '</html>'].join('\n');
+  const B = (find, replace) => [{ find, replace }];
+
+  const wrongIndent = applyEditBlocks(FILE, B('function a() {\ngo();\n}', 'function a() {\n  go2();\n}'), { match: 'normalized' });
+  say(wrongIndent.applicable && wrongIndent.results[0].matchedBy === 'normalized', 'a FIND at the wrong indentation applies in normalized mode');
+  say(wrongIndent.text.includes('    function a() {') && wrongIndent.text.includes('      go2();'),
+    'and the replacement lands at the FILE\'s indentation, not the model\'s');
+  say(wrongIndent.text.includes('  <script>') && wrongIndent.text.includes('    bind(a);'), 'the untouched lines keep their own indentation');
+
+  say(applyEditBlocks(FILE, B('function a() {\ngo();\n}', 'x'), { match: 'exact' }).results[0].status === 'NOT_FOUND',
+    'exact mode is unchanged: it still refuses the same block');
+  say(applyEditBlocks(FILE, B('}\nfunction a() {\ngo();', 'x'), { match: 'normalized' }).results[0].status === 'NOT_FOUND',
+    'REORDERED lines are still refused - reordering is a content disagreement, not a formatting one');
+  say(applyEditBlocks(FILE + '\n' + FILE, B('bind(a);', 'bind(b);'), { match: 'normalized' }).results[0].status === 'AMBIGUOUS',
+    'a block matching two places is still AMBIGUOUS');
+  const span = findNormalizedSpan(FILE, 'function a() {\ngo();\n}');
+  say(span.status === 'MATCHED' && span.fileIndent.length === 4 && span.findIndent.length === 0,
+    `the span records both indentations (${span.fileIndent.length} in the file, ${span.findIndent.length} in the find)`);
+  const destructive = applyEditBlocks(FILE, B('go();', 'go();\nmore();'), { match: 'normalized' });
+  say(destructive.applicable && destructive.text.split('\n').filter((l) => l.trim() === 'more();')[0] === '      more();',
+    'an added line inherits the file\'s indentation too, so nothing escapes its block');
 }
 
 console.log(`\n  localized edit: ${passed} passed, ${failed} failed -> ${failed ? 'THE PROTOCOL IS NOT ESTABLISHED' : 'a correct edit reaches RETAIN through both protocols, and every refusal is deterministic'}`);

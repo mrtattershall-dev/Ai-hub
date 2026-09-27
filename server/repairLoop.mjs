@@ -51,6 +51,8 @@ const TEMPERATURE = parseFloat(opt('temperature', '0.2'));
 const MAX_TOKENS = parseInt(opt('max-tokens', '1500'), 10);
 const DEADLINE_MS = Math.max(10_000, parseFloat(opt('deadline-sec', '900')) * 1000);
 const OUT = opt('out', null);
+const MATCH = opt('match', 'exact');        // 'normalized' also accepts a FIND at the wrong indent
+if (!['exact', 'normalized'].includes(MATCH)) { console.error(`unknown --match ${MATCH}`); process.exit(2); }
 if (!CANDIDATE) { console.error('--candidate <record.json> is required: the UNTOUCHED candidate to repair'); process.exit(2); }
 
 const { farmTasks } = await import('./benchTasks.js');
@@ -85,8 +87,14 @@ const SYSTEM = [
  * The evidence message. EVERY sentence here is either the task's own contract or something the
  * gate measured in this run. Nothing describes the defect in my words.
  */
-function evidenceMessage(file, d, play) {
+function evidenceMessage(file, d, play, lastRefusal) {
   const lines = [`This is ${ENTRY}. It does not work. Repair it.`, '', file, ''];
+  if (lastRefusal) {
+    lines.push('Your previous edit block was rejected by the tool that applies it, with this result:',
+      '', `    ${lastRefusal}`, '',
+      'The FIND text must appear in the file above as one unbroken run of lines, copied in the same',
+      'order they appear there.', '');
+  }
   if (d.failureClass === 'RUNTIME_EXCEPTION_AT_LOAD') {
     lines.push('When the page loads, it raises this error and stops running:', '',
       ...d.loadErrors.map((e) => '    ' + e), '',
@@ -157,8 +165,10 @@ async function main() {
     at: new Date().toISOString(), model: MODEL, modelUrl: MODEL_URL, task: TASK_ID,
     candidateSource: CANDIDATE, candidateSha: sha(startFile), seed: SEED === null ? null : parseInt(SEED, 10),
     maxRounds: MAX_ROUNDS, rounds: [], accepted: false, totals: {},
+    matchMode: MATCH,
     assistance: {
       evidenceIsMachineCaptured: true,
+      indentationToleranceByHarness: MATCH === 'normalized',
       humanAnalysisSupplied: false,          // no rewiring, no corrected decrement, no DOM hint
       editFormatGivenByHarness: true,
       fuzzyMatchingAllowed: false,
@@ -186,7 +196,7 @@ async function main() {
     console.log(`round 0  the untouched candidate: play [${judged.play.passing.join(',')}]  ${judged.diagnosis.failureClass}  ${judged.acceptance.disposition}`);
     if (judged.diagnosis.loadErrors.length) console.log(`         captured error: ${judged.diagnosis.loadErrors[0]}`);
 
-    let genMs = 0, tokens = 0;
+    let genMs = 0, tokens = 0, lastRefusal = null;
     for (let round = 1; round <= MAX_ROUNDS && !judged.boundaries.accepted; round++) {
       // Re-read the play with cases, for the behavioural evidence.
       const beforeRound = current;
@@ -194,7 +204,7 @@ async function main() {
       // working copy back before reading the evidence from it.
       writeFileSync(join(ws, ENTRY), current, 'utf8');
       const play = await playCheck(ws, spec, { timeoutMs: 90_000 });
-      const msg = evidenceMessage(current, judged.diagnosis, play);
+      const msg = evidenceMessage(current, judged.diagnosis, play, lastRefusal);
       const gen = await chat([{ role: 'system', content: SYSTEM }, { role: 'user', content: msg }]);
       genMs += gen.ms || 0; tokens += gen.outTok || 0;
       const row = {
@@ -208,9 +218,18 @@ async function main() {
       const parsed = parseEditBlocks(gen.text);
       row.blocks = parsed.blocks.length; row.incomplete = parsed.incomplete; row.outsideChars = parsed.outside.length;
       if (!parsed.blocks.length) { row.outcome = 'NO_EDIT_PRODUCED'; out.rounds.push(row); console.log(`round ${round}  no edit block produced`); continue; }
-      const applied = applyEditBlocks(current, parsed.blocks);
+      const applied = applyEditBlocks(current, parsed.blocks, { match: MATCH });
       row.applyResults = applied.results;
-      if (!applied.applicable) { row.outcome = 'EDIT_NOT_APPLICABLE'; out.rounds.push(row); console.log(`round ${round}  edit not applicable: ${applied.results.map((r) => r.status).join('/')}`); continue; }
+      if (!applied.applicable) {
+        row.outcome = 'EDIT_NOT_APPLICABLE';
+        out.rounds.push(row);
+        console.log(`round ${round}  edit not applicable: ${applied.results.map((r) => r.status).join('/')}`);
+        // REPAIR-1: rounds 2 and 3 re-sent identical evidence and got identical replies, so the
+        // budget was spent re-reading the same refusal. That the edit did not match is itself a
+        // machine fact, so it is fed back - still nothing of my analysis.
+        lastRefusal = applied.results.map((r) => r.status).join(', ');
+        continue;
+      }
 
       current = applied.text.endsWith('\n') ? applied.text : applied.text + '\n';
       writeFileSync(join(ws, ENTRY), current, 'utf8');
@@ -223,6 +242,8 @@ async function main() {
       row.diagnosis = judged.diagnosis; row.disposition = judged.acceptance.disposition;
       row.accepted = judged.boundaries.accepted;
       row.outcome = judged.boundaries.accepted ? 'ACCEPTED' : 'STILL_FAILING';
+      row.matchedBy = applied.results.map((r) => r.matchedBy).filter(Boolean).join(',');
+      lastRefusal = null;                     // the edit applied; the next round judges behaviour
       out.rounds.push(row);
       console.log(`round ${round}  ${row.blocks} block(s) applied -> play [${judged.play.passing.join(',')}]  ${judged.diagnosis.failureClass}  ${judged.acceptance.disposition}  ${judged.boundaries.passedProtected ? 'protected ok' : 'PROTECTED FAILED -> this round reverted'}`);
 

@@ -212,25 +212,95 @@ export function parseEditBlocks(reply) {
 }
 
 /**
+ * INDENTATION-TOLERANT, FILE-ANCHORED MATCHING. Opt-in, and the distinction matters.
+ *
+ * REPAIR-1: the 7B located the right region in 4 of 4 candidates and every edit was refused, because
+ * its FIND reproduced the lines at column 0 while the file indents them by eight spaces (2 of 4), or
+ * regrouped lines that are not adjacent in the file (2 of 4). Exact matching is correct about the
+ * second case and needlessly strict about the first.
+ *
+ * The recorded danger is a "tolerant matcher" that splices at the MODEL's indentation and thereby
+ * drops a method out of its class. This does the opposite: the span is located by comparing
+ * line-by-line with whitespace ignored, and then the FILE's own lines are replaced, with the
+ * replacement re-indented to the file's indentation. The model's whitespace is never authoritative.
+ *
+ * Still refused: zero matches, more than one match, and any FIND whose line sequence does not appear
+ * contiguously in the file - reordering is a content disagreement, not a formatting one.
+ */
+export function findNormalizedSpan(original, find) {
+  const keep = (arr) => arr.map((l, i) => ({ i, t: l.trim() })).filter((x) => x.t.length);
+  const fileLines = String(original).split('\n');
+  const fileKeep = keep(fileLines);
+  const findKeep = keep(String(find).split('\n'));
+  if (!findKeep.length) return { status: 'EMPTY_FIND', count: 0 };
+  let count = 0, at = -1;
+  for (let k = 0; k + findKeep.length <= fileKeep.length; k++) {
+    let ok = true;
+    for (let j = 0; j < findKeep.length; j++) {
+      if (fileKeep[k + j].t !== findKeep[j].t) { ok = false; break; }
+    }
+    if (ok) { count++; if (at === -1) at = k; }
+  }
+  if (count === 0) return { status: 'NOT_FOUND', count: 0 };
+  if (count > 1) return { status: 'AMBIGUOUS', count };
+  const firstLine = fileKeep[at].i;
+  const lastLine = fileKeep[at + findKeep.length - 1].i;
+  const indentOf = (l) => (l.match(/^[ \t]*/) || [''])[0];
+  return {
+    status: 'MATCHED', count: 1, firstLine, lastLine,
+    fileIndent: indentOf(fileLines[firstLine]),
+    findIndent: indentOf(String(find).split('\n').find((l) => l.trim().length) || ''),
+  };
+}
+
+/** Replace the matched FILE lines, re-indenting the replacement to the FILE's indentation. */
+export function spliceNormalized(original, span, replace) {
+  const fileLines = String(original).split('\n');
+  const delta = span.fileIndent.length - span.findIndent.length;
+  const reindented = String(replace).split('\n').map((l) => {
+    if (!l.trim().length) return '';
+    if (delta > 0) return ' '.repeat(delta) + l;
+    if (delta < 0) return l.replace(new RegExp(`^[ \\t]{0,${-delta}}`), '');
+    return l;
+  });
+  // A trailing blank line in the replacement would otherwise add one on every splice.
+  while (reindented.length && !reindented[reindented.length - 1].length) reindented.pop();
+  return [...fileLines.slice(0, span.firstLine), ...reindented, ...fileLines.slice(span.lastLine + 1)].join('\n');
+}
+
+/**
  * Apply blocks in order. A FIND must match the CURRENT text exactly once; zero matches or more
  * than one is a refusal for that block, recorded with which it was. Nothing is applied unless
  * every block is applicable, so a partial splice can never reach disk.
  */
-export function applyEditBlocks(original, blocks) {
+export function applyEditBlocks(original, blocks, { match = 'exact' } = {}) {
   const results = [];
   let text = String(original);
   for (const b of blocks) {
     const find = b.find;
     if (!find.length) { results.push({ status: 'EMPTY_FIND', count: 0 }); continue; }
+    // LINE-ALIGNED exact matching. A substring match can start in the middle of a line, and then a
+    // multi-line replacement puts its later lines at column 0 - the same de-indentation hazard the
+    // exact rule exists to avoid, arriving through the front door. Found by a test asserting that an
+    // added line inherits the file's indentation: a FIND of `go();` matched inside `      go();` and
+    // spliced `more();` against the left margin. So a match must begin at the start of a line; a
+    // FIND that omits the indentation is not an exact match, and normalized mode handles it properly
+    // by re-indenting to the file.
     let count = 0, from = 0, at = -1;
     for (;;) {
       const i = text.indexOf(find, from);
       if (i === -1) break;
-      count++; if (at === -1) at = i; from = i + 1;
+      if (i === 0 || text[i - 1] === '\n') { count++; if (at === -1) at = i; }
+      from = i + 1;
     }
-    if (count === 0) results.push({ status: 'NOT_FOUND', count });
-    else if (count > 1) results.push({ status: 'AMBIGUOUS', count });
-    else { results.push({ status: 'APPLIED', count, at }); text = text.slice(0, at) + b.replace + text.slice(at + find.length); }
+    if (count === 1) { results.push({ status: 'APPLIED', count, at, matchedBy: 'exact' }); text = text.slice(0, at) + b.replace + text.slice(at + find.length); continue; }
+    if (count > 1) { results.push({ status: 'AMBIGUOUS', count }); continue; }
+    if (match !== 'normalized') { results.push({ status: 'NOT_FOUND', count }); continue; }
+    // Exact matching found nothing: try again ignoring indentation, anchored on the FILE.
+    const span = findNormalizedSpan(text, find);
+    if (span.status !== 'MATCHED') { results.push({ status: span.status, count: span.count, triedNormalized: true }); continue; }
+    results.push({ status: 'APPLIED', count: 1, at: span.firstLine, matchedBy: 'normalized', reindentedBy: span.fileIndent.length - span.findIndent.length });
+    text = spliceNormalized(text, span, b.replace);
   }
   const applicable = results.length > 0 && results.every((r) => r.status === 'APPLIED');
   return { applicable, results, text: applicable ? text : String(original) };
