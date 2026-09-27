@@ -5,6 +5,61 @@
 serving version, matching, stopping rules, budgets and decoding pinned identical. The only difference
 was `--evidence basic` against `--evidence diagnosis`.
 
+## What this comparison tests, and what it cannot isolate
+
+**It tests the whole diagnosis POLICY, not prompting alone.** The policy decides which observations to
+take, whether one explanation survives, whether to call the model at all, and what to hand it. A
+difference between the arms could come from any of those, and this design cannot separate better
+prompting from a different decision about when to attempt a repair. In this run the policy happened
+never to decline — it reached a hypothesis on all four candidates — so no difference here is
+attributable to refusal. That is a fact about this run, not a property of the design.
+
+## The accounting: every starting candidate in the denominator
+
+    arm  accepted    error-free   model  policy    no-new-info  applied  generation  output
+         (old spec)  (post-run)   calls  declines  stops        edits    seconds     tokens
+    E0    0 of 4      1 of 4        9       0          3           6       67.2       4,066
+    E2    0 of 4      0 of 4        4       0          4           1       11.7         631
+
+    per candidate, both verdicts side by side
+    arm  seed  old-spec accepted  post-run passing  errors  what happened
+    E0    2    no                 []                  18    edit applied
+    E0    3    no                 []                  18    edit applied
+    E0    4    no                 []                  18    block produced, refused by the applier
+    E0    5    no                 [1,2,3,5,7]          0    edit applied
+    E2    2    no                 []                  18    edit applied
+    E2    3    no                 []                  18    no edit block produced
+    E2    4    no                 []                  18    no edit block produced
+    E2    5    no                 []                  18    no edit block produced (reconstructed)
+
+**Four starting candidates per arm, and all four are in every denominator** — including the ones that
+never produced a usable edit. Declines and model calls are counted apart: the diagnosis policy declined
+**zero** times, and its lower call count (4 against 9) comes from the loop's own
+no-new-information stop firing sooner, not from refusal.
+
+**The denominator NOT to use, stated so it cannot be reached for by accident:** among candidates whose
+edits actually applied, acceptance is 0 of 3 for E0 and 0 of 1 for E2. Both are zero here, but that
+ratio is the one that would let a narrower attempt rate masquerade as better repair capability, and it
+must not be quoted.
+
+**Old-spec against stricter, side by side:** old-spec acceptance is 0 of 4 in both arms. The stricter
+post-run check is 1 of 4 for E0 and 0 of 4 for E2 — and that single E0 row is error-free with movement
+intact and **no planting**, so it is not a repair either. Nothing in this table is a valid repair.
+
+## Time and cost, including probes and failed attempts
+
+    container window                665 s, all of it inside the $2 cap, $0.204 at $0.000306/s
+    generation, both arms            79 s - 12% of the window
+    everything else                 586 s - the local play, the independent evaluator, the acceptance
+                                    re-check, the diagnosis arm's extra probe per round, and every
+                                    failed attempt's share of all of that
+    per starting candidate           about $0.026, counting the whole window against 8 runs
+    per valid repair                 undefined: there were none
+
+**The diagnosis arm cost less to generate and produced less.** It used 17% of E0's output tokens and
+delivered one applied edit against six. Cheaper work that does not repair is not "comparable repairs
+for less work".
+
 ## The comparison
 
     arm  seed  disposition            rounds  applied  rounds with  accepted  post-check    errors
@@ -133,6 +188,29 @@ Its generation figures come from the log.
 **an escalation budget for this loop is priced in verifications, not tokens**, and E2's cheaper
 generation bought nothing at all.
 
+## The question this was meant to answer
+
+*Does this policy deliver more valid repairs, or comparable repairs for less work, than raw-error
+feedback?*
+
+    more valid repairs                  NO. 0 of 4 both arms, and 0 of 8 valid repairs overall.
+    comparable repairs for less work    NO. There were no repairs to compare. The diagnosis arm did
+                                        less work (4 model calls, 631 tokens) and produced less (1
+                                        applied edit against 6); the only candidate that reached an
+                                        error-free preserved state came from the raw-error arm.
+
+**On this evidence the policy is not an improvement.** The one thing in its favour is a single round's
+repair DIRECTION, and a single round is not a result.
+
+## Frozen
+
+This version is frozen as the one that produced the comparison. The two changes committed after the
+run were record fields only — `engineDiagnosis` / `gateClassification` instead of one shared name, and
+storing the evidence with the file elided instead of a window that began at the file. `git diff` over
+`server/repairLoop.mjs` between the run commit and now shows nothing else: the system prompt, the
+rendered diagnosis, the evidence content, the matching and the gate are untouched, so the behaviour
+that produced these numbers is the behaviour in the tree.
+
 ## What this establishes, and what it does not
 
 - **Established:** under an otherwise identical loop, diagnosis feedback did not improve acceptance
@@ -145,6 +223,8 @@ generation bought nothing at all.
 - **NOT established:** anything about unfamiliar failures. The engine reached the same hypothesis on
   every candidate, because these four candidates share one defect.
 - **Not autonomy.** The candidates, task, format, tolerance and catalogue are all mine.
+- **Not an isolation of prompting.** The arms differ by the whole policy, including its decision about
+  whether to call the model, which is why the accounting above keeps declines and calls apart.
 
 Records: `DOM-EVIDENCE-1_DEFINITION.md`, `DOM-EVIDENCE-1_E0_seed{2,3,4,5}.json`,
 `DOM-EVIDENCE-1_E2_seed{2,3,4}.json`, `DOM-EVIDENCE-1_E2_seed5_reconstructed.json`,
