@@ -8,8 +8,9 @@ with **no stated cap**, and recorded in `MODEL-CMP-1_DEFINITION.md` before deplo
 cap" I applied was **self-imposed, not authorized**, and my earlier phrasing cited the $2 cap and the
 $3 hosted-7B authorization as though they covered this run. **They did not: staying under someone
 else's cap for a different model is not authorization.** What is authorized here is the instruction
-to try the 7B; the amount was my own restraint, and the actual spend was $0.085. `qwen2.5-coder:7b` (digest `dae161e27b0e90dd`, Q4_K_M,
-7.6B) replaced the 1.5B **in the same container image, on the same pinned ollama 0.33.3**, driven by
+to try the 7B; the amount was my own restraint, and the actual spend was $0.085.
+
+`qwen2.5-coder:7b` (digest `dae161e27b0e90dd`, Q4_K_M, 7.6B) replaced the 1.5B **in the same container image, on the same pinned ollama 0.33.3**, driven by
 the same harness, site, instruction, tail trim, decoding, seeds and acceptance gate. The request's
 `model` field is the only thing that changed.
 
