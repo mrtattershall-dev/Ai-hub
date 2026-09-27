@@ -177,7 +177,9 @@ Arm C: the same 1.5B on an A10G — **11.9x faster generation, identical failure
 **Established:** the failure did not move with the model size or the hardware in these cells.
 **Not established:** that model capability is never the constraint. That stronger claim was
 **withdrawn** on the user's correction. Also recorded: ollama versions differ between backends and
-seeds do not reproduce across them, so cross-backend cells are not comparable.
+seeds do not reproduce across them, so **a local record cannot serve as the control for a GPU cell.**
+That is a constraint on borrowing controls, not a bar on GPU work - a GPU comparison is perfectly
+runnable with its own same-backend control arm, and an earlier phrasing of mine implied otherwise.
 
 ### REPAIR-1 / REPAIR-2 / DOM-EVIDENCE-1 — $2 cap, spent under it
 
@@ -245,8 +247,27 @@ Built `codeFacts.mjs` and tried to run the comparison. **It could not be run as 
 ## 4. THE APPARATUS-DEFECT LEDGER
 
 **This is the most valuable artefact in the programme.** Every entry is a defect that, left alone,
-would have been published as a fact about a model. They are listed because the pattern is the finding:
-*at this scale, the instrument is the most likely explanation for a null result.*
+would have been published as a fact about a model.
+
+**What the ledger establishes, stated carefully.** It establishes that **the instrument has been a
+substantial source of uncertainty** in this programme: repeatedly, a null result had an apparatus
+explanation that was found by checking rather than by reasoning. It does **not** establish that the
+instrument is the likeliest cause of any particular null, and the earlier wording - "at this scale the
+instrument is the most likely explanation for a null result" - claimed more than 24 counted defects can
+support.
+
+The correct reading is conditional and per-result:
+
+    before the instrument is checked   a null is uninterpretable. Some apparatus explanation is live,
+                                       and this ledger is the evidence that such explanations are
+                                       common enough to be the first suspect.
+    after specific defects are ruled    MODEL and TASK limitations remain fully possible, and for a
+    out                                given null they may well be the explanation. Ruling out the
+                                       defects you thought of does not rule out capability; it only
+                                       stops capability being asserted by default.
+
+So the ledger licenses one procedural rule and no empirical conclusion: **check the instrument before
+interpreting the number.** It says nothing about what any interpreted number will turn out to mean.
 
 ### Defects found today (Layer A)
 
@@ -273,12 +294,20 @@ would have been published as a fact about a model. They are listed because the p
        block-scoped in strict code, and Annex B can hoist the name in sloppy code. Fixed: strict and
        module modes distinguished; the sloppy case RECORDED as not established.
     9  THE TOKEN ORACLE MEASURED THE WRONG REQUEST. Generation sends prompt AND suffix, selecting the
-       infill template; the oracle sent prompt alone. Measured on unique prefixes, the branches differ
-       by a constant 24 tokens. Every token match made before this was on a template the run does not
-       use.
+       infill template; the oracle sent prompt alone. Every token match made before this was on a
+       template the run does not use.
+       SCOPE OF THE MEASUREMENT, stated because the earlier write-up generalised it: the 24-token gap
+       and the cache-stable counts are findings about THE REQUESTS TESTED - a handful of short prefixes
+       and one suffix, on this ollama build and this model. They are not properties of every request,
+       and a different prefix, a longer suffix or another build could behave differently. They are
+       diagnostic, and the arithmetic uses NEITHER: the fix is not a 24-token correction, it is
+       counting the actual generation request. The stronger form of that fix is now in the design - the
+       generation call reports its own prompt_eval_count and the record voids the match if it disagrees
+       with the oracle, so the match is checked against the real call on every task rather than trusted
+       from a probe.
     10 `num_predict: 0` took 40.7 s on a 509-token prompt; `num_predict: 1` returned the IDENTICAL
        count in 0.4 s. The obvious choice would have made the instrument unusable and looked like a
-       model hang.
+       model hang. Again: one prompt, one build - a timing observation, not a law.
     11 A stray NUL byte in a source file (a hash separator) made it read as binary to every text tool.
     12 My own recorded rule about Windows heredocs eating escapes was violated four times in this
        session. Every patch is now written to a file first.
@@ -304,7 +333,9 @@ would have been published as a fact about a model. They are listed because the p
     24 A positive-control fixture already passed the steps it was meant to test.
 
 **The count is 24 and it is not a boast.** Every one of these was found by checking the instrument
-rather than believing the number, and several were found only because a result looked *right*.
+rather than believing the number, and several were found only because a result looked *right*. The count
+also has no denominator: I cannot say how many defects remain unfound, so 24 measures effort spent, not
+completeness achieved.
 
 ---
 
@@ -315,7 +346,10 @@ rather than believing the number, and several were found only because a result l
       MODEL-CMP-1 arms C + C2              under $0.20
       REPAIR / DOM-EVIDENCE cells          within a $2 cap, spent under it
     everything in this session             $0
-    authorized and UNSPENT right now       $10, with a 5-hour run on the 1.5b
+    spendable right now                    NOTHING. A $10 / 5-hour authorization reached me in one
+                                           turn and Micheal has since said he cannot verify it from
+                                           the visible conversation, so it is recorded as UNVERIFIED
+                                           and NOT spendable in CONSTRAINTS-2, and Modal stays off.
 
 Authorization discipline, in force and honoured every time: **only Micheal authorizes spend; a
 suggested cap from any other voice is not authorization; the authorization is written into the frozen
@@ -351,6 +385,9 @@ Accumulated from the user's corrections. Each exists because a specific claim wa
     13  Preserve failures. A passing count is the weakest claim available.
     14  Keep confounded cells separate rather than averaging them.
     15  One result on the page you tuned against cannot establish transfer.
+    16  Separate what was RE-CHECKED from what was merely READ. An audit that blurs the two borrows
+        credibility from work it did not do, and this document's layer tags exist for that reason.
+    17  A defect count has no denominator. It measures effort spent looking, never completeness.
 
 ---
 
