@@ -76,9 +76,15 @@ transformation the harness performed is visible next to what the model actually 
 
 ## Arms
 
-    A  qwen2.5-coder:1.5b, local CPU      $0      BASELINE - run
-    C  qwen2.5-coder:1.5b, Modal GPU      AUTHORIZED $2 total - run under this definition
-    B  a stronger model, to be chosen     NOT authorized, NOT run
+    A   qwen2.5-coder:1.5b, local CPU      $0      BASELINE - run
+    C   qwen2.5-coder:1.5b, Modal GPU      AUTHORIZED $2 total - run (ollama 0.34.4)
+    C2  the same, serving version PINNED to 0.33.3 to match arm A - run, same authorization
+    B   a stronger model, to be chosen     NOT authorized, NOT run
+
+**Arm B, when it is authorized, must serve on a PINNED version** (`OLLAMA_VERSION` in
+`server/modalOllama.py`, verified in the build log and by the server's startup line). Arm C2 proved
+the pin works and also showed that the version was not what made CPU and GPU outputs differ - the
+hardware alone does that, on 3 of 5 seeds, so arm B will not be seed-pairable against arm A either.
 
 ## Arm C — AUTHORIZED: $2 total, recorded before deploying
 

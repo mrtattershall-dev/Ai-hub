@@ -27,12 +27,17 @@ is still five seeds, but the configuration itself is not wandering.
 
 **CORRECTED by arm C.** This section originally read "16 seconds of generation against 139 seconds
 end to end", concluding that verification is about seven eighths of an attempt. **That mean was
-driven by one outlier.** The five verification times were 19, 15, 13, **554** and 13 seconds; without
-the 554 s row the mean is **15 s**, and arm C measured 21 s for the same local code. The outlier
-matches a 9.5-minute gap before the next attempt, on a machine with a recorded history of sleeping
-mid-run. Verification here takes roughly **13 to 24 seconds**, so on this CPU generation and
-verification are comparable rather than 1:7. Verification only dominates once generation is fast:
-see `MODEL-CMP-1_armC_RESULT.md`.
+driven by one attempt.** The five verification times were 19, 15, 13, **554** and 13 seconds; arm C
+measured 17-24 s for the same local code.
+
+Both figures belong in the record. **Full elapsed account: the five attempts took 696 s**, and that
+is what the run cost in time. **Typical attempt: 13-24 s of verification**, which is the planning
+figure. What made one attempt take 554 s is **not established** - there is a 9.5-minute gap before
+the next attempt and this machine has a recorded history of sleeping mid-run, but a timestamp gap
+alone does not distinguish sleep from contention or a stalled browser.
+
+So on this CPU generation and verification are comparable rather than 1:7, and verification only
+dominates once generation is fast: see `MODEL-CMP-1_armC_RESULT.md`.
 
 ## What arm A's failures are
 

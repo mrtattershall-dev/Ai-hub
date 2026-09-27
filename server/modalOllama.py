@@ -23,13 +23,18 @@ import time
 import modal
 
 MODEL = "qwen2.5-coder:1.5b"
+# Must match the local server every other arm was measured on (`curl localhost:11434/api/version`).
+OLLAMA_VERSION = "0.33.3"
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
     # zstd: ollama's installer extracts a zstd archive and fails with a bare "install zstd" error
     .apt_install("curl", "zstd")
     .run_commands(
-        "curl -fsSL https://ollama.com/install.sh | sh",
+        # PIN the server version. Arm C shipped 0.34.4 against 0.33.3 locally, which moved the
+        # serving version together with the hardware and made a "hardware-only" reading impossible.
+        # Pinning to the version every local record was produced with keeps the arms aligned.
+        f"curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION={OLLAMA_VERSION} sh",
         # Bake the weights into the image: a cold start then loads from local disk instead of
         # paying GPU seconds to download a gigabyte.
         f"(ollama serve &) && sleep 8 && ollama pull {MODEL} && sleep 2",
