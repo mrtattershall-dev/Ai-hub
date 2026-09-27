@@ -1,0 +1,45 @@
+=== E0 basic, candidate seed 2 2026-09-27T09:05:27Z
+round 0  the untouched candidate: play []  RUNTIME_EXCEPTION_AT_LOAD  RESTORED
+         captured error: [JS ERROR] Cannot read properties of null (reading 'addEventListener')
+round 1  1 block(s) applied -> play [2,3,5]  NONE  RESTORED  PROTECTED FAILED -> this round reverted
+round 2  1 block(s) applied -> play []  RUNTIME_EXCEPTION_AT_LOAD  RESTORED  PROTECTED FAILED -> this round reverted
+round 3  STOPPED: same file, same evidence as an earlier round - no new information
+  post-check farm-plant-v2: passing [] failing [1,2,3,4,5,6,7]  errors 18  requested FAIL
+
+  ACCEPTED: no   final play []   RESTORED
+  repair rounds 2   generation 17.7 s   468 tokens   wall clock 77.6 s
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/domev/E0_seed2.json
+=== E0 basic, candidate seed 3 2026-09-27T09:06:45Z
+round 0  the untouched candidate: play []  RUNTIME_EXCEPTION_AT_LOAD  RESTORED
+         captured error: [JS ERROR] Cannot read properties of null (reading 'addEventListener')
+round 1  edit not applicable: NOT_FOUND
+round 2  1 block(s) applied -> play []  RUNTIME_EXCEPTION_AT_LOAD  RESTORED  PROTECTED FAILED -> this round reverted
+round 3  STOPPED: same file, same evidence as an earlier round - no new information
+  post-check farm-plant-v2: passing [] failing [1,2,3,4,5,6,7]  errors 18  requested FAIL
+
+  ACCEPTED: no   final play []   RESTORED
+  repair rounds 2   generation 16 s   1127 tokens   wall clock 69 s
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/domev/E0_seed3.json
+=== E0 basic, candidate seed 4 2026-09-27T09:07:54Z
+round 0  the untouched candidate: play []  RUNTIME_EXCEPTION_AT_LOAD  RESTORED
+         captured error: [JS ERROR] Cannot read properties of null (reading 'addEventListener')
+round 1  edit not applicable: NOT_FOUND
+round 2  no edit block produced
+round 3  STOPPED: same file, same evidence as an earlier round - no new information
+  post-check farm-plant-v2: passing [] failing [1,2,3,4,5,6,7]  errors 18  requested FAIL
+
+  ACCEPTED: no   final play []   RESTORED
+  repair rounds 2   generation 18.7 s   1442 tokens   wall clock 58.3 s
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/domev/E0_seed4.json
+=== E0 basic, candidate seed 5 2026-09-27T09:08:53Z
+round 0  the untouched candidate: play []  RUNTIME_EXCEPTION_AT_LOAD  RESTORED
+         captured error: [JS ERROR] Cannot read properties of null (reading 'addEventListener')
+round 1  1 block(s) applied -> play []  RUNTIME_EXCEPTION_AT_LOAD  RESTORED  PROTECTED FAILED -> this round reverted
+round 2  6 block(s) applied -> play [1,2,3,5]  NONE  PRESERVE_INCOMPLETE  protected ok
+round 3  2 block(s) applied -> play [1,2,3,5]  NONE  PRESERVE_INCOMPLETE  protected ok
+  post-check farm-plant-v2: passing [1,2,3,5,7] failing [4,6]  errors 0  requested FAIL
+
+  ACCEPTED: no   final play [1,2,3,5]   PRESERVE_INCOMPLETE
+  repair rounds 3   generation 14.8 s   1029 tokens   wall clock 99 s
+  written: C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/784f5dee-d411-40db-b5ec-cf91b8f4605f/scratchpad/domev/E0_seed5.json
+E0 exit 0

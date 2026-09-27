@@ -215,8 +215,13 @@ console.log('\n=== 8. diagnosis mode hands over facts, a HYPOTHESIS and obligati
   const { rec, seen } = await run('diagmode', [block('a line that is nowhere in the file', 'x')], undefined, 1, ['--evidence', 'diagnosis']);
   const prompt = JSON.stringify(seen[0]?.messages || []);
   say(rec?.evidenceMode === 'diagnosis' && rec?.assistance?.structuredDiagnosisSupplied === true, 'the record says a structured diagnosis was supplied');
-  say(rec?.rounds?.find((r) => r.round === 1)?.diagnosis?.surviving?.length === 1,
-    `the engine ran per round and one explanation survived (${rec?.rounds?.find((r) => r.round === 1)?.diagnosis?.surviving?.join(',')})`);
+  const r1 = rec?.rounds?.find((r) => r.round === 1);
+  say(r1?.engineDiagnosis?.surviving?.length === 1,
+    `the engine ran per round and one explanation survived (${r1?.engineDiagnosis?.surviving?.join(',')})`);
+  say(r1?.engineDiagnosis?.source === 'diagnose.mjs', 'the round records the ENGINE\'s diagnosis under its own name');
+  // The record must show what the harness added, not a window that stops at the file.
+  say(/IT IS A HYPOTHESIS/.test(r1?.evidenceGiven || '') && /chars, elided/.test(r1?.evidenceGiven || ''),
+    'and evidenceGiven shows the evidence verbatim with the file elided, so the diagnosis is visible in the record');
 
   say(/These are the facts the run measured/.test(prompt), 'the prompt separates the measured facts');
   say(/IT IS A HYPOTHESIS, not an established cause/.test(prompt), 'labels the surviving explanation a HYPOTHESIS, not a cause');

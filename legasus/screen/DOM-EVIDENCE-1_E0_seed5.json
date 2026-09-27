@@ -1,0 +1,385 @@
+{
+  "at": "2026-09-27T09:08:53.289Z",
+  "model": "qwen2.5-coder:7b",
+  "modelUrl": "https://mr-tattershall--legasus-ollama-1p5b-api.modal.run",
+  "task": "farm-plant",
+  "candidateSource": "legasus/screen/MODEL-CMP-1_armB_seed5.json",
+  "candidateSha": "910e6c510d810cbe75fb8f39f1070315f5479948a88d909d68a381308a3f11b4",
+  "seed": 1,
+  "maxRounds": 3,
+  "rounds": [
+    {
+      "round": 0,
+      "kind": "the untouched candidate",
+      "fileSha": "910e6c510d810cbe75fb8f39f1070315f5479948a88d909d68a381308a3f11b4",
+      "play": [],
+      "failing": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "diagnosis": {
+        "failureClass": "RUNTIME_EXCEPTION_AT_LOAD",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:58155/index.html:106:41)",
+          "TypeError: Cannot set properties of null (setting 'textContent')\n    at draw (http://127.0.0.1:58155/index.html:53:56)\n    at movePlayer (http://127.0.0.1:58155/index.html:64:17)",
+          "TypeError: Cannot set properties of null (setting 'textContent')\n    at draw (http://127.0.0.1:58155/index.html:53:56)\n    at movePlayer (http://127.0.0.1:58155/index.html:64:17)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "plant"
+          ],
+          "idsAtFirstFailure": [
+            "gameCanvas"
+          ],
+          "idsAfterReady": [
+            "gameCanvas"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": false,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": false,
+        "note": "the page threw while loading: the failing behavioural steps were NEVER REACHED, so no claim about the candidate behaviour follows from them"
+      },
+      "disposition": "RESTORED",
+      "accepted": false
+    },
+    {
+      "round": 1,
+      "kind": "repair attempt",
+      "diagnosis": {
+        "failureClass": "RUNTIME_EXCEPTION_AT_LOAD",
+        "loadErrors": [
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')",
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')",
+          "[JS ERROR] Cannot set properties of null (setting 'textContent')"
+        ],
+        "stacks": [
+          "TypeError: Cannot set properties of null (setting 'textContent')\n    at draw (http://127.0.0.1:50555/index.html:53:56)\n    at <anonymous> (http://127.0.0.1:50555/index.html:123:9)",
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:50555/index.html:107:45)",
+          "TypeError: Cannot set properties of null (setting 'textContent')\n    at draw (http://127.0.0.1:50555/index.html:53:56)\n    at movePlayer (http://127.0.0.1:50555/index.html:64:17)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "day",
+            "plant"
+          ],
+          "idsAtFirstFailure": [
+            "gameCanvas"
+          ],
+          "idsAfterReady": [
+            "gameCanvas"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": false,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": false,
+        "note": "the page threw while loading: the failing behavioural steps were NEVER REACHED, so no claim about the candidate behaviour follows from them"
+      },
+      "generationMs": 7717,
+      "outputTokens": 546,
+      "promptTokens": 1384,
+      "termination": "stop",
+      "evidenceGiven": "It does not work. Repair it.\n\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n        const gridSize = 32;\n        const player = { x: 0, y: 0 };\n        const tiles = {};\n        const inventory = { seeds: 5, crops: 0 };\n        let day = 0;\n\n        function drawPlayer() {\n            ctx.fillStyle = 'green';\n            ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize, gridSize);\n        }\n\n        function drawTile(x, y, crop, stage) {\n            ctx.fillStyle = crop === 'seed' ? 'yellow' : 'green';\n            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Stage: ${stage}`, x * gridSize + 10, y * gridSize + 20);\n        }\n\n        function dra",
+      "rawReply": "<<<<<<< FIND\ndocument.addEventListener('keydown', movePlayer);\n// p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\ndocument.getElementById('plant').addEventListener('click', () => {\n    if (inventory.seeds > 0) {\n        plantSeed();\n        inventory.seeds--;\n    }\n});\n// a advances time: day++; draw();\ndocument.getElementById('advance').addEventListener('click', advanceTime);\n// h harvests: if the player's tile is a wheat crop, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.seeds++; inventory.crops++;\ndocument.getElementById('harvest').addEventListener('click', harvestCrop);\n// s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\ndocument.getElementById('save').addEventListener('click', saveGame);\n// l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();\ndocument.getElementById('load').addEventListener('click', loadGame);\n=======\ndocument.addEventListener('DOMContentLoaded', () => {\n    document.addEventListener('keydown', movePlayer);\n    // p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\n    document.getElementById('plant').addEventListener('click', () => {\n        if (inventory.seeds > 0) {\n            plantSeed();\n            inventory.seeds--;\n        }\n    });\n    // a advances time: day++; draw();\n    document.getElementById('advance').addEventListener('click', advanceTime);\n    // h harvests: if the player's tile is a wheat crop, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.seeds++; inventory.crops++;\n    document.getElementById('harvest').addEventListener('click', harvestCrop);\n    // s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n    document.getElementById('save').addEventListener('click', saveGame);\n    // l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();\n    document.getElementById('load').addEventListener('click', loadGame);\n});\n>>>>>>> END",
+      "blocks": 1,
+      "incomplete": false,
+      "outsideChars": 0,
+      "applyResults": [
+        {
+          "status": "APPLIED",
+          "count": 1,
+          "at": 103,
+          "matchedBy": "normalized",
+          "reindentedBy": 8
+        }
+      ],
+      "before": {
+        "sha256": "910e6c510d810cbe75fb8f39f1070315f5479948a88d909d68a381308a3f11b4",
+        "chars": 4792
+      },
+      "appliedDiff": "@@ line 104: -16 +18 @@\n-         document.addEventListener('keydown', movePlayer);\n- // p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\n-         document.getElementById('plant').addEventListener('click', () => {\n-             if (inventory.seeds > 0) {\n-                 plantSeed();\n-                 inventory.seeds--;\n-             }\n-         });\n- // a advances time: day++; draw();\n-         document.getElementById('advance').addEventListener('click', advanceTime);\n- // h harvests: if the player's tile is a wheat crop, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.seeds++; inventory.crops++;\n-         document.getElementById('harvest').addEventListener('click', harvestCrop);\n- // s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n-         document.getElementById('save').addEventListener('click', saveGame);\n- // l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();\n-         document.getElementById('load').addEventListener('click', loadGame);\n+         document.addEventListener('DOMContentLoaded', () => {\n+             document.addEventListener('keydown', movePlayer);\n+             // p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\n+             document.getElementById('plant').addEventListener('click', () => {\n+                 if (inventory.seeds > 0) {\n+                     plantSeed();\n+                     inventory.seeds--;\n+                 }\n+             });\n+             // a advances time: day++; draw();\n+             document.getElementById('advance').addEventListener('click', advanceTime);\n+             // h harvests: if the player's tile is a wheat crop, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.seeds++; inventory.crops++;\n+             document.getElementById('harvest').addEventListener('click', harvestCrop);\n+             // s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n+             document.getElementById('save').addEventListener('click', saveGame);\n+             // l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();\n+             document.getElementById('load').addEventListener('click', loadGame);\n+         });",
+      "matchRule": "a FIND matches only if its non-blank lines, each trimmed, appear as one contiguous run in the file and appear exactly ONCE; the FILE's lines are then replaced and the replacement re-indented to the file. No similarity scoring, no nearest match, no guessing which region was intended.",
+      "fileSha": "0e79053524e33d730ab7390173cedb8aff5484e94eb8e51cafdfe8926302fdcd",
+      "play": [],
+      "failing": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "disposition": "RESTORED",
+      "accepted": false,
+      "outcome": "STILL_FAILING",
+      "matchedBy": "normalized",
+      "protectedPassed": false,
+      "workingCopy": "reverted: the protected spec failed, so this round is not built on"
+    },
+    {
+      "round": 2,
+      "kind": "repair attempt",
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [
+            "plant",
+            "advance",
+            "harvest",
+            "save",
+            "load",
+            "day"
+          ],
+          "idsAtFirstFailure": [
+            "gameCanvas"
+          ],
+          "idsAfterReady": [
+            "gameCanvas"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "generationMs": 3255,
+      "outputTokens": 228,
+      "promptTokens": 1384,
+      "termination": "stop",
+      "evidenceGiven": "It does not work. Repair it.\n\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n        const gridSize = 32;\n        const player = { x: 0, y: 0 };\n        const tiles = {};\n        const inventory = { seeds: 5, crops: 0 };\n        let day = 0;\n\n        function drawPlayer() {\n            ctx.fillStyle = 'green';\n            ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize, gridSize);\n        }\n\n        function drawTile(x, y, crop, stage) {\n            ctx.fillStyle = crop === 'seed' ? 'yellow' : 'green';\n            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Stage: ${stage}`, x * gridSize + 10, y * gridSize + 20);\n        }\n\n        function dra",
+      "rawReply": "<<<<<<< FIND\ndocument.getElementById('day').textContent = `Day: ${day}`;\n=======\ndocument.getElementById('day') && (document.getElementById('day').textContent = `Day: ${day}`);\n>>>>>>> END\n\n<<<<<<< FIND\ndocument.getElementById('plant').addEventListener('click', () => {\n=======\ndocument.getElementById('plant') && document.getElementById('plant').addEventListener('click', () => {\n>>>>>>> END\n\n<<<<<<< FIND\ndocument.getElementById('advance').addEventListener('click', advanceTime);\n=======\ndocument.getElementById('advance') && document.getElementById('advance').addEventListener('click', advanceTime);\n>>>>>>> END\n\n<<<<<<< FIND\ndocument.getElementById('harvest').addEventListener('click', harvestCrop);\n=======\ndocument.getElementById('harvest') && document.getElementById('harvest').addEventListener('click', harvestCrop);\n>>>>>>> END\n\n<<<<<<< FIND\ndocument.getElementById('save').addEventListener('click', saveGame);\n=======\ndocument.getElementById('save') && document.getElementById('save').addEventListener('click', saveGame);\n>>>>>>> END\n\n<<<<<<< FIND\ndocument.getElementById('load').addEventListener('click', loadGame);\n=======\ndocument.getElementById('load') && document.getElementById('load').addEventListener('click', loadGame);\n>>>>>>> END",
+      "blocks": 6,
+      "incomplete": false,
+      "outsideChars": 0,
+      "applyResults": [
+        {
+          "status": "APPLIED",
+          "count": 1,
+          "at": 52,
+          "matchedBy": "normalized",
+          "reindentedBy": 12
+        },
+        {
+          "status": "APPLIED",
+          "count": 1,
+          "at": 105,
+          "matchedBy": "normalized",
+          "reindentedBy": 8
+        },
+        {
+          "status": "APPLIED",
+          "count": 1,
+          "at": 112,
+          "matchedBy": "normalized",
+          "reindentedBy": 8
+        },
+        {
+          "status": "APPLIED",
+          "count": 1,
+          "at": 114,
+          "matchedBy": "normalized",
+          "reindentedBy": 8
+        },
+        {
+          "status": "APPLIED",
+          "count": 1,
+          "at": 116,
+          "matchedBy": "normalized",
+          "reindentedBy": 8
+        },
+        {
+          "status": "APPLIED",
+          "count": 1,
+          "at": 118,
+          "matchedBy": "normalized",
+          "reindentedBy": 8
+        }
+      ],
+      "before": {
+        "sha256": "910e6c510d810cbe75fb8f39f1070315f5479948a88d909d68a381308a3f11b4",
+        "chars": 4792
+      },
+      "appliedDiff": "@@ line 53: -67 +67 @@\n-             document.getElementById('day').textContent = `Day: ${day}`;\n-         }\n- \n-         function movePlayer(event) {\n-             const dx = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;\n-             const dy = event.key === 'ArrowUp' ? -1 : event.key === 'ArrowDown' ? 1 : 0;\n-             const newX = player.x + dx;\n-             const newY = player.y + dy;\n-             if (newX >= 0 && newX < 20 && newY >= 0 && newY < 15) {\n-                 player.x = newX;\n-                 player.y = newY;\n-                 draw();\n-             }\n-         }\n- \n-         function plantSeed() {\n-             const tileKey = `${player.x},${player.y}`;\n-             if (!tiles[tileKey]) {\n-                 tiles[tileKey] = { crop: 'seed', stage: 1 };\n-                 draw();\n-             }\n-         }\n- \n-         function advanceTime() {\n-             day++;\n-             draw();\n-         }\n- \n-         function harvestCrop() {\n-             const tileKey = `${player.x},${player.y}`;\n-             if (tiles[tileKey] && tiles[tileKey].crop === 'seed') {\n-                 tiles[tileKey] = { crop: 'empty', stage: 0 };\n-                 inventory.seeds++;\n-                 inventory.crops--;\n-                 draw();\n-             }\n-         }\n- \n-         function saveGame() {\n-             localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n-         }\n- \n-         function loadGame() {\n-             const savedGame = JSON.parse(localStorage.getItem('game'));\n-             player = savedGame.player;\n-             tiles = savedGame.tiles;\n-             inventory = savedGame.inventory;\n-             day = savedGame.day;\n-             draw();\n-         }\n- \n-         document.addEventListener('keydown', movePlayer);\n- // p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\n-         document.getElementById('plant').addEventListener('click', () => {\n-             if (inventory.seeds > 0) {\n-                 plantSeed();\n-                 inventory.seeds--;\n-             }\n-         });\n- // a advances time: day++; draw();\n-         document.getElementById('advance').addEventListener('click', advanceTime);\n- // h harvests: if the player's tile is a wheat crop, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.seeds++; inventory.crops++;\n-         document.getElementById('harvest').addEventListener('click', harvestCrop);\n- // s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n-         document.getElementById('save').addEventListener('click', saveGame);\n- // l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();\n-         document.getElementById('load').addEventListener('click', loadGame);\n+             document.getElementById('day') && (document.getElementById('day').textContent = `Day: ${day}`);\n+         }\n+ \n+         function movePlayer(event) {\n+             const dx = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;\n+             const dy = event.key === 'ArrowUp' ? -1 : event.key === 'ArrowDown' ? 1 : 0;\n+             const newX = player.x + dx;\n+             const newY = player.y + dy;\n+             if (newX >= 0 && newX < 20 && newY >= 0 && newY < 15) {\n+                 player.x = newX;\n+                 player.y = newY;\n+                 draw();\n+             }\n+         }\n+ \n+         function plantSeed() {\n+             const tileKey = `${player.x},${player.y}`;\n+             if (!tiles[tileKey]) {\n+                 tiles[tileKey] = { crop: 'seed', stage: 1 };\n+                 draw();\n+             }\n+         }\n+ \n+         function advanceTime() {\n+             day++;\n+             draw();\n+         }\n+ \n+         function harvestCrop() {\n+             const tileKey = `${player.x},${player.y}`;\n+             if (tiles[tileKey] && tiles[tileKey].crop === 'seed') {\n+                 tiles[tileKey] = { crop: 'empty', stage: 0 };\n+                 inventory.seeds++;\n+                 inventory.crops--;\n+                 draw();\n+             }\n+         }\n+ \n+         function saveGame() {\n+             localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n+         }\n+ \n+         function loadGame() {\n+             const savedGame = JSON.parse(localStorage.getItem('game'));\n+             player = savedGame.player;\n+             tiles = savedGame.tiles;\n+             inventory = savedGame.inventory;\n+             day = savedGame.day;\n+             draw();\n+         }\n+ \n+         document.addEventListener('keydown', movePlayer);\n+ // p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\n+         document.getElementById('plant') && document.getElementById('plant').addEventListener('click', () => {\n+             if (inventory.seeds > 0) {\n+                 plantSeed();\n+                 inventory.seeds--;\n+             }\n+         });\n+ // a advances time: day++; draw();\n+         document.getElementById('advance') && document.getElementById('advance').addEventListener('click', advanceTime);\n+ // h harvests: if the player's tile is a wheat crop, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.seeds++; inventory.crops++;\n+         document.getElementById('harvest') && document.getElementById('harvest').addEventListener('click', harvestCrop);\n+ // s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n+         document.getElementById('save') && document.getElementById('save').addEventListener('click', saveGame);\n+ // l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();\n+         document.getElementById('load') && document.getElementById('load').addEventListener('click', loadGame);",
+      "matchRule": "a FIND matches only if its non-blank lines, each trimmed, appear as one contiguous run in the file and appear exactly ONCE; the FILE's lines are then replaced and the replacement re-indented to the file. No similarity scoring, no nearest match, no guessing which region was intended.",
+      "fileSha": "bad7381b3ace0a0fb0ccd4fc737ce755889bb51cc460bc650bdd12860c59b76d",
+      "play": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "failing": [
+        4,
+        6
+      ],
+      "disposition": "PRESERVE_INCOMPLETE",
+      "accepted": false,
+      "outcome": "STILL_FAILING",
+      "matchedBy": "normalized,normalized,normalized,normalized,normalized,normalized",
+      "protectedPassed": true,
+      "workingCopy": "kept"
+    },
+    {
+      "round": 3,
+      "kind": "repair attempt",
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [
+            "plant",
+            "advance",
+            "harvest",
+            "save",
+            "load",
+            "advance",
+            "harvest",
+            "save",
+            "load",
+            "day"
+          ],
+          "idsAtFirstFailure": [
+            "gameCanvas"
+          ],
+          "idsAfterReady": [
+            "gameCanvas"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "generationMs": 3798,
+      "outputTokens": 255,
+      "promptTokens": 1496,
+      "termination": "stop",
+      "evidenceGiven": "It does not work. Repair it.\n\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n        const gridSize = 32;\n        const player = { x: 0, y: 0 };\n        const tiles = {};\n        const inventory = { seeds: 5, crops: 0 };\n        let day = 0;\n\n        function drawPlayer() {\n            ctx.fillStyle = 'green';\n            ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize, gridSize);\n        }\n\n        function drawTile(x, y, crop, stage) {\n            ctx.fillStyle = crop === 'seed' ? 'yellow' : 'green';\n            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Stage: ${stage}`, x * gridSize + 10, y * gridSize + 20);\n        }\n\n        function dra",
+      "rawReply": "<<<<<<< FIND\n                if (!tiles[tileKey]) {\n                    tiles[tileKey] = { crop: 'seed', stage: 1 };\n                    draw();\n                }\n=======\n                if (!tiles[tileKey] && inventory.seeds > 0) {\n                    tiles[tileKey] = { crop: 'seed', stage: 1 };\n                    inventory.seeds--;\n                    draw();\n                }\n>>>>>>> END\n\n<<<<<<< FIND\n        document.getElementById('plant') && document.getElementById('plant').addEventListener('click', () => {\n            if (inventory.seeds > 0) {\n                plantSeed();\n                inventory.seeds--;\n            }\n        });\n=======\n        document.getElementById('plant') && document.getElementById('plant').addEventListener('click', () => {\n            if (inventory.seeds > 0) {\n                plantSeed();\n                inventory.seeds--;\n            }\n        });\n        document.getElementById('advance') && document.getElementById('advance').addEventListener('click', advanceTime);\n        document.getElementById('harvest') && document.getElementById('harvest').addEventListener('click', harvestCrop);\n        document.getElementById('save') && document.getElementById('save').addEventListener('click', saveGame);\n        document.getElementById('load') && document.getElementById('load').addEventListener('click', loadGame);\n>>>>>>> END",
+      "blocks": 2,
+      "incomplete": false,
+      "outsideChars": 0,
+      "applyResults": [
+        {
+          "status": "APPLIED",
+          "count": 1,
+          "at": 69,
+          "matchedBy": "normalized",
+          "reindentedBy": -4
+        },
+        {
+          "status": "APPLIED",
+          "count": 1,
+          "at": 3741,
+          "matchedBy": "exact"
+        }
+      ],
+      "before": {
+        "sha256": "bad7381b3ace0a0fb0ccd4fc737ce755889bb51cc460bc650bdd12860c59b76d",
+        "chars": 5010
+      },
+      "appliedDiff": "@@ line 70: -42 +47 @@\n-             if (!tiles[tileKey]) {\n-                 tiles[tileKey] = { crop: 'seed', stage: 1 };\n-                 draw();\n-             }\n-         }\n- \n-         function advanceTime() {\n-             day++;\n-             draw();\n-         }\n- \n-         function harvestCrop() {\n-             const tileKey = `${player.x},${player.y}`;\n-             if (tiles[tileKey] && tiles[tileKey].crop === 'seed') {\n-                 tiles[tileKey] = { crop: 'empty', stage: 0 };\n-                 inventory.seeds++;\n-                 inventory.crops--;\n-                 draw();\n-             }\n-         }\n- \n-         function saveGame() {\n-             localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n-         }\n- \n-         function loadGame() {\n-             const savedGame = JSON.parse(localStorage.getItem('game'));\n-             player = savedGame.player;\n-             tiles = savedGame.tiles;\n-             inventory = savedGame.inventory;\n-             day = savedGame.day;\n-             draw();\n-         }\n- \n-         document.addEventListener('keydown', movePlayer);\n- // p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\n-         document.getElementById('plant') && document.getElementById('plant').addEventListener('click', () => {\n-             if (inventory.seeds > 0) {\n-                 plantSeed();\n-                 inventory.seeds--;\n-             }\n-         });\n+             if (!tiles[tileKey] && inventory.seeds > 0) {\n+                 tiles[tileKey] = { crop: 'seed', stage: 1 };\n+                 inventory.seeds--;\n+                 draw();\n+             }\n+         }\n+ \n+         function advanceTime() {\n+             day++;\n+             draw();\n+         }\n+ \n+         function harvestCrop() {\n+             const tileKey = `${player.x},${player.y}`;\n+             if (tiles[tileKey] && tiles[tileKey].crop === 'seed') {\n+                 tiles[tileKey] = { crop: 'empty', stage: 0 };\n+                 inventory.seeds++;\n+                 inventory.crops--;\n+                 draw();\n+             }\n+         }\n+ \n+         function saveGame() {\n+             localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n+         }\n+ \n+         function loadGame() {\n+             const savedGame = JSON.parse(localStorage.getItem('game'));\n+             player = savedGame.player;\n+             tiles = savedGame.tiles;\n+             inventory = savedGame.inventory;\n+             day = savedGame.day;\n+             draw();\n+         }\n+ \n+         document.addEventListener('keydown', movePlayer);\n+ // p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\n+         document.getElementById('plant') && document.getElementById('plant').addEventListener('click', () => {\n+             if (inventory.seeds > 0) {\n+                 plantSeed();\n+                 inventory.seeds--;\n+             }\n+         });\n+         document.getElementById('advance') && document.getElementById('advance').addEventListener('click', advanceTime);\n+         document.getElementById('harvest') && document.getElementById('harvest').addEventListener('click', harvestCrop);\n+         document.getElementById('save') && document.getElementById('save').addEventListener('click', saveGame);\n+         document.getElementById('load') && document.getElementById('load').addEventListener('click', loadGame);",
+      "matchRule": "a FIND matches only if its non-blank lines, each trimmed, appear as one contiguous run in the file and appear exactly ONCE; the FILE's lines are then replaced and the replacement re-indented to the file. No similarity scoring, no nearest match, no guessing which region was intended.",
+      "fileSha": "0dfcd02a51a9bc45e8a5ade7fb04a1724ecb4dd615e5d923c1925388477c5585",
+      "play": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "failing": [
+        4,
+        6
+      ],
+      "disposition": "PRESERVE_INCOMPLETE",
+      "accepted": false,
+      "outcome": "STILL_FAILING",
+      "matchedBy": "normalized,exact",
+      "protectedPassed": true,
+      "workingCopy": "kept"
+    }
+  ],
+  "accepted": false,
+  "totals": {
+    "repairRounds": 3,
+    "generationSeconds": 14.8,
+    "outputTokens": 1029,
+    "wallClockSeconds": 99
+  },
+  "matchMode": "normalized",
+  "evidenceMode": "basic",
+  "loopTask": "farm-plant",
+  "postCheckTask": "farm-plant-v2",
+  "originalCandidate": {
+    "sha256": "910e6c510d810cbe75fb8f39f1070315f5479948a88d909d68a381308a3f11b4",
+    "chars": 4792,
+    "text": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n        const gridSize = 32;\n        const player = { x: 0, y: 0 };\n        const tiles = {};\n        const inventory = { seeds: 5, crops: 0 };\n        let day = 0;\n\n        function drawPlayer() {\n            ctx.fillStyle = 'green';\n            ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize, gridSize);\n        }\n\n        function drawTile(x, y, crop, stage) {\n            ctx.fillStyle = crop === 'seed' ? 'yellow' : 'green';\n            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Stage: ${stage}`, x * gridSize + 10, y * gridSize + 20);\n        }\n\n        function drawInventory() {\n            ctx.fillStyle = 'blue';\n            ctx.fillRect(0, 0, 100, 100);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Seeds: ${inventory.seeds}`, 10, 20);\n            ctx.fillText(`Crops: ${inventory.crops}`, 10, 40);\n        }\n\n        function draw() {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            drawPlayer();\n            for (const [key, value] of Object.entries(tiles)) {\n                drawTile(key.split(',')[0], key.split(',')[1], value.crop, value.stage);\n            }\n            drawInventory();\n            document.getElementById('day').textContent = `Day: ${day}`;\n        }\n\n        function movePlayer(event) {\n            const dx = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;\n            const dy = event.key === 'ArrowUp' ? -1 : event.key === 'ArrowDown' ? 1 : 0;\n            const newX = player.x + dx;\n            const newY = player.y + dy;\n            if (newX >= 0 && newX < 20 && newY >= 0 && newY < 15) {\n                player.x = newX;\n                player.y = newY;\n                draw();\n            }\n        }\n\n        function plantSeed() {\n            const tileKey = `${player.x},${player.y}`;\n            if (!tiles[tileKey]) {\n                tiles[tileKey] = { crop: 'seed', stage: 1 };\n                draw();\n            }\n        }\n\n        function advanceTime() {\n            day++;\n            draw();\n        }\n\n        function harvestCrop() {\n            const tileKey = `${player.x},${player.y}`;\n            if (tiles[tileKey] && tiles[tileKey].crop === 'seed') {\n                tiles[tileKey] = { crop: 'empty', stage: 0 };\n                inventory.seeds++;\n                inventory.crops--;\n                draw();\n            }\n        }\n\n        function saveGame() {\n            localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n        }\n\n        function loadGame() {\n            const savedGame = JSON.parse(localStorage.getItem('game'));\n            player = savedGame.player;\n            tiles = savedGame.tiles;\n            inventory = savedGame.inventory;\n            day = savedGame.day;\n            draw();\n        }\n\n        document.addEventListener('keydown', movePlayer);\n// p plants: if the player's tile is empty and inventory.seeds > 0, set tiles[x+','+y] = { crop: 'wheat', stage: 0 } and do inventory.seeds--; otherwise change nothing.\n        document.getElementById('plant').addEventListener('click', () => {\n            if (inventory.seeds > 0) {\n                plantSeed();\n                inventory.seeds--;\n            }\n        });\n// a advances time: day++; draw();\n        document.getElementById('advance').addEventListener('click', advanceTime);\n// h harvests: if the player's tile is a wheat crop, set tiles[x+','+y] = { crop: 'empty', stage: 0 } and do inventory.seeds++; inventory.crops++;\n        document.getElementById('harvest').addEventListener('click', harvestCrop);\n// s saves game: localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n        document.getElementById('save').addEventListener('click', saveGame);\n// l loads game: const savedGame = JSON.parse(localStorage.getItem('game')); player = savedGame.player; tiles = savedGame.tiles; inventory = savedGame.inventory; day = savedGame.day; draw();\n        document.getElementById('load').addEventListener('click', loadGame);\n\n        draw();\n\n        window.game = { state: () => JSON.parse(JSON.stringify({ player, tiles, inventory, day })) };\n    </script>\n</body>\n</html>\n"
+  },
+  "assistance": {
+    "evidenceIsMachineCaptured": true,
+    "indentationToleranceByHarness": true,
+    "domFactsSupplied": false,
+    "structuredDiagnosisSupplied": false,
+    "hypothesisHandedOverWithItsUncertainty": false,
+    "acceptanceGateRemainsAuthoritative": true,
+    "humanAnalysisSupplied": false,
+    "editFormatGivenByHarness": true,
+    "fuzzyMatchingAllowed": false
+  },
+  "finalPlay": [
+    1,
+    2,
+    3,
+    5
+  ],
+  "finalDisposition": "PRESERVE_INCOMPLETE",
+  "postCheck": {
+    "task": "farm-plant-v2",
+    "appliedAfterTheLoop": true,
+    "fedBackToTheModel": false,
+    "influencedAcceptance": false,
+    "passing": [
+      1,
+      2,
+      3,
+      5,
+      7
+    ],
+    "failing": [
+      4,
+      6
+    ],
+    "errorsRaised": 0,
+    "requested": "FAIL",
+    "protected": "PASS",
+    "note": "measured after the loop finished, on the file it ended with. It decided nothing."
+  }
+}

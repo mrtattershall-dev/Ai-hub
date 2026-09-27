@@ -311,13 +311,13 @@ async function main() {
       if (EVIDENCE === 'diagnosis') {
         const ev = await collectEvidence({ workspace: ws, task, deps: { playCheck, writeFileSync, readFileSync, mkdtempSync, rmSync, join, tmpdir, execFileSync } });
         const dg = diagnose(ev);
-        diagInfo = { primarySignature: dg.primarySignature ?? null, considered: dg.considered.map((c) => c.id), surviving: dg.surviving, declined: dg.declined ?? null, plan: dg.plan ?? null };
+        diagInfo = { source: 'diagnose.mjs', primarySignature: dg.primarySignature ?? null, considered: dg.considered.map((c) => c.id), surviving: dg.surviving, declined: dg.declined ?? null, plan: dg.plan ?? null };
         if (!dg.plan) {
           // THE INTENDED DECLINE. No plan means the engine could not separate the explanations or
           // lacked an observation. The loop stops and says so; it does not fall back to the raw error,
           // because a silent fallback would turn a refusal into an unremarked change of condition.
           out.rounds.push({
-            round, kind: 'repair attempt', diagnosis: diagInfo,
+            round, kind: 'repair attempt', engineDiagnosis: diagInfo,
             outcome: 'DIAGNOSIS_DECLINED',
             reason: `the diagnosis engine declined: ${dg.declined?.reason} - ${dg.declined?.needed}`,
           });
@@ -338,10 +338,15 @@ async function main() {
       const gen = await chat([{ role: 'system', content: SYSTEM }, { role: 'user', content: msg }]);
       genMs += gen.ms || 0; tokens += gen.outTok || 0;
       const row = {
-        round, kind: 'repair attempt', diagnosis: diagInfo,
+        round, kind: 'repair attempt', engineDiagnosis: diagInfo,
         generationMs: gen.ms, outputTokens: gen.outTok ?? null,
         promptTokens: gen.promptTok ?? null, termination: gen.ok ? gen.doneReason : `transport: ${gen.reason}`,
-        evidenceGiven: msg.slice(msg.indexOf('It does not work.')).slice(0, 1200),
+        // THE EVIDENCE, WITH THE FILE ELIDED. This was a 1200-character window that began at the
+        // file, so everything added after the file - the whole diagnosis - fell outside it, and the
+        // record appeared to show a prompt that carried no diagnosis at all. The file is replaced by
+        // a marker instead, so what the harness ADDED is recorded verbatim.
+        evidenceGiven: msg.split(current).join(`<<< the file, ${current.length} chars, elided >>>`).slice(0, 6000),
+        promptChars: msg.length,
         rawReply: String(gen.text || '').slice(0, 8000),
       };
       if (!gen.ok) { row.outcome = 'GENERATION_FAILED'; out.rounds.push(row); console.log(`round ${round}  generation failed: ${gen.reason}`); break; }
@@ -387,7 +392,11 @@ async function main() {
       judged = await judge(ws, startRef);
       row.fileSha = sha(current);
       row.play = judged.play.passing; row.failing = judged.play.failing;
-      row.diagnosis = judged.diagnosis; row.disposition = judged.acceptance.disposition;
+      // NOT `row.diagnosis`: that name already holds the diagnosis ENGINE's plan for this round, and
+      // assigning the gate's failure classification over it destroyed the engine's record on every
+      // round whose edit applied. Two different things, two names.
+      row.gateClassification = judged.diagnosis;
+      row.disposition = judged.acceptance.disposition;
       row.accepted = judged.boundaries.accepted;
       row.outcome = judged.boundaries.accepted ? 'ACCEPTED' : 'STILL_FAILING';
       row.matchedBy = applied.results.map((r) => r.matchedBy).filter(Boolean).join(',');

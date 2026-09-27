@@ -1,0 +1,60 @@
+{
+  "at": "2026-09-27T09:25:00.789Z",
+  "arm": "E2",
+  "seed": 5,
+  "task": "farm-plant",
+  "reconstructed": true,
+  "reconstructionNote": "the live process exited 127 after round 2 and before writing its record. Round 1 produced no edit block and round 2 stopped for want of new information, so no edit was ever applied and the final file is the untouched candidate. The loop verdict, the post-check and the engine diagnosis below are recomputed locally from that file at $0. Generation figures come from the run log.",
+  "roundsFromLog": [
+    {
+      "round": 1,
+      "outcome": "NO_EDIT_PRODUCED"
+    },
+    {
+      "round": 2,
+      "outcome": "NO_NEW_INFORMATION",
+      "reason": "same file, same evidence as an earlier round"
+    }
+  ],
+  "finalFileIsUntouchedCandidate": true,
+  "loopGate": {
+    "passing": [],
+    "failing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "errors": 18,
+    "requested": null
+  },
+  "accepted": false,
+  "postCheck": {
+    "task": "farm-plant-v2",
+    "passing": [],
+    "failing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "errors": 18,
+    "requested": null,
+    "appliedAfterTheLoop": true,
+    "fedBackToTheModel": false,
+    "influencedAcceptance": false
+  },
+  "engineDiagnosis": {
+    "source": "diagnose.mjs",
+    "primarySignature": "NULL_PROPERTY_READ",
+    "surviving": [
+      "INTERFACE_NEVER_BUILT"
+    ],
+    "hypothesis": "INTERFACE_NEVER_BUILT"
+  }
+}
