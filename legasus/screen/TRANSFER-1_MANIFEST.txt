@@ -1,0 +1,15 @@
+TRANSFER-1 FROZEN POLICY MANIFEST
+frozen 2026-09-27T12:57:28.331Z
+
+the sha256 of every file that decides anything:
+
+e40627b4cb43bd68537de98ec4b042e0aa05b24bb1b9eae5ba314a9b3ca2c862    18787  server/autoGuide.mjs
+affc142f8b12143f4df42a0db99475c5f4a534015f6a00e6775fdf27e0a4a805    37175  server/localEdit.mjs
+df56ddc0180262307dec4eb0dd7d171b9a416e25238023e189047586f215e5b4     7484  server/judgeCandidate.mjs
+99e50264209ad4002df979fbd6edde9a45e7a9f09fe3d2085f9f8f201fffd623    12253  server/evaluator.js
+64aa3b7bcb1ad51b5eaba23f996095ab692abbf9f715f3dd29e4685a3caa2bf3     9908  server/acceptance.js
+f62fa26c96e5b5896517c0a6b97a2b463692224e96efeb0a2f7fa04869216fd1    12541  server/playCheck.js
+e414eeb6882d69d90b5afed2ce264489fbfc13b27f0199641be6526c76722cae    20970  server/benchTasks.js
+
+The page for this experiment does not exist yet. This manifest is committed FIRST so that the
+commit order proves the rules were not adapted to it.

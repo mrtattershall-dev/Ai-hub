@@ -213,8 +213,11 @@ async function main() {
         const gen = await infill(cut.prefix + instruction + '\n', cut.suffix, seed);
         const middle = String(gen.text || '');
         const rec = { choice, seed, rule: site.rule, generationMs: gen.ms, outputTokens: gen.outTok ?? null, boundaries: {}, timing: {} };
-        rec.rawReply = middle.slice(0, 4000);
-        rec.middleUsed = middle.slice(0, 2000);
+        // BOTH VERSIONS, ALWAYS. The model supplies a completion; Legasus extracts a bounded candidate
+        // from it. Storing only the extracted text would hide the system's own contribution - and in
+        // ASSIST-5 that contribution was dropping 109 lines. rawCompletion is what came back;
+        // extractedCandidate is what the system decided could sit in the slot.
+        rec.rawCompletion = { text: middle.slice(0, 6000), chars: middle.length, lines: middle.split(String.fromCharCode(10)).length };
         // STRUCTURAL CONTAINMENT, not trimming. ASSIST-2's boundary depended on the model reproducing a
         // line of the suffix; it wrote a different one and 4,000 characters of invented handlers were
         // accepted. A completion whose own shape says it cannot sit in the slot is now REFUSED, and
@@ -228,7 +231,9 @@ async function main() {
           continue;
         }
         if (contained.truncatedAtLine) console.log(`  seed ${seed}: ${contained.how}`);
-        rec.middleUsed = contained.text.slice(0, 2000);
+        rec.extractedCandidate = { text: contained.text.slice(0, 4000), chars: contained.text.length, lines: contained.text.split(String.fromCharCode(10)).length };
+        rec.extraction = { truncatedAtLine: contained.truncatedAtLine, droppedLines: contained.droppedLines, how: contained.how };
+        rec.middleUsed = contained.text.slice(0, 2000);   // kept for readers of the earlier records
         const candidate = cut.prefix + instruction + '\n' + contained.text + cut.suffix;
         writeFileSync(join(ws, ENTRY), candidate.endsWith('\n') ? candidate : candidate + '\n', 'utf8');
         await git(ws, ['add', '-A']);

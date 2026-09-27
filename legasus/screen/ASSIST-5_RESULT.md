@@ -1,8 +1,7 @@
 # ASSIST-5 — an accepted addition that survives the FULL accumulated checks. The system chose the guidance; zero interventions during execution. One page, three listeners, 521 characters added.
 
 2026-09-27, **$0**, local. Same frozen policy as ASSIST-2, plus the two fixes that run's failure
-demanded, plus one refinement those fixes forced. **The game now moves, plants and grows, and every
-previously accepted behaviour still holds.**
+demanded, plus one refinement those fixes forced. **The game now moves, plants and grows, and every CARRIED-FORWARD CHECK PASSED.**
 
 ## The result
 
@@ -82,9 +81,12 @@ Dropping a check is now a recorded decision with a reason, never an omission.
 
 ## What this establishes
 
-- **The milestone: an accepted addition that survives every accumulated check**, with the system
-  choosing site, scaffold and instruction, and no intervention during execution. The page moves, plants
-  and grows; planting still stops when the seeds run out; no errors anywhere.
+- **The milestone: an accepted addition for which every carried-forward check passed**, with the
+  system choosing site, scaffold and instruction, and no intervention during execution. The page moves,
+  plants and grows; planting still stops when the seeds run out; no errors observed in these runs.
+  CORRECTED after review: "every earlier behaviour still holds" claims more than the checks cover.
+  What passed is the accumulated set - thirteen checks across two sequences - not every possible
+  behaviour of the page.
 - **The accumulated protected set catches what a hand-picked one missed**, demonstrated live in ASSIST-3
   and pinned in a regression test.
 - **NOT established:** generalisation to an unseen page, any success rate, or that this survives a
