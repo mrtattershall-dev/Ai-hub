@@ -23,6 +23,9 @@ import time
 import modal
 
 MODEL = "qwen2.5-coder:1.5b"
+# Arm B: the stronger model, baked into the SAME image so the request's `model` field is the only
+# thing that selects between them and no other part of the serving stack changes.
+MODEL_B = "qwen2.5-coder:7b"
 # Must match the local server every other arm was measured on (`curl localhost:11434/api/version`).
 OLLAMA_VERSION = "0.33.3"
 
@@ -37,7 +40,7 @@ image = (
         f"curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION={OLLAMA_VERSION} sh",
         # Bake the weights into the image: a cold start then loads from local disk instead of
         # paying GPU seconds to download a gigabyte.
-        f"(ollama serve &) && sleep 8 && ollama pull {MODEL} && sleep 2",
+        f"(ollama serve &) && sleep 8 && ollama pull {MODEL} && ollama pull {MODEL_B} && sleep 2",
     )
     .pip_install("fastapi[standard]==0.115.*", "httpx==0.27.*")
     .env({"OLLAMA_HOST": "127.0.0.1:11434", "OLLAMA_KEEP_ALIVE": "10m"})

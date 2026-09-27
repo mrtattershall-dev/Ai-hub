@@ -79,9 +79,31 @@ transformation the harness performed is visible next to what the model actually 
     A   qwen2.5-coder:1.5b, local CPU      $0      BASELINE - run
     C   qwen2.5-coder:1.5b, Modal GPU      AUTHORIZED $2 total - run (ollama 0.34.4)
     C2  the same, serving version PINNED to 0.33.3 to match arm A - run, same authorization
-    B   a stronger model, to be chosen     NOT authorized, NOT run
+    B   qwen2.5-coder:7b, Modal GPU        AUTHORIZED - run under this definition
 
-**Arm B, when it is authorized, must serve on a PINNED version** (`OLLAMA_VERSION` in
+## Arm B - AUTHORIZED, recorded before deploying
+
+**Authorized by Micheal (tatte), 2026-09-27:** *"Alright try 7 b now"*, in direct answer to the
+recommendation that the next informative comparison is the stronger model on the frozen task with
+the serving version aligned. Recorded here before any deploy.
+
+**Working cap: $1 total**, including startup, idle and shutdown. That is deliberately conservative:
+two standing authorizations from Micheal each exceed it (the $3 for hosted-7B work, and the $2 for
+this comparison of which under $0.20 is spent), and the estimate for five attempts is around $0.15.
+If the run were to approach $1 it would stop rather than draw on the wider authorizations.
+
+**The model is the only thing that changes.** `qwen2.5-coder:7b` replaces `qwen2.5-coder:1.5b` in
+the SAME container image, on the same pinned ollama 0.33.3, through the same proxy, driven by the
+same harness with the same site, instruction, tail trim, decoding, seeds, caps and acceptance gate.
+Both models are baked into the image, so the request's `model` field selects between them and
+nothing else differs.
+
+**Reading it:** an accepted addition would establish a usable **assisted**-generation path and say
+nothing about an autonomous manager, since the site and the step are still supplied. Code that fails
+the clauses would be a diagnosable behaviour failure. No code at all would repeat the 1.5B result at
+a larger size. Whatever happens, it is five seeds in one exploratory configuration.
+
+**Arm B must serve on a PINNED version** (`OLLAMA_VERSION` in
 `server/modalOllama.py`, verified in the build log and by the server's startup line). Arm C2 proved
 the pin works and also showed that the version was not what made CPU and GPU outputs differ - the
 hardware alone does that, on 3 of 5 seeds, so arm B will not be seed-pairable against arm A either.
