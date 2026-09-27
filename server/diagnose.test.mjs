@@ -13,9 +13,14 @@
  *   the element appears after parsing -> LOOKUP_TOO_EARLY
  *   an id one letter away exists      -> WRONG_IDENTIFIER
  *
- * plus: a malformed script is diagnosed alone and blocks behavioural explanations; a state update
- * outside its guard is caught behaviourally; missing evidence is declined by name; an unreproduced
- * failure is declined before anything else.
+ * That is CONDITIONAL DIAGNOSIS - the answer follows the observation. It is not evidence that a true
+ * cause has been established, and the tests below check specified behaviour, not repair outcomes and
+ * not coverage of failures outside the catalogue.
+ *
+ * The other properties: the four output sections stay apart (facts / hypothesis with what it leaves
+ * unresolved / a PROPOSED scope / obligations); a malformed script is diagnosed alone and blocks
+ * behavioural explanations; a state update outside its guard is caught behaviourally; missing evidence
+ * is declined by name; an unreproduced failure is declined before anything else.
  */
 import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -88,7 +93,12 @@ console.log('\n=== the same error, three different worlds ===');
   console.log(`        nowhere:        considered ${d1.considered.length}, surviving [${d1.surviving.join(',')}]`);
   say(d1.plan?.cause === 'INTERFACE_NEVER_BUILT', `an element that is nowhere -> ${d1.plan?.cause || 'DECLINED:' + d1.declined?.reason}`);
   say(d1.considered.length >= 3 && d1.eliminated.length >= 2, `three explanations considered, ${d1.eliminated?.length} eliminated by observation`);
-  say((d1.plan?.limits || []).some((l) => /does not rule out a later dynamic insertion/.test(l)), 'and the conclusion carries the limit of what the observation supports');
+  say((d1.plan?.hypothesis?.limits || []).some((l) => /does not rule out a later dynamic insertion/.test(l)), 'and the hypothesis carries the limit of what the observation supports');
+  say(/SURVIVING HYPOTHESIS/.test(d1.plan?.hypothesis?.status || ''), 'the surviving explanation is labelled a hypothesis, not a cause');
+  say((d1.plan?.hypothesis?.unresolved || []).some((u) => /HYPOTHESIS: absence in the observed states/.test(u)),
+    'and says outright that absence in the observed states is not absence of any creation path');
+  say((d1.plan?.hypothesis?.unresolved || []).some((u) => /no element-creation machinery was found/.test(u)),
+    'the creation-path observation is reported as SUPPORT, not proof');
 
   const late = await evidenceFor(fixture({ buttonAfter: 'plant' }));
   const d2 = diagnose(late);
@@ -100,9 +110,11 @@ console.log('\n=== the same error, three different worlds ===');
   console.log(`        one letter off: surviving [${d3.surviving.join(',')}]  ids after ready ${JSON.stringify(d3.observations.IDS_PRESENT?.idsAfterReady)}`);
   say(d3.plan?.cause === 'WRONG_IDENTIFIER', `an id one letter away -> ${d3.plan?.cause || 'DECLINED:' + d3.declined?.reason}`);
   say(d3.plan?.obligations?.some((o) => /plantt/.test(o)), 'and the obligation names the id the document actually has');
+  say((d3.plan?.hypothesis?.unresolved || []).some((u) => /INTENDED is not observable/.test(u)),
+    'while stating that which element the program INTENDED is not observable - a near id suggests, it does not establish');
 
   say(new Set([d1.plan?.cause, d2.plan?.cause, d3.plan?.cause]).size === 3,
-    'THE DISCRIMINATION: one engine, one error signature, three different causes - driven by the observation, not by a lookup table');
+    'CONDITIONAL DIAGNOSIS: one engine, one error signature, three different hypotheses - the answer follows the observation');
 }
 
 console.log('\n=== the real arm B candidate, diagnosed from its own run ===');
@@ -113,7 +125,12 @@ console.log('\n=== the real arm B candidate, diagnosed from its own run ===');
   console.log(`        surviving [${d.surviving.join(',')}]  scope ${JSON.stringify(d.plan?.scope)}`);
   say(d.plan?.cause === 'INTERFACE_NEVER_BUILT', `the cause REPAIR-2's model got wrong is reached mechanically (${d.plan?.cause})`);
   say(d.plan?.scope?.kind === 'line' && typeof d.plan.scope.line === 'number', `with a bounded scope: line ${d.plan?.scope?.line}`);
-  say(/edit before rewrite/.test(d.plan?.scopePreference || ''), 'and the smallest-change preference recorded as a preference, not a rule');
+  say(/edit before rewrite/.test(d.plan?.proposedScope?.preference || ''), 'the smallest-change rule is recorded as a preference, not a rule');
+  say(/not established to be the right place to edit/.test(d.plan?.proposedScope?.status || ''),
+    'and the scope is marked a PROPOSAL: line 106 is where the failing operation was seen, not an established edit site');
+  say(Array.isArray(d.plan?.observedFacts) && d.plan.observedFacts.some((f) => /returned nothing/.test(f))
+    && d.plan.observedFacts.every((f) => !/never built|wrong id/i.test(f)),
+    'observed FACTS are listed separately and contain no hypothesis');
   say(d.plan?.obligations?.some((o) => /must not depend on an element/.test(o)), 'the obligation forbids depending on the absent element');
   say(d.plan?.obligations?.some((o) => /must keep passing/.test(o)), 'and requires the already-passing checks to keep passing');
 }

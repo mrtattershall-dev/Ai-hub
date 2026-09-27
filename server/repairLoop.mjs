@@ -35,6 +35,7 @@ import { tmpdir } from 'node:os';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
 const exec = promisify(execFile);
@@ -63,7 +64,7 @@ if (!['exact', 'normalized'].includes(MATCH)) { console.error(`unknown --match $
 // script, a timer or a callback. The evidence reports an observed state; it proves nothing about the
 // page's future, and the message therefore states the observation rather than a conclusion.
 const EVIDENCE = opt('evidence', 'basic');
-if (!['basic', 'dom'].includes(EVIDENCE)) { console.error(`unknown --evidence ${EVIDENCE}`); process.exit(2); }
+if (!['basic', 'dom', 'diagnosis'].includes(EVIDENCE)) { console.error(`unknown --evidence ${EVIDENCE}`); process.exit(2); }
 // A SECOND CHECK, APPLIED AFTERWARDS AND NEVER FED BACK. The loop is driven entirely by --task. If
 // --post-check names another task, the file the loop ends with is judged against it once, at the
 // end, and recorded separately. Nothing about it reaches the model, the evidence, the revert rule or
@@ -71,6 +72,7 @@ if (!['basic', 'dom'].includes(EVIDENCE)) { console.error(`unknown --evidence ${
 // working repair while it still throws during movement, or the loop would quietly be chasing a
 // stricter target than the one the comparison was frozen on.
 const POST_CHECK = opt('post-check', null);
+const BASELINE = opt('baseline', null) || join(dirname(CANDIDATE), 'NARROW-2_accepted_index.html');
 if (!CANDIDATE) { console.error('--candidate <record.json> is required: the UNTOUCHED candidate to repair'); process.exit(2); }
 
 const { farmTasks } = await import('./benchTasks.js');
@@ -79,6 +81,7 @@ const { applyAcceptance } = await import('./acceptance.js');
 const { playCheck } = await import('./playCheck.js');
 const { judgeCandidate } = await import('./judgeCandidate.mjs');
 const { parseEditBlocks, applyEditBlocks } = await import('./localEdit.mjs');
+const { diagnose, collectEvidence } = await import('./diagnose.mjs');
 
 const task = farmTasks().find((t) => t.id === TASK_ID);
 if (!task) { console.error(`unknown task ${TASK_ID}`); process.exit(2); }
@@ -105,8 +108,19 @@ const SYSTEM = [
  * The evidence message. EVERY sentence here is either the task's own contract or something the
  * gate measured in this run. Nothing describes the defect in my words.
  */
-function evidenceMessage(file, d, play, lastRefusal) {
+function evidenceMessage(file, d, play, lastRefusal, diagnosisPlan) {
   const lines = [`This is ${ENTRY}. It does not work. Repair it.`, '', file, ''];
+  // DIAGNOSIS MODE. If a structured plan is available it replaces the hand-rolled evidence entirely.
+  // If it is NOT available - the engine declined - the run stops rather than quietly falling back to
+  // the raw error, because a silent fallback would make the comparison meaningless.
+  if (diagnosisPlan) {
+    lines.push(renderDiagnosis(diagnosisPlan), '', 'Reply with edit blocks only.');
+    if (lastRefusal) {
+      lines.push('', 'Your previous edit block was rejected by the tool that applies it:', '', `    ${lastRefusal}`, '',
+        'The FIND text must appear in the file above as one unbroken run of lines, in the same order.');
+    }
+    return lines.join('\n');
+  }
   if (lastRefusal) {
     lines.push('Your previous edit block was rejected by the tool that applies it, with this result:',
       '', `    ${lastRefusal}`, '',
@@ -137,6 +151,39 @@ function evidenceMessage(file, d, play, lastRefusal) {
   }
   lines.push('', 'Reply with edit blocks only.');
   return lines.join('\n');
+}
+
+/**
+ * Render a structured diagnosis for the model. The four sections stay apart, and the hypothesis is
+ * handed over WITH its unresolved questions: a repair prompt that presents a hypothesis as a finding
+ * would be worse than the raw error, because it would remove the model's chance to disagree with it.
+ * Nothing here is my reading of the defect - every line is either a measured fact, a catalogue
+ * sentence, or an obligation taken from the task's own checks.
+ */
+function renderDiagnosis(plan) {
+  const L = [];
+  L.push('These are the facts the run measured:', '');
+  for (const f of plan.observedFacts) L.push('    ' + f);
+  L.push('', 'One explanation survives the observations taken. IT IS A HYPOTHESIS, not an established cause:', '',
+    `    ${plan.hypothesis.says}`, '');
+  if (plan.hypothesis.eliminated && plan.hypothesis.eliminated.length) {
+    L.push('Explanations the observations contradicted:', '');
+    for (const e of plan.hypothesis.eliminated) L.push(`    ${e.id}`);
+    L.push('');
+  }
+  if (plan.hypothesis.unresolved && plan.hypothesis.unresolved.length) {
+    L.push('What that hypothesis does NOT settle - decide for yourself whether it holds:', '');
+    for (const u of plan.hypothesis.unresolved) L.push('    ' + u);
+    L.push('');
+  }
+  if (plan.proposedScope && plan.proposedScope.line) {
+    L.push(`The failing operation was observed at line ${plan.proposedScope.line}. ${plan.proposedScope.status}`,
+      `    ${plan.proposedScope.preference}`, '');
+  }
+  L.push('Whatever you change must satisfy all of these:', '');
+  for (const o of plan.obligations) L.push('    ' + o);
+  L.push('', 'Repair it. Keep everything that already works.');
+  return L.join('\n');
 }
 
 async function chat(messages) {
@@ -212,7 +259,10 @@ async function main() {
     assistance: {
       evidenceIsMachineCaptured: true,
       indentationToleranceByHarness: MATCH === 'normalized',
-      domFactsSupplied: EVIDENCE === 'dom',
+      domFactsSupplied: EVIDENCE === 'dom' || EVIDENCE === 'diagnosis',
+      structuredDiagnosisSupplied: EVIDENCE === 'diagnosis',
+      hypothesisHandedOverWithItsUncertainty: EVIDENCE === 'diagnosis',
+      acceptanceGateRemainsAuthoritative: true,
       humanAnalysisSupplied: false,          // no rewiring, no corrected decrement, no DOM hint
       editFormatGivenByHarness: true,
       fuzzyMatchingAllowed: false,
@@ -222,7 +272,10 @@ async function main() {
     // The starting point for the ACCEPTANCE policy stays what it has always been: the accepted
     // increment-1 page. A repair that abandons movement is still a regression.
     out.originalCandidate = { sha256: sha(startFile), chars: startFile.length, text: startFile.slice(0, 20000) };
-    const baseline = readFileSync(join(dirname(CANDIDATE), 'NARROW-2_accepted_index.html'), 'utf8');
+    // The verified starting point for the ACCEPTANCE policy. Inferring it from the candidate's own
+    // directory broke the moment a candidate lived anywhere else, so it is an explicit option with
+    // that inference as the default.
+    const baseline = readFileSync(BASELINE, 'utf8');
     writeFileSync(join(ws, ENTRY), baseline, 'utf8');
     await git(ws, ['init', '-q']); await git(ws, ['config', 'core.autocrlf', 'false']);
     await git(ws, ['add', '-A']);
@@ -253,7 +306,28 @@ async function main() {
       // working copy back before reading the evidence from it.
       writeFileSync(join(ws, ENTRY), current, 'utf8');
       const play = await playCheck(ws, spec, { timeoutMs: 90_000 });
-      const msg = evidenceMessage(current, judged.diagnosis, play, lastRefusal);
+      // THE DIAGNOSIS, RECOMPUTED FROM THIS ROUND'S OBSERVATIONS.
+      let plan = null, diagInfo = null;
+      if (EVIDENCE === 'diagnosis') {
+        const ev = await collectEvidence({ workspace: ws, task, deps: { playCheck, writeFileSync, readFileSync, mkdtempSync, rmSync, join, tmpdir, execFileSync } });
+        const dg = diagnose(ev);
+        diagInfo = { primarySignature: dg.primarySignature ?? null, considered: dg.considered.map((c) => c.id), surviving: dg.surviving, declined: dg.declined ?? null, plan: dg.plan ?? null };
+        if (!dg.plan) {
+          // THE INTENDED DECLINE. No plan means the engine could not separate the explanations or
+          // lacked an observation. The loop stops and says so; it does not fall back to the raw error,
+          // because a silent fallback would turn a refusal into an unremarked change of condition.
+          out.rounds.push({
+            round, kind: 'repair attempt', diagnosis: diagInfo,
+            outcome: 'DIAGNOSIS_DECLINED',
+            reason: `the diagnosis engine declined: ${dg.declined?.reason} - ${dg.declined?.needed}`,
+          });
+          console.log(`round ${round}  STOPPED: diagnosis declined (${dg.declined?.reason})`);
+          out.declinedByDiagnosis = { round, ...dg.declined };
+          break;
+        }
+        plan = dg.plan;
+      }
+      const msg = evidenceMessage(current, judged.diagnosis, play, lastRefusal, plan);
       const askKey = sha(current) + '|' + sha(msg);
       if (seenAsk.has(askKey)) {
         out.rounds.push({ round, kind: 'stopped', outcome: 'NO_NEW_INFORMATION', reason: 'this exact file and this exact evidence were already sent; a repeat cannot produce anything new' });
@@ -264,7 +338,8 @@ async function main() {
       const gen = await chat([{ role: 'system', content: SYSTEM }, { role: 'user', content: msg }]);
       genMs += gen.ms || 0; tokens += gen.outTok || 0;
       const row = {
-        round, kind: 'repair attempt', generationMs: gen.ms, outputTokens: gen.outTok ?? null,
+        round, kind: 'repair attempt', diagnosis: diagInfo,
+        generationMs: gen.ms, outputTokens: gen.outTok ?? null,
         promptTokens: gen.promptTok ?? null, termination: gen.ok ? gen.doneReason : `transport: ${gen.reason}`,
         evidenceGiven: msg.slice(msg.indexOf('It does not work.')).slice(0, 1200),
         rawReply: String(gen.text || '').slice(0, 8000),

@@ -210,5 +210,55 @@ console.log('\n=== 7. the second check runs AFTER the loop and decides nothing =
   say(!/no page or console error may be raised/i.test(prompt), 'the stricter requirement never appeared in anything the model was told');
 }
 
+console.log('\n=== 8. diagnosis mode hands over facts, a HYPOTHESIS and obligations - kept apart ===');
+{
+  const { rec, seen } = await run('diagmode', [block('a line that is nowhere in the file', 'x')], undefined, 1, ['--evidence', 'diagnosis']);
+  const prompt = JSON.stringify(seen[0]?.messages || []);
+  say(rec?.evidenceMode === 'diagnosis' && rec?.assistance?.structuredDiagnosisSupplied === true, 'the record says a structured diagnosis was supplied');
+  say(rec?.rounds?.find((r) => r.round === 1)?.diagnosis?.surviving?.length === 1,
+    `the engine ran per round and one explanation survived (${rec?.rounds?.find((r) => r.round === 1)?.diagnosis?.surviving?.join(',')})`);
+
+  say(/These are the facts the run measured/.test(prompt), 'the prompt separates the measured facts');
+  say(/IT IS A HYPOTHESIS, not an established cause/.test(prompt), 'labels the surviving explanation a HYPOTHESIS, not a cause');
+  say(/What that hypothesis does NOT settle/.test(prompt) && /decide for yourself/.test(prompt),
+    'hands over what the hypothesis does not settle, and invites disagreement with it');
+  say(/absence in the observed states is not the same as absence of any creation path/.test(prompt),
+    'so "never built" arrives with its own limit attached');
+  say(/not established to be the right place to edit/.test(prompt),
+    'and the proposed line is marked as where the failure was seen, not as the edit site');
+  say(/Whatever you change must satisfy all of these/.test(prompt) && /must keep passing/.test(prompt),
+    'the obligations include preserving what already passes');
+
+  // The prompt must still carry none of MY analysis, on top of all that structure.
+  const candidateText = JSON.parse(readFileSync(join(SCREEN, 'MODEL-CMP-1_armB_seed3.json'), 'utf8')).candidate.text;
+  let added = prompt;
+  for (const line of candidateText.split('\n')) { const t = line.trim(); if (t.length > 8) added = added.split(JSON.stringify(t).slice(1, -1)).join(' '); }
+  const leaks = ['keydown', 'rewire', 'decrement', 'no such button'];
+  const found = leaks.filter((w) => new RegExp(w, 'i').test(added));
+  say(found.length === 0, `and still none of my analysis${found.length ? ' -- LEAKED: ' + found.join(', ') : ''}`);
+}
+
+console.log('\n=== 9. when the diagnosis declines, the loop STOPS - it does not fall back ===');
+{
+  // The engine declines when an observation it needs is missing. A silent fallback to the raw error
+  // would turn that refusal into an unremarked change of condition, and would make a comparison
+  // between raw-error and diagnosis feedback meaningless.
+  const NOSTATE = join(tmpdir(), `nostate-${Date.now()}.json`);
+  const armB = JSON.parse(readFileSync(join(SCREEN, 'MODEL-CMP-1_armB_seed3.json'), 'utf8'));
+  // A candidate whose script cannot even be located: no <script> block, so the play finds no state
+  // and the failure has no signature this catalogue covers.
+  writeFileSync(NOSTATE, JSON.stringify({ ...armB, candidate: { ...armB.candidate, text: '<!DOCTYPE html><html><body><p>no script here</p></body></html>' } }), 'utf8');
+  try {
+    const { rec, seen } = await run('declines', [block('x', 'y')], NOSTATE, 2,
+      ['--evidence', 'diagnosis', '--baseline', join(SCREEN, 'NARROW-2_accepted_index.html')]);
+    const r1 = rec?.rounds?.find((r) => r.round === 1);
+    say(r1?.outcome === 'DIAGNOSIS_DECLINED', `the round is recorded as DIAGNOSIS_DECLINED (${r1?.outcome})`);
+    say(/declined:/.test(r1?.reason || ''), `with the engine's reason: ${JSON.stringify((r1?.reason || '').slice(0, 70))}`);
+    say(!!rec?.declinedByDiagnosis, 'and the run records that it stopped because of the decline');
+    say(seen.length === 0, 'the model was never asked: no fallback prompt was sent');
+    say(rec?.accepted === false, 'and nothing was accepted');
+  } finally { try { rmSync(NOSTATE, { force: true }); } catch { /* best effort */ } }
+}
+
 console.log(`\n  repair loop: ${passed} passed, ${failed} failed -> ${failed ? 'THE LOOP IS NOT ESTABLISHED' : 'a correct repair reaches RETAIN, the evidence carries no human analysis, and damage is rolled back between rounds'}`);
 process.exit(failed ? 1 : 0);

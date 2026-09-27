@@ -12,9 +12,18 @@ them improve repair, with everything else held identical?**
 
 ## Both arms run NOW, on the current harness
 
-    arm E0   evidence: basic   the file, the captured error message, the declared contract, and once
-                               the page runs, the failing step's name and observed state
-    arm E1   evidence: dom     the same, PLUS four facts read off the page at the failure
+    arm E0   evidence: basic       RAW-ERROR FEEDBACK. The file, the captured error message, the
+                                   declared contract, and once the page runs, the failing step's name
+                                   and observed state. This is what REPAIR-1 and REPAIR-2 sent.
+    arm E2   evidence: diagnosis   DIAGNOSIS FEEDBACK. The structured output of the diagnosis engine:
+                                   measured facts, the surviving explanation LABELLED A HYPOTHESIS with
+                                   what it leaves unresolved, a PROPOSED scope marked as not
+                                   established to be the edit site, and the obligations any repair must
+                                   satisfy.
+
+    arm E1   evidence: dom         the raw DOM facts without the structure. NOT part of the frozen
+                                   comparison - E2 contains those facts already - and available if a
+                                   third arm is ever wanted.
 
 **E0 is re-run. It is not taken from REPAIR-2.** REPAIR-2 ran before repeat-stopping existed, before
 the match rule and diff retention were recorded, before line-aligned exact matching, and before the
@@ -37,9 +46,15 @@ experiment exists.
     the loop's gate       farm-plant (6 steps), unchanged, for continuity with arm B
     harness commit        one commit for both arms, recorded in the result
 
-**The ONLY difference is `--evidence basic` against `--evidence dom`.**
+**The ONLY difference is `--evidence basic` against `--evidence diagnosis`.** That is the question the
+last round of work made precise: does additional runtime evidence, presented as facts plus an
+explicitly uncertain hypothesis, improve repair under an otherwise identical loop?
 
-## What the DOM arm adds, and what those facts do and do not establish
+**A decline is an outcome, not a fallback.** If the engine cannot separate the explanations in the E2
+arm, that round is recorded as DIAGNOSIS_DECLINED and the run stops. It does not quietly send the raw
+error instead, which would silently convert an E2 run into an E0 one.
+
+## What the diagnosis arm adds, and what those facts do and do not establish
 
     the element lookups that returned nothing        e.g. "plant"
     the ids the document contained AT THAT MOMENT    e.g. ["gameCanvas"]
@@ -72,8 +87,9 @@ stricter requirement is shown never to have appeared in anything the model was t
 
 ## What is supplied, and what is not
 
-    supplied      the candidate, the task, the edit format, indentation tolerance, and in E1 the four
-                  DOM facts - each of them read off the page by the harness
+    supplied      the candidate, the task, the edit format, indentation tolerance, and in E2 the
+                  structured diagnosis - its facts read off the page by the harness, its explanation
+                  catalogue and obligation templates authored by me and applied automatically
     NOT supplied  that the buttons do not exist; any event name; the rewiring; the corrected
                   decrement; the stricter spec's requirement; any description of the defect in my
                   words
@@ -82,14 +98,17 @@ stricter requirement is shown never to have appeared in anything the model was t
 
 ## Pre-registered readings
 
-- **E1 reaches RETAIN where E0 does not.** Additional runtime evidence improves repair under an
-  identical loop. Report the old-spec acceptance and the new-spec result separately, and expect the
-  new spec to still fail unless the model also fixed the inherited `#day` defect.
-- **E1 changes the repair family but still fails.** The likely outcome: the evidence redirected the
+- **E2 reaches RETAIN where E0 does not.** Diagnosis feedback improves repair under an identical
+  loop. Report the old-spec acceptance and the new-spec result separately, and expect the new spec to
+  still fail unless the model also fixed the inherited `#day` defect.
+- **E2 changes the repair family but still fails.** The likely outcome: the evidence redirected the
   model and something else now binds. Whatever the new failure is, name it and stop.
-- **E1 behaves like E0.** The error message was not the binding constraint, and my account of
+- **E2 behaves like E0.** The error message was not the binding constraint, and my account of
   REPAIR-2 was wrong. This is the outcome that makes the experiment worth running.
-- **E1 is worse.** More evidence can distract. Reported as plainly as a win.
+- **E2 declines instead of attempting.** A recorded DIAGNOSIS_DECLINED is a result: the engine met a
+  failure it could not separate. Report which observation it wanted.
+- **E2 is worse.** More evidence can distract, and a hypothesis - even one labelled uncertain - can
+  anchor a model onto the wrong repair. Reported as plainly as a win.
 
 **This does not test autonomy.** The candidate, the task, the decomposition, the edit format and the
 choice of which facts to capture are all mine. It tests whether a failure the system can observe is
@@ -97,6 +116,6 @@ enough to drive a repair nobody wrote for it.
 
 ## Estimate, not a request
 
-Eight runs (4 candidates x 2 arms), at most 3 rounds each, on the 7B: roughly 20-30 minutes of A10G,
-**about $0.40-0.55**. Prior hosted spend is about $0.57. **Nothing is deployed and no authorization is
+Eight runs (4 candidates x 2 arms: E0 re-run and E2), at most 3 rounds each, on the 7B: roughly 20-30
+minutes of A10G, **about $0.40-0.55**. Prior hosted spend is about $0.57. **Nothing is deployed and no authorization is
 implied by this estimate.**
