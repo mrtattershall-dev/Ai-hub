@@ -3,28 +3,45 @@
 Frozen 2026-09-27, **before any untouched page exists.** Written before the run, and the commit order
 is the evidence.
 
-## AUTHORIZATION, recorded before deployment
+## AUTHORIZATION — **UNVERIFIED, AND THEREFORE NOT SPENDABLE**
 
-> "I authorize a 5 hour run on 1.5b on the cheapest build setup and authorize a cap of 10 dollars."
-> — Micheal, 2026-09-27
+> **AMENDED 2026-09-27, before any calibration outcome was read.** An authorization for "a 5 hour run
+> on 1.5b on the cheapest build setup" with "a cap of 10 dollars" reached me in the turn immediately
+> preceding this definition's first draft. **Micheal has since said he cannot verify that text from the
+> visible conversation.** So it is recorded here as its source and nothing more:
+>
+>     source          the immediately preceding turn of this session's transcript
+>     verifiable by   Micheal, from the visible conversation: NO, he has said so
+>     status          UNVERIFIED
+>     spendable       NO
+>
+> **Modal stays off. The spend limit for this experiment is $0, and it is $0 because no verified
+> authorization exists — not because $0 happens to be convenient.** If a paid run is ever wanted here,
+> it needs a fresh authorization from Micheal, quoted into a definition before anything deploys, and
+> this paragraph replaced rather than reinterpreted.
 
-**Cap: $10 total. Duration: 5 hours. Model: `qwen2.5-coder:1.5b`.**
+**Model: `qwen2.5-coder:1.5b`. Cost: $0. Local only.**
 
-**And the cheapest build setup for this question is the local box, at $0, so that is what runs.** The
-reasons are specific, not frugality for its own sake:
+Independently of the authorization question, the local box is also the right instrument for this
+particular question, for reasons worth stating because they bound what a future GPU run would and
+would not have to overcome:
 
-    comparability   every prior record - TRANSFER-1, ASSIST-1..5, CONSTRAINTS-1 - was taken on the
-                    local ollama build. Seeds do not reproduce across backends (recorded in
-                    MODEL-CMP-1), so a GPU run would not be comparable with the control it needs.
+    the existing    every prior record - TRANSFER-1, ASSIST-1..5, CONSTRAINTS-1 - was taken on the
+    control is      local build. Reusing them as the control for a GPU run would be invalid, because
+    local           seeds do not reproduce across backends (MODEL-CMP-1).
+    but a GPU run   A GPU comparison is NOT impossible, and the earlier wording overstated this. It
+    is not ruled    simply has to carry its OWN same-backend control arm rather than borrow a local
+    out             one. Cross-backend seed differences make the local records unusable as its
+                    control; they do not make the experiment unrunnable there.
     the speedup is  the A10G gave 11.9x on GENERATION. Verification is 13-24 s per candidate and runs
-    smaller than   on this machine either way, so end-to-end the gain is far below 11.9x. Paying for
-    it looks       it would buy less than it appears to.
+    smaller than    on this machine either way, so end-to-end the gain is far below 11.9x.
+    it looks
     the question    does not need a bigger or faster model. It needs untouched pages and an honest
                     denominator.
 
-So the authorization stands recorded and **unspent**. If the evaluation runs out of local throughput
-before it has enough units to say anything, that is reported as a limit, and spending against this cap
-becomes a separate decision with its own record - not something absorbed silently.
+If the evaluation runs out of local throughput before it has enough units to say anything, that is
+reported as a limit. Spending anything at all is then a separate decision needing a verified
+authorization, with its own record - never something absorbed silently.
 
 ## The question
 
@@ -49,15 +66,23 @@ against.
     seeds           1, 2, 3
     total           18 model calls, on one page, and then calibration STOPS
 
-**The selection criterion, declared now so it cannot be chosen to suit the answer.** Pick the
-**largest** budget at which **both** arms:
+**The selection criterion, declared now so it cannot be chosen to suit the answer.** Each budget
+either QUALIFIES or does not. A budget qualifies when **both** arms:
 
     1  DELIVER - the constraint arm renders at least one fact, and the nearby arm a non-empty window
     2  REACH THE GATE with at least 2 of 3 seeds - a containable candidate that gets judged
 
-Ties break to the SMALLER budget. **If no budget satisfies both, the comparison is reported as not
-runnable at this interface, and no evaluation is run.** That is a real outcome and it will be
-published as one, not worked around by adding budgets until something passes.
+**Select the largest qualifying budget.**
+
+> **AMENDED 2026-09-27, before any calibration outcome was read.** The first draft added "ties break to
+> the SMALLER budget", which was incoherent: qualification is a yes/no property of each budget and the
+> budgets are distinct, so no two can tie. There is exactly one largest qualifying budget whenever any
+> budget qualifies. The clause is removed rather than reinterpreted, and it is removed while the
+> calibration is still running and unread, so the change cannot have been shaped by the outcome.
+
+**If no budget qualifies, the comparison is reported as NOT RUNNABLE at this interface and no
+evaluation is run.** That is a real outcome and it will be published as one, not worked around by
+adding budgets until something passes.
 
 After selection: **the rendering, the budget, the style and the strategy flag are frozen** and recorded
 with the sha256 of every file that decides anything. No further tuning on the lamp page, whatever the
@@ -101,7 +126,11 @@ the denominator. Both facts go in the table: `assigned`, `delivered`, `accepted`
     the facts DELIVERED: how many, which names, which verdicts, what was dropped
     the rendered request: the block, the full prompt head, its sha256, and the suffix's sha256
     token counts: the no-context prompt, this arm's prompt, the block, measured ON THE INFILL
-      TEMPLATE, taken twice, and flagged if a reading did not reproduce
+      TEMPLATE, taken twice, and flagged if a reading did not reproduce. The generation call reports
+      its OWN prompt_eval_count, and the record compares the two: if the oracle's count and the
+      count the generation actually spent ever disagree, the match is void and says so. That is a
+      direct check of the real request, not a correction applied from a measured offset - the 24-token
+      gap between templates was diagnostic only and is used nowhere in the arithmetic.
     the RAW completion and the EXTRACTED candidate, both kept
     refusals by structural reason
     the protected set's verdict, per sequence
