@@ -73,6 +73,9 @@ if (!['basic', 'dom', 'diagnosis'].includes(EVIDENCE)) { console.error(`unknown 
 // stricter target than the one the comparison was frozen on.
 const POST_CHECK = opt('post-check', null);
 const BASELINE = opt('baseline', null) || join(dirname(CANDIDATE), 'NARROW-2_accepted_index.html');
+// Build round 1's request exactly as the loop would, write it out, and call no model. This exists so
+// that a past run's request can be reconstructed through the same code rather than described.
+const DRY_RUN = opt('dry-run-request', null);
 if (!CANDIDATE) { console.error('--candidate <record.json> is required: the UNTOUCHED candidate to repair'); process.exit(2); }
 
 const { farmTasks } = await import('./benchTasks.js');
@@ -294,6 +297,32 @@ async function main() {
     console.log(`round 0  the untouched candidate: play [${judged.play.passing.join(',')}]  ${judged.diagnosis.failureClass}  ${judged.acceptance.disposition}`);
     if (judged.diagnosis.loadErrors.length) console.log(`         captured error: ${judged.diagnosis.loadErrors[0]}`);
 
+    // ── dry run: build round 1's request and stop ──
+    if (DRY_RUN) {
+      // Round 0's acceptance RESTORED the workspace to the baseline, so the candidate has to be put
+      // back before any observation - exactly as a real round does. Without this the dry run read the
+      // baseline and produced a diagnosis-mode request identical to the basic one, which would have
+      // made this audit wrong in the same way the thing it audits was wrong.
+      writeFileSync(join(ws, ENTRY), current, 'utf8');
+      let plan = null;
+      if (EVIDENCE === 'diagnosis') {
+        const ev = await collectEvidence({ workspace: ws, task, deps: { playCheck, writeFileSync, readFileSync, mkdtempSync, rmSync, join, tmpdir, execFileSync } });
+        const dg = diagnose(ev);
+        plan = dg.plan;
+      }
+      const play = await playCheck(ws, spec, { timeoutMs: 90_000 });
+      const msg = evidenceMessage(current, judged.diagnosis, play, null, plan);
+      mkdirSync(dirname(DRY_RUN), { recursive: true });
+      writeFileSync(DRY_RUN, JSON.stringify({
+        candidate: CANDIDATE, evidenceMode: EVIDENCE, matchMode: MATCH,
+        planPresent: !!plan, hypothesis: plan?.hypothesis?.id ?? null,
+        system: SYSTEM, user: msg, sha256: sha(SYSTEM + '\u0000' + msg),
+        userChars: msg.length,
+      }, null, 2), 'utf8');
+      console.log(`dry run: request written to ${DRY_RUN} (${msg.length} chars, plan ${plan ? plan.hypothesis.id : 'none'})`);
+      return out;
+    }
+
     let genMs = 0, tokens = 0, lastRefusal = null;
     // NO NEW INFORMATION. REPAIR-1 spent two thirds of its budget re-sending the same evidence over
     // the same file and getting the same refused patch. A repeated (file, evidence) pair cannot
@@ -347,6 +376,10 @@ async function main() {
         // a marker instead, so what the harness ADDED is recorded verbatim.
         evidenceGiven: msg.split(current).join(`<<< the file, ${current.length} chars, elided >>>`).slice(0, 6000),
         promptChars: msg.length,
+        // THE REQUEST ITSELF. DOM-EVIDENCE-1 could only argue from a prompt-token delta about what
+        // reached the model, because nothing stored the request. The system and user messages are now
+        // saved whole, with a sha256, so the question is answerable from the record.
+        request: { system: SYSTEM, user: msg, sha256: sha(SYSTEM + '\u0000' + msg) },
         rawReply: String(gen.text || '').slice(0, 8000),
       };
       if (!gen.ok) { row.outcome = 'GENERATION_FAILED'; out.rounds.push(row); console.log(`round ${round}  generation failed: ${gen.reason}`); break; }
