@@ -4,8 +4,8 @@
 commit**, so the commit order is the evidence that no rule was adapted to it.
 
 **THE EXECUTED VERSION'S PROVENANCE.** Unchanged rule hashes show those rules were preserved; they do not
-mean the code that ran is the code in the manifest. Two files differ from the frozen manifest, and both
-changes belong in this record rather than in a footnote:
+mean the code that ran is the code in the manifest. THREE files differ from the frozen manifest, and every
+one of those changes belongs in this record rather than in a footnote:
 
     server/autoGuide.mjs    the task lookup was widened beyond farm tasks. The guidance functions'
                             source hash is identical before and after
@@ -15,9 +15,13 @@ changes belong in this record rather than in a footnote:
                             now confined to the case where that file is the program being run. The
                             containment source hash is identical before and after
                             (986c67a5465aa6765c7550f39ffb4970...).
+    server/benchTasks.js    panelTasks() was added: the panel task, its requirement, and its checks. This
+                            is the experimenter's input rather than a rule - the task had to be declared
+                            somewhere - and no existing farm task was touched. But it is a file the frozen
+                            manifest covers, so it is named here as changed.
 
 So: the RULES that chose the site and contained the output are provably the frozen ones; the PROGRAM that
-ran them is two plumbing commits later, and `TRANSFER-1_EXECUTED_MANIFEST.txt` records the hashes of what
+ran them is three files later - two plumbing fixes and the task declaration - and `TRANSFER-1_EXECUTED_MANIFEST.txt` records the hashes of what
 actually executed.
 
 ## The page, and why it is a real test

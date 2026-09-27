@@ -12,6 +12,11 @@ unchanged  64aa3b7bcb1ad51b5eaba23f996095ab692abbf9f715f3dd29e4685a3caa2bf3     
 unchanged  f62fa26c96e5b5896517c0a6b97a2b463692224e96efeb0a2f7fa04869216fd1    12541  server/playCheck.js
 CHANGED    6fe7664977f27e3b5576227a368116db3f3a4ea127be0f338db0881c71604245    23052  server/benchTasks.js
 
-The two CHANGED files are plumbing, and the parts that decide anything were hash-proved identical:
+THREE files differ. All three are plumbing, and in the two that decide anything the deciding parts were
+hash-proved identical:
   autoGuide.mjs   guidance functions  b65885c20bac8932c841deb388ad1593772930d7f56e0cc2ffaaeb686eda950f
   localEdit.mjs   containment source  986c67a5465aa6765c7550f39ffb4970 (first 32)
+  benchTasks.js   panelTasks() was ADDED - the panel task, its requirement and its checks. This file is
+                  the experimenter's input, not a rule: it is where the page's task had to be declared,
+                  and no farm task in it was touched. It is listed as CHANGED because it is, and because
+                  the reader should be able to see that the addition is the task definition itself.
