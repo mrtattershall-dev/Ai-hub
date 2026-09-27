@@ -94,10 +94,16 @@ const { applyAcceptance } = await import('./acceptance.js');
 const { playCheck } = await import('./playCheck.js');
 const { judgeCandidate } = await import('./judgeCandidate.mjs');
 
+// PLUMBING, not a rule. This module resolved its task AT IMPORT TIME and exited the process when the
+// id was unknown - so importing it purely for containToSlot, from a run whose task lives in another
+// group, killed that run before it started. The resolution is unchanged; only the exit is now confined
+// to the case where this file is the program being run. The containment functions above are untouched,
+// and TRANSFER-1 records their source hash before and after to show it.
+const DIRECT_ENTRY = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
 const task = farmTasks().find((t) => t.id === TASK_ID);
-if (!task) { console.error(`unknown task ${TASK_ID}; have ${farmTasks().map((t) => t.id).join(', ')}`); process.exit(2); }
-const spec = task.diagnostic.spec;
-const ENTRY = spec.entry || 'index.html';
+if (!task && DIRECT_ENTRY) { console.error(`unknown task ${TASK_ID}; have ${farmTasks().map((t) => t.id).join(', ')}`); process.exit(2); }
+const spec = task ? task.diagnostic.spec : null;
+const ENTRY = (spec && spec.entry) || 'index.html';
 
 // ── THE ANCHOR CONTRACT ───────────────────────────────────────────────────────────────────
 const ANCHOR_SYSTEM = [
@@ -121,7 +127,7 @@ const ANCHOR_SYSTEM = [
 // verbatim in the result.
 const FIM_INSTRUCTION_OVERRIDE = opt('fim-instruction', null);
 const FIM_INSTRUCTION = FIM_INSTRUCTION_OVERRIDE !== null ? FIM_INSTRUCTION_OVERRIDE : (() => {
-  const words = String(task.goal || '').split(/\s+/);
+  const words = String((task && task.goal) || '').split(/\s+/);
   const lines = [];
   let line = '';
   for (const w of words) {

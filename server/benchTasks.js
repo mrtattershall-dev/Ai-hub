@@ -302,6 +302,42 @@ export function farmTasks() {
   return out;
 }
 
+/**
+ * THE TRANSFER TASK. A page the 1.5B wrote from a one-line request, whose structure I read only to
+ * validate its baseline and write these checks - never to change a policy rule. Its keydown handler
+ * DISPATCHES on key values with no early return, which is a different shape from the farm page, so the
+ * site rules face a case they were not authored against.
+ *
+ * Requirement supplied; site and structure NOT supplied. Protected = every carried-forward check.
+ */
+export function panelTasks() {
+  const dir = join(HERE, '..', 'legasus', 'bench', 'panel');
+  const specPath = join(dir, 'play-panel.json');
+  if (!existsSync(specPath)) return [];
+  const spec = JSON.parse(readFileSync(specPath, 'utf8'));
+  const sub = (steps) => ({ ...spec, name: `panel-steps-${steps.join('')}`, steps: spec.steps.filter((x) => steps.includes(x.n)) });
+  // The lamps the page already had: load, the three toggles, and no errors.
+  const existing = [1, 2, 3, 4, 8];
+  const requested = [1, 2, 3, 4, 5, 6, 7, 8];
+  return [{
+    id: 'panel-alloff', group: 'PANEL', source: 'internal', language: 'javascript', kind: 'build',
+    dependsOn: null,
+    goal: 'Continue the light switch panel already in index.html. Pressing 0 turns every lamp off. It must never turn a lamp on. Everything that already works must keep working. The page is a single self-contained web page, index.html: plain HTML5 canvas and JavaScript, no frameworks, no external files or CDNs. ' + spec.contract,
+    requirement: {
+      trigger: { kind: 'key', key: '0' },
+      effects: ['every lamp is off'],
+      invariants: ['no lamp is ever turned on by this key', 'everything that already works keeps working'],
+    },
+    seed: {},
+    requested: { play: { spec: sub(requested), steps: requested } },
+    accumulates: ['the page as delivered'],
+    supersedes: [],
+    protected: { plays: [{ from: 'the page as delivered', spec: sub(existing), steps: existing }] },
+    diagnostic: { kind: 'play', spec: sub(requested), timeoutSec: 90 },
+    upstreamCases: requested.length, protectedCases: existing.length,
+  }];
+}
+
 export function benchQueue() {
   return [...externalTasks(), ...SEQUENTIAL_TASKS];
 }

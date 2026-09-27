@@ -156,14 +156,17 @@ const git = (ws, args) => exec('git', ['-C', ws, ...args], { windowsHide: true }
 
 async function main() {
   const T0 = Date.now();
-  const { farmTasks } = await import('./benchTasks.js');
+  // PLUMBING, not a rule: the policy has to be able to LOOK UP a task that is not a farm task. The
+  // guidance rules below are untouched by this - their source hash is recorded in TRANSFER-1 before and
+  // after, and it is identical.
+  const { farmTasks, panelTasks } = await import('./benchTasks.js');
   const { evaluate } = await import('./evaluator.js');
   const { applyAcceptance } = await import('./acceptance.js');
   const { playCheck } = await import('./playCheck.js');
   const { judgeCandidate } = await import('./judgeCandidate.mjs');
   const { cutRegion, containToSlot } = await import('./localEdit.mjs');
 
-  const task = farmTasks().find((t) => t.id === TASK_ID);
+  const task = [...farmTasks(), ...(typeof panelTasks === 'function' ? panelTasks() : [])].find((t) => t.id === TASK_ID);
   if (!task) { console.error(`unknown task ${TASK_ID}`); process.exit(2); }
   if (!task.requirement) { console.error(`${TASK_ID} has no structured requirement for the policy to read`); process.exit(2); }
   const spec = task.diagnostic.spec;

@@ -1,0 +1,55 @@
+{
+  "entry": "index.html",
+  "stateExpr": "window.panel.state()",
+  "contract": "The page must expose window.panel.state() returning an array of three booleans, one per lamp.",
+  "steps": [
+    {
+      "n": 1,
+      "name": "loads with no page or console errors and exposes three lamps, all off",
+      "do": [],
+      "expect": "errors.length === 0 && Array.isArray(state) && state.length === 3 && state.every((x) => x === false)"
+    },
+    {
+      "n": 2,
+      "name": "pressing 1 turns the first lamp on and leaves the others alone",
+      "do": [{ "key": "1" }],
+      "expect": "state[0] === true && state[1] === before[1] && state[2] === before[2]"
+    },
+    {
+      "n": 3,
+      "name": "pressing 2 and 3 turns the other two on",
+      "do": [{ "key": "2" }, { "key": "3" }],
+      "expect": "state.every((x) => x === true)"
+    },
+    {
+      "n": 4,
+      "name": "pressing 1 again toggles the first lamp back off",
+      "do": [{ "key": "1" }],
+      "expect": "state[0] === false && state[1] === true && state[2] === true"
+    },
+    {
+      "n": 5,
+      "name": "pressing 0 turns every lamp off",
+      "do": [{ "key": "0" }],
+      "expect": "state.every((x) => x === false)"
+    },
+    {
+      "n": 6,
+      "name": "pressing 0 again leaves every lamp off - it never turns one on",
+      "do": [{ "key": "0" }],
+      "expect": "state.every((x) => x === false)"
+    },
+    {
+      "n": 7,
+      "name": "after 0, the individual toggles still work",
+      "do": [{ "key": "2" }],
+      "expect": "state[1] === true && state[0] === false && state[2] === false"
+    },
+    {
+      "n": 8,
+      "name": "no page or console error was raised at any point during the run",
+      "do": [],
+      "expect": "noErrors"
+    }
+  ]
+}

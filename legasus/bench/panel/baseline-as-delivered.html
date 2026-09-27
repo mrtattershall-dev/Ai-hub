@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light Switch Panel</title>
+</head>
+<body>
+    <canvas id="lightSwitchCanvas" width="200" height="200"></canvas>
+    <script>
+        const canvas = document.getElementById('lightSwitchCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const LAMPS = [false, false, false];
+
+        const drawLamp = (x, y, isOn) => {
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = isOn ? 'red' : 'white';
+            ctx.fill();
+        };
+
+        const drawPanel = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawLamp(50, 50, LAMPS[0]);
+            drawLamp(150, 50, LAMPS[1]);
+            drawLamp(100, 150, LAMPS[2]);
+        };
+
+        const toggleLamp = (index) => {
+            LAMPS[index] = !LAMPS[index];
+            drawPanel();
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '1') toggleLamp(0);
+            if (e.key === '2') toggleLamp(1);
+            if (e.key === '3') toggleLamp(2);
+        });
+
+        window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };
+    </script>
+</body>
+</html>
