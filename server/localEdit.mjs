@@ -62,6 +62,7 @@ import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const exec = promisify(execFile);
@@ -350,7 +351,12 @@ async function main() {
     rec.tokens = { output: gen.outTok ?? null, prompt: gen.promptTok ?? null, replyChars: (gen.text || '').length };
     rec.terminationReason = gen.ok ? gen.doneReason : `transport: ${gen.reason}`;
     rec.naturalStop = gen.doneReason === 'stop';
-    rec.reply = String(gen.text || '').slice(0, 20000);
+    // RAW, before any harness transformation. Every later field derives from this one, and the
+    // assistance stays visible because both ends are on the record: rawReply is what the model
+    // emitted, transformed is what the harness made of it, candidate is what the gate judged.
+    rec.rawReply = String(gen.text || '').slice(0, 20000);
+    rec.rawReplyChars = (gen.text || '').length;
+    rec.reply = rec.rawReply;                      // kept for readers of the earlier records
     if (!gen.ok) { rec.boundaries = { editProduced: false, note: `generation failed: ${gen.reason}` }; return rec; }
 
     if (PROTOCOL === 'anchor') {
@@ -378,6 +384,11 @@ async function main() {
       const code = nonCommentContent(parsed.blocks.map((b) => b.replace).join('\n'));
       rec.edit.code = code;
       rec.boundaries.editInsertsNonComment = code.hasNonComment;
+      rec.transformed = {
+        kind: 'anchor-blocks', tailTrimmed: false,
+        blocks: parsed.blocks.map((b) => ({ find: b.find.slice(0, 2000), replace: b.replace.slice(0, 2000) })),
+        identicalToRaw: false,                                  // a block list is never the raw text
+      };
       if (!applied.applicable) return rec;                      // nothing partially spliced, ever
       edited = applied.text;
     } else {
@@ -388,6 +399,11 @@ async function main() {
         rec.fimTailTrimmed = { trimmed: t.trimmed, droppedLines: t.droppedLines, dropped: t.dropped };
         middle = t.text;
       }
+      rec.transformed = {
+        kind: 'fim-middle', tailTrimmed: TRIM_TAIL && !!(rec.fimTailTrimmed && rec.fimTailTrimmed.trimmed),
+        middleUsed: middle.slice(0, 20000), middleUsedChars: middle.length,
+        identicalToRaw: middle === String(gen.text || ''),
+      };
       rec.boundaries.editProduced = middle.trim().length > 0;
       rec.boundaries.editContractClean = rec.boundaries.editProduced;   // no block format to violate
       rec.boundaries.editApplicable = rec.boundaries.editProduced;
@@ -403,6 +419,10 @@ async function main() {
     rec.boundaries.editApplied = true;
     rec.boundaries.changedProgram = text.trim() !== startFile.trim();
     rec.editedChars = text.length;
+    rec.candidate = {
+      chars: text.length, sha256: createHash('sha256').update(text).digest('hex'),
+      text: text.slice(0, 20000),
+    };
     writeFileSync(join(ws, ENTRY), text, 'utf8');
     await git(ws, ['add', '-A']);
     await git(ws, ['-c', 'user.email=b@b', '-c', 'user.name=b', 'commit', '-q', '-m', 'candidate'])

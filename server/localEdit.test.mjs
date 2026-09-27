@@ -243,6 +243,12 @@ console.log('\n=== 10. the SMALLER fim region, with the movement wiring left int
   say(b.passedProtected === true, 'movement and existing behaviour survive (steps 1-3)');
   say(b.passedDiagnostic === true && b.accepted === true, `planting and growth work, RETAIN (${rec?.acceptance?.disposition})`);
   say(rec?.assistance?.region?.removedLines <= 6, `the hole is ${rec?.assistance?.region?.removedLines} lines, not 42`);
+  // The raw completion, the harness's transformation of it and the judged candidate must ALL be on
+  // the record, so the assistance can never become invisible in a later reading.
+  say(typeof rec?.rawReply === 'string' && rec.rawReply.length > 0, 'the RAW completion is recorded');
+  say(rec?.transformed?.kind === 'fim-middle' && typeof rec.transformed.middleUsed === 'string', 'the TRANSFORMED middle the harness spliced is recorded beside it');
+  say(!!rec?.candidate?.sha256 && rec.candidate.chars > rec.transformed.middleUsedChars, 'the CANDIDATE the gate judged is recorded with its sha256');
+  say(rec.transformed.identicalToRaw === true, 'and this run reports the transformation as a no-op, because no trim was requested');
 }
 
 console.log(`\n  localized edit: ${passed} passed, ${failed} failed -> ${failed ? 'THE PROTOCOL IS NOT ESTABLISHED' : 'a correct edit reaches RETAIN through both protocols, and every refusal is deterministic'}`);
