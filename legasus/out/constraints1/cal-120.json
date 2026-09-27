@@ -1,0 +1,657 @@
+{
+  "at": "2026-09-27T15:54:48.950Z",
+  "experiment": "constraint arms",
+  "task": "panel-alloff",
+  "model": "qwen2.5-coder:1.5b",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "tokenBudget": 120,
+  "style": "compact",
+  "includeStrategy": true,
+  "baseline": "legasus/bench/panel/baseline-as-delivered.html",
+  "startSha": "f9c49c2a8dd58599a2159ae04a32a7669c8a7a24c5ef6d937113989184e77535",
+  "interventionsByAPerson": 0,
+  "heldFixed": [
+    "model",
+    "seeds",
+    "edit interface (FIM)",
+    "scaffold",
+    "instruction",
+    "containment",
+    "max tokens",
+    "temperature",
+    "every check"
+  ],
+  "site": {
+    "rule": "R1",
+    "why": "a keydown listener already dispatches on key values and does not exclude this key, so a branch goes inside it",
+    "insertAfterLine": 34
+  },
+  "scaffold": "            if (e.key === '0') {\n                // FILL IN\n            }",
+  "instruction": "// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.",
+  "armSizes": {
+    "matchedOn": "tokens of the full prompt, measured by the serving model",
+    "promptTokens": {
+      "none": 411,
+      "constraints": 514,
+      "nearby": 512
+    },
+    "blockTokens": {
+      "none": 0,
+      "constraints": 103,
+      "nearby": 101
+    },
+    "tokenDifference": 2,
+    "tokenReadingsStable": true,
+    "unstableReadings": [],
+    "measuredOnTheInfillTemplate": true,
+    "oracleCost": {
+      "totalMs": 54925,
+      "calls": 20,
+      "note": "measured separately from generation, and these calls warm the cache the first generation then reads",
+      "everyReadingUsedTheInfillTemplate": true
+    },
+    "constraints": {
+      "chars": 386,
+      "lines": 4,
+      "complete": false,
+      "dropped": [
+        "ctx: the whole constraint"
+      ],
+      "delivered": [
+        {
+          "label": "LAMPS",
+          "kind": "constraint",
+          "verdict": "CONST_CONTAINER",
+          "lines": 3
+        },
+        {
+          "label": "drawPanel()",
+          "kind": "redraw",
+          "verdict": null,
+          "lines": 1
+        }
+      ],
+      "factsDelivered": 1,
+      "sizeSearch": [
+        {
+          "size": 60,
+          "chars": 1164,
+          "tokens": 411
+        },
+        {
+          "size": 120,
+          "chars": 1262,
+          "tokens": 435
+        },
+        {
+          "size": 300,
+          "chars": 1453,
+          "tokens": 490
+        },
+        {
+          "size": 390,
+          "chars": 1551,
+          "tokens": 514
+        },
+        {
+          "size": 600,
+          "chars": 1746,
+          "tokens": 564
+        }
+      ]
+    },
+    "nearby": {
+      "chars": 356,
+      "lines": 11,
+      "windowLines": [
+        30,
+        40
+      ],
+      "sizeSearch": [
+        {
+          "size": 40,
+          "chars": 1168,
+          "tokens": 413
+        },
+        {
+          "size": 70,
+          "chars": 1221,
+          "tokens": 423
+        },
+        {
+          "size": 100,
+          "chars": 1270,
+          "tokens": 439
+        },
+        {
+          "size": 130,
+          "chars": 1274,
+          "tokens": 441
+        },
+        {
+          "size": 160,
+          "chars": 1337,
+          "tokens": 460
+        },
+        {
+          "size": 220,
+          "chars": 1386,
+          "tokens": 476
+        },
+        {
+          "size": 250,
+          "chars": 1429,
+          "tokens": 484
+        },
+        {
+          "size": 310,
+          "chars": 1478,
+          "tokens": 500
+        },
+        {
+          "size": 340,
+          "chars": 1521,
+          "tokens": 512
+        },
+        {
+          "size": 400,
+          "chars": 1603,
+          "tokens": 533
+        }
+      ]
+    }
+  },
+  "undeliveredTreatments": [],
+  "armText": {
+    "nearby": "//         const toggleLamp = (index) => {\n//             LAMPS[index] = !LAMPS[index];\n//             drawPanel();\n//         };\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === '1') toggleLamp(0);\n//             if (e.key === '2') toggleLamp(1);\n//             if (e.key === '3') toggleLamp(2);\n//         });\n// ",
+    "constraints": "// FACT line 14: LAMPS is declared `const` and holds a container.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// FACT line 23: drawPanel() takes no arguments, and the code here calls it after changing state."
+  },
+  "renderedRequests": {
+    "none": {
+      "block": "",
+      "promptHead": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Light Switch Panel</title>\n</head>\n<body>\n    <canvas id=\"lightSwitchCanvas\" width=\"200\" height=\"200\"></canvas>\n    <script>\n        const canvas = document.getElementById('lightSwitchCanvas');\n        const ctx = canvas.getContext('2d');\n\n        const LAMPS = [false, false, false];\n\n        const drawLamp = (x, y, isOn) => {\n            ctx.beginPath();\n            ctx.arc(x, y, 10, 0, Math.PI * 2);\n            ctx.fillStyle = isOn ? 'red' : 'white';\n            ctx.fill();\n        };\n\n        const drawPanel = () => {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            drawLamp(50, 50, LAMPS[0]);\n            drawLamp(150, 50, LAMPS[1]);\n            drawLamp(100, 150, LAMPS[2]);\n        };\n\n        const toggleLamp = (index) => {\n            LAMPS[index] = !LAMPS[index];\n            drawPanel();\n        };\n\n        document.addEventListener('keydown', (e) => {\n            if (e.key === '0') {\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n",
+      "promptHeadSha": "964d24d763f4e3fc53112639196bc95d040d124c75846fe26f6c5f611c08bf99",
+      "suffix": "\n            }\n            if (e.key === '1') toggleLamp(0);\n            if (e.key === '2') toggleLamp(1);\n            if (e.key === '3') toggleLamp(2);\n        });\n\n        window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n    </script>\n</body>\n</html>\n",
+      "suffixSha": "908adc085f1132431460e30829d6ab3c50d492dd2e1c2ae7aef55405a531d722"
+    },
+    "nearby": {
+      "block": "//         const toggleLamp = (index) => {\n//             LAMPS[index] = !LAMPS[index];\n//             drawPanel();\n//         };\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === '1') toggleLamp(0);\n//             if (e.key === '2') toggleLamp(1);\n//             if (e.key === '3') toggleLamp(2);\n//         });\n// ",
+      "promptHead": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Light Switch Panel</title>\n</head>\n<body>\n    <canvas id=\"lightSwitchCanvas\" width=\"200\" height=\"200\"></canvas>\n    <script>\n        const canvas = document.getElementById('lightSwitchCanvas');\n        const ctx = canvas.getContext('2d');\n\n        const LAMPS = [false, false, false];\n\n        const drawLamp = (x, y, isOn) => {\n            ctx.beginPath();\n            ctx.arc(x, y, 10, 0, Math.PI * 2);\n            ctx.fillStyle = isOn ? 'red' : 'white';\n            ctx.fill();\n        };\n\n        const drawPanel = () => {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            drawLamp(50, 50, LAMPS[0]);\n            drawLamp(150, 50, LAMPS[1]);\n            drawLamp(100, 150, LAMPS[2]);\n        };\n\n        const toggleLamp = (index) => {\n            LAMPS[index] = !LAMPS[index];\n            drawPanel();\n        };\n\n        document.addEventListener('keydown', (e) => {\n            if (e.key === '0') {\n//         const toggleLamp = (index) => {\n//             LAMPS[index] = !LAMPS[index];\n//             drawPanel();\n//         };\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === '1') toggleLamp(0);\n//             if (e.key === '2') toggleLamp(1);\n//             if (e.key === '3') toggleLamp(2);\n//         });\n// \n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n",
+      "promptHeadSha": "30873ca8a48732650213b3036e0f65212c5417e3e8e63563c150c4a1cf9acf34",
+      "suffix": "\n            }\n            if (e.key === '1') toggleLamp(0);\n            if (e.key === '2') toggleLamp(1);\n            if (e.key === '3') toggleLamp(2);\n        });\n\n        window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n    </script>\n</body>\n</html>\n",
+      "suffixSha": "908adc085f1132431460e30829d6ab3c50d492dd2e1c2ae7aef55405a531d722"
+    },
+    "constraints": {
+      "block": "// FACT line 14: LAMPS is declared `const` and holds a container.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// FACT line 23: drawPanel() takes no arguments, and the code here calls it after changing state.",
+      "promptHead": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Light Switch Panel</title>\n</head>\n<body>\n    <canvas id=\"lightSwitchCanvas\" width=\"200\" height=\"200\"></canvas>\n    <script>\n        const canvas = document.getElementById('lightSwitchCanvas');\n        const ctx = canvas.getContext('2d');\n\n        const LAMPS = [false, false, false];\n\n        const drawLamp = (x, y, isOn) => {\n            ctx.beginPath();\n            ctx.arc(x, y, 10, 0, Math.PI * 2);\n            ctx.fillStyle = isOn ? 'red' : 'white';\n            ctx.fill();\n        };\n\n        const drawPanel = () => {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            drawLamp(50, 50, LAMPS[0]);\n            drawLamp(150, 50, LAMPS[1]);\n            drawLamp(100, 150, LAMPS[2]);\n        };\n\n        const toggleLamp = (index) => {\n            LAMPS[index] = !LAMPS[index];\n            drawPanel();\n        };\n\n        document.addEventListener('keydown', (e) => {\n            if (e.key === '0') {\n// FACT line 14: LAMPS is declared `const` and holds a container.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// FACT line 23: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n",
+      "promptHeadSha": "8e044549853dbf1e676d9f9862d2da946f6832d6a71e9f18fba401cffa75716f",
+      "suffix": "\n            }\n            if (e.key === '1') toggleLamp(0);\n            if (e.key === '2') toggleLamp(1);\n            if (e.key === '3') toggleLamp(2);\n        });\n\n        window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n    </script>\n</body>\n</html>\n",
+      "suffixSha": "908adc085f1132431460e30829d6ab3c50d492dd2e1c2ae7aef55405a531d722"
+    }
+  },
+  "facts": {
+    "constraints": [
+      {
+        "name": "LAMPS",
+        "declaredAtLine": 14,
+        "declaration": "const LAMPS = [false, false, false]",
+        "verdict": "CONST_CONTAINER",
+        "constraint": "declared const, so it must be changed IN PLACE through its elements or its own methods; assigning to the name throws TypeError: Assignment to constant variable",
+        "howExistingCodeWritesIt": [
+          {
+            "kind": "member-assign",
+            "meaning": "assigns one of its members or elements",
+            "atLine": 31,
+            "text": "LAMPS[index] = !LAMPS[index];",
+            "reachedVia": "toggleLamp"
+          }
+        ],
+        "callDepth": 1
+      },
+      {
+        "name": "ctx",
+        "declaredAtLine": 12,
+        "declaration": "const ctx = canvas.getContext('2d')",
+        "verdict": "CONST_CONTAINER",
+        "constraint": "declared const, so it must be changed IN PLACE through its elements or its own methods; assigning to the name throws TypeError: Assignment to constant variable",
+        "howExistingCodeWritesIt": [
+          {
+            "kind": "member-assign",
+            "meaning": "assigns one of its members or elements",
+            "atLine": 19,
+            "text": "ctx.fillStyle = isOn ? 'red' : 'white';",
+            "reachedVia": "toggleLamp -> drawPanel -> drawLamp"
+          },
+          {
+            "kind": "mutating-call",
+            "meaning": "calls a method that changes it in place",
+            "atLine": 20,
+            "text": "ctx.fill();",
+            "reachedVia": "toggleLamp -> drawPanel -> drawLamp"
+          }
+        ],
+        "callDepth": 3
+      }
+    ],
+    "redraws": [
+      {
+        "name": "drawPanel",
+        "arity": 0,
+        "declaredAtLine": 23,
+        "calledAtLines": [
+          32
+        ],
+        "viaPath": [
+          "toggleLamp"
+        ],
+        "calledByEveryKeydownHandler": true
+      }
+    ],
+    "uncertainty": [],
+    "structure": {
+      "rule": "R1",
+      "enclosingFunctionLines": [
+        35,
+        39
+      ],
+      "enclosingKind": "ArrowFunctionExpression",
+      "keydownHandlersInFile": 1,
+      "scriptModes": [
+        {
+          "atFileLine": 10,
+          "sourceType": "script",
+          "strict": false
+        }
+      ]
+    }
+  },
+  "arms": {
+    "constraints": {
+      "injectedChars": 387,
+      "blockTokens": 103,
+      "promptTokens": 514,
+      "factsDelivered": 1,
+      "undelivered": false,
+      "startingCandidates": 3,
+      "refused": 1,
+      "reachedTheGate": 2,
+      "accepted": 0,
+      "protectedFailed": 0,
+      "restored": 0,
+      "threwOnItsOwnAction": 0,
+      "constAssignmentErrors": 0,
+      "mutatedInPlace": 0,
+      "reassignedTheBinding": 0,
+      "generationSeconds": 85.4,
+      "outputTokens": 808,
+      "stepsPassing": [
+        null,
+        5,
+        5
+      ],
+      "rows": [
+        {
+          "arm": "constraints",
+          "seed": 1,
+          "generationMs": 73127,
+          "outputTokens": 800,
+          "doneReason": "length",
+          "promptSha": "c547e4d5ffffd78bc9f5ece7633100eb327c706bc1db89554c96b1e222ef4c06",
+          "injectedChars": 387,
+          "rawCompletion": {
+            "text": "// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 22: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 21: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 20: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 19: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 18: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 17: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 16: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 15: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 14: LAMPS is declared `const` and holds a container.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// FACT line 23: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 22: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the key to toggle the lamp at the index corresponding to the key pressed.\n// FACT line 21: drawPanel() takes no arguments, and the code here calls it after changing state.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// STRATEGY: change the",
+            "chars": 3315,
+            "lines": 37
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "EMPTY",
+            "detail": "no code in the completion",
+            "truncatedAtLine": null,
+            "droppedLines": 0
+          },
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "arm": "constraints",
+          "seed": 2,
+          "generationMs": 447,
+          "outputTokens": 4,
+          "doneReason": "stop",
+          "promptSha": "c547e4d5ffffd78bc9f5ece7633100eb327c706bc1db89554c96b1e222ef4c06",
+          "injectedChars": 387,
+          "rawCompletion": {
+            "text": "                return;",
+            "chars": 23,
+            "lines": 1
+          },
+          "boundaries": {
+            "reachedExecution": true,
+            "passedDiagnostic": false,
+            "passedProtected": true,
+            "accepted": false
+          },
+          "timing": {
+            "playMs": 136690,
+            "acceptanceMs": 159095
+          },
+          "containment": {
+            "ok": true,
+            "text": "                return;",
+            "codeLines": 1,
+            "truncatedAtLine": null,
+            "droppedLines": 0,
+            "how": "the completion stayed inside its slot"
+          },
+          "extractedCandidate": {
+            "text": "                return;",
+            "chars": 23,
+            "lines": 1
+          },
+          "extraction": {
+            "truncatedAtLine": null,
+            "droppedLines": 0,
+            "how": "the completion stayed inside its slot"
+          },
+          "play": {
+            "status": "OK",
+            "reason": null,
+            "passing": [
+              1,
+              2,
+              3,
+              4,
+              8
+            ],
+            "failing": [
+              5,
+              6,
+              7
+            ],
+            "total": 8,
+            "log": "PASS case 1  loads with no page or console errors and exposes three lamps, all off\nPASS case 2  pressing 1 turns the first lamp on and leaves the others alone\nPASS case 3  pressing 2 and 3 turns the other two on\nPASS case 4  pressing 1 again toggles the first lamp back off\nFAIL case 5  pressing 0 turns every lamp off -> expected state.every((x) => x === false); state [false,true,true]\nFAIL case 6  pressing 0 again leaves every lamp off - it never turns one on -> expected state.every((x) => x === false); state [false,true,true]\nFAIL case 7  after 0, the individual toggles still work -> expected state[1] === true && state[0] === false && state[2] === false; state [false,false,true]\nPASS case 8  no page or console error was raised at any point during the run\nSUMMARY 5/8 cases pass, 3 fail",
+            "errors": [],
+            "stacks": [],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            }
+          },
+          "diagnosis": {
+            "failureClass": "NONE",
+            "loadErrors": [],
+            "stacks": [],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            },
+            "threwDuringLoad": false,
+            "stateObserved": true,
+            "noFailureObservedDuringInit": true,
+            "initializationCompletedIsEstablished": false,
+            "behaviouralVerdictsMeaningful": true,
+            "note": null
+          },
+          "verdict": {
+            "overall": "FAIL",
+            "requested": "FAIL",
+            "protected": "PASS",
+            "requestedFailing": [
+              5,
+              6,
+              7
+            ]
+          },
+          "acceptance": {
+            "disposition": "PRESERVE_INCOMPLETE",
+            "countsAsCompletion": false,
+            "promotable": false,
+            "survivingWorkspaceVerdict": {
+              "overall": "FAIL",
+              "requested": "FAIL",
+              "protected": "PASS",
+              "candidateTree": "ee687f6259ef0d0c161e53b194539ccc294c7544"
+            },
+            "survivingBytes": null
+          },
+          "candidateSha": "a28f1d11dea74ff2bc149f303817ad246987f75c478cf0a59122d26f9986f06e",
+          "outcome": "REJECTED"
+        },
+        {
+          "arm": "constraints",
+          "seed": 3,
+          "generationMs": 11826,
+          "outputTokens": 4,
+          "doneReason": "stop",
+          "promptSha": "c547e4d5ffffd78bc9f5ece7633100eb327c706bc1db89554c96b1e222ef4c06",
+          "injectedChars": 387,
+          "rawCompletion": {
+            "text": "                return;",
+            "chars": 23,
+            "lines": 1
+          },
+          "boundaries": {
+            "reachedExecution": true,
+            "passedDiagnostic": false,
+            "passedProtected": true,
+            "accepted": false
+          },
+          "timing": {
+            "playMs": 179858,
+            "acceptanceMs": 193164
+          },
+          "containment": {
+            "ok": true,
+            "text": "                return;",
+            "codeLines": 1,
+            "truncatedAtLine": null,
+            "droppedLines": 0,
+            "how": "the completion stayed inside its slot"
+          },
+          "extractedCandidate": {
+            "text": "                return;",
+            "chars": 23,
+            "lines": 1
+          },
+          "extraction": {
+            "truncatedAtLine": null,
+            "droppedLines": 0,
+            "how": "the completion stayed inside its slot"
+          },
+          "play": {
+            "status": "OK",
+            "reason": null,
+            "passing": [
+              1,
+              2,
+              3,
+              4,
+              8
+            ],
+            "failing": [
+              5,
+              6,
+              7
+            ],
+            "total": 8,
+            "log": "PASS case 1  loads with no page or console errors and exposes three lamps, all off\nPASS case 2  pressing 1 turns the first lamp on and leaves the others alone\nPASS case 3  pressing 2 and 3 turns the other two on\nPASS case 4  pressing 1 again toggles the first lamp back off\nFAIL case 5  pressing 0 turns every lamp off -> expected state.every((x) => x === false); state [false,true,true]\nFAIL case 6  pressing 0 again leaves every lamp off - it never turns one on -> expected state.every((x) => x === false); state [false,true,true]\nFAIL case 7  after 0, the individual toggles still work -> expected state[1] === true && state[0] === false && state[2] === false; state [false,false,true]\nPASS case 8  no page or console error was raised at any point during the run\nSUMMARY 5/8 cases pass, 3 fail",
+            "errors": [],
+            "stacks": [],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            }
+          },
+          "diagnosis": {
+            "failureClass": "NONE",
+            "loadErrors": [],
+            "stacks": [],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            },
+            "threwDuringLoad": false,
+            "stateObserved": true,
+            "noFailureObservedDuringInit": true,
+            "initializationCompletedIsEstablished": false,
+            "behaviouralVerdictsMeaningful": true,
+            "note": null
+          },
+          "verdict": {
+            "overall": "FAIL",
+            "requested": "FAIL",
+            "protected": "PASS",
+            "requestedFailing": [
+              5,
+              6,
+              7
+            ]
+          },
+          "acceptance": {
+            "disposition": "PRESERVE_INCOMPLETE",
+            "countsAsCompletion": false,
+            "promotable": false,
+            "survivingWorkspaceVerdict": {
+              "overall": "FAIL",
+              "requested": "FAIL",
+              "protected": "PASS",
+              "candidateTree": "ee687f6259ef0d0c161e53b194539ccc294c7544"
+            },
+            "survivingBytes": null
+          },
+          "candidateSha": "a28f1d11dea74ff2bc149f303817ad246987f75c478cf0a59122d26f9986f06e",
+          "outcome": "REJECTED"
+        }
+      ]
+    },
+    "nearby": {
+      "injectedChars": 357,
+      "blockTokens": 101,
+      "promptTokens": 512,
+      "factsDelivered": null,
+      "undelivered": false,
+      "startingCandidates": 3,
+      "refused": 3,
+      "reachedTheGate": 0,
+      "accepted": 0,
+      "protectedFailed": 0,
+      "restored": 0,
+      "threwOnItsOwnAction": 0,
+      "constAssignmentErrors": 0,
+      "mutatedInPlace": 0,
+      "reassignedTheBinding": 0,
+      "generationSeconds": 206.7,
+      "outputTokens": 2400,
+      "stepsPassing": [
+        null,
+        null,
+        null
+      ],
+      "rows": [
+        {
+          "arm": "nearby",
+          "seed": 1,
+          "generationMs": 70649,
+          "outputTokens": 800,
+          "doneReason": "length",
+          "promptSha": "50a8302ee75938b35464b8b77640a47df9e691ea79f8db0919491588e38808da",
+          "injectedChars": 357,
+          "rawCompletion": {
+            "text": "//         if (e.key === '4') toggleLamp(3);\n//         if (e.key === '5') toggleLamp(4);\n//         if (e.key === '6') toggleLamp(5);\n//         if (e.key === '7') toggleLamp(6);\n//         if (e.key === '8') toggleLamp(7);\n//         if (e.key === '9') toggleLamp(8);\n//         if (e.key === '0') toggleLamp(9);\n//         if (e.key === '1') toggleLamp(0);\n//         if (e.key === '2') toggleLamp(1);\n//         if (e.key === '3') toggleLamp(2);\n//         if (e.key === '4') toggleLamp(3);\n//         if (e.key === '5') toggleLamp(4);\n//         if (e.key === '6') toggleLamp(5);\n//         if (e.key === '7') toggleLamp(6);\n//         if (e.key === '8') toggleLamp(7);\n//         if (e.key === '9') toggleLamp(8);\n//         if (e.key === '0') toggleLamp(9);\n//         if (e.key === '1') toggleLamp(0);\n//         if (e.key === '2') toggleLamp(1);\n//         if (e.key === '3') toggleLamp(2);\n//         if (e.key === '4') toggleLamp(3);\n//         if (e.key === '5') toggleLamp(4);\n//         if (e.key === '6') toggleLamp(5);\n//         if (e.key === '7') toggleLamp(6);\n//         if (e.key === '8') toggleLamp(7);\n//         if (e.key === '9') toggleLamp(8);\n//         if (e.key === '0') toggleLamp(9);\n//         if (e.key === '1') toggleLamp(0);\n//         if (e.key === '2') toggleLamp(1);\n//         if (e.key === '3') toggleLamp(2);\n//         if (e.key === '4') toggleLamp(3);\n//         if (e.key === '5') toggleLamp(4);\n//         if (e.key === '6') toggleLamp(5);\n//         if (e.key === '7') toggleLamp(6);\n//         if (e.key === '8') toggleLamp(7);\n//         if (e.key === '9') toggleLamp(8);\n//         if (e.key === '0') toggleLamp(9);\n//         if (e.key === '1') toggleLamp(0);\n//         if (e.key === '2') toggleLamp(1);\n//         if (e.key === '3') toggleLamp(2);\n//         if (e.key === '4') toggleLamp(3);\n//         if (e.key === '5') toggleLamp(4);\n//         if (e.key === '6') toggleLamp(5);\n//         if (e.key === '7') toggleLamp(6);\n//         if (e.key === '8') toggleLamp(7);\n//         if (e.key === '9') toggleLamp(8);\n//         if (e.key === '0') toggleLamp(9);\n//         if (e.key === '1') toggleLamp(0);\n//         if (e.key === '2') toggleLamp(1);\n//         if (e.key === '3') toggleLamp(2);\n",
+            "chars": 2250,
+            "lines": 51
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "EMPTY",
+            "detail": "no code in the completion",
+            "truncatedAtLine": null,
+            "droppedLines": 0
+          },
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "arm": "nearby",
+          "seed": 2,
+          "generationMs": 70970,
+          "outputTokens": 800,
+          "doneReason": "length",
+          "promptSha": "50a8302ee75938b35464b8b77640a47df9e691ea79f8db0919491588e38808da",
+          "injectedChars": 357,
+          "rawCompletion": {
+            "text": "            } else if (e.key === '1') toggleLamp(0);\n            if (e.key === '2') toggleLamp(1);\n            if (e.key === '3') toggleLamp(2);\n        });\n\n        window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n    </script>\n</body>\n</html>\n```\n\nThis code creates a simple light switch panel using HTML5 canvas. The panel consists of three lamps, each represented by a circle. The lamps can be toggled by pressing the corresponding keys on the keyboard. The `toggleLamp` function is responsible for toggling the state of the lamp at the specified index. The `drawPanel` function is used to redraw the panel with the current state of the lamps. The `state` property of the `panel` object is used to store the current state of the lamps. The `window.panel` object is used to expose the `state` property to the global scope. This allows other parts of the code to access and modify the state of the lamps. The `toggleLamp` function is called whenever a key is pressed, and it toggles the state of the lamp at the specified index. The `drawPanel` function is called whenever the state of the lamps changes, and it redraws the panel with the current state of the lamps. The `state` property of the `panel` object is used to store the current state of the lamps. The `window.panel` object is used to expose the `state` property to the global scope. This allows other parts of the code to access and modify the state of the lamps. The `toggleLamp` function is called whenever a key is pressed, and it toggles the state of the lamp at the specified index. The `drawPanel` function is called whenever the state of the lamps changes, and it redraws the panel with the current state of the lamps. The `state` property of the `panel` object is used to store the current state of the lamps. The `window.panel` object is used to expose the `state` property to the global scope. This allows other parts of the code to access and modify the state of the lamps. The `toggleLamp` function is called whenever a key is pressed, and it toggles the state of the lamp at the specified index. The `drawPanel` function is called whenever the state of the lamps changes, and it redraws the panel with the current state of the lamps. The `state` property of the `panel` object is used to store the current state of the lamps. The `window.panel` object is used to expose the `state` property to the global scope. This allows other parts of the code to access and modify the state of the lamps. The `toggleLamp` function is called whenever a key is pressed, and it toggles the state of the lamp at the specified index. The `drawPanel` function is called whenever the state of the lamps changes, and it redraws the panel with the current state of the lamps. The `state` property of the `panel` object is used to store the current state of the lamps. The `window.panel` object is used to expose the `state` property to the global scope. This allows other parts of the code to access and modify the state of the lamps. The `toggleLamp` function is called whenever a key is pressed, and it toggles the state of the lamp at the specified index. The `drawPanel` function is called whenever the state of the lamps changes, and it redraws the panel with the current state of the lamps. The `state` property of the `panel` object is used to store the current state of the lamps. The `window.panel` object is used to expose the `state` property to the global scope. This allows other parts of the",
+            "chars": 3479,
+            "lines": 12
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "EMPTY",
+            "detail": "no code in the completion",
+            "truncatedAtLine": 1,
+            "droppedLines": 12
+          },
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "arm": "nearby",
+          "seed": 3,
+          "generationMs": 65049,
+          "outputTokens": 800,
+          "doneReason": "length",
+          "promptSha": "50a8302ee75938b35464b8b77640a47df9e691ea79f8db0919491588e38808da",
+          "injectedChars": 357,
+          "rawCompletion": {
+            "text": "            } else if (e.key === '1') toggleLamp(0);\n            if (e.key === '2') toggleLamp(1);\n            if (e.key === '3') toggleLamp(2);\n        });\n\n        window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n    </script>\n</body>\n</html>\n```\n\nThis code creates a simple light switch panel using HTML5 canvas. The panel has three lamps, each represented by a red or white circle. The lamps can be toggled by pressing the corresponding numbers on the keyboard. The `toggleLamp` function is called when a key is pressed, and it toggles the state of the corresponding lamp. The `drawPanel` function is called to redraw the panel with the current state of the lamps. The `state` property of the `panel` object is used to save the current state of the lamps and can be retrieved later. The `JSON.parse(JSON.stringify(LAMPS))` is used to convert the array of lamp states to a JSON string and back to an array, ensuring that the state is preserved across page reloads. The `toggleLamp` function is called when a key is pressed, and it toggles the state of the corresponding lamp. The `drawPanel` function is called to redraw the panel with the current state of the lamps. The `state` property of the `panel` object is used to save the current state of the lamps and can be retrieved later. The `JSON.parse(JSON.stringify(LAMPS))` is used to convert the array of lamp states to a JSON string and back to an array, ensuring that the state is preserved across page reloads. The `toggleLamp` function is called when a key is pressed, and it toggles the state of the corresponding lamp. The `drawPanel` function is called to redraw the panel with the current state of the lamps. The `state` property of the `panel` object is used to save the current state of the lamps and can be retrieved later. The `JSON.parse(JSON.stringify(LAMPS))` is used to convert the array of lamp states to a JSON string and back to an array, ensuring that the state is preserved across page reloads. The `toggleLamp` function is called when a key is pressed, and it toggles the state of the corresponding lamp. The `drawPanel` function is called to redraw the panel with the current state of the lamps. The `state` property of the `panel` object is used to save the current state of the lamps and can be retrieved later. The `JSON.parse(JSON.stringify(LAMPS))` is used to convert the array of lamp states to a JSON string and back to an array, ensuring that the state is preserved across page reloads. The `toggleLamp` function is called when a key is pressed, and it toggles the state of the corresponding lamp. The `drawPanel` function is called to redraw the panel with the current state of the lamps. The `state` property of the `panel` object is used to save the current state of the lamps and can be retrieved later. The `JSON.parse(JSON.stringify(LAMPS))` is used to convert the array of lamp states to a JSON string and back to an array, ensuring that the state is preserved across page reloads. The `toggleLamp` function is called when a key is pressed, and it toggles the state of the corresponding lamp. The `drawPanel` function is called to redraw the panel with the current state of the lamps. The `state` property of the `panel` object is used to save the current state of the lamps and can be retrieved later. The `JSON.parse(JSON.stringify(LAMPS))` is used to convert the array of lamp states to a JSON string and back to an array, ensuring that the state is",
+            "chars": 3464,
+            "lines": 12
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "EMPTY",
+            "detail": "no code in the completion",
+            "truncatedAtLine": 1,
+            "droppedLines": 12
+          },
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    }
+  },
+  "totals": {
+    "wallClockSeconds": 401.6,
+    "oracleSeconds": 54.9,
+    "generationSeconds": 292.1,
+    "timingNote": "wall clock includes the token-counting calls and verification; generationSeconds is the model calls only",
+    "dollars": 0,
+    "modelCalls": 6,
+    "interventionsByAPerson": 0
+  }
+}

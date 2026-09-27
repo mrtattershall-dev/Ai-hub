@@ -1,0 +1,663 @@
+{
+  "at": "2026-09-27T15:49:59.003Z",
+  "experiment": "constraint arms",
+  "task": "panel-alloff",
+  "model": "qwen2.5-coder:1.5b",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "tokenBudget": 80,
+  "style": "compact",
+  "includeStrategy": true,
+  "baseline": "legasus/bench/panel/baseline-as-delivered.html",
+  "startSha": "f9c49c2a8dd58599a2159ae04a32a7669c8a7a24c5ef6d937113989184e77535",
+  "interventionsByAPerson": 0,
+  "heldFixed": [
+    "model",
+    "seeds",
+    "edit interface (FIM)",
+    "scaffold",
+    "instruction",
+    "containment",
+    "max tokens",
+    "temperature",
+    "every check"
+  ],
+  "site": {
+    "rule": "R1",
+    "why": "a keydown listener already dispatches on key values and does not exclude this key, so a branch goes inside it",
+    "insertAfterLine": 34
+  },
+  "scaffold": "            if (e.key === '0') {\n                // FILL IN\n            }",
+  "instruction": "// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.",
+  "armSizes": {
+    "matchedOn": "tokens of the full prompt, measured by the serving model",
+    "promptTokens": {
+      "none": 411,
+      "constraints": 490,
+      "nearby": 484
+    },
+    "blockTokens": {
+      "none": 0,
+      "constraints": 79,
+      "nearby": 73
+    },
+    "tokenDifference": 6,
+    "tokenReadingsStable": true,
+    "unstableReadings": [],
+    "measuredOnTheInfillTemplate": true,
+    "oracleCost": {
+      "totalMs": 38988,
+      "calls": 17,
+      "note": "measured separately from generation, and these calls warm the cache the first generation then reads",
+      "everyReadingUsedTheInfillTemplate": true
+    },
+    "constraints": {
+      "chars": 288,
+      "lines": 3,
+      "complete": false,
+      "dropped": [
+        "ctx: the whole constraint",
+        "drawPanel(): the whole redraw"
+      ],
+      "delivered": [
+        {
+          "label": "LAMPS",
+          "kind": "constraint",
+          "verdict": "CONST_CONTAINER",
+          "lines": 3
+        }
+      ],
+      "factsDelivered": 1,
+      "sizeSearch": [
+        {
+          "size": 60,
+          "chars": 1164,
+          "tokens": 411
+        },
+        {
+          "size": 120,
+          "chars": 1262,
+          "tokens": 435
+        },
+        {
+          "size": 300,
+          "chars": 1453,
+          "tokens": 490
+        },
+        {
+          "size": 390,
+          "chars": 1551,
+          "tokens": 514
+        }
+      ]
+    },
+    "nearby": {
+      "chars": 264,
+      "lines": 8,
+      "windowLines": [
+        32,
+        39
+      ],
+      "sizeSearch": [
+        {
+          "size": 40,
+          "chars": 1168,
+          "tokens": 413
+        },
+        {
+          "size": 70,
+          "chars": 1221,
+          "tokens": 423
+        },
+        {
+          "size": 100,
+          "chars": 1270,
+          "tokens": 439
+        },
+        {
+          "size": 130,
+          "chars": 1274,
+          "tokens": 441
+        },
+        {
+          "size": 160,
+          "chars": 1337,
+          "tokens": 460
+        },
+        {
+          "size": 220,
+          "chars": 1386,
+          "tokens": 476
+        },
+        {
+          "size": 250,
+          "chars": 1429,
+          "tokens": 484
+        },
+        {
+          "size": 310,
+          "chars": 1478,
+          "tokens": 500
+        }
+      ]
+    }
+  },
+  "undeliveredTreatments": [],
+  "armText": {
+    "nearby": "//             drawPanel();\n//         };\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === '1') toggleLamp(0);\n//             if (e.key === '2') toggleLamp(1);\n//             if (e.key === '3') toggleLamp(2);\n//         });",
+    "constraints": "// FACT line 14: LAMPS is declared `const` and holds a container.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked."
+  },
+  "renderedRequests": {
+    "none": {
+      "block": "",
+      "promptHead": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Light Switch Panel</title>\n</head>\n<body>\n    <canvas id=\"lightSwitchCanvas\" width=\"200\" height=\"200\"></canvas>\n    <script>\n        const canvas = document.getElementById('lightSwitchCanvas');\n        const ctx = canvas.getContext('2d');\n\n        const LAMPS = [false, false, false];\n\n        const drawLamp = (x, y, isOn) => {\n            ctx.beginPath();\n            ctx.arc(x, y, 10, 0, Math.PI * 2);\n            ctx.fillStyle = isOn ? 'red' : 'white';\n            ctx.fill();\n        };\n\n        const drawPanel = () => {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            drawLamp(50, 50, LAMPS[0]);\n            drawLamp(150, 50, LAMPS[1]);\n            drawLamp(100, 150, LAMPS[2]);\n        };\n\n        const toggleLamp = (index) => {\n            LAMPS[index] = !LAMPS[index];\n            drawPanel();\n        };\n\n        document.addEventListener('keydown', (e) => {\n            if (e.key === '0') {\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n",
+      "promptHeadSha": "964d24d763f4e3fc53112639196bc95d040d124c75846fe26f6c5f611c08bf99",
+      "suffix": "\n            }\n            if (e.key === '1') toggleLamp(0);\n            if (e.key === '2') toggleLamp(1);\n            if (e.key === '3') toggleLamp(2);\n        });\n\n        window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n    </script>\n</body>\n</html>\n",
+      "suffixSha": "908adc085f1132431460e30829d6ab3c50d492dd2e1c2ae7aef55405a531d722"
+    },
+    "nearby": {
+      "block": "//             drawPanel();\n//         };\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === '1') toggleLamp(0);\n//             if (e.key === '2') toggleLamp(1);\n//             if (e.key === '3') toggleLamp(2);\n//         });",
+      "promptHead": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Light Switch Panel</title>\n</head>\n<body>\n    <canvas id=\"lightSwitchCanvas\" width=\"200\" height=\"200\"></canvas>\n    <script>\n        const canvas = document.getElementById('lightSwitchCanvas');\n        const ctx = canvas.getContext('2d');\n\n        const LAMPS = [false, false, false];\n\n        const drawLamp = (x, y, isOn) => {\n            ctx.beginPath();\n            ctx.arc(x, y, 10, 0, Math.PI * 2);\n            ctx.fillStyle = isOn ? 'red' : 'white';\n            ctx.fill();\n        };\n\n        const drawPanel = () => {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            drawLamp(50, 50, LAMPS[0]);\n            drawLamp(150, 50, LAMPS[1]);\n            drawLamp(100, 150, LAMPS[2]);\n        };\n\n        const toggleLamp = (index) => {\n            LAMPS[index] = !LAMPS[index];\n            drawPanel();\n        };\n\n        document.addEventListener('keydown', (e) => {\n            if (e.key === '0') {\n//             drawPanel();\n//         };\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === '1') toggleLamp(0);\n//             if (e.key === '2') toggleLamp(1);\n//             if (e.key === '3') toggleLamp(2);\n//         });\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n",
+      "promptHeadSha": "87008b866b97588ec0d537438835bf0978ab218f35eaa800cad3768d1aa61d95",
+      "suffix": "\n            }\n            if (e.key === '1') toggleLamp(0);\n            if (e.key === '2') toggleLamp(1);\n            if (e.key === '3') toggleLamp(2);\n        });\n\n        window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n    </script>\n</body>\n</html>\n",
+      "suffixSha": "908adc085f1132431460e30829d6ab3c50d492dd2e1c2ae7aef55405a531d722"
+    },
+    "constraints": {
+      "block": "// FACT line 14: LAMPS is declared `const` and holds a container.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.",
+      "promptHead": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Light Switch Panel</title>\n</head>\n<body>\n    <canvas id=\"lightSwitchCanvas\" width=\"200\" height=\"200\"></canvas>\n    <script>\n        const canvas = document.getElementById('lightSwitchCanvas');\n        const ctx = canvas.getContext('2d');\n\n        const LAMPS = [false, false, false];\n\n        const drawLamp = (x, y, isOn) => {\n            ctx.beginPath();\n            ctx.arc(x, y, 10, 0, Math.PI * 2);\n            ctx.fillStyle = isOn ? 'red' : 'white';\n            ctx.fill();\n        };\n\n        const drawPanel = () => {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            drawLamp(50, 50, LAMPS[0]);\n            drawLamp(150, 50, LAMPS[1]);\n            drawLamp(100, 150, LAMPS[2]);\n        };\n\n        const toggleLamp = (index) => {\n            LAMPS[index] = !LAMPS[index];\n            drawPanel();\n        };\n\n        document.addEventListener('keydown', (e) => {\n            if (e.key === '0') {\n// FACT line 14: LAMPS is declared `const` and holds a container.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n",
+      "promptHeadSha": "eb4bf066eebd6fbcd34ab36a2bf268c24e25120d636045641b249b9b72431e4f",
+      "suffix": "\n            }\n            if (e.key === '1') toggleLamp(0);\n            if (e.key === '2') toggleLamp(1);\n            if (e.key === '3') toggleLamp(2);\n        });\n\n        window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n    </script>\n</body>\n</html>\n",
+      "suffixSha": "908adc085f1132431460e30829d6ab3c50d492dd2e1c2ae7aef55405a531d722"
+    }
+  },
+  "facts": {
+    "constraints": [
+      {
+        "name": "LAMPS",
+        "declaredAtLine": 14,
+        "declaration": "const LAMPS = [false, false, false]",
+        "verdict": "CONST_CONTAINER",
+        "constraint": "declared const, so it must be changed IN PLACE through its elements or its own methods; assigning to the name throws TypeError: Assignment to constant variable",
+        "howExistingCodeWritesIt": [
+          {
+            "kind": "member-assign",
+            "meaning": "assigns one of its members or elements",
+            "atLine": 31,
+            "text": "LAMPS[index] = !LAMPS[index];",
+            "reachedVia": "toggleLamp"
+          }
+        ],
+        "callDepth": 1
+      },
+      {
+        "name": "ctx",
+        "declaredAtLine": 12,
+        "declaration": "const ctx = canvas.getContext('2d')",
+        "verdict": "CONST_CONTAINER",
+        "constraint": "declared const, so it must be changed IN PLACE through its elements or its own methods; assigning to the name throws TypeError: Assignment to constant variable",
+        "howExistingCodeWritesIt": [
+          {
+            "kind": "member-assign",
+            "meaning": "assigns one of its members or elements",
+            "atLine": 19,
+            "text": "ctx.fillStyle = isOn ? 'red' : 'white';",
+            "reachedVia": "toggleLamp -> drawPanel -> drawLamp"
+          },
+          {
+            "kind": "mutating-call",
+            "meaning": "calls a method that changes it in place",
+            "atLine": 20,
+            "text": "ctx.fill();",
+            "reachedVia": "toggleLamp -> drawPanel -> drawLamp"
+          }
+        ],
+        "callDepth": 3
+      }
+    ],
+    "redraws": [
+      {
+        "name": "drawPanel",
+        "arity": 0,
+        "declaredAtLine": 23,
+        "calledAtLines": [
+          32
+        ],
+        "viaPath": [
+          "toggleLamp"
+        ],
+        "calledByEveryKeydownHandler": true
+      }
+    ],
+    "uncertainty": [],
+    "structure": {
+      "rule": "R1",
+      "enclosingFunctionLines": [
+        35,
+        39
+      ],
+      "enclosingKind": "ArrowFunctionExpression",
+      "keydownHandlersInFile": 1,
+      "scriptModes": [
+        {
+          "atFileLine": 10,
+          "sourceType": "script",
+          "strict": false
+        }
+      ]
+    }
+  },
+  "arms": {
+    "constraints": {
+      "injectedChars": 289,
+      "blockTokens": 79,
+      "promptTokens": 490,
+      "factsDelivered": 1,
+      "undelivered": false,
+      "startingCandidates": 3,
+      "refused": 1,
+      "reachedTheGate": 2,
+      "accepted": 0,
+      "protectedFailed": 0,
+      "restored": 0,
+      "threwOnItsOwnAction": 2,
+      "constAssignmentErrors": 2,
+      "mutatedInPlace": 0,
+      "reassignedTheBinding": 2,
+      "generationSeconds": 111.3,
+      "outputTokens": 1218,
+      "stepsPassing": [
+        null,
+        4,
+        4
+      ],
+      "rows": [
+        {
+          "arm": "constraints",
+          "seed": 1,
+          "generationMs": 74328,
+          "outputTokens": 800,
+          "doneReason": "length",
+          "promptSha": "def95c5d8b0f7200e315d68a5e12e36cedb946112ba710bbf2bfdd81c699118a",
+          "injectedChars": 289,
+          "rawCompletion": {
+            "text": "// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n",
+            "chars": 3040,
+            "lines": 31
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "EMPTY",
+            "detail": "no code in the completion",
+            "truncatedAtLine": null,
+            "droppedLines": 0
+          },
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "arm": "constraints",
+          "seed": 2,
+          "generationMs": 22205,
+          "outputTokens": 273,
+          "doneReason": "stop",
+          "promptSha": "def95c5d8b0f7200e315d68a5e12e36cedb946112ba710bbf2bfdd81c699118a",
+          "injectedChars": 289,
+          "rawCompletion": {
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();\n            }\n            if (e.key === '2') {\n// FACT line 14: LAMPS is declared `const` and holds a container.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n                LAMPS = [false, false, false];\n                drawPanel();\n            }\n            if (e.key === '3') {\n// FACT line 14: LAMPS is declared `const` and holds a container.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n                LAMPS = [false, false, false];\n                drawPanel();",
+            "chars": 1061,
+            "lines": 18
+          },
+          "boundaries": {
+            "reachedExecution": true,
+            "passedDiagnostic": false,
+            "passedProtected": true,
+            "accepted": false
+          },
+          "timing": {
+            "playMs": 143558,
+            "acceptanceMs": 156570
+          },
+          "containment": {
+            "ok": true,
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();",
+            "codeLines": 2,
+            "truncatedAtLine": 3,
+            "droppedLines": 16,
+            "how": "truncated at the point where it would have closed a block it did not open (line 3), dropping 16 line(s)"
+          },
+          "extractedCandidate": {
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();",
+            "chars": 75,
+            "lines": 2
+          },
+          "extraction": {
+            "truncatedAtLine": 3,
+            "droppedLines": 16,
+            "how": "truncated at the point where it would have closed a block it did not open (line 3), dropping 16 line(s)"
+          },
+          "play": {
+            "status": "OK",
+            "reason": null,
+            "passing": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "failing": [
+              5,
+              6,
+              7,
+              8
+            ],
+            "total": 8,
+            "log": "PASS case 1  loads with no page or console errors and exposes three lamps, all off\nPASS case 2  pressing 1 turns the first lamp on and leaves the others alone\nPASS case 3  pressing 2 and 3 turns the other two on\nPASS case 4  pressing 1 again toggles the first lamp back off\nFAIL case 5  pressing 0 turns every lamp off -> expected state.every((x) => x === false); state [false,true,true]; errors: [JS ERROR] Assignment to constant variable.\nFAIL case 6  pressing 0 again leaves every lamp off - it never turns one on -> expected state.every((x) => x === false); state [false,true,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 7  after 0, the individual toggles still work -> expected state[1] === true && state[0] === false && state[2] === false; state [false,false,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 8  no page or console error was raised at any point during the run -> expected noErrors; state [false,false,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nSUMMARY 4/8 cases pass, 4 fail",
+            "errors": [
+              "[JS ERROR] Assignment to constant variable.",
+              "[JS ERROR] Assignment to constant variable."
+            ],
+            "stacks": [
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:60137/index.html:41:23)",
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:60137/index.html:41:23)"
+            ],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            }
+          },
+          "diagnosis": {
+            "failureClass": "NONE",
+            "loadErrors": [
+              "[JS ERROR] Assignment to constant variable.",
+              "[JS ERROR] Assignment to constant variable."
+            ],
+            "stacks": [
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:60137/index.html:41:23)",
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:60137/index.html:41:23)"
+            ],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            },
+            "threwDuringLoad": true,
+            "stateObserved": true,
+            "noFailureObservedDuringInit": false,
+            "initializationCompletedIsEstablished": false,
+            "behaviouralVerdictsMeaningful": true,
+            "note": null
+          },
+          "verdict": {
+            "overall": "FAIL",
+            "requested": "FAIL",
+            "protected": "PASS",
+            "requestedFailing": [
+              5,
+              6,
+              7,
+              8
+            ]
+          },
+          "acceptance": {
+            "disposition": "PRESERVE_INCOMPLETE",
+            "countsAsCompletion": false,
+            "promotable": false,
+            "survivingWorkspaceVerdict": {
+              "overall": "FAIL",
+              "requested": "FAIL",
+              "protected": "PASS",
+              "candidateTree": "2818197c55ef063d7601d7745cf95c583b3541f9"
+            },
+            "survivingBytes": null
+          },
+          "candidateSha": "c7b7f0a1950e7cbcf6d71b52b3ee0480b546ec07720a3f31399e6db10c74a9fa",
+          "outcome": "REJECTED"
+        },
+        {
+          "arm": "constraints",
+          "seed": 3,
+          "generationMs": 14772,
+          "outputTokens": 145,
+          "doneReason": "stop",
+          "promptSha": "def95c5d8b0f7200e315d68a5e12e36cedb946112ba710bbf2bfdd81c699118a",
+          "injectedChars": 289,
+          "rawCompletion": {
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();\n            }\n            if (e.key === '2') {\n// FACT line 14: LAMPS is declared `const` and holds a container.\n// FACT line 31: existing code writes it as LAMPS[index] = !LAMPS[index];\n// STRATEGY (proposed, not verified): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked.\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n                LAMPS = [true, true, true];\n                drawPanel();",
+            "chars": 565,
+            "lines": 10
+          },
+          "boundaries": {
+            "reachedExecution": true,
+            "passedDiagnostic": false,
+            "passedProtected": true,
+            "accepted": false
+          },
+          "timing": {
+            "playMs": 186712,
+            "acceptanceMs": 197930
+          },
+          "containment": {
+            "ok": true,
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();",
+            "codeLines": 2,
+            "truncatedAtLine": 3,
+            "droppedLines": 8,
+            "how": "truncated at the point where it would have closed a block it did not open (line 3), dropping 8 line(s)"
+          },
+          "extractedCandidate": {
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();",
+            "chars": 75,
+            "lines": 2
+          },
+          "extraction": {
+            "truncatedAtLine": 3,
+            "droppedLines": 8,
+            "how": "truncated at the point where it would have closed a block it did not open (line 3), dropping 8 line(s)"
+          },
+          "play": {
+            "status": "OK",
+            "reason": null,
+            "passing": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "failing": [
+              5,
+              6,
+              7,
+              8
+            ],
+            "total": 8,
+            "log": "PASS case 1  loads with no page or console errors and exposes three lamps, all off\nPASS case 2  pressing 1 turns the first lamp on and leaves the others alone\nPASS case 3  pressing 2 and 3 turns the other two on\nPASS case 4  pressing 1 again toggles the first lamp back off\nFAIL case 5  pressing 0 turns every lamp off -> expected state.every((x) => x === false); state [false,true,true]; errors: [JS ERROR] Assignment to constant variable.\nFAIL case 6  pressing 0 again leaves every lamp off - it never turns one on -> expected state.every((x) => x === false); state [false,true,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 7  after 0, the individual toggles still work -> expected state[1] === true && state[0] === false && state[2] === false; state [false,false,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 8  no page or console error was raised at any point during the run -> expected noErrors; state [false,false,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nSUMMARY 4/8 cases pass, 4 fail",
+            "errors": [
+              "[JS ERROR] Assignment to constant variable.",
+              "[JS ERROR] Assignment to constant variable."
+            ],
+            "stacks": [
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:50961/index.html:41:23)",
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:50961/index.html:41:23)"
+            ],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            }
+          },
+          "diagnosis": {
+            "failureClass": "NONE",
+            "loadErrors": [
+              "[JS ERROR] Assignment to constant variable.",
+              "[JS ERROR] Assignment to constant variable."
+            ],
+            "stacks": [
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:50961/index.html:41:23)",
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:50961/index.html:41:23)"
+            ],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            },
+            "threwDuringLoad": true,
+            "stateObserved": true,
+            "noFailureObservedDuringInit": false,
+            "initializationCompletedIsEstablished": false,
+            "behaviouralVerdictsMeaningful": true,
+            "note": null
+          },
+          "verdict": {
+            "overall": "FAIL",
+            "requested": "FAIL",
+            "protected": "PASS",
+            "requestedFailing": [
+              5,
+              6,
+              7,
+              8
+            ]
+          },
+          "acceptance": {
+            "disposition": "PRESERVE_INCOMPLETE",
+            "countsAsCompletion": false,
+            "promotable": false,
+            "survivingWorkspaceVerdict": {
+              "overall": "FAIL",
+              "requested": "FAIL",
+              "protected": "PASS",
+              "candidateTree": "2818197c55ef063d7601d7745cf95c583b3541f9"
+            },
+            "survivingBytes": null
+          },
+          "candidateSha": "c7b7f0a1950e7cbcf6d71b52b3ee0480b546ec07720a3f31399e6db10c74a9fa",
+          "outcome": "REJECTED"
+        }
+      ]
+    },
+    "nearby": {
+      "injectedChars": 265,
+      "blockTokens": 73,
+      "promptTokens": 484,
+      "factsDelivered": null,
+      "undelivered": false,
+      "startingCandidates": 3,
+      "refused": 3,
+      "reachedTheGate": 0,
+      "accepted": 0,
+      "protectedFailed": 0,
+      "restored": 0,
+      "threwOnItsOwnAction": 0,
+      "constAssignmentErrors": 0,
+      "mutatedInPlace": 0,
+      "reassignedTheBinding": 0,
+      "generationSeconds": 73.7,
+      "outputTokens": 830,
+      "stepsPassing": [
+        null,
+        null,
+        null
+      ],
+      "rows": [
+        {
+          "arm": "nearby",
+          "seed": 1,
+          "generationMs": 70875,
+          "outputTokens": 800,
+          "doneReason": "length",
+          "promptSha": "6761e1b02dfea32f2a1c70d08afd016c5a67e166c179c5b071f39a5325fb45e4",
+          "injectedChars": 265,
+          "rawCompletion": {
+            "text": "// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === '4') toggleLamp(0);\n//             if (e.key === '5') toggleLamp(1);\n//             if (e.key === '6') toggleLamp(2);\n//         });\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === '7') toggleLamp(0);\n//             if (e.key === '8') toggleLamp(1);\n//             if (e.key === '9') toggleLamp(2);\n//         });\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === 'a') toggleLamp(0);\n//             if (e.key === 'b') toggleLamp(1);\n//             if (e.key === 'c') toggleLamp(2);\n//         });\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === 'd') toggleLamp(0);\n//             if (e.key === 'e') toggleLamp(1);\n//             if (e.key === 'f') toggleLamp(2);\n//         });\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === 'g') toggleLamp(0);\n//             if (e.key === 'h') toggleLamp(1);\n//             if (e.key === 'i') toggleLamp(2);\n//         });\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === 'j') toggleLamp(0);\n//             if (e.key === 'k') toggleLamp(1);\n//             if (e.key === 'l') toggleLamp(2);\n//         });\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === 'm') toggleLamp(0);\n//             if (e.key === 'n') toggleLamp(1);\n//             if (e.key === 'o') toggleLamp(2);\n//         });\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === 'p') toggleLamp(0);\n//             if (e.key === 'q') toggleLamp(1);\n//             if (e.key === 'r') toggleLamp(2);\n//         });\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === 's') toggleLamp(0);\n//             if (e.key === 't') toggleLamp(1);\n//             if (e.key === 'u') toggleLamp(2);\n//         });\n// on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === 'v') toggleL",
+            "chars": 2838,
+            "lines": 66
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "EMPTY",
+            "detail": "no code in the completion",
+            "truncatedAtLine": null,
+            "droppedLines": 0
+          },
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "arm": "nearby",
+          "seed": 2,
+          "generationMs": 1560,
+          "outputTokens": 15,
+          "doneReason": "stop",
+          "promptSha": "6761e1b02dfea32f2a1c70d08afd016c5a67e166c179c5b071f39a5325fb45e4",
+          "injectedChars": 265,
+          "rawCompletion": {
+            "text": "            if (e.key === '0') {\n                drawPanel();",
+            "chars": 61,
+            "lines": 2
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "UNBALANCED",
+            "detail": "the completion ends 1 block(s) deep, so splicing it would leave broken syntax",
+            "truncatedAtLine": null,
+            "droppedLines": 0
+          },
+          "outcome": "REFUSED_UNBALANCED"
+        },
+        {
+          "arm": "nearby",
+          "seed": 3,
+          "generationMs": 1276,
+          "outputTokens": 15,
+          "doneReason": "stop",
+          "promptSha": "6761e1b02dfea32f2a1c70d08afd016c5a67e166c179c5b071f39a5325fb45e4",
+          "injectedChars": 265,
+          "rawCompletion": {
+            "text": "            if (e.key === '0') {\n                drawPanel();",
+            "chars": 61,
+            "lines": 2
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "UNBALANCED",
+            "detail": "the completion ends 1 block(s) deep, so splicing it would leave broken syntax",
+            "truncatedAtLine": null,
+            "droppedLines": 0
+          },
+          "outcome": "REFUSED_UNBALANCED"
+        }
+      ]
+    }
+  },
+  "totals": {
+    "wallClockSeconds": 273.8,
+    "oracleSeconds": 39,
+    "generationSeconds": 185,
+    "timingNote": "wall clock includes the token-counting calls and verification; generationSeconds is the model calls only",
+    "dollars": 0,
+    "modelCalls": 6,
+    "interventionsByAPerson": 0
+  }
+}

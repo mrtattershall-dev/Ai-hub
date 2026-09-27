@@ -1,0 +1,230 @@
+{
+  "at": "2026-09-27T14:53:51.864Z",
+  "experiment": "constraint arms",
+  "task": "panel-alloff",
+  "model": "qwen2.5-coder:1.5b",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "budget": 450,
+  "baseline": "legasus/bench/panel/baseline-as-delivered.html",
+  "startSha": "f9c49c2a8dd58599a2159ae04a32a7669c8a7a24c5ef6d937113989184e77535",
+  "interventionsByAPerson": 0,
+  "heldFixed": [
+    "model",
+    "seeds",
+    "edit interface (FIM)",
+    "scaffold",
+    "instruction",
+    "containment",
+    "max tokens",
+    "temperature",
+    "every check"
+  ],
+  "site": {
+    "rule": "R1",
+    "why": "a keydown listener already dispatches on key values and does not exclude this key, so a branch goes inside it",
+    "insertAfterLine": 34
+  },
+  "scaffold": "            if (e.key === '0') {\n                // FILL IN\n            }",
+  "instruction": "// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.",
+  "armSizes": {
+    "constraints": {
+      "chars": 439,
+      "lines": 4,
+      "complete": false,
+      "dropped": [
+        "ctx: its worked example",
+        "LAMPS: its worked example",
+        "drawPanel(): the whole fact"
+      ]
+    },
+    "nearby": {
+      "chars": 438,
+      "lines": 13,
+      "windowLines": [
+        29,
+        41
+      ],
+      "grownToBudget": 400
+    },
+    "difference": 1
+  },
+  "armText": {
+    "nearby": "// \n//         const toggleLamp = (index) => {\n//             LAMPS[index] = !LAMPS[index];\n//             drawPanel();\n//         };\n// \n//         document.addEventListener('keydown', (e) => {\n//             if (e.key === '1') toggleLamp(0);\n//             if (e.key === '2') toggleLamp(1);\n//             if (e.key === '3') toggleLamp(2);\n//         });\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };",
+    "constraints": "// LAMPS (line 14: const LAMPS = [false, false, false])\n//   declared const, so it must be changed IN PLACE through its elements or its own methods; assigning to the name throws TypeError: Assignment to constant variable\n// ctx (line 12: const ctx = canvas.getContext('2d'))\n//   declared const, so it must be changed IN PLACE through its elements or its own methods; assigning to the name throws TypeError: Assignment to constant variable"
+  },
+  "facts": {
+    "constraints": [
+      {
+        "name": "LAMPS",
+        "declaredAtLine": 14,
+        "declaration": "const LAMPS = [false, false, false]",
+        "verdict": "CONST_CONTAINER",
+        "constraint": "declared const, so it must be changed IN PLACE through its elements or its own methods; assigning to the name throws TypeError: Assignment to constant variable",
+        "howExistingCodeWritesIt": [
+          {
+            "kind": "member-assign",
+            "meaning": "assigns one of its members or elements",
+            "atLine": 31,
+            "text": "LAMPS[index] = !LAMPS[index];",
+            "reachedVia": "toggleLamp"
+          }
+        ],
+        "callDepth": 1
+      },
+      {
+        "name": "ctx",
+        "declaredAtLine": 12,
+        "declaration": "const ctx = canvas.getContext('2d')",
+        "verdict": "CONST_CONTAINER",
+        "constraint": "declared const, so it must be changed IN PLACE through its elements or its own methods; assigning to the name throws TypeError: Assignment to constant variable",
+        "howExistingCodeWritesIt": [
+          {
+            "kind": "member-assign",
+            "meaning": "assigns one of its members or elements",
+            "atLine": 19,
+            "text": "ctx.fillStyle = isOn ? 'red' : 'white';",
+            "reachedVia": "toggleLamp -> drawPanel -> drawLamp"
+          },
+          {
+            "kind": "mutating-call",
+            "meaning": "calls a method that changes it in place",
+            "atLine": 20,
+            "text": "ctx.fill();",
+            "reachedVia": "toggleLamp -> drawPanel -> drawLamp"
+          }
+        ],
+        "callDepth": 3
+      }
+    ],
+    "redraws": [
+      {
+        "name": "drawPanel",
+        "arity": 0,
+        "declaredAtLine": 23,
+        "calledAtLines": [
+          32
+        ],
+        "viaPath": [
+          "toggleLamp"
+        ],
+        "calledByEveryKeydownHandler": true
+      }
+    ],
+    "uncertainty": [],
+    "structure": {
+      "rule": "R1",
+      "enclosingFunctionLines": [
+        35,
+        39
+      ],
+      "enclosingKind": "ArrowFunctionExpression",
+      "keydownHandlersInFile": 1
+    }
+  },
+  "arms": {
+    "nearby": {
+      "injectedChars": 439,
+      "startingCandidates": 3,
+      "refused": 3,
+      "reachedTheGate": 0,
+      "accepted": 0,
+      "protectedFailed": 0,
+      "restored": 0,
+      "threwOnItsOwnAction": 0,
+      "constAssignmentErrors": 0,
+      "mutatedInPlace": 0,
+      "reassignedTheBinding": 0,
+      "generationSeconds": 211.8,
+      "outputTokens": 2400,
+      "stepsPassing": [
+        null,
+        null,
+        null
+      ],
+      "rows": [
+        {
+          "arm": "nearby",
+          "seed": 1,
+          "generationMs": 73950,
+          "outputTokens": 800,
+          "doneReason": "length",
+          "promptSha": "d068968aaf2432a8bba8d23e50c0766949dfd35e3518b10e5edf1100191f574b",
+          "injectedChars": 439,
+          "rawCompletion": {
+            "text": "            } else {\n                toggleLamp(e.key - '0');\n            }\n        });\n\n        window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n    </script>\n</body>\n</html>\n```\n\nThis code creates a simple light switch panel using HTML, CSS, and JavaScript. The panel consists of three lamps that can be toggled by pressing the corresponding keys (0, 1, 2). The `toggleLamp` function is responsible for toggling the state of each lamp and updating the panel display. The `drawPanel` function is used to draw the lamps on the canvas based on their current state. The `keydown` event listener listens for key presses and calls the `toggleLamp` function accordingly. The `window.panel` object is used to store the current state of the lamps, which can be accessed by other parts of the application if needed. The code ensures that no lamp is ever turned on by pressing the key that toggles all lamps off. The `state` method of the `window.panel` object returns a JSON string representing the current state of the lamps. This allows for easy persistence of the lamp states across page reloads. The code also includes a simple key binding for toggling the lamps, which can be useful for testing and debugging purposes. The `state` method of the `window.panel` object is used to store the current state of the lamps, which can be accessed by other parts of the application if needed. The code ensures that no lamp is ever turned on by pressing the key that toggles all lamps off. The `state` method of the `window.panel` object is used to store the current state of the lamps, which can be accessed by other parts of the application if needed. The code includes a simple key binding for toggling the lamps, which can be useful for testing and debugging purposes. The `state` method of the `window.panel` object is used to store the current state of the lamps, which can be accessed by other parts of the application if needed. The code includes a simple key binding for toggling the lamps, which can be useful for testing and debugging purposes. The `state` method of the `window.panel` object is used to store the current state of the lamps, which can be accessed by other parts of the application if needed. The code includes a simple key binding for toggling the lamps, which can be useful for testing and debugging purposes. The `state` method of the `window.panel` object is used to store the current state of the lamps, which can be accessed by other parts of the application if needed. The code includes a simple key binding for toggling the lamps, which can be useful for testing and debugging purposes. The `state` method of the `window.panel` object is used to store the current state of the lamps, which can be accessed by other parts of the application if needed. The code includes a simple key binding for toggling the lamps, which can be useful for testing and debugging purposes. The `state` method of the `window.panel` object is used to store the current state of the lamps, which can be accessed by other parts of the application if needed. The code includes a simple key binding for toggling the lamps, which can be useful for testing and debugging purposes. The `state` method of the `window.panel` object is used to store the current state of the lamps, which can be accessed by other parts of the application if needed. The code includes a simple key binding for toggling the lamps, which can be useful for testing and debugging purposes. The `state` method of the `window.panel` object is used to store the current state of the lamps, which can be accessed by other parts of the application if needed. The code includes a simple key binding for toggling the lamps, which can be useful for testing and debugging purposes. The `state`",
+            "chars": 3769,
+            "lines": 12
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "EMPTY",
+            "detail": "no code in the completion",
+            "truncatedAtLine": 1,
+            "droppedLines": 12
+          },
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "arm": "nearby",
+          "seed": 2,
+          "generationMs": 67807,
+          "outputTokens": 800,
+          "doneReason": "length",
+          "promptSha": "d068968aaf2432a8bba8d23e50c0766949dfd35e3518b10e5edf1100191f574b",
+          "injectedChars": 439,
+          "rawCompletion": {
+            "text": "// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n",
+            "chars": 3101,
+            "lines": 59
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "EMPTY",
+            "detail": "no code in the completion",
+            "truncatedAtLine": null,
+            "droppedLines": 0
+          },
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "arm": "nearby",
+          "seed": 3,
+          "generationMs": 70005,
+          "outputTokens": 800,
+          "doneReason": "length",
+          "promptSha": "d068968aaf2432a8bba8d23e50c0766949dfd35e3518b10e5edf1100191f574b",
+          "injectedChars": 439,
+          "rawCompletion": {
+            "text": "// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n//         window.panel = { state: () => JSON.parse(JSON.stringify(LAMPS)) };\n// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.\n// \n",
+            "chars": 3101,
+            "lines": 59
+          },
+          "boundaries": {},
+          "timing": {},
+          "containment": {
+            "ok": false,
+            "reason": "EMPTY",
+            "detail": "no code in the completion",
+            "truncatedAtLine": null,
+            "droppedLines": 0
+          },
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    }
+  },
+  "totals": {
+    "wallClockSeconds": 213.8,
+    "dollars": 0,
+    "modelCalls": 3,
+    "interventionsByAPerson": 0
+  }
+}

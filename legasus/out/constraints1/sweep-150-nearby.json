@@ -1,0 +1,534 @@
+{
+  "at": "2026-09-27T14:45:44.372Z",
+  "experiment": "constraint arms",
+  "task": "panel-alloff",
+  "model": "qwen2.5-coder:1.5b",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "budget": 150,
+  "baseline": "legasus/bench/panel/baseline-as-delivered.html",
+  "startSha": "f9c49c2a8dd58599a2159ae04a32a7669c8a7a24c5ef6d937113989184e77535",
+  "interventionsByAPerson": 0,
+  "heldFixed": [
+    "model",
+    "seeds",
+    "edit interface (FIM)",
+    "scaffold",
+    "instruction",
+    "containment",
+    "max tokens",
+    "temperature",
+    "every check"
+  ],
+  "site": {
+    "rule": "R1",
+    "why": "a keydown listener already dispatches on key values and does not exclude this key, so a branch goes inside it",
+    "insertAfterLine": 34
+  },
+  "scaffold": "            if (e.key === '0') {\n                // FILL IN\n            }",
+  "instruction": "// on this key: every lamp is off. Ensure no lamp is ever turned on by this key.",
+  "armSizes": {
+    "constraints": {
+      "chars": 0,
+      "lines": 0,
+      "complete": false,
+      "dropped": [
+        "ctx: its worked example",
+        "LAMPS: its worked example",
+        "drawPanel(): the whole fact",
+        "ctx: the whole fact",
+        "LAMPS: the whole fact"
+      ]
+    },
+    "nearby": {
+      "chars": 0,
+      "lines": 0,
+      "grownToBudget": 0
+    },
+    "difference": 0
+  },
+  "armText": {
+    "nearby": "",
+    "constraints": ""
+  },
+  "facts": {
+    "constraints": [
+      {
+        "name": "LAMPS",
+        "declaredAtLine": 14,
+        "declaration": "const LAMPS = [false, false, false]",
+        "verdict": "CONST_CONTAINER",
+        "constraint": "declared const, so it must be changed IN PLACE through its elements or its own methods; assigning to the name throws TypeError: Assignment to constant variable",
+        "howExistingCodeWritesIt": [
+          {
+            "kind": "member-assign",
+            "meaning": "assigns one of its members or elements",
+            "atLine": 31,
+            "text": "LAMPS[index] = !LAMPS[index];",
+            "reachedVia": "toggleLamp"
+          }
+        ],
+        "callDepth": 1
+      },
+      {
+        "name": "ctx",
+        "declaredAtLine": 12,
+        "declaration": "const ctx = canvas.getContext('2d')",
+        "verdict": "CONST_CONTAINER",
+        "constraint": "declared const, so it must be changed IN PLACE through its elements or its own methods; assigning to the name throws TypeError: Assignment to constant variable",
+        "howExistingCodeWritesIt": [
+          {
+            "kind": "member-assign",
+            "meaning": "assigns one of its members or elements",
+            "atLine": 19,
+            "text": "ctx.fillStyle = isOn ? 'red' : 'white';",
+            "reachedVia": "toggleLamp -> drawPanel -> drawLamp"
+          },
+          {
+            "kind": "mutating-call",
+            "meaning": "calls a method that changes it in place",
+            "atLine": 20,
+            "text": "ctx.fill();",
+            "reachedVia": "toggleLamp -> drawPanel -> drawLamp"
+          }
+        ],
+        "callDepth": 3
+      }
+    ],
+    "redraws": [
+      {
+        "name": "drawPanel",
+        "arity": 0,
+        "declaredAtLine": 23,
+        "calledAtLines": [
+          32
+        ],
+        "viaPath": [
+          "toggleLamp"
+        ],
+        "calledByEveryKeydownHandler": true
+      }
+    ],
+    "uncertainty": [],
+    "structure": {
+      "rule": "R1",
+      "enclosingFunctionLines": [
+        35,
+        39
+      ],
+      "enclosingKind": "ArrowFunctionExpression",
+      "keydownHandlersInFile": 1
+    }
+  },
+  "arms": {
+    "nearby": {
+      "injectedChars": 0,
+      "startingCandidates": 3,
+      "refused": 0,
+      "reachedTheGate": 3,
+      "accepted": 0,
+      "protectedFailed": 0,
+      "restored": 0,
+      "threwOnItsOwnAction": 3,
+      "constAssignmentErrors": 3,
+      "mutatedInPlace": 0,
+      "reassignedTheBinding": 3,
+      "generationSeconds": 17,
+      "outputTokens": 179,
+      "stepsPassing": [
+        4,
+        4,
+        4
+      ],
+      "rows": [
+        {
+          "arm": "nearby",
+          "seed": 1,
+          "generationMs": 6385,
+          "outputTokens": 67,
+          "doneReason": "stop",
+          "promptSha": "854fa7f19e1e2dc55feff633570de77112f9df082ffa42755caa9af40ddf0ca6",
+          "injectedChars": 0,
+          "rawCompletion": {
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();\n            }\n            if (e.key === '2') {\n                // on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n                LAMPS = [true, true, true];\n                drawPanel();",
+            "chars": 292,
+            "lines": 7
+          },
+          "boundaries": {
+            "reachedExecution": true,
+            "passedDiagnostic": false,
+            "passedProtected": true,
+            "accepted": false
+          },
+          "timing": {
+            "playMs": 15012,
+            "acceptanceMs": 33223
+          },
+          "containment": {
+            "ok": true,
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();",
+            "codeLines": 2,
+            "truncatedAtLine": 3,
+            "droppedLines": 5,
+            "how": "truncated at the point where it would have closed a block it did not open (line 3), dropping 5 line(s)"
+          },
+          "extractedCandidate": {
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();",
+            "chars": 75,
+            "lines": 2
+          },
+          "extraction": {
+            "truncatedAtLine": 3,
+            "droppedLines": 5,
+            "how": "truncated at the point where it would have closed a block it did not open (line 3), dropping 5 line(s)"
+          },
+          "play": {
+            "status": "OK",
+            "reason": null,
+            "passing": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "failing": [
+              5,
+              6,
+              7,
+              8
+            ],
+            "total": 8,
+            "log": "PASS case 1  loads with no page or console errors and exposes three lamps, all off\nPASS case 2  pressing 1 turns the first lamp on and leaves the others alone\nPASS case 3  pressing 2 and 3 turns the other two on\nPASS case 4  pressing 1 again toggles the first lamp back off\nFAIL case 5  pressing 0 turns every lamp off -> expected state.every((x) => x === false); state [false,true,true]; errors: [JS ERROR] Assignment to constant variable.\nFAIL case 6  pressing 0 again leaves every lamp off - it never turns one on -> expected state.every((x) => x === false); state [false,true,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 7  after 0, the individual toggles still work -> expected state[1] === true && state[0] === false && state[2] === false; state [false,false,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 8  no page or console error was raised at any point during the run -> expected noErrors; state [false,false,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nSUMMARY 4/8 cases pass, 4 fail",
+            "errors": [
+              "[JS ERROR] Assignment to constant variable.",
+              "[JS ERROR] Assignment to constant variable."
+            ],
+            "stacks": [
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:62332/index.html:38:23)",
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:62332/index.html:38:23)"
+            ],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            }
+          },
+          "diagnosis": {
+            "failureClass": "NONE",
+            "loadErrors": [
+              "[JS ERROR] Assignment to constant variable.",
+              "[JS ERROR] Assignment to constant variable."
+            ],
+            "stacks": [
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:62332/index.html:38:23)",
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:62332/index.html:38:23)"
+            ],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            },
+            "threwDuringLoad": true,
+            "stateObserved": true,
+            "noFailureObservedDuringInit": false,
+            "initializationCompletedIsEstablished": false,
+            "behaviouralVerdictsMeaningful": true,
+            "note": null
+          },
+          "verdict": {
+            "overall": "FAIL",
+            "requested": "FAIL",
+            "protected": "PASS",
+            "requestedFailing": [
+              5,
+              6,
+              7,
+              8
+            ]
+          },
+          "acceptance": {
+            "disposition": "PRESERVE_INCOMPLETE",
+            "countsAsCompletion": false,
+            "promotable": false,
+            "survivingWorkspaceVerdict": {
+              "overall": "FAIL",
+              "requested": "FAIL",
+              "protected": "PASS",
+              "candidateTree": "fb9ff21a0439f2b7eb0f404448eb048500c350a1"
+            },
+            "survivingBytes": null
+          },
+          "candidateSha": "d02eb63dec5af59df9cb53ab3fe48982ab594998f4ef1da1a015167902b781df",
+          "outcome": "REJECTED"
+        },
+        {
+          "arm": "nearby",
+          "seed": 2,
+          "generationMs": 7458,
+          "outputTokens": 67,
+          "doneReason": "stop",
+          "promptSha": "854fa7f19e1e2dc55feff633570de77112f9df082ffa42755caa9af40ddf0ca6",
+          "injectedChars": 0,
+          "rawCompletion": {
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();\n            }\n            if (e.key === '2') {\n                // on this key: every lamp is on. Ensure no lamp is ever turned off by this key.\n                LAMPS = [true, true, true];\n                drawPanel();",
+            "chars": 292,
+            "lines": 7
+          },
+          "boundaries": {
+            "reachedExecution": true,
+            "passedDiagnostic": false,
+            "passedProtected": true,
+            "accepted": false
+          },
+          "timing": {
+            "playMs": 45012,
+            "acceptanceMs": 56568
+          },
+          "containment": {
+            "ok": true,
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();",
+            "codeLines": 2,
+            "truncatedAtLine": 3,
+            "droppedLines": 5,
+            "how": "truncated at the point where it would have closed a block it did not open (line 3), dropping 5 line(s)"
+          },
+          "extractedCandidate": {
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();",
+            "chars": 75,
+            "lines": 2
+          },
+          "extraction": {
+            "truncatedAtLine": 3,
+            "droppedLines": 5,
+            "how": "truncated at the point where it would have closed a block it did not open (line 3), dropping 5 line(s)"
+          },
+          "play": {
+            "status": "OK",
+            "reason": null,
+            "passing": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "failing": [
+              5,
+              6,
+              7,
+              8
+            ],
+            "total": 8,
+            "log": "PASS case 1  loads with no page or console errors and exposes three lamps, all off\nPASS case 2  pressing 1 turns the first lamp on and leaves the others alone\nPASS case 3  pressing 2 and 3 turns the other two on\nPASS case 4  pressing 1 again toggles the first lamp back off\nFAIL case 5  pressing 0 turns every lamp off -> expected state.every((x) => x === false); state [false,true,true]; errors: [JS ERROR] Assignment to constant variable.\nFAIL case 6  pressing 0 again leaves every lamp off - it never turns one on -> expected state.every((x) => x === false); state [false,true,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 7  after 0, the individual toggles still work -> expected state[1] === true && state[0] === false && state[2] === false; state [false,false,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 8  no page or console error was raised at any point during the run -> expected noErrors; state [false,false,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nSUMMARY 4/8 cases pass, 4 fail",
+            "errors": [
+              "[JS ERROR] Assignment to constant variable.",
+              "[JS ERROR] Assignment to constant variable."
+            ],
+            "stacks": [
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:50743/index.html:38:23)",
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:50743/index.html:38:23)"
+            ],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            }
+          },
+          "diagnosis": {
+            "failureClass": "NONE",
+            "loadErrors": [
+              "[JS ERROR] Assignment to constant variable.",
+              "[JS ERROR] Assignment to constant variable."
+            ],
+            "stacks": [
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:50743/index.html:38:23)",
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:50743/index.html:38:23)"
+            ],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            },
+            "threwDuringLoad": true,
+            "stateObserved": true,
+            "noFailureObservedDuringInit": false,
+            "initializationCompletedIsEstablished": false,
+            "behaviouralVerdictsMeaningful": true,
+            "note": null
+          },
+          "verdict": {
+            "overall": "FAIL",
+            "requested": "FAIL",
+            "protected": "PASS",
+            "requestedFailing": [
+              5,
+              6,
+              7,
+              8
+            ]
+          },
+          "acceptance": {
+            "disposition": "PRESERVE_INCOMPLETE",
+            "countsAsCompletion": false,
+            "promotable": false,
+            "survivingWorkspaceVerdict": {
+              "overall": "FAIL",
+              "requested": "FAIL",
+              "protected": "PASS",
+              "candidateTree": "fb9ff21a0439f2b7eb0f404448eb048500c350a1"
+            },
+            "survivingBytes": null
+          },
+          "candidateSha": "d02eb63dec5af59df9cb53ab3fe48982ab594998f4ef1da1a015167902b781df",
+          "outcome": "REJECTED"
+        },
+        {
+          "arm": "nearby",
+          "seed": 3,
+          "generationMs": 3163,
+          "outputTokens": 45,
+          "doneReason": "stop",
+          "promptSha": "854fa7f19e1e2dc55feff633570de77112f9df082ffa42755caa9af40ddf0ca6",
+          "injectedChars": 0,
+          "rawCompletion": {
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();\n            } else if (e.key === '2') {\n                LAMPS = [true, true, true];\n                drawPanel();",
+            "chars": 188,
+            "lines": 5
+          },
+          "boundaries": {
+            "reachedExecution": true,
+            "passedDiagnostic": false,
+            "passedProtected": true,
+            "accepted": false
+          },
+          "timing": {
+            "playMs": 63417,
+            "acceptanceMs": 75951
+          },
+          "containment": {
+            "ok": true,
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();",
+            "codeLines": 2,
+            "truncatedAtLine": 3,
+            "droppedLines": 3,
+            "how": "truncated at the point where it would have closed a block it did not open (line 3), dropping 3 line(s)"
+          },
+          "extractedCandidate": {
+            "text": "                LAMPS = [false, false, false];\n                drawPanel();",
+            "chars": 75,
+            "lines": 2
+          },
+          "extraction": {
+            "truncatedAtLine": 3,
+            "droppedLines": 3,
+            "how": "truncated at the point where it would have closed a block it did not open (line 3), dropping 3 line(s)"
+          },
+          "play": {
+            "status": "OK",
+            "reason": null,
+            "passing": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "failing": [
+              5,
+              6,
+              7,
+              8
+            ],
+            "total": 8,
+            "log": "PASS case 1  loads with no page or console errors and exposes three lamps, all off\nPASS case 2  pressing 1 turns the first lamp on and leaves the others alone\nPASS case 3  pressing 2 and 3 turns the other two on\nPASS case 4  pressing 1 again toggles the first lamp back off\nFAIL case 5  pressing 0 turns every lamp off -> expected state.every((x) => x === false); state [false,true,true]; errors: [JS ERROR] Assignment to constant variable.\nFAIL case 6  pressing 0 again leaves every lamp off - it never turns one on -> expected state.every((x) => x === false); state [false,true,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 7  after 0, the individual toggles still work -> expected state[1] === true && state[0] === false && state[2] === false; state [false,false,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nFAIL case 8  no page or console error was raised at any point during the run -> expected noErrors; state [false,false,true]; errors: [JS ERROR] Assignment to constant variable. | [JS ERROR] Assignment to constant variable.\nSUMMARY 4/8 cases pass, 4 fail",
+            "errors": [
+              "[JS ERROR] Assignment to constant variable.",
+              "[JS ERROR] Assignment to constant variable."
+            ],
+            "stacks": [
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:55182/index.html:38:23)",
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:55182/index.html:38:23)"
+            ],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            }
+          },
+          "diagnosis": {
+            "failureClass": "NONE",
+            "loadErrors": [
+              "[JS ERROR] Assignment to constant variable.",
+              "[JS ERROR] Assignment to constant variable."
+            ],
+            "stacks": [
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:55182/index.html:38:23)",
+              "TypeError: Assignment to constant variable.\n    at <anonymous> (http://127.0.0.1:55182/index.html:38:23)"
+            ],
+            "dom": {
+              "nullLookups": [],
+              "idsAtFirstFailure": null,
+              "idsAfterReady": [
+                "lightSwitchCanvas"
+              ],
+              "readyState": "complete"
+            },
+            "threwDuringLoad": true,
+            "stateObserved": true,
+            "noFailureObservedDuringInit": false,
+            "initializationCompletedIsEstablished": false,
+            "behaviouralVerdictsMeaningful": true,
+            "note": null
+          },
+          "verdict": {
+            "overall": "FAIL",
+            "requested": "FAIL",
+            "protected": "PASS",
+            "requestedFailing": [
+              5,
+              6,
+              7,
+              8
+            ]
+          },
+          "acceptance": {
+            "disposition": "PRESERVE_INCOMPLETE",
+            "countsAsCompletion": false,
+            "promotable": false,
+            "survivingWorkspaceVerdict": {
+              "overall": "FAIL",
+              "requested": "FAIL",
+              "protected": "PASS",
+              "candidateTree": "fb9ff21a0439f2b7eb0f404448eb048500c350a1"
+            },
+            "survivingBytes": null
+          },
+          "candidateSha": "d02eb63dec5af59df9cb53ab3fe48982ab594998f4ef1da1a015167902b781df",
+          "outcome": "REJECTED"
+        }
+      ]
+    }
+  },
+  "totals": {
+    "wallClockSeconds": 76,
+    "dollars": 0,
+    "modelCalls": 3,
+    "interventionsByAPerson": 0
+  }
+}
