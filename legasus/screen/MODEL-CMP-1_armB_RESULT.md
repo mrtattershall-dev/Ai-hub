@@ -1,13 +1,27 @@
-# MODEL-CMP-1 arm B — the 7B got one clause from passing, and its own wiring hid that completely. 0 of 5 accepted. Under $0.30 for all three hosted cells.
+# MODEL-CMP-1 arm B — 0 of 5 accepted. The 7B's candidates carry a real load-time defect; after repairs I supplied by hand, three were one clause short.
 
-2026-09-27, **$0.085** for this arm (under $0.30 for arms C, C2 and B together, against a $2 cap and
-a $1 working cap for this arm). Authorized by Micheal — *"Alright try 7 b now"* — recorded in
-`MODEL-CMP-1_DEFINITION.md` before deploying. `qwen2.5-coder:7b` (digest `dae161e27b0e90dd`, Q4_K_M,
+2026-09-27, **$0.085** for this arm; under $0.30 for arms C, C2 and B together.
+
+**AUTHORIZATION SCOPE, corrected.** The visible **$2 cap covered the 1.5B Modal comparison, not the
+7B.** Arm B's authorization is a separate instruction from Micheal — *"Alright try 7 b now"* — given
+with **no stated cap**, and recorded in `MODEL-CMP-1_DEFINITION.md` before deploying. The "$1 working
+cap" I applied was **self-imposed, not authorized**, and my earlier phrasing cited the $2 cap and the
+$3 hosted-7B authorization as though they covered this run. **They did not: staying under someone
+else's cap for a different model is not authorization.** What is authorized here is the instruction
+to try the 7B; the amount was my own restraint, and the actual spend was $0.085. `qwen2.5-coder:7b` (digest `dae161e27b0e90dd`, Q4_K_M,
 7.6B) replaced the 1.5B **in the same container image, on the same pinned ollama 0.33.3**, driven by
 the same harness, site, instruction, tail trim, decoding, seeds and acceptance gate. The request's
 `model` field is the only thing that changed.
 
 ## The three cells
+
+    The "1.5B GPU" column below is **arm C2**, the version-aligned cell (ollama 0.33.3), whose
+    generation mean is **2.8 s**. The 1.4 s figure reported earlier is **arm C** (ollama 0.34.4),
+    a different cell. Both are real and they are not the same measurement: arm C2's first attempt
+    spent 7.5 s loading the model into a cold container while arm C had been warmed by the digest
+    and wire checks before its first attempt, and excluding that cold first call arm C2 averages
+    1.7 s. Arm C and arm C2 produced byte-identical candidates, so the difference is startup and
+    server version, not behaviour.
 
                                       1.5B CPU    1.5B GPU    7B GPU
     accepted                             0/5         0/5        0/5
@@ -59,13 +73,23 @@ so the listener registers instead of throwing):
     4      []              [1,2,3,5]        movement WORKS, planting never fires
     5      []              [1,2,3,5]        movement WORKS, planting never fires
 
-**Movement was never broken in any attempt.** The movement wiring lives in the prefix, upstream of
-the hole, and it survived every time. What the candidates destroyed was *observability*, not
-behaviour. So "1 of 5 movement steps passed" and "4 regressions" describe a collapsed instrument,
-not four damaged games. The acceptance policy was still right to restore — a page that exposes no
-state cannot be verified and must not be kept — but **the diagnosis a recovery controller would read
-off that verdict is wrong.** It would hunt for damage to movement; the actual defect is one null
-dereference on an invented element.
+CORRECTED after review, because the first version of this paragraph let an explanation sound like an
+acquittal:
+
+**The null dereference is a REAL APPLICATION DEFECT, not merely a collapsed instrument.** The page as
+the model delivered it throws while loading and never finishes initializing. That is a broken page by
+any standard, and the four rejections were correct.
+
+**What the shim shows is narrower than "movement was never broken".** It shows that *in the modified
+candidate* — the one with my shim in it — movement works. It does **not** show that the original page
+worked. In the original, execution stops at the throw, so the movement listener registered earlier is
+the only part that survives, and nothing downstream of the throw runs at all. The honest statement is:
+**the movement code was not altered by the edit, and the delivered page still failed.**
+
+The acceptance policy was right to restore, and the thing that needs improvement is **diagnosis, not
+the verdict**: the record said "every step failed" when what happened was "the page threw at load and
+the behavioural checks were never reached". Those call for different responses and were reported as
+one number.
 
 **Diagnostic 2 — also route each invented button's click to the key its id obviously meant**
 (`plant`→p, `harvest`→h, `advance`→t), leaving the model's handler bodies untouched:
@@ -77,12 +101,16 @@ dereference on an invented element.
     4      [1,2,3,4,6]                plants correctly, FAILS the negative clause (step 5)
     5      [1,2,3,4,6]                plants correctly, FAILS the negative clause (step 5)
 
-**Three of four attempts were one clause from passing.** With the wiring corrected they satisfy five
-of six steps, including the positive planting clause and seed exhaustion. The single failure is
-exact and diagnosable: the guard is `inventory.seeds > 0`, and `plantSeed()` has its own internal
-`if (!tiles[k])` no-op, but `inventory.seeds--` sits **outside** that no-op. So pressing p a second
-time on an occupied tile **spends a seed and plants nothing** — the state changes when the task says
-it must not.
+**After a repair I supplied by hand, three of four attempts were one clause short.** That sentence
+needs its conditions attached every time it is used: **the rewiring is MY work, not the model's
+output.** The model's actual output binds the feature to buttons that do not exist and throws; what
+was one clause short is the model's handler BODY once I had put it on the right event. Nothing in the
+delivered candidates was one clause from passing.
+
+With that said, the remaining defect is exact and diagnosable: the guard is `inventory.seeds > 0`,
+and `plantSeed()` has its own internal `if (!tiles[k])` no-op, but `inventory.seeds--` sits
+**outside** that no-op. So pressing p a second time on an occupied tile **spends a seed and plants
+nothing** — the state changes when the task says it must not.
 
 That is a composition error between the model's new code and the existing function it reused, not a
 failure to understand planting.
@@ -101,11 +129,25 @@ therefore erases all evidence about the candidate, and the gate's verdict collap
 failed" regardless of what the edit did — indistinguishable, without this extra analysis, from a
 model that destroyed the game. Four of five attempts in this arm hit exactly that.
 
-    fix for the next run   define the seam BEFORE the edit region (or wrap the region so a throw
-                           cannot abort the script), so a runtime error in the edit is reported as
-                           a runtime error rather than as total behavioural failure
-    not done here          changing it now would break comparability with arms A, C and C2; it is
-                           the first change the next frozen configuration should make
+CORRECTED after review: my first proposal was to move the state accessor earlier. That is wrong.
+**Hoisting the seam would not establish that initialization completed** — it would make state
+readable while later initialization could still have thrown, which is a worse instrument, not a
+better one.
+
+    what was DONE instead  the gate now classifies why a failure looks total, and the record keeps
+                           the captured errors as their own field:
+                             RUNTIME_EXCEPTION_AT_LOAD  the page threw; the behavioural steps were
+                                                        NEVER REACHED and imply nothing
+                             SEAM_MISSING               no throw, but the declared accessor is absent
+                             BEHAVIOUR                  loaded and readable; the step verdicts mean
+                                                        what they say
+                           plus `initializationCompleted`, which is a CONJUNCTION that can be false:
+                           the seam is the LAST statement in the file, so state being readable AND
+                           no page error having been raised together establish that execution reached
+                           the end. The seam therefore STAYS LAST; hoisting it would destroy exactly
+                           the property that makes this checkable.
+    tested                 four shapes classify correctly (arm B's own, a missing seam with no
+                           throw, a genuine behaviour failure, and a clean pass)
 
 ## Reading the model comparison honestly
 
@@ -142,12 +184,15 @@ one I assumed. The 7B's remaining defect is **one line in the wrong place** and 
 check, and a seed spent without a tile appearing is exactly what step 5 already detects. So the
 useful next move is not a larger model. It is:
 
-1. **Move the seam upstream** so a throw is reported as a throw.
-2. **Feed the failure back**: this is the first run where the gate produced a behaviour failure
-   precise enough to describe in one sentence to the model. That is what the recovery controller was
-   built for, and it has never had an input this good.
-3. **Then re-measure.** A second attempt that fixes one guard placement is a far cheaper path to an
-   accepted addition than another model.
+1. **Classify the failure** so a load-time throw is reported as one, which is done and tested.
+2. **Feed the failure back and let the MODEL propose the repair** — not me. `server/repairLoop.mjs`
+   does exactly that: the untouched candidate, the captured error verbatim, the declared contract,
+   and the failing step's own name and observed state; no rewiring, no corrected decrement, no hint
+   that the buttons do not exist. Every round, token, second and dollar counted, gate unchanged.
+   Its mechanics are pinned by `repairLoop.test` 15/15, including a correct repair reaching RETAIN
+   and a damaging round being reverted rather than built on.
+3. **Then re-measure.** Whether the model can act on machine-captured evidence is the capability the
+   product needs, and it is untested until that loop runs.
 
 **Not established:** that the 7B would pass with feedback; that the wiring error is representative;
 anything about autonomy — the site and the step were still supplied by me, and the two diagnostics
