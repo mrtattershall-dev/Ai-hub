@@ -143,6 +143,7 @@ export function writesIn(file, scope) {
       unresolvableTarget: root ? null : `a write whose target is not rooted in a plain name (${target.type})`,
       atLine: fileLine, text: (lines[fileLine - 1] || '').trim(),
       isParamOfOwner: !!(root && params.has(root.name)), ownerStart, ownerEnd,
+      atOffset: blk.offset + n.start,
     });
   };
   walk(node.body, (n) => {
@@ -179,17 +180,22 @@ export function reachableWrites(file, scope, decls, { maxDepth = 3 } = {}) {
     for (const w of writesIn(file, fnScope)) writes.push({ ...w, viaPath: path });
     if (depth >= maxDepth) {
       walk(fnScope.node.body, (n) => {
-        if (n.type === 'CallExpression' && n.callee.type === 'Identifier' && decls.get(n.callee.name)?.isFunction) {
-          calls.push({ name: n.callee.name, notFollowed: true, atDepth: depth });
+        if (n.type === 'CallExpression' && n.callee.type === 'Identifier'
+            && resolveDeclaration(decls, n.callee.name, fnScope.blk.offset + n.start).decl?.isFunction) {
+          calls.push({ name: n.callee.name, notFollowed: true, atDepth: depth, reason: 'DEPTH_LIMIT' });
         }
       });
       return;
     }
     walk(fnScope.node.body, (n) => {
       if (n.type !== 'CallExpression' || n.callee.type !== 'Identifier') return;
-      const decl = decls.get(n.callee.name);
-      if (!decl || !decl.isFunction || !decl.fnNode) return;
-      const line = lineOf(file, fnScope.blk.offset + n.start);
+      const at = fnScope.blk.offset + n.start;
+      const { decl, why } = resolveDeclaration(decls, n.callee.name, at);
+      if (!decl || !decl.isFunction || !decl.fnNode) {
+        if (why) calls.push({ name: n.callee.name, notFollowed: true, reason: why, calledAtLine: lineOf(file, at), viaPath: path });
+        return;
+      }
+      const line = lineOf(file, at);
       calls.push({ name: n.callee.name, arity: decl.arity, argCount: n.arguments.length,
                    declaredAtLine: decl.atLine, calledAtLine: line, viaPath: path });
       if (seen.has(n.callee.name)) return;                     // a cycle is not new information
@@ -207,7 +213,7 @@ export function zeroArgLocalCalls(file, scope, decls, { maxDepth = 3 } = {}) {
   const found = new Map();
   for (const c of calls) {
     if (c.notFollowed || c.argCount !== 0) continue;
-    const decl = decls.get(c.name);
+    const decl = resolveDeclaration(decls, c.name, c.declaredAtLine !== undefined ? decls.get(c.name).start : 0).decl || decls.get(c.name);
     if (!found.has(c.name)) found.set(c.name, { name: c.name, arity: decl.arity, declaredAtLine: decl.atLine, calledAtLines: [], viaPath: c.viaPath });
     found.get(c.name).calledAtLines.push(c.calledAtLine);
   }
@@ -216,13 +222,61 @@ export function zeroArgLocalCalls(file, scope, decls, { maxDepth = 3 } = {}) {
 
 // ══ 4. CONSTRAINTS — what the declaration forbids ════════════════════════════════════════════════
 
-/** Every declaration in the file, by name, with the keyword and the initialiser's shape. */
+// Where a name is VISIBLE. `let` and `const` are block-scoped; `var` and function declarations are
+// function-scoped. Getting this wrong is not a rounding error: a global last-wins name map reports
+// the declaration of some OTHER function's variable as a fact about the state at this site.
+const BLOCK_SCOPES = new Set(['BlockStatement', 'ForStatement', 'ForOfStatement', 'ForInStatement', 'SwitchStatement', 'Program', 'StaticBlock']);
+
+/** Every scope in the file, as absolute offset ranges, so a declaration can be placed in one. */
+function scopeRanges(parsed) {
+  const fns = [], blocks = [];
+  for (const blk of parsed.asts) {
+    fns.push({ start: blk.offset, end: blk.offset + blk.text.length, kind: 'Program' });
+    walk(blk.ast, (n) => {
+      const r = { start: blk.offset + n.start, end: blk.offset + n.end, kind: n.type };
+      if (FUNCTIONS.has(n.type)) { fns.push(r); blocks.push(r); }
+      else if (BLOCK_SCOPES.has(n.type)) blocks.push(r);
+    });
+    blocks.push({ start: blk.offset, end: blk.offset + blk.text.length, kind: 'Program' });
+  }
+  return { fns, blocks };
+}
+
+// STRICTLY containing: a range identical to the declaration's own is not its scope. `function a(){}`
+// spans exactly the declaration, so without this a function declaration is handed ITSELF as the scope
+// it lives in - and then every call to it resolves to nothing, because the call site sits outside the
+// declaration's own range. The two tests that caught this were a mutual recursion and a depth limit.
+const innermostContaining = (ranges, start, end) => ranges
+  .filter((r) => r.start <= start && end <= r.end && (r.end - r.start) > (end - start))
+  .sort((a, b) => (a.end - a.start) - (b.end - b.start))[0] || null;
+
+/**
+ * The declaration of `name` that is actually VISIBLE at `offset`: the innermost scope containing
+ * that offset which declares it. A name declared only inside some other function is NOT visible
+ * here, and saying so is the point - the alternative is reporting a fact about the wrong variable.
+ */
+export function resolveDeclaration(decls, name, offset) {
+  const candidates = (decls.byName.get(name) || []).filter((d) => d.scope.start <= offset && offset <= d.scope.end);
+  if (!candidates.length) {
+    return { decl: null, why: decls.byName.has(name) ? 'DECLARED_ONLY_IN_ANOTHER_SCOPE' : 'NOT_DECLARED_IN_THIS_FILE' };
+  }
+  candidates.sort((a, b) => (a.scope.end - a.scope.start) - (b.scope.end - b.scope.start));
+  return { decl: candidates[0], why: null };
+}
+
+/** Every declaration in the file, keyed by name, each placed in the scope that contains it. */
 export function declarations(file, parsed) {
-  const map = new Map();
+  const byName = new Map();
+  const { fns, blocks } = scopeRanges(parsed);
+  const add = (name, d) => { if (!byName.has(name)) byName.set(name, []); byName.get(name).push(d); };
+  const map = new Map();                     // kept for readers that only need "is there one at all"
   for (const blk of parsed.asts) {
     walk(blk.ast, (n, parent) => {
       if (n.type === 'VariableDeclarator' && n.id.type === 'Identifier') {
-        map.set(n.id.name, {
+        const kw = parent && parent.kind ? parent.kind : 'var';
+        const abs = { start: blk.offset + n.start, end: blk.offset + n.end };
+        const scope = innermostContaining(kw === 'var' ? fns : blocks, abs.start, abs.end) || { start: 0, end: file.length, kind: 'Program' };
+        const d = {
           name: n.id.name, keyword: parent && parent.kind ? parent.kind : 'var',
           isFunction: !!(n.init && FUNCTIONS.has(n.init.type)),
           arity: n.init && FUNCTIONS.has(n.init.type) ? n.init.params.length : null,
@@ -231,21 +285,25 @@ export function declarations(file, parsed) {
           // The KEYWORD goes in the quoted text. An earlier version quoted the declarator alone -
           // `LAMPS = [false, false, false]` - which omits the single word that IS the constraint.
           text: ((parent && parent.kind ? parent.kind + ' ' : '') + blk.text.slice(n.start, Math.min(n.end, n.start + 160)).split('\n')[0]).trim(),
-          start: blk.offset + n.start, end: blk.offset + n.end,
+          start: abs.start, end: abs.end, scope,
           fnNode: n.init && FUNCTIONS.has(n.init.type) ? n.init : null, blk,
-        });
+        };
+        add(n.id.name, d); map.set(n.id.name, d);
       } else if (n.type === 'FunctionDeclaration' && n.id) {
-        map.set(n.id.name, {
+        const abs = { start: blk.offset + n.start, end: blk.offset + n.end };
+        const scope = innermostContaining(fns, abs.start, abs.end) || { start: 0, end: file.length, kind: 'Program' };
+        const d = {
           name: n.id.name, keyword: 'function', isFunction: true, arity: n.params.length,
           initKind: 'FunctionDeclaration', atLine: lineOf(file, blk.offset + n.start),
           text: 'function ' + n.id.name + '(' + n.params.map((p) => p.name || '?').join(', ') + ')',
-          start: blk.offset + n.start, end: blk.offset + n.end,
+          start: abs.start, end: abs.end, scope,
           fnNode: n, blk,
-        });
+        };
+        add(n.id.name, d); map.set(n.id.name, d);
       }
     });
   }
-  return map;
+  return { byName, get: (n) => map.get(n), has: (n) => map.has(n) };
 }
 
 const CONTAINERS = new Set(['ArrayExpression', 'ObjectExpression', 'NewExpression', 'CallExpression']);
@@ -295,7 +353,10 @@ export function extractFacts(file, site) {
   const decls = declarations(file, parsed);
   const { writes, calls } = reachableWrites(file, scope, decls);
   for (const c of calls) {
-    if (c.notFollowed) uncertainty.push(`\`${c.name}()\` is called from here but was not followed: the traversal stops at depth 3, so anything it writes is unreported`);
+    if (!c.notFollowed) continue;
+    if (c.reason === 'DEPTH_LIMIT') uncertainty.push(`\`${c.name}()\` is called from here but was not followed: the traversal stops at depth 3, so anything it writes is unreported`);
+    else if (c.reason === 'DECLARED_ONLY_IN_ANOTHER_SCOPE') uncertainty.push(`\`${c.name}()\` is called from here and the only declaration of that name in this file is not visible at the call, so it was not followed`);
+    else uncertainty.push(`\`${c.name}()\` is called from here but is not declared in this file, so anything it writes is unreported`);
   }
 
   // One entry per piece of state the code reachable from this site writes.
@@ -303,10 +364,16 @@ export function extractFacts(file, site) {
   for (const w of writes) {
     if (w.unresolvableTarget) { uncertainty.push(`${w.unresolvableTarget}, at line ${w.atLine}`); continue; }
     if (w.isParamOfOwner) continue;                    // writing a parameter changes nothing outside
-    const decl = decls.get(w.root);
+    // Resolved AT THE WRITE, in the scope chain containing it - not from a global name map. A name
+    // declared only inside some other function is not the binding being written here, and reporting
+    // that declaration as a fact about this site would be a false fact, not an approximate one.
+    const { decl, why } = resolveDeclaration(decls, w.root, w.atOffset);
+    if (why === 'DECLARED_ONLY_IN_ANOTHER_SCOPE') {
+      uncertainty.push(`\`${w.root}\` is written at line ${w.atLine} and this file declares that name only in a scope that does not contain the write, so its declaration is not established here`);
+    }
     // A binding declared INSIDE the function that writes it is that function's local, not the
-    // page's state. This is checked against the writing function, not the site, because the write
-    // may have been reached through a call.
+    // page's state. Checked against the WRITING function, since the write may have been reached
+    // through a call.
     if (decl && decl.start >= w.ownerStart && decl.end <= w.ownerEnd) continue;
     if (!byName.has(w.root)) byName.set(w.root, { name: w.root, decl: decl || null, writes: [] });
     byName.get(w.root).writes.push(w);
@@ -366,8 +433,9 @@ export function extractFacts(file, site) {
  * ARM B: the extracted constraints, as English a model can act on. Every line is traceable to a
  * line number in the file, so a reader can check the extractor rather than trust it.
  */
-export function renderConstraints(facts, { budget = 700 } = {}) {
-  if (!facts.ok) return { text: `// the constraints could not be extracted: ${facts.why}`, lines: 1, complete: false, dropped: ['everything'] };
+export function renderConstraints(facts, { budget = 700, style = 'prose', includeStrategy = true } = {}) {
+  if (!facts.ok) return { text: `// the constraints could not be extracted: ${facts.why}`, lines: 1, complete: false, dropped: ['everything'], delivered: [], factsDelivered: 0 };
+  if (style === 'compact') return renderCompact(facts, { budget, includeStrategy });
 
   // Each fact is a block whose parts have their own priority. When the budget binds, the OPTIONAL
   // parts of the LOWEST-priority facts go first - so a fact never keeps its worked example while a
@@ -408,6 +476,64 @@ export function renderConstraints(facts, { budget = 700 } = {}) {
 }
 
 /**
+ * THE COMPACT STYLE, and the two things that forced it.
+ *
+ * ONE: the prose rendering spent three lines per fact, and at ~650 characters the 1.5B stopped
+ * writing code - it generated 800 tokens of further `//` prose and hit the token cap, so containment
+ * found no code at all. A block of comment lines makes more comment lines the natural continuation.
+ * At 150 characters the same rendering dropped EVERY fact and emitted nothing, which made a treatment
+ * cell silently identical to its own control. Hence one line per fact, and hence `factsDelivered`.
+ *
+ * TWO: a FACT and a STRATEGY are different kinds of claim and are now labelled as such.
+ *   FACT      `LAMPS is declared const at line 14` - read from the source, checkable against it.
+ *             `existing code writes it as LAMPS[index] = !LAMPS[index]` - likewise.
+ *   STRATEGY  `change it in place rather than assigning to it` - a PROPOSAL consistent with those
+ *             facts. Whether it satisfies the task is not established by the facts and is not
+ *             claimed. It is emitted under its own label, and `includeStrategy: false` withholds it,
+ *             so facts-only and facts-plus-strategy can be compared rather than conflated.
+ * No ready-made fix is offered either way: handing over `LAMPS.fill(false)` would make any success
+ * uninformative about the extraction.
+ */
+export function renderCompact(facts, { budget = 700, includeStrategy = true } = {}) {
+  const blocks = [];
+  for (const c of facts.constraints) {
+    const where = c.declaredAtLine ? `line ${c.declaredAtLine}` : 'not in this file';
+    const ex = c.howExistingCodeWritesIt[0];
+    const kw = /^(const|let|var)\b/.exec(c.declaration || '')?.[1];
+    let fact;
+    if (c.verdict === 'UNKNOWN') fact = `// FACT: ${c.name} is written here and this file does not declare it.`;
+    else fact = `// FACT ${where}: ${c.name} is declared \`${kw || 'var'}\`${c.verdict === 'CONST_CONTAINER' ? ' and holds a container' : ''}.`;
+    const lines = [fact];
+    if (ex) lines.push(`// FACT line ${ex.atLine}: existing code writes it as ${ex.text}`);
+    if (includeStrategy && c.verdict === 'CONST_CONTAINER') {
+      lines.push(`// STRATEGY (proposed, not verified): change ${c.name} in place rather than assigning to ${c.name}; whether that satisfies the task still has to be checked.`);
+    } else if (includeStrategy && c.verdict === 'CONST_VALUE') {
+      lines.push(`// STRATEGY (proposed, not verified): ${c.name} cannot be changed through this name; the change may have to go elsewhere.`);
+    }
+    blocks.push({ label: c.name, verdict: c.verdict, kind: 'constraint', lines });
+  }
+  for (const r of facts.redraws) {
+    blocks.push({ label: r.name + '()', kind: 'redraw', lines: [`// FACT line ${r.declaredAtLine}: ${r.name}() takes no arguments, and the code here calls it after changing state.`] });
+  }
+  for (const u of facts.uncertainty) blocks.push({ label: 'uncertainty', kind: 'uncertainty', lines: [`// NOT ESTABLISHED: ${u}`] });
+
+  const kept = [], dropped = [], delivered = [];
+  let used = 0;
+  for (const b of blocks) {
+    const cost = b.lines.reduce((n, l) => n + l.length + 1, 0);
+    if (used + cost > budget) { dropped.push(`${b.label}: the whole ${b.kind}`); continue; }
+    kept.push(...b.lines); used += cost;
+    delivered.push({ label: b.label, kind: b.kind, verdict: b.verdict || null, lines: b.lines.length });
+  }
+  return {
+    text: kept.join('\n'), lines: kept.length, complete: dropped.length === 0, dropped,
+    style: 'compact', includeStrategy,
+    delivered,
+    factsDelivered: delivered.filter((d) => d.kind === 'constraint').length,
+  };
+}
+
+/**
  * ARM A: ordinary nearby code, to the SAME budget. This is the control, and it has to be a fair
  * one: the most useful thing a person would paste - the lines immediately around the site, which on
  * a page like this is exactly where the existing handlers are.
@@ -442,9 +568,9 @@ export function renderNearbyCode(file, site, { budget = 700 } = {}) {
  * constraints actually came to. Each arm's real size is returned, and so is the difference, because
  * "equal-sized prompts" is a claim the record has to be able to check.
  */
-export function buildArms(file, site, { budget = 700 } = {}) {
+export function buildArms(file, site, { budget = 700, style = 'prose', includeStrategy = true } = {}) {
   const facts = extractFacts(file, site);
-  const constraints = renderConstraints(facts, { budget });
+  const constraints = renderConstraints(facts, { budget, style, includeStrategy });
   const nearby = renderNearbyCode(file, site, { budget: Math.max(constraints.text.length, 1) });
   return {
     facts,

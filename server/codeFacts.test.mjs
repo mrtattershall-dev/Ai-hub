@@ -28,6 +28,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const {
   extractFacts, renderConstraints, renderNearbyCode, constraintOf, declarations,
   scriptBlocks, factsSourceReferencesNoChecks, reachableWrites, enclosingFunction, buildArms,
+  resolveDeclaration, renderCompact,
 } = await import('./codeFacts.mjs');
 
 let passed = 0, failed = 0;
@@ -184,6 +185,81 @@ const named = (facts, n) => facts.constraints.find((c) => c.name === n);
   say(!/^\/\//m.test(arms.nearby.text.split('\n')[0]), 'and is code, not commentary');
   say(/const LAMPS = \[false, false, false\]/.test(arms.constraints.text) && !/^\s*const LAMPS/m.test(arms.nearby.text),
     'and on THIS page the arms differ in a nameable way: the declaration is in B and outside A\'s window');
+}
+
+// ══ 3b. scope and shadowing decide WHICH declaration is the fact ════════════════════
+{
+  console.log('\n3b. a declaration is resolved in the scope chain containing the WRITE');
+  // `total` is declared const in one function and let at the top level. The write reached from the
+  // site is the top-level one. A global last-wins name map would report whichever came second in the
+  // file - a fact about the wrong variable, which is worse than no fact.
+  const file = page([
+    'let total = 0;',
+    'function unrelated() { const total = 99; return total; }',
+    'function bump() { total = total + 1; }',
+    "document.addEventListener('keydown', (e) => { bump(); });",
+  ].join('\n'));
+  const f = factsFor(file);
+  const t = named(f, 'total');
+  say(!!t, 'the written binding is found');
+  say(t?.verdict === 'REASSIGNABLE', `and it is the top-level let, not the const in the other function (${t?.verdict})`);
+  say(t?.declaredAtLine === 3, `the declaration line is the visible one (${t?.declaredAtLine}, expected 3)`);
+
+  // The reverse: a name written at the site whose ONLY declaration in the file is inside some other
+  // function. It is not visible here, so no declaration may be claimed for it.
+  const hidden = page([
+    'function elsewhere() { const hidden = [1]; hidden[0] = 2; }',
+    "document.addEventListener('keydown', (e) => { hidden[0] = 3; });",
+  ].join('\n'));
+  const h = factsFor(hidden);
+  const hv = named(h, 'hidden');
+  say(hv?.verdict === 'UNKNOWN', `a name declared only in another function is UNKNOWN here (${hv?.verdict})`);
+  say(h.uncertainty.some((u) => /only in a scope that does not contain the write/.test(u)),
+    'and the record says the declaration is not established at this site');
+
+  // A block-scoped const in a branch of the same function is visible to a write inside that branch.
+  const blocky = page([
+    "document.addEventListener('keydown', (e) => {",
+    "  if (e.key === '1') { const box = [1]; box[0] = 2; }",
+    '});',
+  ].join('\n'));
+  const b = factsFor(blocky);
+  say(!named(b, 'box'), 'a const declared in a block inside the handler is still a local, not page state');
+
+  const decls = declarations(file, { asts: [] });
+  say(decls.byName instanceof Map, 'declarations expose their names for scope-aware lookup');
+  say(resolveDeclaration({ byName: new Map() }, 'x', 0).why === 'NOT_DECLARED_IN_THIS_FILE',
+    'an unknown name resolves to NOT_DECLARED_IN_THIS_FILE, by name');
+}
+
+// ══ 6b. the compact style: facts, advice and what was delivered ══════════════════
+{
+  console.log('\n6b. the compact style keeps a FACT and a PROPOSAL apart, and reports what it delivered');
+  const file = readFileSync(join(HERE, '..', 'legasus', 'bench', 'panel', 'baseline-as-delivered.html'), 'utf8');
+  const f = factsFor(file);
+  const c = renderConstraints(f, { budget: 700, style: 'compact' });
+  say(c.style === 'compact', 'the style is recorded on the rendering');
+  say(/^\/\/ FACT line 14: LAMPS is declared `const` and holds a container\.$/m.test(c.text),
+    'the declaration is stated as a FACT with its line');
+  say(/^\/\/ FACT line 31: existing code writes it as LAMPS\[index\] = !LAMPS\[index\];$/m.test(c.text),
+    'the existing write is stated as a FACT with its line');
+  say(/^\/\/ STRATEGY \(proposed, not verified\): change LAMPS in place rather than assigning to LAMPS; whether that satisfies the task still has to be checked\.$/m.test(c.text),
+    'the proposal is labelled STRATEGY and says it is unverified');
+  say(!/\.fill\(/.test(c.text), 'and NO ready-made fix is offered - the answer is not handed over');
+
+  const facts_only = renderConstraints(f, { budget: 700, style: 'compact', includeStrategy: false });
+  say(!/STRATEGY/.test(facts_only.text), 'the strategy can be withheld, so facts-only is a separable arm');
+  say(/FACT line 14/.test(facts_only.text), 'while the facts remain');
+  say(facts_only.text.length < c.text.length, 'and withholding it is the shorter block, as it must be');
+
+  say(c.factsDelivered >= 1, `the rendering reports how many constraints it DELIVERED (${c.factsDelivered})`);
+  say(c.delivered.some((d) => d.label === 'LAMPS' && d.verdict === 'CONST_CONTAINER'), 'naming each one and its verdict');
+  const nothing = renderConstraints({ ok: true, constraints: [], redraws: [], uncertainty: [] }, { budget: 700, style: 'compact' });
+  say(nothing.factsDelivered === 0 && nothing.text === '',
+    'a page with no extractable constraint delivers 0 facts and an empty block - an UNDELIVERED treatment, not guidance');
+  const starved = renderConstraints(f, { budget: 30, style: 'compact' });
+  say(starved.factsDelivered === 0 && starved.dropped.length > 0,
+    'and a budget too small for one fact also delivers 0, rather than half a fact');
 }
 
 // ══ 7. the extractor may read the program, never the checks ═════════════════════════════════════
