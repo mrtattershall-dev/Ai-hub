@@ -228,6 +228,35 @@ export function farmTasks() {
     });
   }
 
+  // farm-grow: the FRESH task for ASSIST-2. I supply the requirement and the checks. I do NOT supply
+  // the edit site or the solution's structure - those are what the policy under test has to choose,
+  // and this task exists because replaying a solved one would only show that a known procedure can be
+  // automated. It starts from the page ASSIST-1 produced, so planting is already working and is
+  // protected.
+  const growPath = join(FARM_DIR, 'play-grow.json');
+  if (existsSync(growPath)) {
+    const g = JSON.parse(readFileSync(growPath, 'utf8'));
+    const sub = (steps) => ({ ...g, name: `grow-steps-${steps.join('')}`, steps: g.steps.filter((x) => steps.includes(x.n)) });
+    const requested = [1, 2, 3, 4, 5, 6];
+    const protectedSteps = [1, 2, 3];
+    out.push({
+      id: 'farm-grow', group: 'FARM', source: 'internal', language: 'javascript', kind: 'build',
+      dependsOn: 'farm-plant',
+      // The requirement, in words, and nothing about where or how.
+      goal: 'Continue the farming game already in index.html. The t key advances time: day goes up by one, and every planted tile grows by one stage, stopping at stage 3. t must not create or remove tiles. Everything that already works must keep working. The game is a single self-contained web page, index.html: plain HTML5 canvas and JavaScript, no frameworks, no external files or CDNs. ' + g.contract,
+      requirement: {
+        trigger: { kind: 'key', key: 't' },
+        effects: ["day goes up by one", "every planted tile's stage goes up by one, stopping at 3"],
+        invariants: ['no tile is created or removed', 'everything that already works keeps working'],
+      },
+      seed: {},
+      requested: { play: { spec: sub(requested), steps: requested } },
+      protected: { play: { spec: sub(protectedSteps), steps: protectedSteps } },
+      diagnostic: { kind: 'play', spec: sub(requested), timeoutSec: 90 },
+      upstreamCases: requested.length, protectedCases: protectedSteps.length,
+    });
+  }
+
   // farm-plant rides its own play spec (play-plant.json), which carries the negative clauses.
   const plantPath = join(FARM_DIR, 'play-plant.json');
   if (existsSync(plantPath)) {
