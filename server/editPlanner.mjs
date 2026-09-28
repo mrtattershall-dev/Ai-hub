@@ -48,6 +48,94 @@ export const MOVE = {
 
 const lines = (t) => t.split(NL);
 
+/** Script text with strings, template literals and comments blanked, so braces mean structure. */
+function structural(t) {
+  return String(t)
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
+    .split(NL).map((l) => l.replace(/\/\/.*$/, (m) => ' '.repeat(m.length))).join(NL)
+    .replace(/`(?:\\.|[^`\\])*`/g, (m) => ' '.repeat(m.length))
+    .replace(/'(?:\\.|[^'\\])*'/g, (m) => ' '.repeat(m.length))
+    .replace(/"(?:\\.|[^"\\])*"/g, (m) => ' '.repeat(m.length));
+}
+
+/** Every `<script>` body in the page. */
+function scriptBodies(file) {
+  const out = [];
+  const re = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
+  let m;
+  while ((m = re.exec(file))) out.push(m[1]);
+  return out;
+}
+
+/**
+ * Functions declared at the TOP LEVEL of a script - reachable from code appended at the end of it.
+ *
+ * This replaced a regex sweep over the whole document with no notion of scope. On a page wrapping its
+ * script in an IIFE that sweep produced the guidance line "this file defines render()" for a binding
+ * that throws `render is not defined` at the planned site: a stated fact that is false where it would
+ * be used, which is worse than saying nothing. Brace depth alone is not enough - a declaration inside
+ * `(function () { ... })()` sits at brace depth 0 - so parenthesis depth is tracked too.
+ */
+export function topLevelFunctions(file) {
+  const found = [];
+  for (const body of scriptBodies(file)) {
+    const src = structural(body);
+    const depth = new Array(src.length);
+    const pdepth = new Array(src.length);
+    let d = 0, pd = 0;
+    for (let i = 0; i < src.length; i++) {
+      const c = src[i];
+      if (c === '}') d--; if (c === ')') pd--;
+      depth[i] = d; pdepth[i] = pd;
+      if (c === '{') d++; if (c === '(') pd++;
+    }
+    let m;
+    const decl = /(?:^|[^.\w$])function\s+([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/g;
+    while ((m = decl.exec(src))) {
+      const at = m.index + m[0].indexOf('function');
+      if (depth[at] === 0 && pdepth[at] === 0) found.push({ name: m[1], params: m[2].trim() ? m[2].split(',').length : 0 });
+    }
+    const arrow = /(?:^|[^.\w$])(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:\(([^)]*)\)|([A-Za-z_$][\w$]*))\s*=>/g;
+    while ((m = arrow.exec(src))) {
+      const at = m.index + m[0].search(/(?:const|let|var)/);
+      if (depth[at] !== 0 || pdepth[at] !== 0) continue;
+      const ps = m[2] !== undefined ? m[2] : m[3];
+      found.push({ name: m[1], params: String(ps).trim() ? String(ps).split(',').length : 0 });
+    }
+  }
+  const seen = new Set();
+  return found.filter((f) => (seen.has(f.name) ? false : (seen.add(f.name), true)));
+}
+
+/** Every function name declared at any depth. Used only to RECORD what is out of reach from the site. */
+export function allDeclaredFunctions(file) {
+  const names = [];
+  for (const body of scriptBodies(file)) {
+    const src = structural(body);
+    for (const m of src.matchAll(/(?:^|[^.\w$])function\s+([A-Za-z_$][\w$]*)\s*\(/g)) names.push(m[1]);
+    for (const m of src.matchAll(/(?:^|[^.\w$])(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>/g)) names.push(m[1]);
+  }
+  return [...new Set(names)];
+}
+
+/**
+ * Does existing code already call this function, or hand it to a listener? A zero-argument function
+ * nobody invokes is not the page's renderer; one that other code runs after changing something is the
+ * route a new effect has to travel to become visible.
+ */
+export function referencedElsewhere(file, fn) {
+  let uses = 0;
+  for (const body of scriptBodies(file)) {
+    const src = structural(body);
+    for (const m of src.matchAll(new RegExp(`(?:^|[^.\\w$])${fn.name}\\s*(?:\\(|[,)])`, 'g'))) {
+      const before = src.slice(Math.max(0, m.index - 24), m.index + m[0].indexOf(fn.name));
+      if (/function\s*$/.test(before) || /(?:const|let|var)\s+$/.test(before)) continue;
+      uses++;
+    }
+  }
+  return uses > 0;
+}
+
 /** Where the page's script ends - the natural place for code that must run after everything exists. */
 function endOfScript(file) {
   const ls = lines(file);
@@ -88,13 +176,24 @@ export function plan({ file, requirement, observation, facts = null }) {
   // ── the code tied to the requested effect ──
   const relevantCode = { handlers: [], functions: [], state: [] };
   for (const r of regs) relevantCode.handlers.push(`${r.type} on ${r.target}`);
-  const fnNames = [...file.matchAll(/function\s+([A-Za-z_$][\w$]*)\s*\(/g)].map((m) => m[1])
-    .concat([...file.matchAll(/(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>/g)].map((m) => m[1]));
-  relevantCode.functions = [...new Set(fnNames)];
+  // FUNCTIONS REACHABLE FROM THE SITE, not every `function NAME(` in the file. This was a regex over the
+  // whole document with no notion of scope, so a page wrapping its script in an IIFE produced the
+  // guidance line "this file defines render()" for a binding that throws `render is not defined` at the
+  // end of the script - guidance that actively misleads, which is worse than none. The moves that site
+  // at end-of-script can only reach TOP-LEVEL declarations, so that is what is reported.
+  const top = topLevelFunctions(file);
+  relevantCode.functions = top.map((f) => f.name);
+  relevantCode.notReachable = allDeclaredFunctions(file).filter((n) => !relevantCode.functions.includes(n));
   if (facts && facts.constraints) relevantCode.state = facts.constraints.map((c) => `${c.name} (${c.verdict}${c.declaredAtLine ? `, line ${c.declaredAtLine}` : ''})`);
 
   // A shared renderer is worth naming: an effect that must be VISIBLE usually has to go through it.
-  const renderer = (facts && facts.redraws && facts.redraws[0]) ? facts.redraws[0].name : null;
+  // The renderer used to be read from `facts.redraws`, which the runner computes for a site at line 0 -
+  // not the site being planned - and which fails outright on a page whose script is top-level. It was
+  // null on every real filter page, so the single most useful thing to say ("the page updates through
+  // refresh()") was never said. It is now derived from the file: a top-level zero-argument function that
+  // other code already calls or hands to a listener.
+  const rendererFn = top.find((f) => f.params === 0 && referencedElsewhere(file, f));
+  const renderer = rendererFn ? rendererFn.name : ((facts && facts.redraws && facts.redraws[0]) ? facts.redraws[0].name : null);
   if (renderer) evidence.push(`the page has a zero-argument function ${renderer}() that existing code calls after changing state`);
 
   // ── the move, chosen from the requested behaviour and the structure ──
@@ -232,9 +331,20 @@ export { endOfScript };
  * lines come from the proposal's own scope and evidence, so what the model is shown is what the planner
  * decided - not a second, parallel set of rules.
  */
-export function planToScaffold(proposal, requirement) {
+export function planToScaffold(proposal, requirement, file) {
   const t = requirement.trigger || {};
-  const indent = '        ';
+  // INDENT FROM THE FILE AT THE SITE, not a constant. The constant eight spaces was written for a slot
+  // inside a handler inside a function; at the top level of a page script it put the scaffold and every
+  // guidance line eight columns out from the code around them, which is a prompt that does not look like
+  // the file it is supposed to continue.
+  const indent = (() => {
+    if (typeof file !== 'string') return '        ';
+    const ls = file.split(NL);
+    for (let i = Math.min(proposal.site.insertAfterLine, ls.length - 1); i >= 0; i--) {
+      if (ls[i].trim()) return (ls[i].match(/^[ 	]*/) || [''])[0];
+    }
+    return '';
+  })();
   if (proposal.move === MOVE.EXTEND_HANDLER && t.kind === 'key') {
     return {
       lines: [`${indent}    if (e.key === '${t.key}') {`, `${indent}        // FILL IN`, `${indent}    }`],
