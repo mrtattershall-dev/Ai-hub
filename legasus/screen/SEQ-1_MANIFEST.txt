@@ -1,0 +1,13 @@
+SEQ-1 MANIFEST - hashes at freeze time, before either addition was attempted
+recorded 2026-09-28T03:38:36Z
+
+THE POLICY (codeFacts CORRECTED at d297002):
+  c735f92f19bf17d4f0bdddffe578bd14e422c2b04606fa58a5af404084af3a04    43239  server/codeFacts.mjs
+  cbf4983a7ba89e219a4cbb29cfe8977f51efa440bcc0d8763b44960bc314d732    19101  server/autoGuide.mjs
+  978bc299e5660034605d2f0049b952b9e2e8e7e9adc63163d0e8c4d8d53f9ee2    37806  server/localEdit.mjs
+
+THE GATE (unchanged since TRANSFER-2):
+  df56ddc0180262307dec4eb0dd7d171b9a416e25238023e189047586f215e5b4     7484  server/judgeCandidate.mjs
+  99e50264209ad4002df979fbd6edde9a45e7a9f09fe3d2085f9f8f201fffd623    12253  server/evaluator.js
+  64aa3b7bcb1ad51b5eaba23f996095ab692abbf9f715f3dd29e4685a3caa2bf3     9908  server/acceptance.js
+  f62fa26c96e5b5896517c0a6b97a2b463692224e96efeb0a2f7fa04869216fd1    12541  server/playCheck.js
