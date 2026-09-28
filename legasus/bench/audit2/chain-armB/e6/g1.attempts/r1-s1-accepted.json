@@ -1,0 +1,87 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4
+      ],
+      "passed": [
+        3,
+        4
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a complete, working web page.\n\n<!DOCTYPE html>\n<html><head><title>Crew</title></head>\n<body>\n<h2>Crew</h2>\n<input id=\"search\" type=\"search\" placeholder=\"name\">\n<div id=\"people\">\n  <p class=\"who\">Okafor</p>\n  <p class=\"who\">Okamoto</p>\n  <p class=\"who\">Lindqvist</p>\n  <p class=\"who\">Ferreira</p>\n  <p class=\"who\">Novak</p>\n</div>\n<script>\nconst model = { query: '' };\nconst who = Array.from(document.querySelectorAll('#people .who'));\nconst draw = () => {\n  who.forEach((el) => {\n    el.style.display = el.textContent.toLowerCase().includes(model.query) ? 'block' : 'none';\n  });\n};\ndocument.getElementById('search').addEventListener('input', (e) => {\n  model.query = e.target.value.toLowerCase();\n  draw();\n});\ndraw();\n</script>\n</body></html>\n\n\nChange it so that when #clear-filter is clicked: #search is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nEverything the page already does must keep working.\n\nReply with the COMPLETE updated page: a single HTML document from <!DOCTYPE html> to </html>.\nNo markdown fence, no explanation, no partial snippet, and no placeholder comments.\nKeep all existing markup and script, and create any new element with JavaScript DOM calls or markup as you prefer.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "```html\n<!DOCTYPE html>\n<html><head><title>Crew</title></head>\n<body>\n<h2>Crew</h2>\n<input id=\"search\" type=\"search\" placeholder=\"name\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"people\">\n  <p class=\"who\">Okafor</p>\n  <p class=\"who\">Okamoto</p>\n  <p class=\"who\">Lindqvist</p>\n  <p class=\"who\">Ferreira</p>\n  <p class=\"who\">Novak</p>\n</div>\n<script>\nconst model = { query: '' };\nconst who = Array.from(document.querySelectorAll('#people .who'));\nconst draw = () => {\n  who.forEach((el) => {\n    el.style.display = el.textContent.toLowerCase().includes(model.query) ? 'block' : 'none';\n  });\n};\ndocument.getElementById('search').addEventListener('input', (e) => {\n  model.query = e.target.value.toLowerCase();\n  draw();\n});\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});\ndraw();\n</script>\n</body></html>\n```",
+    "chars": 929,
+    "lines": 35,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html><head><title>Crew</title></head>\n<body>\n<h2>Crew</h2>\n<input id=\"search\" type=\"search\" placeholder=\"name\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"people\">\n  <p class=\"who\">Okafor</p>\n  <p class=\"who\">Okamoto</p>\n  <p class=\"who\">Lindqvist</p>\n  <p class=\"who\">Ferreira</p>\n  <p class=\"who\">Novak</p>\n</div>\n<script>\nconst model = { query: '' };\nconst who = Array.from(document.querySelectorAll('#people .who'));\nconst draw = () => {\n  who.forEach((el) => {\n    el.style.display = el.textContent.toLowerCase().includes(model.query) ? 'block' : 'none';\n  });\n};\ndocument.getElementById('search').addEventListener('input', (e) => {\n  model.query = e.target.value.toLowerCase();\n  draw();\n});\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});\ndraw();\n</script>\n</body></html>",
+    "chars": 917,
+    "lines": 33
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "064eaf29ee31c7e203a0b14331a00ecf39ae5ac1"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

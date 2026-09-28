@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stock</title>
+</head>
+<body>
+  <h2>Stock</h2>
+  <input id="q" type="text">
+  <button id="clear-filter">Clear Filter</button>
+  <span id="match-count">0 items visible</span>
+  <ul id="rows">
+    <li class="row">copper wire</li>
+    <li class="row">copper pipe</li>
+    <li class="row">steel plate</li>
+    <li class="row">steel rod</li>
+    <li class="row">brass fitting</li>
+    <li class="row">nylon washer</li>
+  </ul>
+  <script>
+    const term = document.getElementById('q');
+    const rows = document.getElementById('rows');
+    const clearFilter = document.getElementById('clear-filter');
+    const matchCount = document.getElementById('match-count');
+
+    function redraw() {
+      const needle = term.value.trim().toLowerCase();
+      let visibleCount = 0;
+      Array.prototype.forEach.call(rows.children, function (li) {
+        li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;
+        if (!li.hidden) {
+          visibleCount++;
+        }
+      });
+      matchCount.textContent = `${visibleCount} items visible`;
+    }
+
+    term.addEventListener('input', redraw);
+    clearFilter.addEventListener('click', function() {
+      term.value = '';
+      redraw();
+    });
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        term.value = '';
+        redraw();
+      }
+    });
+
+    redraw();
+  </script>
+</body>
+</html>

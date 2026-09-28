@@ -1,0 +1,337 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:50:41.499Z",
+  "experiment": "TRANSFER-3",
+  "task": "chain-work-g2",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\chain-armA\\e8\\work\\baseline-as-delivered.html",
+  "baselineSha": "81b3554dcfdd6d100011ccc7ff0d50d0c2632043bef0ed5f60896bb7e55b9acf",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true,
+    "guidance": "full"
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_NEW_LISTENER",
+      "why": "at the end of the script, after every element and function the listener must reference exists",
+      "insertAfterLine": 29,
+      "scaffold": "// FILL IN",
+      "instruction": "// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.",
+      "slotContract": "// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "// create a keydown listener and attach the handler that does the work\n// the page updates through sift, which existing code calls after changing state\n// FACT: this file defines sift()\n// FACT: a input on document handler is registered\n// FACT: a click on button#clear-filter handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "noFactsBecause": "// the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_NEW_LISTENER",
+        "site": {
+          "insertAfterLine": 29,
+          "why": "at the end of the script, after every element and function the listener must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "a keydown listener"
+          ],
+          "attaches": [
+            "document"
+          ],
+          "calls": [
+            "sift"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function sift() that existing code calls after changing state",
+          "the requirement asks for key 'Escape', and no key listener is registered anywhere, so the requested listener must be created",
+          "the application is driven by browser.input - that informs how the effect is achieved, NOT whether the request is honoured",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "this application had no key handling before, so nothing establishes that a key press reaches it in the way the requirement assumes; the checks will settle it"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html><head><title>Ledger</title></head>\n<body>\n<h2>Ledger</h2>\n<input id=\"find\" type=\"text\">\n<table id=\"book\"><tbody>\n  <tr class=\"line\"><td>Freight</td></tr>\n  <tr class=\"line\"><td>Freezer</td></tr>\n  <tr class=\"line\"><td>Postage</td></tr>\n  <tr class=\"line\"><td>Postal</td></tr>\n  <tr class=\"line\"><td>Utilities</td></tr>\n</tbody></table>\n<script>\nvar lines = [].slice.call(document.querySelectorAll('#book .line'));\nvar finder = document.getElementById('find');\nfunction sift() {\n  var q = finder.value.toLowerCase();\n  lines.forEach(function (tr) {\n    tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n  });\n}\ndocument.addEventListener('input', function (e) { if (e.target && e.target.id === 'find') sift(); });\ndocument.getElementById('book').insertAdjacentHTML('afterend', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  finder.value = '';\n  lines.forEach(function (tr) {\n    tr.style.display = '';\n  });\n});\nsift(); // initialize display based on initial filter value\n// create a keydown listener and attach the handler that does the work\n// the page updates through sift, which existing code calls after changing state\n// FACT: this file defines sift()\n// FACT: a input on document handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "bb7446e032fb87954f78c6e4df8e8639d73c3b611325f206d990fa142e254537",
+      "suffixSha": "5c1404e034c7ec0d2b8ac19a6c1a2c4786dbd3037cbb48efdc8cfe4820c14aea",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "failing": [],
+          "visual": null,
+          "decision": {
+            "functional": "PASS",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 1315,
+      "outputTokens": 49,
+      "promptTokens": 457,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('find').addEventListener('keydown', function (e) {\n  if (e.key === 'Escape') {\n    finder.value = '';\n    lines.forEach(function (tr) {\n      tr.style.display = '';\n    });\n  }\n});",
+        "chars": 204,
+        "lines": 8
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 7953,
+        "acceptanceMs": 19286
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('find').addEventListener('keydown', function (e) {\n  if (e.key === 'Escape') {\n    finder.value = '';\n    lines.forEach(function (tr) {\n      tr.style.display = '';\n    });\n  }\n});",
+        "codeLines": 8,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('find').addEventListener('keydown', function (e) {\n  if (e.key === 'Escape') {\n    finder.value = '';\n    lines.forEach(function (tr) {\n      tr.style.display = '';\n    });\n  }\n});",
+        "chars": 204,
+        "lines": 8
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "failing": [],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"frei\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #find empty\nPASS case 5  typing \"frei\" narrows the list\nPASS case 6  pressing Escape brings every item back\nPASS case 7  no page or console error was raised at any point\nSUMMARY 7/7 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "find",
+            "book",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "find",
+            "book",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "c6e534a421a34da4084c2a4c444ce5fd878e3d76"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html><head><title>Ledger</title></head>\n<body>\n<h2>Ledger</h2>\n<input id=\"find\" type=\"text\">\n<table id=\"book\"><tbody>\n  <tr class=\"line\"><td>Freight</td></tr>\n  <tr class=\"line\"><td>Freezer</td></tr>\n  <tr class=\"line\"><td>Postage</td></tr>\n  <tr class=\"line\"><td>Postal</td></tr>\n  <tr class=\"line\"><td>Utilities</td></tr>\n</tbody></table>\n<script>\nvar lines = [].slice.call(document.querySelectorAll('#book .line'));\nvar finder = document.getElementById('find');\nfunction sift() {\n  var q = finder.value.toLowerCase();\n  lines.forEach(function (tr) {\n    tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n  });\n}\ndocument.addEventListener('input', function (e) { if (e.target && e.target.id === 'find') sift(); });\ndocument.getElementById('book').insertAdjacentHTML('afterend', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  finder.value = '';\n  lines.forEach(function (tr) {\n    tr.style.display = '';\n  });\n});\nsift(); // initialize display based on initial filter value\n// create a keydown listener and attach the handler that does the work\n// the page updates through sift, which existing code calls after changing state\n// FACT: this file defines sift()\n// FACT: a input on document handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.\ndocument.getElementById('find').addEventListener('keydown', function (e) {\n  if (e.key === 'Escape') {\n    finder.value = '';\n    lines.forEach(function (tr) {\n      tr.style.display = '';\n    });\n  }\n});\n</script>\n</body></html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "8a3ed1b4de48311ac4a9bc60e2b1c2ed9056c8a69ffb0161eef2701d7a4c773c",
+      "classification": {
+        "addition": {
+          "asked": [
+            6
+          ],
+          "passed": [
+            6
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r1-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 9,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "acceptedCandidate": "document.getElementById('find').addEventListener('keydown', function (e) {\n  if (e.key === 'Escape') {\n    finder.value = '';\n    lines.forEach(function (tr) {\n      tr.style.display = '';\n    });\n  }\n});",
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 0,
+    "judged": 1,
+    "protectedFailures": 0,
+    "restored": 0,
+    "mismatch": {
+      "MET": 1
+    },
+    "partialEffects": 0,
+    "corpus": "legasus\\bench\\audit2\\chain-armA\\e8\\g2.attempts",
+    "generationSeconds": 1.3,
+    "wallClockSeconds": 20.2,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

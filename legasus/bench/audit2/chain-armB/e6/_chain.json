@@ -1,0 +1,43 @@
+{
+  "at": "2026-09-28T14:57:28.287Z",
+  "page": "e6",
+  "arm": "direct",
+  "model": "qwen2.5-coder:7b",
+  "generations": [
+    {
+      "generation": 1,
+      "name": "clear-filter control",
+      "startSha": "7dc7dab80b7cc35a",
+      "exitCode": 0,
+      "status": "COMPLETE",
+      "accumulatedObligations": 3,
+      "newChecks": 2,
+      "accepted": true,
+      "calls": 1,
+      "attemptsRecorded": 1,
+      "attemptsInCorpus": 1,
+      "mismatch": {
+        "MET": 1
+      },
+      "regressionsProduced": 0,
+      "restored": 0,
+      "outputTokens": 255,
+      "generationSeconds": 5.4,
+      "wallSeconds": 19.4,
+      "producedSha": "d4b82d179cdd0a4d",
+      "producedChars": 917
+    },
+    {
+      "generation": 2,
+      "status": "NOT_EMITTED",
+      "startSha": "e796504558753341",
+      "emitLog": "generation      2 of 3 - reset key\ngoverned items  5, term \"okaf\" matches 1\ncarried         1,2,3,4,5,7  addition 6\nbaseline        passing [1,2,3,4,5,6,7] failing []\n  every prior obligation still passes : true\n  this generation's addition is ABSENT: false\n\nNOT EMITTED: a generation needs every accumulated obligation passing AND its own addition absent\n"
+    }
+  ],
+  "stoppedAt": 2,
+  "stoppedBecause": "the generation could not be emitted",
+  "wallClockSeconds": 37.7,
+  "maxGpuSeconds": 1500,
+  "reached": 1,
+  "notReached": 1
+}

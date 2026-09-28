@@ -1,0 +1,80 @@
+{
+  "at": "2026-09-28T14:41:40.134Z",
+  "page": "e1",
+  "arm": "manager",
+  "model": "qwen2.5-coder:7b",
+  "generations": [
+    {
+      "generation": 1,
+      "name": "clear-filter control",
+      "startSha": "804c0df348efd054",
+      "exitCode": 0,
+      "status": "COMPLETE",
+      "accumulatedObligations": 3,
+      "newChecks": 2,
+      "accepted": true,
+      "calls": 2,
+      "attemptsRecorded": 2,
+      "attemptsInCorpus": 2,
+      "mismatch": {
+        "NOTHING_WORKED": 1,
+        "MET": 1
+      },
+      "regressionsProduced": 0,
+      "restored": 0,
+      "outputTokens": 94,
+      "generationSeconds": 74.8,
+      "wallSeconds": 113.4,
+      "producedSha": "68e758f07852047e",
+      "producedChars": 1077
+    },
+    {
+      "generation": 2,
+      "name": "reset key",
+      "startSha": "68e758f07852047e",
+      "exitCode": 0,
+      "status": "COMPLETE",
+      "accumulatedObligations": 6,
+      "newChecks": 1,
+      "accepted": true,
+      "calls": 1,
+      "attemptsRecorded": 1,
+      "attemptsInCorpus": 1,
+      "mismatch": {
+        "MET": 1
+      },
+      "regressionsProduced": 0,
+      "restored": 0,
+      "outputTokens": 31,
+      "generationSeconds": 1,
+      "wallSeconds": 20.2,
+      "producedSha": "dafba75ffc111f46",
+      "producedChars": 1201
+    },
+    {
+      "generation": 3,
+      "name": "match count",
+      "startSha": "dafba75ffc111f46",
+      "exitCode": 0,
+      "status": "COMPLETE",
+      "accumulatedObligations": 7,
+      "newChecks": 2,
+      "accepted": false,
+      "calls": 0,
+      "attemptsRecorded": 0,
+      "attemptsInCorpus": 0,
+      "mismatch": {},
+      "regressionsProduced": 0,
+      "restored": 0,
+      "outputTokens": 0,
+      "generationSeconds": 0,
+      "wallSeconds": 9.2
+    }
+  ],
+  "stoppedAt": 3,
+  "stoppedBecause": "generation 3 was not accepted",
+  "wallClockSeconds": 186.7,
+  "maxGpuSeconds": 1500,
+  "reached": 2,
+  "notReached": 0
+}

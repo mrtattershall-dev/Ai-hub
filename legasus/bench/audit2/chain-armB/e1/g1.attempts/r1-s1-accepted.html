@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Glossary</title>
+<style>
+.off { display: none; }
+</style>
+</head>
+<body>
+<h2>Glossary</h2>
+<input id="lookup" type="text" placeholder="look up a term">
+<button id="clear-filter">Clear Filter</button>
+<dl id="terms">
+  <div class="entry"><dt>latency</dt></div>
+  <div class="entry"><dt>lattice</dt></div>
+  <div class="entry"><dt>buffer</dt></div>
+  <div class="entry"><dt>cursor</dt></div>
+  <div class="entry"><dt>daemon</dt></div>
+</dl>
+<script>
+var box = document.getElementById('lookup');
+var entries = document.querySelectorAll('#terms .entry');
+var clearFilterButton = document.getElementById('clear-filter');
+
+function narrow() {
+  var q = box.value.toLowerCase();
+  for (var i = 0; i < entries.length; i++) {
+    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;
+    entries[i].className = hit ? 'entry' : 'entry off';
+  }
+}
+
+function clearFilter() {
+  box.value = '';
+  for (var i = 0; i < entries.length; i++) {
+    entries[i].className = 'entry';
+  }
+}
+
+box.addEventListener('input', narrow);
+clearFilterButton.addEventListener('click', clearFilter);
+</script>
+</body>
+</html>

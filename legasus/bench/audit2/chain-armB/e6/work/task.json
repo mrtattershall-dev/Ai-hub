@@ -1,0 +1,259 @@
+{
+  "id": "chain-work-g1",
+  "group": "CHAIN",
+  "source": "internal",
+  "language": "javascript",
+  "kind": "build",
+  "generation": 1,
+  "generationName": "clear-filter control",
+  "ladderLength": 3,
+  "goal": "Add a control #clear-filter that clears the filter: clicking it empties #search and shows every item in the list again. Everything the page already does must keep working. The page is a single self-contained web page, index.html: plain HTML and JavaScript, no frameworks, no external files or CDNs.",
+  "requirement": {
+    "trigger": {
+      "kind": "click",
+      "selector": "#clear-filter"
+    },
+    "effects": [
+      "#search is empty",
+      "every item in the list is visible again"
+    ],
+    "invariants": [
+      "typing in the filter still narrows the list"
+    ]
+  },
+  "seed": {},
+  "requested": {
+    "play": {
+      "spec": {
+        "entry": "index.html",
+        "stateExpr": "window.app && window.app.state ? window.app.state() : null",
+        "contract": "accumulating obligations",
+        "steps": [
+          {
+            "n": 1,
+            "name": "loads with no page or console error, showing every item",
+            "do": [],
+            "expect": "errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Okafor\",\"Okamoto\",\"Lindqvist\",\"Ferreira\",\"Novak\"].includes(t))) === \"[\\\"Okafor\\\",\\\"Okamoto\\\",\\\"Lindqvist\\\",\\\"Ferreira\\\",\\\"Novak\\\"]\""
+          },
+          {
+            "role": "setup",
+            "n": 2,
+            "name": "typing \"okaf\" narrows the list",
+            "do": [
+              {
+                "kind": "type",
+                "selector": "#search",
+                "text": "okaf"
+              }
+            ],
+            "expect": "JSON.stringify(dom.visible.filter((t) => [\"Okafor\",\"Okamoto\",\"Lindqvist\",\"Ferreira\",\"Novak\"].includes(t))) === \"[\\\"Okafor\\\"]\""
+          },
+          {
+            "role": "addition",
+            "n": 3,
+            "name": "clicking #clear-filter brings every item back",
+            "do": [
+              {
+                "kind": "click",
+                "selector": "#clear-filter"
+              }
+            ],
+            "expect": "JSON.stringify(dom.visible.filter((t) => [\"Okafor\",\"Okamoto\",\"Lindqvist\",\"Ferreira\",\"Novak\"].includes(t))) === \"[\\\"Okafor\\\",\\\"Okamoto\\\",\\\"Lindqvist\\\",\\\"Ferreira\\\",\\\"Novak\\\"]\""
+          },
+          {
+            "role": "addition",
+            "n": 4,
+            "name": "and leaves #search empty",
+            "do": [],
+            "expect": "dom.inputValues[\"#search\"] === ''"
+          },
+          {
+            "n": 5,
+            "name": "no page or console error was raised at any point",
+            "do": [],
+            "expect": "noErrors"
+          }
+        ],
+        "name": "g1-12345"
+      },
+      "steps": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  },
+  "accumulates": [],
+  "supersedes": [],
+  "protected": {
+    "plays": [
+      {
+        "from": "the page after generation 0",
+        "spec": {
+          "entry": "index.html",
+          "stateExpr": "window.app && window.app.state ? window.app.state() : null",
+          "contract": "accumulating obligations",
+          "steps": [
+            {
+              "n": 1,
+              "name": "loads with no page or console error, showing every item",
+              "do": [],
+              "expect": "errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Okafor\",\"Okamoto\",\"Lindqvist\",\"Ferreira\",\"Novak\"].includes(t))) === \"[\\\"Okafor\\\",\\\"Okamoto\\\",\\\"Lindqvist\\\",\\\"Ferreira\\\",\\\"Novak\\\"]\""
+            },
+            {
+              "role": "setup",
+              "n": 2,
+              "name": "typing \"okaf\" narrows the list",
+              "do": [
+                {
+                  "kind": "type",
+                  "selector": "#search",
+                  "text": "okaf"
+                }
+              ],
+              "expect": "JSON.stringify(dom.visible.filter((t) => [\"Okafor\",\"Okamoto\",\"Lindqvist\",\"Ferreira\",\"Novak\"].includes(t))) === \"[\\\"Okafor\\\"]\""
+            },
+            {
+              "n": 5,
+              "name": "no page or console error was raised at any point",
+              "do": [],
+              "expect": "noErrors"
+            }
+          ],
+          "name": "g1-125"
+        },
+        "steps": [
+          1,
+          2,
+          5
+        ]
+      }
+    ]
+  },
+  "diagnostic": {
+    "kind": "play",
+    "spec": {
+      "entry": "index.html",
+      "stateExpr": "window.app && window.app.state ? window.app.state() : null",
+      "contract": "accumulating obligations",
+      "steps": [
+        {
+          "n": 1,
+          "name": "loads with no page or console error, showing every item",
+          "do": [],
+          "expect": "errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Okafor\",\"Okamoto\",\"Lindqvist\",\"Ferreira\",\"Novak\"].includes(t))) === \"[\\\"Okafor\\\",\\\"Okamoto\\\",\\\"Lindqvist\\\",\\\"Ferreira\\\",\\\"Novak\\\"]\""
+        },
+        {
+          "role": "setup",
+          "n": 2,
+          "name": "typing \"okaf\" narrows the list",
+          "do": [
+            {
+              "kind": "type",
+              "selector": "#search",
+              "text": "okaf"
+            }
+          ],
+          "expect": "JSON.stringify(dom.visible.filter((t) => [\"Okafor\",\"Okamoto\",\"Lindqvist\",\"Ferreira\",\"Novak\"].includes(t))) === \"[\\\"Okafor\\\"]\""
+        },
+        {
+          "role": "addition",
+          "n": 3,
+          "name": "clicking #clear-filter brings every item back",
+          "do": [
+            {
+              "kind": "click",
+              "selector": "#clear-filter"
+            }
+          ],
+          "expect": "JSON.stringify(dom.visible.filter((t) => [\"Okafor\",\"Okamoto\",\"Lindqvist\",\"Ferreira\",\"Novak\"].includes(t))) === \"[\\\"Okafor\\\",\\\"Okamoto\\\",\\\"Lindqvist\\\",\\\"Ferreira\\\",\\\"Novak\\\"]\""
+        },
+        {
+          "role": "addition",
+          "n": 4,
+          "name": "and leaves #search empty",
+          "do": [],
+          "expect": "dom.inputValues[\"#search\"] === ''"
+        },
+        {
+          "n": 5,
+          "name": "no page or console error was raised at any point",
+          "do": [],
+          "expect": "noErrors"
+        }
+      ],
+      "name": "g1-12345"
+    },
+    "timeoutSec": 120
+  },
+  "upstreamCases": 5,
+  "protectedCases": 3,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "provenance": {
+    "baselineSha": "7dc7dab80b7cc35af745bc017636d587f30d5f2b3321deb2e49168e5523dba28",
+    "carriedSteps": [
+      1,
+      2,
+      5
+    ],
+    "additionSteps": [
+      3,
+      4
+    ],
+    "noErrorStep": 5,
+    "governedItems": [
+      "Okafor",
+      "Okamoto",
+      "Lindqvist",
+      "Ferreira",
+      "Novak"
+    ],
+    "matchedItems": [
+      "Okafor"
+    ],
+    "matchingTerm": "okaf",
+    "field": "#search",
+    "control": "#clear-filter",
+    "trigger": "Escape",
+    "counter": "#match-count",
+    "priorGenerations": [],
+    "emittedAt": "2026-09-28T14:57:37.451Z"
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        6
+      ],
+      "passed": [
+        6
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": {
+    "move": "CREATE_A_NEW_LISTENER",
+    "site": {
+      "insertAfterLine": 30,
+      "why": "at the end of the script, after every element and function the listener must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "a keydown listener"
+      ],
+      "attaches": [
+        "document"
+      ],
+      "calls": [
+        "narrow"
+      ]
+    },
+    "evidence": [
+      "the page has a zero-argument function narrow() that existing code calls after changing state",
+      "the requirement asks for key 'Escape', and no key listener is registered anywhere, so the requested listener must be created",
+      "the application is driven by browser.input - that informs how the effect is achieved, NOT whether the request is honoured",
+      "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "this application had no key handling before, so nothing establishes that a key press reaches it in the way the requirement assumes; the checks will settle it"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html><head><title>Glossary</title><style>.off{display:none}</style></head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n  }\n}\nbox.addEventListener('input', narrow);\nvar clearFilter = document.createElement('button');\nclearFilter.id = 'clear-filter';\nclearFilter.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function() {\n  box.value = '';\n  narrow();\n});\n// create a keydown listener and attach the handler that does the work\n// the page updates through narrow, which existing code calls after changing state\n// FACT: this file defines narrow()\n// FACT: a input on input#lookup handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// FACT line 14: box is declared `var`.\n// FACT line 29: existing code writes it as box.value = '';\n// FACT line 15: entries is declared `var`.\n// FACT line 20: existing code writes it as entries[i].className = hit ? 'entry' : 'entry off';\n// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+    "suffix": "\n</script>\n</body></html>\n"
+  },
+  "completion": {
+    "text": "box.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    box.value = '';\n    narrow();\n  }\n});",
+    "chars": 123,
+    "lines": 6,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "box.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    box.value = '';\n    narrow();\n  }\n});",
+    "chars": 123,
+    "lines": 6
+  },
+  "containment": {
+    "ok": true,
+    "text": "box.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    box.value = '';\n    narrow();\n  }\n});",
+    "codeLines": 6,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "afc96b12076992a6b77ec941c912a386cfed8ff6"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

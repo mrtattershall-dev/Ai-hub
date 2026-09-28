@@ -1,0 +1,337 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:43:59.094Z",
+  "experiment": "TRANSFER-3",
+  "task": "chain-work-g2",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\chain-armA\\e1\\work\\baseline-as-delivered.html",
+  "baselineSha": "68e758f07852047ea76980d155eabcd10e7cd8a96365d75474fa4fd8ac408e84",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true,
+    "guidance": "full"
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_NEW_LISTENER",
+      "why": "at the end of the script, after every element and function the listener must reference exists",
+      "insertAfterLine": 30,
+      "scaffold": "// FILL IN",
+      "instruction": "// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.",
+      "slotContract": "// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "// create a keydown listener and attach the handler that does the work\n// the page updates through narrow, which existing code calls after changing state\n// FACT: this file defines narrow()\n// FACT: a input on input#lookup handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// FACT line 14: box is declared `var`.\n// FACT line 29: existing code writes it as box.value = '';\n// FACT line 15: entries is declared `var`.\n// FACT line 20: existing code writes it as entries[i].className = hit ? 'entry' : 'entry off';",
+      "factsDelivered": 2,
+      "contextDropped": [
+        "narrow(): the whole redraw"
+      ],
+      "noFactsBecause": null,
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_NEW_LISTENER",
+        "site": {
+          "insertAfterLine": 30,
+          "why": "at the end of the script, after every element and function the listener must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "a keydown listener"
+          ],
+          "attaches": [
+            "document"
+          ],
+          "calls": [
+            "narrow"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function narrow() that existing code calls after changing state",
+          "the requirement asks for key 'Escape', and no key listener is registered anywhere, so the requested listener must be created",
+          "the application is driven by browser.input - that informs how the effect is achieved, NOT whether the request is honoured",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "this application had no key handling before, so nothing establishes that a key press reaches it in the way the requirement assumes; the checks will settle it"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html><head><title>Glossary</title><style>.off{display:none}</style></head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n  }\n}\nbox.addEventListener('input', narrow);\nvar clearFilter = document.createElement('button');\nclearFilter.id = 'clear-filter';\nclearFilter.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function() {\n  box.value = '';\n  narrow();\n});\n// create a keydown listener and attach the handler that does the work\n// the page updates through narrow, which existing code calls after changing state\n// FACT: this file defines narrow()\n// FACT: a input on input#lookup handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// FACT line 14: box is declared `var`.\n// FACT line 29: existing code writes it as box.value = '';\n// FACT line 15: entries is declared `var`.\n// FACT line 20: existing code writes it as entries[i].className = hit ? 'entry' : 'entry off';\n// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "41fe67a317ec8ab8839f0f349ac32b1637882e131e5e0593e325199ebc6f18da",
+      "suffixSha": "5c1404e034c7ec0d2b8ac19a6c1a2c4786dbd3037cbb48efdc8cfe4820c14aea",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "failing": [],
+          "visual": null,
+          "decision": {
+            "functional": "PASS",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 997,
+      "outputTokens": 31,
+      "promptTokens": 519,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "box.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    box.value = '';\n    narrow();\n  }\n});",
+        "chars": 123,
+        "lines": 6
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 8225,
+        "acceptanceMs": 19063
+      },
+      "containment": {
+        "ok": true,
+        "text": "box.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    box.value = '';\n    narrow();\n  }\n});",
+        "codeLines": 6,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "box.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    box.value = '';\n    narrow();\n  }\n});",
+        "chars": 123,
+        "lines": 6
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "failing": [],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"late\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #lookup empty\nPASS case 5  typing \"late\" narrows the list\nPASS case 6  pressing Escape brings every item back\nPASS case 7  no page or console error was raised at any point\nSUMMARY 7/7 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "lookup",
+            "terms",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "lookup",
+            "terms",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "afc96b12076992a6b77ec941c912a386cfed8ff6"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html><head><title>Glossary</title><style>.off{display:none}</style></head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n  }\n}\nbox.addEventListener('input', narrow);\nvar clearFilter = document.createElement('button');\nclearFilter.id = 'clear-filter';\nclearFilter.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function() {\n  box.value = '';\n  narrow();\n});\n// create a keydown listener and attach the handler that does the work\n// the page updates through narrow, which existing code calls after changing state\n// FACT: this file defines narrow()\n// FACT: a input on input#lookup handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// FACT line 14: box is declared `var`.\n// FACT line 29: existing code writes it as box.value = '';\n// FACT line 15: entries is declared `var`.\n// FACT line 20: existing code writes it as entries[i].className = hit ? 'entry' : 'entry off';\n// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.\nbox.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    box.value = '';\n    narrow();\n  }\n});\n</script>\n</body></html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "81c162a22f5d810eaed6d9fda03a6cc0dc6baa4cb5dbb8a2d35fb6f32058db2d",
+      "classification": {
+        "addition": {
+          "asked": [
+            6
+          ],
+          "passed": [
+            6
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r1-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 9,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "acceptedCandidate": "box.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    box.value = '';\n    narrow();\n  }\n});",
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 0,
+    "judged": 1,
+    "protectedFailures": 0,
+    "restored": 0,
+    "mismatch": {
+      "MET": 1
+    },
+    "partialEffects": 0,
+    "corpus": "legasus\\bench\\audit2\\chain-armA\\e1\\g2.attempts",
+    "generationSeconds": 1,
+    "wallClockSeconds": 20.2,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        7,
+        8
+      ],
+      "passed": [
+        7,
+        8
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        9
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a complete, working web page.\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>Glossary</title>\n<style>\n.off { display: none; }\n</style>\n</head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<button id=\"clear-filter\">Clear Filter</button>\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nvar clearFilterButton = document.getElementById('clear-filter');\n\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n  }\n}\n\nfunction clearFilter() {\n  box.value = '';\n  for (var i = 0; i < entries.length; i++) {\n    entries[i].className = 'entry';\n  }\n}\n\nbox.addEventListener('input', narrow);\nclearFilterButton.addEventListener('click', clearFilter);\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    for (var i = 0; i < entries.length; i++) {\n      entries[i].className = 'entry';\n    }\n  }\n});\n</script>\n</body>\n</html>\n\n\nChange it so that when text is typed into #lookup: #match-count shows how many items are visible. Ensure the clear control still works, and typing in the filter still narrows the list.\nEverything the page already does must keep working.\n\nReply with the COMPLETE updated page: a single HTML document from <!DOCTYPE html> to </html>.\nNo markdown fence, no explanation, no partial snippet, and no placeholder comments.\nKeep all existing markup and script, and create any new element with JavaScript DOM calls or markup as you prefer.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "```html\n<!DOCTYPE html>\n<html>\n<head>\n<title>Glossary</title>\n<style>\n.off { display: none; }\n</style>\n</head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"match-count\">0 items visible</div>\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nvar clearFilterButton = document.getElementById('clear-filter');\nvar matchCount = document.getElementById('match-count');\n\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  var count = 0;\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n    if (hit) count++;\n  }\n  matchCount.textContent = count + ' items visible';\n}\n\nfunction clearFilter() {\n  box.value = '';\n  for (var i = 0; i < entries.length; i++) {\n    entries[i].className = 'entry';\n  }\n  matchCount.textContent = entries.length + ' items visible';\n}\n\nbox.addEventListener('input', narrow);\nclearFilterButton.addEventListener('click', clearFilter);\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    for (var i = 0; i < entries.length; i++) {\n      entries[i].className = 'entry';\n    }\n    matchCount.textContent = entries.length + ' items visible';\n  }\n});\n</script>\n</body>\n</html>\n```",
+    "chars": 1658,
+    "lines": 61,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html>\n<head>\n<title>Glossary</title>\n<style>\n.off { display: none; }\n</style>\n</head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"match-count\">0 items visible</div>\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nvar clearFilterButton = document.getElementById('clear-filter');\nvar matchCount = document.getElementById('match-count');\n\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  var count = 0;\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n    if (hit) count++;\n  }\n  matchCount.textContent = count + ' items visible';\n}\n\nfunction clearFilter() {\n  box.value = '';\n  for (var i = 0; i < entries.length; i++) {\n    entries[i].className = 'entry';\n  }\n  matchCount.textContent = entries.length + ' items visible';\n}\n\nbox.addEventListener('input', narrow);\nclearFilterButton.addEventListener('click', clearFilter);\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    for (var i = 0; i < entries.length; i++) {\n      entries[i].className = 'entry';\n    }\n    matchCount.textContent = entries.length + ' items visible';\n  }\n});\n</script>\n</body>\n</html>",
+    "chars": 1646,
+    "lines": 59
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "06aad5c2804a23e7a1e38fca596162b63509747e"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

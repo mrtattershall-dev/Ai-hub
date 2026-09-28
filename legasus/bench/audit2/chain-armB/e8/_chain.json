@@ -1,0 +1,81 @@
+{
+  "at": "2026-09-28T14:58:06.186Z",
+  "page": "e8",
+  "arm": "direct",
+  "model": "qwen2.5-coder:7b",
+  "generations": [
+    {
+      "generation": 1,
+      "name": "clear-filter control",
+      "startSha": "738fc9872a388b35",
+      "exitCode": 0,
+      "status": "COMPLETE",
+      "accumulatedObligations": 3,
+      "newChecks": 2,
+      "accepted": true,
+      "calls": 1,
+      "attemptsRecorded": 1,
+      "attemptsInCorpus": 1,
+      "mismatch": {
+        "MET": 1
+      },
+      "regressionsProduced": 0,
+      "restored": 0,
+      "outputTokens": 310,
+      "generationSeconds": 8,
+      "wallSeconds": 25.9,
+      "producedSha": "95926634fd46f298",
+      "producedChars": 1145
+    },
+    {
+      "generation": 2,
+      "name": "reset key",
+      "startSha": "505e80948edcc8f9",
+      "exitCode": 0,
+      "status": "COMPLETE",
+      "accumulatedObligations": 6,
+      "newChecks": 1,
+      "accepted": true,
+      "calls": 1,
+      "attemptsRecorded": 1,
+      "attemptsInCorpus": 1,
+      "mismatch": {
+        "MET": 1
+      },
+      "regressionsProduced": 0,
+      "restored": 0,
+      "outputTokens": 356,
+      "generationSeconds": 5.3,
+      "wallSeconds": 25.8,
+      "producedSha": "4ca9fb6bb8bfa8dd",
+      "producedChars": 1360
+    },
+    {
+      "generation": 3,
+      "name": "match count",
+      "startSha": "89ce17342c59befa",
+      "exitCode": 0,
+      "status": "COMPLETE",
+      "accumulatedObligations": 7,
+      "newChecks": 2,
+      "accepted": true,
+      "calls": 1,
+      "attemptsRecorded": 1,
+      "attemptsInCorpus": 1,
+      "mismatch": {
+        "MET": 1
+      },
+      "regressionsProduced": 0,
+      "restored": 0,
+      "outputTokens": 453,
+      "generationSeconds": 6.2,
+      "wallSeconds": 29.8,
+      "producedSha": "3a8473fdb119e7ce",
+      "producedChars": 1824
+    }
+  ],
+  "wallClockSeconds": 119,
+  "maxGpuSeconds": 1500,
+  "reached": 3,
+  "notReached": 0
+}

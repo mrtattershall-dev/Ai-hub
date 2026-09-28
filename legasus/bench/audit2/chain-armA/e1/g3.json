@@ -1,0 +1,143 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:44:37.747Z",
+  "experiment": "TRANSFER-3",
+  "task": "chain-work-g3",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\chain-armA\\e1\\work\\baseline-as-delivered.html",
+  "baselineSha": "dafba75ffc111f4620ab1044e08920d0574c2d51ac2c4587d0aa35dc0ab40e9b",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true,
+    "guidance": "full"
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "declined": "DECLINE",
+      "needed": "this planner handles requirements triggered by a key press or a click; this one is {\"kind\":\"type\",\"selector\":\"#lookup\"}",
+      "proposal": {
+        "requestedEffect": {
+          "trigger": {
+            "kind": "type",
+            "selector": "#lookup"
+          },
+          "effects": [
+            "#match-count shows how many items are visible"
+          ],
+          "invariants": [
+            "the clear control still works",
+            "typing in the filter still narrows the list"
+          ],
+          "inUserTerms": "pressing undefined must result in: #match-count shows how many items are visible"
+        },
+        "relevantCode": {
+          "handlers": [
+            "input on input#lookup",
+            "click on button#clear-filter",
+            "keydown on input#lookup"
+          ],
+          "functions": [
+            "narrow"
+          ],
+          "state": [],
+          "notReachable": []
+        },
+        "move": "DECLINE",
+        "site": null,
+        "scope": null,
+        "needed": "this planner handles requirements triggered by a key press or a click; this one is {\"kind\":\"type\",\"selector\":\"#lookup\"}",
+        "evidence": [
+          "the page has a zero-argument function narrow() that existing code calls after changing state",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "preservationObligations": [
+          "every carried-forward check, exactly as recorded from the baseline",
+          "the confirmed behaviour: {\"kind\":\"type\",\"selector\":\"#lookup\",\"text\":\"glos\"} must still produce its effect",
+          "the confirmed behaviour: {\"kind\":\"type\",\"selector\":\"#lookup\",\"text\":\"zzqq\"} must still produce its effect"
+        ],
+        "uncertainty": [],
+        "declined": true,
+        "observationInformed": [
+          "browser.input"
+        ],
+        "note": "a proposal is a hypothesis about where work belongs. It is not permission to retain anything, and it does not define what the correct result is."
+      }
+    }
+  ],
+  "attempts": [],
+  "accepted": false,
+  "calls": 0,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 45,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 0,
+    "attemptsRecorded": 0,
+    "attemptsPreserved": 0,
+    "endedBecause": "rounds exhausted"
+  },
+  "totals": {
+    "additionAttemptCalls": 0,
+    "accepted": 0,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 0,
+    "judged": 0,
+    "protectedFailures": 0,
+    "restored": 0,
+    "mismatch": {},
+    "partialEffects": 0,
+    "corpus": "legasus\\bench\\audit2\\chain-armA\\e1\\g3.attempts",
+    "generationSeconds": 0,
+    "wallClockSeconds": 9.2,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

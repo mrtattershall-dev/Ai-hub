@@ -1,0 +1,239 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:58:53.427Z",
+  "experiment": "AUDIT-2",
+  "arm": "B_DIRECT",
+  "task": "chain-work-g2",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\chain-armB\\e8\\work\\baseline-as-delivered.html",
+  "baselineSha": "505e80948edcc8f90a50204060c6f2feb3e4e8f385e92023843702d3679e161f",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ],
+    "maxTokens": 3000
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "promptSha": "bab41899808cea7e173f0cf595c3f6234bbfcacca09b061295faab17624b4e31",
+      "promptChars": 1710,
+      "feedbackDelivered": null,
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "failing": []
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 5322,
+      "outputTokens": 356,
+      "promptTokens": 448,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "```html\n<!DOCTYPE html>\n<html>\n<head>\n  <title>Ledger</title>\n</head>\n<body>\n  <h2>Ledger</h2>\n  <input id=\"find\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <table id=\"book\"><tbody>\n    <tr class=\"line\"><td>Freight</td></tr>\n    <tr class=\"line\"><td>Freezer</td></tr>\n    <tr class=\"line\"><td>Postage</td></tr>\n    <tr class=\"line\"><td>Postal</td></tr>\n    <tr class=\"line\"><td>Utilities</td></tr>\n  </tbody></table>\n  <script>\n    var lines = [].slice.call(document.querySelectorAll('#book .line'));\n    var finder = document.getElementById('find');\n    var clearFilter = document.getElementById('clear-filter');\n\n    function sift() {\n      var q = finder.value.toLowerCase();\n      lines.forEach(function (tr) {\n        tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n      });\n    }\n\n    document.addEventListener('input', function (e) {\n      if (e.target && e.target.id === 'find') sift();\n    });\n\n    clearFilter.addEventListener('click', function () {\n      finder.value = '';\n      lines.forEach(function (tr) {\n        tr.style.display = '';\n      });\n    });\n\n    document.addEventListener('keydown', function (e) {\n      if (e.key === 'Escape') {\n        finder.value = '';\n        lines.forEach(function (tr) {\n          tr.style.display = '';\n        });\n      }\n    });\n  </script>\n</body>\n</html>\n```",
+        "chars": 1372,
+        "lines": 52
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 13752,
+        "acceptanceMs": 24850
+      },
+      "extraction": {
+        "ok": true,
+        "text": "<!DOCTYPE html>\n<html>\n<head>\n  <title>Ledger</title>\n</head>\n<body>\n  <h2>Ledger</h2>\n  <input id=\"find\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <table id=\"book\"><tbody>\n    <tr class=\"line\"><td>Freight</td></tr>\n    <tr class=\"line\"><td>Freezer</td></tr>\n    <tr class=\"line\"><td>Postage</td></tr>\n    <tr class=\"line\"><td>Postal</td></tr>\n    <tr class=\"line\"><td>Utilities</td></tr>\n  </tbody></table>\n  <script>\n    var lines = [].slice.call(document.querySelectorAll('#book .line'));\n    var finder = document.getElementById('find');\n    var clearFilter = document.getElementById('clear-filter');\n\n    function sift() {\n      var q = finder.value.toLowerCase();\n      lines.forEach(function (tr) {\n        tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n      });\n    }\n\n    document.addEventListener('input', function (e) {\n      if (e.target && e.target.id === 'find') sift();\n    });\n\n    clearFilter.addEventListener('click', function () {\n      finder.value = '';\n      lines.forEach(function (tr) {\n        tr.style.display = '';\n      });\n    });\n\n    document.addEventListener('keydown', function (e) {\n      if (e.key === 'Escape') {\n        finder.value = '';\n        lines.forEach(function (tr) {\n          tr.style.display = '';\n        });\n      }\n    });\n  </script>\n</body>\n</html>",
+        "scriptsChecked": 1
+      },
+      "transformedCandidate": {
+        "text": "<!DOCTYPE html>\n<html>\n<head>\n  <title>Ledger</title>\n</head>\n<body>\n  <h2>Ledger</h2>\n  <input id=\"find\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <table id=\"book\"><tbody>\n    <tr class=\"line\"><td>Freight</td></tr>\n    <tr class=\"line\"><td>Freezer</td></tr>\n    <tr class=\"line\"><td>Postage</td></tr>\n    <tr class=\"line\"><td>Postal</td></tr>\n    <tr class=\"line\"><td>Utilities</td></tr>\n  </tbody></table>\n  <script>\n    var lines = [].slice.call(document.querySelectorAll('#book .line'));\n    var finder = document.getElementById('find');\n    var clearFilter = document.getElementById('clear-filter');\n\n    function sift() {\n      var q = finder.value.toLowerCase();\n      lines.forEach(function (tr) {\n        tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n      });\n    }\n\n    document.addEventListener('input', function (e) {\n      if (e.target && e.target.id === 'find') sift();\n    });\n\n    clearFilter.addEventListener('click', function () {\n      finder.value = '';\n      lines.forEach(function (tr) {\n        tr.style.display = '';\n      });\n    });\n\n    document.addEventListener('keydown', function (e) {\n      if (e.key === 'Escape') {\n        finder.value = '';\n        lines.forEach(function (tr) {\n          tr.style.display = '';\n        });\n      }\n    });\n  </script>\n</body>\n</html>",
+        "chars": 1360,
+        "lines": 50
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "failing": [],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"frei\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #find empty\nPASS case 5  typing \"frei\" narrows the list\nPASS case 6  pressing Escape brings every item back\nPASS case 7  no page or console error was raised at any point\nSUMMARY 7/7 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "find",
+            "clear-filter",
+            "book"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "find",
+            "clear-filter",
+            "book"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "bf230fd0e26e3f9f34f7fc0f99d0712ca5c19d49"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html>\n<head>\n  <title>Ledger</title>\n</head>\n<body>\n  <h2>Ledger</h2>\n  <input id=\"find\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <table id=\"book\"><tbody>\n    <tr class=\"line\"><td>Freight</td></tr>\n    <tr class=\"line\"><td>Freezer</td></tr>\n    <tr class=\"line\"><td>Postage</td></tr>\n    <tr class=\"line\"><td>Postal</td></tr>\n    <tr class=\"line\"><td>Utilities</td></tr>\n  </tbody></table>\n  <script>\n    var lines = [].slice.call(document.querySelectorAll('#book .line'));\n    var finder = document.getElementById('find');\n    var clearFilter = document.getElementById('clear-filter');\n\n    function sift() {\n      var q = finder.value.toLowerCase();\n      lines.forEach(function (tr) {\n        tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n      });\n    }\n\n    document.addEventListener('input', function (e) {\n      if (e.target && e.target.id === 'find') sift();\n    });\n\n    clearFilter.addEventListener('click', function () {\n      finder.value = '';\n      lines.forEach(function (tr) {\n        tr.style.display = '';\n      });\n    });\n\n    document.addEventListener('keydown', function (e) {\n      if (e.key === 'Escape') {\n        finder.value = '';\n        lines.forEach(function (tr) {\n          tr.style.display = '';\n        });\n      }\n    });\n  </script>\n</body>\n</html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "4ca9fb6bb8bfa8dd8969e73619d38d3df45bff4920c9066e12275f77564cdac5",
+      "classification": {
+        "addition": {
+          "asked": [
+            6
+          ],
+          "passed": [
+            6
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r1-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "refused": 0,
+    "echoed": 0,
+    "noCompletePage": 0,
+    "scriptDoesNotParse": 0,
+    "judged": 1,
+    "mismatch": {
+      "MET": 1
+    },
+    "restored": 0,
+    "generationSeconds": 5.3,
+    "wallClockSeconds": 25.8,
+    "interventionsByAPerson": 0,
+    "corpus": "legasus\\bench\\audit2\\chain-armB\\e8\\g2.attempts"
+  }
+}

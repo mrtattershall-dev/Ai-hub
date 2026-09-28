@@ -1,0 +1,234 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:58:16.352Z",
+  "experiment": "AUDIT-2",
+  "arm": "B_DIRECT",
+  "task": "chain-work-g1",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\chain-armB\\e8\\work\\baseline-as-delivered.html",
+  "baselineSha": "738fc9872a388b355185d2c5ab5dc88d5128e1968977837128003e391e779d7a",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ],
+    "maxTokens": 3000
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "promptSha": "132ea12773e63bf5e0f903e83e7f70cf6bfd55b294b0fa801f7f7935a10ee3bf",
+      "promptChars": 1334,
+      "feedbackDelivered": null,
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "failing": []
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 8044,
+      "outputTokens": 310,
+      "promptTokens": 368,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "```html\n<!DOCTYPE html>\n<html>\n<head>\n  <title>Ledger</title>\n</head>\n<body>\n  <h2>Ledger</h2>\n  <input id=\"find\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <table id=\"book\"><tbody>\n    <tr class=\"line\"><td>Freight</td></tr>\n    <tr class=\"line\"><td>Freezer</td></tr>\n    <tr class=\"line\"><td>Postage</td></tr>\n    <tr class=\"line\"><td>Postal</td></tr>\n    <tr class=\"line\"><td>Utilities</td></tr>\n  </tbody></table>\n  <script>\n    var lines = [].slice.call(document.querySelectorAll('#book .line'));\n    var finder = document.getElementById('find');\n    var clearFilter = document.getElementById('clear-filter');\n\n    function sift() {\n      var q = finder.value.toLowerCase();\n      lines.forEach(function (tr) {\n        tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n      });\n    }\n\n    document.addEventListener('input', function (e) {\n      if (e.target && e.target.id === 'find') sift();\n    });\n\n    clearFilter.addEventListener('click', function () {\n      finder.value = '';\n      lines.forEach(function (tr) {\n        tr.style.display = '';\n      });\n    });\n  </script>\n</body>\n</html>\n```",
+        "chars": 1157,
+        "lines": 43
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 13506,
+        "acceptanceMs": 24241
+      },
+      "extraction": {
+        "ok": true,
+        "text": "<!DOCTYPE html>\n<html>\n<head>\n  <title>Ledger</title>\n</head>\n<body>\n  <h2>Ledger</h2>\n  <input id=\"find\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <table id=\"book\"><tbody>\n    <tr class=\"line\"><td>Freight</td></tr>\n    <tr class=\"line\"><td>Freezer</td></tr>\n    <tr class=\"line\"><td>Postage</td></tr>\n    <tr class=\"line\"><td>Postal</td></tr>\n    <tr class=\"line\"><td>Utilities</td></tr>\n  </tbody></table>\n  <script>\n    var lines = [].slice.call(document.querySelectorAll('#book .line'));\n    var finder = document.getElementById('find');\n    var clearFilter = document.getElementById('clear-filter');\n\n    function sift() {\n      var q = finder.value.toLowerCase();\n      lines.forEach(function (tr) {\n        tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n      });\n    }\n\n    document.addEventListener('input', function (e) {\n      if (e.target && e.target.id === 'find') sift();\n    });\n\n    clearFilter.addEventListener('click', function () {\n      finder.value = '';\n      lines.forEach(function (tr) {\n        tr.style.display = '';\n      });\n    });\n  </script>\n</body>\n</html>",
+        "scriptsChecked": 1
+      },
+      "transformedCandidate": {
+        "text": "<!DOCTYPE html>\n<html>\n<head>\n  <title>Ledger</title>\n</head>\n<body>\n  <h2>Ledger</h2>\n  <input id=\"find\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <table id=\"book\"><tbody>\n    <tr class=\"line\"><td>Freight</td></tr>\n    <tr class=\"line\"><td>Freezer</td></tr>\n    <tr class=\"line\"><td>Postage</td></tr>\n    <tr class=\"line\"><td>Postal</td></tr>\n    <tr class=\"line\"><td>Utilities</td></tr>\n  </tbody></table>\n  <script>\n    var lines = [].slice.call(document.querySelectorAll('#book .line'));\n    var finder = document.getElementById('find');\n    var clearFilter = document.getElementById('clear-filter');\n\n    function sift() {\n      var q = finder.value.toLowerCase();\n      lines.forEach(function (tr) {\n        tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n      });\n    }\n\n    document.addEventListener('input', function (e) {\n      if (e.target && e.target.id === 'find') sift();\n    });\n\n    clearFilter.addEventListener('click', function () {\n      finder.value = '';\n      lines.forEach(function (tr) {\n        tr.style.display = '';\n      });\n    });\n  </script>\n</body>\n</html>",
+        "chars": 1145,
+        "lines": 41
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "failing": [],
+        "total": 5,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"frei\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #find empty\nPASS case 5  no page or console error was raised at any point\nSUMMARY 5/5 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "find",
+            "clear-filter",
+            "book"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "find",
+            "clear-filter",
+            "book"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "becfdd2a29b22629b6d20d60ef0c88f11c64162d"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html>\n<head>\n  <title>Ledger</title>\n</head>\n<body>\n  <h2>Ledger</h2>\n  <input id=\"find\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <table id=\"book\"><tbody>\n    <tr class=\"line\"><td>Freight</td></tr>\n    <tr class=\"line\"><td>Freezer</td></tr>\n    <tr class=\"line\"><td>Postage</td></tr>\n    <tr class=\"line\"><td>Postal</td></tr>\n    <tr class=\"line\"><td>Utilities</td></tr>\n  </tbody></table>\n  <script>\n    var lines = [].slice.call(document.querySelectorAll('#book .line'));\n    var finder = document.getElementById('find');\n    var clearFilter = document.getElementById('clear-filter');\n\n    function sift() {\n      var q = finder.value.toLowerCase();\n      lines.forEach(function (tr) {\n        tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n      });\n    }\n\n    document.addEventListener('input', function (e) {\n      if (e.target && e.target.id === 'find') sift();\n    });\n\n    clearFilter.addEventListener('click', function () {\n      finder.value = '';\n      lines.forEach(function (tr) {\n        tr.style.display = '';\n      });\n    });\n  </script>\n</body>\n</html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "95926634fd46f298b189a0c76f1dcfd54ad2437de6c8d9d9c555377272edfcca",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4
+          ],
+          "passed": [
+            3,
+            4
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r1-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "refused": 0,
+    "echoed": 0,
+    "noCompletePage": 0,
+    "scriptDoesNotParse": 0,
+    "judged": 1,
+    "mismatch": {
+      "MET": 1
+    },
+    "restored": 0,
+    "generationSeconds": 8,
+    "wallClockSeconds": 25.9,
+    "interventionsByAPerson": 0,
+    "corpus": "legasus\\bench\\audit2\\chain-armB\\e8\\g1.attempts"
+  }
+}

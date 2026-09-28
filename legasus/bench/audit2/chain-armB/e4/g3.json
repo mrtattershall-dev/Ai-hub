@@ -1,0 +1,248 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:57:03.210Z",
+  "experiment": "AUDIT-2",
+  "arm": "B_DIRECT",
+  "task": "chain-work-g3",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\chain-armB\\e4\\work\\baseline-as-delivered.html",
+  "baselineSha": "2f1758775097b8852b37cfc008c15b06520e305e072b071e7ff5d152a88c8391",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ],
+    "maxTokens": 3000
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "promptSha": "f40509e9407f808e9d30208837102493221b78f78a8231d9566ad41214632631",
+      "promptChars": 1751,
+      "feedbackDelivered": null,
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "failing": []
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 6731,
+      "outputTokens": 365,
+      "promptTokens": 447,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "```html\n<!DOCTYPE html>\n<html>\n<head>\n  <title>Stock</title>\n</head>\n<body>\n  <h2>Stock</h2>\n  <input id=\"q\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <span id=\"match-count\">0 items visible</span>\n  <ul id=\"rows\">\n    <li class=\"row\">copper wire</li>\n    <li class=\"row\">copper pipe</li>\n    <li class=\"row\">steel plate</li>\n    <li class=\"row\">steel rod</li>\n    <li class=\"row\">brass fitting</li>\n    <li class=\"row\">nylon washer</li>\n  </ul>\n  <script>\n    const term = document.getElementById('q');\n    const rows = document.getElementById('rows');\n    const clearFilter = document.getElementById('clear-filter');\n    const matchCount = document.getElementById('match-count');\n\n    function redraw() {\n      const needle = term.value.trim().toLowerCase();\n      let visibleCount = 0;\n      Array.prototype.forEach.call(rows.children, function (li) {\n        li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;\n        if (!li.hidden) {\n          visibleCount++;\n        }\n      });\n      matchCount.textContent = `${visibleCount} items visible`;\n    }\n\n    term.addEventListener('input', redraw);\n    clearFilter.addEventListener('click', function() {\n      term.value = '';\n      redraw();\n    });\n\n    document.addEventListener('keydown', function(event) {\n      if (event.key === 'Escape') {\n        term.value = '';\n        redraw();\n      }\n    });\n\n    redraw();\n  </script>\n</body>\n</html>\n```",
+        "chars": 1461,
+        "lines": 55
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 11943,
+        "acceptanceMs": 23871
+      },
+      "extraction": {
+        "ok": true,
+        "text": "<!DOCTYPE html>\n<html>\n<head>\n  <title>Stock</title>\n</head>\n<body>\n  <h2>Stock</h2>\n  <input id=\"q\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <span id=\"match-count\">0 items visible</span>\n  <ul id=\"rows\">\n    <li class=\"row\">copper wire</li>\n    <li class=\"row\">copper pipe</li>\n    <li class=\"row\">steel plate</li>\n    <li class=\"row\">steel rod</li>\n    <li class=\"row\">brass fitting</li>\n    <li class=\"row\">nylon washer</li>\n  </ul>\n  <script>\n    const term = document.getElementById('q');\n    const rows = document.getElementById('rows');\n    const clearFilter = document.getElementById('clear-filter');\n    const matchCount = document.getElementById('match-count');\n\n    function redraw() {\n      const needle = term.value.trim().toLowerCase();\n      let visibleCount = 0;\n      Array.prototype.forEach.call(rows.children, function (li) {\n        li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;\n        if (!li.hidden) {\n          visibleCount++;\n        }\n      });\n      matchCount.textContent = `${visibleCount} items visible`;\n    }\n\n    term.addEventListener('input', redraw);\n    clearFilter.addEventListener('click', function() {\n      term.value = '';\n      redraw();\n    });\n\n    document.addEventListener('keydown', function(event) {\n      if (event.key === 'Escape') {\n        term.value = '';\n        redraw();\n      }\n    });\n\n    redraw();\n  </script>\n</body>\n</html>",
+        "scriptsChecked": 1
+      },
+      "transformedCandidate": {
+        "text": "<!DOCTYPE html>\n<html>\n<head>\n  <title>Stock</title>\n</head>\n<body>\n  <h2>Stock</h2>\n  <input id=\"q\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <span id=\"match-count\">0 items visible</span>\n  <ul id=\"rows\">\n    <li class=\"row\">copper wire</li>\n    <li class=\"row\">copper pipe</li>\n    <li class=\"row\">steel plate</li>\n    <li class=\"row\">steel rod</li>\n    <li class=\"row\">brass fitting</li>\n    <li class=\"row\">nylon washer</li>\n  </ul>\n  <script>\n    const term = document.getElementById('q');\n    const rows = document.getElementById('rows');\n    const clearFilter = document.getElementById('clear-filter');\n    const matchCount = document.getElementById('match-count');\n\n    function redraw() {\n      const needle = term.value.trim().toLowerCase();\n      let visibleCount = 0;\n      Array.prototype.forEach.call(rows.children, function (li) {\n        li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;\n        if (!li.hidden) {\n          visibleCount++;\n        }\n      });\n      matchCount.textContent = `${visibleCount} items visible`;\n    }\n\n    term.addEventListener('input', redraw);\n    clearFilter.addEventListener('click', function() {\n      term.value = '';\n      redraw();\n    });\n\n    document.addEventListener('keydown', function(event) {\n      if (event.key === 'Escape') {\n        term.value = '';\n        redraw();\n      }\n    });\n\n    redraw();\n  </script>\n</body>\n</html>",
+        "chars": 1449,
+        "lines": 53
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "failing": [],
+        "total": 9,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"copp\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #q empty\nPASS case 5  typing \"copp\" narrows the list\nPASS case 6  pressing Escape brings every item back\nPASS case 7  #match-count shows 6 at load\nPASS case 8  typing \"copp\" makes it show 2\nPASS case 9  no page or console error was raised at any point\nSUMMARY 9/9 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "clear-filter",
+            "match-count",
+            "rows"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "clear-filter",
+            "match-count",
+            "rows"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "edc724076c5f559db116f37145f0fb1b372905b5"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html>\n<head>\n  <title>Stock</title>\n</head>\n<body>\n  <h2>Stock</h2>\n  <input id=\"q\" type=\"text\">\n  <button id=\"clear-filter\">Clear Filter</button>\n  <span id=\"match-count\">0 items visible</span>\n  <ul id=\"rows\">\n    <li class=\"row\">copper wire</li>\n    <li class=\"row\">copper pipe</li>\n    <li class=\"row\">steel plate</li>\n    <li class=\"row\">steel rod</li>\n    <li class=\"row\">brass fitting</li>\n    <li class=\"row\">nylon washer</li>\n  </ul>\n  <script>\n    const term = document.getElementById('q');\n    const rows = document.getElementById('rows');\n    const clearFilter = document.getElementById('clear-filter');\n    const matchCount = document.getElementById('match-count');\n\n    function redraw() {\n      const needle = term.value.trim().toLowerCase();\n      let visibleCount = 0;\n      Array.prototype.forEach.call(rows.children, function (li) {\n        li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;\n        if (!li.hidden) {\n          visibleCount++;\n        }\n      });\n      matchCount.textContent = `${visibleCount} items visible`;\n    }\n\n    term.addEventListener('input', redraw);\n    clearFilter.addEventListener('click', function() {\n      term.value = '';\n      redraw();\n    });\n\n    document.addEventListener('keydown', function(event) {\n      if (event.key === 'Escape') {\n        term.value = '';\n        redraw();\n      }\n    });\n\n    redraw();\n  </script>\n</body>\n</html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "59d5f3e951ece83e028f5c33f222218857aac646a492b156968bf2bea9e74493",
+      "classification": {
+        "addition": {
+          "asked": [
+            7,
+            8
+          ],
+          "passed": [
+            7,
+            8
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            9
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r1-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "refused": 0,
+    "echoed": 0,
+    "noCompletePage": 0,
+    "scriptDoesNotParse": 0,
+    "judged": 1,
+    "mismatch": {
+      "MET": 1
+    },
+    "restored": 0,
+    "generationSeconds": 6.7,
+    "wallClockSeconds": 24.8,
+    "interventionsByAPerson": 0,
+    "corpus": "legasus\\bench\\audit2\\chain-armB\\e4\\g3.attempts"
+  }
+}

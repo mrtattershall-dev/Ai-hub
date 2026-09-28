@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html><head><title>Glossary</title><style>.off{display:none}</style></head>
+<body>
+<h2>Glossary</h2>
+<input id="lookup" type="text" placeholder="look up a term">
+<dl id="terms">
+  <div class="entry"><dt>latency</dt></div>
+  <div class="entry"><dt>lattice</dt></div>
+  <div class="entry"><dt>buffer</dt></div>
+  <div class="entry"><dt>cursor</dt></div>
+  <div class="entry"><dt>daemon</dt></div>
+</dl>
+<script>
+var box = document.getElementById('lookup');
+var entries = document.querySelectorAll('#terms .entry');
+function narrow() {
+  var q = box.value.toLowerCase();
+  for (var i = 0; i < entries.length; i++) {
+    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;
+    entries[i].className = hit ? 'entry' : 'entry off';
+  }
+}
+box.addEventListener('input', narrow);
+var clearFilter = document.createElement('button');
+clearFilter.id = 'clear-filter';
+clearFilter.textContent = 'Clear Filter';
+document.body.appendChild(clearFilter);
+clearFilter.addEventListener('click', function() {
+  box.value = '';
+  narrow();
+});
+// create a keydown listener and attach the handler that does the work
+// the page updates through narrow, which existing code calls after changing state
+// FACT: this file defines narrow()
+// FACT: a input on input#lookup handler is registered
+// FACT: a click on button#clear-filter handler is registered
+// FACT line 14: box is declared `var`.
+// FACT line 29: existing code writes it as box.value = '';
+// FACT line 15: entries is declared `var`.
+// FACT line 20: existing code writes it as entries[i].className = hit ? 'entry' : 'entry off';
+// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.
+box.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    box.value = '';
+    narrow();
+  }
+});
+</script>
+</body></html>

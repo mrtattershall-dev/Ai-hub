@@ -1,0 +1,96 @@
+{
+  "entry": "index.html",
+  "stateExpr": "window.app && window.app.state ? window.app.state() : null",
+  "contract": "accumulating obligations",
+  "steps": [
+    {
+      "n": 1,
+      "name": "loads with no page or console error, showing every item",
+      "do": [],
+      "expect": "errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"latency\",\"lattice\",\"buffer\",\"cursor\",\"daemon\"].includes(t))) === \"[\\\"latency\\\",\\\"lattice\\\",\\\"buffer\\\",\\\"cursor\\\",\\\"daemon\\\"]\""
+    },
+    {
+      "role": "setup",
+      "n": 2,
+      "name": "typing \"late\" narrows the list",
+      "do": [
+        {
+          "kind": "type",
+          "selector": "#lookup",
+          "text": "late"
+        }
+      ],
+      "expect": "JSON.stringify(dom.visible.filter((t) => [\"latency\",\"lattice\",\"buffer\",\"cursor\",\"daemon\"].includes(t))) === \"[\\\"latency\\\"]\""
+    },
+    {
+      "role": "addition",
+      "n": 3,
+      "name": "clicking #clear-filter brings every item back",
+      "do": [
+        {
+          "kind": "click",
+          "selector": "#clear-filter"
+        }
+      ],
+      "expect": "JSON.stringify(dom.visible.filter((t) => [\"latency\",\"lattice\",\"buffer\",\"cursor\",\"daemon\"].includes(t))) === \"[\\\"latency\\\",\\\"lattice\\\",\\\"buffer\\\",\\\"cursor\\\",\\\"daemon\\\"]\""
+    },
+    {
+      "role": "addition",
+      "n": 4,
+      "name": "and leaves #lookup empty",
+      "do": [],
+      "expect": "dom.inputValues[\"#lookup\"] === ''"
+    },
+    {
+      "role": "setup",
+      "n": 5,
+      "name": "typing \"late\" narrows the list",
+      "do": [
+        {
+          "kind": "type",
+          "selector": "#lookup",
+          "text": "late"
+        }
+      ],
+      "expect": "JSON.stringify(dom.visible.filter((t) => [\"latency\",\"lattice\",\"buffer\",\"cursor\",\"daemon\"].includes(t))) === \"[\\\"latency\\\"]\""
+    },
+    {
+      "role": "addition",
+      "n": 6,
+      "name": "pressing Escape brings every item back",
+      "do": [
+        {
+          "kind": "key",
+          "key": "Escape"
+        }
+      ],
+      "expect": "JSON.stringify(dom.visible.filter((t) => [\"latency\",\"lattice\",\"buffer\",\"cursor\",\"daemon\"].includes(t))) === \"[\\\"latency\\\",\\\"lattice\\\",\\\"buffer\\\",\\\"cursor\\\",\\\"daemon\\\"]\""
+    },
+    {
+      "role": "addition",
+      "n": 7,
+      "name": "#match-count shows 5 at load",
+      "do": [],
+      "expect": "(dom.visible.join(' ').match(/(^|[^0-9])5([^0-9]|$)/) !== null)"
+    },
+    {
+      "role": "addition",
+      "n": 8,
+      "name": "typing \"late\" makes it show 1",
+      "do": [
+        {
+          "kind": "type",
+          "selector": "#lookup",
+          "text": "late"
+        }
+      ],
+      "expect": "(dom.visible.join(' ').match(/(^|[^0-9])1([^0-9]|$)/) !== null)"
+    },
+    {
+      "n": 9,
+      "name": "no page or console error was raised at any point",
+      "do": [],
+      "expect": "noErrors"
+    }
+  ]
+}

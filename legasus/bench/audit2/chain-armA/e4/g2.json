@@ -1,0 +1,985 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:47:45.208Z",
+  "experiment": "TRANSFER-3",
+  "task": "chain-work-g2",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\chain-armA\\e4\\work\\baseline-as-delivered.html",
+  "baselineSha": "c3c894edc3de0cefef7408f317ca98177f7e255b8d613713d6025b012046f44a",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true,
+    "guidance": "full"
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_NEW_LISTENER",
+      "why": "at the end of the script, after every element and function the listener must reference exists",
+      "insertAfterLine": 28,
+      "scaffold": "// FILL IN",
+      "instruction": "// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.",
+      "slotContract": "// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "// create a keydown listener and attach the handler that does the work\n// the page updates through redraw, which existing code calls after changing state\n// FACT: this file defines redraw()\n// FACT: a input on input#q handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// FACT line 15: term is declared `const` and holds a container.\n// FACT line 27: existing code writes it as term.value = '';",
+      "factsDelivered": 1,
+      "contextDropped": [
+        "uncertainty: the whole uncertainty",
+        "redraw(): the whole redraw",
+        "li: the whole constraint"
+      ],
+      "noFactsBecause": null,
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_NEW_LISTENER",
+        "site": {
+          "insertAfterLine": 28,
+          "why": "at the end of the script, after every element and function the listener must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "a keydown listener"
+          ],
+          "attaches": [
+            "document"
+          ],
+          "calls": [
+            "redraw"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function redraw() that existing code calls after changing state",
+          "the requirement asks for key 'Escape', and no key listener is registered anywhere, so the requested listener must be created",
+          "the application is driven by browser.input - that informs how the effect is achieved, NOT whether the request is honoured",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "this application had no key handling before, so nothing establishes that a key press reaches it in the way the requirement assumes; the checks will settle it"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html><head><title>Stock</title></head>\n<body>\n<h2>Stock</h2>\n<input id=\"q\" type=\"text\">\n<ul id=\"rows\">\n  <li class=\"row\">copper wire</li>\n  <li class=\"row\">copper pipe</li>\n  <li class=\"row\">steel plate</li>\n  <li class=\"row\">steel rod</li>\n  <li class=\"row\">brass fitting</li>\n  <li class=\"row\">nylon washer</li>\n</ul>\n<script>\nconst term = document.getElementById('q');\nconst rows = document.getElementById('rows');\nfunction redraw() {\n  const needle = term.value.trim().toLowerCase();\n  Array.prototype.forEach.call(rows.children, function (li) {\n    li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;\n  });\n}\nterm.addEventListener('input', redraw);\nredraw();\ndocument.getElementById('rows').insertAdjacentHTML('beforebegin', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  term.value = '';\n  redraw();\n});\n// create a keydown listener and attach the handler that does the work\n// the page updates through redraw, which existing code calls after changing state\n// FACT: this file defines redraw()\n// FACT: a input on input#q handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// FACT line 15: term is declared `const` and holds a container.\n// FACT line 27: existing code writes it as term.value = '';\n// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "7df4bea6ac7d9f0170ca8e388e7882cbfbc30b5a962f49d1cf8aba93674d4444",
+      "suffixSha": "5c1404e034c7ec0d2b8ac19a6c1a2c4786dbd3037cbb48efdc8cfe4820c14aea",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "failing": [
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "failing": [
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "failing": [
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "rule": "CREATE_A_NEW_LISTENER",
+      "why": "at the end of the script, after every element and function the listener must reference exists",
+      "insertAfterLine": 28,
+      "scaffold": "// FILL IN",
+      "instruction": "// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.",
+      "slotContract": "// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "// create a keydown listener and attach the handler that does the work\n// the page updates through redraw, which existing code calls after changing state\n// FACT: this file defines redraw()\n// FACT: a input on input#q handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// FACT line 15: term is declared `const` and holds a container.\n// FACT line 27: existing code writes it as term.value = '';",
+      "factsDelivered": 1,
+      "contextDropped": [
+        "uncertainty: the whole uncertainty",
+        "redraw(): the whole redraw",
+        "li: the whole constraint"
+      ],
+      "noFactsBecause": null,
+      "feedbackDelivered": "// CHECK 6 FAILED: pressing Escape brings every item back",
+      "proposal": {
+        "move": "CREATE_A_NEW_LISTENER",
+        "site": {
+          "insertAfterLine": 28,
+          "why": "at the end of the script, after every element and function the listener must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "a keydown listener"
+          ],
+          "attaches": [
+            "document"
+          ],
+          "calls": [
+            "redraw"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function redraw() that existing code calls after changing state",
+          "the requirement asks for key 'Escape', and no key listener is registered anywhere, so the requested listener must be created",
+          "the application is driven by browser.input - that informs how the effect is achieved, NOT whether the request is honoured",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "this application had no key handling before, so nothing establishes that a key press reaches it in the way the requirement assumes; the checks will settle it"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html><head><title>Stock</title></head>\n<body>\n<h2>Stock</h2>\n<input id=\"q\" type=\"text\">\n<ul id=\"rows\">\n  <li class=\"row\">copper wire</li>\n  <li class=\"row\">copper pipe</li>\n  <li class=\"row\">steel plate</li>\n  <li class=\"row\">steel rod</li>\n  <li class=\"row\">brass fitting</li>\n  <li class=\"row\">nylon washer</li>\n</ul>\n<script>\nconst term = document.getElementById('q');\nconst rows = document.getElementById('rows');\nfunction redraw() {\n  const needle = term.value.trim().toLowerCase();\n  Array.prototype.forEach.call(rows.children, function (li) {\n    li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;\n  });\n}\nterm.addEventListener('input', redraw);\nredraw();\ndocument.getElementById('rows').insertAdjacentHTML('beforebegin', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  term.value = '';\n  redraw();\n});\n// create a keydown listener and attach the handler that does the work\n// the page updates through redraw, which existing code calls after changing state\n// FACT: this file defines redraw()\n// FACT: a input on input#q handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// FACT line 15: term is declared `const` and holds a container.\n// FACT line 27: existing code writes it as term.value = '';\n// CHECK 6 FAILED: pressing Escape brings every item back\n// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "aff6da4e0ea1302478da585bafb968ef13a5211fbfdf1fe4e38a05cca188bae3",
+      "suffixSha": "5c1404e034c7ec0d2b8ac19a6c1a2c4786dbd3037cbb48efdc8cfe4820c14aea",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "failing": [],
+          "visual": null,
+          "decision": {
+            "functional": "PASS",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 902,
+      "outputTokens": 26,
+      "promptTokens": 448,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "term.addEventListener('keydown', function(event) {\n  if (event.key === 'Enter') {\n    redraw();\n  }\n});",
+        "chars": 103,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 11002,
+        "acceptanceMs": 21533
+      },
+      "containment": {
+        "ok": true,
+        "text": "term.addEventListener('keydown', function(event) {\n  if (event.key === 'Enter') {\n    redraw();\n  }\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "term.addEventListener('keydown', function(event) {\n  if (event.key === 'Enter') {\n    redraw();\n  }\n});",
+        "chars": 103,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          7
+        ],
+        "failing": [
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"copp\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #q empty\nPASS case 5  typing \"copp\" narrows the list\nFAIL case 6  pressing Escape brings every item back -> expected JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\",\\\"steel plate\\\",\\\"steel rod\\\",\\\"brass fitting\\\",\\\"nylon washer\\\"]\"; state null; visible [\"Stock\",\"Clear Filter\",\"copper wire\",\"copper pipe\"]\nPASS case 7  no page or console error was raised at any point\nSUMMARY 6/7 cases pass, 1 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "clear-filter",
+            "rows"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "clear-filter",
+            "rows"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "db923ad2a80b5d093ead948450d877d9fb280299"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "ad611ffe8977434a09cba5ac1caa2b8da6c3057335b06aeae5e91145bf0027af",
+      "classification": {
+        "addition": {
+          "asked": [
+            6
+          ],
+          "passed": [],
+          "failed": [
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r1-s1-rejected"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 869,
+      "outputTokens": 25,
+      "promptTokens": 448,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('rows').insertAdjacentHTML('beforebegin', '<button id=\"clear-filter\">Clear Filter</button>');",
+        "chars": 117,
+        "lines": 1
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 27378,
+        "acceptanceMs": 38407
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('rows').insertAdjacentHTML('beforebegin', '<button id=\"clear-filter\">Clear Filter</button>');",
+        "codeLines": 1,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('rows').insertAdjacentHTML('beforebegin', '<button id=\"clear-filter\">Clear Filter</button>');",
+        "chars": 117,
+        "lines": 1
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          7
+        ],
+        "failing": [
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"copp\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #q empty\nPASS case 5  typing \"copp\" narrows the list\nFAIL case 6  pressing Escape brings every item back -> expected JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\",\\\"steel plate\\\",\\\"steel rod\\\",\\\"brass fitting\\\",\\\"nylon washer\\\"]\"; state null; visible [\"Stock\",\"Clear Filter\",\"Clear Filter\",\"copper wire\",\"copper pipe\"]\nPASS case 7  no page or console error was raised at any point\nSUMMARY 6/7 cases pass, 1 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "clear-filter",
+            "clear-filter",
+            "rows"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "clear-filter",
+            "clear-filter",
+            "rows"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "93028b9d948cd82177de75b8a91250bb251d0637"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "d241e22ed32b6e1509de404e87150956f13e16b3c0b45bf72130951d5cabf87b",
+      "classification": {
+        "addition": {
+          "asked": [
+            6
+          ],
+          "passed": [],
+          "failed": [
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r1-s2-rejected"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 1709,
+      "outputTokens": 25,
+      "promptTokens": 448,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('rows').insertAdjacentHTML('beforebegin', '<button id=\"clear-filter\">Clear Filter</button>');",
+        "chars": 117,
+        "lines": 1
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 45854,
+        "acceptanceMs": 57642
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('rows').insertAdjacentHTML('beforebegin', '<button id=\"clear-filter\">Clear Filter</button>');",
+        "codeLines": 1,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('rows').insertAdjacentHTML('beforebegin', '<button id=\"clear-filter\">Clear Filter</button>');",
+        "chars": 117,
+        "lines": 1
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          7
+        ],
+        "failing": [
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"copp\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #q empty\nPASS case 5  typing \"copp\" narrows the list\nFAIL case 6  pressing Escape brings every item back -> expected JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\",\\\"steel plate\\\",\\\"steel rod\\\",\\\"brass fitting\\\",\\\"nylon washer\\\"]\"; state null; visible [\"Stock\",\"Clear Filter\",\"Clear Filter\",\"copper wire\",\"copper pipe\"]\nPASS case 7  no page or console error was raised at any point\nSUMMARY 6/7 cases pass, 1 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "clear-filter",
+            "clear-filter",
+            "rows"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "clear-filter",
+            "clear-filter",
+            "rows"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "93028b9d948cd82177de75b8a91250bb251d0637"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "d241e22ed32b6e1509de404e87150956f13e16b3c0b45bf72130951d5cabf87b",
+      "classification": {
+        "addition": {
+          "asked": [
+            6
+          ],
+          "passed": [],
+          "failed": [
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r1-s3-rejected"
+    },
+    {
+      "round": 2,
+      "seed": 1,
+      "generationMs": 935,
+      "outputTokens": 31,
+      "promptTokens": 461,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    term.value = '';\n    redraw();\n  }\n});",
+        "chars": 129,
+        "lines": 6
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 64027,
+        "acceptanceMs": 78049
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    term.value = '';\n    redraw();\n  }\n});",
+        "codeLines": 6,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    term.value = '';\n    redraw();\n  }\n});",
+        "chars": 129,
+        "lines": 6
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "failing": [],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"copp\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #q empty\nPASS case 5  typing \"copp\" narrows the list\nPASS case 6  pressing Escape brings every item back\nPASS case 7  no page or console error was raised at any point\nSUMMARY 7/7 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "clear-filter",
+            "rows"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "clear-filter",
+            "rows"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "9009e6eef2d8dec3a2192ee669daccfd59492f04"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html><head><title>Stock</title></head>\n<body>\n<h2>Stock</h2>\n<input id=\"q\" type=\"text\">\n<ul id=\"rows\">\n  <li class=\"row\">copper wire</li>\n  <li class=\"row\">copper pipe</li>\n  <li class=\"row\">steel plate</li>\n  <li class=\"row\">steel rod</li>\n  <li class=\"row\">brass fitting</li>\n  <li class=\"row\">nylon washer</li>\n</ul>\n<script>\nconst term = document.getElementById('q');\nconst rows = document.getElementById('rows');\nfunction redraw() {\n  const needle = term.value.trim().toLowerCase();\n  Array.prototype.forEach.call(rows.children, function (li) {\n    li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;\n  });\n}\nterm.addEventListener('input', redraw);\nredraw();\ndocument.getElementById('rows').insertAdjacentHTML('beforebegin', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  term.value = '';\n  redraw();\n});\n// create a keydown listener and attach the handler that does the work\n// the page updates through redraw, which existing code calls after changing state\n// FACT: this file defines redraw()\n// FACT: a input on input#q handler is registered\n// FACT: a click on button#clear-filter handler is registered\n// FACT line 15: term is declared `const` and holds a container.\n// FACT line 27: existing code writes it as term.value = '';\n// CHECK 6 FAILED: pressing Escape brings every item back\n// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    term.value = '';\n    redraw();\n  }\n});\n</script>\n</body></html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "62ec1051aa85baf6b419879f515c322c26b2b190c6a381c4a52b6c7f348ce59e",
+      "classification": {
+        "addition": {
+          "asked": [
+            6
+          ],
+          "passed": [
+            6
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r2-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 4,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 9,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "acceptedSeed": 1,
+  "acceptedRound": 2,
+  "acceptedCandidate": "document.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    term.value = '';\n    redraw();\n  }\n});",
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 4,
+    "attemptsRecorded": 4,
+    "attemptsPreserved": 4,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 4,
+    "accepted": 1,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 0,
+    "judged": 4,
+    "protectedFailures": 0,
+    "restored": 0,
+    "mismatch": {
+      "NOTHING_WORKED": 3,
+      "MET": 1
+    },
+    "partialEffects": 0,
+    "corpus": "legasus\\bench\\audit2\\chain-armA\\e4\\g2.attempts",
+    "generationSeconds": 4.4,
+    "wallClockSeconds": 79.1,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

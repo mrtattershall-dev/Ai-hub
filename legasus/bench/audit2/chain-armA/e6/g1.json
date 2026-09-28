@@ -1,0 +1,332 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:49:37.919Z",
+  "experiment": "TRANSFER-3",
+  "task": "chain-work-g1",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\chain-armA\\e6\\work\\baseline-as-delivered.html",
+  "baselineSha": "7dc7dab80b7cc35af745bc017636d587f30d5f2b3321deb2e49168e5523dba28",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true,
+    "guidance": "full"
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 24,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #search is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "slotContract": "// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through draw, which existing code calls after changing state\n// FACT: this file defines draw()\n// FACT: a input on input#search handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "noFactsBecause": "// the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 24,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "draw"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function draw() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html><head><title>Crew</title></head>\n<body>\n<h2>Crew</h2>\n<input id=\"search\" type=\"search\" placeholder=\"name\">\n<div id=\"people\">\n  <p class=\"who\">Okafor</p>\n  <p class=\"who\">Okamoto</p>\n  <p class=\"who\">Lindqvist</p>\n  <p class=\"who\">Ferreira</p>\n  <p class=\"who\">Novak</p>\n</div>\n<script>\nconst model = { query: '' };\nconst who = Array.from(document.querySelectorAll('#people .who'));\nconst draw = () => {\n  who.forEach((el) => {\n    el.style.display = el.textContent.toLowerCase().includes(model.query) ? 'block' : 'none';\n  });\n};\ndocument.getElementById('search').addEventListener('input', (e) => {\n  model.query = e.target.value.toLowerCase();\n  draw();\n});\ndraw();\n// create #clear-filter and attach the handler that does the work\n// the page updates through draw, which existing code calls after changing state\n// FACT: this file defines draw()\n// FACT: a input on input#search handler is registered\n// when #clear-filter is clicked: #search is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "c6fe52b9be50dad2863aeec42119a06c76307fa4e88d3bd4307b65550fdb6348",
+      "suffixSha": "5c1404e034c7ec0d2b8ac19a6c1a2c4786dbd3037cbb48efdc8cfe4820c14aea",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "failing": [],
+          "visual": null,
+          "decision": {
+            "functional": "PASS",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 1511,
+      "outputTokens": 56,
+      "promptTokens": 355,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('people').insertAdjacentHTML('beforeend', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});",
+        "chars": 273,
+        "lines": 6
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 6851,
+        "acceptanceMs": 15723
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('people').insertAdjacentHTML('beforeend', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});",
+        "codeLines": 6,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('people').insertAdjacentHTML('beforeend', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});",
+        "chars": 273,
+        "lines": 6
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "failing": [],
+        "total": 5,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"okaf\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #search empty\nPASS case 5  no page or console error was raised at any point\nSUMMARY 5/5 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "search",
+            "people",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "search",
+            "people",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "7ea2fe75900f65bef936d8294fdaaa686a3b7b30"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html><head><title>Crew</title></head>\n<body>\n<h2>Crew</h2>\n<input id=\"search\" type=\"search\" placeholder=\"name\">\n<div id=\"people\">\n  <p class=\"who\">Okafor</p>\n  <p class=\"who\">Okamoto</p>\n  <p class=\"who\">Lindqvist</p>\n  <p class=\"who\">Ferreira</p>\n  <p class=\"who\">Novak</p>\n</div>\n<script>\nconst model = { query: '' };\nconst who = Array.from(document.querySelectorAll('#people .who'));\nconst draw = () => {\n  who.forEach((el) => {\n    el.style.display = el.textContent.toLowerCase().includes(model.query) ? 'block' : 'none';\n  });\n};\ndocument.getElementById('search').addEventListener('input', (e) => {\n  model.query = e.target.value.toLowerCase();\n  draw();\n});\ndraw();\n// create #clear-filter and attach the handler that does the work\n// the page updates through draw, which existing code calls after changing state\n// FACT: this file defines draw()\n// FACT: a input on input#search handler is registered\n// when #clear-filter is clicked: #search is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\ndocument.getElementById('people').insertAdjacentHTML('beforeend', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});\n</script>\n</body></html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "64f1f52bb9e1a1e9d6969db405cb6641c97b78b28ad613360ae473686079baa0",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4
+          ],
+          "passed": [
+            3,
+            4
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r1-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 6,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "acceptedCandidate": "document.getElementById('people').insertAdjacentHTML('beforeend', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});",
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 0,
+    "judged": 1,
+    "protectedFailures": 0,
+    "restored": 0,
+    "mismatch": {
+      "MET": 1
+    },
+    "partialEffects": 0,
+    "corpus": "legasus\\bench\\audit2\\chain-armA\\e6\\g1.attempts",
+    "generationSeconds": 1.5,
+    "wallClockSeconds": 16.6,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

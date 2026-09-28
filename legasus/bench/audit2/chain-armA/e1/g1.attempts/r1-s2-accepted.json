@@ -1,0 +1,120 @@
+{
+  "round": 1,
+  "seed": 2,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4
+      ],
+      "passed": [
+        3,
+        4
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": {
+    "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+    "site": {
+      "insertAfterLine": 22,
+      "why": "at the end of the script, after every element and function it must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "#clear-filter"
+      ],
+      "attaches": [
+        "#clear-filter"
+      ],
+      "calls": [
+        "narrow"
+      ]
+    },
+    "evidence": [
+      "the page has a zero-argument function narrow() that existing code calls after changing state",
+      "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+      "the page's clickable controls are: none",
+      "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html><head><title>Glossary</title><style>.off{display:none}</style></head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n  }\n}\nbox.addEventListener('input', narrow);\n// create #clear-filter and attach the handler that does the work\n// the page updates through narrow, which existing code calls after changing state\n// FACT: this file defines narrow()\n// FACT: a input on input#lookup handler is registered\n// when #clear-filter is clicked: #lookup is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+    "suffix": "\n</script>\n</body></html>\n"
+  },
+  "completion": {
+    "text": "var clearFilter = document.createElement('button');\nclearFilter.id = 'clear-filter';\nclearFilter.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function() {\n  box.value = '';\n  narrow();\n});",
+    "chars": 251,
+    "lines": 8,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "var clearFilter = document.createElement('button');\nclearFilter.id = 'clear-filter';\nclearFilter.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function() {\n  box.value = '';\n  narrow();\n});",
+    "chars": 251,
+    "lines": 8
+  },
+  "containment": {
+    "ok": true,
+    "text": "var clearFilter = document.createElement('button');\nclearFilter.id = 'clear-filter';\nclearFilter.textContent = 'Clear Filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function() {\n  box.value = '';\n  narrow();\n});",
+    "codeLines": 8,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "0357c7e05fbd1a2a128664edf00877fa81be2632"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s2-accepted.html"
+}

@@ -1,0 +1,234 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:57:37.682Z",
+  "experiment": "AUDIT-2",
+  "arm": "B_DIRECT",
+  "task": "chain-work-g1",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\chain-armB\\e6\\work\\baseline-as-delivered.html",
+  "baselineSha": "7dc7dab80b7cc35af745bc017636d587f30d5f2b3321deb2e49168e5523dba28",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ],
+    "maxTokens": 3000
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "promptSha": "462dbca90045db6333126b95c3975a96164008857b562048be45175fcf10c60b",
+      "promptChars": 1260,
+      "feedbackDelivered": null,
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "failing": []
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 5353,
+      "outputTokens": 255,
+      "promptTokens": 349,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "```html\n<!DOCTYPE html>\n<html><head><title>Crew</title></head>\n<body>\n<h2>Crew</h2>\n<input id=\"search\" type=\"search\" placeholder=\"name\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"people\">\n  <p class=\"who\">Okafor</p>\n  <p class=\"who\">Okamoto</p>\n  <p class=\"who\">Lindqvist</p>\n  <p class=\"who\">Ferreira</p>\n  <p class=\"who\">Novak</p>\n</div>\n<script>\nconst model = { query: '' };\nconst who = Array.from(document.querySelectorAll('#people .who'));\nconst draw = () => {\n  who.forEach((el) => {\n    el.style.display = el.textContent.toLowerCase().includes(model.query) ? 'block' : 'none';\n  });\n};\ndocument.getElementById('search').addEventListener('input', (e) => {\n  model.query = e.target.value.toLowerCase();\n  draw();\n});\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});\ndraw();\n</script>\n</body></html>\n```",
+        "chars": 929,
+        "lines": 35
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 10450,
+        "acceptanceMs": 18613
+      },
+      "extraction": {
+        "ok": true,
+        "text": "<!DOCTYPE html>\n<html><head><title>Crew</title></head>\n<body>\n<h2>Crew</h2>\n<input id=\"search\" type=\"search\" placeholder=\"name\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"people\">\n  <p class=\"who\">Okafor</p>\n  <p class=\"who\">Okamoto</p>\n  <p class=\"who\">Lindqvist</p>\n  <p class=\"who\">Ferreira</p>\n  <p class=\"who\">Novak</p>\n</div>\n<script>\nconst model = { query: '' };\nconst who = Array.from(document.querySelectorAll('#people .who'));\nconst draw = () => {\n  who.forEach((el) => {\n    el.style.display = el.textContent.toLowerCase().includes(model.query) ? 'block' : 'none';\n  });\n};\ndocument.getElementById('search').addEventListener('input', (e) => {\n  model.query = e.target.value.toLowerCase();\n  draw();\n});\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});\ndraw();\n</script>\n</body></html>",
+        "scriptsChecked": 1
+      },
+      "transformedCandidate": {
+        "text": "<!DOCTYPE html>\n<html><head><title>Crew</title></head>\n<body>\n<h2>Crew</h2>\n<input id=\"search\" type=\"search\" placeholder=\"name\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"people\">\n  <p class=\"who\">Okafor</p>\n  <p class=\"who\">Okamoto</p>\n  <p class=\"who\">Lindqvist</p>\n  <p class=\"who\">Ferreira</p>\n  <p class=\"who\">Novak</p>\n</div>\n<script>\nconst model = { query: '' };\nconst who = Array.from(document.querySelectorAll('#people .who'));\nconst draw = () => {\n  who.forEach((el) => {\n    el.style.display = el.textContent.toLowerCase().includes(model.query) ? 'block' : 'none';\n  });\n};\ndocument.getElementById('search').addEventListener('input', (e) => {\n  model.query = e.target.value.toLowerCase();\n  draw();\n});\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});\ndraw();\n</script>\n</body></html>",
+        "chars": 917,
+        "lines": 33
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "failing": [],
+        "total": 5,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"okaf\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #search empty\nPASS case 5  no page or console error was raised at any point\nSUMMARY 5/5 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "search",
+            "clear-filter",
+            "people"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "search",
+            "clear-filter",
+            "people"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "064eaf29ee31c7e203a0b14331a00ecf39ae5ac1"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html><head><title>Crew</title></head>\n<body>\n<h2>Crew</h2>\n<input id=\"search\" type=\"search\" placeholder=\"name\">\n<button id=\"clear-filter\">Clear Filter</button>\n<div id=\"people\">\n  <p class=\"who\">Okafor</p>\n  <p class=\"who\">Okamoto</p>\n  <p class=\"who\">Lindqvist</p>\n  <p class=\"who\">Ferreira</p>\n  <p class=\"who\">Novak</p>\n</div>\n<script>\nconst model = { query: '' };\nconst who = Array.from(document.querySelectorAll('#people .who'));\nconst draw = () => {\n  who.forEach((el) => {\n    el.style.display = el.textContent.toLowerCase().includes(model.query) ? 'block' : 'none';\n  });\n};\ndocument.getElementById('search').addEventListener('input', (e) => {\n  model.query = e.target.value.toLowerCase();\n  draw();\n});\ndocument.getElementById('clear-filter').addEventListener('click', () => {\n  document.getElementById('search').value = '';\n  model.query = '';\n  draw();\n});\ndraw();\n</script>\n</body></html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "d4b82d179cdd0a4d50fd865fa7daec38ecc898b335e3c01ad92a975a062ab8f8",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4
+          ],
+          "passed": [
+            3,
+            4
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r1-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "refused": 0,
+    "echoed": 0,
+    "noCompletePage": 0,
+    "scriptDoesNotParse": 0,
+    "judged": 1,
+    "mismatch": {
+      "MET": 1
+    },
+    "restored": 0,
+    "generationSeconds": 5.4,
+    "wallClockSeconds": 19.4,
+    "interventionsByAPerson": 0,
+    "corpus": "legasus\\bench\\audit2\\chain-armB\\e6\\g1.attempts"
+  }
+}

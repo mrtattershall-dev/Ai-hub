@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Glossary</title>
+<style>
+.off { display: none; }
+</style>
+</head>
+<body>
+<h2>Glossary</h2>
+<input id="lookup" type="text" placeholder="look up a term">
+<button id="clear-filter">Clear Filter</button>
+<div id="match-count">0 items visible</div>
+<dl id="terms">
+  <div class="entry"><dt>latency</dt></div>
+  <div class="entry"><dt>lattice</dt></div>
+  <div class="entry"><dt>buffer</dt></div>
+  <div class="entry"><dt>cursor</dt></div>
+  <div class="entry"><dt>daemon</dt></div>
+</dl>
+<script>
+var box = document.getElementById('lookup');
+var entries = document.querySelectorAll('#terms .entry');
+var clearFilterButton = document.getElementById('clear-filter');
+var matchCount = document.getElementById('match-count');
+
+function narrow() {
+  var q = box.value.toLowerCase();
+  var count = 0;
+  for (var i = 0; i < entries.length; i++) {
+    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;
+    entries[i].className = hit ? 'entry' : 'entry off';
+    if (hit) count++;
+  }
+  matchCount.textContent = count + ' items visible';
+}
+
+function clearFilter() {
+  box.value = '';
+  for (var i = 0; i < entries.length; i++) {
+    entries[i].className = 'entry';
+  }
+  matchCount.textContent = entries.length + ' items visible';
+}
+
+box.addEventListener('input', narrow);
+clearFilterButton.addEventListener('click', clearFilter);
+
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    for (var i = 0; i < entries.length; i++) {
+      entries[i].className = 'entry';
+    }
+    matchCount.textContent = entries.length + ' items visible';
+  }
+});
+</script>
+</body>
+</html>

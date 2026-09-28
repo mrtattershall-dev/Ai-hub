@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html><head><title>Ledger</title></head>
+<body>
+<h2>Ledger</h2>
+<input id="find" type="text">
+<table id="book"><tbody>
+  <tr class="line"><td>Freight</td></tr>
+  <tr class="line"><td>Freezer</td></tr>
+  <tr class="line"><td>Postage</td></tr>
+  <tr class="line"><td>Postal</td></tr>
+  <tr class="line"><td>Utilities</td></tr>
+</tbody></table>
+<script>
+var lines = [].slice.call(document.querySelectorAll('#book .line'));
+var finder = document.getElementById('find');
+function sift() {
+  var q = finder.value.toLowerCase();
+  lines.forEach(function (tr) {
+    tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';
+  });
+}
+document.addEventListener('input', function (e) { if (e.target && e.target.id === 'find') sift(); });
+// create #clear-filter and attach the handler that does the work
+// the page updates through sift, which existing code calls after changing state
+// FACT: this file defines sift()
+// FACT: a input on document handler is registered
+// FACT: tr is written here and this file does not declare it.
+// FACT line 19: existing code writes it as tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';
+// when #clear-filter is clicked: #find is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+document.getElementById('book').insertAdjacentHTML('afterend', '<button id="clear-filter">Clear Filter</button>');
+document.getElementById('clear-filter').addEventListener('click', function () {
+  finder.value = '';
+  lines.forEach(function (tr) {
+    tr.style.display = '';
+  });
+});
+sift(); // initialize display based on initial filter value
+</script>
+</body></html>

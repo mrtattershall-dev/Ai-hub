@@ -1,0 +1,81 @@
+{
+  "at": "2026-09-28T14:44:47.031Z",
+  "page": "e4",
+  "arm": "manager",
+  "model": "qwen2.5-coder:7b",
+  "generations": [
+    {
+      "generation": 1,
+      "name": "clear-filter control",
+      "startSha": "001d4abc72c19208",
+      "exitCode": 0,
+      "status": "COMPLETE",
+      "accumulatedObligations": 3,
+      "newChecks": 2,
+      "accepted": true,
+      "calls": 4,
+      "attemptsRecorded": 4,
+      "attemptsInCorpus": 4,
+      "mismatch": {
+        "NOTHING_WORKED": 3,
+        "MET": 1
+      },
+      "regressionsProduced": 0,
+      "restored": 0,
+      "outputTokens": 183,
+      "generationSeconds": 79.2,
+      "wallSeconds": 150.8,
+      "producedSha": "c3c894edc3de0cef",
+      "producedChars": 972
+    },
+    {
+      "generation": 2,
+      "name": "reset key",
+      "startSha": "c3c894edc3de0cef",
+      "exitCode": 0,
+      "status": "COMPLETE",
+      "accumulatedObligations": 6,
+      "newChecks": 1,
+      "accepted": true,
+      "calls": 4,
+      "attemptsRecorded": 4,
+      "attemptsInCorpus": 4,
+      "mismatch": {
+        "NOTHING_WORKED": 3,
+        "MET": 1
+      },
+      "regressionsProduced": 0,
+      "restored": 0,
+      "outputTokens": 107,
+      "generationSeconds": 4.4,
+      "wallSeconds": 79.1,
+      "producedSha": "89534f9e0bd334d3",
+      "producedChars": 1102
+    },
+    {
+      "generation": 3,
+      "name": "match count",
+      "startSha": "89534f9e0bd334d3",
+      "exitCode": 0,
+      "status": "COMPLETE",
+      "accumulatedObligations": 7,
+      "newChecks": 2,
+      "accepted": false,
+      "calls": 0,
+      "attemptsRecorded": 0,
+      "attemptsInCorpus": 0,
+      "mismatch": {},
+      "regressionsProduced": 0,
+      "restored": 0,
+      "outputTokens": 0,
+      "generationSeconds": 0,
+      "wallSeconds": 8.7
+    }
+  ],
+  "stoppedAt": 3,
+  "stoppedBecause": "generation 3 was not accepted",
+  "wallClockSeconds": 281.9,
+  "maxGpuSeconds": 1500,
+  "reached": 2,
+  "notReached": 0
+}

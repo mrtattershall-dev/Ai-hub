@@ -1,0 +1,239 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:54:42.989Z",
+  "experiment": "AUDIT-2",
+  "arm": "B_DIRECT",
+  "task": "chain-work-g2",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\chain-armB\\e1\\work\\baseline-as-delivered.html",
+  "baselineSha": "d66f572ce0b324cd73e3c2660393ceb429c7b08339543944b7a3ad15001b4b58",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ],
+    "maxTokens": 3000
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "promptSha": "17f68b855f8fabb2d71aaa94e54ce3fa5a195a9322590cff271bd2f3a7a8a00c",
+      "promptChars": 1705,
+      "feedbackDelivered": null,
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "failing": []
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 5137,
+      "outputTokens": 370,
+      "promptTokens": 458,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "```html\n<!DOCTYPE html>\n<html>\n<head>\n<title>Glossary</title>\n<style>\n.off { display: none; }\n</style>\n</head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<button id=\"clear-filter\">Clear Filter</button>\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nvar clearFilterButton = document.getElementById('clear-filter');\n\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n  }\n}\n\nfunction clearFilter() {\n  box.value = '';\n  for (var i = 0; i < entries.length; i++) {\n    entries[i].className = 'entry';\n  }\n}\n\nbox.addEventListener('input', narrow);\nclearFilterButton.addEventListener('click', clearFilter);\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    for (var i = 0; i < entries.length; i++) {\n      entries[i].className = 'entry';\n    }\n  }\n});\n</script>\n</body>\n</html>\n```",
+        "chars": 1339,
+        "lines": 54
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 11730,
+        "acceptanceMs": 24313
+      },
+      "extraction": {
+        "ok": true,
+        "text": "<!DOCTYPE html>\n<html>\n<head>\n<title>Glossary</title>\n<style>\n.off { display: none; }\n</style>\n</head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<button id=\"clear-filter\">Clear Filter</button>\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nvar clearFilterButton = document.getElementById('clear-filter');\n\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n  }\n}\n\nfunction clearFilter() {\n  box.value = '';\n  for (var i = 0; i < entries.length; i++) {\n    entries[i].className = 'entry';\n  }\n}\n\nbox.addEventListener('input', narrow);\nclearFilterButton.addEventListener('click', clearFilter);\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    for (var i = 0; i < entries.length; i++) {\n      entries[i].className = 'entry';\n    }\n  }\n});\n</script>\n</body>\n</html>",
+        "scriptsChecked": 1
+      },
+      "transformedCandidate": {
+        "text": "<!DOCTYPE html>\n<html>\n<head>\n<title>Glossary</title>\n<style>\n.off { display: none; }\n</style>\n</head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<button id=\"clear-filter\">Clear Filter</button>\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nvar clearFilterButton = document.getElementById('clear-filter');\n\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n  }\n}\n\nfunction clearFilter() {\n  box.value = '';\n  for (var i = 0; i < entries.length; i++) {\n    entries[i].className = 'entry';\n  }\n}\n\nbox.addEventListener('input', narrow);\nclearFilterButton.addEventListener('click', clearFilter);\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    for (var i = 0; i < entries.length; i++) {\n      entries[i].className = 'entry';\n    }\n  }\n});\n</script>\n</body>\n</html>",
+        "chars": 1327,
+        "lines": 52
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "failing": [],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"late\" narrows the list\nPASS case 3  clicking #clear-filter brings every item back\nPASS case 4  and leaves #lookup empty\nPASS case 5  typing \"late\" narrows the list\nPASS case 6  pressing Escape brings every item back\nPASS case 7  no page or console error was raised at any point\nSUMMARY 7/7 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "lookup",
+            "clear-filter",
+            "terms"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "lookup",
+            "clear-filter",
+            "terms"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "18b15b994b441293940dec87ee73481496115fdb"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html>\n<head>\n<title>Glossary</title>\n<style>\n.off { display: none; }\n</style>\n</head>\n<body>\n<h2>Glossary</h2>\n<input id=\"lookup\" type=\"text\" placeholder=\"look up a term\">\n<button id=\"clear-filter\">Clear Filter</button>\n<dl id=\"terms\">\n  <div class=\"entry\"><dt>latency</dt></div>\n  <div class=\"entry\"><dt>lattice</dt></div>\n  <div class=\"entry\"><dt>buffer</dt></div>\n  <div class=\"entry\"><dt>cursor</dt></div>\n  <div class=\"entry\"><dt>daemon</dt></div>\n</dl>\n<script>\nvar box = document.getElementById('lookup');\nvar entries = document.querySelectorAll('#terms .entry');\nvar clearFilterButton = document.getElementById('clear-filter');\n\nfunction narrow() {\n  var q = box.value.toLowerCase();\n  for (var i = 0; i < entries.length; i++) {\n    var hit = entries[i].textContent.toLowerCase().indexOf(q) !== -1;\n    entries[i].className = hit ? 'entry' : 'entry off';\n  }\n}\n\nfunction clearFilter() {\n  box.value = '';\n  for (var i = 0; i < entries.length; i++) {\n    entries[i].className = 'entry';\n  }\n}\n\nbox.addEventListener('input', narrow);\nclearFilterButton.addEventListener('click', clearFilter);\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === 'Escape') {\n    for (var i = 0; i < entries.length; i++) {\n      entries[i].className = 'entry';\n    }\n  }\n});\n</script>\n</body>\n</html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "2658fcd5a4c43a45eb783cf4622d4a8bdaf9837e635f0dced4099ab7dc923c1e",
+      "classification": {
+        "addition": {
+          "asked": [
+            6
+          ],
+          "passed": [
+            6
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r1-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "refused": 0,
+    "echoed": 0,
+    "noCompletePage": 0,
+    "scriptDoesNotParse": 0,
+    "judged": 1,
+    "mismatch": {
+      "MET": 1
+    },
+    "restored": 0,
+    "generationSeconds": 5.1,
+    "wallClockSeconds": 25.3,
+    "interventionsByAPerson": 0,
+    "corpus": "legasus\\bench\\audit2\\chain-armB\\e1\\g2.attempts"
+  }
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html><head><title>Stock</title></head>
+<body>
+<h2>Stock</h2>
+<input id="q" type="text">
+<ul id="rows">
+  <li class="row">copper wire</li>
+  <li class="row">copper pipe</li>
+  <li class="row">steel plate</li>
+  <li class="row">steel rod</li>
+  <li class="row">brass fitting</li>
+  <li class="row">nylon washer</li>
+</ul>
+<script>
+const term = document.getElementById('q');
+const rows = document.getElementById('rows');
+function redraw() {
+  const needle = term.value.trim().toLowerCase();
+  Array.prototype.forEach.call(rows.children, function (li) {
+    li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;
+  });
+}
+term.addEventListener('input', redraw);
+redraw();
+document.getElementById('rows').insertAdjacentHTML('beforebegin', '<button id="clear-filter">Clear Filter</button>');
+document.getElementById('clear-filter').addEventListener('click', function() {
+  term.value = '';
+  redraw();
+});
+// create a keydown listener and attach the handler that does the work
+// the page updates through redraw, which existing code calls after changing state
+// FACT: this file defines redraw()
+// FACT: a input on input#q handler is registered
+// FACT: a click on button#clear-filter handler is registered
+// FACT line 15: term is declared `const` and holds a container.
+// FACT line 27: existing code writes it as term.value = '';
+// on this key: every item in the list is visible again. Ensure the clear control still works, and typing in the filter still narrows the list.
+term.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    redraw();
+  }
+});
+</script>
+</body></html>
