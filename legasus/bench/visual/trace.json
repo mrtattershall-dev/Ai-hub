@@ -1,0 +1,13 @@
+{
+  "note": "The expected totals at each step, written from the requirements by hand. They are NOT read from window.app.state() and NOT derived from any candidate, so a page whose accessor lies cannot influence them.",
+  "steps": [
+    { "key": null, "expect": { "playerA": 0, "playerB": 0 } },
+    { "key": "a",  "expect": { "playerA": 1, "playerB": 0 } },
+    { "key": "a",  "expect": { "playerA": 2, "playerB": 0 } },
+    { "key": "b",  "expect": { "playerA": 2, "playerB": 1 } },
+    { "key": "z",  "expect": { "playerA": 1, "playerB": 1 } },
+    { "key": "z",  "expect": { "playerA": 0, "playerB": 1 } },
+    { "key": "z",  "expect": { "playerA": 0, "playerB": 1 } },
+    { "key": "0",  "expect": { "playerA": 0, "playerB": 0 } }
+  ]
+}

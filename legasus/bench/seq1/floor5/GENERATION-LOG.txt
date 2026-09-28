@@ -1,0 +1,12 @@
+HAND-WRITTEN FIXTURE, not generated. It exists to test whether the task generator derives the floor
+from the LOAD VALUE rather than assuming zero, and whether the guidance can reach a non-zero floor.
+It is NOT evidence of transfer and NOT evidence about SEQ-1's zero-floor answer, which was correct
+for its own load value.
+
+out           baseline-as-delivered.html
+sha256        7b2b7070e5c6a9350e0632d28a5086a9f48c4f6addf3df039a4a75808193f578
+chars         989
+model         hand-written (no model call)
+outputTokens  0   doneReason stop   ms 0
+seamWording   firm + document-listener
+ask           FLOOR-5 BASE, hand-written. playerA starts at 5 and the reset is already present. The decrement is absent.

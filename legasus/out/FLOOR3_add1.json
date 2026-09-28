@@ -1,0 +1,247 @@
+{
+  "at": "2026-09-28T06:22:15.443Z",
+  "experiment": "TRANSFER-3",
+  "task": "set3-floor3",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\seq1\\floor3\\baseline-as-delivered.html",
+  "baselineSha": "fc0bf8f1566d41a8fb5e07e3b30849bc1153cb7efac443bf1b2006094a2f643f",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "R1",
+      "why": "a keydown listener already dispatches on key values and does not exclude this key, so a branch goes inside it",
+      "insertAfterLine": 16,
+      "scaffold": "            if (e.key === '0') {\n                // FILL IN\n            }",
+      "instruction": "// on this key: every piece of state is back to its starting value.",
+      "contextDelivered": "// FACT line 8: playerA is declared `let`.\n// FACT line 18: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// FACT line 9: playerB is declared `let`.",
+      "factsDelivered": 2,
+      "contextDropped": [
+        "updateScoreboard(): the whole redraw",
+        "ctx: the whole constraint"
+      ],
+      "feedbackDelivered": null,
+      "promptHeadSha": "323ac8d3c8506806bda24bb480a7ca601cfb77f3e56bcae2fa3357e53d48344f",
+      "suffixSha": "32ec3195a6acb561d6a8c59dccbc87f01c4279366b0cd09aeddc7ef1361247bf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "rule": "R2",
+      "why": "no existing keydown listener dispatches on key values, so a new listener goes after the last one",
+      "insertAfterLine": 19,
+      "scaffold": "        document.addEventListener('keydown', (e) => {\n            if (e.key !== '0') return;\n            // FILL IN\n        });",
+      "instruction": "// on this key: every piece of state is back to its starting value.",
+      "contextDelivered": "// FACT line 8: playerA is declared `let`.\n// FACT line 18: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// FACT line 9: playerB is declared `let`.",
+      "factsDelivered": 2,
+      "contextDropped": [
+        "updateScoreboard(): the whole redraw",
+        "ctx: the whole constraint"
+      ],
+      "feedbackDelivered": null,
+      "promptHeadSha": "a5ef3308cdc895a707e496e26b0bafb5799071bb48ddffa5236779f74141e363",
+      "suffixSha": "19e3b081094db945edd26451a0add4bd151e3b15bbb0d272536361edea6704da",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 49847,
+      "outputTokens": 400,
+      "promptTokens": 336,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "// FACT line 10: playerA is declared `let`.\n// FACT line 11: playerB is declared `let`.\n// FACT line 12: playerA is declared `let`.\n// FACT line 13: playerB is declared `let`.\n// FACT line 14: playerA is declared `let`.\n// FACT line 15: playerB is declared `let`.\n// FACT line 16: playerA is declared `let`.\n// FACT line 17: playerB is declared `let`.\n// FACT line 18: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// FACT line 19: playerB is declared `let`.\n// FACT line 20: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// FACT line 21: playerB is declared `let`.\n// FACT line 22: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// FACT line 23: playerB is declared `let`.\n// FACT line 24: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// FACT line 25: playerB is declared `let`.\n// FACT line 26: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// FACT line 27: playerB is declared `let`.\n// FACT line 28: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// FACT line 29: playerB is declared `let`.\n// FACT line 30: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n//",
+        "chars": 1304,
+        "lines": 22
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 36974,
+      "outputTokens": 400,
+      "promptTokens": 336,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "                // FACT line 10: playerA is declared `let`.\n                // FACT line 11: playerB is declared `let`.\n                // FACT line 12: playerA is declared `let`.\n                // FACT line 13: playerB is declared `let`.\n                // FACT line 14: playerA is declared `let`.\n                // FACT line 15: playerB is declared `let`.\n                // FACT line 16: playerA is declared `let`.\n                // FACT line 17: playerB is declared `let`.\n                // FACT line 18: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n                // FACT line 19: playerB is declared `let`.\n                // FACT line 20: playerA is declared `let`.\n                // FACT line 21: playerB is declared `let`.\n                // FACT line 22: playerA is declared `let`.\n                // FACT line 23: playerB is declared `let`.\n                // FACT line 24: playerA is declared `let`.\n                // FACT line 25: playerB is declared `let`.\n                // FACT line 26: playerA is declared `let`.\n                // FACT line 27: playerB is declared `let`.\n                // FACT line 28: playerA is declared `let`.\n                // FACT line 29: playerB is declared `let`.\n                // FACT line 30: playerA is declared `let`.\n                // FACT line 31: playerB is declared `let`.\n                // FACT line 32: playerA is declared `let`.\n                // FACT line 33: playerB is declared `let`.\n                // FACT line 34: playerA is declared `let`.\n                // FACT line 35: playerB",
+        "chars": 1594,
+        "lines": 26
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 34859,
+      "outputTokens": 400,
+      "promptTokens": 336,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "                // FACT line 10: playerA is declared `let`.\n                // FACT line 11: playerB is declared `let`.\n                // FACT line 12: playerA is declared `let`.\n                // FACT line 13: playerB is declared `let`.\n                // FACT line 14: playerA is declared `let`.\n                // FACT line 15: playerB is declared `let`.\n                // FACT line 16: playerA is declared `let`.\n                // FACT line 17: playerB is declared `let`.\n                // FACT line 18: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n                // FACT line 19: playerB is declared `let`.\n                // FACT line 20: playerA is declared `let`.\n                // FACT line 21: playerB is declared `let`.\n                // FACT line 22: playerA is declared `let`.\n                // FACT line 23: playerB is declared `let`.\n                // FACT line 24: playerA is declared `let`.\n                // FACT line 25: playerB is declared `let`.\n                // FACT line 26: playerA is declared `let`.\n                // FACT line 27: playerB is declared `let`.\n                // FACT line 28: playerA is declared `let`.\n                // FACT line 29: playerB is declared `let`.\n                // FACT line 30: playerA is declared `let`.\n                // FACT line 31: playerB is declared `let`.\n                // FACT line 32: playerA is declared `let`.\n                // FACT line 33: playerB is declared `let`.\n                // FACT line 34: playerA is declared `let`.\n                // FACT line 35: playerB",
+        "chars": 1594,
+        "lines": 26
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 2,
+      "seed": 1,
+      "generationMs": 39476,
+      "outputTokens": 400,
+      "promptTokens": 348,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "// playerA = 3;\n// playerB = 0;\n// FACT line 20: existing code writes it as if (e.key === 'b') { playerB++; updateScoreboard(); }\n// playerA = 3;\n// playerB = 1;\n// FACT line 22: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// playerA = 4;\n// playerB = 1;\n// FACT line 24: existing code writes it as if (e.key === 'b') { playerB++; updateScoreboard(); }\n// playerA = 4;\n// playerB = 2;\n// FACT line 26: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// playerA = 5;\n// playerB = 2;\n// FACT line 28: existing code writes it as if (e.key === 'b') { playerB++; updateScoreboard(); }\n// playerA = 5;\n// playerB = 3;\n// FACT line 30: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// playerA = 6;\n// playerB = 3;\n// FACT line 32: existing code writes it as if (e.key === 'b') { playerB++; updateScoreboard(); }\n// playerA = 6;\n// playerB = 4;\n// FACT line 34: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n// playerA = 7;\n// playerB = 4;\n// FACT line 36: existing code writes it as if (e.key === 'b') { playerB++; updateScoreboard(); }\n// playerA = 7;\n// playerB = 5",
+        "chars": 1200,
+        "lines": 29
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 2,
+      "seed": 2,
+      "generationMs": 33364,
+      "outputTokens": 400,
+      "promptTokens": 348,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "            // FACT line 10: playerA is declared `let`.\n            // FACT line 11: playerB is declared `let`.\n            // FACT line 12: playerA is declared `let`.\n            // FACT line 13: playerB is declared `let`.\n            // FACT line 14: playerA is declared `let`.\n            // FACT line 15: playerB is declared `let`.\n            // FACT line 16: playerA is declared `let`.\n            // FACT line 17: playerB is declared `let`.\n            // FACT line 18: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n            // FACT line 19: playerA is declared `let`.\n            // FACT line 20: playerB is declared `let`.\n            // FACT line 21: playerA is declared `let`.\n            // FACT line 22: playerB is declared `let`.\n            // FACT line 23: playerA is declared `let`.\n            // FACT line 24: playerB is declared `let`.\n            // FACT line 25: playerA is declared `let`.\n            // FACT line 26: playerB is declared `let`.\n            // FACT line 27: playerA is declared `let`.\n            // FACT line 28: playerB is declared `let`.\n            // FACT line 29: playerA is declared `let`.\n            // FACT line 30: playerB is declared `let`.\n            // FACT line 31: playerA is declared `let`.\n            // FACT line 32: playerB is declared `let`.\n            // FACT line 33: playerA is declared `let`.\n            // FACT line 34: playerB is declared `let`.\n            // FACT line 35: playerA",
+        "chars": 1490,
+        "lines": 26
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 2,
+      "seed": 3,
+      "generationMs": 35113,
+      "outputTokens": 400,
+      "promptTokens": 348,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "            // FACT line 10: playerA is declared `let`.\n            // FACT line 11: playerB is declared `let`.\n            // FACT line 12: playerA is declared `let`.\n            // FACT line 13: playerB is declared `let`.\n            // FACT line 14: playerA is declared `let`.\n            // FACT line 15: playerB is declared `let`.\n            // FACT line 16: playerA is declared `let`.\n            // FACT line 17: playerB is declared `let`.\n            // FACT line 18: existing code writes it as if (e.key === 'a') { playerA++; updateScoreboard(); }\n            // FACT line 19: playerA is declared `let`.\n            // FACT line 20: playerB is declared `let`.\n            // FACT line 21: playerA is declared `let`.\n            // FACT line 22: playerB is declared `let`.\n            // FACT line 23: playerA is declared `let`.\n            // FACT line 24: playerB is declared `let`.\n            // FACT line 25: playerA is declared `let`.\n            // FACT line 26: playerB is declared `let`.\n            // FACT line 27: playerA is declared `let`.\n            // FACT line 28: playerB is declared `let`.\n            // FACT line 29: playerA is declared `let`.\n            // FACT line 30: playerB is declared `let`.\n            // FACT line 31: playerA is declared `let`.\n            // FACT line 32: playerB is declared `let`.\n            // FACT line 33: playerA is declared `let`.\n            // FACT line 34: playerB is declared `let`.\n            // FACT line 35: playerA",
+        "chars": 1490,
+        "lines": 26
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    }
+  ],
+  "accepted": false,
+  "calls": 6,
+  "escalation": {
+    "afterRound": 1,
+    "reason": "every attempt at this site yielded no code",
+    "switchingTo": "R2"
+  },
+  "stoppedBecause": "no code at either scaffold shape",
+  "totals": {
+    "additionAttemptCalls": 6,
+    "accepted": 0,
+    "refused": 6,
+    "judged": 0,
+    "protectedFailures": 0,
+    "restored": 0,
+    "generationSeconds": 229.6,
+    "wallClockSeconds": 229.8,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

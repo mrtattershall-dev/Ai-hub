@@ -1,0 +1,262 @@
+{
+  "id": "set3-floor3",
+  "group": "SET3",
+  "source": "internal",
+  "language": "javascript",
+  "kind": "build",
+  "dependsOn": null,
+  "goal": "Continue the page already in index.html. Pressing 0 returns every piece of state to what it was when the page loaded. Everything that already works must keep working. The page is a single self-contained web page, index.html: plain HTML5 canvas and JavaScript, no frameworks, no external files or CDNs. The page must expose window.app.state() returning every piece of state it keeps.",
+  "requirement": {
+    "trigger": {
+      "kind": "key",
+      "key": "0"
+    },
+    "effects": [
+      "every piece of state is back to its starting value"
+    ],
+    "invariants": [
+      "the a key keeps working",
+      "everything that already works keeps working"
+    ]
+  },
+  "seed": {},
+  "requested": {
+    "play": {
+      "spec": {
+        "entry": "index.html",
+        "stateExpr": "window.app.state()",
+        "contract": "The page must expose window.app.state() returning every piece of state it keeps.",
+        "steps": [
+          {
+            "n": 1,
+            "name": "loads with no page or console error, in its starting state",
+            "do": [],
+            "expect": "errors.length === 0 && JSON.stringify(state) === \"{\\\"playerA\\\":3,\\\"playerB\\\":0}\""
+          },
+          {
+            "n": 2,
+            "name": "pressing a changes the state as it already did",
+            "do": [
+              {
+                "key": "a"
+              }
+            ],
+            "expect": "JSON.stringify(state) === \"{\\\"playerA\\\":4,\\\"playerB\\\":0}\""
+          },
+          {
+            "n": 3,
+            "name": "pressing a again changes it again",
+            "do": [
+              {
+                "key": "a"
+              }
+            ],
+            "expect": "JSON.stringify(state) === \"{\\\"playerA\\\":5,\\\"playerB\\\":0}\""
+          },
+          {
+            "n": 4,
+            "name": "pressing 0 returns every piece of state to its starting value",
+            "do": [
+              {
+                "key": "0"
+              }
+            ],
+            "expect": "JSON.stringify(state) === \"{\\\"playerA\\\":3,\\\"playerB\\\":0}\""
+          },
+          {
+            "n": 5,
+            "name": "pressing 0 again leaves it at the starting value",
+            "do": [
+              {
+                "key": "0"
+              }
+            ],
+            "expect": "JSON.stringify(state) === \"{\\\"playerA\\\":3,\\\"playerB\\\":0}\""
+          },
+          {
+            "n": 6,
+            "name": "after 0, pressing a still changes the state",
+            "do": [
+              {
+                "key": "a"
+              }
+            ],
+            "expect": "JSON.stringify(state) !== \"{\\\"playerA\\\":3,\\\"playerB\\\":0}\""
+          },
+          {
+            "n": 7,
+            "name": "no page or console error was raised at any point",
+            "do": [],
+            "expect": "noErrors"
+          }
+        ],
+        "name": "steps-1234567"
+      },
+      "steps": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    }
+  },
+  "accumulates": [
+    "the page as delivered"
+  ],
+  "supersedes": [],
+  "protected": {
+    "plays": [
+      {
+        "from": "the page as delivered",
+        "spec": {
+          "entry": "index.html",
+          "stateExpr": "window.app.state()",
+          "contract": "The page must expose window.app.state() returning every piece of state it keeps.",
+          "steps": [
+            {
+              "n": 1,
+              "name": "loads with no page or console error, in its starting state",
+              "do": [],
+              "expect": "errors.length === 0 && JSON.stringify(state) === \"{\\\"playerA\\\":3,\\\"playerB\\\":0}\""
+            },
+            {
+              "n": 2,
+              "name": "pressing a changes the state as it already did",
+              "do": [
+                {
+                  "key": "a"
+                }
+              ],
+              "expect": "JSON.stringify(state) === \"{\\\"playerA\\\":4,\\\"playerB\\\":0}\""
+            },
+            {
+              "n": 3,
+              "name": "pressing a again changes it again",
+              "do": [
+                {
+                  "key": "a"
+                }
+              ],
+              "expect": "JSON.stringify(state) === \"{\\\"playerA\\\":5,\\\"playerB\\\":0}\""
+            },
+            {
+              "n": 7,
+              "name": "no page or console error was raised at any point",
+              "do": [],
+              "expect": "noErrors"
+            }
+          ],
+          "name": "steps-1237"
+        },
+        "steps": [
+          1,
+          2,
+          3,
+          7
+        ]
+      }
+    ]
+  },
+  "diagnostic": {
+    "kind": "play",
+    "spec": {
+      "entry": "index.html",
+      "stateExpr": "window.app.state()",
+      "contract": "The page must expose window.app.state() returning every piece of state it keeps.",
+      "steps": [
+        {
+          "n": 1,
+          "name": "loads with no page or console error, in its starting state",
+          "do": [],
+          "expect": "errors.length === 0 && JSON.stringify(state) === \"{\\\"playerA\\\":3,\\\"playerB\\\":0}\""
+        },
+        {
+          "n": 2,
+          "name": "pressing a changes the state as it already did",
+          "do": [
+            {
+              "key": "a"
+            }
+          ],
+          "expect": "JSON.stringify(state) === \"{\\\"playerA\\\":4,\\\"playerB\\\":0}\""
+        },
+        {
+          "n": 3,
+          "name": "pressing a again changes it again",
+          "do": [
+            {
+              "key": "a"
+            }
+          ],
+          "expect": "JSON.stringify(state) === \"{\\\"playerA\\\":5,\\\"playerB\\\":0}\""
+        },
+        {
+          "n": 4,
+          "name": "pressing 0 returns every piece of state to its starting value",
+          "do": [
+            {
+              "key": "0"
+            }
+          ],
+          "expect": "JSON.stringify(state) === \"{\\\"playerA\\\":3,\\\"playerB\\\":0}\""
+        },
+        {
+          "n": 5,
+          "name": "pressing 0 again leaves it at the starting value",
+          "do": [
+            {
+              "key": "0"
+            }
+          ],
+          "expect": "JSON.stringify(state) === \"{\\\"playerA\\\":3,\\\"playerB\\\":0}\""
+        },
+        {
+          "n": 6,
+          "name": "after 0, pressing a still changes the state",
+          "do": [
+            {
+              "key": "a"
+            }
+          ],
+          "expect": "JSON.stringify(state) !== \"{\\\"playerA\\\":3,\\\"playerB\\\":0}\""
+        },
+        {
+          "n": 7,
+          "name": "no page or console error was raised at any point",
+          "do": [],
+          "expect": "noErrors"
+        }
+      ],
+      "name": "steps-1234567"
+    },
+    "timeoutSec": 90
+  },
+  "upstreamCases": 7,
+  "protectedCases": 4,
+  "provenance": {
+    "baselineSha": "fc0bf8f1566d41a8fb5e07e3b30849bc1153cb7efac443bf1b2006094a2f643f",
+    "triggerKey": "0",
+    "existingKeys": [
+      "a",
+      "b"
+    ],
+    "keyUsed": "a",
+    "loadState": {
+      "playerA": 3,
+      "playerB": 0
+    },
+    "after1": {
+      "playerA": 4,
+      "playerB": 0
+    },
+    "after2": {
+      "playerA": 5,
+      "playerB": 0
+    },
+    "emittedAt": "2026-09-28T06:22:03.183Z",
+    "note": "existing-behaviour expectations come from OBSERVATION; addition expectations come from the frozen rule"
+  }
+}

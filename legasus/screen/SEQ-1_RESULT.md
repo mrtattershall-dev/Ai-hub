@@ -96,6 +96,36 @@ heuristics with known holes in both directions:
 revisited state renders the same way" - that needs a state to be seen twice. An earlier version counted
 two distinct states as coverage for both rules, crediting a rule that had never run.
 
+## A USER-VISIBLE DEFECT, found after the fact by the second observation channel
+
+**SEQ-1's results above are unchanged by this. It is an additional finding, not a revision.**
+
+The page's canvas is **200 pixels wide**, and it draws `Player B` at `canvas.width - 110` = x 90 while
+`Player A` starts at x 10. Measured by painting each label alone and masking its ink:
+
+    "Player A: 0" at x=10    painted columns 11..107, 679 pixels inked
+    "Player B: 0" at x=90    painted columns 91..187, 694 pixels inked
+    PIXELS PAINTED BY BOTH   64
+
+**64 pixels are inked by both labels: the two scores visibly collide.** This was confirmed from painted
+pixels, not from `measureText`. Advance widths are the wrong instrument for the question - they include
+side bearings and exclude overhanging ink, so two advance spans can overlap with nothing painted twice and
+two that do not overlap can still collide. The advance metric said "overlap" here and so did the pixels,
+but only the second is the claim. A screenshot of the two together is at
+`legasus/out/visual/seq1-labels.png`.
+
+**The defect is in the page as delivered by the generator**, inherited unchanged by both additions. Neither
+addition introduced it and neither could have been expected to fix it - it was never in any requirement.
+
+**Why it matters here:** every check in SEQ-1 passed, twice over, and the reported state was correct at
+every step. A user looking at this scoreboard sees two overlapping numbers. That is the gap between
+"passed the checker" and "the software works", found by looking at the picture rather than the state - and
+it is exactly what a second observation channel is for.
+
+**What it is NOT:** it is not a failure of the additions, not a failure of the gate at what the gate was
+asked to judge, and not grounds for revising SEQ-1's verdicts. The 400-pixel layout used by the new visual
+fixture is a requirement of THAT fixture and is not applied retroactively to this page.
+
 ## What this establishes
 
 - **Established:** the frozen policy made two successive accepted additions to one program, the second
@@ -119,9 +149,10 @@ two distinct states as coverage for both rules, crediting a rule that had never 
 
 - **Not transfer.** The page is a development page and is now doubly so.
 - **Not that the software is CORRECT.** Two sources of evidence agree; both read the same state seam for
-  the primary judgement, and the second only looks for internal contradictions. For this page the stronger,
-  task-specific requirement is that **the displayed totals match the expected totals once rendering has
-  settled** - which is not yet checked, and is the next thing to build.
+  the primary judgement, and the second only looks for internal contradictions. **A third look - at the
+  picture - found a user-visible defect that both of them passed** (see above). For this page the stronger,
+  task-specific requirement is that the displayed totals match the expected totals once rendering has
+  settled; the checker for that now exists and this page is outside its supported layout.
 - **Not reproducible generation.** Addition 1 succeeded on its first seed; addition 2 needed a second round
   after three identical near-misses. Both were single successes and neither was repeated.
 - **Not a third addition.** Whether this keeps working as features accumulate is untested beyond two.

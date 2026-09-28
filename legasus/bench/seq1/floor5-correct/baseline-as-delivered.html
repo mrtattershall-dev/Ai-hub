@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Scoreboard</title></head>
+<body style="margin:0">
+<canvas id="scoreboard" width="400" height="100"></canvas>
+<script>
+// TEST VALIDATION, hand-written CORRECT: decrement floored at the LOAD VALUE 5.
+const canvas = document.getElementById('scoreboard');
+const ctx = canvas.getContext('2d');
+let playerA = 5;
+let playerB = 0;
+function updateScoreboard() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = '20px Arial';
+  ctx.fillStyle = '#000000';
+  ctx.fillText('Player A: ' + playerA, 10, 20);
+  ctx.fillText('Player B: ' + playerB, 290, 20);
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'a') { playerA++; updateScoreboard(); }
+  else if (e.key === 'b') { playerB++; updateScoreboard(); }
+  else if (e.key === '0') { playerA = 5; playerB = 0; updateScoreboard(); }
+  else if (e.key === 'z') { playerA = Math.max(5, playerA - 1); updateScoreboard(); }
+});
+
+updateScoreboard();
+window.app = { state: () => ({ playerA, playerB }) };
+</script></body></html>

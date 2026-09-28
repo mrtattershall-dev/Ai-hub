@@ -1,0 +1,12 @@
+HAND-WRITTEN FIXTURE, not generated. It exists to test whether the task generator derives the floor
+from the LOAD VALUE rather than assuming zero, and whether the guidance can reach a non-zero floor.
+It is NOT evidence of transfer and NOT evidence about SEQ-1's zero-floor answer, which was correct
+for its own load value.
+
+out           baseline-as-delivered.html
+sha256        df0bbb84c802925f5ce73f413f131ad2e72eb6b54e2a0eafd7133562960220db
+chars         1060
+model         hand-written (no model call)
+outputTokens  0   doneReason stop   ms 0
+seamWording   firm + document-listener
+ask           TEST VALIDATION, hand-written FAULTY: decrement floored at a HARDCODED 0. Must be rejected.

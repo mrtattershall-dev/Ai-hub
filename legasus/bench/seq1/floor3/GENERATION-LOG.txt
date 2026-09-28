@@ -1,0 +1,11 @@
+HAND-WRITTEN REGRESSION SUBJECT, not generated. It exists to test whether the task generator derives
+the floor from the LOAD VALUE rather than assuming zero, and whether the guidance can reach a non-zero
+floor. It is not evidence about SEQ-1, and it is not evidence of transfer: I wrote this page.
+
+out           baseline-as-delivered.html
+sha256        fc0bf8f1566d41a8fb5e07e3b30849bc1153cb7efac443bf1b2006094a2f643f
+chars         802
+model         hand-written (no model call)
+outputTokens  0   doneReason stop   ms 0
+seamWording   firm + document-listener
+ask           A scoreboard whose Player A counter starts at 3.

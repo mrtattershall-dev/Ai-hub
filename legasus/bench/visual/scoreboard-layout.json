@@ -1,0 +1,15 @@
+{
+  "note": "INDEPENDENTLY SPECIFIED, and a requirement OF THIS FIXTURE ONLY. Written from the requirement, not read from any candidate draw calls: reading the candidate to decide what it should have drawn would reproduce its mistake and call it agreement. It is NOT a retroactive requirement for SEQ-1, whose page is 200px wide and predates this fixture; that page is reported as outside this check supported layout, not as wrong totals.",
+  "pinned": {
+    "viewport": { "width": 800, "height": 600 },
+    "deviceScaleFactor": 1,
+    "font": "20px Arial",
+    "fillStyle": "#000000",
+    "textBaseline": "alphabetic"
+  },
+  "canvas": { "width": 400, "height": 100 },
+  "items": [
+    { "name": "playerA", "template": "Player A: {playerA}", "x": 10, "y": 20, "region": [0, 0, 190, 40] },
+    { "name": "playerB", "template": "Player B: {playerB}", "x": 290, "y": 20, "region": [280, 0, 400, 40] }
+  ]
+}
