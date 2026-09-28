@@ -1,0 +1,9 @@
+at            2026-09-28T07:18:17.107Z
+group         B
+out           baseline-as-delivered.html
+sha256        dc9a062d632c0b4dcef774a44228937e7365ec5669b4f61ce4fb764788f943c6
+chars         1661
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  325   doneReason stop   ms 28361
+seamWording   BATCH-1 frozen template, group B
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA page listing five contacts with a name and a role. A text input with id 'filter' hides the contacts whose name does not contain the typed text.\nREQUIRED, the page will be rejected without it: attach handling with\ndocument.addEventListener(...) on the document, not inline onclick attributes.\nREQUIRED, the page will be rejected without it: the last line of the script must be exactly\nwindow.app = { state: () => ({ ...<every piece of state the page keeps> }) }; so that automated\ntests can read the state.\nUse plain HTML and one inline <script>. No canvas. Plain JavaScript, no libraries."

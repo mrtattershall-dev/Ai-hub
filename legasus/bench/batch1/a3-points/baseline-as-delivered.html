@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Points Display</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            width: 400px;
+            height: 100px;
+            font: 20px Arial;
+            fillStyle: #000000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pointsCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('pointsCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let playerAScore = 0;
+        let playerBScore = 0;
+
+        function drawPoints() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillText(`Player A: ${playerAScore}`, 10, 20);
+            ctx.fillText(`Player B: ${playerBScore}`, 290, 20);
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowUp') {
+                playerAScore++;
+            } else if (event.key === 'ArrowDown') {
+                playerAScore--;
+            } else if (event.key === 'ArrowLeft') {
+                playerBScore--;
+            } else if (event.key === 'ArrowRight') {
+                playerBScore++;
+            }
+            drawPoints();
+        });
+
+        window.app = { state: () => ({ playerAScore, playerBScore }) };
+    </script>
+</body>
+</html>

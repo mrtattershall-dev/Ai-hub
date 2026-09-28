@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter Game</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            width: 400px;
+            height: 100px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const font = '20px Arial';
+        const color = '#000000';
+
+        let scoreA = 0;
+        let scoreB = 0;
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = font;
+            ctx.fillStyle = color;
+            ctx.fillText(`Player A: ${scoreA}`, 10, 20);
+            ctx.fillText(`Player B: ${scoreB}`, 290, 20);
+        }
+
+        function update() {
+            // Update game state here
+            // For example, increment scoreA or scoreB based on key presses
+            // Example: if (event.key === 'a') scoreA++;
+            // Example: if (event.key === 'b') scoreB++;
+        }
+
+        function handleKeyDown(event) {
+            update();
+            draw();
+        }
+
+        canvas.addEventListener('keydown', handleKeyDown);
+
+        window.app = { state: () => ({ scoreA, scoreB }) };
+    </script>
+</body>
+</html>

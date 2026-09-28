@@ -1,0 +1,393 @@
+{
+  "at": "2026-09-28T07:21:40.735Z",
+  "experiment": "TRANSFER-3",
+  "task": "set3-a1-scores",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\batch1\\a1-scores\\baseline-as-delivered.html",
+  "baselineSha": "4db84318c336068693a282574d91226f62dc47d1a738180a76142c205f77c4d4",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "R2",
+      "why": "no existing keydown listener dispatches on key values, so a new listener goes after the last one",
+      "insertAfterLine": 43,
+      "scaffold": "        document.addEventListener('keydown', (e) => {\n            if (e.key !== '0') return;\n            // FILL IN\n        });",
+      "instruction": "// on this key: every piece of state is back to its starting value.",
+      "contextDelivered": "// FACT line 22: playerAScore is declared `let`.\n// FACT line 33: existing code writes it as playerAScore += 1;\n// FACT line 23: playerBScore is declared `let`.\n// FACT line 34: existing code writes it as playerBScore += 1;",
+      "factsDelivered": 2,
+      "contextDropped": [
+        "drawScoreboard(): the whole redraw",
+        "updateScoreboard(): the whole redraw"
+      ],
+      "feedbackDelivered": null,
+      "promptHeadSha": "9c87b911a7c02c9f8d35f45e1612f437af2a540be42c6cb6f0464217d5effae9",
+      "suffixSha": "8b527894ed7b65fa55917cd8b18dec3feef8b86e902e81a8cdd903f2792c4ee8",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "BLOCKED_BY_VISUAL_CONTRACT",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "failing": [],
+          "visual": "DISPLAY_DOES_NOT_MATCH_EXPECTED",
+          "decision": {
+            "functional": "PASS",
+            "visual": "REQUIREMENT_FAILURE_WRONG_DISPLAY",
+            "render": "RENDER_AGREES (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "rule": "R2",
+      "why": "no existing keydown listener dispatches on key values, so a new listener goes after the last one",
+      "insertAfterLine": 43,
+      "scaffold": "        document.addEventListener('keydown', (e) => {\n            if (e.key !== '0') return;\n            // FILL IN\n        });",
+      "instruction": "// on this key: every piece of state is back to its starting value.",
+      "contextDelivered": "// FACT line 22: playerAScore is declared `let`.\n// FACT line 33: existing code writes it as playerAScore += 1;\n// FACT line 23: playerBScore is declared `let`.\n// FACT line 34: existing code writes it as playerBScore += 1;",
+      "factsDelivered": 2,
+      "contextDropped": [
+        "drawScoreboard(): the whole redraw",
+        "updateScoreboard(): the whole redraw"
+      ],
+      "feedbackDelivered": null,
+      "promptHeadSha": "9c87b911a7c02c9f8d35f45e1612f437af2a540be42c6cb6f0464217d5effae9",
+      "suffixSha": "8b527894ed7b65fa55917cd8b18dec3feef8b86e902e81a8cdd903f2792c4ee8",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "declined": "R1_UNAVAILABLE",
+      "needed": "a dispatching listener that does not exclude this key"
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 33099,
+      "outputTokens": 297,
+      "promptTokens": 464,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "// The state of the application is reset to its initial state.\n            playerAScore = 0;\n            playerBScore = 0;\n            drawScoreboard();\n        });\n\n        setInterval(drawScoreboard, 1000); // Update scoreboard every second\n        setInterval(updateScoreboard, 1000); // Update scoreboard every second\n\n        // FACT line 22: playerAScore is declared `let`.\n        // FACT line 33: existing code writes it as playerAScore += 1;\n        // FACT line 23: playerBScore is declared `let`.\n        // FACT line 34: existing code writes it as playerBScore += 1;\n// on this key: every piece of state is back to its starting value.\n// The state of the application is reset to its initial state.\n        document.addEventListener('keydown', (e) => {\n            if (e.key !== '0') return;\n            // FACT line 22: playerAScore is declared `let`.\n            // FACT line 33: existing code writes it as playerAScore += 1;\n            // FACT line 23: playerBScore is declared `let`.\n            // FACT line 34: existing code writes it as playerBScore += 1;\n// on this key: every piece of state is back to its starting value.\n// The state of the application is reset to its initial state.",
+        "chars": 1205,
+        "lines": 23
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 40481,
+        "acceptanceMs": 62540
+      },
+      "containment": {
+        "ok": true,
+        "text": "// The state of the application is reset to its initial state.\n            playerAScore = 0;\n            playerBScore = 0;\n            drawScoreboard();",
+        "codeLines": 3,
+        "truncatedAtLine": 5,
+        "droppedLines": 19,
+        "how": "truncated at the point where it would have closed a block it did not open (line 5), dropping 19 line(s)"
+      },
+      "transformedCandidate": {
+        "text": "// The state of the application is reset to its initial state.\n            playerAScore = 0;\n            playerBScore = 0;\n            drawScoreboard();",
+        "chars": 152,
+        "lines": 4
+      },
+      "extraction": {
+        "truncatedAtLine": 5,
+        "droppedLines": 19,
+        "how": "truncated at the point where it would have closed a block it did not open (line 5), dropping 19 line(s)"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "failing": [],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, in its starting state\nPASS case 2  pressing a changes the state as it already did\nPASS case 3  pressing a again changes it again\nPASS case 4  pressing 0 returns every piece of state to its starting value\nPASS case 5  pressing 0 again leaves it at the starting value\nPASS case 6  after 0, pressing a still changes the state\nPASS case 7  no page or console error was raised at any point\nSUMMARY 7/7 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "scoreboard"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "scoreboard"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "79004d97010680dab15971189b2f7b469a5c4ae0"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Scoreboard</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n            margin: 20px;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"scoreboard\" width=\"400\" height=\"100\"></canvas>\n    <script>\n        const canvas = document.getElementById('scoreboard');\n        const ctx = canvas.getContext('2d');\n        ctx.font = '20px Arial';\n        ctx.fillStyle = '#000000';\n\n        let playerAScore = 0;\n        let playerBScore = 0;\n\n        function drawScoreboard() {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            ctx.fillText(`Player A: ${playerAScore}`, 10, 20);\n            ctx.fillText(`Player B: ${playerBScore}`, 290, 20);\n        }\n\n        function updateScoreboard() {\n            // Simulate scoring logic\n            playerAScore += 1;\n            playerBScore += 1;\n            drawScoreboard();\n        }\n\n        document.addEventListener('keydown', (event) => {\n            if (event.key === 'a') {\n                updateScoreboard();\n            } else if (event.key === 'b') {\n                updateScoreboard();\n            }\n        });\n        document.addEventListener('keydown', (e) => {\n            if (e.key !== '0') return;\n            // FACT line 22: playerAScore is declared `let`.\n            // FACT line 33: existing code writes it as playerAScore += 1;\n            // FACT line 23: playerBScore is declared `let`.\n            // FACT line 34: existing code writes it as playerBScore += 1;\n// on this key: every piece of state is back to its starting value.\n// The state of the application is reset to its initial state.\n            playerAScore = 0;\n            playerBScore = 0;\n            drawScoreboard();\n        });\n\n        window.app = { state: () => ({ playerAScore, playerBScore }) };\n    </script>\n</body>\n</html>\n",
+      "visual": {
+        "verdict": "DISPLAY_DOES_NOT_MATCH_EXPECTED",
+        "evaluated": true,
+        "reason": null,
+        "mismatched": 4
+      },
+      "render": {
+        "verdict": "RENDER_AGREES",
+        "coverage": {
+          "functionalRuleExercised": true,
+          "revisitedStates": 2,
+          "injectiveRuleExercised": true,
+          "distinctStates": 3,
+          "observationsConsidered": 5
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": true,
+        "visualStatus": "REQUIREMENT_FAILURE_WRONG_DISPLAY",
+        "visualBlocking": true,
+        "visualEvaluated": true,
+        "renderStatus": "RENDER_AGREES",
+        "renderCoverage": {
+          "functionalRuleExercised": true,
+          "revisitedStates": 2,
+          "injectiveRuleExercised": true,
+          "distinctStates": 3,
+          "observationsConsidered": 5
+        },
+        "reasons": [
+          "the displayed values do not match the expected values at 4 step(s)"
+        ],
+        "advisories": [],
+        "summary": {
+          "functional": "PASS",
+          "visual": "REQUIREMENT_FAILURE_WRONG_DISPLAY",
+          "render": "RENDER_AGREES (advisory)"
+        }
+      },
+      "outcome": "BLOCKED_BY_VISUAL_CONTRACT",
+      "candidateSha": "9431c99bb895303c047ae102365f82f53c5dfc92b58bdadb4086683b176254df"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 34062,
+      "outputTokens": 400,
+      "promptTokens": 464,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "            // FACT line 24: playerAScore is declared `let`.\n            // FACT line 35: existing code writes it as playerAScore += 1;\n            // FACT line 25: playerBScore is declared `let`.\n            // FACT line 36: existing code writes it as playerBScore += 1;\n            // FACT line 26: playerAScore is declared `let`.\n            // FACT line 37: existing code writes it as playerAScore += 1;\n            // FACT line 27: playerAScore is declared `let`.\n            // FACT line 38: existing code writes it as playerAScore += 1;\n            // FACT line 29: playerAScore is declared `let`.\n            // FACT line 40: existing code writes it as playerAScore += 1;\n            // FACT line 41: playerAScore is declared `let`.\n            // FACT line 42: existing code writes it as playerAScore += 1;\n            // FACT line 43: playerAScore is declared `let`.\n            // FACT line 44: existing code writes it as playerAScore += 1;\n            // FACT line 45: playerAScore is declared `let`.\n            // FACT line 46: existing code writes it as playerAScore += 1;\n            // FACT line 47: playerAScore is declared `let`.\n            // FACT line 48: existing code writes it as playerAScore += 1;\n            // FACT line 49: playerAScore is declared `let`.\n            // FACT line 50: existing code writes it as playerAScore += 1;\n            // FACT line 51: playerAScore is declared `let`.\n            // FACT line 52: existing code writes it as playerAScore += 1;\n            // FACT line",
+        "chars": 1520,
+        "lines": 23
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 33381,
+      "outputTokens": 400,
+      "promptTokens": 464,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "            // FACT line 24: playerAScore is declared `let`.\n            // FACT line 35: existing code writes it as playerAScore += 1;\n            // FACT line 25: playerBScore is declared `let`.\n            // FACT line 36: existing code writes it as playerBScore += 1;\n            // FACT line 26: playerAScore is declared `let`.\n            // FACT line 37: existing code writes it as playerAScore += 1;\n            // FACT line 27: playerAScore is declared `let`.\n            // FACT line 38: existing code writes it as playerAScore += 1;\n            // FACT line 29: playerAScore is declared `let`.\n            // FACT line 40: existing code writes it as playerAScore += 1;\n            // FACT line 41: playerAScore is declared `let`.\n            // FACT line 42: existing code writes it as playerAScore += 1;\n            // FACT line 43: playerAScore is declared `let`.\n            // FACT line 44: existing code writes it as playerAScore += 1;\n            // FACT line 45: playerAScore is declared `let`.\n            // FACT line 46: existing code writes it as playerAScore += 1;\n            // FACT line 47: playerAScore is declared `let`.\n            // FACT line 48: existing code writes it as playerAScore += 1;\n            // FACT line 49: playerAScore is declared `let`.\n            // FACT line 50: existing code writes it as playerAScore += 1;\n            // FACT line 51: playerAScore is declared `let`.\n            // FACT line 52: existing code writes it as playerAScore += 1;\n            // FACT line",
+        "chars": 1520,
+        "lines": 23
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 2,
+      "seed": 1,
+      "generationMs": 32273,
+      "outputTokens": 400,
+      "promptTokens": 464,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "// FACT line 24: playerAScore is declared `let`.\n// FACT line 35: existing code writes it as playerAScore += 1;\n// FACT line 25: playerBScore is declared `let`.\n// FACT line 36: existing code writes it as playerBScore += 1;\n// FACT line 26: playerAScore is declared `let`.\n// FACT line 37: existing code writes it as playerAScore += 1;\n// FACT line 27: playerAScore is declared `let`.\n// FACT line 38: existing code writes it as playerAScore += 1;\n// FACT line 29: playerBScore is declared `let`.\n// FACT line 40: existing code writes it as playerBScore += 1;\n// FACT line 41: playerAScore is declared `let`.\n// FACT line 42: existing code writes it as playerAScore += 1;\n// FACT line 43: playerAScore is declared `let`.\n// FACT line 44: existing code writes it as playerAScore += 1;\n// FACT line 45: playerAScore is declared `let`.\n// FACT line 46: existing code writes it as playerAScore += 1;\n// FACT line 47: playerAScore is declared `let`.\n// FACT line 48: existing code writes it as playerAScore += 1;\n// FACT line 49: playerAScore is declared `let`.\n// FACT line 50: existing code writes it as playerAScore += 1;\n// FACT line 51: playerAScore is declared `let`.\n// FACT line 52: existing code writes it as playerAScore += 1;\n// FACT line 53: playerAScore is declared `let`.\n// FACT line 54: existing code writes it",
+        "chars": 1321,
+        "lines": 24
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 2,
+      "seed": 2,
+      "generationMs": 27371,
+      "outputTokens": 400,
+      "promptTokens": 464,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "            // FACT line 24: playerAScore is declared `let`.\n            // FACT line 35: existing code writes it as playerAScore += 1;\n            // FACT line 25: playerBScore is declared `let`.\n            // FACT line 36: existing code writes it as playerBScore += 1;\n            // FACT line 26: playerAScore is declared `let`.\n            // FACT line 37: existing code writes it as playerAScore += 1;\n            // FACT line 27: playerAScore is declared `let`.\n            // FACT line 38: existing code writes it as playerAScore += 1;\n            // FACT line 29: playerAScore is declared `let`.\n            // FACT line 40: existing code writes it as playerAScore += 1;\n            // FACT line 41: playerAScore is declared `let`.\n            // FACT line 42: existing code writes it as playerAScore += 1;\n            // FACT line 43: playerAScore is declared `let`.\n            // FACT line 44: existing code writes it as playerAScore += 1;\n            // FACT line 45: playerAScore is declared `let`.\n            // FACT line 46: existing code writes it as playerAScore += 1;\n            // FACT line 47: playerAScore is declared `let`.\n            // FACT line 48: existing code writes it as playerAScore += 1;\n            // FACT line 49: playerAScore is declared `let`.\n            // FACT line 50: existing code writes it as playerAScore += 1;\n            // FACT line 51: playerAScore is declared `let`.\n            // FACT line 52: existing code writes it as playerAScore += 1;\n            // FACT line",
+        "chars": 1520,
+        "lines": 23
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 2,
+      "seed": 3,
+      "generationMs": 28709,
+      "outputTokens": 400,
+      "promptTokens": 464,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "            // FACT line 24: playerAScore is declared `let`.\n            // FACT line 35: existing code writes it as playerAScore += 1;\n            // FACT line 25: playerBScore is declared `let`.\n            // FACT line 36: existing code writes it as playerBScore += 1;\n            // FACT line 26: playerAScore is declared `let`.\n            // FACT line 37: existing code writes it as playerAScore += 1;\n            // FACT line 27: playerAScore is declared `let`.\n            // FACT line 38: existing code writes it as playerAScore += 1;\n            // FACT line 29: playerAScore is declared `let`.\n            // FACT line 40: existing code writes it as playerAScore += 1;\n            // FACT line 41: playerAScore is declared `let`.\n            // FACT line 42: existing code writes it as playerAScore += 1;\n            // FACT line 43: playerAScore is declared `let`.\n            // FACT line 44: existing code writes it as playerAScore += 1;\n            // FACT line 45: playerAScore is declared `let`.\n            // FACT line 46: existing code writes it as playerAScore += 1;\n            // FACT line 47: playerAScore is declared `let`.\n            // FACT line 48: existing code writes it as playerAScore += 1;\n            // FACT line 49: playerAScore is declared `let`.\n            // FACT line 50: existing code writes it as playerAScore += 1;\n            // FACT line 51: playerAScore is declared `let`.\n            // FACT line 52: existing code writes it as playerAScore += 1;\n            // FACT line",
+        "chars": 1520,
+        "lines": 23
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    }
+  ],
+  "accepted": false,
+  "calls": 6,
+  "escalation": {
+    "afterRound": 2,
+    "reason": "every attempt at this site yielded no code",
+    "switchingTo": "R1"
+  },
+  "totals": {
+    "additionAttemptCalls": 6,
+    "accepted": 0,
+    "blockedByVisualContract": 1,
+    "visualNotEvaluated": 0,
+    "refused": 5,
+    "judged": 0,
+    "protectedFailures": 0,
+    "restored": 0,
+    "generationSeconds": 188.9,
+    "wallClockSeconds": 223.7,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

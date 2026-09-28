@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact List</title>
+</head>
+<body>
+    <h1>Contact List</h1>
+    <ul id="contacts">
+        <li>John Doe - Developer</li>
+        <li>Jane Smith - Designer</li>
+        <li>Mike Johnson - Manager</li>
+        <li>Emily Davis - Analyst</li>
+        <li>David Brown - Intern</li>
+    </ul>
+    <input type="text" id="filter" placeholder="Filter contacts...">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterInput = document.getElementById('filter');
+            const contactsList = document.getElementById('contacts');
+
+            filterInput.addEventListener('input', () => {
+                const searchText = filterInput.value.toLowerCase();
+                const filteredContacts = Array.from(contactsList.children).filter(contact => {
+                    const name = contact.textContent.split(' - ')[0].toLowerCase();
+                    return name.includes(searchText);
+                });
+
+                filteredContacts.forEach(contact => {
+                    if (!contact.classList.contains('hidden')) {
+                        contact.classList.remove('hidden');
+                    }
+                });
+
+                filteredContacts.forEach(contact => {
+                    if (contact.classList.contains('hidden')) {
+                        contact.classList.add('hidden');
+                    }
+                });
+            });
+
+            window.app = { state: () => ({ contacts }) };
+        });
+    </script>
+</body>
+</html>

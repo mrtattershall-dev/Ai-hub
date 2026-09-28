@@ -22,3 +22,9 @@ THE NEW ARMS AND THE DECISION RULE:
 THE VISUAL CONTRACT - written by hand from the requirement:
   a7bc24b05a21a86941f31bfd02905ba00f754db5b336b9c750ed274f4bb4eaf2      904  legasus/bench/visual/scoreboard-layout.json
   ce24b9cbcd482172cbf2201363466e3a67cffd3e5cc75277c7c14ccbae112b0d      741  legasus/bench/visual/trace.json
+
+AMENDMENT 2026-09-28, before BATCH-1 group A was run:
+  the frozen trace.json contains z-decrement steps that group A pages are never asked to implement.
+  Group A uses legasus/bench/visual/trace-reset-only.json instead, hashed here. The layout is unchanged.
+  925010b0b72da0a051c6f7bae90c631178f5173bce6f68d22a4c0506083cb358  legasus/bench/visual/trace-reset-only.json
+  This is an error in BATCH-1_DEFINITION caught before the run, not a change made after seeing results.

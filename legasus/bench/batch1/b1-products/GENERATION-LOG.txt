@@ -1,0 +1,9 @@
+at            2026-09-28T07:17:19.863Z
+group         B
+out           baseline-as-delivered.html
+sha256        dd07616f40d6c63bdf68c5fe3f51aa6245ceae06f7a47a74bc7cb6d680d918d1
+chars         1813
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  402   doneReason stop   ms 34360
+seamWording   BATCH-1 frozen template, group B
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA page listing five products, each with a name and a category. A text input with id 'filter' narrows the visible list to items whose name contains the typed text.\nREQUIRED, the page will be rejected without it: attach handling with\ndocument.addEventListener(...) on the document, not inline onclick attributes.\nREQUIRED, the page will be rejected without it: the last line of the script must be exactly\nwindow.app = { state: () => ({ ...<every piece of state the page keeps> }) }; so that automated\ntests can read the state.\nUse plain HTML and one inline <script>. No canvas. Plain JavaScript, no libraries."

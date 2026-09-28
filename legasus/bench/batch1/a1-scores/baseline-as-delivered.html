@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoreboard</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="scoreboard" width="400" height="100"></canvas>
+    <script>
+        const canvas = document.getElementById('scoreboard');
+        const ctx = canvas.getContext('2d');
+        ctx.font = '20px Arial';
+        ctx.fillStyle = '#000000';
+
+        let playerAScore = 0;
+        let playerBScore = 0;
+
+        function drawScoreboard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillText(`Player A: ${playerAScore}`, 10, 20);
+            ctx.fillText(`Player B: ${playerBScore}`, 290, 20);
+        }
+
+        function updateScoreboard() {
+            // Simulate scoring logic
+            playerAScore += 1;
+            playerBScore += 1;
+            drawScoreboard();
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'a') {
+                updateScoreboard();
+            } else if (event.key === 'b') {
+                updateScoreboard();
+            }
+        });
+
+        window.app = { state: () => ({ playerAScore, playerBScore }) };
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+at            2026-09-28T07:16:45.490Z
+group         A
+out           baseline-as-delivered.html
+sha256        812338c19d1351aa49f2981bca9be686c5f6b64ec6e77836fc50ede7cf20781e
+chars         1423
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  362   doneReason stop   ms 32896
+seamWording   BATCH-1 frozen template, group A
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nTwo counters side by side. Key a increments the left counter and key b the right.\nThe canvas must be exactly 400 wide and 100 high. Draw with font 20px Arial and\nfillStyle #000000. Draw 'Player A: <score>' at x=10 y=20 and 'Player B: <score>' at x=290 y=20.\nREQUIRED, the page will be rejected without it: attach key handling with\ndocument.addEventListener('keydown', ...) and NOT to the canvas element.\nREQUIRED, the page will be rejected without it: the last line of the script must be exactly\nwindow.app = { state: () => ({ ...<every piece of state the page keeps> }) }; so that automated\ntests can read the state.\nUse a single <canvas> and one inline <script>. Plain JavaScript, no libraries."

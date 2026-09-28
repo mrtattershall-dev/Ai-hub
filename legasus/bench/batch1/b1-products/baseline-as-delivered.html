@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+</head>
+<body>
+    <h1>Product List</h1>
+    <div id="product-list">
+        <div class="product">
+            <h2>Product 1</h2>
+            <p>Category: Electronics</p>
+        </div>
+        <div class="product">
+            <h2>Product 2</h2>
+            <p>Category: Clothing</p>
+        </div>
+        <div class="product">
+            <h2>Product 3</h2>
+            <p>Category: Books</p>
+        </div>
+        <div class="product">
+            <h2>Product 4</h2>
+            <p>Category: Electronics</p>
+        </div>
+        <div class="product">
+            <h2>Product 5</h2>
+            <p>Category: Clothing</p>
+        </div>
+    </div>
+    <input type="text" id="filter" placeholder="Filter products...">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterInput = document.getElementById('filter');
+            const productList = document.getElementById('product-list');
+
+            filterInput.addEventListener('input', () => {
+                const filterValue = filterInput.value.toLowerCase();
+                const products = productList.querySelectorAll('.product');
+
+                products.forEach(product => {
+                    const productName = product.querySelector('h2').textContent.toLowerCase();
+                    if (productName.includes(filterValue)) {
+                        product.style.display = '';
+                    } else {
+                        product.style.display = 'none';
+                    }
+                });
+            });
+
+            window.app = { state: () => ({ products }) };
+        });
+    </script>
+</body>
+</html>

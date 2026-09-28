@@ -1,0 +1,268 @@
+{
+  "id": "set3-a1-scores",
+  "group": "SET3",
+  "source": "internal",
+  "language": "javascript",
+  "kind": "build",
+  "dependsOn": null,
+  "goal": "Continue the page already in index.html. Pressing 0 returns every piece of state to what it was when the page loaded. Everything that already works must keep working. The page is a single self-contained web page, index.html: plain HTML5 canvas and JavaScript, no frameworks, no external files or CDNs. The page must expose window.app.state() returning every piece of state it keeps.",
+  "requirement": {
+    "trigger": {
+      "kind": "key",
+      "key": "0"
+    },
+    "effects": [
+      "every piece of state is back to its starting value"
+    ],
+    "invariants": [
+      "the a key keeps working",
+      "everything that already works keeps working"
+    ]
+  },
+  "seed": {},
+  "requested": {
+    "play": {
+      "spec": {
+        "entry": "index.html",
+        "stateExpr": "window.app.state()",
+        "contract": "The page must expose window.app.state() returning every piece of state it keeps.",
+        "steps": [
+          {
+            "n": 1,
+            "name": "loads with no page or console error, in its starting state",
+            "do": [],
+            "expect": "errors.length === 0 && JSON.stringify(state) === \"{\\\"playerAScore\\\":0,\\\"playerBScore\\\":0}\""
+          },
+          {
+            "n": 2,
+            "name": "pressing a changes the state as it already did",
+            "do": [
+              {
+                "key": "a"
+              }
+            ],
+            "expect": "JSON.stringify(state) === \"{\\\"playerAScore\\\":1,\\\"playerBScore\\\":1}\""
+          },
+          {
+            "n": 3,
+            "name": "pressing a again changes it again",
+            "do": [
+              {
+                "key": "a"
+              }
+            ],
+            "expect": "JSON.stringify(state) === \"{\\\"playerAScore\\\":2,\\\"playerBScore\\\":2}\""
+          },
+          {
+            "n": 4,
+            "name": "pressing 0 returns every piece of state to its starting value",
+            "do": [
+              {
+                "key": "0"
+              }
+            ],
+            "expect": "JSON.stringify(state) === \"{\\\"playerAScore\\\":0,\\\"playerBScore\\\":0}\""
+          },
+          {
+            "n": 5,
+            "name": "pressing 0 again leaves it at the starting value",
+            "do": [
+              {
+                "key": "0"
+              }
+            ],
+            "expect": "JSON.stringify(state) === \"{\\\"playerAScore\\\":0,\\\"playerBScore\\\":0}\""
+          },
+          {
+            "n": 6,
+            "name": "after 0, pressing a still changes the state",
+            "do": [
+              {
+                "key": "a"
+              }
+            ],
+            "expect": "JSON.stringify(state) !== \"{\\\"playerAScore\\\":0,\\\"playerBScore\\\":0}\""
+          },
+          {
+            "n": 7,
+            "name": "no page or console error was raised at any point",
+            "do": [],
+            "expect": "noErrors"
+          }
+        ],
+        "name": "steps-1234567"
+      },
+      "steps": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    }
+  },
+  "accumulates": [
+    "the page as delivered"
+  ],
+  "supersedes": [],
+  "protected": {
+    "plays": [
+      {
+        "from": "the page as delivered",
+        "spec": {
+          "entry": "index.html",
+          "stateExpr": "window.app.state()",
+          "contract": "The page must expose window.app.state() returning every piece of state it keeps.",
+          "steps": [
+            {
+              "n": 1,
+              "name": "loads with no page or console error, in its starting state",
+              "do": [],
+              "expect": "errors.length === 0 && JSON.stringify(state) === \"{\\\"playerAScore\\\":0,\\\"playerBScore\\\":0}\""
+            },
+            {
+              "n": 2,
+              "name": "pressing a changes the state as it already did",
+              "do": [
+                {
+                  "key": "a"
+                }
+              ],
+              "expect": "JSON.stringify(state) === \"{\\\"playerAScore\\\":1,\\\"playerBScore\\\":1}\""
+            },
+            {
+              "n": 3,
+              "name": "pressing a again changes it again",
+              "do": [
+                {
+                  "key": "a"
+                }
+              ],
+              "expect": "JSON.stringify(state) === \"{\\\"playerAScore\\\":2,\\\"playerBScore\\\":2}\""
+            },
+            {
+              "n": 7,
+              "name": "no page or console error was raised at any point",
+              "do": [],
+              "expect": "noErrors"
+            }
+          ],
+          "name": "steps-1237"
+        },
+        "steps": [
+          1,
+          2,
+          3,
+          7
+        ]
+      }
+    ]
+  },
+  "diagnostic": {
+    "kind": "play",
+    "spec": {
+      "entry": "index.html",
+      "stateExpr": "window.app.state()",
+      "contract": "The page must expose window.app.state() returning every piece of state it keeps.",
+      "steps": [
+        {
+          "n": 1,
+          "name": "loads with no page or console error, in its starting state",
+          "do": [],
+          "expect": "errors.length === 0 && JSON.stringify(state) === \"{\\\"playerAScore\\\":0,\\\"playerBScore\\\":0}\""
+        },
+        {
+          "n": 2,
+          "name": "pressing a changes the state as it already did",
+          "do": [
+            {
+              "key": "a"
+            }
+          ],
+          "expect": "JSON.stringify(state) === \"{\\\"playerAScore\\\":1,\\\"playerBScore\\\":1}\""
+        },
+        {
+          "n": 3,
+          "name": "pressing a again changes it again",
+          "do": [
+            {
+              "key": "a"
+            }
+          ],
+          "expect": "JSON.stringify(state) === \"{\\\"playerAScore\\\":2,\\\"playerBScore\\\":2}\""
+        },
+        {
+          "n": 4,
+          "name": "pressing 0 returns every piece of state to its starting value",
+          "do": [
+            {
+              "key": "0"
+            }
+          ],
+          "expect": "JSON.stringify(state) === \"{\\\"playerAScore\\\":0,\\\"playerBScore\\\":0}\""
+        },
+        {
+          "n": 5,
+          "name": "pressing 0 again leaves it at the starting value",
+          "do": [
+            {
+              "key": "0"
+            }
+          ],
+          "expect": "JSON.stringify(state) === \"{\\\"playerAScore\\\":0,\\\"playerBScore\\\":0}\""
+        },
+        {
+          "n": 6,
+          "name": "after 0, pressing a still changes the state",
+          "do": [
+            {
+              "key": "a"
+            }
+          ],
+          "expect": "JSON.stringify(state) !== \"{\\\"playerAScore\\\":0,\\\"playerBScore\\\":0}\""
+        },
+        {
+          "n": 7,
+          "name": "no page or console error was raised at any point",
+          "do": [],
+          "expect": "noErrors"
+        }
+      ],
+      "name": "steps-1234567"
+    },
+    "timeoutSec": 90
+  },
+  "upstreamCases": 7,
+  "protectedCases": 4,
+  "provenance": {
+    "baselineSha": "4db84318c336068693a282574d91226f62dc47d1a738180a76142c205f77c4d4",
+    "triggerKey": "0",
+    "existingKeys": [
+      "a",
+      "b"
+    ],
+    "keyUsed": "a",
+    "loadState": {
+      "playerAScore": 0,
+      "playerBScore": 0
+    },
+    "after1": {
+      "playerAScore": 1,
+      "playerBScore": 1
+    },
+    "after2": {
+      "playerAScore": 2,
+      "playerBScore": 2
+    },
+    "emittedAt": "2026-09-28T07:21:27.744Z",
+    "note": "existing-behaviour expectations come from OBSERVATION; addition expectations come from the frozen rule"
+  },
+  "visualContract": {
+    "required": true,
+    "name": "400-pixel scoreboard",
+    "layout": "legasus/bench/visual/scoreboard-layout.json",
+    "trace": "legasus/bench/visual/trace-reset-only.json"
+  }
+}

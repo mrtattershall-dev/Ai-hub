@@ -1,0 +1,10 @@
+{
+  "note": "AMENDMENT, made BEFORE BATCH-1 group A was run and recorded as an error of mine. GATE-2 froze a trace containing z-decrement steps, but group A's addition is RESET ONLY - so that trace described a page group A was never asked to build, and every group A candidate would have failed the visual contract for a feature the task never required. The keys below are the EXPECTED DISPLAYED totals, used only to fill the layout templates; they are independent of whatever the page names its internal fields.",
+  "steps": [
+    { "key": null, "expect": { "playerA": 0, "playerB": 0 } },
+    { "key": "a",  "expect": { "playerA": 1, "playerB": 0 } },
+    { "key": "a",  "expect": { "playerA": 2, "playerB": 0 } },
+    { "key": "b",  "expect": { "playerA": 2, "playerB": 1 } },
+    { "key": "0",  "expect": { "playerA": 0, "playerB": 0 } }
+  ]
+}

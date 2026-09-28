@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task List</title>
+    <style>
+        .task {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .task.completed {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task List</h1>
+    <input type="text" id="filter" placeholder="Filter tasks...">
+    <ul id="tasks">
+        <li class="task" data-title="Task 1" data-status="pending">Task 1</li>
+        <li class="task" data-title="Task 2" data-status="completed">Task 2</li>
+        <li class="task" data-title="Task 3" data-status="pending">Task 3</li>
+        <li class="task" data-title="Task 4" data-status="completed">Task 4</li>
+        <li class="task" data-title="Task 5" data-status="pending">Task 5</li>
+    </ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filter = document.getElementById('filter');
+            const tasks = document.getElementById('tasks');
+
+            filter.addEventListener('input', () => {
+                const searchTerm = filter.value.toLowerCase();
+                const filteredTasks = Array.from(tasks.children).filter(task => {
+                    const title = task.getAttribute('data-title').toLowerCase();
+                    return title.includes(searchTerm);
+                });
+
+                filteredTasks.forEach(task => {
+                    task.classList.remove('completed');
+                });
+
+                filteredTasks.forEach(task => {
+                    task.classList.add('completed');
+                });
+            });
+
+            window.app = { state: () => ({ ...tasks }) };
+        });
+    </script>
+</body>
+</html>
