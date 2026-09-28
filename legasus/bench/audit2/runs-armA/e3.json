@@ -1,0 +1,324 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:18:16.709Z",
+  "experiment": "TRANSFER-3",
+  "task": "auto-e3",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\eligible\\e3\\baseline-as-delivered.html",
+  "baselineSha": "eefd9209224f36d11f9f29ae6808f2313eda636acc747f9921eb918b5334ac67",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true,
+    "guidance": "full"
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "EXTEND_AN_EXISTING_HANDLER",
+      "why": "inside the existing key handling",
+      "insertAfterLine": 20,
+      "scaffold": "    if (e.key === '0') {\n        // FILL IN\n    }",
+      "instruction": "// on this key: the page shows what it showed when it first loaded.",
+      "slotContract": "        // JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n        // No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n        // Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "        // the page updates through paint, which existing code calls after changing state\n        // FACT: this file defines paint()\n        // FACT: a keydown on document handler is registered\n        // FACT line 11: pos is declared `var`.\n        // FACT line 22: existing code writes it as if (e.key === 'ArrowRight' && pos < cells.length - 1) { pos = pos + 1; paint(); }\n        // FACT line 12: cells is declared `var`.",
+      "factsDelivered": 2,
+      "contextDropped": [
+        "paint(): the whole redraw",
+        "label: the whole constraint"
+      ],
+      "noFactsBecause": null,
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "EXTEND_AN_EXISTING_HANDLER",
+        "site": {
+          "insertAfterLine": 20,
+          "why": "inside the existing key handling"
+        },
+        "scope": {
+          "creates": [],
+          "attaches": [],
+          "calls": [
+            "paint"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function paint() that existing code calls after changing state",
+          "key handling already exists (keydown on document)",
+          "observation selected browser.keyboard, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": []
+      },
+      "promptHead": "<!DOCTYPE html>\n<html><head><title>Track</title><style>.cell{display:inline-block;width:2em}.here{font-weight:bold}</style></head>\n<body>\n<h3>Track</h3>\n<div id=\"row\">\n  <span class=\"cell\">.</span><span class=\"cell\">.</span><span class=\"cell\">.</span>\n  <span class=\"cell\">.</span><span class=\"cell\">.</span>\n</div>\n<p id=\"where\">position 0</p>\n<script>\nvar pos = 0;\nvar cells = document.querySelectorAll('#row .cell');\nvar label = document.getElementById('where');\nfunction paint() {\n  for (var i = 0; i < cells.length; i++) {\n    cells[i].textContent = i === pos ? 'X' : '.';\n    cells[i].className = i === pos ? 'cell here' : 'cell';\n  }\n  label.textContent = 'position ' + pos;\n}\ndocument.addEventListener('keydown', function (e) {\n    if (e.key === '0') {\n        // the page updates through paint, which existing code calls after changing state\n        // FACT: this file defines paint()\n        // FACT: a keydown on document handler is registered\n        // FACT line 11: pos is declared `var`.\n        // FACT line 22: existing code writes it as if (e.key === 'ArrowRight' && pos < cells.length - 1) { pos = pos + 1; paint(); }\n        // FACT line 12: cells is declared `var`.\n// on this key: the page shows what it showed when it first loaded.\n        // JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n        // No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n        // Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "359a6c003d76ea3511d7ab60ed708d48bed83f71f959f00551f4dd553f0264cf",
+      "suffixSha": "2fa93346ad1ccdbebdadc8c843fff38ced6aaec6929984919e07ab09b78f6642",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "failing": [],
+          "visual": null,
+          "decision": {
+            "functional": "PASS",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 1235,
+      "outputTokens": 9,
+      "promptTokens": 483,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "        pos = 0; paint();",
+        "chars": 25,
+        "lines": 1
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 20678,
+        "acceptanceMs": 40575
+      },
+      "containment": {
+        "ok": true,
+        "text": "        pos = 0; paint();",
+        "codeLines": 1,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "        pos = 0; paint();",
+        "chars": 25,
+        "lines": 1
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "failing": [],
+        "total": 5,
+        "log": "PASS case 1  loads with no page or console error, in its starting state\nPASS case 2  press ArrowRight produces the result it already produces\nPASS case 3  pressing 0 returns the visible result to its starting state\nPASS case 4  pressing 0 again leaves it at the starting state\nPASS case 5  no page or console error was raised at any point\nSUMMARY 5/5 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "row",
+            "where"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "row",
+            "where"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "3ab6493119fed11cc8d44cda96ab3f5f3cc0236a"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html><head><title>Track</title><style>.cell{display:inline-block;width:2em}.here{font-weight:bold}</style></head>\n<body>\n<h3>Track</h3>\n<div id=\"row\">\n  <span class=\"cell\">.</span><span class=\"cell\">.</span><span class=\"cell\">.</span>\n  <span class=\"cell\">.</span><span class=\"cell\">.</span>\n</div>\n<p id=\"where\">position 0</p>\n<script>\nvar pos = 0;\nvar cells = document.querySelectorAll('#row .cell');\nvar label = document.getElementById('where');\nfunction paint() {\n  for (var i = 0; i < cells.length; i++) {\n    cells[i].textContent = i === pos ? 'X' : '.';\n    cells[i].className = i === pos ? 'cell here' : 'cell';\n  }\n  label.textContent = 'position ' + pos;\n}\ndocument.addEventListener('keydown', function (e) {\n    if (e.key === '0') {\n        // the page updates through paint, which existing code calls after changing state\n        // FACT: this file defines paint()\n        // FACT: a keydown on document handler is registered\n        // FACT line 11: pos is declared `var`.\n        // FACT line 22: existing code writes it as if (e.key === 'ArrowRight' && pos < cells.length - 1) { pos = pos + 1; paint(); }\n        // FACT line 12: cells is declared `var`.\n// on this key: the page shows what it showed when it first loaded.\n        pos = 0; paint();\n    }\n  if (e.key === 'ArrowRight' && pos < cells.length - 1) { pos = pos + 1; paint(); }\n  if (e.key === 'ArrowLeft' && pos > 0) { pos = pos - 1; paint(); }\n});\npaint();\n</script>\n</body></html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "bbad2e4884d534ef4815199392953c243d2ec375450a96da10fb0bf957ed0567",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4
+          ],
+          "passed": [
+            3,
+            4
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r1-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.keyboard"
+    ],
+    "executedActions": 36,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "acceptedCandidate": "        pos = 0; paint();",
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 0,
+    "judged": 1,
+    "protectedFailures": 0,
+    "restored": 0,
+    "mismatch": {
+      "MET": 1
+    },
+    "partialEffects": 0,
+    "corpus": "legasus\\bench\\audit2\\runs-armA\\e3.attempts",
+    "generationSeconds": 1.2,
+    "wallClockSeconds": 46,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

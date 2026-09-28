@@ -1,0 +1,239 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-09-28T14:27:08.600Z",
+  "experiment": "AUDIT-2",
+  "arm": "B_DIRECT",
+  "task": "auto-e7",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\audit2\\eligible\\e7\\baseline-as-delivered.html",
+  "baselineSha": "25703a7323076c557cf18f8501e7224b6c75012e435ebf1b2daac2cadd7c414a",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ],
+    "maxTokens": 3000
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "promptSha": "c75ca063ff7ff749181ba2c8aae761bdfefe3a70b978d1b6c4eb6a7e5bc06a60",
+      "promptChars": 1241,
+      "feedbackDelivered": null,
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "mismatch": "MET",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "failing": []
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 3726,
+      "outputTokens": 231,
+      "promptTokens": 315,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "```html\n<!DOCTYPE html>\n<html>\n<head>\n<title>Panels</title>\n</head>\n<body>\n<h2>Panels</h2>\n<button id=\"toggle-a\">toggle alpha</button>\n<button id=\"toggle-b\">toggle beta</button>\n<section id=\"alpha\"><p>alpha content</p></section>\n<section id=\"beta\"><p>beta content</p></section>\n<script>\nvar shown = { alpha: true, beta: true };\nfunction apply() {\n  document.getElementById('alpha').style.display = shown.alpha ? '' : 'none';\n  document.getElementById('beta').style.display = shown.beta ? '' : 'none';\n}\ndocument.getElementById('toggle-a').addEventListener('click', function () { shown.alpha = !shown.alpha; apply(); });\ndocument.getElementById('toggle-b').addEventListener('click', function () { shown.beta = !shown.beta; apply(); });\napply();\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === '0') {\n    shown.alpha = true;\n    shown.beta = true;\n    apply();\n  }\n});\n</script>\n</body>\n</html>\n```",
+        "chars": 924,
+        "lines": 33
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 12384,
+        "acceptanceMs": 25600
+      },
+      "extraction": {
+        "ok": true,
+        "text": "<!DOCTYPE html>\n<html>\n<head>\n<title>Panels</title>\n</head>\n<body>\n<h2>Panels</h2>\n<button id=\"toggle-a\">toggle alpha</button>\n<button id=\"toggle-b\">toggle beta</button>\n<section id=\"alpha\"><p>alpha content</p></section>\n<section id=\"beta\"><p>beta content</p></section>\n<script>\nvar shown = { alpha: true, beta: true };\nfunction apply() {\n  document.getElementById('alpha').style.display = shown.alpha ? '' : 'none';\n  document.getElementById('beta').style.display = shown.beta ? '' : 'none';\n}\ndocument.getElementById('toggle-a').addEventListener('click', function () { shown.alpha = !shown.alpha; apply(); });\ndocument.getElementById('toggle-b').addEventListener('click', function () { shown.beta = !shown.beta; apply(); });\napply();\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === '0') {\n    shown.alpha = true;\n    shown.beta = true;\n    apply();\n  }\n});\n</script>\n</body>\n</html>",
+        "scriptsChecked": 1
+      },
+      "transformedCandidate": {
+        "text": "<!DOCTYPE html>\n<html>\n<head>\n<title>Panels</title>\n</head>\n<body>\n<h2>Panels</h2>\n<button id=\"toggle-a\">toggle alpha</button>\n<button id=\"toggle-b\">toggle beta</button>\n<section id=\"alpha\"><p>alpha content</p></section>\n<section id=\"beta\"><p>beta content</p></section>\n<script>\nvar shown = { alpha: true, beta: true };\nfunction apply() {\n  document.getElementById('alpha').style.display = shown.alpha ? '' : 'none';\n  document.getElementById('beta').style.display = shown.beta ? '' : 'none';\n}\ndocument.getElementById('toggle-a').addEventListener('click', function () { shown.alpha = !shown.alpha; apply(); });\ndocument.getElementById('toggle-b').addEventListener('click', function () { shown.beta = !shown.beta; apply(); });\napply();\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === '0') {\n    shown.alpha = true;\n    shown.beta = true;\n    apply();\n  }\n});\n</script>\n</body>\n</html>",
+        "chars": 912,
+        "lines": 31
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "failing": [],
+        "total": 6,
+        "log": "PASS case 1  loads with no page or console error, in its starting state\nPASS case 2  click #toggle-a produces the result it already produces\nPASS case 3  click #toggle-b produces the result it already produces\nPASS case 4  pressing 0 returns the visible result to its starting state\nPASS case 5  pressing 0 again leaves it at the starting state\nPASS case 6  no page or console error was raised at any point\nSUMMARY 6/6 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "toggle-a",
+            "toggle-b",
+            "alpha",
+            "beta"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "toggle-a",
+            "toggle-b",
+            "alpha",
+            "beta"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "945998081c95a2de5a423cf0a9949a3e9dbcfcd5"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html>\n<head>\n<title>Panels</title>\n</head>\n<body>\n<h2>Panels</h2>\n<button id=\"toggle-a\">toggle alpha</button>\n<button id=\"toggle-b\">toggle beta</button>\n<section id=\"alpha\"><p>alpha content</p></section>\n<section id=\"beta\"><p>beta content</p></section>\n<script>\nvar shown = { alpha: true, beta: true };\nfunction apply() {\n  document.getElementById('alpha').style.display = shown.alpha ? '' : 'none';\n  document.getElementById('beta').style.display = shown.beta ? '' : 'none';\n}\ndocument.getElementById('toggle-a').addEventListener('click', function () { shown.alpha = !shown.alpha; apply(); });\ndocument.getElementById('toggle-b').addEventListener('click', function () { shown.beta = !shown.beta; apply(); });\napply();\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === '0') {\n    shown.alpha = true;\n    shown.beta = true;\n    apply();\n  }\n});\n</script>\n</body>\n</html>\n",
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": true,
+        "functionallyAccepted": true,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "PASS",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "ACCEPTED",
+      "candidateSha": "30d01481f7d8fd4ef2dc0cce9d6e59281ddf088ca1639fb6262b06272d2ebd19",
+      "classification": {
+        "addition": {
+          "asked": [
+            4,
+            5
+          ],
+          "passed": [
+            4,
+            5
+          ],
+          "failed": []
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            3,
+            6
+          ],
+          "broken": []
+        },
+        "mismatch": "MET",
+        "why": "every addition check passed and nothing carried forward broke"
+      },
+      "preserved": "r1-s1-accepted"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "reconciliation": {
+    "maxCallsAllowed": 12,
+    "callsMade": 1,
+    "attemptsRecorded": 1,
+    "attemptsPreserved": 1,
+    "endedBecause": "accepted"
+  },
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "refused": 0,
+    "echoed": 0,
+    "noCompletePage": 0,
+    "scriptDoesNotParse": 0,
+    "judged": 1,
+    "mismatch": {
+      "MET": 1
+    },
+    "restored": 0,
+    "generationSeconds": 3.7,
+    "wallClockSeconds": 27.1,
+    "interventionsByAPerson": 0,
+    "corpus": "legasus\\bench\\audit2\\runs-armB\\e7.attempts"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4
+      ],
+      "passed": [
+        3,
+        4
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a complete, working web page.\n\n<!DOCTYPE html>\n<html><head><title>Track</title><style>.cell{display:inline-block;width:2em}.here{font-weight:bold}</style></head>\n<body>\n<h3>Track</h3>\n<div id=\"row\">\n  <span class=\"cell\">.</span><span class=\"cell\">.</span><span class=\"cell\">.</span>\n  <span class=\"cell\">.</span><span class=\"cell\">.</span>\n</div>\n<p id=\"where\">position 0</p>\n<script>\nvar pos = 0;\nvar cells = document.querySelectorAll('#row .cell');\nvar label = document.getElementById('where');\nfunction paint() {\n  for (var i = 0; i < cells.length; i++) {\n    cells[i].textContent = i === pos ? 'X' : '.';\n    cells[i].className = i === pos ? 'cell here' : 'cell';\n  }\n  label.textContent = 'position ' + pos;\n}\ndocument.addEventListener('keydown', function (e) {\n  if (e.key === 'ArrowRight' && pos < cells.length - 1) { pos = pos + 1; paint(); }\n  if (e.key === 'ArrowLeft' && pos > 0) { pos = pos - 1; paint(); }\n});\npaint();\n</script>\n</body></html>\n\n\nChange it so that when the 0 key is pressed: the page shows what it showed when it first loaded.\nEverything the page already does must keep working.\n\nReply with the COMPLETE updated page: a single HTML document from <!DOCTYPE html> to </html>.\nNo markdown fence, no explanation, no partial snippet, and no placeholder comments.\nKeep all existing markup and script, and create any new element with JavaScript DOM calls or markup as you prefer.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "```html\n<!DOCTYPE html>\n<html><head><title>Track</title><style>.cell{display:inline-block;width:2em}.here{font-weight:bold}</style></head>\n<body>\n<h3>Track</h3>\n<div id=\"row\">\n  <span class=\"cell\">.</span><span class=\"cell\">.</span><span class=\"cell\">.</span>\n  <span class=\"cell\">.</span><span class=\"cell\">.</span>\n</div>\n<p id=\"where\">position 0</p>\n<script>\nvar pos = 0;\nvar cells = document.querySelectorAll('#row .cell');\nvar label = document.getElementById('where');\nfunction paint() {\n  for (var i = 0; i < cells.length; i++) {\n    cells[i].textContent = i === pos ? 'X' : '.';\n    cells[i].className = i === pos ? 'cell here' : 'cell';\n  }\n  label.textContent = 'position ' + pos;\n}\ndocument.addEventListener('keydown', function (e) {\n  if (e.key === 'ArrowRight' && pos < cells.length - 1) { pos = pos + 1; paint(); }\n  if (e.key === 'ArrowLeft' && pos > 0) { pos = pos - 1; paint(); }\n  if (e.key === '0') { pos = 0; paint(); }\n});\npaint();\n</script>\n</body></html>\n```",
+    "chars": 980,
+    "lines": 30,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html><head><title>Track</title><style>.cell{display:inline-block;width:2em}.here{font-weight:bold}</style></head>\n<body>\n<h3>Track</h3>\n<div id=\"row\">\n  <span class=\"cell\">.</span><span class=\"cell\">.</span><span class=\"cell\">.</span>\n  <span class=\"cell\">.</span><span class=\"cell\">.</span>\n</div>\n<p id=\"where\">position 0</p>\n<script>\nvar pos = 0;\nvar cells = document.querySelectorAll('#row .cell');\nvar label = document.getElementById('where');\nfunction paint() {\n  for (var i = 0; i < cells.length; i++) {\n    cells[i].textContent = i === pos ? 'X' : '.';\n    cells[i].className = i === pos ? 'cell here' : 'cell';\n  }\n  label.textContent = 'position ' + pos;\n}\ndocument.addEventListener('keydown', function (e) {\n  if (e.key === 'ArrowRight' && pos < cells.length - 1) { pos = pos + 1; paint(); }\n  if (e.key === 'ArrowLeft' && pos > 0) { pos = pos - 1; paint(); }\n  if (e.key === '0') { pos = 0; paint(); }\n});\npaint();\n</script>\n</body></html>",
+    "chars": 968,
+    "lines": 28
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "5a6bb21e0f904773c040b52613a5f7c53dac71fb"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

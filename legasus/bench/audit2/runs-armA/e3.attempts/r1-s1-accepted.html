@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html><head><title>Track</title><style>.cell{display:inline-block;width:2em}.here{font-weight:bold}</style></head>
+<body>
+<h3>Track</h3>
+<div id="row">
+  <span class="cell">.</span><span class="cell">.</span><span class="cell">.</span>
+  <span class="cell">.</span><span class="cell">.</span>
+</div>
+<p id="where">position 0</p>
+<script>
+var pos = 0;
+var cells = document.querySelectorAll('#row .cell');
+var label = document.getElementById('where');
+function paint() {
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].textContent = i === pos ? 'X' : '.';
+    cells[i].className = i === pos ? 'cell here' : 'cell';
+  }
+  label.textContent = 'position ' + pos;
+}
+document.addEventListener('keydown', function (e) {
+    if (e.key === '0') {
+        // the page updates through paint, which existing code calls after changing state
+        // FACT: this file defines paint()
+        // FACT: a keydown on document handler is registered
+        // FACT line 11: pos is declared `var`.
+        // FACT line 22: existing code writes it as if (e.key === 'ArrowRight' && pos < cells.length - 1) { pos = pos + 1; paint(); }
+        // FACT line 12: cells is declared `var`.
+// on this key: the page shows what it showed when it first loaded.
+        pos = 0; paint();
+    }
+  if (e.key === 'ArrowRight' && pos < cells.length - 1) { pos = pos + 1; paint(); }
+  if (e.key === 'ArrowLeft' && pos > 0) { pos = pos - 1; paint(); }
+});
+paint();
+</script>
+</body></html>

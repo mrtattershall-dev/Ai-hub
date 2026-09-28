@@ -1,0 +1,89 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        4,
+        5
+      ],
+      "passed": [
+        4,
+        5
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        3,
+        6
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a complete, working web page.\n\n<!DOCTYPE html>\n<html><head><title>Panels</title></head>\n<body>\n<h2>Panels</h2>\n<button id=\"toggle-a\">toggle alpha</button>\n<button id=\"toggle-b\">toggle beta</button>\n<section id=\"alpha\"><p>alpha content</p></section>\n<section id=\"beta\"><p>beta content</p></section>\n<script>\nvar shown = { alpha: true, beta: true };\nfunction apply() {\n  document.getElementById('alpha').style.display = shown.alpha ? '' : 'none';\n  document.getElementById('beta').style.display = shown.beta ? '' : 'none';\n}\ndocument.getElementById('toggle-a').addEventListener('click', function () { shown.alpha = !shown.alpha; apply(); });\ndocument.getElementById('toggle-b').addEventListener('click', function () { shown.beta = !shown.beta; apply(); });\napply();\n</script>\n</body></html>\n\n\nChange it so that when the 0 key is pressed: the page shows what it showed when it first loaded.\nEverything the page already does must keep working.\n\nReply with the COMPLETE updated page: a single HTML document from <!DOCTYPE html> to </html>.\nNo markdown fence, no explanation, no partial snippet, and no placeholder comments.\nKeep all existing markup and script, and create any new element with JavaScript DOM calls or markup as you prefer.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "```html\n<!DOCTYPE html>\n<html>\n<head>\n<title>Panels</title>\n</head>\n<body>\n<h2>Panels</h2>\n<button id=\"toggle-a\">toggle alpha</button>\n<button id=\"toggle-b\">toggle beta</button>\n<section id=\"alpha\"><p>alpha content</p></section>\n<section id=\"beta\"><p>beta content</p></section>\n<script>\nvar shown = { alpha: true, beta: true };\nfunction apply() {\n  document.getElementById('alpha').style.display = shown.alpha ? '' : 'none';\n  document.getElementById('beta').style.display = shown.beta ? '' : 'none';\n}\ndocument.getElementById('toggle-a').addEventListener('click', function () { shown.alpha = !shown.alpha; apply(); });\ndocument.getElementById('toggle-b').addEventListener('click', function () { shown.beta = !shown.beta; apply(); });\napply();\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === '0') {\n    shown.alpha = true;\n    shown.beta = true;\n    apply();\n  }\n});\n</script>\n</body>\n</html>\n```",
+    "chars": 924,
+    "lines": 33,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html>\n<head>\n<title>Panels</title>\n</head>\n<body>\n<h2>Panels</h2>\n<button id=\"toggle-a\">toggle alpha</button>\n<button id=\"toggle-b\">toggle beta</button>\n<section id=\"alpha\"><p>alpha content</p></section>\n<section id=\"beta\"><p>beta content</p></section>\n<script>\nvar shown = { alpha: true, beta: true };\nfunction apply() {\n  document.getElementById('alpha').style.display = shown.alpha ? '' : 'none';\n  document.getElementById('beta').style.display = shown.beta ? '' : 'none';\n}\ndocument.getElementById('toggle-a').addEventListener('click', function () { shown.alpha = !shown.alpha; apply(); });\ndocument.getElementById('toggle-b').addEventListener('click', function () { shown.beta = !shown.beta; apply(); });\napply();\n\ndocument.addEventListener('keydown', function(event) {\n  if (event.key === '0') {\n    shown.alpha = true;\n    shown.beta = true;\n    apply();\n  }\n});\n</script>\n</body>\n</html>",
+    "chars": 912,
+    "lines": 31
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "945998081c95a2de5a423cf0a9949a3e9dbcfcd5"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

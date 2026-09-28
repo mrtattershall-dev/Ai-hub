@@ -1,0 +1,92 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [
+        3,
+        4,
+        6
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "Here is a complete, working web page.\n\n<!DOCTYPE html>\n<html><head><title>Ledger</title></head>\n<body>\n<h2>Ledger</h2>\n<input id=\"find\" type=\"text\">\n<table id=\"book\"><tbody>\n  <tr class=\"line\"><td>Freight</td></tr>\n  <tr class=\"line\"><td>Freezer</td></tr>\n  <tr class=\"line\"><td>Postage</td></tr>\n  <tr class=\"line\"><td>Postal</td></tr>\n  <tr class=\"line\"><td>Utilities</td></tr>\n</tbody></table>\n<script>\nvar lines = [].slice.call(document.querySelectorAll('#book .line'));\nvar finder = document.getElementById('find');\nfunction sift() {\n  var q = finder.value.toLowerCase();\n  lines.forEach(function (tr) {\n    tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n  });\n}\ndocument.addEventListener('input', function (e) { if (e.target && e.target.id === 'find') sift(); });\n</script>\n</body></html>\n\n\nChange it so that when #clear-filter is clicked: #find is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nEverything the page already does must keep working.\n\nReply with the COMPLETE updated page: a single HTML document from <!DOCTYPE html> to </html>.\nNo markdown fence, no explanation, no partial snippet, and no placeholder comments.\nKeep all existing markup and script, and create any new element with JavaScript DOM calls or markup as you prefer.",
+    "suffix": ""
+  },
+  "completion": {
+    "text": "```html\n<!DOCTYPE html>\n<html>\n<head>\n<title>Ledger</title>\n</head>\n<body>\n<h2>Ledger</h2>\n<input id=\"find\" type=\"text\">\n<button id=\"clear-filter\">Clear Filter</button>\n<table id=\"book\"><tbody>\n  <tr class=\"line\"><td>Freight</td></tr>\n  <tr class=\"line\"><td>Freezer</td></tr>\n  <tr class=\"line\"><td>Postage</td></tr>\n  <tr class=\"line\"><td>Postal</td></tr>\n  <tr class=\"line\"><td>Utilities</td></tr>\n</tbody></table>\n<script>\nvar lines = [].slice.call(document.querySelectorAll('#book .line'));\nvar finder = document.getElementById('find');\nvar clearFilter = document.getElementById('clear-filter');\nfunction sift() {\n  var q = finder.value.toLowerCase();\n  lines.forEach(function (tr) {\n    tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n  });\n}\nclearFilter.addEventListener('click', function () {\n  finder.value = '';\n  lines.forEach(function (tr) {\n    tr.style.display = '';\n  });\n});\ndocument.addEventListener('input', function (e) { if (e.target && e.target.id === 'find') sift(); });\n</script>\n</body>\n</html>\n```",
+    "chars": 1054,
+    "lines": 38,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "<!DOCTYPE html>\n<html>\n<head>\n<title>Ledger</title>\n</head>\n<body>\n<h2>Ledger</h2>\n<input id=\"find\" type=\"text\">\n<button id=\"clear-filter\">Clear Filter</button>\n<table id=\"book\"><tbody>\n  <tr class=\"line\"><td>Freight</td></tr>\n  <tr class=\"line\"><td>Freezer</td></tr>\n  <tr class=\"line\"><td>Postage</td></tr>\n  <tr class=\"line\"><td>Postal</td></tr>\n  <tr class=\"line\"><td>Utilities</td></tr>\n</tbody></table>\n<script>\nvar lines = [].slice.call(document.querySelectorAll('#book .line'));\nvar finder = document.getElementById('find');\nvar clearFilter = document.getElementById('clear-filter');\nfunction sift() {\n  var q = finder.value.toLowerCase();\n  lines.forEach(function (tr) {\n    tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n  });\n}\nclearFilter.addEventListener('click', function () {\n  finder.value = '';\n  lines.forEach(function (tr) {\n    tr.style.display = '';\n  });\n});\ndocument.addEventListener('input', function (e) { if (e.target && e.target.id === 'find') sift(); });\n</script>\n</body>\n</html>",
+    "chars": 1042,
+    "lines": 36
+  },
+  "containment": null,
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "68a84fc16a61e9448d256544d50144638ba768e7"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

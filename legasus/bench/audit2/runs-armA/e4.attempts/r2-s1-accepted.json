@@ -1,0 +1,125 @@
+{
+  "round": 2,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [
+        3,
+        4,
+        6
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": {
+    "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+    "site": {
+      "insertAfterLine": 23,
+      "why": "at the end of the script, after every element and function it must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "#clear-filter"
+      ],
+      "attaches": [
+        "#clear-filter"
+      ],
+      "calls": [
+        "redraw"
+      ]
+    },
+    "evidence": [
+      "the page has a zero-argument function redraw() that existing code calls after changing state",
+      "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+      "the page's clickable controls are: none",
+      "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html><head><title>Stock</title></head>\n<body>\n<h2>Stock</h2>\n<input id=\"q\" type=\"text\">\n<ul id=\"rows\">\n  <li class=\"row\">copper wire</li>\n  <li class=\"row\">copper pipe</li>\n  <li class=\"row\">steel plate</li>\n  <li class=\"row\">steel rod</li>\n  <li class=\"row\">brass fitting</li>\n  <li class=\"row\">nylon washer</li>\n</ul>\n<script>\nconst term = document.getElementById('q');\nconst rows = document.getElementById('rows');\nfunction redraw() {\n  const needle = term.value.trim().toLowerCase();\n  Array.prototype.forEach.call(rows.children, function (li) {\n    li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;\n  });\n}\nterm.addEventListener('input', redraw);\nredraw();\n// create #clear-filter and attach the handler that does the work\n// the page updates through redraw, which existing code calls after changing state\n// FACT: this file defines redraw()\n// FACT: a input on input#q handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #q empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+    "suffix": "\n</script>\n</body></html>\n"
+  },
+  "completion": {
+    "text": "document.getElementById('rows').insertAdjacentHTML('afterend', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  term.value = '';\n  redraw();\n});",
+    "chars": 228,
+    "lines": 5,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "document.getElementById('rows').insertAdjacentHTML('afterend', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  term.value = '';\n  redraw();\n});",
+    "chars": 228,
+    "lines": 5
+  },
+  "containment": {
+    "ok": true,
+    "text": "document.getElementById('rows').insertAdjacentHTML('afterend', '<button id=\"clear-filter\">Clear Filter</button>');\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  term.value = '';\n  redraw();\n});",
+    "codeLines": 5,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "f24fd137e8b10b0556e6a5cf7224f4c75f3cd0ff"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r2-s1-accepted.html"
+}

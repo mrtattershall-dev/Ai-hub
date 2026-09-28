@@ -1,0 +1,125 @@
+{
+  "round": 1,
+  "seed": 3,
+  "outcome": "REJECTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        4,
+        5
+      ],
+      "passed": [],
+      "failed": [
+        4,
+        5
+      ]
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        3,
+        6
+      ],
+      "broken": []
+    },
+    "mismatch": "NOTHING_WORKED",
+    "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+  },
+  "proposal": {
+    "move": "CREATE_A_NEW_LISTENER",
+    "site": {
+      "insertAfterLine": 16,
+      "why": "at the end of the script, after every element and function the listener must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "a keydown listener"
+      ],
+      "attaches": [
+        "document"
+      ],
+      "calls": [
+        "apply"
+      ]
+    },
+    "evidence": [
+      "the page has a zero-argument function apply() that existing code calls after changing state",
+      "the requirement asks for key '0', and no key listener is registered anywhere, so the requested listener must be created",
+      "the application is driven by browser.click - that informs how the effect is achieved, NOT whether the request is honoured",
+      "observation selected browser.click, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "this application had no key handling before, so nothing establishes that a key press reaches it in the way the requirement assumes; the checks will settle it"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html><head><title>Panels</title></head>\n<body>\n<h2>Panels</h2>\n<button id=\"toggle-a\">toggle alpha</button>\n<button id=\"toggle-b\">toggle beta</button>\n<section id=\"alpha\"><p>alpha content</p></section>\n<section id=\"beta\"><p>beta content</p></section>\n<script>\nvar shown = { alpha: true, beta: true };\nfunction apply() {\n  document.getElementById('alpha').style.display = shown.alpha ? '' : 'none';\n  document.getElementById('beta').style.display = shown.beta ? '' : 'none';\n}\ndocument.getElementById('toggle-a').addEventListener('click', function () { shown.alpha = !shown.alpha; apply(); });\ndocument.getElementById('toggle-b').addEventListener('click', function () { shown.beta = !shown.beta; apply(); });\napply();\n// create a keydown listener and attach the handler that does the work\n// the page updates through apply, which existing code calls after changing state\n// FACT: this file defines apply()\n// FACT: a click on button#toggle-a handler is registered\n// FACT: a click on button#toggle-b handler is registered\n// on this key: the page shows what it showed when it first loaded.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+    "suffix": "\n</script>\n</body></html>\n"
+  },
+  "completion": {
+    "text": "document.addEventListener('keydown', function (e) {\n  if (e.key === 'r') {\n    shown.alpha = true;\n    shown.beta = true;\n    apply();\n  }\n});",
+    "chars": 142,
+    "lines": 7,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "document.addEventListener('keydown', function (e) {\n  if (e.key === 'r') {\n    shown.alpha = true;\n    shown.beta = true;\n    apply();\n  }\n});",
+    "chars": 142,
+    "lines": 7
+  },
+  "containment": {
+    "ok": true,
+    "text": "document.addEventListener('keydown', function (e) {\n  if (e.key === 'r') {\n    shown.alpha = true;\n    shown.beta = true;\n    apply();\n  }\n});",
+    "codeLines": 7,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      6
+    ],
+    "failing": [
+      4,
+      5
+    ],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "PRESERVE_INCOMPLETE",
+    "protected": "PASS",
+    "survivingBytes": null,
+    "candidateTree": "2a23c3ddf74e777f1d6c3dd443b6b9e136ec1e1b"
+  },
+  "decision": {
+    "accepted": false,
+    "functionallyAccepted": false,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [
+      "the functional checks did not pass"
+    ],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "FAIL",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s3-rejected.html"
+}

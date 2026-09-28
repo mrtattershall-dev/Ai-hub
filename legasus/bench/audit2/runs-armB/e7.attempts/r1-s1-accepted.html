@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Panels</title>
+</head>
+<body>
+<h2>Panels</h2>
+<button id="toggle-a">toggle alpha</button>
+<button id="toggle-b">toggle beta</button>
+<section id="alpha"><p>alpha content</p></section>
+<section id="beta"><p>beta content</p></section>
+<script>
+var shown = { alpha: true, beta: true };
+function apply() {
+  document.getElementById('alpha').style.display = shown.alpha ? '' : 'none';
+  document.getElementById('beta').style.display = shown.beta ? '' : 'none';
+}
+document.getElementById('toggle-a').addEventListener('click', function () { shown.alpha = !shown.alpha; apply(); });
+document.getElementById('toggle-b').addEventListener('click', function () { shown.beta = !shown.beta; apply(); });
+apply();
+
+document.addEventListener('keydown', function(event) {
+  if (event.key === '0') {
+    shown.alpha = true;
+    shown.beta = true;
+    apply();
+  }
+});
+</script>
+</body>
+</html>
