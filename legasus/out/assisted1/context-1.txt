@@ -1,0 +1,3 @@
+            // FACT line 25: state is declared `let`.
+            // FACT line 38: existing code writes it as state.color = colors[index % colors.length];
+            // FACT line 35: switchLight() takes no arguments, and the code here calls it after changing state.

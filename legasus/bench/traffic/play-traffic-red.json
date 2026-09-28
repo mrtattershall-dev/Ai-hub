@@ -1,0 +1,16 @@
+{
+  "entry": "index.html",
+  "stateExpr": "window.app.state()",
+  "contract": "The page must expose window.app.state() returning an object whose color is the light's current colour.",
+  "steps": [
+    { "n": 1, "name": "loads with no page or console error, showing red", "do": [], "expect": "errors.length === 0 && state.color === 'red'" },
+    { "n": 2, "name": "a key press advances the light to amber", "do": [{ "key": "1" }], "expect": "state.color === 'yellow'" },
+    { "n": 3, "name": "the next press advances it to green", "do": [{ "key": "2" }], "expect": "state.color === 'green'" },
+    { "n": 4, "name": "the next press cycles back to red", "do": [{ "key": "3" }], "expect": "state.color === 'red'" },
+    { "n": 5, "name": "pressing 1 advances to amber again", "do": [{ "key": "1" }], "expect": "state.color === 'yellow'" },
+    { "n": 6, "name": "pressing r sets the light straight to red", "do": [{ "key": "r" }], "expect": "state.color === 'red'" },
+    { "n": 7, "name": "pressing r again leaves it red", "do": [{ "key": "r" }], "expect": "state.color === 'red'" },
+    { "n": 8, "name": "after r, the cycling keys still work", "do": [{ "key": "2" }], "expect": "state.color === 'yellow'" },
+    { "n": 9, "name": "no page or console error was raised at any point", "do": [], "expect": "noErrors" }
+  ]
+}

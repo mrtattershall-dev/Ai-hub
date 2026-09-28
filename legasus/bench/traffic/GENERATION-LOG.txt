@@ -1,0 +1,9 @@
+at            2026-09-28T01:16:54.729Z
+out           baseline-a2.html
+sha256        9ae3cb01e221b98ada4a99c08e0a4dd4193893966c466d607119863a489b625b
+chars         1549
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  332   doneReason stop   ms 31315
+seamWording   firm
+ask           A traffic light drawn on a canvas. Keys 1, 2 and 3 switch it to red, amber and green.
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA traffic light drawn on a canvas. Keys 1, 2 and 3 switch it to red, amber and green.\nREQUIRED, the page will be rejected without it: the last line of the script must be exactly window.app = { state: () => ({ ...<every piece of state the page keeps> }) }; so that automated tests can read the state. Do not omit this line.\nUse a single <canvas> and one inline <script>. Plain JavaScript, no libraries."

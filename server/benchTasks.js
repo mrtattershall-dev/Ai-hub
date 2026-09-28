@@ -338,6 +338,45 @@ export function panelTasks() {
   }];
 }
 
+/**
+ * ASSISTED-1's task, on page A2 (`legasus/bench/traffic/baseline-a2.html`, sha 9ae3cb01e221b98a).
+ *
+ * The page's OWN behaviour is a cycle: all three of keys 1, 2 and 3 call the same switchLight(), which
+ * advances red -> yellow -> green -> red. That is not what the one-line request asked for, but the page
+ * is the artefact and these checks describe what it ACTUALLY does, measured: steps 1-4 and 9 pass on
+ * the untouched baseline.
+ *
+ * The addition is a new key that does NOT cycle. On the baseline, steps 6 and 7 fail because pressing r
+ * does nothing - the colour stays where the cycle left it - which is the addition being absent rather
+ * than the harness being broken. Step 8 fails downstream of them.
+ */
+export function trafficTasks() {
+  const dir = join(HERE, '..', 'legasus', 'bench', 'traffic');
+  const specPath = join(dir, 'play-traffic-red.json');
+  if (!existsSync(specPath)) return [];
+  const spec = JSON.parse(readFileSync(specPath, 'utf8'));
+  const sub = (steps) => ({ ...spec, name: `traffic-steps-${steps.join('')}`, steps: spec.steps.filter((x) => steps.includes(x.n)) });
+  const existing = [1, 2, 3, 4, 9];          // the page as delivered: load, three advances, no errors
+  const requested = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  return [{
+    id: 'traffic-red', group: 'TRAFFIC', source: 'internal', language: 'javascript', kind: 'build',
+    dependsOn: null,
+    goal: 'Continue the traffic light already in index.html. Pressing r sets the light straight to red, whatever colour it is showing. Everything that already works must keep working. The page is a single self-contained web page, index.html: plain HTML5 canvas and JavaScript, no frameworks, no external files or CDNs. ' + spec.contract,
+    requirement: {
+      trigger: { kind: 'key', key: 'r' },
+      effects: ['the light is red'],
+      invariants: ['the cycling keys keep working', 'everything that already works keeps working'],
+    },
+    seed: {},
+    requested: { play: { spec: sub(requested), steps: requested } },
+    accumulates: ['the page as delivered'],
+    supersedes: [],
+    protected: { plays: [{ from: 'the page as delivered', spec: sub(existing), steps: existing }] },
+    diagnostic: { kind: 'play', spec: sub(requested), timeoutSec: 90 },
+    upstreamCases: requested.length, protectedCases: existing.length,
+  }];
+}
+
 export function benchQueue() {
   return [...externalTasks(), ...SEQUENTIAL_TASKS];
 }

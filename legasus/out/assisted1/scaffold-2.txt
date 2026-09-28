@@ -1,0 +1,4 @@
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'r') return;
+            // FILL IN
+        });
