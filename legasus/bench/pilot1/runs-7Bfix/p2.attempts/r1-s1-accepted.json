@@ -1,0 +1,121 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "ACCEPTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [
+        3,
+        4,
+        6
+      ],
+      "failed": []
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "MET",
+    "why": "every addition check passed and nothing carried forward broke"
+  },
+  "proposal": {
+    "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+    "site": {
+      "insertAfterLine": 43,
+      "why": "at the end of the script, after every element and function it must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "#clear-filter"
+      ],
+      "attaches": [
+        "#clear-filter"
+      ],
+      "calls": []
+    },
+    "evidence": [
+      "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+      "the page's clickable controls are: none",
+      "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+      "no shared zero-argument renderer was identified, so a change may need to update the page itself rather than delegating"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html>\n<head>\n<title>Team directory</title>\n<style>\n  body { font-family: sans-serif; }\n  table { border-collapse: collapse; }\n  td { padding: 4px 12px; border-bottom: 1px solid #ddd; }\n  .gone { display: none; }\n</style>\n</head>\n<body>\n<h2>Team directory</h2>\n<label for=\"q\">Find someone</label>\n<input type=\"search\" id=\"q\">\n<table id=\"people\">\n  <tbody>\n    <tr class=\"person\"><td>Alvarez</td></tr>\n    <tr class=\"person\"><td>Okonkwo</td></tr>\n    <tr class=\"person\"><td>Petrov</td></tr>\n    <tr class=\"person\"><td>Nakamura</td></tr>\n    <tr class=\"person\"><td>Alberts</td></tr>\n    <tr class=\"person\"><td>Duarte</td></tr>\n  </tbody>\n</table>\n<script>\n(function () {\n  var box = document.getElementById('q');\n  var people = document.getElementById('people');\n  function render() {\n    var needle = box.value.trim().toLowerCase();\n    var all = people.querySelectorAll('.person');\n    for (var i = 0; i < all.length; i++) {\n      var name = all[i].textContent.toLowerCase();\n      if (needle === '' || name.indexOf(needle) !== -1) {\n        all[i].classList.remove('gone');\n      } else {\n        all[i].classList.add('gone');\n      }\n    }\n  }\n  box.addEventListener('keyup', render);\n  box.addEventListener('input', render);\n})();\n// create #clear-filter and attach the handler that does the work\n// FACT: a keyup on input#q handler is registered\n// FACT: a input on input#q handler is registered\n// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+    "suffix": "\n</script>\n</body>\n</html>\n"
+  },
+  "completion": {
+    "text": "document.querySelector('body').appendChild(document.createElement('button')).id = 'clear-filter';\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  document.getElementById('q').value = '';\n  document.querySelectorAll('.person').forEach(function(item) {\n    item.classList.remove('gone');\n  });\n});\n// End of solution.",
+    "chars": 348,
+    "lines": 8,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "document.querySelector('body').appendChild(document.createElement('button')).id = 'clear-filter';\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  document.getElementById('q').value = '';\n  document.querySelectorAll('.person').forEach(function(item) {\n    item.classList.remove('gone');\n  });\n});\n// End of solution.",
+    "chars": 348,
+    "lines": 8
+  },
+  "containment": {
+    "ok": true,
+    "text": "document.querySelector('body').appendChild(document.createElement('button')).id = 'clear-filter';\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  document.getElementById('q').value = '';\n  document.querySelectorAll('.person').forEach(function(item) {\n    item.classList.remove('gone');\n  });\n});\n// End of solution.",
+    "codeLines": 7,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "failing": [],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "RETAIN",
+    "protected": "PASS"
+  },
+  "decision": {
+    "accepted": true,
+    "functionallyAccepted": true,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "PASS",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s1-accepted.html"
+}

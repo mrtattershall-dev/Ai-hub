@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>Parts</title></head>
+<body>
+<h1>Parts</h1>
+<input type="text" id="search" placeholder="search parts">
+<ul id="parts">
+  <li class="part">bracket</li>
+  <li class="part">brace</li>
+  <li class="part">washer</li>
+  <li class="part">spindle</li>
+  <li class="part">grommet</li>
+</ul>
+<script>
+const field = document.getElementById('search');
+const rows = Array.from(document.querySelectorAll('#parts .part'));
+function refresh() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (li) {
+    li.style.display = li.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';
+  });
+}
+field.addEventListener('input', refresh);
+// create #clear-filter and attach the handler that does the work
+// FACT: this file defines refresh()
+// FACT: a input on input#search handler is registered
+// when #clear-filter is clicked: #search is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+const clearFilter = document.createElement('button');
+clearFilter.textContent = 'Clear Filter';
+document.body.appendChild(clearFilter);
+clearFilter.addEventListener('click', function () {
+  field.value = '';
+  refresh();
+});
+// FACT: this file defines clearFilter()
+</script>
+</body>
+</html>

@@ -1,0 +1,2503 @@
+{
+  "at": "2026-09-28T11:33:42.659Z",
+  "experiment": "TRANSFER-3",
+  "task": "auto-p3",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\pilot1\\p3\\baseline-as-delivered.html",
+  "baselineSha": "7eff475af9de1c8d8f8604505a2960bba61938132b39ff1759c67f6013b73faa",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 42,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "noFactsBecause": "// the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 42,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "paint"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function paint() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Recipe box</title></head>\n<body>\n<header><h3>Recipe box</h3></header>\n<div class=\"controls\">\n  <input id=\"recipe-filter\" type=\"text\" placeholder=\"type to narrow\">\n  <span id=\"count\"></span>\n</div>\n<div id=\"cards\">\n  <div class=\"card\"><span class=\"title\">Flatbread</span></div>\n  <div class=\"card\"><span class=\"title\">Flapjacks</span></div>\n  <div class=\"card\"><span class=\"title\">Chowder</span></div>\n  <div class=\"card\"><span class=\"title\">Risotto</span></div>\n  <div class=\"card\"><span class=\"title\">Custard</span></div>\n  <div class=\"card\"><span class=\"title\">Chutney</span></div>\n</div>\n<script>\nconst state = { query: '' };\nconst cards = document.getElementById('cards');\nconst counter = document.getElementById('count');\n\nfunction matches(card) {\n  if (!state.query) return true;\n  return card.querySelector('.title').textContent.toLowerCase().startsWith(state.query);\n}\n\nfunction paint() {\n  let shown = 0;\n  for (const card of cards.children) {\n    const on = matches(card);\n    card.hidden = !on;\n    if (on) shown++;\n  }\n  counter.textContent = shown + ' shown';\n}\n\ndocument.getElementById('recipe-filter').addEventListener('input', (e) => {\n  state.query = e.target.value.trim().toLowerCase();\n  paint();\n});\n\npaint();\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "71a4f994ce3e775848482194fe3695a1dac1c26ab37c02bdacf8ae981fa973bf",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 42,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "noFactsBecause": "// the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "feedbackDelivered": "// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 42,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "paint"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function paint() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Recipe box</title></head>\n<body>\n<header><h3>Recipe box</h3></header>\n<div class=\"controls\">\n  <input id=\"recipe-filter\" type=\"text\" placeholder=\"type to narrow\">\n  <span id=\"count\"></span>\n</div>\n<div id=\"cards\">\n  <div class=\"card\"><span class=\"title\">Flatbread</span></div>\n  <div class=\"card\"><span class=\"title\">Flapjacks</span></div>\n  <div class=\"card\"><span class=\"title\">Chowder</span></div>\n  <div class=\"card\"><span class=\"title\">Risotto</span></div>\n  <div class=\"card\"><span class=\"title\">Custard</span></div>\n  <div class=\"card\"><span class=\"title\">Chutney</span></div>\n</div>\n<script>\nconst state = { query: '' };\nconst cards = document.getElementById('cards');\nconst counter = document.getElementById('count');\n\nfunction matches(card) {\n  if (!state.query) return true;\n  return card.querySelector('.title').textContent.toLowerCase().startsWith(state.query);\n}\n\nfunction paint() {\n  let shown = 0;\n  for (const card of cards.children) {\n    const on = matches(card);\n    card.hidden = !on;\n    if (on) shown++;\n  }\n  counter.textContent = shown + ' shown';\n}\n\ndocument.getElementById('recipe-filter').addEventListener('input', (e) => {\n  state.query = e.target.value.trim().toLowerCase();\n  paint();\n});\n\npaint();\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "79ce288e75c979bfdae4d06e87b1aa9387e83e07b5d761616a27f68b725df056",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            2,
+            5
+          ],
+          "failing": [
+            1,
+            3,
+            4,
+            6,
+            7
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            2,
+            5
+          ],
+          "failing": [
+            1,
+            3,
+            4,
+            6,
+            7
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 42,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "noFactsBecause": "// the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "feedbackDelivered": "// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 42,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "paint"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function paint() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Recipe box</title></head>\n<body>\n<header><h3>Recipe box</h3></header>\n<div class=\"controls\">\n  <input id=\"recipe-filter\" type=\"text\" placeholder=\"type to narrow\">\n  <span id=\"count\"></span>\n</div>\n<div id=\"cards\">\n  <div class=\"card\"><span class=\"title\">Flatbread</span></div>\n  <div class=\"card\"><span class=\"title\">Flapjacks</span></div>\n  <div class=\"card\"><span class=\"title\">Chowder</span></div>\n  <div class=\"card\"><span class=\"title\">Risotto</span></div>\n  <div class=\"card\"><span class=\"title\">Custard</span></div>\n  <div class=\"card\"><span class=\"title\">Chutney</span></div>\n</div>\n<script>\nconst state = { query: '' };\nconst cards = document.getElementById('cards');\nconst counter = document.getElementById('count');\n\nfunction matches(card) {\n  if (!state.query) return true;\n  return card.querySelector('.title').textContent.toLowerCase().startsWith(state.query);\n}\n\nfunction paint() {\n  let shown = 0;\n  for (const card of cards.children) {\n    const on = matches(card);\n    card.hidden = !on;\n    if (on) shown++;\n  }\n  counter.textContent = shown + ' shown';\n}\n\ndocument.getElementById('recipe-filter').addEventListener('input', (e) => {\n  state.query = e.target.value.trim().toLowerCase();\n  paint();\n});\n\npaint();\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "79ce288e75c979bfdae4d06e87b1aa9387e83e07b5d761616a27f68b725df056",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            2,
+            5
+          ],
+          "failing": [
+            1,
+            3,
+            4,
+            6,
+            7
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            2,
+            5
+          ],
+          "failing": [
+            1,
+            3,
+            4,
+            6,
+            7
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 42,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "noFactsBecause": "// the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "feedbackDelivered": "// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 42,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "paint"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function paint() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Recipe box</title></head>\n<body>\n<header><h3>Recipe box</h3></header>\n<div class=\"controls\">\n  <input id=\"recipe-filter\" type=\"text\" placeholder=\"type to narrow\">\n  <span id=\"count\"></span>\n</div>\n<div id=\"cards\">\n  <div class=\"card\"><span class=\"title\">Flatbread</span></div>\n  <div class=\"card\"><span class=\"title\">Flapjacks</span></div>\n  <div class=\"card\"><span class=\"title\">Chowder</span></div>\n  <div class=\"card\"><span class=\"title\">Risotto</span></div>\n  <div class=\"card\"><span class=\"title\">Custard</span></div>\n  <div class=\"card\"><span class=\"title\">Chutney</span></div>\n</div>\n<script>\nconst state = { query: '' };\nconst cards = document.getElementById('cards');\nconst counter = document.getElementById('count');\n\nfunction matches(card) {\n  if (!state.query) return true;\n  return card.querySelector('.title').textContent.toLowerCase().startsWith(state.query);\n}\n\nfunction paint() {\n  let shown = 0;\n  for (const card of cards.children) {\n    const on = matches(card);\n    card.hidden = !on;\n    if (on) shown++;\n  }\n  counter.textContent = shown + ' shown';\n}\n\ndocument.getElementById('recipe-filter').addEventListener('input', (e) => {\n  state.query = e.target.value.trim().toLowerCase();\n  paint();\n});\n\npaint();\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "79ce288e75c979bfdae4d06e87b1aa9387e83e07b5d761616a27f68b725df056",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            2,
+            5
+          ],
+          "failing": [
+            1,
+            3,
+            4,
+            6,
+            7
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            2,
+            5
+          ],
+          "failing": [
+            1,
+            3,
+            4,
+            6,
+            7
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 785,
+      "outputTokens": 10,
+      "promptTokens": 442,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</script>\n</body>\n</html>\n",
+        "chars": 26,
+        "lines": 4
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 6288,
+        "acceptanceMs": 14899
+      },
+      "containment": {
+        "ok": true,
+        "text": "</script>\n</body>\n</html>\n",
+        "codeLines": 3,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</script>\n</body>\n</html>\n",
+        "chars": 26,
+        "lines": 4
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"flat\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "cdad7b2e588900912de1c20680e0a93c71a65b2a"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "a5f5296656e09417f43eb08b6cd27c35c9a28e12ffef8b254169a38af18b506f",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r1-s1-rejected"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 1480,
+      "outputTokens": 80,
+      "promptTokens": 442,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+        "chars": 367,
+        "lines": 5
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s2-refused_empty"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 763,
+      "outputTokens": 28,
+      "promptTokens": 442,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "// when #clear-filter is clicked: the count of visible items is updated. Ensure typing in the filter still narrows the list.",
+        "chars": 124,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s3-refused_empty"
+    },
+    {
+      "round": 2,
+      "seed": 1,
+      "generationMs": 1216,
+      "outputTokens": 75,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</script>\n<script>\n// create #clear-filter and attach the handler that does the work\nconst clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\n\nclearFilter.addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});\n</script>",
+        "chars": 367,
+        "lines": 13
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 22618,
+        "acceptanceMs": 32334
+      },
+      "containment": {
+        "ok": true,
+        "text": "</script>\n<script>\n// create #clear-filter and attach the handler that does the work\nconst clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\n\nclearFilter.addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});\n</script>",
+        "codeLines": 11,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</script>\n<script>\n// create #clear-filter and attach the handler that does the work\nconst clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\n\nclearFilter.addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});\n</script>",
+        "chars": 367,
+        "lines": 13
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"flat\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "fdd22e362dafd8a9a2268eb111ccae50d99013d5"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "a77caf11224e6021201e68cfedc33787dcae63671fc56aecd187b743e3639a0a",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r2-s1-rejected"
+    },
+    {
+      "round": 2,
+      "seed": 2,
+      "generationMs": 798,
+      "outputTokens": 33,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  paint();\n  document.getElementById('recipe-filter').value = '';\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 36930,
+        "acceptanceMs": 46261
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  paint();\n  document.getElementById('recipe-filter').value = '';\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  paint();\n  document.getElementById('recipe-filter').value = '';\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          2,
+          5
+        ],
+        "failing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\",\\\"Flapjacks\\\",\\\"Chowder\\\",\\\"Risotto\\\",\\\"Custard\\\",\\\"Chutney\\\"]\"; state null; visible [\"Recipe box\",\"6 shown\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 2  typing \"flat\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nSUMMARY 2/7 cases pass, 5 fail",
+        "errors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:49909/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:49909/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "9f95bac8fe9b54b9597e4e945a5ff047b75f8a1e"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "230e37e07534e93c31164d59189e07d79ce6d570cd527cc891f0b108e1bdcf24",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 1, 7"
+      },
+      "preserved": "r2-s2-rejected"
+    },
+    {
+      "round": 2,
+      "seed": 3,
+      "generationMs": 1332,
+      "outputTokens": 33,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 51899,
+        "acceptanceMs": 61952
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          2,
+          5
+        ],
+        "failing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\",\\\"Flapjacks\\\",\\\"Chowder\\\",\\\"Risotto\\\",\\\"Custard\\\",\\\"Chutney\\\"]\"; state null; visible [\"Recipe box\",\"6 shown\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 2  typing \"flat\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nSUMMARY 2/7 cases pass, 5 fail",
+        "errors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:63080/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:63080/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "9f95bac8fe9b54b9597e4e945a5ff047b75f8a1e"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "969357278133d285b8c2f4df4ae709d6c607eaa59bd32d13e27618ed73a81aa7",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 1, 7"
+      },
+      "preserved": "r2-s3-rejected"
+    },
+    {
+      "round": 3,
+      "seed": 1,
+      "generationMs": 2969,
+      "outputTokens": 201,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</script>\n<script>\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nconst clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\n\nclearFilter.addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});\n</script>",
+        "chars": 936,
+        "lines": 21
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 69285,
+        "acceptanceMs": 79276
+      },
+      "containment": {
+        "ok": true,
+        "text": "</script>\n<script>\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nconst clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\n\nclearFilter.addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});\n</script>",
+        "codeLines": 11,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</script>\n<script>\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nconst clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\n\nclearFilter.addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});\n</script>",
+        "chars": 936,
+        "lines": 21
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"flat\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "a5227243608f0ef64541633b052307587984428f"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "82963274db9da79c938ef409cc8cc424477d9d4769334b0d32ad6edc1b77ca79",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r3-s1-rejected"
+    },
+    {
+      "round": 3,
+      "seed": 2,
+      "generationMs": 1289,
+      "outputTokens": 33,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  paint();\n  document.getElementById('recipe-filter').value = '';\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 85018,
+        "acceptanceMs": 94822
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  paint();\n  document.getElementById('recipe-filter').value = '';\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  paint();\n  document.getElementById('recipe-filter').value = '';\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          2,
+          5
+        ],
+        "failing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\",\\\"Flapjacks\\\",\\\"Chowder\\\",\\\"Risotto\\\",\\\"Custard\\\",\\\"Chutney\\\"]\"; state null; visible [\"Recipe box\",\"6 shown\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 2  typing \"flat\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nSUMMARY 2/7 cases pass, 5 fail",
+        "errors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:50586/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:50586/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "9f95bac8fe9b54b9597e4e945a5ff047b75f8a1e"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "230e37e07534e93c31164d59189e07d79ce6d570cd527cc891f0b108e1bdcf24",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 1, 7"
+      },
+      "preserved": "r3-s2-rejected"
+    },
+    {
+      "round": 3,
+      "seed": 3,
+      "generationMs": 1057,
+      "outputTokens": 33,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 99661,
+        "acceptanceMs": 108489
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          2,
+          5
+        ],
+        "failing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\",\\\"Flapjacks\\\",\\\"Chowder\\\",\\\"Risotto\\\",\\\"Custard\\\",\\\"Chutney\\\"]\"; state null; visible [\"Recipe box\",\"6 shown\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 2  typing \"flat\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nSUMMARY 2/7 cases pass, 5 fail",
+        "errors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:63205/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:63205/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "9f95bac8fe9b54b9597e4e945a5ff047b75f8a1e"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "969357278133d285b8c2f4df4ae709d6c607eaa59bd32d13e27618ed73a81aa7",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 1, 7"
+      },
+      "preserved": "r3-s3-rejected"
+    },
+    {
+      "round": 4,
+      "seed": 1,
+      "generationMs": 2966,
+      "outputTokens": 201,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</script>\n<script>\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nconst clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\n\nclearFilter.addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});\n</script>",
+        "chars": 936,
+        "lines": 21
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 115312,
+        "acceptanceMs": 123611
+      },
+      "containment": {
+        "ok": true,
+        "text": "</script>\n<script>\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nconst clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\n\nclearFilter.addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});\n</script>",
+        "codeLines": 11,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</script>\n<script>\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\nconst clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\n\nclearFilter.addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});\n</script>",
+        "chars": 936,
+        "lines": 21
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"flat\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "a5227243608f0ef64541633b052307587984428f"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "82963274db9da79c938ef409cc8cc424477d9d4769334b0d32ad6edc1b77ca79",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r4-s1-rejected"
+    },
+    {
+      "round": 4,
+      "seed": 2,
+      "generationMs": 920,
+      "outputTokens": 33,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  paint();\n  document.getElementById('recipe-filter').value = '';\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 128228,
+        "acceptanceMs": 137067
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  paint();\n  document.getElementById('recipe-filter').value = '';\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  paint();\n  document.getElementById('recipe-filter').value = '';\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          2,
+          5
+        ],
+        "failing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\",\\\"Flapjacks\\\",\\\"Chowder\\\",\\\"Risotto\\\",\\\"Custard\\\",\\\"Chutney\\\"]\"; state null; visible [\"Recipe box\",\"6 shown\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 2  typing \"flat\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nSUMMARY 2/7 cases pass, 5 fail",
+        "errors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:61790/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:61790/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "9f95bac8fe9b54b9597e4e945a5ff047b75f8a1e"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "230e37e07534e93c31164d59189e07d79ce6d570cd527cc891f0b108e1bdcf24",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 1, 7"
+      },
+      "preserved": "r4-s2-rejected"
+    },
+    {
+      "round": 4,
+      "seed": 3,
+      "generationMs": 825,
+      "outputTokens": 33,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 141794,
+        "acceptanceMs": 151541
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+        "chars": 163,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          2,
+          5
+        ],
+        "failing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\",\\\"Flapjacks\\\",\\\"Chowder\\\",\\\"Risotto\\\",\\\"Custard\\\",\\\"Chutney\\\"]\"; state null; visible [\"Recipe box\",\"6 shown\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 2  typing \"flat\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"Recipe box\",\"1 shown\",\"Flatbread\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nSUMMARY 2/7 cases pass, 5 fail",
+        "errors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:49692/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:49692/index.html:53:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "9f95bac8fe9b54b9597e4e945a5ff047b75f8a1e"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "969357278133d285b8c2f4df4ae709d6c607eaa59bd32d13e27618ed73a81aa7",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 1, 7"
+      },
+      "preserved": "r4-s3-rejected"
+    }
+  ],
+  "accepted": false,
+  "calls": 12,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 6,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "totals": {
+    "additionAttemptCalls": 12,
+    "accepted": 0,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 2,
+    "judged": 10,
+    "protectedFailures": 0,
+    "restored": 6,
+    "mismatch": {
+      "NOTHING_WORKED": 4,
+      "NOT_JUDGED": 2,
+      "BROKE_WHAT_WORKED": 6
+    },
+    "partialEffects": 0,
+    "corpus": "legasus/bench/pilot1/runs-7B/p3.attempts",
+    "generationSeconds": 16.4,
+    "wallClockSeconds": 152.4,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

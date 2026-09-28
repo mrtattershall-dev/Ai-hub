@@ -1,0 +1,889 @@
+{
+  "at": "2026-09-28T11:09:27.866Z",
+  "experiment": "TRANSFER-3",
+  "task": "auto-p3",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\pilot1\\p3\\baseline-as-delivered.html",
+  "baselineSha": "7eff475af9de1c8d8f8604505a2960bba61938132b39ff1759c67f6013b73faa",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 42,
+      "scaffold": "        // FILL IN",
+      "instruction": "// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "        // create #clear-filter and attach the handler that does the work\n        // FACT: this file defines matches()\n        // FACT: this file defines paint()\n        // FACT: a input on input#recipe-filter handler is registered\n        // the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 42,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": []
+        },
+        "evidence": [
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "no shared zero-argument renderer was identified, so a change may need to update the page itself rather than delegating"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Recipe box</title></head>\n<body>\n<header><h3>Recipe box</h3></header>\n<div class=\"controls\">\n  <input id=\"recipe-filter\" type=\"text\" placeholder=\"type to narrow\">\n  <span id=\"count\"></span>\n</div>\n<div id=\"cards\">\n  <div class=\"card\"><span class=\"title\">Flatbread</span></div>\n  <div class=\"card\"><span class=\"title\">Flapjacks</span></div>\n  <div class=\"card\"><span class=\"title\">Chowder</span></div>\n  <div class=\"card\"><span class=\"title\">Risotto</span></div>\n  <div class=\"card\"><span class=\"title\">Custard</span></div>\n  <div class=\"card\"><span class=\"title\">Chutney</span></div>\n</div>\n<script>\nconst state = { query: '' };\nconst cards = document.getElementById('cards');\nconst counter = document.getElementById('count');\n\nfunction matches(card) {\n  if (!state.query) return true;\n  return card.querySelector('.title').textContent.toLowerCase().startsWith(state.query);\n}\n\nfunction paint() {\n  let shown = 0;\n  for (const card of cards.children) {\n    const on = matches(card);\n    card.hidden = !on;\n    if (on) shown++;\n  }\n  counter.textContent = shown + ' shown';\n}\n\ndocument.getElementById('recipe-filter').addEventListener('input', (e) => {\n  state.query = e.target.value.trim().toLowerCase();\n  paint();\n});\n\npaint();\n        // create #clear-filter and attach the handler that does the work\n        // FACT: this file defines matches()\n        // FACT: this file defines paint()\n        // FACT: a input on input#recipe-filter handler is registered\n        // the constraints could not be extracted: NO_ENCLOSING_FUNCTION\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "80ce947e15392c79a26a9da72d30571d6611423e83dba076d946c4b4ea50371b",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [],
+          "failing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 42,
+      "scaffold": "        // FILL IN",
+      "instruction": "// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "        // create #clear-filter and attach the handler that does the work\n        // FACT: this file defines matches()\n        // FACT: this file defines paint()\n        // FACT: a input on input#recipe-filter handler is registered\n        // the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "feedbackDelivered": "        // CHECK 1 FAILED: loads with no page or console error, showing every item\n        // CHECK 2 FAILED: typing \"flat\" narrows the list as it already does\n        // CHECK 3 FAILED: clicking #clear-filter brings every item back\n        // CHECK 4 FAILED: and leaves #recipe-filter empty\n        // CHECK 5 FAILED: filtering still narrows the list afterwards\n        // CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n        // CHECK 7 FAILED: no page or console error was raised at any point\n        // [JS ERROR] Unexpected token '<'",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 42,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": []
+        },
+        "evidence": [
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "no shared zero-argument renderer was identified, so a change may need to update the page itself rather than delegating"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Recipe box</title></head>\n<body>\n<header><h3>Recipe box</h3></header>\n<div class=\"controls\">\n  <input id=\"recipe-filter\" type=\"text\" placeholder=\"type to narrow\">\n  <span id=\"count\"></span>\n</div>\n<div id=\"cards\">\n  <div class=\"card\"><span class=\"title\">Flatbread</span></div>\n  <div class=\"card\"><span class=\"title\">Flapjacks</span></div>\n  <div class=\"card\"><span class=\"title\">Chowder</span></div>\n  <div class=\"card\"><span class=\"title\">Risotto</span></div>\n  <div class=\"card\"><span class=\"title\">Custard</span></div>\n  <div class=\"card\"><span class=\"title\">Chutney</span></div>\n</div>\n<script>\nconst state = { query: '' };\nconst cards = document.getElementById('cards');\nconst counter = document.getElementById('count');\n\nfunction matches(card) {\n  if (!state.query) return true;\n  return card.querySelector('.title').textContent.toLowerCase().startsWith(state.query);\n}\n\nfunction paint() {\n  let shown = 0;\n  for (const card of cards.children) {\n    const on = matches(card);\n    card.hidden = !on;\n    if (on) shown++;\n  }\n  counter.textContent = shown + ' shown';\n}\n\ndocument.getElementById('recipe-filter').addEventListener('input', (e) => {\n  state.query = e.target.value.trim().toLowerCase();\n  paint();\n});\n\npaint();\n        // create #clear-filter and attach the handler that does the work\n        // FACT: this file defines matches()\n        // FACT: this file defines paint()\n        // FACT: a input on input#recipe-filter handler is registered\n        // the constraints could not be extracted: NO_ENCLOSING_FUNCTION\n        // CHECK 1 FAILED: loads with no page or console error, showing every item\n        // CHECK 2 FAILED: typing \"flat\" narrows the list as it already does\n        // CHECK 3 FAILED: clicking #clear-filter brings every item back\n        // CHECK 4 FAILED: and leaves #recipe-filter empty\n        // CHECK 5 FAILED: filtering still narrows the list afterwards\n        // CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n        // CHECK 7 FAILED: no page or console error was raised at any point\n        // [JS ERROR] Unexpected token '<'\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "1e60ec60802deac5cd75b3ab3373c881f6c3eacc6fa586726e1a9d833b5cebf2",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [],
+          "failing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 42,
+      "scaffold": "        // FILL IN",
+      "instruction": "// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "        // create #clear-filter and attach the handler that does the work\n        // FACT: this file defines matches()\n        // FACT: this file defines paint()\n        // FACT: a input on input#recipe-filter handler is registered\n        // the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "feedbackDelivered": "        // CHECK 1 FAILED: loads with no page or console error, showing every item\n        // CHECK 2 FAILED: typing \"flat\" narrows the list as it already does\n        // CHECK 3 FAILED: clicking #clear-filter brings every item back\n        // CHECK 4 FAILED: and leaves #recipe-filter empty\n        // CHECK 5 FAILED: filtering still narrows the list afterwards\n        // CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n        // CHECK 7 FAILED: no page or console error was raised at any point\n        // [JS ERROR] Unexpected token '<'",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 42,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": []
+        },
+        "evidence": [
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "no shared zero-argument renderer was identified, so a change may need to update the page itself rather than delegating"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Recipe box</title></head>\n<body>\n<header><h3>Recipe box</h3></header>\n<div class=\"controls\">\n  <input id=\"recipe-filter\" type=\"text\" placeholder=\"type to narrow\">\n  <span id=\"count\"></span>\n</div>\n<div id=\"cards\">\n  <div class=\"card\"><span class=\"title\">Flatbread</span></div>\n  <div class=\"card\"><span class=\"title\">Flapjacks</span></div>\n  <div class=\"card\"><span class=\"title\">Chowder</span></div>\n  <div class=\"card\"><span class=\"title\">Risotto</span></div>\n  <div class=\"card\"><span class=\"title\">Custard</span></div>\n  <div class=\"card\"><span class=\"title\">Chutney</span></div>\n</div>\n<script>\nconst state = { query: '' };\nconst cards = document.getElementById('cards');\nconst counter = document.getElementById('count');\n\nfunction matches(card) {\n  if (!state.query) return true;\n  return card.querySelector('.title').textContent.toLowerCase().startsWith(state.query);\n}\n\nfunction paint() {\n  let shown = 0;\n  for (const card of cards.children) {\n    const on = matches(card);\n    card.hidden = !on;\n    if (on) shown++;\n  }\n  counter.textContent = shown + ' shown';\n}\n\ndocument.getElementById('recipe-filter').addEventListener('input', (e) => {\n  state.query = e.target.value.trim().toLowerCase();\n  paint();\n});\n\npaint();\n        // create #clear-filter and attach the handler that does the work\n        // FACT: this file defines matches()\n        // FACT: this file defines paint()\n        // FACT: a input on input#recipe-filter handler is registered\n        // the constraints could not be extracted: NO_ENCLOSING_FUNCTION\n        // CHECK 1 FAILED: loads with no page or console error, showing every item\n        // CHECK 2 FAILED: typing \"flat\" narrows the list as it already does\n        // CHECK 3 FAILED: clicking #clear-filter brings every item back\n        // CHECK 4 FAILED: and leaves #recipe-filter empty\n        // CHECK 5 FAILED: filtering still narrows the list afterwards\n        // CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n        // CHECK 7 FAILED: no page or console error was raised at any point\n        // [JS ERROR] Unexpected token '<'\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "1e60ec60802deac5cd75b3ab3373c881f6c3eacc6fa586726e1a9d833b5cebf2",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 5012,
+      "outputTokens": 6,
+      "promptTokens": 446,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</code></pre>",
+        "chars": 13,
+        "lines": 1
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 11543,
+        "acceptanceMs": 21311
+      },
+      "containment": {
+        "ok": true,
+        "text": "</code></pre>",
+        "codeLines": 1,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</code></pre>",
+        "chars": 13,
+        "lines": 1
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [],
+        "failing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\",\\\"Flapjacks\\\",\\\"Chowder\\\",\\\"Risotto\\\",\\\"Custard\\\",\\\"Chutney\\\"]\"; state null; visible [\"Recipe box\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Unexpected token '<'\nFAIL case 2  typing \"flat\" narrows the list as it already does -> expected JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\"]\"; state null; visible [\"Recipe box\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Unexpected token '<'\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Unexpected token '<'\nFAIL case 5  filtering still narrows the list afterwards -> expected JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\"]\"; state null; visible [\"Recipe box\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Unexpected token '<'\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"Recipe box\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Unexpected token '<'\nSUMMARY 0/7 cases pass, 7 fail",
+        "errors": [
+          "[JS ERROR] Unexpected token '<'"
+        ],
+        "stacks": [
+          "SyntaxError: Unexpected token '<'"
+        ],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Unexpected token '<'"
+        ],
+        "stacks": [
+          "SyntaxError: Unexpected token '<'"
+        ],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "9f95bac8fe9b54b9597e4e945a5ff047b75f8a1e"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "47007d194d99c48831f579db1ea95c21b7d934e9526cc8416f0e58660603dd96",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            2,
+            5,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "4 carried-forward check(s) stopped passing: 1, 2, 5, 7"
+      },
+      "preserved": "r1-s1-rejected"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 185,
+      "outputTokens": 1,
+      "promptTokens": 446,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s2-refused_empty"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 96,
+      "outputTokens": 1,
+      "promptTokens": 446,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s3-refused_empty"
+    },
+    {
+      "round": 2,
+      "seed": 1,
+      "generationMs": 2136,
+      "outputTokens": 4,
+      "promptTokens": 578,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</div>",
+        "chars": 6,
+        "lines": 1
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 28039,
+        "acceptanceMs": 38958
+      },
+      "containment": {
+        "ok": true,
+        "text": "</div>",
+        "codeLines": 1,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</div>",
+        "chars": 6,
+        "lines": 1
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [],
+        "failing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\",\\\"Flapjacks\\\",\\\"Chowder\\\",\\\"Risotto\\\",\\\"Custard\\\",\\\"Chutney\\\"]\"; state null; visible [\"Recipe box\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Unexpected token '<'\nFAIL case 2  typing \"flat\" narrows the list as it already does -> expected JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\"]\"; state null; visible [\"Recipe box\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Unexpected token '<'\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #recipe-filter empty -> expected dom.inputValues[\"#recipe-filter\"] === ''; state null; visible [\"Recipe box\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Unexpected token '<'\nFAIL case 5  filtering still narrows the list afterwards -> expected JSON.stringify(dom.visible.filter((t) => [\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"].includes(t))) === \"[\\\"Flatbread\\\"]\"; state null; visible [\"Recipe box\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Unexpected token '<'\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"Recipe box\",\"Flatbread\",\"Flapjacks\",\"Chowder\",\"Risotto\",\"Custard\",\"Chutney\"]; errors: [JS ERROR] Unexpected token '<'\nSUMMARY 0/7 cases pass, 7 fail",
+        "errors": [
+          "[JS ERROR] Unexpected token '<'"
+        ],
+        "stacks": [
+          "SyntaxError: Unexpected token '<'"
+        ],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Unexpected token '<'"
+        ],
+        "stacks": [
+          "SyntaxError: Unexpected token '<'"
+        ],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "recipe-filter",
+            "count",
+            "cards"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "9f95bac8fe9b54b9597e4e945a5ff047b75f8a1e"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "48ddf588511faf757e00cd689b6b11a814a7f4000c63bc5a1c3095091af82341",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            2,
+            5,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "4 carried-forward check(s) stopped passing: 1, 2, 5, 7"
+      },
+      "preserved": "r2-s1-rejected"
+    },
+    {
+      "round": 2,
+      "seed": 2,
+      "generationMs": 365,
+      "outputTokens": 1,
+      "promptTokens": 578,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r2-s2-refused_empty"
+    },
+    {
+      "round": 2,
+      "seed": 3,
+      "generationMs": 284,
+      "outputTokens": 1,
+      "promptTokens": 578,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r2-s3-refused_empty"
+    },
+    {
+      "round": 3,
+      "seed": 1,
+      "generationMs": 156,
+      "outputTokens": 1,
+      "promptTokens": 578,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r3-s1-refused_empty"
+    },
+    {
+      "round": 3,
+      "seed": 2,
+      "generationMs": 103,
+      "outputTokens": 1,
+      "promptTokens": 578,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r3-s2-refused_empty"
+    },
+    {
+      "round": 3,
+      "seed": 3,
+      "generationMs": 96,
+      "outputTokens": 1,
+      "promptTokens": 578,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r3-s3-refused_empty"
+    }
+  ],
+  "accepted": false,
+  "calls": 9,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 6,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "stoppedBecause": "no code was produced at the planned site (CREATE_A_CONTROL_AND_WIRE_IT)",
+  "totals": {
+    "additionAttemptCalls": 9,
+    "accepted": 0,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 7,
+    "judged": 2,
+    "protectedFailures": 0,
+    "restored": 2,
+    "mismatch": {
+      "BROKE_WHAT_WORKED": 2,
+      "NOT_JUDGED": 7
+    },
+    "partialEffects": 0,
+    "corpus": "legasus/bench/pilot1/runs/p3.attempts",
+    "generationSeconds": 8.4,
+    "wallClockSeconds": 40.9,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

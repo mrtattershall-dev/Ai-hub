@@ -1,0 +1,126 @@
+{
+  "round": 1,
+  "seed": 2,
+  "outcome": "REJECTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [],
+      "failed": [
+        3,
+        4,
+        6
+      ]
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": []
+    },
+    "mismatch": "NOTHING_WORKED",
+    "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+  },
+  "proposal": {
+    "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+    "site": {
+      "insertAfterLine": 22,
+      "why": "at the end of the script, after every element and function it must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "#clear-filter"
+      ],
+      "attaches": [
+        "#clear-filter"
+      ],
+      "calls": [
+        "refresh"
+      ]
+    },
+    "evidence": [
+      "the page has a zero-argument function refresh() that existing code calls after changing state",
+      "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+      "the page's clickable controls are: none",
+      "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html>\n<head><title>Parts</title></head>\n<body>\n<h1>Parts</h1>\n<input type=\"text\" id=\"search\" placeholder=\"search parts\">\n<ul id=\"parts\">\n  <li class=\"part\">bracket</li>\n  <li class=\"part\">brace</li>\n  <li class=\"part\">washer</li>\n  <li class=\"part\">spindle</li>\n  <li class=\"part\">grommet</li>\n</ul>\n<script>\nconst field = document.getElementById('search');\nconst rows = Array.from(document.querySelectorAll('#parts .part'));\nfunction refresh() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (li) {\n    li.style.display = li.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n  });\n}\nfield.addEventListener('input', refresh);\n// create #clear-filter and attach the handler that does the work\n// the page updates through refresh, which existing code calls after changing state\n// FACT: this file defines refresh()\n// FACT: a input on input#search handler is registered\n// when #clear-filter is clicked: #search is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+    "suffix": "\n</script>\n</body>\n</html>\n"
+  },
+  "completion": {
+    "text": "const clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear Filter';\nclearFilter.addEventListener('click', function() {\n  field.value = '';\n  refresh();\n});\ndocument.body.appendChild(clearFilter);",
+    "chars": 223,
+    "lines": 7,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "const clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear Filter';\nclearFilter.addEventListener('click', function() {\n  field.value = '';\n  refresh();\n});\ndocument.body.appendChild(clearFilter);",
+    "chars": 223,
+    "lines": 7
+  },
+  "containment": {
+    "ok": true,
+    "text": "const clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear Filter';\nclearFilter.addEventListener('click', function() {\n  field.value = '';\n  refresh();\n});\ndocument.body.appendChild(clearFilter);",
+    "codeLines": 7,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      1,
+      2,
+      5,
+      7
+    ],
+    "failing": [
+      3,
+      4,
+      6
+    ],
+    "errors": []
+  },
+  "acceptance": {
+    "disposition": "PRESERVE_INCOMPLETE",
+    "protected": "PASS"
+  },
+  "decision": {
+    "accepted": false,
+    "functionallyAccepted": false,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [
+      "the functional checks did not pass"
+    ],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "FAIL",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r1-s2-rejected.html"
+}

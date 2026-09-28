@@ -1,0 +1,131 @@
+{
+  "round": 2,
+  "seed": 3,
+  "outcome": "REJECTED",
+  "classification": {
+    "addition": {
+      "asked": [
+        3,
+        4,
+        6
+      ],
+      "passed": [],
+      "failed": [
+        3,
+        4,
+        6
+      ]
+    },
+    "carriedForward": {
+      "asked": [
+        1,
+        2,
+        5,
+        7
+      ],
+      "broken": [
+        1,
+        7
+      ]
+    },
+    "mismatch": "BROKE_WHAT_WORKED",
+    "why": "2 carried-forward check(s) stopped passing: 1, 7"
+  },
+  "proposal": {
+    "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+    "site": {
+      "insertAfterLine": 42,
+      "why": "at the end of the script, after every element and function it must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "#clear-filter"
+      ],
+      "attaches": [
+        "#clear-filter"
+      ],
+      "calls": [
+        "paint"
+      ]
+    },
+    "evidence": [
+      "the page has a zero-argument function paint() that existing code calls after changing state",
+      "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+      "the page's clickable controls are: none",
+      "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html>\n<head><title>Recipe box</title></head>\n<body>\n<header><h3>Recipe box</h3></header>\n<div class=\"controls\">\n  <input id=\"recipe-filter\" type=\"text\" placeholder=\"type to narrow\">\n  <span id=\"count\"></span>\n</div>\n<div id=\"cards\">\n  <div class=\"card\"><span class=\"title\">Flatbread</span></div>\n  <div class=\"card\"><span class=\"title\">Flapjacks</span></div>\n  <div class=\"card\"><span class=\"title\">Chowder</span></div>\n  <div class=\"card\"><span class=\"title\">Risotto</span></div>\n  <div class=\"card\"><span class=\"title\">Custard</span></div>\n  <div class=\"card\"><span class=\"title\">Chutney</span></div>\n</div>\n<script>\nconst state = { query: '' };\nconst cards = document.getElementById('cards');\nconst counter = document.getElementById('count');\n\nfunction matches(card) {\n  if (!state.query) return true;\n  return card.querySelector('.title').textContent.toLowerCase().startsWith(state.query);\n}\n\nfunction paint() {\n  let shown = 0;\n  for (const card of cards.children) {\n    const on = matches(card);\n    card.hidden = !on;\n    if (on) shown++;\n  }\n  counter.textContent = shown + ' shown';\n}\n\ndocument.getElementById('recipe-filter').addEventListener('input', (e) => {\n  state.query = e.target.value.trim().toLowerCase();\n  paint();\n});\n\npaint();\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #recipe-filter empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+    "suffix": "\n</script>\n</body>\n</html>\n"
+  },
+  "completion": {
+    "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+    "chars": 163,
+    "lines": 5,
+    "truncatedInRunRecord": false
+  },
+  "contained": {
+    "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+    "chars": 163,
+    "lines": 5
+  },
+  "containment": {
+    "ok": true,
+    "text": "document.getElementById('clear-filter').addEventListener('click', () => {\n  state.query = '';\n  document.getElementById('recipe-filter').value = '';\n  paint();\n});",
+    "codeLines": 5,
+    "truncatedAtLine": null,
+    "droppedLines": 0,
+    "how": "the completion stayed inside its slot"
+  },
+  "play": {
+    "passing": [
+      2,
+      5
+    ],
+    "failing": [
+      1,
+      3,
+      4,
+      6,
+      7
+    ],
+    "errors": [
+      "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+    ]
+  },
+  "acceptance": {
+    "disposition": "RESTORED",
+    "protected": "PASS"
+  },
+  "decision": {
+    "accepted": false,
+    "functionallyAccepted": false,
+    "visualStatus": "NOT_RUN",
+    "visualBlocking": false,
+    "visualEvaluated": false,
+    "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+    "renderCoverage": {
+      "functionalRuleExercised": false,
+      "revisitedStates": 0,
+      "injectiveRuleExercised": false,
+      "distinctStates": 0,
+      "observationsConsidered": 0
+    },
+    "reasons": [
+      "the functional checks did not pass"
+    ],
+    "advisories": [
+      "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+    ],
+    "summary": {
+      "functional": "FAIL",
+      "visual": "NOT_RUN",
+      "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+    }
+  },
+  "candidateFile": "r2-s3-rejected.html"
+}

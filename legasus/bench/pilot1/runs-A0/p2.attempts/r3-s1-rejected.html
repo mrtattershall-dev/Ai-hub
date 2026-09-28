@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Team directory</title>
+<style>
+  body { font-family: sans-serif; }
+  table { border-collapse: collapse; }
+  td { padding: 4px 12px; border-bottom: 1px solid #ddd; }
+  .gone { display: none; }
+</style>
+</head>
+<body>
+<h2>Team directory</h2>
+<label for="q">Find someone</label>
+<input type="search" id="q">
+<table id="people">
+  <tbody>
+    <tr class="person"><td>Alvarez</td></tr>
+    <tr class="person"><td>Okonkwo</td></tr>
+    <tr class="person"><td>Petrov</td></tr>
+    <tr class="person"><td>Nakamura</td></tr>
+    <tr class="person"><td>Alberts</td></tr>
+    <tr class="person"><td>Duarte</td></tr>
+  </tbody>
+</table>
+<script>
+(function () {
+  var box = document.getElementById('q');
+  var people = document.getElementById('people');
+  function render() {
+    var needle = box.value.trim().toLowerCase();
+    var all = people.querySelectorAll('.person');
+    for (var i = 0; i < all.length; i++) {
+      var name = all[i].textContent.toLowerCase();
+      if (needle === '' || name.indexOf(needle) !== -1) {
+        all[i].classList.remove('gone');
+      } else {
+        all[i].classList.add('gone');
+      }
+    }
+  }
+  box.addEventListener('keyup', render);
+  box.addEventListener('input', render);
+})();
+        // create #clear-filter and attach the handler that does the work
+        // FACT: this file defines render()
+        // FACT: a keyup on input#q handler is registered
+        // FACT: a input on input#q handler is registered
+        // CHECK 3 FAILED: clicking #clear-filter brings every item back
+        // CHECK 4 FAILED: and leaves #q empty
+        // CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again
+// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.
+</html>
+</script>
+</body>
+</html>

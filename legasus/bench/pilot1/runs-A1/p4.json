@@ -1,0 +1,243 @@
+{
+  "at": "2026-09-28T11:19:23.733Z",
+  "experiment": "TRANSFER-3",
+  "task": "auto-p4",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\pilot1\\p4\\baseline-as-delivered.html",
+  "baselineSha": "a7efef3b063adaac8fb4475fed0724e35c51cb7faa0a0fce088f878aa3f7186e",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 33,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// FACT: this file defines visibleFor()\n// FACT: this file defines update()\n// FACT: a input on document handler is registered\n// FACT: li is written here and this file does not declare it.\n// FACT line 28: existing code writes it as li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';",
+      "factsDelivered": 1,
+      "contextDropped": [
+        "uncertainty: the whole uncertainty",
+        "update(): the whole redraw"
+      ],
+      "noFactsBecause": null,
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 33,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": []
+        },
+        "evidence": [
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "this application uses handler mechanisms the observer does not capture, so some behaviour may be unobserved and therefore unprotected",
+          "this application uses handler mechanisms the registration capture does not see: 1 inline handler attribute(s). Behaviour reached only through them is UNCOVERED, and any \"no change observed\" here is correspondingly weaker.",
+          "no shared zero-argument renderer was identified, so a change may need to update the page itself rather than delegating"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Shipping log</title></head>\n<body>\n<h1>Shipping log</h1>\n<form id=\"tools\" onsubmit=\"return false;\">\n  <input name=\"needle\" id=\"needle\" type=\"text\">\n</form>\n<ol id=\"log\">\n  <li data-row=\"1\">Portland dispatched</li>\n  <li data-row=\"2\">Portsmouth delayed</li>\n  <li data-row=\"3\">Halifax dispatched</li>\n  <li data-row=\"4\">Galveston held</li>\n  <li data-row=\"5\">Hamburg dispatched</li>\n</ol>\n<script>\nvar log = document.getElementById('log');\nvar entries = [].slice.call(log.getElementsByTagName('li'));\nvar needle = document.getElementById('needle');\n\nfunction visibleFor(text, term) {\n  return term.length === 0 || text.toLowerCase().indexOf(term) >= 0;\n}\n\nfunction update() {\n  var term = needle.value.toLowerCase();\n  entries.forEach(function (li) {\n    li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';\n  });\n}\n\ndocument.addEventListener('input', function (e) {\n  if (e.target === needle) update();\n});\n// create #clear-filter and attach the handler that does the work\n// FACT: this file defines visibleFor()\n// FACT: this file defines update()\n// FACT: a input on document handler is registered\n// FACT: li is written here and this file does not declare it.\n// FACT line 28: existing code writes it as li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';\n// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "2308a0a07bae7bd3b20860ccb6ade1d15a3048691c2574c4e7162dedd4f103ff",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 1716,
+      "outputTokens": 1,
+      "promptTokens": 392,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_empty"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 5451,
+      "outputTokens": 87,
+      "promptTokens": 392,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "// FACT: #clear-filter is a button that clears the filter. When clicked, #needle is empty, and every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// FACT: #clear-filter is a button that clears the filter. When clicked, #needle is empty, and every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+        "chars": 375,
+        "lines": 2
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s2-refused_empty"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 27566,
+      "outputTokens": 400,
+      "promptTokens": 392,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "// FACT: #clear-filter is a button that clears the filter. When clicked, the input field #needle is cleared, and all items in the list are displayed again. This ensures that typing in the filter still narrows the list. The #clear-filter button is attached to the document's click event listener. When the button is clicked, the input field #needle is cleared, and all items in the list are displayed again. This ensures that typing in the filter still narrows the list. The #clear-filter button is attached to the document's click event listener. When the button is clicked, the input field #needle is cleared, and all items in the list are displayed again. This ensures that typing in the filter still narrows the list. The #clear-filter button is attached to the document's click event listener. When the button is clicked, the input field #needle is cleared, and all items in the list are displayed again. This ensures that typing in the filter still narrows the list. The #clear-filter button is attached to the document's click event listener. When the button is clicked, the input field #needle is cleared, and all items in the list are displayed again. This ensures that typing in the filter still narrows the list. The #clear-filter button is attached to the document's click event listener. When the button is clicked, the input field #needle is cleared, and all items in the list are displayed again. This ensures that typing in the filter still narrows the list. The #clear-filter button is attached to the document's click event listener. When the button is clicked, the input field #needle is cleared, and all items in the list are displayed again. This ensures that typing in the filter still narrows the list. The #clear-filter button is attached to the document's click event listener. When the button is clicked, the input field #needle is cleared, and all items in the list are displayed again. This",
+        "chars": 1917,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s3-refused_empty"
+    }
+  ],
+  "accepted": false,
+  "calls": 3,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 9,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [
+          {
+            "selector": "#tools",
+            "attr": "onsubmit"
+          }
+        ],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": true
+    },
+    "unresolved": [
+      "this application uses handler mechanisms the registration capture does not see: 1 inline handler attribute(s). Behaviour reached only through them is UNCOVERED, and any \"no change observed\" here is correspondingly weaker."
+    ]
+  },
+  "stoppedBecause": "no code was produced at the planned site (CREATE_A_CONTROL_AND_WIRE_IT)",
+  "totals": {
+    "additionAttemptCalls": 3,
+    "accepted": 0,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 3,
+    "judged": 0,
+    "protectedFailures": 0,
+    "restored": 0,
+    "mismatch": {
+      "NOT_JUDGED": 3
+    },
+    "partialEffects": 0,
+    "corpus": "legasus/bench/pilot1/runs-A1/p4.attempts",
+    "generationSeconds": 34.7,
+    "wallClockSeconds": 39.9,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

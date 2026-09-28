@@ -1,0 +1,58 @@
+{
+  "round": 2,
+  "seed": 2,
+  "outcome": "REFUSED_EMPTY",
+  "classification": {
+    "mismatch": "NOT_JUDGED",
+    "why": "the completion never reached the gate",
+    "addition": null,
+    "carriedForward": null
+  },
+  "proposal": {
+    "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+    "site": {
+      "insertAfterLine": 22,
+      "why": "at the end of the script, after every element and function it must reference exists"
+    },
+    "scope": {
+      "creates": [
+        "#clear-filter"
+      ],
+      "attaches": [
+        "#clear-filter"
+      ],
+      "calls": []
+    },
+    "evidence": [
+      "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+      "the page's clickable controls are: none",
+      "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+    ],
+    "uncertainty": [
+      "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+      "no shared zero-argument renderer was identified, so a change may need to update the page itself rather than delegating"
+    ]
+  },
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html>\n<head><title>Parts</title></head>\n<body>\n<h1>Parts</h1>\n<input type=\"text\" id=\"search\" placeholder=\"search parts\">\n<ul id=\"parts\">\n  <li class=\"part\">bracket</li>\n  <li class=\"part\">brace</li>\n  <li class=\"part\">washer</li>\n  <li class=\"part\">spindle</li>\n  <li class=\"part\">grommet</li>\n</ul>\n<script>\nconst field = document.getElementById('search');\nconst rows = Array.from(document.querySelectorAll('#parts .part'));\nfunction refresh() {\n  const q = field.value.toLowerCase();\n  rows.forEach(function (li) {\n    li.style.display = li.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';\n  });\n}\nfield.addEventListener('input', refresh);\n// create #clear-filter and attach the handler that does the work\n// FACT: this file defines refresh()\n// FACT: a input on input#search handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #search empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #search is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+    "suffix": "\n</script>\n</body>\n</html>\n"
+  },
+  "completion": {
+    "text": "",
+    "chars": 0,
+    "lines": 1,
+    "truncatedInRunRecord": false
+  },
+  "contained": null,
+  "containment": {
+    "ok": false,
+    "reason": "EMPTY",
+    "detail": "no code in the completion",
+    "truncatedAtLine": null,
+    "droppedLines": 0
+  },
+  "play": null,
+  "acceptance": null,
+  "decision": null,
+  "candidateFile": null
+}

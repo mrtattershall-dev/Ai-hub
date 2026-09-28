@@ -1,0 +1,2733 @@
+{
+  "at": "2026-09-28T11:53:20.313Z",
+  "experiment": "TRANSFER-3",
+  "task": "auto-p4",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\pilot1\\p4\\baseline-as-delivered.html",
+  "baselineSha": "a7efef3b063adaac8fb4475fed0724e35c51cb7faa0a0fce088f878aa3f7186e",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 33,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "slotContract": "// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through update, which existing code calls after changing state\n// FACT: this file defines visibleFor()\n// FACT: this file defines update()\n// FACT: a input on document handler is registered\n// FACT: li is written here and this file does not declare it.\n// FACT line 28: existing code writes it as li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';",
+      "factsDelivered": 1,
+      "contextDropped": [
+        "uncertainty: the whole uncertainty",
+        "update(): the whole redraw"
+      ],
+      "noFactsBecause": null,
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 33,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "update"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function update() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "this application uses handler mechanisms the observer does not capture, so some behaviour may be unobserved and therefore unprotected",
+          "this application uses handler mechanisms the registration capture does not see: 1 inline handler attribute(s). Behaviour reached only through them is UNCOVERED, and any \"no change observed\" here is correspondingly weaker."
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Shipping log</title></head>\n<body>\n<h1>Shipping log</h1>\n<form id=\"tools\" onsubmit=\"return false;\">\n  <input name=\"needle\" id=\"needle\" type=\"text\">\n</form>\n<ol id=\"log\">\n  <li data-row=\"1\">Portland dispatched</li>\n  <li data-row=\"2\">Portsmouth delayed</li>\n  <li data-row=\"3\">Halifax dispatched</li>\n  <li data-row=\"4\">Galveston held</li>\n  <li data-row=\"5\">Hamburg dispatched</li>\n</ol>\n<script>\nvar log = document.getElementById('log');\nvar entries = [].slice.call(log.getElementsByTagName('li'));\nvar needle = document.getElementById('needle');\n\nfunction visibleFor(text, term) {\n  return term.length === 0 || text.toLowerCase().indexOf(term) >= 0;\n}\n\nfunction update() {\n  var term = needle.value.toLowerCase();\n  entries.forEach(function (li) {\n    li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';\n  });\n}\n\ndocument.addEventListener('input', function (e) {\n  if (e.target === needle) update();\n});\n// create #clear-filter and attach the handler that does the work\n// the page updates through update, which existing code calls after changing state\n// FACT: this file defines visibleFor()\n// FACT: this file defines update()\n// FACT: a input on document handler is registered\n// FACT: li is written here and this file does not declare it.\n// FACT line 28: existing code writes it as li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';\n// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "d1c538d2c509cf063209cceb88e8709063ccc1fd81bc744cd47ba0028fa824e4",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            1,
+            3,
+            6,
+            7
+          ],
+          "failing": [
+            2,
+            4,
+            5
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 33,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "slotContract": "// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through update, which existing code calls after changing state\n// FACT: this file defines visibleFor()\n// FACT: this file defines update()\n// FACT: a input on document handler is registered\n// FACT: li is written here and this file does not declare it.\n// FACT line 28: existing code writes it as li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';",
+      "factsDelivered": 1,
+      "contextDropped": [
+        "uncertainty: the whole uncertainty",
+        "update(): the whole redraw"
+      ],
+      "noFactsBecause": null,
+      "feedbackDelivered": "// CHECK 2 FAILED: typing \"port\" narrows the list as it already does\n// CHECK 4 FAILED: and leaves #needle empty\n// CHECK 5 FAILED: filtering still narrows the list afterwards",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 33,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "update"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function update() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "this application uses handler mechanisms the observer does not capture, so some behaviour may be unobserved and therefore unprotected",
+          "this application uses handler mechanisms the registration capture does not see: 1 inline handler attribute(s). Behaviour reached only through them is UNCOVERED, and any \"no change observed\" here is correspondingly weaker."
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Shipping log</title></head>\n<body>\n<h1>Shipping log</h1>\n<form id=\"tools\" onsubmit=\"return false;\">\n  <input name=\"needle\" id=\"needle\" type=\"text\">\n</form>\n<ol id=\"log\">\n  <li data-row=\"1\">Portland dispatched</li>\n  <li data-row=\"2\">Portsmouth delayed</li>\n  <li data-row=\"3\">Halifax dispatched</li>\n  <li data-row=\"4\">Galveston held</li>\n  <li data-row=\"5\">Hamburg dispatched</li>\n</ol>\n<script>\nvar log = document.getElementById('log');\nvar entries = [].slice.call(log.getElementsByTagName('li'));\nvar needle = document.getElementById('needle');\n\nfunction visibleFor(text, term) {\n  return term.length === 0 || text.toLowerCase().indexOf(term) >= 0;\n}\n\nfunction update() {\n  var term = needle.value.toLowerCase();\n  entries.forEach(function (li) {\n    li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';\n  });\n}\n\ndocument.addEventListener('input', function (e) {\n  if (e.target === needle) update();\n});\n// create #clear-filter and attach the handler that does the work\n// the page updates through update, which existing code calls after changing state\n// FACT: this file defines visibleFor()\n// FACT: this file defines update()\n// FACT: a input on document handler is registered\n// FACT: li is written here and this file does not declare it.\n// FACT line 28: existing code writes it as li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';\n// CHECK 2 FAILED: typing \"port\" narrows the list as it already does\n// CHECK 4 FAILED: and leaves #needle empty\n// CHECK 5 FAILED: filtering still narrows the list afterwards\n// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "27e69309bc201dcbceedf826be6013c3db57abc3da05e6da87f7bb91117b4e26",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            1,
+            3,
+            6,
+            7
+          ],
+          "failing": [
+            2,
+            4,
+            5
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 33,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "slotContract": "// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through update, which existing code calls after changing state\n// FACT: this file defines visibleFor()\n// FACT: this file defines update()\n// FACT: a input on document handler is registered\n// FACT: li is written here and this file does not declare it.\n// FACT line 28: existing code writes it as li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';",
+      "factsDelivered": 1,
+      "contextDropped": [
+        "uncertainty: the whole uncertainty",
+        "update(): the whole redraw"
+      ],
+      "noFactsBecause": null,
+      "feedbackDelivered": "// CHECK 2 FAILED: typing \"port\" narrows the list as it already does\n// CHECK 4 FAILED: and leaves #needle empty\n// CHECK 5 FAILED: filtering still narrows the list afterwards",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 33,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "update"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function update() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "this application uses handler mechanisms the observer does not capture, so some behaviour may be unobserved and therefore unprotected",
+          "this application uses handler mechanisms the registration capture does not see: 1 inline handler attribute(s). Behaviour reached only through them is UNCOVERED, and any \"no change observed\" here is correspondingly weaker."
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Shipping log</title></head>\n<body>\n<h1>Shipping log</h1>\n<form id=\"tools\" onsubmit=\"return false;\">\n  <input name=\"needle\" id=\"needle\" type=\"text\">\n</form>\n<ol id=\"log\">\n  <li data-row=\"1\">Portland dispatched</li>\n  <li data-row=\"2\">Portsmouth delayed</li>\n  <li data-row=\"3\">Halifax dispatched</li>\n  <li data-row=\"4\">Galveston held</li>\n  <li data-row=\"5\">Hamburg dispatched</li>\n</ol>\n<script>\nvar log = document.getElementById('log');\nvar entries = [].slice.call(log.getElementsByTagName('li'));\nvar needle = document.getElementById('needle');\n\nfunction visibleFor(text, term) {\n  return term.length === 0 || text.toLowerCase().indexOf(term) >= 0;\n}\n\nfunction update() {\n  var term = needle.value.toLowerCase();\n  entries.forEach(function (li) {\n    li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';\n  });\n}\n\ndocument.addEventListener('input', function (e) {\n  if (e.target === needle) update();\n});\n// create #clear-filter and attach the handler that does the work\n// the page updates through update, which existing code calls after changing state\n// FACT: this file defines visibleFor()\n// FACT: this file defines update()\n// FACT: a input on document handler is registered\n// FACT: li is written here and this file does not declare it.\n// FACT line 28: existing code writes it as li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';\n// CHECK 2 FAILED: typing \"port\" narrows the list as it already does\n// CHECK 4 FAILED: and leaves #needle empty\n// CHECK 5 FAILED: filtering still narrows the list afterwards\n// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "27e69309bc201dcbceedf826be6013c3db57abc3da05e6da87f7bb91117b4e26",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            1,
+            3,
+            6,
+            7
+          ],
+          "failing": [
+            2,
+            4,
+            5
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 33,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "slotContract": "// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through update, which existing code calls after changing state\n// FACT: this file defines visibleFor()\n// FACT: this file defines update()\n// FACT: a input on document handler is registered\n// FACT: li is written here and this file does not declare it.\n// FACT line 28: existing code writes it as li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';",
+      "factsDelivered": 1,
+      "contextDropped": [
+        "uncertainty: the whole uncertainty",
+        "update(): the whole redraw"
+      ],
+      "noFactsBecause": null,
+      "feedbackDelivered": "// CHECK 2 FAILED: typing \"port\" narrows the list as it already does\n// CHECK 4 FAILED: and leaves #needle empty\n// CHECK 5 FAILED: filtering still narrows the list afterwards",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 33,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "update"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function update() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "this application uses handler mechanisms the observer does not capture, so some behaviour may be unobserved and therefore unprotected",
+          "this application uses handler mechanisms the registration capture does not see: 1 inline handler attribute(s). Behaviour reached only through them is UNCOVERED, and any \"no change observed\" here is correspondingly weaker."
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Shipping log</title></head>\n<body>\n<h1>Shipping log</h1>\n<form id=\"tools\" onsubmit=\"return false;\">\n  <input name=\"needle\" id=\"needle\" type=\"text\">\n</form>\n<ol id=\"log\">\n  <li data-row=\"1\">Portland dispatched</li>\n  <li data-row=\"2\">Portsmouth delayed</li>\n  <li data-row=\"3\">Halifax dispatched</li>\n  <li data-row=\"4\">Galveston held</li>\n  <li data-row=\"5\">Hamburg dispatched</li>\n</ol>\n<script>\nvar log = document.getElementById('log');\nvar entries = [].slice.call(log.getElementsByTagName('li'));\nvar needle = document.getElementById('needle');\n\nfunction visibleFor(text, term) {\n  return term.length === 0 || text.toLowerCase().indexOf(term) >= 0;\n}\n\nfunction update() {\n  var term = needle.value.toLowerCase();\n  entries.forEach(function (li) {\n    li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';\n  });\n}\n\ndocument.addEventListener('input', function (e) {\n  if (e.target === needle) update();\n});\n// create #clear-filter and attach the handler that does the work\n// the page updates through update, which existing code calls after changing state\n// FACT: this file defines visibleFor()\n// FACT: this file defines update()\n// FACT: a input on document handler is registered\n// FACT: li is written here and this file does not declare it.\n// FACT line 28: existing code writes it as li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';\n// CHECK 2 FAILED: typing \"port\" narrows the list as it already does\n// CHECK 4 FAILED: and leaves #needle empty\n// CHECK 5 FAILED: filtering still narrows the list afterwards\n// when #clear-filter is clicked: #needle is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.\n// Create any element you need with document.createElement and append it. Continue here:\n",
+      "promptHeadSha": "27e69309bc201dcbceedf826be6013c3db57abc3da05e6da87f7bb91117b4e26",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            1,
+            3,
+            6,
+            7
+          ],
+          "failing": [
+            2,
+            4,
+            5
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 1268,
+      "outputTokens": 42,
+      "promptTokens": 467,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  needle.value = '';\n  update();\n});",
+        "chars": 212,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 8182,
+        "acceptanceMs": 18484
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  needle.value = '';\n  update();\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function() {\n  needle.value = '';\n  update();\n});",
+        "chars": 212,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          3,
+          6,
+          7
+        ],
+        "failing": [
+          2,
+          4,
+          5
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nFAIL case 2  typing \"port\" narrows the list as it already does -> expected JSON.stringify(dom.visible.filter((t) => [\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"].includes(t))) === \"[\\\"Portland dispatched\\\",\\\"Portsmouth delayed\\\"]\"; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nPASS case 3  clicking #clear-filter brings every item back\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nFAIL case 5  filtering still narrows the list afterwards -> expected JSON.stringify(dom.visible.filter((t) => [\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"].includes(t))) === \"[\\\"Portland dispatched\\\",\\\"Portsmouth delayed\\\"]\"; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nPASS case 6  clicking #clear-filter a second time brings every item back again\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "clear-filter",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "clear-filter",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          2,
+          4,
+          5
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "3e03ed467d91be9680d68280bedc3e1e7fc958f7"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "c3b7b401efb3f196ef6dcad2d3b55e68969599386394ab522553abb8034bd1fe",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [
+            3,
+            6
+          ],
+          "failed": [
+            4
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            2,
+            5
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 2, 5"
+      },
+      "preserved": "r1-s1-rejected"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 1209,
+      "outputTokens": 43,
+      "promptTokens": 467,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "chars": 222,
+        "lines": 7
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 24099,
+        "acceptanceMs": 33316
+      },
+      "containment": {
+        "ok": true,
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "codeLines": 7,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "chars": 222,
+        "lines": 7
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"port\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Portland dispatched\",\"Portsmouth delayed\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "51d1f4f96caac8f3588acd2275b17034b8d4b1a4"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "83587ddf7c9117126a7584261a54514891cca90e37c9048e12e637fe4710de50",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r1-s2-rejected"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 1024,
+      "outputTokens": 43,
+      "promptTokens": 467,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 222,
+        "lines": 7
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 38384,
+        "acceptanceMs": 47439
+      },
+      "containment": {
+        "ok": true,
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "codeLines": 7,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 222,
+        "lines": 7
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"port\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Portland dispatched\",\"Portsmouth delayed\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "2bda14706a0c2f5c210af9632cea09033ffa6ade"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "59f4522183df8c2436246392f5dfc38809f0b991749f0dc3ec1364fcbbf64c28",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r1-s3-rejected"
+    },
+    {
+      "round": 2,
+      "seed": 1,
+      "generationMs": 1057,
+      "outputTokens": 42,
+      "promptTokens": 512,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 213,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 52639,
+        "acceptanceMs": 62669
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 213,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          3,
+          6,
+          7
+        ],
+        "failing": [
+          2,
+          4,
+          5
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nFAIL case 2  typing \"port\" narrows the list as it already does -> expected JSON.stringify(dom.visible.filter((t) => [\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"].includes(t))) === \"[\\\"Portland dispatched\\\",\\\"Portsmouth delayed\\\"]\"; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nPASS case 3  clicking #clear-filter brings every item back\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nFAIL case 5  filtering still narrows the list afterwards -> expected JSON.stringify(dom.visible.filter((t) => [\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"].includes(t))) === \"[\\\"Portland dispatched\\\",\\\"Portsmouth delayed\\\"]\"; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nPASS case 6  clicking #clear-filter a second time brings every item back again\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "clear-filter",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "clear-filter",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          2,
+          4,
+          5
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "3e03ed467d91be9680d68280bedc3e1e7fc958f7"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "ef24a85f83fee36ab5dd9167a948b7c0f549c46ab517ebe6a098685781d01ecf",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [
+            3,
+            6
+          ],
+          "failed": [
+            4
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            2,
+            5
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 2, 5"
+      },
+      "preserved": "r2-s1-rejected"
+    },
+    {
+      "round": 2,
+      "seed": 2,
+      "generationMs": 990,
+      "outputTokens": 43,
+      "promptTokens": 512,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "chars": 222,
+        "lines": 7
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 67557,
+        "acceptanceMs": 76268
+      },
+      "containment": {
+        "ok": true,
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "codeLines": 7,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "chars": 222,
+        "lines": 7
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"port\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Portland dispatched\",\"Portsmouth delayed\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "abf6ddab41c9bb5f1d4044c23b38d01554af90b3"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "458ec24b46feee4ee616e9a2a20ac7fa4195bccccea94d8c05bd80bc17ebd798",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r2-s2-rejected"
+    },
+    {
+      "round": 2,
+      "seed": 3,
+      "generationMs": 1073,
+      "outputTokens": 43,
+      "promptTokens": 512,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 222,
+        "lines": 7
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 81134,
+        "acceptanceMs": 90095
+      },
+      "containment": {
+        "ok": true,
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "codeLines": 7,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 222,
+        "lines": 7
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"port\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Portland dispatched\",\"Portsmouth delayed\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "427115601b20753299b8250d6b96241da829c6ae"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "d941c232f688ed1e0264067e0909121af7d2460568f89ac6cd3a3d19e2a383dd",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r2-s3-rejected"
+    },
+    {
+      "round": 3,
+      "seed": 1,
+      "generationMs": 923,
+      "outputTokens": 42,
+      "promptTokens": 512,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 213,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 95000,
+        "acceptanceMs": 104811
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 213,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          3,
+          6,
+          7
+        ],
+        "failing": [
+          2,
+          4,
+          5
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nFAIL case 2  typing \"port\" narrows the list as it already does -> expected JSON.stringify(dom.visible.filter((t) => [\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"].includes(t))) === \"[\\\"Portland dispatched\\\",\\\"Portsmouth delayed\\\"]\"; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nPASS case 3  clicking #clear-filter brings every item back\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nFAIL case 5  filtering still narrows the list afterwards -> expected JSON.stringify(dom.visible.filter((t) => [\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"].includes(t))) === \"[\\\"Portland dispatched\\\",\\\"Portsmouth delayed\\\"]\"; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nPASS case 6  clicking #clear-filter a second time brings every item back again\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "clear-filter",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "clear-filter",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          2,
+          4,
+          5
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "3e03ed467d91be9680d68280bedc3e1e7fc958f7"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "ef24a85f83fee36ab5dd9167a948b7c0f549c46ab517ebe6a098685781d01ecf",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [
+            3,
+            6
+          ],
+          "failed": [
+            4
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            2,
+            5
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 2, 5"
+      },
+      "preserved": "r3-s1-rejected"
+    },
+    {
+      "round": 3,
+      "seed": 2,
+      "generationMs": 977,
+      "outputTokens": 43,
+      "promptTokens": 512,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "chars": 222,
+        "lines": 7
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 109491,
+        "acceptanceMs": 118416
+      },
+      "containment": {
+        "ok": true,
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "codeLines": 7,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "chars": 222,
+        "lines": 7
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"port\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Portland dispatched\",\"Portsmouth delayed\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "abf6ddab41c9bb5f1d4044c23b38d01554af90b3"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "458ec24b46feee4ee616e9a2a20ac7fa4195bccccea94d8c05bd80bc17ebd798",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r3-s2-rejected"
+    },
+    {
+      "round": 3,
+      "seed": 3,
+      "generationMs": 1018,
+      "outputTokens": 43,
+      "promptTokens": 512,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 222,
+        "lines": 7
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 123064,
+        "acceptanceMs": 131349
+      },
+      "containment": {
+        "ok": true,
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "codeLines": 7,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 222,
+        "lines": 7
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"port\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Portland dispatched\",\"Portsmouth delayed\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "427115601b20753299b8250d6b96241da829c6ae"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "d941c232f688ed1e0264067e0909121af7d2460568f89ac6cd3a3d19e2a383dd",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r3-s3-rejected"
+    },
+    {
+      "round": 4,
+      "seed": 1,
+      "generationMs": 1070,
+      "outputTokens": 42,
+      "promptTokens": 512,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 213,
+        "lines": 5
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 136554,
+        "acceptanceMs": 146364
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "codeLines": 5,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('tools').innerHTML += '<button id=\"clear-filter\">Clear filter</button>';\ndocument.getElementById('clear-filter').addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 213,
+        "lines": 5
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          3,
+          6,
+          7
+        ],
+        "failing": [
+          2,
+          4,
+          5
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nFAIL case 2  typing \"port\" narrows the list as it already does -> expected JSON.stringify(dom.visible.filter((t) => [\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"].includes(t))) === \"[\\\"Portland dispatched\\\",\\\"Portsmouth delayed\\\"]\"; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nPASS case 3  clicking #clear-filter brings every item back\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nFAIL case 5  filtering still narrows the list afterwards -> expected JSON.stringify(dom.visible.filter((t) => [\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"].includes(t))) === \"[\\\"Portland dispatched\\\",\\\"Portsmouth delayed\\\"]\"; state null; visible [\"Shipping log\",\"Clear filter\",\"Portland dispatched\",\"Portsmouth delayed\",\"Halifax dispatched\",\"Galveston held\",\"Hamburg dispatched\"]\nPASS case 6  clicking #clear-filter a second time brings every item back again\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "clear-filter",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "clear-filter",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          2,
+          4,
+          5
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "3e03ed467d91be9680d68280bedc3e1e7fc958f7"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "ef24a85f83fee36ab5dd9167a948b7c0f549c46ab517ebe6a098685781d01ecf",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [
+            3,
+            6
+          ],
+          "failed": [
+            4
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            2,
+            5
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 2, 5"
+      },
+      "preserved": "r4-s1-rejected"
+    },
+    {
+      "round": 4,
+      "seed": 2,
+      "generationMs": 980,
+      "outputTokens": 43,
+      "promptTokens": 512,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "chars": 222,
+        "lines": 7
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 151227,
+        "acceptanceMs": 162209
+      },
+      "containment": {
+        "ok": true,
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "codeLines": 7,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});\ndocument.body.appendChild(clearFilter);",
+        "chars": 222,
+        "lines": 7
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"port\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Portland dispatched\",\"Portsmouth delayed\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "abf6ddab41c9bb5f1d4044c23b38d01554af90b3"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "458ec24b46feee4ee616e9a2a20ac7fa4195bccccea94d8c05bd80bc17ebd798",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r4-s2-rejected"
+    },
+    {
+      "round": 4,
+      "seed": 3,
+      "generationMs": 932,
+      "outputTokens": 43,
+      "promptTokens": 512,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 222,
+        "lines": 7
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 167192,
+        "acceptanceMs": 176816
+      },
+      "containment": {
+        "ok": true,
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "codeLines": 7,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "var clearFilter = document.createElement('button');\nclearFilter.textContent = 'Clear filter';\ndocument.body.appendChild(clearFilter);\nclearFilter.addEventListener('click', function () {\n  needle.value = '';\n  update();\n});",
+        "chars": 222,
+        "lines": 7
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"port\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #needle empty -> expected dom.inputValues[\"#needle\"] === ''; state null; visible [\"Shipping log\",\"Portland dispatched\",\"Portsmouth delayed\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "tools",
+            "needle",
+            "log"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "427115601b20753299b8250d6b96241da829c6ae"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "d941c232f688ed1e0264067e0909121af7d2460568f89ac6cd3a3d19e2a383dd",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r4-s3-rejected"
+    }
+  ],
+  "accepted": false,
+  "calls": 12,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 9,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [
+          {
+            "selector": "#tools",
+            "attr": "onsubmit"
+          }
+        ],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": true
+    },
+    "unresolved": [
+      "this application uses handler mechanisms the registration capture does not see: 1 inline handler attribute(s). Behaviour reached only through them is UNCOVERED, and any \"no change observed\" here is correspondingly weaker."
+    ]
+  },
+  "totals": {
+    "additionAttemptCalls": 12,
+    "accepted": 0,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 0,
+    "judged": 12,
+    "protectedFailures": 0,
+    "restored": 4,
+    "mismatch": {
+      "BROKE_WHAT_WORKED": 4,
+      "NOTHING_WORKED": 8
+    },
+    "partialEffects": 0,
+    "corpus": "legasus/bench/pilot1/runs-7Bfix/p4.attempts",
+    "generationSeconds": 12.5,
+    "wallClockSeconds": 177.9,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

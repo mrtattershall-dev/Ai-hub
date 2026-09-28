@@ -134,7 +134,7 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
     break;
   }
   const site = { rule: proposal.move, why: proposal.site.why, insertAfterLine: proposal.site.insertAfterLine };
-  const sc = planToScaffold(proposal, task.requirement);
+  const sc = planToScaffold(proposal, task.requirement, startFile);
   const scaffold = { lines: sc.lines, why: sc.why };
   const instruction = buildInstruction(task.requirement);
   const facts = extractFacts(startFile, site);
@@ -142,7 +142,14 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
   const indent = (scaffold.lines.find((l) => l.includes('// FILL IN')) || '            ').match(/^\s*/)[0];
   // The guidance shown to the model comes from the PROPOSAL, so what it sees is what the planner decided.
   const planGuidance = planToGuidance(proposal).map((l) => indent + l).join(NL);
-  const context = [planGuidance, rendered.text ? rendered.text.split(NL).map((l) => indent + l).join(NL) : ''].filter(Boolean).join(NL);
+  // A NON-DELIVERY NOTICE IS NOT GUIDANCE. `renderConstraints` returns explanatory text when it could
+  // extract nothing - "the constraints could not be extracted: NO_ENCLOSING_FUNCTION" - which is right
+  // for a RECORD and wrong to hand a model: it reaches the prompt as a line reporting that the system
+  // failed. The runner is the deciding path for what the model sees, so the reason goes in the run
+  // record and only delivered facts go in the prompt.
+  const factsText = rendered.factsDelivered > 0 ? rendered.text : '';
+  const noFactsBecause = factsText ? null : rendered.text;
+  const context = [planGuidance, factsText ? factsText.split(NL).map((l) => indent + l).join(NL) : ''].filter(Boolean).join(NL);
 
   const lines = startFile.split(NL);
   const scaffolded = [...lines.slice(0, site.insertAfterLine + 1), ...scaffold.lines, ...lines.slice(site.insertAfterLine + 1)].join(NL);
@@ -151,12 +158,26 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
   if (!cut.ok) { out.rounds.push({ round, error: cut.reason }); break; }
 
   const block = [context, feedback].filter(Boolean).join(NL);
-  const head = cut.prefix + (block ? block + NL : '') + instruction + NL;
+  // ── THE SLOT'S LANGUAGE CONTRACT ────────────────────────────────────────────────────────────────
+  // CALIBRATION, declared as such in AUDIT-1_RESULT.md and made on development pages. It is not a bug
+  // fix: it can improve results, and it is recorded so it can never be mistaken for one.
+  //
+  // AUDIT-1 measured a 7B answering in the wrong LANGUAGE on 18 of 40 completions - markup, sometimes
+  // wrapped in its own <script> tags - while its behavioural logic was correct enough to pass all seven
+  // checks once moved into the script. Nothing in the prompt said which language the slot takes. It
+  // sits last, closest to the generation point, because that is where a format contract belongs, and it
+  // ends on a continuation cue so the wanted fragment is the natural thing to write next.
+  const slotContract = [
+    `${indent}// JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.`,
+    `${indent}// No HTML, no <script> tags, no markdown fence, no explanation, no full-page replacement.`,
+    `${indent}// Create any element you need with document.createElement and append it. Continue here:`,
+  ].join(NL);
+  const head = cut.prefix + (block ? block + NL : '') + instruction + NL + slotContract + NL;
 
   const roundRec = {
     round, rule: site.rule, why: site.why, insertAfterLine: site.insertAfterLine,
-    scaffold: scaffold.lines.join(NL), instruction,
-    contextDelivered: context, factsDelivered: rendered.factsDelivered, contextDropped: rendered.dropped,
+    scaffold: scaffold.lines.join(NL), instruction, slotContract,
+    contextDelivered: context, factsDelivered: rendered.factsDelivered, contextDropped: rendered.dropped, noFactsBecause,
     feedbackDelivered: feedback || null,
     proposal: { move: proposal.move, site: proposal.site, scope: proposal.scope, evidence: proposal.evidence, uncertainty: proposal.uncertainty },
     promptHead: head, promptHeadSha: sha(head), suffixSha: sha(cut.suffix),

@@ -1,0 +1,235 @@
+{
+  "at": "2026-09-28T11:26:03.631Z",
+  "experiment": "TRANSFER-3",
+  "task": "auto-p3",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\pilot1\\p3\\baseline-as-delivered.html",
+  "baselineSha": "7eff475af9de1c8d8f8604505a2960bba61938132b39ff1759c67f6013b73faa",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 42,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "everything"
+      ],
+      "noFactsBecause": "// the constraints could not be extracted: NO_ENCLOSING_FUNCTION",
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 42,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": [
+            "paint"
+          ]
+        },
+        "evidence": [
+          "the page has a zero-argument function paint() that existing code calls after changing state",
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head><title>Recipe box</title></head>\n<body>\n<header><h3>Recipe box</h3></header>\n<div class=\"controls\">\n  <input id=\"recipe-filter\" type=\"text\" placeholder=\"type to narrow\">\n  <span id=\"count\"></span>\n</div>\n<div id=\"cards\">\n  <div class=\"card\"><span class=\"title\">Flatbread</span></div>\n  <div class=\"card\"><span class=\"title\">Flapjacks</span></div>\n  <div class=\"card\"><span class=\"title\">Chowder</span></div>\n  <div class=\"card\"><span class=\"title\">Risotto</span></div>\n  <div class=\"card\"><span class=\"title\">Custard</span></div>\n  <div class=\"card\"><span class=\"title\">Chutney</span></div>\n</div>\n<script>\nconst state = { query: '' };\nconst cards = document.getElementById('cards');\nconst counter = document.getElementById('count');\n\nfunction matches(card) {\n  if (!state.query) return true;\n  return card.querySelector('.title').textContent.toLowerCase().startsWith(state.query);\n}\n\nfunction paint() {\n  let shown = 0;\n  for (const card of cards.children) {\n    const on = matches(card);\n    card.hidden = !on;\n    if (on) shown++;\n  }\n  counter.textContent = shown + ' shown';\n}\n\ndocument.getElementById('recipe-filter').addEventListener('input', (e) => {\n  state.query = e.target.value.trim().toLowerCase();\n  paint();\n});\n\npaint();\n// create #clear-filter and attach the handler that does the work\n// the page updates through paint, which existing code calls after changing state\n// FACT: this file defines matches()\n// FACT: this file defines paint()\n// FACT: a input on input#recipe-filter handler is registered\n// when #clear-filter is clicked: #recipe-filter is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "71a4f994ce3e775848482194fe3695a1dac1c26ab37c02bdacf8ae981fa973bf",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 4056,
+      "outputTokens": 33,
+      "promptTokens": 442,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "// FACT: this file defines state\n// FACT: this file defines cards\n// FACT: this file defines counter\n// FACT: this file defines paint()",
+        "chars": 135,
+        "lines": 4
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s1-refused_empty"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 102,
+      "outputTokens": 1,
+      "promptTokens": 442,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s2-refused_empty"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 82,
+      "outputTokens": 1,
+      "promptTokens": 442,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r1-s3-refused_empty"
+    }
+  ],
+  "accepted": false,
+  "calls": 3,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 6,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "stoppedBecause": "no code was produced at the planned site (CREATE_A_CONTROL_AND_WIRE_IT)",
+  "totals": {
+    "additionAttemptCalls": 3,
+    "accepted": 0,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 3,
+    "judged": 0,
+    "protectedFailures": 0,
+    "restored": 0,
+    "mismatch": {
+      "NOT_JUDGED": 3
+    },
+    "partialEffects": 0,
+    "corpus": "legasus/bench/pilot1/runs-A2/p3.attempts",
+    "generationSeconds": 4.2,
+    "wallClockSeconds": 9.4,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

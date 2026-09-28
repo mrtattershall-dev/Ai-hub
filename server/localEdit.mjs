@@ -64,6 +64,9 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+// V8's own parser, used as the slot's language gate. Compiling is not running: `new Script` builds an
+// AST and executes nothing, so a hostile completion is inspected without ever being given control.
+import { Script } from 'node:vm';
 
 const exec = promisify(execFile);
 const argv = process.argv.slice(2);
@@ -236,6 +239,8 @@ export function parseEditBlocks(reply) {
  *                             allowListener, which is how a "create a control and wire it" move says
  *                             that registering one is the edit being asked for.
  *   TOO_LARGE                 it exceeds the line budget for the slot
+ *   WRONG_SLOT_LANGUAGE       it is markup, or a markdown fence, and the slot is JavaScript
+ *   NOT_PARSEABLE_JAVASCRIPT  it is neither, and still does not parse
  *
  * Refusing is the point. A completion that cannot be contained is not evidence about the model's logic,
  * and quietly cutting it into shape hides the fact that it did not answer the question asked.
@@ -256,6 +261,35 @@ export function containsSafely(middle, { maxLines = 20, allowListener = false } 
   if (!allowListener && /addEventListener\s*\(/.test(raw)) {
     return { ok: false, reason: 'ADDS_A_LISTENER', detail: 'the completion registers an event listener; the slot is a body and the scaffold already supplies the binding' };
   }
+  // ── THE SLOT'S LANGUAGE ──────────────────────────────────────────────────────────────────────
+  // The slot is JavaScript inside a <script> element. AUDIT-1 measured a 7B answering in the WRONG
+  // LANGUAGE on 18 of 40 completions - markup, sometimes with its own <script> tags - and every one of
+  // them spliced cleanly past a brace-balance check, because an HTML fragment has no braces. 23 of 48
+  // attempts broke the page that way. Brace counting cannot see this; a parser can.
+  //
+  // Two gates, because neither alone is enough:
+  //   a MARKDOWN FENCE parses - three backticks tokenize as template literals - so it is caught by name
+  //   MARKUP does not parse, and the parser is the authority on everything else
+  //
+  // Parsed inside a function wrapper, never bare: `return` is legal in a handler-body slot and illegal
+  // as a standalone program, so a bare parse would refuse every correct answer to a key requirement.
+  // COMPILED, NOT RUN - `new vm.Script` builds the AST and executes nothing.
+  if (/^\s*```|```\s*$/m.test(raw)) {
+    return { ok: false, reason: 'WRONG_SLOT_LANGUAGE', detail: 'the completion is fenced as a markdown code block; the slot takes JavaScript statements, not a document' };
+  }
+  try {
+    new Script(`(function(){${raw}${String.fromCharCode(10)}})`);
+  } catch (e) {
+    const markup = /<\/?[a-zA-Z][\w-]*[\s/>]/.test(raw);
+    return {
+      ok: false,
+      reason: markup ? 'WRONG_SLOT_LANGUAGE' : 'NOT_PARSEABLE_JAVASCRIPT',
+      detail: markup
+        ? `the completion contains markup; the slot is JavaScript inside a <script> element (${String(e.message).slice(0, 80)})`
+        : `the completion does not parse as JavaScript: ${String(e.message).slice(0, 100)}`,
+    };
+  }
+
   // Depth over the whole completion, ignoring braces inside strings, template literals and comments.
   let depth = 0, min = 0;
   const stripped = raw

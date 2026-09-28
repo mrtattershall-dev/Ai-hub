@@ -1,0 +1,2194 @@
+{
+  "at": "2026-09-28T11:31:28.411Z",
+  "experiment": "TRANSFER-3",
+  "task": "auto-p2",
+  "model": "qwen2.5-coder:7b",
+  "page": "legasus\\bench\\pilot1\\p2\\baseline-as-delivered.html",
+  "baselineSha": "ed4a4adfea67a173cf3f3878b21bb1ac372a441310b018d1dcc16fb6f97404b5",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 43,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// FACT: a keyup on input#q handler is registered\n// FACT: a input on input#q handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [],
+      "noFactsBecause": "",
+      "feedbackDelivered": null,
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 43,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": []
+        },
+        "evidence": [
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "no shared zero-argument renderer was identified, so a change may need to update the page itself rather than delegating"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head>\n<title>Team directory</title>\n<style>\n  body { font-family: sans-serif; }\n  table { border-collapse: collapse; }\n  td { padding: 4px 12px; border-bottom: 1px solid #ddd; }\n  .gone { display: none; }\n</style>\n</head>\n<body>\n<h2>Team directory</h2>\n<label for=\"q\">Find someone</label>\n<input type=\"search\" id=\"q\">\n<table id=\"people\">\n  <tbody>\n    <tr class=\"person\"><td>Alvarez</td></tr>\n    <tr class=\"person\"><td>Okonkwo</td></tr>\n    <tr class=\"person\"><td>Petrov</td></tr>\n    <tr class=\"person\"><td>Nakamura</td></tr>\n    <tr class=\"person\"><td>Alberts</td></tr>\n    <tr class=\"person\"><td>Duarte</td></tr>\n  </tbody>\n</table>\n<script>\n(function () {\n  var box = document.getElementById('q');\n  var people = document.getElementById('people');\n  function render() {\n    var needle = box.value.trim().toLowerCase();\n    var all = people.querySelectorAll('.person');\n    for (var i = 0; i < all.length; i++) {\n      var name = all[i].textContent.toLowerCase();\n      if (needle === '' || name.indexOf(needle) !== -1) {\n        all[i].classList.remove('gone');\n      } else {\n        all[i].classList.add('gone');\n      }\n    }\n  }\n  box.addEventListener('keyup', render);\n  box.addEventListener('input', render);\n})();\n// create #clear-filter and attach the handler that does the work\n// FACT: a keyup on input#q handler is registered\n// FACT: a input on input#q handler is registered\n// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "2146affb3738055e3c82e0ae1b2f065866f497bebae8efed41a7186a14028e2e",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            2,
+            5
+          ],
+          "failing": [
+            1,
+            3,
+            4,
+            6,
+            7
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "BROKE_WHAT_WORKED",
+          "passing": [
+            2,
+            5
+          ],
+          "failing": [
+            1,
+            3,
+            4,
+            6,
+            7
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 43,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// FACT: a keyup on input#q handler is registered\n// FACT: a input on input#q handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [],
+      "noFactsBecause": "",
+      "feedbackDelivered": "// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #q empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 43,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": []
+        },
+        "evidence": [
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "no shared zero-argument renderer was identified, so a change may need to update the page itself rather than delegating"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head>\n<title>Team directory</title>\n<style>\n  body { font-family: sans-serif; }\n  table { border-collapse: collapse; }\n  td { padding: 4px 12px; border-bottom: 1px solid #ddd; }\n  .gone { display: none; }\n</style>\n</head>\n<body>\n<h2>Team directory</h2>\n<label for=\"q\">Find someone</label>\n<input type=\"search\" id=\"q\">\n<table id=\"people\">\n  <tbody>\n    <tr class=\"person\"><td>Alvarez</td></tr>\n    <tr class=\"person\"><td>Okonkwo</td></tr>\n    <tr class=\"person\"><td>Petrov</td></tr>\n    <tr class=\"person\"><td>Nakamura</td></tr>\n    <tr class=\"person\"><td>Alberts</td></tr>\n    <tr class=\"person\"><td>Duarte</td></tr>\n  </tbody>\n</table>\n<script>\n(function () {\n  var box = document.getElementById('q');\n  var people = document.getElementById('people');\n  function render() {\n    var needle = box.value.trim().toLowerCase();\n    var all = people.querySelectorAll('.person');\n    for (var i = 0; i < all.length; i++) {\n      var name = all[i].textContent.toLowerCase();\n      if (needle === '' || name.indexOf(needle) !== -1) {\n        all[i].classList.remove('gone');\n      } else {\n        all[i].classList.add('gone');\n      }\n    }\n  }\n  box.addEventListener('keyup', render);\n  box.addEventListener('input', render);\n})();\n// create #clear-filter and attach the handler that does the work\n// FACT: a keyup on input#q handler is registered\n// FACT: a input on input#q handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #q empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "83a57505195a217773ac90e1504bc422a4bfa937739a50fab13f6f093981363e",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 43,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// FACT: a keyup on input#q handler is registered\n// FACT: a input on input#q handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [],
+      "noFactsBecause": "",
+      "feedbackDelivered": "// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #q empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 43,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": []
+        },
+        "evidence": [
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "no shared zero-argument renderer was identified, so a change may need to update the page itself rather than delegating"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head>\n<title>Team directory</title>\n<style>\n  body { font-family: sans-serif; }\n  table { border-collapse: collapse; }\n  td { padding: 4px 12px; border-bottom: 1px solid #ddd; }\n  .gone { display: none; }\n</style>\n</head>\n<body>\n<h2>Team directory</h2>\n<label for=\"q\">Find someone</label>\n<input type=\"search\" id=\"q\">\n<table id=\"people\">\n  <tbody>\n    <tr class=\"person\"><td>Alvarez</td></tr>\n    <tr class=\"person\"><td>Okonkwo</td></tr>\n    <tr class=\"person\"><td>Petrov</td></tr>\n    <tr class=\"person\"><td>Nakamura</td></tr>\n    <tr class=\"person\"><td>Alberts</td></tr>\n    <tr class=\"person\"><td>Duarte</td></tr>\n  </tbody>\n</table>\n<script>\n(function () {\n  var box = document.getElementById('q');\n  var people = document.getElementById('people');\n  function render() {\n    var needle = box.value.trim().toLowerCase();\n    var all = people.querySelectorAll('.person');\n    for (var i = 0; i < all.length; i++) {\n      var name = all[i].textContent.toLowerCase();\n      if (needle === '' || name.indexOf(needle) !== -1) {\n        all[i].classList.remove('gone');\n      } else {\n        all[i].classList.add('gone');\n      }\n    }\n  }\n  box.addEventListener('keyup', render);\n  box.addEventListener('input', render);\n})();\n// create #clear-filter and attach the handler that does the work\n// FACT: a keyup on input#q handler is registered\n// FACT: a input on input#q handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #q empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "83a57505195a217773ac90e1504bc422a4bfa937739a50fab13f6f093981363e",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "rule": "CREATE_A_CONTROL_AND_WIRE_IT",
+      "why": "at the end of the script, after every element and function it must reference exists",
+      "insertAfterLine": 43,
+      "scaffold": "// FILL IN",
+      "instruction": "// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.",
+      "contextDelivered": "// create #clear-filter and attach the handler that does the work\n// FACT: a keyup on input#q handler is registered\n// FACT: a input on input#q handler is registered",
+      "factsDelivered": 0,
+      "contextDropped": [],
+      "noFactsBecause": "",
+      "feedbackDelivered": "// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #q empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again",
+      "proposal": {
+        "move": "CREATE_A_CONTROL_AND_WIRE_IT",
+        "site": {
+          "insertAfterLine": 43,
+          "why": "at the end of the script, after every element and function it must reference exists"
+        },
+        "scope": {
+          "creates": [
+            "#clear-filter"
+          ],
+          "attaches": [
+            "#clear-filter"
+          ],
+          "calls": []
+        },
+        "evidence": [
+          "the requirement names #clear-filter and NO control with that selector exists, so one must be created and wired",
+          "the page's clickable controls are: none",
+          "observation selected browser.input, which says how the application is driven - it informs this choice and does not determine the implementation"
+        ],
+        "uncertainty": [
+          "creating a control changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements",
+          "no shared zero-argument renderer was identified, so a change may need to update the page itself rather than delegating"
+        ]
+      },
+      "promptHead": "<!DOCTYPE html>\n<html>\n<head>\n<title>Team directory</title>\n<style>\n  body { font-family: sans-serif; }\n  table { border-collapse: collapse; }\n  td { padding: 4px 12px; border-bottom: 1px solid #ddd; }\n  .gone { display: none; }\n</style>\n</head>\n<body>\n<h2>Team directory</h2>\n<label for=\"q\">Find someone</label>\n<input type=\"search\" id=\"q\">\n<table id=\"people\">\n  <tbody>\n    <tr class=\"person\"><td>Alvarez</td></tr>\n    <tr class=\"person\"><td>Okonkwo</td></tr>\n    <tr class=\"person\"><td>Petrov</td></tr>\n    <tr class=\"person\"><td>Nakamura</td></tr>\n    <tr class=\"person\"><td>Alberts</td></tr>\n    <tr class=\"person\"><td>Duarte</td></tr>\n  </tbody>\n</table>\n<script>\n(function () {\n  var box = document.getElementById('q');\n  var people = document.getElementById('people');\n  function render() {\n    var needle = box.value.trim().toLowerCase();\n    var all = people.querySelectorAll('.person');\n    for (var i = 0; i < all.length; i++) {\n      var name = all[i].textContent.toLowerCase();\n      if (needle === '' || name.indexOf(needle) !== -1) {\n        all[i].classList.remove('gone');\n      } else {\n        all[i].classList.add('gone');\n      }\n    }\n  }\n  box.addEventListener('keyup', render);\n  box.addEventListener('input', render);\n})();\n// create #clear-filter and attach the handler that does the work\n// FACT: a keyup on input#q handler is registered\n// FACT: a input on input#q handler is registered\n// CHECK 3 FAILED: clicking #clear-filter brings every item back\n// CHECK 4 FAILED: and leaves #q empty\n// CHECK 6 FAILED: clicking #clear-filter a second time brings every item back again\n// when #clear-filter is clicked: #q is empty; every item in the list is visible again. Ensure typing in the filter still narrows the list.\n",
+      "promptHeadSha": "83a57505195a217773ac90e1504bc422a4bfa937739a50fab13f6f093981363e",
+      "suffixSha": "ae086d9e42383e9861bf2400ef412a8c7214cfd110b861f7fc4f465b994833cf",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        },
+        {
+          "seed": 3,
+          "outcome": "REJECTED",
+          "mismatch": "NOTHING_WORKED",
+          "passing": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "failing": [
+            3,
+            4,
+            6
+          ],
+          "visual": null,
+          "decision": {
+            "functional": "FAIL",
+            "visual": "NOT_RUN",
+            "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+          }
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 1699,
+      "outputTokens": 90,
+      "promptTokens": 443,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "(function () {\n  var clearFilter = document.createElement('button');\n  clearFilter.textContent = 'Clear filter';\n  document.body.appendChild(clearFilter);\n  clearFilter.addEventListener('click', function () {\n    document.getElementById('q').value = '';\n    var all = document.querySelectorAll('.person');\n    for (var i = 0; i < all.length; i++) {\n      all[i].classList.remove('gone');\n    }\n  });\n})();",
+        "chars": 405,
+        "lines": 12
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 12602,
+        "acceptanceMs": 21041
+      },
+      "containment": {
+        "ok": true,
+        "text": "(function () {\n  var clearFilter = document.createElement('button');\n  clearFilter.textContent = 'Clear filter';\n  document.body.appendChild(clearFilter);\n  clearFilter.addEventListener('click', function () {\n    document.getElementById('q').value = '';\n    var all = document.querySelectorAll('.person');\n    for (var i = 0; i < all.length; i++) {\n      all[i].classList.remove('gone');\n    }\n  });\n})();",
+        "codeLines": 12,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "(function () {\n  var clearFilter = document.createElement('button');\n  clearFilter.textContent = 'Clear filter';\n  document.body.appendChild(clearFilter);\n  clearFilter.addEventListener('click', function () {\n    document.getElementById('q').value = '';\n    var all = document.querySelectorAll('.person');\n    for (var i = 0; i < all.length; i++) {\n      all[i].classList.remove('gone');\n    }\n  });\n})();",
+        "chars": 405,
+        "lines": 12
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"alva\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #q empty -> expected dom.inputValues[\"#q\"] === ''; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "6c334873c861cb02bbaf8b10221500ed0c67c9e0"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "d1935e119e050a1faf3af8bf8f84a082d22e2af8e7414747d5c0eff470268e14",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r1-s1-rejected"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 1116,
+      "outputTokens": 61,
+      "promptTokens": 443,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', function() {\n  document.getElementById('q').value = '';\n  var all = document.querySelectorAll('.person');\n  for (var i = 0; i < all.length; i++) {\n    all[i].classList.remove('gone');\n  }\n});",
+        "chars": 257,
+        "lines": 7
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 25882,
+        "acceptanceMs": 34718
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.getElementById('clear-filter').addEventListener('click', function() {\n  document.getElementById('q').value = '';\n  var all = document.querySelectorAll('.person');\n  for (var i = 0; i < all.length; i++) {\n    all[i].classList.remove('gone');\n  }\n});",
+        "codeLines": 7,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.getElementById('clear-filter').addEventListener('click', function() {\n  document.getElementById('q').value = '';\n  var all = document.querySelectorAll('.person');\n  for (var i = 0; i < all.length; i++) {\n    all[i].classList.remove('gone');\n  }\n});",
+        "chars": 257,
+        "lines": 7
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          2,
+          5
+        ],
+        "failing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Alvarez\",\"Okonkwo\",\"Petrov\",\"Nakamura\",\"Alberts\",\"Duarte\"].includes(t))) === \"[\\\"Alvarez\\\",\\\"Okonkwo\\\",\\\"Petrov\\\",\\\"Nakamura\\\",\\\"Alberts\\\",\\\"Duarte\\\"]\"; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Okonkwo\",\"Petrov\",\"Nakamura\",\"Alberts\",\"Duarte\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 2  typing \"alva\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #q empty -> expected dom.inputValues[\"#q\"] === ''; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nSUMMARY 2/7 cases pass, 5 fail",
+        "errors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:50786/index.html:49:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "q",
+            "people"
+          ],
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:50786/index.html:49:40)"
+        ],
+        "dom": {
+          "nullLookups": [
+            "clear-filter"
+          ],
+          "idsAtFirstFailure": [
+            "q",
+            "people"
+          ],
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "4e60be1799bc92da735d9d8c9d2bb404f4be4ca7"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "76eaa8d9e22466b2296414042644e9984b82710f3a9fb1df1315851418139427",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 1, 7"
+      },
+      "preserved": "r1-s2-rejected"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 923,
+      "outputTokens": 44,
+      "promptTokens": 443,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "document.querySelector('#clear-filter').addEventListener('click', function() {\n  document.querySelector('#q').value = '';\n  document.querySelectorAll('.person').forEach(function(person) {\n    person.classList.remove('gone');\n  });\n});",
+        "chars": 234,
+        "lines": 6
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": false,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 39131,
+        "acceptanceMs": 48184
+      },
+      "containment": {
+        "ok": true,
+        "text": "document.querySelector('#clear-filter').addEventListener('click', function() {\n  document.querySelector('#q').value = '';\n  document.querySelectorAll('.person').forEach(function(person) {\n    person.classList.remove('gone');\n  });\n});",
+        "codeLines": 6,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "document.querySelector('#clear-filter').addEventListener('click', function() {\n  document.querySelector('#q').value = '';\n  document.querySelectorAll('.person').forEach(function(person) {\n    person.classList.remove('gone');\n  });\n});",
+        "chars": 234,
+        "lines": 6
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          2,
+          5
+        ],
+        "failing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ],
+        "total": 7,
+        "log": "FAIL case 1  loads with no page or console error, showing every item -> expected errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"Alvarez\",\"Okonkwo\",\"Petrov\",\"Nakamura\",\"Alberts\",\"Duarte\"].includes(t))) === \"[\\\"Alvarez\\\",\\\"Okonkwo\\\",\\\"Petrov\\\",\\\"Nakamura\\\",\\\"Alberts\\\",\\\"Duarte\\\"]\"; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Okonkwo\",\"Petrov\",\"Nakamura\",\"Alberts\",\"Duarte\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 2  typing \"alva\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #q empty -> expected dom.inputValues[\"#q\"] === ''; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nFAIL case 7  no page or console error was raised at any point -> expected noErrors; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\"]; errors: [JS ERROR] Cannot read properties of null (reading 'addEventListener')\nSUMMARY 2/7 cases pass, 5 fail",
+        "errors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:60687/index.html:49:40)"
+        ],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [
+          "[JS ERROR] Cannot read properties of null (reading 'addEventListener')"
+        ],
+        "stacks": [
+          "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at <anonymous> (http://127.0.0.1:60687/index.html:49:40)"
+        ],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": true,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": false,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "FAIL",
+        "requestedFailing": [
+          1,
+          3,
+          4,
+          6,
+          7
+        ]
+      },
+      "acceptance": {
+        "disposition": "RESTORED",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "4e60be1799bc92da735d9d8c9d2bb404f4be4ca7"
+        },
+        "survivingBytes": "IDENTICAL_TO_START"
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "3ea8ae23e9816154dbc7d9a9f7fd0cd2c36a158a6f6395709ae9f3f5db5ac5b2",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": [
+            1,
+            7
+          ]
+        },
+        "mismatch": "BROKE_WHAT_WORKED",
+        "why": "2 carried-forward check(s) stopped passing: 1, 7"
+      },
+      "preserved": "r1-s3-rejected"
+    },
+    {
+      "round": 2,
+      "seed": 1,
+      "generationMs": 499,
+      "outputTokens": 1,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r2-s1-refused_empty"
+    },
+    {
+      "round": 2,
+      "seed": 2,
+      "generationMs": 598,
+      "outputTokens": 15,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</script>\n<button id=\"clear-filter\">Clear filter</button>",
+        "chars": 57,
+        "lines": 2
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 53577,
+        "acceptanceMs": 63498
+      },
+      "containment": {
+        "ok": true,
+        "text": "</script>\n<button id=\"clear-filter\">Clear filter</button>",
+        "codeLines": 2,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</script>\n<button id=\"clear-filter\">Clear filter</button>",
+        "chars": 57,
+        "lines": 2
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"alva\" narrows the list as it already does\nFAIL case 3  clicking #clear-filter brings every item back -> expected JSON.stringify(dom.visible.filter((t) => [\"Alvarez\",\"Okonkwo\",\"Petrov\",\"Nakamura\",\"Alberts\",\"Duarte\"].includes(t))) === \"[\\\"Alvarez\\\",\\\"Okonkwo\\\",\\\"Petrov\\\",\\\"Nakamura\\\",\\\"Alberts\\\",\\\"Duarte\\\"]\"; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Clear filter\"]\nFAIL case 4  and leaves #q empty -> expected dom.inputValues[\"#q\"] === ''; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nFAIL case 6  clicking #clear-filter a second time brings every item back again -> expected JSON.stringify(dom.visible.filter((t) => [\"Alvarez\",\"Okonkwo\",\"Petrov\",\"Nakamura\",\"Alberts\",\"Duarte\"].includes(t))) === \"[\\\"Alvarez\\\",\\\"Okonkwo\\\",\\\"Petrov\\\",\\\"Nakamura\\\",\\\"Alberts\\\",\\\"Duarte\\\"]\"; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Clear filter\"]\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "56782983e220e197a693fc0f3c6e9fd34aea632d"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "fa0bd2135a93c38b9c192ea6524e6b52c8cebe75c5c8c729c658acf8e1bb9d29",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r2-s2-rejected"
+    },
+    {
+      "round": 2,
+      "seed": 3,
+      "generationMs": 453,
+      "outputTokens": 4,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</script>",
+        "chars": 9,
+        "lines": 1
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 68351,
+        "acceptanceMs": 77533
+      },
+      "containment": {
+        "ok": true,
+        "text": "</script>",
+        "codeLines": 1,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</script>",
+        "chars": 9,
+        "lines": 1
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"alva\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #q empty -> expected dom.inputValues[\"#q\"] === ''; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "27a2c9ed8adb464c474e2aa61cd8a4503ab33b3f"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "8bb33a018818fc357e1115472fffc6c4418c6633ef46e588fb5247358172dfe3",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r2-s3-rejected"
+    },
+    {
+      "round": 3,
+      "seed": 1,
+      "generationMs": 464,
+      "outputTokens": 1,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r3-s1-refused_empty"
+    },
+    {
+      "round": 3,
+      "seed": 2,
+      "generationMs": 664,
+      "outputTokens": 15,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</script>\n<button id=\"clear-filter\">Clear filter</button>",
+        "chars": 57,
+        "lines": 2
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 82806,
+        "acceptanceMs": 92671
+      },
+      "containment": {
+        "ok": true,
+        "text": "</script>\n<button id=\"clear-filter\">Clear filter</button>",
+        "codeLines": 2,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</script>\n<button id=\"clear-filter\">Clear filter</button>",
+        "chars": 57,
+        "lines": 2
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"alva\" narrows the list as it already does\nFAIL case 3  clicking #clear-filter brings every item back -> expected JSON.stringify(dom.visible.filter((t) => [\"Alvarez\",\"Okonkwo\",\"Petrov\",\"Nakamura\",\"Alberts\",\"Duarte\"].includes(t))) === \"[\\\"Alvarez\\\",\\\"Okonkwo\\\",\\\"Petrov\\\",\\\"Nakamura\\\",\\\"Alberts\\\",\\\"Duarte\\\"]\"; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Clear filter\"]\nFAIL case 4  and leaves #q empty -> expected dom.inputValues[\"#q\"] === ''; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nFAIL case 6  clicking #clear-filter a second time brings every item back again -> expected JSON.stringify(dom.visible.filter((t) => [\"Alvarez\",\"Okonkwo\",\"Petrov\",\"Nakamura\",\"Alberts\",\"Duarte\"].includes(t))) === \"[\\\"Alvarez\\\",\\\"Okonkwo\\\",\\\"Petrov\\\",\\\"Nakamura\\\",\\\"Alberts\\\",\\\"Duarte\\\"]\"; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Clear filter\"]\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "56782983e220e197a693fc0f3c6e9fd34aea632d"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "fa0bd2135a93c38b9c192ea6524e6b52c8cebe75c5c8c729c658acf8e1bb9d29",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r3-s2-rejected"
+    },
+    {
+      "round": 3,
+      "seed": 3,
+      "generationMs": 469,
+      "outputTokens": 4,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</script>",
+        "chars": 9,
+        "lines": 1
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 96870,
+        "acceptanceMs": 105540
+      },
+      "containment": {
+        "ok": true,
+        "text": "</script>",
+        "codeLines": 1,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</script>",
+        "chars": 9,
+        "lines": 1
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"alva\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #q empty -> expected dom.inputValues[\"#q\"] === ''; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "27a2c9ed8adb464c474e2aa61cd8a4503ab33b3f"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "8bb33a018818fc357e1115472fffc6c4418c6633ef46e588fb5247358172dfe3",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r3-s3-rejected"
+    },
+    {
+      "round": 4,
+      "seed": 1,
+      "generationMs": 469,
+      "outputTokens": 1,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "",
+        "chars": 0,
+        "lines": 1
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY",
+      "classification": {
+        "mismatch": "NOT_JUDGED",
+        "why": "the completion never reached the gate",
+        "addition": null,
+        "carriedForward": null
+      },
+      "preserved": "r4-s1-refused_empty"
+    },
+    {
+      "round": 4,
+      "seed": 2,
+      "generationMs": 607,
+      "outputTokens": 15,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</script>\n<button id=\"clear-filter\">Clear filter</button>",
+        "chars": 57,
+        "lines": 2
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 110903,
+        "acceptanceMs": 120257
+      },
+      "containment": {
+        "ok": true,
+        "text": "</script>\n<button id=\"clear-filter\">Clear filter</button>",
+        "codeLines": 2,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</script>\n<button id=\"clear-filter\">Clear filter</button>",
+        "chars": 57,
+        "lines": 2
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"alva\" narrows the list as it already does\nFAIL case 3  clicking #clear-filter brings every item back -> expected JSON.stringify(dom.visible.filter((t) => [\"Alvarez\",\"Okonkwo\",\"Petrov\",\"Nakamura\",\"Alberts\",\"Duarte\"].includes(t))) === \"[\\\"Alvarez\\\",\\\"Okonkwo\\\",\\\"Petrov\\\",\\\"Nakamura\\\",\\\"Alberts\\\",\\\"Duarte\\\"]\"; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Clear filter\"]\nFAIL case 4  and leaves #q empty -> expected dom.inputValues[\"#q\"] === ''; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Clear filter\"]\nPASS case 5  filtering still narrows the list afterwards\nFAIL case 6  clicking #clear-filter a second time brings every item back again -> expected JSON.stringify(dom.visible.filter((t) => [\"Alvarez\",\"Okonkwo\",\"Petrov\",\"Nakamura\",\"Alberts\",\"Duarte\"].includes(t))) === \"[\\\"Alvarez\\\",\\\"Okonkwo\\\",\\\"Petrov\\\",\\\"Nakamura\\\",\\\"Alberts\\\",\\\"Duarte\\\"]\"; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\",\"Clear filter\"]\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people",
+            "clear-filter"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "56782983e220e197a693fc0f3c6e9fd34aea632d"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "fa0bd2135a93c38b9c192ea6524e6b52c8cebe75c5c8c729c658acf8e1bb9d29",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r4-s2-rejected"
+    },
+    {
+      "round": 4,
+      "seed": 3,
+      "generationMs": 550,
+      "outputTokens": 4,
+      "promptTokens": 489,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "</script>",
+        "chars": 9,
+        "lines": 1
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 124921,
+        "acceptanceMs": 133235
+      },
+      "containment": {
+        "ok": true,
+        "text": "</script>",
+        "codeLines": 1,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "</script>",
+        "chars": 9,
+        "lines": 1
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          5,
+          7
+        ],
+        "failing": [
+          3,
+          4,
+          6
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, showing every item\nPASS case 2  typing \"alva\" narrows the list as it already does\nERROR case 3  clicking #clear-filter brings every item back: No element found for selector: #clear-filter\nFAIL case 4  and leaves #q empty -> expected dom.inputValues[\"#q\"] === ''; state null; visible [\"Team directory\",\"Find someone\",\"Alvarez\"]\nPASS case 5  filtering still narrows the list afterwards\nERROR case 6  clicking #clear-filter a second time brings every item back again: No element found for selector: #clear-filter\nPASS case 7  no page or console error was raised at any point\nSUMMARY 4/7 cases pass, 3 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "q",
+            "people"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          3,
+          4,
+          6
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "27a2c9ed8adb464c474e2aa61cd8a4503ab33b3f"
+        },
+        "survivingBytes": null
+      },
+      "visual": null,
+      "render": {
+        "verdict": "RENDER_EVIDENCE_VACUOUS",
+        "coverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        }
+      },
+      "decision": {
+        "accepted": false,
+        "functionallyAccepted": false,
+        "visualStatus": "NOT_RUN",
+        "visualBlocking": false,
+        "visualEvaluated": false,
+        "renderStatus": "RENDER_EVIDENCE_VACUOUS",
+        "renderCoverage": {
+          "functionalRuleExercised": false,
+          "revisitedStates": 0,
+          "injectiveRuleExercised": false,
+          "distinctStates": 0,
+          "observationsConsidered": 0
+        },
+        "reasons": [
+          "the functional checks did not pass"
+        ],
+        "advisories": [
+          "renderEvidence was VACUOUS: neither of its rules was exercised, so it supports nothing either way"
+        ],
+        "summary": {
+          "functional": "FAIL",
+          "visual": "NOT_RUN",
+          "render": "RENDER_EVIDENCE_VACUOUS (advisory)"
+        }
+      },
+      "outcome": "REJECTED",
+      "candidateSha": "8bb33a018818fc357e1115472fffc6c4418c6633ef46e588fb5247358172dfe3",
+      "classification": {
+        "addition": {
+          "asked": [
+            3,
+            4,
+            6
+          ],
+          "passed": [],
+          "failed": [
+            3,
+            4,
+            6
+          ]
+        },
+        "carriedForward": {
+          "asked": [
+            1,
+            2,
+            5,
+            7
+          ],
+          "broken": []
+        },
+        "mismatch": "NOTHING_WORKED",
+        "why": "no addition check passed; the page is intact and unchanged in the way that was asked for"
+      },
+      "preserved": "r4-s3-rejected"
+    }
+  ],
+  "accepted": false,
+  "calls": 12,
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "executedActions": 42,
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": []
+  },
+  "totals": {
+    "additionAttemptCalls": 12,
+    "accepted": 0,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 3,
+    "judged": 9,
+    "protectedFailures": 0,
+    "restored": 2,
+    "mismatch": {
+      "NOTHING_WORKED": 7,
+      "BROKE_WHAT_WORKED": 2,
+      "NOT_JUDGED": 3
+    },
+    "partialEffects": 0,
+    "corpus": "legasus/bench/pilot1/runs-7B/p2.attempts",
+    "generationSeconds": 8.5,
+    "wallClockSeconds": 134,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}
