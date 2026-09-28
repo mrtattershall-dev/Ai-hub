@@ -1,0 +1,61 @@
+Amendment 4 plus the class A interception harness: prevention works, and the POSITIVE CONTROL CANNOT PASS
+
+AMENDMENT 4 splits the write surface into two claims of different strength, frozen before the harness
+existed, with the exact wording given: class A PREVENTION - every exercised direct workspace write is
+prevented unless governedEdit authorizes the resolved target, revision and required evidence; class B
+DETECTION AFTER RETURN - a before/after snapshot detects every changed, created, deleted and renamed path
+within the governed workspace and its repository metadata, each checked against the authority attached to
+that invocation. Class B is explicitly NOT prevention and cannot account for writes outside the snapshot
+boundary. spawn_subtask gets its own rule: a child receives a NARROWED inherited authority or NONE, never
+a broader grant merely because it is a new process.
+
+THE WRITE SURFACE IS 28 MODEL-CALLABLE TOOLS, not 8. My first extraction missed every `async` one, which
+would have made a harness look complete. Plus 47 direct fs write calls in agent.js outside the tool
+surface and 16 imported modules that write or spawn.
+
+WHY THE SPLIT IS STRUCTURAL: run_command and run_python both reach execAgentCommand with cwd: WORKSPACE. A
+CHILD PROCESS CANNOT BE MEDIATED BY AN IN-PROCESS EXECUTOR. AUTONOMY.md already says the same thing from
+the other side - auto-allowing node app.js IS auto-allowing arbitrary code execution.
+
+TWO MEASURED FACTS FORCED THE HARNESS DESIGN, both found by trying rather than reasoning:
+  1 an ESM namespace object is FROZEN: fs[name] = ... throws "Cannot assign to read only property".
+  2 agent.js:16 does `import { writeFileSync, ... } from 'fs'`, and A NAMED ESM IMPORT BINDS THE FUNCTION
+    DIRECTLY - so patching fs AFTER agent.js loads intercepts NOTHING, silently.
+Verified by experiment that a PRELOAD patch IS seen by a later named import, so the interceptor runs via
+node --import in a child process before agent.js is imported - the same mechanism legascreen's
+witness-register.mjs already uses. AGENT_WORKSPACE is set before the child starts because it binds at
+import time, a hazard already in this project's ledger.
+
+DRIVEN THROUGH THE REAL DISPATCH, never by calling governedEdit directly: __toolPolicyTest.callTool is the
+same tools[name](args) the three run-loop sites use, and it already exists for exactly this purpose, so no
+production change was needed.
+
+    UNGOVERNED  effected 3  refused 0  governed 0  ungoverned 3   digest CHANGED
+                write_file -> mkdirSync + writeFileSync, caller frame Object.write_file
+                append_file -> writeFileSync, caller frame Object.append_file
+                edit_file -> writeFileSync, caller frame Object.edit_file
+    GOVERNED    effected 0  refused 3  governed 0  ungoverned 0   digest UNCHANGED
+
+So A-1, A-2 and A-3 hold: each of the three direct routes is PREVENTED, with bytes byte-identical - the
+primitive never runs, which is prevention and not detection. A-5 holds: every write was recorded with its
+caller and resolved path. A-6 holds: the ungoverned run IS the bypass demonstration, three writes reaching
+disk with zero governed.
+
+AND A-4 CANNOT PASS, WHICH IS THE REAL FINDING. The positive control requires an AUTHORIZED write to
+produce the exact expected bytes. No tool routes through governedEdit, so there is no authorized path at
+all: the gate is currently refuse-everything. An apparatus that rejects everything passes every known-bad
+suite, and this project has that exact hazard on record. Class A is therefore ENFORCEABLE AND NOT YET
+ENFORCED - the interception proves the boundary can hold, not that the controller respects it.
+Wiring write_file / edit_file / append_file to call governedEdit is the next change, and A-4 is its test.
+
+ONE CORRECTION OF MINE: the first edit_file attempt passed { search } - never a parameter - so the tool
+returned an error and wrote nothing, and I nearly recorded edit_file as exercised. The signature is
+{ path, find, replace, lines, occurrence }. Corrected, and edit_file now writes in the ungoverned run.
+
+NOT ESTABLISHED: no bypass exists anywhere. The claim is for THREE EXERCISED ROUTES in one process. The
+other 25 tools, the 47 direct write calls, the 16 writing modules, all child-process routes, symlink and
+junction aliasing, E4/E5/E6/E7/E9 - none covered.
+
+Message-File: scratch/classA.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
