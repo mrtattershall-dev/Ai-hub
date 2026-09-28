@@ -439,8 +439,27 @@ export function extractFacts(file, site) {
   // own code changes the state: fewest calls from the site first. That is a property of the program,
   // not a guess about the task.
   for (const c of constraints) c.callDepth = Math.min(...c.howExistingCodeWritesIt.map((w) => (w.reachedVia === 'the site itself' ? 0 : w.reachedVia.split(' -> ').length)));
+
+  // A HANDLE IS NOT THE PROGRAM'S STATE. A binding initialised with the result of a CALL - or a `new` -
+  // holds something obtained from outside: a drawing context, a looked-up element, a timer. A binding
+  // initialised with a literal, an array or an object holds state the program itself keeps.
+  //
+  // Why this rule exists. On TRANSFER-3's colour page, `ctx` (from canvas.getContext('2d')) and
+  // `colorIndex` (from a literal) are both written at call depth 0, and `ctx` is `const` while
+  // `colorIndex` is `let`. Ranking const above let at equal depth therefore promoted the DRAWING CONTEXT
+  // over the variable the task had to change, and at a tight budget the context was delivered and the
+  // state was dropped. The old greedy renderer hid this by accident: `ctx`'s block did not fit, so it was
+  // skipped and `colorIndex` got through. Fixing the renderer exposed the ranking.
+  //
+  // The rule is structural and names no library: it asks how the binding was obtained, not what it is.
+  const HANDLE_INITS = new Set(['CallExpression', 'NewExpression', 'MemberExpression', 'AwaitExpression']);
+  for (const c of constraints) c.handleLike = !!(c.declaration && HANDLE_INITS.has(byName.get(c.name)?.decl?.initKind));
+
   const rank = { CONST_VALUE: 0, CONST_CONTAINER: 1, REASSIGNABLE: 2, UNKNOWN: 3 };
-  constraints.sort((a, b) => a.callDepth - b.callDepth || rank[a.verdict] - rank[b.verdict] || a.name.localeCompare(b.name));
+  constraints.sort((a, b) => a.callDepth - b.callDepth
+    || (a.handleLike ? 1 : 0) - (b.handleLike ? 1 : 0)
+    || rank[a.verdict] - rank[b.verdict]
+    || a.name.localeCompare(b.name));
 
   const redraws = zeroArgLocalCalls(file, scope, decls);
   const keydownHandlers = (file.match(/addEventListener\(\s*['"]keydown['"]/g) || []).length;
@@ -535,6 +554,8 @@ export function renderConstraints(facts, { budget = 700, style = 'prose', includ
  * uninformative about the extraction.
  */
 export function renderCompact(facts, { budget = 700, includeStrategy = true } = {}) {
+  // Each fact is built as a REQUIRED line plus OPTIONAL lines, so that a block which does not fit can be
+  // shortened instead of discarded - and so that shortening is reportable.
   const blocks = [];
   for (const c of facts.constraints) {
     const where = c.declaredAtLine ? `line ${c.declaredAtLine}` : 'not in this file';
@@ -543,33 +564,91 @@ export function renderCompact(facts, { budget = 700, includeStrategy = true } = 
     let fact;
     if (c.verdict === 'UNKNOWN') fact = `// FACT: ${c.name} is written here and this file does not declare it.`;
     else fact = `// FACT ${where}: ${c.name} is declared \`${kw || 'var'}\`${c.verdict === 'CONST_CONTAINER' ? ' and holds a container' : ''}.`;
-    const lines = [fact];
-    if (ex) lines.push(`// FACT line ${ex.atLine}: existing code writes it as ${ex.text}`);
-    if (includeStrategy && c.verdict === 'CONST_CONTAINER') {
-      lines.push(`// STRATEGY (proposed, not verified): change ${c.name} in place rather than assigning to ${c.name}; whether that satisfies the task still has to be checked.`);
-    } else if (includeStrategy && c.verdict === 'CONST_VALUE') {
-      lines.push(`// STRATEGY (proposed, not verified): ${c.name} cannot be changed through this name; the change may have to go elsewhere.`);
-    }
-    blocks.push({ label: c.name, verdict: c.verdict, kind: 'constraint', lines });
+    const optional = [];
+    if (ex) optional.push({ kind: 'the line of existing code that writes it', text: `// FACT line ${ex.atLine}: existing code writes it as ${ex.text}` });
+    if (includeStrategy && c.verdict === 'CONST_CONTAINER') optional.push({ kind: 'the proposed strategy', text: `// STRATEGY (proposed, not verified): change ${c.name} in place rather than assigning to ${c.name}; whether that satisfies the task still has to be checked.` });
+    else if (includeStrategy && c.verdict === 'CONST_VALUE') optional.push({ kind: 'the proposed strategy', text: `// STRATEGY (proposed, not verified): ${c.name} cannot be changed through this name; the change may have to go elsewhere.` });
+    blocks.push({ label: c.name, verdict: c.verdict, kind: 'constraint', required: fact, optional });
   }
-  for (const r of facts.redraws) {
-    blocks.push({ label: r.name + '()', kind: 'redraw', lines: [`// FACT line ${r.declaredAtLine}: ${r.name}() takes no arguments, and the code here calls it after changing state.`] });
-  }
-  for (const u of facts.uncertainty) blocks.push({ label: 'uncertainty', kind: 'uncertainty', lines: [`// NOT ESTABLISHED: ${u}`] });
+  for (const r of facts.redraws) blocks.push({ label: r.name + '()', kind: 'redraw', required: `// FACT line ${r.declaredAtLine}: ${r.name}() takes no arguments, and the code here calls it after changing state.`, optional: [] });
+  for (const u of facts.uncertainty) blocks.push({ label: 'uncertainty', kind: 'uncertainty', required: `// NOT ESTABLISHED: ${u}`, optional: [] });
 
-  const kept = [], dropped = [], delivered = [];
-  let used = 0;
-  for (const b of blocks) {
-    const cost = b.lines.reduce((n, l) => n + l.length + 1, 0);
-    if (used + cost > budget) { dropped.push(`${b.label}: the whole ${b.kind}`); continue; }
-    kept.push(...b.lines); used += cost;
-    delivered.push({ label: b.label, kind: b.kind, verdict: b.verdict || null, lines: b.lines.length });
+  // THE DEFECT THIS REPLACES, and it cost a page. The first version was a greedy FIRST FIT: it walked the
+  // blocks in priority order and SKIPPED any that did not fit, then carried on. On TRANSFER-3's
+  // s3-05-stack the top-ranked constraint - `stack` is a const container, exactly the fact the task needed
+  // - was three lines and exceeded the 240-character budget, so it was skipped, and two LOWER-priority
+  // redraw facts fitted in the space it left. The model was handed zero constraints and two redraws.
+  //
+  // The prose renderer had already been fixed for exactly this, and this one had not; no test caught it
+  // because every earlier page happened to fit.
+  //
+  // The rule now: DEGRADE FROM THE BOTTOM. Drop whole low-priority blocks first, then shorten
+  // low-priority blocks by removing their optional lines, working upward - and never drop a
+  // higher-priority fact while a lower-priority one survives. Every removal is REPORTED, because a
+  // shortened fact says less than the full one and that change of meaning must be visible rather than
+  // silent.
+  const keepBlock = blocks.map(() => true);
+  const keepOptional = blocks.map((b) => b.optional.map(() => true));
+  const size = () => blocks.reduce((n, b, i) => {
+    if (!keepBlock[i]) return n;
+    let t = b.required.length + 1;
+    b.optional.forEach((o, j) => { if (keepOptional[i][j]) t += o.text.length + 1; });
+    return n + t;
+  }, 0);
+
+  const dropped = [];        // whole facts removed
+  const shortened = [];      // facts kept, but saying less than they could
+
+  // ONE PASS FROM THE BOTTOM, finishing each block before moving up. For the lowest surviving block:
+  // strip its optional lines, then remove it entirely; only then consider the block above it.
+  //
+  // The ordering matters and a first attempt at this fix got it wrong. Stripping optionals across ALL
+  // blocks first, and only then dropping whole blocks, cost the TOP fact its worked example while a
+  // lower-priority constraint survived on its bare declaration. Finishing from the bottom instead means a
+  // less relevant fact is given up completely before a more relevant one is allowed to say less.
+  //
+  // Block 0 - the most directly relevant fact - can be shortened but is never removed. If even its
+  // required line will not fit, `budgetTooSmallForOneFact` says so rather than returning an empty block
+  // that looks like "this page has no constraints".
+  for (let i = blocks.length - 1; i >= 0 && size() > budget; i--) {
+    for (let j = blocks[i].optional.length - 1; j >= 0 && size() > budget; j--) {
+      if (!keepOptional[i][j]) continue;
+      keepOptional[i][j] = false;
+      shortened.push(`${blocks[i].label}: dropped ${blocks[i].optional[j].kind}`);
+    }
+    if (size() > budget && i > 0) {
+      keepBlock[i] = false;
+      dropped.push(`${blocks[i].label}: the whole ${blocks[i].kind}`);
+    }
   }
+  // If block 0's own required line still does not fit, nothing is emitted and the caller is told why.
+  if (size() > budget) { keepBlock[0] = false; dropped.push(`${blocks[0].label}: does not fit the budget at all`); }
+
+  const lines = [];
+  const delivered = [];
+  blocks.forEach((b, i) => {
+    if (!keepBlock[i]) return;
+    lines.push(b.required);
+    b.optional.forEach((o, j) => { if (keepOptional[i][j]) lines.push(o.text); });
+    delivered.push({
+      label: b.label, kind: b.kind, verdict: b.verdict || null,
+      lines: 1 + b.optional.filter((_, j) => keepOptional[i][j]).length,
+      complete: b.optional.every((_, j) => keepOptional[i][j]),
+    });
+  });
+
+  const text = lines.join('\n');
   return {
-    text: kept.join('\n'), lines: kept.length, complete: dropped.length === 0, dropped,
+    text, lines: lines.length,
+    complete: dropped.length === 0 && shortened.length === 0,
+    dropped, shortened,
     style: 'compact', includeStrategy,
     delivered,
     factsDelivered: delivered.filter((d) => d.kind === 'constraint').length,
+    // True when the budget could not even hold the single highest-priority fact. A caller that sees this
+    // is being told the budget is too small, not that the page has no constraints.
+    budgetTooSmallForOneFact: blocks.length > 0 && delivered.length === 0,
+    overBudget: text.length > budget,
   };
 }
 

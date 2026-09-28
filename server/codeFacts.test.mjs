@@ -312,6 +312,74 @@ const named = (facts, n) => facts.constraints.find((c) => c.name === n);
     'and a budget too small for one fact also delivers 0, rather than half a fact');
 }
 
+// ══ 6c. the two delivery defects that cost TRANSFER-3 a page ═══════════════════
+{
+  console.log('\n6c. the most relevant fact survives a tight budget, and a handle never outranks real state');
+
+  // THE REGRESSION CASE. This is TRANSFER-3's s3-05-stack, reduced to its shape: a const array written
+  // through a call, a canvas context, and several redraws. At the declared 240-character budget the old
+  // renderer delivered ZERO constraints and two redraw facts, because it skipped any block that did not
+  // fit and kept the smaller ones that did. The page was not completed.
+  const stackShape = page([
+    "const canvas = document.getElementById('c');",
+    "const ctx = canvas.getContext('2d');",
+    'const stack = [];',
+    'function drawStack() { ctx.clearRect(0, 0, 1, 1); ctx.fillStyle = "blue"; }',
+    'function pushBlock() { stack.push({ x: stack.length }); drawStack(); }',
+    'function popBlock() { if (stack.length) { stack.pop(); drawStack(); } }',
+    "document.addEventListener('keydown', (e) => {",
+    "  if (e.key === 'a') { pushBlock(); } else if (e.key === 'b') { popBlock(); }",
+    '});',
+  ].join('\n'));
+  const f = factsFor(stackShape);
+  const tight = renderConstraints(f, { budget: 240, style: 'compact' });
+  say(tight.factsDelivered >= 1, `at a tight budget at least one CONSTRAINT is delivered (${tight.factsDelivered})`);
+  say(/^\/\/ FACT line \d+: stack is declared `const` and holds a container\.$/m.test(tight.text),
+    'and it is the state the site writes, not a redraw');
+  say(!/takes no arguments/.test(tight.text) || /stack is declared/.test(tight.text),
+    'a redraw fact never appears while the constraint it competes with is absent');
+  say(tight.text.length <= 240, `the budget is still respected (${tight.text.length})`);
+
+  // Any shortening must be REPORTED, because a shortened fact says less than the full one.
+  say(Array.isArray(tight.shortened), 'the rendering reports what it shortened');
+  say(tight.shortened.length > 0, `and at this budget it did shorten something (${tight.shortened.length} items)`);
+  say(tight.shortened.every((x) => /dropped (the proposed strategy|the line of existing code that writes it)/.test(x)),
+    'naming which part of which fact was removed');
+  say(!tight.complete, 'so `complete` is false - the block is not silently passed off as the whole picture');
+  const loose = renderConstraints(f, { budget: 2000, style: 'compact' });
+  say(loose.complete && loose.shortened.length === 0 && loose.dropped.length === 0,
+    'with room, nothing is dropped or shortened and `complete` is true');
+
+  // A LOWER-PRIORITY WHOLE FACT GOES BEFORE A HIGHER-PRIORITY ONE IS SHORTENED. A first attempt at the
+  // fix stripped optional lines across every block first, which cost the top fact its worked example
+  // while a less relevant constraint survived on its bare declaration.
+  const firstBlock = tight.text.split('\n').filter((l) => /stack/.test(l));
+  say(firstBlock.length >= 2, 'the top fact keeps its worked example rather than being cut to one line');
+
+  // THE RANKING DEFECT. `ctx` holds the result of a CALL - a handle obtained from outside - while
+  // `colorIndex` holds a literal the program keeps. Both are written at the same call depth, and ranking
+  // const above let promoted the DRAWING CONTEXT over the variable the task had to change.
+  const colourShape = page([
+    "const canvas = document.getElementById('c');",
+    "const ctx = canvas.getContext('2d');",
+    'let colorIndex = 0;',
+    "document.addEventListener('keydown', (e) => {",
+    "  if (e.key === 'c') { colorIndex = (colorIndex + 1) % 3; ctx.fillStyle = 'red'; }",
+    '});',
+  ].join('\n'));
+  const g = factsFor(colourShape);
+  say(g.constraints[0].name === 'colorIndex', `the program's own state ranks first (${g.constraints.map((c) => c.name).join(' > ')})`);
+  say(g.constraints.find((c) => c.name === 'ctx')?.handleLike === true, 'a binding initialised from a call is marked handle-like');
+  say(g.constraints.find((c) => c.name === 'colorIndex')?.handleLike === false, 'and one initialised from a literal is not');
+  const gt = renderConstraints(g, { budget: 240, style: 'compact' });
+  say(/colorIndex is declared `let`/.test(gt.text), 'so at a tight budget the state is what gets delivered');
+
+  // And the guard for a budget that cannot hold even one fact: say so rather than look like "no facts".
+  const starved = renderConstraints(g, { budget: 20, style: 'compact' });
+  say(starved.budgetTooSmallForOneFact === true, 'a budget too small for one fact says so explicitly');
+  say(starved.factsDelivered === 0 && starved.dropped.length > 0, 'and reports nothing delivered, with reasons');
+}
+
 // ══ 7. the extractor may read the program, never the checks ═════════════════════════════════════
 {
   console.log('\n7. the extractor may read the program, never the thing that judges it');
