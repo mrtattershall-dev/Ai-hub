@@ -142,7 +142,16 @@ export function buildScaffold(file, requirement, site) {
 export function buildInstruction(requirement, cap = 200) {
   const parts = [...(requirement.effects || [])];
   const hard = (requirement.invariants || []).filter((i) => !/keeps working/i.test(i));
-  let line = `// on this key: ${parts.join('; ')}.`;
+  // The lead comes from the requirement's OWN trigger. It used to say "on this key" whatever the trigger
+  // was, so a requirement about a button read to the model as a requirement about a keystroke. A key
+  // trigger - and any trigger this does not recognise - renders exactly as before, so every frozen key
+  // task produces a byte-identical instruction.
+  const t = requirement.trigger || {};
+  const lead = t.kind === 'click' ? `when ${t.selector} is clicked`
+    : t.kind === 'submit' ? `when ${t.selector} is submitted`
+      : t.kind === 'type' ? `when text is typed into ${t.selector}`
+        : 'on this key';
+  let line = `// ${lead}: ${parts.join('; ')}.`;
   // The invariants go in VERBATIM. An earlier version rewrote them and produced
   // "Create or remove no tile is created or removed" - a policy that edits the requirement's words is
   // a policy that can corrupt them.

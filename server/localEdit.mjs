@@ -231,14 +231,16 @@ export function parseEditBlocks(reply) {
  *
  *   ESCAPES_ENCLOSING_BLOCK   it closes more blocks than it opens, so it reaches outside its slot
  *   UNBALANCED                it ends mid-block, so splicing it leaves broken syntax
- *   ADDS_A_LISTENER           it registers an event listener: the slot is a body, and the scaffold
- *                             already supplies whatever binding was wanted
+ *   ADDS_A_LISTENER           it registers an event listener while the slot is a HANDLER BODY whose
+ *                             binding the scaffold already supplied. Not raised when the caller passes
+ *                             allowListener, which is how a "create a control and wire it" move says
+ *                             that registering one is the edit being asked for.
  *   TOO_LARGE                 it exceeds the line budget for the slot
  *
  * Refusing is the point. A completion that cannot be contained is not evidence about the model's logic,
  * and quietly cutting it into shape hides the fact that it did not answer the question asked.
  */
-export function containsSafely(middle, { maxLines = 20 } = {}) {
+export function containsSafely(middle, { maxLines = 20, allowListener = false } = {}) {
   const raw = String(middle ?? '');
   const lines = raw.split('\n');
   const code = lines.filter((l) => l.trim().length && !l.trim().startsWith('//'));
@@ -246,7 +248,12 @@ export function containsSafely(middle, { maxLines = 20 } = {}) {
   if (code.length > maxLines) {
     return { ok: false, reason: 'TOO_LARGE', detail: `${code.length} code lines for a slot budgeted at ${maxLines}` };
   }
-  if (/addEventListener\s*\(/.test(raw)) {
+  // ADDS_A_LISTENER is about the SLOT, not about listeners. When the slot is the body of a handler the
+  // scaffold already bound, registering another one escapes it. When the planner's move is to CREATE a
+  // control and wire it, or to attach a new listener, registering one IS the requested edit - and
+  // refusing it there would refuse the only completion that could answer the request. The caller says
+  // which slot this is; the default is the strict one, so every existing caller is unchanged.
+  if (!allowListener && /addEventListener\s*\(/.test(raw)) {
     return { ok: false, reason: 'ADDS_A_LISTENER', detail: 'the completion registers an event listener; the slot is a body and the scaffold already supplies the binding' };
   }
   // Depth over the whole completion, ignoring braces inside strings, template literals and comments.
@@ -288,7 +295,7 @@ export function containsSafely(middle, { maxLines = 20 } = {}) {
  *
  * A completion whose FIRST statement already escapes is refused, not truncated to nothing.
  */
-export function containToSlot(middle, { maxLines = 20 } = {}) {
+export function containToSlot(middle, { maxLines = 20, allowListener = false } = {}) {
   const raw = String(middle ?? '');
   const lines = raw.split('\n');
   // Depth per line, computed over text with strings, template literals and comments removed so a brace
@@ -312,7 +319,7 @@ export function containToSlot(middle, { maxLines = 20 } = {}) {
   }
   const kept = escapeLine === -1 ? raw : lines.slice(0, escapeLine).join('\n');
   const dropped = escapeLine === -1 ? 0 : lines.length - escapeLine;
-  const verdict = containsSafely(kept, { maxLines });
+  const verdict = containsSafely(kept, { maxLines, allowListener });
   if (!verdict.ok) {
     return { ok: false, reason: verdict.reason, detail: verdict.detail, truncatedAtLine: escapeLine === -1 ? null : escapeLine + 1, droppedLines: dropped };
   }

@@ -223,3 +223,39 @@ if (DIRECT) {
 }
 
 export { endOfScript };
+
+/**
+ * The SCAFFOLD the proposal implies, and the guidance that goes with it.
+ *
+ * The move decides the shape: extending a key handler needs a trigger branch; creating a control or a
+ * listener needs a bare slot at a point where everything it references already exists. The guidance
+ * lines come from the proposal's own scope and evidence, so what the model is shown is what the planner
+ * decided - not a second, parallel set of rules.
+ */
+export function planToScaffold(proposal, requirement) {
+  const t = requirement.trigger || {};
+  const indent = '        ';
+  if (proposal.move === MOVE.EXTEND_HANDLER && t.kind === 'key') {
+    return {
+      lines: [`${indent}    if (e.key === '${t.key}') {`, `${indent}        // FILL IN`, `${indent}    }`],
+      why: ['the trigger filter is supplied because the site is inside an existing key handler'],
+    };
+  }
+  // Every other move is a bare slot: the model writes the whole construction, because creating a
+  // control, attaching a handler or adding a listener has no fixed surrounding shape to supply.
+  const why = [];
+  if (proposal.scope && proposal.scope.creates.length) why.push(`the proposal is to create ${proposal.scope.creates.join(', ')} and wire it`);
+  if (proposal.scope && proposal.scope.attaches.length) why.push(`attaching to ${proposal.scope.attaches.join(', ')}`);
+  if (proposal.scope && proposal.scope.calls.length) why.push(`the page renders through ${proposal.scope.calls.join(', ')}`);
+  return { lines: [`${indent}// FILL IN`], why };
+}
+
+/** The guidance lines the runner shows the model, taken from the proposal itself. */
+export function planToGuidance(proposal) {
+  const out = [];
+  if (proposal.scope && proposal.scope.creates.length) out.push(`// create ${proposal.scope.creates.join(', ')} and attach the handler that does the work`);
+  if (proposal.scope && proposal.scope.calls.length) out.push(`// the page updates through ${proposal.scope.calls.join(', ')}, which existing code calls after changing state`);
+  for (const f of (proposal.relevantCode.functions || []).slice(0, 4)) out.push(`// FACT: this file defines ${f}()`);
+  for (const h of (proposal.relevantCode.handlers || []).slice(0, 3)) out.push(`// FACT: a ${h} handler is registered`);
+  return out;
+}

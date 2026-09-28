@@ -188,7 +188,7 @@ export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browse
           n: step.n, name: step.name, kind: ok ? 'PASS' : 'FAIL',
           // The observed DOM goes in the record on failure, so "the filter is wrong" can be stated with
           // the expected result AND what was actually on screen, rather than inferred.
-          observed: ok ? undefined : { visible: domNow.visible, inputValues: domNow.inputValues },
+          observed: ok ? undefined : { visible: domNow.visible, hidden: domNow.hidden, inputValues: domNow.inputValues },
           text: ok ? '' : `expected ${step.expect}; state ${JSON.stringify(state).slice(0, 200)}; visible ${JSON.stringify(domNow.visible).slice(0, 200)}${errors.length ? '; errors: ' + errors.slice(-2).join(' | ') : ''}`,
         });
         lines.push(`${ok ? 'PASS' : 'FAIL'} case ${step.n}  ${step.name}${ok ? '' : ' -> ' + cases[cases.length - 1].text}`);

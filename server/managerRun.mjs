@@ -5,15 +5,15 @@
 //   node server/managerRun.mjs --dir legasus/bench/set3/s3-04-colour --out <run.json>
 //
 // Everything the model is shown is produced by code:
-//   site         autoGuide.chooseSite
-//   scaffold     autoGuide.buildScaffold
+//   site         editPlanner.plan - the MOVE and the site, chosen from the request and the structure
+//   scaffold     editPlanner.planToScaffold, shaped to the chosen move
 //   instruction  autoGuide.buildInstruction, from the requirement's words
-//   context      codeFacts compact rendering, ranked by call distance from the site
+//   context      editPlanner.planToGuidance (the proposal scope) + codeFacts, ranked by call distance
 //   feedback     assembled from the GATE'S OWN OUTPUT - the failing step numbers, those steps' names as
 //                written in the emitted spec, and any captured error text. No sentence of it is written
 //                by a person at run time.
 //   containment  localEdit.containToSlot
-//   escalation   if every attempt at a site yields NO CODE, switch scaffold shape once, then stop
+//   stopping     if every attempt at the planned site yields NO CODE, stop and report it
 //
 // If a person has to touch anything, that is an INTERVENTION and the result becomes "the policy plus N
 // rescues". This program has no way to accept one, which is the point: it either does it or it does not.
@@ -53,7 +53,7 @@ const SEEDS_PER_ROUND = String(opt('seeds', '1,2,3')).split(',').map((x) => pars
 if (!DIR) { console.error('usage: node server/managerRun.mjs --dir <page dir> [--out run.json]'); process.exit(2); }
 
 const T0 = Date.now();
-const { chooseSite, buildScaffold, buildInstruction } = await import('./autoGuide.mjs');
+const { buildInstruction } = await import('./autoGuide.mjs');
 const { extractFacts, renderConstraints } = await import('./codeFacts.mjs');
 const { cutRegion, containToSlot } = await import('./localEdit.mjs');
 const { evaluate } = await import('./evaluator.js');
@@ -61,6 +61,8 @@ const { applyAcceptance } = await import('./acceptance.js');
 const { playCheck } = await import('./playCheck.js');
 const { judgeCandidate } = await import('./judgeCandidate.mjs');
 const { judgeAndDecide, shouldRetain } = await import('./retainPath.mjs');
+const { plan: makePlan, planToScaffold, planToGuidance, MOVE } = await import('./editPlanner.mjs');
+const { selectObservation } = await import('./observationSelect.mjs');
 
 const task = JSON.parse(readFileSync(join(DIR, 'task.json'), 'utf8'));
 const spec = task.diagnostic.spec;
@@ -99,23 +101,44 @@ async function infill(prefix, suffix, seed) {
   return { ok: true, text: String(j.response || ''), ms: Date.now() - t0, outTok: j.eval_count ?? null, promptTok: j.prompt_eval_count ?? null, doneReason: j.done_reason };
 }
 
-let preferRule = null;
-let shapeSwitched = false;
+// ── OBSERVE, ONCE, before any round. The observation informs the plan; the plan decides the site.
+const obsWs = mkdtempSync(join(tmpdir(), 'mgr-obs-'));
+let observation;
+try {
+  writeFileSync(join(obsWs, ENTRY), startFile, 'utf8');
+  observation = await selectObservation(obsWs, { entry: ENTRY });
+} finally { if (existsSync(obsWs)) { try { rmSync(obsWs, { recursive: true, force: true }); } catch { /* best effort */ } } }
+out.observation = observation && observation.ok ? {
+  outcome: observation.outcome,
+  selectedAdapters: observation.selected.map((x) => x.adapterId),
+  executedActions: observation.interactionsUsed,
+  coverageLimits: observation.coverageLimits,
+  unresolved: observation.unresolved,
+} : { error: observation && observation.reason };
+console.log(`observation: ${out.observation.outcome || 'UNAVAILABLE'} - ${(out.observation.selectedAdapters || []).join(', ') || 'no adapter selected'}`);
+
 let feedback = '';
 
 for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALLS; round++) {
-  const site = chooseSite(startFile, task.requirement, preferRule ? { preferRule } : {});
-  if (site.declined) {
-    out.rounds.push({ round, declined: site.declined, needed: site.needed });
-    console.log(`round ${round}: the policy DECLINED - ${site.declined}: ${site.needed}`);
+  // ── THE PLANNER DECIDES THE SITE AND THE GUIDANCE. Not autoGuide.chooseSite, which knew only two
+  // keyboard moves and had nowhere to put a change about a button.
+  const factsForPlan = (() => { try { return extractFacts(startFile, { rule: 'R2', insertAfterLine: 0 }); } catch { return null; } })();
+  const proposal = makePlan({ file: startFile, requirement: task.requirement, observation: observation || {}, facts: factsForPlan });
+  if (proposal.declined) {
+    out.rounds.push({ round, declined: proposal.move, needed: proposal.needed, proposal });
+    console.log(`round ${round}: the PLANNER DECLINED - ${proposal.needed}`);
     break;
   }
-  const scaffold = buildScaffold(startFile, task.requirement, site);
+  const site = { rule: proposal.move, why: proposal.site.why, insertAfterLine: proposal.site.insertAfterLine };
+  const sc = planToScaffold(proposal, task.requirement);
+  const scaffold = { lines: sc.lines, why: sc.why };
   const instruction = buildInstruction(task.requirement);
   const facts = extractFacts(startFile, site);
   const rendered = renderConstraints(facts, { budget: CONTEXT_BUDGET, style: CONTEXT_STYLE, includeStrategy: INCLUDE_STRATEGY });
   const indent = (scaffold.lines.find((l) => l.includes('// FILL IN')) || '            ').match(/^\s*/)[0];
-  const context = rendered.text ? rendered.text.split(NL).map((l) => indent + l).join(NL) : '';
+  // The guidance shown to the model comes from the PROPOSAL, so what it sees is what the planner decided.
+  const planGuidance = planToGuidance(proposal).map((l) => indent + l).join(NL);
+  const context = [planGuidance, rendered.text ? rendered.text.split(NL).map((l) => indent + l).join(NL) : ''].filter(Boolean).join(NL);
 
   const lines = startFile.split(NL);
   const scaffolded = [...lines.slice(0, site.insertAfterLine + 1), ...scaffold.lines, ...lines.slice(site.insertAfterLine + 1)].join(NL);
@@ -129,12 +152,13 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
   const roundRec = {
     round, rule: site.rule, why: site.why, insertAfterLine: site.insertAfterLine,
     scaffold: scaffold.lines.join(NL), instruction,
-    contextDelivered: rendered.text, factsDelivered: rendered.factsDelivered, contextDropped: rendered.dropped,
+    contextDelivered: context, factsDelivered: rendered.factsDelivered, contextDropped: rendered.dropped,
     feedbackDelivered: feedback || null,
-    promptHeadSha: sha(head), suffixSha: sha(cut.suffix),
+    proposal: { move: proposal.move, site: proposal.site, scope: proposal.scope, evidence: proposal.evidence, uncertainty: proposal.uncertainty },
+    promptHead: head, promptHeadSha: sha(head), suffixSha: sha(cut.suffix),
     seeds: [],
   };
-  console.log(`\nround ${round}: site ${site.rule} - ${site.why}`);
+  console.log(`\nround ${round}: move ${site.rule} - ${site.why} (after line ${site.insertAfterLine})`);
   console.log(`  facts delivered ${rendered.factsDelivered}${feedback ? `, feedback ${feedback.split(NL).length} lines` : ', no feedback yet'}`);
 
   let anyCode = false;
@@ -150,7 +174,10 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
       rawCompletion: { text: middle.slice(0, 6000), chars: middle.length, lines: middle.split(NL).length },
       boundaries: {}, timing: {},
     };
-    const contained = containToSlot(middle, { maxLines: 20 });
+    // Whether a new listener is inside the slot depends on the MOVE. In a handler body it escapes; when
+    // the plan is to create a control and wire it, or to attach a listener, registering one is the edit.
+    const wiring = [MOVE.CREATE_CONTROL, MOVE.NEW_LISTENER, MOVE.ATTACH_TO_CONTROL].includes(proposal.move);
+    const contained = containToSlot(middle, { maxLines: 20, allowListener: wiring });
     rec.containment = contained;
     if (!contained.ok) {
       rec.outcome = `REFUSED_${contained.reason}`;
@@ -201,15 +228,14 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
   out.rounds.push(roundRec);
   if (out.accepted) break;
 
-  if (!anyCode && !shapeSwitched) {
-    preferRule = site.rule === 'R1' ? 'R2' : 'R1';
-    shapeSwitched = true;
-    out.escalation = { afterRound: round, reason: 'every attempt at this site yielded no code', switchingTo: preferRule };
-    console.log(`  escalating: no code at this site, switching scaffold shape to ${preferRule}`);
-    feedback = '';
-    continue;
+  // The old escalation switched between the two keyboard scaffold shapes. The planner chooses a move
+  // from the request and the structure, so there is no second shape to fall back to: if a site yields no
+  // code, that is reported rather than papered over by trying the other keyboard move.
+  if (!anyCode) {
+    out.stoppedBecause = `no code was produced at the planned site (${site.rule})`;
+    console.log(`  stopping: no code produced at the planned site`);
+    break;
   }
-  if (!anyCode && shapeSwitched) { out.stoppedBecause = 'no code at either scaffold shape'; console.log('  stopping: no code at either shape'); break; }
   feedback = worst ? buildFeedback(worst, indent) : '';
 }
 
