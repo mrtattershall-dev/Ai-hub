@@ -9,8 +9,10 @@
 //
 // TWO SOURCES, KEPT APART, as they have been since the first emitter:
 //   the CARRIED-FORWARD checks describe what the application ALREADY does, and their expectations come
-//     from OBSERVATION - the confirmed interactions and the result they produced. Preserving behaviour
-//     means preserving what is there, bugs included.
+//     from OBSERVATION - the confirmed interactions and the result they produced. These are PROPOSED
+//     preservation, not established obligations: observing a behaviour does not establish that it was
+//     intended, and a defect in the delivered page becomes a check that protects the defect. Only a
+//     requirement can separate the two, and this emitter is not given one for the existing behaviour.
 //   the ADDITION's checks come from the frozen REQUIREMENT, never from the candidate. They cannot come
 //     from observation because the behaviour does not exist yet, and on the baseline they must FAIL.
 //
@@ -270,6 +272,18 @@ const task = {
   protected: { plays: [{ from: 'the page as delivered', spec: sub(carried), steps: carried }] },
   diagnostic: { kind: 'play', spec: sub(all), timeoutSec: 90 },
   upstreamCases: all.length, protectedCases: carried.length,
+  // WHAT THE BASELINE RUN ESTABLISHED, AND WHAT IT DID NOT. Two NECESSARY conditions were checked. They
+  // are not sufficient, and calling them "the task is validated" would overstate them by a long way.
+  validation: {
+    checked: [
+      'every carried-forward check PASSES on the page as delivered',
+      'every addition check FAILS on the page as delivered, so the addition is genuinely absent',
+    ],
+    notEstablished: [
+      'that the carried-forward checks encode INTENDED behaviour. They are PROPOSED preservation, derived from observing what the page does; a defect present in the delivered page becomes a check that protects the defect. Only a requirement can say which it is, and none was consulted.',
+      'that the requested and the protected sets are mutually consistent. A requirement contradicting a preserved behaviour passes both conditions above and only fails later, as a candidate that cannot satisfy both.',
+    ],
+  },
   observation: {
     outcome: sel.outcome,
     selectedAdapters: sel.selected.map((s) => s.adapterId),
