@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toggle Users</title>
+</head>
+<body>
+    <ul id="users">
+        <li>John Doe</li>
+        <li>Jane Smith</li>
+        <li>Mike Johnson</li>
+        <li>Emily Davis</li>
+        <li>David Brown</li>
+    </ul>
+    <button id="toggle">Toggle Users</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const usersList = document.getElementById('users');
+            const toggleButton = document.getElementById('toggle');
+
+            toggleButton.addEventListener('click', () => {
+                usersList.style.display = usersList.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

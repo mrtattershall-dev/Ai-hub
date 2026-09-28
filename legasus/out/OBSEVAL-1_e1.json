@@ -1,0 +1,47 @@
+{
+  "at": "2026-09-28T08:51:46.964Z",
+  "experiment": "TRANSFER-3",
+  "task": "auto-e1-books",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\obseval\\e1-books\\baseline-as-delivered.html",
+  "baselineSha": "f4eafe35ccbd4377b2989e3752943b099d5d04622d51e0253865464296d75034",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "declined": "NO_LISTENER_FOUND",
+      "needed": "somewhere that already handles a key press, to put this beside"
+    }
+  ],
+  "attempts": [],
+  "accepted": false,
+  "calls": 0,
+  "totals": {
+    "additionAttemptCalls": 0,
+    "accepted": 0,
+    "blockedByVisualContract": 0,
+    "visualNotEvaluated": 0,
+    "refused": 0,
+    "judged": 0,
+    "protectedFailures": 0,
+    "restored": 0,
+    "generationSeconds": 0,
+    "wallClockSeconds": 0.1,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

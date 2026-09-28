@@ -1,0 +1,8 @@
+at            2026-09-28T08:48:45.404Z
+shape         INPUT
+out           baseline-as-delivered.html
+sha256        efd25d4c5ccf526a6ebb658abde104c070e2dffc463f12aae83f1aeaf91e0f8b
+chars         1457
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  325   doneReason stop   ms 22063
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA page listing five fruits, each with a name. A text input with id 'filter' shows only the items whose name contains the typed text.\nREQUIRED, the page will be rejected without it: attach handling with\ndocument.addEventListener(...) on the document, not inline onclick attributes.\nUse plain HTML and one inline <script>. No canvas. Plain JavaScript, no libraries."

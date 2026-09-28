@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Filter</title>
+    <style>
+        #fruits {
+            list-style-type: none;
+            padding: 0;
+        }
+        #fruits li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        #filter {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fruits</h1>
+    <ul id="fruits">
+        <li>Apple</li>
+        <li>Banana</li>
+        <li>Cherry</li>
+        <li>Date</li>
+        <li>Elderberry</li>
+    </ul>
+    <input type="text" id="filter" placeholder="Filter fruits...">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fruits = document.querySelectorAll('#fruits li');
+            const filterInput = document.getElementById('filter');
+
+            filterInput.addEventListener('input', function() {
+                const searchText = filterInput.value.toLowerCase();
+                fruits.forEach(function(fruit) {
+                    const fruitText = fruit.textContent.toLowerCase();
+                    if (fruitText.includes(searchText)) {
+                        fruit.style.display = '';
+                    } else {
+                        fruit.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

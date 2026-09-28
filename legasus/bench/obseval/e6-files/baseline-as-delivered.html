@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File List</title>
+</head>
+<body>
+    <ul id="fileList">
+        <li>file1.txt</li>
+        <li>file2.txt</li>
+        <li>file3.txt</li>
+        <li>file4.txt</li>
+        <li>file5.txt</li>
+    </ul>
+    <button id="toggle">Toggle List</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileList = document.getElementById('fileList');
+            const toggleButton = document.getElementById('toggle');
+
+            toggleButton.addEventListener('click', function() {
+                fileList.style.display = fileList.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

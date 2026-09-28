@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+    <style>
+        .book {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .book:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Book List</h1>
+    <input type="text" id="filter" placeholder="Filter books...">
+    <div id="book-list">
+        <div class="book" onclick="showBook(this)">Book 1</div>
+        <div class="book" onclick="showBook(this)">Book 2</div>
+        <div class="book" onclick="showBook(this)">Book 3</div>
+        <div class="book" onclick="showBook(this)">Book 4</div>
+        <div class="book" onclick="showBook(this)">Book 5</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterInput = document.getElementById('filter');
+            const bookList = document.getElementById('book-list');
+
+            filterInput.addEventListener('input', function() {
+                const filterText = this.value.toLowerCase();
+                const books = bookList.querySelectorAll('.book');
+
+                books.forEach(book => {
+                    const bookName = book.textContent.toLowerCase();
+                    if (bookName.includes(filterText)) {
+                        book.style.display = '';
+                    } else {
+                        book.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

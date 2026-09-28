@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool List</title>
+    <style>
+        #tool-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        #tool-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tool List</h1>
+    <input type="text" id="filter" placeholder="Filter tools...">
+    <ul id="tool-list">
+        <li>Text Editor</li>
+        <li>Code Editor</li>
+        <li>Web Browser</li>
+        <li>Database Management</li>
+        <li>Version Control</li>
+    </ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterInput = document.getElementById('filter');
+            const toolList = document.getElementById('tool-list');
+
+            filterInput.addEventListener('input', () => {
+                const searchTerm = filterInput.value.toLowerCase();
+                const filteredTools = toolList.querySelectorAll('li');
+
+                filteredTools.forEach(tool => {
+                    const toolName = tool.textContent.toLowerCase();
+                    if (toolName.includes(searchTerm)) {
+                        tool.style.display = '';
+                    } else {
+                        tool.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

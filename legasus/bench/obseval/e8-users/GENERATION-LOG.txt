@@ -1,0 +1,8 @@
+at            2026-09-28T08:49:47.241Z
+shape         CLICK
+out           baseline-as-delivered.html
+sha256        2944a3646159fd1cb542e8ce91d6cadef6d7c88014eb3366c750e08ba75c5a3e
+chars         830
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  206   doneReason stop   ms 14661
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA page listing five users, each with a name. A button with id 'toggle' hides the list, and clicking it again shows the list.\nREQUIRED, the page will be rejected without it: attach handling with\ndocument.addEventListener(...) on the document, not inline onclick attributes.\nUse plain HTML and one inline <script>. No canvas. Plain JavaScript, no libraries."

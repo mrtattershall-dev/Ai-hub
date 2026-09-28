@@ -1,0 +1,8 @@
+at            2026-09-28T08:49:17.089Z
+shape         CLICK
+out           baseline-as-delivered.html
+sha256        066c57f353d535fe2bb65770e54aaae3c92c0c3f1f7dfde7375249cf7d2b2eaa
+chars         832
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  210   doneReason stop   ms 13884
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA page listing five files, each with a name. A button with id 'toggle' hides the list, and clicking it again shows the list.\nREQUIRED, the page will be rejected without it: attach handling with\ndocument.addEventListener(...) on the document, not inline onclick attributes.\nUse plain HTML and one inline <script>. No canvas. Plain JavaScript, no libraries."

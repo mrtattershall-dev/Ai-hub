@@ -1,0 +1,8 @@
+at            2026-09-28T08:48:00.953Z
+shape         INPUT
+out           baseline-as-delivered.html
+sha256        91834ab52de2c7abd1d70f596b96b2fcfb295caa74a6e2b3d5cee0848d24056f
+chars         1259
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  267   doneReason stop   ms 18816
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA page listing five cities, each with a name. A text input with id 'filter' shows only the items whose name contains the typed text.\nREQUIRED, the page will be rejected without it: attach handling with\ndocument.addEventListener(...) on the document, not inline onclick attributes.\nUse plain HTML and one inline <script>. No canvas. Plain JavaScript, no libraries."

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Filter</title>
+</head>
+<body>
+    <h1>City List</h1>
+    <ul id="city-list">
+        <li>Paris</li>
+        <li>London</li>
+        <li>Berlin</li>
+        <li>Madrid</li>
+        <li>Amsterdam</li>
+    </ul>
+    <input type="text" id="filter" placeholder="Filter cities...">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterInput = document.getElementById('filter');
+            const cityList = document.getElementById('city-list');
+
+            filterInput.addEventListener('input', function() {
+                const filterText = filterInput.value.toLowerCase();
+                const filteredCities = cityList.querySelectorAll('li');
+
+                filteredCities.forEach(city => {
+                    const cityText = city.textContent.toLowerCase();
+                    if (cityText.includes(filterText)) {
+                        city.style.display = '';
+                    } else {
+                        city.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

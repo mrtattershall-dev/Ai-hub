@@ -1,0 +1,8 @@
+at            2026-09-28T08:48:23.335Z
+shape         INPUT
+out           baseline-as-delivered.html
+sha256        38168b898227e6a04984d587398519770ea2426356a607956a5eb4bdc82efe51
+chars         1499
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  324   doneReason stop   ms 22384
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA page listing five tools, each with a name. A text input with id 'filter' shows only the items whose name contains the typed text.\nREQUIRED, the page will be rejected without it: attach handling with\ndocument.addEventListener(...) on the document, not inline onclick attributes.\nUse plain HTML and one inline <script>. No canvas. Plain JavaScript, no libraries."
