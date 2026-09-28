@@ -1,0 +1,46 @@
+E0: authorization now governs an ACTUAL EFFECT - the permitted write occurs, the forbidden one does not, through the same path
+
+FIRST ENFORCEMENT CODE IN THIS EXPERIMENT. Everything before it governed a verdict. governed-edit.mjs is
+where authorization meets the filesystem, and E0 is the two-trial test that says so with byte digests
+rather than return values.
+
+    E0-ALLOWED     grant pinned to fixture.js writes the EXACT expected bytes; OTHER.js byte-identical
+    E0-DENIED      ONLY action.target changes to OTHER.js; refused ACTION_DENIED_SCOPE_MISMATCH naming
+                   both the authorized and requested target; BOTH files byte-identical afterwards
+    E0-CONTROL     the two actions differ in EXACTLY ONE FIELD, asserted mechanically, so the refusal is
+                   caused by the target and not by some unrelated difference
+    E0-STRUCTURAL  a path escaping the declared root is refused before authorization, and nothing is
+                   written outside it
+4/4.
+
+THE ONE STRUCTURAL RULE THE MODULE EXISTS FOR: THE CHECK AND THE WRITE CONSUME THE SAME RESOLVED TARGET.
+resolvedTarget is computed once and is the only value passed to both the authorization comparison and
+writeFileSync. The baseline probe demonstrated the trap directly - it passed action: 'edit OTHER.js' as a
+STRING while nothing derived a path from it - and an enforcement point that validates a label while
+another argument picks the file would recreate the hole with a check in front of it. The comparison is
+against the path RELATIVE TO ROOT, not the basename, or sub/fixture.js would satisfy a grant pinned to
+fixture.js.
+
+WHAT E0 DOES NOT ESTABLISH, recorded in the test file so no later reader inherits a wider claim:
+  E9  the check-then-change RACE. governedEdit resolves once and writes immediately, which NARROWS the
+      window and does not close it. E0 passing establishes NOTHING about race protection.
+  E4  single use  NOT EVALUATED - no single-use policy is declared for this operation
+  E5  allowance   NOT EVALUATED - no finite allowance is declared for this operation
+E4 and E5 are neither passing nor vacuously satisfied; they are undecided policy and are reported as such.
+Evidence obligations are a property of the OPERATION CONTRACT (EDIT_FIXTURE declares none) rather than a
+universal precondition, so E3 will need a contract that declares some.
+
+NOTHING NEAR IT REGRESSED. The B-prime suite is 12/12 after the enforcement was added, GAP G3's baseline
+test still passes - commit() itself is unchanged, the binding is enforced at the consumer - and legaknow
+is byte-unchanged by E0: 0 files.
+
+ONE SLIP OF MINE: E0-STRUCTURAL used require() in an ESM module and failed on ReferenceError. Fixed with a
+top-level existsSync import. Third occurrence of that pattern in this project.
+
+NON-INTERFERENCE WITH THE LIVE 7B FUZZER, described as actions rather than inferred from a process count:
+every operation was a read-only git query, an in-process calculus call, or a test suite run inside this
+separate worktree. No process was killed or signalled, and nothing was written to the fuzzer's checkout.
+
+Message-File: scratch/e0.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
