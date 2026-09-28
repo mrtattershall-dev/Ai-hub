@@ -66,7 +66,10 @@ image = (
     image=image,
     gpu="A10G",
     volumes={"/root/.ollama": volume},
-    scaledown_window=2 * MINUTES,    # a burst, not a service
+    scaledown_window=45,             # AUDIT-2: 84% of AUDIT-1 billed time was idle GPU waiting on
+                                     # LOCAL puppeteer verification. Release during checking and cold
+                                     # start back from the volume (~15s, weights cached). A cost
+                                     # change only - it cannot affect what the model generates.
     timeout=5 * MINUTES,             # one infill call; longer than this is a fault, not a wait
     min_containers=0,                # scale to zero -> no idle cost
 )
