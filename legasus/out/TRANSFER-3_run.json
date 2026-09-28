@@ -1,0 +1,237 @@
+{
+  "at": "2026-09-28T02:11:14.835Z",
+  "experiment": "TRANSFER-3",
+  "task": "set3-s3-04-colour",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\set3\\s3-04-colour\\baseline-as-delivered.html",
+  "baselineSha": "02ad6b0e816b9b45908871648f9d47e45d8fdd78318e02cf320f99057046e12f",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "R1",
+      "why": "a keydown listener already dispatches on key values and does not exclude this key, so a branch goes inside it",
+      "insertAfterLine": 15,
+      "scaffold": "            if (e.key === '0') {\n                // FILL IN\n            }",
+      "instruction": "// on this key: every piece of state is back to its starting value.",
+      "contextDelivered": "// FACT line 14: colorIndex is declared `let`.\n// FACT line 18: existing code writes it as colorIndex = (colorIndex + 1) % 3;",
+      "factsDelivered": 1,
+      "contextDropped": [
+        "ctx: the whole constraint"
+      ],
+      "feedbackDelivered": null,
+      "promptHeadSha": "ac4ea927804a36b5192deab4d9532731761c9d36d1844afa8408e6f381e710dd",
+      "suffixSha": "85018a19eb01de6e1592adae0eb89bd7b2cd24c1151d7c0ddc57cbad8a6472d3",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "ACCEPTED",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "failing": []
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 59638,
+      "outputTokens": 400,
+      "promptTokens": 290,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "                // FACT line 20: the state is reset to its initial value.\n                // FACT line 22: the state is reset to its initial value.\n                // FACT line 24: the state is reset to its initial value.\n                // FACT line 26: the state is reset to its initial value.\n                // FACT line 28: the state is reset to its initial value.\n                // FACT line 30: the state is reset to its initial value.\n                // FACT line 32: the state is reset to its initial value.\n                // FACT line 34: the state is reset to its initial value.\n                // FACT line 36: the state is reset to its initial value.\n                // FACT line 38: the state is reset to its initial value.\n                // FACT line 40: the state is reset to its initial value.\n                // FACT line 42: the state is reset to its initial value.\n                // FACT line 44: the state is reset to its initial value.\n                // FACT line 46: the state is reset to its initial value.\n                // FACT line 48: the state is reset to its initial value.\n                // FACT line 50: the state is reset to its initial value.\n                // FACT line 52: the state is reset to its initial value.\n                // FACT line 54: the state is reset to its initial value.\n                // FACT line 56: the state is reset to its initial value.\n                // FACT line 58: the state is reset to its initial value.\n                // FACT line 60: the state is reset to its initial value.\n                // FACT line 62: the state is reset to its initial value.\n                // FACT line 64: the state is reset to its initial value.\n                // FACT line 66: the",
+        "chars": 1738,
+        "lines": 24
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 42359,
+      "outputTokens": 400,
+      "promptTokens": 290,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "                // FACT line 20: existing code reads it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 22: existing code writes it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 24: existing code reads it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 26: existing code writes it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 28: existing code reads it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 30: existing code writes it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 32: existing code reads it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 34: existing code writes it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 36: existing code reads it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 38: existing code writes it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 40: existing code reads it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 42: existing code writes it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 44: existing code reads it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 46: existing code writes it as colorIndex = (colorIndex + 1) % 3;\n                // FACT line 48: existing code reads it as colorIndex = (colorIndex + 1",
+        "chars": 1410,
+        "lines": 15
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 20253,
+      "outputTokens": 193,
+      "promptTokens": 290,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "                colorIndex = 0;\n                ctx.fillStyle = `rgb(${colorIndex * 100}, ${colorIndex * 100}, ${colorIndex * 100})`;\n                ctx.fillRect(0, 0, canvas.width, canvas.height);\n            }\n            if (e.key === '1') {\n                colorIndex = 1;\n                ctx.fillStyle = `rgb(${colorIndex * 100}, ${colorIndex * 100}, ${colorIndex * 100})`;\n                ctx.fillRect(0, 0, canvas.width, canvas.height);\n            }\n            if (e.key === '2') {\n                colorIndex = 2;\n                ctx.fillStyle = `rgb(${colorIndex * 100}, ${colorIndex * 100}, ${colorIndex * 100})`;\n                ctx.fillRect(0, 0, canvas.width, canvas.height);",
+        "chars": 690,
+        "lines": 13
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 135193,
+        "acceptanceMs": 155832
+      },
+      "containment": {
+        "ok": true,
+        "text": "                colorIndex = 0;\n                ctx.fillStyle = `rgb(${colorIndex * 100}, ${colorIndex * 100}, ${colorIndex * 100})`;\n                ctx.fillRect(0, 0, canvas.width, canvas.height);",
+        "codeLines": 3,
+        "truncatedAtLine": 4,
+        "droppedLines": 10,
+        "how": "truncated at the point where it would have closed a block it did not open (line 4), dropping 10 line(s)"
+      },
+      "transformedCandidate": {
+        "text": "                colorIndex = 0;\n                ctx.fillStyle = `rgb(${colorIndex * 100}, ${colorIndex * 100}, ${colorIndex * 100})`;\n                ctx.fillRect(0, 0, canvas.width, canvas.height);",
+        "chars": 198,
+        "lines": 3
+      },
+      "extraction": {
+        "truncatedAtLine": 4,
+        "droppedLines": 10,
+        "how": "truncated at the point where it would have closed a block it did not open (line 4), dropping 10 line(s)"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "failing": [],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, in its starting state\nPASS case 2  pressing c changes the state as it already did\nPASS case 3  pressing c again changes it again\nPASS case 4  pressing 0 returns every piece of state to its starting value\nPASS case 5  pressing 0 again leaves it at the starting value\nPASS case 6  after 0, pressing c still changes the state\nPASS case 7  no page or console error was raised at any point\nSUMMARY 7/7 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "colorCanvas"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "colorCanvas"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "f9c9778ad86d954ddb3768dfb87980f73d1d9b87"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Color Changer</title>\n</head>\n<body>\n    <canvas id=\"colorCanvas\"></canvas>\n    <script>\n        const canvas = document.getElementById('colorCanvas');\n        const ctx = canvas.getContext('2d');\n        const key = 'c';\n        let colorIndex = 0;\n\n        document.addEventListener('keydown', (e) => {\n            if (e.key === '0') {\n                // FACT line 14: colorIndex is declared `let`.\n                // FACT line 18: existing code writes it as colorIndex = (colorIndex + 1) % 3;\n// on this key: every piece of state is back to its starting value.\n                colorIndex = 0;\n                ctx.fillStyle = `rgb(${colorIndex * 100}, ${colorIndex * 100}, ${colorIndex * 100})`;\n                ctx.fillRect(0, 0, canvas.width, canvas.height);\n            }\n            if (e.key === key) {\n                colorIndex = (colorIndex + 1) % 3;\n                ctx.fillStyle = `rgb(${colorIndex * 100}, ${colorIndex * 100}, ${colorIndex * 100})`;\n                ctx.fillRect(0, 0, canvas.width, canvas.height);\n            }\n        });\n\n        window.app = { state: () => ({ colorIndex }) };\n    </script>\n</body>\n</html>\n",
+      "candidateSha": "03603335cacacc12200538a9fc22a1bb9dddb57ebd1e777dd5851bf3f88f6f18",
+      "outcome": "ACCEPTED"
+    }
+  ],
+  "accepted": true,
+  "calls": 3,
+  "acceptedSeed": 3,
+  "acceptedRound": 1,
+  "acceptedCandidate": "                colorIndex = 0;\n                ctx.fillStyle = `rgb(${colorIndex * 100}, ${colorIndex * 100}, ${colorIndex * 100})`;\n                ctx.fillRect(0, 0, canvas.width, canvas.height);",
+  "totals": {
+    "additionAttemptCalls": 3,
+    "accepted": 1,
+    "refused": 2,
+    "judged": 1,
+    "protectedFailures": 0,
+    "restored": 0,
+    "generationSeconds": 122.3,
+    "wallClockSeconds": 155.9,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

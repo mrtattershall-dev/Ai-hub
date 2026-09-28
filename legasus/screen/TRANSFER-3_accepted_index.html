@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Changer</title>
+</head>
+<body>
+    <canvas id="colorCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('colorCanvas');
+        const ctx = canvas.getContext('2d');
+        const key = 'c';
+        let colorIndex = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '0') {
+                // FACT line 14: colorIndex is declared `let`.
+                // FACT line 18: existing code writes it as colorIndex = (colorIndex + 1) % 3;
+// on this key: every piece of state is back to its starting value.
+                colorIndex = 0;
+                ctx.fillStyle = `rgb(${colorIndex * 100}, ${colorIndex * 100}, ${colorIndex * 100})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            if (e.key === key) {
+                colorIndex = (colorIndex + 1) % 3;
+                ctx.fillStyle = `rgb(${colorIndex * 100}, ${colorIndex * 100}, ${colorIndex * 100})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+        });
+
+        window.app = { state: () => ({ colorIndex }) };
+    </script>
+</body>
+</html>
