@@ -108,7 +108,12 @@ const ids = (r) => r.selected.map((s) => s.adapterId).sort();
   // INERT: real surfaces, a real listener, and an interaction that changes nothing observable.
   const inert = await runHtml('<!DOCTYPE html><html><body><button id="b">nothing</button><script>document.getElementById("b").addEventListener("click", () => { const x = 1; });</script></body></html>');
   say(inert.outcome === OUTCOME.NO_CHANGE_OBSERVED, `an inert control gives NO_CHANGE_OBSERVED (${inert.outcome})`);
-  say(inert.probes.some((p) => p.interactionsPerformed > 0), 'the probe DID run - this is not a probe failure');
+  // `interactionsPerformed` was split into a distinct-interaction count and an EXECUTED-ACTION count
+  // when bounded repetition was introduced, and this assertion kept the retired name - so it read
+  // `undefined > 0` and failed while the probe was in fact running. Both counts are checked now, because
+  // the point of that split was that three repetitions of one interaction are three executed actions.
+  say(inert.probes.some((p) => p.distinctInteractionsPerformed > 0 && p.executedActions >= p.distinctInteractionsPerformed),
+    `the probe DID run - this is not a probe failure (${inert.probes.map((p) => `${p.distinctInteractionsPerformed} interaction, ${p.executedActions} executed actions`).join('; ')})`);
   const note = inert.unresolved.join(' ');
   say(/NOT A FINDING THAT THE APPLICATION HAS NO BEHAVIOUR/.test(note),
     'and the record says explicitly that this is not a finding of no behaviour');

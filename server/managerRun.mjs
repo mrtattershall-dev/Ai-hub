@@ -53,6 +53,9 @@ const SEEDS_PER_ROUND = String(opt('seeds', '1,2,3')).split(',').map((x) => pars
 if (!DIR) { console.error('usage: node server/managerRun.mjs --dir <page dir> [--out run.json]'); process.exit(2); }
 
 const T0 = Date.now();
+// WHERE REJECTED ATTEMPTS GO. Retention decides what replaces the program; this decides what survives
+// to be studied. The two are separate, and only the first can authorize anything.
+const CORPUS = opt('corpus', OUT ? OUT.replace(/\.json$/, '') + '.attempts' : null);
 const { buildInstruction } = await import('./autoGuide.mjs');
 const { extractFacts, renderConstraints } = await import('./codeFacts.mjs');
 const { cutRegion, containToSlot } = await import('./localEdit.mjs');
@@ -63,6 +66,7 @@ const { judgeCandidate } = await import('./judgeCandidate.mjs');
 const { judgeAndDecide, shouldRetain } = await import('./retainPath.mjs');
 const { plan: makePlan, planToScaffold, planToGuidance, MOVE } = await import('./editPlanner.mjs');
 const { selectObservation } = await import('./observationSelect.mjs');
+const { classifyAttempt, preserveAttempt } = await import('./attemptRecord.mjs');
 
 const task = JSON.parse(readFileSync(join(DIR, 'task.json'), 'utf8'));
 const spec = task.diagnostic.spec;
@@ -182,6 +186,8 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
     if (!contained.ok) {
       rec.outcome = `REFUSED_${contained.reason}`;
       console.log(`  seed ${seed}: REFUSED - ${contained.reason}`);
+      rec.classification = classifyAttempt(task, rec);
+      if (CORPUS) rec.preserved = preserveAttempt(CORPUS, rec, { candidate: null, prompt: head, suffix: cut.suffix, proposal: roundRec.proposal, classification: rec.classification });
       out.attempts.push(rec); roundRec.seeds.push({ seed, outcome: rec.outcome });
       worst = worst || rec;
       continue;
@@ -218,8 +224,14 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
       if (!decision.accepted && decision.functionallyAccepted) console.log(`           BLOCKED: ${decision.reasons.join('; ')}`);
       for (const a of decision.advisories) console.log(`           advisory: ${a}`);
       console.log(`           wrote: ${contained.text.trim().split(NL).join(' | ').slice(0, 130)}${decision.accepted ? '   <- ACCEPTED' : ''}`);
+      // PRESERVED WHATEVER THE VERDICT. A rejected candidate that created and wired a control, and then
+      // failed to clear the field, is a question worth keeping; deleting it answers the question by
+      // destroying it. Nothing preserved here feeds back into this run or any later one.
+      rec.classification = classifyAttempt(task, rec);
+      if (CORPUS) rec.preserved = preserveAttempt(CORPUS, rec, { candidate, prompt: head, suffix: cut.suffix, proposal: roundRec.proposal, classification: rec.classification });
+      if (rec.classification.mismatch === 'PARTIAL_EFFECT') console.log(`           PARTIAL: ${rec.classification.why}`);
       out.attempts.push(rec);
-      roundRec.seeds.push({ seed, outcome: rec.outcome, passing: rec.play?.passing, failing: rec.play?.failing, visual: rec.visual?.verdict ?? null, decision: decision.summary });
+      roundRec.seeds.push({ seed, outcome: rec.outcome, mismatch: rec.classification.mismatch, passing: rec.play?.passing, failing: rec.play?.failing, visual: rec.visual?.verdict ?? null, decision: decision.summary });
       if (shouldRetain(decision)) { out.accepted = true; out.acceptedSeed = seed; out.acceptedRound = round; out.acceptedCandidate = contained.text; break; }
       // The attempt that got furthest is the one the next round gets feedback from.
       if (!worst || (rec.play?.passing || []).length > (worst.play?.passing || []).length) worst = rec;
@@ -250,6 +262,10 @@ out.totals = {
   judged: out.attempts.filter((a) => a.outcome === 'ACCEPTED' || a.outcome === 'REJECTED').length,
   protectedFailures: out.attempts.filter((a) => a.acceptance && a.acceptance.survivingWorkspaceVerdict && a.acceptance.survivingWorkspaceVerdict.protected !== 'PASS').length,
   restored: out.attempts.filter((a) => a.acceptance?.disposition === 'RESTORED').length,
+  // What the attempts showed, which is not the same question as what was authorized to survive.
+  mismatch: out.attempts.reduce((m, a) => { const k = (a.classification && a.classification.mismatch) || 'UNRECORDED'; m[k] = (m[k] || 0) + 1; return m; }, {}),
+  partialEffects: out.attempts.filter((a) => a.classification && a.classification.mismatch === 'PARTIAL_EFFECT').length,
+  corpus: CORPUS,
   generationSeconds: +(out.attempts.reduce((s, a) => s + (a.generationMs || 0), 0) / 1000).toFixed(1),
   wallClockSeconds: +((Date.now() - T0) / 1000).toFixed(1),
   interventionsByAPerson: 0,

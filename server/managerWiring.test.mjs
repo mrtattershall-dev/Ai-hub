@@ -18,7 +18,7 @@
  * would have caught that.
  */
 import { createServer } from 'node:http';
-import { mkdtempSync, writeFileSync, readFileSync, rmSync, existsSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, readdirSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFile } from 'node:child_process';
@@ -58,6 +58,15 @@ clearBtn.textContent = 'Clear';
 document.body.appendChild(clearBtn);
 clearBtn.addEventListener('click', () => { const intended = ''; });`;
 
+// Creates the control, wires it, and empties the field - but never tells the page to re-render, so the
+// list stays filtered. It FAILS its task. It also demonstrably got the control-and-wiring part right.
+const PARTIAL = `
+const clearBtn = document.createElement('button');
+clearBtn.id = 'clear-filter';
+clearBtn.textContent = 'Clear';
+document.body.appendChild(clearBtn);
+clearBtn.addEventListener('click', () => { input.value = ''; });`;
+
 /** A scripted backend speaking the model API. It RECORDS every request it is asked to complete. */
 function scriptedBackend(completion) {
   const seen = [];
@@ -95,7 +104,13 @@ async function invoke(completion) {
       '--model-url', `http://127.0.0.1:${port}`, '--seeds', '1', '--max-rounds', '1',
     ], { cwd: process.cwd(), windowsHide: true, maxBuffer: 20e6 }).catch((e) => ({ stdout: e.stdout || '', stderr: e.stderr || '' }));
     const run = existsSync(outFile) ? JSON.parse(readFileSync(outFile, 'utf8')) : null;
-    return { run, seen, emitted, emitLog: String(em.stdout || ''), stdout: r.stdout || '' };
+    // Read the corpus back off disk BEFORE the directory is removed: "the record says it wrote a file"
+    // is not the same claim as "the file is there with the candidate in it".
+    const cdir = run && run.totals && run.totals.corpus;
+    const corpus = cdir && existsSync(cdir)
+      ? readdirSync(cdir).map((f) => ({ f, chars: readFileSync(join(cdir, f), 'utf8').length }))
+      : [];
+    return { run, seen, emitted, corpus, emitLog: String(em.stdout || ''), stdout: r.stdout || '' };
   } finally {
     try { srv.close(); } catch { /* best effort */ }
     try { rmSync(dir, { recursive: true, force: true }); } catch { /* best effort */ }
@@ -175,6 +190,22 @@ say(CARRIED.every((n) => (iatt.play.passing || []).includes(n)),
 say(ADDED.every((n) => !(iatt.play.passing || []).includes(n)),
   `every addition check failed (${ADDED.join(',')}) - the button is there and does nothing`);
 say(inert.seen.length >= 1, 'and it reached the model through the same scripted backend');
+
+// ══ 4. a failed attempt that shows a mechanism working is KEPT, not authorized ══════════════════
+console.log('\n4. an attempt can fail its task and still be worth keeping');
+const part = await invoke(PARTIAL);
+const patt = part.run.attempts[0];
+say(patt.outcome !== 'ACCEPTED' && part.run.accepted === false, `it is NOT retained (${patt && patt.outcome}) - the task verdict is unchanged`);
+say(patt.classification && patt.classification.mismatch === 'PARTIAL_EFFECT',
+  `and it is recorded as ${patt.classification && patt.classification.mismatch}: ${patt.classification && patt.classification.why}`);
+say((patt.classification.addition.passed || []).length > 0 && (patt.classification.addition.failed || []).length > 0,
+  `some of what the requirement asked for worked (${patt.classification.addition.passed.join(',')}) and some did not (${patt.classification.addition.failed.join(',')})`);
+say((patt.classification.carriedForward.broken || []).length === 0, 'nothing that already worked was broken, so this is a partial effect and not a regression');
+say(typeof patt.preserved === 'string', `the full candidate survives the run as ${patt.preserved}.html - not just its hash`);
+say(inert.run.attempts[0].classification.mismatch === 'NOTHING_WORKED',
+  `and the inert button is recorded differently (${inert.run.attempts[0].classification.mismatch}) - a button that does nothing is not a partial success`);
+say(good.run.attempts[0].classification.mismatch === 'MET', `the accepted one is recorded as ${good.run.attempts[0].classification.mismatch}`);
+say(part.run.totals.partialEffects === 1 && part.run.totals.corpus, 'the run reports how many attempts showed a partial effect, and where they were kept');
 
 console.log(`\n  manager wiring: ${passed} passed, ${failed} failed -> ${failed ? 'THE PLANNING-TO-EXECUTION CONNECTION IS NOT ESTABLISHED' : 'the live runner plans the site, sends it to the model, and the returned edit reaches a retain decision that refuses an inert one'}`);
 process.exit(failed ? 1 : 0);
