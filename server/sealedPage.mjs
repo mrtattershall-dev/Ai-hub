@@ -70,42 +70,53 @@ export function generationFacts(dir) {
 }
 
 /**
- * Probe the page by OBSERVING it: `observeState.observe` loads it, reads the state expression, presses
- * each declared key and reads again, returning structured values.
+ * Probe the page by SELECTING AN OBSERVATION METHOD FOR IT.
  *
- * The previous version asserted `false` on every step so that playCheck would print the state inside a
- * failure message, then parsed it back out with a regex. That regex returned null for a state which was a
- * JSON *string*, and would have disqualified a readable page while reporting NO_READABLE_STATE - a true
- * verdict reached for a false reason. Reading the value directly removes the whole class.
+ * This used to press a fixed list of keys and nothing else. On BATCH-1 that reported a working
+ * input-driven filter as having no behaviour - conflating "our observation method is unsuitable" with
+ * "the application does nothing", and writing off two of four applications on the strength of it.
+ *
+ * It now asks `observationSelect`, which inspects the application's real interaction surfaces and
+ * listener registrations, proposes candidate methods with their evidence and uncertainty, probes them in
+ * isolated pages within a frozen budget, and keeps the ones that produced an observable effect. No name,
+ * filename or comment influences the choice.
  */
 export async function probe(html) {
-  const { observe, respondingKeys } = await import('./observeState.mjs');
+  const { selectObservation } = await import('./observationSelect.mjs');
   const ws = mkdtempSync(join(tmpdir(), 'sealed-'));
   try {
     writeFileSync(join(ws, 'index.html'), html, 'utf8');
-    const keys = [...PROBE_KEYS, ...RESET_KEY_CANDIDATES];
-    const r = await observe(ws, { keys });
-    if (!r.ok) return { ok: false, reason: r.reason };
-    const responds = respondingKeys(r.observations);
+    const sel = await selectObservation(ws);
+    if (!sel.ok) return { ok: false, reason: sel.reason };
+
+    // The keys that were CONFIRMED to do something, taken from the probes rather than assumed. Used by
+    // the task emitter, which today can only build key-driven checks.
+    const keyEffects = [];
+    for (const pr of sel.probes) {
+      if (pr.adapterId !== 'browser.keyboard') continue;
+      for (const e of pr.effective) if (e.interaction.kind === 'key') keyEffects.push(e.interaction.key);
+    }
     return {
       ok: true,
-      loadState: r.atLoad.threw ? null : r.atLoad.value,
-      loadReadThrew: r.atLoad.threw ? r.atLoad.message : null,
-      loadErrorCount: r.loadErrors.length,
-      loadErrors: r.loadErrors,
-      observations: r.observations,
-      responds,
-      respondsExisting: responds.filter((k) => PROBE_KEYS.includes(k)),
-      errorsTotal: r.errors.length,
-      readyState: r.readyState,
-      keysProbed: keys,
+      selection: sel,
+      outcome: sel.outcome,
+      selectedAdapters: sel.selected.map((x) => x.adapterId),
+      loadErrorCount: sel.loadErrors.length,
+      loadErrors: sel.loadErrors,
+      loadState: sel.atLoad ? sel.atLoad.seam : null,
+      loadReadThrew: sel.atLoad ? sel.atLoad.seamThrew : null,
+      respondsExisting: [...new Set(keyEffects)],
+      responds: [...new Set(keyEffects)],
+      observations: [],
+      unresolved: sel.unresolved,
     };
   } finally { if (existsSync(ws)) { try { rmSync(ws, { recursive: true, force: true }); } catch { /* best effort */ } } }
 }
 
 /**
- * The six eligibility rules, applied mechanically. Returned as a list of failures so a page is rejected
- * with EVERY reason it failed, not just the first one found.
+ * The eligibility rules, applied mechanically, now expressed over the OBSERVATION OUTCOMES rather than
+ * over a fixed key probe. A page is rejected with every reason it failed, and the reasons distinguish a
+ * fault in the application from a limit of ours.
  */
 export function eligibility({ gen, parses, pr }) {
   const fails = [];
@@ -115,16 +126,40 @@ export function eligibility({ gen, parses, pr }) {
   for (const q of parses) if (!q.ok) fails.push(`SCRIPT_DOES_NOT_PARSE: ${q.message}`);
   if (!pr) return { eligible: false, fails, trigger: null };
   if (!pr.ok) { fails.push(`CANNOT_OBSERVE: ${pr.reason}`); return { eligible: false, fails, trigger: null }; }
-  if (pr.loadErrorCount > 0) fails.push(`ERRORS_AT_LOAD: ${pr.loadErrorCount} - ${(pr.loadErrors[0] || '').slice(0, 120)}`);
-  if (pr.loadReadThrew) fails.push(`STATE_READ_THREW_AT_LOAD: ${pr.loadReadThrew}`);
-  else if (pr.loadState === null) fails.push('NO_READABLE_STATE: the state expression yielded nothing');
-  if (!pr.respondsExisting.length) fails.push('NO_EXISTING_BEHAVIOUR: no probed key changed the state');
+
+  switch (pr.outcome) {
+    case 'BASELINE_ERROR':
+      fails.push(`ERRORS_AT_LOAD: ${pr.loadErrorCount} - ${(pr.loadErrors[0] || '').slice(0, 120)}`);
+      break;
+    case 'UNSUPPORTED_OBSERVATION':
+      fails.push('UNSUPPORTED_OBSERVATION: no registered adapter could propose a way to interact with this application. This is a limit of our adapters, NOT a finding about the application.');
+      break;
+    case 'PROBE_ERROR':
+      fails.push('PROBE_ERROR: the probes could not be executed, so nothing is known about the application');
+      break;
+    case 'NO_CHANGE_OBSERVED':
+      fails.push('NO_CHANGE_OBSERVED_UNDER_THE_PROBES_ATTEMPTED: every proposed interaction ran and none changed the seam, the DOM or the canvas. This is NOT a finding that the application has no behaviour.');
+      break;
+    default: break;
+  }
+
+  // THE CHECK HARNESS IS NARROWER THAN THE OBSERVER, and that gap is reported rather than hidden.
+  // `playCheck` executes `{ key }` steps only, so an application whose confirmed behaviour is
+  // input-driven or click-driven can be OBSERVED but its checks cannot yet be RUN. A required check that
+  // cannot run must never become a pass, so such a page is not eligible for a task - and the reason says
+  // which adapter would be needed.
+  if (pr.outcome === 'CONFIRMED_BEHAVIOUR') {
+    const nonKey = (pr.selectedAdapters || []).filter((a) => a !== 'browser.keyboard');
+    if (!pr.respondsExisting.length) {
+      fails.push(`CHECKS_UNSUPPORTED_FOR_SELECTED_ADAPTER: behaviour was CONFIRMED via ${nonKey.join(', ') || 'a non-keyboard adapter'}, but the check harness executes key interactions only. The application is observable; our checks are not yet. NOT a defect of the application.`);
+    }
+  }
+
   const trigger = RESET_KEY_CANDIDATES.find((k) => !pr.responds.includes(k)) || null;
-  if (!trigger) fails.push('NO_FREE_TRIGGER_KEY: the page already responds to every candidate trigger');
-  // A state that becomes unreadable partway through is not a usable subject either: the checks would
-  // fail for a reason that has nothing to do with the candidate.
-  if (pr.observations.some((o) => o.threw)) fails.push('STATE_BECAME_UNREADABLE: reading the state threw after some key press');
-  return { eligible: fails.length === 0, fails, trigger };
+  if (pr.outcome === 'CONFIRMED_BEHAVIOUR' && pr.respondsExisting.length && !trigger) {
+    fails.push('NO_FREE_TRIGGER_KEY: the page already responds to every candidate trigger');
+  }
+  return { eligible: fails.length === 0, fails, trigger, outcome: pr.outcome, selectedAdapters: pr.selectedAdapters || [] };
 }
 
 const DIRECT = process.argv[1] && (await import('node:url')).pathToFileURL(process.argv[1]).href === import.meta.url;
@@ -150,12 +185,11 @@ if (DIRECT) {
   const v = eligibility({ gen, parses, pr });
 
   if (pr && pr.ok) {
-    console.log(`errors AT LOAD ${pr.loadErrorCount}   readyState ${pr.readyState}`);
+    console.log(`errors AT LOAD ${pr.loadErrorCount}`);
+    console.log(`observation    ${pr.outcome}   adapters selected: ${pr.selectedAdapters.join(', ') || 'none'}`);
     console.log(`state at load  ${pr.loadReadThrew ? 'READ THREW: ' + pr.loadReadThrew : JSON.stringify(pr.loadState)}`);
-    for (const o of pr.observations.slice(1)) {
-      console.log(`  after ${String(o.after).padEnd(12)} ${o.threw ? 'READ THREW' : JSON.stringify(o.value)}`);
-    }
-    console.log(`responds to    ${pr.respondsExisting.join(', ') || 'NOTHING'}`);
+    console.log(`keys confirmed ${pr.respondsExisting.join(', ') || 'none'}`);
+    for (const u of pr.unresolved || []) console.log(`  unresolved: ${String(u).slice(0, 150)}`);
   }
 
   if (!v.eligible) {

@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
+<input type="text" id="q">
+<ul id="l"><li>one</li><li>two</li></ul>
+<canvas id="c" width="120" height="40"></canvas>
+<script>
+const ctx = document.getElementById('c').getContext('2d');
+let k = 0;
+function draw(){ ctx.clearRect(0,0,120,40); ctx.fillText('k='+k,5,20); }
+document.addEventListener('keydown', (e) => { if (e.key === 'b') { k++; draw(); } });
+const q = document.getElementById('q');
+const lis = Array.from(document.querySelectorAll('#l li'));
+q.addEventListener('input', () => { const v = q.value; lis.forEach((li) => { li.style.display = li.textContent.includes(v) ? '' : 'none'; }); });
+draw();
+</script>
+</body></html>

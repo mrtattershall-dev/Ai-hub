@@ -1,0 +1,11 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
+<canvas id="c" width="200" height="60"></canvas>
+<script>
+const ctx = document.getElementById('c').getContext('2d');
+let n = 0;
+function draw(){ ctx.clearRect(0,0,200,60); ctx.fillText('n='+n,10,20); }
+document.addEventListener('keydown', (e) => { if (e.key === 'a') { n++; draw(); } });
+draw();
+window.app = { state: () => ({ n }) };
+</script>
+</body></html>

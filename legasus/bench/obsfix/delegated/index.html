@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
+<div id="wrap"><button class="item" data-v="1">one</button><button class="item" data-v="2">two</button></div>
+<p id="picked">none</p>
+<script>
+setTimeout(() => {
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.classList && e.target.classList.contains('item')) {
+      document.getElementById('picked').textContent = 'picked ' + e.target.dataset.v;
+    }
+  });
+}, 30);
+</script>
+</body></html>

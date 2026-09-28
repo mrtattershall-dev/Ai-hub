@@ -19,13 +19,24 @@ failed."** The four break into two kinds:
     KNOWN BASELINE DEFECTS, 2 of 4
       b2-inventory   SCRIPT_DOES_NOT_PARSE at line 20
       b1-products    the state seam throws at load - `products is not defined`
-    UNSUPPORTED BY THE CURRENT PROBE, 2 of 4
-      b3-contacts    reported NO_EXISTING_BEHAVIOUR. It is a WORKING FILTER: it binds
-                     `filterInput.addEventListener('input', ...)`. My probe only presses bare keydowns
-                     on `document` and never types into an input, so it cannot see the behaviour.
-      b4-tasks       same shape, same limitation
+    UNSUPPORTED BY THE PROBE AS IT THEN WAS, 2 of 4
+      b3-contacts    reported NO_EXISTING_BEHAVIOUR, because the probe only pressed bare keydowns and
+                     never typed into an input.
+      b4-tasks       same.
 
-**Two of those four are a fact about my instrument, not about the pages.**
+> **CORRECTION, 2026-09-28.** This record originally called b3 and b4 WORKING FILTERS that the probe
+> could not see. **That was wrong, and I inferred it from the presence of an `input` listener without
+> reading what the handler does.** The observation-selection layer built afterwards types into their
+> inputs properly and reports NO_CHANGE_OBSERVED - correctly, because BOTH FILTERS ARE NO-OPS:
+>
+>     b3-contacts  computes the MATCHING contacts, then removes `hidden` from matching ones that lack
+>                  it and adds `hidden` to matching ones that have it. It never hides the non-matching.
+>     b4-tasks     the same shape, toggling a `completed` class on the matching items only.
+>
+> So the honest reading of group B is: **two pages with known baseline defects, and two pages whose
+> filters do nothing - none of which the original probe could have told apart.** The instrument was a
+> real limitation; the conclusion I drew from it about these two pages was an overstatement. Seeing a
+> listener establishes RESPONSIVENESS AT MOST, and here not even that.
 
 ## THE WEBSITE-ADAPTER REQUIREMENT, now concrete rather than guessed
 

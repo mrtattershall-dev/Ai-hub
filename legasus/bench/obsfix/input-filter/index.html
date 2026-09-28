@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
+<input type="text" id="filter" placeholder="filter">
+<ul id="list"><li>alpha</li><li>beta</li><li>gamma</li></ul>
+<script>
+const input = document.getElementById('filter');
+const items = Array.from(document.querySelectorAll('#list li'));
+input.addEventListener('input', () => {
+  const q = input.value.toLowerCase();
+  items.forEach((li) => { li.style.display = li.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+});
+</script>
+</body></html>
