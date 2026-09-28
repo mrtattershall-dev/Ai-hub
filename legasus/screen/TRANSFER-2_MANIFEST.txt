@@ -1,0 +1,12 @@
+TRANSFER-2 MANIFEST - hashes at freeze time, before any eligibility check was run
+recorded 2026-09-28T01:40:18Z
+
+cbf4983a7ba89e219a4cbb29cfe8977f51efa440bcc0d8763b44960bc314d732    19101  server/autoGuide.mjs
+f10f7708b4620a287d2bf32cbce0f3cca46d84d42f276226dc47ef894e9c1d65    38057  server/codeFacts.mjs
+978bc299e5660034605d2f0049b952b9e2e8e7e9adc63163d0e8c4d8d53f9ee2    37806  server/localEdit.mjs
+df56ddc0180262307dec4eb0dd7d171b9a416e25238023e189047586f215e5b4     7484  server/judgeCandidate.mjs
+99e50264209ad4002df979fbd6edde9a45e7a9f09fe3d2085f9f8f201fffd623    12253  server/evaluator.js
+64aa3b7bcb1ad51b5eaba23f996095ab692abbf9f715f3dd29e4685a3caa2bf3     9908  server/acceptance.js
+f62fa26c96e5b5896517c0a6b97a2b463692224e96efeb0a2f7fa04869216fd1    12541  server/playCheck.js
+cde5b7cc7c647a0c417e19687dcebcb57e168398b2326ebd7256538a75abc083    25390  server/benchTasks.js
+eedf6d7d39bd3a2aa9e6646e67ac852e3c7b424c0e261501288ab82990b81ee2     7908  server/sealedPage.mjs

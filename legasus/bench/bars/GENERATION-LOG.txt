@@ -1,0 +1,11 @@
+RECONSTRUCTED from commit ad9aa0e, whose message recorded these facts BEFORE this page was read.
+The sha256 below was verified against the file on disk at reconstruction time, so the file is the
+one those facts describe. It was not written at generation time because makePages.mjs had no log;
+makePage.mjs writes one at generation time and later pages use that.
+
+out           baseline-as-delivered.html
+sha256        9dff0d2dfa0329bef40a8c91e31cbe0d1668f0f3ce76627006b86e884785b585
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  383   doneReason stop
+seamWording   plain
+ask           Three vertical bars drawn on a canvas, all at height one. Keys a, b and c each make their own bar one taller.

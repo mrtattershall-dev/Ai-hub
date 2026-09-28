@@ -1,0 +1,11 @@
+RECONSTRUCTED from commit ad9aa0e, whose message recorded these facts BEFORE this page was read.
+The sha256 below was verified against the file on disk at reconstruction time, so the file is the
+one those facts describe. It was not written at generation time because makePages.mjs had no log;
+makePage.mjs writes one at generation time and later pages use that.
+
+out           baseline-as-delivered.html
+sha256        e899be776227f2bbac18ed87fc9e1a5f467e4e80bd9f5a30165ff2e390b97117
+model         qwen2.5-coder:1.5b  seed 7  num_predict 1400  temperature 0.3
+outputTokens  1400   doneReason length
+seamWording   plain
+ask           A dice face drawn on a canvas. Key r rolls a six-sided die and draws the new number.
