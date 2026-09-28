@@ -5,9 +5,13 @@
 //   node server/editPlanner.mjs --dir <page dir>
 //
 // THE ASSUMPTION THIS REPLACES. `autoGuide.chooseSite` knows two moves: put a branch inside an existing
-// keydown listener, or add a keydown listener after the last one. On a page with no keyboard handling at
-// all it declines - correctly, by name - and OBSEVAL-1 stopped there. The fix is NOT "add a keyboard
-// listener when none exists". That would keep the keyboard assumption and bolt a shortcut onto a website.
+// keydown listener, or add a keydown listener after the last one. Both are keyboard moves, so a
+// requirement about a BUTTON has nowhere to go, and OBSEVAL-1 stopped there.
+//
+// The fix is not to add a third keyboard move. It is to choose the move from what was ASKED FOR and what
+// the application IS. If a requirement asks for a key, the requested listener is created - someone asked
+// for it, and refusing because the selected adapter is browser.input would let the ADAPTER DICTATE THE
+// IMPLEMENTATION, which is the restriction being removed. If it asks for a button, a button is wired.
 //
 // The planner chooses from THE REQUESTED BEHAVIOUR and THE APPLICATION'S STRUCTURE. The selected
 // observation adapter INFORMS the choice - it says how the application is driven - but does not dictate
@@ -125,12 +129,22 @@ export function plan({ file, requirement, observation, facts = null }) {
       evidence.push(`key handling already exists (${kb.map((r) => `${r.type} on ${r.target}`).join(', ')})`);
       scope = { creates: [], attaches: [], calls: renderer ? [renderer] : [] };
     } else {
-      // THE CASE THAT USED TO DECLINE. A key requirement on a page with no key handling is a genuine
-      // mismatch between the requirement and the application, and the planner says so rather than
-      // bolting a keyboard shortcut onto a website.
-      move = MOVE.DECLINE;
-      needed = 'the requirement is triggered by a key press, and this application has no key handling at all. Adding one would give a website a keyboard shortcut nobody asked for. A requirement stated in the modality the application actually uses - a control to click, or a change to an existing handler - would fit it.';
-      evidence.push(`no key listener is registered anywhere; the application is driven by ${selected.join(', ') || 'something this planner did not identify'}`);
+      // IF THE REQUIREMENT ASKS FOR A KEY, SOMEONE ASKED FOR A KEY.
+      //
+      // An earlier version DECLINED here, reasoning that adding key handling to an input-driven page
+      // would be "a keyboard shortcut nobody asked for". That was wrong twice over: the requirement is
+      // exactly who asked for it, and refusing on the grounds that the selected adapter is browser.input
+      // lets the ADAPTER DICTATE THE IMPLEMENTATION - the restriction this planner exists to remove. An
+      // input-driven application can legitimately gain keyboard controls.
+      //
+      // So the requested listener is proposed. A decline is reserved for a concrete unsupported
+      // capability or a requirement that cannot be resolved.
+      move = MOVE.NEW_LISTENER;
+      site = { insertAfterLine: endOfScript(file), why: 'at the end of the script, after every element and function the listener must reference exists' };
+      evidence.push(`the requirement asks for key '${trigger.key}', and no key listener is registered anywhere, so the requested listener must be created`);
+      evidence.push(`the application is driven by ${selected.join(', ') || 'a modality this planner did not identify'} - that informs how the effect is achieved, NOT whether the request is honoured`);
+      scope = { creates: ['a keydown listener'], attaches: ['document'], calls: renderer ? [renderer] : [] };
+      uncertainty.push('this application had no key handling before, so nothing establishes that a key press reaches it in the way the requirement assumes; the checks will settle it');
     }
   } else {
     move = MOVE.DECLINE;
