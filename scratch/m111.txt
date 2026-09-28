@@ -1,0 +1,38 @@
+TRANSFER-1 RUN 1: the transfer FAILED - the frozen mechanism never reported, because the subject exits
+
+The mechanism was verified against its freeze immediately before the run, the clean room was built as
+required, and the hub repository was never executed, written to, or given a process. Two of the hub's
+90 test files ran, the process ended, and the report was never printed. Exit 0, 23 lines of log, no
+BACKWARD-1 report at all.
+
+The cause was diagnosed before it was called anything. All 90 hub test files call process.exit, and
+run-backward.mjs registers its exit handler at line 51, AFTER the import loop at line 48. The second
+test file terminated the process while the runner was still importing, so the handler did not yet
+exist.
+
+THIS IS A MECHANISM FAILURE, NOT AN ENVIRONMENTAL ONE, by the rule fixed before the run: a missing
+module or a busy port is environmental and may be retried, while an instrument that produced no data
+in a working environment is the result. The environment worked - hub tests ran and passed. The
+unstated assumption was that a subject does not terminate the process, which is true of Legasus,
+whose tests are node:test, and false of the hub, whose test files are bespoke runners that exit when
+they finish. The assumption was written into the harness by a subject that never violated it.
+
+Every coordinate is NOT ESTABLISHED. Zero is not the finding; there is no finding. The run reported
+nothing, which is a different fact from reporting that nothing happened, and distinguishing those two
+is the thing this instrument exists to do. It failed to do it about itself, at the harness level, for
+the fourth time in this line of work. The hardening in c408f0b covers a hole INSIDE a report and does
+not cover the absence OF a report - exit 0 with no output is the same silent shape as the loader
+defect in BACKWARD-1, one layer further out.
+
+THE HUB IS NO LONGER AN UNSPOILED SUBJECT. The preregistration is explicit that a repair and a re-run
+are a SECOND run, that this first result stands as recorded, and that is how it will be reported. No
+information about the hub's effects, ancestry, backdoors or observability was obtained, because
+nothing was measured; what was spent is the one-shot status.
+
+The transfer question was whether the discipline survives contact with software not built around this
+ontology. The first contact found an assumption the instrument did not know it had, in the harness
+rather than in the analysis. That is a real answer, and not the one I wanted.
+
+Message-File: scratch/m111.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

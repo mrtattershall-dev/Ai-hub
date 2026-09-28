@@ -1,0 +1,32 @@
+Preregister LegaScreen v3 slice 1: discover the support structure counterfactually instead of matching names
+
+v2's two structural failures - the same-name perturbation assumption and the derived-by-another-name
+blind spot - have one cause: it compares field names and has no idea what supports what. This slice
+builds that layer and nothing else. The owner's v3 design has twelve parts and a readiness gate;
+this preregisters one, because the whole point of the holdout was that breadth asserted is
+worthless.
+
+The idea is to take a witnessed call, perturb one input coordinate, re-run and diff the output, and
+build an empirical dependency matrix from execution rather than from names. The same machinery
+answers what defeated the ancestry invariant, because aggregation is observable too: if removing one
+input leaves an output dimension intact the operation behaves disjunctively for it, and if the
+dimension disappears it behaves conjunctively.
+
+Five predictions. The matrix should resolve the three dimensions v2 reports as unscreened, showing
+criterion depending on producer and history on document and ordinal. A sound derive should observe
+ALL_OF. The decisive one is that a defective derive should observe ANY_OF, making C2 a mismatch
+between observed aggregation and declared semantics, discovered without any probe being told that
+derive is conjunctive - which would mean the hand-authored declaration is no longer what finds C2.
+Four-state outcomes become centralized so that a perturbation changing nothing is a first-class
+state carrying zero evidence rather than an assertion buried in one function, which is how v2
+shipped the bug it later caught. And non-vacuity: the matrix must contain both dependence and
+independence, since a matrix saying everything depends on everything has discovered nothing.
+
+Falsification is stated both ways: if the matrix cannot separate derived-from-a-renamed-input from
+minted-from-nothing, counterfactual lineage does not close the blind spot and the later parts do not
+proceed on a hope; if the aggregation prediction fails, the claim that lineage generalizes C2 is
+withdrawn and the declaration stays hand-authored.
+
+Message-File: scratch/m77.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

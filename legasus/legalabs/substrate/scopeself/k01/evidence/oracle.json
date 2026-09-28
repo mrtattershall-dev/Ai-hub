@@ -1,0 +1,60 @@
+{
+  "task_id": "k01",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing store as the relation to parallel; that feature has a declaration and a reader, and the new table occupies the same positions",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the parallel table and the writer",
+        "site_hint": "        self._store = {}\n"
+      },
+      {
+        "id": "op2",
+        "intent": "a branch inside get, requiring the unit PARAMETER `key`",
+        "site_hint": "elf._store:\n            return self._store[key]\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 5
+  },
+  "reference": {
+    "source_hash": "e0abc0ae0d514bb5995809949c7958d85c8121d54f4d0b62e298cdddb7c8f0ed",
+    "reference_hash": "8d6c7d268d77fd537b6a9e346dca5e8cf85ee8f7f10cd88e921c9c1a9f049a47",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "note": "Per-case expectations for the requirement-resolution family. Written before any run and committed with the seal. Revision 2 of the deriver is frozen; running it here is the prospective test of whether its requirement model generalizes.",
+  "tasks": [
+    { "id": "h01", "ops": 2, "kind": "symbol_availability", "half": "POSITIVE", "case": "provider -> IMMEDIATE consumer",
+      "situation": "op1 defines _bonus; op2 binds BONUS = _bonus() at import time",
+      "expect": "the two are ordered; every removed boundary genuinely fails" },
+    { "id": "h02", "ops": 2, "kind": "symbol_availability", "half": "NEGATIVE", "case": "provider -> DEFERRED body consumer",
+      "situation": "shout references _emph inside its body, resolved when shout RUNS",
+      "expect": "no symbol ordering is derived; a textual mention is not a dependency" },
+    { "id": "h03", "ops": 3, "kind": "symbol_availability", "half": "POSITIVE", "case": "definition-time requirement",
+      "situation": "def rule(n, ch=_dash()) - the default evaluates when the def executes",
+      "expect": "ordered against _dash; this is the definition-time half of the phase distinction" },
+    { "id": "h04", "ops": 3, "kind": "symbol_availability", "half": "NEGATIVE", "case": "same shape, body reference",
+      "situation": "def star(n): return _mark() * n - the call happens when star RUNS",
+      "expect": "NOT ordered; h03 and h04 differ only in where the helper call sits" },
+    { "id": "h05", "ops": 3, "kind": "symbol_availability", "half": "POSITIVE", "case": "bare statement, TWO providers",
+      "situation": "CONFIG.update(_extra()) and CONFIG.update(_more()) - the operation provides nothing",
+      "expect": "ordered after BOTH helpers and after CONFIG; an operation can impose ordering through what it consumes" },
+    { "id": "h06", "ops": 3, "kind": "symbol_availability", "half": "POSITIVE", "case": "EXISTING vs PLANNED provider",
+      "situation": "SCALED = BASE * _factor() - BASE is a current program fact, _factor exists only because another planned operation creates it",
+      "expect": "both requirements honoured, and the two sources are not collapsed - they carry different epistemic authority" },
+    { "id": "h07", "ops": 3, "kind": "symbol_availability", "half": "UNRESOLVED", "case": "requirement the rule cannot resolve",
+      "situation": "TAU = _round2(2 * math.pi) - math is bound by an import statement, which the provider search does not recognise",
+      "expect": "the constraint is REAL and execution demands it, but the rule cannot find the provider. Deriving nothing is not the same answer as 'there is no dependency'. Must not invent ordering; the gap is expected to show as a MISS rather than an over-constraint." },
+    { "id": "h08", "ops": 3, "kind": "symbol_availability", "half": "RESOLVED-CONTROL", "case": "the same shape, fully resolvable",
+      "situation": "TAU = _round2(2 * PI) - identical to h07 except PI is a module constant",
+      "expect": "fully ordered. h07 and h08 differ only in whether the provider arrives by import or by assignment, so a difference between them isolates the unresolved path." }
+  ],
+  "matching": "operation counts are {2,3,3,3} on the must-order half (h01,h03,h05,h06) and {2,3,3,3} on the must-not-order/unresolved half (h02,h04,h07,h08)",
+  "prior_standing": "revision 2 scored 8/8 on the generalization family and 26/26 on the provenance family, both DEVELOPMENT evidence. It has no prospective standing before this run.",
+  "absence_rule": "Absence of evidence is not evidence of absence. 'I found no provider' and 'there is no dependency' are different states, and h07 exists to make the difference measurable."
+}

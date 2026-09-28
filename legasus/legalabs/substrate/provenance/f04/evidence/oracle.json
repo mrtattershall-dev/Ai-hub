@@ -1,0 +1,72 @@
+{
+  "task_id": "f04",
+  "analogy_class": "no_supported_analogy",
+  "analogy_justification": "every function in this file converts or bounds a single value and retains nothing between calls, so tracking readings across calls has no structural relation here to parallel",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the across-call store the new behaviour needs",
+        "site_hint": "# Temperature helpers.\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the recorder, using that store",
+        "site_hint": "def to_c(f):\n    return (f - 32.0) * 5.0 / 9.0\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the aggregate over that store",
+        "site_hint": "def floor_c(c):\n    return max(-273.15, c)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "novel-state-feature",
+    "affected_region_lines": 16
+  },
+  "reference": {
+    "source_hash": "6d3906be9bb3e2c34804bb57c98df74974003e4676f7047e9484f019bde28136",
+    "reference_hash": "85adbd098dcb365ed95f14ab74f6623540319bb75432d44cad0c39ddc37fc942",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

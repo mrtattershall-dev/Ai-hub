@@ -1,0 +1,25 @@
+Freeze BACKWARD-2 and preregister TRANSFER-2, with the regression gate recorded before the digest
+
+The Legasus regression passed on a quiet machine at a baseline of 8 node processes: 3804 effects,
+383 process executions, 93 COMPLETE entries, one DRAIN_INCOMPLETE, one TIMED_OUT, no records missing,
+nothing swept and no orphans afterwards. The same four private functions appear on witnessed effect
+paths - runProgram, snapshot, restore and git - and the intersection of the two surfaces is still
+zero, so the headline findings reproduce.
+
+The totals are lower than the pre-leak 4132 and 717 because entries now run ISOLATED rather than
+sharing a single process, so cross-file state no longer accumulates between test files. The isolated
+figure is the more correct measurement and the difference is recorded rather than smoothed.
+
+BACKWARD-2 is frozen at COMBINED 0784cd3f4e3970b3, superseding BACKWARD-1, which stands as the digest
+TRANSFER-1 actually ran against. TRANSFER-2 runs ONCE against exactly this mechanism; any edit to a
+frozen file makes the next attempt TRANSFER-3 with the TRANSFER-2 result standing as recorded.
+
+The preregistration carries TRANSFER-1 permanently in its ancestry, states the falsified assumption
+in its raw prospective form rather than filing it under a hypothesis, and reports six independent
+coordinates with no percentage whose denominator hides the unobservable CommonJS region. It also
+adopts BIND-1's protocol of a load ceiling sampled during the run, recorded before it starts, so a
+contended attempt discards itself by rule.
+
+Message-File: scratch/m114.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

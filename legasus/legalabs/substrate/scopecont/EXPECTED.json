@@ -1,0 +1,27 @@
+{
+  "note": "Prospective validation of revisions 4 and 5. Authored blind against GATE6_PROCEDURE.md before any deriver change. Revision 5 is frozen; running it here is the test of whether scope_availability and expression_continuation are architecture or development familiarity.",
+  "unconstructible_case": "The procedure asked for a requirement 'bound nowhere' that must stay UNRESOLVED. In a program that actually runs, an immediate requirement bound nowhere raises NameError and the reference cannot pass its own delta probe. The only runnable forms of 'no supported provider' are an import (already tested by i01/i02) and a builtin (removed before it becomes a requirement). That case has SYNTHETIC coverage only, in scope.test.mjs. Recorded as a limit of the case type, not a gap in the rule.",
+  "tasks": [
+    { "id": "j01", "ops": 3, "kind": "scope_availability", "half": "POSITIVE", "case": "parameter of the enclosing unit",
+      "situation": "op2 is a branch inside resolve(self, path) whose code uses `path`",
+      "expect": "`path` resolves as enclosing_scope, narrows nothing, requirement_complete true" },
+    { "id": "j02", "ops": 3, "kind": "scope_availability", "half": "POSITIVE", "case": "local of the enclosing unit, beside a planned provider",
+      "situation": "op2 is `total = total * SCALE` inside summarize; `total` is a local, `SCALE` is created by op1",
+      "expect": "`total` resolves as enclosing_scope and narrows nothing; `SCALE` resolves as planned_operation and DOES order op2 after op1" },
+    { "id": "j03", "ops": 2, "kind": "expression_continuation", "half": "POSITIVE", "case": "hand-written multi-line literal",
+      "situation": "COLORS spans four lines at module level, written by hand rather than produced by an intra-line operation",
+      "expect": "positions inside the literal are removed. PATH SENSITIVITY: the literal is at module level so no body encloses those positions and ownership_boundary cannot reach them, and no terminator precedes them at module indent, so expression_continuation is the only mechanism that can" },
+    { "id": "j04", "ops": 3, "kind": "scope_availability", "half": "NEGATIVE", "case": "module-level op using a name that is ALSO a function parameter",
+      "situation": "op1 is `BANNER = PREFIX + \"-\"` at module level. `msg` and `channel` are parameters of send, and PREFIX is a module constant",
+      "expect": "the module-level insertion must NOT claim enclosing scope for anything. PREFIX resolves as existing_definition and DOES order against its binding. A resolver that granted enclosing scope at module level would lose that ordering" },
+    { "id": "j05", "ops": 3, "kind": "expression_continuation", "half": "NEGATIVE", "case": "brackets inside strings and comments",
+      "situation": "the header comment contains [brackets], PATTERNS holds \"a[b\" and \"c)d\", and LABEL is \"see ] here\" - every bracket is inside a string or a comment",
+      "expect": "no continuation is detected and no position is removed by it. A depth counter blind to strings or comments would remove legal positions here, which is over-constraint" },
+    { "id": "j06", "ops": 2, "kind": "expression_continuation", "half": "NEGATIVE", "case": "balanced literals and nested calls on one line",
+      "situation": "BASE = max(1, min(4, 3)) and PAIR = (BASE, [1, 2]) are balanced within their own lines",
+      "expect": "no continuation is detected; nested and balanced brackets close on the line that opens them" }
+  ],
+  "matching": "operation counts are {2,3,3} on the must-fire half (j03 j01 j02) and {2,3,3} on the must-not half (j06 j04 j05)",
+  "prior_standing": "revisions 4 and 5 have DEVELOPMENT standing only. Both were built against defects found on the provenance family, so their contribution to 100% of available positional information is measured on the data that diagnosed them.",
+  "endpoint": "every positive case resolves or narrows as stated, every negative does not, zero over-constraint, 100% witness replay, every unsupported case declaring itself. A residual needing semantic intent is classified at that boundary with a justified register entry, not an assertion."
+}

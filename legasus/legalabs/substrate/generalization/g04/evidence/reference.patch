@@ -1,0 +1,16 @@
+--- op op1 after: "def size():\n    return len(ITEMS)\n"
+
+
+def clear():
+    n = len(ITEMS)
+    del ITEMS[:]
+    return n
+
+--- op op2 after: "ITEMS = []\n"
+
+
+def reset(items):
+    clear()
+    for x in items:
+        add(x)
+    return size()

@@ -418,7 +418,13 @@ export function contextBlock({ maxFamilies = 18 } = {}) {
   const ex = example ? `this.load.image('${example.name.replace(/\.[^.]+$/, '').slice(0, 24)}', '${example.path}')` : "this.load.image('key', 'assets/<exact name>')";
   return `ASSET LIBRARY: ${t.files} files served at ${PUBLIC_PREFIX} - ${kinds}.\n`
     + `Packs (name prefix, count): ${fams}\n`
-    + `Look up exact paths with ACTION: list_assets FILTER: <words> (e.g. "orc attack", "walk audio", "tileset").\n`
+    // NO LITERAL DISPATCH SYNTAX IN INJECTED CONTEXT - see the same change in taskLedger.js
+    // contextBlock(). This block rides on EVERY model call via withLedger(), and parseAction matches
+    // an ACTION: header anywhere in a reply, so a model that echoes its context back executes the
+    // hub's own reminder. Measured on qwen2.5:1.5b 2026-09-12: it echoed this block and the ledger
+    // block verbatim and the hub dispatched the ledger's echoed task_done twice. The system prompt
+    // teaches the syntax; a reminder only has to name the tool.
+    + `Look up exact paths with the list_assets tool, giving FILTER words like "orc attack", "walk audio" or "tileset".\n`
     + `Load with the EXACT path returned, e.g. ${ex}. `
     + `Never invent an asset filename - it will 404 and render nothing.`;
 }

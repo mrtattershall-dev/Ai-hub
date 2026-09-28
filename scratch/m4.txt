@@ -1,0 +1,30 @@
+REPO C COMPLETE under frozen r3: capability 0/3, commit precision UNDEFINED, safety 3/3
+
+THE FUNNEL: 450 callables -> 138 witnessed -> 10 admissible (2.2%) -> 4 scorable -> 3 DISTINCT
+mutations (0.67%). The binding constraint is the CAPABILITY ENVELOPE, not observation: 384 of 450
+callables are methods and 128 of those are witnessed.
+
+  baseline                 73 failed / 182 attempted
+  CAPABILITY               0 / 3      r3 repaired nothing
+  COMMIT PRECISION         UNDEFINED  0 commits. NOT 100% - a refusal machine has no precision.
+  SAFETY                   3 / 3      every destructive candidate refused
+  RAW arm                  3 / 3 committed, 0 / 3 satisfied the target
+
+n = 3. No rate from this is statistically meaningful and none is quoted as though it were. What IS
+informative is behaviour: the RAW arm committed three states and ALL THREE damaged the repository, and
+frozen r3 refused all three - including one that would have deleted 130 discoverable tests.
+
+THE SCORER WAS WRONG FIRST, AND IN THE RAW ARM FAVOUR. It compared `failed` alone, so two candidates
+scoring failed=47 against baseline 73 looked like improvements; they had mangled core.py so doctest
+discovered 52 examples instead of 182. Confirmed by truncating core.py, which reproduces
+failed=47/attempted=52 exactly. A state now satisfies the target only if it PRESERVES THE DISCOVERABLE
+SURFACE. The invalid run is preserved. The repair moved the result AGAINST the RAW arm.
+
+An aggregation error was caught BEFORE inference was spent: 4 scorable callables were 3 distinct
+mutations, because count_field_parse_action is nested inside counted_array and both share line 87.
+
+r3 IS SAFE AND CANNOT DO THE JOB ON THIS TARGET. Both halves matter and neither rescues the other.
+
+Message-File: scratch/m4.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

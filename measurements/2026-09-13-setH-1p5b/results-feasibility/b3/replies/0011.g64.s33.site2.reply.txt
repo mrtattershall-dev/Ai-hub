@@ -1,0 +1,12 @@
+# AT THIS POINT WRITE ONLY THIS: define a flush function for paragraphs, mirroring flush_para but emitting <p>
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+    def flush_codes():
+        if codes:
+            blocks.append("".join(codes))
+            del codes[:]
+
+    def flush_links():
+        if links:
+            blocks.append("".join(links))
+            del links[:]

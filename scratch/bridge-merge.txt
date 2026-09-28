@@ -1,0 +1,35 @@
+Land the consolidation bridge: calculus and controller in ONE tree for the first time
+
+Merges 761efaf (integration lineage: legaknow + legascreen + runtime admission, with the acorn/eslint
+reproducibility fixes and the checkout-local imports) into the controller-lineage base 5a3072d.
+
+FIRST TREE TO HOLD BOTH SUBSYSTEMS. Until now the authority calculus and the controller/screen line had
+never coexisted in one checkout - they forked at cb1f8ce on 2026-09-12 and evolved independently. Working
+tree now carries legaknow (43 .mjs), runtime admission (74 .mjs), and screen (204 files) together.
+
+FOUR agent.js CONFLICTS, ALL ORTHOGONAL, resolved by union not by side-picking:
+  1 runSubtask dispatch: audit noteUncoveredTraversal AND tool-context save/restore, one tool call
+  2 finish gate: ROUTES_BOUNDED branch KEPT (records CLOSED_UNDER_BOUNDING, never claims hub verify),
+    AND the else-branch call gains goal: run.goal - the two are orthogonal, not competing
+  3 tool result: diagnostic-staleness + refusal-handback + repeat-warning-survives-substitution +
+    protocol, merged into ONE feedback assignment (no duplicate declarations)
+  4 human-approval site: ours' refusal gate kept (must not return early or the Express request hangs)
+    with theirs' context save/restore inside the else
+Both verifier.verify call sites carry the goal (tool path + finish gate). node --check passes.
+
+THE THREE byte-unchanged GUARDS (B-4/C-4/L-4) WILL NOW PASS, AND THE PASS IS BASELINE-RELATIVE, NOT A
+PROOF. Each runs `git diff --name-only HEAD -- legasus/legaknow/`; mid-merge, HEAD was the pre-merge
+commit so every legaknow file read as changed. Post-commit they pass because HEAD now includes the merge.
+That is legitimate HERE - legaknow in this merge is byte-identical to its source 761efaf (0 files differ,
+measured) so the calculus was not modified - but the guard's MECHANISM (working-tree vs HEAD) would also
+pass a commit that DID rewrite the calculus. Fixing its baseline to the frozen calculus commit is a
+separate change against the runtime test file, recorded as outstanding, not done here.
+
+NOT in this commit: node_modules (ignored; deps declared+locked), FUTURE_DIRECTION.md (kept separate),
+the end-to-end governed slice (preregistered next, not built).
+
+Bridge input frozen as tag controller-bridge-input (cccb6a1) so phase2 cannot move the target mid-build.
+
+Message-File: scratch/bridge-merge.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

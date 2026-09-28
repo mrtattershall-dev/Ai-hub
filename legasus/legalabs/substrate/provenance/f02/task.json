@@ -1,0 +1,11 @@
+{
+  "task_id": "f02",
+  "goal": "Add a running mean to the EXISTING stats.py: running_mean(x) returns the mean of every value passed to running_mean so far, including the current one. Keep mean, scaled and spread working exactly as they do now. Run it with python.",
+  "lead": "stats.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the running mean is written the same way as the existing mean helper",
+  "interface": [
+    "running_mean"
+  ]
+}

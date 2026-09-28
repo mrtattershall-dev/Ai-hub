@@ -1,0 +1,13 @@
+{
+  "task_id": "f03",
+  "goal": "Add shape checking to the EXISTING matrix.py: checked(m) returns m when every row has the same length and neither dimension exceeds MAX_DIM, and raises ShapeError otherwise. Also add checked_all(ms), which checks several matrices and returns them in order. Set MAX_DIM to 64. Keep shape, row and col working exactly as they do now. Run it with python.",
+  "lead": "matrix.py",
+  "language": "py",
+  "run_with": "python",
+  "interface": [
+    "checked",
+    "checked_all",
+    "ShapeError",
+    "MAX_DIM"
+  ]
+}

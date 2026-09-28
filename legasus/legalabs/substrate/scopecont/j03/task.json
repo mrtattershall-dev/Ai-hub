@@ -1,0 +1,12 @@
+{
+  "task_id": "j03",
+  "goal": "Add a fallback lookup to the EXISTING palette.py: pick(name) returns the name when it is a known colour and DEFAULT otherwise, and safe(name) reports whether pick would fall back. Keep COLORS, DEFAULT and known working exactly as they do now. Run it with python.",
+  "lead": "palette.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the fallback lookup works the same way as the existing known check",
+  "interface": [
+    "pick",
+    "safe"
+  ]
+}

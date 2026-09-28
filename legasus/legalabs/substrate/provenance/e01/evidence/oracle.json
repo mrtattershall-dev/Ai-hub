@@ -1,0 +1,80 @@
+{
+  "task_id": "e01",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing square kind as the relation to parallel; that kind participates in the valid-kind list, the label map, its own area function and a branch of the dispatcher, and the requested kind occupies the same four positions",
+  "transaction": {
+    "operation_count": 4,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "admit the new kind in the valid-kind list",
+        "site_hint": "SHAPE_KINDS = [\"circle\", \"square\""
+      },
+      {
+        "id": "op2",
+        "intent": "describe the new kind",
+        "site_hint": "\"square\": \"four equal sides\""
+      },
+      {
+        "id": "op3",
+        "intent": "the area function for the new kind",
+        "site_hint": "e(k):\n    return SHAPE_LABELS.get(k, \"unknown\")\n"
+      },
+      {
+        "id": "op4",
+        "intent": "the branch that routes the new kind to its area function",
+        "site_hint": "f k == \"square\":\n        return _area_square(s)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op3",
+        "op4"
+      ],
+      [
+        "op1",
+        "op4"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3",
+        "op4"
+      ]
+    ],
+    "transaction_length": 4
+  },
+  "complexity": {
+    "structural_class": "parallel-variant-feature",
+    "affected_region_lines": 10
+  },
+  "reference": {
+    "source_hash": "a2fc50894ac0c6c592cd97ca967d729f1c95cd0ba566b32d4af78f25207f8d2e",
+    "reference_hash": "34a8a569bbb0eab44cef3d31d85e192e25440c6ca45104ad99f76c160c9f1ffd",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3",
+      "op4"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

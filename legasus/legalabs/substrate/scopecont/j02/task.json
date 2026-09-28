@@ -1,0 +1,12 @@
+{
+  "task_id": "j02",
+  "goal": "Add scaling to the EXISTING aggregation.py: SCALE is 2, summarize multiplies its result by SCALE, and scaled_count(items) returns the item count multiplied by SCALE. Keep count working exactly as it does now. Run it with python.",
+  "lead": "aggregation.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the scaling works the same way as the existing summarize accumulation",
+  "interface": [
+    "SCALE",
+    "scaled_count"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "task_id": "d03",
+  "goal": "Add link resolution to the EXISTING paths.py: resolve(links, start) follows a mapping of name to name from start until it reaches a name the mapping does not contain, and returns that name. If following the mapping revisits a name, or takes more than MAX_HOPS steps, raise PathCycle. Also add resolve_all(links, starts), which resolves each of several starting names and returns the results in order. Set MAX_HOPS to 16. Keep clean, join_path and depth working exactly as they do now. Run it with python.",
+  "lead": "paths.py",
+  "language": "py",
+  "run_with": "python",
+  "interface": [
+    "resolve",
+    "resolve_all",
+    "PathCycle",
+    "MAX_HOPS",
+    "links",
+    "start",
+    "starts"
+  ]
+}

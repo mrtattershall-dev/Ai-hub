@@ -1,0 +1,2 @@
+# END OF EXISTING - do not repeat or rewrite it.
+        # REQUESTED CHANGE: Add unordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a dash, a dot and a space ("1. ") become <ul><li>...</li>...</ol>, written like the ordered lists. Run it with python.

@@ -1,0 +1,14 @@
+BACKWARD-1 MECHANISM FREEZE
+
+The hub is run ONCE against exactly this mechanism. Any change to a file below
+invalidates the freeze, and a run after such a change must be reported as a
+SECOND run, not as the transfer test.
+
+944f55862c3579ea  legasus/legascreen/sink.mjs
+6b129623c26c46f0  legasus/legascreen/ancestry.mjs
+59e422211de7b10e  legasus/legascreen/witness-loader.mjs
+e5fa267e94f03180  legasus/legascreen/witness-store.mjs
+4c59d11fed1fbeb6  legasus/legascreen/witness-register.mjs
+6b9a6448bb63af89  benchmarks/run-backward.mjs
+
+COMBINED  76f35914abd5b737

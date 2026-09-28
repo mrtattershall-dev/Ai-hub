@@ -1,0 +1,10 @@
+# BEGIN SOLUTION
+        m = re.match(r"(\d+)\. (.*)", line)
+        if m:
+            flush_para()
+            flush_list()
+            ol_items.append(m.group(2).strip())
+            continue
+        # END SOLUTION
+
+        flush_ol()

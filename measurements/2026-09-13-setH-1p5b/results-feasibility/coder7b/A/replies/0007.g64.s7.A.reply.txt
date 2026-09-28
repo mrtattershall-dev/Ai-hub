@@ -1,0 +1,31 @@
+text):
+    lines = text.split("\n")
+    in_list = False
+    result = []
+    list_items = []
+
+    for line in lines:
+        heading = _is_heading(line)
+        if heading:
+            if in_list:
+                result.append("<ol>" + "".join(list_items) + "</ol>")
+                in_list = False
+                list_items = []
+            result.append("<h{}>{}</h{}>".format(*heading))
+        elif line.startswith("- "):
+            item = _inline(line[2:])
+            if not in_list:
+                result.append("<ul>")
+                in_list = True
+            list_items.append("<li>" + item + "</li>")
+        else:
+            if in_list:
+                result.append("<ol>" + "".join(list_items) + "</ol>")
+                in_list = False
+                list_items = []
+            result.append("<p>{}</p>".format(_inline(line)))
+
+    if in_list:
+        result.append("<ol>" + "".join(list_items) + "</ol>")
+
+    return "\n".join(result)

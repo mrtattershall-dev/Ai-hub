@@ -1,0 +1,16 @@
+{
+  "note": "Cases whose residual narrowing CANNOT be derived from structure or transaction topology, and which must therefore not be counted as structural defects. This register is a commitment, not a convenience: every entry names the overlapping behaviours, states why no structural rule reaches it, and cites the executable evidence. An entry added without that justification is an excuse and must be refused.",
+  "rule": "If a currently supported case cannot reach perfection without semantic-intent knowledge, stop treating it as a structural defect and classify it at the semantic-intent boundary. Do NOT invent a structural rule to make the number green.",
+  "cases": [
+    {
+      "family": "generalization",
+      "op": "g03:op1",
+      "kind": "guard_precedence",
+      "overlapping_behaviours": ["n == 0 returns \"zero\"", "n < 10 returns \"small\""],
+      "ambiguous_input": "classify(0) satisfies both conditions",
+      "why_no_structural_rule": "the surviving position is reachable, inside the correct structural parent, after every requirement it has, and before the fall-through terminator. Every structural and transaction fact is satisfied there. The only thing that makes it wrong is that the contract requires \"zero\" to win the overlap, which is a statement about intended meaning and not about program structure.",
+      "evidence": "executable ground truth: 3 candidates, 1 passes. LegaCore derives 2, recovering 0.58 of 1.58 bits. The 1.00-bit residual is exactly this overlap.",
+      "do_not": "do not approximate with a control-flow, ordering or placement rule; doing so would make the number green while teaching the architecture something false."
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+  sentence lengths, recorded because length runs COUNTER to the hypothesis:
+    OFF            (none)
+    FACT            42 chars,  7 words
+    TARGET_ID       25 chars,  5 words
+    NONTARGET_ID    31 chars,  5 words
+    NEUTRAL         55 chars, 11 words
+  W1 shows the function name: false   FULL shows it: true
+  controls ok: sufficiency holds, endpoint reachable, perfect verifies, inversion and off-by-one accepted-but-failing, arms differ by exactly one sentence
+  RULE 3 ok: endpoint names qwen2.5-coder:1.5b
+  arms OFF, FACT, TARGET_ID, NONTARGET_ID, NEUTRAL   windows W1, FULL   samples 20   temperature 0.6
+
+  W1   OFF          case A  PRIMARY repeated-fixed  1/20   verified 11/20   whole-fn 0   other-shape  8   named-fn-in-out  0   P(c|auth) 1.00
+  W1   OFF          case B  PRIMARY repeated-fixed  3/20   verified  9/20   whole-fn 0   other-shape  8   named-fn-in-out  0   P(c|auth) 1.00
+  W1   FACT         case A  PRIMARY repeated-fixed  0/20   verified 12/20   whole-fn 0   other-shape  8   named-fn-in-out  0   P(c|auth) 1.00
+  W1   FACT         case B  PRIMARY repeated-fixed  7/20   verified  9/20   whole-fn 0   other-shape  4   named-fn-in-out  0   P(c|auth) 1.00
+  W1   TARGET_ID    case A  PRIMARY repeated-fixed  2/20   verified 10/20   whole-fn 0   other-shape  8   named-fn-in-out  0   P(c|auth) 1.00
+  W1   TARGET_ID    case B  PRIMARY repeated-fixed  2/20   verified 13/20   whole-fn 0   other-shape  5   named-fn-in-out  0   P(c|auth) 1.00
+  W1   NONTARGET_ID case A  PRIMARY repeated-fixed  0/20   verified 12/20   whole-fn 0   other-shape  8   named-fn-in-out  0   P(c|auth) 1.00
+  W1   NONTARGET_ID case B  PRIMARY repeated-fixed  4/20   verified 13/20   whole-fn 0   other-shape  3   named-fn-in-out  0   P(c|auth) 1.00
+  W1   NEUTRAL      case A  PRIMARY repeated-fixed  1/20   verified 15/20   whole-fn 0   other-shape  4   named-fn-in-out  0   P(c|auth) 1.00
+  W1   NEUTRAL      case B  PRIMARY repeated-fixed  3/20   verified 11/20   whole-fn 0   other-shape  6   named-fn-in-out  0   P(c|auth) 1.00
+  FULL OFF          case A  PRIMARY repeated-fixed  3/20   verified 16/20   whole-fn 0   other-shape  1   named-fn-in-out  0   P(c|auth) 1.00
+  FULL OFF          case B  PRIMARY repeated-fixed  2/20   verified 16/20   whole-fn 0   other-shape  2   named-fn-in-out  0   P(c|auth) 1.00
+  FULL FACT         case A  PRIMARY repeated-fixed  9/20   verified  9/20   whole-fn 0   other-shape  2   named-fn-in-out  1   P(c|auth) 1.00
+  FULL FACT         case B  PRIMARY repeated-fixed 10/20   verified  8/20   whole-fn 2   other-shape  0   named-fn-in-out  3   P(c|auth) 1.00
+  FULL TARGET_ID    case A  PRIMARY repeated-fixed 11/20   verified  7/20   whole-fn 0   other-shape  1   named-fn-in-out  0   P(c|auth) 0.88
+  FULL TARGET_ID    case B  PRIMARY repeated-fixed  7/20   verified 11/20   whole-fn 0   other-shape  2   named-fn-in-out  0   P(c|auth) 1.00
+  FULL NONTARGET_ID case A  PRIMARY repeated-fixed 10/20   verified  9/20   whole-fn 0   other-shape  1   named-fn-in-out  0   P(c|auth) 1.00
+  FULL NONTARGET_ID case B  PRIMARY repeated-fixed  5/20   verified 13/20   whole-fn 1   other-shape  1   named-fn-in-out  1   P(c|auth) 1.00
+  FULL NEUTRAL      case A  PRIMARY repeated-fixed 11/20   verified  7/20   whole-fn 1   other-shape  1   named-fn-in-out  1   P(c|auth) 1.00
+  FULL NEUTRAL      case B  PRIMARY repeated-fixed  3/20   verified 13/20   whole-fn 0   other-shape  4   named-fn-in-out  0   P(c|auth) 1.00
+
+  POOLED W1   OFF          repeated-fixed  4/40   verified 20/40   named-fn  0/40
+  POOLED W1   FACT         repeated-fixed  7/40   verified 21/40   named-fn  0/40
+  POOLED W1   TARGET_ID    repeated-fixed  4/40   verified 23/40   named-fn  0/40
+  POOLED W1   NONTARGET_ID repeated-fixed  4/40   verified 25/40   named-fn  0/40
+  POOLED W1   NEUTRAL      repeated-fixed  4/40   verified 26/40   named-fn  0/40
+  POOLED FULL OFF          repeated-fixed  5/40   verified 32/40   named-fn  0/40
+  POOLED FULL FACT         repeated-fixed 19/40   verified 17/40   named-fn  4/40
+  POOLED FULL TARGET_ID    repeated-fixed 18/40   verified 18/40   named-fn  0/40
+  POOLED FULL NONTARGET_ID repeated-fixed 15/40   verified 22/40   named-fn  1/40
+  POOLED FULL NEUTRAL      repeated-fixed 14/40   verified 20/40   named-fn  1/40
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.idnaming.json

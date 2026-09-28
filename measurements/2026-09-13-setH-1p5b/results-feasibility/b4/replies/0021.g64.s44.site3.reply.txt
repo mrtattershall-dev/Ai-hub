@@ -1,0 +1,8 @@
+# NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+            continue
+
+        if line.startswith("# "):
+            flush_para()
+            level = len(line) - 2
+            body = line[level + 2:].strip()
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))

@@ -1,0 +1,9 @@
+if line.startswith("1. "):  # Check if the line starts with a number followed by ". "
+            flush_para()
+            flush_list()
+            ol_items.append(line[3:].strip())  # Add the text after "1. " to the accumulator list
+            continue
+        # END OF REQUESTED CHANGE
+
+        if current and not items:
+    

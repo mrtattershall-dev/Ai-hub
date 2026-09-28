@@ -1,0 +1,92 @@
+if line.strip() == "":
+                flush_ol()
+            continue
+        if line.startswith("1. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        if line.startswith("2. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        if line.startswith("3. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        if line.startswith("4. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        if line.startswith("5. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        if line.startswith("6. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        if line.startswith("7. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        if line.startswith("8. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        if line.startswith("9. "):
+            flush_para()
+            ol_items.append(line[3:].strip())
+            continue
+        if line.startswith("10. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("11. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("12. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("13. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("14. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("15. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("16. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("17. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("18. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("19. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("20. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("21. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+        if line.startswith("22. "):
+            flush_para()
+            ol_items.append(line[4:].strip())
+            continue
+       

@@ -1,0 +1,12 @@
+{
+  "task_id": "h04",
+  "goal": "Add star drawing to the EXISTING border.py: a helper supplies the star character, star(n) draws n stars by calling that helper, and star_thick() draws THICK of them. Keep THICK and line working exactly as they do now. Run it with python.",
+  "lead": "border.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the star drawing works the same way as the existing line drawing",
+  "interface": [
+    "star",
+    "star_thick"
+  ]
+}

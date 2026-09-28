@@ -1,0 +1,109 @@
+// CANONICAL REFERENCE - cumulative correct state after setH goals 3, 13, 23, 33.
+// Goal 43 onward (equals, determinant) is HELD OUT and deliberately not implemented.
+//
+//   goal  3  new Matrix(rows) with validation, shape(), get(r, c), toArray()
+//   goal 13  add(other), sub(other) - new Matrix each, neither mutates its inputs
+//   goal 23  mul(x) - scalar or matrix product
+//   goal 33  transpose(), static identity(n)
+class Matrix {
+  constructor(rows) {
+    if (!Array.isArray(rows) || rows.length === 0) throw new Error('no rows');
+    if (!rows.every((r) => Array.isArray(r))) throw new Error('rows must be arrays');
+    if (rows[0].length === 0) throw new Error('empty rows');
+    const cols = rows[0].length;
+    if (!rows.every((r) => r.length === cols)) throw new Error('rows of different lengths');
+    for (const r of rows) {
+      for (const v of r) {
+        if (typeof v !== 'number' || !Number.isFinite(v)) throw new Error('not a finite number');
+      }
+    }
+    this.rows = rows.map((r) => r.slice());
+  }
+
+  shape() {
+    return [this.rows.length, this.rows[0].length];
+  }
+
+  get(r, c) {
+    if (!Number.isInteger(r) || !Number.isInteger(c)) throw new Error('index must be an integer');
+    if (r < 0 || c < 0 || r >= this.rows.length || c >= this.rows[0].length) {
+      throw new Error('outside the matrix');
+    }
+    return this.rows[r][c];
+  }
+
+  toArray() {
+    return this.rows.map((r) => r.slice());
+  }
+
+  add(other) {
+    return this._combine(other, (a, b) => a + b);
+  }
+
+  sub(other) {
+    return this._combine(other, (a, b) => a - b);
+  }
+
+  _combine(other, f) {
+    const [ar, ac] = this.shape();
+    const [br, bc] = other.shape();
+    if (ar !== br || ac !== bc) throw new Error('shapes differ');
+    const out = this.rows.map((row, i) => row.map((v, j) => f(v, other.rows[i][j])));
+    return new Matrix(out);
+  }
+
+  mul(x) {
+    if (typeof x === 'number') {
+      if (!Number.isFinite(x)) throw new Error('not a finite number');
+      return new Matrix(this.rows.map((row) => row.map((v) => v * x)));
+    }
+    const [ar, ac] = this.shape();
+    const [br, bc] = x.shape();
+    if (ac !== br) throw new Error('inner dimensions do not match');
+    const out = [];
+    for (let i = 0; i < ar; i++) {
+      const row = [];
+      for (let j = 0; j < bc; j++) {
+        let s = 0;
+        for (let k = 0; k < ac; k++) s += this.rows[i][k] * x.rows[k][j];
+        row.push(s);
+      }
+      out.push(row);
+    }
+    return new Matrix(out);
+  }
+
+  transpose() {
+    const [r, c] = this.shape();
+    const out = [];
+    for (let j = 0; j < c; j++) {
+      const row = [];
+      for (let i = 0; i < r; i++) row.push(this.rows[i][j]);
+      out.push(row);
+    }
+    return new Matrix(out);
+  }
+
+  static identity(n) {
+    if (!Number.isInteger(n) || n <= 0) throw new Error('n must be a positive integer');
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const row = new Array(n).fill(0);
+      row[i] = 1;
+      out.push(row);
+    }
+    return new Matrix(out);
+  }
+
+  equals(other) {
+    if (!this.shape().equals(other.shape())) throw new Error('shapes differ');
+    for (let i = 0; i < this.rows.length; i++) {
+      for (let j = 0; j < this.rows[i].length; j++) {
+        if (this.rows[i][j] !== other.rows[i][j]) return false;
+      }
+    }
+    return true;
+  }
+}
+
+module.exports = { Matrix };

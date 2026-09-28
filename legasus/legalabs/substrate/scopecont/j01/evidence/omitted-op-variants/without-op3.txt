@@ -1,0 +1,14 @@
+class Router:
+    def __init__(self):
+        self._routes = {}
+        self._aliases = {}
+
+    def add(self, path, handler):
+        self._routes[path] = handler
+
+    def resolve(self, path):
+        if path in self._routes:
+            return self._routes[path]
+        if path in self._aliases:
+            return self._routes.get(self._aliases[path])
+        return None

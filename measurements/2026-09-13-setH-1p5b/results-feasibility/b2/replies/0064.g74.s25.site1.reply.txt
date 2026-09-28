@@ -1,0 +1,6 @@
+fence = None
+
+    def flush_code():
+        if codes:
+            blocks.append("<pre><code>" + "\n".join(codes) + "</code></pre>")
+            del codes[:]

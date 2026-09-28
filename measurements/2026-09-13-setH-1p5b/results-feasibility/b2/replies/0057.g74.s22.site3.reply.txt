@@ -1,0 +1,7 @@
+if fence:
+        if not codes and not links:
+            blocks.append("<pre><code>" + "\n".join(fence) + "</code></pre>")
+        else:
+            code = "\n".join(codes)
+            link = "\n".join(links)
+            blocks.append("<pre><code>%s %s</code></pre>" % (code, link))

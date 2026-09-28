@@ -1,0 +1,13 @@
+{
+  "task_id": "g02",
+  "goal": "Add millimetre conversion to the EXISTING units.py: to_mm(inches) converts inches to millimetres, from_mm(mm) converts millimetres back to inches, and round_mm(inches) gives the millimetre value rounded to one decimal place. Keep to_cm, to_inches and round_cm working exactly as they do now. Run it with python.",
+  "lead": "units.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the millimetre helpers work the same way as the existing centimetre helpers",
+  "interface": [
+    "to_mm",
+    "from_mm",
+    "round_mm"
+  ]
+}

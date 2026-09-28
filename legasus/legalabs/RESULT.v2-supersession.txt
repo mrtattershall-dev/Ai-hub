@@ -1,0 +1,15 @@
+  DESCRIPTIVE - Narrowability V2 structural channel on j01:op3
+  NOT a rescore. Gate 7 stands at one over-constraint under V1.
+
+  V1 behavioural channel says these positions PASS: [3,4,6,7,12,13]
+
+  position  12  V1 PASS  /  V2 STRUCTURAL VIOLATION
+        re_parented  "return None"
+           was under ["class Router:","def resolve(self, path):"]
+           now under ["class Router:","def alias(self, frm, to):"]
+
+  1 of 6 behaviourally-passing positions violate structural preservation.
+
+  The disputed boundary ownership_boundary removed is among them, so under the later
+  oracle it is independently classified as invalid - by a mechanism that never consulted
+  ownership_boundary. The V1 score is unchanged and remains the historical record.

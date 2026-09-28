@@ -1,0 +1,39 @@
+if line.startswith('1. '):
+            flush_para()
+            flush_list()
+            items.append(line[3:].strip())
+        else:
+            if current and current[-1].startswith('1. '):  # Handle ordered list items
+                flush_ordered_list()
+                continue
+            if not current or not current[-1].startswith('1. '):
+                flush_ordered_list()
+                current.append(line.strip())
+
+    if current:
+        blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    print("ok")
+
+
+# REQUESTED CHANGE: Add ordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a number, a dot and a space ("1. ") become <ol><li>...</li>...</ol>, written like the unordered lists. Run it with python.
+# AT THIS POINT WRITE ONLY THIS: the new branch: a line starting with a number, a dot and a space is an ordered-list item; close any paragraph and unordered list, collect the text after the marker, and continue
+if __name__ == "__main__":
+    assert to_html("1. one\n2. two") == "<ol><li>one</li><li>two</li></ol>"
+    print("ok")
+
+
+# REQUESTED CHANGE: Add ordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a number, a dot and a space ("1. ") become <ol><li>...</li>...</ol>, written like the unordered lists. Run it with python.
+# AT THIS POINT WRITE ONLY THIS: the new branch: a line starting with a number, a dot and a space is an ordered-list item; close any

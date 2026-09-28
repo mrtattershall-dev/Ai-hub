@@ -1,0 +1,32 @@
+def flush_ol():
+        if ol_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")
+            del ol_items[:]
+
+    def add_to_list(text):
+        items.append(_inline(text))
+
+    def add_to_ol(text):
+        ol_items.append(_inline(text))
+
+    def flush_block():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_block()
+            continue
+        h = _is_heading(line)
+        if h:
+            flush_block()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        if line.startswith("- "):
+            flush_block()
+            add_to_list(line[2:].strip())
+            continue
+        flush_block()
+        add_to_ol(line.strip())

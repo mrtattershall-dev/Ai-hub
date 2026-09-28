@@ -1,0 +1,10 @@
+--- op op1 after: "BASE = 10\n"
+
+
+def _bonus():
+    return 5
+
+--- op op2 after: "f total(extra):\n    return BASE + extra\n"
+
+
+BONUS = _bonus()

@@ -1,0 +1,17 @@
+Repair W2-c: a STALE or INVALID witness is not an execution edge and establishes no site
+
+connectivity() read `entered` off every witness handed in and never looked at its lifecycle, so a
+witness the bank had marked STALE still connected the region and a subject reached only through it
+scored ADVANCEMENT (b0673cd) - "stale -> current" inside the ratchet that exists to stop exactly
+that. liveWitnesses() now separates VALID, REVALIDATED and raw (unstated) witnesses from STALE and
+INVALID ones; connectivity() and region.buildRegion() consume only the live set and report the
+exclusions, so a STALE_EDGE boundary can be derived from the graph rather than from a caller's
+memory. Executed: the stale case equals the no-witness case, every live lifecycle still connects,
+and buildRegion establishes no site from a stale witness.
+
+region-frontier (512/779) and purpose-connectivity (P1-P3 HELD) re-run byte-identical: the repoB
+witnesses carry no lifecycle and are raw, so nothing historical changed.
+
+Message-File: scratch/m37.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

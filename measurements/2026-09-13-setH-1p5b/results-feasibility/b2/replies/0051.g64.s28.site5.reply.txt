@@ -1,0 +1,12 @@
+# AT THIS POINT WRITE ONLY THIS: close any open ordered list, append the item text after the marker to `ol_items`, and continue
+        if line.startswith("# "):
+            flush_para()
+            h = _is_heading(line)
+            if h:
+                flush_list()
+                level, body = h
+                blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+                continue
+            current.append(line[2:].strip())
+        else:
+    

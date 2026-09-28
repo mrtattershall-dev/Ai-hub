@@ -1,0 +1,20 @@
+  ok    HAZARD  a RAW domain inverts through JSON, which is why bounds are tagged   raw lo becomes null
+  ok    ROUND TRIP  the tagged domain answers identically at every probe input   14 inputs agree
+  ok    ROUND TRIP  through actual JSON text, not just the encoder   all agree
+  ok    ROUND TRIP  point survives
+  ok    ROUND TRIP  interval survives
+  ok    ROUND TRIP  complement_point survives
+  ok    ROUND TRIP  universe survives
+  ok    NO LEAKAGE  the emitted contract names no site, order or branch shape   {"winner":"existing","loser":"requested","scope":"overlap"}
+  ok    SHAPE  precedence is scoped to the overlap only
+  ok    SHAPE  the overlap witness travels with the contract
+  ok    ANTI-ORACLE  implementation A (precedence by ORDER) conforms   witness -> zero
+  ok    ANTI-ORACLE  implementation B (precedence by PREDICATE) conforms   witness -> zero
+  ok    ANTI-ORACLE  implementation C (precedence REVERSED) does NOT conform   witness -> small, expected "zero"
+  ok    ANTI-ORACLE  C fails specifically AT THE OVERLAP WITNESS
+  ok    UNDERDETERMINED  the contract admits MORE THAN ONE implementation
+
+  all witnesses pass
+  Non-vacuity: two structurally different programs must BOTH conform and a third must
+  fail at the contested input. A contract only A satisfied would have encoded one
+  implementation; one C also satisfied would not constrain meaning at all.

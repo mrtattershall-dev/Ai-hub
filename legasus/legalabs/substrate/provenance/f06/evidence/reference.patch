@@ -1,0 +1,23 @@
+--- op op1 after: "# Audit helpers.\n"
+
+_LOG = []
+
+--- op op2 after: "\", \"?\")) + \":\" + str(e.get(\"who\", \"?\"))\n"
+
+
+MAX_LOG = 50
+
+--- op op3 after: "eturn str(e.get(\"kind\", \"\")) == \"error\"\n"
+
+
+def record(e):
+    _LOG.append(e)
+    while len(_LOG) > MAX_LOG:
+        _LOG.pop(0)
+    return e
+
+--- op op4 after: "\", \".join(fmt_event(e) for e in events)\n"
+
+
+def history():
+    return list(_LOG)

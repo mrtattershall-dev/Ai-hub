@@ -1,0 +1,87 @@
+{
+  "kind": "canonical_post_goal_60_reference_seed",
+  "created_at": "2026-09-14T13:52:59.458Z",
+  "builds_on": {
+    "seed40_commit": "77eed90",
+    "v3_commit": "4be486d"
+  },
+  "goal_set_sha": "1f29e971e72f9461f6326e0e861031926f771c334453bbdf4bfa2627673171a9",
+  "seed60_bundle_sha": "2cafbeed0314275b0a16471a59131e7aca2dee19796b917573e1e8d50d44180f",
+  "files": [
+    {
+      "file": "s10_desk.js",
+      "sha256": "a60c6bcf881348534b2174923ca09deb902570d4a088f2b0ad03eb9b67653ccf"
+    },
+    {
+      "file": "s1_library.js",
+      "sha256": "476ae6a9bc6dce7746552ad72b4590ebb8c5cfa19e13c874bb8eea1d81318249"
+    },
+    {
+      "file": "s2_logs.py",
+      "sha256": "e0e12ac4d156880a4b890f02e395cf077c04748193f3afa7be03331c93c4a504"
+    },
+    {
+      "file": "s3_matrix.js",
+      "sha256": "cdf4c0a81357e7690e8b7d845673b7584bbc58c51b24dd64950ba546595e142a"
+    },
+    {
+      "file": "s4_markdown.py",
+      "sha256": "1593f66e8afe842fed65109721562f3001a303b9ef73a2db14bea8e49c7b3e82"
+    },
+    {
+      "file": "s5_expr.js",
+      "sha256": "9b2d0bf0f95188a63cf90131b6023b1f845bedcbb823106da6637873640a895b"
+    },
+    {
+      "file": "s6_graph.py",
+      "sha256": "e5f84c92ec5f2899ddef771b17baf805408e27d35a1bca03a104863386f3d978"
+    },
+    {
+      "file": "s7_cache.js",
+      "sha256": "dfa24299a6227e956370869614482776dfd259c0fa29463fba7f4fa139763761"
+    },
+    {
+      "file": "s8_grades.py",
+      "sha256": "01067a37244d27be71d870f401d0768d90d872ff3fd81da5ba7f31987f6bee2c"
+    },
+    {
+      "file": "s9_board.html",
+      "sha256": "b724868488bccaf89b81dc3b09c29f9f3787b564de711ff10916cf76ba0decc3"
+    },
+    {
+      "file": "s9_board.js",
+      "sha256": "c00595917c523e5796d45aa435ee316e113e66d7eca7c7173a4c1ba321e5807f"
+    }
+  ],
+  "verification": {
+    "structural_contracts": "60/60",
+    "behavioural_js": "seed60Proof.test.mjs 58 + seed60Proof2.test.mjs 58",
+    "behavioural_browser": "board60Proof.test.mjs 27 (puppeteer)",
+    "cross_goal_interactions_proven": [
+      "goal 31+41  a hold that becomes a loan starts on the day of that return",
+      "goal 34+44  link syntax inside inline code is not a link",
+      "goal 44+54  a list item may contain a link",
+      "goal 45+55  an unknown FUNCTION is distinguishable from an unknown variable",
+      "goal 48+58  a missing-zero score is itself droppable",
+      "goal 49+59  a REJECTED move does not become persisted state",
+      "goal 51+60  fines produced by a return feed fineReport"
+    ],
+    "held_out_absent": "goals 61-80 deltas checked individually, comments stripped first"
+  },
+  "classification": {
+    "BEHAVIORALLY_VERIFIED": [
+      "s10_desk.js",
+      "s1_library.js",
+      "s3_matrix.js",
+      "s5_expr.js",
+      "s7_cache.js",
+      "s9_board.html",
+      "s9_board.js",
+      "s2_logs.py",
+      "s4_markdown.py",
+      "s6_graph.py",
+      "s8_grades.py"
+    ],
+    "note": "Every file carries external behavioural assertions this time - the python modules are exercised by seed60Proof2.test.mjs, not only by their own __main__ blocks, so the REFERENCE_IMPLEMENTED_BUT_UNPROVEN category is empty for this seed."
+  }
+}

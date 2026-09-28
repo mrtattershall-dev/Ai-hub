@@ -1,0 +1,26 @@
+Preregister AUTO-CF-1: perturb a recorded witness through the real production path, and keep the two vacuity cases apart
+
+The witness now exists, so the next milestone the owner sequenced is to mutate one eligible leaf
+fact, reconstruct through the real production constructors, prove the perturbation occurred, execute
+the same target and produce a typed outcome. No judgment, no support formula, no contract source, no
+discovery - those come after this works.
+
+C-1 is decisive and is stated against the tempting number rather than for it: K greater than zero
+with zero hand-authored counterfactual drivers, where a small K beats a hand-driven hundred. If K
+comes out at 3 the honest report is 3.
+
+C-3 is the distinction slice 1 got wrong and it is preregistered as a control that must fire. A
+rebuilt input that is identical means the intervention did not happen and scores nothing; an input
+that really changed while the output did not is a real observation. Conflating them is how a matrix
+where everything depends on everything gets produced.
+
+C-4 says the discriminator between a refused reconstruction, a refused target and a target that never
+ran must be the subject's own isAuthority predicate - what production asks - and never a refusal
+convention invented for the screen.
+
+C-6 predicts that NO verdict is issued by this slice at all. If one appears, the slice has exceeded
+its scope.
+
+Message-File: scratch/m86.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

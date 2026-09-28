@@ -1,0 +1,19 @@
+Preregister composition wave 2: seven cases from the recomputed frontier, before any attack runs
+
+After the wave-1 repairs the frontier was recomputed by re-reading the relation-producing operations
+those repairs touched and the ones they did not. Seven cases, each derived from reading and none
+executed, each named against the invariant it is expected to fall under: a refuter refuting across
+worlds (W2-a); reestablish() moving a scope under an identity that now encodes it (W2-b); a STALE
+witness still creating execution edges and scoring ADVANCEMENT (W2-c); a candidate missing a
+behavioural metric surviving the Pareto frontier (W2-d); an absent producer version stringified
+into a criterion, and an absent producer not refused (W2-e); an IMPORT_FAILED record given a
+document and a flat array index as its ordinal, and therefore a fabricated history (W2-f); a
+mapping applied across producers by native-vocabulary string match (W2-g), recorded beside the
+finding that pytest has no declared mapping at all.
+
+Controls named for each. Two additional rigs are threatened by W2-c and are baselined before the
+repair. A prediction that does not reproduce is a falsification of mine and is kept.
+
+Message-File: scratch/m34.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

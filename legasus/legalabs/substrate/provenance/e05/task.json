@@ -1,0 +1,12 @@
+{
+  "task_id": "e05",
+  "goal": "Add a draft list to the EXISTING Board in board.py: add_draft(item) appends a draft and draft_count() returns how many drafts have been added. Keep pin, unpin, pin_count and pin_report working exactly as they do now. Run it with python.",
+  "lead": "board.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the draft list works the same way as the existing pins list",
+  "interface": [
+    "add_draft",
+    "draft_count"
+  ]
+}

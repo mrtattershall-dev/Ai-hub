@@ -1,0 +1,60 @@
+{
+  "task_id": "h01",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing base value as the relation to parallel; that feature is a module constant read by a function, and the new feature occupies the same position",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the helper supplying the value",
+        "site_hint": "BASE = 10\n"
+      },
+      {
+        "id": "op2",
+        "intent": "bind the value at import time from that helper",
+        "site_hint": "def total(extra):\n    return BASE + extra\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 9
+  },
+  "reference": {
+    "source_hash": "791d1dcbaa9801310a7f9f3e9559c82943e85aa2855d8b0e0fe3e0d8e4ff11c0",
+    "reference_hash": "e7846e2a90c2e481f0e897980399efd3525f00e4753d6c83fdcea7a438641ef0",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

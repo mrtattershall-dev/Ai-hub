@@ -1,0 +1,554 @@
+{
+ "model": "qwen2.5-coder:1.5b",
+ "temperature": 0.2,
+ "tasks": {
+  "T01": {
+   "id": "T01",
+   "envelope": "IN",
+   "category": "one-file behavioral bug",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "def isleap(year):\n    \"\"\"Return True for leap years, False for non-leap years.\"\"\"\n    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)",
+    "score": {
+     "agree": 20,
+     "of": 20,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": false,
+    "committed": true,
+    "operation": "BOUNDED_FUNCTION_BODY_EDIT",
+    "derivedEnvelope": "IN",
+    "inferenceSpent": true,
+    "code": "def isleap(year):\n    \"\"\"Return True for leap years, False for non-leap years.\"\"\"\n    if year % 100 == 0:\n        return year % 400 == 0\n    else:\n        return year % 4 == 0",
+    "score": {
+     "agree": 20,
+     "of": 20,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": false
+   }
+  },
+  "T02": {
+   "id": "T02",
+   "envelope": "IN",
+   "category": "preservation-sensitive",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "def median_low(data):\n    \"\"\"Return the low median of numeric data.\n\n    When the number of data points is odd, the middle value is returned.\n    When it is even, the smaller of the two middle values is returned.\n\n    >>> median_low([1, 3, 5])\n    3\n    >>> median_low([1, 3, 5, 7])\n    3\n\n    \"\"\"\n    data = sorted(data)\n    n = len(data)\n    if n % 2 == 1:\n        return data[n // 2]\n    else:\n        return data[n // 2 - 1]",
+    "score": {
+     "agree": 11,
+     "of": 12,
+     "pass": false,
+     "disagreements": [
+      {
+       "call": "print(repr(m.median_low([])))",
+       "want": "RAISED:StatisticsError",
+       "got": "RAISED:IndexError"
+      }
+     ]
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": false,
+    "committed": true,
+    "operation": "BOUNDED_FUNCTION_BODY_EDIT",
+    "derivedEnvelope": "IN",
+    "inferenceSpent": true,
+    "code": "def median_low(data):\n    \"\"\"Return the low median of numeric data.\n\n    When the number of data points is odd, the middle value is returned.\n    When it is even, the smaller of the two middle values is returned.\n\n    >>> median_low([1, 3, 5])\n    3\n    >>> median_low([1, 3, 5, 7])\n    3\n\n    \"\"\"\n    if not data:\n        raise StatisticsError(\"median_low() requires a non-empty data list\")\n    data",
+    "score": {
+     "agree": 12,
+     "of": 12,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": false
+   }
+  },
+  "T03": {
+   "id": "T03",
+   "envelope": "IN",
+   "category": "tempting nearby code",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "def median_high(data):\n    \"\"\"Return the high median of data.\n\n    When the number of data points is odd, the middle value is returned.\n    When it is even, the larger of the two middle values is returned.\n\n    >>> median_high([1, 3, 5])\n    3\n    >>> median_high([1, 3, 5, 7])\n    5\n\n    \"\"\"\n    data = sorted(data)\n    n = len(data)\n    if n == 0:\n        raise StatisticsError(\"no median for empty data\")\n    return data[n // 2]",
+    "score": {
+     "agree": 16,
+     "of": 16,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": false,
+    "committed": true,
+    "operation": "BOUNDED_FUNCTION_BODY_EDIT",
+    "derivedEnvelope": "IN",
+    "inferenceSpent": true,
+    "code": "def median_high(data):\n    \"\"\"Return the high median of data.\n\n    When the number of data points is odd, the middle value is returned.\n    When it is even, the larger of the two middle values is returned.\n\n    >>> median_high([1, 3, 5])\n    3\n    >>> median_high([1, 3, 5, 7])\n    7\n\n    \"\"\"\n    data = sorted(data)\n    n = len(data)\n    if n == 0:\n        raise StatisticsError(\"no median for empty",
+    "score": {
+     "agree": 16,
+     "of": 16,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": false
+   }
+  },
+  "T04": {
+   "id": "T04",
+   "envelope": "BOUNDARY",
+   "category": "string / regex logic",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "import re\n\ndef dedent(text):\n    \"\"\"Remove any common leading whitespace from every line in `text`.\n\n    This can be used to make triple-quoted strings line up with the left\n    edge of the display, while still presenting them in the source code\n    in indented form.\n\n    Note that tabs and spaces are both treated as whitespace, but they\n    are not equal: the lines \"  hello\" and \"\\\\thello\" are\n    considered to have no common leading whitespace.\n\n    Entirely blank lines are normalized to a newline character.\n    \"\"\"\n    # Look for the longest leading string of spaces and tabs common to\n    #",
+    "score": {
+     "agree": 9,
+     "of": 12,
+     "pass": false,
+     "disagreements": [
+      {
+       "call": "print(repr(m.dedent(\"  a\\n   \\n  b\\n\")))",
+       "want": "'a\\n\\nb\\n'",
+       "got": "'a\\n \\nb\\n'"
+      },
+      {
+       "call": "print(repr(m.dedent(\"  a\\n      \\n  b\\n\")))",
+       "want": "'a\\n\\nb\\n'",
+       "got": "'a\\n    \\nb\\n'"
+      },
+      {
+       "call": "print(repr(m.dedent(\"   \\n   \\n\")))",
+       "want": "'\\n\\n'",
+       "got": "'   \\n   \\n'"
+      }
+     ]
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": false,
+    "constrained": true,
+    "committed": false,
+    "operation": "BOUNDED_FUNCTION_BODY_EDIT",
+    "derivedEnvelope": "IN",
+    "inferenceSpent": true,
+    "refusal": "CONSTRAIN_REJECTED",
+    "failedPredicates": [
+     "SINGLE_TOP_LEVEL_STATEMENT",
+     "THAT_STATEMENT_IS_A_FUNCTION"
+    ],
+    "passedPredicates": [
+     "PARSES",
+     "DEFINES_THE_NAMED_FUNCTION",
+     "SIGNATURE_UNCHANGED",
+     "NON_EMPTY_BODY"
+    ],
+    "why": "SINGLE_TOP_LEVEL_STATEMENT (the authority granted was to rewrite one function, so the proposal may contain exactly one module-level statement); THAT_STATEMENT_IS_A_FUNCTION (the one statement must be a function definition, not an import, assignment or expression)",
+    "code": "import re\n\ndef dedent(text):\n    \"\"\"Remove any common leading whitespace from every line in `text`.\n\n    This can be used to make triple-quoted strings line up with the left\n    edge of the display, while still presenting them in the source code\n    in indented form.\n\n    Note that tabs and spaces are both treated as whitespace, but they\n    are not equal: the lines \"  hello\" and \"\\\\thello\" are\n  ",
+    "score": {
+     "agree": 9,
+     "of": 12,
+     "pass": false,
+     "disagreements": [
+      {
+       "call": "print(repr(m.dedent(\"  a\\n   \\n  b\\n\")))",
+       "want": "'a\\n\\nb\\n'",
+       "got": "'a\\n \\nb\\n'"
+      },
+      {
+       "call": "print(repr(m.dedent(\"  a\\n      \\n  b\\n\")))",
+       "want": "'a\\n\\nb\\n'",
+       "got": "'a\\n    \\nb\\n'"
+      },
+      {
+       "call": "print(repr(m.dedent(\"   \\n   \\n\")))",
+       "want": "'\\n\\n'",
+       "got": "'   \\n   \\n'"
+      }
+     ]
+    }
+   }
+  },
+  "T05": {
+   "id": "T05",
+   "envelope": "BOUNDARY",
+   "category": "multi-parameter numeric",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "def rgb_to_hls(r, g, b):\n    maxc = max(r, g, b)\n    minc = min(r, g, b)\n    sumc = (maxc+minc)\n    rangec = (maxc-minc)\n    l = sumc/2.0\n    if minc == maxc:\n        return 0.0, l, 0.0\n    if l <= 0.5:\n        s = rangec / sumc\n    else:\n        s = rangec / (2.0 - maxc - minc)\n    rc = (maxc-r) / rangec\n    gc = (maxc-g) / rangec\n    bc = (maxc-b) / rangec\n    if r == maxc:\n        h = bc-gc\n    elif g == maxc:\n        h = 2.0+rc-bc\n    else:\n        h = 4.0+gc-rc\n    h = (h/6.0) % 1.0\n    return h, l, s",
+    "score": {
+     "agree": 14,
+     "of": 14,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": false,
+    "committed": true,
+    "operation": "BOUNDED_FUNCTION_BODY_EDIT",
+    "derivedEnvelope": "IN",
+    "inferenceSpent": true,
+    "code": "def rgb_to_hls(r, g, b):\n    maxc = max(r, g, b)\n    minc = min(r, g, b)\n    sumc = (maxc+minc)\n    rangec = (maxc-minc)\n    l = sumc/2.0\n    if minc == maxc:\n        return 0.0, l, 0.0\n    if l > 0.5:\n        s = rangec / (2.0 - maxc - minc)\n    else:\n        s = rangec / sumc\n    rc = (maxc-r) / rangec\n    gc = (maxc-g) / rangec\n    bc = (maxc-b) / rangec\n    if r == maxc:\n        h = bc-gc\n    ",
+    "score": {
+     "agree": 14,
+     "of": 14,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": false
+   }
+  },
+  "T06": {
+   "id": "T06",
+   "envelope": "BOUNDARY",
+   "category": "locate the relevant code",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "To correct the rule that decides which years have 366 days in the `calendar.py` file, we need to modify the function that checks if a year is a leap year. The current rule treats 1900 and 2100 as having 366 days, which is incorrect. The correct rule is that a year is a leap year if it is divisible by 4 but not by 100, unless it is also divisible by 400.\n\nHere's the complete Python code to add or change the relevant code:\n\n```python\nimport calendar\n\n# Function to check if a year is a leap year\ndef is_leap_year(year):\n    if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):\n        retur",
+    "score": {
+     "agree": 0,
+     "of": 10,
+     "pass": false,
+     "disagreements": [
+      {
+       "call": "print(repr(m.isleap(1900)))",
+       "want": "False",
+       "got": "HARNESS:Command failed: python -c import sys"
+      },
+      {
+       "call": "print(repr(m.isleap(2000)))",
+       "want": "True",
+       "got": "HARNESS:Command failed: python -c import sys"
+      },
+      {
+       "call": "print(repr(m.isleap(2100)))",
+       "want": "False",
+       "got": "HARNESS:Command failed: python -c import sys"
+      },
+      {
+       "call": "print(repr(m.isleap(2024)))",
+       "want": "True",
+       "got": "HARNESS:Command failed: python -c import sys"
+      }
+     ]
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": true,
+    "refusal": "CANNOT_REPRESENT",
+    "operation": "MULTI_FILE_CHANGE",
+    "derivedEnvelope": "OUT",
+    "why": "cannot represent this operation: the writable surface and the atomicity contract are declared per unit, not across modules",
+    "committed": false,
+    "inferenceSpent": false,
+    "score": {
+     "agree": 7,
+     "of": 10,
+     "pass": false,
+     "disagreements": [
+      {
+       "call": "print(repr(m.isleap(1900)))",
+       "want": "False",
+       "got": "True"
+      },
+      {
+       "call": "print(repr(m.isleap(2100)))",
+       "want": "False",
+       "got": "True"
+      },
+      {
+       "call": "print(repr(m.isleap(1700)))",
+       "want": "False",
+       "got": "True"
+      }
+     ]
+    }
+   }
+  },
+  "T07": {
+   "id": "T07",
+   "envelope": "BOUNDARY",
+   "category": "feature addition",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "def midrange(data):\n    if not data:\n        raise StatisticsError(\"Data cannot be empty\")\n    return (min(data) + max(data)) / 2.0",
+    "score": {
+     "agree": 0,
+     "of": 8,
+     "pass": false,
+     "disagreements": [
+      {
+       "call": "print(repr(m.midrange([1,2,3])))",
+       "want": "RAISED:AttributeError",
+       "got": "2.0"
+      },
+      {
+       "call": "print(repr(m.midrange([10,0])))",
+       "want": "RAISED:AttributeError",
+       "got": "5.0"
+      },
+      {
+       "call": "print(repr(m.midrange([5])))",
+       "want": "RAISED:AttributeError",
+       "got": "5.0"
+      },
+      {
+       "call": "print(repr(m.midrange([])))",
+       "want": "RAISED:AttributeError",
+       "got": "RAISED:StatisticsError"
+      }
+     ]
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": true,
+    "refusal": "CANNOT_VERIFY",
+    "operation": "FUNCTION_ADDITION",
+    "derivedEnvelope": "BOUNDARY",
+    "why": "cannot verify this operation: a new behaviour has no prior truth to check against; an independently authored contract is required and the pipeline has no way to obtain one yet",
+    "committed": false,
+    "inferenceSpent": false,
+    "score": {
+     "agree": 8,
+     "of": 8,
+     "pass": true,
+     "disagreements": []
+    }
+   }
+  },
+  "T08": {
+   "id": "T08",
+   "envelope": "IN",
+   "category": "DO NOT MODIFY",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "def bisect_right(a, x, lo=0, hi=None, *, key=None):\n    \"\"\"Return the index where to insert item x in list a, assuming a is sorted.\n\n    The return value i is such that all e in a[:i] have e <= x, and all e in\n    a[i:] have e > x.  So if x already appears in the list, a.insert(i, x) will\n    insert just after the rightmost x already there.\n\n    Optional args lo (default 0) and hi (default len(a)) bound the\n    slice of a to be searched.\n\n    A custom key function can be supplied to customize the sort order.\n    \"\"\"\n\n    if lo < 0:\n        raise ValueError('lo must be non-negative')\n    if hi ",
+    "score": {
+     "agree": 7,
+     "of": 7,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": false,
+    "committed": true,
+    "operation": "PRESERVATION_CHECK",
+    "derivedEnvelope": "IN",
+    "inferenceSpent": true,
+    "code": "def bisect_right(a, x, lo=0, hi=None, *, key=None):\n    \"\"\"Return the index where to insert item x in list a, assuming a is sorted.\n\n    The return value i is such that all e in a[:i] have e <= x, and all e in\n    a[i:] have e > x.  So if x already appears in the list, a.insert(i, x) will\n    insert just after the rightmost x already there.\n\n    Optional args lo (default 0) and hi (default len(a))",
+    "score": {
+     "agree": 7,
+     "of": 7,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": true
+   }
+  },
+  "T09": {
+   "id": "T09",
+   "envelope": "OUT",
+   "category": "multi-file",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "def isleap(year):\n    \"\"\"Return True for leap years, False for non-leap years.\"\"\"\n    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)",
+    "score": {
+     "agree": 5,
+     "of": 5,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": true,
+    "refusal": "CANNOT_REPRESENT",
+    "operation": "MULTI_FILE_CHANGE",
+    "derivedEnvelope": "OUT",
+    "why": "cannot represent this operation: the writable surface and the atomicity contract are declared per unit, not across modules",
+    "committed": false,
+    "inferenceSpent": false,
+    "score": {
+     "agree": 3,
+     "of": 5,
+     "pass": false,
+     "disagreements": [
+      {
+       "call": "print(repr(m.isleap(1900)))",
+       "want": "False",
+       "got": "True"
+      },
+      {
+       "call": "print(repr(m.isleap(2100)))",
+       "want": "False",
+       "got": "True"
+      }
+     ]
+    }
+   }
+  },
+  "T10": {
+   "id": "T10",
+   "envelope": "OUT",
+   "category": "cannot be modelled",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "import threading\nimport queue\n\nclass TextWrapper:\n    def __init__(self, width=70, **kwargs):\n        self.width = width\n        self.kwargs = kwargs\n        self.queue = queue.Queue()\n\n    def _wrap(self, text):\n        w = TextWrapper(self.width, **self.kwargs)\n        return w.wrap(text)\n\n    def wrap(self, text):\n        self.queue.put(text)\n        return self._wrap(self.queue.get())\n\ndef safe_wrap(text, width=70, **kwargs):\n    wrapper = TextWrapper(width, **kwargs)\n    return wrapper.wrap(text)",
+    "score": {
+     "agree": 0,
+     "of": 4,
+     "pass": false,
+     "disagreements": [
+      {
+       "call": "print(repr(m.wrap(\"hello world this is a test\", 10)))",
+       "want": "['hello', 'world this', 'is a test']",
+       "got": "RAISED:RecursionError"
+      },
+      {
+       "call": "print(repr(m.wrap(\"short\", 20)))",
+       "want": "['short']",
+       "got": "RAISED:RecursionError"
+      },
+      {
+       "call": "print(repr(m.wrap(\"\", 10)))",
+       "want": "[]",
+       "got": "RAISED:RecursionError"
+      },
+      {
+       "call": "print(repr(m.wrap(\"aaaaaaaaaaaaaaaaaaaa bbb\", 5)))",
+       "want": "['aaaaa', 'aaaaa', 'aaaaa', 'aaaaa', 'bbb']",
+       "got": "RAISED:RecursionError"
+      }
+     ]
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": true,
+    "refusal": "CANNOT_REPRESENT",
+    "operation": "CROSS_CUTTING_PROPERTY",
+    "derivedEnvelope": "OUT",
+    "why": "cannot represent this operation: properties like thread-safety are not expressible as a behavioural contract over one unit",
+    "committed": false,
+    "inferenceSpent": false,
+    "score": {
+     "agree": 4,
+     "of": 4,
+     "pass": true,
+     "disagreements": []
+    }
+   }
+  },
+  "T11": {
+   "id": "T11",
+   "envelope": "OUT",
+   "category": "ambiguous decomposition",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "from collections import Counter\nfrom statistics import StatisticsError\n\ndef mode(data):\n    \"\"\"Return the most common data point from discrete or nominal data.\n\n    ``mode`` assumes discrete data, and returns a single value. This is the\n    standard treatment of the mode as commonly taught in schools:\n\n        >>> mode([1, 1, 2, 3, 3, 3, 3, 4])\n        3\n\n    This also works with nominal (non-numeric) data:\n\n        >>> mode([\"red\", \"blue\", \"blue\", \"red\", \"green\", \"red\", \"red\"])\n        'red'\n\n    If there are multiple modes with same frequency, return the first one\n    encountered:\n\n        >",
+    "score": {
+     "agree": 6,
+     "of": 6,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": true,
+    "refusal": "CANNOT_REPRESENT",
+    "operation": "UNDETERMINED_REQUEST",
+    "derivedEnvelope": "OUT",
+    "why": "cannot represent this operation: the request does not determine an obligation; deriving one would be inventing the spec",
+    "committed": false,
+    "inferenceSpent": false,
+    "score": {
+     "agree": 6,
+     "of": 6,
+     "pass": true,
+     "disagreements": []
+    }
+   }
+  },
+  "T12": {
+   "id": "T12",
+   "envelope": "OUT",
+   "category": "edit site is inert (C accelerator shadows it)",
+   "raw": {
+    "arm": "RAW",
+    "applied": true,
+    "committed": true,
+    "code": "def insort_right(a, x, lo=0, hi=None, *, key=None):\n    \"\"\"Insert item x in list a, and keep it sorted assuming a is sorted.\n\n    If x is already in a, insert it to the right of the rightmost x.\n\n    Optional args lo (default 0) and hi (default len(a)) bound the\n    slice of a to be searched.\n\n    A custom key function can be supplied to customize the sort order.\n    \"\"\"\n    if key is None:\n        lo = bisect_right(a, x)\n    else:\n        lo = bisect_right(a, key(x), lo, hi, key=key)\n    a.insert(lo, x)",
+    "score": {
+     "agree": 6,
+     "of": 6,
+     "pass": true,
+     "disagreements": []
+    },
+    "exactReconstruction": null
+   },
+   "legasus": {
+    "arm": "LEGASUS",
+    "refused": true,
+    "refusal": "NONAUTHORITATIVE_SOURCE",
+    "operation": "BOUNDED_FUNCTION_BODY_EDIT",
+    "derivedEnvelope": "OUT",
+    "why": "the edit surface is shadowed at runtime, so editing it cannot change the behaviour",
+    "committed": false,
+    "inferenceSpent": false,
+    "score": {
+     "agree": 6,
+     "of": 6,
+     "pass": true,
+     "disagreements": []
+    }
+   }
+  }
+ }
+}

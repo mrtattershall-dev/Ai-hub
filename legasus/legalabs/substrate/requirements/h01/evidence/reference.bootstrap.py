@@ -1,0 +1,14 @@
+# Counter bootstrap.
+
+BASE = 10
+
+
+def _bonus():
+    return 5
+
+
+def total(extra):
+    return BASE + extra
+
+
+BONUS = _bonus()

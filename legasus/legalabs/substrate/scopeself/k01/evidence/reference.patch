@@ -1,0 +1,6 @@
+--- op op1 after: "        self._store = {}\n"
+        self._defaults = {}
+
+--- op op2 after: "re:\n            return self._store[key]\n"
+        if key in self._defaults:
+            return self._defaults[key]

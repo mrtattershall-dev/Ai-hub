@@ -1,0 +1,21 @@
+LegaCore CONSTRAINT DERIVATION revision 4, frozen.
+
+CHANGE: one new resolution state, RESOLVED_ENCLOSING_SCOPE. It narrows NOTHING - a parameter is bound
+for the whole body, so no boundary inside that body precedes its availability, and treating it as a
+module binding would manufacture an ordering constraint from a name that was never unavailable.
+
+EFFECT: the three B-SUPPORTED-INCOMPLETE cases are gone. Derived regions are IDENTICAL to revision 3
+on all four families; only the account changed, which is the point.
+
+STANDING: development. The three defects were found on the provenance family. The seven synthetic
+witnesses in scope.test.mjs were written BEFORE the implementation and include four negatives - a
+module-level name, a name bound nowhere, and both a parameter and a local for a module-level insertion
+where neither is in scope. A resolver that answered enclosing_scope for everything fails all four.
+
+KNOWN LIMIT, declared rather than discovered later: resolution is against the IMMEDIATE enclosing unit
+only. A name reaching an operation through a closure over an outer function's locals stays UNRESOLVED,
+which is the correct declared-gap behaviour rather than a silent wrong answer.
+
+legasus/legacore/constraints4.mjs       64ded02b0f2ecfb66f811bee2cea754a3a55c8b8cce45826f229fdaaad75d8fb
+legasus/legacore/scopefacts.mjs         2aee41e4af1eb299cd6b1cc361694f366db46f42c88c6c4a30a184769020ce2e
+legasus/legacore/scope.test.mjs         699e7ff0a9046a2d681fd78c4e7692d00170c6434872730b1cea61ca0bbfd53d

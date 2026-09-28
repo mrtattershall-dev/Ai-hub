@@ -1,0 +1,20 @@
+LegaCore CONSTRAINT DERIVATION revision 2, frozen. g01-g06 have done their development job.
+
+WHAT THIS EARNED, and what it did not:
+
+  development, generalization family   8 of 8 narrowable, 0 over-constraint, 85.8% of available bits,
+                                       all three kinds passing both halves
+  development, provenance family      26 of 26, 0 over-constraint, 93.8% - identical to the frozen
+                                       deriver, so no regression
+  prospective                          NONE. g01-g06 diagnosed the two defects this revision fixes.
+
+  The EXECUTION PHASE concept has separate and better standing: ten synthetic witnesses, written
+  before this ran against any family, including MUST DISTINGUISH pairs. They caught three real
+  defects before a family was touched.
+
+The frozen predecessor keeps its own prospective result unchanged: symbol_availability FAIL/pass.
+
+legasus/legacore/constraints2.mjs     150506478fce469c3969d671038119d71a6b9c72214f05d3dbb789d88afe84ba
+legasus/legacore/opfacts.mjs          25a2c2950df82a69da223c51a3aa2137fb2d67e19f7d9ef072b440e0dbcf82c2
+legasus/legacore/opfacts.test.mjs     1ce101c78fdbd48845be89599d32de205e64a83de8f08dcf204d5945028d6ef9
+legasus/legacore/boundaries.mjs       1d9fb8486cb6df48b867073025fea53446393d9728760ec4ffcba1afad4feb35

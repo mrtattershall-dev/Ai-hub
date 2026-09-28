@@ -1,0 +1,11 @@
+{
+  "task_id": "b01",
+  "goal": "Add snapshot and undo to the EXISTING Stack in stack.py: snapshot() marks the current contents, and undo() restores the contents to the most recent mark and forgets that mark. undo() with no mark leaves the stack unchanged. Keep push, pop, peek and size working exactly as they do now. Run it with python.",
+  "lead": "stack.py",
+  "language": "py",
+  "run_with": "python",
+  "interface": [
+    "snapshot",
+    "undo"
+  ]
+}

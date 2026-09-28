@@ -1,0 +1,70 @@
+  four tasks: T10_0 (below 10, preserve 0)   T10_3 (below 10, preserve 3)   T20_5 (below 20, preserve 5)   T0_N2 (below 0, preserve -2)
+  controls ok: identical plans per task, no leakage, sufficiency, BOTH realizations verify, three wrong fragments accepted-but-failing, classifier separates the three families
+  RULE 3 ok: endpoint names qwen2.5-coder:1.5b, qwen2.5-coder:7b
+  12 cells x 2 models   samples 20   temperature 0.6
+
+  qwen2.5-coder:1.5b   T10_0  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 19   verified 17   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   T10_0  NAMED_EXCLUSION  PRIMARY excludes-preserved  2/20   excludes-other  0   no-exclusion 18   verified 18   P(c|auth) 0.95
+  qwen2.5-coder:1.5b   T10_0  RELATIONAL       PRIMARY excludes-preserved  2/20   excludes-other  0   no-exclusion 18   verified 17   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   T10_3  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 18   verified 14   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   T10_3  NAMED_EXCLUSION  PRIMARY excludes-preserved  3/20   excludes-other  0   no-exclusion 17   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   T10_3  RELATIONAL       PRIMARY excludes-preserved  5/20   excludes-other  0   no-exclusion 15   verified 19   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   T20_5  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified 14   P(c|auth) 0.78
+  qwen2.5-coder:1.5b   T20_5  NAMED_EXCLUSION  PRIMARY excludes-preserved  1/20   excludes-other  0   no-exclusion 19   verified 17   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   T20_5  RELATIONAL       PRIMARY excludes-preserved  4/20   excludes-other  0   no-exclusion 15   verified 17   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   T0_N2  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified 18   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   T0_N2  NAMED_EXCLUSION  PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified 17   P(c|auth) 1.00
+  qwen2.5-coder:1.5b   T0_N2  RELATIONAL       PRIMARY excludes-preserved  2/20   excludes-other  0   no-exclusion 18   verified 17   P(c|auth) 1.00
+  qwen2.5-coder:7b     T10_0  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified  6   P(c|auth) 0.46
+  qwen2.5-coder:7b     T10_0  NAMED_EXCLUSION  PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified  8   P(c|auth) 0.40
+  qwen2.5-coder:7b     T10_0  RELATIONAL       PRIMARY excludes-preserved 10/20   excludes-other  0   no-exclusion 10   verified 15   P(c|auth) 0.79
+  qwen2.5-coder:7b     T10_3  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified 15   P(c|auth) 0.83
+  qwen2.5-coder:7b     T10_3  NAMED_EXCLUSION  PRIMARY excludes-preserved 13/20   excludes-other  0   no-exclusion  7   verified 17   P(c|auth) 0.85
+  qwen2.5-coder:7b     T10_3  RELATIONAL       PRIMARY excludes-preserved 20/20   excludes-other  0   no-exclusion  0   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:7b     T20_5  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified  1   P(c|auth) 0.06
+  qwen2.5-coder:7b     T20_5  NAMED_EXCLUSION  PRIMARY excludes-preserved 20/20   excludes-other  0   no-exclusion  0   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:7b     T20_5  RELATIONAL       PRIMARY excludes-preserved 20/20   excludes-other  0   no-exclusion  0   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:7b     T0_N2  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:7b     T0_N2  NAMED_EXCLUSION  PRIMARY excludes-preserved  6/20   excludes-other  0   no-exclusion 14   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:7b     T0_N2  RELATIONAL       PRIMARY excludes-preserved 13/20   excludes-other  0   no-exclusion  7   verified 20   P(c|auth) 1.00
+
+  THE SEPARATED ENDPOINTS - one line per model, 240 generations each
+    qwen2.5-coder:1.5b    proposal-yield 0.875   authorization-precision 0.976   verification-rate 0.854   sec/verified 1.0
+      refusal topology  {"not exactly one guard and one return":18,"repeated a fixed line":5,"returned a function":7}
+      realization diversity, distinct guards per cell  3 4 5 4 2 2 4 3 3 2 2 2
+    qwen2.5-coder:7b      proposal-yield 0.946   authorization-precision 0.802   verification-rate 0.758   sec/verified 1.2
+      refusal topology  {"repeated a fixed line":13}
+      realization diversity, distinct guards per cell  2 6 4 2 4 1 3 1 1 1 2 2
+
+  RENDER EFFECT, held frozen across models - excludes-preserved per 80:
+    qwen2.5-coder:1.5b   IMPLICIT 0   NAMED_EXCLUSION 6   RELATIONAL 13
+    qwen2.5-coder:7b     IMPLICIT 0   NAMED_EXCLUSION 39   RELATIONAL 63
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.scale.a.json
+  four tasks: T10_0 (below 10, preserve 0)   T10_3 (below 10, preserve 3)   T20_5 (below 20, preserve 5)   T0_N2 (below 0, preserve -2)
+  controls ok: identical plans per task, no leakage, sufficiency, BOTH realizations verify, three wrong fragments accepted-but-failing, classifier separates the three families
+  RULE 3 ok: endpoint names qwen2.5-coder:14b
+  12 cells x 1 models   samples 20   temperature 0.6
+
+  qwen2.5-coder:14b    T10_0  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified 17   P(c|auth) 0.85
+  qwen2.5-coder:14b    T10_0  NAMED_EXCLUSION  PRIMARY excludes-preserved  9/20   excludes-other  0   no-exclusion 11   verified  9   P(c|auth) 0.45
+  qwen2.5-coder:14b    T10_0  RELATIONAL       PRIMARY excludes-preserved 11/20   excludes-other  0   no-exclusion  9   verified 17   P(c|auth) 0.85
+  qwen2.5-coder:14b    T10_3  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:14b    T10_3  NAMED_EXCLUSION  PRIMARY excludes-preserved 20/20   excludes-other  0   no-exclusion  0   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:14b    T10_3  RELATIONAL       PRIMARY excludes-preserved 19/20   excludes-other  0   no-exclusion  1   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:14b    T20_5  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified 19   P(c|auth) 0.95
+  qwen2.5-coder:14b    T20_5  NAMED_EXCLUSION  PRIMARY excludes-preserved 20/20   excludes-other  0   no-exclusion  0   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:14b    T20_5  RELATIONAL       PRIMARY excludes-preserved 20/20   excludes-other  0   no-exclusion  0   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:14b    T0_N2  IMPLICIT         PRIMARY excludes-preserved  0/20   excludes-other  0   no-exclusion 20   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:14b    T0_N2  NAMED_EXCLUSION  PRIMARY excludes-preserved 16/20   excludes-other  0   no-exclusion  4   verified 20   P(c|auth) 1.00
+  qwen2.5-coder:14b    T0_N2  RELATIONAL       PRIMARY excludes-preserved  6/20   excludes-other  0   no-exclusion 14   verified 20   P(c|auth) 1.00
+
+  THE SEPARATED ENDPOINTS - one line per model, 240 generations each
+    qwen2.5-coder:14b     proposal-yield 1.000   authorization-precision 0.925   verification-rate 0.925   sec/verified 1.6
+      refusal topology  {}
+      realization diversity, distinct guards per cell  2 2 3 1 1 2 2 1 1 1 2 2
+
+  RENDER EFFECT, held frozen across models - excludes-preserved per 80:
+    qwen2.5-coder:14b    IMPLICIT 0   NAMED_EXCLUSION 65   RELATIONAL 56
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.scale.b.json

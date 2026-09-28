@@ -1,0 +1,12 @@
+{
+  "task_id": "h08",
+  "goal": "Add a rounded tau to the EXISTING geolocal.py: a helper rounds a value to two decimal places, TAU must hold two times PI rounded that way when the module is imported, and tau() returns it. Keep RADIUS and area working exactly as they do now. Run it with python.",
+  "lead": "geolocal.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the tau value is assembled the same way as the existing area computation",
+  "interface": [
+    "TAU",
+    "tau"
+  ]
+}

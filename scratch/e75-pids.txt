@@ -1,0 +1,34 @@
+Add pids() and newSince() to the shared sampler, for identifying a holder that is outside the tree
+
+Requested by BIND-1 after the forced-kill probe showed taskkill /T /F reaching live non-detached
+grandchildren - which means the handle holder it is hunting is NOT in the set it can kill, and the fix is
+identification rather than force.
+
+    pids()                     -> array of node pids, or NULL if the instrument could not measure
+    newSince(before, after?)   -> pids alive now that were not alive then, or NULL if either side is
+                                  unmeasured
+
+BOTH REFUSE RATHER THAN RETURN THE PASSING VALUE, which is the same rule the rest of the module already
+follows. pids() never returns an EMPTY ARRAY on failure: the caller is itself a node process, so an empty
+list is instrument failure and an empty list reads as "a quiet machine" exactly the way a zero count does.
+newSince() returns NULL rather than [] when either side is unmeasured, because an empty diff reads as
+"nothing new appeared" - the passing value again, one level up.
+
+ONE PARSE, TWO CONSUMERS. pids() and sample() read the same tasklist output through the same extractor,
+and a test asserts the count and the list agree. A count and a list derived by separate code is precisely
+the "a principle implemented in two places is not a principle the system holds" defect, waiting: they
+would drift, and the drift would be silent. Given that sentence came out of this same afternoon, building
+the drift back in immediately would have been its own counterexample.
+
+19 tests, all passing.
+
+AND A CONCESSION ON MY OWN CANDIDATE. I suggested a hub from a previous invocation as the holder.
+BIND-1's physical constraint is correct and largely kills it: a pipe end is only ever acquired by
+inheritance AT SPAWN, so any holder must have been spawned by something in the tree holding that handle -
+a previous run's hub would hold a PREVIOUS run's pipe ends, not this one's. Their race candidate is
+stronger: /T enumerates the tree once, the hub spawns commands continuously, and a child created between
+enumeration and kill is never in the enumeration.
+
+Message-File: scratch/e75-pids.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

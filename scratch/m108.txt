@@ -1,0 +1,39 @@
+Preregister H-DISTINCTION, written to break it: the locating rule is fixed before any defect is seen
+
+The claim is the soundness and minimality pair - a projection must never collapse a distinction the
+proposition depends on, and should not preserve one it does not - with two error directions,
+illegitimate collapse and illegitimate separation. NO INVENTION IS CLAIMED: this is contextual and
+observational equivalence together with intervention-based identification of relevant variables,
+reached from a different direction, and the prior art is older and better developed. What is being
+tested is whether the framing predicts something about THIS system that was not already known.
+
+THE LOCATING RULE IS THE WHOLE DIFFERENCE BETWEEN A THEORY AND A FRAME THAT FITS EVERYTHING, and it
+is fixed here before anything is classified: a collapse or separation may be located only in a
+PROJECTION, a step that produces a representation consumed downstream, and never in a consumer's
+decision procedure. A consumer that had the distinction available and failed to branch on it is
+NEITHER. Without that rule every defect can be narrated as a consumer treating two cases alike.
+
+DX-1 is prospective and tests MINIMALITY, the direction nothing has tested yet. semantic() assigns a
+fresh identity to every non-plain object, and replay() compares projections to decide baseline
+stability, so a perfectly deterministic subject returning a structurally identical Map on each call
+should be declared BASELINE_UNSTABLE and refused. An over-fine projection producing a false refusal,
+the opposite direction from the false agreement L-3 found.
+
+DX-2 IS THE BREAKING PREDICTION: at least one corpus defect is NEITHER collapse nor separation. I am
+predicting the frame fails somewhere, and the dangerous outcome is 36 of 36, which would be evidence
+of unfalsifiability rather than of truth and will be reported that way.
+
+DX-3 says both directions must be populated, because if every qualifying defect is a collapse then
+distinction adds nothing to H-LOSS, which was already a collapse hypothesis.
+
+DX-4 forbids repair and architecture. Neither L-3's String(v) unsoundness nor DX-1's over-fine
+semantic() is fixed here, the freeze must still verify, and no quotient machinery is built.
+
+The scope section says plainly that the descent through code, authority, evidence, representation,
+event, question, transition and now distinction has produced a frame explaining more at each level,
+and that this is exactly the pattern an unfalsifiable descent produces. This slice tests one level.
+It does not endorse the ladder.
+
+Message-File: scratch/m108.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

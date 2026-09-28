@@ -1,0 +1,37 @@
+  LOCALIZED-DELTA EXPRESSIBILITY - reference patches, no model
+
+===== GOAL 64 =====
+  insertion sites:            7
+    + 1 lines  accumulator, beside the existing items[]
+    + 5 lines  flush_ol, mirroring flush_list
+    + 1 lines  a blank line closes an ordered list too
+    + 1 lines  a "- " line closes an open ordered list
+    + 6 lines  the new branch itself
+    + 1 lines  any other line closes an open ordered list
+    + 1 lines  end of input flushes an open ordered list
+  existing lines DELETED or MODIFIED: 0  (insertion-only PROVEN)
+  lines added:                16
+  to_html before / after:     37 -> 53 lines, 954 -> 1411 bytes
+  of the original to_html:    37/37 lines survive byte-identical
+  model responsibility:       16 new lines instead of reconstructing 37
+  loads:                      true
+  OLD regression suite:       PASS
+  NEW delta probe:            PASS
+  VERDICT: the held-out behaviour IS expressible as a pure insertion with old behaviour intact
+
+===== GOAL 74 =====
+  insertion sites:            3
+    + 1 lines  fence state, beside the existing items[]
+    +12 lines  fence handling ahead of every other line rule
+    + 2 lines  an unclosed fence runs to the end of the text
+  existing lines DELETED or MODIFIED: 0  (insertion-only PROVEN)
+  lines added:                15
+  to_html before / after:     37 -> 52 lines, 954 -> 1470 bytes
+  of the original to_html:    37/37 lines survive byte-identical
+  model responsibility:       15 new lines instead of reconstructing 37
+  loads:                      true
+  OLD regression suite:       PASS
+  NEW delta probe:            PASS
+  VERDICT: the held-out behaviour IS expressible as a pure insertion with old behaviour intact
+
+  BOTH goals are pure-insertion expressible. Whole-function replacement was the wrong operation.

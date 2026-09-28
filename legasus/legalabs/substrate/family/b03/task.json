@@ -1,0 +1,10 @@
+{
+  "task_id": "b03",
+  "goal": "Add nested block comments to tokens in the EXISTING scan.py: text between an opening paren-star and a closing star-paren is skipped entirely and produces no tokens, and these comments nest, so an inner comment does not end the outer one. A comment that is never closed is an error and must raise ValueError. Whitespace, numbers and symbols must keep tokenising exactly as they do now. Run it with python.",
+  "lead": "scan.py",
+  "language": "py",
+  "run_with": "python",
+  "interface": [
+    "ValueError"
+  ]
+}

@@ -1,0 +1,35 @@
+  BOUNDARY ANALYSIS - post-hoc over preserved bytes, step 1 only, no new inference
+
+=== goal 64  site 1  (reference is 1 line(s): "    ol_items = []\n") ===
+  seed 11     17B/  5tok      raw load/old-ok   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+  seed 12    324B/ 80tok      raw load/old-ok   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+  seed 13     47B/ 12tok      raw load/old-ok   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+  seed 14    211B/ 46tok      raw load/old-ok   D1 load/old-ok   D2 load/old-ok
+  seed 15    163B/ 34tok      raw load/old-ok   D1 load/old-ok   D2 load/old-ok
+  seed 16     18B/  5tok      raw load/old-ok   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+  seed 17     17B/  5tok      raw load/old-ok   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+  seed 18     17B/  5tok      raw load/old-ok   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+
+=== goal 74  site 1  (reference is 1 line(s): "    fence = None\n") ===
+  seed 11    270B/ 64tok      raw load/old-ok   D1 load/old-ok/EXACT   D2 load/old-ok
+  seed 12   1940B/600tok CAP   raw FAIL/old-x   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+  seed 13     17B/  6tok      raw load/old-ok   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+  seed 14   2430B/600tok CAP   raw FAIL/old-x   D1 load/old-ok   D2 load/old-ok
+  seed 15     17B/  6tok      raw load/old-ok   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+  seed 16   2125B/600tok CAP   raw FAIL/old-x   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+  seed 17   2092B/600tok CAP   raw FAIL/old-x   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+  seed 18   2046B/562tok      raw FAIL/old-x   D1 load/old-ok/EXACT   D2 load/old-ok/EXACT
+
+===== STEP-1 SUMMARY =====
+  goal 64  n=8
+    raw                loads 8/8   old kept 8/8   byte-identical to reference 4/8
+    D1_oracle_length   loads 8/8   old kept 8/8   byte-identical to reference 6/8
+    D2_deterministic   loads 8/8   old kept 8/8   byte-identical to reference 6/8
+  goal 74  n=8
+    raw                loads 3/8   old kept 3/8   byte-identical to reference 2/8
+    D1_oracle_length   loads 8/8   old kept 8/8   byte-identical to reference 7/8
+    D2_deterministic   loads 8/8   old kept 8/8   byte-identical to reference 6/8
+
+  D1 uses the reference LENGTH and is not implementable - it only separates wrong content
+  from right content that ran on. D2 is implementable. Any gain must be re-tested on FRESH
+  seeds before it counts: this rule was written while looking at these trajectories.

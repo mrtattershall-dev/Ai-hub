@@ -1,0 +1,27 @@
+# AT THIS POINT WRITE ONLY THIS: handle ordinary text: the current list and paragraph branches are unaffected by any other line rule except that a blank line resets the lists
+        # ALREADY HANDLED ELSEWHERE - do not add a second path for it: ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists already have their own branches
+
+        if line.startswith("```"):
+            if codes:
+                flush_para()
+                flush_list()
+            if links:
+                flush_para()
+                flush_list()
+            code_block = []
+            while True:
+                line = next(text)
+                code_block.append(line.strip())
+                if line == "```":
+                    break
+            blocks.append("<pre><code>" + "\n".join(_escape(l) for l in code_block) + "</code></pre>")
+            continue
+
+        if codes and not current:
+            flush_para()
+        if links and not current:
+            flush_para()
+
+        # AT THIS POINT WRITE ONLY THIS: handle headings: the current list and paragraph branches are unaffected by any other line rule except that a blank line resets the lists
+        # ALREADY HANDLED ELSEWHERE - do not add a second path for it: ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists already have their own branches
+

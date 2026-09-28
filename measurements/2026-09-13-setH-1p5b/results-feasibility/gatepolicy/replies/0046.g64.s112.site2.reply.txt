@@ -1,0 +1,4 @@
+def flush_ol():
+        if ol_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")
+            del ol_items[:]

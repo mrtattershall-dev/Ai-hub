@@ -1,0 +1,29 @@
+Entry 20: give COMPLETE back its subject, and record what LegaScreen v0 actually earned
+
+The owner withdrew an earlier overstatement of their own, and it lands on something I wrote two
+hours ago. attainment reported COMPLETE as NOT_REPRESENTABLE with the gloss that no important
+failure exists anywhere. That is right about its subject - the failure-class space of arbitrary
+unconstrained software, an open-world claim over an unenumerated space - and wrong if read as
+completeness being unreachable. Over a bounded contract with a finite input domain, a fully
+specified behaviour and no side effects, sixteen states can be checked and there is no philosophical
+mystery left.
+
+And this repository already held the authority for that case. GENERALIZATION.EXHAUSTIVE is exactly
+the domain was enumerated and all of it was checked, and widen already refuses it without the
+enumeration carried as evidence - now asserted by AT-3b, which shows the refusal and then the grant
+and then the widened claim being entitled across the domain. The machinery for a PROVE mode is older
+than the proposal for one. The refusal now names its subject in the code and in the printed verdict,
+and the entry records that perfection is relative to a criterion rather than a property of source,
+which is why dominance keeps a frontier instead of electing a winner.
+
+Entry 20 also records what LegaScreen v0 earned: one principled true positive, five artifacts with a
+single named cause, two coincidences explicitly not counted as detections, one function never called
+and reported as never called, and a region covering SC-1 and nothing else. The design's remaining
+parts - the authority-flow graph, the mutation battery, the static and dynamic cross-check, the
+region classification - are named as not started.
+
+Suite 589/589.
+
+Message-File: scratch/m66.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

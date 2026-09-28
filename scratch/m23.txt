@@ -1,0 +1,41 @@
+owner declined FREEZE_R4_AND_SELECT_REPO_D; preserve the 452/452 falsification sequence and mark UNRESOLVED ATTRIBUTION as TERMINAL
+
+FREEZE_R4_AND_SELECT_REPO_D IS NOT AUTHORIZED, recorded with the owner's stated reason, which is sharper
+than the one this ledger gave. Not "two defects were found recently" but THE REPAIR SURFACE IS STILL
+PRODUCING NEW AUTHORITY BUGS WHEN EXERCISED COMPOSITIONALLY. That distinction decides WHEN the block
+lifts: the first would lift on a quiet night, the second only when adversarial development stops producing
+findings, which is a measurable condition rather than a mood. An outward-facing page is declined too, for
+the same argument seen from outside: it is only meaningful after Repo D, because the consequential
+question is deliberately still unanswered.
+
+PRESERVED #1 - THE 452/452 STATE IS EVIDENCE AND 464/464 MUST NOT REPLACE IT HISTORICALLY.
+
+    452/452 green, and the original contradiction SURVIVES
+      -> PIPELINE-LEVEL FALSIFICATION: the repair was real and UNREACHED
+      -> repair the ACTUAL DECISION LAYER
+    REPRESENTATION-LOSS DEFECT: the merge discarded what the adapter had just carried
+      -> repair
+    AUTHORITY-ALIAS DEFECT: a coordinate named history took the declared dimension's authority because
+    two STRINGS MATCHED - L2 inside the repair written to stop coordinates being mishandled
+      -> repair
+    464/464
+
+Without that sequence, "464 tests pass" radically understates what those tests now mean. A green suite is
+not evidence that a pipeline is correct; it is evidence about the propositions someone thought to assert,
+and the 452/452 state is the counterexample to its own reassurance.
+
+PRESERVED #2 - 49 / 7 / 1 IS A SUCCESSFUL EPISTEMIC OUTCOME, NOT UNFINISHED BOOKKEEPING. UNRESOLVED
+ATTRIBUTION is not a task waiting for a sufficiently clever agent; it is the MAXIMALLY JUSTIFIED TERMINAL
+STATE of that evidence. Mechanized rather than left as prose: every entry in quiesce-check.mjs now carries
+a BLOCK CLASS. PLATFORM unblocks on a different host, SEQUENCING when the sequence advances, OWNER on an
+owner decision, and TERMINAL - "UNBLOCKS NEVER. Do not re-attempt." Conflating TERMINAL with the others is
+how an agent spends days reconstructing information that no longer exists.
+
+AND THE PYTEST RESULT NAMES A CLASS THIS LEDGER HAD NOT NAMED. Earlier failures mostly LOST a distinction
+and accidentally GAINED authority. This is the dual symptom at the RELATION layer: AN INCOMPLETE
+COORDINATE SYSTEM CAN MANUFACTURE A FALSE RELATION BETWEEN OTHERWISE FAITHFULLY REPRESENTED EVIDENCE. The
+system did not report UNKNOWN - it POSITIVELY REPRESENTED A COMPATIBILITY THAT DID NOT EXIST.
+
+Message-File: scratch/m23.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

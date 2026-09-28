@@ -1,0 +1,20 @@
+  T3_NESTED      ORDERED      order micro then low then mid   basis DERIVED
+  T3_MIXED       ORDERED      order high then micro then low   basis DERIVED_WITH_ENGINEERING_CHOICE
+  T3_MIXED NOTE: reversed order fails, which is expected to depend on which constraint the reversal crosses
+  T3_UNDETERMINEDUNDETERMINED NO GENERATION   blocked by low/plus at n=1
+  controls ok: orders derived as expected, each prompt isolated from the other operation, both realizations verify, the reversed composition fails where ordering is derived and passes where both orders are legal
+  RULE 3 ok: qwen2.5-coder:1.5b, qwen2.5-coder:7b, qwen2.5-coder:14b
+  2 transaction cases x 3 models   samples 20
+
+  qwen2.5-coder:1.5b   T3_NESTED     op-yield 0.850   assembled 12/20   verified 12   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:1.5b   T3_MIXED      op-yield 0.867   assembled 13/20   verified 13   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:7b     T3_NESTED     op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:7b     T3_MIXED      op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:14b    T3_NESTED     op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+  qwen2.5-coder:14b    T3_MIXED      op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0
+
+  qwen2.5-coder:1.5b    transaction yield 0.625   P(correct|assembled) 1.000   verified end-to-end 0.625   sec/verified 5.1
+  qwen2.5-coder:7b      transaction yield 1.000   P(correct|assembled) 1.000   verified end-to-end 1.000   sec/verified 2.4
+  qwen2.5-coder:14b     transaction yield 1.000   P(correct|assembled) 1.000   verified end-to-end 1.000   sec/verified 4.4
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.t3.json

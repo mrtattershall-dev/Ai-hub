@@ -1,0 +1,34 @@
+Preregister LegaScreen v1: three historical defects, one machinery, before any probe is written
+
+The owner set a failable bar - given a historical commit before the defect was known, the screen
+independently surfaces the transition that later became a recorded defect, while preserving explicit
+UNSCREENED for what it cannot evaluate, and does it for the objectivesFromContest case, the
+provenance reason case and one composition case using the same machinery rather than three special
+cases. v0 did the first. This does all three or fails.
+
+Same machinery is defined before it can be argued afterwards: one harness doing enumeration,
+exercise, positive collection, coverage accounting and the unscreened report, with pluggable
+invariant probes - which is the owner's own plan of expanding one invariant at a time and rescanning.
+A probe that needs the defect's file, function, field or commit named in it fails the bar, as does one
+whose thresholds were adjusted after seeing its target.
+
+Three probes as general properties. Erasure is v0 unchanged. Alias enumerates state words owned by
+more than one module, reports owners and classifies nothing. Composition is the genuinely new one and
+is metamorphic: lengthening a justification path must not grant what the direct path refuses,
+compared over generated three-node graphs with scopes drawn from a small domain, knowing nothing
+about null, about C1 or about which dimension. That is the decisive prediction, because the other two
+restate work already done and this is the first probe written as a property over a generated space
+rather than as a scan.
+
+Six predictions including silence at HEAD, a coverage and unscreened report on every run, and false
+positives reported rather than tuned - the seven standing collisions and the five wrong-shape
+artifacts stay in the numbers.
+
+What is not built is named rather than implied: no repository-wide authority graph, no runtime
+instrumentation, no static parser, no mutation battery, no shrinking, no repair packets, no severity
+dimensions, no bisection beyond the three commits, no per-model rendering. The owner described a
+cathedral and asked for a vertical slice; this is the slice.
+
+Message-File: scratch/m67.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

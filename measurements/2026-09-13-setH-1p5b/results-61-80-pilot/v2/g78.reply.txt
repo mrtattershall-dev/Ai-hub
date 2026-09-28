@@ -1,0 +1,11 @@
+):
+        out = []
+        for s in sorted(self._students):
+            for a, meta in self._assignments.items():
+                pts = self._scores.get((s, a), None)
+                if pts is None:
+                    if not self._missing_zero:
+                        continue
+                    pts = 0
+                out.append("%s,%s,%d" % (s, a, pts))
+        return "\n".join(out)

@@ -1,0 +1,58 @@
+// s5_expr.js
+function parseExpression(expression) {
+  // Check if the expression is empty or null
+  if (!expression || expression.trim() === '') {
+    throw new Error('Expression cannot be empty');
+  }
+
+  // Split the expression into tokens based on operators and numbers
+  const tokens = expression.split(/[\+\-\*/]/);
+
+  // Initialize the result stack with a number that will be updated as the expressions are evaluated
+  let result = 0;
+
+  // Iterate over the tokens
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i].trim();
+
+    // Check if the token is a number
+    if (!isNaN(token)) {
+      // Convert the token to a number and push it onto the result stack
+      result += parseFloat(token);
+    } else {
+      // The token is an operator, so pop the last two numbers from the result stack, perform the operation, and push the result back onto the stack
+      const num2 = result;
+      result = 0;
+
+      switch (token) {
+        case '+':
+          result += num2;
+          break;
+        case '-':
+          result -= num2;
+          break;
+        case '*':
+          result *= num2;
+          break;
+        case '/':
+          if (num2 === 0) {
+            throw new Error('Division by zero');
+          }
+          result /= num2;
+          break;
+      }
+    }
+  }
+
+  // Return the final result
+  return result;
+}
+
+// Example usage
+try {
+  const expression = "3 + 4 * 5";
+  const result = parseExpression(expression);
+  console.log(`Result: ${result}`);
+} catch (error) {
+  console.error(error.message);
+}

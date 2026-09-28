@@ -1,0 +1,19 @@
+# Aggregation.
+
+SCALE = 2
+
+
+def summarize(items):
+    total = 0
+    for it in items:
+        total += int(it)
+    total = total * SCALE
+    return total
+
+
+def count(items):
+    return len(items)
+
+
+def scaled_count(items):
+    return count(items) * SCALE

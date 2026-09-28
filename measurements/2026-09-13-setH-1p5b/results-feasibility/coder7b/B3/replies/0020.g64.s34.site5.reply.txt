@@ -1,0 +1,9 @@
+if line.startswith("1. "):
+            flush_para()
+            if items:
+                flush_ordered_list()
+            items.append(line[3:].strip())
+            continue
+        # END OF REQUESTED CHANGE
+        if current and not items:
+    

@@ -1,0 +1,60 @@
+{
+  "task_id": "g03",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing zero case as the relation to parallel; that case is a guarded branch returning a label, and the new case occupies the same position",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the guarded branch for the new case",
+        "site_hint": "    if n == 0:\n        return \"zero\"\n"
+      },
+      {
+        "id": "op2",
+        "intent": "a reader that reports whether the new case applies",
+        "site_hint": "    return \"positive\"\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-variant-feature",
+    "affected_region_lines": 8
+  },
+  "reference": {
+    "source_hash": "89848816dab79e2b97af7584051a81d0c8d62e326d06bd249c0ba42d621b41b2",
+    "reference_hash": "9f0e2cd55d6dc6c0a97bd76c30ee1f801828b38d8ea37e86a31be09150e77561",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

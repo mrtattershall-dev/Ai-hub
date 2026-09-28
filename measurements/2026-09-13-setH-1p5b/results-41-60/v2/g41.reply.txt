@@ -1,0 +1,7 @@
+isbn) {
+    const loan = this.loansByIsbn.get(isbn);
+    if (!loan) throw new Error('unknown isbn');
+    const member = loan.values().next().value;
+    // goal 41: calculate the due date based on a specific algorithm, which is deliberately not implemented here.
+    return new Date();
+  }

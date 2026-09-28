@@ -1,0 +1,49 @@
+TRANSFER-2: it transferred - forward discovery found ZERO on the hub and backward found 40
+
+Ninety entries against the frozen mechanism 0784cd3f4e3970b3, in a clean room outside the hub
+repository, on a quiet machine. Every preregistered coordinate is reported separately and none is
+averaged into another.
+
+U-4 IS THE RESULT. Forward discovery found NOTHING AT ALL - not few, zero candidates - because the
+hub has no identity brand for the brand-shape seed to find, while backward discovery found forty. On
+Legasus the two surfaces were disjoint but both populated at 10 and 39. On a repository that was
+never built around this ontology the forward direction returns an empty set and the backward
+direction returns the whole surface. That is the transfer question answered: a screen seeded only on
+explicit authority machinery is a mirror, and this repository holds nothing up to it.
+
+U-2 held with eleven private functions reached through effects - lock acquisition, enqueue, dequeue,
+completion, stale-lock clearing, quarantine, ledger writes, a filesystem walk. Authority-bearing by
+any reading, none exported, none reachable by any forward method. They are PARTICIPANTS and not
+established dependencies; a stack is coarse causal participation and not counterfactual dependence.
+
+U-3 held and brought its own bound. The backdoor detector had only ever fired on a fixture I wrote,
+and here it fired unprompted on an aggregate of module-private bindings with no name supplied. It
+also found ONE OF FOUR such exports in that file. Whether the other three differ in shape or the
+threshold is too strict is UNMEASURED, so its sensitivity on real specimens is bounded by one in
+four rather than by the fixture's one in one.
+
+U-6 fired for the first time on a real subject: 148 observable modules, 10 unobservable by this
+instrument, 17 with no module syntax. Twenty-seven of 175 hub modules are outside what the technique
+can see, and no figure here divides by 175 as though they had been examined.
+
+U-5 held and confirmed what killed TRANSFER-1: sixty-four of ninety entries ended the process
+themselves. Every entry is classified, none silently absent, nothing swept, no child outliving the
+run.
+
+THE COST OF THAT IS STATED PLAINLY. Those 64 entries are EFFECTS UNESTABLISHED, so for 71 percent of
+this repository's entries the question of whether an entry caused nothing CANNOT BE ANSWERED, and
+4498 is a floor rather than a count.
+
+U-7 was not triggered. The only inputs were six sink classes and twelve Node platform boundaries, no
+hub file or function appears in the configuration, and the one test-only export found was reported as
+a finding about the subject rather than used as a way in.
+
+The hub repository was never executed, written to, or given a process. Verified after the run: no
+file under it has an mtime inside the run window except the peers' COORD.md, which this runner does
+not touch. Clean room discarded, machine back to baseline with none of mine remaining.
+
+Still unreached: SUPPORT_CHARACTERIZED, JUSTIFICATION_ESTABLISHED, SCREENED.
+
+Message-File: scratch/m115.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

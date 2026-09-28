@@ -1,0 +1,31 @@
+# The code below is the new code for ordered lists:
+            m = re.match(r"(\d+)\. (.*)", line)
+            if m:
+                flush_ordered_list()
+                ordered_items.append(m.group(2).strip())
+                continue
+            # If it's not a number, dot and space, treat it as an unordered list item
+            items.append(line[2:].strip())
+        elif line.startswith("1. "):
+            flush_para()
+            flush_list()  # Close any open ordered list before starting a new one
+            m = re.match(r"(\d+)\. (.*)", line)
+            if m:
+                flush_ordered_list()
+                ordered_items.append(m.group(2).strip())
+                continue
+        elif line.startswith("1.") and not line[2:].strip().startswith("- "):
+            flush_para()
+            flush_list()  # Close any open ordered list before starting a new one
+            m = re.match(r"(\d+)\. (.*)", line)
+            if m:
+                flush_ordered_list()
+                ordered_items.append(m.group(2).strip())
+                continue
+        elif line.startswith("1.") and line[2:].strip().startswith("- "):
+            flush_para()
+            flush_list()  # Close any open ordered list before starting a new one
+            items.append(line[2:].strip())
+        else:
+            # If it's not a number, dot and space, treat it as an unordered list item
+            flush_ordered_list()

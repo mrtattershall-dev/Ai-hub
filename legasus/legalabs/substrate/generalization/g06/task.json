@@ -1,0 +1,12 @@
+{
+  "task_id": "g06",
+  "goal": "Add the missing suffix helper to the EXISTING report.py: _suffix(s) returns \"long\" when the stripped text is longer than five characters and \"short\" otherwise, so that describe works. Also add suffix_of(s) returning the same value, and blank(s) reporting whether the stripped text is empty. Keep title and plain working exactly as they do now. Run it with python.",
+  "lead": "report.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the suffix helper works the same way as the existing title helper",
+  "interface": [
+    "suffix_of",
+    "blank"
+  ]
+}

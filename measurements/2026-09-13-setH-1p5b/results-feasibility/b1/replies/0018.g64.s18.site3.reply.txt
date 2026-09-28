@@ -1,0 +1,30 @@
+# AT THIS POINT WRITE ONLY THIS: add an `if line.startswith("- ")` block that calls `flush_list()` and nothing else, so a blank line also closes an open list
+            # AT THIS POINT WRITE ONLY THIS: add an `if h := _is_heading(line)` block that calls `flush_para()`, `flush_list()`, or `flush_ol()` depending on whether the line is a heading, a paragraph, or an ordered list item, respectively. If none of those apply (i.e., it's a regular paragraph), add the line to `current`.
+            # AT THIS POINT WRITE ONLY THIS: call `flush_para()` after the loop finishes.
+    flush_list()
+    flush_ol()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+<|cursor|>
+```python
+assert to_html("a\nb") == "<p>a b</p>"
+assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+assert to_html("# Title") == "<h1>Title</h1>"
+assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+assert to_html("a * b") == "<p>a * b</p>"
+assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+assert to_html("see [docs](http://

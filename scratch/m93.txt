@@ -1,0 +1,54 @@
+SEMANTIC-1: a transform nobody pointed at went from DISCOVERED to SCREENED, and the first run failed because of a defect in my layer
+
+P-5 is reached. calculus.derive was DISCOVERED by the brand-shape surface scan with no name supplied,
+WITNESSED from an existing test with no hand-written driver, COUNTERFACTUALIZED over 22 cells minted
+through the production constructors, CONTRACT-RESOLVED against calculus.mjs at digest 8988942c5701be7b
+and SCREENED as INVARIANT_HELD on three coordinates. Human points to function has left the pipeline.
+What has NOT left it is the criterion: the contract is still human testimony, and the claim is
+precisely that the driver is gone rather than the contract.
+
+Roles are established from what each call DID and not from what it is called. derive is a TRANSDUCER
+on 8 calls and a CONSUMER on 9, the same function in different roles, because the role is a property
+of the call. observe never consumes, isAuthority never produces, and none of that was told to the
+screen.
+
+Track C's positive control fired on real code: 50 decisions unchanged under a real perturbation
+against 13 changed, with isAuthority at 0 required and 12 irrelevant, because no fact of a token
+changes whether it IS a token. A screen that convicted every perturbation would have scored twelve
+findings there.
+
+AND THE FIRST RUN FAILED P-5 BECAUSE OF A DEFECT IN MY LAYER. I was counting the target's own
+configuration facts, a rule name and a claim string, as a third input group, so two of three groups
+carried the coordinate, every derive call came out SOME_OF(2/3) and ALL_OF was structurally
+unreachable for anything in the repository. The repair is structural rather than a tuning: an input
+group is a node a recorded call CONSTRUCTED and handed in, which is the non-root nodes, while the
+root's own scalars are facts about the operation and not premises of an aggregation over premises.
+That is the sixth consecutive slice where a control or a run found a defect in the instrument rather
+than in the subject.
+
+UNMAPPABLE is 0 on the real tree after the repair, which makes it a state never shown to work, so a
+control forces it: an observation of SOME_OF(2/3) against a vocabulary with no such word resolves
+UNMAPPABLE, not coerced to UNKNOWN and not coerced to the nearest available word. CHARACTERIZED means
+measured with no established contract; UNMAPPABLE means measured and the specification has no
+vocabulary for it. They are different facts.
+
+P-3 blocks self-ratification by construction. A contract is refused at construction if it lacks
+source, provenance or validAgainst, and validAgainst is a digest of the subject's bytes. Proven on
+real bytes: a contract that convicts, then the implementation is edited, then the contract can
+neither convict NOR absolve. The absolve half is the one usually forgotten.
+
+S-8 makes module resolution a coordinate: 256 STATIC_LINKED, 0 DYNAMIC_LINKED, 4 UNRESOLVED and
+RUNTIME_ONLY explicitly NOT MEASURED. The four are dynamic imports whose target acorn cannot
+establish, and they are unresolved rather than absent.
+
+The surface total moved from 15 to 18 because the INSTRUMENT grew from 5 to 8; the subject count is
+unchanged at 10, which is why the split exists.
+
+The differential comparison against the calculus as a specification, and the semantic bridge, arrived
+mid-slice and are NOT folded into this frozen preregistration. They are preregistered separately.
+
+Focused 15/15. Suite 661/661.
+
+Message-File: scratch/m93.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

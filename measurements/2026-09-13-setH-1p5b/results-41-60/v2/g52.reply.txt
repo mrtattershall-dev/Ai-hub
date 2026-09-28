@@ -1,0 +1,12 @@
+text):
+    out = {}
+    for line in text.split("\n"):
+        if line.strip() == "":
+            continue
+        try:
+            d = parse_line(line)
+            hour = d["time"].split(":")[0]
+            out[hour] = out.get(hour, 0) + 1
+        except ValueError:
+            pass
+    return sorted(out.items(), key=lambda kv: (-kv[1], kv[0]))

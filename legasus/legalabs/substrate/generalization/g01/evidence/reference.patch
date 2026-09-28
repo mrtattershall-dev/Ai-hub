@@ -1,0 +1,15 @@
+--- op op1 after: "        self._seen = {}\n"
+        self._rare = set()
+
+--- op op2 after: "        return len(self._seen)\n"
+
+    def mark_rare(self, word):
+        self._rare.add(str(word).strip().lower())
+
+--- op op3 after: "lf._seen.get(str(w).strip().lower(), 0)\n"
+
+    def is_rare(self, word):
+        return str(word).strip().lower() in self._rare
+
+    def rare_count(self):
+        return len(self._rare)

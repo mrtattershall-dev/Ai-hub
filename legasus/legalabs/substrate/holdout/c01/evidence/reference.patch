@@ -1,0 +1,14 @@
+--- op op1 after: "        self._active = []\n"
+        self._waiting = []
+
+--- op op2 after: "e):\n        return name in self._active\n"
+
+    def wait(self, name):
+        if name not in self._waiting:
+            self._waiting.append(name)
+
+    def waiting_count(self):
+        return len(self._waiting)
+
+    def is_waiting(self, name):
+        return name in self._waiting

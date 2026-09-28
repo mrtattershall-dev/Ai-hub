@@ -1,0 +1,43 @@
+Freeze the specimen and complete step 1: the destruction is not an authority failure
+
+Two records, no integration, trunk untouched.
+
+SPECIMEN_FREEZE.md preserves what TRANSFER-2 was run against - revision 143772c, mechanism digest
+0784cd3f4e3970b3, the clean-room composition, the environment, and the results with their caveat that
+64 of 90 entries leave their effects unestablished. On the owner's correction: importing the calculus
+does not retroactively invalidate that run; it changes the status of runs AFTER the import, against
+the branch that imported it. Screening the frozen specimen stays independent evidence of transfer,
+while screening an integrated branch would be integration testing. Three of my own overclaims are
+corrected in the file - that the independence would be irrecoverably spent, that one overlapping file
+made the merge nearly free when it only estimated textual conflict against 41 changed server files,
+and that the effect cluster IS the hub's irreversible-action boundary when it is a set of leads.
+
+DESTRUCTION_STEP1.md establishes the denominator by computing it rather than quoting it. Roughly a
+third is 16 of 48 for one model in one set, where the denominator is steps whose feature worked when
+written; the other model's 75 percent is over n equals 4 and is not a rate. The sixteen split into
+nine where a named symbol that existed and worked is simply gone and seven where behaviour regressed
+with the symbol still present, and s4_markdown.py to_html was destroyed three separate times with
+three commit states, corroborated from a different set by the peek() case identified in git history.
+
+AND THE FINDING RESHAPES THE EXPERIMENT. The hub ALREADY DETECTS this class: agent.js imports
+lostDefs and lostExports from defNames.js, and on a write that drops an export it appends a warning
+sentence to the model's prompt and pushes a note into the run record. The write proceeds. So for all
+nine symbol-loss cases the agent was permitted, the loss was detected, and the write happened anyway
+- which means an authority token minted from "this agent may write this file" would have prevented
+NONE of the sixteen. The owner's caution that permission to write is not evidence that the write is
+acceptable arrives here as a measurement rather than a worry.
+
+The prediction is therefore stated before anything is built: the small baseline, which is making the
+detection that already exists decide instead of advise, prevents most of the nine, and Legasus adds
+nothing to those on its own. Its only testable contribution is whether the preservation obligation
+can be made part of what minting requires rather than bolted beside the write, whether it covers
+ALTERNATE ROUTES where a bolted-on refusal historically fails here, and the seven behaviour cases a
+symbol-existence check cannot see.
+
+Step 2, tracing the complete action path including bypass routes, is next and is measurement. Steps 3
+through 5 get their preregistration after it, because the bypass structure determines what the
+baseline must cover and therefore what the comparison means.
+
+Message-File: scratch/m123.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

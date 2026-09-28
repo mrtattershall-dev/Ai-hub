@@ -1,0 +1,30 @@
+Measure the backdoor detector's 1-of-4: the cause is wrapper indirection, not the threshold, and my explanation was wrong
+
+RESULT.transfer-2.md said three of the four aggregate exports failed the half-the-properties
+threshold and that whether they differ in shape or the threshold is too strict was unmeasured.
+Measured now, and the threshold has nothing to do with it.
+
+The one that was caught lists its private bindings as bare identifier references. The three that were
+missed wrap each binding in an arrow - autoTools returning a new Set, collect calling
+collectGodotFiles, brake calling supervisorBrake - so their value nodes are ArrowFunctionExpression
+and my filter, which keeps only Identifier values, drops them all. Their property list comes out
+EMPTY and the length guard declines before any threshold is consulted. A getter is dropped the same
+way.
+
+So the detector recognises re-export by REFERENCE and not re-export by WRAPPER, though both expose
+the same module-private binding.
+
+AND THAT IS THE SAME DEFECT AS EVERYTHING ELSE TODAY: an incidental property of the representation,
+whether the author wrote a bare reference or an arrow that calls it, was allowed to decide a semantic
+classification. It is the readable brand, the name-keyed admission, the consumer-count backdoor rule
+and String(v) again - this time inside the detector written to find that family.
+
+NOT FIXED. Widening the rule to count wrapper bodies would be fitting it to the three specimens that
+exposed it, and the honest sensitivity number is the one measured before the fix. What changes is
+only that the cause is known rather than guessed. A repair needs its own preregistration with a
+falsifier and a specimen set not drawn from these four, or the next recall figure measures the
+fixture again, which is the finding that started this.
+
+Message-File: scratch/m122.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

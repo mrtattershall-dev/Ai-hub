@@ -1,0 +1,27 @@
+Run the preregistered composition attacks: 25/25 reproduce, every control holds, zero falsified
+
+Six attack files, each assertion stating the PREDICTED DEFECT from a62b1c4 and each beside a
+control that refuses the neighbouring case. Run against aa03ab9 unmodified. All twenty-five held.
+
+Four instances of authority appearing under composition, in deciding paths, beyond the pytest case
+that motivated the hypothesis: a null intermediate launders a context dimension through entitled()
+while the direct edge is refused (C1); node identity excludes scope, so a second add() moves the
+referent under an existing dependent without invalidating it (C7); admission is keyed by name, so a
+pytest-argued dimension blocks joins between git records (C4); the provenance ledger keeps the LAST
+binding for a digest and reports no conflict (C8-a). And six representational holes: absence means
+"for all" in the calculus and "never established" in the graph (C2); the mint symbol is readable off
+any real token and a forgery then traces to OWNER (C3); the reserved key UNADMITTED is admissible and
+then manufactures NOT_COMPARABLE (C5); a carried value shadowed by a top-level value vanishes (C6);
+the seal covers digests and not attributions (C8-b); an irrelevant pending string holds the contest
+OPEN with zero objectives (C9-a). One duplicated vocabulary entry (C10).
+
+Zero predictions failed. Recorded plainly: the predictions came from reading the implementations,
+so full reproduction is what accurate reading yields and is not evidence the reading was complete.
+Measured beside the run: calculus.mjs has no production importer (the quiesce-check scan's hit is
+its own file list), no production caller consumes add()'s return, and no artifact stores node ids.
+
+Nothing is repaired in this commit. The result file is written before any repair and stays as is.
+
+Message-File: scratch/m26.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

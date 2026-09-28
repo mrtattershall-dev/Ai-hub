@@ -1,0 +1,60 @@
+{
+  "task_id": "d01",
+  "analogy_class": "no_supported_analogy",
+  "analogy_justification": "no existing function in this file retains anything between calls - normalize, word_count and initials are each a pure transformation of their argument - so there is no structural relation for the requested across-call memory to parallel",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the across-call store the new behaviour needs",
+        "site_hint": "# Small text helpers.\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the counting function, using that store",
+        "site_hint": "\".join(w[0] for w in normalize(s).split() if w)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "novel-state-feature",
+    "affected_region_lines": 10
+  },
+  "reference": {
+    "source_hash": "895c67b02218386741459b7d3533a121a8b0b7810a9aebc55b28f6c581fbe692",
+    "reference_hash": "3cb29deac71fe7b1e175cf00cb34b03f69afa8ff36dee86e1fa1195f6ec0c010",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

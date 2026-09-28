@@ -1,0 +1,30 @@
+  S_UPPER     req n < 10    pres n == 3   overlap SATISFIABLE winner existing   probes 16
+  S_LOWER     req n > 100   pres n == 200 overlap SATISFIABLE winner existing   probes 13
+  S_IVAL      req n < 10    pres n < 0    overlap SATISFIABLE winner existing   probes 13
+  S_STRADDLE/SILENT NOTE: `if n <= 10:` is a LEGAL realization here (605 inputs agree with the contract) - the preserved guard makes it unreachable, so it is not a mutant on this shape
+  S_STRADDLE  req n < 10    pres n > 5    overlap SATISFIABLE winner existing   probes 13
+  S_STRADDLE/NEGATED NOTE: `if n <= 10:` is a LEGAL realization here (605 inputs agree with the contract) - the preserved guard makes it unreachable, so it is not a mutant on this shape
+  S_STRADDLE/EXTENT NOTE: `if n <= 10:` is a LEGAL realization here (605 inputs agree with the contract) - the preserved guard makes it unreachable, so it is not a mutant on this shape
+  controls ok: every shape poses a real precedence question, both renderings plan identically, two legal realizations pass the contract probes and three mutants die
+  RULE 3 ok: qwen2.5-coder:14b
+  12 cells x 1 models   samples 20
+
+  qwen2.5-coder:14b    S_UPPER    SILENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_UPPER    NEGATED     authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_UPPER    EXTENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_LOWER    SILENT      authorized 20/20   verified  0   PRIMARY too-narrow 20   too-wide 0   P(c|auth) 0.00
+  qwen2.5-coder:14b    S_LOWER    NEGATED     authorized 20/20   verified  6   PRIMARY too-narrow 14   too-wide 0   P(c|auth) 0.30
+  qwen2.5-coder:14b    S_LOWER    EXTENT      authorized 20/20   verified 18   PRIMARY too-narrow  2   too-wide 0   P(c|auth) 0.90
+  qwen2.5-coder:14b    S_IVAL     SILENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_IVAL     NEGATED     authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_IVAL     EXTENT      authorized 20/20   verified 20   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_STRADDLE SILENT      authorized  2/20   verified  2   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+  qwen2.5-coder:14b    S_STRADDLE NEGATED     authorized  0/20   verified  0   PRIMARY too-narrow  0   too-wide 0   P(c|auth)  n/a
+  qwen2.5-coder:14b    S_STRADDLE EXTENT      authorized  4/20   verified  4   PRIMARY too-narrow  0   too-wide 0   P(c|auth) 1.00
+
+  qwen2.5-coder:14b     proposal-yield 0.775   authorization-precision 0.806   verification-rate 0.625
+      SILENT    PRIMARY too-narrow 20/80   too-wide 0   authorized 62   verified 42
+      NEGATED   PRIMARY too-narrow 14/80   too-wide 0   authorized 60   verified 46
+      EXTENT    PRIMARY too-narrow  2/80   too-wide 0   authorized 64   verified 62
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.openend14.json

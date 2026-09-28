@@ -1,0 +1,2907 @@
+{
+ "models": [
+  "qwen2.5-coder:14b"
+ ],
+ "samples": 20,
+ "temperature": 0.6,
+ "cells": {
+  "qwen2.5-coder:14b|S_UPPER/SILENT": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_UPPER",
+   "render": "SILENT",
+   "probes": 16,
+   "seconds": 121.59,
+   "authorized": 20,
+   "verified": 20,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 0,
+   "too_wide": 0,
+   "realizations": 1,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_UPPER/NEGATED": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_UPPER",
+   "render": "NEGATED",
+   "probes": 16,
+   "seconds": 29.975,
+   "authorized": 20,
+   "verified": 20,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 0,
+   "too_wide": 0,
+   "realizations": 1,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_UPPER/EXTENT": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_UPPER",
+   "render": "EXTENT",
+   "probes": 16,
+   "seconds": 30.211,
+   "authorized": 20,
+   "verified": 20,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 0,
+   "too_wide": 0,
+   "realizations": 1,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_LOWER/SILENT": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_LOWER",
+   "render": "SILENT",
+   "probes": 13,
+   "seconds": 31.449,
+   "authorized": 20,
+   "verified": 0,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 20,
+   "too_wide": 0,
+   "realizations": 1,
+   "commit_integrity": 0,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_LOWER/NEGATED": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_LOWER",
+   "render": "NEGATED",
+   "probes": 13,
+   "seconds": 32.486,
+   "authorized": 20,
+   "verified": 6,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 14,
+   "too_wide": 0,
+   "realizations": 2,
+   "commit_integrity": 0.3,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_LOWER/EXTENT": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_LOWER",
+   "render": "EXTENT",
+   "probes": 13,
+   "seconds": 33.653,
+   "authorized": 20,
+   "verified": 18,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 2,
+   "too_wide": 0,
+   "realizations": 2,
+   "commit_integrity": 0.9,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "too_narrow": true,
+     "too_wide": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_IVAL/SILENT": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_IVAL",
+   "render": "SILENT",
+   "probes": 13,
+   "seconds": 28.731,
+   "authorized": 20,
+   "verified": 20,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 0,
+   "too_wide": 0,
+   "realizations": 1,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_IVAL/NEGATED": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_IVAL",
+   "render": "NEGATED",
+   "probes": 13,
+   "seconds": 29.781,
+   "authorized": 20,
+   "verified": 20,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 0,
+   "too_wide": 0,
+   "realizations": 2,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_IVAL/EXTENT": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_IVAL",
+   "render": "EXTENT",
+   "probes": 13,
+   "seconds": 28.781,
+   "authorized": 20,
+   "verified": 20,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 0,
+   "too_wide": 0,
+   "realizations": 1,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_STRADDLE/SILENT": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_STRADDLE",
+   "render": "SILENT",
+   "probes": 13,
+   "seconds": 22.487,
+   "authorized": 2,
+   "verified": 2,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 0,
+   "too_wide": 0,
+   "realizations": 2,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n <= 5",
+     "code": "if n < 10 and n <= 5: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_STRADDLE/NEGATED": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_STRADDLE",
+   "render": "NEGATED",
+   "probes": 13,
+   "seconds": 20.689,
+   "authorized": 0,
+   "verified": 0,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 0,
+   "too_wide": 0,
+   "realizations": 3,
+   "commit_integrity": null,
+   "rows": [
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\nelif n <= 5:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 0",
+     "raw": "```python\n    elif n > 0:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 0",
+     "raw": "```python\nelif n > 0:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 0",
+     "raw": "```python\n    elif n > 0:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\nelif n <= 5:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 0",
+     "raw": "```python\n    elif n > 0:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 0",
+     "raw": "```python\n    elif n > 0:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 0",
+     "raw": "```python\n    elif n > 0:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|S_STRADDLE/EXTENT": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "shape": "S_STRADDLE",
+   "render": "EXTENT",
+   "probes": 13,
+   "seconds": 22.335,
+   "authorized": 4,
+   "verified": 4,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "too_narrow": 0,
+   "too_wide": 0,
+   "realizations": 2,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n <= 5",
+     "code": "if n <= 5: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n <= 5",
+     "code": "if n <= 5: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n <= 5",
+     "raw": "```python\n    elif n <= 5:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n <= 5",
+     "code": "if n <= 5: return \"small\"",
+     "verified": true,
+     "too_narrow": false,
+     "too_wide": false,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    }
+   ]
+  }
+ }
+}

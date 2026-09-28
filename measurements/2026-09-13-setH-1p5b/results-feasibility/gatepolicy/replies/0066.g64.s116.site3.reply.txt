@@ -1,0 +1,32 @@
+if ordered_items:
+                flush_ordered_list()
+            continue
+        if line.startswith("1. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("2. "):  # Assuming this is the next number in a sequence
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("3. "):  # And so on for additional numbers
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("4. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("5. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("6. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        # END OF ADDED CODE
+        if line.strip() == "":
+            flush_ordered_list()  # Close an open ordered list with a blank line
+            flush_para()
+            flush_list()

@@ -1,0 +1,33 @@
+COLUMN_TYPES = ["plain", "quoted"]
+
+TYPE_LABELS = {"plain": "text", "quoted": "quoted text", "date": "date"}
+
+
+def _fmt_quoted(v):
+    return "\"" + str(v).replace("\"", "\"\"") + "\""
+
+
+def label(t):
+    return TYPE_LABELS.get(t, "unknown")
+
+
+def _fmt_date(v):
+    y, m, d = v
+    return "%04d-%02d-%02d" % (y, m, d)
+
+
+def valid_types(types):
+    return all(t in COLUMN_TYPES for t in types)
+
+
+def format_row(values, types):
+    out = []
+    for v, t in zip(values, types):
+        if t == "quoted":
+            out.append(_fmt_quoted(v))
+            continue
+        if t == "date":
+            out.append(_fmt_date(v))
+            continue
+        out.append(str(v))
+    return ",".join(out)

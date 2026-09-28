@@ -1,0 +1,76 @@
+  COUNTERFACTUAL REPLAY - preserved snippets only, no model calls
+
+  g64 s31   boundary at site 5 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g64 s32   aborted_without_boundary
+  g64 s33   DELTA_INCOMPLETE
+  g64 s34   boundary at site 6 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   FAILS
+        => MULTIPLE_DEFECTS
+  g64 s35   boundary at site 2 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   holds
+        => LOCAL_SNIPPET_DEFECT
+  g64 s36   aborted_without_boundary
+  g64 s37   aborted_without_boundary
+  g64 s38   DELTA_INCOMPLETE
+  g74 s31   boundary at site 3 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   FAILS
+        => MULTIPLE_DEFECTS
+  g74 s32   DELTA_INCOMPLETE
+  g74 s33   boundary at site 2 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   FAILS
+        => MULTIPLE_DEFECTS
+  g74 s34   boundary at site 2 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   FAILS
+        => MULTIPLE_DEFECTS
+  g74 s35   DELTA_INCOMPLETE
+  g74 s36   DELTA_INCOMPLETE
+  g74 s37   DELTA_INCOMPLETE
+  g74 s38   boundary at site 2 (PRESERVATION_BOUNDARY)
+        (a) model pre + model k       FAILS  <- reproduced
+        (b) REFERENCE pre + model k   FAILS
+        (c) model pre + REFERENCE k   FAILS
+        => MULTIPLE_DEFECTS
+
+===== CAUSAL TALLY =====
+  6x  DELTA_INCOMPLETE
+  5x  MULTIPLE_DEFECTS
+  3x  aborted_without_boundary
+  2x  LOCAL_SNIPPET_DEFECT
+
+===== ENDPOINT EQUIVALENCE vs CAUSAL EQUIVALENCE =====
+  same cause   64 | site 5: anchor_ambiguous (2 occurrences)
+      seed 32  depth 4  boundary site null  aborted_without_boundary
+      seed 36  depth 4  boundary site null  aborted_without_boundary
+      seed 37  depth 4  boundary site null  aborted_without_boundary
+  same cause   64 | DELTA: ordered lists not rendered: A False
+B False
+C Fal
+      seed 33  depth 7  boundary site null  DELTA_INCOMPLETE
+      seed 38  depth 7  boundary site null  DELTA_INCOMPLETE
+  same cause   74 | DELTA: fenced block not rendered, escaped, with line break
+      seed 32  depth 3  boundary site null  DELTA_INCOMPLETE
+      seed 35  depth 3  boundary site null  DELTA_INCOMPLETE
+      seed 36  depth 3  boundary site null  DELTA_INCOMPLETE
+      seed 37  depth 3  boundary site null  DELTA_INCOMPLETE
+  same cause   74 | site 2 broke old behaviour: REGFAIL 'a\nb' -> '<p>a a b b<
+      seed 33  depth 2  boundary site 2  MULTIPLE_DEFECTS
+      seed 38  depth 2  boundary site 2  MULTIPLE_DEFECTS
+
+  every shared endpoint signature also shares its cause, in this panel.
+
+  FIRST_FAILING_SITE is the earliest causal BOUNDARY, not a proof that the site is bad.
+  Only (b) implicates the snippet itself; (c) failing points the burden upstream of k.

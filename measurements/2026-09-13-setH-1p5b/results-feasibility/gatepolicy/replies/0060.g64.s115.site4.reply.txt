@@ -1,0 +1,55 @@
+if items:
+                flush_ordered_list()
+            ol_items.append(line[2:].strip())
+            continue
+        if re.match(r"^\d+\. ", line):
+            flush_para()
+            # BEGIN SOLUTION
+            if ol_items:
+                flush_ordered_list()
+            ol_items.append(line[3:].strip())
+            # END SOLUTION
+            continue
+        flush_ordered_list()  # Added to close any open ordered list before starting a new paragraph or heading
+        flush_list()
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    # BEGIN SOLUTION
+    flush_ordered_list()  # Added to close any open ordered list at the end of the document
+    # END SOLUTION
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+# BEGIN SOLUTION
+def _escape(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+def _inline(text):
+    codes = []
+    links = []
+    def take_code(m):
+        codes.append("<code>" + _escape(m.group(1)) + "</code>")
+        return _CODE % (len(codes) - 1)
+    text = re.sub(r"`([^`]*)`", take_code, text)
+    def take_link(m):
+        label = _escape(m.group(1))
+        url = _escape(m.group(2)).replace('"', "&quot;")
+        links

@@ -1,0 +1,12 @@
+{
+  "task_id": "k04",
+  "goal": "Add a doubled step to the EXISTING stepping.py: DOUBLE holds twice STEP when the module is imported, and doubled() returns it. Keep STEP and step working exactly as they do now. Run it with python.",
+  "lead": "stepping.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the doubled step is assembled the same way as the existing step is declared",
+  "interface": [
+    "DOUBLE",
+    "doubled"
+  ]
+}

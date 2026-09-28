@@ -1,0 +1,33 @@
+Preregister v3 slice 2: generate counterfactuals upstream of authority issuance, through the production constructor
+
+Slice 1 ended with HEAD unmeasurable because the perturbation built a modified copy of a token and
+the C3 repair makes a copy not a token. The owner's reading is adopted: a secure authority object
+and a screenable one have conflicting requirements unless counterfactuals are generated upstream of
+authority issuance. So the screen stops mutating authority objects and instead mutates the facts
+those objects are minted from, obtaining a second genuinely valid object from the same production
+constructor.
+
+The hard constraint is stated first because it is the one worth breaking the slice over: no
+backdoor. No forge-for-testing, no exported mint, no privileged path. If the only way to make this
+work were a test-only API, the correct outcome is to abandon the slice, because that API would
+weaken the exact property being screened. Security becomes part of experimental validity - the
+screen proves its counterfactual by legitimately obtaining another token through the secure path,
+and is bound by Legasus's authority laws more tightly than anything else rather than exempt from
+them.
+
+Six predictions. The decisive one is that HEAD becomes measurable, yielding ALL_OF where slice 1
+reported four unobservable and UNKNOWN; if that fails, moving the intervention upstream does not
+resolve the tension and the slice is recorded as not working. Baseline replay is a precondition: a
+construction path that cannot reproduce its own recorded observation scores nothing. Every
+non-observed outcome is tagged with its own reason and scores zero, which takes hazard 3 out of the
+probe author's memory and into the substrate. And a minimal anti-self-ratification rule at the
+contract layer: a declared aggregation must name the authority it came from, or it is not
+comparable - with the owner's fuller requirement, that the declaration also pin the state it is
+valid against so implementation and criterion cannot move together, recorded as not built.
+
+Then stop and inspect. No AST discovery, no transform surface, no path invariants, no
+repository-wide run.
+
+Message-File: scratch/m80.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

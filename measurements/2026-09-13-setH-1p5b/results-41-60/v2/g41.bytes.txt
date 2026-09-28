@@ -1,0 +1,90 @@
+// CANONICAL REFERENCE - cumulative correct state after setH goals 1, 11, 21, 31.
+// Goal 41 onward is HELD OUT and deliberately not implemented here.
+//
+//   goal  1  addBook(isbn, title, copies = 1), copies(isbn), titles()
+//   goal 11  checkout(isbn, member), available(isbn)
+//   goal 21  returnBook(isbn, member), loans(member)
+//   goal 31  placeHold(isbn, member), holds(isbn), and a returned copy goes to the queue head
+class Library {
+  constructor() {
+    this.books = new Map();   // isbn -> { title, copies }
+    this.loansByIsbn = new Map(); // isbn -> Set(member)
+    this.queues = new Map();  // isbn -> [member]
+  }
+
+  addBook(isbn, title, copies = 1) {
+    if (!Number.isInteger(copies) || copies <= 0) {
+      throw new Error('copies must be a positive integer');
+    }
+    const existing = this.books.get(isbn);
+    if (existing) existing.copies += copies;       // keeps the FIRST title
+    else this.books.set(isbn, { title, copies });
+  }
+
+  copies(isbn) {
+    const b = this.books.get(isbn);
+    return b ? b.copies : 0;
+  }
+
+  titles() {
+    return [...this.books.values()].map((b) => b.title).sort();
+  }
+
+  available(isbn) {
+    const out = this.loansByIsbn.get(isbn);
+    return this.copies(isbn) - (out ? out.size : 0);
+  }
+
+  checkout(isbn, member) {
+    if (!this.books.has(isbn)) throw new Error('unknown isbn');
+    const out = this.loansByIsbn.get(isbn) || new Set();
+    if (out.has(member)) throw new Error('member already has that book');
+    if (this.available(isbn) <= 0) throw new Error('no copy available');
+    out.add(member);
+    this.loansByIsbn.set(isbn, out);
+  }
+
+  returnBook(isbn, member) {
+    const out = this.loansByIsbn.get(isbn);
+    if (!out || !out.has(member)) throw new Error('member does not have that book');
+    out.delete(member);
+    // goal 31: a returned copy passes straight to the head of the queue as a new loan.
+    const q = this.queues.get(isbn);
+    if (q && q.length) {
+      const next = q.shift();
+      out.add(next);
+    }
+    this.loansByIsbn.set(isbn, out);
+  }
+
+  loans(member) {
+    const out = [];
+    for (const [isbn, members] of this.loansByIsbn) if (members.has(member)) out.push(isbn);
+    return out.sort();
+  }
+
+  placeHold(isbn, member) {
+    if (!this.books.has(isbn)) throw new Error('unknown isbn');
+    if (this.available(isbn) > 0) throw new Error('a copy is available');
+    const out = this.loansByIsbn.get(isbn);
+    if (out && out.has(member)) throw new Error('member already has that book');
+    const q = this.queues.get(isbn) || [];
+    if (q.includes(member)) throw new Error('member already holds that book');
+    q.push(member);
+    this.queues.set(isbn, q);
+  }
+
+  holds(isbn) {
+    return [...(this.queues.get(isbn) || [])];
+  }
+
+  dueDay(isbn) {
+    const loan = this.loansByIsbn.get(isbn);
+    if (!loan) throw new Error('unknown isbn');
+    const member = loan.values().next().value;
+    // goal 41: calculate the due date based on a specific algorithm, which is deliberately not implemented here.
+    return new Date();
+  }
+}
+
+module.exports = { Library };

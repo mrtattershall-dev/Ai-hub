@@ -1,0 +1,60 @@
+{
+  "task_id": "k02",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing size helper as the relation to parallel; that feature reads the shared collection, and the new value occupies the same position",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "a module statement requiring `values`, NOT the parameter `value`",
+        "site_hint": "def size():\n    return len(values)\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the accessor",
+        "site_hint": "# Statistics.\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 8
+  },
+  "reference": {
+    "source_hash": "20b1446ff2c8762e3b1b4623a23e4795598529f07f1077e993d0db61f1c310fa",
+    "reference_hash": "e3d919df86e7002f8c45f1488bae42c145dbc078a0a8a44c71c57f1b06dd7f81",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

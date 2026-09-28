@@ -1,0 +1,17 @@
+--- op op1 after: "    out = []\n"
+    held = None
+
+--- op op2 after: "     if not piece:\n            continue\n"
+        if held is not None:
+            held.append(piece)
+            if piece.endswith('"'):
+                out.append(" ".join(held).strip('"'))
+                held = None
+            continue
+        if piece.startswith('"') and not piece.endswith('"'):
+            held = [piece]
+            continue
+
+--- op op3 after: "        out.append(piece)\n"
+    if held is not None:
+        out.append(" ".join(held).strip('"'))

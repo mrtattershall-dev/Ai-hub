@@ -1,0 +1,13 @@
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { runProducer } from '../legasus/legaexternal/producer.mjs';
+const NL=String.fromCharCode(10), PKG='extfix';
+const dir=mkdtempSync(join(tmpdir(),'cnt-'));
+mkdirSync(join(dir,PKG),{recursive:true});
+writeFileSync(join(dir,PKG,'__init__.py'),'','utf8');
+writeFileSync(join(dir,PKG,'m.py'),['def good():','    """','    >>> shared()',"    'ok'",'    """','    return 1','','def bad():','    """','    >>> shared()',"    'THIS IS WRONG'",'    """','    return 2','','def noisy():','    """','    >>> print("subject chatter"); shared()','    subject chatter',"    'ok'",'    """','    return 3','','def shared():','    return "ok"',''].join(NL),'utf8');
+const p=runProducer({rootDir:dir,modules:[PKG+'.m']});
+console.log('ok:',p.ok,' records:',p.records?p.records.length:0,' subjectBytes:',p.subjectBytes);
+for(const r of p.records||[]) console.log('  '+r.identity.document+'#'+r.identity.ordinal+'  '+r.nativeResult+'  '+JSON.stringify(r.source));
+rmSync(dir,{recursive:true,force:true});

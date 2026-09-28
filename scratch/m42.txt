@@ -1,0 +1,31 @@
+Run the wave-3 attacks: both predictions of NO defect held, all four predicted calculus defects reproduced, and the first retirement scanner was wrong
+
+Twelve assertions from 7c49fae against 2894308 unmodified, all held. covers() is transitive over
+all 4,096 triples of 4-valued pairs on two dimensions, with non-vacuity shown (triples where A covers
+B but not C exist); the ledger does not reconcile FALSIFIED@S0 with VERIFIED@S1 by recency in either
+path, and neither world lends reliance to the other. Those two were predicted to HOLD and did.
+Delegation widened the world a grant applies in ({repository: S1} to {}); narrow() moved an
+established dimension S1 to S2 and stayed authority; commit() committed on an OBSERVE token; and
+derive() minted NORMATIVE-with-grant or EPISTEMIC-without depending on argument order. Those four
+were predicted defects and reproduced.
+
+Twenty-one defect predictions and two no-defect predictions, none falsified. Two no-defect probes on
+simply structured mechanisms is a favourable and thin calibration, not a reliable one; said so in
+the result file.
+
+The retirement scanner's first version reported all six candidates retirable. It was wrong for two,
+in the direction its control could not see: score-constraints.mjs loads its deriver from argv with
+'./constraints.mjs' as the default, a dynamic path through a variable that neither a static import
+scan nor an import() scan sees. Found by grepping the string by hand after the scanner's R1 line
+disagreed with an earlier grep. The result file records the first scanner's output, the hand scan,
+and the reading: constraints.mjs and score-constraints.mjs stay; constraints2, 4, 5 and opcontext2
+are each named only by the frozen record of their own revision. Also recorded: a regex probed
+through node -e collapsed its own backslash while investigating the scanner - the probe was not
+trusted, the scanner's control was.
+
+The calculus attack file in this commit is the version that ran. Its flipped form lands with the
+repairs.
+
+Message-File: scratch/m42.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

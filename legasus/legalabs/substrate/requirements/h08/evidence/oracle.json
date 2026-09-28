@@ -1,0 +1,72 @@
+{
+  "task_id": "h08",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing area computation as the relation to parallel; that feature reads the shared constants at module level, and the new value occupies the same position",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the rounding helper",
+        "site_hint": "RADIUS = 2\n"
+      },
+      {
+        "id": "op2",
+        "intent": "a statement whose requirements are ALL resolvable in the program",
+        "site_hint": "def area():\n    return PI * RADIUS * RADIUS\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the accessor",
+        "site_hint": "# Geometry with a local constant.\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op2",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 13
+  },
+  "reference": {
+    "source_hash": "12f374fe8ef844bb4d4697d8e34c32cd96b5bd52fb6569c65a18a6db36b6a555",
+    "reference_hash": "53ace3fae3f739fe14798c598836d4048aa49c7c0156155d991224baabb185b1",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

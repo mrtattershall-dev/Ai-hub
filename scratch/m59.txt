@@ -1,0 +1,36 @@
+Report which level has been earned, and freeze the cross-module state-word inventory
+
+The four levels are computed rather than asserted, and the live answer is weaker than QUIESCENT
+sounded: LEVEL EARNED is NO_CURRENT_OBJECTIVE. FRONTIER_EXHAUSTED is NOT earned, because exactly one
+of the eight represented questions - INSTRUMENT_CLASSES_FOR_THE_RIGS - is UNKNOWN-classed and so is
+neither resolved nor blocked. NAMED_COVERAGE_EXHAUSTED is not earned because coverage needs an
+outside witness and instruments.mjs reports the rigs' classes as UNKNOWN; coverageEstablished is
+passed as null on purpose and UNKNOWN is never a quiet yes. COMPLETE is NOT_REPRESENTABLE rather
+than false, because returning false would imply the question had been evaluated. AT-1 is asserted
+against the REAL entries parsed from quiesce-check, not a fixture of mine, and controls show a fully
+blocked frontier does earn level 2, coverage earns level 3, an OPEN contest earns nothing, and
+attainment changes no verdict.
+
+The vocabulary guard is the weak achievable form of the compounding property, and it exists because
+this session falsified the strong form. C4 - authority transferred because two strings matched - was
+repaired at a31046c, and four commits later the C8 repair exported CONTESTED from provenance.mjs
+against the ledger's STATE.CONTESTED, whose meaning carries an obligation, and the obligation
+travelled. C4's guard was producer-keyed promotion inside one module: it guarded a mechanism while
+the ledger called it a class. Mechanizing an instance does not mechanize its class. So the inventory
+of cross-module state words is frozen at its measured seven, and AT-7 proves by reconstruction that
+adding CONTESTED back makes it the eighth - the guard would have fired at the moment the real defect
+was introduced. It classifies nothing: an innocuous addition is reported identically, and the
+argument is the human step it forces.
+
+AT-8 FAILED ON ITS FIRST RUN AND THE FAILURE IS KEPT. The control added HELD as its innocuous word,
+but HELD is not in this inventory at all - it lives in legaexternal's adapt.mjs, nested deeper than
+the scan reaches - so it produced one owner and no collision, and the control asserted something
+that could not happen. Replaced with ESTABLISHED, measured as owned by exactly one module. The
+failure also produced AT-8b, which asserts the scan's blast radius is one directory and one nesting
+depth, so nobody reads a green inventory as no collisions anywhere.
+
+Focused 9/9. Suite 577/577.
+
+Message-File: scratch/m59.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

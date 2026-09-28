@@ -1,0 +1,38 @@
+preregister R1-R6: retirement of the replay path as an authority-boundary simplification
+
+THE QUESTION, stated so "grep found no callers" cannot answer it: can the replay path be removed without
+reducing any currently authorized capability, evidence production, verification or auditability? That
+distinguishes UNUSED CODE from OBSOLETE AUTHORITY.
+
+  R1  no live authority-bearing consumer requires replay-produced evidence
+  R2  removing replay cannot reduce currently supported producer/adapter evidence
+  R3  historical replay evidence remains interpretable and auditable AFTER the implementation is gone
+  R4  no fallback silently routes external-producer failure back through replay
+  R5  unsupported producer cases become explicit inability / UNKNOWN, never implicit replay
+  R6  the retirement analysis can DETECT a genuine live dependency
+
+R6 IS THE CONTROL. A scanner that always reports unused gives a beautiful retirement result and
+establishes nothing.
+
+R4 IS THE ONE TO ATTACK HARDEST. The dangerous architecture is: producer succeeds -> authoritative
+evidence; producer FAILS -> helpfully replay it ourselves. That grants the least trustworthy
+implementation authority PRECISELY WHEN the stronger producer becomes unavailable - losing information
+would increase entitlement, a textbook monotonicity violation. The correct shape is explicit
+non-knowledge, never Legasus impersonating the producer.
+
+RETIRING A MECHANISM IS NOT DELETING ITS HISTORY. Replay-produced evidence stays stamped
+producer=LEGASUS_DOCTEST_REPLAY and does not retroactively become CPython evidence. Migration test:
+delete the implementation, reload the historical record, prove provenance survives. If history becomes
+unreadable when its implementation disappears, the ledger was never preserving evidence independently of
+machinery.
+
+VERIFIED SUBTRACTION IS PROGRESS when it reduces duplicated authority while preserving the evidence-backed
+capability frontier - and only then. Deletion is not automatically progress.
+
+If a live consumer is found it is NOT ported reflexively; the consumer becomes the finding.
+
+Carried forward unerased: POSIX_FORK_INHERITANCE = UNTESTED.
+
+Message-File: scratch/m13.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -1,0 +1,5 @@
+#!/bin/sh
+# A POSIX shim, because a `#!/usr/bin/env node` hook is not portably executable here and failed OPEN -
+# git ran it, node did not, and the commit sailed through. A guard that fails open is worse than no guard,
+# because it is also reassuring.
+exec node "$(dirname "$0")/commit-msg.mjs" "$@"

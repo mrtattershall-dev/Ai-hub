@@ -1,0 +1,39 @@
+Preregister SEMANTIC-1: two tracks kept apart, a contract that goes stale when its subject moves, and no wiring of the calculus into production
+
+SURFACE-1 established that production paths consuming the authority calculus number zero, which
+settles that the repository is case B - the calculus is an executable specification rather than the
+production authority substrate. This slice does not touch that. Wiring the calculus into production
+to improve the screen would contaminate the architecture and would build software that is easy for
+its own scanner to read rather than a scanner that reads software.
+
+The three roles are discovered rather than named: a call that consumed no authority and produced
+some is a PRODUCER, one that consumed authority and produced none is a CONSUMER, one that did both is
+a TRANSDUCER, all decided by the subject's own brand predicate. The two tracks share the AUTO-CF-1
+experiment and differ only in what is read off the end, so the observer becomes a parameter - support
+coordinates for Track P, the output value itself for Track C. They are kept separate and no claim is
+made that they are one invariant.
+
+Track P infers a support formula from counterfactual cells with a deliberately tiny vocabulary,
+ALL_OF, ANY_OF, NTH, CONSTANT and UNKNOWN, where UNKNOWN is always available and is never a failure
+state. P-3 is the mechanical anti-self-ratification rule: a contract pins to a digest of its subject,
+so editing the implementation invalidates the criterion by construction and a stale contract can
+neither convict nor absolve. P-4 says an observed relation with no established contract is recorded
+as CHARACTERIZED, because the screen does not invent requirements.
+
+P-5 is the milestone the owner set: at least one mechanically discovered transform going all the way
+from DISCOVERED to SCREENED with no hand-written driver. It is preregistered with the qualification
+that the CONTRACT remains human testimony - what disappears is the driver, not the criterion.
+
+C-2 is the control that stops always-refuse from winning: at least one consumer case where a
+legitimately weakened authority input must leave the decision UNCHANGED because the removed
+coordinate is irrelevant. Without it a screen that convicts every perturbation would look perfect.
+
+S-8 makes module-resolution completeness an explicit coordinate rather than an absence, so a dynamic
+import acorn cannot resolve reads UNRESOLVED and the report looks gray rather than green.
+
+Backward discovery from effect sinks is named as NOT in this slice, so the surface stays
+one-directional and CAVEAT still stands.
+
+Message-File: scratch/m92.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

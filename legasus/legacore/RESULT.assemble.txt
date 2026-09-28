@@ -1,0 +1,37 @@
+  ok    NO LEAKAGE  case A package names no site, ordering or branch shape
+  ok    NO LEAKAGE  case B package names no site, ordering or branch shape
+  ok    NO LEAKAGE  the ambiguous package leaks nothing either
+  ok    SCANNER FIRES  on a line number   "Put the new guard at line 4."
+  ok    SCANNER FIRES  on an insertion point   "Try inserting after the zero check."
+  ok    SCANNER FIRES  on a branch keyword   "Use an elif for the new case."
+  ok    SCANNER FIRES  on a placement instruction   "Place it before the fall-through."
+  ok    SCANNER FIRES  on a check ordering   "You should check it first."
+  ok    SCANNER FIRES  on the reference   "Match the reference implementation."
+  ok    MUST DISTINGUISH  the packages differ only in the precedence ruling   ["  On inputs where both apply, the result must be \"zero\"."] vs ["  On inputs where both apply, the result must be \"small\"."]
+  ok    CASE A  rules the contested input to the existing result
+  ok    CASE B  rules the contested input to the requested result
+  ok    AMBIGUOUS  says so rather than ruling
+
+  --- case A package as the model would receive it
+      OBLIGATIONS FOR THIS CHANGE
+      
+      You are modifying `classify`.
+      
+      WHERE YOU MAY ACT
+        You may only change the body of `classify`.
+        These must keep their current structure and behaviour:
+          - the result for negative inputs
+          - the result for inputs of 10 or more
+      
+      WHAT THE CODE MUST MEAN
+        Existing behaviour:  when n is exactly 0, the result is "zero"
+        Requested behaviour: when n < 10, the result is "small"
+        These two can both apply - for example when the input is 0.
+        On inputs where both apply, the result must be "zero".
+      
+      HOW YOU WRITE THIS IS YOUR CHOICE. Any implementation satisfying every statement above is
+      correct. Nothing here tells you the shape of the code.
+
+  all witnesses pass
+  Non-vacuity: 6 seeded packages must be CAUGHT. A scanner that passed
+  those would certify anything, and "no leakage" would be worth nothing.

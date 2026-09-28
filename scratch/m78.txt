@@ -1,0 +1,34 @@
+LegaScreen v3 slice 1: lineage closes the renamed-coordinate blind spot and generalizes C2, and the architecture's unforgeability defeats the probe at HEAD
+
+L-1 held. The three dimensions v2 reported as UNSCREENED are resolved by perturb-and-diff with no
+name matching: producer and producerVersion support scope.criterion, document and ordinal support
+scope.history.
+
+L-3 held and is what the slice was for. At b11e51f the layer OBSERVES ANY_OF for both dimensions
+where the operation's own contract declares an intersection, so C2 becomes a mismatch between
+observed and declared aggregation. Nothing told the probe that derive is conjunctive; v2's weakening
+invariant needed a human to encode that, and this does not.
+
+L-2 is NOT MEASURABLE at HEAD, and the reason is the finding. The perturbation builds a modified
+copy of a token, and since the C3 repair a token is branded by membership in a module-private
+WeakSet, so a copy is not an authority token and derive correctly refuses it. Verified directly at
+both commits rather than inferred: at HEAD the spread copy carries zero own symbols and is refused,
+at b11e51f it carries one and is accepted. The architecture's own unforgeability defeats external
+perturbation - a real tension between defensibility and screenability, found by the screen failing
+rather than by anyone reasoning about it. The fix is named and not built: perturbation must go
+through the constructors rather than by copying.
+
+THREE DEFECTS IN THE PROBE, all found by running it. A refused input was read as a dependency,
+producing a confident ALL_OF at HEAD where nothing had been observed, and L-5's non-vacuity
+requirement is what exposed it. UNSUPPORTED and ANY_OF were conflated, which are opposite findings,
+and only the all-inputs-stripped run separates them. And worst: could-not-measure and was-removed
+shared one representation as a bare undefined - this project's oldest defect class, UNKNOWN
+collapsing into a value, the one Law 1 was written for, committed inside the layer built to detect
+it.
+
+Controls written here rather than imported, so nothing passes by accident of the repository's state.
+Focused 6/6. Suite 605/605.
+
+Message-File: scratch/m78.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

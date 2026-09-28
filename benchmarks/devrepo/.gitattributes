@@ -1,0 +1,5 @@
+# The benchmark corpus is a byte-for-byte copy of the real stdlib. Its CRLF line endings are an
+# OBSERVED REPOSITORY FACT that tasks are validated against - git must not normalize them, or version
+# control would modify the artifact before the experiment, which is the exact hazard PROVENANCE.md
+# documents.
+benchmarks/devrepo/pristine/** -text

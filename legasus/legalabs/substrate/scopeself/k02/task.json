@@ -1,0 +1,12 @@
+{
+  "task_id": "k02",
+  "goal": "Add a total to the EXISTING statistics.py: TOTAL holds the sum of the values when the module is imported, and total() returns it. Keep values, describe and size working exactly as they do now. Run it with python.",
+  "lead": "statistics.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the total is assembled the same way as the existing size helper",
+  "interface": [
+    "TOTAL",
+    "total"
+  ]
+}

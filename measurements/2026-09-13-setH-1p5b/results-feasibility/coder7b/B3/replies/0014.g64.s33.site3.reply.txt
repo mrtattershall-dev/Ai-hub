@@ -1,0 +1,46 @@
+# BEGIN: Add ordered list support
+            if line.startswith(". "):  # Check for an ordered list item
+                flush_para()  # Flush the current paragraph, if any
+                ordered_items.append(line[2:].strip())  # Append to ordered_items list
+                continue
+
+            if not ordered_items and current == []:  # If no ordered items are present and current block is empty
+                flush_ordered_list()  # Flush the ordered list, if any
+            # END: Add ordered list support
+        elif line.startswith(". "):  # Check for an ordered list item
+            flush_para()  # Flush the current paragraph, if any
+            ordered_items.append(line[2:].strip())  # Append to ordered_items list
+            continue
+
+        flush_list()
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    flush_ordered_list()  # Flush the ordered list, if any
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+
+### Explanation of Changes:
+1. **Ordered List Support**: Added code to handle ordered lists. Lines starting with `. ` are considered ordered list items and are collected in the `ordered_items` list.
+2. **Flush Ordered List**: After processing each line, check if there are any ordered list items present. If not, flush any existing ordered list by appending it to the blocks.
+3. **Blank Line Handling

@@ -1,0 +1,2759 @@
+{
+ "models": [
+  "qwen2.5-coder:1.5b",
+  "qwen2.5-coder:7b"
+ ],
+ "samples": 20,
+ "temperature": 0.6,
+ "cells": {
+  "qwen2.5-coder:1.5b|S_UPPER/IMPLICIT": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "shape": "S_UPPER",
+   "render": "IMPLICIT",
+   "probes": 16,
+   "seconds": 114.662,
+   "authorized": 13,
+   "verified": 13,
+   "repeated_fixed": 1,
+   "whole_function": 2,
+   "realizations": 4,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "returned a function",
+     "condition": "n == 3",
+     "raw": "def classify(n):\n    if n == 3:\n        return \"three\"\n    elif n > 100000:\n        return \"vast\"\n    elif n < 10:\n        return \"small\"\n  "
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "10 <= n < 100000",
+     "raw": "```python\n    elif 10 <= n < 100000:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "returned a function",
+     "condition": "n == 3",
+     "raw": "def classify(n):\n    if n == 3:\n        return \"three\"\n    elif n < 10:\n        return \"small\"\n    elif n > 100000:\n        return \"vast\"\n  "
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n > 100000",
+     "raw": "```python\nif n > 100000:\n    return \"vast\"\nelif n > 10:\n    return \"small\"\nreturn \"other\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|S_UPPER/RELATIONAL": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "shape": "S_UPPER",
+   "render": "RELATIONAL",
+   "probes": 16,
+   "seconds": 22.069,
+   "authorized": 17,
+   "verified": 17,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "realizations": 2,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|S_LOWER/IMPLICIT": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "shape": "S_LOWER",
+   "render": "IMPLICIT",
+   "probes": 13,
+   "seconds": 22.419,
+   "authorized": 10,
+   "verified": 10,
+   "repeated_fixed": 3,
+   "whole_function": 0,
+   "realizations": 3,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nif n > 100:\n    return \"big\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nif n > 100:\n    return \"big\"\nreturn \"other\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 100",
+     "raw": "```python\n    elif n < 100:\n        return \"big\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 100",
+     "raw": "```python\n    elif n > 100:\n        return \"big\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 100",
+     "raw": "```python\n    elif n > 100:\n        return \"big\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 100",
+     "raw": "```python\n    elif n > 100:\n        return \"big\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 100",
+     "raw": "```python\n    elif n > 100:\n        return \"big\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nelif n < 100:\n    return \"other\"\nelse:\n    return \"big\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 100",
+     "raw": "```python\n    elif n > 100:\n        return \"big\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null,
+     "raw": "```python\nreturn \"big\"\n```"
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|S_LOWER/RELATIONAL": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "shape": "S_LOWER",
+   "render": "RELATIONAL",
+   "probes": 13,
+   "seconds": 108.458,
+   "authorized": 17,
+   "verified": 17,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "realizations": 2,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null,
+     "raw": "```python\nreturn \"big\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 100",
+     "raw": "```python\n    elif n > 100:\n        return \"big\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 100",
+     "raw": "```python\n    elif n > 100:\n        return \"big\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|S_IVAL/IMPLICIT": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "shape": "S_IVAL",
+   "render": "IMPLICIT",
+   "probes": 13,
+   "seconds": 23.145,
+   "authorized": 14,
+   "verified": 14,
+   "repeated_fixed": 3,
+   "whole_function": 1,
+   "realizations": 3,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 100",
+     "raw": "```python\n    elif n > 100:\n        return \"large\"\n    elif n > 10:\n        return \"medium\"\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nelif n > 100000:\n    return \"vast\"\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nif n > 100000:\n    return \"vast\"\nif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "returned a function",
+     "condition": "n < 0",
+     "raw": "```python\ndef classify(n):\n    if n < 0:\n        return \"negative\"\n    if n > 100000:\n        return \"vast\"\n    if n < 10:\n        return \"s"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null,
+     "raw": "```python\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nelif n < 10:\n    return \"small\"\nelse:\n    return \"vast\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|S_IVAL/RELATIONAL": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "shape": "S_IVAL",
+   "render": "RELATIONAL",
+   "probes": 13,
+   "seconds": 118.04,
+   "authorized": 11,
+   "verified": 11,
+   "repeated_fixed": 4,
+   "whole_function": 0,
+   "realizations": 2,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nif n > 100000:\n    return \"vast\"\nif n < 10:\n    return \"small\"\nreturn \"other\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nif n < 10:\n    return \"small\"\nif n > 100000:\n    return \"vast\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nif n < 10:\n    return \"small\"\nif n > 100000:\n    return \"vast\"\nreturn \"other\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nif n > 100000:\n    return \"vast\"\nif n < 10:\n    return \"small\"\nreturn \"other\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|S_STRADDLE/IMPLICIT": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "shape": "S_STRADDLE",
+   "render": "IMPLICIT",
+   "probes": 13,
+   "seconds": 109.612,
+   "authorized": 8,
+   "verified": 8,
+   "repeated_fixed": 5,
+   "whole_function": 2,
+   "realizations": 3,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n > 5",
+     "raw": "```python\nif n > 5:\n    return \"big\"\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n > 5",
+     "raw": "```python\nif n > 5:\n    return \"big\"\nreturn \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n > 5",
+     "raw": "```python\nif n > 5:\n    return \"big\"\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "returned a function",
+     "condition": "n > 5",
+     "raw": "```python\ndef classify(n):\n    if n > 5:\n        return \"big\"\n    elif n < 10:\n        return \"small\"\n    return \"other\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n > 5",
+     "raw": "```python\nif n > 5:\n    return \"big\"\nelse:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "returned a function",
+     "condition": "n > 5",
+     "raw": "```python\ndef classify(n):\n    if n > 5:\n        return \"big\"\n    if n < 10:\n        return \"small\"\n    return \"other\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null,
+     "raw": "```python\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n <= 5",
+     "code": "if n <= 5: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n > 5",
+     "raw": "```python\n    if n > 5:\n        return \"big\"\n    else:\n        return \"small\"\n```"
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|S_STRADDLE/RELATIONAL": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "shape": "S_STRADDLE",
+   "render": "RELATIONAL",
+   "probes": 13,
+   "seconds": 12.771,
+   "authorized": 8,
+   "verified": 8,
+   "repeated_fixed": 2,
+   "whole_function": 0,
+   "realizations": 2,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null,
+     "raw": "```python\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null,
+     "raw": "```python\nreturn \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n > 5",
+     "raw": "```python\nif n > 5:\n    return \"big\"\nelif n < 10 and n <= 5:\n    return \"small\"\nreturn \"other\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n > 5",
+     "raw": "```python\nif n > 5:\n    return \"big\"\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null,
+     "raw": "```python\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\n    elif n < 10:\n        return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null,
+     "raw": "```python\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|S_UPPER/IMPLICIT": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "shape": "S_UPPER",
+   "render": "IMPLICIT",
+   "probes": 16,
+   "seconds": 43.97,
+   "authorized": 19,
+   "verified": 17,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "realizations": 3,
+   "commit_integrity": 0.8947368421052632,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "1 < n < 10",
+     "code": "if 1 < n < 10: return \"small\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": -999990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -9990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -90,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "10 > n >= 3",
+     "code": "if 10 > n >= 3: return \"small\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": -999990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -9990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -90,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|S_UPPER/RELATIONAL": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "shape": "S_UPPER",
+   "render": "RELATIONAL",
+   "probes": 16,
+   "seconds": 25.131,
+   "authorized": 19,
+   "verified": 17,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "realizations": 3,
+   "commit_integrity": 0.8947368421052632,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "10 > n > 3",
+     "code": "if 10 > n > 3: return \"small\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": -999990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -9990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -90,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "10 > n > 3",
+     "code": "if 10 > n > 3: return \"small\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": -999990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -9990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -90,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|S_LOWER/IMPLICIT": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "shape": "S_LOWER",
+   "render": "IMPLICIT",
+   "probes": 13,
+   "seconds": 23.616,
+   "authorized": 17,
+   "verified": 16,
+   "repeated_fixed": 2,
+   "whole_function": 0,
+   "realizations": 4,
+   "commit_integrity": 0.9411764705882353,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 100",
+     "raw": "```python\nif n < 100:\n    return \"other\"\nif n > 100:\n    return \"big\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0",
+     "raw": "```python\nif n < 0:\n    return \"negative\"\nif n > 100:\n    return \"big\"\nreturn \"other\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n > 100",
+     "raw": "```python\nelif n > 100:\n    return \"big\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n <= 200",
+     "code": "if 100 < n <= 200: return \"big\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|S_LOWER/RELATIONAL": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "shape": "S_LOWER",
+   "render": "RELATIONAL",
+   "probes": 13,
+   "seconds": 28.114,
+   "authorized": 20,
+   "verified": 11,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "realizations": 3,
+   "commit_integrity": 0.55,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100",
+     "code": "if n > 100: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "100 < n < 200",
+     "code": "if 100 < n < 200: return \"big\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": 201,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 10100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": 1000100,
+       "expected": "big",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n > 100 and n != 200",
+     "code": "if n > 100 and n != 200: return \"big\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|S_IVAL/IMPLICIT": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "shape": "S_IVAL",
+   "render": "IMPLICIT",
+   "probes": 13,
+   "seconds": 24.419,
+   "authorized": 19,
+   "verified": 19,
+   "repeated_fixed": 1,
+   "whole_function": 0,
+   "realizations": 4,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n >= 0 and n < 10",
+     "code": "if n >= 0 and n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n >= 0 and n < 10",
+     "code": "if n >= 0 and n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n >= 100000",
+     "raw": "```python\nif n >= 100000:\n    return \"vast\"\nif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n >= 0 and n < 10",
+     "code": "if n >= 0 and n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n >= 0 and n < 10",
+     "code": "if n >= 0 and n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|S_IVAL/RELATIONAL": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "shape": "S_IVAL",
+   "render": "RELATIONAL",
+   "probes": 13,
+   "seconds": 24.115,
+   "authorized": 20,
+   "verified": 20,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "realizations": 3,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n >= 0",
+     "code": "if n < 10 and n >= 0: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 10",
+     "code": "if 0 <= n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|S_STRADDLE/IMPLICIT": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "shape": "S_STRADDLE",
+   "render": "IMPLICIT",
+   "probes": 13,
+   "seconds": 20.34,
+   "authorized": 7,
+   "verified": 3,
+   "repeated_fixed": 0,
+   "whole_function": 0,
+   "realizations": 5,
+   "commit_integrity": 0.42857142857142855,
+   "rows": [
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n >= 0",
+     "code": "if n >= 0: return \"small\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": -999990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -9990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -90,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n >= 0",
+     "raw": "```python\nelif n >= 0:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "elif n < 10:\n    return \"small\""
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n >= 0",
+     "raw": "```python\nelif n >= 0:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n >= 10",
+     "code": "if n >= 10: return \"small\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": -999990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -9990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -90,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n >= 1",
+     "raw": "```python\nelif n >= 1:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n >= 5 and n < 10",
+     "code": "if n >= 5 and n < 10: return \"small\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": -999990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -9990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -90,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": true,
+     "condition": "n >= 5 and n < 10",
+     "code": "if n >= 5 and n < 10: return \"small\"",
+     "verified": false,
+     "failed_probes": [
+      {
+       "input": -999990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -9990,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      },
+      {
+       "input": -90,
+       "expected": "small",
+       "why": "the requested behaviour claims this input",
+       "got": "other"
+      }
+     ]
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "elif n < 10:\n    return \"small\""
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n >= 0",
+     "raw": "```python\nelif n >= 0:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|S_STRADDLE/RELATIONAL": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "shape": "S_STRADDLE",
+   "render": "RELATIONAL",
+   "probes": 13,
+   "seconds": 20.527,
+   "authorized": 12,
+   "verified": 12,
+   "repeated_fixed": 2,
+   "whole_function": 0,
+   "realizations": 2,
+   "commit_integrity": 1,
+   "rows": [
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n >= 10",
+     "raw": "```python\nif n >= 10:\n    return \"other\"\nreturn \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n >= 10",
+     "raw": "```python\nif n >= 10:\n    return \"other\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n >= 10",
+     "raw": "```python\nelif n >= 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": "n < 10",
+     "raw": "```python\nelif n < 10:\n    return \"small\"\n```"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"small\"",
+     "verified": true,
+     "failed_probes": []
+    }
+   ]
+  }
+ }
+}

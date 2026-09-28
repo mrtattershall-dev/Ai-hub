@@ -1,0 +1,40 @@
+if fenced_code_block is not None:
+            if line.strip() == "```":
+                blocks.append("<pre><code>" + "\n".join(fenced_code_block) + "</code></pre>")
+                fenced_code_block = None
+            else:
+                fenced_code_block.append(line)
+        elif line.startswith("```"):
+            if fenced_code_block is not None:
+                continue
+            blocks.append("<pre><code>")
+            fenced_code_block = []
+        else:
+            flush_para()
+            flush_list()
+
+    # Existing code continues below this point, unchanged.
+    if current:
+        blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+
+In this code, the `_escape` function is responsible for escaping HTML special characters (`&`, `<`, `>`). The `_inline` function handles inline formatting such as strong text (`**...**`), emphasis (`*...*`), and code spans (`` `...` ``).
+
+The `to_html` function processes a Markdown string into HTML by splitting it into blocks, handling different types of lines (paragraphs, headings, lists, etc.), and applying the appropriate formatting.
+
+The code also includes a simple test block at the end to verify that the functions work as expected with a few sample inputs.

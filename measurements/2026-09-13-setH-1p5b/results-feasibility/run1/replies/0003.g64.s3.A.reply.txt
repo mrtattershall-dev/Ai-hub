@@ -1,0 +1,39 @@
+text):
+    text = re.sub(r"\n\n+", "\n", text)  # remove multiple blank lines
+    lines = text.split("\n")
+
+    def _heading(text, level=1):
+        if len(lines) < level:
+            return None
+
+        heading_text = lines[level - 1].strip()
+        _, heading_text = _is_heading(heading_text)
+        return f"<h{level}>{heading_text}</h{level}>"
+
+    def _unordered_list(lines):
+        text = "\n".join(lines)
+        m = re.match(r"^\s*(\d+)\. (.*)$", text, flags=re.MULTILINE | re.DOTALL)
+        if not m:
+            return None
+
+        items = []
+        for i, line in enumerate(lines[level:], start=1):
+            items.append(f"<li>{line.strip()}</li>")
+
+        return f'<ul>\n{" ".join(items)}\n</ul>'
+
+    html = ""
+    level = 0
+    for line in lines:
+        if _is_heading(line):
+            html += "\n" + _heading(line)
+            level += 1
+        elif re.match(r"\d+\.\s+", line):
+            html += "\n" + _unordered_list(lines[level:])
+            level += 1
+        else:
+            text = _inline(line)
+            if text:
+                html += "<p>" + text + "</p>"
+
+    return html.strip()

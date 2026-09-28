@@ -1,0 +1,41 @@
+preregister the Odysseus x Legasus integration BEFORE any glue exists, and declare the two constraints while they are still cheap
+
+AUTHORITY. QUIESCENT_CONTEST was correct and is not being overridden by a manufactured objective. This is
+an OWNER grant, which is the one thing in the calculus that changes entitlement without deriving it -
+OWNER is an axiom, not a conclusion. The six open questions are unchanged and FREEZE_R4_AND_SELECT_REPO_D
+remains declined.
+
+THE QUESTION IS NOT WHETHER THE COMBINATION IS BETTER. It is whether an independently designed agent
+platform can operate NORMALLY while Legasus observes and governs, WITHOUT Odysseus becoming
+Legasus-shaped. Any capability claim extracted from this run is out of scope, because the run is not
+designed to support one.
+
+C1 - THE DISPOSABLE REPOSITORY IS DECLARED NOT REPO D, IN ADVANCE, AND IS BURNED BY THIS EXPERIMENT. A
+repository silently promoted to Repo D after r4 has seen it would LOOK like prospective validation and be
+nothing of the kind. Declaring it first is the whole point.
+
+C2 - THIS MOVES AWAY FROM REPO D, NOT TOWARD IT. The owner's lifting condition is that adversarial
+composition stops exposing new authority defects. A new composition surface will, if it is any good,
+expose more. That is why it is worth running AND it is the cost. It must not later be reported as
+progress toward Repo D.
+
+WHY THIS IS A BETTER TEST THAN PRODUCER #4 WOULD HAVE BEEN. Producer #4 was refused partly because I
+would be choosing a producer convenient to my own abstraction. Odysseus was designed by someone else for
+another purpose and will carry coordinates Legasus has no name for - session, agent identity, tool-call
+id, model version - with no regard for whether Legasus can represent them. That makes it an INDEPENDENT
+test of tonight's UNADMITTED repair rather than a self-selected one.
+
+I6 IS THE SHARPEST PREDICTION AND THE ONE I EXPECT TO BE HARDEST. The agent is made to claim success on a
+change that is broken, and THE CLAIM MUST NOT MOVE THE VERDICT. An autonomous worker cannot be allowed to
+mint entitlement by asserting it. That is the entire architecture compressed into one test.
+
+I5 is the non-vacuity control: without a REFUSAL that names its cause, I4's commit is unfalsifiable and
+"it worked" means nothing. I1 and I8 are the layering thesis itself - if Odysseus needs modification, or
+if the calculus has to move to accept it, THAT IS THE RESULT and it is recorded rather than engineered
+away.
+
+NO GLUE EXISTS YET. NO REPOSITORY HAS BEEN CREATED OR BURNED. NOTHING HAS BEEN STARTED.
+
+Message-File: scratch/m25.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

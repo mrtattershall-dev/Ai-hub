@@ -1,0 +1,30 @@
+Declare the pytest mapping (six predictions held) and apply the instrument representation once, where the classes come from executed refusals
+
+PYTEST_MAPPING is declared for its producer under FOR_PRODUCER and registered beside doctest's:
+PASSED to OBSERVED/HELD, FAILED to OBSERVED/REFUTED, SKIPPED and SETUP_SKIPPED to NOT_ATTEMPTED,
+SETUP_FAILED to PREREQUISITE_MISSING, anything else UNKNOWN_MAPPING by construction. All six
+predictions from 9704145 held: each native maps as declared and an unlisted one does not (PM-1); a
+scoped claim derives from a pytest PASSED record, criterion and invocation from the producer, cohort
+and plugin set carried under UNADMITTED (PM-2, E6 for producer 3); two records pytest reports as
+FAILED grant identical permissions after adaptation, checked by illegalRefinement (PM-3); the
+cohort experiment's two verdicts adapt to HELD and REFUTED on scopes identical over the six, so they
+are comparable and contradictory before admission and refused a comparison on collectionCohort
+after it, both halves executed in that order (PM-4, the Entry 11 payoff with assertions); doctest
+and git adaptations byte-unchanged (PM-5); neither producer can use the other's mapping (PM-6).
+
+The W2-g FINDING test that recorded "pytest has no declared mapping" is superseded, with the reason
+beside it and git kept as the producer that still has none, so the refusal by name stays reachable.
+The finding itself stays in RESULT.composition-2.md.
+
+instruments-applied.test.mjs applies the representation to the two instruments whose failure
+classes are enumerated by their own executed refusals: the freeze gate's ten, and the composition
+suite's twenty-one with the commits that reproduced each as witnesses. Neither subsumes the other,
+in both directions; a green freeze gate was never a null for the composition suite, which is what
+history showed at 464/464 with all twenty-one live; and a class claimed without a witness reads
+UNKNOWN, not covered.
+
+Suite 553/553.
+
+Message-File: scratch/m48.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

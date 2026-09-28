@@ -1,0 +1,10 @@
+if codes:
+        blocks.append("<pre><code>")
+        for c in codes:
+            blocks.append(c)
+        blocks.append("</code></pre>")
+    if links:
+        blocks.append("<pre><code>")
+        for l in links:
+            blocks.append(l)
+        blocks.append("</code></pre>")

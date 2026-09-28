@@ -1,0 +1,49 @@
+if line.startswith(". "):
+            flush_para()
+            # AT THIS POINT WRITE ONLY THIS: call `flush_ol()` here and nothing else, so an ordered-list line closes an open ordered list
+            ol_items.append(line[2:].strip())
+            continue
+        # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+        # REQUESTED CHANGE: Add unordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a dot, a space ("1. ") become <ul><li>...</li>...</ul>, written like the ordered lists. Run it with python.
+        # AT THIS POINT WRITE ONLY THIS: add a new branch for unordered-list items: when the line starts with a dot, a space, close any open paragraph and any open unordered list, append the item text after the marker to `items`, and continue; do not alter the existing branches
+    if current:
+        flush_para()
+    if items:
+        flush_list()
+    if ol_items:
+        flush_ol()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+
+```python
+import re
+
+_CODE = "\x00CODE%d\x00"
+_LINK = "\x00LINK%d\x00"
+
+
+def _escape(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _inline(text):
+    codes = []
+    links = []
+
+    def take_code(m):
+        codes.append("<code>" + _escape(m.group(1)) + "</code>")
+        return _CODE

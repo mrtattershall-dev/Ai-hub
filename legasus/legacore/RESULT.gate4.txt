@@ -1,0 +1,117 @@
+  provenance/e01:op3   indent 0
+      operation code: "def _area_rect(s):\n    return s.get(\"w\", 0) * s.get(\"h\", 0)"
+      facts  provides ["_area_rect"]  immediate []  deferred []
+      truth passes 19 of 25   derived 21   survivors that FAIL: [0,3]
+      constraints emitted: ownership_boundary(0) ownership_boundary(0) ownership_boundary(0) ownership_boundary(0) ownership_boundary(4) ownership_boundary(0) ownership_boundary(0) ownership_boundary(0) canonical_realization(0)
+      --- the text, with candidate positions marked
+          0 SURV  SHAPE_KINDS = ["circle", "square", "rect"
+          1 pass  ]
+          2 pass  
+          3 SURV  SHAPE_LABELS = {"circle": "round shape", "square": "four equal sides", "rect": "four right angles"
+          4 pass  }
+          5 pass  
+          6 pass  
+          7       def _area_circle(s):
+          8 pass      return 3.14159 * s.get("r", 0) * s.get("r", 0)
+          9 pass  
+         10 pass  
+         11       def _area_square(s):
+         12 pass      return s.get("side", 0) * s.get("side", 0)
+         13 pass  
+         14 pass  
+         15       def describe(k):
+         16 pass      return SHAPE_LABELS.get(k, "unknown")
+         17 pass  
+         18 pass  
+         19       def valid_kinds(kinds):
+         20 pass      return all(k in SHAPE_KINDS for k in kinds)
+         21 pass  
+         22 pass  
+         23       def area(s):
+         24 cut       k = s.get("kind")
+         25           if k == "circle":
+         26 cut           return _area_circle(s)
+         27           if k == "square":
+         28 cut           return _area_square(s)
+         29           if k == "rect":
+         30 cut           return _area_rect(s)
+         31 pass      return 0
+         32 pass  
+
+  provenance/e06:op3   indent 0
+      operation code: "def _dump_tsv(rows):\n    return \"\\n\".join(\"\\t\".join(str(c) for c in r) for r in rows)"
+      facts  provides ["_dump_tsv"]  immediate []  deferred ["c","r"]
+      truth passes 24 of 29   derived 26   survivors that FAIL: [0,3]
+      constraints emitted: ownership_boundary(0) ownership_boundary(0) ownership_boundary(0) ownership_boundary(0) ownership_boundary(0) ownership_boundary(3) ownership_boundary(0) ownership_boundary(0) ownership_boundary(0) deferred_requirement(0) canonical_realization(0)
+      --- the text, with candidate positions marked
+          0 SURV  FORMATS = ["json", "csv", "tsv"
+          1 pass  ]
+          2 pass  
+          3 SURV  FORMAT_LABELS = {"json": "JSON", "csv": "comma separated", "tsv": "tab separated"
+          4 pass  }
+          5 pass  
+          6 pass  ALIASES = {"js": "json", "comma": "csv"}
+          7 pass  
+          8 pass  
+          9       def _dump_json(rows):
+         10 pass      return "[" + ", ".join(str(r) for r in rows) + "]"
+         11 pass  
+         12 pass  
+         13       def _dump_csv(rows):
+         14 pass      return "\n".join(",".join(str(c) for c in r) for r in rows)
+         15 pass  
+         16 pass  
+         17       def label(f):
+         18 pass      return FORMAT_LABELS.get(f, "unknown")
+         19 pass  
+         20 pass  
+         21       def resolve_alias(a):
+         22 pass      return ALIASES.get(a, a)
+         23 pass  
+         24 pass  
+         25       def valid_formats(fs):
+         26 pass      return all(f in FORMATS for f in fs)
+         27 pass  
+         28 pass  
+         29       def dump(fmt, rows):
+         30           if fmt == "json":
+         31 cut           return _dump_json(rows)
+         32           if fmt == "csv":
+         33 cut           return _dump_csv(rows)
+         34           if fmt == "tsv":
+         35 cut           return _dump_tsv(rows)
+         36 pass      return ""
+         37 pass  
+
+  provenance/f01:op2   indent 0
+      operation code: "def _send_push(msg):\n    return \"push: \" + str(msg)"
+      facts  provides ["_send_push"]  immediate []  deferred []
+      truth passes 14 of 18   derived 15   survivors that FAIL: [0]
+      constraints emitted: ownership_boundary(0) ownership_boundary(0) ownership_boundary(0) ownership_boundary(3) ownership_boundary(0) ownership_boundary(0) ownership_boundary(0) canonical_realization(0)
+      --- the text, with candidate positions marked
+          0 SURV  CHANNELS = ["email", "sms", "push"
+          1 pass  ]
+          2 pass  
+          3 pass  
+          4       def _send_email(msg):
+          5 pass      return "email: " + str(msg)
+          6 pass  
+          7 pass  
+          8       def _send_sms(msg):
+          9 pass      return "sms: " + str(msg)
+         10 pass  
+         11 pass  
+         12       def valid_channels(cs):
+         13 pass      return all(c in CHANNELS for c in cs)
+         14 pass  
+         15 pass  
+         16       def send(channel, msg):
+         17           if channel == "email":
+         18 cut           return _send_email(msg)
+         19           if channel == "sms":
+         20 cut           return _send_sms(msg)
+         21           if channel == "push":
+         22 cut           return _send_push(msg)
+         23 pass      return "dropped"
+         24 pass  
+

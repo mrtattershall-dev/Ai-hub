@@ -1,0 +1,13 @@
+module.exports = function(library, members) {
+  let fineReport = '';
+  
+  // Sort members by amount (largest first), then by name
+  members.sort((a, b) => b.amount - a.amount || a.name.localeCompare(b.name));
+  
+  // Format each member's information and append to fineReport
+  for (let member of members) {
+    fineReport += `member: ${member.name}\n`;
+  }
+  
+  return fineReport;
+};

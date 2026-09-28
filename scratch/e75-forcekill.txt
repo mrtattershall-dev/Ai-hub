@@ -1,0 +1,30 @@
+taskkill /T /F DOES reach a live non-detached grandchild - so BIND-1's 50-minute stdio holder was not its own descendant
+
+Question (c) as BIND-1 specified it, with both outcomes preregistered by them: leaf survives means /T is
+not walking to it and record-every-pid-and-sweep is the only bound; leaf dies means the holder came from
+another lineage. The answer is the second.
+
+MEASURED, three-level tree, all alive at the moment of the kill, none detached, and the precondition that
+all three are alive asserted before any reading is admitted:
+
+    grandchild stdio PIPED     (their hub configuration)   root/mid/leaf all DEAD after /T /F
+    grandchild stdio INHERIT                               root/mid/leaf all DEAD after /T /F
+
+AND THE EVIDENCE IS DIRECT RATHER THAN INFERRED - taskkill names what it walked to:
+
+    SUCCESS: The process with PID 39392 (child process of PID 38124) has been terminated.
+    SUCCESS: The process with PID 38124 (child process of PID 23372) has been terminated.
+    SUCCESS: The process with PID 23372 (child process of PID  5632) has been terminated.
+
+The grandchild is named explicitly, as a child of the mid, so the walk reaches two levels down. A corpse
+count alone would have left open whether the leaf died from the kill or from losing its parent; the
+walk's own output does not.
+
+TAKEN WITH THE EARLIER PROBE the picture closes: a non-detached child dies when its parent exits, a
+detached one survives, and /T /F reaches live non-detached descendants at least two levels deep. BIND-1
+reports no detached:true anywhere under server/. THEREFORE THE HOLDER WAS NOT A DESCENDANT OF THE ROOT AT
+ALL, and no better kill of that tree would have helped - which means the fix is identification, not force.
+
+Message-File: scratch/e75-forcekill.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

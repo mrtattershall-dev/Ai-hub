@@ -1,0 +1,12 @@
+{
+  "task_id": "h03",
+  "goal": "Add rule drawing to the EXISTING formatting.py: a helper supplies the dash character, rule(n) draws a rule n characters wide using it as the default character, and rule_width() draws one WIDTH characters wide. The default character must be taken when each function is defined. Keep WIDTH and pad working exactly as they do now. Run it with python.",
+  "lead": "formatting.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the rule drawing works the same way as the existing padding",
+  "interface": [
+    "rule",
+    "rule_width"
+  ]
+}

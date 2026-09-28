@@ -1,0 +1,30 @@
+Represent what a guard has earned: PATTERN_NAMED, MECHANIZED_REGION and COVERED_CLASS are three claims, and C4 has only the second
+
+All six predictions from d0d307c held. Applied to this project's own C4 pattern with its real
+evidence - two incidents and the two detectors actually built, each carrying the test that
+demonstrates its reach - the verdict is MECHANIZED_REGION at 2/2 observed coverage, and the reason
+the ratio cannot be the verdict is printed with it: known incidents are a sample, and covering all
+of them is not a coverage argument over the class.
+
+PT-1 is the fact that made the overclaim invisible for twenty commits: the two detectors are
+DISJOINT. Producer-keyed promotion reaches the first incident and not the second; the frozen
+collision inventory reaches the second and not the first, because collectionCohort was a runtime
+data key rather than an exported state word. No single detector reaches both, so the coverage is a
+union of disjoint regions - which is not a claim about the pattern, and the module says so in its
+why.
+
+COVERED_CLASS requires coverage established outside the detectors' own say-so, in the same shape
+instruments.mjs already uses; UNKNOWN and DOES_NOT_SUBSUME both leave the verdict at the weaker
+level. An unwitnessed claim covering everything leaves the verdict at PATTERN_NAMED and is named as
+unwitnessed - a claim is not a region. Both other levels are reachable, so this is not a machine
+with one answer, and dropping a detector names the incident that loses its cover, which is the state
+this project was in for twenty commits and seven green suites.
+
+History is not rewritten. Entries 15 to 18 keep the word mechanized where they used it; the
+distinction applies to what is claimed from here.
+
+Focused 6/6. Suite 583/583.
+
+Message-File: scratch/m62.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

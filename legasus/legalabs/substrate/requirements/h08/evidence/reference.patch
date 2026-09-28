@@ -1,0 +1,15 @@
+--- op op1 after: "RADIUS = 2\n"
+
+
+def _round2(v):
+    return round(v, 2)
+
+--- op op2 after: "area():\n    return PI * RADIUS * RADIUS\n"
+
+
+TAU = _round2(2 * PI)
+
+--- op op3 after: "# Geometry with a local constant.\n"
+
+def tau():
+    return TAU

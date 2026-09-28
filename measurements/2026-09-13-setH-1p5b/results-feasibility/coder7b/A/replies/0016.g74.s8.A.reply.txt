@@ -1,0 +1,33 @@
+text):
+    result = []
+    lines = text.split("\n")
+    in_code_block = False
+    code_block_lines = []
+
+    def flush_code_block():
+        nonlocal in_code_block, code_block_lines
+        if in_code_block:
+            result.append("<pre><code>")
+            for line in code_block_lines:
+                result.append(_escape(line))
+            result.append("</code></pre>")
+            in_code_block = False
+            code_block_lines = []
+
+    for line in lines:
+        if re.match(r"```", line):
+            flush_code_block()
+            in_code_block = not in_code_block
+            continue
+
+        if in_code_block:
+            code_block_lines.append(line)
+        else:
+            heading = _is_heading(line)
+            if heading:
+                result.append(f"<h{heading[0]}>{_inline(heading[1])}</h{heading[0]}>")
+            elif line.strip():
+                result.append(f"<p>{_inline(line)}</p>")
+
+    flush_code_block()
+    return "\n".join(result)

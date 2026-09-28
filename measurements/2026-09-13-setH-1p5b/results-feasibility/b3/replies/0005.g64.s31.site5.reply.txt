@@ -1,0 +1,44 @@
+# NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+```output
+ok
+```
+The provided code snippet `to_html` takes a string of markdown text and converts it into HTML. It handles various markdown features such as headers, links, bold, italic, inline code blocks, lists, and blank lines. The function uses regular expressions to identify different types of markdown elements and constructs the corresponding HTML tags accordingly.
+
+Here is a breakdown of the key components and how they interact:
+
+1. **Header Detection**:
+   - Lines starting with `#` followed by one or three spaces are considered headers.
+   - These lines are converted into `<h1>` through `<h3>` tags based on the number of `#` characters.
+
+2. **Link Detection**:
+   - Lines enclosed in square brackets and parentheses, such as `[text](url)`, are treated as links.
+   - The text inside the brackets is used as the link text, and the URL is escaped to ensure proper HTML rendering.
+
+3. **Bold and Italic**:
+   - Bold text is represented by double asterisks (`**`).
+   - Italic text is represented by single asterisks (`

@@ -1,0 +1,17 @@
+--- op op1 after: "to_cm(inches):\n    return inches * 2.54\n"
+
+
+def to_mm(inches):
+    return inches * 25.4
+
+--- op op2 after: "def to_inches(cm):\n    return cm / 2.54\n"
+
+
+def from_mm(mm):
+    return mm / 25.4
+
+--- op op3 after: "es):\n    return round(to_cm(inches), 1)\n"
+
+
+def round_mm(inches):
+    return round(to_mm(inches), 1)

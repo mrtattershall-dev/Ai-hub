@@ -1,0 +1,60 @@
+{
+  "task_id": "i02",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing area computation as the relation to parallel; that feature reads the shared constants at module level, and the new constant occupies the same position",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "bind the constant, requiring only the module constant",
+        "site_hint": "RADIUS = 2\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the accessor",
+        "site_hint": "def box():\n    return WIDTH * HEIGHT\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 8
+  },
+  "reference": {
+    "source_hash": "f7eab759c36abb0ab4649ee340bb571f019663ae26de921a6281f991b95f4c73",
+    "reference_hash": "913b5436111c58bd703b39100853af1f704b5154568282e7effb1cbe82685177",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

@@ -1,0 +1,39 @@
+import json
+
+class Gradebook:
+    def __init__(self, data):
+        self.data = data
+
+    def drop_lowest(self, category, n):
+        # Extract scores for the specified category
+        category_scores = [score['percent'] / score['max_points'] for score in self.data if score['category'] == category]
+        
+        # Sort scores in descending order
+        sorted_scores = sorted(category_scores, reverse=True)
+        
+        # Calculate the number of scores to drop
+        total_scores = len(sorted_scores)
+        scores_to_drop = min(n, total_scores - n)
+        
+        # Remove the lowest scores
+        self.data = [score for score in self.data if score['category'] == category and score['percent'] / score['max_points'] >= sorted_scores[scores_to_drop]]
+
+    def save(self, filename):
+        with open(filename, 'w') as file:
+            json.dump(self.data, file)
+
+# Example usage
+data = [
+    {'student_id': 1, 'category': 'Math', 'percent': 85, 'max_points': 100},
+    {'student_id': 2, 'category': 'Math', 'percent': 78, 'max_points': 100},
+    {'student_id': 3, 'category': 'Math', 'percent': 92, 'max_points': 100},
+    {'student_id': 4, 'category': 'Science', 'percent': 88, 'max_points': 100}
+]
+
+gradebook = Gradebook(data)
+
+# Drop the lowest scores in the 'Math' category
+gradebook.drop_lowest('Math', 2)
+
+# Save the updated gradebook to a file
+gradebook.save('updated_gradebook.json')

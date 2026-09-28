@@ -1,0 +1,64 @@
+text):
+    # Your code here
+    blocks = text.split("\n")
+
+    current_block = ""
+    heading_level = 0
+
+    for line in blocks:
+        if _is_heading(line):
+            heading_level, heading_text = _is_heading(line)
+            if current_block:
+                if heading_level == 1:
+                    current_block += "<h1>" + current_block.strip() + "</h1>"
+                elif heading_level == 2:
+                    current_block += "<h2>" + current_block.strip() + "</h2>"
+                elif heading_level == 3:
+                    current_block += "<h3>" + current_block.strip() + "</h3>"
+                else:
+                    raise ValueError("Invalid heading level")
+            current_block = ""
+        elif re.match(r"^\d+\.\s+", line):
+            if current_block:
+                if heading_level == 1:
+                    current_block += "<ul><li>" + _inline(current_block.strip()) + "</li></ul>"
+                elif heading_level == 2:
+                    current_block += "<ul><li>" + _inline(current_block.strip()) + "</li></ul>"
+                elif heading_level == 3:
+                    current_block += "<ul><li>" + _inline(current_block.strip()) + "</li></ul>"
+                else:
+                    raise ValueError("Invalid heading level")
+            current_block = ""
+        elif re.match(r"^\s+", line):
+            if current_block:
+                if heading_level == 1:
+                    current_block += "\n<p>" + _inline(current_block.strip()) + "</p>"
+                elif heading_level == 2:
+                    current_block += "\n<p>" + _inline(current_block.strip()) + "</p>"
+                elif heading_level == 3:
+                    current_block += "\n<p>" + _inline(current_block.strip()) + "</p>"
+                else:
+                    raise ValueError("Invalid heading level")
+            current_block = ""
+        else:
+            if current_block:
+                if heading_level == 1:
+                    current_block += "\n<p>" + _inline(current_block.strip()) + "</p>"
+                elif heading_level == 2:
+                    current_block += "\n<p>" + _inline(current_block.strip()) + "</p>"
+                elif heading_level == 3:
+                    current_block += "\n<p>" + _inline(current_block.strip()) + "</p>"
+                else:
+                    raise ValueError("Invalid heading level")
+            current_block = line
+
+    if current_block:
+        if heading_level == 1:
+            current_block += "<h1>" + current_block.strip() + "</h1>"
+        elif heading_level == 2:
+            current_block += "<h2>" + current_block.strip() + "</h2>"
+        elif heading_level == 3:
+            current_block += "<h3>" + current_block.strip() + "</h3>"
+        else:
+            raise ValueError("Invalid heading level")
+    return "<p>" + current_block.strip() + "</p>"

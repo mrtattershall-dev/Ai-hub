@@ -1,0 +1,25 @@
+Represent instrument subsumption (Entry 14): SUBSUMES only with a witness per class, UNKNOWN otherwise
+
+The asymmetry Entry 14 recorded and deliberately did not codify: a cheap instrument that finds a
+defect is conclusive; a cheap instrument that finds nothing substitutes for a stronger null only
+under an independently established relation. legaknow/instruments.mjs represents that relation
+without a cost term. An instrument declares the failure classes it detects, each with a witness - a
+record that the class was injected and the instrument fired, the shape of the freeze gate's ten
+refusals. subsumes(A, B) is SUBSUMES only when every class B detects, A detects with a witness;
+DOES_NOT_SUBSUME when B detects a class A has never been shown to detect; UNKNOWN when a class set
+is undeclared or a claimed class has no witness, on either side. nullTransfers() answers the Entry
+14 question in both directions: a cheap finding stands whatever the relation; a cheap null transfers
+only under SUBSUMES.
+
+Controls executed: admit (A with witnessed f1 f2 f3 subsumes B with f1 f2), refusal (B detects f4),
+unknown (a claimed-not-fired class on either side; an undeclared instrument), the asymmetry itself,
+and non-vacuity (self-subsumption; an empty B).
+
+THE LIMIT, stated before the code and repeated with it: the failure classes are hand-authored. What
+is mechanical is the witness requirement and the refusal to say SUBSUMES without one. No Legasus
+instrument is described with this yet; doing so honestly means arguing each instrument's classes
+independently, and that is not started.
+
+Message-File: scratch/m44.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

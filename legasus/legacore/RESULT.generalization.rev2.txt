@@ -1,0 +1,48 @@
+  CORRECT-0       g01:op1      cand   1  truth-passes   1  derived   1  gain 0.00/0.00
+  RECOVERED       g01:op2      cand  13  truth-passes   9  derived   9  gain 0.53/0.53  [ownership_boundary]
+  RECOVERED       g01:op3      cand  11  truth-passes   7  derived   7  gain 0.65/0.65  [ownership_boundary]
+  CORRECT-0       g02:op1      cand  17  truth-passes  17  derived  17  gain 0.00/0.00
+  CORRECT-0       g02:op2      cand  17  truth-passes  17  derived  17  gain 0.00/0.00
+  CORRECT-0       g02:op3      cand  17  truth-passes  17  derived  17  gain 0.00/0.00
+  RECOVERED       g03:op1      cand   3  truth-passes   1  derived   2  gain 0.58/1.58  [control_flow_boundary]
+  RECOVERED       g03:op2      cand   5  truth-passes   2  derived   2  gain 1.32/1.32  [ownership_boundary]
+  RECOVERED       g04:op1      cand  17  truth-passes  13  derived  13  gain 0.39/0.39  [ownership_boundary]
+  RECOVERED       g04:op2      cand  17  truth-passes  13  derived  13  gain 0.39/0.39  [ownership_boundary]
+  RECOVERED       g05:op1      cand  15  truth-passes   7  derived   7  gain 1.10/1.10  [symbol_availability]
+  RECOVERED       g05:op2      cand  17  truth-passes   8  derived   8  gain 1.09/1.09  [symbol_availability]
+  CORRECT-0       g05:op3      cand  15  truth-passes  15  derived  15  gain 0.00/0.00
+  CORRECT-0       g06:op1      cand  17  truth-passes  17  derived  17  gain 0.00/0.00
+  CORRECT-0       g06:op2      cand  17  truth-passes  17  derived  17  gain 0.00/0.00
+  CORRECT-0       g06:op3      cand  17  truth-passes  17  derived  17  gain 0.00/0.00
+
+  ---- PER CONSTRAINT KIND (the aggregate is reported after this, not instead of it)
+
+  ownership_boundary
+    PASS  POSITIVE g01  narrowable 2/3  this kind fired on 4 op(s)  over-constraint 0  bits 1.18/1.18
+          kinds that narrowed: ownership_boundary
+    PASS  NEGATIVE g02  narrowable 0/3  this kind fired on 0 op(s)  over-constraint 0  bits 0.00/0.00
+
+  control_flow_boundary
+    PASS  POSITIVE g03  narrowable 2/2  this kind fired on 1 op(s)  over-constraint 0  bits 1.91/2.91
+          kinds that narrowed: control_flow_boundary, ownership_boundary
+    PASS  NEGATIVE g04  narrowable 2/2  this kind fired on 0 op(s)  over-constraint 0  bits 0.77/0.77
+          kinds that narrowed: ownership_boundary
+
+  symbol_availability
+    PASS  POSITIVE g05  narrowable 2/3  this kind fired on 2 op(s)  over-constraint 0  bits 2.19/2.19
+          kinds that narrowed: symbol_availability
+    PASS  NEGATIVE g06  narrowable 0/3  this kind fired on 0 op(s)  over-constraint 0  bits 0.00/0.00
+
+  ---- LegaCore constraint derivation, against executable ground truth
+  operations scored          16   (narrowable 8)
+  RECOVERED                  8   narrowed, and every removed boundary really fails
+  missed                     0   narrowable, nothing derived
+  OVER-CONSTRAINT            0   removed a boundary that actually passes
+  correct zero               8   position-independent and left alone
+  witnesses that replayed    16/16
+
+  PRIMARY   recovered 8 of 8 narrowable   (v6 target: >= 15 of 26)
+  SECONDARY realized available information 85.8%   (6.05 of 7.05 bits)   DIAGNOSTIC ONLY
+
+  STYLE CONTROL  canonical_realization fired on 13 operation(s) and narrowed 0.
+  A style constraint that narrows anything is a milestone failure regardless of score.

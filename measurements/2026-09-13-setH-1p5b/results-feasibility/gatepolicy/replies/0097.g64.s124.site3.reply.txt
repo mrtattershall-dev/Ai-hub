@@ -1,0 +1,78 @@
+# At this point, the following code is a new addition to the function and should be written EXACTLY as it appears below:
+            if ordered_items:  # Check if there are any open ordered list items
+                flush_ordered_list()  # If so, close them before starting a new paragraph
+            continue
+
+        if line.startswith("1. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("2. ") or line.startswith("3. "):  # Add these lines for numbers 2 and 3
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("4. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("5. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("6. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        # Add the following lines for numbers 7 to 9
+        if line.startswith("7. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("8. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        if line.startswith("9. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        # Add the following lines for numbers 10 to 12
+        if line.startswith("10. "):
+            flush_para()
+            ordered_items.append(line[4:].strip())
+            continue
+        if line.startswith("11. "):
+            flush_para()
+            ordered_items.append(line[4:].strip())
+            continue
+        if line.startswith("12. "):
+            flush_para()
+            ordered_items.append(line[4:].strip())
+            continue
+        # Add the following lines for numbers 13 to 15
+        if line.startswith("13. "):
+            flush_para()
+            ordered_items.append(line[4:].strip())
+            continue
+        if line.startswith("14. "):
+            flush_para()
+            ordered_items.append(line[4:].strip())
+            continue
+        if line.startswith("15. "):
+            flush_para()
+            ordered_items.append(line[4:].strip())
+            continue
+        # Add the following lines for numbers 16 to 18
+        if line.startswith("16. "):
+            flush_para()
+            ordered_items.append(line[4:].strip())
+            continue
+        if line.startswith("17. "):
+            flush_para()
+            ordered_items.append(line[4:].strip())
+            continue
+        if line.startswith("18. "):
+            flush_para()
+            ordered_items.append(line[4:].strip())
+            continue
+        #

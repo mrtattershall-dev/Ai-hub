@@ -1,0 +1,17 @@
+Preregister composition wave 3: two predictions of NO defect, four calculus defects, a retirement analysis, and the instrument representation
+
+Seventeen predicted defects in two waves, none falsified: a program that only confirms itself is not
+being tested. This wave states two places where the reading says the code is RIGHT - covers() is
+transitive, and the ledger does not reconcile across worlds by recency - so the model can fail in
+the other direction. It predicts four defects in the constructor calculus: delegation widens the
+world a grant applies in (W3-c); narrow() moves an established dimension under restriction's free
+pass (W3-d); commit() consumes epistemic authority, so OBSERVE plus COMMIT is an action nobody
+permitted (W3-e, which an existing test asserts and will be changed with its reason); derive()'s
+kind and grant depend on argument order (W3-f). It applies RETIREMENT_PREREG's questions to the
+unimported constraints revisions with a detection control (W3-g), and specifies the instrument-
+subsumption representation Entry 14 asked for, with admit, refusal and unknown controls and its
+hand-authored limit stated in advance (W3-h).
+
+Message-File: scratch/m41.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

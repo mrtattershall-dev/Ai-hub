@@ -1,0 +1,15 @@
+class Stack:
+    def __init__(self):
+        self._items = []
+
+    def push(self, v):
+        self._items.append(v)
+
+    def pop(self):
+        return self._items.pop()
+
+    def peek(self):
+        return self._items[-1] if self._items else None
+
+    def size(self):
+        return len(self._items)

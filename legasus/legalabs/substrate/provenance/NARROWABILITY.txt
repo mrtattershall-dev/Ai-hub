@@ -1,0 +1,49 @@
+  e01 op1 INTRA-LINE   candidates null  passing null  max gain n/a
+  e01 op2 INTRA-LINE   candidates null  passing null  max gain n/a
+  e01 op3 NARROWABLE   candidates  25  passing  19  max gain 0.40 bits
+  e01 op4 NARROWABLE   candidates   4  passing   3  max gain 0.42 bits
+  e02 op1 independent  candidates   2  passing   2  max gain 0.00 bits
+  e02 op2 NARROWABLE   candidates  15  passing  13  max gain 0.21 bits
+  e02 op3 NARROWABLE   candidates  17  passing  15  max gain 0.18 bits
+  e03 op1 independent  candidates   2  passing   2  max gain 0.00 bits
+  e03 op2 NARROWABLE   candidates  11  passing   9  max gain 0.29 bits
+  e04 op1 independent  candidates   1  passing   1  max gain 0.00 bits
+  e04 op2 NARROWABLE   candidates  10  passing   9  max gain 0.15 bits
+  e04 op3 NARROWABLE   candidates  12  passing  11  max gain 0.13 bits
+  e05 op1 independent  candidates   1  passing   1  max gain 0.00 bits
+  e05 op2 NARROWABLE   candidates  12  passing  11  max gain 0.13 bits
+  e05 op3 NARROWABLE   candidates  12  passing  11  max gain 0.13 bits
+  e06 op1 INTRA-LINE   candidates null  passing null  max gain n/a
+  e06 op2 INTRA-LINE   candidates null  passing null  max gain n/a
+  e06 op3 NARROWABLE   candidates  29  passing  24  max gain 0.27 bits
+  e06 op4 NARROWABLE   candidates   3  passing   2  max gain 0.58 bits
+  f01 op1 INTRA-LINE   candidates null  passing null  max gain n/a
+  f01 op2 NARROWABLE   candidates  18  passing  14  max gain 0.36 bits
+  f01 op3 NARROWABLE   candidates   3  passing   2  max gain 0.58 bits
+  f02 op1 NARROWABLE   candidates  16  passing  14  max gain 0.19 bits
+  f02 op2 independent  candidates  13  passing  13  max gain 0.00 bits
+  f03 op1 NARROWABLE   candidates  23  passing  20  max gain 0.20 bits
+  f03 op2 NARROWABLE   candidates  22  passing  19  max gain 0.21 bits
+  f03 op3 independent  candidates  19  passing  19  max gain 0.00 bits
+  f03 op4 NARROWABLE   candidates  22  passing  19  max gain 0.21 bits
+  f04 op1 NARROWABLE   candidates  19  passing  17  max gain 0.16 bits
+  f04 op2 NARROWABLE   candidates  17  passing  16  max gain 0.09 bits
+  f04 op3 NARROWABLE   candidates  17  passing  16  max gain 0.09 bits
+  f05 op1 NARROWABLE   candidates  19  passing  17  max gain 0.16 bits
+  f05 op2 NARROWABLE   candidates  17  passing  16  max gain 0.09 bits
+  f05 op3 NARROWABLE   candidates  18  passing  16  max gain 0.17 bits
+  f06 op1 NARROWABLE   candidates  22  passing  20  max gain 0.14 bits
+  f06 op2 NARROWABLE   candidates  21  passing  19  max gain 0.14 bits
+  f06 op3 independent  candidates  19  passing  19  max gain 0.00 bits
+  f06 op4 NARROWABLE   candidates  21  passing  19  max gain 0.14 bits
+
+  ---- NARROWABILITY, proven by execution
+  operations                38
+  NARROWABLE                26   <- the v6 denominator
+  position-independent      7   0 bits is the CORRECT answer for these
+  intra-line                5   position fixed by the expression, not a line boundary
+  untestable                0   no candidate passes: instrument or probe, not program
+  mean max derivable gain   0.22 bits
+
+  No planner produced any of this. It is what the program and its probes actually do,
+  so LegaCore cannot be rewarded for narrowing past it - those positions really fail.

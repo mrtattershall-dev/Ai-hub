@@ -1,0 +1,11 @@
+{
+  "task_id": "a03",
+  "goal": "Add a date column type to the EXISTING csvfmt.py: a date value is a (year, month, day) tuple and formats as YYYY-MM-DD with month and day zero-padded to two digits. The type must be accepted by valid_types, formatted by format_row, and labelled as \"date\" by label. The plain and quoted column types must keep working exactly as they do now. Run it with python.",
+  "lead": "csvfmt.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the date column type is written the same way as the existing quoted column type",
+  "interface": [
+    "date"
+  ]
+}

@@ -1,0 +1,11 @@
+--- op op1 after: "# Small text helpers.\n"
+
+_SEEN = {}
+
+--- op op2 after: "[0] for w in normalize(s).split() if w)\n"
+
+
+def counted(s):
+    key = normalize(s)
+    _SEEN[key] = _SEEN.get(key, 0) + 1
+    return _SEEN[key]

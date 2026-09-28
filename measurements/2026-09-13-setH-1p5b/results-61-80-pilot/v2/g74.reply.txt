@@ -1,0 +1,22 @@
+```python
+import markdown
+
+def to_html(markdown_text):
+    # Convert markdown text to HTML using markdown library
+    html_output = markdown.markdown(markdown_text)
+    return html_output
+
+# Example usage
+existing_markdown = """
+This is some example markdown text.
+
+```python
+print("Hello, World!")
+```
+
+And this is more text.
+"""
+
+html_output = to_html(existing_markdown)
+print(html_output)
+```

@@ -1,0 +1,16 @@
+  ABLATING CONSTRAIN - what would have happened if the envelope had not refused?
+  no GPU time: every refused output replayed is already on disk
+
+  repeated a fixed line
+      refused  15   PROVE would CATCH  15   PROVE would MISS   0   unassemblable   0   raw truncated 0
+  returned a function
+      refused  10   PROVE would CATCH  10   PROVE would MISS   0   unassemblable   0   raw truncated 0
+  not exactly one guard and one return
+      refused   3   PROVE would CATCH   0   PROVE would MISS   0   unassemblable   3   raw truncated 0
+
+  TOTAL refused 28   PROVE would catch 25   PROVE would MISS 0   unassemblable 3   held out as truncated 0
+
+  MISS means the envelope discarded a semantically correct program. CATCH means it merely
+  saved the verifier a run. UNASSEMBLABLE means it caught something the verifier could not
+  have been pointed at. Those are three different justifications and only one of them is
+  a defect.

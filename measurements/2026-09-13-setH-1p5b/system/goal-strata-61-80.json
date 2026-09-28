@@ -1,0 +1,723 @@
+{
+  "provenance": {
+    "created_at": "2026-09-14T14:00:48.161Z",
+    "v2_commit": "68ab72c",
+    "v3_commit": "4be486d",
+    "seed60_commit": "e76e14c",
+    "seed60_bundle_sha": "2cafbeed0314275b0a16471a59131e7aca2dee19796b917573e1e8d50d44180f",
+    "goal_set_sha": "1f29e971e72f9461f6326e0e861031926f771c334453bbdf4bfa2627673171a9",
+    "planner_sha": "ea33af5db4d50171d19b1174f033337dd0f07c64178aeadaa72c03a603c77ebc",
+    "multiInsert_sha": "b48f309750e681871a6c3f7abbe194f8177b43bd0b1f8b771b57aa0b41bad534",
+    "safeReplace_sha": "a4d9efc8b100954b04c08d61603a9dc63dd485c688bacb9d548661abe2aec283",
+    "regression_sha": "a5d5c8be2a8237682f6ed6e3f9d537096383effa42f3437914ae3200b9ab6dae",
+    "model_output_consulted": false
+  },
+  "primary_outcome": {
+    "VERIFIED_GOAL_PASS": "structural obligations pass AND all applicable behavioural regressions pass AND the requested behavioural delta passes. For structural-only goals the behavioural terms do not apply; for behavioural goals structural success alone CANNOT produce a pass."
+  },
+  "predictions": {
+    "A": "v3 outperforms v2 specifically on MULTI_MEMBER_ELIGIBLE goals, because v2 inserts only the first required member while v3 performs stateful sequential insertion.",
+    "B": "v3 outperforms v2 specifically on SINGLE_SPAN_BEHAVIORAL_ELIGIBLE goals, because v3 can alter the authorized semantic span while requiring BOTH the old regression suite and the new delta to pass.",
+    "C": "V2_ALREADY_HANDLES and UNSUPPORTED show little or no systematic v3 advantage, because v3 intentionally changes neither mechanism there.",
+    "falsification": "If v3 wins overall but its rescues are NOT concentrated in the A/B strata, the architectural mechanism is NOT established. An aggregate improvement alone does not confirm the hypothesis."
+  },
+  "power_warning": {
+    "treatment_goals": 4,
+    "detail": "Only 4 of 20 goals fall in a v3-treatment stratum, and goal 80 is UNACHIEVABLE BY EITHER ARM under per-goal isolation because it depends on goal 71. Prediction A therefore rests on ONE informative goal (71) and Prediction B on TWO (64, 74). This range cannot produce a statistically meaningful test of either; at best it can show the mechanism operating or failing. That limitation is recorded BEFORE the run and must not be reinterpreted after it."
+  },
+  "counts": {
+    "UNSUPPORTED": 5,
+    "V2_ALREADY_HANDLES": 11,
+    "SINGLE_SPAN_BEHAVIORAL_ELIGIBLE": 2,
+    "MULTI_MEMBER_ELIGIBLE": 2
+  },
+  "goals": [
+    {
+      "goal": 61,
+      "lead": "s1_library.js",
+      "stratum": "UNSUPPORTED",
+      "rationale": "MULTI_SITE_BEHAVIORAL: the limit must be enforced in BOTH checkout and placeHold, so no single span contains the delta",
+      "note": null,
+      "blocked": null,
+      "v2_route": "content_edit",
+      "v3_route": "content_edit",
+      "v2_fallback_reason": "BEHAVIORAL_DELTA_UNPROVEN",
+      "owner": null,
+      "members": [],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Library"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "476ae6a9bc6dce7746552ad72b4590ebb8c5cfa19e13c874bb8eea1d81318249",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 62,
+      "lead": "s2_logs.py",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_function",
+      "v3_route": "add_function",
+      "v2_fallback_reason": null,
+      "owner": null,
+      "members": [
+        {
+          "name": "between",
+          "kind": "module_function"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "between"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "e0e12ac4d156880a4b890f02e395cf077c04748193f3afa7be03331c93c4a504",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 63,
+      "lead": "s3_matrix.js",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_method",
+      "v3_route": "add_method",
+      "v2_fallback_reason": null,
+      "owner": "Matrix",
+      "members": [
+        {
+          "name": "inverse",
+          "kind": "instance_method"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Matrix"
+        ],
+        "members": [
+          {
+            "owner": "Matrix",
+            "kind": "instance_method",
+            "name": "inverse"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "cdf4c0a81357e7690e8b7d845673b7584bbc58c51b24dd64950ba546595e142a",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 64,
+      "lead": "s4_markdown.py",
+      "stratum": "SINGLE_SPAN_BEHAVIORAL_ELIGIBLE",
+      "rationale": "confinement PROVEN by construction: a 1311B body spliced into the 954B to_html span delivers ordered lists and keeps every prior behaviour",
+      "note": null,
+      "blocked": null,
+      "v2_route": "content_edit",
+      "v3_route": "safe_behavioural_replacement",
+      "v2_fallback_reason": "BEHAVIORAL_DELTA_UNPROVEN",
+      "owner": null,
+      "members": [],
+      "oracle": "STRUCTURAL_PLUS_OLD_REGRESSION_PLUS_DELTA",
+      "confinement_probe": "confineAudit goal64",
+      "structural_contract": {
+        "moduleExports": [
+          "to_html"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "1593f66e8afe842fed65109721562f3001a303b9ef73a2db14bea8e49c7b3e82",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 65,
+      "lead": "s5_expr.js",
+      "stratum": "UNSUPPORTED",
+      "rationale": "MULTI_SITE_BEHAVIORAL: tokenize must change shape AND be added to module.exports, and evaluate consumes its current format - three sites",
+      "note": null,
+      "blocked": null,
+      "v2_route": "content_edit",
+      "v3_route": "content_edit",
+      "v2_fallback_reason": "BEHAVIORAL_DELTA_UNPROVEN",
+      "owner": null,
+      "members": [],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "tokenize"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "9b2d0bf0f95188a63cf90131b6023b1f845bedcbb823106da6637873640a895b",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 66,
+      "lead": "s6_graph.py",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_method",
+      "v3_route": "add_method",
+      "v2_fallback_reason": null,
+      "owner": "Graph",
+      "members": [
+        {
+          "name": "reachable",
+          "kind": "instance_method"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Graph"
+        ],
+        "members": [
+          {
+            "owner": "Graph",
+            "kind": "instance_method",
+            "name": "reachable"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "e5f84c92ec5f2899ddef771b17baf805408e27d35a1bca03a104863386f3d978",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 67,
+      "lead": "s7_cache.js",
+      "stratum": "UNSUPPORTED",
+      "rationale": "MULTI_SITE_BEHAVIORAL: onEvict must fire from the constructor option plus the lru, expired and deleted paths",
+      "note": null,
+      "blocked": null,
+      "v2_route": "content_edit",
+      "v3_route": "content_edit",
+      "v2_fallback_reason": "BEHAVIORAL_DELTA_UNPROVEN",
+      "owner": null,
+      "members": [],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Cache"
+        ],
+        "members": [
+          {
+            "owner": "Cache",
+            "kind": "instance_method",
+            "name": "delete"
+          },
+          {
+            "owner": "Cache",
+            "kind": "instance_method",
+            "name": "clear"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "dfa24299a6227e956370869614482776dfd259c0fa29463fba7f4fa139763761",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 68,
+      "lead": "s8_grades.py",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_method",
+      "v3_route": "add_method",
+      "v2_fallback_reason": null,
+      "owner": "Gradebook",
+      "members": [
+        {
+          "name": "curve",
+          "kind": "instance_method"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Gradebook"
+        ],
+        "members": [
+          {
+            "owner": "Gradebook",
+            "kind": "instance_method",
+            "name": "curve"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "01067a37244d27be71d870f401d0768d90d872ff3fd81da5ba7f31987f6bee2c",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 69,
+      "lead": "s9_board.html",
+      "stratum": "UNSUPPORTED",
+      "rationale": "NONLOCAL_EDIT: DOM/multi-artifact, and no structural contract is derivable",
+      "note": null,
+      "blocked": null,
+      "v2_route": "content_edit",
+      "v3_route": "content_edit",
+      "v2_fallback_reason": "NONLOCAL_EDIT",
+      "owner": null,
+      "members": [],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "b724868488bccaf89b81dc3b09c29f9f3787b564de711ff10916cf76ba0decc3",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 70,
+      "lead": "s10_desk.js",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_function",
+      "v3_route": "add_function",
+      "v2_fallback_reason": null,
+      "owner": null,
+      "members": [
+        {
+          "name": "canBorrow",
+          "kind": "module_function"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "canBorrow"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "a60c6bcf881348534b2174923ca09deb902570d4a088f2b0ad03eb9b67653ccf",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 71,
+      "lead": "s1_library.js",
+      "stratum": "MULTI_MEMBER_ELIGIBLE",
+      "rationale": "two additive members on one existing owner: Library.toJSON (instance) and Library.fromJSON (static)",
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_method",
+      "v3_route": "multi_member_insertion",
+      "v2_fallback_reason": null,
+      "owner": "Library",
+      "members": [
+        {
+          "name": "toJSON",
+          "kind": "instance_method"
+        },
+        {
+          "name": "fromJSON",
+          "kind": "static_method"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Library"
+        ],
+        "members": [
+          {
+            "owner": "Library",
+            "kind": "instance_method",
+            "name": "toJSON"
+          },
+          {
+            "owner": "Library",
+            "kind": "static_method",
+            "name": "fromJSON"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "476ae6a9bc6dce7746552ad72b4590ebb8c5cfa19e13c874bb8eea1d81318249",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 72,
+      "lead": "s2_logs.py",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_function",
+      "v3_route": "add_function",
+      "v2_fallback_reason": null,
+      "owner": null,
+      "members": [
+        {
+          "name": "sessions",
+          "kind": "module_function"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "sessions"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "e0e12ac4d156880a4b890f02e395cf077c04748193f3afa7be03331c93c4a504",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 73,
+      "lead": "s3_matrix.js",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_method",
+      "v3_route": "add_method",
+      "v2_fallback_reason": null,
+      "owner": "Matrix",
+      "members": [
+        {
+          "name": "solve",
+          "kind": "instance_method"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Matrix"
+        ],
+        "members": [
+          {
+            "owner": "Matrix",
+            "kind": "instance_method",
+            "name": "solve"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "cdf4c0a81357e7690e8b7d845673b7584bbc58c51b24dd64950ba546595e142a",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 74,
+      "lead": "s4_markdown.py",
+      "stratum": "SINGLE_SPAN_BEHAVIORAL_ELIGIBLE",
+      "rationale": "confinement PROVEN by construction: a 1479B body spliced into the 954B to_html span delivers fenced code blocks and keeps every prior behaviour",
+      "note": null,
+      "blocked": null,
+      "v2_route": "content_edit",
+      "v3_route": "safe_behavioural_replacement",
+      "v2_fallback_reason": "BEHAVIORAL_DELTA_UNPROVEN",
+      "owner": null,
+      "members": [],
+      "oracle": "STRUCTURAL_PLUS_OLD_REGRESSION_PLUS_DELTA",
+      "confinement_probe": "confineAudit goal74",
+      "structural_contract": {
+        "moduleExports": [
+          "to_html"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "1593f66e8afe842fed65109721562f3001a303b9ef73a2db14bea8e49c7b3e82",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 75,
+      "lead": "s5_expr.js",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_function",
+      "v3_route": "add_function",
+      "v2_fallback_reason": null,
+      "owner": null,
+      "members": [
+        {
+          "name": "toRPN",
+          "kind": "module_function"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "toRPN"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "9b2d0bf0f95188a63cf90131b6023b1f845bedcbb823106da6637873640a895b",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 76,
+      "lead": "s6_graph.py",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_method",
+      "v3_route": "add_method",
+      "v2_fallback_reason": null,
+      "owner": "Graph",
+      "members": [
+        {
+          "name": "components",
+          "kind": "instance_method"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Graph"
+        ],
+        "members": [
+          {
+            "owner": "Graph",
+            "kind": "instance_method",
+            "name": "components"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "e5f84c92ec5f2899ddef771b17baf805408e27d35a1bca03a104863386f3d978",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 77,
+      "lead": "s7_cache.js",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": "reason 'lru' is only observable with goal 67's onEvict, which is held out; Cache.resize alone satisfies the contract",
+      "blocked": null,
+      "v2_route": "add_method",
+      "v3_route": "add_method",
+      "v2_fallback_reason": null,
+      "owner": "Cache",
+      "members": [
+        {
+          "name": "resize",
+          "kind": "instance_method"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Cache"
+        ],
+        "members": [
+          {
+            "owner": "Cache",
+            "kind": "instance_method",
+            "name": "resize"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "dfa24299a6227e956370869614482776dfd259c0fa29463fba7f4fa139763761",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 78,
+      "lead": "s8_grades.py",
+      "stratum": "V2_ALREADY_HANDLES",
+      "rationale": null,
+      "note": null,
+      "blocked": null,
+      "v2_route": "add_method",
+      "v3_route": "add_method",
+      "v2_fallback_reason": null,
+      "owner": "Gradebook",
+      "members": [
+        {
+          "name": "to_csv",
+          "kind": "instance_method"
+        }
+      ],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "Gradebook"
+        ],
+        "members": [
+          {
+            "owner": "Gradebook",
+            "kind": "instance_method",
+            "name": "to_csv"
+          }
+        ],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "01067a37244d27be71d870f401d0768d90d872ff3fd81da5ba7f31987f6bee2c",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 79,
+      "lead": "s9_board.html",
+      "stratum": "UNSUPPORTED",
+      "rationale": "NONLOCAL_EDIT: DOM/multi-artifact filter across html and js",
+      "note": null,
+      "blocked": null,
+      "v2_route": "content_edit",
+      "v3_route": "content_edit",
+      "v2_fallback_reason": "NONLOCAL_EDIT",
+      "owner": null,
+      "members": [],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [],
+        "members": [],
+        "domIds": [
+          "s9-filter"
+        ],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "b724868488bccaf89b81dc3b09c29f9f3787b564de711ff10916cf76ba0decc3",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    },
+    {
+      "goal": 80,
+      "lead": "s10_desk.js",
+      "stratum": "MULTI_MEMBER_ELIGIBLE",
+      "rationale": "two additive module-level functions: snapshot and restore",
+      "note": null,
+      "blocked": "HARD DEPENDENCY on goal 71 - snapshot calls library.toJSON() and restore calls Library.fromJSON, neither of which exists in the post-60 world. Under per-goal isolation this goal is UNACHIEVABLE BY EITHER ARM.",
+      "v2_route": "content_edit",
+      "v3_route": "multi_member_insertion",
+      "v2_fallback_reason": "MULTI_NAME_ABSENT",
+      "owner": null,
+      "members": [],
+      "oracle": "STRUCTURAL",
+      "confinement_probe": null,
+      "structural_contract": {
+        "moduleExports": [
+          "snapshot",
+          "restore"
+        ],
+        "members": [],
+        "domIds": [],
+        "domClasses": []
+      },
+      "localization_preconditions": {
+        "predecessor_source_sha256": "a60c6bcf881348534b2174923ca09deb902570d4a088f2b0ad03eb9b67653ccf",
+        "lead_exists": true
+      },
+      "new_dependencies_authorized": false
+    }
+  ]
+}

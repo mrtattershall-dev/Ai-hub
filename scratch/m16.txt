@@ -1,0 +1,56 @@
+producer #2 (git) held E1-E10 and bent the evidence boundary; the selection rule's ordering clause did nothing
+
+SELECTION WAS MECHANICAL BUT THE ORDERING CLAUSE DID NO WORK, and that is recorded rather than smoothed
+over. All five eligible candidates - git, pip-check, py_compile, symtable, unittest - differ from doctest
+on ALL SEVEN declared axes, so "most axes differing" tied everywhere and the LEXICOGRAPHIC TIEBREAK made
+the choice. The rule was applied as frozen in 087ec67 rather than repaired once the candidate list was
+visible, because rewriting a selection rule after seeing the candidates is exactly what the freeze exists
+to prevent. Eligibility is still a real filter; the ordering clause is now recorded as
+P2-SELECTION-ORDERING = UNDISCRIMINATING and must not be cited as evidence that git was the maximally
+distant choice. git's merits stand on their own: it never executes the subject, its identity is
+content-addressed, its history is a DAG, and it has no PASS or FAIL. It is also a fact Legasus genuinely
+consumes rather than one invented to be consumed - THE COPY YOU MEASURE MUST BE THE COPY YOU EDITED is a
+byte-identity claim.
+
+ALL TEN PREDICTIONS HELD.
+
+    E1  raw evidence survives untranslated           TRACKED_CLEAN / TRACKED_MODIFIED / UNTRACKED
+    E2  producer-native identity stays authoritative 40-hex oid; no document or ordinal invented
+    E3  native distinctions survive unmodelled       worktree-vs-committed divergence
+    E4  the adapter invents nothing                  UNTRACKED -> UNKNOWN_MAPPING, not a guess at why
+    E5  producer failure is non-knowledge            no records emitted at all
+    E6  a scoped claim legitimately derives          "the copy measured is the copy committed"
+    E7  a distinction stays producer-specific        git evidence is NOT expressible in PASS/FAIL/UNKNOWN
+    E8  doctest evidence unchanged                   history m.f#0 intact, unstripped want intact
+    E9  a malformed record is refused                not coerced to the nearest label
+    E10 interpretable after subject AND producer gone
+
+THE BOUNDARY HAD TO BEND, AND THAT IS THE RESULT. The predictions were run against the EXISTING adapter
+first, deliberately, so a shape change would be discovered rather than pre-empted. The adapter hard-coded
+doctest's history shape, document + "#" + ordinal. Handed a git record - which has neither coordinate - it
+emitted the literal string "undefined#undefined". A FABRICATED COORDINATE WHERE THE HONEST ANSWER IS THAT
+THE DIMENSION DOES NOT APPLY: UNKNOWN collapsing into a value, inside the very abstraction built to prevent
+exactly that. It survived producer #1 only because producer #1 always had both fields.
+
+Repaired: a coordinate the producer cannot establish is now ABSENT rather than invented.
+
+    git scope     {criterion: "git 2.43", implementation: <oid>, repository: <head>}
+    doctest scope {criterion: "CPython doctest 3.13", history: "m.f#0"}
+
+Absent is not the same as unknown, and neither is the same as a string that looks like data.
+
+E6 DISTINGUISHES GENERIC FROM MERELY TOLERANT. git evidence does not just survive storage, it DERIVES a
+scoped Legasus claim with assertion: null - git establishes IDENTITY, NOT AN ASSERTION - and forcing an
+assertion field onto it would have invented a distinction the producer never made. Law 4 in the direction
+that is easy to miss, because the invented value would have looked harmless.
+
+NOT ESTABLISHED: two producers is not "generic", it is one demonstrated bend plus a repair. Nothing here
+tests whether {observability, assertion} are the right two fields; git fits only by being allowed to
+DECLINE the second. win32, git 2.43, no POSIX run.
+
+444 tests, 444 pass. PROVENANCE.json regenerates to the identical seal 4365cdde0a0cb6e4, so no historical
+artifact drifted. legasus-freeze-r3 untouched; Repo C prospective numbers unchanged.
+
+Message-File: scratch/m16.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

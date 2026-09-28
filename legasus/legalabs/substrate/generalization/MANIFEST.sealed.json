@@ -1,0 +1,44 @@
+{
+  "sealed_at": "2026-09-18T03:24:45.783Z",
+  "sealed_at_commit": "78e464869a72d1e669d3921f392376f6bb3bd355",
+  "pre_generation": true,
+  "note": "Sealed BEFORE any model generation or applicability detection ran against this family. Rule 15: author all, validate, seal, freeze, and only then let anything see it.",
+  "tasks": [
+    {
+      "task_id": "g01",
+      "task_sha": "83299e2cc31e6551fc7afd3c7fb5fc99d428328a1b2eb784285dc685d586fa7c",
+      "source_sha": "86fe4ef3f7a54c049f5471c4398a8ba2dd48181bbc1fa55fe68d8bc3685b8490",
+      "evidence_sha": "55415f3246e9aa5a1eeaa0456c467e7587548cdef86a09e7ac72016bfb636a53"
+    },
+    {
+      "task_id": "g02",
+      "task_sha": "3815ffecdd884f3fe49c7a931a084e030f1f41cf5cefc976a9d246d53bc12c3d",
+      "source_sha": "0532e938b7642f6d41c949a2cad755e360c1fef93c3f2b42b8eca18e5f074324",
+      "evidence_sha": "d55c963ef0106b3676d9e43d9350a85d94d486b3e3398f920ad2f5c2fe0bea0f"
+    },
+    {
+      "task_id": "g03",
+      "task_sha": "e6c3208abbe88bd0b086e9388f39f8df84e982843e4702928386d2dd0c31ec81",
+      "source_sha": "8f0967fbd54283f55e54367c0c51b5bae96883bc1f60249d4b7c7ba4fef46e8d",
+      "evidence_sha": "0eead35b122fdfd6f998a78bd39a4e00f56f967c07d4a8f3b83284bb2fd480dc"
+    },
+    {
+      "task_id": "g04",
+      "task_sha": "15bffe3afe2c1e84892426315e142924e6b692732d3be6e7cfa82aefd5a11aa7",
+      "source_sha": "5c04b8b1d71f94c3e55bd219bc059d5751c85e132627ac79a967275e6847c0bb",
+      "evidence_sha": "6752e08e9167dc8f39cae21dc32cf4eac00bb408acd7db24e62f5211c50634a6"
+    },
+    {
+      "task_id": "g05",
+      "task_sha": "18c7ffca7cd64a9da9b7b79154d4cf333d0b379c6b9ee102b944a84ee5b34bf8",
+      "source_sha": "8d82e53490c0bcea194424a36307940fc687d54fe057ee90c3e5470bc981753d",
+      "evidence_sha": "0d2539729913598d96e86a99225a9b3452ce86e461a6d963c501628f9676454f"
+    },
+    {
+      "task_id": "g06",
+      "task_sha": "78cc6b398d501ae45b3ff597b1dc66f86d38c791b24489db6daf04bc2072bc96",
+      "source_sha": "eb83166548d4eabdb956f90eade52ec5b19d1314bd6fd918ec517674498d1345",
+      "evidence_sha": "84e81c2529e17da975954d816d9cc3ed8852244be26da0fd63da0d11fc5e3a17"
+    }
+  ]
+}

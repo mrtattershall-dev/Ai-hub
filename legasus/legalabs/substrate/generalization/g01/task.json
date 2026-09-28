@@ -1,0 +1,14 @@
+{
+  "task_id": "g01",
+  "goal": "Add rare-word tracking to the EXISTING Counter in counter.py: mark_rare(word) records a word as rare, is_rare(word) reports whether it was recorded, and rare_count() returns how many have been recorded. Words are matched after stripping and lowercasing, the same as scan does. Keep scan and seen_count working exactly as they do now. Run it with python.",
+  "lead": "counter.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the rare-word set works the same way as the existing seen counts",
+  "interface": [
+    "mark_rare",
+    "is_rare",
+    "rare_count",
+    "word"
+  ]
+}

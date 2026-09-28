@@ -1,0 +1,12 @@
+{
+  "task_id": "h06",
+  "goal": "Add a scaled rate to the EXISTING rates.py: a helper supplies the factor 2, SCALED must hold the base rate multiplied by that factor when the module is imported, and scaled() returns it. Keep BASE and apply_rate working exactly as they do now. Run it with python.",
+  "lead": "rates.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the scaled rate is assembled the same way as the existing base rate",
+  "interface": [
+    "SCALED",
+    "scaled"
+  ]
+}

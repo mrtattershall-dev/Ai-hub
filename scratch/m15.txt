@@ -1,0 +1,52 @@
+provenance binds to CONTENT not PATH, and producer #2 selection is frozen before candidates are seen
+
+PROVENANCE BINDING. The retirement sidecar keyed provenance by PATHNAME, which is the module:line identity
+mistake one layer out: rewrite an artifact and the new bytes silently inherit the old attribution. Since
+PROVENANCE.json now participates directly in the evidence chain, its referential integrity can change
+entitlement today rather than hypothetically.
+
+    THE PROPERTY, FROZEN BEFORE THE IMPLEMENTATION: provenance attaches to immutable artifact identity,
+    not to where the artifact happens to be stored.
+
+A content digest is one implementation of that property, not the property itself. Seven controls, every
+expected behaviour decided BEFORE running:
+
+    same path, changed bytes        provenance MUST NOT transfer
+    different path, identical bytes provenance IS retained - the admit control, decided in advance,
+                                    because moving a file does not change what produced it and without
+                                    this "referential integrity" would only mean brittleness
+    missing artifact                provenance does not manufacture evidence
+    undeclared binding              REFUSED
+    modified sidecar                DETECTABLE, via a seal over the ledger
+    historical artifact             producer binding reconstructible from content alone
+    lifetime                        lookup succeeds with nothing available but bytes and ledger
+
+The live sidecar is migrated: 21 artifacts, 0 unknown, digest-keyed, sealed.
+
+PRODUCER #2 SELECTION FROZEN BEFORE CANDIDATES ARE INSPECTED. Every external claim in r4 rests on ONE
+authority, CPython doctest - the narrowest part of the evidence base, and an abstraction validated against
+a single producer is an abstraction SHAPED BY IT.
+
+Eligibility is boring and mechanical: an independently implemented external authority already available;
+establishing a real software fact Legasus has reason to consume; differing from doctest on AT LEAST THREE
+of evidence unit, identity scheme, execution model, native vocabulary, criterion, state/history semantics,
+isolation model; machine-readable without reimplementing its semantics. Selection takes the candidate
+differing on the MOST axes, ties by lexicographically smallest name - chosen for STRAIN rather than for
+expected agreement, and fixed before the list is seen so that distinction is checkable.
+
+E1-E10 frozen. E7 IS THE ANTI-COLLAPSE CONTROL: at least one distinction must remain PRODUCER-SPECIFIC,
+because flattening every producer to PASS/FAIL/UNKNOWN would satisfy E1-E6 trivially while abstracting
+away the thing the boundary exists to carry.
+
+E10 combines two halves discovered separately - subject lifetime != evidence lifetime, and producer
+lifetime != evidence lifetime - into something stronger than "save provenance":
+
+    THE LIFETIME OF JUSTIFIED EVIDENCE IS DETERMINED BY ITS RECORDED VALIDITY CONDITIONS, NOT BY THE
+    CONTINUED EXISTENCE OF EITHER ENDPOINT THAT PRODUCED IT.
+
+If producer #2 forces the supposedly generic boundary to change shape, that is THE RESULT - recorded, not
+engineered away.
+
+Message-File: scratch/m15.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

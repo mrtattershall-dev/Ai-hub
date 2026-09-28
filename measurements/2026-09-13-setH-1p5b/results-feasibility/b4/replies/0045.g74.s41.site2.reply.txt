@@ -1,0 +1,14 @@
+if line.startswith("```"):
+            if codes:
+                blocks.append("<pre><code>" + "\n".join(codes) + "</code></pre>")
+                del codes[:]
+            if links:
+                blocks.append("<pre><code>" + "\n".join(links) + "</code></pre>")
+                del links[:]
+            current = []
+        elif line.endswith("```"):
+            flush_para()
+            flush_list()
+            current = []
+        else:
+    

@@ -1,0 +1,12 @@
+text):
+    html = ""
+    for i, line in enumerate(text.split("\n")):
+        if _is_heading(line) is not None:
+            _, title = _is_heading(line)
+            html += f"<h{title}>{line.strip()}</h{title}>\n"
+            continue
+        if i % 2 == 0:  # even lines are regular paragraphs
+            html += "<p>" + _inline(line) + "</p>"
+        else:
+            html += "<ul><li>" + _inline(line) + "</li></ul>"
+    return html

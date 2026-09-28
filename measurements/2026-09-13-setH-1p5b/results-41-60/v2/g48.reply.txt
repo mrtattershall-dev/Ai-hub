@@ -1,0 +1,13 @@
+):
+        scores = self._scores.copy()         # shallow copy for in-place modification
+        keys = list(scores.keys())            # to preserve order of assignments
+        while keys:
+            best = (keys[0], None)
+            for k, v in scores.items():
+                if k[1] != best[1]:
+                    continue
+                pts = self._assignments[k[1]]["max"]
+                if v > best[0][1] * pts / top or (v == best[0][1] * pts / top and k < best[0]):
+                    best = (k, v)
+            del scores[keys.pop(0)]
+        return scores

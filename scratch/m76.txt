@@ -1,0 +1,19 @@
+Freeze the LegaScreen v2 baseline before designing v3
+
+Recorded at ab47226 so v2 cannot be remembered as broader than it was, and separately from anything
+that follows it. Four demonstrated lenses, each with an executed witness: field erasure, state-word
+alias, composition laundering including the ANY route, and conjunctive weakening. Five measured
+blind spots rather than supposed ones: the malformed-invocation specificity problem that v2 fixed
+and the v1 probes still carry; the same-name perturbation assumption; the derived-by-another-name
+blind spot with three dimensions unscreened at HEAD for exactly that reason; a surface of seven
+witnessed transforms across four modules, which is development calibration and not repository
+screening; and one prospective discovery attempt that found nothing new. Plus one more that the
+holdout made visible: the conjunctive invariant applies only where a human wrote down that the
+operation is conjunctive, and nothing discovers that.
+
+Per protection.mjs this is MECHANIZED_REGION for each lens and COVERED_CLASS for none, and no run
+has changed classCoverage from UNKNOWN.
+
+Message-File: scratch/m76.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

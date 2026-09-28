@@ -1,0 +1,33 @@
+Entry 23: the witness architecture removed the artifact class, and the rescan found nothing new
+
+Recorded before any code so it could not look convenient afterwards: the owner's general
+formulation, that output authority must be a subset of the authorized closure of the inputs, does
+not catch the holdout. C2's S1 was in the closure because premise two established it, so nothing was
+minted from nothing; the defect is that derive is conjunctive by its own source and took a dimension
+only one premise established. Two invariants were carried rather than one, and the instruction not
+to collapse single-edge minting with multi-edge laundering was obeyed because the data has not
+earned that reduction.
+
+V2-1 was a prediction of no detection and it held - ancestry does not flag C2, only weakening does -
+so the insufficiency of the general formulation is executed rather than argued.
+
+The architecture result is the strongest part. Requiring a witnessed call before concluding anything
+from an output took the erasure probe's seven positives over eight functions on calculus down to
+zero at HEAD with two real ones at the historical commit. The artifact class is gone, and the rule
+that removed it has been in witness.mjs since r2 - no observation without execution - while the
+screening layer ignored its own project's oldest discipline.
+
+V2-5 failed. The rescan over four trees surfaced C2 and nothing else, so v2 is a regression test
+wearing a screen's clothes and the earlier ANY moment did not repeat. No probe is added to chase a
+better result. The honest bound is that the surface was seven transforms, making a null weak
+evidence about the repository and strong evidence about the probe's reach.
+
+And the run found a defect in the screen itself: the first version reported the adapter minting two
+dimensions at HEAD, both false, because stripping a name the input never carried changed nothing and
+the invariant failed without any perturbation occurring - hazard 3, a control that could not fire,
+committed inside a screen built to catch that class, found by running rather than reading. Repaired
+with a non-vacuity check, with three dimensions now honestly unscreened.
+
+Message-File: scratch/m75.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

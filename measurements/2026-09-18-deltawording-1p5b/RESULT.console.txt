@@ -1,0 +1,26 @@
+  all three deltas plan identically: condition n < 10, result "small", winner existing, insert after line 8
+  controls ok: identical plans, sufficiency, reachable endpoint, perfect verifies, three wrong fragments accepted-but-failing, classifier and extractor separate the declared families
+  RULE 3 ok: endpoint names qwen2.5-coder:1.5b
+  10 cells   samples 40   temperature 0.6
+
+  W1   NONE    OTHER       PRIMARY zero-lower  0/40   correct-cond 36   verified 27   repeated-fixed  1   P(c|auth) 1.00
+  W1   NEUTRAL OTHER       PRIMARY zero-lower  1/40   correct-cond 33   verified 20   repeated-fixed  3   P(c|auth) 1.00
+  W1   FACT    OTHER       PRIMARY zero-lower  0/40   correct-cond 32   verified 28   repeated-fixed  6   P(c|auth) 1.00
+  W1   NONE    EXPLICIT    PRIMARY zero-lower  1/40   correct-cond 33   verified 31   repeated-fixed  2   P(c|auth) 1.00
+  W1   NONE    RELATIONAL  PRIMARY zero-lower  1/40   correct-cond 17   verified 33   repeated-fixed  0   P(c|auth) 1.00
+  FULL NONE    OTHER       PRIMARY zero-lower  0/40   correct-cond 31   verified 28   repeated-fixed  9   P(c|auth) 1.00
+  FULL NEUTRAL OTHER       PRIMARY zero-lower  0/40   correct-cond 25   verified 23   repeated-fixed 14   P(c|auth) 1.00
+  FULL FACT    OTHER       PRIMARY zero-lower  3/40   correct-cond 20   verified 19   repeated-fixed 17   P(c|auth) 1.00
+  FULL NONE    EXPLICIT    PRIMARY zero-lower  3/40   correct-cond 22   verified 28   repeated-fixed  6   P(c|auth) 0.93
+  FULL NONE    RELATIONAL  PRIMARY zero-lower  0/40   correct-cond  6   verified 34   repeated-fixed  4   P(c|auth) 1.00
+
+  E1 - ZERO_LOWER by delta wording, pooled over windows, per 80:
+     OTHER       zero-lower   0    correct  67    verified  55
+     EXPLICIT    zero-lower   4    correct  55    verified  59
+     RELATIONAL  zero-lower   1    correct  23    verified  67
+
+  E2 - window x sentence interaction on repeated-a-fixed-line, tested directly:
+     NONE vs NEUTRAL  DiD 0.075   chi2(1) 0.18   p = 6.69e-1
+     NONE vs FACT     DiD 0.075   chi2(1) 0.77   p = 3.80e-1
+
+  written -> C:/Users/tatte/AppData/Local/Temp/claude/C--Users-tatte-OneDrive-Documents-ai-native-engine/a8160f8c-9099-46b5-8e59-75485c848e44/scratchpad/RESULT.deltawording.json

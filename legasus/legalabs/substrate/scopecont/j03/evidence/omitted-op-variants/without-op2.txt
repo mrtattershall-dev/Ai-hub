@@ -1,0 +1,16 @@
+# Palette.
+
+COLORS = [
+    "red",
+    "green",
+]
+
+DEFAULT = "red"
+
+
+def known(name):
+    return name in COLORS
+
+
+def pick(name):
+    return name if known(name) else DEFAULT

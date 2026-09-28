@@ -1,0 +1,29 @@
+{
+ "denominator": {
+  "minedRuns": 182,
+  "distinctKeys": 157,
+  "duplicateKeys": 19,
+  "runsUnderDuplicateKeys": 44
+ },
+ "claim1": {
+  "PRINTS": 48,
+  "SILENT": 2,
+  "UNATTRIBUTED": 0
+ },
+ "silentExamples": [
+  {
+   "inv": "res = Word('a').parse_string('aaaaabaaa', parse_all=True)",
+   "err": "ParseException"
+  },
+  {
+   "inv": "patt = Word(alphas)[...].ignore(c_style_comment)",
+   "err": "NameError"
+  }
+ ],
+ "claim2": {
+  "supported": 57,
+  "unsupported": 0,
+  "noSetup": 0,
+  "total": 57
+ }
+}

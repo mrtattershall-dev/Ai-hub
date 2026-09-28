@@ -135,8 +135,48 @@ export // Parse one plain-text action from a model response. File content lives 
 // intact — the thing that broke JSON-string encoding on smaller models.
 function parseAction(text, lastPath) {
   if (!text) return null;
-  const thought = (text.match(/THOUGHT:\s*(.+)/i)?.[1] || '').trim();
-  const fenceM = text.match(/```([^\n]*)\n([\s\S]*?)```/);
+  // ── THE ECHO WINDOW ─────────────────────────────────────────────────────────────────────────
+  //
+  // tatte 2026-09-12: "Can't we have an echo window that doesn't affect the code itself. Gives it a
+  // space to think."
+  //
+  // A place the model may restate, plan, and echo its context WITHOUT any of it dispatching. This
+  // matters because echoing is what small models do: measured the same day on a real run,
+  // qwen2.5:1.5b answered its first turn with 2,877 characters that were almost entirely its own
+  // input played back - the BUILD PLAN, the task ledger block and the asset block, verbatim. The
+  // hub then executed a line IT had written, and did it twice.
+  //
+  // Reasoning models already work this way, so this also fixes a second case for free:
+  // deepseek-r1:1.5b emits its reasoning separately and some backends inline it as <think>...</think>.
+  //
+  // CLOSED pairs only. An UNCLOSED <think> has its tag removed and its text kept, deliberately: if a
+  // model opens the window and never shuts it, swallowing the rest would eat a real action and turn a
+  // recoverable turn into "could not parse an action". Losing the window is cheap; losing the action
+  // is a wasted call.
+  // TWO WINDOWS, ONE RULE: what is inside them is never read as an instruction.
+  //
+  //   <think>   the model's space to restate, plan and echo          (tatte's echo window)
+  //   <example> the HUB's space to SHOW an action without arming it
+  //
+  // The example window exists because deleting the hub's examples was the wrong fix. A 1.5B's single
+  // strongest measured ability is copying a format it has been shown - it reproduced the two-line
+  // THOUGHT/ACTION shape perfectly when given one - so edit_file's "the shape is: ..." help and
+  // run_command's "use test_web instead" suggestion EARN their place. They just must not be live
+  // ammunition: both are tool results, tool results are pushed into run.history, and an echoing model
+  // hands them straight back to this function. Measured 2026-09-12 by echoedHeaderDispatch.test.mjs:
+  // the edit_file help parsed as edit_file, and the blocking-server refusal parsed as test_web.
+  //
+  // If a model copies an example INCLUDING the tags, the content is stripped, no action is found, and
+  // the loop answers "could not parse an action" - a recoverable wasted turn instead of a confidently
+  // wrong tool. That asymmetry is the whole design: fail towards saying nothing.
+  //
+  // UNCLOSED tags keep their text, as before. Losing the window is cheap; swallowing a real action
+  // that followed an unclosed tag costs a call.
+  const thinkless = String(text)
+    .replace(/<(think|example)>[\s\S]*?<\/\1>/gi, '\n')
+    .replace(/<\/?(?:think|example)>/gi, '');
+  const thought = (thinkless.match(/THOUGHT:\s*(.+)/i)?.[1] || '').trim();
+  const fenceM = thinkless.match(/```([^\n]*)\n([\s\S]*?)```/);
   const fenceLang = fenceM ? fenceM[1].trim().toLowerCase() : '';
   const fenced = fenceM ? fenceM[2].replace(/\n$/, '') : undefined;
   // FIELDS ARE READ FROM HERE, NOT FROM `text`. A fenced block is the model's content: a file that contains the
@@ -144,7 +184,7 @@ function parseAction(text, lastPath) {
   // a markdown file documenting the REMOVE: convention handed itself permission to delete existing definitions,
   // and the words "replace LINES: 10-14" in a THOUGHT turned a whole-file rewrite into a line deletion with the
   // new code thrown away. FIND:/REPLACE: keep reading `text`, because their payloads are fenced by design.
-  const outside = text.replace(/```[\s\S]*?```/g, '\n');
+  const outside = thinkless.replace(/```[\s\S]*?```/g, '\n');
   const pathM = outside.match(/PATH:\s*(.+)/i);
   let path = pathM ? pathM[1].trim().replace(/[`"']/g, '') : undefined;
   // If no PATH was given, a filename mentioned in the text is a GUESS, not an instruction.
@@ -166,11 +206,62 @@ function parseAction(text, lastPath) {
   // coin flip that overwrites working code when it loses. One distinct name is evidence;
   // two is a question, and the run loop recovers from "I could not parse that" far better
   // than from a file silently destroyed.
-  const mentioned = [...new Set((text.match(/\b[\w.\-/]+\.(?:html|css|js|mjs|py|json|md|txt)\b/gi) || []).map((s) => s.toLowerCase()))];
+  // SCAVENGE FROM `outside` TOO, not the raw text. Same divergence as the ACTION header had, one
+  // field lower down, and with a worse payload: a filename that appears ONLY inside the model's
+  // fenced code block was eligible to become the write target. Combined with the lone-code-block
+  // fallback below ("a bare code block means write_file"), a reply whose only filename was mentioned
+  // inside its own content parsed to write_file -> that file. Measured 2026-09-12: a block
+  // containing the line "PATH: secret.txt" produced exactly that, and secret.txt is not a file the
+  // model ever asked to write. `outside` is the whole point - the model's CONTENT must not steer the
+  // hub - and PATH, REMOVE, LINES and OCCURRENCE already honoured it.
+  const mentioned = [...new Set((outside.match(/\b[\w.\-/]+\.(?:html|css|js|mjs|py|json|md|txt)\b/gi) || []).map((s) => s.toLowerCase()))];
   const scavenged = mentioned.length === 1 ? mentioned[0] : undefined;
 
   const langFile = { html: 'index.html', css: 'style.css', js: 'script.js', javascript: 'script.js', python: 'main.py', py: 'main.py' };
-  const am = text.match(/ACTION:\s*([a-z_]+)/i);
+  // WHICH ACTION DID THE MODEL CHOOSE? Two changes here, both closing a gap between this function
+  // and the rules stated eight lines above it.
+  //
+  // 1. READ IT FROM `outside`, NOT THE RAW TEXT. The comment at `outside` states the rule outright -
+  //    "a file that contains the line REMOVE:, LINES:, OCCURRENCE: or ACTION: must not be able to
+  //    change what the hub does with it" - and PATH, REMOVE, LINES and OCCURRENCE all honour it.
+  //    The TOOL SELECTION did not. So an ACTION: header inside a fenced code block could pick the
+  //    tool, which is the one field where being wrong costs the most.
+  //
+  // 2. ANCHOR IT TO THE START OF A LINE, as parseActions already does when it SPLITS a reply
+  //    (/^[ \t]*ACTION:[ \t]*[a-z_]+/gim). Two parsers, one idea, different rules - and the
+  //    dispatching one was the lax one. The cost, measured on a real run 2026-09-12: taskLedger's
+  //    context block said "Mark a task done as soon as it works (ACTION: task_done)." on every call,
+  //    the model echoed it, and this unanchored match found the header MID-SENTENCE INSIDE
+  //    PARENTHESES and dispatched it. Two turns and 433 seconds executing the hub's own reminder.
+  //
+  // Deliberately NO unanchored fallback. One would re-admit exactly that echo, since the echoed
+  // block contains no line-anchored header at all. The system prompt teaches the header on its own
+  // line and parseActions has always required it there; a reply that does not do that is better
+  // answered with "could not parse an action" - which the loop recovers from - than with a
+  // confidently wrong tool. parserCorpus.test.mjs runs this over the recorded real replies, so the
+  // corpus decides whether strict is affordable rather than my taste.
+  // PREFER the header outside any fence; FALL BACK to one inside a fence only if there is none.
+  //
+  // The first version of this read `outside` ONLY, and that was too strict. Proven by running the
+  // committed parser and this one side by side on the same inputs: a reply whose WHOLE action block is
+  // fenced parsed as write_file before and as NOTHING after. parserFields.test.mjs asserts that shape
+  // under a heading that calls it a deliberate limit - some models wrap their entire reply in a code
+  // fence, and the hub has always understood that. parserCorpus stayed 7/0 because the recorded corpus
+  // does not contain the shape, so the corpus alone could not have caught it. (I had not baselined
+  // parserFields before editing, which is exactly why the regression got this far.)
+  //
+  // The ordering is what makes the fallback safe. The danger `outside` exists for is a PAYLOAD
+  // hijacking a real action - a reply that gives an action and also writes a file whose content
+  // happens to contain "ACTION:". In that case a header exists outside the fence, the primary match
+  // wins, and the fallback is never consulted. The fallback fires only when there is NO action outside
+  // any fence, which means the fenced text is the model's actual action, clumsily wrapped.
+  //
+  // Both matches stay LINE-ANCHORED, which is what actually kills the echo that started this: the
+  // ledger block's "(ACTION: task_done)" sits mid-sentence inside parentheses, so neither the primary
+  // nor the fallback can see it. Verified against the committed parser: HEAD returned task_done for
+  // that string, this returns null.
+  const am = outside.match(/^[ \t]*ACTION:[ \t]*([a-z_]+)/im)
+    || thinkless.match(/^[ \t]*ACTION:[ \t]*([a-z_]+)/im);
   let tool = am ? am[1].toLowerCase() : null;
 
   // Forgiving fallback: small models often "fix" a file by just pasting a code

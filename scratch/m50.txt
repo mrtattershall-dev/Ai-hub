@@ -1,0 +1,27 @@
+Preregister the provenance relation question: is content-to-producer a function, and does CONTESTED assert a conflict the evidence does not support
+
+Raised by the owner reviewing the wave-1 repair of C8-a, and recorded as the owner's observation.
+bind() asserts that this content was produced by this implementation, and the module decided that
+identical bytes at another path retain provenance - content to producer as a FUNCTION. The C8-a
+repair inherited that and hardened it: having refused to pick a winner between two attributions, it
+declares them in CONFLICT.
+
+The word is the defect. CONTESTED is defined in ledger.mjs LAW 3 as contradicting live claims that
+block reliance and OWE AN EXPERIMENT. No experiment separates two tools that each emitted an empty
+file - both statements are true - so the repair attaches an unsatisfiable obligation to a state that
+may carry none. And it is the C4 class committed by me inside the repair for C8: a state acquired
+the ledger's CONTESTED authority because I reused the word.
+
+Measured before predicting: the sidecar's 21 artifacts have 21 distinct digests, so nothing is
+currently mis-reported and the defect is LATENT; and three files in repoC/IDENTITY.json already
+share the empty-file digest, so the triggering condition exists in data this project measures. Both
+halves stated so no repair can be sold as fixing a live corruption.
+
+Five predictions with controls, and the expected repair states the relation - MULTIPLY_BOUND, N
+production events, no single producer established - without asserting a conflict. CONTESTED is left
+to a check that has the coordinate which would justify one; where that belongs is left UNKNOWN
+rather than invented.
+
+Message-File: scratch/m50.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

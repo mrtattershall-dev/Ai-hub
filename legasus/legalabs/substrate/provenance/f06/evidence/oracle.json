@@ -1,0 +1,84 @@
+{
+  "task_id": "f06",
+  "analogy_class": "no_supported_analogy",
+  "analogy_justification": "every function in this file formats or inspects the arguments it is given and retains nothing between calls, so an append-only log with a retention bound has no structural relation here to parallel",
+  "transaction": {
+    "operation_count": 4,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the across-call store the new behaviour needs",
+        "site_hint": "# Audit helpers.\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the retention bound the new behaviour is specified against",
+        "site_hint": "et(\"kind\", \"?\")) + \":\" + str(e.get(\"who\", \"?\"))\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the recorder, using the store and the bound",
+        "site_hint": "):\n    return str(e.get(\"kind\", \"\")) == \"error\"\n"
+      },
+      {
+        "id": "op4",
+        "intent": "the reader over the store",
+        "site_hint": " return \", \".join(fmt_event(e) for e in events)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op3"
+      ],
+      [
+        "op2",
+        "op3"
+      ],
+      [
+        "op1",
+        "op4"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3",
+        "op4"
+      ]
+    ],
+    "transaction_length": 4
+  },
+  "complexity": {
+    "structural_class": "novel-state-feature",
+    "affected_region_lines": 20
+  },
+  "reference": {
+    "source_hash": "b5655e1f69ecd7b540fe1cb3bb0e7a04632fe5478a25903f3e9d48048c3f98e5",
+    "reference_hash": "706b61fdfe8fa0fe842ecec41d856ff466d7c24181765bbb0c19244d6eeab46d",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3",
+      "op4"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "task_id": "j06",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing base value as the relation to parallel; that feature is a module constant read by a function, and the new value occupies the same position",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the doubled value",
+        "site_hint": "PAIR = (BASE, [1, 2])\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the accessor",
+        "site_hint": "def base():\n    return BASE\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 8
+  },
+  "reference": {
+    "source_hash": "a17a273441d545871a1f52bd018ee2a7e783ae4a2dc522a096f4a277eb8b2375",
+    "reference_hash": "04cc9f104df2eb132ee700ca3c05ffcc45e081404499660d20f299be99442fa3",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

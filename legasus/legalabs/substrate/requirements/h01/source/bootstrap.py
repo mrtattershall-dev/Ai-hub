@@ -1,0 +1,7 @@
+# Counter bootstrap.
+
+BASE = 10
+
+
+def total(extra):
+    return BASE + extra

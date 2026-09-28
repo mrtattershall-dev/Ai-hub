@@ -1,0 +1,77 @@
+  E0             ORDERED      order fifty then high then micro   basis DERIVED_WITH_ENGINEERING_CHOICE
+  E0 NOTE: reversed order verifies, which is expected to depend on which constraint the reversal crosses
+  E1             ORDERED      order high then micro then low   basis DERIVED_WITH_ENGINEERING_CHOICE
+  E1 NOTE: reversed order fails, which is expected to depend on which constraint the reversal crosses
+  E2             ORDERED      order five then micro then low   basis DERIVED_WITH_ENGINEERING_CHOICE
+  E2 NOTE: reversed order fails, which is expected to depend on which constraint the reversal crosses
+  E3             ORDERED      order micro then low then mid   basis DERIVED
+  UND            UNDETERMINED NO GENERATION   blocked by low/plus at n=1
+
+  ABLATION INSTRUMENT (perfect fragments, presented order):
+    E0   edges 0   DECIDE ON verified   DECIDE OFF verified   expected OFF verified
+    E1   edges 1   DECIDE ON verified   DECIDE OFF failed: micro   expected OFF failed
+    E2   edges 2   DECIDE ON verified   DECIDE OFF failed: micro,five   expected OFF failed
+    E3   edges 3   DECIDE ON verified   DECIDE OFF failed: low,micro   expected OFF failed
+
+  RENDERING CONTROL:
+    E0   prompts differing between conditions 3/3   derived order unchanged [fifty high micro]
+    E1   prompts differing between conditions 3/3   derived order unchanged [high micro low]
+    E2   prompts differing between conditions 3/3   derived order unchanged [five micro low]
+    E3   prompts differing between conditions 3/3   derived order unchanged [micro low mid]
+
+  controls ok: orders derived as expected, each prompt isolated from the other operation, both realizations verify, the reversed composition fails where ordering is derived and passes where both orders are legal
+  RULE 3 ok: qwen2.5-coder:1.5b, qwen2.5-coder:7b, qwen2.5-coder:14b
+  4 transaction cases x 3 models   samples 20
+
+  qwen2.5-coder:1.5b ISOLATED       E0    op-yield 0.933   assembled 16/20   verified 16   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 0   DECIDE-OFF verified 16   broken  0/16
+  qwen2.5-coder:1.5b ISOLATED       E1    op-yield 0.867   assembled 13/20   verified 13   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 1   DECIDE-OFF verified  0   broken 13/13
+  qwen2.5-coder:1.5b ISOLATED       E2    op-yield 0.800   assembled 10/20   verified 10   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 2   DECIDE-OFF verified  0   broken 10/10
+  qwen2.5-coder:1.5b ISOLATED       E3    op-yield 0.833   assembled 11/20   verified 11   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 3   DECIDE-OFF verified  0   broken 11/11
+  qwen2.5-coder:1.5b SIBLING_NAMED  E0    op-yield 0.950   assembled 17/20   verified 17   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 0   DECIDE-OFF verified 17   broken  0/17
+  qwen2.5-coder:1.5b SIBLING_NAMED  E1    op-yield 0.900   assembled 15/20   verified  0   P(correct|assembled) 0.000   dead-op 15   probe-fail 0  ||  edges 1   DECIDE-OFF verified  0   broken  0/0
+  qwen2.5-coder:1.5b SIBLING_NAMED  E2    op-yield 0.867   assembled 14/20   verified  0   P(correct|assembled) 0.000   dead-op 14   probe-fail 0  ||  edges 2   DECIDE-OFF verified  0   broken  0/0
+  qwen2.5-coder:1.5b SIBLING_NAMED  E3    op-yield 0.867   assembled 14/20   verified  2   P(correct|assembled) 0.143   dead-op 12   probe-fail 0  ||  edges 3   DECIDE-OFF verified  0   broken  2/2
+  qwen2.5-coder:7b   ISOLATED       E0    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 0   DECIDE-OFF verified 20   broken  0/20
+  qwen2.5-coder:7b   ISOLATED       E1    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 1   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:7b   ISOLATED       E2    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 2   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:7b   ISOLATED       E3    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 3   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:7b   SIBLING_NAMED  E0    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 0   DECIDE-OFF verified 20   broken  0/20
+  qwen2.5-coder:7b   SIBLING_NAMED  E1    op-yield 1.000   assembled 20/20   verified 17   P(correct|assembled) 0.850   dead-op 3   probe-fail 0  ||  edges 1   DECIDE-OFF verified  0   broken 17/17
+  qwen2.5-coder:7b   SIBLING_NAMED  E2    op-yield 1.000   assembled 20/20   verified 18   P(correct|assembled) 0.900   dead-op 2   probe-fail 0  ||  edges 2   DECIDE-OFF verified  0   broken 18/18
+  qwen2.5-coder:7b   SIBLING_NAMED  E3    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 3   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:14b  ISOLATED       E0    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 0   DECIDE-OFF verified 20   broken  0/20
+  qwen2.5-coder:14b  ISOLATED       E1    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 1   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:14b  ISOLATED       E2    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 2   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:14b  ISOLATED       E3    op-yield 1.000   assembled 20/20   verified 20   P(correct|assembled) 1.000   dead-op 0   probe-fail 0  ||  edges 3   DECIDE-OFF verified  0   broken 20/20
+  qwen2.5-coder:14b  SIBLING_NAMED  E0    op-yield 1.000   assembled 20/20   verified 19   P(correct|assembled) 0.950   dead-op 1   probe-fail 0  ||  edges 0   DECIDE-OFF verified 19   broken  0/19
+  qwen2.5-coder:14b  SIBLING_NAMED  E1    op-yield 1.000   assembled 20/20   verified  1   P(correct|assembled) 0.050   dead-op 19   probe-fail 0  ||  edges 1   DECIDE-OFF verified  0   broken  1/1
+  qwen2.5-coder:14b  SIBLING_NAMED  E2    op-yield 1.000   assembled 20/20   verified  9   P(correct|assembled) 0.450   dead-op 11   probe-fail 0  ||  edges 2   DECIDE-OFF verified  0   broken  9/9
+  qwen2.5-coder:14b  SIBLING_NAMED  E3    op-yield 1.000   assembled 20/20   verified  0   P(correct|assembled) 0.000   dead-op 20   probe-fail 0  ||  edges 3   DECIDE-OFF verified  0   broken  0/0
+
+  qwen2.5-coder:1.5b    transaction yield 1.375   P(correct|assembled) 0.627   verified end-to-end 0.863   sec/verified 9.9
+  qwen2.5-coder:7b      transaction yield 2.000   P(correct|assembled) 0.969   verified end-to-end 1.938   sec/verified 5.4
+  qwen2.5-coder:14b     transaction yield 2.000   P(correct|assembled) 0.681   verified end-to-end 1.363   sec/verified 11.1
+
+  THE PRIMARY ENDPOINT: does naming the sibling facts produce sibling defence?
+    qwen2.5-coder:1.5b ISOLATED        defends NAMED fact   0   defends SIBLING  44   RESCUED   0   op-yield 0.858   clauses: n == 3 | n != 3 | 1 < n < 100
+    qwen2.5-coder:1.5b SIBLING_NAMED   defends NAMED fact   0   defends SIBLING  81   RESCUED   0   op-yield 0.896   clauses: n == 3 | n < 0 | n < 10 | n < 100 | n != 3
+    qwen2.5-coder:7b   ISOLATED        defends NAMED fact   0   defends SIBLING  60   RESCUED   0   op-yield 1.000   clauses: n != 3
+    qwen2.5-coder:7b   SIBLING_NAMED   defends NAMED fact   0   defends SIBLING  55   RESCUED   0   op-yield 1.000   clauses: n < 0 | n != 3 | n == 5
+    qwen2.5-coder:14b  ISOLATED        defends NAMED fact   0   defends SIBLING  76   RESCUED   0   op-yield 1.000   clauses: n != 3
+    qwen2.5-coder:14b  SIBLING_NAMED   defends NAMED fact   0   defends SIBLING  78   RESCUED   0   op-yield 1.000   clauses: n < 0 | n != 3
+
+  DOSE-RESPONSE by rendering  (of the transactions DECIDE got right, how many broke)
+    ISOLATED       E0   edges 0   DECIDE ON  56   DECIDE OFF  56   broken   0/56   0%
+    ISOLATED       E1   edges 1   DECIDE ON  53   DECIDE OFF   0   broken  53/53   100%
+    ISOLATED       E2   edges 2   DECIDE ON  50   DECIDE OFF   0   broken  50/50   100%
+    ISOLATED       E3   edges 3   DECIDE ON  51   DECIDE OFF   0   broken  51/51   100%
+    SIBLING_NAMED  E0   edges 0   DECIDE ON  56   DECIDE OFF  56   broken   0/56   0%
+    SIBLING_NAMED  E1   edges 1   DECIDE ON  18   DECIDE OFF   0   broken  18/18   100%
+    SIBLING_NAMED  E2   edges 2   DECIDE ON  27   DECIDE OFF   0   broken  27/27   100%
+    SIBLING_NAMED  E3   edges 3   DECIDE ON  22   DECIDE OFF   0   broken  22/22   100%
+
+  THE COST OF THE RENDERING: refusal reasons, so a yield loss cannot hide
+    ISOLATED        refusals  34   returned a function x23, not exactly one guard and one return x9, repeated a fixed line x2
+    SIBLING_NAMED   refusals  25   returned a function x21, not exactly one guard and one return x3, repeated a fixed line x1
+
+  written -> measurements/2026-09-18-decide-rendering/RESULT.json

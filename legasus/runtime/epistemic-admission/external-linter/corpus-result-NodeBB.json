@@ -1,0 +1,27 @@
+{
+  "rule": "array-callback-return",
+  "budgetFiles": 6000,
+  "scanned": 945,
+  "tally": {
+    "EVALUATED": 938,
+    "INCOMPLETE": 7,
+    "EXCLUDED": 0,
+    "VIOLATION": 0
+  },
+  "byRepo": {
+    "NodeBB": {
+      "eligibleOnDisk": 945,
+      "EVALUATED": 938,
+      "INCOMPLETE": 7,
+      "EXCLUDED": 0,
+      "VIOLATION": 0,
+      "notScannedBudget": 0
+    }
+  },
+  "incompleteReasons": {
+    "coverageIncomplete": 6,
+    "analysisIncomplete": 1
+  },
+  "candidates": [],
+  "seconds": 5
+}

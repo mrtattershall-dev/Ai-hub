@@ -1,0 +1,9 @@
+# NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+        if line.startswith("#"):
+            flush_para()
+            flush_list()
+            h = _is_heading(line)
+            if h:
+                level, body = h
+                blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+                continue

@@ -1,0 +1,84 @@
+{
+  "task_id": "f03",
+  "analogy_class": "no_supported_analogy",
+  "analogy_justification": "every helper in this file reads a matrix and returns a value, and none of them validates anything or signals failure, so a checking operation that raises has no structural relation here to parallel",
+  "transaction": {
+    "operation_count": 4,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the bound the new behaviour is specified against",
+        "site_hint": "# Small matrix helpers.\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the failure signal the new behaviour raises",
+        "site_hint": "(m):\n    return (len(m), len(m[0]) if m else 0)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the checking operation, using the bound and the failure signal",
+        "site_hint": "def row(m, i):\n    return list(m[i])\n"
+      },
+      {
+        "id": "op4",
+        "intent": "the batch form over the checking operation",
+        "site_hint": "def col(m, j):\n    return [r[j] for r in m]\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op3"
+      ],
+      [
+        "op2",
+        "op3"
+      ],
+      [
+        "op3",
+        "op4"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3",
+        "op4"
+      ]
+    ],
+    "transaction_length": 4
+  },
+  "complexity": {
+    "structural_class": "novel-control-feature",
+    "affected_region_lines": 23
+  },
+  "reference": {
+    "source_hash": "363bdf3a182acf7dcc34970bde8a776782be0c51e182b8f909615163fa37d103",
+    "reference_hash": "36e7464c095f2ede63eda4f63dcf974ae936c0f01d0186f1d78988cb57232b6d",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3",
+      "op4"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

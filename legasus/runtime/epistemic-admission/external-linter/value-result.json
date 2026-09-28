@@ -1,0 +1,162 @@
+[
+  {
+    "arm": "b0",
+    "scenario": "unchanged, after restart",
+    "reused": true,
+    "why": "",
+    "ms": 1,
+    "wall": 289,
+    "expected": true,
+    "verdict": "as required"
+  },
+  {
+    "arm": "b0",
+    "scenario": "CONTENT changed",
+    "reused": true,
+    "why": "",
+    "ms": 1,
+    "wall": 191,
+    "expected": false,
+    "verdict": "REQUIREMENT VIOLATED"
+  },
+  {
+    "arm": "b0",
+    "scenario": "CONFIG changed",
+    "reused": true,
+    "why": "",
+    "ms": 1,
+    "wall": 223,
+    "expected": false,
+    "verdict": "REQUIREMENT VIOLATED"
+  },
+  {
+    "arm": "b0",
+    "scenario": "TOOL changed (R-e)",
+    "reused": true,
+    "why": "",
+    "ms": 0,
+    "wall": 189,
+    "expected": false,
+    "verdict": "REQUIREMENT VIOLATED"
+  },
+  {
+    "arm": "b1",
+    "scenario": "unchanged, after restart",
+    "reused": true,
+    "why": "",
+    "ms": 55,
+    "wall": 235,
+    "expected": true,
+    "verdict": "as required"
+  },
+  {
+    "arm": "b1",
+    "scenario": "CONTENT changed",
+    "reused": false,
+    "why": "file content changed since the result was saved",
+    "ms": 0,
+    "wall": 205,
+    "expected": false,
+    "verdict": "as required"
+  },
+  {
+    "arm": "b1",
+    "scenario": "CONFIG changed",
+    "reused": false,
+    "why": "configuration changed since the result was saved",
+    "ms": 56,
+    "wall": 255,
+    "expected": false,
+    "verdict": "as required"
+  },
+  {
+    "arm": "b1",
+    "scenario": "TOOL changed (R-e)",
+    "reused": false,
+    "why": "the tool changed since the result was saved",
+    "ms": 57,
+    "wall": 270,
+    "expected": false,
+    "verdict": "as required"
+  },
+  {
+    "arm": "t",
+    "scenario": "unchanged, after restart",
+    "reused": true,
+    "why": "",
+    "ms": 56,
+    "wall": 273,
+    "expected": true,
+    "verdict": "as required"
+  },
+  {
+    "arm": "t",
+    "scenario": "CONTENT changed",
+    "reused": false,
+    "why": "evidence was established in file:value-subject.js@d9128b6165645956 and this is file:value-subject.js@254c5ea4a9f47fc9",
+    "ms": 55,
+    "wall": 249,
+    "expected": false,
+    "verdict": "as required"
+  },
+  {
+    "arm": "t",
+    "scenario": "CONFIG changed",
+    "reused": false,
+    "why": "evidence was established over claim domain ARRAY_METHOD_CALLBACKS_RECOGNISED_BY_ARRAY_CALLBACK_RETURN_IN_LINTED_MODULE@1c9eecc43f4fa055 and this is ARRAY_METHOD_CALLBACKS_RECOGNISED_BY_ARRAY_CALLBACK_RETURN_IN_LINTED_MODULE@2ad0efe53ead304f",
+    "ms": 59,
+    "wall": 247,
+    "expected": false,
+    "verdict": "as required"
+  },
+  {
+    "arm": "t",
+    "scenario": "TOOL changed (R-e)",
+    "reused": false,
+    "why": "evidence was established over claim domain ARRAY_METHOD_CALLBACKS_RECOGNISED_BY_ARRAY_CALLBACK_RETURN_IN_LINTED_MODULE@1c9eecc43f4fa055 and this is ARRAY_METHOD_CALLBACKS_RECOGNISED_BY_ARRAY_CALLBACK_RETURN_IN_LINTED_MODULE@6860ef9c7a49cfd1",
+    "ms": 58,
+    "wall": 251,
+    "expected": false,
+    "verdict": "as required"
+  },
+  {
+    "arm": "tc",
+    "scenario": "unchanged, after restart",
+    "reused": true,
+    "why": "",
+    "ms": 57,
+    "wall": 256,
+    "expected": true,
+    "verdict": "as required"
+  },
+  {
+    "arm": "tc",
+    "scenario": "CONTENT changed",
+    "reused": true,
+    "why": "",
+    "ms": 52,
+    "wall": 248,
+    "expected": false,
+    "verdict": "REQUIREMENT VIOLATED"
+  },
+  {
+    "arm": "tc",
+    "scenario": "CONFIG changed",
+    "reused": true,
+    "why": "",
+    "ms": 53,
+    "wall": 246,
+    "expected": false,
+    "verdict": "REQUIREMENT VIOLATED"
+  },
+  {
+    "arm": "tc",
+    "scenario": "TOOL changed (R-e)",
+    "reused": true,
+    "why": "",
+    "ms": 52,
+    "wall": 257,
+    "expected": false,
+    "verdict": "REQUIREMENT VIOLATED"
+  }
+]

@@ -1,0 +1,34 @@
+Repair C4, C5 and C6: an admission names its producer, the bookkeeping key cannot be a dimension, and a shadowed carried value is recorded
+
+C4. Admission was keyed by dimension NAME and promotion in scope() matched on the name alone, so
+once collectionCohort was admitted on pytest's fixture-scope argument, two git records carrying an
+identity key spelled the same were refused a join on it (b11e51f, C4-a). Same name is not same
+referent - L7 one door further in. An admission now declares the PRODUCER whose semantics its
+argument was drawn from, and a carried coordinate is promoted only on a scope whose criterion names
+that producer; any other carrier, including one that names no producer at all, keeps it recorded
+and unpromoted. The base six are producer-agnostic by design and are the only entries without one.
+Executed both ways: a pytest scope promotes and its join is then refused; a git scope does not and
+two git records stay comparable.
+
+C5. admitDimension accepted the reserved key UNADMITTED as a name; scope() then wrote the recorded
+block under an active key and covers() compared two identical blocks by object identity, so
+NOT_COMPARABLE was manufactured out of bookkeeping (b11e51f, C5-a/b). Both gates now refuse the
+reserved name and any non-identifier, with the reason. Admit control: an ordinary identifier with a
+producer is still admissible.
+
+C6. `{...promotable, ...partial}` let a declared top-level value win over a carried value of the same
+name - correctly, the declared value is the adapter's deliberate mapping - and then forgot the
+carried value existed (b11e51f, C6-a/b). It now survives under a SHADOWED: key inside UNADMITTED,
+survives a second pass through scope(), and never touches comparison. An equal value is not a
+shadow.
+
+Two existing tests that admit dimensions now declare a producer (producer3.test P3-10 and the
+DISCOVERY test; registry-leak ENTRY and L8's carrier criterion), each with a comment naming why.
+That is a changed test following a changed contract, recorded here rather than folded in silently.
+
+Focused 69/69. Suite 497/497. The six threatened rigs re-run and byte-identical to their b11e51f
+baselines.
+
+Message-File: scratch/m29.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

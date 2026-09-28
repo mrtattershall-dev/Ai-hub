@@ -1,0 +1,4 @@
+if line.startswith("1. "):
+            flush_para()
+            flush_ol()
+    

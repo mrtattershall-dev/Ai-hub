@@ -1,0 +1,19 @@
+):
+        WHITE, GREY, BLACK = 0, 1, 2
+
+        def visit(n):
+            colour[n] = GREY
+            for nxt in self._adj[n]:
+                if colour.get(nxt, WHITE) == GREY:
+                    return True
+                if colour.get(nxt, WHITE) == WHITE and visit(nxt):
+                    return True
+            colour[n] = BLACK
+            order.append(n)
+            return False
+
+        order = []
+        for n in self._adj:
+            if colour.get(n, WHITE) == WHITE and visit(n):
+                raise ValueError("graph contains a cycle")
+        return order

@@ -1,0 +1,9 @@
+# Nested calls.
+
+BASE = max(1, min(4, 3))
+
+PAIR = (BASE, [1, 2])
+
+
+def base():
+    return BASE

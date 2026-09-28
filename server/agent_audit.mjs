@@ -140,7 +140,11 @@ check('approval is a policy decision, not a binary gate',
   /classifyCommand/.test(src) && /classifyPython/.test(src)
   && /decision === 'deny'/.test(src) && /decision === 'ask'/.test(src));
 check('a denied command does NOT halt the run (it continues)',
-  /policy_denied[\s\S]{0,400}continue;/.test(src));
+  // Same stale shape as the finish-gate check above: the loop uses a LABELLED continue now, so
+  // `continue;` stopped matching `continue turn;` and this went red while the behaviour it guards
+  // stayed correct. Measured 2026-09-13 - the refusal pushes a policy_denied step, tells the model
+  // why it will never run, and continues the turn loop under a `// keep working - do NOT halt` comment.
+  /policy_denied[\s\S]{0,400}continue turn;/.test(src));
 check('an auto-approved command is recorded as a policy decision',
   /policy_allowed/.test(src));
 check('the ledger is injected per call, never pushed into history',
@@ -151,7 +155,15 @@ check('the plan seeds the ledger, and only when it is empty',
 check('the finish gate blocks on unfinished tasks',
   /ledger\.progress\(WORKSPACE\)/.test(src) && /task\(s\) still open/.test(src));
 check('the finish gate covers NON-web projects',
-  /!hasWeb \|\| !run\.touchedWeb\) && !run\.verified/.test(src) && /verifier\.verify\(WORKSPACE\)/.test(src));
+  // STALE ASSERTION, not a defect - and the first guess at which half was stale was wrong, so both
+  // halves were finally tested separately against the concatenated src rather than read and guessed at.
+  // Measured 2026-09-13: the verify() half matched all along. The half that went red was `) && !run.verified`,
+  // because the gate now reads `&& (!run.verified || run.verifiedAt !== workspaceStamp())` - it ALSO
+  // re-verifies when the workspace changed under an earlier pass. The guarded behaviour was never
+  // missing; it got stronger and the regex was left behind. A check that can never pass is worse than
+  // no check, because it teaches everyone to skim past a FAIL.
+  /\(!hasWeb \|\| !run\.touchedWeb\) && \(!run\.verified \|\| run\.verifiedAt !== workspaceStamp\(\)\)/.test(src)
+  && /verifier\.verify\(WORKSPACE, \{ entry: goalEntry/.test(src));
 // The web checks must key on what THIS RUN touched, not on a file merely existing in
 // the workspace. Gating on existence alone blocked a Node build forever because a stale
 // index.html from a previous project was lying around.

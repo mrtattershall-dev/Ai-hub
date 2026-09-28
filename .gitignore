@@ -81,3 +81,7 @@ legasus/out/transfer-engine/cov/
 # d2 audit captures: sealed on disk, never committed - a bundle in git history
 # would be readable by anyone who can read the repo, which defeats the lock.
 server/legasus-audit/
+modal-serve/__pycache__/
+
+# test debris: R6 copies eslint rule files here to evaluate them outside an ignored path
+legasus/runtime/epistemic-admission/external-linter/external/

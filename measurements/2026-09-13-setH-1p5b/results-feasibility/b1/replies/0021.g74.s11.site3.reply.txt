@@ -1,0 +1,2 @@
+if fence:
+        blocks.append("\n".join(codes))

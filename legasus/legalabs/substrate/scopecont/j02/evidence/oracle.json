@@ -1,0 +1,72 @@
+{
+  "task_id": "j02",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing accumulation as the relation to parallel; that feature computes over the shared items at module level, and the new behaviour occupies the same position",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the module constant",
+        "site_hint": "# Aggregation.\n"
+      },
+      {
+        "id": "op2",
+        "intent": "a statement inside summarize using its LOCAL and the planned constant",
+        "site_hint": "    for it in items:\n        total += int(it)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "a module-level function using the planned constant",
+        "site_hint": "def count(items):\n    return len(items)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 10
+  },
+  "reference": {
+    "source_hash": "c696cb9578018738d76b61cab8cce26f4fad651d69c4c35cdf585e606d3f965c",
+    "reference_hash": "fdd2be15f2f486c1ed59553dea8f8d4515324c6bda3c4e1bb0b8106c932624b3",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

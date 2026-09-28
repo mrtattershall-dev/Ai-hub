@@ -78,6 +78,24 @@ await test('FIND identical to REPLACE says NO CHANGE, not OK', () => {
 await test('a tolerant match rewritten to the same lines says NO CHANGE', () => {
   assert.match(edits[1], /^NO CHANGE/, edits[1].slice(0, 200));
 });
+// A NO-OP REFUSAL HAS TO SHOW WHAT THE REGION ACTUALLY CONTAINS.
+//
+// Set I (2026-09-12), goal 16, dense Qwen2.5-Coder-32B on s6_graph.py: the model had ALREADY landed its de-indent at
+// call 14 ("OK: edited s6_graph.py; now 76 lines"). At calls 18-21 it re-sent the same edit four times and got
+// "NO CHANGE: your REPLACE is identical to what it would replace" every time. The hub was RIGHT each time - but the
+// answer never showed the region's current text, so the model could not tell "already applied" from "failed to
+// apply", and the run died on the loop guard. Four of that run's five loop-guard deaths were refusal-retry loops.
+//
+// The same lesson is already written into the ambiguous-match refusal below preview() at agent.js:811 - "an error
+// that a caller cannot act on is a loop". The no-op refusal never got it.
+await test('the NO CHANGE refusal shows the region as it actually reads now', () => {
+  assert.match(edits[1], /x = 1/,
+    'the refusal names no line of the region, so a caller cannot tell "already applied" from "failed to apply":\n'
+    + edits[1].slice(0, 300));
+  assert.match(edits[1], /\d+\|/,
+    'the refusal shows no LINE NUMBERS, so the caller cannot switch to LINES: a-b to address the region directly:\n'
+    + edits[1].slice(0, 300));
+});
 await test('a real edit still says OK and changes the file (the control)', () => {
   assert.match(edits[2], /^OK: edited n\.py/, edits[2].slice(0, 200));
   assert.equal(now.trim(), SRC.replace('y = 2', 'y = 3'), now);

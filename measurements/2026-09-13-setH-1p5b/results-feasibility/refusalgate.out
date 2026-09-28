@@ -1,0 +1,30 @@
+  REFUSAL GATE - classifier experiment, static checks only, no execution
+
+=== POSITIVE WITNESS (must ADMIT - if this refuses, the whole suite fails) ===
+  plan          ADMIT
+  snippets      7/7 admitted
+  goal 74 plan  ADMIT   snippets 3/3 admitted
+
+=== NEGATIVE WITNESSES (must REFUSE) ===
+  unreachable site (defect 6)     REFUSE   site3:site_unreachable
+  ambiguous anchor                REFUSE   anchor_ambiguous(2 occurrences)
+  out-of-scope identifier (codes) REFUSE   out_of_scope_identifier(codes is a local of another function)
+  duplicate accumulation (a a b b)REFUSE   duplicate_accumulation(current.append(line.strip()) (already runs in this loop))
+  instruction echo                ADMIT   flagged: instruction_echo   (non-fatal by design)
+
+=== ADVERSARIAL NEAR-MISS (same shape as the good plan; exactly one bad snippet) ===
+  plan-level shape                ADMIT  (identical to the good plan)
+  snippets refused                [5]   exactly site 5 - the gate is not just pattern-matching plan shape
+
+===== CLASSIFIER METRICS =====
+  known-good admitted    12/12
+  known-bad refused      4/5
+  false refusals         0
+  false admissions       1
+  coverage (admitted/total of all witnesses)  13/17
+  adversarial near-miss  isolated the bad site
+
+===== NON-VACUITY INVARIANT =====
+  holds: the gate admits the full known-good plan, so its refusals carry information.
+
+  ALL WITNESSES PASS

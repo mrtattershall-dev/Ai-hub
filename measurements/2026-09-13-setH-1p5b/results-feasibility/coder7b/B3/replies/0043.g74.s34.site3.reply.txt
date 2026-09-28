@@ -1,0 +1,3 @@
+if fenced_code_block is not None:
+        blocks.append("<pre><code>" + "\n".join(fenced_code_block).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;") + "</code></pre>")
+    # END OF REQUESTED CHANGE

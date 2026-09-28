@@ -1,0 +1,5 @@
+) {
+    const size = this.size();
+    const hits = size - this.m.size;
+    return `hits: ${hits}, misses: ${size - hits}`;
+  }

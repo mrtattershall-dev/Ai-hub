@@ -1,0 +1,3 @@
+if re.match(r"^\d+\.\s+", line):
+            flush_para()
+    

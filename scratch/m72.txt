@@ -1,0 +1,31 @@
+Entry 22: the holdout did not transfer, and the microscope's narrowness is now measured rather than assumed
+
+v1 met a three-case bar in which each probe was built around the case it later found, which shows
+the probes were faithfully built and not that they transfer. The selection rule, the two readings
+and the four outcomes were frozen in a commit containing nothing else, before any candidate was
+named, with the consequence of each outcome decided in advance so the result could not choose its
+own.
+
+C2 was selected mechanically - the output context of derive gaining a dimension no premise
+established - and verified live in the target tree by direct evaluation so silence could not be
+misread as absence. STRICT produced twelve positives, none relating to calculus, derive or C2.
+POINTED produced seven over eight functions, one naming the right function and field for three wrong
+reasons: the call is wrong-shaped and its refusal naturally lacks context, the pathology is a gain
+while the probe detects loss, and a reader following it reaches a dead end. PARTIAL, and the
+preregistration says PARTIAL is not rounded up.
+
+The screen detects loss of a field, collision of a name, and gain along a lengthened path. C2 is
+gain from absence in a single transformation - a fourth shape nothing in the harness models. The
+first defect none of the probes was designed around is not reached, and the narrowness is now
+measured, which is what this series has been trying to buy. Also measured and unflattering: aimed at
+a module whose functions take structured arguments rather than each other's outputs, the erasure
+probe produced almost pure noise, quantifying the specificity problem v0 named.
+
+The fourth probe is named by the evidence - a derived context must not establish a dimension that no
+premise established, the dual of the erasure invariant - and is deliberately left unwritten so the
+preregistration governing it can be written first, and so it rescans all prior history rather than
+only its motivating defect.
+
+Message-File: scratch/m72.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

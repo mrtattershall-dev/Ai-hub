@@ -1,0 +1,12 @@
+b) {
+    if (!Array.isArray(b) || b.length !== this.rows.length) throw new Error('b must be an array of the same length as rows');
+    const [ar, ac] = this.shape();
+    if (ac !== 1) throw new Error('matrix must be square');
+    const out = [];
+    for (let i = 0; i < ar; i++) {
+      let row = [];
+      for (let j = 0; j < ac; j++) row.push(b[i]);
+      row = this.rows.map((a, k) => a[k] * row[k]).reduce((s, x) => s + x);
+      out.push(row[0] / row[1]);
+    }
+    return new Matrix(out);

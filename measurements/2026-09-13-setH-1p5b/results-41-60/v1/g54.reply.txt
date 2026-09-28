@@ -1,0 +1,33 @@
+```python
+# s4_markdown.py
+
+def to_html(markdown):
+    lines = markdown.split('\n')
+    html = ''
+    current_list = []
+    for line in lines:
+        if line.startswith('- '):
+            if current_list:
+                html += '</ul>\n'
+            current_list.append('<li>{}</li>'.format(line[2:]))
+        else:
+            if current_list:
+                html += '</ul>\n'
+            html += '<p>{}</p>'.format(line)
+    if current_list:
+        html += '</ul>\n'
+    return html
+
+# Example usage
+markdown = """
+- List item 1
+  - Sublist item 1.1
+  - Sublist item 1.2
+- List item 2
+"""
+print(to_html(markdown))
+```
+
+This code defines a function `to_html` that takes a Markdown string as input and converts it to HTML by handling unordered lists. It splits the input into lines, checks if each line starts with "- ", and if so, appends it to the current list of items. If the line does not start with "- ", it closes the current list and starts a new paragraph. The function returns the complete HTML string.
+
+The example usage demonstrates how to use the `to_html` function with a sample Markdown string.

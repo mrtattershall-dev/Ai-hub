@@ -1,0 +1,12 @@
+{
+  "task_id": "j04",
+  "goal": "Add a banner to the EXISTING messaging.py: BANNER holds the prefix followed by a dash when the module is imported, and banner() returns it. Keep PREFIX, send and label working exactly as they do now. Run it with python.",
+  "lead": "messaging.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the banner is assembled the same way as the existing prefix label",
+  "interface": [
+    "BANNER",
+    "banner"
+  ]
+}

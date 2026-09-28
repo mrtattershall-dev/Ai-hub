@@ -1,0 +1,39 @@
+# Path helpers.
+
+MAX_HOPS = 16
+
+
+def clean(p):
+    return str(p).strip().strip("/")
+
+
+class PathCycle(Exception):
+    pass
+
+
+def join_path(a, b):
+    left = clean(a)
+    right = clean(b)
+    if not left:
+        return right
+    if not right:
+        return left
+    return left + "/" + right
+
+
+def resolve(links, start):
+    seen = set()
+    cur = start
+    hops = 0
+    while cur in links:
+        if cur in seen or hops >= MAX_HOPS:
+            raise PathCycle(cur)
+        seen.add(cur)
+        cur = links[cur]
+        hops += 1
+    return cur
+
+
+def depth(p):
+    c = clean(p)
+    return len(c.split("/")) if c else 0

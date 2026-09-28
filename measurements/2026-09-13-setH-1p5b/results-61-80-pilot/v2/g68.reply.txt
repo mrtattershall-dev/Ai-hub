@@ -1,0 +1,10 @@
+, by_student=False):
+        # TODO: curve all students or just one?
+        out = []
+        for s in sorted(self._students):
+            p = self.percent(s)
+            if p is None:
+                out.append((s, "N/A", "-"))
+                continue
+            out.append((s, p, letter(p)))
+        return out

@@ -1,0 +1,48 @@
+def flush_ol():
+        if ol_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")
+            del ol_items[:]
+    # END OF NEW FUNCTION
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            flush_ol()  # ADDED FOR ORDERED LISTS
+            continue
+        if re.match(r"^\d+\. ", line):  # ADDED FOR ORDERED LISTS
+            flush_para()
+            ol_items.append(line[2:].strip())
+            continue
+        flush_list()
+        flush_ol()  # ADDED FOR ORDERED LISTS
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    flush_ol()  # ADDED FOR ORDERED LISTS
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    # ADDED FOR ORDERED LISTS
+    assert to_html("1. one\n2. two") == "<ol><li>one</li><li>two</li></ol>"
+    print("ok")
+```
+
+This code snippet is a Python implementation of a Markdown parser that converts Markdown formatted text into HTML. The `to_html` function processes the input text, splitting it into blocks and handling different types of Markdown elements such as paragraphs, headings, emphasis

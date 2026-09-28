@@ -1,0 +1,12 @@
+{
+  "task_id": "h05",
+  "goal": "Add two extra settings groups to the EXISTING config.py: one helper supplies b as 2, another supplies c as 3, and both must be merged into CONFIG when the module is imported. Keep the a setting and get working exactly as they do now. Run it with python.",
+  "lead": "config.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the extra settings are merged the same way as the existing settings are declared",
+  "interface": [
+    "b",
+    "c"
+  ]
+}

@@ -1,0 +1,18 @@
+flush_ol()
+            flush_list_item(line)
+            continue
+        if line.startswith("1. "):
+            flush_para()
+            # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+            # REQUESTED CHANGE: Add ordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a number, a dot and a space ("1. ") become <ol><li>...</li>...</ol>, written like the unordered lists. Run it with python.
+            # AT THIS POINT WRITE ONLY THIS: call `flush_ol()` here and nothing else, so an ordered-list line closes an open ordered list
+            flush_ol()
+            flush_list_item(line)
+            continue
+        if line.startswith("  - "):
+            flush_para()
+            # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+            # REQUESTED CHANGE: Add ordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a number, a dot and a space ("1. ") become <ol><li>...</li>...</ol>, written like the unordered lists. Run it with python.
+            # AT THIS POINT WRITE ONLY THIS: call `flush_ol()` here and nothing else, so an ordered-list line closes an open ordered list
+            flush_ol()
+            flush_list_item(line)

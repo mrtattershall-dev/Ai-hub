@@ -1,0 +1,30 @@
+s) {
+  const out = [];
+  let i = 0;
+  while (i < s.length) {
+    const c = s[i];
+    if (c === ' ') { i++; continue; }
+    if ('+-*/^(),'.includes(c)) { out.push({ t: c, at: i }); i++; continue; }
+    const num = /^\d+(?:\.\d+)?/.exec(s.slice(i));
+    if (num) { out.push({ t: 'num', v: Number(num[0]), at: i }); i += num[0].length; continue; }
+    const name = /^[A-Za-z_][A-Za-z0-9_]*/.exec(s.slice(i));
+    if (name) {
+      p++;
+      if (peek() && peek().t === '(') {
+        const fn = FUNCS[name];
+        if (!fn) throw new Error('unknown function ' + name + ' at ' + tk.at);
+        eat('(');
+        const args = [additive()];
+        while (peek() && peek().t === ',') { eat(','); args.push(additive()); }
+        eat(')');
+        return fn(...args);
+      }
+      if (!Object.prototype.hasOwnProperty.call(vars, name)) {
+        throw new Error('unknown name ' + name + ' at ' + tk.at);
+      }
+      return vars[name];
+    }
+    throw bad('cannot parse');
+  }
+  return out;
+}

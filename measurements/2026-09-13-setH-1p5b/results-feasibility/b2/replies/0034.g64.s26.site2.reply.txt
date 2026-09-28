@@ -1,0 +1,23 @@
+def flush_ol():
+        if ol_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")
+            del ol_items[:]
+    # END OF EXISTING - do not repeat or rewrite it.
+
+    def flush_paragraph(line):
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]
+    # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+    # REQUESTED CHANGE: Add ordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a number, a dot and a space ("1. ") become <ol><li>...</li>...</ol>, written like the unordered lists. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: define a nested function named `flush_ol` that mirrors the existing `flush_list` but emits an <ol> block from `ol_items` instead of a <ul> from `items`, and clears `ol_items` afterwards; do not modify `flush_list`
+    def flush_ol():
+        if ol_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")
+            del ol_items[:]
+    # END OF EXISTING - do not repeat or rewrite it.

@@ -1,0 +1,85 @@
+# END OF REQUESTED CHANGE
+            # BEGIN EXISTING CODE (do not remove or change this code)
+        if line.startswith("1. "):
+            flush_para()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("2. "):
+            flush_para()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("3. "):
+            flush_para()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("4. "):
+            flush_para()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("5. "):
+            flush_para()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("6. "):
+            flush_para()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("7. "):
+            flush_para()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("8. "):
+            flush_para()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("9. "):
+            flush_para()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("10. "):
+            flush_para()
+            items.append(line[4:].strip())
+            continue
+        # END OF REQUESTED CHANGE
+        # BEGIN EXISTING CODE (do not remove or change this code)
+        if line.startswith("**"):
+            flush_para()
+            m = re.match(r"^\*\*(.*)\*\*", line)
+            blocks.append("<p><strong>" + _inline(m.group(1)) + "</strong></p>")
+            continue
+        if line.startswith("*"):
+            flush_para()
+            m = re.match(r"^\*(.*)\*", line)
+            blocks.append("<p><em>" + _inline(m.group(1)) + "</em></p>")
+            continue
+        if line.startswith("1. "):
+            flush_ol()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("2. "):
+            flush_ol()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("3. "):
+            flush_ol()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("4. "):
+            flush_ol()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("5. "):
+            flush_ol()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("6. "):
+            flush_ol()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("7. "):
+            flush_ol()
+            items.append(line[3:].strip())
+            continue
+        if line.startswith("8. "):
+            flush_ol()
+            items.append(line[3

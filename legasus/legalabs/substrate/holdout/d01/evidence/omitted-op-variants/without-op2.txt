@@ -1,0 +1,15 @@
+# Small text helpers.
+
+_SEEN = {}
+
+
+def normalize(s):
+    return " ".join(str(s).split()).lower()
+
+
+def word_count(s):
+    return len(normalize(s).split())
+
+
+def initials(s):
+    return "".join(w[0] for w in normalize(s).split() if w)

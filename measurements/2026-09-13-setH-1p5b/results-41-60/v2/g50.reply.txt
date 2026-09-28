@@ -1,0 +1,9 @@
+library) {
+  const l = library.overdue();
+  return l.length ? l.map(i => i.isbn).join(', ') : '(empty)';
+}
+
+function fineReport(library) {
+  const l = library.fines();
+  return l.length ? l.map(i => `${i.member}: ${i.amount}`).join('\n') : '(empty)';
+}

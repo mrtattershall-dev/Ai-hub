@@ -1,0 +1,29 @@
+fenced_code_block = None  # Declare the state for fenced code blocks
+    if line.strip() == "":
+        flush_para()
+        flush_list()
+        continue
+    if line.startswith("- "):
+        flush_para()
+        items.append(line[2:].strip())
+        continue
+    flush_list()
+    h = _is_heading(line)
+    if h:
+        flush_para()
+        level, body = h
+        blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+        continue
+    current.append(line.strip())
+    # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+    # REQUESTED CHANGE: Add fenced code blocks to to_html in the EXISTING s4_markdown.py: the lines between two lines of ``` become <pre><code>...</code></pre>, keeping their line breaks ("\n"), escaped, with no other formatting; a fence that is never closed runs to the end of the text. Run it with python.
+    # AT THIS POINT WRITE ONLY THE CODE TO HANDLE FENCED CODE BLOCKS
+    if line.strip() == "```":
+        if fenced_code_block is None:
+            fenced_code_block = []
+        else:
+            blocks.append("<pre><code>" + "\n".join(fenced_code_block) + "</code></pre>")
+            fenced_code_block = None
+            continue
+    elif fenced_code_block is not None:
+        fenced_code_block.append(line.strip())

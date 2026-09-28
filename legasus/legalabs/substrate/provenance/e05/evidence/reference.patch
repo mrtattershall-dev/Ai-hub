@@ -1,0 +1,12 @@
+--- op op1 after: "        self._pins = []\n"
+        self._drafts = []
+
+--- op op2 after: " item):\n        self._pins.append(item)\n"
+
+    def add_draft(self, item):
+        self._drafts.append(item)
+
+--- op op3 after: "t(self):\n        return len(self._pins)\n"
+
+    def draft_count(self):
+        return len(self._drafts)

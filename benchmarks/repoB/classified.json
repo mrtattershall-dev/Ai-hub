@@ -1,0 +1,823 @@
+{
+ "tally": {
+  "FUNCTION_NOT_ENTERED": 28,
+  "SITE_REACHED": 20,
+  "SITE_NOT_REACHED": 8
+ },
+ "rows": [
+  {
+   "file": "dependency_groups.py",
+   "fn": "_parse_group",
+   "cls": "DependencyGroupResolver",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 220,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "direct_url.py",
+   "fn": "_from_dict",
+   "cls": "ArchiveInfo",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 211,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "direct_url.py",
+   "fn": "_from_dict",
+   "cls": "DirectUrl",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 276,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "markers.py",
+   "fn": "evaluate",
+   "cls": "Marker",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 461,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "metadata.py",
+   "fn": "parse_email",
+   "cls": null,
+   "method": false,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 417,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "IN"
+  },
+  {
+   "file": "metadata.py",
+   "fn": "_process_description_content_type",
+   "cls": "_Validator",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 634,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "metadata.py",
+   "fn": "_process_license_files",
+   "cls": "_Validator",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 725,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "metadata.py",
+   "fn": "_process_import_names",
+   "cls": "_Validator",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 737,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "metadata.py",
+   "fn": "_write_metadata",
+   "cls": "Metadata",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 945,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "pylock.py",
+   "fn": "is_valid_pylock_path",
+   "cls": null,
+   "method": false,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 75,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "IN"
+  },
+  {
+   "file": "pylock.py",
+   "fn": "_from_dict",
+   "cls": "Package",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 588,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "pylock.py",
+   "fn": "_from_dict",
+   "cls": "Pylock",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 704,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_is_family",
+   "cls": "_BoundaryVersion",
+   "method": true,
+   "operator": "BOOLEAN_WEAKEN",
+   "anchorHits": 1,
+   "line": 129,
+   "category": "SITE_REACHED",
+   "witnessCount": 1,
+   "witness": {
+    "invocation": "SpecifierSet(\"==1.0,!=1.0\").is_unsatisfiable()",
+    "setup": [
+     "SpecifierSet(\">=2.0,<1.0\").is_unsatisfiable()",
+     "SpecifierSet(\">=1.0,<2.0\").is_unsatisfiable()",
+     "SpecifierSet(\"\").is_unsatisfiable()"
+    ],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "SpecifierSet.is_unsatisfiable"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_get_spec_version",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 613,
+   "category": "SITE_REACHED",
+   "witnessCount": 53,
+   "witness": {
+    "invocation": "\"1.2.3\" in Specifier(\">=1.2.3\")",
+    "setup": [],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "Specifier.__contains__"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_to_ranges",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 645,
+   "category": "SITE_REACHED",
+   "witnessCount": 3,
+   "witness": {
+    "invocation": "SpecifierSet(\">=2.0,<1.0\").is_unsatisfiable()",
+    "setup": [],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "SpecifierSet.is_unsatisfiable"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_standard_ranges",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 673,
+   "category": "SITE_REACHED",
+   "witnessCount": 3,
+   "witness": {
+    "invocation": "SpecifierSet(\">=2.0,<1.0\").is_unsatisfiable()",
+    "setup": [],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "SpecifierSet.is_unsatisfiable"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "prereleases",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 742,
+   "category": "SITE_REACHED",
+   "witnessCount": 26,
+   "witness": {
+    "invocation": "\"1.2.3\" in Specifier(\">=1.2.3\")",
+    "setup": [],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "Specifier.__contains__"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_canonical_spec",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 853,
+   "category": "SITE_REACHED",
+   "witnessCount": 17,
+   "witness": {
+    "invocation": "SpecifierSet('>=1.0.0,!=2.0.0')",
+    "setup": [],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "SpecifierSet.__repr__"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_compare_compatible",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 904,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_compare_equal",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 969,
+   "category": "SITE_REACHED",
+   "witnessCount": 10,
+   "witness": {
+    "invocation": "\"1.2.3\" in SpecifierSet(\">=1.0.0,!=1.0.1\")",
+    "setup": [],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "SpecifierSet.__contains__"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_compare_less_than_equal",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "COMPARISON_FLIP",
+   "anchorHits": 1,
+   "line": 981,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_compare_greater_than_equal",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "COMPARISON_FLIP",
+   "anchorHits": 1,
+   "line": 987,
+   "category": "SITE_REACHED",
+   "witnessCount": 33,
+   "witness": {
+    "invocation": "\"1.2.3\" in Specifier(\">=1.2.3\")",
+    "setup": [],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "Specifier.__contains__"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_compare_less_than",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 997,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_compare_greater_than",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 1036,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_compare_arbitrary",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 1047,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "contains",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 1081,
+   "category": "SITE_NOT_REACHED",
+   "why": "the function executes under authored evidence but this line never does",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "filter",
+   "cls": "Specifier",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 1133,
+   "category": "SITE_NOT_REACHED",
+   "why": "the function executes under authored evidence but this line never does",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_canonical_specs",
+   "cls": "SpecifierSet",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 1409,
+   "category": "SITE_REACHED",
+   "witnessCount": 12,
+   "witness": {
+    "invocation": "SpecifierSet('>=1.0.0,!=2.0.0')",
+    "setup": [],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "SpecifierSet.__repr__"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_get_ranges",
+   "cls": "SpecifierSet",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 1629,
+   "category": "SITE_REACHED",
+   "witnessCount": 3,
+   "witness": {
+    "invocation": "SpecifierSet(\">=2.0,<1.0\").is_unsatisfiable()",
+    "setup": [],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "SpecifierSet.is_unsatisfiable"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "is_unsatisfiable",
+   "cls": "SpecifierSet",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 1641,
+   "category": "SITE_NOT_REACHED",
+   "why": "the function executes under authored evidence but this line never does",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_check_prerelease_only_ranges",
+   "cls": "SpecifierSet",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 1678,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_check_arbitrary_unsatisfiable",
+   "cls": "SpecifierSet",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 1690,
+   "category": "SITE_REACHED",
+   "witnessCount": 1,
+   "witness": {
+    "invocation": "SpecifierSet(\">=1.0,<2.0\").is_unsatisfiable()",
+    "setup": [
+     "SpecifierSet(\">=2.0,<1.0\").is_unsatisfiable()"
+    ],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "SpecifierSet.is_unsatisfiable"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "contains",
+   "cls": "SpecifierSet",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 1761,
+   "category": "SITE_NOT_REACHED",
+   "why": "the function executes under authored evidence but this line never does",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "filter",
+   "cls": "SpecifierSet",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 1823,
+   "category": "SITE_NOT_REACHED",
+   "why": "the function executes under authored evidence but this line never does",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "specifiers.py",
+   "fn": "_filter_versions",
+   "cls": "SpecifierSet",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 1930,
+   "category": "SITE_NOT_REACHED",
+   "why": "the function executes under authored evidence but this line never does",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "tags.py",
+   "fn": "parse_tag",
+   "cls": null,
+   "method": false,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 229,
+   "category": "SITE_NOT_REACHED",
+   "why": "the function executes under authored evidence but this line never does",
+   "envelope": "IN"
+  },
+  {
+   "file": "tags.py",
+   "fn": "cpython_tags",
+   "cls": null,
+   "method": false,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 365,
+   "category": "SITE_REACHED",
+   "witnessCount": 1,
+   "witness": {
+    "invocation": "selector = tags.create_compatible_tags_selector(tags.sys_tags())",
+    "setup": [
+     "from packaging import tags",
+     "from packaging.utils import parse_wheel_filename"
+    ],
+    "namespaceModule": "packaging.tags",
+    "owner": "create_compatible_tags_selector"
+   },
+   "envelope": "IN"
+  },
+  {
+   "file": "tags.py",
+   "fn": "generic_tags",
+   "cls": null,
+   "method": false,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 473,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "IN"
+  },
+  {
+   "file": "tags.py",
+   "fn": "mac_platforms",
+   "cls": null,
+   "method": false,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 605,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "IN"
+  },
+  {
+   "file": "tags.py",
+   "fn": "ios_platforms",
+   "cls": null,
+   "method": false,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 707,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "IN"
+  },
+  {
+   "file": "tags.py",
+   "fn": "android_platforms",
+   "cls": null,
+   "method": false,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 744,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "IN"
+  },
+  {
+   "file": "tags.py",
+   "fn": "platform_tags",
+   "cls": null,
+   "method": false,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 802,
+   "category": "SITE_REACHED",
+   "witnessCount": 1,
+   "witness": {
+    "invocation": "selector = tags.create_compatible_tags_selector(tags.sys_tags())",
+    "setup": [
+     "from packaging import tags",
+     "from packaging.utils import parse_wheel_filename"
+    ],
+    "namespaceModule": "packaging.tags",
+    "owner": "create_compatible_tags_selector"
+   },
+   "envelope": "IN"
+  },
+  {
+   "file": "tags.py",
+   "fn": "sys_tags",
+   "cls": null,
+   "method": false,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 875,
+   "category": "SITE_REACHED",
+   "witnessCount": 1,
+   "witness": {
+    "invocation": "selector = tags.create_compatible_tags_selector(tags.sys_tags())",
+    "setup": [
+     "from packaging import tags",
+     "from packaging.utils import parse_wheel_filename"
+    ],
+    "namespaceModule": "packaging.tags",
+    "owner": "create_compatible_tags_selector"
+   },
+   "envelope": "IN"
+  },
+  {
+   "file": "utils.py",
+   "fn": "parse_wheel_filename",
+   "cls": null,
+   "method": false,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 202,
+   "category": "SITE_REACHED",
+   "witnessCount": 2,
+   "witness": {
+    "invocation": "name, ver, build, tags = parse_wheel_filename(\"foo-1.0-py3-none-any.whl\")",
+    "setup": [
+     "from packaging.utils import parse_wheel_filename",
+     "from packaging.tags import Tag",
+     "from packaging.version import Version"
+    ],
+    "namespaceModule": "packaging.utils",
+    "owner": "parse_wheel_filename"
+   },
+   "envelope": "IN"
+  },
+  {
+   "file": "utils.py",
+   "fn": "parse_sdist_filename",
+   "cls": null,
+   "method": false,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 284,
+   "category": "SITE_REACHED",
+   "witnessCount": 1,
+   "witness": {
+    "invocation": "name, ver = parse_sdist_filename(\"foo-1.0.tar.gz\")",
+    "setup": [
+     "from packaging.utils import parse_sdist_filename",
+     "from packaging.version import Version"
+    ],
+    "namespaceModule": "packaging.utils",
+    "owner": "parse_sdist_filename"
+   },
+   "envelope": "IN"
+  },
+  {
+   "file": "version.py",
+   "fn": "normalize_pre",
+   "cls": null,
+   "method": false,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 93,
+   "category": "SITE_NOT_REACHED",
+   "why": "the function executes under authored evidence but this line never does",
+   "envelope": "IN"
+  },
+  {
+   "file": "version.py",
+   "fn": "major",
+   "cls": "Version",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 1045,
+   "category": "SITE_REACHED",
+   "witnessCount": 1,
+   "witness": {
+    "invocation": "Version(\"1.2.3\").major",
+    "setup": [],
+    "namespaceModule": "packaging.version",
+    "owner": "Version.major"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "version.py",
+   "fn": "minor",
+   "cls": "Version",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 1056,
+   "category": "SITE_REACHED",
+   "witnessCount": 2,
+   "witness": {
+    "invocation": "Version(\"1.2.3\").minor",
+    "setup": [],
+    "namespaceModule": "packaging.version",
+    "owner": "Version.minor"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "version.py",
+   "fn": "micro",
+   "cls": "Version",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 1067,
+   "category": "SITE_REACHED",
+   "witnessCount": 2,
+   "witness": {
+    "invocation": "Version(\"1.2.3\").micro",
+    "setup": [],
+    "namespaceModule": "packaging.version",
+    "owner": "Version.micro"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "version.py",
+   "fn": "release",
+   "cls": "_TrimmedRelease",
+   "method": true,
+   "operator": "BOUNDARY_SHIFT",
+   "anchorHits": 1,
+   "line": 1099,
+   "category": "SITE_REACHED",
+   "witnessCount": 22,
+   "witness": {
+    "invocation": "SpecifierSet('>=1.0.0,!=2.0.0')",
+    "setup": [],
+    "namespaceModule": "packaging.specifiers",
+    "owner": "SpecifierSet.__repr__"
+   },
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "_elffile.py",
+   "fn": "interpreter",
+   "cls": "ELFFile",
+   "method": true,
+   "operator": "EQUALITY_FLIP",
+   "anchorHits": 1,
+   "line": 104,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "_manylinux.py",
+   "fn": "platform_tags",
+   "cls": null,
+   "method": false,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 230,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "IN"
+  },
+  {
+   "file": "_parser.py",
+   "fn": "_restore_value",
+   "cls": "Node",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 35,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "_tokenizer.py",
+   "fn": "check",
+   "cls": "Tokenizer",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 131,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "_tokenizer.py",
+   "fn": "expect",
+   "cls": "Tokenizer",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 140,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  },
+  {
+   "file": "_tokenizer.py",
+   "fn": "enclosing_tokens",
+   "cls": "Tokenizer",
+   "method": true,
+   "operator": "NEGATION_DROP",
+   "anchorHits": 1,
+   "line": 187,
+   "category": "FUNCTION_NOT_ENTERED",
+   "why": "no authored example in the repository runs this function",
+   "envelope": "OUT_METHOD_UNSUPPORTED"
+  }
+ ]
+}

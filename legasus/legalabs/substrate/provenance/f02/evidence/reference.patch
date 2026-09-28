@@ -1,0 +1,11 @@
+--- op op1 after: "SCALE = 100\n"
+
+_RUNNING = [0.0, 0]
+
+--- op op2 after: "  return max(xs) - min(xs) if xs else 0\n"
+
+
+def running_mean(x):
+    _RUNNING[0] += x
+    _RUNNING[1] += 1
+    return _RUNNING[0] / _RUNNING[1]

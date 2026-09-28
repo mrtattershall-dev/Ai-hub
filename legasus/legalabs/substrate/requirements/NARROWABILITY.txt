@@ -1,0 +1,34 @@
+  h01 op1 NARROWABLE   candidates  10  passing   8  max gain 0.32 bits
+  h01 op2 NARROWABLE   candidates  10  passing   5  max gain 1.00 bits
+  h02 op1 independent  candidates  11  passing  11  max gain 0.00 bits
+  h02 op2 independent  candidates  11  passing  11  max gain 0.00 bits
+  h03 op1 NARROWABLE   candidates  16  passing   8  max gain 1.00 bits
+  h03 op2 NARROWABLE   candidates  16  passing  11  max gain 0.54 bits
+  h03 op3 NARROWABLE   candidates  16  passing  11  max gain 0.54 bits
+  h04 op1 independent  candidates  12  passing  12  max gain 0.00 bits
+  h04 op2 independent  candidates  12  passing  12  max gain 0.00 bits
+  h04 op3 independent  candidates  13  passing  13  max gain 0.00 bits
+  h05 op1 NARROWABLE   candidates  17  passing  14  max gain 0.28 bits
+  h05 op2 NARROWABLE   candidates  17  passing  15  max gain 0.18 bits
+  h05 op3 NARROWABLE   candidates  16  passing   5  max gain 1.68 bits
+  h06 op1 NARROWABLE   candidates  12  passing  10  max gain 0.26 bits
+  h06 op2 NARROWABLE   candidates  12  passing   5  max gain 1.26 bits
+  h06 op3 independent  candidates  13  passing  13  max gain 0.00 bits
+  h07 op1 NARROWABLE   candidates  14  passing  12  max gain 0.22 bits
+  h07 op2 NARROWABLE   candidates  14  passing   5  max gain 1.49 bits
+  h07 op3 independent  candidates  15  passing  15  max gain 0.00 bits
+  h08 op1 NARROWABLE   candidates  14  passing  12  max gain 0.22 bits
+  h08 op2 NARROWABLE   candidates  14  passing   5  max gain 1.49 bits
+  h08 op3 independent  candidates  15  passing  15  max gain 0.00 bits
+
+  ---- NARROWABILITY, proven by execution
+  operations                22
+  NARROWABLE                14   <- the v6 denominator
+  position-independent      8   0 bits is the CORRECT answer for these
+  intra-line                0   position fixed by the expression, not a line boundary
+  untestable                0   no candidate passes: instrument or probe, not program
+  mean max derivable gain   0.75 bits
+
+  per-position ground truth written to ./requirements/GROUNDTRUTH.json
+  No planner produced any of this. It is what the program and its probes actually do,
+  so LegaCore cannot be rewarded for narrowing past it - those positions really fail.

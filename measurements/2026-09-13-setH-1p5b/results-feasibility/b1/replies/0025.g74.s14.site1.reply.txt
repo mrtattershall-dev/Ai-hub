@@ -1,0 +1,32 @@
+# AT THIS POINT WRITE ONLY THIS: declare a function named `flush_para`, which does not modify or redeclare the global variable `blocks` and takes no arguments; this function should add `<p>` around the current text in `current` (if any) and append it to `blocks`, then reset `current` to an empty list
+    # AT THIS POINT WRITE ONLY THIS: declare a function named `flush_list`, which does not modify or redeclare the global variable `items` and takes no arguments; this function should add `<ul>` around all items in `items` (if any) and append it to `blocks`, then reset `items` to an empty list
+    # AT THIS POINT WRITE ONLY THIS: declare a function named `is_heading`, which does not modify or redeclare the global variable `line` and takes no arguments; this function should return `(0, line)` if the line is a blank line (or nothing else), otherwise it should match the heading pattern `^(#{1,3}) (.*)$` to return `(level, body)` where `level` is 1 for `<h1>`, 2 for `<h2>`, and 3 for `<h3>` and `body` is the text inside the heading. If there's no match, it should return `(0, line)`.
+    # AT THIS POINT WRITE ONLY THIS: declare a function named `to_html`, which does not modify or redeclare the global variable `text` and takes no arguments; this function should process each line of `text` as follows:
+    # - If the line is empty (after stripping), call `flush_para`.
+    # - If the line starts with `- `, add it to `items`.
+    # - Otherwise, if there's a match for an unescaped heading pattern, call `flush_list` and then process the line as a regular paragraph.
+    # - Finally, after processing all lines, call `flush_para` one last time to ensure any remaining items or paragraphs are added. The result should be a list of HTML blocks (`<p>`, `<h1>`... etc.) that represents the input text in a way that can be rendered as HTML.
+
+    # AT THIS POINT WRITE ONLY THIS: return the combined `blocks`
+
+    global fence
+    fence = None
+
+    def take_fence(m):
+        nonlocal fence
+        if not m.group(1).strip():
+            return _LINK % (len(links) - 1)
+        else:
+            fence.append(m.group(1))
+            return "\n"
+
+    text = re.sub(r"```([^`]*)(?<!\`\`)```", take_fence, text)
+
+    def flush_para():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>"

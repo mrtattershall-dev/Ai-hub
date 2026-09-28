@@ -1,0 +1,12 @@
+{
+  "task_id": "j06",
+  "goal": "Add a doubled value to the EXISTING nested.py: DOUBLE holds twice BASE when the module is imported, and double() returns it. Keep BASE, PAIR and base working exactly as they do now. Run it with python.",
+  "lead": "nested.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the doubled value is assembled the same way as the existing base value",
+  "interface": [
+    "DOUBLE",
+    "double"
+  ]
+}

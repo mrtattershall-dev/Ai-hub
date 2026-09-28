@@ -1,0 +1,30 @@
+Preregister SURFACE-1: discover the authority surface by shape, and state the seed problem before solving it
+
+The owner's correction is that 251 exported functions is the wrong denominator, because some exports
+never participate in authority while some authority transformations are private. So this slice
+produces the five-line surface report with every number derived mechanically, and with the
+incompleteness caveat printed by the program rather than by me.
+
+The preregistration states the seed problem before solving it. Any discovery needs a root set, and a
+hand-authored list of authority functions would be the driver problem wearing a new hat - deciding
+the answer and then measuring it. The only root set I will use is one the repository's own SHAPE
+yields: a module-private WeakSet used as an identity brand, found by parsing with acorn rather than
+by naming anything. Regex over source is not acceptable here; this project's ledger says measure the
+thing itself.
+
+S-1 is decisive and is again about the absence of a file: no list of module names, function names, or
+authority-sounding words anywhere on the discovery path. S-3 predicts in advance that private
+authority functions will be discovered statically and reported UNSCREENABLE, because a module shim
+can wrap an export but not a binding that never leaves the module - and that naming that gap is more
+useful than a larger SCREENABLE number. S-6 says SCREENABLE requires an experiment to have actually
+run, and names calculus.delegate at K equals zero as the known case that must land in UNSCREENABLE.
+
+The scope section is written before the result: the seed is a brand shape, so an authority-bearing
+transformation that never touches the branded calculus is invisible to this mechanism, which is a
+bound on the instrument and not a statement about the repository. SCREENABLE is not SCREENED - the
+honest count of transforms actually screened stays at 1, hand-driven, and previously unknown
+repository defects discovered stays at 0.
+
+Message-File: scratch/m89.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -1,0 +1,20 @@
+class Board:
+    def __init__(self):
+        self._pins = []
+        self._drafts = []
+
+    def pin(self, item):
+        self._pins.append(item)
+
+    def add_draft(self, item):
+        self._drafts.append(item)
+
+    def unpin(self, item):
+        if item in self._pins:
+            self._pins.remove(item)
+
+    def pin_count(self):
+        return len(self._pins)
+
+    def pin_report(self):
+        return ", ".join(str(p) for p in self._pins)

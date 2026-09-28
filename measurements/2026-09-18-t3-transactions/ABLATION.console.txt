@@ -1,0 +1,19 @@
+  ABLATION - the SAME model outputs, re-assembled in PRESENTATION order
+  no GPU time: every fragment replayed is already on disk
+
+  T3_NESTED
+      derived order    micro then low then mid
+      presented order  mid then micro then low
+      assembled 52   verified under DERIVED 52   verified under PRESENTED 0   dead-op 52   probe-fail 0
+      operations killed by the presentation order: micro x52, low x52
+  T3_MIXED
+      derived order    high then micro then low
+      presented order  low then high then micro
+      assembled 53   verified under DERIVED 53   verified under PRESENTED 0   dead-op 53   probe-fail 0
+      operations killed by the presentation order: micro x53
+
+  TOTAL  assembled 105   verified under DERIVED 105   verified under PRESENTED 0
+
+  A verifier that stays silent under the ablation would show the ordering is decoration.
+  One that fires here and nowhere else shows it is load-bearing, and gives the
+  transaction verifier the live evidence a perfect score cannot supply.

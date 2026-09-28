@@ -1,0 +1,11 @@
+{
+  "task_id": "h02",
+  "goal": "Add the missing emphasis helper to the EXISTING texttools.py: _emph(s) appends an exclamation mark to the text so that shout works. Also add shout_twice(s), which returns the shouted text repeated twice. Keep plain working exactly as it does now. Run it with python.",
+  "lead": "texttools.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the emphasis helper works the same way as the existing plain helper",
+  "interface": [
+    "shout_twice"
+  ]
+}

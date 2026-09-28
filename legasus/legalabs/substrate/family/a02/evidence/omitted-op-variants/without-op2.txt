@@ -1,0 +1,23 @@
+class Metrics:
+    def __init__(self):
+        self._daily = {}
+        self._hourly = {}
+
+    def record_day(self, day, n):
+        self._daily[day] = self._daily.get(day, 0) + n
+
+    def day_total(self, day):
+        return self._daily.get(day, 0)
+
+    def busiest_day(self):
+        if not self._daily:
+            return None
+        return max(sorted(self._daily), key=lambda d: self._daily[d])
+
+    def hour_total(self, hour):
+        return self._hourly.get(hour, 0)
+
+    def busiest_hour(self):
+        if not self._hourly:
+            return None
+        return max(sorted(self._hourly), key=lambda h: self._hourly[h])

@@ -1,0 +1,31 @@
+Capture the unloaded calibration reference while the machine is verifiably quiet - and one result against my own advice
+
+0d cleared 261 leaked processes; the sampler confirms 9 node processes at 18:55:03Z. A verified-quiet box
+is the scarce resource here, so the reference was taken immediately rather than deferred.
+
+MEASURED, JIT warmed, 5 runs each:
+
+    BIND-1 workload 2e8    853 808 856 950 958 ms    min 808.5   max 957.8   spread 1.185
+    short workload 1.2e7   43.3 54.4 59.6 45.4 47.0  min  43.3   max  59.6   spread 1.377
+
+THE TRUE UNLOADED BASELINE IS ~808ms, NOT THE ~1500ms MEASURED UNDER LOAD. That quantifies the anchoring
+problem raised earlier: the 1500ms figure was ~1.85x inflated, so a cap set at 3x-of-loaded is 5.6x of
+true unloaded; and a per-attempt baseline captured on a box permanently at 1500ms reads 1.0x forever,
+leaving the ratio rule blind to exactly the state this machine was in for most of today.
+
+AND ONE FINDING AGAINST MY OWN ADVICE, reported because it is against it. I recommended cutting the
+calibration workload to 50-100ms. The short workload is NOISIER in relative terms - 1.377 against 1.185 -
+so "shorter is strictly better" was wrong; it trades precision for self-load. It remains the right trade,
+and now with numbers instead of assertion: 1.377 against a 3.0 threshold leaves comfortable headroom, and
+43ms against 808ms is ~19x less self-load, which is what stops two abort-on-breach runners aborting each
+other indefinitely.
+
+Warmup is not optional. A cold-JIT first sample is an outlier that inflates a baseline and then HIDES REAL
+LOAD BEHIND IT.
+
+Conditions are recorded alongside the numbers deliberately, so a later reader can tell what they were
+taken in rather than inheriting them as context-free constants.
+
+Message-File: scratch/e75-unloaded-ref.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

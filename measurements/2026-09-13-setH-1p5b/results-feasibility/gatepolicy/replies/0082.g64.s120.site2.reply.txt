@@ -1,0 +1,45 @@
+def flush_ordered_list():  # New function for ordered lists
+        if ol_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")
+            del ol_items[:]  # Clear the accumulator
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            flush_ordered_list()  # Call new function
+            continue
+        if line.startswith("1. "):  # Check for ordered list item (new condition)
+            flush_para()  # Ensure any previous paragraph is closed
+            ol_items.append(line[3:].strip())  # Add the content of the ordered list item to the accumulator
+            continue
+        flush_list()
+        flush_ordered_list()  # Call new function again to ensure it's cleared after each block
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    flush_ordered_list()  # Call new function one last time to ensure it's cleared after the final block
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+
+In this solution, I've added a new function `flush_ordered_list` that mirrors the behavior of `flush_list`, but it's specifically for ordered lists. It checks if there are any items in the `ol_items` accumulator and appends them to the blocks

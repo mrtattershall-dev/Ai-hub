@@ -1,0 +1,36 @@
+LegaScreen v1: the three-case bar is met by one harness, and the composition probe found a route my hand analysis missed
+
+Three probes on one harness, run unchanged against HEAD and three historical trees. At 77fd921
+P-ERASURE surfaced objectivesFromContest losing establishes and doesNotEstablish. At 58b62aa P-ALIAS
+surfaced CONTESTED owned by ledger.mjs and provenance.mjs. At b11e51f P-COMPOSITION surfaced the
+laundering chain. At HEAD all three are silent on those findings. No probe names a file, a function,
+a field or a commit.
+
+The decisive one is P-COMPOSITION, because it is the only probe written as a metamorphic property
+over a generated space rather than as a scan: lengthening a justification path must not grant what
+the direct path refuses. It enumerates sixty-four three-node chains, builds the two-node graph with
+the same endpoints, and compares entitlement, containing no mention of null, of C1, of which
+dimension matters, or of what a laundering defect looks like. So the erasure result was not a scan
+finding a scan-shaped defect.
+
+AND IT FOUND A ROUTE I NEVER ENUMERATED. The wave-1 preregistration predicted the null intermediate
+and tested exactly that; an intermediate at ANY launders identically and I never wrote it down. The
+C1 repair happens to close it, which is why HEAD is silent, but the repair covering it was luck of
+construction rather than coverage I had demonstrated - and per protection.mjs that distinction is
+the whole point. A generated space reached a member of the class that hand enumeration missed, which
+is the first evidence here that screening goes where preregistered attacks did not.
+
+False positives are reported and not tuned: alias carries its standing collisions at every commit,
+and a different seven at 77fd921 than at HEAD because pin.mjs exists there and instruments.mjs does
+not, which is why the count alone is not the signal and the delta across commits is. Erasure carries
+the wrong-shape artifacts whose cause was named in v0.
+
+The probes are themselves screened: each is shown to fire on a synthetic defective module and to be
+silent on a sound one over the same sixty-four chains, and to report an unusable target as
+unscreened with examined at zero, so silence can never be read as a clean result.
+
+Suite 594/594.
+
+Message-File: scratch/m68.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

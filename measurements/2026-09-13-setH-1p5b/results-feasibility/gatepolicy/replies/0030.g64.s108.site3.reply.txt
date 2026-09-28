@@ -1,0 +1,13 @@
+if line.strip() == "":
+                flush_ol()
+            ol_items = []  # Clear the accumulator list when a blank line is encountered
+        elif re.match(r"^\d+\. ", line):  # Check if the line starts with a number, followed by a dot and a space
+            flush_para()
+            ol_items.append(line[2:].strip())  # Add the item to the ordered-list items accumulator list
+            continue
+        else:
+            flush_ol()  # Flush any open ordered list when processing a non-ordered list line
+            if ol_items:  # If there are any accumulated ordered list items, close the ordered list
+                flush_ol()
+                ol_items = []  # Clear the accumulator list after flushing
+        

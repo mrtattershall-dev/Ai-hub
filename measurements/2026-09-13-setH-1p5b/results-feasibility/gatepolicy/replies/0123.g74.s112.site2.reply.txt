@@ -1,0 +1,47 @@
+if fenced_code_block is None and line.strip().startswith('```'):
+            fenced_code_block = []
+        elif fenced_code_block is not None:
+            if line.strip() == '```':
+                blocks.append("<pre><code>" + "\n".join(_escape(l) for l in fenced_code_block) + "</code></pre>")
+                fenced_code_block = None
+            else:
+                fenced_code_block.append(line.strip())
+        else:
+            if line.strip() == "```":
+                flush_para()
+                flush_list()
+                blocks.append("<p>```</p>")
+            else:
+                current.append(line.strip())
+
+    # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+    # ALREADY HANDLED ELSEWHERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+```python
+# ALREADY HANDLED ELSEWHERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+flush_para()
+flush_list()
+return "\n".join(blocks)
+```
+
+This code snippet is a Python function that converts Markdown text to HTML. It handles the following features:
+
+1. **Blank Lines**: Consecutive blank lines are treated as paragraph separators.
+2. **Headings**: Lines starting with `#`, `##`, or `###` are converted to `<h1>`, `<h2>`, and `<h3>` tags respectively

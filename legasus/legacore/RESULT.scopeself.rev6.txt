@@ -1,0 +1,40 @@
+  CORRECT-0       k01:op1      cand   1  truth-passes   1  derived   1  gain 0.00/0.00
+  RECOVERED       k01:op2      cand   2  truth-passes   1  derived   1  gain 1.00/1.00  [control_flow_boundary]
+  RECOVERED       k02:op1      cand  12  truth-passes   8  derived   8  gain 0.58/0.58  [symbol_availability]
+  CORRECT-0       k02:op2      cand  13  truth-passes  13  derived  13  gain 0.00/0.00
+  RECOVERED       k03:op1      cand  10  truth-passes   8  derived   8  gain 0.32/0.32  [symbol_availability]
+  CORRECT-0       k03:op2      cand   9  truth-passes   9  derived   9  gain 0.00/0.00
+  RECOVERED       k04:op1      cand  10  truth-passes   8  derived   8  gain 0.32/0.32  [symbol_availability]
+  CORRECT-0       k04:op2      cand   9  truth-passes   9  derived   9  gain 0.00/0.00
+
+  ---- PER CONSTRAINT KIND (the aggregate is reported after this, not instead of it)
+
+  scope_availability  [requirement is an enclosing parameter]
+    PASS  POSITIVE         k01  narrowable 1/2  this kind fired on 1 op(s) [emission (this kind narrows nothing by design)]  over-constraint 0  bits 1.00/1.00
+          kinds that narrowed: control_flow_boundary
+
+  scope_availability  [similarly named symbol NOT in scope]
+    PASS  NEGATIVE         k02  narrowable 1/2  this kind fired on 0 op(s) [emission (this kind narrows nothing by design)]  over-constraint 0  bits 0.58/0.58
+          kinds that narrowed: symbol_availability
+
+  self_referential_binding  [the new value is computed from the old]
+    PASS  POSITIVE         k03  narrowable 1/2  this kind fired on 1 op(s) [narrowing]  over-constraint 0  [account: requires ["TOTAL"]]  bits 0.32/0.32
+          kinds that narrowed: symbol_availability
+
+  self_referential_binding  [fresh binding from another name]
+    PASS  NEGATIVE         k04  narrowable 1/2  this kind fired on 1 op(s) [narrowing]  over-constraint 0  [account: requires ["STEP"]]  bits 0.32/0.32
+          kinds that narrowed: symbol_availability
+
+  ---- LegaCore constraint derivation, against executable ground truth
+  operations scored          8   (narrowable 4)
+  RECOVERED                  4   narrowed, and every removed boundary really fails
+  missed                     0   narrowable, nothing derived
+  OVER-CONSTRAINT            0   removed a boundary that actually passes
+  correct zero               4   position-independent and left alone
+  witnesses that replayed    8/8
+
+  PRIMARY   recovered 4 of 4 narrowable   (v6 target: >= 15 of 26)
+  SECONDARY realized available information 100.0%   (2.23 of 2.23 bits)   DIAGNOSTIC ONLY
+
+  STYLE CONTROL  canonical_realization fired on 3 operation(s) and narrowed 0.
+  A style constraint that narrows anything is a milestone failure regardless of score.

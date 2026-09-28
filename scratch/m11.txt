@@ -1,0 +1,34 @@
+preregister the concurrency envelope experiment, including my own prior so it can be wrong
+
+THREE OUTCOMES, none inherently bad: PARALLEL_SAFE, SERIALIZATION_REQUIRED, PROCESS_ISOLATION_REQUIRED.
+The experiment determines the authority envelope; it has no preferred answer.
+
+NON-VACUITY IS STRICT. Overlap may NOT be inferred from Promise.all, timestamps or completion. Both
+subjects carry a barrier and the run counts as a parallelism test only on a MUTUAL WITNESS - A saw B
+entered and B saw A entered, each before release. Absent that the outcome is OVERLAP_NOT_ESTABLISHED,
+which is not a pass.
+
+FOUR PROPERTIES ATTACKED INDEPENDENTLY: protocol integrity, attribution, NON-INTERFERENCE (the dangerous
+one - perfect attribution can be built around an environment that already changed the program being
+measured), and POST-FAILURE ISOLATION (a hostile run must not contaminate the next one while the later
+record looks pristine).
+
+THE ATTACK THAT MATTERS: subject A manipulates fd 1 WHILE B IS ALIVE - close, dup2, fork with inherited
+descriptors, writes after the window. If that defeats isolation the finding is stronger than "dup2 needs
+a lock": the subject possesses causal authority over the same process-global resource the observer relies
+on for evidence custody, and a mutex can only schedule access to that mismatch, not repair it.
+
+MY PRIOR, STATED SO IT CAN BE WRONG: runIsolated spawns a process per observation, so I EXPECT the
+attacks to fail and the API to be serialized by construction. A prediction I believe is exactly the kind
+that needs the strict overlap witness.
+
+NOT BEING DECIDED HERE: whether to move to worker processes. The current design must be made to FAIL
+first, or process isolation becomes architecture motivated by expectation rather than evidence.
+
+Also recorded: the 2/5 OUTPUT_MISMATCH naming issue sits on the REPLAY path, which the external-producer
+boundary supersedes. Maintaining two implementations of doctest semantics would recreate the problem just
+eliminated, so it is a RETIREMENT candidate rather than a repair candidate.
+
+Message-File: scratch/m11.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

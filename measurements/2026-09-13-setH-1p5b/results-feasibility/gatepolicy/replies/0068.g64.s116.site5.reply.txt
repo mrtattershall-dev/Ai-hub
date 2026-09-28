@@ -1,0 +1,12 @@
+# BEGIN SOLUTION
+        # END SOLUTION
+        if line.startswith("1. "):
+            flush_para()
+            if ordered_items:
+                flush_ordered_list()
+            items.append(line[3:].strip())
+            ordered_items.append(line[3:].strip())
+            continue
+
+        flush_ordered_list()  # Ensure any existing ordered list is closed before continuing
+        flush_para()

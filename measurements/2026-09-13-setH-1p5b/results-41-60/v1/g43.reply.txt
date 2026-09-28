@@ -1,0 +1,313 @@
+```javascript
+class Matrix {
+  constructor(rows, cols) {
+    this.rows = rows;
+    this.cols = cols;
+    this.data = new Array(rows).fill(null).map(() => new Array(cols).fill(0));
+  }
+
+  set(row, col, value) {
+    if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) {
+      throw new Error('Row or column index out of bounds');
+    }
+    this.data[row][col] = value;
+  }
+
+  get(row, col) {
+    if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) {
+      throw new Error('Row or column index out of bounds');
+    }
+    return this.data[row][col];
+  }
+
+  equals(other, eps = 1e-9) {
+    if (!other instanceof Matrix) {
+      throw new Error('Parameter must be a Matrix instance');
+    }
+    if (this.rows !== other.rows || this.cols !== other.cols) {
+      return false;
+    }
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        if (Math.abs(this.get(i, j) - other.get(i, j)) > eps) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  static loadFromCsv(csvString) {
+    const lines = csvString.split('\n');
+    const rows = lines.length;
+    const cols = lines[0].split(',').length;
+    const matrix = new Matrix(rows, cols);
+    for (let i = 0; i < rows; i++) {
+      const row = lines[i].split(',');
+      for (let j = 0; j < cols; j++) {
+        matrix.set(i, j, parseFloat(row[j]));
+      }
+    }
+    return matrix;
+  }
+
+  static saveToCsv(matrix) {
+    let csvString = '';
+    for (let i = 0; i < matrix.rows; i++) {
+      if (i > 0) {
+        csvString += '\n';
+      }
+      const row = matrix.data[i].join(',');
+      csvString += row;
+    }
+    return csvString;
+  }
+
+  toArray() {
+    return this.data.map(row => row.slice());
+  }
+
+  static fromArray(array, rows, cols) {
+    if (array.length !== rows * cols) {
+      throw new Error('Array length must match the specified number of rows and columns');
+    }
+    const matrix = new Matrix(rows, cols);
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        matrix.set(i, j, array[i * cols + j]);
+      }
+    }
+    return matrix;
+  }
+
+  static add(a, b) {
+    if (!a instanceof Matrix || !b instanceof Matrix) {
+      throw new Error('Both parameters must be Matrix instances');
+    }
+    if (a.rows !== b.rows || a.cols !== b.cols) {
+      throw new Error('Matrices must have the same dimensions for addition');
+    }
+    const result = new Matrix(a.rows, a.cols);
+    for (let i = 0; i < a.rows; i++) {
+      for (let j = 0; j < a.cols; j++) {
+        result.set(i, j, a.get(i, j) + b.get(i, j));
+      }
+    }
+    return result;
+  }
+
+  static subtract(a, b) {
+    if (!a instanceof Matrix || !b instanceof Matrix) {
+      throw new Error('Both parameters must be Matrix instances');
+    }
+    if (a.rows !== b.rows || a.cols !== b.cols) {
+      throw new Error('Matrices must have the same dimensions for subtraction');
+    }
+    const result = new Matrix(a.rows, a.cols);
+    for (let i = 0; i < a.rows; i++) {
+      for (let j = 0; j < a.cols; j++) {
+        result.set(i, j, a.get(i, j) - b.get(i, j));
+      }
+    }
+    return result;
+  }
+
+  static multiply(a, b) {
+    if (!a instanceof Matrix || !b instanceof Matrix) {
+      throw new Error('Both parameters must be Matrix instances');
+    }
+    if (a.cols !== b.rows) {
+      throw new Error('Matrices must have compatible dimensions for multiplication');
+    }
+    const result = new Matrix(a.rows, b.cols);
+    for (let i = 0; i < a.rows; i++) {
+      for (let j = 0; j < b.cols; j++) {
+        let sum = 0;
+        for (let k = 0; k < a.cols; k++) {
+          sum += a.get(i, k) * b.get(k, j);
+        }
+        result.set(i, j, sum);
+      }
+    }
+    return result;
+  }
+
+  static transpose(matrix) {
+    if (!matrix instanceof Matrix) {
+      throw new Error('Parameter must be a Matrix instance');
+    }
+    const rows = matrix.rows;
+    const cols = matrix.cols;
+    const transposed = new Matrix(cols, rows);
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        transposed.set(j, i, matrix.get(i, j));
+      }
+    }
+    return transposed;
+  }
+
+  static dot(a, b) {
+    if (!a instanceof Matrix || !b instanceof Matrix) {
+      throw new Error('Both parameters must be Matrix instances');
+    }
+    if (a.cols !== b.rows) {
+      throw new Error('Matrices must have compatible dimensions for dot product');
+    }
+    const rows = a.rows;
+    const cols = b.cols;
+    const result = new Matrix(rows, cols);
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        let sum = 0;
+        for (let k = 0; k < a.cols; k++) {
+          sum += a.get(i, k) * b.get(k, j);
+        }
+        result.set(i, j, sum);
+      }
+    }
+    return result;
+  }
+
+  static inverse(matrix) {
+    if (!matrix instanceof Matrix) {
+      throw new Error('Parameter must be a Matrix instance');
+    }
+    const rows = matrix.rows;
+    if (rows !== matrix.cols) {
+      throw new Error('Matrix must be square for inversion');
+    }
+    // Implement LU decomposition and solve the system using back substitution
+    // For simplicity, we will use a library like 'ludecompose' to perform these steps
+    const lud = require('ludecompose')(matrix.toArray());
+    const U = lud.U;
+    const L = lud.L;
+
+    const result = new Matrix(rows, rows);
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j <= i; j++) {
+        let sum = 0;
+        for (let k = 0; k < j; k++) {
+          sum += L[i][k] * result.get(k, j);
+        }
+        result.set(i, j, U[i][j] - sum);
+      }
+    }
+
+    return result;
+  }
+
+  static determinant(matrix) {
+    if (!matrix instanceof Matrix) {
+      throw new Error('Parameter must be a Matrix instance');
+    }
+    const rows = matrix.rows;
+    if (rows !== matrix.cols) {
+      throw new Error('Matrix must be square for determinant calculation');
+    }
+    // Implement LU decomposition and calculate the determinant
+    const lud = require('ludecompose')(matrix.toArray());
+    return lud.D;
+  }
+
+  static trace(matrix) {
+    if (!matrix instanceof Matrix) {
+      throw new Error('Parameter must be a Matrix instance');
+    }
+    const rows = matrix.rows;
+    let sum = 0;
+    for (let i = 0; i < rows; i++) {
+      sum += matrix.get(i, i);
+    }
+    return sum;
+  }
+
+  static eigenvalues(matrix) {
+    if (!matrix instanceof Matrix) {
+      throw new Error('Parameter must be a Matrix instance');
+    }
+    const rows = matrix.rows;
+    if (rows !== matrix.cols) {
+      throw new Error('Matrix must be square for eigenvalue calculation');
+    }
+    // Implement the QR algorithm to find the eigenvalues and eigenvectors
+    // For simplicity, we will use a library like 'eigen' to perform these steps
+    const result = require('eigen')(matrix.toArray());
+    return result.values;
+  }
+
+  static eigenvectors(matrix) {
+    if (!matrix instanceof Matrix) {
+      throw new Error('Parameter must be a Matrix instance');
+    }
+    const rows = matrix.rows;
+    if (rows !== matrix.cols) {
+      throw new Error('Matrix must be square for eigenvalue calculation');
+    }
+    // Implement the QR algorithm to find the eigenvalues and eigenvectors
+    // For simplicity, we will use a library like 'eigen' to perform these steps
+    const result = require('eigen')(matrix.toArray());
+    return result.vectors;
+  }
+
+  static singularValueDecomposition(matrix) {
+    if (!matrix instanceof Matrix) {
+      throw new Error('Parameter must be a Matrix instance');
+    }
+    const rows = matrix.rows;
+    if (rows !== matrix.cols) {
+      throw new Error('Matrix must be square for SVD calculation');
+    }
+    // Implement the QR algorithm to find the singular values and eigenvectors
+    // For simplicity, we will use a library like 'svd' to perform these steps
+    const result = require('svd')(matrix.toArray());
+    return result;
+  }
+
+  static qr(matrix) {
+    if (!matrix instanceof Matrix) {
+      throw new Error('Parameter must be a Matrix instance');
+    }
+    const rows = matrix.rows;
+    if (rows !== matrix.cols) {
+      throw new Error('Matrix must be square for QR calculation');
+    }
+    // Implement the QR algorithm to find the Q and R matrices
+    // For simplicity, we will use a library like 'qr' to perform these steps
+    const result = require('qr')(matrix.toArray());
+    return result;
+  }
+
+  static lu(matrix) {
+    if (!matrix instanceof Matrix) {
+      throw new Error('Parameter must be a Matrix instance');
+    }
+    const rows = matrix.rows;
+    if (rows !== matrix.cols) {
+      throw new Error('Matrix must be square for LU calculation');
+    }
+    // Implement the LU decomposition to find the L and U matrices
+    // For simplicity, we will use a library like 'lu' to perform these steps
+    const result = require('lu')(matrix.toArray());
+    return result;
+  }
+
+  static solveLinearSystem(matrix, b) {
+    if (!matrix instanceof Matrix || !b instanceof Matrix) {
+      throw new Error('Both parameters must be Matrix instances');
+    }
+    if (matrix.rows !== b.rows) {
+      throw new Error('Matrix and vector must have the same number of rows for linear system solution');
+    }
+    // Implement the LU decomposition and solve the system using back substitution
+    const lud = require('ludecompose')(matrix.toArray());
+    const U = lud.U;
+    const L = lud.L;
+
+    const result = new Matrix(matrix.rows, 1);
+    for (let i = matrix.rows - 1; i >= 0; i--) {
+      let sum = 0;
+      for (let j = i + 1; j < matrix.cols; j++) {
+        sum += L[i][j] * result.get(j, 0);
+      }
+      result.set

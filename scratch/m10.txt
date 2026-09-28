@@ -1,0 +1,41 @@
+r4: the external-producer boundary - stop reenacting an authority Legasus can simply run
+
+THREE DEFECTS, ONE ROOT, and it was not "the doctest replay has bugs":
+
+    doctest truth              Legasus reconstruction
+    want = "integer
+"    ->   "integer"              information destroyed
+    example identity      ->   module|source          identity destroyed
+    failure semantics     ->   a local vocabulary     semantics approximated
+
+LEGASUS HAD PLACED ITSELF INSIDE THE TRUTH-PRODUCING MECHANISM WHEN IT ONLY NEEDED TO BE AN EVIDENCE
+CONSUMER. CPython owns discovery, sequencing, shared globals, exception semantics, output comparison and
+option flags. The producer now runs that authority and records what it said.
+
+    REASON AT THE BOUNDARY WHERE AUTHORITY ORIGINATES; ADAPT EVIDENCE RATHER THAN REENACTING THE
+    AUTHORITY BEHIND IT.
+
+IDENTITY IS NOT SOURCE TEXT. Identity is producer + document + ordinal; the source is DESCRIPTION. No
+hash is used as identity either - a hash faithfully identifies only the fields chosen to hash, so hashing
+a coarse tuple would merely make the coarseness look authoritative.
+
+DOCTEST IS NOT AN ORACLE. A PASS establishes satisfaction of THAT example under THAT producer semantics -
+not general correctness, preservation, or project advancement. Each claim carries the scope that bounds
+it.
+
+NINE CONTROLS, ALL HOLDING: identity (with the OLD key asserted to collide, so the test demonstrates the
+defect it replaces), fidelity, non-invention by declaration AND mechanically via illegalRefinement,
+non-vacuity, raw preservation with deterministic re-adaptation AFTER THE SUBJECT IS DELETED, channel
+isolation, version/scope, and an ADMIT control proving a legitimate lossy collapse stays legal - and
+becomes illegal the moment a consumer distinguishes the collapsed states.
+
+A VACUOUS TEST OF MY OWN, CAUGHT AND FIXED: the first channel test used a printing doctest EXAMPLE, but
+doctest captures example output itself, so the subject never touched fd 1 and subjectBytes was 0. The
+corpus now writes at MODULE IMPORT time and the test asserts subjectBytes > 0 so it cannot go vacuous
+again.
+
+426 tests. legasus-freeze-r3 untouched; Repo C prospective numbers unchanged.
+
+Message-File: scratch/m10.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+import sys
+from markdown import Markdown
+
+def to_html(markdown_string):
+    # Create a Markdown object
+    md = Markdown()
+
+    # Parse the markdown string
+    html_output = md.convert(markdown_string)
+
+    return html_output
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python s4_markdown.py <markdown_input>")
+        sys.exit(1)
+
+    markdown_input = sys.argv[1]
+    html_output = to_html(markdown_input)
+
+    print(html_output)

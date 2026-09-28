@@ -1,0 +1,12 @@
+--- op op1 after: "# Aggregation.\n"
+
+SCALE = 2
+
+--- op op2 after: "r it in items:\n        total += int(it)\n"
+    total = total * SCALE
+
+--- op op3 after: "def count(items):\n    return len(items)\n"
+
+
+def scaled_count(items):
+    return count(items) * SCALE

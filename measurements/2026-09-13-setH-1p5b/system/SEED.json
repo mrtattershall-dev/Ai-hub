@@ -1,0 +1,82 @@
+{
+  "kind": "canonical_post_goal_40_reference_seed",
+  "created_at": "2026-09-14T11:53:16.837Z",
+  "goal_set_sha": "1f29e971e72f9461f6326e0e861031926f771c334453bbdf4bfa2627673171a9",
+  "seed_bundle_sha": "29c4cf9e4004311f21ca86e464ef1b5ffc8ca1b01a998a1292565b8ded9649de",
+  "files": [
+    {
+      "file": "s10_desk.js",
+      "sha256": "4b618e7996185d02cf701149613ab3566b7357caf88dcf9e24f10cd672719e7b"
+    },
+    {
+      "file": "s1_library.js",
+      "sha256": "f2778de32196bfaf25f16e867774111682544aa42d39739dac8bd71f3d48f9ce"
+    },
+    {
+      "file": "s2_logs.py",
+      "sha256": "e7d55308b58573b275831304ac296938f491ae2f04e3028d3125287fbf5c9d1c"
+    },
+    {
+      "file": "s3_matrix.js",
+      "sha256": "7454561c07c992d8daeeab74a8ce5deece9793a25d21b19a14ace7c3699da2c8"
+    },
+    {
+      "file": "s4_markdown.py",
+      "sha256": "7db6b6d5fc3a2895e2de1a515ba5d6cba70da967278151b86ee2ea437c99c71e"
+    },
+    {
+      "file": "s5_expr.js",
+      "sha256": "690a70292b9f100d1f56ff939e9130739472262dfde17cd006f24de88f3995fb"
+    },
+    {
+      "file": "s6_graph.py",
+      "sha256": "c5ea2eeb58851dd8837d4da8b6784e35bcef8f21ebc2ba39cffcb57cd3ec6373"
+    },
+    {
+      "file": "s7_cache.js",
+      "sha256": "970f5bcafc0ebda89163f53f9d5e7db2584872e97f8a3bacabad3c1a05020226"
+    },
+    {
+      "file": "s8_grades.py",
+      "sha256": "aa6efd9a2b1b116d7da3ab399adbab8358b0fae61e7b89083d93fba7c07a14be"
+    },
+    {
+      "file": "s9_board.html",
+      "sha256": "65b24836117745772231b9f25e257bdc66170bcfeb5591a93fa7cc17117dae4c"
+    },
+    {
+      "file": "s9_board.js",
+      "sha256": "dd75221ff2008b7de3436941d976d47f33d23dd2f1a662570a3b6010d91cd50f"
+    }
+  ],
+  "verification": {
+    "structural_contracts": "40/40",
+    "behavioural_js": "seedProof.test.mjs - 64 assertions",
+    "behavioural_browser": "boardProof.test.mjs - 20 assertions (puppeteer)",
+    "held_out_absent": [
+      "goal 44 links",
+      "goal 45 functions",
+      "goal 49 persistence",
+      "goal 54 lists",
+      "goal 59 doing-limit"
+    ]
+  },
+  "classification": {
+    "BEHAVIORALLY_VERIFIED": [
+      "s1_library.js",
+      "s3_matrix.js",
+      "s5_expr.js",
+      "s7_cache.js",
+      "s10_desk.js",
+      "s9_board.html",
+      "s9_board.js"
+    ],
+    "STRUCTURAL_VERIFIED_PLUS_SELF_ASSERTIONS": [
+      "s2_logs.py",
+      "s4_markdown.py",
+      "s6_graph.py",
+      "s8_grades.py"
+    ],
+    "note": "The python modules carry their own goal-derived assertions and satisfy every structural contract, but do not yet have an independent external behavioural suite equivalent to seedProof.test.mjs. They are NOT claimed as BEHAVIORALLY_VERIFIED."
+  }
+}

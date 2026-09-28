@@ -1,0 +1,35 @@
+CORRECTION: I overwrote another session's scratch file, and asserted a ledger state I had not read
+
+TWO ERRORS, BOTH MINE, BOTH IN fb9da14.
+
+1. DESTRUCTIVE WRITE ON ANOTHER SESSION'S FILE. scratch/m25.txt already held the second session's
+   commit-message file for a62b1c4, "Preregister the composition attacks". I ran cat > on that path
+   because I had been counting up from m16 and ASSUMED the next number was free. 22 lines were replaced.
+   Restored here verbatim from a62b1c4; my own text moved to scratch/m26.txt. The content was never at
+   risk of being lost - it survives in a62b1c4's own message - but the file at HEAD was wrong and the
+   habit that produced it is worse than the damage. LOOK AT THE TARGET BEFORE OVERWRITING IT.
+
+2. I ASSERTED A SYSTEM STATE FROM MEMORY INSTEAD OF READING IT. The authority section claimed
+   "QUIESCENT_CONTEST ... the six open questions are unchanged". My session last observed the ledger at
+   Entry 14 / aa03ab9. A second session has since carried it to ENTRY 33 through BACKWARD-1, H-LOSS,
+   H-DISTINCTION and TRANSFER-1, and was mid-run when I committed on top of its work. The quiescent state
+   I described had been superseded for roughly an hour.
+
+   That is the exact error this project mechanizes against, committed inside the authority section of a
+   PREREGISTRATION - the one place a stale premise does the most damage, because everything downstream
+   inherits it.
+
+CORRECTED IN PLACE RATHER THAN AMENDED. fb9da14 stays in the history with its stale claim, and this
+commit carries the correction, because an amend would erase the evidence that the error happened. Same
+reason Entry 13 preserves the 452/452 state.
+
+THE PREDICTIONS ARE UNAFFECTED. I1-I8 are about the Odysseus interface and were not derived from the
+ledger state. Only the AUTHORITY claim was. The prereg now says the starting state must be RE-READ and
+the quiesce check RE-EXECUTED before the experiment runs, not recalled.
+
+NOT TOUCHED: benchmarks/run-backward.mjs and legasus/legascreen/lifecycle.test.mjs are the other
+session's in-flight work and are left exactly as found.
+
+Message-File: scratch/m27.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

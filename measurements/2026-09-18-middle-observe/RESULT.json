@@ -1,0 +1,2067 @@
+{
+ "models": [
+  "qwen2.5-coder:1.5b",
+  "qwen2.5-coder:7b",
+  "qwen2.5-coder:14b"
+ ],
+ "samples": 20,
+ "temperature": 0.6,
+ "negative_case": "the later behaviour is disjoint from the requested one, so nothing constrains the new guard to precede it; the legal region is open-ended and choosing a point inside it is an ENGINEERING CHOICE rather than a derivation",
+ "cells": {
+  "qwen2.5-coder:1.5b|C1": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "case": "C1",
+   "authorized": 18,
+   "derived_ok": 18,
+   "top_ok": 4,
+   "bottom_ok": 0,
+   "top_preservation_broken": 14,
+   "bottom_new_dead": 18,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": false,
+     "reason": "returned a function",
+     "condition": "n == 3"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|C2": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "case": "C2",
+   "authorized": 19,
+   "derived_ok": 19,
+   "top_ok": 10,
+   "bottom_ok": 0,
+   "top_preservation_broken": 9,
+   "bottom_new_dead": 19,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20",
+     "code": "if n < 20: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20",
+     "code": "if n < 20: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20",
+     "code": "if n < 20: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20",
+     "code": "if n < 20: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20",
+     "code": "if n < 20: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20",
+     "code": "if n < 20: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": false,
+     "reason": "returned a function",
+     "condition": "n == 12"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20",
+     "code": "if n < 20: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20",
+     "code": "if n < 20: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20",
+     "code": "if n < 20: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|C3": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "case": "C3",
+   "authorized": 17,
+   "derived_ok": 17,
+   "top_ok": 1,
+   "bottom_ok": 0,
+   "top_preservation_broken": 16,
+   "bottom_new_dead": 17,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": false,
+     "reason": "returned a function",
+     "condition": "n < 0"
+    },
+    {
+     "authorized": false,
+     "reason": "repeated a fixed line",
+     "condition": "n < 0"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50 and n >= 0",
+     "code": "if n < 50 and n >= 0: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|C4": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "case": "C4",
+   "authorized": 19,
+   "derived_ok": 19,
+   "top_ok": 4,
+   "bottom_ok": 0,
+   "top_preservation_broken": 15,
+   "bottom_new_dead": 19,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": false,
+     "reason": "not exactly one guard and one return",
+     "condition": null
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|C1": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "case": "C1",
+   "authorized": 20,
+   "derived_ok": 17,
+   "top_ok": 16,
+   "bottom_ok": 0,
+   "top_preservation_broken": 3,
+   "bottom_new_dead": 20,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 < n < 10",
+     "code": "if 0 < n < 10: return \"tiny\"",
+     "derived": "OTHER",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 < n < 10",
+     "code": "if 0 < n < 10: return \"tiny\"",
+     "derived": "OTHER",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "1 <= n < 10 and n != 3",
+     "code": "if 1 <= n < 10 and n != 3: return \"tiny\"",
+     "derived": "OTHER",
+     "blindTop": "OTHER",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|C2": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "case": "C2",
+   "authorized": 20,
+   "derived_ok": 20,
+   "top_ok": 19,
+   "bottom_ok": 0,
+   "top_preservation_broken": 1,
+   "bottom_new_dead": 20,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20",
+     "code": "if n < 20: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|C3": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "case": "C3",
+   "authorized": 20,
+   "derived_ok": 20,
+   "top_ok": 0,
+   "bottom_ok": 0,
+   "top_preservation_broken": 20,
+   "bottom_new_dead": 20,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|C4": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "case": "C4",
+   "authorized": 20,
+   "derived_ok": 20,
+   "top_ok": 19,
+   "bottom_ok": 0,
+   "top_preservation_broken": 1,
+   "bottom_new_dead": 20,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10",
+     "code": "if n < 10: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|C1": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "case": "C1",
+   "authorized": 20,
+   "derived_ok": 20,
+   "top_ok": 20,
+   "bottom_ok": 0,
+   "top_preservation_broken": 0,
+   "bottom_new_dead": 20,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|C2": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "case": "C2",
+   "authorized": 20,
+   "derived_ok": 20,
+   "top_ok": 20,
+   "bottom_ok": 0,
+   "top_preservation_broken": 0,
+   "bottom_new_dead": 20,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 20 and n != 12",
+     "code": "if n < 20 and n != 12: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|C3": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "case": "C3",
+   "authorized": 20,
+   "derived_ok": 20,
+   "top_ok": 13,
+   "bottom_ok": 0,
+   "top_preservation_broken": 7,
+   "bottom_new_dead": 20,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 50",
+     "code": "if n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "PRESERVATION_BROKEN",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 <= n < 50",
+     "code": "if 0 <= n < 50: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|C4": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "case": "C4",
+   "authorized": 20,
+   "derived_ok": 19,
+   "top_ok": 19,
+   "bottom_ok": 0,
+   "top_preservation_broken": 0,
+   "bottom_new_dead": 20,
+   "rows": [
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "0 < n < 10 and n != 3",
+     "code": "if 0 < n < 10 and n != 3: return \"tiny\"",
+     "derived": "OTHER",
+     "blindTop": "OTHER",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    },
+    {
+     "authorized": true,
+     "condition": "n < 10 and n != 3",
+     "code": "if n < 10 and n != 3: return \"tiny\"",
+     "derived": "OK",
+     "blindTop": "OK",
+     "blindBottom": "NEW_DEAD"
+    }
+   ]
+  }
+ }
+}

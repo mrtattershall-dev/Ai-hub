@@ -1,0 +1,10 @@
+lines):
+    text = ""
+    for line in lines:
+        if _is_heading(line) is not None:
+            level, content = _is_heading(line)
+            text += f"<h{level}>{content}</h{level}>\n"
+        else:
+            text += _inline(line) + "\n"
+
+    return "<html><body>" + text + "</body></html>"

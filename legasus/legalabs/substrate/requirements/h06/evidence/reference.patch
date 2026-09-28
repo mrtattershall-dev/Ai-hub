@@ -1,0 +1,15 @@
+--- op op1 after: "BASE = 100\n"
+
+
+def _factor():
+    return 2
+
+--- op op2 after: "def apply_rate(x):\n    return x * BASE\n"
+
+
+SCALED = BASE * _factor()
+
+--- op op3 after: "# Rates.\n"
+
+def scaled():
+    return SCALED

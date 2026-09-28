@@ -1,0 +1,11 @@
+--- op op1 after: "        self._routes = {}\n"
+        self._aliases = {}
+
+--- op op2 after: ":\n            return self._routes[path]\n"
+        if path in self._aliases:
+            return self._routes.get(self._aliases[path])
+
+--- op op3 after: "):\n        self._routes[path] = handler\n"
+
+    def alias(self, frm, to):
+        self._aliases[frm] = to

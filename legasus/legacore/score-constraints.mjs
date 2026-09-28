@@ -1,0 +1,230 @@
+// Score LegaCore's derived constraints against the EXECUTABLE ground truth.
+//
+// THE SCORING RULE THAT MAKES A RECOVERED BIT MEAN SOMETHING:
+//
+//     A constraint's gain counts ONLY IF every boundary it removed genuinely fails when executed.
+//
+// Remove one position that actually passes and the constraint is manufacturing information - it has
+// narrowed the model's authority on a claim the program does not support. Those are counted separately
+// as OVER-CONSTRAINT and never contribute gain, because a system rewarded for confident narrowing will
+// learn to narrow confidently.
+//
+// The ground truth is read HERE and never by the deriver. constraints.mjs sees the source and the
+// planned operations only.
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+// The deriver revision is selectable so the frozen one and the revision can be scored by IDENTICAL
+// code. A scorer rewritten between two arms measures the rewrite.
+const DERIVER = process.argv[3] || './constraints.mjs';
+const { constrain, verify } = await import(DERIVER);
+// The SAME reconstruction the ground truth was built with. This scorer used to rebuild the patch
+// blocks itself and normalized trailing newlines differently, so its text and the ground truth's text
+// disagreed, every line number shifted, and an entire scoring run compared misaligned positions while
+// looking completely plausible. `base_lines` is asserted below so a future divergence fails loudly
+// instead of producing a number.
+import { reconstruct, baseFor } from '../legalabs/substrate/narrowability.mjs';
+import { buildContext } from './opcontext.mjs';
+
+const NL = String.fromCharCode(10);
+const ind = (l) => (l.match(/^[ \t]*/) || [''])[0].length;
+const ROOT = 'C:/Users/tatte/Projects/ai-coding-hub-indent/legasus/legalabs/substrate/';
+const SUB = ROOT + (process.argv[2] || 'provenance');
+
+const GT = JSON.parse(readFileSync(join(SUB, 'GROUNDTRUTH.json'), 'utf8'));
+
+// PER-KIND EXPECTATIONS. Each task in the generalization family preregisters WHICH constraint kind it
+// tests and whether that kind SHOULD or SHOULD NOT fire. Reporting per kind is the point: an aggregate
+// can be carried entirely by one rule while the others are wrong.
+//
+// This is a REPORTING change made before the run. The scoring rule - gain counts only if every removed
+// boundary genuinely fails - is untouched.
+const EXP = existsSync(join(SUB, 'EXPECTED.json'))
+  ? JSON.parse(readFileSync(join(SUB, 'EXPECTED.json'), 'utf8')) : { tasks: [] };
+const KIND = new Map((EXP.tasks || []).filter((t) => t.kind).map((t) => [t.id, t]));
+
+// The local copy of parentRangeFor that used to live here is DELETED, not merely unused. A stale
+// duplicate of a derived-artifact computation is precisely hazard 9, and leaving one in place invites
+// the next consumer to copy the wrong one.
+
+let opsSeen = 0; let recovered = 0; let over = 0; let clean0 = 0; let missed = 0;
+let bitsDerived = 0; let bitsAvailable = 0;
+let styleFired = 0; let styleNarrowed = 0; let replayFail = 0;
+const rows = [];
+
+for (const t of GT) {
+  const dir = join(SUB, t.task);
+  if (!existsSync(join(dir, 'task.json'))) continue;
+  const recon = reconstruct(dir);
+  const blocks = recon.full.map((f) => f.code);
+
+  for (let k = 0; k < t.rows.length; k++) {
+    const row = t.rows[k];
+    if (row.intra_line || row.error || !row.candidate_positions) continue;
+    opsSeen++;
+    // COORDINATES. The ground truth numbers candidate positions against the text with the OTHER
+    // operations already applied, not against the original source. Deriving constraints against the
+    // original would misalign every position silently, since line numbers still exist there. It is
+    // also the right context semantically: when LegaCore reasons about where op_k may go, the rest of
+    // the transaction is part of the program it is reasoning about.
+    const base = baseFor(recon, k);
+    if (base === null) continue;
+    // ALIGNMENT ASSERTION. If this text is not the one the candidate positions were numbered against,
+    // every comparison below is meaningless - and meaningless in the worst way, since the numbers still
+    // look reasonable. Fail loudly rather than score.
+    if (row.base_lines !== undefined && base.split(NL).length !== row.base_lines) {
+      console.log('  MISALIGNED  ' + t.task + ':' + row.op + '  ground truth was built against '
+        + row.base_lines + ' lines, this text has ' + base.split(NL).length + ' - refusing to score');
+      process.exitCode = 1;
+      continue;
+    }
+    // ONE context builder, shared with the conformance audit. `origin` is the UNMODIFIED source, so a
+    // provider found in `base` can be classified as a current program fact or as one that exists only
+    // because another planned operation creates it.
+    const ctx = buildContext(recon, k, base, row, t.task);
+    const code = ctx.code;
+
+    const res = constrain(ctx, row.candidate_positions);
+    const rep = verify(ctx, res.chain);
+    if (!rep.all_replayed) replayFail++;
+
+    const failing = new Set(row.failing_positions || []);
+    const removed = res.chain.flatMap((c) => c.removed_positions || []);
+    const wrongly = removed.filter((p) => !failing.has(p));
+    const style = res.chain.filter((c) => c.kind === 'canonical_realization');
+    if (style.length) styleFired++;
+    if (style.some((c) => (c.removed_positions || []).length || c.gain_bits > 0)) styleNarrowed++;
+
+    const maxBits = row.max_gain_bits || 0;
+    bitsAvailable += maxBits;
+    const honest = wrongly.length === 0;
+    const gained = honest ? res.total_gain_bits : 0;
+    if (honest) bitsDerived += Math.min(gained, maxBits);
+
+    let verdict;
+    if (!row.narrowable) verdict = (removed.length === 0) ? 'CORRECT-0' : 'OVER-CONSTRAINT';
+    else if (wrongly.length) verdict = 'OVER-CONSTRAINT';
+    else if (removed.length) verdict = 'RECOVERED';
+    else verdict = 'missed';
+    if (verdict === 'RECOVERED') recovered++;
+    else if (verdict === 'OVER-CONSTRAINT') over++;
+    else if (verdict === 'CORRECT-0') clean0++;
+    else missed++;
+
+    // The resolution ACCOUNT, so an expectation can assert about requirements rather than about which
+    // kinds fired. k04's negative - DOUBLE must never require itself - is not expressible as "this kind
+    // did not fire", because symbol_availability legitimately fires there for STEP.
+    const requiredSyms = [...res.requirement_resolution.resolved.map((r) => r.symbol),
+      ...res.requirement_resolution.unresolved.map((r) => r.symbol)];
+    rows.push({ task: t.task, op: ctx.operation_id, verdict, narrowable: row.narrowable, requiredSyms,
+      cand: row.candidates, truth: row.passing, derived: res.constrained,
+      gained, maxBits, wrongly: wrongly.length,
+      kinds: res.chain.filter((c) => (c.removed_positions || []).length).map((c) => c.kind),
+      // EMITTED is a different fact from NARROWED. A rule whose correctness is its SILENCE -
+      // scope_availability, deferred_requirement, unresolved_requirement, canonical_realization -
+      // never narrows, so scoring it by narrowing marks every correct result a failure. That is
+      // exactly what happened to j01 and j02, whose scope resolution was right.
+      emitted: res.chain.map((c) => c.kind) });
+  }
+}
+
+for (const r of rows) {
+  console.log('  ' + r.verdict.padEnd(16) + r.op.padEnd(12)
+    + ' cand ' + String(r.cand).padStart(3)
+    + '  truth-passes ' + String(r.truth).padStart(3)
+    + '  derived ' + String(r.derived).padStart(3)
+    + '  gain ' + r.gained.toFixed(2) + '/' + r.maxBits.toFixed(2)
+    + (r.wrongly ? '  WRONGLY REMOVED ' + r.wrongly : '')
+    + (r.kinds.length ? '  [' + [...new Set(r.kinds)].join(',') + ']' : ''));
+}
+
+const narrowableOps = rows.filter((r) => r.narrowable).length;
+
+// ---- PER KIND FIRST. The aggregate comes after, because an aggregate can be carried entirely by one
+// rule while the others are wrong - which is exactly the state this family was built to resolve.
+if (KIND.size) {
+  console.log('');
+  console.log('  ---- PER CONSTRAINT KIND (the aggregate is reported after this, not instead of it)');
+  // GROUP BY CASE, NOT BY KIND. Keying on `kind` alone collapsed eight tasks that all test
+  // `symbol_availability` into one row pair, silently keeping only the last POSITIVE and the last
+  // NEGATIVE and dropping six tasks from the table. The aggregate and per-operation rows were
+  // unaffected, but the per-kind table - the thing that exists precisely so one rule cannot hide
+  // behind another - was itself hiding tasks.
+  const byKind = new Map();
+  for (const [id, spec] of KIND) {
+    const group = spec.kind + (spec.case ? '  [' + spec.case + ']' : '');
+    if (!byKind.has(group)) byKind.set(group, {});
+    const rs = rows.filter((r) => r.task === id);
+    const fired = rs.flatMap((r) => r.kinds);
+    const emitted = rs.flatMap((r) => r.emitted || []);
+    // Kinds that resolve an account without narrowing are judged on EMISSION; kinds that exist to
+    // narrow are judged on narrowing.
+    const SILENT = ['scope_availability', 'deferred_requirement', 'unresolved_requirement',
+      'canonical_realization'];
+    // A declared `kind` names the MECHANISM under test. When a differently-named constraint implements
+    // it, the expectation says so with `emitted_as`; otherwise the report hunts for a kind that is
+    // never emitted and marks a working rule FAIL.
+    const target = spec.emitted_as || spec.kind;
+    const silent = SILENT.includes(target);
+    byKind.get(group)[spec.half] = {
+      id,
+      narrowable: rs.filter((r) => r.narrowable).length,
+      ops: rs.length,
+      firedOwn: (silent ? emitted : fired).filter((k) => k === target).length,
+      judged_on: silent ? 'emission (this kind narrows nothing by design)' : 'narrowing',
+      firedAny: [...new Set(fired)],
+      over: rs.filter((r) => r.wrongly > 0).length,
+      bits: rs.reduce((a, r) => a + r.gained, 0),
+      avail: rs.reduce((a, r) => a + r.maxBits, 0),
+      // carried so the printing loop can evaluate account-level expectations without reaching back
+      // into this scope - the kind of cross-scope reach that produced a ReferenceError here once
+      requires: [...new Set(rs.flatMap((r) => r.requiredSyms || []))],
+      spec,
+    };
+  }
+  for (const [kind, halves] of byKind) {
+    console.log('');
+    console.log('  ' + kind);
+    for (const half of Object.keys(halves)) {
+      const h = halves[half];
+      if (!h) continue;
+      // A positive case must fire its own kind. A negative case must NOT, and must not over-constrain.
+      // Other labels (UNRESOLVED, RESOLVED-CONTROL) are reported without a pass/fail verdict, because
+      // what they establish is not "did the rule fire" but "was the path exercised at all".
+      // Account-level expectations take precedence when declared: they are a stronger and more
+      // specific claim than "did this kind fire".
+      const req = new Set(h.requires || []);
+      const sp = h.spec || {};
+      const mustHave = (sp.expect_required || []).every((sym) => req.has(sym));
+      const mustLack = (sp.expect_not_required || []).every((sym) => !req.has(sym));
+      const accountDeclared = (sp.expect_required || sp.expect_not_required) ? true : false;
+      const ok = accountDeclared ? (mustHave && mustLack && h.over === 0)
+        : half === 'POSITIVE' ? (h.firedOwn > 0 && h.over === 0)
+          : half === 'NEGATIVE' ? (h.firedOwn === 0 && h.over === 0) : null;
+      console.log('    ' + (ok === null ? '----  ' : ok ? 'PASS  ' : 'FAIL  ') + half.padEnd(17) + h.id
+        + '  narrowable ' + h.narrowable + '/' + h.ops
+        + '  this kind fired on ' + h.firedOwn + ' op(s) [' + h.judged_on + ']'
+        + '  over-constraint ' + h.over
+        + (accountDeclared ? '  [account: requires ' + JSON.stringify([...req]) + ']' : '')
+        + '  bits ' + h.bits.toFixed(2) + '/' + h.avail.toFixed(2));
+      if (h.firedAny.length) console.log('          kinds that narrowed: ' + h.firedAny.join(', '));
+    }
+  }
+}
+
+console.log('');
+console.log('  ---- LegaCore constraint derivation, against executable ground truth');
+console.log('  operations scored          ' + opsSeen + '   (narrowable ' + narrowableOps + ')');
+console.log('  RECOVERED                  ' + recovered + '   narrowed, and every removed boundary really fails');
+console.log('  missed                     ' + missed + '   narrowable, nothing derived');
+console.log('  OVER-CONSTRAINT            ' + over + '   removed a boundary that actually passes');
+console.log('  correct zero               ' + clean0 + '   position-independent and left alone');
+console.log('  witnesses that replayed    ' + (opsSeen - replayFail) + '/' + opsSeen);
+console.log('');
+console.log('  PRIMARY   recovered ' + recovered + ' of ' + narrowableOps + ' narrowable   (v6 target: >= 15 of 26)');
+console.log('  SECONDARY realized available information '
+  + (bitsAvailable ? (100 * bitsDerived / bitsAvailable).toFixed(1) : '0') + '%   ('
+  + bitsDerived.toFixed(2) + ' of ' + bitsAvailable.toFixed(2) + ' bits)   DIAGNOSTIC ONLY');
+console.log('');
+console.log('  STYLE CONTROL  canonical_realization fired on ' + styleFired + ' operation(s) and narrowed '
+  + styleNarrowed + '.');
+console.log('  A style constraint that narrows anything is a milestone failure regardless of score.');

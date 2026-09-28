@@ -1,0 +1,48 @@
+Step 2: the mutation topology has no convergence point, and step 1 is corrected
+
+The owner's question was where, if anywhere, every repository-mutating route converges after
+preservation evidence could be required but before the mutation becomes real. The answer, measured
+read-only against trunk, is NOWHERE. Every route reaches the same primitives, and by then no
+preservation evidence has been assembled on any of them. The only shared boundary is the main loop's
+pre-tool checkpoint, which is a rollback substrate rather than a decision and which three routes
+never pass through.
+
+Step 1 is corrected first. It said the hub warns and writes anyway; that was true at set F and is
+false at HEAD. Commit 4764bde on 2026-09-11 added a refusal that re-reads the file after a write or
+edit, diffs lost definitions and exports against the before-image, and restores the before-image
+unless the model declared REMOVE with the names. The baseline I proposed already exists, built by the
+hub in response to the exact incident: set F 16 of 48 before it, set G 6 of 33 after it, with the
+caveat that set G's first regression file was committed empty and the 6 is from a hardened re-run.
+Set H has no regression run.
+
+Fourteen routes are tabulated with requester, authorizer, before-image, preservation check,
+decision, checkpoint and primitive. Three structural bypass classes fall out, not one. The refusal is
+route-local: it fires for two tools and four extensions in the main loop only, while append_file has
+no before-image and so skips the duplicate guard too, download_file can overwrite a source file with
+fetched bytes unchecked, spawn_subtask calls the tools directly with zero guards AND no checkpoint,
+shell classification denies only recursive rm while mv, cp, git and redirects sit in the build tier,
+the editor's HTTP routes write and delete with nothing between them and the disk, and the end-of-run
+repair restores the first checkpoint that PARSES with no preservation check. Second, the model can
+exempt names by declaration. Third, the refusal is write-then-restore, so the destroyed state is
+briefly on disk where another route could observe it.
+
+The settings page's authority claims were checked as conformance targets against their deciding
+paths. Strict mode holds on both agent shell routes, and the subtask loop stops on anything not
+allowed. The twelve-per-hour cap is enforced at exactly one site. The five-hop sentence describes
+supervisor lineage, while subtask chains have their own counter capped at two - one UI sentence, two
+lineage counters, an under-specification rather than a violation.
+
+What this means for the comparison is that the problem has moved: correctness is enforced by routes
+while the property belongs to effects, and the hub has no place where what is changing, what must
+survive, what evidence exists and who may act are all available before state becomes real. The
+baseline is therefore precisely defined as making the existing refusal route-complete and
+decide-before-write, and Legasus's candidate contribution is equally precise as an evidence-bearing
+boundary every route must pass. The removal control asks the only question that matters.
+
+Not established: which routes the six set G survivors took, which needs the regression tool re-run
+with per-route attribution and is the step-4 specimen work. Nothing built, trunk untouched, specimen
+frozen.
+
+Message-File: scratch/m124.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

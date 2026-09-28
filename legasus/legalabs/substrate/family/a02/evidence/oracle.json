@@ -1,0 +1,72 @@
+{
+  "task_id": "a02",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing daily-tracking feature as the relation to parallel; that feature occupies a declaration, a recorder and two readers, and the requested feature occupies the same positions at a different granularity",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the parallel accumulator",
+        "site_hint": "        self._daily = {}\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the parallel recorder",
+        "site_hint": " self._daily[day] = self._daily.get(day, 0) + n\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the parallel readers",
+        "site_hint": "ted(self._daily), key=lambda d: self._daily[d])\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 15
+  },
+  "reference": {
+    "source_hash": "f238c896c5340515ab3789fa11d0c671260c0f3db058b670e55e430ad7fb80c6",
+    "reference_hash": "965b830ae3ae2cb0617332d1af78fa84af3e8977deed4b291273c2ab0d31d488",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

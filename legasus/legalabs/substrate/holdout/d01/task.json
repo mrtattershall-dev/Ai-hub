@@ -1,0 +1,10 @@
+{
+  "task_id": "d01",
+  "goal": "Add repeat counting to the EXISTING text.py: counted(s) returns how many times a string equal to s after normalization has been passed to counted so far, counting the current call, so the first call returns 1. Keep normalize, word_count and initials working exactly as they do now. Run it with python.",
+  "lead": "text.py",
+  "language": "py",
+  "run_with": "python",
+  "interface": [
+    "counted"
+  ]
+}

@@ -1,0 +1,47 @@
+# BEGIN SOLUTION
+        m = re.match(r"^\d+\. (.*)$", line)
+        if m:
+            flush_para()
+            ol_items.append(m.group(1).strip())
+            continue
+        # END SOLUTION
+
+    if current:
+        blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+    if items:
+        blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+
+This Python code defines a function `to_html` that converts Markdown text into HTML. The function handles various Markdown features such as paragraphs, headings, bold and italic formatting, code spans, links, and unordered lists.
+
+Here's a breakdown of the key functionalities:
+
+1. **Paragraphs and Blank Lines**:
+   - Paragraphs are formed by consecutive lines without blank lines in between.
+   - Blank lines separate different paragraphs.
+
+2. **Headings**:
+   - Headings are defined by lines starting with one to three hash symbols (`#`), followed by a space and the heading text.
+   - The number of `#` determines the heading level (e.g., `#` for `<h1>`, `##` for `<h2>`).
+
+3. **Bold and Italic Formatting**:
+   - Bold text is enclosed in double asterisks (`**`).
+   - Emphasis (italic) is enclosed in single asterisks (`*`).
+
+4. **Code Spans**:
+   - Code spans are enclosed in backticks (\`) and are escaped within the

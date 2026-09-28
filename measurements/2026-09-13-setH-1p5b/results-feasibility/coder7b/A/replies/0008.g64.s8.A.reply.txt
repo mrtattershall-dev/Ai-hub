@@ -1,0 +1,35 @@
+text):
+    lines = text.split("\n")
+
+    html = []
+    in_list = False
+    list_items = []
+
+    def close_list():
+        nonlocal in_list, list_items
+        if in_list:
+            html.append("<ol>")
+            for item in list_items:
+                html.append(f"<li>{item}</li>")
+            html.append("</ol>")
+            in_list = False
+            list_items = []
+
+    for line in lines:
+        heading = _is_heading(line)
+        if heading is not None:
+            close_list()
+            level, title = heading
+            html.append(f'<h{level}>{title}</h{level}>')
+        elif re.match(r"^\d+ \. ", line):
+            if not in_list:
+                close_list()
+                in_list = True
+            list_items.append(_inline(line[3:]))
+        else:
+            close_list()
+            html.append(f"<p>{_inline(line)}</p>")
+
+    close_list()
+
+    return "\n".join(html)

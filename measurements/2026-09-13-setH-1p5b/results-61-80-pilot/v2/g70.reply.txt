@@ -1,0 +1,8 @@
+library, isbn) {
+  return library.available(isbn) > 0;
+}
+
+function canCheckout(library, member, isbn) {
+  const l = library.loans(member);
+  return !l.some((r) => r.isbn === isbn && r.daysLate < library.overdueDays());
+}

@@ -1,0 +1,6 @@
+# AT THIS POINT WRITE ONLY THIS: call `flush_list()` here and nothing else, so a blank line also closes an open list
+            # AT THIS POINT WRITE ONLY THIS: call `flush_ol()` here and nothing else, so a blank line also closes an open ordered list
+        if line.startswith("-"):
+            flush_para()
+            ol_items.append(line[2:].strip())
+            continue

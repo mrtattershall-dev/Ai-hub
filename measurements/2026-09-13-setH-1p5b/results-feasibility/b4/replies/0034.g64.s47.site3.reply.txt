@@ -1,0 +1,8 @@
+continue
+        if line.startswith("#"):
+            flush_para()
+            blocks.append("<h1>" + _inline(line[2:].strip()) + "</h1>")
+            continue
+        if line.startswith("* "):
+            flush_list()
+            items.append(_inline(line[2:].strip()))

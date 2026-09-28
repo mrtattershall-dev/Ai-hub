@@ -1,0 +1,7 @@
+# NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    # REQUESTED CHANGE: Add emphasis to to_html in the EXISTING s4_markdown.py: consecutive lines starting with `*` and `**` become <em>...</em> and <strong>...</strong>, written like the italic and bold text. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: define a flush function for emphasis, mirroring flush_para but emitting <em>
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    # REQUESTED CHANGE: Add code spans to to_html in the EXISTING s4_markdown.py: consecutive lines starting with `code` followed by a space become <code>...</code>, written like the code block. Run it with python.
+    # AT THIS POINT WRITE ONLY THIS: define a flush function for code spans, mirroring flush_para but emitting <code>
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url

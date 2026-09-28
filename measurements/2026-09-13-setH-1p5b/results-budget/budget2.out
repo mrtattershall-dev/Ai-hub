@@ -1,0 +1,23 @@
+  v3 safeReplace route - does the cap bite?
+
+  [64/s1/n900 ]   365B/  94tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' threw cannot access local variable 'text' where it
+  [64/s1/n1800]   873B/ 243tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a\n\n\nb' wanted '<p>a b</p>' | 'a\n\nb' ->
+  [64/s2/n900 ]   914B/ 228tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> 'a\nb\n' wanted '<p>a b</p>' | 'a\n\nb' -> 'a\n
+  [64/s2/n1800]   914B/ 228tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> 'a\nb\n' wanted '<p>a b</p>' | 'a\n\nb' -> 'a\n
+  [64/s3/n900 ]   557B/ 135tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<html><body>\na\nb\n</body></html>' wanted '<p
+  [64/s3/n1800]   557B/ 135tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<html><body>\na\nb\n</body></html>' wanted '<p
+
+  [74/s1/n900 ]   873B/ 243tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a\n\n\nb' wanted '<p>a b</p>' | 'a\n\nb' ->
+  [74/s1/n1800]   873B/ 243tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<p>a\n\n\nb' wanted '<p>a b</p>' | 'a\n\nb' ->
+  [74/s2/n900 ]   914B/ 228tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> 'a\nb\n' wanted '<p>a b</p>' | 'a\n\nb' -> 'a\n
+  [74/s2/n1800]   914B/ 228tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> 'a\nb\n' wanted '<p>a b</p>' | 'a\n\nb' -> 'a\n
+  [74/s3/n900 ]   557B/ 135tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<html><body>\na\nb\n</body></html>' wanted '<p
+  [74/s3/n1800]   557B/ 135tok stop=stop        loads=true  old=false delta=false OLD BROKE: REGFAIL 'a\nb' -> '<html><body>\na\nb\n</body></html>' wanted '<p
+
+===== SUMMARY =====
+  goal 64 n=900   hit cap 0/3   loads 3/3   old-regression green 0/3   delta 0/3
+  goal 64 n=1800  hit cap 0/3   loads 3/3   old-regression green 0/3   delta 0/3
+  goal 74 n=900   hit cap 0/3   loads 3/3   old-regression green 0/3   delta 0/3
+  goal 74 n=1800  hit cap 0/3   loads 3/3   old-regression green 0/3   delta 0/3
+
+  RAW = C:\Users\tatte\AppData\Local\Temp\budget2-gecNjr

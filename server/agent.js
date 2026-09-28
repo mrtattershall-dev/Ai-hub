@@ -34,7 +34,7 @@ import { canonicalSummary } from './canonicalAssets.mjs';
 import { SYSTEM_PROMPT, systemPromptFor } from './agentPrompt.js';
 import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
-import { lostDefs, lostExports, defCounts } from './defNames.js';
+import { lostDefs, lostExports, defCounts, exportNames } from './defNames.js';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 // LEGASUS PHASE 1 - OBSERVATION ONLY. See legasus/screen/PHASE1-OBSERVATION_PREREG.md.
 // Emits a canonical host execution event from the one place where the whole truth of a tool
@@ -449,7 +449,15 @@ const CMD_TIMEOUT_MS = 60_000;   // per shell command
 // cap for a 14B: KV cache ~4.5GB + ~9GB model + buffers ≈ 14.5GB (fits, tight). Enable
 // OLLAMA_KV_CACHE_TYPE=q8_0 server-side to halve the KV and run it comfortably. Drop
 // NUM_CTX to 8192 if you OOM; a 7B has room to spare either way.
-const NUM_CTX = parseInt(process.env.NUM_CTX, 10) || 24_576;
+// MUST NOT EXCEED WHAT THE SERVER ACTUALLY SERVES, and until 2026-09-12 it did. Every set H/I/J arm was deployed
+// with max_len=16384 while this default claimed 24,576, and contextTokensFor() hands the claim straight to
+// historyBudget(): 24,576 * 0.55 = 13,516 tokens of history, against a real window of 16,384 for history AND the
+// ledger block AND the reply. It was only ever survivable because the message-count cap in pruneHistory kept runs
+// at 38-70% of that budget by accident; removing that cap (as this commit does) makes the claim reachable, and a
+// reachable overlong prompt is a silent one - the CONTEXT_OVERFLOW recovery keys on an HTTP 400 that this backend
+// never returns, so ctxSquashes is 0 across all 835 set J calls. Matched to OPENAI_CTX_DEFAULT. Raise it by env
+// only alongside a server that really serves it.
+const NUM_CTX = parseInt(process.env.NUM_CTX, 10) || 16_384;
 const NUM_PREDICT = parseInt(process.env.NUM_PREDICT, 10) || -1; // -1 = generate until done; never truncate a long file mid-write
 // SAMPLING-1. This was `const TEMPERATURE = 0.2` and nothing else: no top_p, no top_k and NO
 // REPETITION PENALTY were ever sent, so the server applied vLLM's defaults (top_k disabled,
@@ -480,6 +488,19 @@ const SAMPLING_EXTRA = {
   ...(SEED !== null ? { seed: SEED } : {}),
 };
 const MAX_HISTORY_MSGS = 16;     // keep recent context dense; older tool dumps are pruned
+// A BACKSTOP, not a working limit. pruneHistory admits recent messages until the TOKEN budget is spent; this exists
+// only so the array cannot grow without bound if a run somehow produces thousands of tiny messages. It is
+// deliberately an order of magnitude above the working window so that it never decides what the model remembers -
+// see pruneHistory, where a cap of exactly this kind sat inside the admission loop and silently held every run in
+// every measured set to the last six turns.
+const MAX_TAIL_MSGS = 200;
+// A refused write hands the file back (see the choke point in drive()). Both numbers come from the records, not
+// from taste: across the archive a refused file is 81 lines at the median, 269 at p90 and 1842 at worst, so 6000
+// characters shows the whole of a typical one and truncates honestly beyond that; and a run has 2 refusals at the
+// median and 9 at most, with only 24 runs above four, so four hand-backs covers almost every run without letting a
+// pathological loop paste a file into the window nine times.
+const HANDBACK_CHARS = 6000;
+const HANDBACK_MAX = 4;
 
 // ── Workspace sandbox helpers ────────────────────────────────────────────────
 
@@ -556,6 +577,32 @@ function candidatePagesForBaseline() {
 // browser against the LIVE hub. No serving port, no baseline.
 let servingPort = null;
 export function setServingPort(port) { servingPort = port; }
+
+/**
+ * The URL of a workspace page, or NULL when the workspace is not actually being served.
+ *
+ * takeVisualBaseline already refused to guess (`if (!servingPort) return base`), but the three routes
+ * that CONSUME that baseline kept using the module const PORT, which defaults to 3001. So the recorder
+ * was fixed and the deciders were not - the same one-route-not-the-sibling shape as seven of the eight
+ * findings in the original walk.
+ *
+ * In a live hub the two agree: index.js calls setServingPort(PORT) in the same process. Two things go
+ * wrong when they do not:
+ *   - an in-process test with no PORT env leaves PORT at 3001 while servingPort is null, so test_web,
+ *     see_screen and the finish gate would open a headless browser against the DEVELOPER'S LIVE HUB.
+ *     That is the exact failure the servingPort comment describes, still reachable from three routes.
+ *   - index.js wraps the call in .catch(() => {}). If it never runs, servingPort stays null, the
+ *     baseline silently returns {} - and the finish gate, still working off PORT, then judges the page
+ *     STRICTLY against no baseline. That restores the failure the baseline exists to prevent (88 of
+ *     327 harvested games refused for problems the agent never touched) with no error on either side.
+ *
+ * Returning null rather than falling back to PORT is the whole point: "not served" must be sayable.
+ * A fallback would reintroduce precisely what servingPort was added to stop.
+ */
+function workspaceUrl(page) {
+  if (!servingPort) return null;
+  return `http://localhost:${servingPort}/workspace/${String(page || '').replace(/^\/+/, '')}`;
+}
 async function takeVisualBaseline() {
   const base = {};
   if (!servingPort) return base;
@@ -589,6 +636,57 @@ function safePath(p) {
   return full;
 }
 
+/**
+ * THE SSRF GATE — shared by EVERY tool that fetches a URL the model supplied.
+ *
+ * This rule lived inside download_file and nowhere else. download_file is off by default and
+ * deliberately absent from AUTO_TOOLS, and its own header explained exactly what the rule is for:
+ * "without this an autonomous agent could fetch http://localhost:3001/api/keys and write your API
+ * keys into the workspace, or read cloud instance credentials."
+ *
+ * web_fetch IS in AUTO_TOOLS. It takes a URL straight from the model, had no host check at all, and
+ * returns the page as clean text into the model's context — which is then written to the run file,
+ * the transcript jsonl, and harvested into training rows. The justification in the AUTO_TOOLS
+ * comment was "read-only network reads with truncated output", and that is the reasoning error:
+ * read-only with respect to the WORKSPACE is not read-only with respect to this machine, and
+ * READING is the whole attack — nothing needs to be written.
+ *
+ * Demonstrated 2026-09-12 before this fix, by webFetchSsrf.test.mjs against a live hub:
+ * web_fetch http://localhost:3001/api/keys returned the hub's provider configuration as extracted
+ * text; http://[::1]:3001 did the same through IPv6; 127.0.0.1:11434 listed the local Ollama models.
+ *
+ * So the gate is one function with one caller-visible answer, and both tools use it — the sibling
+ * problem this hub keeps having is what a shared function is for. It is a HOST check, not a
+ * blanket refusal: a fix that refused everything would pass every refusal test and break the tool,
+ * which is why webFetchSsrf.test.mjs asserts a public host still reaches the fetch.
+ *
+ * It does NOT resolve DNS. A public name that resolves to 127.0.0.1 still gets through, and closing
+ * that needs a lookup before every fetch plus a re-check against the socket's real peer. This closes
+ * the direct route and the redirect route, which are the ones reachable by typing a URL.
+ *
+ * Returns the offending hostname, or null when the host is allowed.
+ */
+function blockedHost(urlish) {
+  let u;
+  try { u = urlish instanceof URL ? urlish : new URL(String(urlish)); } catch { return null; }
+  // new URL() keeps IPv6 literals in brackets; compare them bare.
+  const host = u.hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  const isPrivate =
+    host === 'localhost' || host === '::1' || host.endsWith('.localhost') ||
+    /^127\./.test(host) || /^10\./.test(host) || /^192\.168\./.test(host) ||
+    /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
+    /^169\.254\./.test(host) ||                      // link-local, incl. 169.254.169.254
+    /^0\./.test(host) || host === '0.0.0.0' ||
+    /^f[cd][0-9a-f]{2}:/i.test(host) || /^fe80:/i.test(host) ||
+    host === 'metadata.google.internal';
+  return isPrivate ? host : null;
+}
+
+/** One wording for the refusal, so the two tools cannot drift apart on what they say. */
+const ssrfRefusal = (host) =>
+  `ERROR: refusing to fetch a private or loopback address (${host}). That points at this machine's own `
+  + `services - the hub's API keys, your router, cloud instance credentials - not at anything on the public internet.`;
+
 // At/above this size, a blind read_file (no LINES) returns a MAP instead of the
 // contents — forcing the model to navigate by range like a human reads code.
 const BIG_FILE_LINES = 250;
@@ -604,14 +702,41 @@ function buildOutline(lines) {
     /^\s*(?:async\s+)?def\s+([A-Za-z_]\w*)\s*\(/,        // python def
     /^\s*class\s+([A-Za-z_]\w*)\s*[:(]/,                 // python class
   ];
+  // A CLASS METHOD IS A DECLARATION, and until 2026-09-12 none of the six patterns above could see one - they all
+  // anchor on function/class/const/def. So every class-based JS file mapped to its `class X {` line and NOTHING
+  // else. Archive-wide: 224 of 651 outline_file calls on a JS file returned a lone class name, on files up to 75
+  // lines - 34% of all JS orientation calls.
+  //
+  // Traced end to end on set J run 8e7cf9aa (14B, goal 11). Its FIRST move was outline_file on a 26-line
+  // s1_library.js and it was told "1 declarations / 1: class Library {". It then invented addBook's body, the
+  // duplicate guard correctly refused it, and its next three FINDs quoted a body that had never been in the file.
+  // Zero writes landed; the run still finished "Verified (node)". Checker: "threw: l.checkout is not a function".
+  // The system prompt sends the model here "Before EDITING, to find exactly which function you need to change and
+  // where it starts, so your FIND snippet matches one place" - so the tool the hub recommends for aiming an edit
+  // was the reason the edit could not be aimed.
+  //
+  // Same shape as defNames.js, which has ALWAYS returned addBook/copies/titles for this exact file - including its
+  // narrowing for quoted arguments, because `it('adds', function () {` is a CALL and listing it as a declaration is
+  // how defNames once refused a model's rewrite of its own test file. constructor IS listed here (defNames drops it
+  // as a keyword): this map exists for navigation, and "where does the constructor start" is a fair question.
+  const METHOD = /^[ \t]+(?:static[ \t]+)?(?:async[ \t]+)?(?:get[ \t]+|set[ \t]+)?\*?([A-Za-z_$][\w$]*)[ \t]*\(([^)\n]*)\)[ \t]*\{/;
+  const CONTROL_FLOW = new Set(['if', 'for', 'while', 'switch', 'catch', 'function', 'return', 'with', 'else', 'do', 'try', 'typeof', 'new', 'await', 'yield', 'super']);
   const out = [];
   for (let i = 0; i < lines.length; i++) {
-    for (const re of pats) {
-      if (re.test(lines[i])) { out.push(`${i + 1}: ${lines[i].trim().slice(0, 90)}`); break; }
+    let hit = false;
+    for (const re of pats) if (re.test(lines[i])) { hit = true; break; }
+    if (!hit) {
+      const m = lines[i].match(METHOD);
+      if (m && !CONTROL_FLOW.has(m[1]) && !/["'`]/.test(m[2])) hit = true;
     }
+    if (hit) out.push(`${i + 1}: ${lines[i].trim().slice(0, 90)}`);
   }
   return out;
 }
+
+// buildOutline is module-level and has no other way in, so outlineMap.test.mjs would otherwise have to re-implement
+// it and pin a COPY - which is how a test comes to pass while the shipped rule is broken. Exported for that test only.
+export const __outlineTest = { buildOutline };
 
 // ── Tools ────────────────────────────────────────────────────────────────────
 // THE WORKSPACE BOUNDARY MARKER IS NOT THE AGENT'S TO REWRITE.
@@ -921,10 +1046,32 @@ const tools = {
       : `(no declarations found — use read_file with LINES or search_file)`;
   },
 
-  write_file({ path, content = '' }) {
+  write_file({ path, content = '', empty }) {
     { const r = markerRefusal(path, 'write_file'); if (r) return r; }
     const full = safePath(path);
     mkdirSync(dirname(full), { recursive: true });
+    // AN EMPTY WRITE IS NOT A SUCCESS. Measured 2026-09-13 while building the per-gate harness:
+    // qwen2.5:1.5b emitted a bare fence immediately followed by its own ```language fence, so the
+    // parser read the empty FIRST pair as the content and this answered `OK: wrote 0 bytes to
+    // s4_markdown.py`. Three files in one run landed at 0 bytes with the tool reporting success,
+    // and the gate above then said "missing to_html" - a misleading label for "nothing arrived".
+    //
+    // The destructive guard below cannot catch it: it only runs when the file ALREADY exists, and
+    // even then requires before.length > 400 - so creating an empty file, or emptying a small one,
+    // both sail through. Same family as exportNames reporting phantom exports and /api/health
+    // answering ok over a dead engine: the instrument says fine while the work is gone.
+    //
+    // Narrow, and with the escape hatch this file uses elsewhere (REMOVE:, DUPLICATE:) so a caller
+    // who genuinely wants an empty file is never stuck against a refusal it cannot get past.
+    if (!String(content).trim() && !empty) {
+      const had = existsSync(full) ? Buffer.byteLength(readFileSync(full, 'utf8')) : 0;
+      return `ERROR: refusing to write an EMPTY file to ${path}`
+        + (had ? ` - it has ${had} bytes and they would be lost.` : '.')
+        + ` Nothing was written.`
+        + `\nThis usually means the content did not arrive: put the WHOLE file inside ONE fenced code block,`
+        + ` and do not open a second fence inside it.`
+        + `\nIf you really do want ${path} to be empty, repeat the same action and add a line: EMPTY: yes`;
+    }
     // DO NOT LET A FRAGMENT DESTROY WORKING CODE.
     //
     // Measured 2026-09-10: mid-build, the 32B wrote 158 bytes of English prose about a
@@ -939,12 +1086,48 @@ const tools = {
       const before = readFileSync(full, 'utf8');
       const shrank = content.length < before.length * 0.4 && before.length > 400;
       const ext = (path.match(/\.([a-z0-9]+)$/i) || [, ''])[1].toLowerCase();
+      // PYTHON AND GODOT BELONG HERE, and until 2026-09-12 neither was.
+      //
+      // `[ext]` on an extension this map does not list yields undefined, so `!CODEISH` below is
+      // true, `looksLikeCode` is true, and the refusal is UNREACHABLE. That made the guard blind to
+      // every language the hub builds in except web files - including the two this very file cites
+      // as its worst corruptions: s6_graph.py (set I goal 16) and q8_units.py (set E goal 8). Set G
+      // took 50 of 100 hidden checks with s6_graph.py alone. `cjs` was missing for the same reason,
+      // in a workspace whose boundary marker declares `"type": "commonjs"`.
+      //
+      // These two key on SYNTAX rather than on keywords, deliberately. The js row tests \bclass\b
+      // and \bfunction\b, and English prose ABOUT code uses those words - the original incident was
+      // prose about a "User class". Brackets, parens and `=` are what prose does not contain, so a
+      // description of a Graph class is refused while one line of real Python is not. (The js row is
+      // left exactly as it was: destructiveWrite.test.mjs is green against it and this change has no
+      // business moving that baseline. Its keyword weakness is logged separately.)
+      //
+      // Unknown extensions stay permissive on purpose: prose IS valid content for a .txt or .md,
+      // and a refusal a caller cannot get past is a loop. destructiveWritePython.test.mjs pins both
+      // directions - the refusals AND that a legitimate shrinking Python rewrite still lands.
       const CODEISH = {
         html: /<\/?[a-z!][\s\S]*>/i,
-        js: /[;{}]|=>|\bfunction\b|\bconst\b|\blet\b|\bvar\b|\bclass\b/,
-        mjs: /[;{}]|=>|\bfunction\b|\bconst\b/,
+        // THE js ROWS NOW KEY ON SYNTAX, not on words that prose about code also uses.
+        //
+        // They used to test \bclass\b, \bfunction\b, \bconst\b, \blet\b, \bvar\b - and English prose
+        // ABOUT code contains those words constantly. The incident this entire guard was built for
+        // was, in the original comment's own words, "158 bytes of English prose about a User class".
+        // Prose about a User class is precisely what the js row could not see; it only fired in 2026
+        // because that victim was an .html file, whose row needs a TAG and has no such hole.
+        // Measured 2026-09-12: 80 bytes reading "This module defines a User class and a function that
+        // looks accounts up by email" replaced a 600-byte working class, reported OK.
+        //
+        // Punctuation is the discriminator. Real JavaScript essentially always carries one of
+        // ; { } ( ) [ ] = or an arrow; an English sentence carries none of them. The line-initial
+        // keyword alternative covers the rare punctuation-free file (e.g. a bare `export default 5`).
+        // Same shape as the py and gd rows added earlier, so all four now agree.
+        js: /[;{}()\[\]=]|=>|^[ \t]*(?:function|class|const|let|var|return|import|export)\b/m,
+        cjs: /[;{}()\[\]=]|=>|^[ \t]*(?:function|class|const|let|var|return|require|module)\b/m,
+        mjs: /[;{}()\[\]=]|=>|^[ \t]*(?:function|class|const|let|var|return|import|export)\b/m,
         css: /[{}:;]/,
         json: /^[\s]*[[{]/,
+        py: /[()\[\]{}=]|^[ \t]*(?:def|class|import|from|return|if|for|while|with|try)\b/m,
+        gd: /[()\[\]{}=]|^[ \t]*(?:func|extends|var|const|signal|return|if|for|while)\b/m,
       }[ext];
       const looksLikeCode = !CODEISH || CODEISH.test(content);
       if (shrank && !looksLikeCode) {
@@ -1094,11 +1277,17 @@ const tools = {
         : '';
       return 'ERROR: edit_file needs a FIND snippet — the exact text to replace. You sent PATH'
         + (replace ? ' and REPLACE' : '') + ' but no FIND.\n'
-        + 'The shape is:\n'
+        // Inside <example> so it can be COPIED but not EXECUTED. This block is a tool result, tool
+        // results enter run.history, and an echoing model hands them back to parseAction - which
+        // read this help and dispatched edit_file from it (echoedHeaderDispatch.test.mjs).
+        // The example is kept, not deleted: showing the shape is the most effective thing the hub
+        // does for a small model. See the two windows at the top of parseAction.
+        + 'The shape is:\n<example>\n'
         + '  ACTION: edit_file\n'
         + `  PATH: ${path}\n`
         + '  FIND:\n  ```\n  <the exact lines to replace>\n  ```\n'
         + '  REPLACE:\n  ```\n  <the new lines>\n  ```\n'
+        + '</example>\n'
         + (head ? `First lines of ${path}, so you can copy a snippet verbatim:\n${head}\n` : '')
         + `To ADD something to the end of the file, use append_file instead — it is far simpler and cannot lose what is already there. To rewrite the file completely, use write_file.`;
     }
@@ -1149,6 +1338,39 @@ const tools = {
     // again, because that line was also preceded by a blank. No extension could ever
     // win, so the run looped until the repeat guard killed it. The tool made the task
     // impossible and blamed the model.
+    // A TOLERANT MATCH IGNORED INDENTATION ON THE WAY IN; SPLICING REPLACE BACK VERBATIM CARRIES THE MODEL'S OWN
+    // INDENTATION INTO THE FILE. Set I (2026-09-12), goal 3, dense Qwen2.5-Coder-32B: the model wrote a 4-space class
+    // skeleton, sent a CORRECT edit to fill shape() in with its snippet at 2-space body indent, the exact matcher
+    // missed, and this splice put shape() back at the model's own depth - outside the class. The destructive-write
+    // guard then correctly refused a correct edit ("would have REMOVED ... shape"), the model tried inserting instead
+    // and hit "would have DUPLICATED ... shape (1 -> 2)", and four identical retries later the loop guard ended the
+    // run. The weaker MoE 30B scored that same goal. Tolerance about the INPUT must never become damage to the
+    // OUTPUT, so the replacement is re-indented to the region it replaced.
+    //
+    // Anchored on the MINIMUM indent across REPLACE's non-blank lines, not its first line, so the block's internal
+    // structure is preserved rather than flattened. Blank lines stay blank. An empty REPLACE (a deletion) is returned
+    // untouched, which is what emptyReplace.test.mjs pins.
+    // THE ANCHOR MUST BE THE FIRST NON-BLANK LINE OF THE MATCHED REGION, NOT ITS FIRST LINE. scanTolerant skips blank
+    // lines while matching but still anchors the region at i, so `start` frequently lands ON a blank line - in the set
+    // I goal 3 fixture it is line 4, the blank before `    shape() {`. Reading indentation from that blank line gives
+    // '', which equals REPLACE's own indent, and the re-indent silently becomes a no-op. Measured: the first version
+    // of this fix parsed, ran on both paths, and changed nothing at all.
+    const regionAnchor = (lines, from, to) => lines.slice(from, to + 1).find((l) => l.trim());
+
+    const reindentTo = (text, sampleLine) => {
+      const target = (String(sampleLine ?? '').match(/^[ \t]*/) || [''])[0];
+      const lines = String(text).split('\n');
+      const bodies = lines.filter((l) => l.trim());
+      if (!bodies.length) return String(text);
+      let own = null;
+      for (const l of bodies) {
+        const w = (l.match(/^[ \t]*/) || [''])[0];
+        if (own === null || w.length < own.length) own = w;
+      }
+      if (own === target) return String(text);
+      return lines.map((l) => (l.trim() ? target + l.slice(own.length) : l)).join('\n');
+    };
+
     const scanTolerant = (hay, needles) => {
       const at = [];
       for (let i = 0; i < hay.length; i++) {
@@ -1158,25 +1380,63 @@ const tools = {
           if (t === '') { fi++; continue; }            // skip blank lines in the file
           if (t === needles[ki]) { fi++; ki++; } else break;
         }
-        if (ki === needles.length) { at.push({ start: i, end: fi - 1 }); i = fi - 1; }
+        // THE REGION STARTS WHERE FIND ACTUALLY MATCHED, NOT AT THE LOOP INDEX. Blank lines are skipped while
+        // matching (above), but `i` is the scan's starting point, which for a match preceded by blanks is the FIRST
+        // BLANK LINE. Recording that as the region start makes the splice delete a separator the caller never named:
+        // class members end up glued together. It also defeats noChangeAt - a swallowed blank guarantees
+        // out !== content, so resending an edit that already landed answers "OK: edited" instead of
+        // "THE EDIT HAS ALREADY LANDED", which is the exact case that refusal exists for.
+        if (ki === needles.length) {
+          let s = i;
+          while (s < fi && hay[s].trim() === '') s++;
+          at.push({ start: s, end: fi - 1 });
+          i = fi - 1;
+        }
       }
       return at;
     };
+    // preview() is defined HERE, above the tolerant edit paths, not beside the ambiguous-match refusal that used to be
+    // its only caller. It is a const arrow, so calling it from :798/:805 while it was declared further down was a
+    // temporal-dead-zone ReferenceError - and one of those paths sits inside a try that would have swallowed it.
+    const preview = (m) => {
+      const from = Math.max(0, m.start - 1);
+      const to = Math.min(fileLines.length - 1, m.end + 1);
+      return fileLines.slice(from, to + 1)
+        .map((l, k) => `      ${String(from + k + 1).padStart(4)}| ${l}`.slice(0, 130))
+        .join('\n');
+    };
+
+    // A NO-OP REFUSAL HAS TO SHOW WHAT THE REGION ACTUALLY CONTAINS.
+    //
+    // Set I (2026-09-12) goal 16, dense Qwen2.5-Coder-32B on s6_graph.py: the model had ALREADY landed its de-indent
+    // at call 14 ("OK: edited s6_graph.py; now 76 lines"). At calls 18-21 it re-sent the same edit four times and was
+    // told "NO CHANGE: your REPLACE is identical to what it would replace" each time. The hub was RIGHT every time -
+    // but the answer never showed the region, so the model could not tell "already applied" from "failed to apply",
+    // and the run died on the loop guard. Four of that run's five loop-guard deaths were refusal-retry loops.
+    //
+    // Saying the edit may have ALREADY LANDED is the part that ends the loop; the line numbers are what let a caller
+    // switch to LINES: a-b and stop matching altogether.
+    const noChangeAt = (p, m) => `NO CHANGE: your REPLACE is identical to what it would replace, so ${p} is exactly`
+      + ` as it was - nothing was edited.\nLines ${m.start + 1}-${m.end + 1} read like this NOW:\n${preview(m)}\n`
+      + `If that is already what you wanted, THE EDIT HAS ALREADY LANDED - nothing is wrong, move on to the next thing.`
+      + ` If it is not, change what is actually wrong there, or use LINES: ${m.start + 1}-${m.end + 1} to replace that`
+      + ` range directly. Do NOT resend this same edit; it will do nothing again.`;
+
     const where = scanTolerant(fileLines, findLines);
     const hits = where.length;
     const start = hits ? where[0].start : -1, end = hits ? where[0].end : -1;
     if (hits > 1 && occurrence) {
       if (occurrence < 1 || occurrence > hits) return `ERROR: OCCURRENCE: ${occurrence} but the snippet matches ${hits} places in ${path}.`;
       const m = where[occurrence - 1];
-      const out = [...fileLines.slice(0, m.start), replace, ...fileLines.slice(m.end + 1)].join('\n');
-      if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
+      const out = [...fileLines.slice(0, m.start), reindentTo(replace, regionAnchor(fileLines, m.start, m.end)), ...fileLines.slice(m.end + 1)].join('\n');
+      if (out === content) return noChangeAt(path, m);
       writeFileSync(full, out, 'utf8');
       return `OK: edited ${path} (occurrence ${occurrence} of ${hits}, matched ignoring indentation)`
         + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
     }
     if (hits === 1) {
-      const out = [...fileLines.slice(0, start), replace, ...fileLines.slice(end + 1)].join('\n');
-      if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
+      const out = [...fileLines.slice(0, start), reindentTo(replace, regionAnchor(fileLines, start, end)), ...fileLines.slice(end + 1)].join('\n');
+      if (out === content) return noChangeAt(path, { start, end });
       writeFileSync(full, out, 'utf8');
       return `OK: edited ${path} (matched ignoring indentation)`
         + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
@@ -1189,14 +1449,6 @@ const tools = {
     // times and the run died on the repeat guard. The instruction was correct and
     // unusable - it named the problem while withholding the one fact needed to solve it,
     // which is WHERE the matches are. An error that a caller cannot act on is a loop.
-    const preview = (m) => {
-      const from = Math.max(0, m.start - 1);
-      const to = Math.min(fileLines.length - 1, m.end + 1);
-      return fileLines.slice(from, to + 1)
-        .map((l, k) => `      ${String(from + k + 1).padStart(4)}| ${l}`.slice(0, 130))
-        .join('\n');
-    };
-
     if (hits > 1) {
       const sites = where.slice(0, 4)
         .map((m, n) => `  match ${n + 1} - lines ${m.start + 1}-${m.end + 1}:\n${preview(m)}`)
@@ -1352,19 +1604,9 @@ const tools = {
     }
 
     // SSRF: block loopback, link-local, private ranges, and cloud metadata endpoints.
-    const host = u.hostname.toLowerCase().replace(/^\[|\]$/g, '');
-    const isPrivate =
-      host === 'localhost' || host === '::1' || host.endsWith('.localhost') ||
-      /^127\./.test(host) || /^10\./.test(host) || /^192\.168\./.test(host) ||
-      /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
-      /^169\.254\./.test(host) ||                      // link-local, incl. 169.254.169.254
-      /^0\./.test(host) || host === '0.0.0.0' ||
-      /^f[cd][0-9a-f]{2}:/i.test(host) || /^fe80:/i.test(host) ||
-      host === 'metadata.google.internal';
-    if (isPrivate) {
-      return `ERROR: refusing to fetch a private or loopback address (${host}). That path leads to `
-           + 'your own API keys and cloud metadata, not to assets.';
-    }
+    // The rule itself now lives at blockedHost() so web_fetch gets the SAME one - it used to live
+    // only here, which is why the auto-approved sibling had no gate at all.
+    { const bad = blockedHost(u); if (bad) return ssrfRefusal(bad); }
 
     let full;
     try { full = safePath(path); } catch (e) { return `ERROR: ${e.message}`; }
@@ -1377,12 +1619,10 @@ const tools = {
       if (!res.ok) return `ERROR: HTTP ${res.status} fetching ${u.href}`;
 
       // Re-check after redirects: a public URL can 302 to a loopback address.
-      try {
-        const finalHost = new URL(res.url).hostname.toLowerCase();
-        if (/^(localhost|127\.|10\.|192\.168\.|169\.254\.|0\.)/.test(finalHost) || finalHost === '::1') {
-          return `ERROR: redirected to a private address (${finalHost}) - refusing.`;
-        }
-      } catch {}
+      // Through blockedHost(), not a second hand-rolled regex. The old one here was WEAKER than the
+      // check at the top of this same function - it missed 172.16/12, the IPv6 ranges, .localhost and
+      // metadata.google.internal - so a redirect reached hosts a direct request could not.
+      { const hopped = blockedHost(res.url); if (hopped) return `ERROR: that URL redirected to a private or loopback address (${hopped}) - refusing.`; }
 
       const declared = Number(res.headers.get('content-length') || 0);
       if (declared && declared > MAX_BYTES) {
@@ -1442,7 +1682,9 @@ const tools = {
         + `You do not need a server: this workspace is ALREADY served at `
         + `http://localhost:${PORT}/workspace/ (index.html is at /workspace/index.html).\n`
         + `To check that your page actually works, use:\n`
-        + `ACTION: test_web\nPATH: index.html\n`
+        // <example> for the same reason as edit_file's help above: this refusal is a tool result, and
+        // when the model echoed it back parseAction dispatched test_web out of the hub's own advice.
+        + `<example>\nACTION: test_web\nPATH: index.html\n</example>\n`
         + `That loads it in a real headless browser and reports console errors and what rendered.`,
       );
     }
@@ -1570,11 +1812,19 @@ const tools = {
   // Fetch a page and strip it to clean text (never dump raw HTML into the model).
   async web_fetch({ url, max_chars = 4000 }) {
     if (!/^https?:\/\//i.test(url || '')) return 'ERROR: URL must start with http:// or https://';
+    // THE SAME GATE download_file HAS - see blockedHost(). This tool is AUTO-APPROVED and takes the
+    // URL from the model, so it is the one that actually needed it: before this, web_fetch on
+    // http://localhost:3001/api/keys returned the hub's provider configuration as clean text.
+    { const bad = blockedHost(url); if (bad) return ssrfRefusal(bad); }
     const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
     let html;
     try {
       const r = await fetch(url, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(15_000) });
       if (!r.ok) return `ERROR: fetch returned HTTP ${r.status}`;
+      // fetch follows redirects by default, so a public URL can hop to loopback. Checked BEFORE the
+      // body is read, so a blocked destination's content never becomes a string this can return.
+      const hopped = blockedHost(r.url);
+      if (hopped) return `ERROR: that URL redirected to a private or loopback address (${hopped}) - refusing to read it.`;
       html = await r.text();
     } catch (e) { return `ERROR: fetch failed: ${e.message}`; }
     const text = html
@@ -1595,7 +1845,10 @@ const tools = {
     let puppeteer;
     try { puppeteer = require('puppeteer'); }
     catch { return 'ERROR: puppeteer is not installed on the server, cannot test.'; }
-    const url = `http://localhost:${PORT}/workspace/${String(path).replace(/^\/+/, '')}`;
+    // servingPort, not PORT - see workspaceUrl(). Guessing 3001 here pointed the browser at whatever
+    // hub happened to be on that port, which in an in-process test is the developer's live one.
+    const url = workspaceUrl(path);
+    if (!url) return 'ERROR: this workspace is not being served over HTTP right now, so the page cannot be loaded in a browser. Nothing about it was checked - do not treat that as a pass.';
     const logs = [];
     let browser;
     try {
@@ -1723,8 +1976,33 @@ const tools = {
   },
 
   async task_done({ which }) {
+    // A REFUSAL HAS TO HAND BACK SOMETHING TO ACT ON. Same lesson as edit_file's missing FIND,
+    // run_command's bare EXIT 1 and list_assets' failed multi-word filter: this said
+    // `ERROR: no task matches "". Use task_list to see the numbered list.` - naming the problem while
+    // withholding the one fact needed to solve it, and costing a whole extra turn to call task_list.
+    //
+    // Measured 2026-09-12 on qwen2.5:1.5b level 1: two consecutive turns and 433 seconds spent on
+    // exactly this message. That empty WHICH came from the hub dispatching its own echoed reminder -
+    // fixed at source in taskLedger.contextBlock and in parseAction - but a model can still send
+    // task_done with no WHICH on its own, so the refusal has to stand up by itself.
+    //
+    // NOTE the wording carefully: it does NOT contain a line-anchored "ACTION: task_done" example.
+    // Tool results are pushed into history and an echoing model would hand that straight back to
+    // parseAction, which is the very failure this whole thread came from. Describe the shape, do not
+    // print a dispatchable header. (agent.js still has three older ones of these in edit_file's,
+    // run_command's and the sub-agent's help text - logged, not fixed here.)
+    if (!String(which ?? '').trim()) {
+      const block = ledger.contextBlock(WORKSPACE, _toolGoal);
+      return `ERROR: task_done needs WHICH - the NUMBER of the task you are closing, or enough of its title to match one.\n`
+        + `You sent task_done with no WHICH, so nothing was marked done.\n`
+        + (block ? `${block}\n` : '')
+        + `Put a WHICH line with the task number under your task_done action.`;
+    }
     const r = ledger.mark(WORKSPACE, which, 'done');
-    if (!r.ok) return `ERROR: ${r.error}. Use task_list to see the numbered list.`;
+    if (!r.ok) {
+      const block = ledger.contextBlock(WORKSPACE, _toolGoal);
+      return `ERROR: ${r.error}. These are the open tasks - close one of THESE by its number:\n${block || '(there are no open tasks)'}`;
+    }
     const p = ledger.progress(WORKSPACE);
     // A task LEFT OVER from an earlier run is not this goal's work, and closing one says
     // nothing about whether THIS goal is finished. It used to: in the 14B data run
@@ -1751,7 +2029,8 @@ const tools = {
   // clean. This interrogates the rendered page instead and reports what is (and is not)
   // on screen. The model is text-only, so it gets sentences; the PNG is saved for you.
   async see_screen({ path = 'index.html' } = {}) {
-    const url = `http://localhost:${PORT}/workspace/${String(path).replace(/^\/+/, '')}`;
+    const url = workspaceUrl(path);   // servingPort, not PORT - see workspaceUrl()
+    if (!url) return 'ERROR: this workspace is not being served over HTTP right now, so there is nothing to look at. Nothing was checked - do not treat that as a pass.';
     const r = await visual.inspect(url, { saveTo: join(WORKSPACE, '.screenshots'), label: 'agent' });
     return r.report;
   },
@@ -1798,7 +2077,10 @@ const tools = {
     // projects this reported "detected: node ... `node q1_stock.js` ran and exited cleanly" for a goal about
     // q8_units.py; the model took that as its own work verified and repeated it until the repeat guard stopped it.
     const named = entry ? null : ledger.namedFiles(_toolGoal || '').find((f) => /\.(py|c?js|mjs)$/i.test(f) && existsSync(join(WORKSPACE, f)));
-    const r = await verifier.verify(WORKSPACE, { entry: entry || named });
+    // The GOAL travels with the entry: verify() reads it only to check an export the goal explicitly
+    // names (see exportedName there). Without it, "verified" means "it ran", which a file exporting
+    // nothing satisfies - measured on a real run, 2026-09-13.
+    const r = await verifier.verify(WORKSPACE, { entry: entry || named, goal: _toolGoal || '' });
     return verifier.format(r);
   },
 
@@ -2967,6 +3249,22 @@ function pruneHistory(run, budgetTokens, opts = {}) {
   // MESSAGES, whatever they weigh. Sixteen messages can be 200 tokens or 200,000, so this
   // was not a defence against overflow at all; it defended against message-count growth,
   // which was never a failure mode. Tokens are the only unit the backend charges in.
+  //
+  // THAT REPLACEMENT NEVER TOOK EFFECT - the third time this hub has had this exact shape, where the rule that was
+  // FIXED advises and the rule it superseded still decides. The count rule was rewritten as a `break` INSIDE the
+  // admission loop below, sitting next to the token test, where it always won first:
+  // MAX_HISTORY_MSGS - head.length - 1 = 12 messages = THE LAST SIX TURNS, whatever the budget says.
+  //
+  // Measured 2026-09-12 by replaying this function over all 835 set J model calls: it first fires at CALL 8 in every
+  // run of every arm, and the token budget was never the binding constraint once - final windows used 38-70% of
+  // their allowance while content was discarded on message count alone. historyWindow.test.mjs drives the shipped
+  // function and pins the shape: 40 small messages against a 20,000-token budget kept 16 of 43 while spending 645
+  // tokens - 3.2% of the allowance.
+  //
+  // The cost is the north-star failure itself. A 30-call run that remembers six turns re-reads what it already read
+  // and edits files it can no longer see: setI run de950b2d read s3_matrix.js twice, lost BOTH reads to this cap by
+  // call 25, then spent ten calls deleting what it believed was a stray brace - walking LINES: 52-53 down to 46-47,
+  // deleting a real line each time. The file went 55 lines to 47 and sub() is now a comment. Two goals.
   const perMsgCap = Math.max(400, Math.floor(budget / 4));
   const headTok = estimateTokens(head);
   const MIN_TAIL = 2;                       // the model must always see the latest result
@@ -2975,7 +3273,7 @@ function pruneHistory(run, budgetTokens, opts = {}) {
   for (let i = h.length - 1; i >= 0; i--) {
     const m = h[i];
     if (head.includes(m)) continue;
-    if (tail.length >= MAX_HISTORY_MSGS - head.length - 1) break;
+    if (tail.length >= MAX_TAIL_MSGS) break;   // backstop only - the budget test below is what decides
     const capped = capMessage(m, perMsgCap);
     const cost = estimateTokens([capped]);
     if (spent + cost > budget && tail.length >= MIN_TAIL) break;
@@ -3331,14 +3629,41 @@ async function runSubtask(goal, depth, parent) {
         break;
       }
     }
+    // SET THE TOOL CONTEXT, AND PUT IT BACK. drive() sets _toolGoal before every dispatch; this loop
+    // and the approve route never set it at all, so a tool running HERE saw whatever goal drive() last
+    // left behind - the PARENT's, or in the approve route's case possibly a different run's entirely.
+    //
+    // What that costs: verify_project with no ENTRY resolves ledger.namedFiles(_toolGoal), so a
+    // sub-task verified the file named by its PARENT's goal - which is precisely the bug
+    // verify_project's own comment says it fixed (set E: it reported `node q1_stock.js` ran cleanly for
+    // a goal about q8_units.py, and the model repeated itself until the guard stopped the run). The fix
+    // landed in drive() and not on the sibling paths. task_list/task_add/task_done are the same story:
+    // they render ledger.contextBlock(WORKSPACE, _toolGoal), so a sub-agent closing its OWN task was
+    // told it was "LEFT OVER from earlier work in this workspace, not part of this goal".
+    //
+    // Restored in a finally so a nested dispatch cannot leak its context to whatever runs next. A
+    // module global written by one of three callers and read by six tools cannot be right; now all
+    // three write it, and none of them leaves it changed.
     let result;
     // UNCOVERED SITE. d2's host events, before-images and terminal gate all live in
     // drive(); none of them see this dispatch. Recorded BEFORE the call, because a tool
     // that throws still traversed the route.
     noteUncoveredTraversal(parent, 'runSubtask', tool);
-    try { result = await tools[tool](args); } catch (e) { result = `ERROR: ${e.message}`; }
+    const prevGoal = _toolGoal, prevRun = _activeRun;
+    _toolGoal = goal || null;
+    _activeRun = parent || null;
+    try { result = await tools[tool](args); }
+    catch (e) { result = `ERROR: ${e.message}`; }
+    finally { _toolGoal = prevGoal; _activeRun = prevRun; }
     if (tool === 'write_file' || tool === 'edit_file') { sub.lastPath = args.path; done.push(`${tool} ${args.path}`); }
-    if (parent) pushStep(parent, { type: 'subtask_step', tool, args, text: `  ↳ ${tool} ${args.path || args.cmd || ''}`.slice(0, 160) });
+    // RECORD THE RESULT, 2026-09-13. This pushed tool+args+text and NOT `result`, so every sub-task tool
+    // outcome was discarded while the sub-agent kept it in its own history one line below. Measured cost:
+    // 147 sub-task tool calls in one night with no recorded outcome, 39 of them edit_file - so the question
+    // "why can the model not edit files" was unanswerable for delegated work. Truncated because a
+    // repetition collapse can make a single result 130,000 chars.
+    if (parent) pushStep(parent, { type: 'subtask_step', tool, args,
+      result: String(result ?? '').slice(0, 400),
+      text: `  ↳ ${tool} ${args.path || args.cmd || ''}`.slice(0, 160) });
     sub.history.push({ role: 'user', content: `TOOL RESULT (${tool}):\n${result}` });
   }
 
@@ -3745,11 +4070,14 @@ async function drive(loadDb, run) {
       // across 855 real responses: 9.7% carried more than one action, and 49 `finish` calls
       // were thrown away because they were not first. The model then re-sends the identical
       // response - nothing it asked for happened - until the repetition guard kills the run.
-      // That single silence explains the finish failures AND the "same response 3 times"
-      // stops. Counting here rather than in agentParse.js deliberately: the parser has ~15
-      // return sites and threading a field through all of them is a merge conflict waiting
-      // to happen. The raw text is right here and it is the same information.
-      const extraActions = Math.max(0, (raw.match(/ACTION:\s*[a-z_]+/gi) || []).length - 1);
+      // That single silence explains the finish failures AND the "same response 3 times" stops.
+      //
+      // The COUNT now happens at `dropped` below, through parseActions. It used to be a bare
+      // /ACTION:\s*[a-z_]+/gi over the whole reply, computed here - and that regex cannot tell an
+      // action from the word ACTION: sitting inside a fenced block, which is 5 of the 102 real
+      // multi-action replies. See the note at `dropped` for why that mattered so much more than it
+      // looks: the accurate counter was wired only to the opt-in batch path, so the DEFAULT path
+      // kept the wrong one and told the model its edit had been discarded when it had not.
       const action = parseAction(raw, run.lastPath);
       // INSERTION 2 of 3: the action gate. A refusal does NOT execute the tool, and it is a
       // RECORDED outcome rather than a silent drop. It refuses BEFORE execution, so nothing
@@ -3798,12 +4126,24 @@ async function drive(loadDb, run) {
       // ── BATCH ACTIONS (opt-in, AGENT_BATCH_ACTIONS=1) - rules at planBatch() ──────────
       // null = the ordinary single-action path, which is ALL there is with the flag off.
       const batch = BATCH_ACTIONS ? planBatch(raw, run.lastPath, action, run.history[run.history.length - 1]) : null;
-      // What the dropped-action nudge below may claim (rule 7). Flag off: the raw ACTION:
-      // count, unchanged. Flag on: only actions that genuinely did not run - a batch reports
-      // its own leftovers in closeBatch(), and a stray `ACTION:` line in the middle of one
-      // edit_file (5 of the 102 real multi-action replies) is not a second action at all.
-      const dropped = !BATCH_ACTIONS ? extraActions
-        : batch ? 0 : Math.max(0, parseActions(raw, run.lastPath, 1000).length - 1);
+      // What the dropped-action nudge below may claim (rule 7): only actions that genuinely did
+      // not run. A batch reports its own leftovers in closeBatch(), so a live batch contributes 0.
+      //
+      // THE ACCURATE COUNTER WAS ON THE OPT-IN PATH AND THE WRONG ONE WAS THE DEFAULT. This read
+      // `!BATCH_ACTIONS ? extraActions : ...`, and AGENT_BATCH_ACTIONS is off unless someone sets
+      // it - so every normal run used the raw /ACTION:/gi count over the whole reply, fences and
+      // all, while the branch nobody runs used parseActions. The comment sitting here even said
+      // why the regex is wrong ("a stray ACTION: line in the middle of one edit_file ... is not a
+      // second action at all", 5 of 102 real multi-action replies) and then used it anyway.
+      //
+      // The cost is not cosmetic. The nudge tells the model "ONLY THE FIRST was executed - the
+      // other N were DISCARDED and did NOT happen" and instructs it to resend. Say that to a model
+      // whose single edit_file merely QUOTED an ACTION: line, and the correct thing it just did is
+      // reported as mostly undone - so it resends, which is how the repeat guard gets fed.
+      //
+      // parseActions is already imported and was already being called on the other branch, so this
+      // costs one call and the two paths can no longer disagree about what an action is.
+      const dropped = batch ? 0 : Math.max(0, parseActions(raw, run.lastPath, 1000).length - 1);
 
       // THE PER-ACTION LOOP. With the flag off it runs exactly once, over `action`.
       //
@@ -3968,7 +4308,13 @@ async function drive(loadDb, run) {
             // entirely. A one-shot gate that a second attempt walks straight past is not
             // a gate. finishBlocks (capped at 3) is what stops this looping.
             try {
-              const r = await visual.inspect(`http://localhost:${PORT}/workspace/${webPage}`,
+              // THE DECIDING PATH, and the one that mattered most. takeVisualBaseline declines to run
+              // when servingPort is null; this gate kept running off PORT, so with no baseline it
+              // judged the page STRICTLY - blocking a finish for problems the run never introduced.
+              // No serving port now means no baseline AND no verdict, which is the honest pairing.
+              const finishUrl = workspaceUrl(webPage);
+              if (!finishUrl) throw new Error('workspace is not being served - no visual verdict');
+              const r = await visual.inspect(finishUrl,
                 { saveTo: join(WORKSPACE, '.screenshots'), label: 'finish' });
               if (r.ok && visual.hasProblems(r)) {
                 // Only what this run INTRODUCED blocks. A page with a baseline (it existed when the
@@ -4029,6 +4375,9 @@ async function drive(loadDb, run) {
                 // had fixed - it could pass a goal on the strength of a leftover file from another goal.
                 // Reproduced in finishGateEntry.test.mjs before this change.
                 const goalEntry = ledger.namedFiles(run.goal || '').find((f) => /\.(py|c?js|mjs)$/i.test(f) && existsSync(join(WORKSPACE, f)));
+                // ...and the goal travels here too. Fixing only the verify_project TOOL would leave the
+                // DECIDING path stamping verified:true on a file that exports nothing, which is exactly
+                // how the advisory/deciding split has bitten this gate twice before.
                 // THE FINISH GATE EXECUTES MODEL-WRITTEN CODE ON THE HOST. verifier.verify runs
                 // `python <entry>` / `node <entry>` (verifyProject.js) - the same host execution
                 // route bounding closes for the verify_project TOOL, reached here without a tool
@@ -4042,7 +4391,7 @@ async function drive(loadDb, run) {
                   pushStep(run, { type: 'route_closed', route: 'finish-gate verify', text: 'Finish-time host verification is closed in this configuration; the finish is recorded UNVERIFIED by the hub and judged by the independent evaluator.' });
                   run.finishVerification = 'CLOSED_UNDER_BOUNDING';
                 } else {
-                const v = await verifier.verify(WORKSPACE, { entry: goalEntry });
+                const v = await verifier.verify(WORKSPACE, { entry: goalEntry, goal: run.goal || '' });
                 if (!v.ok) {
                   blocked(`Project does not run (${v.kind}) — not finished.`,
                     `Do NOT finish yet — the project does not run:\n\n${verifier.format(v)}\n\nFix these, then finish.`);
@@ -4150,7 +4499,15 @@ async function drive(loadDb, run) {
       if (tool === 'spawn_subtask') { args.depth = (run.depth || 0) + 1; _activeRun = run; }
       // The file as it was BEFORE this write/edit, so a write that silently drops definitions can say so (defNames.js).
       let beforeSrc = null;
-      if ((tool === 'write_file' || tool === 'edit_file') && args.path && /\.(py|c?js|mjs)$/i.test(args.path)) {
+      // append_file BELONGS HERE. Every write guard downstream gates on `beforeSrc !== null` - the destructive-write
+      // refusal (:3531), the DUPLICATE refusal (:3561) and both loss warnings (:3582, :3595) - so leaving append out
+      // made all four unreachable for the one write tool the system prompt calls "the easiest and safest way to
+      // extend a file". Set J, run 17cc6854: 26 appends to s8_grades.py left `add_assignment` defined TWENTY-THREE
+      // times, 826 -> 8973 bytes, with zero refusals, while defCounts would have refused on the first repeat.
+      // Tested here rather than via the `appended` flag at :3488, which is not yet in scope - this is the only point
+      // where the pre-write content still exists.
+      if ((tool === 'write_file' || tool === 'edit_file' || tool === 'append_file')
+        && args.path && /\.(py|c?js|mjs)$/i.test(args.path)) {
         try { beforeSrc = readFileSync(safePath(args.path), 'utf8'); } catch { /* a new file */ }
       }
       // The diagnostic target as it stands BEFORE this tool. Compared after, so freshness
@@ -4201,6 +4558,45 @@ async function drive(loadDb, run) {
         result = answer + `\n\n⚠️ You already ran this exact ${tool} in this run${changedAnswer ? ' - and it did something DIFFERENT this time, because the file is no longer what it was when you first sent it. Re-sending an edit that already landed edits the WRONG text: read the file, then address exactly what you mean to change (LINES: <a>-<b> is exact).' : ' and got exactly this answer. Nothing changed, so repeating it cannot help - do something different: a different file or range, a different action, or fix the problem the answer describes.'}`;
       }
       run.callLog[callKey] = answer;
+      // STOP A RUN THAT REPEATS AN IDENTICAL *SUCCESSFUL* CALL. Nothing was wired to run.repeatCalls.
+      //
+      // Measured 2026-09-13 on a real hub run: the model wrote the same 53-byte add.js EIGHT times, each
+      // answered with the ⚠️ notice above, and the run ground to its 20-minute wall. Nothing stopped it,
+      // because the only stop that reacts to repetition keys on three identical REPLIES (~:3301), and this
+      // model varied its THOUGHT prose every turn while sending a byte-identical call. repeatFailures only
+      // counts /^ERROR/ answers, and every one of these writes SUCCEEDED. Across the corpus: 264 of the
+      // 14B's 279 repeats succeeded, so repeatFailures saw 15 of 279 - the detector fired 279 times and
+      // had no consumer. The house pattern, named in this file's own notes: detects but does not act.
+      //
+      // THE THRESHOLD IS FORCED, NOT CHOSEN. repeatCall.test.mjs scripts read, read, list_dir, read, read
+      // and asserts every later call is NAMED as a repeat - that is 3 per-key repeats, so a threshold of 3
+      // would stop that run and break it. Hence >= 4: a fifth byte-identical call.
+      //
+      // PROGRESS IS COUNTED IN DISTINCT CALLS, NOT `landed`. The defect case is eight SUCCESSFUL writes, so
+      // the landed-work counter rises on every one and would defeat the test. A genuinely new call is
+      // seenBefore === undefined, so distinctCalls is the honest denominator: the stop needs no distinct
+      // call to have happened since this key last repeated.
+      //
+      // Plain objects, not Maps, for the reason written at :3737 - this is persisted and read back.
+      if (seenBefore === undefined) run.distinctCalls = (run.distinctCalls || 0) + 1;
+      else {
+        if (!run.callRepeats || typeof run.callRepeats !== 'object' || Array.isArray(run.callRepeats)) run.callRepeats = {};
+        if (!run.callRepeatsAt || typeof run.callRepeatsAt !== 'object' || Array.isArray(run.callRepeatsAt)) run.callRepeatsAt = {};
+        const stalled = run.callRepeatsAt[callKey] === (run.distinctCalls || 0);
+        run.callRepeats[callKey] = (run.callRepeats[callKey] || 0) + 1;
+        run.callRepeatsAt[callKey] = run.distinctCalls || 0;
+        if (run.callRepeats[callKey] >= 4 && stalled) {
+          // DELIBERATELY NOT "identical answer" OR "same response". Those phrases map to 'tool_loop' and
+          // 'loop' at ~:4323, and repairGoalFor turns 'tool_loop' into "the tool was the problem, not the
+          // plan" - a lie here, because the tool succeeded every single time. The stop's WORDING picks the
+          // repair goal, so a borrowed phrase misdirects the retry.
+          pushStep(run, { type: 'tool', tool, args, thought, result });
+          pushStep(run, { type: 'error', text: `Stopped: the same call (${tool} ${args && args.path ? args.path : ''}`.trim()
+            + `) was sent ${run.callRepeats[callKey] + 1} times and SUCCEEDED every time, with nothing different in between. The work was already done; repeating it cannot finish the goal.` });
+          run.status = 'stopped';
+          break turn;
+        }
+      }
       let syntaxNote = '';
       // append_file is an edit too, and needs the same checks. It used to skip this whole
       // block, so an append that broke an existing file was never flagged to the model, an
@@ -4241,6 +4637,37 @@ async function drive(loadDb, run) {
           try { syntaxNote += duplicateNote(readFileSync(safePath(args.path), 'utf8'), args.path); }
           catch { /* unreadable after the write - the syntax verdict above still stands */ }
         }
+        // "PASSED A SYNTAX CHECK" WAS A GREEN LIGHT ON A FILE THAT MISSED THE GOAL.
+        //
+        // Measured 2026-09-13, hub level 1, a real 20-minute run: the model wrote
+        //     function add(a, b) { return a + b; }
+        // EIGHT times - 53 bytes, parses, runs, exports nothing - and after every single one the only
+        // answer it got was "OK: wrote 53 bytes" and "✅ add.js passed a syntax check.". Its own plan
+        // DID contain ACTION: verify_project, which says "does not export `add`" - but that action sat
+        // in position 2 of a multi-action reply and the hub executes only the first, so the model never
+        // saw it once. The message it is GUARANTEED to read said everything was fine.
+        //
+        // So the check belongs in the guaranteed message. And it SHOWS the closing line rather than
+        // stating a rule, because that is the difference this model measurably responds to: in the gate
+        // ladder, prose scored 0/5 and a stronger prohibition also scored 0/5 (obeyed the ban, never
+        // heard the requirement, wrote a bare function with no export - this exact file), while showing
+        // the literal line worked.
+        //
+        // NARROW ON PURPOSE. Only when the goal NAMES an export, only for JS, and only when that name is
+        // genuinely absent - exportNames() reads CommonJS and ESM forms alike, so a correct file in
+        // either style stays silent. A false warning here would land on every write and teach the model
+        // to fight the tool, which is the direction that manufactured a false 0/5 earlier today.
+        // Logic pinned in writeExportNote.test.mjs (6/6), shapes in exportNamesShapes.test.mjs (10/10).
+        if (!err && /\.(c|m)?js$/i.test(args.path || '')) {
+          try {
+            const want = verifier.exportedName(_toolGoal || '');
+            if (want && !exportNames(readFileSync(safePath(args.path), 'utf8'), args.path).has(want)) {
+              syntaxNote += `\n\n⚠️ ${args.path} does not export \`${want}\`, which the goal asks for.`
+                + ` It parses and it runs, but require('./${args.path}') gives {} - so nothing can use it and the goal is NOT met.`
+                + ` End the file with:\nmodule.exports = { ${want} };`;
+            }
+          } catch { /* evidence only - never a reason to fail the step */ }
+        }
         // SET F (2026-09-11): WARNING WAS NOT ENOUGH. Goal 81 rewrote s1_library.js without titles, returnBook,
         // getLoans, holds, overdue and pay; the hub said so; the code never came back, and since the checks score
         // the final workspace, that one write erased eight earlier steps of the chain. 7 of 8 warnings across that
@@ -4258,7 +4685,15 @@ async function drive(loadDb, run) {
               run.destructiveRefused = (run.destructiveRefused || 0) + 1;
               pushStep(run, { type: 'note', text: `${tool} ${args.path} refused: it would have removed ${all.join(', ')}` });
               result = `ERROR: this ${tool} would have REMOVED ${all.length} thing(s) ${args.path} already had: ${all.join(', ')}.`
-                + ` ${args.path} is UNCHANGED - nothing was written. Earlier steps depend on those, and the hidden checks score the final file.`
+                // "Earlier steps depend on those" WAS A LIE THE GUARD COULD NOT CHECK. It has no workspace file list
+                // in scope and never looked for a caller. Measured across set J: it fired 10 times and the claim was
+                // untrue on ALL TEN - getNumber/getNumberEnd/getNumberStart x4, assert x2, parse_line x4, none of
+                // them called anywhere in the body being written. One of those runs (c75eab5e) then spent its whole
+                // 30-call budget fighting the refusal and died. State what the guard actually knows - that the names
+                // were there and are now gone, and that the hidden checks score the final file - and stop asserting
+                // a dependency it cannot see.
+                + ` ${args.path} is UNCHANGED - nothing was written. The hidden checks score the FINAL file, so a name that`
+                + ` disappears here is gone for every later goal that needs it.`
                 + `\nSend the whole file again WITH them (or use edit_file with LINES: <a>-<b> to change only the part you meant).`
                 + `\nIf you really do want them gone, repeat the same action and add a line: REMOVE: ${all.join(', ')}`;
               syntaxNote = '';
@@ -4431,6 +4866,34 @@ async function drive(loadDb, run) {
       // EVERY tool, and any real change marks the report stale. An edit that failed changes no
       // bytes and marks nothing; a write that happens to restore the previous bytes marks
       // nothing either, because nothing the diagnostic would say has changed.
+      // INSERTION 3 of 3: the controller sees the result and advances its phase, then states
+      // what is open next. The raw result still reaches the model - the controller adds the
+      // sequencing it owns, it does not replace the evidence.
+      // BACK TO STAGE ONE: a refused write hands back the FILE, not just a complaint.
+      //
+      // tatte, 2026-09-12: "it keeps trying to rewrite instead of taking a file and moving it down the line ... if
+      // it fails a scan it needs a manual scan, told why it failed, handed a new copy and try again. It can't get
+      // better if it doesn't know why it failed."
+      //
+      // Measured across the archive: 619 write/edit/append calls were REFUSED, and before its next write to that
+      // same file the model wrote again BLIND 314 times (51%), read the file first only 170 (27%), and abandoned
+      // the file altogether 135 times (22%). 54 runs hit 3+ consecutive refusals on one file. Half the time it is
+      // retrying from imagination, because the refusal hands back a sentence and the file stays unseen.
+      //
+      // The remedy was already here and wired to the wrong path. The ORIENT substitution below injects a file's
+      // real contents when a model repeats itself, and its own comment records why: advisory ("you already ran
+      // this") scored 0/5 productive, MECHANICAL (hand it what it needs) scored 5/5. But ORIENT is the READ-ONLY
+      // tools; mutating tools were excluded on purpose, so a refused EDIT - the moment the model is most lost -
+      // never got the copy. Traced case, set J run 8e7cf9aa: four refusals on s1_library.js, ZERO read_file calls
+      // in the entire run, zero writes landed, and a "Verified (node)" finish on a goal the checker failed.
+      //
+      // The numbering is `${n}: ${line}`, matching read_file, because agentParse.js's stripLineNumberPrefixes
+      // removes exactly that form (and the hint's `n| ` form) when a model copies lines back into a FIND. Inventing
+      // a third format would leave the prefixes in the model's FIND and manufacture a fresh miss.
+      //
+      // It rides on `feedback`, not on `result`: the run record and the training corpus keep the short refusal,
+      // and a `note` step says the copy was handed over - the same split the substitution uses.
+
       if (run.diagnostic) {
         const afterHash = diagTargetHash(run);
         if (afterHash !== beforeDiagHash) {
@@ -4438,13 +4901,31 @@ async function drive(loadDb, run) {
           run.diagnosticStaleBy = tool;        // which route actually changed it, for the record
         }
       }
+      let handedBack = '';
+      if (!substituted && MUTATING_REPEAT.has(tool) && /^ERROR/.test(String(result ?? '')) && args.path
+        && (run.handedBack || 0) < HANDBACK_MAX) {
+        try {
+          const all = readFileSync(safePath(args.path), 'utf8').split('\n');
+          let shown = all;
+          let numbered = all.map((l, i) => `${i + 1}: ${l}`).join('\n');
+          while (numbered.length > HANDBACK_CHARS && shown.length > 1) {
+            shown = shown.slice(0, Math.max(1, Math.floor(shown.length * 0.9)));
+            numbered = shown.map((l, i) => `${i + 1}: ${l}`).join('\n');
+          }
+          const cut = all.length - shown.length;
+          run.handedBack = (run.handedBack || 0) + 1;
+          handedBack = `\n\nHERE IS ${args.path} AS IT NOW READS`
+            + `${cut ? ` (lines 1-${shown.length} of ${all.length})` : ' (the whole file)'}:\n\`\`\`\n${numbered}\n\`\`\`\n`
+            + (cut ? `… ${cut} more line(s) below. read_file ${args.path} with OFFSET: ${shown.length + 1} for the rest — you do NOT have the whole file, so do not rewrite it from this.\n` : '')
+            + `(The hub is showing you this because your ${tool} was refused — you did not call read_file. Copy the lines you mean to change from ABOVE, exactly as they read, or address them with LINES: <a>-<b>. Do not rewrite the file from memory.)`;
+          pushStep(run, { type: 'note', text: `Refused ${tool} — handed ${args.path} back (${shown.length} of ${all.length} lines) so the next attempt is not blind.` });
+        } catch { /* unreadable or already gone — the plain refusal still stands */ }
+      }
       const repeatWarning = (String(result).match(/\n\n⚠️ You already ran this exact[\s\S]*$/) || [''])[0];
       let feedback = substituted
         ? substituted + (repeatWarning && !substituted.includes('⚠️ You already ran') ? repeatWarning : '')
-        : `TOOL RESULT (${tool}):\n${result}${syntaxNote}`;
-      // INSERTION 3 of 3: the controller sees the result and advances its phase, then states
-      // what is open next. The raw result still reaches the model - the controller adds the
-      // sequencing it owns, it does not replace the evidence.
+        : `TOOL RESULT (${tool}):
+${result}${syntaxNote}${handedBack}`;
       const pc3 = protocolFor(run);
       if (pc3) {
         pc3.notifyResult(tool, args || {}, result);
@@ -4574,7 +5055,38 @@ async function drive(loadDb, run) {
         const floorSha = ownShas[0] || null;   // the run's first checkpoint = the boundary of this goal's own work
         let touched = false;                   // did the repair change the tree? then it must be committed
 
-        const files = readdirSync(WORKSPACE).filter((f) => /\.(c|m)?js$|\.py$/i.test(f));
+        // WALK THE TREE. This was readdirSync(WORKSPACE) with no recursion, so the end-of-run repair
+        // only ever saw the workspace's TOP LEVEL - a broken src/app.js or lib/util.py was never
+        // restored, and the "nothing this run produced parses, so it was left as the run left it"
+        // ERROR branch never fired for it either, so the failure was not even recorded. The repair was
+        // narrower than the thing it repairs, and silent about the gap.
+        //
+        // Five other places in this same file already walk properly (list_dir, search_file,
+        // workspaceStamp, collectGodotFiles, GET /files). This is the sibling-path pattern again: the
+        // recursion was written five times and missed on the one path that REPAIRS.
+        //
+        // The 40-file cap stays - it bounds cost on a big tree - but it now bounds a recursive list
+        // rather than standing in for one. Paths stay workspace-relative with forward slashes, which
+        // is what quickCheck(), join(WORKSPACE, f), fileHistory() and showFile() all already expect,
+        // so the rest of the repair path is unchanged.
+        const repairable = [];
+        const walkRepair = (abs, rel = '') => {
+          if (repairable.length >= 40) return;
+          let names = [];
+          try { names = readdirSync(abs); } catch { return; }
+          for (const name of names) {
+            if (repairable.length >= 40) return;
+            if (name === 'node_modules' || name === '.git' || name === '__pycache__' || name === '.screenshots') continue;
+            const full = join(abs, name);
+            const r = rel ? `${rel}/${name}` : name;
+            let st;
+            try { st = statSync(full); } catch { continue; }
+            if (st.isDirectory()) walkRepair(full, r);
+            else if (/\.(c|m)?js$|\.py$/i.test(name)) repairable.push(r);
+          }
+        };
+        walkRepair(WORKSPACE);
+        const files = repairable;
         for (const f of files.slice(0, 40)) {
           if (!(await quickCheck(f))) continue;                 // parses fine - leave it alone
           const full = join(WORKSPACE, f);
@@ -4738,7 +5250,13 @@ async function drive(loadDb, run) {
     if (['error', 'stopped', 'interrupted'].includes(run.status)) {
       const last = [...run.steps].reverse().find((s) => s.type === 'error');
       const text = (last && last.text) || '';
+      // `call_loop` must come BEFORE the two loop branches and must key on its own phrase. The new stop
+      // says "the same call ... SUCCEEDED every time"; /identical answer/ would be wrong (the tool never
+      // refused) and /same response/ is the REPLY guard's phrase. Without a branch of its own this stop
+      // fell through to a bare 'error', so escalate() recorded no cause and repairGoalFor() handed the
+      // chain no repair goal - the run stopped and the queue behind it learned nothing.
       const reason = /budget/i.test(text) ? 'budget'
+        : /the same call/i.test(text) && /SUCCEEDED every time/i.test(text) ? 'call_loop'
         : /identical answer/i.test(text) ? 'tool_loop'
         : /same response/i.test(text) ? 'loop'
         : /could not be parsed/i.test(text) ? 'parse'
@@ -4917,6 +5435,12 @@ export function repairGoalFor(item, { reason = 'error', detail = '' } = {}) {
   if (!item || item.repairOf) return null;
   const why = { budget: 'it ran out of budget', loop: 'it repeated itself and got stuck',
     tool_loop: 'a tool kept returning the identical answer, so nothing it tried had any effect - the tool was the problem, not the plan',
+    // call_loop is the OPPOSITE of tool_loop and must not borrow its words. There the tool refused every
+    // time and nothing landed; here the same call SUCCEEDED every time, so the work IS on disk and the
+    // retry must not redo it. Saying "the tool was the problem" would send the retry to fix a tool that
+    // worked perfectly. Measured 2026-09-13: eight identical successful write_file calls, each answered
+    // with the repeat notice, grinding to the 20-minute wall with the correct file already written.
+    call_loop: 'it sent the same successful call over and over, so the work it was repeating is ALREADY on disk - check what is there and do the NEXT thing, do not write it again',
     parse: 'its reply could not be parsed', same_error: 'the same error kept coming back',
     tunnel: 'its connection dropped' }[reason] || 'it errored';
   const snippet = String(detail || '').trim().slice(0, 400);
@@ -5536,6 +6060,11 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       pushStep(run, { type: 'approval_denied', tool, args });
       run.history.push({ role: 'user', content: `The human DENIED running: ${args.cmd}. Do not run it. Continue another way or finish.` });
     } else {
+      // THE SAME TOOL CONTEXT drive() SETS - see the note in runSubtask. This is the worst of the three
+      // sites for staleness, because it runs when a HUMAN answers the approval prompt: minutes or hours
+      // after the run parked, quite possibly after other runs have executed tools and moved _toolGoal
+      // on. The approved command then ran against some other goal's ledger and some other goal's
+      // verify_project entry, with nothing to show it had happened.
       // UNCOVERED SITE - the human-approved command path. Closed outright during a
       // campaign; instrumented always, because "no approver was watching" is not the
       // same claim as "this route cannot execute".
@@ -5549,8 +6078,12 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       } else {
         noteUncoveredTraversal(run, 'driveDetached', tool);
         let result;
+        const prevGoal = _toolGoal, prevRun = _activeRun;
+        _toolGoal = run.goal || null;
+        _activeRun = run;
         try { result = await tools[tool](args); }
         catch (e) { result = `ERROR: ${e.message}`; }
+        finally { _toolGoal = prevGoal; _activeRun = prevRun; }
         result = await withAssertEvidence(tool, result);   // same evidence for a human-approved run
         pushStep(run, { type: 'tool', tool, args, result, approved: true });
         run.history.push({ role: 'user', content: `TOOL RESULT (${tool}):\n${result}` });
@@ -5617,6 +6150,45 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     run.recent = []; run.parseLog = [];
     run.sameErr = 0; run.lastErrSig = null;
     run.needsTest = false; run.finishBlocks = 0; run.cleanTests = 0;
+    // ...AND THE REST OF IT. The comment above named the right principle and then cleared about half
+    // the state it applies to. Everything below either GATES the next iteration or ACCUSES it of
+    // something the PREVIOUS one did:
+    //
+    //   callLog      an unbounded plain object keyed by tool+JSON.stringify(args), persisted with the
+    //                run and never trimmed. Uncleared, a follow-up's first ordinary repeat of any call
+    //                the earlier iteration made is answered "You already ran this exact X in this run
+    //                and got exactly this answer. Nothing changed, so repeating it cannot help" -
+    //                about a different instruction, possibly days earlier.
+    //   repeatCalls  and repeatFailures are pure latches: incremented, never reset anywhere. The stuck-
+    //   repeatFailures loop stop picks its WORDING from repeatFailures >= 1, and repairGoalFor turns
+    //                that wording into the retry goal ("a tool kept returning the identical answer ...
+    //                the tool was the problem, not the plan"). One repeated failure in iteration 1
+    //                would otherwise pin every later stop to that story and hand the retry the wrong
+    //                diagnosis.
+    //   escalations  the caps on the two interventions this hub has actually MEASURED as working -
+    //   handedBack   mechanical substitution scored 5/5 productive against 0/5 for advisory, and the
+    //                refusal hand-back came from tatte's own instruction. Spent once, they stayed
+    //                spent for the life of the run, so a long follow-up chain silently fell back to
+    //                exactly the advisory behaviour that scored 0/5.
+    //   resultSigs   self-bounding at 40, so this one only rolls over rather than latching - cleared
+    //                for consistency, not because it was dangerous.
+    //   justSubstituted a stale pardon owed to an iteration that has already ended.
+    //   checkpointProblem the "report each distinct problem once" dedup; a new iteration deserves to
+    //                be told again if its checkpoints are still failing.
+    //
+    // Consumers checked before changing this (the baseline rule): editTruth asserts repeatCalls >= 1
+    // and resumeAfterRestart asserts callLog survives a RESTART - both inside one run with no
+    // follow-up, so neither can be reached from here. tracesIsolation is the only test that exercises
+    // follow-ups at all. Baselines 18 / 7 / 6 recorded before the edit.
+    //
+    // NOT reset, deliberately: the end-of-run repair records (rolledBack, repairRefused,
+    // restoredFiles, unrepairedFiles). Those are history of what happened to the workspace, not a
+    // gate on what happens next, and clearing them would hide that an earlier iteration rolled back.
+    run.callLog = {}; run.resultSigs = [];
+    run.repeatCalls = 0; run.repeatFailures = 0;
+    run.escalations = 0; run.handedBack = 0; run.justSubstituted = false;
+    run.destructiveRefused = 0; run.duplicateRefused = 0;
+    run.connRetries = 0; run.ctxSquashes = 0; run.checkpointProblem = null;
     // The finish gate's one-shot checks must re-arm too, or a follow-up inherits
     // "already verified" from the previous iteration and skips its own proof.
     run.sawScreen = false; run.verified = false; run.touchedWeb = false;

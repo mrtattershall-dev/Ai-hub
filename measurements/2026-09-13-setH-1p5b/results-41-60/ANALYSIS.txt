@@ -1,0 +1,80 @@
+===== PROVENANCE =====
+  distinct start states across all 40 trials: 1  (all from the canonical seed 29c4cf9e4004311f)
+  strata_sha efb496a8566931e7   v1 a09e649   v2 68ab72c
+
+===== 1. PRIMARY - verified goal attainment, all 20 =====
+  VERIFIED_GOAL_PASS (structural AND behavioural oracle where one exists)
+    v1 3/20    v2 11/20
+    both 1  neither 7  discordant 12   v1 fail -> v2 pass [43,46,47,48,50,52,56,57,58,60]   v1 pass -> v2 fail [41,51]
+    exact McNemar p = 0.0386   SIGNIFICANT
+
+===== 2. SENSITIVITY - excluding preregistered weak oracle [47] =====
+  VERIFIED_GOAL_PASS, 19 goals
+    v1 3/19    v2 10/19
+    both 1  neither 7  discordant 11   v1 fail -> v2 pass [43,46,48,50,52,56,57,58,60]   v1 pass -> v2 fail [41,51]
+    exact McNemar p = 0.0654
+
+===== 3. MECHANISM SUBSET (secondary) - FIM_ELIGIBLE, 13 goals =====
+  goals whose edit surface v2 actually changes
+    v1 3/13    v2 10/13
+    both 1  neither 1  discordant 11   v1 fail -> v2 pass [43,46,48,50,52,56,57,58,60]   v1 pass -> v2 fail [41,51]
+    exact McNemar p = 0.0654
+
+===== 4. QUASI-CONTROL - WHOLE_FILE_FALLBACK, 7 goals =====
+  goals where BOTH arms generate whole files
+    v1 0/7    v2 1/7
+    both 0  neither 6  discordant 1   v1 fail -> v2 pass [47]   v1 pass -> v2 fail [none]
+    exact McNemar p = 1.0000
+
+  PREDICTED INTERACTION: separation concentrated in the FIM subset, fallback flat.
+    FIM subset      v1 3/13  ->  v2 10/13   delta 7
+    fallback subset v1 0/7  ->  v2 1/7   delta 1
+
+===== 5. MECHANISM METRICS =====
+    metric                        v1        v2
+    body produced                19       20
+    load success                 13       18
+    structural contract pass     7        14
+    behavioural probe pass       0        0
+    VERIFIED goal pass           3        11
+    dependency-firewall blocks   0        1
+    unresolved-dep violations    0        1
+    span-safety rejections       0        0
+    outside-span changes         0        0
+    whole-file rewrites          19       5
+    lines added (total)          451      238
+    lines removed (total)        1519     366
+    repairs attempted            12       8
+    repairs succeeded            0        3
+    model calls (total)          20       20
+
+===== 6. ROUTE-SPECIFIC OUTCOMES (v2) =====
+    add_method       n=9    contract 7/9   VERIFIED 7/9
+    add_function     n=4    contract 3/4   VERIFIED 3/4
+    content_edit     n=7    contract 4/7   VERIFIED 1/7
+
+    failure kinds v1: {"missing_export":5,"no_body":1,"load_error":6,"execution_contamination":1}
+    failure kinds v2: {"missing_member":2,"load_error":1,"missing_export":1,"dead_ref":1,"dependency_firewall":1}
+
+===== PER-GOAL =====
+  goal  stratum      op(v2)        v1        v2       oracle
+  [41]  FIM       add_method    PASS      fail     STRUCTURAL
+  [42]  FIM       add_function  fail      fail     STRUCTURAL
+  [43]  FIM       add_method    fail      PASS     STRUCTURAL
+  [44]  fallback  content_edit  fail      fail     STRUCTURAL_PLUS_BEHAVIORAL
+  [45]  fallback  content_edit  fail      fail     STRUCTURAL_PLUS_BEHAVIORAL
+  [46]  FIM       add_method    fail      PASS     STRUCTURAL
+  [47]  fallback  content_edit  fail      PASS     STRUCTURAL_WEAK_NO_OP_PASSES
+  [48]  FIM       add_method    fail      PASS     STRUCTURAL
+  [49]  fallback  content_edit  fail      fail     BEHAVIORAL_REQUIRED
+  [50]  FIM       add_function  fail      PASS     STRUCTURAL
+  [51]  FIM       add_method    PASS      fail     STRUCTURAL
+  [52]  FIM       add_function  fail      PASS     STRUCTURAL
+  [53]  FIM       add_method    PASS      PASS     STRUCTURAL
+  [54]  fallback  content_edit  fail      fail     STRUCTURAL_PLUS_BEHAVIORAL
+  [55]  fallback  content_edit  fail      fail     BEHAVIORAL_REQUIRED
+  [56]  FIM       add_method    fail      PASS     STRUCTURAL
+  [57]  FIM       add_method    fail      PASS     STRUCTURAL
+  [58]  FIM       add_method    fail      PASS     STRUCTURAL
+  [59]  fallback  content_edit  fail      fail     STRUCTURAL_PLUS_BEHAVIORAL
+  [60]  FIM       add_function  fail      PASS     STRUCTURAL

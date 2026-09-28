@@ -1,0 +1,63 @@
+expr) {
+  const text = String(expr);
+  const toks = tokenize(text);
+  let p = 0;
+  const peek = () => toks[p];
+  const where = () => (toks[p] ? toks[p].at : text.length);
+  const bad = (what) => new Error(what + ' at ' + where());
+  const eat = (t) => {
+    if (!toks[p] || toks[p].t !== t) throw bad('expected ' + t);
+    return toks[p++];
+  };
+
+  const atom = () => {
+    const tk = peek();
+    if (!tk) throw bad('unexpected end of input');
+    if (tk.t === '(') { eat('('); const v = additive(); eat(')'); return v; }
+    if (tk.t === 'num') { p++; return tk.v; }
+    if (tk.t === 'name') {
+      p++;
+      if (peek() && peek().t === '(') {
+        const fn = FUNCS[tk.v];
+        if (!fn) throw new Error('unknown function ' + tk.v + ' at ' + tk.at);
+        eat('(');
+        const args = [additive()];
+        while (peek() && peek().t === ',') { eat(','); args.push(additive()); }
+        eat(')');
+        return fn(...args);
+      }
+      if (!Object.prototype.hasOwnProperty.call(vars, tk.v)) {
+        throw new Error('unknown name ' + tk.v + ' at ' + tk.at);
+      }
+      return vars[tk.v];
+    }
+    throw bad('cannot parse');
+  };
+
+  const power = () => {
+    const base = atom();
+    if (peek() && peek().t === '^') { eat('^'); return Math.pow(base, unary()); }
+    return base;
+  };
+  const unary = () => {
+    if (peek() && peek().t === '-') { p++; return -unary(); }
+    if (peek() && peek().t === '+') { p++; return unary(); }
+    return power();
+  };
+  const multiplicative = () => {
+    let v = unary();
+    while (peek() && (peek().t === '*' || peek().t === '/')) {
+      const op = toks[p++].t;
+      const r = unary();
+      if (op === '/') { if (r === 0) throw new Error('division by zero'); v /= r; } else v *= r;
+    }
+    return v;
+  };
+  const additive = () => {
+    let v = multiplicative();
+    while (peek() && (peek().t === '+' || peek().t === '-')) {
+      const op = toks[p++].t;
+      const r = multiplicative();
+      v = op === '+' ? v + r : v - r;
+    }
+    return v;

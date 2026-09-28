@@ -1,0 +1,39 @@
+MEASURED: witness processes are LEAKING - 108 to 263 in 23 minutes, oldest alive 89 minutes, most orphaned
+
+An independent process trace confirms ownership of the witness fleet as 0d's - root ancestor is PID 21728,
+node benchmarks/run-backward.mjs - so ownership is now corroborated by measurement rather than taken on
+report. The trace found more than ownership.
+
+MEASURED, not inferred:
+
+    witness-register processes NOW      263
+    same count ~23 minutes earlier      108
+    oldest still alive                  11:58:58
+    newest                              13:28:01
+    parent status                       the LARGE MAJORITY report "(parent gone)"
+
+It is GROWING, on the same instrument both times. Processes from 89 minutes ago are STILL ALIVE, which no
+per-witness child should be. And they are ORPHANED - parent dead, child still running. That is children
+not being reaped, accumulating without bound.
+
+HYPOTHESIS, FLAGGED AS ONE BECAUSE I HAVE BEEN WRONG THREE TIMES TODAY BY ASSERTING. 0d's TRANSFER-1
+repair is described as "the child lets the subject drain instead of exiting when import() returns". If a
+subject holds a live handle, timer or socket and never drains, "let it drain" is "never exit" - which
+produces exactly this shape. I have NOT read witness-register.mjs; it is 0d's and I stay out of
+legascreen/**. This is inference from process metadata only and 0d is the one who can settle it.
+
+THREE CONSEQUENCES. 0d's own timings drift monotonically under a load its own run is creating, which will
+not look like noise but like a real effect in anything ordered by time. "A window after TRANSFER-2" may
+not be a window, because completing a run does not free processes that never exit - BIND-1 has been told
+to treat a non-zero witness count as a blocking precondition and verify it directly. And my two
+UNOBSERVABLE tests were measured at 108, so at 263 those figures UNDERSTATE the contention.
+
+I HAVE NOT TOUCHED THE PROCESSES AND WILL NOT. They are 0d's, some may be load-bearing for a live run, and
+I cannot distinguish a stuck orphan from a working child from outside.
+
+AND THIS IS THE ARGUMENT FOR SAMPLING DURING A RUN RATHER THAN ONLY AT THE START: a leak that grows
+monotonically passes a start-time check and then contaminates everything after it.
+
+Message-File: scratch/e75-leak.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

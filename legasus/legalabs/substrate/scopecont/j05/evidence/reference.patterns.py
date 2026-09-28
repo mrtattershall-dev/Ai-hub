@@ -1,0 +1,19 @@
+# Patterns with [brackets] in this comment.
+
+PATTERNS = ["a[b", "c)d"]
+
+TOTAL = len(PATTERNS)
+
+LABEL = "see ] here"
+
+
+def described():
+    return LABEL + str(TOTAL)
+
+
+def size():
+    return len(PATTERNS)
+
+
+def first():
+    return PATTERNS[0]

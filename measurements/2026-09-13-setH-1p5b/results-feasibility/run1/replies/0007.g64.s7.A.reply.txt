@@ -1,0 +1,64 @@
+text):
+    lines = text.split("\n")
+
+    # Remove blank lines
+    while lines and not lines[0].strip():
+        lines.pop(0)
+
+    # Handle consecutive heading blocks
+    headings = []
+    for line in lines:
+        if (len(h) := len(_is_heading(line))) > 0:
+            if headings and len(headings[-1]) == len(h):
+                headings[-1][1] += " " + line.strip()
+            else:
+                headings.append([len(h), line.strip()])
+        else:
+            if headings:
+                # End of heading block
+                heading_text = "\n".join(line.strip() for line in headings)
+                text = text.replace("\n" + heading_text, "\n")
+                headings = []
+    # Add remaining heading blocks at the end of the text
+    if headings:
+        heading_text = "\n".join(line.strip() for line in headings)
+        text = text.replace("\n", heading_text)
+
+    # Handle ordered lists
+    ol_items = []
+    for i, line in enumerate(lines):
+        m = re.match(r"^\s*(\d+)\.\s+(.*)$", line)
+        if m:
+            ol_items.append((int(m.group(1)), m.group(2)))
+        else:
+            if ol_items:
+                # End of ordered list block
+                ol_text = "\n".join(f"{i+1}. {item}" for i, item in enumerate(ol_items))
+                text = text.replace("\n" + ol_text, "\n")
+                ol_items = []
+    # Add remaining ordered list items at the end of the text
+    if ol_items:
+        ol_text = "\n".join(f"{i+1}. {item}" for i, item in enumerate(ol_items))
+        text = text.replace("\n", ol_text)
+
+    # Handle unordered lists
+    ul_items = []
+    for i, line in enumerate(lines):
+        if line.startswith("- "):
+            ul_items.append(line.strip()[2:])
+        else:
+            if ul_items:
+                # End of unordered list block
+                ul_text = "\n".join(f"<li>{item}</li>" for item in ul_items)
+                text = text.replace("\n" + ul_text, "\n")
+                ul_items = []
+    # Add remaining unordered list items at the end of the text
+    if ul_items:
+        ul_text = "\n".join(f"<li>{item}</li>" for item in ul_items)
+        text = text.replace("\n", ul_text)
+
+    # Handle inline text
+    lines = [_inline(line) for line in lines]
+    text = "\n".join(lines)
+
+    return text

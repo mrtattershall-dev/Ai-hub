@@ -1,0 +1,72 @@
+{
+  "task_id": "f05",
+  "analogy_class": "no_supported_analogy",
+  "analogy_justification": "every function in this file computes from its argument and retains nothing between calls, so a registry that remembers what previous calls recorded has no structural relation here to parallel",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the across-call registry the new behaviour needs",
+        "site_hint": "# Colour helpers.\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the recorder, using that registry",
+        "site_hint": "] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000.0\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the reader over that registry",
+        "site_hint": "_dark(h):\n    return luminance(to_rgb(h)) < 128\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "novel-state-feature",
+    "affected_region_lines": 14
+  },
+  "reference": {
+    "source_hash": "5706c913cd8f8c066ba1d67eb6c3329d5e11c61d0d00928824ae9eed99a38981",
+    "reference_hash": "a9835bdb6d9ab8827670d4bd09ea6439b8d807d5429508eb810a6f000ffeba12",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

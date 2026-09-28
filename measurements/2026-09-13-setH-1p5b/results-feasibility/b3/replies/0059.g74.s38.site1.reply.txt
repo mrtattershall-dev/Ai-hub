@@ -1,0 +1,17 @@
+codes = []
+    label = None
+    links = []
+
+    def take_code(m):
+        codes.append("<code>" + _escape(m.group(1)) + "</code>")
+        return _CODE % (len(codes) - 1)
+
+    text = re.sub(r"`([^`]*)`", take_code, text)
+
+    def take_link(m):
+        label = _escape(m.group(1))
+        url = _escape(m.group(2)).replace('"', "&quot;")
+        links.append('<a href="' + url + '">' + label + "</a>")
+        return _LINK % (len(links) - 1)
+
+    text = re.sub(r"\[([^\]]*)\]\(([^)]*)\)", take_link, text)

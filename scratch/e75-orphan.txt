@@ -1,0 +1,40 @@
+Characterise what survives a parent's death on this box: DETACHMENT decides it, not stdio - and my taskkill hypothesis is falsified
+
+Taken up at BIND-1's offer: runLifecycle.test.mjs hit its 180s budget, taskkill /T /F fired, and close
+took ~50 MORE MINUTES. Something holding stdio outlived the tree kill.
+
+MY HYPOTHESIS, stated first and now DEAD: taskkill /T walks the CURRENT parent-pid chain, so a child
+whose parent already exited is unreachable from the root and survives. It never got tested, because the
+apparatus could not construct the state, and the reason it could not is the finding.
+
+TWO APPARATUS DEFECTS OF MINE, both recorded rather than quietly fixed.
+  1. The first version spawned mid.mjs AS the root, so root and mid were ONE process - the output printed
+     the same pid for both. In the exit variant the root therefore died before the kill and taskkill was
+     aimed at an already-dead pid. It printed "hypothesis FALSIFIED"; that reading was unsupported and is
+     withdrawn. A THREE-level tree is required for the question to be asked at all.
+  2. A node -e probe lost its regex to shell escaping, so the leaf pid parsed as null and tasklist was
+     asked for "PID eq null" four times. That is my own recorded rule - never pass prose through a shell
+     argument - broken for the second time today. Rewritten as a file.
+
+The repaired experiment then REFUSED TO REPORT, which is the apparatus working: its precondition check
+found the leaf already dead before the kill, so the orphan state never existed and no reading of the kill
+is admissible either way. That refusal left the sharper question, because 263 witness processes WERE
+observed alive with "(parent gone)" earlier today. Both cannot be true without a distinguishing condition.
+
+MEASURED, with the leaf reporting its pid through a FILE rather than the pipe under test:
+
+    plain     stdio inherited      leaf DIES with its parent
+    detached  detached + unref     leaf SURVIVES
+    piped     stdio piped          leaf DIES with its parent
+
+DETACHMENT DECIDES IT. Inherited versus piped stdio makes no difference at all - which kills the "it was
+holding the pipe" framing as the explanation for survival, though not as the explanation for close
+staying open.
+
+SCOPE, AND IT MATTERS: this measures a parent EXITING NORMALLY, not a parent FORCE-KILLED. taskkill /F is
+not process.exit(0) and the two may differ. So this does not yet explain BIND-1's 50 minutes; it removes
+one candidate and names the variable that actually governs survival.
+
+Message-File: scratch/e75-orphan.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

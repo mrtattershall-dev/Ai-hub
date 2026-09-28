@@ -1,0 +1,40 @@
+Preregister BACKWARD-1: discovery from effect sinks, with the hub frozen as a prospective subject
+
+Entry 28 recorded backward discovery as NOT STARTED and it looked like a coverage improvement. It is
+not. Forward discovery seeds on an identity brand, and Legasus has one because Legasus was built to
+make authority visible - so a screen that only works on software built to be understood by it is a
+mirror rather than a screen. The hub has no brand and almost no export surface, which makes it the
+right prospective subject and makes the backward direction required for architectural independence.
+
+The sink classes are frozen as CATEGORIES ONLY, taken from the owner's list which predates any
+inspection of the subject: filesystem mutation, process execution, version-control mutation, state
+persistence, network egress, commit operation. No file, function, module or API name appears in them
+and none may be added during the run.
+
+The rule is frozen too: TEST-ONLY ACCESSIBILITY CANNOT ESTABLISH PRODUCTION REACHABILITY. Reachability
+becomes a coordinate with a value - PRODUCTION_REACHED, TEST_ONLY or UNREACHED - rather than an
+absence. And the function denominator is replaced by six stages from EFFECT_DISCOVERED through
+SCREENED, so a private function is not automatically a hole and a public export is not automatically
+coverage.
+
+This commit carries a CONTAMINATION REGISTER, because I inspected the hub read-only before freezing
+and it cannot be claimed afterwards that discovery was blind. What I learned is mechanism-level - the
+module systems, the ratio of exports to functions, that effects are imported by name at module scope,
+where the router is constructed - and not knowledge of where the hub's authority logic or defects
+are. The predictions are written so that knowing those numbers does not help satisfy them.
+
+BK-1 is decisive and prospective: starting only from the frozen sink classes, backward discovery
+recovers production paths through PRIVATE code that forward discovery cannot reach. BK-2 is the
+dangerous null preregistered as a FAILURE - if meaningful discovery requires the test-only exports,
+hand-named functions or knowledge of the hub's intended architecture, the transfer attempt fails and
+will be reported as failed rather than as a smaller success. BK-3 is the substantive claim, that at
+least one private function reaches SUPPORT_CHARACTERIZED by perturbation rather than by appearing in
+a stack, because appearing in a stack is not participation.
+
+The mechanism will be developed against Legasus and synthetic fixtures only. The hub is run ONCE
+after the mechanism is frozen, under the same discipline a prospective environment gets, and any
+change to the mechanism followed by a second run must be reported as a second run.
+
+Message-File: scratch/m101.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

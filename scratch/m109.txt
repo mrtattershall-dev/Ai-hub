@@ -1,0 +1,42 @@
+H-DISTINCTION: DX-1 fired, DX-2 survived by ONE entry, and the descent has a measurable problem
+
+DX-1 tested MINIMALITY, the direction nothing had tested, and it fired. semantic() assigns a fresh
+identity to every non-plain object and replay() compares projections to decide baseline stability, so
+a subject that is deterministic in every respect anyone could care about is declared
+BASELINE_UNSTABLE purely because its output carries a freshly allocated Map. The instrument's
+limitation is reported as a property of the subject, and any subject whose outputs hold a Map, Set,
+Buffer, stream or class instance is unscreenable by that path and told it is non-deterministic. It is
+the opposite error from L-3: an over-fine projection producing a FALSE REFUSAL where String(v)
+produced a FALSE AGREEMENT. run-backward does not use replay(), so the frozen hub transfer is
+unaffected.
+
+DX-2 SURVIVED BY A SINGLE ENTRY. Thirty-three collapses, two separations, one NEITHER - W3-e, where
+the token KIND was carried, distinct and readable at every step and commit() simply did not branch on
+it. Under the locating rule, fixed in advance precisely so this could not be argued away, a consumer
+failing to consult is not a collapse. Without that rule it would have been 36 of 36.
+
+DX-3 held with two separations, so distinction is not merely H-LOSS relabelled - it names an error
+direction H-LOSS could not express - but two out of thirty-six is thin.
+
+THE MEASURABLE PROBLEM WITH THE DESCENT is the trend across three hypotheses on one corpus:
+H-DEFAULT covers 42 percent with a discriminating set of 15, H-LOSS covers 83 percent with 6, and
+H-DISTINCTION covers 97 percent with 1. Each level down explains more and refutes less, which is the
+signature of a frame becoming unfalsifiable rather than becoming true. Reading those coverage numbers
+as confirmation would be the exact error every one of these hypotheses was written to detect.
+
+WHAT ACTUALLY PAID IS THE PROSPECTIVE RECORD, WHICH IS 3 OF 3. D-3 found that delegate inherits on an
+omitted argument and refuses on an empty object, decided by a falsiness test. L-3 found that String(v)
+turns a real change into a false CONSTANT. DX-1 found a deterministic subject declared unstable.
+Three hypotheses, three prospective hits, and ZERO defects found by classification. The
+classifications produced coverage percentages; the predictions produced defects. That asymmetry
+suggests running the ladder by demanding a prospective prediction per level and ignoring the
+retrospective fit entirely.
+
+DX-4 held: no production code changed, the freeze still verifies, both L-3's String(v) and DX-1's
+semantic() remain unrepaired pending their own preregistrations, and the hub is still unrun.
+
+Suite 686/686.
+
+Message-File: scratch/m109.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

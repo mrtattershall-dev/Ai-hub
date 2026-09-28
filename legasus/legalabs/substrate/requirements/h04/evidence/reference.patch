@@ -1,0 +1,16 @@
+--- op op1 after: "THICK = 3\n"
+
+
+def _mark():
+    return "*"
+
+--- op op2 after: "def line(n):\n    return \"-\" * n\n"
+
+
+def star(n):
+    return _mark() * n
+
+--- op op3 after: "# Border drawing.\n"
+
+def star_thick():
+    return star(THICK)

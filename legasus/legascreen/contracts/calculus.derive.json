@@ -1,0 +1,11 @@
+{
+  "subject": "legaknow/calculus.mjs::derive",
+  "coordinate": "context.*",
+  "proposition": "ALL_OF",
+  "authority": {
+    "source": "legasus/legaknow/calculus.mjs",
+    "provenance": "DERIVE: 'The output context is the INTERSECTION of premise contexts; it cannot exceed any of them.' and: 'a dimension goes into the output only when EVERY premise establishes it and they agree.'",
+    "version": "r4",
+    "validAgainst": "8988942c5701be7b"
+  }
+}

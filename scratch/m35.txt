@@ -1,0 +1,24 @@
+Run the wave-2 composition attacks: 20/20 reproduce, every control holds, zero falsified
+
+Five attack files, each assertion stating the PREDICTED DEFECT from 80724ba beside a control, run
+against 455f2a2 unmodified. All twenty held. Three more compositions: a refuter established in
+another world defeats a claim without a bridge (W2-a); a STALE witness is still an execution edge
+and scores ADVANCEMENT (W2-c); the adapter grants doctest's semantics to any producer whose native
+vocabulary is spelled the same (W2-g). Four representational holes: reestablish() rewrites a scope
+the identity now encodes (W2-b); an unmeasured behavioural metric reads as compatible on the Pareto
+frontier (W2-d); an absent version and an absent producer both become the string "undefined"
+(W2-e); producer #1 fabricates a document and an array-index ordinal for a record that has no
+example, so a history coordinate is built for no experiment (W2-f) - the producer #2 strain, living
+in producer #1 all along.
+
+Recorded beside W2-g: pytest has no declared mapping, every pytest verdict adapts to
+UNKNOWN_MAPPING, and so no scoped claim has ever derived from pytest evidence. Producer #3
+established scope construction, not derivation. A limit of Entry 11, not a defect.
+
+Zero predictions failed, and the same caveat stands: read-derived predictions reproducing is what
+accurate reading yields. Wave 3 will carry predictions of NO defect so the program can fail both
+ways. Nothing is repaired in this commit.
+
+Message-File: scratch/m35.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

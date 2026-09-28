@@ -1,0 +1,44 @@
+# NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    def flush_ordered_list():
+        if items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+            del items[:]
+
+    # REQUESTED CHANGE: Add a function to handle the escape of urls and links.
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    def _escape_url(text):
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+    # REQUESTED CHANGE: Add a function to handle the escaping of code.
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    def _escape_code(text):
+        return text.replace("`", "&lt;code&gt;").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+    # REQUESTED CHANGE: Add a function to handle the taking of codes.
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    def take_code(m):
+        codes.append("<code>" + _escape_code(m.group(1)) + "</code>")
+        return _CODE % (len(codes) - 1)
+
+
+    # REQUESTED CHANGE: Add a function to handle the taking of links.
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    def take_link(m):
+        label = _escape_url(m.group(1))
+        url = _escape_url(m.group(2)).replace('"', "&quot;")
+        links.append('<a href="' + url + '">' + label + "</a>")
+        return _LINK % (len(links) - 1)
+
+
+    # REQUESTED CHANGE: Add a function to handle the escaping of urls and links.
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    def _escape_url(text):
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+    # REQUESTED CHANGE: Add a function to handle the escaping of code.
+    # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+    def _escape_code(text):
+        return text.replace("`

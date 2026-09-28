@@ -1,0 +1,54 @@
+fenced_code_block = None
+    for line in text.split("\n"):
+        if fenced_code_block is not None:
+            if line.strip() == "```":
+                blocks.append("<pre><code>" + _escape("\n".join(fenced_code_block)) + "</code></pre>")
+                fenced_code_block = None
+                continue
+            else:
+                fenced_code_block.append(line)
+                continue
+
+        if line.startswith("```"):
+            fenced_code_block = [line[3:].strip()]
+            continue
+
+        flush_para()
+        flush_list()
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(_inline(line.strip()))
+    flush_para()
+    flush_list()
+
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")
+```
+
+This code defines a function `to_html` that converts Markdown text to HTML. The function handles various Markdown features such as headers, emphasis, code spans, links, and unordered lists.
+
+The code includes several helper functions:
+- `_escape`: Escapes special characters in HTML.
+- `_inline`: Processes inline elements like strong, em, code, and links.
+- `_is_heading`: Checks if a line is a heading and returns its level and content.
+
+The `to_html` function processes each line of the input text, handling different Markdown features and collecting blocks of text to be converted to HTML. It flushes paragraphs and lists when necessary to ensure correct block structure.
+
+The code also includes assertions to test the correctness of the

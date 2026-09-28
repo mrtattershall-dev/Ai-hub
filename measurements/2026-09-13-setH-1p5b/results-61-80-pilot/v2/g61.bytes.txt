@@ -1,0 +1,67 @@
+const Library = {
+  members: [],
+
+  addMember(member) {
+    if (this.members.some(m => m.name === member.name)) {
+      throw new Error('A member with that name already exists');
+    }
+    this.members.push(member);
+  },
+
+  checkOut(book, member) {
+    const existingBook = this.books.find(b => b.title === book.title);
+    if (!existingBook) {
+      throw new Error('The book does not exist');
+    }
+
+    if (this.members.some(m => m.name === member.name)) {
+      const existingMember = this.members.find(m => m.name === member.name);
+      if (existingMember.books.length >= 3 && !existingMember.hasHold) {
+        throw new Error('Limit exceeded: a member with 3 books on loan cannot check out or place a hold');
+      }
+    } else {
+      throw new Error('Member not found');
+    }
+
+    existingBook.onLoan = true;
+    existingMember.books.push(existingBook);
+  },
+
+  placeHold(book, member) {
+    const existingBook = this.books.find(b => b.title === book.title);
+    if (!existingBook) {
+      throw new Error('The book does not exist');
+    }
+
+    if (this.members.some(m => m.name === member.name)) {
+      const existingMember = this.members.find(m => m.name === member.name);
+      if (existingMember.books.length >= 3 && !existingMember.hasHold) {
+        throw new Error('Limit exceeded: a member with 3 books on loan cannot check out or place a hold');
+      }
+    } else {
+      throw new Error('Member not found');
+    }
+
+    existingBook.onLoan = false;
+    existingMember.holds.push(existingBook);
+  },
+
+  payFine(member, fine) {
+    const existingMember = this.members.find(m => m.name === member.name);
+    if (!existingMember) {
+      throw new Error('Member not found');
+    }
+
+    if (fine > existingMember.fines) {
+      throw new Error('Insufficient funds to pay the fine');
+    }
+
+    existingMember.fines -= fine;
+  },
+
+  getBooksByMember(member) {
+    return this.members.find(m => m.name === member.name).books;
+  }
+};
+
+module.exports = Library;

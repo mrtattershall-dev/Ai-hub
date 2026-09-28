@@ -1,0 +1,9 @@
+if fence is not None:
+            if line.strip() != "```":
+                codes.append(line)
+            else:
+                fence = None
+                continue
+        elif fence is None and line.startswith("```"):
+            fence = True
+            continue

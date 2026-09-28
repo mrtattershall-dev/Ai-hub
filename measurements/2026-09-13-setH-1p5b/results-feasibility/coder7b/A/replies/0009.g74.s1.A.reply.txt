@@ -1,0 +1,48 @@
+markdown_text):
+    lines = markdown_text.splitlines()
+    html_lines = []
+
+    def emit_paragraph():
+        if paragraph:
+            html_lines.append("<p>" + _inline("\n".join(paragraph)) + "</p>")
+            del paragraph[:]
+
+    heading = None
+    code_block = False
+    paragraph = []
+    list_items = []
+
+    for line in lines:
+        if not paragraph and not list_items and heading is None:
+            heading = _is_heading(line)
+            if heading:
+                html_lines.append("<h%d>%s</h%d>" % heading)
+                continue
+
+        if code_block:
+            if line.strip() == "```":
+                code_block = False
+                html_lines.append("</code></pre>")
+            else:
+                paragraph.append(_escape(line))
+        elif re.match(r"^```", line):
+            code_block = True
+            html_lines.append("<pre><code>")
+        elif not paragraph and not list_items and line.strip() == "":
+            emit_paragraph()
+        elif re.match(r"^- ", line):
+            if paragraph:
+                emit_paragraph()
+            item = _inline(line[2:].strip())
+            list_items.append(item)
+        else:
+            if list_items:
+                html_lines.append("<ul><li>" + "</li>\n<li>".join(list_items) + "</li></ul>")
+                del list_items[:]
+            if paragraph and not line.strip():
+                continue
+            paragraph.append(line)
+
+    emit_paragraph()
+
+    return "\n".join(html_lines).strip()  # Remove leading/trailing whitespace from the final result.

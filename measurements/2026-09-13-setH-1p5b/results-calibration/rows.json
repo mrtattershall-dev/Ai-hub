@@ -1,0 +1,669 @@
+[
+  {
+    "goal": 62,
+    "arm": "v2",
+    "route": "add_function",
+    "n": 8,
+    "passes": 8,
+    "p_pass": 1,
+    "pairwise_disagreement": 0,
+    "stability": "STABLE_PASS",
+    "syntax_failures": 0,
+    "kinds": [],
+    "outcomes": [
+      {
+        "repeat": 1,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 2,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 3,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 4,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 5,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 6,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 7,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 8,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      }
+    ]
+  },
+  {
+    "goal": 63,
+    "arm": "v2",
+    "route": "add_method",
+    "n": 8,
+    "passes": 6,
+    "p_pass": 0.75,
+    "pairwise_disagreement": 0.429,
+    "stability": "STOCHASTIC",
+    "syntax_failures": 2,
+    "kinds": [
+      "load_error",
+      "load_error"
+    ],
+    "outcomes": [
+      {
+        "repeat": 1,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      },
+      {
+        "repeat": 2,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      },
+      {
+        "repeat": 3,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      },
+      {
+        "repeat": 4,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_method",
+        "loads": false
+      },
+      {
+        "repeat": 5,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_method",
+        "loads": false
+      },
+      {
+        "repeat": 6,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      },
+      {
+        "repeat": 7,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      },
+      {
+        "repeat": 8,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      }
+    ]
+  },
+  {
+    "goal": 66,
+    "arm": "v2",
+    "route": "add_method",
+    "n": 8,
+    "passes": 6,
+    "p_pass": 0.75,
+    "pairwise_disagreement": 0.429,
+    "stability": "STOCHASTIC",
+    "syntax_failures": 2,
+    "kinds": [
+      "load_error",
+      "load_error"
+    ],
+    "outcomes": [
+      {
+        "repeat": 1,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      },
+      {
+        "repeat": 2,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      },
+      {
+        "repeat": 3,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_method",
+        "loads": false
+      },
+      {
+        "repeat": 4,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_method",
+        "loads": false
+      },
+      {
+        "repeat": 5,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      },
+      {
+        "repeat": 6,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      },
+      {
+        "repeat": 7,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      },
+      {
+        "repeat": 8,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_method",
+        "loads": true
+      }
+    ]
+  },
+  {
+    "goal": 72,
+    "arm": "v2",
+    "route": "add_function",
+    "n": 8,
+    "passes": 7,
+    "p_pass": 0.875,
+    "pairwise_disagreement": 0.25,
+    "stability": "STOCHASTIC",
+    "syntax_failures": 1,
+    "kinds": [
+      "load_error"
+    ],
+    "outcomes": [
+      {
+        "repeat": 1,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 2,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 3,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 4,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 5,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 6,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 7,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_function",
+        "loads": false
+      },
+      {
+        "repeat": 8,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      }
+    ]
+  },
+  {
+    "goal": 75,
+    "arm": "v2",
+    "route": "add_function",
+    "n": 8,
+    "passes": 1,
+    "p_pass": 0.125,
+    "pairwise_disagreement": 0.25,
+    "stability": "STOCHASTIC",
+    "syntax_failures": 7,
+    "kinds": [
+      "load_error",
+      "load_error",
+      "load_error",
+      "load_error",
+      "load_error",
+      "load_error",
+      "load_error"
+    ],
+    "outcomes": [
+      {
+        "repeat": 1,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_function",
+        "loads": false
+      },
+      {
+        "repeat": 2,
+        "pass": true,
+        "contract": true,
+        "kind": null,
+        "route": "add_function",
+        "loads": true
+      },
+      {
+        "repeat": 3,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_function",
+        "loads": false
+      },
+      {
+        "repeat": 4,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_function",
+        "loads": false
+      },
+      {
+        "repeat": 5,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_function",
+        "loads": false
+      },
+      {
+        "repeat": 6,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_function",
+        "loads": false
+      },
+      {
+        "repeat": 7,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_function",
+        "loads": false
+      },
+      {
+        "repeat": 8,
+        "pass": false,
+        "contract": false,
+        "kind": "load_error",
+        "route": "add_function",
+        "loads": false
+      }
+    ]
+  },
+  {
+    "goal": 71,
+    "arm": "v3",
+    "route": "multi_member_insertion",
+    "n": 8,
+    "passes": 0,
+    "p_pass": 0,
+    "pairwise_disagreement": 0,
+    "stability": "STABLE_FAIL",
+    "syntax_failures": 5,
+    "kinds": [
+      "multi_member: final contract: missing_member [\"Library.fromJSON (must be static)\"]",
+      "multi_member: intermediate_does_not_load: load_error [\"Malformed arrow function parameter list",
+      "multi_member: intermediate_does_not_load: load_error [\"Unexpected token '.'\"]",
+      "multi_member: intermediate_does_not_load: load_error [\"Unexpected token '.'\"]",
+      "multi_member: intermediate_does_not_load: load_error [\"Unexpected token '.'\"]",
+      "multi_member: final contract: missing_member [\"Library.fromJSON (must be static)\"]",
+      "multi_member: final contract: missing_member [\"Library.fromJSON (must be static)\"]",
+      "multi_member: intermediate_does_not_load: load_error [\"Unexpected token '.'\"]"
+    ],
+    "outcomes": [
+      {
+        "repeat": 1,
+        "pass": false,
+        "contract": false,
+        "kind": "multi_member: final contract: missing_member [\"Library.fromJSON (must be static)\"]",
+        "route": "multi_member_insertion",
+        "loads": null
+      },
+      {
+        "repeat": 2,
+        "pass": false,
+        "contract": false,
+        "kind": "multi_member: intermediate_does_not_load: load_error [\"Malformed arrow function parameter list",
+        "route": "multi_member_insertion",
+        "loads": null
+      },
+      {
+        "repeat": 3,
+        "pass": false,
+        "contract": false,
+        "kind": "multi_member: intermediate_does_not_load: load_error [\"Unexpected token '.'\"]",
+        "route": "multi_member_insertion",
+        "loads": null
+      },
+      {
+        "repeat": 4,
+        "pass": false,
+        "contract": false,
+        "kind": "multi_member: intermediate_does_not_load: load_error [\"Unexpected token '.'\"]",
+        "route": "multi_member_insertion",
+        "loads": null
+      },
+      {
+        "repeat": 5,
+        "pass": false,
+        "contract": false,
+        "kind": "multi_member: intermediate_does_not_load: load_error [\"Unexpected token '.'\"]",
+        "route": "multi_member_insertion",
+        "loads": null
+      },
+      {
+        "repeat": 6,
+        "pass": false,
+        "contract": false,
+        "kind": "multi_member: final contract: missing_member [\"Library.fromJSON (must be static)\"]",
+        "route": "multi_member_insertion",
+        "loads": null
+      },
+      {
+        "repeat": 7,
+        "pass": false,
+        "contract": false,
+        "kind": "multi_member: final contract: missing_member [\"Library.fromJSON (must be static)\"]",
+        "route": "multi_member_insertion",
+        "loads": null
+      },
+      {
+        "repeat": 8,
+        "pass": false,
+        "contract": false,
+        "kind": "multi_member: intermediate_does_not_load: load_error [\"Unexpected token '.'\"]",
+        "route": "multi_member_insertion",
+        "loads": null
+      }
+    ]
+  },
+  {
+    "goal": 64,
+    "arm": "v3",
+    "route": "safe_behavioural_replacement",
+    "n": 8,
+    "passes": 0,
+    "p_pass": 0,
+    "pairwise_disagreement": 0,
+    "stability": "STABLE_FAIL",
+    "syntax_failures": 0,
+    "kinds": [
+      "safe_replace",
+      "safe_replace",
+      "safe_replace",
+      "safe_replace",
+      "safe_replace",
+      "safe_replace",
+      "safe_replace",
+      "safe_replace"
+    ],
+    "outcomes": [
+      {
+        "repeat": 1,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 2,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 3,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 4,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 5,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 6,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 7,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 8,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      }
+    ]
+  },
+  {
+    "goal": 74,
+    "arm": "v3",
+    "route": "safe_behavioural_replacement",
+    "n": 8,
+    "passes": 0,
+    "p_pass": 0,
+    "pairwise_disagreement": 0,
+    "stability": "STABLE_FAIL",
+    "syntax_failures": 0,
+    "kinds": [
+      "safe_replace",
+      "safe_replace",
+      "safe_replace",
+      "safe_replace",
+      "safe_replace",
+      "safe_replace",
+      "safe_replace",
+      "safe_replace"
+    ],
+    "outcomes": [
+      {
+        "repeat": 1,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 2,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 3,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 4,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 5,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 6,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 7,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      },
+      {
+        "repeat": 8,
+        "pass": false,
+        "contract": false,
+        "kind": "safe_replace",
+        "route": "safe_behavioural_replacement",
+        "loads": null
+      }
+    ]
+  }
+]

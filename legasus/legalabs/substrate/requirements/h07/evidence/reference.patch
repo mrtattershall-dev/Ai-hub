@@ -1,0 +1,15 @@
+--- op op1 after: "RADIUS = 2\n"
+
+
+def _round2(v):
+    return round(v, 2)
+
+--- op op2 after: "):\n    return math.pi * RADIUS * RADIUS\n"
+
+
+TAU = _round2(2 * math.pi)
+
+--- op op3 after: "# Geometry.\n"
+
+def tau():
+    return TAU

@@ -1,0 +1,18 @@
+Repair W2-a and W2-b: a refuter refutes only the world it was established in, and reestablish() cannot move a scope
+
+W2-a. entitled() let any ESTABLISHED refuter defeat its target at any scope, so a counterexample
+executed at S2 refuted a claim about S1 with no bridge (b0673cd) - authority carried across the
+REFUTES edge by ignoring scope, Law 2 from the negative side. A refuter is now held to the coverage a
+premise is held to: on every context dimension it must cover the target; a refuter established
+nowhere in particular refutes nothing. Executed: same-world and for-all refuters still refute, an
+invalidated one still does not.
+
+W2-b. Since ca4d9ed scope is part of node identity, and reestablish() still rewrote n.scope in place,
+leaving a node saying one world under an id computed for another (b0673cd). It now refuses a scope
+change with its reason and changes nothing; evidence, or the same scope, still re-establishes.
+
+Suite 527/527 at the end of the wave-2 repairs; the eight threatened rigs byte-identical to baseline.
+
+Message-File: scratch/m36.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

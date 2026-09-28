@@ -1,0 +1,22 @@
+Hazard 1, occurrences 14 and 15: a line beginning with a hash is a comment to git, and the guard now says so
+
+A commit message written to a file, with the trailer, committed with -F - the rule followed to the
+letter - was refused as "does not match the file". No shell had touched it. One line of prose had
+wrapped onto a leading hash character, which git's message cleanup drops as a comment before any
+hook runs; the message reached git one line short and the file was intact. The guard fired
+correctly and blamed the shell. It now names this cause when the file has such a line, proven both
+ways on a temporary file: the hash-initial message is refused with the new diagnostic, a clean
+message is admitted with exit 0.
+
+Occurrence 15, minutes later: a regex probed through node -e printed froms+ for the backslash-s
+form - the probe's own backslash had collapsed inside the shell argument. The scanner under
+investigation had been written with the editor and was intact; its own control was trusted and the
+probe was not. And a sixteenth, while writing these very message files: five heredocs in one shell
+call failed to parse, which is why they were written with the editor instead.
+
+Both recorded in HAZARDS.md under hazard 1 as different loss paths caught, and not caught, by the
+same discipline.
+
+Message-File: scratch/m46.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

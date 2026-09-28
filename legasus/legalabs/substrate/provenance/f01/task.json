@@ -1,0 +1,11 @@
+{
+  "task_id": "f01",
+  "goal": "Add a push channel to the EXISTING notify.py: sending on it returns the word push, a colon, a space, and the message. The channel must be accepted by valid_channels and routed by send. The email and sms channels must keep working exactly as they do now. Run it with python.",
+  "lead": "notify.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the push channel is written the same way as the existing email and sms channels",
+  "interface": [
+    "push"
+  ]
+}

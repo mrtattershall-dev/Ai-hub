@@ -1,0 +1,49 @@
+def flush_ol():
+        if items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ol>")
+            del items[:]
+    # END OF REQUESTED CHANGE
+    # BEGIN NEW CODE HERE (do not repeat or rewrite any existing code above and below it)
+
+    flush_para()  # Flush the initial paragraph if there is one
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            flush_ol()  # Flush the list after a blank line
+            continue
+        m = re.match(r"(\d+)\. (.*)", line)  # Match lines starting with a number, dot and space
+        if m:
+            flush_para()
+            flush_list()
+            items.append(m.group(2).strip())  # Add the rest of the line as an item in the ordered list
+            continue
+        flush_ol()  # Flush the ordered list before processing other lines
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            flush_list()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    flush_ol()  # Flush the ordered list at the end of the input
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    # BEGIN NEW CODE HERE (do not repeat or rewrite any existing code above and below it)
+    assert to_html("1. one\n

@@ -1,0 +1,13 @@
+fenced_code_block = None  # Declare the fenced-code-block state
+    for line in text.split("\n"):
+        if line.startswith("```"):
+            if fenced_code_block is None:
+                fenced_code_block = []  # Start collecting lines for a new fenced code block
+            else:
+                blocks.append("<pre><code>" + "\n".join(fenced_code_block) + "</code></pre>")
+                fenced_code_block = None  # End the current fenced code block and flush it
+                continue
+        elif fenced_code_block is not None:
+            fenced_code_block.append(line)  # Collect lines inside a fenced code block
+            continue
+        # Existing code continues below this point, unchanged.

@@ -1,0 +1,27 @@
+Preregister the consumption question: does the completeness bound survive the artifacts derived from a verdict?
+
+The owner, reviewing Entry 16, said the qualification has to survive consumption - a consumer that
+reads only the state and discards doesNotEstablish recreates the information-loss problem at the API
+boundary - and said they had not inspected it. This inspects it, and finds three sites rather than
+one.
+
+objectivesFromContest takes the whole verdict and returns objectives and a why, with neither bound
+field, which means the bound is erased at exactly the step that turns a verdict into
+work-or-no-work, and that artifact is what PURPOSE consumes. nextAction makes the same shape of
+claim - there is currently no justified next action - over a candidate list someone supplied, and
+never had a bound at all. And the third, which the owner did not name: evidenceFrontier's CLOSED
+means every producer on a DECLARED list was attempted, its why reads as completeness over the
+evidence, and quiesce-check declares that list by hand. The gap Entry 16 named at the contest layer
+is already present one layer below it, and inherited upward.
+
+Five predictions. SC-2 puts the project's own Law 1 instrument on its own new API:
+informationMonotonicity with the verdict as the rich state and objectivesFromContest as the erasure
+should report a forbidden transition, permission gained by information loss, with a non-vacuity
+requirement that the same consumer is refused on the rich state. The expected repair gives each
+artifact the bound appropriate to its own claim, since the three claims differ. The residual is
+stated in advance: carrying the bound makes dropping it deliberate rather than automatic; it does
+not make it inseparable, and a representation where the state cannot be read alone is not started.
+
+Message-File: scratch/m54.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

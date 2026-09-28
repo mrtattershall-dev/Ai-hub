@@ -1,0 +1,17 @@
+) {
+    const [r, c] = this.shape();
+    if (r !== c) throw new Error('not square');
+    const out = [];
+    for (let i = 0; i < r; i++) {
+      const row = [];
+      for (let j = 0; j < c; j++) {
+        let s = 0;
+        for (let k = 0; k < r; k++) s += this.rows[i][k] * out[k][j];
+        row.push(s);
+      }
+      out.push(row);
+    }
+    const det = this.determinant();
+    if (det === 0) throw new Error('not invertible');
+    return new Matrix(out.map((row) => row.map((v) => v / det)));
+  }

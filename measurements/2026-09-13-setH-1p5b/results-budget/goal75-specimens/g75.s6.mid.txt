@@ -1,0 +1,33 @@
+s) {
+  // RPN is a reverse polish notation, where each number and operator are separated by spaces.
+  // For example, the expression "3 + 4 * 5" would be converted to "3 4 5 * +".
+
+  const out = [];
+  let i = 0;
+  while (i < s.length) {
+    const c = s[i];
+    if (c === ' ') { i++; continue; }
+    if ('+-*/^(),'.includes(c)) { out.push(c); i++; continue; }
+    const num = /^\d+(?:\.\d+)?/.exec(s.slice(i));
+    if (num) { out.push(num[0]); i += num[0].length; continue; }
+    const name = /^[A-Za-z_][A-Za-z0-9_]*/.exec(s.slice(i));
+    if (name) {
+      p++;
+      if (peek() && peek().t === '(') {
+        const fn = FUNCS[name.v];
+        if (!fn) throw new Error('unknown function ' + name.v + ' at ' + tk.at);
+        eat('(');
+        const args = [additive()];
+        while (peek() && peek().t === ',') { eat(','); args.push(additive()); }
+        eat(')');
+        return fn(...args);
+      }
+      if (!Object.prototype.hasOwnProperty.call(vars, name.v)) {
+        throw new Error('unknown name ' + name.v + ' at ' + tk.at);
+      }
+      return vars[name.v];
+    }
+    throw bad('cannot parse');
+  }
+  return out;
+}

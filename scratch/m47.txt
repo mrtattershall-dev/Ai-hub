@@ -1,0 +1,20 @@
+Preregister a declared mapping for producer #3: pytest evidence has never derived a claim
+
+Wave 2 recorded beside W2-g that pytest has no declared mapping, so every pytest verdict adapts to
+UNKNOWN_MAPPING and no scoped claim has ever derived from pytest evidence. That is the E6 half of
+the producer-2 result, never run for producer 3. Against law 7 it is authorized, executable (pytest
+9.1.1, measured), targets whether pytest evidence can derive or only be stored, and some outcome
+changes what may be claimed; so it is a justified objective and not a manufactured one. It is not a
+fourth producer: no new producer, coordinate or dimension.
+
+The mapping is argued from pytest's documented outcomes, with FAILED's collapse of assertion-failed
+and body-raised stated as forced by the producer rather than chosen by the adapter. Six predictions,
+including the Entry 11 payoff with real assertions - the cohort's two verdicts comparable and
+contradictory before admission, refused a comparison after - and a null-result reading.
+
+Recorded: the first version of this message was refused by the hazard-1 guard's new diagnostic, for
+two lines that wrapped onto a leading hash. The guard named the cause. Rewrapped here.
+
+Message-File: scratch/m47.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

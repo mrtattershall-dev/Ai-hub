@@ -1,0 +1,72 @@
+{
+  "task_id": "h06",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing base rate as the relation to parallel; that feature is a module constant read by a function, and the new feature occupies the same position",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the helper supplying the factor",
+        "site_hint": "BASE = 100\n"
+      },
+      {
+        "id": "op2",
+        "intent": "a statement requiring an EXISTING provider and a PLANNED one",
+        "site_hint": "def apply_rate(x):\n    return x * BASE\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the accessor",
+        "site_hint": "# Rates.\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op2",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 13
+  },
+  "reference": {
+    "source_hash": "ff24ea3f5800621aa8b771b8c1b0ae15f39e74ecf9687f4f5a1b90b2d575277a",
+    "reference_hash": "a0732bbe718312828867cab227cf42616cd72851877b51574a964c760014ce50",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

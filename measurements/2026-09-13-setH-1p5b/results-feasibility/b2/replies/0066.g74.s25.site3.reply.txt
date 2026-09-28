@@ -1,0 +1,5 @@
+if fence:
+        blocks.append("<pre><code>" + "\n".join(lines) + "</code></pre>")
+    else:
+        for l in lines:
+            blocks.append(_inline(l))

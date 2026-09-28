@@ -1,0 +1,16 @@
+  k01 op1 independent  candidates   1  passing   1  max gain 0.00 bits
+  k01 op2 NARROWABLE   candidates   2  passing   1  max gain 1.00 bits
+  k02 op1 NARROWABLE   candidates  12  passing   8  max gain 0.58 bits
+  k02 op2 independent  candidates  13  passing  13  max gain 0.00 bits
+  k03 op1 NARROWABLE   candidates  10  passing   8  max gain 0.32 bits
+  k03 op2 independent  candidates   9  passing   9  max gain 0.00 bits
+  k04 op1 NARROWABLE   candidates  10  passing   8  max gain 0.32 bits
+  k04 op2 independent  candidates   9  passing   9  max gain 0.00 bits
+
+  ---- NARROWABILITY V2, both channels required
+  NARROWABLE                4   <- the denominator
+  position-independent      4
+  intra-line                0      untestable 0
+  caught by STRUCTURE only  0   positions the probes called legal and
+                                structural preservation rejected
+  ground truth -> ./scopeself/GROUNDTRUTH.json

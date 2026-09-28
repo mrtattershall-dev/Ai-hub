@@ -1,0 +1,5 @@
+# BEGIN SOLUTION
+        if ol_items:
+            flush_ordered_list()
+            ol_items = []
+        # END SOLUTION

@@ -1,0 +1,31 @@
+Repair the consumption boundary: the bound travels into every derived artifact, and the frontier states that its requirement list is an input
+
+objectivesFromContest now inherits the verdict's bound verbatim, because an objective list is a
+PROJECTION of a verdict and not a claim of its own. informationMonotonicity - this project's Law 1
+instrument, which reported a forbidden transition on this API one commit ago - now reports ok with
+nothing gained, and the regression keeps both non-vacuity checks: the consumer is refused on the rich
+state, granted on an unbounded one, and the instrument still FAILS against an erasure that really
+does drop the bound, so the guard can be seen to fire.
+
+nextAction states its own bound rather than reusing the contest's, because its claim is different:
+no candidate OFFERED to this call is justified, and the candidate list is supplied by the caller.
+Asserted on both branches and on the empty call.
+
+evidenceFrontier states that requiredProducers is an INPUT and not a finding, and its CLOSED why now
+says every producer DECLARED required rather than reading as completeness over the evidence. This is
+where the gap originates: Entry 16 found the frontier is a set of questions someone wrote down, and
+the evidence requirement turns out to be a set someone wrote down too. quiesce-check prints that
+second layer beside the first, with the three strings this run actually declared.
+
+THE RESIDUAL IS ASSERTED, NOT JUST STATED. A test pins that the state remains a bare string readable
+without its bound, and that a consumer comparing only the state regains the inference. Carrying the
+bound makes dropping it deliberate rather than automatic; it does not make it inseparable, and a
+representation where the state cannot be read alone would change every comparison in the freeze gate
+and is not started.
+
+Focused 29/29. Suite 568/568. No verdict changed - SC-5 asserts every state and objective list is
+what it was.
+
+Message-File: scratch/m56.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

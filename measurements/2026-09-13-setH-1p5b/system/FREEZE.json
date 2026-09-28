@@ -1,0 +1,98 @@
+{
+  "frozen_at": "2026-09-14T09:18:41.273Z",
+  "purpose": "pre-evaluation freeze; held-out set = setH goals 21-40, outputs not yet inspected",
+  "model": {
+    "tag": "qwen2.5-coder:1.5b",
+    "runtime": "ollama",
+    "ollama_version": "ollama version is 0.33.3",
+    "family": "qwen2",
+    "parameter_size": "1.5B",
+    "quantization_level": "Q4_K_M",
+    "context_length": 32768,
+    "block_count": 28,
+    "embedding_length": 1536,
+    "feed_forward_length": 8960,
+    "head_count": 12,
+    "head_count_kv": 2,
+    "rope_freq_base": 1000000,
+    "capabilities": [
+      "completion",
+      "tools",
+      "insert"
+    ]
+  },
+  "decoding": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "repeat_penalty": 1.1,
+    "repeat_last_n": 64,
+    "num_predict_generation": 2500,
+    "num_predict_repair": 600,
+    "note": "pinned explicitly on every call; backend defaults are never relied on"
+  },
+  "endpoints": {
+    "generation": "/api/chat",
+    "fim_repair": "/api/generate with prompt(prefix)+suffix  (native insert capability)"
+  },
+  "goal_set": {
+    "path": "C:/Users/tatte/Projects/ai-coding-hub-indent/measurements/2026-09-12-setH/goals-H.json",
+    "sha256": "1f29e971e72f9461f6326e0e861031926f771c334453bbdf4bfa2627673171a9",
+    "development": "1-20  (inspected; repair rules designed on these)",
+    "held_out": "21-40  (contracts audited and rendered; generated outputs NOT inspected)"
+  },
+  "code": {
+    "contract.mjs": {
+      "sha256": "940295e51759cc5a8f08044c6046ac196ba2af33a7a15de09864abb7e9046606",
+      "purpose": "typed contract derivation + prompt/human renderings"
+    },
+    "contractCheck.mjs": {
+      "sha256": "94771f8b1368457e8e98d7981f4f076cae2bbdc9bc0724e3df00314ae1ad893e",
+      "purpose": "contract checker + execution isolation"
+    },
+    "_htmlcheck.mjs": {
+      "sha256": "2d60f888975439d09c6fed5314b3ffbb91a221f0a35eff0c468e62d71d3daae2",
+      "purpose": "html structural check"
+    },
+    "repairGates.mjs": {
+      "sha256": "25c4a927c2989d81df9e718dcb9f24b607289220ffae41b90bf1b4225c47c8c9",
+      "purpose": "failure classifier + deterministic transforms + FIM localization"
+    },
+    "repairPipeline.mjs": {
+      "sha256": "c2c5a5ac799e066fda89264fa0b55a3b9620d9912486b43debe86afcd265b800",
+      "purpose": "repair routing, FIM call, typed retry, rollback"
+    },
+    "baseline.mjs": {
+      "sha256": "5821eedfc4385d490023766a43c41ffe56c8a34b134e8909d3f129ee5f9115b0",
+      "purpose": "paired baseline runner"
+    },
+    "derive.mjs": {
+      "sha256": "ca373a028946437513a6604ee40c7cfe147859abdefea7547e3f2e30a91dfc60",
+      "purpose": "lead-file / language / edit derivation (upstream of contract.mjs)"
+    }
+  },
+  "fixtures": {
+    "contract.test.mjs": "24/24 - typed contract, both witnesses on every branch",
+    "isolation.test.mjs": "10/10 - execution isolation, adversarial specimen is goal 20 real bytes",
+    "repairGates.test.mjs": "29/29 - transforms AND refusals",
+    "spec2check.test.mjs": "7/7 - html check, includes the positive control that caught over-strictness",
+    "total": "70/70"
+  },
+  "success_criterion": "Typed repair succeeds if it recovers failures WITHOUT decreasing already-correct artifacts, through externally verified transformations rather than evaluator accommodation. A pass is terminal: passing specimens are never touched.",
+  "development_check": {
+    "note": "NOT an evaluation - the rules were designed on these six failures",
+    "first_turn": "14/20",
+    "after_repair": "17/20",
+    "repairs_attempted": 6,
+    "repairs_succeeded": 3,
+    "model_calls": 1,
+    "regressions": 0,
+    "by_route": {
+      "deterministic": "2/2",
+      "generate_artifact": "1/1",
+      "localized_semantic": "0/2",
+      "quarantine": "0/1"
+    }
+  },
+  "holdout_rule": "If an instrument defect is discovered on 21-40, fix it, INVALIDATE that evaluation, and run a fresh held-out set. Do not revise the system and keep counting 21-40 as holdout."
+}

@@ -1,0 +1,45 @@
+Shared load sampler, built to the BIND-1 interface - and PROCESS COUNT IS A PROXY, NOT A MEASURE
+
+benchmarks/load-sampler.mjs + 9 tests, all passing. sample() and verdict(samples, ceiling) to the
+interface BIND-1 specified, no dependencies, ESM, importable from anywhere.
+
+A REAL DEFECT FOUND DURING CONSTRUCTION, on the machine this is for. The obvious command is correct from
+cmd.exe and from execFileSync, and BROKEN under Git Bash, which rewrites the /FI switch into a path:
+
+    $ tasklist /FI "IMAGENAME eq node.exe" /NH
+    ERROR: Invalid argument/option - 'C:/Program Files/Git/FI'.
+
+Piped into grep -c that yields 0. Not an error - a ZERO. A sampler built that way reads 0 processes on a
+machine running 263, passes any ceiling, and certifies every run as clean. THE BROKEN INSTRUMENT RETURNS
+THE PASSING VALUE. So: no shell, ever; argv array only.
+
+TWO SAFETY PROPERTIES BEYOND THE REQUESTED INTERFACE, both pinned by tests with controls.
+  A FAILED SAMPLE IS NOT A LOW SAMPLE. nodeProcs is null with an error, never 0, and verdict() treats an
+  unmeasured sample as NOT ok - an instrument that could not measure is not a quiet machine.
+  A ZERO IS SUSPECT. The caller is itself node, so a correct count is never 0. Zero is classified
+  SUSPECT_ZERO rather than believed.
+verdict() reads nothing but its arguments, so "was the machine too busy?" cannot be decided after seeing
+the number it would disqualify. cpuPct is null on win32 on purpose: every cheap instrument for it is wrong
+under load and every correct one is slow, and an absent field is honest in a way a plausible one is not.
+
+AND THE TWO UNOBSERVABLE TESTS ARE RESOLVED: CONTAMINATION, NOT REGRESSION. producer3.test.mjs 12/12.
+P3-1 went 81.1s -> 13.0s and the DISCOVERY test 96.4s -> 4.4s, both passing.
+
+BUT THE SAMPLER IMMEDIATELY UNDERCUT ITS OWN INSTRUMENT, which is the finding worth keeping:
+
+    P3-1 at 108 node processes    81.1s   FAILED
+    P3-1 at 110 node processes    13.0s   PASSED
+    P3-1 unloaded baseline         2.3s
+
+SAME PROCESS COUNT, SIX-FOLD DIFFERENCE. Count does not measure contention - it counts processes, and a
+blocked or idle process costs nothing. The 263 witness processes were actively burning CPU; the 110 now
+are mostly not. A ceiling on process count is therefore wrong in BOTH directions: too strict on many idle
+processes, and too loose on eight CPU-bound ones saturating eight cores well under any count ceiling.
+
+The conservative direction is safe - erring toward UNOBSERVABLE wastes runs without admitting bad data -
+but the loose direction is not, and it is reachable. Reported to BIND-1, whose frozen ceiling of 40 rests
+on this instrument.
+
+Message-File: scratch/e75-sampler.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -1,0 +1,22 @@
+):
+        for n in list(self._adj):
+            if n not in self._adj:
+                continue
+            for nxt, _w in self._adj[n].items():
+                del self._adj[nxt][n]
+                if nxt == n:
+                    del self._adj[n]
+                    break
+
+    def remove_edge(self, a, b):
+        if a not in self._adj or b not in self._adj[a]:
+            raise KeyError((a, b))
+        del self._adj[a][b]
+        if a == b:
+            del self._adj[a]
+
+    def __repr__(self):
+        return str(self.nodes()) + " -> " + "\n".join(
+            "%s -> %s" % (a, ", ".join(f"{b}: {w}" for b, w in sorted(neighbors)))
+            for a, neighbors in sorted(self._adj.items())
+        )

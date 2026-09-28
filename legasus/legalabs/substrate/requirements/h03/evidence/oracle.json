@@ -1,0 +1,72 @@
+{
+  "task_id": "h03",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing padding as the relation to parallel; that feature is a module-level function reading the shared WIDTH, and the new functions occupy the same position",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the helper supplying the character",
+        "site_hint": "WIDTH = 8\n"
+      },
+      {
+        "id": "op2",
+        "intent": "a function whose DEFAULT argument calls that helper at definition time",
+        "site_hint": "def pad(s):\n    return str(s).ljust(WIDTH)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "a second function taking the same definition-time default",
+        "site_hint": "def trim(s):\n    return str(s).strip()\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 15
+  },
+  "reference": {
+    "source_hash": "046673197881d2b9a524424ac789f12f5e05b216eb37ed561f0f73fec62317a9",
+    "reference_hash": "c9665be6fd2f313538b5ba0d417a9a20ae569ee0a0d058ec925c431177f6e53b",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

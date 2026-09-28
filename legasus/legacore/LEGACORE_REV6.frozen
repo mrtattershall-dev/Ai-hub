@@ -1,0 +1,26 @@
+LegaCore CONSTRAINT DERIVATION revision 6, frozen.
+
+CHANGE: self-referential bindings. `total = total * SCALE` reads its target before writing it, so the
+prior binding is a genuine requirement. opfacts.mjs is hashed into four earlier freeze files and is
+NOT edited - opfacts2.mjs is its successor, so every historical hash stays checkable.
+
+EFFECT: j02's scope case now PASSES. No regression on any family; aggregates identical everywhere.
+
+OPEN, AND NOT EXCUSED: conformance P3 (no over-constraint) FAILS on the scopecont family, 1 violation,
+j01:op3. ownership_boundary removes a position where inserting a class-level def genuinely ends
+`resolve` early and re-parents its remaining statements. The code IS damaged; the sealed probes do not
+exercise the path that reveals it, so executable ground truth records the position as passing.
+
+The frozen scoring rule is not reinterpreted to rescue this. Under that rule it is an over-constraint
+and it stays recorded as one. The remedy is stronger probes in a future family, NOT a weaker rule -
+weakening ownership_boundary to satisfy a thin probe would trade a correct structural fact for a
+number.
+
+STANDING: development for the self-reference rule (j02 diagnosed it). Its seven synthetic witnesses
+predate the implementation and four are negatives, so a rule that always added the target - giving
+every assignment a phantom requirement on its own name - fails all four.
+
+legasus/legacore/constraints6.mjs       8b18708dc1aba964c2daabf0e2052375dfd8d383e9755928f26805cf42595a4d
+legasus/legacore/opfacts2.mjs           c8e0bf9202a0e5330db2cbaa092fca601becffb987755586cb7fce50c14426fe
+legasus/legacore/opcontext2.mjs         2a54cafbdeb725441d23943a4e41aa2b79718c34e272b776218feaab02fa1831
+legasus/legacore/selfref.test.mjs       987206e65250c8323c76e5889442e6f118f207a7449aea797603408a5dae462a

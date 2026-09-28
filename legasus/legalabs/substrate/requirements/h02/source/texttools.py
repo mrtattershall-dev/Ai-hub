@@ -1,0 +1,9 @@
+# Text tools.
+
+
+def shout(s):
+    return _emph(s).upper()
+
+
+def plain(s):
+    return str(s).strip()

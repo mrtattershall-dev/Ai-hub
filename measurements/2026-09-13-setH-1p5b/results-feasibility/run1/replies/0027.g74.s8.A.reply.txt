@@ -1,0 +1,22 @@
+text):
+    text = re.sub(r"([^\n]+)\n\n", r"\1<p>\n", text)
+    text = re.sub(r"\n\n", "</p>", text)
+
+    for i, line in enumerate(text.split("\n")):
+        if _is_heading(line) is not None:
+            level, heading = _is_heading(line)
+            text = text.replace(
+                line,
+                f"<h{level}>{heading}</h{level}>",
+            )
+            continue
+        if line.startswith("- "):
+            text = text.replace(
+                line,
+                f"<li>{line[3:]}</li>",
+            )
+            continue
+
+        text = text.replace(line, _inline(line))
+
+    return "<p>" + text + "</p>"

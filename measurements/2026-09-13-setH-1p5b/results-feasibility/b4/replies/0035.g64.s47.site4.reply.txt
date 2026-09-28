@@ -1,0 +1,29 @@
+# items.append(line[2:].strip())
+            # continue
+        if line.startswith("# "):
+            flush_para()
+            level, body = line.split(" ", 1)
+            blocks.append("<h%d>%s</h%d>" % (int(level), _inline(body.strip()), int(level)))
+            continue
+        if line.startswith("* "):
+            flush_list()
+            items.append(line[2:].strip())
+            continue
+        if line.startswith("- ") or line.startswith("# "):
+            # The code above and below is EXISTING and AUTHORITATIVE - do not repeat or rewrite it.
+            # REQUESTED CHANGE: Add ordered lists to to_html in the EXISTING s4_markdown.py: consecutive lines starting with a number, a dot and a space ("1. ") become <ol><li>...</li>...</ol>, written like the unordered lists. Run it with python.
+            # AT THIS POINT WRITE ONLY THIS: an unordered-list line must close an open ordered list
+            # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): m, take_code, take_link, url
+            # items.append(line[2:].strip())
+            # continue
+        if line.startswith("- "):
+            flush_list()
+            items.append(line[2:].strip())
+            continue
+        if line.startswith("# "):
+            flush_para()
+            level, body = line.split(" ", 1)
+            blocks.append("<h%d>%s</h%d>" % (int(level), _inline(body.strip()), int(level)))
+            continue
+        if line.startswith("* "):
+            flush_list()

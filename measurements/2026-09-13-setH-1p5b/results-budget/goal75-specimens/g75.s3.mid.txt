@@ -1,0 +1,43 @@
+expr) {
+  const text = String(expr);
+  const toks = tokenize(text);
+
+  let p = 0;
+  const peek = () => toks[p];
+  const where = () => (toks[p] ? toks[p].at : text.length);
+  const bad = (what) => new Error(what + ' at ' + where());
+  const eat = (t) => {
+    if (!toks[p] || toks[p].t !== t) throw bad('expected ' + t);
+    return toks[p++];
+  };
+
+  let out = [];
+  const stack = [];
+
+  while (p < toks.length) {
+    const tk = toks[p];
+    switch (tk.t) {
+      case '(':
+        stack.push(tk);
+        break;
+      case ')':
+        while (stack[stack.length - 1].t !== '(') out.push(stack.pop());
+        stack.pop();
+        break;
+      default: // operator
+        while (
+          stack.length &&
+          (stack[stack.length - 1].t === '^' ||
+            (stack[stack.length - 1].t === '*' || stack[stack.length - 1].t === '/') && !tk.t.match(/^\+|\-$/))
+        ) out.push(stack.pop());
+        stack.push(tk);
+    }
+    p++;
+  }
+
+  while (stack.length) {
+    out.push(stack.pop());
+  }
+
+  return out;
+}

@@ -1,0 +1,80 @@
+{
+  "sealed_at": "2026-09-17T19:13:48.328Z",
+  "sealed_at_commit": "1013abf6a74ab729bd26f876d34136cb4a9ab13b",
+  "pre_generation": true,
+  "note": "Sealed BEFORE any model generation or applicability detection ran against this family. Rule 15: author all, validate, seal, freeze, and only then let anything see it.",
+  "tasks": [
+    {
+      "task_id": "e01",
+      "task_sha": "ccc32b07ce11cb543c48e8b91057ba54906f9bac46b26d834c79b02bb185484c",
+      "source_sha": "e6e96ba527542399868a268a140c31b00d0746d588bffa62e335ff9d60ad9b98",
+      "evidence_sha": "951ed04393c9bbf46de0fb5ae984c1e0a5c364de6d8e7b3a58b81e28b4ca662a"
+    },
+    {
+      "task_id": "e02",
+      "task_sha": "4b1c62019d769e0c347894ea58b043ac5e16b8c6318a2f683379efdbce46db65",
+      "source_sha": "fa663c36bfd3826f11c446a844321789f9c0038c8c938cae4105b54b11803eb7",
+      "evidence_sha": "1f2c4ed66e0852bde4bd69a4d5a7b8aeb6dfe95b14393661f6d791fe81b6d0ef"
+    },
+    {
+      "task_id": "e03",
+      "task_sha": "b703e1d2c907dfced18f2570604eedfe584447de5787034d3db6b645c3677987",
+      "source_sha": "2ea43f4a3c1c96c2d8534a594d5277e0a72916181e24bf852b37c3b652f6f4c1",
+      "evidence_sha": "45f1925d2cdda55cc4081083d021974d64626972ad61d608e11f75f15661de42"
+    },
+    {
+      "task_id": "e04",
+      "task_sha": "772bfce3db51818c8a8c502c5bedaea659208b50e7a0d49f6da0e86310c1c9ec",
+      "source_sha": "76249277a8c1258fab70dfb6d17738707c26421ef99954cf53d2f689365a047f",
+      "evidence_sha": "5c225f2076ad4ffa796263fe7adbf88ab52ef40a304e507622e7940e0955a5c2"
+    },
+    {
+      "task_id": "e05",
+      "task_sha": "9b89b5dad94d90fa78ba2e33319d9aeae825793824aaa69ee0c0f09b9e17c46a",
+      "source_sha": "2ddea6f2730ac47323ac0f2612809024c7f5fd7d9f8d7e19797b2f04303c9a57",
+      "evidence_sha": "138854a54932da663c70a3ea85fe3d73f26261359a6efc78bcd8036cc607efd0"
+    },
+    {
+      "task_id": "e06",
+      "task_sha": "d3fc94537d510e67eaa270ce7a3d38201628606721ebcdca5338e9aa3001bf78",
+      "source_sha": "5edd4ae040f4401f4be59dd1d87c4317ebfe58367a2dc3f26719330d1b445c3b",
+      "evidence_sha": "074620f6bf5753dcb7191e05f88cc1a6e9e842583022131894b98b10cf7c5407"
+    },
+    {
+      "task_id": "f01",
+      "task_sha": "9c807c0b6863c364d9170a96e51bef6d1835ac1e87f0aeec2f9a11c2d7a51098",
+      "source_sha": "270fa5698f7872b829d28a8f6e43e4c78c0239adbac50664aa446c440cc9526d",
+      "evidence_sha": "a4f0547b662b01804c7c99356e9b3bc4e0b25a3fc81bc300c1b55c1329f8ab88"
+    },
+    {
+      "task_id": "f02",
+      "task_sha": "1fa00f2e05ee5601df574d62b950b9e1db7269293a13d337dce07fa336a60ba4",
+      "source_sha": "5b5aa0819e1a0d9c8e655dcbe5f6179df9115a784f9d7c24fe1aedc57eb2068e",
+      "evidence_sha": "f074bddb0720d6e0fcc38b2aab5e457f86d65856d1fd4d3b1c3cbfde5fe7059c"
+    },
+    {
+      "task_id": "f03",
+      "task_sha": "e7d40860ddc8ab5740eb1e3ec480221a831f588fd4a2f7225b1bb6ad66ec35bd",
+      "source_sha": "dbd1ce69b88094db81b0010375487dd72670b026a1ecc54b226f4e89ce8bb9c1",
+      "evidence_sha": "67fb3eb1fa83cab4480d737156a8c98f1ac8290e1e1dd3fab5bcc58f5f309f8a"
+    },
+    {
+      "task_id": "f04",
+      "task_sha": "4cb4fcd881fce71d58b6506cd03795156c6decfa82d3ca1caaec4a33dfa6c4a9",
+      "source_sha": "42eea64b59881168b9c53e7e8294fbf39222c0a5748c62f126afad7e6b0a8266",
+      "evidence_sha": "5f5c89fb5c088d2dc7374c4af6e690e977faa9e7b57c8407d0acc2d1c847777f"
+    },
+    {
+      "task_id": "f05",
+      "task_sha": "08af7869a9839c701346a8825769427214439b77fcd9b13963219773c614c4f1",
+      "source_sha": "187e454580097be024cf63cbc4552540201f60f0d06ae603808f7fefb2bc2a78",
+      "evidence_sha": "7f46464a5035c324840608beeae01bc3a29e42359513fe2ca6076889cce71f1c"
+    },
+    {
+      "task_id": "f06",
+      "task_sha": "f0954fdfdf6162e8a83c6c063b1fe916b3b915f9789f55f2fc552eeedd89d344",
+      "source_sha": "4e4131ed2448c4b5e3fb6e8351a0e8132b3d22cb152c193f220b11c5bb8b1277",
+      "evidence_sha": "7e8be55f0885af8b855c232db67c1d6c1eaef85b5b5f61f93ee4f5e68a776f8d"
+    }
+  ]
+}

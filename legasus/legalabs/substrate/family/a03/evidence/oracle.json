@@ -1,0 +1,80 @@
+{
+  "task_id": "a03",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing quoted column type as the relation to parallel; that type participates in the valid-type list, its own formatter, a branch of the row formatter and the label map, and the requested type occupies the same four positions",
+  "transaction": {
+    "operation_count": 4,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "admit the new type in the valid-type list",
+        "site_hint": "COLUMN_TYPES = [\"plain\", \"quoted\""
+      },
+      {
+        "id": "op2",
+        "intent": "label the new type",
+        "site_hint": "\"quoted\": \"quoted text\""
+      },
+      {
+        "id": "op3",
+        "intent": "the formatter for the new type",
+        "site_hint": "el(t):\n    return TYPE_LABELS.get(t, \"unknown\")\n"
+      },
+      {
+        "id": "op4",
+        "intent": "the branch that routes the new type to its formatter",
+        "site_hint": "out.append(_fmt_quoted(v))\n            continue\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op3",
+        "op4"
+      ],
+      [
+        "op1",
+        "op4"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3",
+        "op4"
+      ]
+    ],
+    "transaction_length": 4
+  },
+  "complexity": {
+    "structural_class": "parallel-variant-feature",
+    "affected_region_lines": 12
+  },
+  "reference": {
+    "source_hash": "8061724e7cccbf10485341c1ad902b95b605c396a015bef55585b52b09416c96",
+    "reference_hash": "cc87754b747fcda7d9ea11f336f1942bb3ac3cc9a966e26567a117fb82ed0c30",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3",
+      "op4"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

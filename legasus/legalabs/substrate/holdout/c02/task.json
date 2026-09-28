@@ -1,0 +1,13 @@
+{
+  "task_id": "c02",
+  "goal": "Add attempt tracking to the EXISTING Grades in grades.py: record_attempt(student, n) adds n attempts for a student, attempts_of(student) returns the total recorded for that student and 0 when there is none, and most_attempts() returns the student with the most attempts, or None when nothing has been recorded. Keep record, score_of and best working exactly as they do now. Run it with python.",
+  "lead": "grades.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the attempt tracking works the same way as the existing score tracking",
+  "interface": [
+    "record_attempt",
+    "attempts_of",
+    "most_attempts"
+  ]
+}

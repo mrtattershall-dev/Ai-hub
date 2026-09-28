@@ -1,0 +1,37 @@
+H-LOSS: the prospective prediction found a live unsoundness, the retrospective one explained 83% and that is the warning
+
+L-3 was the only prospective test and it fired. coordinates() projects authority coordinates with
+String(v), and a counterfactual that genuinely changes a coordinate from one non-primitive value to a
+different one is reported as NO CHANGE, yielding a support formula of CONSTANT for a coordinate
+entirely determined by the facts. CONSTANT is in the specification vocabulary, so a contract
+resolution built on it would be SCREENED rather than UNMAPPABLE - a false conviction or a false
+acquittal depending on which way the contract points. Every context dimension in the witnessed
+calculus runs holds a primitive, so the SEMANTIC-1 milestone is not contaminated; that was checked
+rather than assumed. The defect is real, latent and NOT repaired here, because L-4 forbade it.
+
+L-1 held at 83 percent, and that is the warning rather than the result. Thirty of thirty-six qualify
+on all three criteria, and the discriminating set is six. A frame that explains almost everything
+retrospectively is not thereby true, and those six entries are the only thing standing between this
+hypothesis and unfalsifiability. They earn their place by failing a named criterion: two because the
+distinction was never acquired rather than lost, and four because the distinction SURVIVED and a
+consumer simply failed to consult it, asked the wrong question, or used a different feature.
+
+L-2 WAS HALF REFUTED. The sets do not coincide, and H-LOSS reaches seventeen defects H-DEFAULT called
+NOT_AN_OMISSION. But I predicted at least one H-DEFAULT EXPLAINED entry would fail a criterion and
+ZERO did, so H-LOSS is a strict superset of H-DEFAULT on this corpus. That makes H-DEFAULT a proper
+special case rather than an independent finding, and strict superset is uncomfortably close to the
+bigger-word-for-the-same-thing the prediction was written to detect.
+
+L-4 held. No production code changed and BACKWARD_1_FROZEN.txt still verifies, so the hub run remains
+unspent and the mechanism is still the frozen one.
+
+The honest verdict is that the classification is weak evidence and the load is carried entirely by
+L-3. What the classification did establish mechanically is that the criteria were not relaxed:
+classify() refuses an entry that cannot name all three, and refuses a NOT_H_LOSS that will not say
+which criterion fails.
+
+Suite 686/686.
+
+Message-File: scratch/m107.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

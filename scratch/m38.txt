@@ -1,0 +1,17 @@
+Repair W2-d: an unmeasured behavioural metric is INCOMPARABLE, and off the Pareto frontier with a record
+
+compare() skipped any dimension either candidate lacked, so a candidate whose placementRobustness was
+never measured read as EQUIVALENT to a measured one and sat beside it on the frontier (b0673cd):
+"missing -> compatible" in the one class of dimension allowed to promote. compare() now returns
+INCOMPARABLE naming the unmeasured dimension; descriptive metrics may still be absent, because they
+cannot promote.
+
+THE FIRST FLIP OF THE REGRESSION FAILED, and the failure is kept in the test: repairing compare()
+alone left the unmeasured candidate on the frontier, because INCOMPARABLE is not DOMINATED and the
+frontier filtered on domination only. paretoFrontierReport() now excludes such candidates up front
+with a record naming the missing dimension, so absence from the frontier can be told apart from
+being beaten. Promotion already refused the case in both directions and still does.
+
+Message-File: scratch/m38.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

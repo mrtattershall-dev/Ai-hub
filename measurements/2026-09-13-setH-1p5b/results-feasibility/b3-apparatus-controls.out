@@ -1,0 +1,9 @@
+--- R with corrected anchor + strengthened probe ---
+--- R  reference control (no model): is the harness and the site ORDER sound? ---
+  goal 64  steps 7/7  intermediates [LR LR LR LR LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+  goal 74  steps 3/3  intermediates [LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+  reference control: 2/2  (harness and site order sound)
+--- STRICT preservation witnesses ---
+MUTATE_PRESERVE=3 STRICT=1: steps 3/7  intermediates [LR LR L-]  old=null  delta=null  CONTROL BROKEN: site 3 broke old behaviour: REGFAIL 'a\n\nb' -> '<p>a</p>\n<p>ZZZ b</p>' wanted '<p>a</p>\n<p>b</p>'
+MUTATE_PRESERVE=6 STRICT=1: steps 6/7  intermediates [LR LR LR LR LR L-]  old=null  delta=null  CONTROL BROKEN: site 6 broke old behaviour: REGFAIL 'a\nb' -> '<p>ZZZ a ZZZ b</p>' wanted '<p>a b</p>' | 'a\n\nb' -> '<p>ZZZ
+MUTATE_PRESERVE=3 STRICT=0: steps 7/7  intermediates [LR LR L- L- L- L- L-]  old=false  delta=false  CONTROL BROKEN: OLD BROKE: REGFAIL 'a\n\nb' -> '<p>a</p>\n<p>ZZZ b</p>' wanted '<p>a</p>\n<p>b</p>'

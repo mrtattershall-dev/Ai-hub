@@ -1,0 +1,4017 @@
+{
+ "models": [
+  "qwen2.5-coder:1.5b",
+  "qwen2.5-coder:7b",
+  "qwen2.5-coder:14b"
+ ],
+ "samples": 20,
+ "temperature": 0.6,
+ "undetermined_not_generated": "the domains intersect without containment, so the specification has not said which wins on the shared inputs; generating here would ask the model to supply an ordering the contract does not determine",
+ "cells": {
+  "qwen2.5-coder:1.5b|T_CONTAIN": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "case": "T_CONTAIN",
+   "order": [
+    "tiny",
+    "small"
+   ],
+   "orderBasis": "DERIVED",
+   "seconds": 213.449,
+   "op_yield": 0.775,
+   "assembled": 13,
+   "verified": 13,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "small": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "small": {
+       "authorized": false,
+       "reason": "not exactly one guard and one return",
+       "condition": null
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "small": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "tiny": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "small": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "small": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "small": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|T_REVERSE": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "case": "T_REVERSE",
+   "order": [
+    "tiny",
+    "small"
+   ],
+   "orderBasis": "DERIVED",
+   "seconds": 30.717,
+   "op_yield": 0.825,
+   "assembled": 13,
+   "verified": 13,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": false,
+       "reason": "not exactly one guard and one return",
+       "condition": null
+      }
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n < 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:1.5b|T_DISJOINT": {
+   "of": 20,
+   "model": "qwen2.5-coder:1.5b",
+   "case": "T_DISJOINT",
+   "order": [
+    "tiny",
+    "big"
+   ],
+   "orderBasis": "ENGINEERING_CHOICE",
+   "seconds": 28.002,
+   "op_yield": 0.9,
+   "assembled": 16,
+   "verified": 16,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": false,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": false,
+       "reason": "returned a function",
+       "condition": "n == 3"
+      }
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|T_CONTAIN": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "case": "T_CONTAIN",
+   "order": [
+    "tiny",
+    "small"
+   ],
+   "orderBasis": "DERIVED",
+   "seconds": 59.613,
+   "op_yield": 1,
+   "assembled": 20,
+   "verified": 20,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|T_REVERSE": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "case": "T_REVERSE",
+   "order": [
+    "tiny",
+    "small"
+   ],
+   "orderBasis": "DERIVED",
+   "seconds": 41.728,
+   "op_yield": 1,
+   "assembled": 20,
+   "verified": 20,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:7b|T_DISJOINT": {
+   "of": 20,
+   "model": "qwen2.5-coder:7b",
+   "case": "T_DISJOINT",
+   "order": [
+    "tiny",
+    "big"
+   ],
+   "orderBasis": "ENGINEERING_CHOICE",
+   "seconds": 47.331,
+   "op_yield": 1,
+   "assembled": 20,
+   "verified": 20,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|T_CONTAIN": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "case": "T_CONTAIN",
+   "order": [
+    "tiny",
+    "small"
+   ],
+   "orderBasis": "DERIVED",
+   "seconds": 90.888,
+   "op_yield": 1,
+   "assembled": 20,
+   "verified": 20,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      },
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "small": "if n < 10 and n != 3: return \"low\"",
+      "tiny": "if n < 0: return \"micro\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|T_REVERSE": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "case": "T_REVERSE",
+   "order": [
+    "tiny",
+    "small"
+   ],
+   "orderBasis": "DERIVED",
+   "seconds": 70.746,
+   "op_yield": 1,
+   "assembled": 20,
+   "verified": 20,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10: return \"low\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "small": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 10 and n != 3"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "small": "if n < 10 and n != 3: return \"low\""
+     }
+    }
+   ]
+  },
+  "qwen2.5-coder:14b|T_DISJOINT": {
+   "of": 20,
+   "model": "qwen2.5-coder:14b",
+   "case": "T_DISJOINT",
+   "order": [
+    "tiny",
+    "big"
+   ],
+   "orderBasis": "ENGINEERING_CHOICE",
+   "seconds": 62.564,
+   "op_yield": 1,
+   "assembled": 20,
+   "verified": 20,
+   "transaction_precision": 1,
+   "dead_ops": 0,
+   "probe_failures": 0,
+   "rows": [
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    },
+    {
+     "assembled": true,
+     "perOp": {
+      "tiny": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n < 0"
+      },
+      "big": {
+       "authorized": true,
+       "reason": null,
+       "condition": "n > 100"
+      }
+     },
+     "verified": true,
+     "dead": [],
+     "failures": [],
+     "codes": {
+      "tiny": "if n < 0: return \"micro\"",
+      "big": "if n > 100: return \"high\""
+     }
+    }
+   ]
+  }
+ }
+}

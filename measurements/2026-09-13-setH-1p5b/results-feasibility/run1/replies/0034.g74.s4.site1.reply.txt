@@ -1,0 +1,2 @@
+
+    # AT THIS POINT WRITE ONLY THIS: declare the fenced-code-block state: None when not inside a fence, otherwise the list of collected lines

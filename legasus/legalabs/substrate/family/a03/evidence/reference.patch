@@ -1,0 +1,15 @@
+--- op op1 after: "COLUMN_TYPES = [\"plain\", \"quoted\""
+, "date"
+--- op op2 after: "\"quoted\": \"quoted text\""
+, "date": "date"
+--- op op3 after: "   return TYPE_LABELS.get(t, \"unknown\")\n"
+
+
+def _fmt_date(v):
+    y, m, d = v
+    return "%04d-%02d-%02d" % (y, m, d)
+
+--- op op4 after: "nd(_fmt_quoted(v))\n            continue\n"
+        if t == "date":
+            out.append(_fmt_date(v))
+            continue

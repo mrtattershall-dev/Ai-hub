@@ -1,0 +1,25 @@
+Ledger Entry 33: two hypotheses, three prospective hits, and a descent that refutes less at every level
+
+Records both frozen experiments and, more importantly, the trend across them. H-DEFAULT covered 42
+percent with a discriminating set of 15, H-LOSS covered 83 percent with 6, H-DISTINCTION covered 97
+percent with 1. Each level down explains more and refutes less, which is the signature of a frame
+becoming unfalsifiable rather than becoming true, and the entry says plainly that reading those
+coverage numbers as confirmation would be the precise error every one of these hypotheses was
+written to detect.
+
+What paid was the prospective record, which is three of three. Each level was required to predict
+something before it was checked, each did, and each found a real live defect: delegate inheriting on
+an omitted argument and refusing on an empty object, String(v) turning a real change into a false
+CONSTANT, and a deterministic subject declared BASELINE_UNSTABLE because its output carries a freshly
+allocated Map. Zero defects were found by classification.
+
+The entry also records that L-2 was half refuted - H-LOSS is a strict superset of H-DEFAULT with zero
+H-DEFAULT-only entries - and that DX-2 survived by a single entry, W3-e, only because the locating
+rule was fixed before any defect was seen. Without it the frame would have covered 36 of 36.
+
+No invention is claimed for the distinction framing. Nothing was repaired, the freeze still verifies,
+and the hub is still unrun.
+
+Message-File: scratch/m110.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

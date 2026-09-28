@@ -1,0 +1,37 @@
+FORMATS = ["json", "csv", "tsv"]
+
+FORMAT_LABELS = {"json": "JSON", "csv": "comma separated", "tsv": "tab separated"}
+
+ALIASES = {"js": "json", "comma": "csv"}
+
+
+def _dump_json(rows):
+    return "[" + ", ".join(str(r) for r in rows) + "]"
+
+
+def _dump_csv(rows):
+    return "\n".join(",".join(str(c) for c in r) for r in rows)
+
+
+def label(f):
+    return FORMAT_LABELS.get(f, "unknown")
+
+
+def _dump_tsv(rows):
+    return "\n".join("\t".join(str(c) for c in r) for r in rows)
+
+
+def resolve_alias(a):
+    return ALIASES.get(a, a)
+
+
+def valid_formats(fs):
+    return all(f in FORMATS for f in fs)
+
+
+def dump(fmt, rows):
+    if fmt == "json":
+        return _dump_json(rows)
+    if fmt == "csv":
+        return _dump_csv(rows)
+    return ""

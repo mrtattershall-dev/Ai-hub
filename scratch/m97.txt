@@ -1,0 +1,28 @@
+Ledger Entry 30: BRIDGE-1, the 965 manufactured accusations, and the failed bridge-mutation control
+
+Records the first comparison of production behaviour against the calculus as an executable
+specification, with production not importing the calculus, both endpoints pinned by digest, and
+12,301 witnessed production calls put to the specification through its own constructors.
+
+B-6 held with zero result disagreements, and the entry states plainly that a PARTIAL relation
+licensing no verdict over 12,301 calls is correct behaviour rather than a gap.
+
+The entry's substance is the two bridge defects. A production concept the specification cannot
+represent - ANY, a wildcard the calculus context has no notion of - was silently coerced into 965
+accusations against working code, and a second gap in nested scope values accounted for the four that
+survived the first repair, two of which had identical inputs on both sides. Production was right both
+times and the specification was right both times. Stripping the unrepresentable axis was rejected
+because that would be the bridge claiming the drop is meaning-preserving.
+
+And B-4b is recorded as a FAILED prediction rather than softened. One edited line of reason
+correspondence turns a genuine reason disagreement into AGREE and nothing in the comparison can tell,
+because the bridge is the oracle for its own correctness. Provenance and pinning give attributability
+and staleness, not detection. A test asserts the failure so it cannot quietly become behaviour, and
+the two mutation modes that do work are asserted beside it.
+
+The calculus is still not wired into production, and the entry records why that independence is what
+makes agreement informative at all.
+
+Message-File: scratch/m97.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

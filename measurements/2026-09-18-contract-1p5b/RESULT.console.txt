@@ -1,0 +1,11 @@
+  RULE 3 ok: endpoint names qwen2.5-coder:1.5b
+  samples 10 per arm per case, temperature 0.6
+  leakage scan clean on both contract prompts
+
+  BASELINE  case A   conforms 3/10   parsed 10/10   distinct shapes 2
+  BASELINE  case B   conforms 2/10   parsed 10/10   distinct shapes 2
+  CONTRACT  case A   conforms 2/10   parsed 10/10   distinct shapes 2
+  CONTRACT  case B   conforms 1/10   parsed 10/10   distinct shapes 1
+
+  CASE B is the discriminating one: appending after the zero check gives case A semantics.
+  written -> measurements/2026-09-18-contract-1p5b/RESULT.json

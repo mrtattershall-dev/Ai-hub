@@ -1,0 +1,84 @@
+{
+ "baseline": {
+  "failed": 73,
+  "attempted": 182
+ },
+ "tasks": [
+  {
+   "module": "core.py",
+   "fn": "_trim_arity",
+   "line": 271,
+   "operator": "BOUNDARY_SHIFT",
+   "anchor": "    limit = 0",
+   "replacement": "    limit = 1",
+   "baselineFailed": 73,
+   "mutatedFailed": 75
+  },
+  {
+   "module": "core.py",
+   "fn": "wrapper",
+   "line": 300,
+   "operator": "BOUNDARY_SHIFT",
+   "anchor": "                    frame_summary = frames[-1]",
+   "replacement": "                    frame_summary = frames[-2]",
+   "baselineFailed": 73,
+   "mutatedFailed": 91
+  },
+  {
+   "module": "core.py",
+   "fn": "condition_as_parse_action",
+   "unscorable": true,
+   "why": "no deterministic mutation on a witnessed line was DETECTED by the independent verifier"
+  },
+  {
+   "module": "core.py",
+   "fn": "pa",
+   "unscorable": true,
+   "why": "no deterministic mutation on a witnessed line was DETECTED by the independent verifier"
+  },
+  {
+   "module": "helpers.py",
+   "fn": "counted_array",
+   "line": 87,
+   "operator": "BOUNDARY_SHIFT",
+   "anchor": "        n = t[0]",
+   "replacement": "        n = t[1]",
+   "baselineFailed": 73,
+   "mutatedFailed": 75
+  },
+  {
+   "module": "helpers.py",
+   "fn": "count_field_parse_action",
+   "line": 87,
+   "operator": "BOUNDARY_SHIFT",
+   "anchor": "        n = t[0]",
+   "replacement": "        n = t[1]",
+   "baselineFailed": 73,
+   "mutatedFailed": 75
+  },
+  {
+   "module": "util.py",
+   "fn": "_escape_regex_range_chars",
+   "unscorable": true,
+   "why": "no deterministic mutation on a witnessed line was DETECTED by the independent verifier"
+  },
+  {
+   "module": "util.py",
+   "fn": "_escape_re_range_char",
+   "unscorable": true,
+   "why": "no deterministic mutation on a witnessed line was DETECTED by the independent verifier"
+  },
+  {
+   "module": "util.py",
+   "fn": "_collapse_string_to_ranges",
+   "unscorable": true,
+   "why": "no deterministic mutation on a witnessed line was DETECTED by the independent verifier"
+  },
+  {
+   "module": "util.py",
+   "fn": "deprecate_argument",
+   "unscorable": true,
+   "why": "no deterministic mutation on a witnessed line was DETECTED by the independent verifier"
+  }
+ ]
+}

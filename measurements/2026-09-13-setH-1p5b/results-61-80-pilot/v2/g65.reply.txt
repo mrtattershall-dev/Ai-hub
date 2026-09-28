@@ -1,0 +1,97 @@
+Sure, I'll create a `s5_expr.js` file that includes the `tokenize(expr)` function as requested. This function will parse an expression into tokens based on known operators and parentheses.
+
+Here's the full file contents:
+
+```javascript
+// s5_expr.js
+
+function tokenize(expr) {
+  const tokens = [];
+  let i = 0;
+  const len = expr.length;
+
+  while (i < len) {
+    if (expr[i] === '(' || expr[i] === ')') {
+      tokens.push({ type: 'lparen', value: expr[i] });
+      i++;
+    } else if (expr[i] === ',') {
+      tokens.push({ type: 'comma', value: expr[i] });
+      i++;
+    } else if (/\d/.test(expr[i])) {
+      let number = '';
+      while (i < len && /\d/.test(expr[i])) {
+        number += expr[i];
+        i++;
+      }
+      tokens.push({ type: 'num', value: parseFloat(number) });
+    } else if (/^[+-]?[a-zA-Z_][0-9A-Za-z_$]*$/.test(expr.slice(i))) {
+      let name = '';
+      while (i < len && /^[a-zA-Z_][0-9A-Za-z_$]*$/.test(expr.slice(i))) {
+        name += expr[i];
+        i++;
+      }
+      tokens.push({ type: 'name', value: name });
+    } else if (/^[+-]?[*/]/.test(expr.slice(i))) {
+      let op = '';
+      while (i < len && /^[+-]?[*/]/.test(expr.slice(i))) {
+        op += expr[i];
+        i++;
+      }
+      tokens.push({ type: 'op', value: op });
+    } else {
+      throw new Error(`Unknown character: ${expr[i]}`);
+    }
+  }
+
+  return tokens;
+}
+
+module.exports = tokenize;
+```
+
+### Explanation:
+1. **Function Definition**: The `tokenize` function takes an expression string as input and returns an array of token objects.
+2. **Token Types**:
+   - `'num'`: Represents a numeric value.
+   - `'name'`: Represents a variable or identifier.
+   - `'op'`: Represents an operator (e.g., '+', '-', '*', '/').
+   - `'lparen'` and `'rparen'`: Represent parentheses.
+   - `'comma'`: Represents a comma.
+3. **Parsing Loop**:
+   - The function iterates through each character of the expression.
+   - It uses regular expressions to identify different types of tokens:
+     - Numbers: `/\d/`
+     - Names: `^[a-zA-Z_][0-9A-Za-z_$]*$`
+     - Operators: `^[+-]?[*/]`
+     - Parentheses and commas
+4. **Error Handling**: If the function encounters an unrecognized character, it throws an error.
+
+### Usage:
+To use this module in your Node.js application, you can do:
+
+```javascript
+const tokenize = require('./s5_expr');
+
+try {
+  const tokens = tokenize('(a + b) * c');
+  console.log(tokens);
+} catch (error) {
+  console.error(error.message);
+}
+```
+
+This will output the tokens for the given expression:
+
+```json
+[
+  { type: 'lparen', value: '(' },
+  { type: 'name', value: 'a' },
+  { type: 'op', value: '+' },
+  { type: 'name', value: 'b' },
+  { type: 'rparen', value: ')' },
+  { type: 'op', value: '*' },
+  { type: 'name', value: 'c' }
+]
+```
+
+Make sure to save the file as `s5_expr.js` and run it using Node.js.

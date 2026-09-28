@@ -1,0 +1,60 @@
+{
+  "task_id": "c01",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing active list as the relation to parallel; that feature has a declaration, a joiner, a count and a membership test, and the new feature occupies the same positions",
+  "transaction": {
+    "operation_count": 2,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the parallel list",
+        "site_hint": "        self._active = []\n"
+      },
+      {
+        "id": "op2",
+        "intent": "joiner, count and membership test for the parallel list",
+        "site_hint": "elf, name):\n        return name in self._active\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2"
+      ]
+    ],
+    "transaction_length": 2
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 13
+  },
+  "reference": {
+    "source_hash": "26223fc28ff89b3d0ef44206842ceb007470f4084e0ef770cf7a93b33c4c47c3",
+    "reference_hash": "90af544f9fe412037a7915d118c2c8521df0160f0513c3a2e2c774076ee95acd",
+    "changed_sites": [
+      "op1",
+      "op2"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

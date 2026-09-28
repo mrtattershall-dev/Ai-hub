@@ -1,0 +1,16 @@
+  i01 op1 NARROWABLE   candidates  19  passing  13  max gain 0.55 bits
+  i01 op2 independent  candidates  18  passing  18  max gain 0.00 bits
+  i02 op1 NARROWABLE   candidates  19  passing  13  max gain 0.55 bits
+  i02 op2 independent  candidates  18  passing  18  max gain 0.00 bits
+
+  ---- NARROWABILITY, proven by execution
+  operations                4
+  NARROWABLE                2   <- the v6 denominator
+  position-independent      2   0 bits is the CORRECT answer for these
+  intra-line                0   position fixed by the expression, not a line boundary
+  untestable                0   no candidate passes: instrument or probe, not program
+  mean max derivable gain   0.55 bits
+
+  per-position ground truth written to ./unresolved/GROUNDTRUTH.json
+  No planner produced any of this. It is what the program and its probes actually do,
+  so LegaCore cannot be rewarded for narrowing past it - those positions really fail.

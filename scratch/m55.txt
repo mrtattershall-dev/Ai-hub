@@ -1,0 +1,29 @@
+Run the consumption attack: all four reproduce, and Law 1 fires on the API written one commit ago
+
+Five assertions from 0018592 against d188998 unmodified, all held. The bound does not survive
+objectivesFromContest (SC-1); nextAction makes the same claim with no bound at all (SC-3); and
+evidenceFrontier's CLOSED carries none either, while its why reads as completeness over evidence
+when it means that every producer on a declared list was attempted (SC-4).
+
+SC-2 is the result. This project's own Law 1 instrument, pointed at this project's own new API:
+informationMonotonicity with the bounded verdict as the rich state and objectivesFromContest as the
+erasure reports ok false, gained the consumer that concludes no justified investigation exists, and
+the module's own words - authority was manufactured out of information loss. Non-vacuity asserted in
+the same test: that consumer is refused on the rich state and granted on an unbounded artifact, so
+the predicate is not constant. Entry 16 attached the bound to the verdict and did not follow it one
+function downstream, to the artifact PURPOSE actually consumes.
+
+SC-4 is the deeper of the two and the owner did not name it: the completeness gap Entry 16 found at
+the contest layer already exists at the frontier layer, in a requiredProducers list that
+quiesce-check writes by hand, and contestState inherits it. The frontier is a set of questions
+someone wrote down; the evidence requirement is a set someone wrote down too.
+
+SC-5 holds: no verdict changed. This is entirely a defect in what the artifacts say they establish -
+the same class as the provenance finding one commit earlier, and here the erased account is not
+inert, it is a permission the next consumer takes.
+
+Nothing is repaired in this commit.
+
+Message-File: scratch/m55.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

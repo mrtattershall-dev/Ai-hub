@@ -1,0 +1,72 @@
+{
+  "task_id": "e04",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing borrowing as the relation to parallel; that feature has a declaration, a recorder, a per-key reader and an aggregate, and the new feature occupies the same four positions",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "declare the parallel accumulator",
+        "site_hint": "        self._borrowed = {}\n"
+      },
+      {
+        "id": "op2",
+        "intent": "recorder and per-key reader for the parallel accumulator",
+        "site_hint": "e):\n        return self._borrowed.get(title, 0)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "aggregate over the parallel accumulator",
+        "site_hint": "f):\n        return sum(self._borrowed.values())\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op2"
+      ],
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 13
+  },
+  "reference": {
+    "source_hash": "4aeb9b6dd56fce01e80ef07d0a9a28c3c67161fb1ae7ae03ba7a82be39c898ea",
+    "reference_hash": "19fd1b31fe6ae10d1f4b0a2dcab86d631a10b927dd6b31fb33ca8cd823faf479",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

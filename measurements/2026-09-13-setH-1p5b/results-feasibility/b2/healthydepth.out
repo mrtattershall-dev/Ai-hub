@@ -1,0 +1,22 @@
+===== b1-run =====
+  goal 64  of 7 sites
+    depth as I reported it (loaded)   1 1 1 1 1 2 2 2    max 2
+    HEALTHY depth (load AND preserve) 1 1 1 1 1 1 1 2    max 2
+    reached full healthy depth        0/8
+  goal 74  of 3 sites
+    depth as I reported it (loaded)   0 0 0 0 0 1 1 3    max 3
+    HEALTHY depth (load AND preserve) 0 0 0 0 0 1 1 3    max 3
+    reached full healthy depth        1/8
+
+===== b2-run =====
+  goal 64  of 7 sites
+    depth as I reported it (loaded)   4 4 5 7 7 7 7 7    max 7
+    HEALTHY depth (load AND preserve) 4 4 4 5 5 5 5 7    max 7
+    reached full healthy depth        1/8
+  goal 74  of 3 sites
+    depth as I reported it (loaded)   3 3 3 3 3 3 3 3    max 3
+    HEALTHY depth (load AND preserve) 1 1 1 1 1 1 3 3    max 3
+    reached full healthy depth        2/8
+
+  The two rows differ because a preservation break does not abort the chain. Quoting the
+  first row alone would credit the apparatus with progress it did not make.

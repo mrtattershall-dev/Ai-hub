@@ -1,0 +1,13 @@
+{
+  "task_id": "g04",
+  "goal": "Add clearing and resetting to the EXISTING registry.py: clear() empties the registry and returns how many entries were removed, and reset(items) empties it and then adds each of the given items, returning the new size. Keep add and size working exactly as they do now. Run it with python.",
+  "lead": "registry.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "clearing and resetting work the same way as the existing size helper",
+  "interface": [
+    "clear",
+    "reset",
+    "items"
+  ]
+}

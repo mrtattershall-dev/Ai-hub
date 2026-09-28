@@ -1,0 +1,42 @@
+# THIS BLOCK IS AUTOMATICALLY GENERATED - DO NOT EDIT IT BY HAND.
+    # BEGIN CODE
+    codes = []
+    label, links = [], []
+    m, take_code, take_link, url = None, None, None, None
+
+    def take_code(m):
+        codes.append("<code>" + _escape(m.group(1)) + "</code>")
+        return _CODE % (len(codes) - 1)
+
+    text = re.sub(r"`([^`]*)`", take_code, text)
+
+    def take_link(m):
+        label = _escape(m.group(1))
+        url = _escape(m.group(2)).replace('"', "&quot;")
+        links.append('<a href="' + url + '">' + label + "</a>")
+        return _LINK % (len(links) - 1)
+
+    text = re.sub(r"\[([^\]]*)\]\(([^)]*)\)", take_link, text)
+
+    def url(m):
+        return _escape(m.group(0))
+
+    # END CODE
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            continue
+        if line.startswith("- "):
+            flush_para()
+            items.append(line[2:].strip())
+            continue
+        flush_list()
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())

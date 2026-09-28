@@ -1,0 +1,34 @@
+Preregister LegaScreen v2: two invariants rather than one, on a witness-mutation-invariant architecture
+
+Recorded before any code, so it cannot look like a convenient discovery later: the owner's general
+formulation - output authority must have ancestry in the inputs - does NOT catch the holdout. C2 was
+derive of an empty context with a repository context yielding that repository, and S1 is in the
+closure of the inputs because premise two established it. Nothing was minted from nothing. The
+defect is that derive is conjunctive, its own source saying the output context is the intersection,
+and it took a dimension only one premise established. So v2 implements two invariants: ancestry,
+universal, strip a dimension from every input and the output must not establish it; and weakening,
+for operations whose own documentation declares conjunctive combination, strip it from one input and
+the output must not establish it. The owner's instruction not to collapse single-edge minting and
+multi-edge laundering into one graph invariant is obeyed - the data has not earned that reduction.
+
+The architecture correction the holdout forced: pointed at calculus, the erasure probe produced
+seven positives over eight functions, nearly all because a wrong-shape call returned a plausible
+object, so the screen could not tell semantic abnormality from nonsense in and nonsense out. That is
+LegaExercise's own discipline arriving at the screening layer - witness.mjs has said since r2 that
+there is no observation without execution, and v0 and v1 ignored it. Every v2 probe now has three
+parts: an opportunity that must be a call which actually succeeds, one controlled perturbation of
+that witnessed call, and an invariant; a probe that cannot complete part one reports unscreened.
+
+Five predictions including one of NO detection, a positive control so that discarding every
+dimension cannot pass, and a specificity requirement that v2 produce fewer positives on calculus
+than the erasure probe's seven of eight or the witness requirement bought nothing.
+
+The only result worth reporting as new is the rescan. Catching C2 is a regression test with extra
+steps because C2 created the probe. The question is what it finds besides C2 across every legaknow
+module at HEAD and three historical trees, with four conditions for counting a finding as new, and
+an explicit falsification: if the rescan surfaces only C2 and artifacts, v2 is a regression test
+wearing a screen's clothes and no probe is added to chase a better result.
+
+Message-File: scratch/m73.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

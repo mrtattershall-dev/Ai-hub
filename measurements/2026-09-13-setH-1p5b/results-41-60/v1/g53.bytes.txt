@@ -1,0 +1,35 @@
+// s3_matrix.js
+
+class Matrix {
+  constructor(data) {
+    this.data = data;
+  }
+
+  static determinant(matrix) {
+    if (!matrix.every(row => row.length === matrix[0].length)) {
+      throw new Error('Matrix must be square');
+    }
+
+    const n = matrix.length;
+
+    // Base case: a 2x2 matrix
+    if (n === 2) {
+      return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+    }
+
+    let det = 0;
+    for (let i = 0; i < n; i++) {
+      const subMatrix = [];
+      for (let j = 1; j < n; j++) {
+        subMatrix.push(matrix[j].slice(0, i).concat(matrix[j].slice(i + 1)));
+      }
+      det += Math.pow(-1, i) * matrix[0][i] * Matrix.determinant(subMatrix);
+    }
+
+    return det;
+  }
+
+  // Other methods and properties can be added here
+}
+
+module.exports = Matrix;

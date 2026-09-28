@@ -1,0 +1,44 @@
+H-DEFAULT: the table did not grow, D-3 held prospectively, and D-1 did not hold
+
+The hard failure condition was not triggered. Thirty-one defects enumerated before classification,
+every one validated against the six frozen roles and six frozen laws, and classify() throws on a
+seventh - mechanically checked by tests that feed it one and require refusal. Six roles in, six out.
+
+But D-1 did not hold as stated. Thirteen of thirty-one defects, 42 percent, are wrong-role completion
+of an omitted coordinate, and nine of thirty-one on the strict reading that drops every disputable
+classification. That is not the high fraction the prediction wanted. Fifteen defects have nothing to
+do with omission at all - a readable Symbol brand, a name-keyed admission, ordering dependence, a
+referent moved by identity, a wrapper elided from a DAG. The default problem is a real class; it is
+not the class. The four disputable readings are named in the data so the strict number can be
+recomputed by anyone who disagrees.
+
+D-2 held but weakly. Four distinct confusions, so this is not one observation wearing a table, but
+nine of thirteen are the single pair EVIDENCE read as QUERY. And QUERY, GRANT and DELTA are NEVER the
+required role in this corpus, so by this project's own standard half the table is unexercised. A test
+records that so it cannot be forgotten.
+
+D-3 HELD AND IS THE RESULT WORTH HAVING. Stated before any classification and confirmed against the
+real delegate: omitting the context argument PERMITS and inherits, while passing an empty object
+REFUSES, and omitting a single dimension REFUSES. The same semantic request gets opposite answers
+depending on whether the caller omits the argument or passes an empty object, and the divergence is
+produced by a JavaScript falsiness test deciding a question about authority. The per-dimension
+refusal is deliberate and documented as the W3-c repair; the divergence between the two forms of
+omission is documented nowhere. The documented reasoning reads an empty context as every world, which
+is the QUERY completion applied to a REQUEST operand - the role confusion is visible in the prose
+that justifies the code. As predicted in advance this is not a safety defect, since refusing never
+grants more than inheriting, but an expressiveness one.
+
+D-5 held: no production code was changed. delegate behaves exactly as before, and a repair would be a
+separate slice with its own preregistration - and is not obviously wanted, since the current
+behaviour errs safe.
+
+The honest verdict is that H-DEFAULT is neither refuted nor vindicated. It survived its own failure
+condition, explains about two fifths of the corpus, and made one correct prospective prediction about
+production code nobody had encoded. That is worth keeping and not worth building a semantic substrate
+on yet.
+
+Focused 6/6. Suite 678/678.
+
+Message-File: scratch/m99.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

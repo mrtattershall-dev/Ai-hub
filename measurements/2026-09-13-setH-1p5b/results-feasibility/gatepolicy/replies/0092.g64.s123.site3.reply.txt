@@ -1,0 +1,66 @@
+# The following is the new code for ordered lists:
+            flush_ordered_list()
+        elif line.startswith("1. "):
+            flush_para()  # Ensure any previous paragraph is flushed
+            ordered_items.append(line[3:].strip())
+            continue
+        elif line.strip().endswith("."):
+            if items:  # Close an open unordered list if present
+                flush_list()
+            flush_ordered_list()  # Close an open ordered list if present
+            blocks.append("<p>" + _inline(line.strip()) + "</p>")
+            current.clear()  # Clear the paragraph content
+            continue
+        elif line.startswith("1. ") and current:  # Flush previous paragraph before starting a new one
+            flush_para()
+            items.clear()  # Clear any unordered list items
+            ordered_items.append(line[3:].strip())
+            continue
+        elif line.strip().endswith("."):
+            if items:  # Close an open unordered list if present
+                flush_list()
+            flush_ordered_list()  # Close an open ordered list if present
+            blocks.append("<p>" + _inline(line.strip()) + "</p>")
+            current.clear()  # Clear the paragraph content
+            continue
+        elif line.startswith("1. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        elif line.strip().endswith("."):
+            if items:  # Close an open unordered list if present
+                flush_list()
+            flush_ordered_list()  # Close an open ordered list if present
+            blocks.append("<p>" + _inline(line.strip()) + "</p>")
+            current.clear()  # Clear the paragraph content
+            continue
+        elif line.startswith("1. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        elif line.strip().endswith("."):
+            if items:  # Close an open unordered list if present
+                flush_list()
+            flush_ordered_list()  # Close an open ordered list if present
+            blocks.append("<p>" + _inline(line.strip()) + "</p>")
+            current.clear()  # Clear the paragraph content
+            continue
+        elif line.startswith("1. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        elif line.strip().endswith("."):
+            if items:  # Close an open unordered list if present
+                flush_list()
+            flush_ordered_list()  # Close an open ordered list if present
+            blocks.append("<p>" + _inline(line.strip()) + "</p>")
+            current.clear()  # Clear the paragraph content
+            continue
+        elif line.startswith("1. "):
+            flush_para()
+            ordered_items.append(line[3:].strip())
+            continue
+        elif line.strip().endswith("."):
+            if items:  # Close an open unordered list if present
+                flush_list()
+            flush_ordered_list()  #

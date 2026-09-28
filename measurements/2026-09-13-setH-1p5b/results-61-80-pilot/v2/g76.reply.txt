@@ -1,0 +1,17 @@
+):
+        seen = set()
+        out = []
+        for n in self._adj:
+            if n not in seen:
+                self.dfs(n, seen, out)
+        return out
+
+    def dfs(self, n, seen, out):
+        if n not in self._adj:
+            raise KeyError(n)
+        if n in seen:
+            return
+        seen.add(n)
+        out.append(n)
+        for nxt in sorted(self._adj[n].items()):
+            self.dfs(nxt[0], seen, out)

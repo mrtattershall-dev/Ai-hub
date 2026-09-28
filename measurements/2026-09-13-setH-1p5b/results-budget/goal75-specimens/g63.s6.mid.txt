@@ -1,0 +1,18 @@
+eps = 1e-9) {
+    const [r, c] = this.shape();
+    if (r !== c) throw new Error('not square');
+    const a = this.rows.map((row) => row.slice());
+    const det = this.determinant();
+    if (Math.abs(det) < eps) return null;
+    const inv = [];
+    for (let i = 0; i < r; i++) {
+      const row = new Array(c).fill(0);
+      for (let j = 0; j < c; j++) {
+        let s = 0;
+        for (let k = 0; k < r; k++) s += a[k][j] * inv[k][i];
+        row[j] = s / det;
+      }
+      inv.push(row);
+    }
+    return new Matrix(inv);
+  }

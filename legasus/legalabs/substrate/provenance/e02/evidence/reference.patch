@@ -1,0 +1,15 @@
+--- op op1 after: "        self._names = []\n"
+        self._roles = []
+
+--- op op2 after: "(self):\n        return len(self._names)\n"
+
+    def add_role(self, role):
+        self._roles.append(role)
+
+    def role_count(self):
+        return len(self._roles)
+
+--- op op3 after: "name):\n        self._names.append(name)\n"
+
+    def has_role(self, role):
+        return role in self._roles

@@ -1,0 +1,11 @@
+{
+  "task_id": "e01",
+  "goal": "Add a rect kind to the EXISTING shapes.py: a rect carries w and h, and its area is w times h, using 0 when either is missing. The kind must be accepted by valid_kinds, computed by area, and described as \"four right angles\" by describe. The circle and square kinds must keep working exactly as they do now. Run it with python.",
+  "lead": "shapes.py",
+  "language": "py",
+  "run_with": "python",
+  "analogy": "the rect kind is written the same way as the existing square kind",
+  "interface": [
+    "rect"
+  ]
+}

@@ -1,0 +1,20 @@
+def split_tokens(text):
+    out = []
+    held = None
+    for raw in str(text).split(" "):
+        piece = raw.strip()
+        if not piece:
+            continue
+        if held is not None:
+            held.append(piece)
+            if piece.endswith('"'):
+                out.append(" ".join(held).strip('"'))
+                held = None
+            continue
+        if piece.startswith('"') and not piece.endswith('"'):
+            held = [piece]
+            continue
+        out.append(piece)
+    if held is not None:
+        out.append(" ".join(held).strip('"'))
+    return out

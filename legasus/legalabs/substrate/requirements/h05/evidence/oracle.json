@@ -1,0 +1,72 @@
+{
+  "task_id": "h05",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing settings declaration as the relation to parallel; that feature is a module-level mapping read by an accessor, and the new groups occupy the same position over the same mapping",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the first supplying helper",
+        "site_hint": "CONFIG = {\"a\": 1}\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the second supplying helper",
+        "site_hint": "def get(k):\n    return CONFIG.get(k)\n"
+      },
+      {
+        "id": "op3",
+        "intent": "a bare statement merging BOTH, providing nothing itself",
+        "site_hint": "def names():\n    return sorted(CONFIG)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op3"
+      ],
+      [
+        "op2",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-state-feature",
+    "affected_region_lines": 15
+  },
+  "reference": {
+    "source_hash": "538d271884702b66e1ab2290d793ae4673061b5b5b824a67057f925fd020b622",
+    "reference_hash": "cffc7c338d8001aa77fe547d681dcc67fd1b2723ba4d8cbd23899ca18fc9da82",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

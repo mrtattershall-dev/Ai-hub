@@ -1,0 +1,11 @@
+--- op op1 after: "        self._items = []\n"
+        self._marks = []
+
+--- op op2 after: "(self):\n        return len(self._items)\n"
+
+    def snapshot(self):
+        self._marks.append(list(self._items))
+
+    def undo(self):
+        if self._marks:
+            self._items = self._marks.pop()

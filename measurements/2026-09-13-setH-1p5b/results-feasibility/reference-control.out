@@ -1,0 +1,14 @@
+  BEHAVIOUR-LOCALIZATION FEASIBILITY   (development goals only; NOT v4)
+  model qwen2.5-coder:1.5b   goals [64,74]   seeds [1,2,3,4,5,6,7,8]   conditions [R]
+  A num_predict 1800   B num_predict 600   out C:\Users\tatte\AppData\Local\Temp\feas-y3WtAT
+
+--- R  reference control (no model): is the harness and the site ORDER sound? ---
+  goal 64  steps 7/7  intermediates [LR LR LR LR LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+  goal 74  steps 3/3  intermediates [LR LR LR]  old=true  delta=true  REFERENCE VERIFIED
+
+===== FEASIBILITY SUMMARY =====
+
+  reference control: 2/2  (harness and site order sound)
+  rollbacks byte-exact: 0/0
+
+  RAW = C:\Users\tatte\AppData\Local\Temp\feas-y3WtAT

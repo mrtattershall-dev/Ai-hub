@@ -1,0 +1,16 @@
+--- op op1 after: "# Colour helpers.\n"
+
+_NAMED = {}
+
+--- op op2 after: "+ rgb[1] * 587 + rgb[2] * 114) / 1000.0\n"
+
+
+def name_color(name, h):
+    _NAMED[name] = h
+    return h
+
+--- op op3 after: ":\n    return luminance(to_rgb(h)) < 128\n"
+
+
+def lookup(name):
+    return _NAMED.get(name)

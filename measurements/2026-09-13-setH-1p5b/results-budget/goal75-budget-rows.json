@@ -1,0 +1,58 @@
+[
+  {
+    "seed": 2,
+    "npred": 600,
+    "bytes": 2010,
+    "eval_count": 600,
+    "done_reason": "length",
+    "hit_cap": true,
+    "tail": ";\\n      v = op === '+' ? v + r : v - r;\\n    }\\n    return v;\\n",
+    "loads_before_repair": false,
+    "contract_before_repair": "load_error",
+    "repair": "no deterministic route (load_error)",
+    "contract_after_repair": "load_error",
+    "final": false
+  },
+  {
+    "seed": 2,
+    "npred": 900,
+    "bytes": 2113,
+    "eval_count": 629,
+    "done_reason": "stop",
+    "hit_cap": false,
+    "tail": "== toks.length) throw bad('cannot parse');\\n  return value;\\n}",
+    "loads_before_repair": true,
+    "contract_before_repair": "missing_export",
+    "repair": "merged toRPN into the existing module.exports object literal",
+    "contract_after_repair": "PASS",
+    "final": true
+  },
+  {
+    "seed": 4,
+    "npred": 600,
+    "bytes": 2012,
+    "eval_count": 600,
+    "done_reason": "length",
+    "hit_cap": true,
+    "tail": "plicative();\\n      v = op === '+' ? v + r : v - r;\\n    }\\n   ",
+    "loads_before_repair": false,
+    "contract_before_repair": "load_error",
+    "repair": "no deterministic route (load_error)",
+    "contract_after_repair": "load_error",
+    "final": false
+  },
+  {
+    "seed": 4,
+    "npred": 900,
+    "bytes": 2126,
+    "eval_count": 632,
+    "done_reason": "stop",
+    "hit_cap": false,
+    "tail": "== toks.length) throw bad('cannot parse');\\n  return value;\\n}",
+    "loads_before_repair": true,
+    "contract_before_repair": "missing_export",
+    "repair": "merged toRPN into the existing module.exports object literal",
+    "contract_after_repair": "PASS",
+    "final": true
+  }
+]

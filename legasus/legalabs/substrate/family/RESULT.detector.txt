@@ -1,0 +1,20 @@
+  seal: INTACT
+
+  a01  truth=applicable   ABSTAIN     target=null        no feature group could be resolved in the source, so the named relation has no referent
+  a02  truth=applicable   ABSTAIN     target=null        no feature group could be resolved in the source, so the named relation has no referent
+  a03  truth=applicable   ABSTAIN     target=valid_types no feature group could be resolved in the source, so the named relation has no referent
+  b01  truth=no-analogue  ABSTAIN     target=null        the task names no relation to an existing feature
+  b02  truth=no-analogue  ABSTAIN     target=parse_configthe task names no relation to an existing feature
+  b03  truth=no-analogue  ABSTAIN     target=tokens      the task names no relation to an existing feature
+
+===== APPLICABILITY =====
+  true-apply   0/3   (tasks that DO possess the supported relation)
+  false-apply  0/3   (tasks that do NOT - goal 74 failure mode)
+  abstention   6/6
+
+===== SITE QUALITY, conditional on APPLY =====
+  undefined - the detector applied to nothing, so this has NO SENSITIVITY
+
+===== SYSTEM COVERAGE =====
+  applies AND returns an acceptable site set:  0/6
+  (the guard against a detector that earns precision by refusing nearly everything)

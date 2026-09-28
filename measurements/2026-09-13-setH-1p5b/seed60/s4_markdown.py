@@ -1,0 +1,108 @@
+# CANONICAL REFERENCE - cumulative correct state after setH goals 1-60 for this file.
+# Goals 61+ are HELD OUT and deliberately not implemented.
+#
+#   goal  4  blank-line blocks -> <p>, inner lines joined with one space, & < > escaped
+#   goal 14  1-3 '#' + space -> <h1>/<h2>/<h3>, always its own block
+#   goal 24  **strong** and *em*; unpaired markers stay literal
+#   goal 34  `code` -> <code>, escaped, and * inside it is not emphasis
+#   goal 44  [text](url) -> <a href="url">text</a>, a double quote in the url as &quot;
+#   goal 54  consecutive "- " lines -> <ul><li>..</li>..</ul> on ONE line, items get inline
+#            formatting like a paragraph
+#
+# CROSS-GOAL NOTE: 34, 44 and 54 all interact inside _inline. Code spans are extracted FIRST so
+# neither emphasis nor link syntax can reach inside them; links are extracted BEFORE escaping so the
+# url can be escaped on its own terms; and list items run the same _inline as a paragraph, so a list
+# item containing a link or code behaves identically to one in a paragraph.
+import re
+
+_CODE = "\x00CODE%d\x00"
+_LINK = "\x00LINK%d\x00"
+
+
+def _escape(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _inline(text):
+    codes = []
+    links = []
+
+    def take_code(m):
+        codes.append("<code>" + _escape(m.group(1)) + "</code>")
+        return _CODE % (len(codes) - 1)
+
+    text = re.sub(r"`([^`]*)`", take_code, text)
+
+    def take_link(m):
+        label = _escape(m.group(1))
+        url = _escape(m.group(2)).replace('"', "&quot;")
+        links.append('<a href="' + url + '">' + label + "</a>")
+        return _LINK % (len(links) - 1)
+
+    text = re.sub(r"\[([^\]]*)\]\(([^)]*)\)", take_link, text)
+
+    text = _escape(text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
+    text = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<em>\1</em>", text)
+
+    for i, c in enumerate(codes):
+        text = text.replace(_CODE % i, c)
+    for i, a in enumerate(links):
+        text = text.replace(_LINK % i, a)
+    return text
+
+
+def _is_heading(line):
+    m = re.match(r"^(#{1,3}) (.*)$", line)
+    return (len(m.group(1)), m.group(2)) if m else None
+
+
+def to_html(text):
+    blocks = []
+    current = []
+    items = []
+
+    def flush_para():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            continue
+        if line.startswith("- "):
+            flush_para()
+            items.append(line[2:].strip())
+            continue
+        flush_list()
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html("- **b** item") == "<ul><li><strong>b</strong> item</li></ul>"
+    print("ok")

@@ -1,0 +1,47 @@
+QUIESCE CHECK: do not quiesce - and the check found that admitDimension has no production consumer
+
+Entry 8 ended with "is there a justified operation whose outcome could change entitlement?" That had to be
+answered by running the architecture's own stopping law on the architecture's own ledger, not by deciding
+and then writing prose that agrees. benchmarks/quiesce-check.mjs runs, prints its evidence before its
+verdict, and tags every one of law 7's four conditions MEASURED or DECLARED - because a boolean I assert
+is my judgment wearing a machine's clothes. The value is not that it computes the answer. It is that
+canChangeEntitlement becomes unskippable and a declared condition is visibly declared.
+
+VERDICT: OPEN_CONTEST. 1 of 4 open questions is justified, so stopping here would be STALLING, which is a
+different thing and must not be reported as quiescence.
+
+THREE ARE BLOCKED AND NOT ONE IS BLOCKED BY LACK OF AUTHORITY.
+
+  POSIX_FORK_INHERITANCE          the PLATFORM. MEASURED: hasattr(os,"fork") is False on win32.
+  REPOC_UNRESOLVED_ATTRIBUTION    INFORMATION DESTROYED IN THE PAST. MEASURED: external.json records carry
+                                  exactly {module, outcome, source}; 3 keys hold CONFLICTING outcomes and
+                                  NO coordinate distinguishes them. A fresh run yields observations with
+                                  NOTHING TO JOIN ON - it would not resolve the old case, it would
+                                  silently REPLACE it. 49 / 7 / 1 is PERMANENT, not pending. Law 1 from
+                                  the other side: information destroyed in the past cannot be restored by
+                                  authority in the present.
+  REPO_D_PROSPECTIVE_VALIDATION   SEQUENCING under the frozen burn rule. Lifts when r4 STOPS CHANGING.
+
+APPARATUS CORRECTION, recorded rather than quietly fixed. Measurement 3 first looked for SCOPE_DIMENSIONS
+in admissibility.mjs and printed "NOT FOUND" - true and useless. The dimensions live in justification.mjs;
+admissibility.mjs holds the GATE deciding whether a new one may exist. Repointed.
+
+AND THE CORRECTED MEASUREMENT FOUND A DEFECT THE HYPOTHESIS HAD NOT PREDICTED:
+
+    declared scope dimensions                 repository, environment, history, criterion, invocation,
+                                              implementation   (6, a CLOSED set)
+    production modules using admitDimension   NONE - imported only by its own test
+
+scope(), covers() and joinConflicts() all iterate the module constant DIMENSIONS. admitDimension - the
+gate built to adjudicate whether a NEW coordinate may exist, carrying the entire anti-overfitting argument
+- HAS NO PRODUCTION CONSUMER. The set is closed in practice however the gate rules. THE DECIDING PATH AND
+THE ADVISORY PATH ARE NOT THE SAME PATH, a defect class this project has paid for before, now found inside
+Legasus's own authority core.
+
+So the producer #2 repair may have MOVED the failure rather than removed it: a coordinate the producer
+cannot establish is now absent instead of invented, but a coordinate the producer CAN establish and
+Legasus has no name for still has nowhere to go and no path to earn a name.
+
+Message-File: scratch/m17.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

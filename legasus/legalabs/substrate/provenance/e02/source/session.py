@@ -1,0 +1,19 @@
+class Session:
+    def __init__(self):
+        self._hits = {}
+        self._names = []
+
+    def record_hit(self, page):
+        self._hits[page] = self._hits.get(page, 0) + 1
+
+    def hit_count(self, page):
+        return self._hits.get(page, 0)
+
+    def total_hits(self):
+        return sum(self._hits.values())
+
+    def add_name(self, name):
+        self._names.append(name)
+
+    def name_count(self):
+        return len(self._names)

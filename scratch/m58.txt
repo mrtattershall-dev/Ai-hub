@@ -1,0 +1,31 @@
+Preregister the attainment hierarchy and the question of whether mechanizing an instance mechanizes its class
+
+Two questions from the owner's review of Entry 17. First, the four levels - no current objective,
+frontier exhausted, named coverage exhausted, complete - and the claim that a system must say which
+one it has earned. Legasus reports QUIESCENT_CONTEST, which is level 1, and is silent about 2 and 3.
+Predicted: level 2 is NOT earned, because of the eight represented investigations exactly one,
+INSTRUMENT_CLASSES_FOR_THE_RIGS, is UNKNOWN-classed and so is neither resolved nor blocked; level 3
+is not earned either, for the independently recorded reason that instruments.mjs reports the rigs'
+classes as UNKNOWN and level 3 requires established coverage; and level 4 must be refused rather than
+computed, because no important failure exists anywhere is not a proposition this system can hold.
+Two controls: a hypothetical fully blocked frontier must earn level 2, and attainment must change no
+verdict.
+
+Second, the session's own counterexample to the compounding thesis. C4 - a coordinate acquiring a
+declared dimension's authority because two strings matched - was repaired at a31046c, and four
+commits later the C8 repair exported CONTESTED from provenance.mjs, colliding with the ledger's
+STATE.CONTESTED whose meaning carries an obligation, and the obligation traveled. The reason is
+visible in the repair: C4's guard is producer-keyed promotion inside one module. It guards a
+mechanism, not a class, and the ledger called it a class anyway.
+
+Measured: 97 exported state words across legaknow, 7 owned by more than one module. The demonstrated
+true positive to be proven by reconstruction rather than argued: adding CONTESTED back makes it the
+8th, so a frozen inventory would have fired at the moment the defect was introduced. And the honest
+limit: none of the 7 standing collisions is a demonstrated defect, what made CONTESTED dangerous was
+that the word carried an obligation, and which words carry obligations is not mechanically derivable
+- the same hand-authored boundary instruments.mjs already records. The guard surfaces a new collision
+for argument and classifies nothing.
+
+Message-File: scratch/m58.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

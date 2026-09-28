@@ -1,0 +1,30 @@
+Entry 24: lineage closes the renamed-coordinate blind spot, generalizes C2, and meets the architecture's own unforgeability
+
+v2 was frozen first, in its own commit, with its five measured blind spots written down before
+anything that might make it look broader in retrospect.
+
+Support is now discovered by execution rather than by matching names, which closes the
+derived-by-another-name blind spot for the adapter case: producer and version support the criterion,
+document and ordinal support the history, with no name matching anywhere. And aggregation turns out
+to be observable by the same means, so C2 becomes a mismatch between observed and declared
+aggregation - the earlier weakening invariant needed a human to encode that derive is conjunctive,
+and this needs only the operation's own contract.
+
+The entry's finding is that the same measurement is impossible at HEAD. The perturbation builds a
+modified copy of a token, and since the C3 repair a token is branded by WeakSet membership, so a
+copy is not an authority token and derive correctly refuses it - verified at both commits rather
+than inferred. The architecture's own unforgeability defeats external perturbation: the repair made
+tokens harder to forge and by the same property harder to screen. Found by the screen failing rather
+than by anyone reasoning about it, and the fix is named rather than built.
+
+Three defects in the probe, each found by running it. A refused input read as a dependency,
+producing a confident aggregation where nothing had been observed. UNSUPPORTED and ANY_OF conflated,
+which are opposite findings. And could-not-measure sharing one representation with was-removed - the
+oldest defect class in this project, UNKNOWN collapsing into a value, committed inside the layer
+built to detect it. That third one is the most instructive thing in the entry: the layer whose
+purpose is to notice information loss lost that very distinction in its own return value, at the
+first attempt.
+
+Message-File: scratch/m79.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -1,0 +1,29 @@
+Entry 19: the ledger's own vocabulary was overclaiming, and the compounding thesis is narrowed to what survived
+
+This ledger has been writing mechanized for a demonstrated region and reading it as a covered class.
+That is how C4 got four commits of cover, and at scale it is how a catalogue of named failures reads
+as a guarantee. The three claims are now representable, and the first thing represented was this
+project's own case: C4 earns MECHANIZED_REGION at two of two observed incidents, with the ratio
+printed beside the verdict rather than as it, because known incidents are a sample.
+
+The fact that hid the overclaim is that the two detectors are disjoint. The inventory guard cannot
+see the original C4 at all, since collectionCohort was a runtime data key and not an exported state
+word - measured rather than assumed. So the pattern is covered only as a union of disjoint regions,
+which is not a claim about the pattern. And the distance from introducing the CONTESTED defect to
+recording it was twenty commits containing seven passing full suites, which is the 452/452 shape at
+small scale.
+
+The compounding thesis is restated at the strength that survived: not that every failure makes the
+system unable to repeat it, which this session falsified in four commits, but that every discovery
+should leave behind reusable protection whose exact coverage is known, so repetitions inside that
+coverage become cheaper. For C4 the answer is honestly mixed - the first repair did not cover the
+provenance route, the accumulated machinery did make the recurrence recognizable, and there is now a
+detector that would have surfaced that specific cross-module form at introduction.
+
+One data point is reported as one data point. The owner named a family of long-run metrics and no
+framework is built over n equals one, which would be the budget-becomes-entitlement error in a new
+costume. History is not rewritten; entries 15 to 18 keep the word they used.
+
+Message-File: scratch/m63.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

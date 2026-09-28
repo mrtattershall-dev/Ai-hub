@@ -1,0 +1,68 @@
+{
+  "task_id": "g02",
+  "analogy_class": "analogy_specified",
+  "analogy_justification": "the task names the existing centimetre helpers as the relation to parallel; that feature has a forward conversion, a reverse conversion and a rounded form, and the new feature occupies the same three positions",
+  "transaction": {
+    "operation_count": 3,
+    "operations": [
+      {
+        "id": "op1",
+        "intent": "the forward conversion",
+        "site_hint": "def to_cm(inches):\n    return inches * 2.54\n"
+      },
+      {
+        "id": "op2",
+        "intent": "the reverse conversion",
+        "site_hint": "def to_inches(cm):\n    return cm / 2.54\n"
+      },
+      {
+        "id": "op3",
+        "intent": "the rounded form",
+        "site_hint": "_cm(inches):\n    return round(to_cm(inches), 1)\n"
+      }
+    ],
+    "dependency_edges": [
+      [
+        "op1",
+        "op3"
+      ]
+    ],
+    "permitted_orders": [
+      [
+        "op1",
+        "op2",
+        "op3"
+      ]
+    ],
+    "transaction_length": 3
+  },
+  "complexity": {
+    "structural_class": "parallel-variant-feature",
+    "affected_region_lines": 15
+  },
+  "reference": {
+    "source_hash": "3e9a4cabe882b5c3d9dcef281b44a2a15973d832748852385274a98342f1284c",
+    "reference_hash": "7d3ed91a405ed295e2119bf19fce3f9867fc46cf64b5e2acf1c7a69d0e97dfa6",
+    "changed_sites": [
+      "op1",
+      "op2",
+      "op3"
+    ],
+    "implementation": "reference.patch"
+  },
+  "witnesses": {
+    "noop_fails_delta": true,
+    "each_operation_omitted_fails_delta": [
+      true,
+      true,
+      true
+    ],
+    "reference_preserves_old_behavior": true,
+    "reference_passes_delta": true
+  },
+  "sealing": {
+    "authored_commit": null,
+    "evidence_commit": null,
+    "pre_generation": true
+  }
+}

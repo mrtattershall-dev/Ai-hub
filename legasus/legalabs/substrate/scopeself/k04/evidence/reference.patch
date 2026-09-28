@@ -1,0 +1,9 @@
+--- op op1 after: "STEP = 4\n"
+
+DOUBLE = STEP * 2
+
+--- op op2 after: "def step():\n    return STEP\n"
+
+
+def doubled():
+    return DOUBLE

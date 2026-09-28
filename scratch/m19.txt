@@ -1,0 +1,46 @@
+producer #3 (pytest) pre-repair: the closed dimension set does not merely DROP a coordinate, it ADMITS A CONTRADICTION
+
+SELECTION, applying the rule frozen in 0baca08. The replacement ordering criterion DID discriminate where
+P2's saturated - foreign-coordinate counts spread 2 / 1 / 0 across seven eligible candidates - but three
+tied at the top (pytest, timeit, trace), the first tiebreak (axes differing from GIT) saturated at 7 again,
+and THE LEXICOGRAPHIC TIEBREAK DECIDED A SECOND TIME. Recorded, not smoothed: the rule is better than P2's
+and still does not finish the job. sqlite3 scored 2 foreign coordinates and was refused by eligibility -
+not a fact Legasus has reason to consume - which is the filter doing real work.
+
+SELECTED: pytest. Foreign coordinates collectionCohort and pluginSet.
+
+P3-1 IS NOT A LABEL I INVENTED, IT IS EXECUTED. A module-scoped fixture, two tests:
+
+    pytest test_cohort.py::test_b            test_b PASSED
+    pytest test_cohort.py                    test_b FAILED
+
+Same nodeid, same file bytes, same interpreter, same criterion. The only thing that changed is WHICH OTHER
+TESTS WERE COLLECTED - a set that test_b is not the only member of, and that none of repository /
+environment / history / criterion / invocation / implementation names.
+
+P3-2 HELD AS PREDICTED: scope() silently drops collectionCohort and pluginSet. No error, no record, no
+UNKNOWN. P3-5, the non-vacuity control, confirms a declared coordinate survives intact, so "dropped" is
+falsifiable rather than free.
+
+P3-3 HELD, AND BY EXECUTION RATHER THAN BY GREPPING IMPORTERS - a gate can have a consumer that never
+runs. admitDimension is ASKED about collectionCohort with a specification-argued relevance and ANSWERS
+admitted:true. scope() drops it anyway. THE DECIDING PATH AND THE ADVISORY PATH ARE NOT THE SAME PATH.
+
+AND THE DISCOVERY, WHICH THE PREREGISTRATION DID NOT PREDICT AND WHICH IS THEREFORE NOT COUNTED AS A
+CONFIRMED PREDICTION. Adapt both records and compare them:
+
+    native results     PASSED  vs  FAILED
+    scopes             IDENTICAL on all six dimensions
+    joinConflicts      []          - the join gate sees NO conflict
+    covers             ok: true    - each covers the other
+
+The closed dimension set does not merely lose information. IT REPORTS TWO CONTRADICTORY CLAIMS AS
+COMPARABLE, and would let them compose. A dropped coordinate is a gap; this is a gap that manufactures
+agreement. P3-9 keeps its frozen POST-REPAIR meaning and is not claimed here.
+
+Committed BEFORE any repair, so the pre-repair state is on the record independently of what the repair
+turns out to be. 8 predictions run against the EXISTING boundary, 8 pass; doctest and git unchanged.
+
+Message-File: scratch/m19.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

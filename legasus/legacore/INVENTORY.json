@@ -1,0 +1,433 @@
+{
+ "generated_for": "GATE 1",
+ "semantic_classes": {
+  "ownership_boundary": {
+   "layer": "LegaCore",
+   "supported": true,
+   "prospective": "generalization family (g01 positive, g02 negative), both halves passed",
+   "development": "provenance family, 23 of 26 operations",
+   "gaps": [
+    "sound only RELATIVE to a correct parentRange, which it trusts as an input"
+   ],
+   "synthetic_witnesses": [],
+   "positive_control": [
+    "generalization/g01"
+   ],
+   "negative_control": [
+    "generalization/g02"
+   ],
+   "other_controls": [],
+   "emitted_on": {
+    "provenance": {
+     "e01": 10,
+     "e02": 15,
+     "e03": 5,
+     "e04": 11,
+     "e05": 15,
+     "e06": 11,
+     "f01": 9,
+     "f02": 7,
+     "f03": 27,
+     "f04": 15,
+     "f05": 13,
+     "f06": 21
+    },
+    "generalization": {
+     "g01": 15,
+     "g02": 15,
+     "g03": 6,
+     "g04": 9,
+     "g05": 10,
+     "g06": 15
+    },
+    "requirements": {
+     "h01": 3,
+     "h02": 6,
+     "h03": 12,
+     "h04": 9,
+     "h05": 10,
+     "h06": 7,
+     "h07": 7,
+     "h08": 7
+    },
+    "unresolved": {
+     "i01": 5,
+     "i02": 5
+    }
+   },
+   "narrowed_on": {
+    "provenance": {
+     "e01": 1,
+     "e02": 2,
+     "e03": 1,
+     "e04": 2,
+     "e05": 2,
+     "e06": 1,
+     "f01": 1,
+     "f02": 1,
+     "f03": 3,
+     "f04": 4,
+     "f05": 5,
+     "f06": 3
+    },
+    "generalization": {
+     "g01": 4,
+     "g03": 1,
+     "g04": 4
+    }
+   },
+   "has_positive_control": true,
+   "has_negative_control": true,
+   "ever_emitted": true,
+   "narrowing_expected": true
+  },
+  "control_flow_boundary": {
+   "layer": "LegaCore",
+   "supported": true,
+   "prospective": "generalization family (g03 positive, g04 negative), both halves passed",
+   "development": "provenance family, 3 of 26 operations",
+   "gaps": [
+    "under-narrows on magnitude: g03 op1 recovered 0.58 of 1.58 bits",
+    "the residual on g03 op1 is GUARD PRECEDENCE, which is semantic intent and NOT this rule"
+   ],
+   "synthetic_witnesses": [],
+   "positive_control": [
+    "generalization/g03"
+   ],
+   "negative_control": [
+    "generalization/g04"
+   ],
+   "other_controls": [],
+   "emitted_on": {
+    "provenance": {
+     "e01": 1,
+     "e06": 1,
+     "f01": 1
+    },
+    "generalization": {
+     "g03": 1
+    }
+   },
+   "narrowed_on": {
+    "provenance": {
+     "e01": 1,
+     "e06": 1,
+     "f01": 1
+    },
+    "generalization": {
+     "g03": 1
+    }
+   },
+   "has_positive_control": true,
+   "has_negative_control": true,
+   "ever_emitted": true,
+   "narrowing_expected": true
+  },
+  "symbol_availability": {
+   "layer": "LegaCore",
+   "supported": true,
+   "prospective": "requirements family, five case types passed (h01 h02 h03 h04 h05 h06)",
+   "development": "generalization family g05; revision 2 fixed an off-by-one and a missing direction",
+   "gaps": [
+    "providers reachable only through an import are UNRESOLVED by design"
+   ],
+   "synthetic_witnesses": [
+    "legasus/legacore/opfacts.test.mjs"
+   ],
+   "positive_control": [
+    "generalization/g05",
+    "requirements/h01 [provider -> IMMEDIATE consumer]",
+    "requirements/h03 [definition-time requirement]",
+    "requirements/h05 [bare statement, TWO providers]",
+    "requirements/h06 [EXISTING vs PLANNED provider]"
+   ],
+   "negative_control": [
+    "generalization/g06",
+    "requirements/h02 [provider -> DEFERRED body consumer]",
+    "requirements/h04 [same shape, body reference]"
+   ],
+   "other_controls": [
+    "requirements/h07 [requirement the rule cannot resolve]",
+    "requirements/h08 [the same shape, fully resolvable]",
+    "unresolved/i01 [provider arrives by import]",
+    "unresolved/i02 [provider is a module constant]"
+   ],
+   "emitted_on": {
+    "provenance": {
+     "e01": 1,
+     "e06": 1,
+     "f01": 1
+    },
+    "generalization": {
+     "g05": 3
+    },
+    "requirements": {
+     "h01": 2,
+     "h03": 3,
+     "h05": 5,
+     "h06": 3,
+     "h07": 2,
+     "h08": 3
+    },
+    "unresolved": {
+     "i02": 1
+    }
+   },
+   "narrowed_on": {
+    "generalization": {
+     "g05": 2
+    },
+    "requirements": {
+     "h01": 2,
+     "h03": 3,
+     "h05": 5,
+     "h06": 3,
+     "h07": 2,
+     "h08": 2
+    },
+    "unresolved": {
+     "i02": 1
+    }
+   },
+   "has_positive_control": true,
+   "has_negative_control": true,
+   "ever_emitted": true,
+   "narrowing_expected": true
+  },
+  "deferred_requirement": {
+   "layer": "LegaCore",
+   "supported": true,
+   "prospective": "requirements family h02 and h04, fired on 0 operations - correct silence",
+   "development": "opfacts synthetic witnesses",
+   "gaps": [],
+   "synthetic_witnesses": [
+    "legasus/legacore/opfacts.test.mjs"
+   ],
+   "positive_control": [],
+   "negative_control": [],
+   "other_controls": [],
+   "emitted_on": {
+    "provenance": {
+     "e06": 1,
+     "f02": 1,
+     "f03": 2,
+     "f04": 2,
+     "f05": 2,
+     "f06": 2
+    },
+    "generalization": {
+     "g02": 1,
+     "g03": 1,
+     "g04": 2,
+     "g05": 1,
+     "g06": 1
+    },
+    "requirements": {
+     "h02": 1,
+     "h03": 1,
+     "h04": 2,
+     "h06": 1,
+     "h07": 1,
+     "h08": 1
+    },
+    "unresolved": {
+     "i01": 1,
+     "i02": 1
+    }
+   },
+   "narrowed_on": {},
+   "has_positive_control": false,
+   "has_negative_control": false,
+   "ever_emitted": true,
+   "narrowing_expected": false
+  },
+  "unresolved_requirement": {
+   "layer": "LegaCore",
+   "supported": true,
+   "prospective": "unresolved family i01 vs i02, surgical pair - the path fired for the right reason",
+   "development": "requirements family h07, where the control was MASKED and proved nothing",
+   "gaps": [
+    "DECLARES the gap; does not resolve it. This is intentional."
+   ],
+   "synthetic_witnesses": [
+    "legasus/legacore/completeness.test.mjs"
+   ],
+   "positive_control": [],
+   "negative_control": [],
+   "other_controls": [],
+   "emitted_on": {
+    "provenance": {
+     "e01": 2,
+     "e06": 2,
+     "f01": 2
+    },
+    "generalization": {
+     "g03": 1
+    },
+    "requirements": {
+     "h07": 1
+    },
+    "unresolved": {
+     "i01": 1
+    }
+   },
+   "narrowed_on": {},
+   "has_positive_control": false,
+   "has_negative_control": false,
+   "ever_emitted": true,
+   "narrowing_expected": false
+  },
+  "canonical_realization": {
+   "layer": "ENGINEERING_CHOICE",
+   "supported": true,
+   "prospective": "fired on 17 operations in the requirements family and narrowed 0",
+   "development": "all families",
+   "gaps": [
+    "contributes zero semantic gain BY CONSTRUCTION; its replay fails if it ever narrows"
+   ],
+   "synthetic_witnesses": [],
+   "positive_control": [],
+   "negative_control": [],
+   "other_controls": [],
+   "emitted_on": {
+    "provenance": {
+     "e01": 1,
+     "e02": 2,
+     "e03": 1,
+     "e04": 2,
+     "e05": 2,
+     "e06": 1,
+     "f01": 1,
+     "f02": 1,
+     "f03": 2,
+     "f04": 2,
+     "f05": 2,
+     "f06": 2
+    },
+    "generalization": {
+     "g01": 2,
+     "g02": 3,
+     "g03": 1,
+     "g04": 2,
+     "g05": 2,
+     "g06": 3
+    },
+    "requirements": {
+     "h01": 1,
+     "h02": 2,
+     "h03": 3,
+     "h04": 3,
+     "h05": 2,
+     "h06": 2,
+     "h07": 2,
+     "h08": 2
+    },
+    "unresolved": {
+     "i01": 1,
+     "i02": 1
+    }
+   },
+   "narrowed_on": {},
+   "has_positive_control": false,
+   "has_negative_control": false,
+   "ever_emitted": true,
+   "narrowing_expected": false
+  }
+ },
+ "requirement_states": {
+  "existing_definition": {
+   "exercised_on": {
+    "generalization": {
+     "g05": 1
+    },
+    "requirements": {
+     "h05": 1,
+     "h06": 1,
+     "h08": 1
+    },
+    "unresolved": {
+     "i02": 1
+    }
+   }
+  },
+  "planned_operation": {
+   "exercised_on": {
+    "provenance": {
+     "e01": 1,
+     "e06": 1,
+     "f01": 1
+    },
+    "generalization": {
+     "g05": 1
+    },
+    "requirements": {
+     "h01": 1,
+     "h03": 2,
+     "h05": 2,
+     "h06": 1,
+     "h07": 1,
+     "h08": 1
+    }
+   }
+  },
+  "deferred": {
+   "exercised_on": {
+    "provenance": {
+     "e06": 1,
+     "f02": 1,
+     "f03": 2,
+     "f04": 2,
+     "f05": 2,
+     "f06": 2
+    },
+    "generalization": {
+     "g02": 1,
+     "g03": 1,
+     "g04": 2,
+     "g05": 1,
+     "g06": 1
+    },
+    "requirements": {
+     "h02": 1,
+     "h03": 1,
+     "h04": 2,
+     "h06": 1,
+     "h07": 1,
+     "h08": 1
+    },
+    "unresolved": {
+     "i01": 1,
+     "i02": 1
+    }
+   }
+  },
+  "unresolved": {
+   "exercised_on": {
+    "provenance": {
+     "e01": 2,
+     "e06": 2,
+     "f01": 2
+    },
+    "generalization": {
+     "g03": 1
+    },
+    "requirements": {
+     "h07": 1
+    },
+    "unresolved": {
+     "i01": 1
+    }
+   }
+  }
+ },
+ "semantic_intent": {
+  "guard_precedence": {
+   "layer": "SEMANTIC_INTENT",
+   "supported": false,
+   "why": "when two individually valid behaviours overlap, structure cannot determine which owns the ambiguous input. classify(0) matches both `n == 0` and `n < 10`.",
+   "evidence": "generalization family g03 op1: 1.00 bit of available narrowing that no structural rule may claim",
+   "do_not": "do not approximate this with a control-flow or placement rule"
+  }
+ },
+ "note": "Fired-on counts are DERIVED by running the frozen deriver over every sealed family. Standing lines are DECLARED, because which family a rule was designed against is history that running code cannot recover."
+}

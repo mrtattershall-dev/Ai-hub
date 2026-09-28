@@ -1,0 +1,32 @@
+LegaScreen holdout: STRICT is SILENT and POINTED is PARTIAL - the screen did not transfer to the first case it was not designed around
+
+The rule frozen at 040d95e selected C2 mechanically as the first eligible identifier in canonical
+order, C1 being excluded as the composition family and C4 as the alias family, and C2 is cited in
+neither screening preregistration. The defect was verified live in the target tree by direct
+evaluation, so silence could not be misread as the defect being absent: derive of an empty context
+with a repository context mints a token carrying that repository.
+
+STRICT, the three probes as shipped at b11e51f, produced twelve positives and not one relates to
+calculus, to derive or to C2. POINTED, the same probe code aimed at calculus with a driver that
+composes the module the obvious way and is committed verbatim, produced seven positives over eight
+functions. One names the right function and the right field, and it is not a detection: the seeds are
+tokens so the call is wrong-shaped and returns a refusal that naturally lacks context; the pathology
+is a GAIN and the probe looks for LOSS, which no driver or target can fix; and a reader following it
+asks why derive drops context, finds it was called wrongly, and stops. PARTIAL by the frozen
+vocabulary, and the preregistration says PARTIAL is not rounded up.
+
+What this establishes is worth more than the three v1 positives. Each v1 probe was built around the
+case it later found. The first case none of them was designed around is not reached. The screen
+detects loss of a field, collision of a name, and gain along a lengthened path; C2 is gain from
+absence in a single transformation, a fourth shape nothing in the harness models. Also measured and
+unflattering: aimed at a module whose functions take structured arguments, the erasure probe produced
+seven positives over eight functions, essentially all the wrong-shape artifact, which quantifies the
+specificity problem v0 named.
+
+The missing observable property is named from the evidence - a derived context must not establish a
+dimension that no premise established - and per the frozen consequence no probe is written in this
+slice.
+
+Message-File: scratch/m71.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

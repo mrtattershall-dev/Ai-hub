@@ -1,0 +1,56 @@
+if h:
+            flush_block()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+    flush_para()
+    flush_list()
+    return "\n".join(blocks)
+
+
+def to_html(text):
+    blocks = []
+    current = []
+    items = []
+    ol_items = []
+
+    def flush_para():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    def flush_list():
+        if items:
+            blocks.append("<ul>" + "".join("<li>" + _inline(i) + "</li>" for i in items) + "</ul>")
+            del items[:]
+    def flush_ol():
+        if ol_items:
+            blocks.append("<ol>" + "".join("<li>" + _inline(i) + "</li>" for i in ol_items) + "</ol>")
+            del ol_items[:]
+
+    def add_to_list(text):
+        items.append(_inline(text))
+
+    def add_to_ol(text):
+        ol_items.append(_inline(text))
+
+    def flush_block():
+        if current:
+            blocks.append("<p>" + _inline(" ".join(current)) + "</p>")
+            del current[:]
+
+    for line in str(text).split("\n"):
+        if line.strip() == "":
+            flush_para()
+            flush_list()
+            continue
+            # AT THIS POINT WRITE ONLY THIS: call `flush_ol()` here and nothing else, so a blank line also closes an open ordered list
+        if line.startswith("- "):
+            flush_para()
+            # AT THIS POINT WRITE ONLY THIS: call `flush_ol()` here and nothing else, so an unordered-list line closes an open ordered list
+            items.append(line[2:].strip())
+            continue
+        if line.startswith(". "):
+            flush_para()
+        flush_list()

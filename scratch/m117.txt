@@ -1,0 +1,38 @@
+Ledger Entry 34: the hub found four defects in LegaScreen before LegaScreen found anything in the hub
+
+Records both transfer attempts. TRANSFER-1 failed because the frozen observer shared process lifetime
+with its subject and reported nothing at all, which is indistinguishable from a subject with no
+effects unless the difference is made explicit; its result stands unamended and the falsified
+assumption is kept in its raw prospective form rather than filed under any of the three hypotheses
+that would fit it.
+
+Four attempts at one repair, each wrong in a new way, with the defect underneath all of them being
+that removing the child's exit also removed the guard against falling through into the parent section
+of the same file. The repairs worth keeping are recorded in their general form: the child is its own
+FILE so fall-through is unrepresentable rather than forbidden, and a bound that can only be installed
+by the thing it is bounding is not a bound.
+
+TRANSFER-2 transferred. Forward discovery found ZERO candidates on the hub where backward found
+forty, because the hub has no identity brand to seed on, while on Legasus the two surfaces were
+disjoint but both populated. Eleven private functions were reached through effects and are recorded
+as participants rather than established dependencies. The backdoor detector fired on its first
+natural specimen and caught one of four, where the fixture had said one of one. The CommonJS
+coordinate fired for the first time, putting 27 of 175 modules outside what the instrument can see.
+
+The cost is stated plainly: 64 of 90 entries ended the process themselves, so for 71 percent of the
+repository's entries the question of whether an entry caused nothing cannot be answered and 4498 is a
+floor rather than a count.
+
+One claim is corrected after the fact. I attributed an 8s-to-under-1s per-entry drop entirely to the
+fall-through, but that 8s was measured under my own leak, which session 75 calibrated at about 1.85x
+inflation. Direction holds, magnitude does not, and the frozen preregistration was not edited - the
+correction lives in the result.
+
+The cross-session section records that 75's own suggested diagnostic would have misled because a
+diagnostic derived from a hypothesised cause inherits that hypothesis, that its retraction about C4
+over-corrected and I measured rather than accepted it, and that BIND-1 independently replicated
+TRANSFER-1's failure class in its own tracer.
+
+Message-File: scratch/m117.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

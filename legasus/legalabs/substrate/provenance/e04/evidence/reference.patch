@@ -1,0 +1,15 @@
+--- op op1 after: "        self._borrowed = {}\n"
+        self._reserved = {}
+
+--- op op2 after: "    return self._borrowed.get(title, 0)\n"
+
+    def reserve(self, title, n):
+        self._reserved[title] = self._reserved.get(title, 0) + n
+
+    def reserved_count(self, title):
+        return self._reserved.get(title, 0)
+
+--- op op3 after: "    return sum(self._borrowed.values())\n"
+
+    def total_reserved(self):
+        return sum(self._reserved.values())

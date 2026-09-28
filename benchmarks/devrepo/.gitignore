@@ -1,0 +1,5 @@
+.validate/
+.admit/
+.raw/
+.legasus/
+__pycache__/

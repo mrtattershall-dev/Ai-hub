@@ -1,0 +1,111 @@
+{
+  "corpus_rule": "Every defect named in ledger Entries 15-30, enumerated BEFORE classification, whether or not it looks like an omission problem. The denominator includes defects the hypothesis cannot touch.",
+  "reading_note": "Each EXPLAINED entry records the reading so it can be disputed. `disputable: true` marks the ones where the role assignment is a judgement call rather than forced by the call site.",
+  "entries": [
+    { "id": "C1", "what": "a never-established intermediate laundered S1 into S2 through entitled()",
+      "operand": "the intermediate node's scope", "verdict": "EXPLAINED",
+      "role": "EVIDENCE", "applied": "DONT_CARE" },
+
+    { "id": "C2", "what": "the calculus read absence as 'for all', the graph as 'never established'",
+      "operand": "a premise context dimension", "verdict": "EXPLAINED",
+      "role": "EVIDENCE", "applied": "DONT_CARE" },
+
+    { "id": "C3", "what": "the authority brand was a Symbol readable off any real token",
+      "operand": "the token's brand", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "C4", "what": "an admission keyed by NAME let a pytest-argued dimension govern git records",
+      "operand": "the admission key", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "C5", "what": "the reserved key was admissible and then manufactured NOT_COMPARABLE",
+      "operand": "a reserved scope key", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "C6", "what": "a shadowed carried value vanished, indistinguishable from never having been",
+      "operand": "an UNADMITTED carried value", "verdict": "EXPLAINED",
+      "role": "EVIDENCE", "applied": "DONT_CARE", "disputable": true },
+
+    { "id": "C7", "what": "node identity excluded scope, so add() moved the referent under dependents",
+      "operand": "the node identity key", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "C8-a", "what": "the provenance ledger kept the LAST binding per digest",
+      "operand": "the digest binding", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "C9-a", "what": "an irrelevant pending string held the contest OPEN with zero objectives",
+      "operand": "a pending item", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "C9-b", "what": "TERMINAL was measured by PATH rather than by the question's state",
+      "operand": "the block classification", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "W2-a", "what": "a refuter at S2 refuted a claim about S1",
+      "operand": "the refuter's scope", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "W2-b", "what": "reestablish() rewrote a scope the identity now encodes",
+      "operand": "the reestablished scope", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "W2-c", "what": "a STALE witness was still an execution edge and scored ADVANCEMENT",
+      "operand": "a stale witness", "verdict": "VALUE_CONFUSION" },
+
+    { "id": "W2-d", "what": "an unmeasured behavioural metric read as EQUIVALENT on the Pareto frontier",
+      "operand": "an unmeasured metric", "verdict": "EXPLAINED",
+      "role": "EVIDENCE", "applied": "DONT_CARE" },
+
+    { "id": "W2-e", "what": "'pytest undefined' and 'undefined undefined' as criteria",
+      "operand": "an absent producer version", "verdict": "EXPLAINED",
+      "role": "EVIDENCE", "applied": "DONT_CARE" },
+
+    { "id": "W2-f", "what": "IMPORT_FAILED records were given a document and an ARRAY INDEX as ordinal",
+      "operand": "identity fields of a failed record", "verdict": "EXPLAINED",
+      "role": "EVIDENCE", "applied": "DONT_CARE" },
+
+    { "id": "W2-g", "what": "the adapter granted doctest's semantics to any producer whose word matched",
+      "operand": "the producer name", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "W3-c", "what": "a grant over S1 was delegated over every world",
+      "operand": "delegate's context argument", "verdict": "EXPLAINED",
+      "role": "REQUEST", "applied": "DONT_CARE" },
+
+    { "id": "W3-d", "what": "narrow() moved an established world under restriction's free pass",
+      "operand": "the narrowing request", "verdict": "EXPLAINED",
+      "role": "REQUEST", "applied": "DONT_CARE", "disputable": true },
+
+    { "id": "W3-e", "what": "commit() consumed an OBSERVE token - evidence acted",
+      "operand": "the token kind", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "W3-f", "what": "derive() minted NORMATIVE-with-grant or not, by argument ORDER",
+      "operand": "premise ordering", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "SLICE1-a", "what": "a refused input was read as a dependency: no context meant every coordinate changed",
+      "operand": "a refusal's output", "verdict": "EXPLAINED",
+      "role": "EVIDENCE", "applied": "DONT_CARE" },
+
+    { "id": "SLICE1-b", "what": "UNSUPPORTED and ANY_OF shared one label - two opposite readings of 'no single input affects it'",
+      "operand": "the support set", "verdict": "EXPLAINED",
+      "role": "EVIDENCE", "applied": "DONT_CARE" },
+
+    { "id": "SLICE1-c", "what": "'could not measure' and 'was removed' shared a bare undefined",
+      "operand": "a measurement result", "verdict": "EXPLAINED",
+      "role": "STATE", "applied": "NOT_ESTABLISHED", "disputable": true },
+
+    { "id": "SLICE2-a", "what": "the all-facts strip deleted a fact key named after the output coordinate",
+      "operand": "the stripped key", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "AUTOCF-a", "what": "a witness whose baseline was already a refusal scored counterfactuals as OBSERVED with no delta",
+      "operand": "both sides' outputs", "verdict": "EXPLAINED",
+      "role": "EVIDENCE", "applied": "DONT_CARE" },
+
+    { "id": "AUTOCF-b", "what": "a world that could not be built was reported as a world in which nothing changed",
+      "operand": "the reconstruction result", "verdict": "EXPLAINED",
+      "role": "STATE", "applied": "PRESERVE", "disputable": true },
+
+    { "id": "AUTOCF-c", "what": "a validating wrapper was elided from the DAG, so replay skipped its refusal",
+      "operand": "the producer binding", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "SEMANTIC-a", "what": "the target's own configuration facts were counted as a premise group",
+      "operand": "the input group set", "verdict": "NOT_AN_OMISSION" },
+
+    { "id": "BRIDGE-a", "what": "ANY was coerced into a comparison the specification cannot express, producing 965 accusations",
+      "operand": "a wildcard scope value", "verdict": "VALUE_CONFUSION" },
+
+    { "id": "BRIDGE-b", "what": "a nested object compared by reference identity refused identical scopes",
+      "operand": "a non-primitive scope value", "verdict": "VALUE_CONFUSION" }
+  ]
+}

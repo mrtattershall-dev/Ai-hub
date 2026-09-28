@@ -1,0 +1,17 @@
+  ok    POSITIVE  equality becomes a point
+  ok    POSITIVE  strict less-than becomes an open interval
+  ok    POSITIVE  greater-or-equal becomes a closed lower bound
+  ok    NEGATIVE  a compound condition is NOT normalised
+  ok    NEGATIVE  a non-numeric condition is NOT normalised
+  ok    POSITIVE  three behaviours read from the program
+  ok    POSITIVE  the fall-through is the universe, not a guard
+  ok    POSITIVE  a GENERIC subject binds to the sole parameter
+  ok    NEGATIVE  a generic subject does NOT bind when the unit has several parameters
+  ok    POSITIVE  an explicit operator form is accepted
+  ok    NEGATIVE  prose with no expressible condition yields no condition
+  ok    NEGATIVE  a condition over a DIFFERENT variable is not adopted
+
+  all witnesses pass
+  Non-vacuity: 6 negatives must NOT normalise. An extractor that normalised
+  everything would invent domains, and every later overlap and precedence answer would
+  rest on a fabricated interval.

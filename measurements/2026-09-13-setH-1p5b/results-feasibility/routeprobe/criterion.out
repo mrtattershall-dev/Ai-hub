@@ -1,0 +1,11 @@
+  ROUTE CRITERION, recomputed from preserved bytes
+  RESPONSIVE = non-empty AND does not echo the instruction
+  ELIGIBLE   = responsive on at least 6 of 8
+
+  route              n   responsive(as-run)  responsive(echo fixed)  echoed  loads  oldKept
+  V1_comment_only   8   5/8                 4/8                     2       4      4
+  V2_indent_primer  8   8/8                 6/8                     2       6      4
+  V3_chat           8   7/8                 7/8                     1       1      1
+
+  ELIGIBLE: V2_indent_primer (6/8, loads 6)  |  V3_chat (7/8, loads 1)
+  CHOSEN:   V2_indent_primer   (most candidates that load)

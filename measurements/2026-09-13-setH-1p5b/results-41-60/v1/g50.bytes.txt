@@ -1,0 +1,21 @@
+const library = require('./library');
+
+function overdueLines(library, today) {
+  const overdueMembers = library.overdue(today);
+  
+  if (overdueMembers.length === 0) {
+    return '';
+  }
+
+  let lines = [];
+  for (const member of overdueMembers) {
+    const isbn = member.isbn;
+    const daysOverdue = Math.floor((today - member.borrowedDate) / (24 * 60 * 60));
+    
+    lines.push(`member owes ${isbn} (${daysOverdue} days)`);
+  }
+
+  return lines.join('\n');
+}
+
+module.exports = overdueLines;

@@ -1,0 +1,36 @@
+const Library = {};
+
+// Function to return a book and calculate fines for late returns
+Library.returnBook = function(member, dueDate) {
+  const currentDate = new Date();
+  const daysLate = Math.ceil((currentDate - dueDate) / (24 * 60 * 60 * 1000));
+
+  // Calculate the fine based on the number of days late
+  let fine;
+  if (daysLate > 0) {
+    fine = daysLate * 25; // Fine is 25 cents per day late
+  } else {
+    fine = 0;
+  }
+
+  // Add the fine to the member's unpaid fines
+  member.unpaidFines += fine;
+
+  return fine;
+};
+
+// Function to get the total unpaid fines for a member
+Library.fines = function(member) {
+  return member.unpaidFines;
+};
+
+// Function to pay fines for a member
+Library.pay = function(member, cents) {
+  if (cents <= 0 || cents > member.unpaidFines) {
+    throw new Error('Invalid payment amount');
+  }
+
+  member.unpaidFines -= cents;
+};
+
+module.exports = Library;

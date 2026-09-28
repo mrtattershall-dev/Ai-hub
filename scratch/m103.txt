@@ -1,0 +1,34 @@
+Harden BACKWARD-1: an unreadable frame poisons the claim, and 676 of my published verdicts were resting on holes
+
+The parser was repaired last slice; the SILENCE about parse failure was not. frames() still dropped a
+line it could not read, so a hole in the ancestry was indistinguishable from a complete path, and the
+published PRODUCTION_REACHED of 2245 included 676 effects whose reachability verdict rested on a path
+with an unreadable frame in it. That is sixteen percent of the witnessed total, and it is the third
+time in one slice that information destruction increased certainty inside the instrument:
+
+    REPRESENTATION_UNRECOGNIZED  ->  EMPTY SET  ->  SEMANTIC ABSENCE
+
+An unparsed line is now FRAME_UNPARSED and is counted. Recognised-but-excluded - node_modules, node:
+internals - is a DIFFERENT fact and is counted separately, because treating a deliberate exclusion as
+unreadable would poison every claim. A hole poisons the reachability verdict, which becomes
+ANCESTRY_INCOMPLETE, while the frames that did parse stay valid as participation. NO OBSERVATION IS
+NOT OBSERVED NOTHING.
+
+    2245  ->  1569 PRODUCTION_REACHED  +  676 ANCESTRY_INCOMPLETE
+
+The earlier number is preserved in the result file rather than quietly replaced.
+
+OBSERVABILITY IS NOW A COORDINATE. The loader technique substitutes ES modules, so a CommonJS region
+is not unmeasured but outside what this instrument can see, and the denominator has to say so. On
+Legasus it reads 258 observable and zero unobservable, which means the coordinate is unexercised on
+this subject and fires only on a fixture - and that is exactly why a mixed-module subject is the
+interesting transfer test. A coverage number that hid such a region would repeat the unparsed-frame
+error at repository scale.
+
+The prospective subject was still not run.
+
+Focused 8/8. Suite 686/686.
+
+Message-File: scratch/m103.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -1,0 +1,84 @@
+text):
+    lines = text.split("\n")
+
+    in_code_block = False
+    code_lines = []
+
+    def process_code_block():
+        nonlocal in_code_block, code_lines
+        if code_lines:
+            output.append("<pre><code>")
+            for line in code_lines:
+                output.append(_escape(line))
+            output.append("</code></pre>")
+        in_code_block = False
+        code_lines = []
+
+    output = []
+    current_paragraph = ""
+    current_heading = None
+
+    for i, line in enumerate(lines):
+        if re.match(r"```", line):
+            if not in_code_block:
+                in_code_block = True
+                if current_paragraph:
+                    process_paragraph()
+                continue
+            else:
+                process_code_block()
+                continue
+
+        if in_code_block:
+            code_lines.append(line)
+            continue
+
+        heading = _is_heading(line)
+        if heading is not None:
+            if current_paragraph:
+                process_paragraph()
+            current_heading = heading
+            continue
+
+        line = line.strip()
+        if not line:
+            if current_paragraph:
+                process_paragraph()
+            output.append("<p></p>")
+            continue
+
+        current_paragraph += _inline(line) + " "
+
+    if current_paragraph:
+        process_paragraph()
+
+    return "\n".join(output)
+
+
+def process_paragraph():
+    global output, current_paragraph
+    if current_heading:
+        output.append(f'<h{current_heading[0]}>{_escape(current_heading[1])}</h{current_heading[0]}>')
+        current_heading = None
+    else:
+        output.append("<p>" + current_paragraph.strip() + "</p>")
+    current_paragraph = ""
+
+
+# TESTS
+print(to_html("a\nb"))  # <p>a b</p>
+print(to_html("a\n\nb"))  # <p>a</p>\n<p>b</p>
+print(to_html("1 < 2 & 3 > 0"))  # <p>1 &lt; 2 &amp; 3 &gt; 0</p>
+print(to_html("# Title"))  # <h1>Title</h1>
+print(to_html("**b** and *i*"))  # <p><strong>b</strong> and <em>i</em></p>
+print(to_html("a * b"))  # <p>a * b</p>
+print(to_html("`a*b*c`"))  # <p><code>a*b*c</code></p>
+print(to_html("see [docs](http://x/a)"))  # <p>see <a href="http://x/a">docs</a></p>
+print(to_html("- one\n- two"))  # <ul><li>one</li><li>two</li></ul>
+print(to_html("- **b** item"))  # <ul><li><strong>b</strong> item</li></ul>
+
+# NEW TESTS FOR FENCED CODE BLOCKS
+print(to_html("```\n```"))  # <pre><code></code></pre>
+print(to_html("```\na\nb\n```"))  # <pre><code>a\nb</code></pre>
+print(to_html("a\n```\nb\nc\n```"))  # <p>a</p>\n<pre><code>b\nc</code></pre>
+print(to_html("```\ndef f():\n    return 1\n```"))  # <pre><code>def f():\n    return 1</code></pre>

@@ -1,5 +1,33 @@
 # AI Coding Hub
 
+> **Orientation — this repository contains two distinct things.**
+>
+> **The AI Coding Hub** (documented below) is a standalone multi-provider coding UI. It is a real
+> product, it predates the research programme, and it keeps its name.
+>
+> **[Legasus](LEGASUS.md)** is the software-engineering architecture and research programme developed in
+> this repository, using the hub and its goal sets as experimental substrate. Legasus is the parent
+> identity for the architecture and its components — **LegaCore** (orchestration and planning),
+> **LegaGate** (risk estimation and authority control), **LegaVerify** (truth and commit authority),
+> **LegaParse** (deterministic program analysis), **LegaLabs** (research and measurement), and
+> **LegaEngine** (AI-native creative environment, in a separate repository).
+>
+> LEGACY + PEGASUS. *Preserve what already works; extend it without regenerating or destroying it.*
+> The research question: **how much neural scale remains necessary once software-engineering
+> responsibilities that do not inherently require neural generation are externalized into deterministic,
+> testable machinery?**
+>
+> | | |
+> |---|---|
+> | Identity, vocabulary, glossary | [`LEGASUS.md`](LEGASUS.md) |
+> | Intended direction and predictions | [`LEGASUS_DIRECTION.md`](LEGASUS_DIRECTION.md) |
+> | Findings and raw evidence | [`measurements/2026-09-13-setH-1p5b/README.md`](measurements/2026-09-13-setH-1p5b/README.md) |
+>
+> Findings are kept separate from direction on purpose. Historical logs, commit messages and frozen
+> experiment artifacts do not use the Legasus vocabulary and are deliberately not rewritten to.
+
+---
+
 A standalone, self-hosted hub for working with multiple AI providers from one
 UI: a **Code** tab for explain/refactor/debug/generate-style tasks, a
 **Strategy** tab for structured project planning (project maps, action plans,

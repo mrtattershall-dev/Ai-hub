@@ -1,0 +1,356 @@
+{
+ "criteria": {
+  "min_doctests": 20,
+  "min_lines": 500,
+  "max_lines": 20000,
+  "burned": [
+   "packaging"
+  ]
+ },
+ "candidates": [
+  {
+   "name": "numpy",
+   "files": 407,
+   "doctests": 7800,
+   "lines": 121985,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\numpy",
+   "eligible": false
+  },
+  {
+   "name": "fontTools",
+   "files": 337,
+   "doctests": 1000,
+   "lines": 66982,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\fontTools",
+   "eligible": false
+  },
+  {
+   "name": "pip",
+   "files": 395,
+   "doctests": 308,
+   "lines": 55181,
+   "root": "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0\\Lib\\site-packages\\pip",
+   "eligible": false
+  },
+  {
+   "name": "matplotlib",
+   "files": 248,
+   "doctests": 204,
+   "lines": 100222,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\matplotlib",
+   "eligible": false
+  },
+  {
+   "name": "pyparsing",
+   "files": 17,
+   "doctests": 182,
+   "lines": 5826,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\pyparsing",
+   "eligible": true
+  },
+  {
+   "name": "dateutil",
+   "files": 18,
+   "doctests": 65,
+   "lines": 4182,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\dateutil",
+   "eligible": true
+  },
+  {
+   "name": "modal",
+   "files": 145,
+   "doctests": 57,
+   "lines": 26583,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\modal",
+   "eligible": false
+  },
+  {
+   "name": "pygments",
+   "files": 339,
+   "doctests": 20,
+   "lines": 43141,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\pygments",
+   "eligible": false
+  },
+  {
+   "name": "rich",
+   "files": 100,
+   "doctests": 20,
+   "lines": 11915,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\rich",
+   "eligible": true
+  },
+  {
+   "name": "attr",
+   "files": 13,
+   "doctests": 7,
+   "lines": 2473,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\attr",
+   "eligible": false
+  },
+  {
+   "name": "aiohttp",
+   "files": 55,
+   "doctests": 3,
+   "lines": 16608,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\aiohttp",
+   "eligible": false
+  },
+  {
+   "name": "cycler",
+   "files": 1,
+   "doctests": 3,
+   "lines": 245,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\cycler",
+   "eligible": false
+  },
+  {
+   "name": "synchronicity",
+   "files": 11,
+   "doctests": 1,
+   "lines": 1614,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\synchronicity",
+   "eligible": false
+  },
+  {
+   "name": "PIL",
+   "files": 97,
+   "doctests": 0,
+   "lines": 18091,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\PIL",
+   "eligible": false
+  },
+  {
+   "name": "aiohappyeyeballs",
+   "files": 5,
+   "doctests": 0,
+   "lines": 271,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\aiohappyeyeballs",
+   "eligible": false
+  },
+  {
+   "name": "aiosignal",
+   "files": 1,
+   "doctests": 0,
+   "lines": 23,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\aiosignal",
+   "eligible": false
+  },
+  {
+   "name": "anyio",
+   "files": 43,
+   "doctests": 0,
+   "lines": 8801,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\anyio",
+   "eligible": false
+  },
+  {
+   "name": "attrs",
+   "files": 6,
+   "doctests": 0,
+   "lines": 0,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\attrs",
+   "eligible": false
+  },
+  {
+   "name": "cbor2",
+   "files": 2,
+   "doctests": 0,
+   "lines": 136,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\cbor2",
+   "eligible": false
+  },
+  {
+   "name": "certifi",
+   "files": 3,
+   "doctests": 0,
+   "lines": 18,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\certifi",
+   "eligible": false
+  },
+  {
+   "name": "click",
+   "files": 17,
+   "doctests": 0,
+   "lines": 5749,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\click",
+   "eligible": false
+  },
+  {
+   "name": "colorama",
+   "files": 13,
+   "doctests": 0,
+   "lines": 1176,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\colorama",
+   "eligible": false
+  },
+  {
+   "name": "contourpy",
+   "files": 17,
+   "doctests": 0,
+   "lines": 1713,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\contourpy",
+   "eligible": false
+  },
+  {
+   "name": "frozenlist",
+   "files": 1,
+   "doctests": 0,
+   "lines": 58,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\frozenlist",
+   "eligible": false
+  },
+  {
+   "name": "grpclib",
+   "files": 40,
+   "doctests": 0,
+   "lines": 3187,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\grpclib",
+   "eligible": false
+  },
+  {
+   "name": "h2",
+   "files": 11,
+   "doctests": 0,
+   "lines": 2474,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\h2",
+   "eligible": false
+  },
+  {
+   "name": "hpack",
+   "files": 8,
+   "doctests": 0,
+   "lines": 463,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\hpack",
+   "eligible": false
+  },
+  {
+   "name": "hyperframe",
+   "files": 4,
+   "doctests": 0,
+   "lines": 564,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\hyperframe",
+   "eligible": false
+  },
+  {
+   "name": "idna",
+   "files": 10,
+   "doctests": 0,
+   "lines": 495,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\idna",
+   "eligible": false
+  },
+  {
+   "name": "iniconfig",
+   "files": 4,
+   "doctests": 0,
+   "lines": 276,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\iniconfig",
+   "eligible": false
+  },
+  {
+   "name": "kiwisolver",
+   "files": 2,
+   "doctests": 0,
+   "lines": 27,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\kiwisolver",
+   "eligible": false
+  },
+  {
+   "name": "markdown_it",
+   "files": 66,
+   "doctests": 0,
+   "lines": 3813,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\markdown_it",
+   "eligible": false
+  },
+  {
+   "name": "mdurl",
+   "files": 6,
+   "doctests": 0,
+   "lines": 262,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\mdurl",
+   "eligible": false
+  },
+  {
+   "name": "modal_docs",
+   "files": 9,
+   "doctests": 0,
+   "lines": 809,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\modal_docs",
+   "eligible": false
+  },
+  {
+   "name": "modal_proto",
+   "files": 8,
+   "doctests": 0,
+   "lines": 9887,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\modal_proto",
+   "eligible": false
+  },
+  {
+   "name": "modal_version",
+   "files": 2,
+   "doctests": 0,
+   "lines": 0,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\modal_version",
+   "eligible": false
+  },
+  {
+   "name": "multidict",
+   "files": 4,
+   "doctests": 0,
+   "lines": 1146,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\multidict",
+   "eligible": false
+  },
+  {
+   "name": "pluggy",
+   "files": 8,
+   "doctests": 0,
+   "lines": 878,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\pluggy",
+   "eligible": false
+  },
+  {
+   "name": "propcache",
+   "files": 4,
+   "doctests": 0,
+   "lines": 41,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\propcache",
+   "eligible": false
+  },
+  {
+   "name": "pytest",
+   "files": 2,
+   "doctests": 0,
+   "lines": 0,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\pytest",
+   "eligible": false
+  },
+  {
+   "name": "toml",
+   "files": 5,
+   "doctests": 0,
+   "lines": 1140,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\toml",
+   "eligible": false
+  },
+  {
+   "name": "watchfiles",
+   "files": 7,
+   "doctests": 0,
+   "lines": 495,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\watchfiles",
+   "eligible": false
+  },
+  {
+   "name": "yarl",
+   "files": 8,
+   "doctests": 0,
+   "lines": 1349,
+   "root": "C:\\Users\\tatte\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\yarl",
+   "eligible": false
+  }
+ ]
+}

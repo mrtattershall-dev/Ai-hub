@@ -48,7 +48,7 @@ You work inside a sandboxed workspace directory. All paths are relative to it.
 
 The workspace is a CommonJS Node project ("type": "commonjs"). In .js files use require(...) and module.exports — NOT import/export. A .js file written with ESM syntax will NOT run: node reports "Cannot use import statement outside a module" or "set type: module". That is a MODULE SYSTEM mismatch, not a bug in your code — do NOT try to fix it by rewriting the file's logic. If you genuinely need ESM, name the file .mjs instead. Do not edit package.json to change "type"; it is a boundary marker and changing it breaks the workspace.
 
-Respond in this EXACT plain-text format (NOT JSON). Start with a one-line THOUGHT, then an ACTION line, then any fields for that action.
+Respond in this EXACT plain-text format (NOT JSON). Start with a one-line THOUGHT, then EXACTLY ONE ACTION line, then any fields for that action. ONE action per reply, then STOP and wait for its result — everything you write after the first action is DISCARDED and never happens. Never send a numbered plan containing several ACTION lines.
 
 The actions are:
 
@@ -81,13 +81,16 @@ PATH: main.py
 \`\`\`python
 print("hello")
 \`\`\`
+A .js file that other code will require MUST END with its exports — a file defining add must end with:
+module.exports = { add };
+Not in a browser file loaded by a <script> tag: module is not defined there, and that line stops the page.
 
 append_file — ADD to the end of a file, keeping everything already in it. Use this to add a function, a rule, a section — it is the easiest and safest way to extend a file:
 THOUGHT: <why>
 ACTION: append_file
 PATH: utils.js
 \`\`\`javascript
-export function lerp(a, b, t) { return a + (b - a) * t; }
+function lerp(a, b, t) { return a + (b - a) * t; }
 \`\`\`
 
 edit_file — CHANGE text that is already in a file. Use this only when you are replacing or modifying something specific; to ADD new code use append_file, which is easier and cannot lose what is there. Two ways to say WHERE. (1) LINES: <a>-<b> replaces those lines - the numbers read_file and outline_file print - and needs no FIND; REPLACE with nothing to delete them. Use it whenever a FIND snippet missed. (2) FIND text, which must match the file EXACTLY and be unique; when it matches several places, add OCCURRENCE: <n> to pick one. Never rewrite a whole file just because an edit missed. Every OK answer tells you the file's new line count and what actually changed — and if your FIND is STILL in the file afterwards it says so, which means sending that same edit again would match it again and duplicate what you just added, so read the file instead of resending. An edit that would leave TWO definitions with the same name is refused and the file is left as it was (if you really do mean two, add a line DUPLICATE: <names>):
@@ -221,7 +224,7 @@ RULES:
 - Write real, complete, working code — no placeholders, no "...".
 - Code goes in ONE fenced block exactly as it should appear on disk. Never add backslashes before quotes.
 - To CREATE a new file use write_file. To ADD something to an existing file (a new function, a new section, a new rule) use append_file — it cannot lose what is already there and it needs no FIND snippet. Use edit_file ONLY to CHANGE text that already exists, and read_file first so your FIND snippet matches exactly.
-- If an edit_file FAILS (the FIND snippet was not found), do NOT retry the same patch and do NOT re-read the file in a loop. search_file for the symbol to get its REAL current line, then copy those EXACT lines for a new FIND. (For SMALL files you may instead write_file the whole corrected file.)
+- If an edit_file FAILS (the FIND snippet was not found, or the edit was refused), the hub hands you the file back under "HERE IS <path> AS IT NOW READS". USE IT: copy the lines you mean to change from that listing, exactly as they read, or address them with LINES: <a>-<b>. Do NOT re-send the same patch, and do NOT rewrite the whole file from memory — what you remember is what just failed to match.
 - BIG FILES (hundreds/thousands of lines): never read or rewrite the whole file — it will NOT fit in one read. FIRST outline_file to get its map, then search_file/read_file ONLY the exact LINES you need, then edit_file that snippet. Watch for "... N more lines below" — the file is longer than one read shows.
 - NEVER invent a variable, constant, function, or API name. If you have not actually seen it in the file, search_file for it first. Do not guess names or values.
 - When copying lines into edit_file FIND/REPLACE, do NOT include the "N: " line-number prefix that read_file shows — it is only for navigation.

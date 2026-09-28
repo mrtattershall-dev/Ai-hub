@@ -1,0 +1,979 @@
+{
+ "roots": 15,
+ "subjects": 69,
+ "sites": 522,
+ "density": {
+  "full": 4,
+  "partial": 81,
+  "established": 512,
+  "total": 779,
+  "density": 0.6572528883183568
+ },
+ "boundaryCount": 81,
+ "boundary": [
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_trim_release",
+   "established": 4,
+   "total": 5,
+   "missing": [
+    74
+   ],
+   "why": "the region executes this function but has never established 1 of its 5 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_BoundaryVersion.__init__",
+   "established": 3,
+   "total": 4,
+   "missing": [
+    113
+   ],
+   "why": "the region executes this function but has never established 1 of its 4 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_BoundaryVersion._is_family",
+   "established": 6,
+   "total": 9,
+   "missing": [
+    118,
+    126,
+    131
+   ],
+   "why": "the region executes this function but has never established 3 of its 9 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_BoundaryVersion.__eq__",
+   "established": 3,
+   "total": 4,
+   "missing": [
+    133
+   ],
+   "why": "the region executes this function but has never established 1 of its 4 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_BoundaryVersion.__lt__",
+   "established": 2,
+   "total": 6,
+   "missing": [
+    138,
+    140,
+    141,
+    142
+   ],
+   "why": "the region executes this function but has never established 4 of its 6 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_LowerBound.__init__",
+   "established": 2,
+   "total": 3,
+   "missing": [
+    163
+   ],
+   "why": "the region executes this function but has never established 1 of its 3 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_LowerBound.__eq__",
+   "established": 2,
+   "total": 4,
+   "missing": [
+    167,
+    169
+   ],
+   "why": "the region executes this function but has never established 2 of its 4 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_LowerBound.__lt__",
+   "established": 6,
+   "total": 10,
+   "missing": [
+    172,
+    174,
+    179,
+    183
+   ],
+   "why": "the region executes this function but has never established 4 of its 10 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_UpperBound.__init__",
+   "established": 2,
+   "total": 3,
+   "missing": [
+    204
+   ],
+   "why": "the region executes this function but has never established 1 of its 3 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_UpperBound.__lt__",
+   "established": 7,
+   "total": 10,
+   "missing": [
+    213,
+    215,
+    224
+   ],
+   "why": "the region executes this function but has never established 3 of its 10 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_range_is_empty",
+   "established": 4,
+   "total": 6,
+   "missing": [
+    246,
+    249
+   ],
+   "why": "the region executes this function but has never established 2 of its 6 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_intersect_ranges",
+   "established": 13,
+   "total": 14,
+   "missing": [
+    255
+   ],
+   "why": "the region executes this function but has never established 1 of its 14 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_coerce_version",
+   "established": 4,
+   "total": 7,
+   "missing": [
+    292,
+    296,
+    297
+   ],
+   "why": "the region executes this function but has never established 3 of its 7 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_public_version",
+   "established": 2,
+   "total": 4,
+   "missing": [
+    301,
+    304
+   ],
+   "why": "the region executes this function but has never established 2 of its 4 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier.__init__",
+   "established": 12,
+   "total": 14,
+   "missing": [
+    573,
+    591
+   ],
+   "why": "the region executes this function but has never established 2 of its 14 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier._get_spec_version",
+   "established": 6,
+   "total": 8,
+   "missing": [
+    611,
+    618
+   ],
+   "why": "the region executes this function but has never established 2 of its 8 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier._require_spec_version",
+   "established": 3,
+   "total": 4,
+   "missing": [
+    623
+   ],
+   "why": "the region executes this function but has never established 1 of its 4 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier._to_ranges",
+   "established": 8,
+   "total": 13,
+   "missing": [
+    633,
+    640,
+    646,
+    647,
+    650
+   ],
+   "why": "the region executes this function but has never established 5 of its 13 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier._standard_ranges",
+   "established": 18,
+   "total": 39,
+   "missing": [
+    670,
+    677,
+    678,
+    679,
+    680,
+    685,
+    688,
+    689,
+    690,
+    692,
+    693,
+    695
+   ],
+   "why": "the region executes this function but has never established 21 of its 39 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier.operator",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    804
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier.version",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    813
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier.__repr__",
+   "established": 5,
+   "total": 6,
+   "missing": [
+    822
+   ],
+   "why": "the region executes this function but has never established 1 of its 6 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier.__str__",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    840
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier._canonical_spec",
+   "established": 6,
+   "total": 8,
+   "missing": [
+    850,
+    854
+   ],
+   "why": "the region executes this function but has never established 2 of its 8 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier.__hash__",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    864
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier.__eq__",
+   "established": 5,
+   "total": 9,
+   "missing": [
+    867,
+    889,
+    890,
+    892
+   ],
+   "why": "the region executes this function but has never established 4 of its 9 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier._get_operator",
+   "established": 3,
+   "total": 4,
+   "missing": [
+    896
+   ],
+   "why": "the region executes this function but has never established 1 of its 4 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier._get_wildcard_split",
+   "established": 7,
+   "total": 8,
+   "missing": [
+    922
+   ],
+   "why": "the region executes this function but has never established 1 of its 8 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier._compare_equal",
+   "established": 5,
+   "total": 13,
+   "missing": [
+    938,
+    941,
+    944,
+    945,
+    950,
+    954,
+    959,
+    961
+   ],
+   "why": "the region executes this function but has never established 8 of its 13 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier._compare_not_equal",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    974
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier._compare_greater_than_equal",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    983
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier.__contains__",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    1049
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier.contains",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    1070
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|Specifier.filter",
+   "established": 21,
+   "total": 27,
+   "missing": [
+    1113,
+    1165,
+    1166,
+    1168,
+    1170,
+    1171
+   ],
+   "why": "the region executes this function but has never established 6 of its 27 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_pep440_filter_prereleases",
+   "established": 16,
+   "total": 22,
+   "missing": [
+    1198,
+    1216,
+    1217,
+    1219,
+    1220,
+    1221
+   ],
+   "why": "the region executes this function but has never established 6 of its 22 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_version_split",
+   "established": 8,
+   "total": 10,
+   "missing": [
+    1240,
+    1256
+   ],
+   "why": "the region executes this function but has never established 2 of its 10 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_numeric_prefix_len",
+   "established": 6,
+   "total": 7,
+   "missing": [
+    1279
+   ],
+   "why": "the region executes this function but has never established 1 of its 7 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_left_pad",
+   "established": 4,
+   "total": 6,
+   "missing": [
+    1293,
+    1303
+   ],
+   "why": "the region executes this function but has never established 2 of its 6 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|_operator_cost",
+   "established": 7,
+   "total": 13,
+   "missing": [
+    1307,
+    1321,
+    1325,
+    1328,
+    1329,
+    1331
+   ],
+   "why": "the region executes this function but has never established 6 of its 13 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.__init__",
+   "established": 8,
+   "total": 11,
+   "missing": [
+    1362,
+    1393,
+    1396
+   ],
+   "why": "the region executes this function but has never established 3 of its 11 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet._canonical_specs",
+   "established": 6,
+   "total": 7,
+   "missing": [
+    1407
+   ],
+   "why": "the region executes this function but has never established 1 of its 7 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.__repr__",
+   "established": 5,
+   "total": 6,
+   "missing": [
+    1504
+   ],
+   "why": "the region executes this function but has never established 1 of its 6 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.__str__",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    1525
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.__and__",
+   "established": 11,
+   "total": 17,
+   "missing": [
+    1541,
+    1554,
+    1565,
+    1566,
+    1568,
+    1569
+   ],
+   "why": "the region executes this function but has never established 6 of its 17 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.__eq__",
+   "established": 4,
+   "total": 6,
+   "missing": [
+    1574,
+    1596
+   ],
+   "why": "the region executes this function but has never established 2 of its 6 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.__len__",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    1600
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.__iter__",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    1604
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet._get_ranges",
+   "established": 10,
+   "total": 12,
+   "missing": [
+    1614,
+    1633
+   ],
+   "why": "the region executes this function but has never established 2 of its 12 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.is_unsatisfiable",
+   "established": 11,
+   "total": 14,
+   "missing": [
+    1636,
+    1652,
+    1664
+   ],
+   "why": "the region executes this function but has never established 3 of its 14 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet._check_arbitrary_unsatisfiable",
+   "established": 3,
+   "total": 18,
+   "missing": [
+    1682,
+    1694,
+    1695,
+    1696,
+    1700,
+    1705,
+    1706,
+    1707,
+    1709,
+    1711,
+    1712,
+    1713
+   ],
+   "why": "the region executes this function but has never established 15 of its 18 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.__contains__",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    1721
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.contains",
+   "established": 5,
+   "total": 8,
+   "missing": [
+    1742,
+    1777,
+    1782
+   ],
+   "why": "the region executes this function but has never established 3 of its 8 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet.filter",
+   "established": 19,
+   "total": 22,
+   "missing": [
+    1803,
+    1886,
+    1888
+   ],
+   "why": "the region executes this function but has never established 3 of its 22 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "specifiers|SpecifierSet._filter_versions",
+   "established": 15,
+   "total": 19,
+   "missing": [
+    1899,
+    1929,
+    1931,
+    1933
+   ],
+   "why": "the region executes this function but has never established 4 of its 19 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "utils|canonicalize_version",
+   "established": 6,
+   "total": 7,
+   "missing": [
+    119
+   ],
+   "why": "the region executes this function but has never established 1 of its 7 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|normalize_pre",
+   "established": 2,
+   "total": 3,
+   "missing": [
+    90
+   ],
+   "why": "the region executes this function but has never established 1 of its 3 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|_validate_pre",
+   "established": 6,
+   "total": 10,
+   "missing": [
+    286,
+    288,
+    295,
+    296
+   ],
+   "why": "the region executes this function but has never established 4 of its 10 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|_validate_dev",
+   "established": 3,
+   "total": 7,
+   "missing": [
+    308,
+    310,
+    313,
+    314
+   ],
+   "why": "the region executes this function but has never established 4 of its 7 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|_validate_local",
+   "established": 2,
+   "total": 7,
+   "missing": [
+    317,
+    320,
+    321,
+    322,
+    323
+   ],
+   "why": "the region executes this function but has never established 5 of its 7 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.__init__",
+   "established": 23,
+   "total": 28,
+   "missing": [
+    404,
+    417,
+    421,
+    422,
+    424
+   ],
+   "why": "the region executes this function but has never established 5 of its 28 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.__replace__",
+   "established": 23,
+   "total": 27,
+   "missing": [
+    501,
+    528,
+    543,
+    545
+   ],
+   "why": "the region executes this function but has never established 4 of its 27 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.__lt__",
+   "established": 3,
+   "total": 22,
+   "missing": [
+    592,
+    594,
+    595,
+    596,
+    597,
+    598,
+    599,
+    600,
+    601,
+    603,
+    604,
+    605
+   ],
+   "why": "the region executes this function but has never established 19 of its 22 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.__le__",
+   "established": 18,
+   "total": 22,
+   "missing": [
+    619,
+    641,
+    642,
+    644
+   ],
+   "why": "the region executes this function but has never established 4 of its 22 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.__eq__",
+   "established": 20,
+   "total": 22,
+   "missing": [
+    646,
+    671
+   ],
+   "why": "the region executes this function but has never established 2 of its 22 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.__ge__",
+   "established": 18,
+   "total": 22,
+   "missing": [
+    673,
+    695,
+    696,
+    698
+   ],
+   "why": "the region executes this function but has never established 4 of its 22 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.__gt__",
+   "established": 4,
+   "total": 22,
+   "missing": [
+    700,
+    703,
+    704,
+    705,
+    706,
+    707,
+    708,
+    709,
+    712,
+    713,
+    714,
+    715
+   ],
+   "why": "the region executes this function but has never established 18 of its 22 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.__ne__",
+   "established": 3,
+   "total": 22,
+   "missing": [
+    727,
+    729,
+    730,
+    731,
+    732,
+    733,
+    734,
+    735,
+    736,
+    738,
+    739,
+    740
+   ],
+   "why": "the region executes this function but has never established 19 of its 22 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.__repr__",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    840
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.__str__",
+   "established": 8,
+   "total": 13,
+   "missing": [
+    848,
+    859,
+    867,
+    871,
+    875
+   ],
+   "why": "the region executes this function but has never established 5 of its 13 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.epoch",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    884
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.release",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    895
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.pre",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    911
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.post",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    926
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.dev",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    937
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.local",
+   "established": 2,
+   "total": 4,
+   "missing": [
+    948,
+    958
+   ],
+   "why": "the region executes this function but has never established 2 of its 4 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|Version.is_prerelease",
+   "established": 1,
+   "total": 2,
+   "missing": [
+    999
+   ],
+   "why": "the region executes this function but has never established 1 of its 2 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|_TrimmedRelease.__init__",
+   "established": 10,
+   "total": 11,
+   "missing": [
+    1073
+   ],
+   "why": "the region executes this function but has never established 1 of its 11 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|_TrimmedRelease.release",
+   "established": 6,
+   "total": 7,
+   "missing": [
+    1085
+   ],
+   "why": "the region executes this function but has never established 1 of its 7 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|_parse_letter_version",
+   "established": 6,
+   "total": 8,
+   "missing": [
+    1104,
+    1123
+   ],
+   "why": "the region executes this function but has never established 2 of its 8 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|_parse_local_version",
+   "established": 2,
+   "total": 5,
+   "missing": [
+    1131,
+    1137,
+    1139
+   ],
+   "why": "the region executes this function but has never established 3 of its 5 sites"
+  },
+  {
+   "kind": "UNEXERCISED_BRANCH",
+   "subject": "version|_cmpkey",
+   "established": 22,
+   "total": 23,
+   "missing": [
+    1157
+   ],
+   "why": "the region executes this function but has never established 1 of its 23 sites"
+  }
+ ]
+}

@@ -1,0 +1,9 @@
+other) {
+    if (!this.shape().equals(other.shape())) throw new Error('shapes differ');
+    for (let i = 0; i < this.rows.length; i++) {
+      for (let j = 0; j < this.rows[i].length; j++) {
+        if (this.rows[i][j] !== other.rows[i][j]) return false;
+      }
+    }
+    return true;
+  }

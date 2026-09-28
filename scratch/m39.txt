@@ -1,0 +1,28 @@
+Repair W2-e and W2-g: a mapping declares the producer it is for, and an absent producer or version is never a string
+
+W2-g. adaptRecord applied whatever mapping it was handed - the doctest one by default - to any
+record, so a git record whose native result was spelled PASS received doctest's semantics,
+OBSERVED / HELD (b0673cd): same name, same authority, at the one boundary whose job is to refuse
+that. A mapping now declares its producer under a Symbol key FOR_PRODUCER - a Symbol so it can never
+collide with a native result name, and so a mapping extended by spread for re-adaptation keeps it.
+The default mapping is chosen by the record's producer from a registry; a record from another
+producer, or a mapping that declares no producer, is UNKNOWN_MAPPING with the mismatch named.
+Handing the doctest mapping to a git record explicitly does not help. Recorded in the module: pytest
+has no registered mapping, so every pytest verdict is UNKNOWN_MAPPING and no scoped claim has yet
+derived from pytest evidence.
+
+W2-e. criterion was producer + ' ' + producerVersion, so an unversioned producer became "pytest
+undefined" and a record with no producer at all was adapted under "undefined undefined" (b0673cd).
+An unversioned producer is now a criterion of its own, which covers() will refuse to equate with a
+versioned one; a record naming no producer is refused as malformed.
+
+THREE EXISTING TESTS CHANGED, each with the reason written beside it: producer2.test's GIT_MAPPING now
+declares itself for git; external.test's NON-INVENTION record and its mechanical twin identify as
+the producer the default mapping is for - they used a placeholder producer 'p' under doctest's
+mapping, which is the W2-g defect itself, and after the repair the positive control was
+UNKNOWN_MAPPING for the right reason. The first run after the repair failed on that control; the
+failure and the test change are recorded here rather than folded in.
+
+Message-File: scratch/m39.txt
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>

@@ -1,0 +1,11 @@
+--- op op1 after: "CHANNELS = [\"email\", \"sms\""
+, "push"
+--- op op2 after: "  return all(c in CHANNELS for c in cs)\n"
+
+
+def _send_push(msg):
+    return "push: " + str(msg)
+
+--- op op3 after: "== \"sms\":\n        return _send_sms(msg)\n"
+    if channel == "push":
+        return _send_push(msg)

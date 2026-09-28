@@ -1,0 +1,260 @@
+{
+ "note": "ANNOTATION beside the artifacts, never inside them. Evidence for each attribution is the git commit that last wrote the artifact plus an explicit declaration of the implementation that produced it. Artifacts are NOT modified.",
+ "generated": "2026-09-20T07:58:33.012Z",
+ "bindingProperty": "provenance attaches to immutable artifact identity (content digest), never to storage location. Path is DESCRIPTION.",
+ "seal": "03c9832b425b9ec3a59bc8ea5902cb450815e42487b922756dbf78de728041e9",
+ "records": [
+  {
+   "artifact": "benchmarks/devrepo/RESULT.1p5b.json",
+   "present": true,
+   "sha256": "33704ae5ad394de66cc8eb4d66eae2e5977d7c316332f36690e4abdfe9d5fc09",
+   "bytes": 19342,
+   "producedBy": "LEGASUS_r3 devrepo benchmark, earlier run, same 400-char truncation and the same limit on what it is authoritative for.",
+   "git": {
+    "commit": "ada3fc4f106a0e62173730a18c49efbf7e752a4d",
+    "committed": "2026-09-19T05:41:48-05:00",
+    "subject": "Repo Runtime v2: the four gates Run 0 demanded, and the box widened from guards to bounded body edits"
+   }
+  },
+  {
+   "artifact": "benchmarks/devrepo/RESULT.dev1.json",
+   "present": true,
+   "sha256": "571d24e085318dc0fdabdc10332cceb240592b8a465e2c7bdae080227cc6db9e",
+   "bytes": 20293,
+   "producedBy": "LEGASUS_r3 devrepo benchmark, qwen2.5-coder:1.5b. NOTE: its `code` fields are 400-char PREFIXES (hazard 16), so it is authoritative for the DECISIONS it records and NOT for candidate text.",
+   "git": {
+    "commit": "d3b327b2a3065727cf4cc7375e23ffb0b6d663b8",
+    "committed": "2026-09-19T05:56:36-05:00",
+    "subject": "DEV 1: development validation of the v2 gates, on the tasks that taught me what to build"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoB/candidates.json",
+   "present": true,
+   "sha256": "1ca7fb181e592a3b21137bbaf8f9a2ab21a6a0e1302eb13645bf19fe48ba356b",
+   "bytes": 23796,
+   "producedBy": "LEGASUS_r3 mutation-candidate generation over the repoB corpus",
+   "git": {
+    "commit": "5cbcbaa9ff61a9659fa2bab01ecbdece0516738b",
+    "committed": "2026-09-19T06:02:07-05:00",
+    "subject": "Repo B: mechanical task generation, and the unit-of-work finding before any inference"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoB/classified.json",
+   "present": true,
+   "sha256": "61e6040d7a259e6a0e9f7c0e3053b5b9f5a115433cbfbed919c5b09a47809046",
+   "bytes": 21318,
+   "producedBy": "LEGASUS_r3 classification over sweep.json + legacore/capability.mjs",
+   "git": {
+    "commit": "3f32b764d3b40186e542363727eb5d92d34683a9",
+    "committed": "2026-09-19T06:40:17-05:00",
+    "subject": "LegaExercise: the witness bank, doctest mining, and the Repo B development validation"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoB/manifest.json",
+   "present": true,
+   "sha256": "63a42d592bcb3acc353703c9193baef3c40e97123032fcc58c2f39da2b4b3390",
+   "bytes": 41076,
+   "producedBy": "LEGASUS_r3 frozen candidate manifest for repoB",
+   "git": {
+    "commit": "c98495c2064369f011a7d850e9b0240a83a54217",
+    "committed": "2026-09-19T06:14:05-05:00",
+    "subject": "Repo B is BLOCKED by the measuring instrument, not by r2 - and that is the result of this stage"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoB/region-frontier.json",
+   "present": true,
+   "sha256": "a1c0fdb1aa666bbffbd0c4640de4abf722c3e89b139d95b6f2350f4eddbcc14b",
+   "bytes": 21545,
+   "producedBy": "LEGASUS_r3 execution-region derivation from sweep.json",
+   "git": {
+    "commit": "d84fe24b91ea73447fa82ad13c473fe6163db8a5",
+    "committed": "2026-09-19T07:11:14-05:00",
+    "subject": "EXECUTION_IDENTITY_NONALIASING — evidence belongs to the exact executable identity that produced it"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoB/slice-granularity.json",
+   "present": true,
+   "sha256": "3fcf25a9b386f1781567cbeedd7e2d82160b5a909f26ae95da6d165a35554a85",
+   "bytes": 3079,
+   "producedBy": "LEGASUS_r3 preregistered P-A / P-B slice measurement",
+   "git": {
+    "commit": "ca13d0381fc38e3a3d5b27ccae609144afacdbf9",
+    "committed": "2026-09-19T06:57:40-05:00",
+    "subject": "RESULT: the function is a container the region intersects, not a unit the region is made of"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoB/sweep.json",
+   "present": true,
+   "sha256": "ee1695e974852a3f0ef95ace2182071c1016edb2967a3a085fc8d188fe491da2",
+   "bytes": 854318,
+   "producedBy": "LEGASUS_REPLAY_r3 (legaexercise/witness.mjs observe, shared stdout channel)",
+   "git": {
+    "commit": "d84fe24b91ea73447fa82ad13c473fe6163db8a5",
+    "committed": "2026-09-19T07:11:14-05:00",
+    "subject": "EXECUTION_IDENTITY_NONALIASING — evidence belongs to the exact executable identity that produced it"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/IDENTITY.json",
+   "present": true,
+   "sha256": "1eeb21d2e40fd4340c822f954bb90101e32188b5c15192ac678e50a810197c12",
+   "bytes": 3347,
+   "producedBy": "LEGASUS_r4 Repo C subject pinning (byte-for-byte copy + sha256 manifest)",
+   "git": {
+    "commit": "19d200a2e12bd5d71ef028c1f6cb7106c168d947",
+    "committed": "2026-09-19T09:19:52-05:00",
+    "subject": "REPO C SELECTED MECHANICALLY: pyparsing 3.3.2. Identity recorded before anything semantic is inspected"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/admission.json",
+   "present": true,
+   "sha256": "8a6f76df7b45cda6fb81fba6d45af557e0f81f38895025929392ee4b391cbd72",
+   "bytes": 161675,
+   "producedBy": "LEGASUS_r3 envelope + witnessed-site intersection",
+   "git": {
+    "commit": "bb4ba36f121922074ed505502fda240d74c1ebfd",
+    "committed": "2026-09-19T09:39:02-05:00",
+    "subject": "Repo C stage 3: 10 of 450 callables admissible (2.2%)"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/arms.INVALID-failed-only-scorer.json",
+   "present": true,
+   "sha256": "efa1ade96cbec9aa75549832119c698fe215654a239a4b437855ee67522cec5e",
+   "bytes": 1170,
+   "producedBy": "LEGASUS_r3 gate vs RAW arm, INVALID: scorer compared `failed` alone and admitted destruction",
+   "git": {
+    "commit": "a52c26f0b073ab120e5763e5e910aa8e678605ad",
+    "committed": "2026-09-19T09:47:02-05:00",
+    "subject": "REPO C COMPLETE under frozen r3: capability 0/3, commit precision UNDEFINED, safety 3/3"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/arms.json",
+   "present": true,
+   "sha256": "0afcf291807b19b31cfbcfea0d3a09e509091442776c08f757b4916e45622392",
+   "bytes": 1291,
+   "producedBy": "LEGASUS_r3 gate vs RAW arm, local qwen2.5-coder:1.5b, surface-preserving scorer",
+   "git": {
+    "commit": "a52c26f0b073ab120e5763e5e910aa8e678605ad",
+    "committed": "2026-09-19T09:47:02-05:00",
+    "subject": "REPO C COMPLETE under frozen r3: capability 0/3, commit precision UNDEFINED, safety 3/3"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/attribution.json",
+   "present": true,
+   "sha256": "9a3395687c508e8099ca712ec14969e58b5a3d9eb53964e3d3e1f10da55fe7e5",
+   "bytes": 499,
+   "producedBy": "LEGASUS_r4 per-example attribution probes",
+   "git": {
+    "commit": "89d37fc81910e6b5aaa6455c2989682fd775a225",
+    "committed": "2026-09-19T09:31:57-05:00",
+    "subject": "REPO C 2b: seven corrections to my own stage 1-2 record, one of them in r3's favour"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/calibration.json",
+   "present": true,
+   "sha256": "79894578f817230e9c9e3175ad0555d559de9d23ad542c6bbb2e3c99198318e1",
+   "bytes": 561,
+   "producedBy": "COMPARISON of LEGASUS_REPLAY_r3 against CPYTHON_DOCTEST",
+   "git": {
+    "commit": "f204c416ba7383eecab42a351676e02fdde1bf51",
+    "committed": "2026-09-19T09:26:17-05:00",
+    "subject": "REPO C STAGES 1-2: coverage 41.1%, calibration 86.0%, and r3 has a capability failure it will not be fixed for"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/external.json",
+   "present": true,
+   "sha256": "fc0f04acdfd94b27b68635bc47212703df8d76955e304529de94d0011b22ccfc",
+   "bytes": 22523,
+   "producedBy": "CPYTHON_DOCTEST (external producer, verdicts only)",
+   "git": {
+    "commit": "89d37fc81910e6b5aaa6455c2989682fd775a225",
+    "committed": "2026-09-19T09:31:57-05:00",
+    "subject": "REPO C 2b: seven corrections to my own stage 1-2 record, one of them in r3's favour"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/r4-ab.json",
+   "present": true,
+   "sha256": "ffbcfc3fa432a06322bde798a374432e171af11c8c710ae9f5abdd8581e81c74",
+   "bytes": 5151,
+   "producedBy": "A/B of LEGASUS_REPLAY_r3 against LEGASUS_r4 isolated channel",
+   "git": {
+    "commit": "60323a5493706bb99d22d603493780f232d2776a",
+    "committed": "2026-09-19T09:56:13-05:00",
+    "subject": "r4 / V1: observer-subject channel isolation, attacked at the boundary"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/r4-v2.json",
+   "present": true,
+   "sha256": "0563a726ef39fba592a0ba4ae73407e263e7be324e057aca8f6005ec24df3ab8",
+   "bytes": 977,
+   "producedBy": "LEGASUS_r4 SEQUENTIAL_SHARED, execution only, no assertion evaluation",
+   "git": {
+    "commit": "4eda10d63385d35850080f1fa13b8332f91b5b9b",
+    "committed": "2026-09-19T09:58:37-05:00",
+    "subject": "r4 / V2: execution model made explicit. W1 and W3 held, W2 FAILED and located the next defect"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/r4-v2b.json",
+   "present": true,
+   "sha256": "318fc358165cd616b48a3e23333e4dce2e2f163d6c13513f016f9c8cc84a476b",
+   "bytes": 278,
+   "producedBy": "LEGASUS_r4 SEQUENTIAL_SHARED_CHECKED, comparison delegated to doctest.OutputChecker",
+   "git": {
+    "commit": "0ea782ea1cc90e01c81228fa56ce86321207fe6b",
+    "committed": "2026-09-19T10:04:24-05:00",
+    "subject": "r4 / V2b: X1 and X3 held, X2 held only after fixing MY defect, and a Repo C number needs a correction"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/sweep.json",
+   "present": true,
+   "sha256": "8024ebfeb736e6457f996c2fc683fae66117cb462e360beca761db4c7ead0d95",
+   "bytes": 793146,
+   "producedBy": "LEGASUS_REPLAY_r3 (legaexercise/witness.mjs observe, shared stdout channel)",
+   "git": {
+    "commit": "f204c416ba7383eecab42a351676e02fdde1bf51",
+    "committed": "2026-09-19T09:26:17-05:00",
+    "subject": "REPO C STAGES 1-2: coverage 41.1%, calibration 86.0%, and r3 has a capability failure it will not be fixed for"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC/tasks.json",
+   "present": true,
+   "sha256": "e49d23c1c7cc616df4041d24d1594c82a97e10180fa8757e14a7ca6a85591818",
+   "bytes": 2165,
+   "producedBy": "LEGASUS_r4 oracle establishment via legalabs/mutate.mjs",
+   "git": {
+    "commit": "a52c26f0b073ab120e5763e5e910aa8e678605ad",
+    "committed": "2026-09-19T09:47:02-05:00",
+    "subject": "REPO C COMPLETE under frozen r3: capability 0/3, commit precision UNDEFINED, safety 3/3"
+   }
+  },
+  {
+   "artifact": "benchmarks/repoC_candidates.json",
+   "present": true,
+   "sha256": "b0a0629a7f8c34b4dbde9a1918bf16b8803911a544dc923d3799fb2d916e4378",
+   "bytes": 12345,
+   "producedBy": "LEGASUS_r4 mechanical Repo C eligibility enumeration",
+   "git": {
+    "commit": "19d200a2e12bd5d71ef028c1f6cb7106c168d947",
+    "committed": "2026-09-19T09:19:52-05:00",
+    "subject": "REPO C SELECTED MECHANICALLY: pyparsing 3.3.2. Identity recorded before anything semantic is inspected"
+   }
+  }
+ ]
+}

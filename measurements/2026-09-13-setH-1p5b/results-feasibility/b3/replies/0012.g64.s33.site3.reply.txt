@@ -1,0 +1,21 @@
+# AT THIS POINT WRITE ONLY THIS: a heading must also close an open list
+            # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+
+        if line.startswith("#"):
+            flush_para()
+            items = []
+            blocks.append("<h1>" + _inline(line[2:]) + "</h1>")
+            continue
+        elif line.startswith("##"):
+            flush_para()
+            items = []
+            blocks.append("<h2>" + _inline(line[3:]) + "</h2>")
+            continue
+        elif line.startswith("###"):
+            flush_para()
+            items = []
+            blocks.append("<h3>" + _inline(line[4:]) + "</h3>")
+            continue
+        if line.startswith("1. "):
+            flush_para()
+            items.append(line[3:].strip())

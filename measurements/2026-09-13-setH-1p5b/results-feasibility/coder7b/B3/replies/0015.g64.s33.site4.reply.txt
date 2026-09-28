@@ -1,0 +1,44 @@
+if ordered_items:
+                flush_ordered_list()  # Flush the current ordered list
+            items.append(line[2:].strip())
+            continue
+        if line.startswith(". "):  # Check for an ordered list item
+            flush_para()  # Flush any previous paragraph
+            ordered_items.append(line[2:].strip())  # Add to ordered_items list
+            continue
+        if not ordered_items and current == []:  # If no ordered items are present and the current block is empty
+            flush_ordered_list()  # Flush the ordered list, if any
+
+        h = _is_heading(line)
+        if h:
+            flush_para()
+            level, body = h
+            blocks.append("<h%d>%s</h%d>" % (level, _inline(body), level))
+            continue
+        current.append(line.strip())
+
+    flush_para()
+    flush_list()
+    # BEGIN: Add ordered list support
+    flush_ordered_list()  # Flush any remaining ordered list
+    # END: Add ordered list support
+
+    return "\n".join(blocks)
+
+
+if __name__ == "__main__":
+    assert to_html("a\nb") == "<p>a b</p>"
+    assert to_html("a\n\nb") == "<p>a</p>\n<p>b</p>"
+    assert to_html("1 < 2 & 3 > 0") == "<p>1 &lt; 2 &amp; 3 &gt; 0</p>"
+    assert to_html("# Title") == "<h1>Title</h1>"
+    assert to_html("**b** and *i*") == "<p><strong>b</strong> and <em>i</em></p>"
+    assert to_html("a * b") == "<p>a * b</p>"
+    assert to_html("`a*b*c`") == "<p><code>a*b*c</code></p>"
+    assert to_html("see [docs](http://x/a)") == '<p>see <a href="http://x/a">docs</a></p>'
+    assert to_html("- one\n- two") == "<ul><li>one</li><li>two</li></ul>"
+    assert to_html(". 1. two\n- three") == "<ol><li>two</li></ol>\n<ul><li>three</li></ul>"  # Add ordered list support
+    print("ok")
+
+# This code is a Python script that converts Markdown text to HTML. It uses regular expressions to identify different types of Markdown syntax, such as headers, lists, emphasis, and links, and replaces them with the corresponding HTML tags. The resulting HTML is then returned as a string.
+#
+# The script defines several functions for handling different aspects of the conversion process. For example, the `_escape` function escapes special characters in text, the `_inline` function processes inline Markdown syntax such as emphasis

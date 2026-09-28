@@ -1,0 +1,4 @@
+# REQUESTED CHANGE: If the line starts with `- `, it should be interpreted as a list item, and added to the items list. The rest of the line is collected verbatim until the next list item.
+        # ALREADY HANDLED ELSEWHERE - do not add a second path for it: ordinary text is already accumulated by the existing current.append(line.strip()) at the end of the loop; paragraphs, headings and unordered lists already have their own branches
+        # NOT AVAILABLE HERE (they are locals of other functions, not of to_html): codes, label, links, m, take_code, take_link, url
+        # Any line this code does not handle must fall through to the EXISTING code unchanged.
