@@ -1,0 +1,56 @@
+ACTION-GOVERNANCE-1 amendment 2: behavioural baseline replaces the grep, and three of my own claims were wrong
+
+Frozen before implementation. No governance code written. Probe: ag-baseline-probe.mjs, read-only.
+
+THE METHODOLOGICAL CORRECTION IS THE IMPORTANT ONE. Amendment 1 built its baseline by GREPPING for scope,
+budget, expiry and revoke, found zero, and recorded six bindings as ABSENT. Absence of a word is search
+evidence, not proof of absent enforcement - and it was WRONG: context monotonicity IS enforced, under the
+names context and widened, added after composition attack W3-c. Every row of the baseline is now a run
+probe.
+
+MEASURED. Already enforced, and a refusal here is a binding that must not regress:
+    B1 widen the grant beyond the grantor            REFUSED
+    B2 drop a pinned context dimension               REFUSED
+    B3 change a pinned context dimension             REFUSED
+    B4 delegate FROM an epistemic token              REFUSED
+    B5 commit with a bare epistemic token            refused
+    B6 controller-HELD owner-issued authority        PERMITTED - and correctly so
+
+Measured gaps, where PERMITTED is the gap:
+    G1 two children each receive the parent's FULL grant    both minted, no shared accounting
+    G2 the same token consumed for two separate actions     both committed, no single use
+    G3 context pins implementation=fixture.js; commit edit OTHER.js    COMMITTED
+    G4 commit with no admitted evidence at all              COMMITTED
+    G5 token fields carry no expiry or revocation surface at all
+
+CORRECTION 1. Amendment 1 said any change letting a CONTROLLER-HELD token satisfy `from` is a regression.
+That was wrong and would have prohibited the legitimate case. B6 proves a controller exercising
+owner-issued authority is permitted today and must stay permitted. The prohibition is on CREATING,
+EXPANDING or RE-DELEGATING BEYOND the grant - never on holding or exercising. Whether a controller may
+re-delegate at all is a separate policy decision, explicitly NOT decided here; if it is forbidden it gets
+its own rule and its own test rather than arriving by accident through a mis-stated regression check.
+
+CORRECTION 2. A14 predicted context monotonicity would need real design. It is already enforced, so A14 is
+WITHDRAWN as a build item and kept as a regression test. THE REAL GAP IS ONE LAYER LATER AND G3 IS THE
+PROOF: the calculus polices how context TRAVELS and never compares it to the action when the action
+EXECUTES. A grant pinned to fixture.js committed edit OTHER.js. Time-of-check to time-of-use, inside a
+system built to prevent exactly that class. Verification at execution must bind target, revision, action,
+evidence and current authorization state together, at the moment of commit.
+
+CORRECTION 3. Narrowing each child is necessary and INSUFFICIENT for budgets. A parent permitting N can
+issue two children each permitting N; each satisfies child <= parent, together they permit 2N. The
+constraint is not a property of any token, so budget needs shared accounting or explicit allocation, with
+atomic consumption (G2 shows consumption is not even recorded) and ancestor revocation invalidating
+descendants (G5 shows no revocation surface exists). These are properties of the DELEGATION TREE AND ITS
+RUNTIME STATE, not token fields; Amendment 1's framing of them as eight token bindings was wrong.
+
+A14 is restated as five dimensions with measured status - actions/targets HELD, context HELD, expiry
+ABSENT, evidence obligations ABSENT, budget ABSENT, revocation ABSENT - and A8-A14 are replaced by E1-E8,
+every one a refusal at the EXECUTION path rather than at issuance.
+
+PROOF TARGET, one sentence: valid delegated work proceeds, while changing the target, the revision, the
+evidence, the lifetime, or the remaining authority causes the ACTUAL EXECUTION PATH to refuse.
+
+Message-File: scratch/ag-amend2.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
