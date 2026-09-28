@@ -91,8 +91,9 @@ Consequences worth recording separately:
   cases. That is a repeat of the success on different code, which is what this test asked for.
 - **Established:** across all three pages and 13 attempts, **zero regressions**: no protected-set failure,
   no restore, and every carried-forward check passing on every attempt including the nine failures.
-- **Established:** the per-attempt success rate is low - 3 of 13 - so per-page success depends on getting
-  a usable draw within the budget.
+- **Established:** completing a page depends on getting a usable draw within the budget - 2 accepted of 13
+  attempts, and colour needed its third seed. This is a statement about cost and variability, NOT a success
+  rate, because each page stops at its first success.
 - **Established, by the failure:** a budget-driven renderer defect can silently deliver the least useful
   facts available. The extractor was right all along, and the delivery threw its answer away.
 
