@@ -29,18 +29,26 @@ Derived from AUDIT-1's two runs, not from a price list:
 
 **Implied A10G rate ≈ $0.86/hour.** Nothing here is a price quote; Modal's rates move.
 
-### The dominant cost is idle GPU, not generation
+### Most billed time is NOT generation time
 
-| | generation | wall | idle while local checking runs |
+| | generation | wall | non-generation |
 |---|---|---|---|
-| run 1 | 108 s | 673 s | **565 s — 84% of billed time** |
-| run 2 | 94 s | 448 s | **354 s — 79% of billed time** |
+| run 1 | 108 s | 673 s | 565 s — **84% of billed time** |
+| run 2 | 94 s | 448 s | 354 s — **79% of billed time** |
 
-The A10G is billed at full rate while puppeteer verifies candidates on this laptop. **Four fifths of
-AUDIT-1's spend bought nothing.** Mitigation for this audit: `scaledown_window` drops from 2 minutes to
-**45 seconds**, so the container releases during long local verification and cold-starts back from the
-volume (~15 s, weights already cached). Recorded as a cost change, not an apparatus change — it cannot
-affect what the model generates.
+An earlier draft called this "idle GPU" and said four fifths of the spend "bought nothing." That
+overstates what was measured. The non-generation figure is a residual: it contains container startup,
+model load, HTTP round trips, ollama's own overhead, and time waiting on local verification, and this
+run did not separate them. What is established is that **most billed time was not generation** — not
+that all of it was waste.
+
+`scaledown_window` drops from 2 minutes to **45 seconds** for this audit. That is a **serving change
+whose effects have to be measured, not an obviously free saving**: a shorter window can cut billed idle
+time, and it can equally add repeated cold starts that cost more than they save, or push a request into
+a startup window and produce a timeout. Cost per verified completion and any timeout are recorded for
+this configuration and compared against AUDIT-1's 2-minute runs before the change is called an
+improvement. It should not change what the model generates — the prompt and decoding are untouched —
+but "should not" is a prediction, so generation-side outcomes are compared too.
 
 ### Planned exposure
 
@@ -54,9 +62,30 @@ affect what the model generates.
 | **subtotal** | | **~$1.07** |
 | ×3 contingency (retries, cold starts, longer runs) | | **~$3.20** |
 
-**Hard stop at $4.00 cumulative**, leaving headroom under the $5 cap. Billing is read **between every
-stage**; if cumulative spend exceeds $4.00 the audit stops there and reports what it has. If billing
-cannot be read, the audit stops and reports an unresolved cost exposure rather than continuing.
+### Enforcement, which cannot rest on billing
+
+**A between-stage billing read cannot enforce a cap.** Billing lags, so a check after the fact reports
+spend that has already happened and says nothing about spend in flight. Two mechanisms instead:
+
+**1. A pre-stage admission test.** A stage starts only if
+
+    accrued (last billing read)
+  + outstanding exposure (GPU seconds since that read x rate)
+  + this stage's maximum (wall-clock budget x rate)
+  + shutdown allowance (scaledown window + stop latency x rate)
+  <  $4.00
+
+If the sum reaches $4.00 the stage does not start. Unknown accrued spend is treated as the largest
+value consistent with what is known, never as zero.
+
+**2. An independent wall-clock watchdog**, which is the actual enforcement. Time is the quantity this
+project can meter directly and in real time; dollars are not. `campaign.mjs --max-gpu-seconds` stops the
+campaign and stops the Modal app when the budget is spent, whatever billing says and whether or not
+billing can be read at all. At ~$0.86/hour, $4.00 is ~4.6 hours; the watchdog is set well inside that
+per stage.
+
+Billing is still read between stages — as a *reconciliation* of the watchdog against reality, and to
+detect a rate that has moved. A discrepancy stops the audit.
 
 ## The five stages
 
@@ -69,6 +98,11 @@ machinery is a design, not code, and is outside every claim in this audit**.
 
 ### Stage 2 — validate the apparatus without spending ($0)
 
+Plus the **operational** gate, which is the failure mode most capable of quietly invalidating stage 3:
+an injected crash driven through the real launcher must produce a non-zero campaign exit, an explicit
+interrupted record, and a reconciliation of expected against recorded against preserved attempts.
+Tested alongside a positive control, so the gate cannot pass by failing everything.
+
 Five candidates through the **actual runner** against a scripted backend, each of which must succeed or
 fail *for its intended reason*, not merely land on the right verdict:
 
@@ -76,7 +110,7 @@ fail *for its intended reason*, not merely land on the right verdict:
 |---|---|
 | correct | reach RETAIN, protected PASS |
 | inert | be rejected for failing the addition, with carried-forward intact |
-| regression | be rejected for breaking carried-forward behaviour, and be RESTORED |
+| regression | be rejected for breaking carried-forward behaviour, and be RESTORED **with byte-identity evidence against the start commit**, not a disposition label |
 | wrong-language | be refused at containment as WRONG_SLOT_LANGUAGE, never spliced |
 | out-of-scope edit | be refused, and not reach the page |
 

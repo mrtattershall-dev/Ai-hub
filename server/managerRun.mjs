@@ -81,6 +81,12 @@ const startFile = readFileSync(join(DIR, NAME), 'utf8');
 const stepName = (n) => (spec.steps.find((s) => s.n === n) || {}).name || `step ${n}`;
 
 const out = {
+  // A RUN THAT DIES MUST NOT LOOK LIKE A RUN THAT FINISHED. p4's 1.5B run was killed in round 4 and
+  // wrote no record at all, while the shell reported success because the loop's last command was an
+  // echo. The record is now written after EVERY attempt, starting as INTERRUPTED and only becoming
+  // COMPLETE on the final write, so an absent or INTERRUPTED status is a positive signal rather than
+  // an absence to be guessed at.
+  status: 'INTERRUPTED',
   at: new Date().toISOString(), experiment: 'TRANSFER-3', task: task.id, model: MODEL,
   page: join(DIR, NAME), baselineSha: sha(startFile),
   budget: { maxCalls: MAX_CALLS, maxRounds: MAX_ROUNDS, seedsPerRound: SEEDS_PER_ROUND },
@@ -260,6 +266,7 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
       if (CORPUS) rec.preserved = preserveAttempt(CORPUS, rec, { candidate, rawFull: middle, prompt: head, suffix: cut.suffix, proposal: roundRec.proposal, classification: rec.classification });
       if (rec.classification.mismatch === 'PARTIAL_EFFECT') console.log(`           PARTIAL: ${rec.classification.why}`);
       out.attempts.push(rec);
+      if (OUT) { try { writeFileSync(OUT, JSON.stringify(out, null, 2), 'utf8'); } catch { /* the run continues; the corpus still holds this attempt */ } }
       roundRec.seeds.push({ seed, outcome: rec.outcome, mismatch: rec.classification.mismatch, passing: rec.play?.passing, failing: rec.play?.failing, visual: rec.visual?.verdict ?? null, decision: decision.summary });
       if (shouldRetain(decision)) { out.accepted = true; out.acceptedSeed = seed; out.acceptedRound = round; out.acceptedCandidate = contained.text; break; }
       // The attempt that got furthest is the one the next round gets feedback from.
@@ -280,6 +287,16 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
   feedback = worst ? buildFeedback(worst, indent) : '';
 }
 
+// RECONCILIATION: what the budget allowed against what is actually on record. A run that made fewer
+// calls than its budget either stopped for a declared reason or died; the record has to say which.
+out.status = 'COMPLETE';
+out.reconciliation = {
+  maxCallsAllowed: MAX_CALLS,
+  callsMade: out.calls,
+  attemptsRecorded: out.attempts.length,
+  attemptsPreserved: out.attempts.filter((a) => typeof a.preserved === 'string').length,
+  endedBecause: out.accepted ? 'accepted' : (out.stoppedBecause || (out.calls >= MAX_CALLS ? 'call budget exhausted' : 'rounds exhausted')),
+};
 out.totals = {
   additionAttemptCalls: out.calls,
   accepted: out.attempts.filter((a) => a.outcome === 'ACCEPTED').length,

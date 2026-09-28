@@ -107,7 +107,16 @@ export function preserveAttempt(dir, rec, { candidate, rawFull, prompt, suffix, 
       contained: rec.transformedCandidate || null,
       containment: rec.containment || null,
       play: rec.play ? { passing: rec.play.passing, failing: rec.play.failing, errors: (rec.play.errors || []).slice(0, 5) } : null,
-      acceptance: rec.acceptance ? { disposition: rec.acceptance.disposition, protected: rec.acceptance.survivingWorkspaceVerdict && rec.acceptance.survivingWorkspaceVerdict.protected } : null,
+      // THE EVIDENCE, not only the label. `survivingBytes` is the byte comparison against the start
+      // commit that RESTORED actually rests on; `candidateTree` is the tree hash. Recording only the
+      // disposition dropped both - and dropped them exactly in the interrupted-run case where this
+      // corpus is the ONLY record, leaving "restored" as an unbacked word.
+      acceptance: rec.acceptance ? {
+        disposition: rec.acceptance.disposition,
+        protected: rec.acceptance.survivingWorkspaceVerdict && rec.acceptance.survivingWorkspaceVerdict.protected,
+        survivingBytes: rec.acceptance.survivingBytes ?? null,
+        candidateTree: rec.acceptance.survivingWorkspaceVerdict && rec.acceptance.survivingWorkspaceVerdict.candidateTree,
+      } : null,
       decision: rec.decision || null,
       candidateFile: candidate ? `${stem}.html` : null,
     }, null, 2), 'utf8');
