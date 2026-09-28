@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertical Bars</title>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const state = () => ({
+            bars: [
+                { height: 1 },
+                { height: 1 },
+                { height: 1 }
+            ]
+        });
+
+        const updateState = (key) => {
+            const { bars } = state();
+            switch (key) {
+                case 'a':
+                    bars[0].height++;
+                    break;
+                case 'b':
+                    bars[1].height++;
+                    break;
+                case 'c':
+                    bars[2].height++;
+                    break;
+            }
+            setState(state => ({
+                ...state,
+                bars
+            }));
+        };
+
+        const draw = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            bars.forEach((bar, index) => {
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(0, index * 10, bar.height, 10);
+            });
+        };
+
+        const setState = (newState) => {
+            Object.assign(state, newState);
+        };
+
+        document.addEventListener('keydown', (e) => {
+            updateState(e.key);
+            draw();
+        });
+
+        window.app = { state };
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+at            2026-09-28T02:03:17.394Z
+out           baseline-as-delivered.html
+sha256        02ad6b0e816b9b45908871648f9d47e45d8fdd78318e02cf320f99057046e12f
+chars         822
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  221   doneReason stop   ms 25150
+seamWording   firm + document-listener (TRANSFER-3 frozen template)
+ask           A colour name shown on a canvas. Key c cycles through red, green and blue.
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA colour name shown on a canvas. Key c cycles through red, green and blue.\nREQUIRED, the page will be rejected without it: attach key handling with\ndocument.addEventListener('keydown', ...) and NOT to the canvas element.\nREQUIRED, the page will be rejected without it: the last line of the script must be exactly\nwindow.app = { state: () => ({ ...<every piece of state the page keeps> }) }; so that automated\ntests can read the state.\nUse a single <canvas> and one inline <script>. Plain JavaScript, no libraries."

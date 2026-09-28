@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack Game</title>
+</head>
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const stack = [];
+
+        function drawStack() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = stack.length - 1; i >= 0; i--) {
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(i * 50, 350, 50, 50);
+            }
+        }
+
+        function pushBlock() {
+            stack.push({ x: stack.length * 50, y: 350 });
+            drawStack();
+        }
+
+        function popBlock() {
+            if (stack.length > 0) {
+                stack.pop();
+                drawStack();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'a') {
+                pushBlock();
+            } else if (e.key === 'b') {
+                popBlock();
+            }
+        });
+
+        window.app = {
+            state: () => ({ stack })
+        };
+    </script>
+</body>
+</html>

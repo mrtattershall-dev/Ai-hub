@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Grid</title>
+</head>
+<body>
+    <canvas id="gridCanvas" width="300" height="300"></canvas>
+    <script>
+        const canvas = document.getElementById('gridCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Initialize state
+        window.app = {
+            state: () => ({
+                grid: [
+                    [0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0]
+                ]
+            })
+        };
+
+        // Handle keydown event
+        document.addEventListener('keydown', (e) => {
+            const key = e.key;
+            if (key === '1') {
+                window.app.state().grid[0][0] = 1;
+            } else if (key === '2') {
+                window.app.state().grid[0][1] = 2;
+            } else if (key === '3') {
+                window.app.state().grid[0][2] = 3;
+            }
+            drawGrid();
+        });
+
+        // Draw the grid
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const gridSize = 100;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const x = j * gridSize;
+                    const y = i * gridSize;
+                    ctx.fillStyle = window.app.state().grid[i][j] === 1 ? 'red' : window.app.state().grid[i][j] === 2 ? 'green' : window.app.state().grid[i][j] === 3 ? 'blue' : 'white';
+                    ctx.fillRect(x, y, gridSize, gridSize);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

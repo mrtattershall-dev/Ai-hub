@@ -1,0 +1,9 @@
+at            2026-09-28T02:01:46.090Z
+out           baseline-as-delivered.html
+sha256        951e4254727c95b5fda2f01c8055ae5b96b28040e50197ab3a2aae78b38dd2d1
+chars         1384
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  326   doneReason stop   ms 43068
+seamWording   firm + document-listener (TRANSFER-3 frozen template)
+ask           A single square on a canvas that moves one cell left or right when ArrowLeft or ArrowRight is pressed.
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA single square on a canvas that moves one cell left or right when ArrowLeft or ArrowRight is pressed.\nREQUIRED, the page will be rejected without it: attach key handling with\ndocument.addEventListener('keydown', ...) and NOT to the canvas element.\nREQUIRED, the page will be rejected without it: the last line of the script must be exactly\nwindow.app = { state: () => ({ ...<every piece of state the page keeps> }) }; so that automated\ntests can read the state.\nUse a single <canvas> and one inline <script>. Plain JavaScript, no libraries."

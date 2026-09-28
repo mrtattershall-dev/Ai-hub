@@ -1,0 +1,9 @@
+at            2026-09-28T02:05:55.280Z
+out           baseline-as-delivered.html
+sha256        89ed04dbe64f5b86266538fb02291bab1308d6e63e92acc8c297bdc5af6d8326
+chars         1638
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  348   doneReason stop   ms 35213
+seamWording   firm + document-listener (TRANSFER-3 frozen template)
+ask           Three vertical bars on a canvas, all at height one. Keys a, b and c each make their own bar one taller.
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nThree vertical bars on a canvas, all at height one. Keys a, b and c each make their own bar one taller.\nREQUIRED, the page will be rejected without it: attach key handling with\ndocument.addEventListener('keydown', ...) and NOT to the canvas element.\nREQUIRED, the page will be rejected without it: the last line of the script must be exactly\nwindow.app = { state: () => ({ ...<every piece of state the page keeps> }) }; so that automated\ntests can read the state.\nUse a single <canvas> and one inline <script>. Plain JavaScript, no libraries."

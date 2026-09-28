@@ -1,0 +1,9 @@
+at            2026-09-28T02:02:16.296Z
+out           baseline-as-delivered.html
+sha256        2784ea219e4cd1d9d226b519142520d43bcabadc718ca2a319f48c1cdc1b7c08
+chars         1257
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  325   doneReason stop   ms 30155
+seamWording   firm + document-listener (TRANSFER-3 frozen template)
+ask           A tally of votes for two options drawn on a canvas. Key 1 adds a vote to the first, key 2 to the second.
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nA tally of votes for two options drawn on a canvas. Key 1 adds a vote to the first, key 2 to the second.\nREQUIRED, the page will be rejected without it: attach key handling with\ndocument.addEventListener('keydown', ...) and NOT to the canvas element.\nREQUIRED, the page will be rejected without it: the last line of the script must be exactly\nwindow.app = { state: () => ({ ...<every piece of state the page keeps> }) }; so that automated\ntests can read the state.\nUse a single <canvas> and one inline <script>. Plain JavaScript, no libraries."

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Brightness</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            width: 200px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="brightnessCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('brightnessCanvas');
+        const ctx = canvas.getContext('2d');
+        const brightness = 3; // Initial brightness level
+
+        function drawBrightness() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgb(' + brightness + ', ' + brightness + ', ' + brightness + ')';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'ArrowUp') {
+                brightness = Math.min(brightness + 1, 5);
+            } else if (event.key === 'ArrowDown') {
+                brightness = Math.max(brightness - 1, 0);
+            }
+            drawBrightness();
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        window.app = { state: () => ({ brightness }) };
+    </script>
+</body>
+</html>

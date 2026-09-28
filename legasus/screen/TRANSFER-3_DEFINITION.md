@@ -110,7 +110,11 @@ it; and no error at any point.
     site         autoGuide.chooseSite         R1 / R2 / DECLINE by name
     scaffold     autoGuide.buildScaffold
     instruction  autoGuide.buildInstruction
-    context      codeFacts compact FACT / STRATEGY / NOT-ESTABLISHED, ranked by call distance
+    context      codeFacts compact FACT / STRATEGY / NOT-ESTABLISHED, ranked by call distance.
+                 DECLARED BEFORE THE RUN, filling in a parameter this definition first left open:
+                 style `compact`, character budget 240, strategy line INCLUDED. That is the exact
+                 configuration ASSISTED-1 used; it is carried over rather than chosen, and it is
+                 written down here before any attempt so it cannot be picked from outcomes.
     containment  localEdit.containToSlot
     feedback     built automatically from the gate's output - failing step numbers, the state seen, any
                  captured error text. No sentence of it written by me at run time.
