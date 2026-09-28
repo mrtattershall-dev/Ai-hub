@@ -245,9 +245,45 @@ export function plan({ file, requirement, observation, facts = null }) {
       scope = { creates: ['a keydown listener'], attaches: ['document'], calls: renderer ? [renderer] : [] };
       uncertainty.push('this application had no key handling before, so nothing establishes that a key press reaches it in the way the requirement assumes; the checks will settle it');
     }
+  } else if (trigger.kind === 'type') {
+    // A TYPING-TRIGGERED REQUIREMENT. This used to DECLINE, and AUDIT-2 stage 4 showed what that
+    // costs: the manager could not attempt a match-count feature that the direct control completed
+    // on its first call, on three pages out of three. A decline is not a neutral abstention when
+    // the requirement is ordinary and the control can express it.
+    //
+    // The shape mirrors the click branch. What decides it is whether the EFFECTS name something
+    // that does not exist yet:
+    //   they do      create it and keep it current whenever the field changes
+    //   they do not  extend the handling the field already has
+    const field = trigger.selector || null;
+    const wantedInEffects = (requirement.effects || []).join(' ').match(/#[A-Za-z][\w-]*/);
+    const named = wantedInEffects ? wantedInEffects[0] : null;
+    const existsAlready = named ? new RegExp(`id=["']${named.slice(1)}["']`).test(file) : false;
+    const typeRegs = regs.filter((r) => ['input', 'change', 'keyup', 'keydown'].includes(r.type));
+    if (named && !existsAlready) {
+      move = MOVE.CREATE_CONTROL;
+      site = { insertAfterLine: endOfScript(file), why: 'at the end of the script, after the field and every function it must reference exists' };
+      evidence.push(`the requirement is triggered by typing into ${field || 'a field'} and its effects name ${named}, which does not exist, so it must be created`);
+      evidence.push(`the effect must hold WHENEVER the field changes, so the new element has to be brought up to date from the field's own events, not once at load`);
+      if (typeRegs.length) evidence.push(`the field already has ${typeRegs.map((r) => `${r.type} on ${r.target}`).join(', ')}, which is what existing code listens to`);
+      scope = { creates: [named], attaches: [field || 'the field'], calls: renderer ? [renderer] : [] };
+      uncertainty.push('adding a visible element changes what the page shows, so the carried-forward checks must be read for anything that counts visible elements');
+      uncertainty.push('the effect must also be correct at LOAD, before anything is typed; nothing here establishes that a listener alone achieves that');
+    } else if (typeRegs.length) {
+      move = MOVE.EXTEND_HANDLER;
+      const region = findHandlerRegion(file, /addEventListener\(\s*['"](input|change|keyup|keydown)['"]/);
+      site = { insertAfterLine: region ? region.start : endOfScript(file), why: region ? 'inside the existing handling for this field' : 'after the existing script' };
+      evidence.push(`typing into ${field || 'the field'} is already handled (${typeRegs.map((r) => `${r.type} on ${r.target}`).join(', ')}), so the change extends that handling`);
+      scope = { creates: [], attaches: [], calls: renderer ? [renderer] : [] };
+    } else {
+      move = MOVE.NEW_LISTENER;
+      site = { insertAfterLine: endOfScript(file), why: 'at the end of the script, after the field exists' };
+      evidence.push(`the requirement is triggered by typing into ${field || 'a field'} and no input listener is registered anywhere, so one must be created`);
+      scope = { creates: ['an input listener'], attaches: [field || 'the field'], calls: renderer ? [renderer] : [] };
+    }
   } else {
     move = MOVE.DECLINE;
-    needed = `this planner handles requirements triggered by a key press or a click; this one is ${JSON.stringify(trigger)}`;
+    needed = `this planner handles requirements triggered by a key press, a click or typing; this one is ${JSON.stringify(trigger)}`;
   }
 
   // The adapter INFORMS, it does not dictate: it is recorded as context for the choice, not as its cause.
@@ -269,7 +305,9 @@ export function plan({ file, requirement, observation, facts = null }) {
   return {
     requestedEffect: {
       trigger, effects: requirement.effects || [], invariants: requirement.invariants || [],
-      inUserTerms: `${trigger.kind === 'click' ? `clicking ${trigger.selector || 'a control'}` : `pressing ${trigger.key}`} must result in: ${(requirement.effects || []).join('; ')}`,
+      inUserTerms: `${trigger.kind === 'click' ? `clicking ${trigger.selector || 'a control'}`
+        : trigger.kind === 'type' ? `typing into ${trigger.selector || 'the field'}`
+          : `pressing ${trigger.key}`} must result in: ${(requirement.effects || []).join('; ')}`,
     },
     relevantCode,
     move, site, scope, needed,
