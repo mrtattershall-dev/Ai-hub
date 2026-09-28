@@ -13,15 +13,24 @@
 // file recreates the hole with a check in front of it — the baseline probe demonstrated exactly that by
 // passing `action: 'edit OTHER.js'` as a string while nothing derived a path from it.
 //
-// SCOPE OF THIS FILE: E0 only — target binding, on a declared operation contract, against a real write.
-// NOT here, and each is its own prediction:
-//     E2 revision binding     E3 evidence obligations     E4 single use     E5 allowance
-//     E6 expiry               E7 ancestor revocation      E9 the check-then-change RACE
-// E9 in particular: this module resolves once and writes immediately, which narrows the window but is NOT
-// a race proof. E0 passing establishes nothing about E9.
+// SCOPE OF THIS FILE, and the numbering, stated because it drifted once already:
+//     E0  target binding        DONE  (subsumes amendment 3's E1, which was the same claim)
+//     E1  revision binding      DONE  below, conditional on the authority pinning a revision
+//     E3  evidence obligations  DONE  below, conditional on the CONTRACT declaring them
+// NOT here, each its own prediction, none of them satisfied by anything in this file:
+//     E4 single use    E5 allowance    E6 expiry    E7 ancestor revocation
+//     E8 re-delegation policy
+//     E9 the check-then-change RACE. This module resolves once, checks the CURRENT revision, and writes
+//        immediately — which narrows the window and does NOT close it. Nothing here is a race proof.
+//
+// AND ONE CONTAINMENT BOUNDARY, recorded because rejecting `..` is easy to mistake for containment:
+// refusing a traversing path does NOT establish filesystem containment through SYMLINKS or WINDOWS
+// JUNCTIONS. `resolve()` does not dereference them, so an in-root name aliasing an out-of-root target is
+// UNTESTED and outside the demonstrated coverage.
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { resolve, relative, sep } from 'node:path';
-import { commit } from '../../legaknow/calculus.mjs';
+import { commit, isAuthority, KIND } from '../../legaknow/calculus.mjs';
 
 export const OUTCOME = {
   ACTION_PERMITTED: 'ACTION_PERMITTED',
@@ -29,7 +38,15 @@ export const OUTCOME = {
   ACTION_DENIED_SCOPE_MISMATCH: 'ACTION_DENIED_SCOPE_MISMATCH',
   ACTION_DENIED_TARGET_ESCAPES_ROOT: 'ACTION_DENIED_TARGET_ESCAPES_ROOT',
   ACTION_DENIED_OPERATION_UNSUPPORTED: 'ACTION_DENIED_OPERATION_UNSUPPORTED',
+  ACTION_DENIED_REVISION_MISMATCH: 'ACTION_DENIED_REVISION_MISMATCH',
+  ACTION_DENIED_UNADMITTED_EVIDENCE: 'ACTION_DENIED_UNADMITTED_EVIDENCE',
 };
+
+// THE REVISION OF A TARGET IS THE DIGEST OF ITS CURRENT BYTES. Not an mtime, not a version label - both
+// of those can agree while the content differs, which is the whole failure being guarded against.
+export const revisionOf = (absPath) => (existsSync(absPath)
+  ? createHash('sha256').update(readFileSync(absPath)).digest('hex')
+  : null);
 
 // The declared contract for the one operation E0 governs. Evidence obligations are a property of the
 // CONTRACT, not a universal precondition — an operation declaring none is unaffected by E3.
@@ -39,9 +56,17 @@ export const EDIT_FIXTURE = Object.freeze({
   evidenceObligations: [],        // E0 declares none; E3 will exercise a contract that declares some
 });
 
+// A SECOND CONTRACT, for E3. Evidence obligations belong to the OPERATION, never to every action: an
+// operation declaring none is unaffected, which is why EDIT_FIXTURE above stays as it is.
+export const EDIT_FIXTURE_EVIDENCED = Object.freeze({
+  operation: 'edit',
+  requires: ['edit:fixture'],
+  evidenceObligations: ['observed:target'],
+});
+
 // A structured action. `target` is a path RELATIVE TO root — never a sentence, never a label.
-export function editAction({ target, contents }) {
-  return Object.freeze({ operation: 'edit', target, contents });
+export function editAction({ target, contents, evidence = [] }) {
+  return Object.freeze({ operation: 'edit', target, contents, evidence: Object.freeze([...evidence]) });
 }
 
 export function governedEdit({ authority, action, root, contract = EDIT_FIXTURE }) {
@@ -78,6 +103,47 @@ export function governedEdit({ authority, action, root, contract = EDIT_FIXTURE 
       'the authority is scoped to "' + authorizedTarget + '"; this action targets "' + requested
       + '". A grant over one target is not a grant over another.',
       { authorizedTarget, requestedTarget: requested, resolvedTarget });
+  }
+
+  // ---- REVISION BINDING (E1). Only when the authority PINS a revision. A grant issued against revision
+  // A must not authorize a change to a target that has since become revision B: the evidence and the
+  // permission were about bytes that no longer exist. Checked against the CURRENT bytes on disk, here,
+  // immediately before the write - not at issuance, where it would prove nothing about now.
+  const pinnedRevision = authority && authority.context && authority.context.revision;
+  const currentRevision = revisionOf(resolvedTarget);
+  if (pinnedRevision && pinnedRevision !== currentRevision) {
+    return deny(OUTCOME.ACTION_DENIED_REVISION_MISMATCH,
+      'the authority is pinned to revision ' + String(pinnedRevision).slice(0, 12) + ' and the target is'
+      + ' now at ' + String(currentRevision).slice(0, 12) + '. Permission granted over one revision is'
+      + ' not permission over another.',
+      { pinnedRevision, currentRevision, resolvedTarget });
+  }
+
+  // ---- EVIDENCE OBLIGATIONS (E3). Only those the CONTRACT declares. Each must be an admitted EPISTEMIC
+  // token whose own context names THIS target and, where a revision is pinned, THIS revision - so
+  // evidence about another file, or about bytes that have since changed, cannot satisfy the obligation.
+  const obligations = contract.evidenceObligations || [];
+  if (obligations.length) {
+    const supplied = Array.isArray(action.evidence) ? action.evidence : [];
+    for (const need of obligations) {
+      const ok = supplied.find((e) => isAuthority(e) && e.kind === KIND.EPISTEMIC
+        && e.context && e.context.implementation === requested
+        && (!pinnedRevision || e.context.revision === currentRevision));
+      if (!ok) {
+        const wrongTarget = supplied.filter((e) => isAuthority(e)
+          && e.context && e.context.implementation !== requested)
+          .map((e) => e.context.implementation);
+        const staleRev = supplied.filter((e) => isAuthority(e) && pinnedRevision
+          && e.context && e.context.implementation === requested
+          && e.context.revision !== currentRevision).length;
+        return deny(OUTCOME.ACTION_DENIED_UNADMITTED_EVIDENCE,
+          'the contract requires admitted evidence "' + need + '" about ' + requested
+          + (wrongTarget.length ? '; supplied evidence is about ' + wrongTarget.join(', ') : '')
+          + (staleRev ? '; ' + staleRev + ' item(s) are about a different revision' : '')
+          + (!supplied.length ? '; none was supplied' : ''),
+          { obligation: need, suppliedCount: supplied.length, wrongTarget, staleRevisionCount: staleRev });
+      }
+    }
   }
 
   // ---- NORMATIVE AUTHORIZATION. Structured, and carrying the resolved target so the record shows what

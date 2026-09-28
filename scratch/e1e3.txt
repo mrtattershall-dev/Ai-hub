@@ -1,0 +1,50 @@
+E1 revision binding and E3 evidence obligations: 27/27, and the positive control caught a fixture that made a refusal meaningless
+
+E1 - REVISION BINDING, 4/4. A grant issued against revision A, the target then becomes revision B, the
+edit is attempted:
+    E1-ALLOWED    unchanged revision, the positive control: proceeds to the exact bytes
+    E1-DENIED     ACTION_DENIED_REVISION_MISMATCH naming both revisions, and B's BYTES ARE PRESERVED -
+                  not overwritten with the proposal, and NOT REVERTED TO A. Refusing is not repairing.
+    E1-CONTROL    identical authority, action and root across two runs; the ONLY difference is whether the
+                  file moved underneath, so the denial is caused by the revision alone
+    E1-SCOPE      an authority pinning NO revision is unaffected - recorded as a deliberate conditional
+                  rather than an omission, so tightening it later is a visible policy change
+The revision is the DIGEST OF THE CURRENT BYTES read at the execution boundary, not an mtime or a version
+label - either of those can agree while content differs, which is the failure being guarded.
+
+E3 - EVIDENCE OBLIGATIONS, 7/7, scoped to the OPERATION CONTRACT and never universal. Valid evidence
+permits; missing, wrong-target and wrong-revision evidence each refuse BEFORE writing, with the absence of
+the write asserted by digest rather than inferred from the verdict. E3-SCOPE proves a contract declaring no
+obligation is unaffected. E3-NON-VACUITY feeds the NORMATIVE token itself as evidence - right context,
+wrong kind - so permission cannot launder itself into satisfying its own precondition.
+
+AND THE POSITIVE CONTROL EARNED ITS PLACE. My first E3 fixture passed a bare { subject } literal to
+observe(), which REFUSED it: "requires an observation with evidential force and complete provenance". No
+evidence token ever existed. E3-MISSING PASSED ANYWAY - a refusal for the wrong reason - and only
+E3-VALID's failure exposed it. Fixed by building observations through the observation() constructor, and
+E3-FIXTURE now asserts the evidence is actually MINTED, so no future refusal can pass because evidence is
+impossible to construct.
+
+ONE MORE OF MINE: adding `evidence` to editAction broke E0-CONTROL, which compared action fields BY
+IDENTITY - two frozen empty arrays are equal in meaning and distinct as objects. Fixed in the test by
+comparing by value rather than contorting the executor to suit it. The control did its job.
+
+THE CONTAINMENT BOUNDARY IS RECORDED IN THE SOURCE, because rejecting `..` is easy to mistake for
+containment: refusing a traversing path does NOT establish filesystem containment through SYMLINKS or
+WINDOWS JUNCTIONS. resolve() does not dereference them, so an in-root name aliasing an out-of-root target
+is UNTESTED and outside demonstrated coverage.
+
+27/27 across baseline + E0 + E1 + E3. legaknow byte-unchanged: 0 files. The calculus governs three
+dimensions of a real effect without being modified to do it; every binding is enforced at the CONSUMER.
+
+STILL NOT ESTABLISHED, and the next one is the decisive one:
+    E4 single use / E5 allowance   NOT EVALUATED - no such policy is declared for this operation
+    E6 expiry / E7 revocation      not built
+    E9 the check-then-change RACE  not built; resolving once narrows the window and does not close it
+    AND THE CONTROLLER IS NOT YET REQUIRED TO USE THIS EXECUTOR. E0/E1/E3 prove the executor enforces.
+    They prove nothing about agent.js's other write paths. Governed repair needs the controller to have NO
+    path to a write that bypasses governedEdit - that measurement is the remaining connection.
+
+Message-File: scratch/e1e3.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

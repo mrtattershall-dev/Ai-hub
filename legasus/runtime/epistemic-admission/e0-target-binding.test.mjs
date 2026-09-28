@@ -112,7 +112,13 @@ test('E0-CONTROL — the two trials differ in exactly one field, so the refusal 
     assert.equal(a.operation, b.operation);
     assert.equal(a.contents, b.contents);
     assert.notEqual(a.target, b.target);
-    const diffs = Object.keys(a).filter((k) => a[k] !== b[k]);
+    // compared BY VALUE, not by identity: `evidence` is a fresh frozen array per action, so two empty
+    // evidence lists are equal in meaning and distinct as objects. Identity comparison reported a
+    // difference that does not exist, which is the control failing for the wrong reason.
+    const sameValue = (x, y) => (Array.isArray(x) && Array.isArray(y))
+      ? (x.length === y.length && x.every((v, i) => v === y[i]))
+      : x === y;
+    const diffs = Object.keys(a).filter((k) => !sameValue(a[k], b[k]));
     assert.deepEqual(diffs, ['target'], 'exactly one field differs: ' + diffs.join(', '));
   });
 
