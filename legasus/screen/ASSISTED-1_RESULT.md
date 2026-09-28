@@ -68,9 +68,10 @@ measured, rather than what was requested - the page is the artefact.
     5  3        LOCATION: a new anchor, AFTER the existing listener
     6  3        SCAFFOLD: a NEW listener with an EARLY RETURN -
                 `if (e.key !== 'r') return;` - instead of an if-block
-       ->       THIS IS THE ONE THAT MATTERED. Output changed from comments to CODE immediately. The
-                model wrote `switchLight();` - a statement. Containment kept that 1 line and dropped 53.
-                8 of 9 steps passed; only step 6 failed, because switchLight ADVANCES rather than sets.
+       ->       THIS IS WHERE CODE FIRST APPEARED (which is an ordering, not a cause). Output changed
+                from comments to CODE immediately: the model wrote `switchLight();`, a statement.
+                Containment kept that 1 line and dropped 53. 8 of 9 steps passed; only step 6 failed,
+                because switchLight ADVANCES rather than sets.
     7  4        CONTEXT, taken mechanically from codeFacts (compact,     the output became TIDY - 5
                 budget 240): that `state` is declared `let` at line 25,   tokens, exactly one line, no
                 that existing code writes it as `state.color =            runaway - but still
