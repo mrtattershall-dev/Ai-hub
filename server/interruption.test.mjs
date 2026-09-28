@@ -83,6 +83,9 @@ function backend(completion, killAfter, hangAfter) {
 
 async function campaign({ killAfter, hangAfter, pages, maxGpuSeconds, killRunnerAfterMs }) {
   const root = mkdtempSync(join(tmpdir(), 'camp-'));
+  // A token unique to THIS campaign, present in the child's own --dir argument, so the process we
+  // kill is provably the one this test spawned rather than any node process that happens to exist.
+  const stamp = root.split(/[\\/]/).filter(Boolean).pop();
   const pagesDir = join(root, 'pages');
   const outDir = join(root, 'out');
   const { srv, port } = await backend(GOOD, killAfter, hangAfter);
@@ -101,6 +104,7 @@ async function campaign({ killAfter, hangAfter, pages, maxGpuSeconds, killRunner
     // Destroying sockets tests a connection failure; this tests the supervisor noticing that its child
     // died without finalising anything. Killed by pid, never by a name pattern.
     let killedPid = null;
+    let killedIdentity = null;
     let campaignAlive = true;
     child.on('close', () => { campaignAlive = false; });
     if (killRunnerAfterMs) {
@@ -114,11 +118,21 @@ async function campaign({ killAfter, hangAfter, pages, maxGpuSeconds, killRunner
           await new Promise((r) => setTimeout(r, 400));
           if (!campaignAlive) break;
           try {
+            // IDENTITY IS CONFIRMED BEFORE KILLING, by command line, not by 'first node child'.
+            // The first version of this test killed pid 14388 on a fixed delay after the campaign
+            // had already exited. Windows recycles pids, so ParentProcessId matched a process that
+            // was not the runner at all - and it is now UNIDENTIFIABLE, because nothing about it
+            // was recorded before it was killed. Never kill a pid whose identity is not asserted.
             const { stdout: o } = await exec('powershell', ['-NoProfile', '-Command',
-              `Get-CimInstance Win32_Process -Filter "ParentProcessId=${child.pid}" | Where-Object { $_.Name -eq 'node.exe' } | Select-Object -First 1 -ExpandProperty ProcessId`],
+              `Get-CimInstance Win32_Process -Filter "ParentProcessId=${child.pid}" | Where-Object { $_.Name -eq 'node.exe' -and $_.CommandLine -like '*managerRun.mjs*' -and $_.CommandLine -like '*${stamp}*' } | Select-Object -First 1 | ForEach-Object { $_.ProcessId.ToString() + '|' + $_.CommandLine }`],
               { windowsHide: true });
-            const pid = parseInt(String(o).trim(), 10);
-            if (pid && campaignAlive) { process.kill(pid, 'SIGKILL'); killedPid = pid; }
+            const [pidText, cmdline] = String(o).trim().split('|');
+            const pid = parseInt(pidText, 10);
+            if (pid && cmdline && cmdline.includes('managerRun.mjs') && cmdline.includes(stamp) && campaignAlive) {
+              killedIdentity = { pid, cmdline: cmdline.slice(0, 220) };
+              process.kill(pid, 'SIGKILL');
+              killedPid = pid;
+            }
           } catch { /* keep polling; the assertions report a failure to find one */ }
         }
       })();
@@ -134,7 +148,7 @@ async function campaign({ killAfter, hangAfter, pages, maxGpuSeconds, killRunner
       ? JSON.parse(readFileSync(join(outDir, '_campaign.json'), 'utf8')) : null;
     const wd = existsSync(join(outDir, '_watchdog.json'))
       ? JSON.parse(readFileSync(join(outDir, '_watchdog.json'), 'utf8')) : null;
-    return { code, stdout, sum, wall, wd, killedPid };
+    return { code, stdout, sum, wall, wd, killedPid, killedIdentity };
   } finally {
     try { srv.close(); } catch { /* best effort */ }
     try { rmSync(root, { recursive: true, force: true }); } catch { /* best effort */ }
@@ -181,6 +195,8 @@ say(!!hung.sum && hung.sum.wallClockSeconds >= 18, `the clock ran from process s
 console.log('\n4. the runner process is killed by pid - not its connection - mid-page');
 const slain = await campaign({ pages: ['d1', 'd2'], killRunnerAfterMs: 1 });
 say(slain.killedPid !== null, `a child pid was located and killed (${slain.killedPid})`);
+say(!!slain.killedIdentity && /managerRun\.mjs/.test(slain.killedIdentity.cmdline),
+  `its identity was CONFIRMED before the kill, not assumed: ${slain.killedIdentity && slain.killedIdentity.cmdline.slice(0, 90)}`);
 say(slain.code !== 0, `the campaign exits NON-ZERO (${slain.code}) - the supervisor noticed its child died`);
 say(!!slain.sum, 'a summary was still written by the supervisor, which the child could not have written');
 const dead = slain.sum && slain.sum.results.find((r) => !r.ok);

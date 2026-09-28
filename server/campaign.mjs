@@ -44,12 +44,33 @@ const GUIDANCE = opt('guidance', null);
 //   per-request  managerRun's own fetch deadline, so one hung call cannot run forever
 //   in-flight    each child is given the REMAINING budget as a hard timeout, so the deadline lands
 //                mid-page and kills the runner rather than waiting for it to finish
-//   backstop     an independent timer that stops the hosted app even if the child ignores termination
+//   backstop     a timer in THIS process that stops the hosted app even if the child ignores
+//                termination or never returns
+//
+// WHAT THE BACKSTOP IS NOT INDEPENDENT OF, stated because a bound nobody has bounded is not a bound:
+// it lives in the campaign process. It survives a hung child, a child that ignores SIGTERM, and a
+// request that never returns. It does NOT survive this process being killed, the machine sleeping
+// (which has already cost this project a campaign), power loss, or the host being suspended. In
+// every one of those cases the hosted app keeps its own scaledown window and then scales to zero on
+// its own - so `scaledown_window` is the only bound that holds when this process is gone, and it is
+// the reason it is set to 45s rather than left at the hub's 15 minutes.
+//
+// STARTUP IS INSIDE THE BUDGET ONLY IF DEPLOYMENT HAPPENS AFTER THIS CLOCK STARTS. Deploying the
+// hosted app in a separate command beforehand - which is how AUDIT-1 ran - puts deployment and the
+// first cold start OUTSIDE the measured window. Pass --deploy to bring it inside.
+//
+// A TESTED STOP INVOCATION IS NOT AN OBSERVED SHUTDOWN. The local tests establish that this process
+// calls `modal app stop --yes` and records the outcome. They cannot establish that the provider
+// stopped billing; only the provider's own app state and billing report can, and those are read
+// separately and reconciled.
 //
 // The clock starts at process start, BEFORE the first page, so deployment and startup exposure are
 // inside the budget rather than outside it.
 const MAX_GPU_SECONDS = parseInt(opt('max-gpu-seconds', '0'), 10);
 const STOP_APP = opt('stop-app', null);
+// Deploying here rather than in a prior command is what puts deployment and the first cold start
+// INSIDE the measured budget. Deployed beforehand, that exposure is real and simply unmeasured.
+const DEPLOY = opt('deploy', null);
 const T_START = Date.now();
 const elapsed = () => (Date.now() - T_START) / 1000;
 let shutdown = null;
@@ -80,6 +101,22 @@ WATCHDOG BACKSTOP at ${elapsed().toFixed(0)}s: stopping the hosted app regardles
 if (!PAGES || !OUTDIR) { console.error('usage: node server/campaign.mjs --pages <dir> --out <dir>'); process.exit(2); }
 
 mkdirSync(OUTDIR, { recursive: true });
+
+let deployment = null;
+if (DEPLOY) {
+  const t0 = Date.now();
+  try {
+    await exec('python', ['-m', 'modal', 'deploy', DEPLOY],
+      { windowsHide: true, env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' } });
+    deployment = { file: DEPLOY, ok: true, seconds: +((Date.now() - t0) / 1000).toFixed(1), insideBudget: true };
+  } catch (e) {
+    deployment = { file: DEPLOY, ok: false, seconds: +((Date.now() - t0) / 1000).toFixed(1), error: String(e.message || e).slice(0, 300) };
+    console.error(`deployment FAILED after ${deployment.seconds}s: ${deployment.error.split(String.fromCharCode(10))[0]}`);
+    writeFileSync(join(OUTDIR, '_campaign.json'), JSON.stringify({ at: new Date().toISOString(), deployment, results: [] }, null, 2), 'utf8');
+    process.exit(1);
+  }
+  console.log(`deployed in ${deployment.seconds}s, inside the ${MAX_GPU_SECONDS || 'unbounded'}s budget`);
+}
 const pages = readdirSync(PAGES).filter((d) => {
   try { return statSync(join(PAGES, d)).isDirectory() && existsSync(join(PAGES, d, 'task.json')); } catch { return false; }
 }).sort();
@@ -154,7 +191,7 @@ WATCHDOG: ${elapsed().toFixed(0)}s of a ${MAX_GPU_SECONDS}s budget - stopping be
 if (MAX_GPU_SECONDS && !watchdog) await stopHostedApp('campaign finished');
 const summary = {
   at: new Date().toISOString(), pages: pages.length,
-  wallClockSeconds: +elapsed().toFixed(1), maxGpuSeconds: MAX_GPU_SECONDS || null, watchdog,
+  wallClockSeconds: +elapsed().toFixed(1), maxGpuSeconds: MAX_GPU_SECONDS || null, watchdog, deployment,
   terminatedInFlight: results.some((r) => r.killedByWatchdog), backstop: shutdown,
   pagesNotRun: watchdog ? pages.length - results.length : 0,
   completed: results.filter((r) => r.ok).length,
