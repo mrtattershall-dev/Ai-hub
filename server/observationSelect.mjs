@@ -89,13 +89,25 @@ const SNAPSHOT = `() => {
     }
   } catch (e) { out.seamThrew = String(e && e.message || e); }
   try {
+    // VISIBILITY, and only the cases this supports. display:none on an ANCESTOR leaves a child's own
+    // computed display untouched - that is the defect OBSEVAL-1 found - so rendered rectangles decide
+    // it. visibility:hidden leaves rectangles intact, so it is checked separately.
+    const isVisible = (el) => {
+      if (!el.getClientRects || el.getClientRects().length === 0) return false;
+      const st = getComputedStyle(el);
+      if (st.visibility === 'hidden' || st.visibility === 'collapse') return false;
+      return true;
+    };
     const vis = [];
+    const texts = [];
     for (const el of document.body ? document.body.querySelectorAll('*') : []) {
-      const s = getComputedStyle(el);
-      if (s.display === 'none' || s.visibility === 'hidden') continue;
-      if (el.children.length === 0 && el.textContent.trim()) vis.push(el.tagName + ':' + el.textContent.trim());
+      if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE') continue;
+      if (!isVisible(el)) continue;
+      const t = (el.textContent || '').trim();
+      if (el.children.length === 0 && t) { vis.push(el.tagName + ':' + t); texts.push(t); }
     }
     out.visibleText = vis.join('|');
+    out.visibleSample = texts.slice(0, 12);
     out.elementCount = vis.length;
     out.domDigest = out.visibleText;
   } catch {}
@@ -213,6 +225,8 @@ export async function selectObservation(dir, { entry = 'index.html', budget = BU
     // WHAT THE REGISTRATION CAPTURE DOES AND DOES NOT SEE, recorded for every application.
     const sf = record.surfaces;
     record.coverageLimits = {
+      visibilitySupported: ['display:none on self or any ancestor', 'visibility:hidden, including inherited', 'the hidden attribute'],
+      visibilityNotCovered: ['opacity:0', 'clip-path', 'off-screen transforms', 'overflow-hidden zero-size containers', 'scrolled out of view', 'aria-hidden', 'covered by another element'],
       captures: 'listeners registered through addEventListener, at any time, including delegated ones on document or body',
       doesNotCapture: [
         'inline handler attributes such as onclick="..." in the markup',

@@ -20,8 +20,25 @@ const onGlobal = (regs, type) => regs.some((r) => r.type === type && ['document'
 
 /** Keys tried, in this order. Declared once, never chosen per application. */
 export const KEY_SET = ['a', 'b', 'c', '1', '2', '3', 'r', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '];
-/** Text typed into an input when probing it. Two values, so "it changed" is not one lucky string. */
-export const TYPE_SET = ['a', 'zzqq'];
+/**
+ * Text typed into an input when probing it. BOTH HALVES ARE NEEDED.
+ *
+ * OBSEVAL-1 typed a fixed ['a', 'zzqq'] into a list of "Book 1".."Book 5". Neither matches, so the
+ * filter was only ever exercised on its NEGATIVE half - it hid everything, correctly - and whether it
+ * SHOWS matching items was never tested at all.
+ *
+ * A matching term is therefore derived FROM THE PAGE'S OWN VISIBLE TEXT. That is example input, not an
+ * expected result: what the page SHOULD then show is judged against the filtering requirement, never
+ * against what the page happens to do.
+ */
+export const NON_MATCHING = 'zzqq';
+export function matchingTermFrom(samples) {
+  for (const t of samples || []) {
+    const word = String(t).trim().split(/\s+/).find((w) => /[A-Za-z]{3,}/.test(w));
+    if (word) return word.slice(0, 4).toLowerCase();
+  }
+  return null;
+}
 
 register({
   id: 'browser.keyboard',
@@ -54,16 +71,22 @@ register({
     const listens = ev.registrations.filter((r) => ['input', 'change', 'keyup', 'keydown'].includes(r.type));
     // A field with no listener anywhere is still worth typing into: the page may re-render from a
     // framework-free polling loop, or the listener may be an inline attribute. The uncertainty says so.
+    const match = matchingTermFrom(ev.atLoad && ev.atLoad.visibleSample);
+    const texts = match ? [match, NON_MATCHING] : [NON_MATCHING];
     return fields.slice(0, 4).map((f) => ({
       id: `input:${f.selector}`,
       adapterId: 'browser.input',
       what: `type into ${f.selector} and look for an observable effect`,
-      interactions: TYPE_SET.map((t) => ({ kind: 'type', selector: f.selector, text: t })),
+      interactions: texts.map((t) => ({ kind: 'type', selector: f.selector, text: t })),
       evidence: [
         `a text-like input exists at ${f.selector}`,
+        ...(match ? [`"${match}" is taken from the page's own visible text, so it should MATCH something`] : ['no word could be taken from the page to build a matching term, so only a non-matching one is tried']),
         ...(listens.length ? listens.map((r) => `a ${r.type} listener was registered on ${r.target}`) : []),
       ],
-      uncertainty: listens.length ? [] : ['no input/change/key listener was recorded, so typing may produce nothing; that would be NO CHANGE OBSERVED, not an absence of behaviour'],
+      uncertainty: [
+        ...(listens.length ? [] : ['no input/change/key listener was recorded, so typing may produce nothing; that would be NO CHANGE OBSERVED, not an absence of behaviour']),
+        ...(match ? [] : ['without a matching term only the negative half of a filter can be exercised']),
+      ],
       priority: listens.length ? 9 : 4,
     }));
   },
@@ -82,7 +105,12 @@ register({
       id: 'click',
       adapterId: 'browser.click',
       what: 'click each clickable control and look for an observable effect',
-      interactions: targets.map((t) => ({ kind: 'click', selector: t.selector })),
+      // EACH CONTROL IS CLICKED TWICE. A toggle whose content starts hidden shows nothing on its first
+      // click - OBSEVAL-1's e5-notes has `#note-list { display: none }` in CSS while its handler tests
+      // the INLINE style, so the first click sets display:none on an already-hidden list and only the
+      // second reveals it. One click per control would report that page as NO_CHANGE_OBSERVED, which
+      // would be true of the probe and misleading about the application.
+      interactions: targets.flatMap((t) => [{ kind: 'click', selector: t.selector }, { kind: 'click', selector: t.selector }]),
       evidence: [
         `${targets.length} clickable control(s): ${targets.map((t) => t.selector).join(', ')}`,
         ...listens.map((r) => `a ${r.type} listener was registered on ${r.target}`),

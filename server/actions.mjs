@@ -120,15 +120,26 @@ export async function perform(page, actIn, { settleMs = 40 } = {}) {
  * typing changes an input's own value whether or not the application does anything with it: a DOM digest
  * that folded the two together would call every keystroke "behaviour".
  */
+/** What this visibility test covers, and what it does not. Quoted in records rather than assumed. */
+export const VISIBILITY_SUPPORTED = ['display:none on self or any ancestor', 'visibility:hidden, including inherited', 'the hidden attribute'];
+export const VISIBILITY_NOT_COVERED = ['opacity:0', 'clip-path', 'off-screen transforms', 'overflow-hidden zero-size containers', 'scrolled out of view', 'aria-hidden', 'covered by another element'];
+
 export const DOM_VIEW = `() => {
+  // VISIBILITY, matching the observer's test exactly. Rendered rectangles settle display:none on ANY
+  // ancestor - computed display is not inherited, which is the defect OBSEVAL-1 found - and
+  // visibility:hidden is checked separately because it leaves rectangles intact.
+  const isVisible = (el) => {
+    if (!el.getClientRects || el.getClientRects().length === 0) return false;
+    const st = getComputedStyle(el);
+    if (st.visibility === 'hidden' || st.visibility === 'collapse') return false;
+    return true;
+  };
   const visible = [];
   const hidden = [];
   for (const el of document.body ? document.body.querySelectorAll('*') : []) {
     if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE') continue;
-    const s = getComputedStyle(el);
-    const shown = s.display !== 'none' && s.visibility !== 'hidden' && !el.hasAttribute('hidden');
     if (el.children.length === 0 && (el.textContent || '').trim()) {
-      (shown ? visible : hidden).push((el.textContent || '').trim());
+      (isVisible(el) ? visible : hidden).push((el.textContent || '').trim());
     }
   }
   const inputValues = {};
