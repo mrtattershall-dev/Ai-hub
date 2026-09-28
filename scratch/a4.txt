@@ -1,0 +1,49 @@
+A-4 PASSES: the controller now performs authorized writes through governedEdit, and refuses the rest with bytes unchanged
+
+THE PRODUCTION CHANGE. agent.js gains a static import of governedEdit, a module-scoped runAuthority holder
+with setRunAuthority/clearRunAuthority, and a synchronous governWrite() helper. All EIGHT write sites in
+the three direct routes go through it: write_file 1, edit_file 5, append_file 2.
+
+THE MODEL CANNOT SUPPLY OR WIDEN ITS OWN AUTHORITY. The token lives in the module holder set by the
+governing layer; nothing reads it from tool arguments, so widening through a parameter is unrepresentable
+rather than forbidden. Tested directly: the harness passes a VALID token for target.txt inside args
+(authority and runAuthority keys) while the holder is scoped elsewhere, and the write is still refused.
+
+FOUR RUNS THROUGH THE REAL DISPATCH (__toolPolicyTest.callTool, the same tools[name](args) the run loop
+uses), governance enabled in agent.js itself:
+
+    valid         OK: wrote 15 bytes   governed 1   bytes CHANGED to "governed write"
+    wrongtarget   REFUSED ACTION_DENIED_SCOPE_MISMATCH   governed 0   bytes UNCHANGED
+    noauthority   REFUSED no authority for this run      governed 0   bytes UNCHANGED
+    ungoverned fixture (earlier commit)  3 writes reached disk, 0 governed - the bypass, recorded
+
+So class A is now ENFORCED, not merely enforceable. A-4's positive control - which COULD NOT PASS before
+this change, because no tool routed through the executor - now passes, and the suite therefore
+distinguishes "the gate rejects everything" from "the controller performs authorized writes".
+
+ONE GAP THE AUDIT FOUND AND I WOULD HAVE MISSED: every run reports ungoverned 1, and it is mkdirSync.
+write_file creates the parent directory BEFORE governWrite is consulted, so a REFUSED write still creates
+directories. Content writes are governed; directory creation is not. Narrow, real, and not fixed here -
+recorded rather than quietly swept into the pass.
+
+OFF BY DEFAULT. AGENT_GOVERNED_WRITES=1 enables it, following the existing env-flag convention, so the
+live hub, the server tests and the running fuzzer are untouched. GOVERNANCE IS THEREFORE DEMONSTRATED
+UNDER A FLAG AND THE DEFAULT PATH REMAINS UNGOVERNED - a limitation, not a claim.
+
+THREE APPARATUS FAILURES OF MINE DURING THE WIRING, all caught by asserting rather than assuming:
+  1 write_file and edit_file are NOT async, so an awaited dynamic import inside them is a SyntaxError.
+    node --check found it. The helper is synchronous and the import static as a result.
+  2 append_file has TWO write sites, not one. I targeted one and would have left the append path
+    ungoverned while reporting append_file governed.
+  3 the heredoc COLLAPSED MY DOUBLED BACKSLASHES - a hazard already in this project's ledger - so two
+    string matches silently found zero sites. The assertion refused to write a partial edit; the two
+    append_file sites were then patched by line, matching a backslash-free substring.
+
+STILL NOT ESTABLISHED: the 25 other tools, the 47 direct write calls in agent.js outside the tool surface,
+the 16 writing modules, every child-process route (class B), mkdirSync, symlink/junction aliasing, and
+E4/E5/E6/E7/E9. The default-off flag means even the three governed routes are ungoverned in ordinary use.
+A full server-suite regression check with the flag OFF is running and is not yet reported.
+
+Message-File: scratch/a4.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

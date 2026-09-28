@@ -12,6 +12,8 @@ import { launchOptions } from './browser.js';
 import { serveScriptsFromCache } from './engineCache.js';
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve, relative, sep } from 'path';
+import { governedEdit, editAction, EDIT_FIXTURE }
+  from '../legasus/runtime/epistemic-admission/governed-edit.mjs';
 import { randomUUID } from 'crypto';
 import { mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, existsSync, unlinkSync, rmSync, appendFileSync, renameSync } from 'fs';
 import { exec } from 'child_process';
@@ -892,6 +894,43 @@ function suppliedFileMessages(goal) {
   }
   return { messages: out, supplied };
 }
+// ---------------------------------------------------------------------------------------------------
+// GOVERNED WRITES. The controller's three direct write routes go through the authority calculus.
+//
+// THE MODEL MUST NOT BE ABLE TO SUPPLY OR WIDEN ITS OWN AUTHORITY. The token lives HERE, in a
+// module-scoped holder set by the governing layer through setRunAuthority(), and the tools read it from
+// here. It is NEVER read from tool arguments: an authority arriving in args is an authority the MODEL
+// wrote, which is self-issued permission wearing a parameter name. Nothing below reads args for it, so
+// widening through a tool argument is unrepresentable rather than merely forbidden.
+//
+// OFF BY DEFAULT. AGENT_GOVERNED_WRITES=1 enables it, following the existing env-flag convention. With the
+// flag off these three tools behave exactly as before, so this cannot alter the live hub, the 162 server
+// tests, or the running fuzzer. That also means governance is DEMONSTRATED UNDER A FLAG while the default
+// path stays ungoverned - a limitation, not a claim.
+//
+// SYNCHRONOUS on purpose: write_file and edit_file are not async functions, so an awaited dynamic import
+// inside them is a SyntaxError. node --check found that; it was not reasoned about. The import is static.
+const GOVERNED_WRITES = process.env.AGENT_GOVERNED_WRITES === '1';
+let runAuthority = null;
+export function setRunAuthority(token) { runAuthority = token || null; }
+export function clearRunAuthority() { runAuthority = null; }
+
+// null   -> proceed with the ordinary write
+// string -> REFUSED; the tool returns it, so the run sees the refusal instead of a silent no-op
+// {governed:true} -> governedEdit HAS ALREADY WRITTEN; the caller must not write again
+function governWrite(tool, fullPath, contents) {
+  if (!GOVERNED_WRITES) return null;
+  if (!runAuthority) {
+    return 'REFUSED by governance: ' + tool + ' has no authority for this run. Acting needs permission'
+      + ' that reaches an independent root; none was issued.';
+  }
+  const rel = relative(WORKSPACE, fullPath).split(sep).join('/');
+  const r = governedEdit({ authority: runAuthority, action: editAction({ target: rel, contents }),
+    root: WORKSPACE, contract: EDIT_FIXTURE });
+  if (!r.permitted) return 'REFUSED by governance (' + r.outcome + '): ' + r.why;
+  return { governed: true };
+}
+
 const tools = {
   list_dir({ path = '.' }) {
     const full = safePath(path);
@@ -1138,7 +1177,11 @@ const tools = {
           + `the whole file, send the COMPLETE new ${ext || 'source'} - not a description of it.`;
       }
     }
-    writeFileSync(full, content, 'utf8');
+    {
+      const g = governWrite('write_file', full, content);
+      if (typeof g === 'string') return g;
+      if (!g) writeFileSync(full, content, 'utf8');
+    }
     return `OK: wrote ${Buffer.byteLength(content)} bytes to ${path}`;
   },
 
@@ -1169,7 +1212,12 @@ const tools = {
     const full = safePath(path);
     if (!content) return `ERROR: append_file needs CONTENT — put the lines to add in a fenced code block.`;
     if (!existsSync(full)) {
-      writeFileSync(full, content.endsWith('\n') ? content : content + '\n', 'utf8');
+      {
+        const body = content.endsWith(String.fromCharCode(10)) ? content : content + String.fromCharCode(10);
+        const g = governWrite('append_file', full, body);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, body, "utf8");
+      }
       // ── A FRAGMENT IS NOT A FILE ────────────────────────────────────────────────
       //
       // "Add five helpers to the EXISTING q3_list.js" - but an earlier goal never created
@@ -1198,7 +1246,11 @@ const tools = {
     const before = readFileSync(full, 'utf8');
     const joiner = before.endsWith('\n') ? '' : '\n';
     const body = content.endsWith('\n') ? content : content + '\n';
-    writeFileSync(full, before + joiner + body, 'utf8');
+    {
+      const g = governWrite('append_file', full, before + joiner + body);
+      if (typeof g === 'string') return g;
+      if (!g) writeFileSync(full, before + joiner + body, 'utf8');
+    }
     return `OK: appended ${Buffer.byteLength(body)} bytes to ${path} (now ${Buffer.byteLength(before + joiner + body)} bytes). The existing content was not touched.`;
   },
 
@@ -1251,7 +1303,11 @@ const tools = {
       const repl = String(replace) === '' ? [] : String(replace).split('\n');
       const out = [...srcLines.slice(0, a - 1), ...repl, ...srcLines.slice(b)].join('\n');
       if (out === src) return `NO CHANGE: lines ${a}-${b} of ${path} already read exactly like your REPLACE, so nothing was edited and whatever you were fixing is still there.`;
-      writeFileSync(full, out, 'utf8');
+      {
+        const g = governWrite('edit_file', full, out);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, out, 'utf8');
+      }
       // The TEXT that went, not only how many lines: this is what makes two identical LINES requests answer
       // differently, because the second one is addressing different text (run 071d5478 deleted nine different pairs).
       const went = srcLines.slice(a - 1, b).filter((l) => l.trim()).slice(0, 2).map((l) => `"${l.trim().slice(0, 50)}"`).join(' / ');
@@ -1301,7 +1357,11 @@ const tools = {
       for (let k = 0; k < occurrence; k++) at = content.indexOf(find, at + 1);
       const out = content.slice(0, at) + replace + content.slice(at + find.length);
       if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
-      writeFileSync(full, out, 'utf8');
+      {
+        const g = governWrite('edit_file', full, out);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, out, 'utf8');
+      }
       return `OK: edited ${path} (occurrence ${occurrence} of ${exact})${changed(content, out, find, out.split(find).length - 1)}`;
     }
     // NO CHANGE IS NOT AN EDIT. Set E (2026-09-11), 14B goal 5: the model sent the SAME 13-line edit three times with
@@ -1314,7 +1374,11 @@ const tools = {
     // A function replacement is handed the text verbatim. The other three write paths use slice/splice already.
     if (exact === 1) {
       const out = content.replace(find, () => replace);
-      writeFileSync(full, out, 'utf8');
+      {
+        const g = governWrite('edit_file', full, out);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, out, 'utf8');
+      }
       return `OK: edited ${path}${changed(content, out, find, out.split(find).length - 1)}`;
     }
     // An ambiguous EXACT match falls through to the line-based path below, which computes
@@ -1430,14 +1494,22 @@ const tools = {
       const m = where[occurrence - 1];
       const out = [...fileLines.slice(0, m.start), reindentTo(replace, regionAnchor(fileLines, m.start, m.end)), ...fileLines.slice(m.end + 1)].join('\n');
       if (out === content) return noChangeAt(path, m);
-      writeFileSync(full, out, 'utf8');
+      {
+        const g = governWrite('edit_file', full, out);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, out, 'utf8');
+      }
       return `OK: edited ${path} (occurrence ${occurrence} of ${hits}, matched ignoring indentation)`
         + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
     }
     if (hits === 1) {
       const out = [...fileLines.slice(0, start), reindentTo(replace, regionAnchor(fileLines, start, end)), ...fileLines.slice(end + 1)].join('\n');
       if (out === content) return noChangeAt(path, { start, end });
-      writeFileSync(full, out, 'utf8');
+      {
+        const g = governWrite('edit_file', full, out);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, out, 'utf8');
+      }
       return `OK: edited ${path} (matched ignoring indentation)`
         + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
     }
