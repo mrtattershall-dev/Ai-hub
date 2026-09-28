@@ -210,6 +210,7 @@ export async function selectObservation(dir, { entry = 'index.html', budget = BU
     adapterCoverage: coverage(),
     loadErrors: [], registrations: [], surfaces: null,
     plans: [], probes: [], selected: [], outcome: null, unresolved: [],
+    // Every repetition is an executed action and counts against budget.maxTotalInteractions.
     interactionsUsed: 0,
   };
 
@@ -355,8 +356,12 @@ export async function selectObservation(dir, { entry = 'index.html', budget = BU
         planId: plan.id, adapterId: plan.adapterId,
         probeError, pageErrors: probeErrors,
         repeatsPerInteraction: budget.repeatsPerInteraction,
-        interactionsTried: sequences.length,
-        interactionsPerformed: sequences.filter((q) => q.steps.some((x) => x.performed)).length,
+        // ACCOUNTING, stated precisely. A sequence of 3 repetitions is 3 EXECUTED ACTIONS, and every one
+        // of them counts against the probe budget - `distinctInteractions` is how many different things
+        // were tried, never how much budget was spent.
+        distinctInteractions: sequences.length,
+        distinctInteractionsPerformed: sequences.filter((q) => q.steps.some((x) => x.performed)).length,
+        executedActions: sequences.reduce((n, q) => n + q.steps.filter((x) => x.performed).length, 0),
         sequences,
         effective: effective.map((q) => ({ interaction: q.interaction, changed: q.steps.find((x) => x.changedFromInitial.any).changedFromInitial, atRepetition: q.firstChangeAtRepetition })),
         selfEffectOnly: sequences.filter((q) => q.selfEffectOnly).map((q) => ({ interaction: q.interaction })),
@@ -422,7 +427,8 @@ if (DIRECT) {
     console.log(`  plans proposed: ${r.plans.length}`);
     for (const p of r.plans) console.log(`    ${p.adapterId.padEnd(18)} ${p.what}`);
     console.log(`  probes:`);
-    for (const p of r.probes) console.log(`    ${p.adapterId.padEnd(18)} ${p.outcome.padEnd(22)} ${p.interactionsPerformed} interaction(s) x${p.repeatsPerInteraction}, ${p.effective.length} produced a change${p.sequenceDependent.length ? `, ${p.sequenceDependent.length} only after repeating` : ''}`);
+    for (const p of r.probes) console.log(`    ${p.adapterId.padEnd(18)} ${p.outcome.padEnd(22)} ${p.distinctInteractionsPerformed} interaction(s) x${p.repeatsPerInteraction} = ${p.executedActions} executed actions, ${p.effective.length} produced a change${p.sequenceDependent.length ? `, ${p.sequenceDependent.length} only after repeating` : ''}`);
+    console.log(`  budget: ${r.interactionsUsed} of ${r.budget.maxTotalInteractions} executed actions used`);
     console.log(`  SELECTED: ${r.selected.map((x) => x.adapterId).join(', ') || 'none'}`);
     console.log(`  OUTCOME:  ${r.outcome}`);
     for (const u of r.unresolved) console.log(`    unresolved: ${u}`);
