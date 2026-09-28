@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html><head><title>Stock</title></head>
+<body>
+<h2>Stock</h2>
+<input id="q" type="text">
+<ul id="rows">
+  <li class="row">copper wire</li>
+  <li class="row">copper pipe</li>
+  <li class="row">steel plate</li>
+  <li class="row">steel rod</li>
+  <li class="row">brass fitting</li>
+  <li class="row">nylon washer</li>
+</ul>
+<script>
+const term = document.getElementById('q');
+const rows = document.getElementById('rows');
+function redraw() {
+  const needle = term.value.trim().toLowerCase();
+  Array.prototype.forEach.call(rows.children, function (li) {
+    li.hidden = needle.length > 0 && li.textContent.toLowerCase().indexOf(needle) === -1;
+  });
+}
+term.addEventListener('input', redraw);
+redraw();
+</script>
+</body></html>

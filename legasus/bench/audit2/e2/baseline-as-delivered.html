@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html><head><title>Tally</title></head>
+<body>
+<h1>Tally</h1>
+<p>count: <span id="count">0</span></p>
+<button id="up">add one</button>
+<button id="down">take one</button>
+<script>
+let total = 0;
+const readout = document.getElementById('count');
+function show() { readout.textContent = String(total); }
+document.getElementById('up').addEventListener('click', function () { total = total + 1; show(); });
+document.getElementById('down').addEventListener('click', function () { total = total - 1; show(); });
+show();
+</script>
+</body></html>

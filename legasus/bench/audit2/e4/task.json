@@ -1,0 +1,340 @@
+{
+  "id": "auto-e4",
+  "group": "AUTO",
+  "source": "internal",
+  "language": "javascript",
+  "kind": "build",
+  "dependsOn": null,
+  "goal": "Continue the page already in index.html. Add a control #clear-filter that clears the filter: clicking it empties #q and shows every item in the list again. Typing in the filter must still narrow the list. Everything that already works must keep working. The page is a single self-contained web page, index.html: plain HTML and JavaScript, no frameworks, no external files or CDNs.",
+  "requirement": {
+    "trigger": {
+      "kind": "click",
+      "selector": "#clear-filter"
+    },
+    "effects": [
+      "#q is empty",
+      "every item in the list is visible again"
+    ],
+    "invariants": [
+      "typing in the filter still narrows the list"
+    ]
+  },
+  "seed": {},
+  "requested": {
+    "play": {
+      "spec": {
+        "entry": "index.html",
+        "stateExpr": "window.app && window.app.state ? window.app.state() : null",
+        "contract": "The visible result is the evidence; a state accessor is used only when the page exposes one.",
+        "steps": [
+          {
+            "n": 1,
+            "name": "loads with no page or console error, showing every item",
+            "do": [],
+            "expect": "errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\",\\\"steel plate\\\",\\\"steel rod\\\",\\\"brass fitting\\\",\\\"nylon washer\\\"]\""
+          },
+          {
+            "n": 2,
+            "name": "typing \"copp\" narrows the list as it already does",
+            "do": [
+              {
+                "kind": "type",
+                "selector": "#q",
+                "text": "copp"
+              }
+            ],
+            "expect": "JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\"]\""
+          },
+          {
+            "n": 3,
+            "name": "clicking #clear-filter brings every item back",
+            "do": [
+              {
+                "kind": "click",
+                "selector": "#clear-filter"
+              }
+            ],
+            "expect": "JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\",\\\"steel plate\\\",\\\"steel rod\\\",\\\"brass fitting\\\",\\\"nylon washer\\\"]\""
+          },
+          {
+            "n": 4,
+            "name": "and leaves #q empty",
+            "do": [],
+            "expect": "dom.inputValues[\"#q\"] === ''"
+          },
+          {
+            "n": 5,
+            "name": "filtering still narrows the list afterwards",
+            "do": [
+              {
+                "kind": "type",
+                "selector": "#q",
+                "text": "copp"
+              }
+            ],
+            "expect": "JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\"]\""
+          },
+          {
+            "n": 6,
+            "name": "clicking #clear-filter a second time brings every item back again",
+            "do": [
+              {
+                "kind": "click",
+                "selector": "#clear-filter"
+              }
+            ],
+            "expect": "JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\",\\\"steel plate\\\",\\\"steel rod\\\",\\\"brass fitting\\\",\\\"nylon washer\\\"]\""
+          },
+          {
+            "n": 7,
+            "name": "no page or console error was raised at any point",
+            "do": [],
+            "expect": "noErrors"
+          }
+        ],
+        "name": "steps-1234567"
+      },
+      "steps": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    }
+  },
+  "accumulates": [
+    "the page as delivered"
+  ],
+  "supersedes": [],
+  "protected": {
+    "plays": [
+      {
+        "from": "the page as delivered",
+        "spec": {
+          "entry": "index.html",
+          "stateExpr": "window.app && window.app.state ? window.app.state() : null",
+          "contract": "The visible result is the evidence; a state accessor is used only when the page exposes one.",
+          "steps": [
+            {
+              "n": 1,
+              "name": "loads with no page or console error, showing every item",
+              "do": [],
+              "expect": "errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\",\\\"steel plate\\\",\\\"steel rod\\\",\\\"brass fitting\\\",\\\"nylon washer\\\"]\""
+            },
+            {
+              "n": 2,
+              "name": "typing \"copp\" narrows the list as it already does",
+              "do": [
+                {
+                  "kind": "type",
+                  "selector": "#q",
+                  "text": "copp"
+                }
+              ],
+              "expect": "JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\"]\""
+            },
+            {
+              "n": 5,
+              "name": "filtering still narrows the list afterwards",
+              "do": [
+                {
+                  "kind": "type",
+                  "selector": "#q",
+                  "text": "copp"
+                }
+              ],
+              "expect": "JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\"]\""
+            },
+            {
+              "n": 7,
+              "name": "no page or console error was raised at any point",
+              "do": [],
+              "expect": "noErrors"
+            }
+          ],
+          "name": "steps-1257"
+        },
+        "steps": [
+          1,
+          2,
+          5,
+          7
+        ]
+      }
+    ]
+  },
+  "diagnostic": {
+    "kind": "play",
+    "spec": {
+      "entry": "index.html",
+      "stateExpr": "window.app && window.app.state ? window.app.state() : null",
+      "contract": "The visible result is the evidence; a state accessor is used only when the page exposes one.",
+      "steps": [
+        {
+          "n": 1,
+          "name": "loads with no page or console error, showing every item",
+          "do": [],
+          "expect": "errors.length === 0 && JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\",\\\"steel plate\\\",\\\"steel rod\\\",\\\"brass fitting\\\",\\\"nylon washer\\\"]\""
+        },
+        {
+          "n": 2,
+          "name": "typing \"copp\" narrows the list as it already does",
+          "do": [
+            {
+              "kind": "type",
+              "selector": "#q",
+              "text": "copp"
+            }
+          ],
+          "expect": "JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\"]\""
+        },
+        {
+          "n": 3,
+          "name": "clicking #clear-filter brings every item back",
+          "do": [
+            {
+              "kind": "click",
+              "selector": "#clear-filter"
+            }
+          ],
+          "expect": "JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\",\\\"steel plate\\\",\\\"steel rod\\\",\\\"brass fitting\\\",\\\"nylon washer\\\"]\""
+        },
+        {
+          "n": 4,
+          "name": "and leaves #q empty",
+          "do": [],
+          "expect": "dom.inputValues[\"#q\"] === ''"
+        },
+        {
+          "n": 5,
+          "name": "filtering still narrows the list afterwards",
+          "do": [
+            {
+              "kind": "type",
+              "selector": "#q",
+              "text": "copp"
+            }
+          ],
+          "expect": "JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\"]\""
+        },
+        {
+          "n": 6,
+          "name": "clicking #clear-filter a second time brings every item back again",
+          "do": [
+            {
+              "kind": "click",
+              "selector": "#clear-filter"
+            }
+          ],
+          "expect": "JSON.stringify(dom.visible.filter((t) => [\"copper wire\",\"copper pipe\",\"steel plate\",\"steel rod\",\"brass fitting\",\"nylon washer\"].includes(t))) === \"[\\\"copper wire\\\",\\\"copper pipe\\\",\\\"steel plate\\\",\\\"steel rod\\\",\\\"brass fitting\\\",\\\"nylon washer\\\"]\""
+        },
+        {
+          "n": 7,
+          "name": "no page or console error was raised at any point",
+          "do": [],
+          "expect": "noErrors"
+        }
+      ],
+      "name": "steps-1234567"
+    },
+    "timeoutSec": 90
+  },
+  "upstreamCases": 7,
+  "protectedCases": 4,
+  "validation": {
+    "checked": [
+      "every carried-forward check PASSES on the page as delivered",
+      "every addition check FAILS on the page as delivered, so the addition is genuinely absent"
+    ],
+    "notEstablished": [
+      "that the carried-forward checks encode INTENDED behaviour. They are PROPOSED preservation, derived from observing what the page does; a defect present in the delivered page becomes a check that protects the defect. Only a requirement can say which it is, and none was consulted.",
+      "that the requested and the protected sets are mutually consistent. A requirement contradicting a preserved behaviour passes both conditions above and only fails later, as a candidate that cannot satisfy both."
+    ]
+  },
+  "observation": {
+    "outcome": "CONFIRMED_BEHAVIOUR",
+    "selectedAdapters": [
+      "browser.input"
+    ],
+    "why": [
+      "probing type into #q and look for an observable effect produced an observable change"
+    ],
+    "confirmedInteractions": [
+      "type \"stoc\" into #q",
+      "type \"zzqq\" into #q"
+    ],
+    "coverageLimits": {
+      "visibilitySupported": [
+        "display:none on self or any ancestor",
+        "visibility:hidden, including inherited",
+        "the hidden attribute"
+      ],
+      "visibilityNotCovered": [
+        "opacity:0",
+        "clip-path",
+        "off-screen transforms",
+        "overflow-hidden zero-size containers",
+        "scrolled out of view",
+        "aria-hidden",
+        "covered by another element"
+      ],
+      "captures": "listeners registered through addEventListener, at any time, including delegated ones on document or body",
+      "doesNotCapture": [
+        "inline handler attributes such as onclick=\"...\" in the markup",
+        "handlers assigned to element properties, e.g. el.onclick = fn",
+        "anything inside an iframe or frame - a separate document this layer never enters",
+        "handlers registered after observation finished"
+      ],
+      "detectedButUncovered": {
+        "inlineHandlers": [],
+        "propertyHandlers": [],
+        "frames": []
+      },
+      "anyDetected": false
+    },
+    "unresolved": [],
+    "additionRule": "FILTER",
+    "additionRuleWhy": [
+      "typing into #q was confirmed to change what the page shows",
+      "typing \"zzqq\" hid 6 visible texts, and that is the set the filter governs",
+      "typing \"copp\" left 2 of those 6 visible, so a check using it can tell filtering from doing nothing",
+      "#clear-filter appears nowhere in the page, so the requirement asks for something that does not exist yet"
+    ],
+    "note": "the addition is click-triggered because typing was confirmed to govern a set of items; its two effects are checked separately, and every list check is scoped to the governed items so the new control cannot fail a preservation check"
+  },
+  "provenance": {
+    "baselineSha": "001d4abc72c192088454d305031aac806512ee963974b5efb198e1ce7aff365d",
+    "carriedSteps": [
+      1,
+      2,
+      5,
+      7
+    ],
+    "additionSteps": [
+      3,
+      4,
+      6
+    ],
+    "noErrorStep": 7,
+    "control": "#clear-filter",
+    "field": "#q",
+    "matchingTerm": "copp",
+    "nonMatchingTerm": "zzqq",
+    "governedItems": [
+      "copper wire",
+      "copper pipe",
+      "steel plate",
+      "steel rod",
+      "brass fitting",
+      "nylon washer"
+    ],
+    "matchedItems": [
+      "copper wire",
+      "copper pipe"
+    ],
+    "emittedAt": "2026-09-28T14:13:19.428Z"
+  }
+}

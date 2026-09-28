@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html><head><title>Crew</title></head>
+<body>
+<h2>Crew</h2>
+<input id="search" type="search" placeholder="name">
+<div id="people">
+  <p class="who">Okafor</p>
+  <p class="who">Okamoto</p>
+  <p class="who">Lindqvist</p>
+  <p class="who">Ferreira</p>
+  <p class="who">Novak</p>
+</div>
+<script>
+const model = { query: '' };
+const who = Array.from(document.querySelectorAll('#people .who'));
+const draw = () => {
+  who.forEach((el) => {
+    el.style.display = el.textContent.toLowerCase().includes(model.query) ? 'block' : 'none';
+  });
+};
+document.getElementById('search').addEventListener('input', (e) => {
+  model.query = e.target.value.toLowerCase();
+  draw();
+});
+draw();
+</script>
+</body></html>
