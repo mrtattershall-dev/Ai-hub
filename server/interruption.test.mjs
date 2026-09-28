@@ -22,6 +22,7 @@ import { tmpdir } from 'node:os';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 
+const execFileRaw = execFile;
 const exec = promisify(execFile);
 const NL = String.fromCharCode(10);
 let passed = 0, failed = 0;
@@ -54,7 +55,7 @@ clearBtn.addEventListener('click', () => { input.value = ''; applyFilter(); });`
  * socket on the Nth request, which kills the runner mid-flight exactly as an interrupted run does -
  * rather than simulating the failure by writing a file that says "interrupted".
  */
-function backend(completion, killAfter) {
+function backend(completion, killAfter, hangAfter) {
   const seen = [];
   const sockets = new Set();
   return new Promise((done) => {
@@ -63,6 +64,9 @@ function backend(completion, killAfter) {
       req.on('data', (c) => { body += c; });
       req.on('end', () => {
         seen.push(1);
+        // NEVER RETURN. Not a slow reply and not an error - the request is simply never answered.
+        // This is the case a between-page deadline cannot see, and a hosted GPU bills straight through it.
+        if (hangAfter && seen.length >= hangAfter) return;
         if (killAfter && seen.length >= killAfter) {
           for (const s of sockets) { try { s.destroy(); } catch { /* going away */ } }
           try { srv.close(); } catch { /* going away */ }
@@ -77,11 +81,11 @@ function backend(completion, killAfter) {
   });
 }
 
-async function campaign({ killAfter, pages }) {
+async function campaign({ killAfter, hangAfter, pages, maxGpuSeconds, killRunnerAfterMs }) {
   const root = mkdtempSync(join(tmpdir(), 'camp-'));
   const pagesDir = join(root, 'pages');
   const outDir = join(root, 'out');
-  const { srv, port } = await backend(GOOD, killAfter);
+  const { srv, port } = await backend(GOOD, killAfter, hangAfter);
   try {
     for (const p of pages) {
       mkdirSync(join(pagesDir, p), { recursive: true });
@@ -89,15 +93,48 @@ async function campaign({ killAfter, pages }) {
       await exec(process.execPath, ['server/emitTaskAuto.mjs', '--dir', join(pagesDir, p)],
         { cwd: process.cwd(), windowsHide: true, maxBuffer: 20e6 });
     }
-    let code = 0; let stdout = '';
-    try {
-      const r = await exec(process.execPath, ['server/campaign.mjs', '--pages', pagesDir, '--out', outDir,
-        '--model-url', `http://127.0.0.1:${port}`], { cwd: process.cwd(), windowsHide: true, maxBuffer: 50e6 });
-      stdout = String(r.stdout || '');
-    } catch (e) { code = e.code ?? 1; stdout = String(e.stdout || ''); }
+    const cargs = ['server/campaign.mjs', '--pages', pagesDir, '--out', outDir, '--model-url', `http://127.0.0.1:${port}`];
+    if (maxGpuSeconds) cargs.push('--max-gpu-seconds', String(maxGpuSeconds));
+    const t0 = Date.now();
+    const child = execFileRaw(process.execPath, cargs, { cwd: process.cwd(), windowsHide: true, maxBuffer: 50e6 });
+    // ABRUPT RUNNER DEATH: find the campaign's OWN child - the managerRun process - and kill it BY PID.
+    // Destroying sockets tests a connection failure; this tests the supervisor noticing that its child
+    // died without finalising anything. Killed by pid, never by a name pattern.
+    let killedPid = null;
+    let campaignAlive = true;
+    child.on('close', () => { campaignAlive = false; });
+    if (killRunnerAfterMs) {
+      // POLL for a live runner rather than killing on a fixed delay. A fixed delay is a race: the
+      // first attempt of this test fired at 7s, by which time the scripted campaign had already
+      // finished, so it killed an unrelated pid and 'proved' the supervisor was fine. Waiting for a
+      // real child to exist means the kill lands on a runner that is actually working.
+      (async () => {
+        const deadline = Date.now() + 60000;
+        while (campaignAlive && !killedPid && Date.now() < deadline) {
+          await new Promise((r) => setTimeout(r, 400));
+          if (!campaignAlive) break;
+          try {
+            const { stdout: o } = await exec('powershell', ['-NoProfile', '-Command',
+              `Get-CimInstance Win32_Process -Filter "ParentProcessId=${child.pid}" | Where-Object { $_.Name -eq 'node.exe' } | Select-Object -First 1 -ExpandProperty ProcessId`],
+              { windowsHide: true });
+            const pid = parseInt(String(o).trim(), 10);
+            if (pid && campaignAlive) { process.kill(pid, 'SIGKILL'); killedPid = pid; }
+          } catch { /* keep polling; the assertions report a failure to find one */ }
+        }
+      })();
+    }
+    const done = await new Promise((res) => {
+      let o = '';
+      child.stdout.on('data', (d) => { o += d; });
+      child.on('close', (c) => res({ c, o }));
+    });
+    const code = done.c; const stdout = done.o;
+    const wall = (Date.now() - t0) / 1000;
     const sum = existsSync(join(outDir, '_campaign.json'))
       ? JSON.parse(readFileSync(join(outDir, '_campaign.json'), 'utf8')) : null;
-    return { code, stdout, sum };
+    const wd = existsSync(join(outDir, '_watchdog.json'))
+      ? JSON.parse(readFileSync(join(outDir, '_watchdog.json'), 'utf8')) : null;
+    return { code, stdout, sum, wall, wd, killedPid };
   } finally {
     try { srv.close(); } catch { /* best effort */ }
     try { rmSync(root, { recursive: true, force: true }); } catch { /* best effort */ }
@@ -129,4 +166,26 @@ say(bad.sum.results.some((r) => r.attemptsInCorpus > 0),
   'attempts made before the interruption survive in the corpus and are counted');
 
 console.log(`\n  interruption gate: ${passed} passed, ${failed} failed -> ${failed ? 'AN INTERRUPTED RUN CAN STILL LOOK LIKE A COMPLETED ONE' : 'an interrupted run fails the campaign, names itself, and keeps what it had'}`);
+// == 3. a request that NEVER RETURNS must be terminated in flight ==============================
+console.log('\n3. the backend accepts a request and never answers - the case a between-page check cannot see');
+const hung = await campaign({ hangAfter: 1, pages: ['c1'], maxGpuSeconds: 20 });
+say(hung.wall < 120, `the campaign ended after ${hung.wall.toFixed(0)}s rather than hanging forever`);
+say(hung.code !== 0, `it exits NON-ZERO (${hung.code})`);
+say(!!hung.sum && hung.sum.terminatedInFlight === true, 'and reports a RUNNING page terminated in flight, not merely one never started');
+const kp = hung.sum && hung.sum.results.find((r) => r.killedByWatchdog);
+say(!!kp, `the page is named as killed by the watchdog (${kp && kp.page})`);
+say(!!kp && /TERMINATED IN FLIGHT/.test(kp.problems.join(' ')), 'with the reason recorded, not inferred from an exit code');
+say(!!hung.sum && hung.sum.wallClockSeconds >= 18, `the clock ran from process start, so startup exposure is inside the budget (${hung.sum && hung.sum.wallClockSeconds}s against 20s)`);
+
+// == 4. the runner PROCESS is killed outright, mid-page ========================================
+console.log('\n4. the runner process is killed by pid - not its connection - mid-page');
+const slain = await campaign({ pages: ['d1', 'd2'], killRunnerAfterMs: 1 });
+say(slain.killedPid !== null, `a child pid was located and killed (${slain.killedPid})`);
+say(slain.code !== 0, `the campaign exits NON-ZERO (${slain.code}) - the supervisor noticed its child died`);
+say(!!slain.sum, 'a summary was still written by the supervisor, which the child could not have written');
+const dead = slain.sum && slain.sum.results.find((r) => !r.ok);
+say(!!dead, 'the killed page is named as a problem');
+say(!!dead && /NO_RECORD|INTERRUPTED/.test(dead.status), `with a status the child never finalised (${dead && dead.status})`);
+say(!!dead && typeof dead.attemptsInCorpus === 'number', `and persisted records were reconciled independently (${dead && dead.attemptsInCorpus} attempt(s) in the corpus)`);
+
 process.exit(failed ? 1 : 0);
