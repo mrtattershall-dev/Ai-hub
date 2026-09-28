@@ -105,12 +105,7 @@ register({
       id: 'click',
       adapterId: 'browser.click',
       what: 'click each clickable control and look for an observable effect',
-      // EACH CONTROL IS CLICKED TWICE. A toggle whose content starts hidden shows nothing on its first
-      // click - OBSEVAL-1's e5-notes has `#note-list { display: none }` in CSS while its handler tests
-      // the INLINE style, so the first click sets display:none on an already-hidden list and only the
-      // second reveals it. One click per control would report that page as NO_CHANGE_OBSERVED, which
-      // would be true of the probe and misleading about the application.
-      interactions: targets.flatMap((t) => [{ kind: 'click', selector: t.selector }, { kind: 'click', selector: t.selector }]),
+      interactions: targets.map((t) => ({ kind: 'click', selector: t.selector })),
       evidence: [
         `${targets.length} clickable control(s): ${targets.map((t) => t.selector).join(', ')}`,
         ...listens.map((r) => `a ${r.type} listener was registered on ${r.target}`),

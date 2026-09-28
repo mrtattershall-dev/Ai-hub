@@ -1,0 +1,9 @@
+REGRESSION CASE, copied from OBSEVAL-1 e5-notes (sha e1da2edcf082) and preserved unchanged.
+
+A stylesheet sets #note-list { display: none } while the handler tests the INLINE style, so the first
+click sets display:none on an already-hidden list and only the SECOND click reveals it. A single-click
+probe reported NO_CHANGE_OBSERVED - true of the probe, misleading about the application.
+
+It is kept to hold the bounded repeat sequence honest, and to keep two verdicts apart: the behaviour
+becomes observable at repetition 2, which is NOT a finding that the toggle meets its requirement. If the
+requirement is "each click toggles visibility", the first click doing nothing is itself a defect.

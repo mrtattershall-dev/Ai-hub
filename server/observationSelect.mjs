@@ -33,6 +33,7 @@ import { createServer } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { resolve, join, normalize, extname } from 'node:path';
 import { createHash } from 'node:crypto';
+import { perform as performAction } from './actions.mjs';
 import { OUTCOME, adaptersFor, coverage } from './adapters/interface.mjs';
 import './adapters/browser.mjs';
 
@@ -40,7 +41,25 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 const sha = (t) => createHash('sha256').update(String(t)).digest('hex');
 
 /** The frozen probe budget. Declared here, not chosen per application. */
-export const BUDGET = { maxPlans: 8, maxInteractionsPerPlan: 12, maxTotalInteractions: 60, pageTimeoutMs: 20_000 };
+export const BUDGET = {
+  maxPlans: 8, maxInteractionsPerPlan: 12, maxTotalInteractions: 60, pageTimeoutMs: 20_000,
+  // ONE INTERACTION IS NOT ALWAYS ENOUGH TO REVEAL BEHAVIOUR, and the fix is a bounded sequence rather
+  // than a rule for any particular page. Each distinct interaction is repeated this many times from a
+  // FRESH page, with every intermediate result recorded.
+  //
+  // Why 3: a toggle needs 2 to complete a cycle, and a third shows the cycle repeating. OBSEVAL-1's
+  // e5-notes is hidden by a stylesheet while its handler tests the INLINE style, so its first click
+  // hides an already-hidden list and only the second reveals it - one click reported NO_CHANGE_OBSERVED,
+  // which was true of the probe and misleading about the application.
+  repeatsPerInteraction: 3,
+};
+
+/** How an interaction behaved across its repeat sequence. These are DIAGNOSTIC, not verdicts. */
+export const EFFECT = {
+  IMMEDIATE: 'IMMEDIATE_EFFECT',                 // changed on the first repetition
+  SEQUENCE_DEPENDENT: 'SEQUENCE_DEPENDENT_EFFECT', // changed only after repeating
+  NONE: 'NO_EFFECT_OBSERVED',                    // no change across the whole sequence
+};
 
 function serveDir(dirIn) {
   const dir = resolve(dirIn);
@@ -275,79 +294,86 @@ export async function selectObservation(dir, { entry = 'index.html', budget = BU
       return { ok: true, ...record };
     }
 
-    // ── 3. PROBE, each in a fresh page, within the budget ──
+    // ── 3. PROBE. Each distinct interaction gets its OWN FRESH PAGE and is repeated a declared number
+    // of times, with every intermediate result recorded. Resetting between sequences is what stops one
+    // interaction from silently setting up - or destroying - the conditions another is judged under.
     for (const plan of plans) {
       if (record.interactionsUsed >= budget.maxTotalInteractions) {
         record.unresolved.push(`the interaction budget (${budget.maxTotalInteractions}) ran out before plan ${plan.id} was tried`);
         break;
       }
+      const sequences = [];
       const probeErrors = [];
-      let page = null;
-      const steps = [];
       let probeError = null;
-      try {
-        page = await freshPage(probeErrors);
-        let prev = await page.evaluate(`(${SNAPSHOT})()`);
-        const interactions = plan.interactions.slice(0, budget.maxInteractionsPerPlan);
-        for (const it of interactions) {
-          if (record.interactionsUsed >= budget.maxTotalInteractions) break;
-          record.interactionsUsed++;
-          try {
-            if (it.kind === 'key') { await page.keyboard.press(it.key); }
-            else if (it.kind === 'type') {
-              await page.focus(it.selector);
-              await page.evaluate((s) => { const e = document.querySelector(s); if (e) { e.value = ''; } }, it.selector);
-              await page.type(it.selector, it.text, { delay: 5 });
-              // Dispatch the events a page is likely to listen for, beyond what typing already fires.
-              await page.evaluate((s) => {
-                const e = document.querySelector(s);
-                if (!e) return;
-                e.dispatchEvent(new Event('input', { bubbles: true }));
-                e.dispatchEvent(new Event('change', { bubbles: true }));
-              }, it.selector);
-            } else if (it.kind === 'click') { await page.click(it.selector); }
-            else if (it.kind === 'submit') {
-              await page.evaluate((s) => { const f = document.querySelector(s); if (f) f.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); }, it.selector);
-            }
-          } catch (e) {
-            steps.push({ interaction: it, performed: false, error: String(e.message || e).slice(0, 140) });
-            continue;
-          }
-          await new Promise((r) => setTimeout(r, 40));
-          const now = await page.evaluate(`(${SNAPSHOT})()`);
-          const ch = changedBetween(prev, now);
-          steps.push({
-            interaction: it, performed: true, changed: ch,
-            seam: now.seam, seamThrew: now.seamThrew,
-            domDigest: digest(now.domDigest), canvasDigest: digest(now.canvasDigest), elementCount: now.elementCount,
-          });
-          prev = now;
-        }
-      } catch (e) { probeError = String(e.message || e).slice(0, 180); }
-      finally { try { if (page) await page.close(); } catch { /* best effort */ } }
+      const distinct = plan.interactions.slice(0, budget.maxInteractionsPerPlan);
 
-      const effective = steps.filter((s) => s.performed && s.changed && s.changed.any);
-      // Interactions that moved only their own control - a field that accepted text while the page did
-      // nothing with it. Reported so "the interaction happened" is never mistaken for "it did something".
-      const selfOnly = steps.filter((s) => s.performed && s.changed && !s.changed.any && s.changed.selfEffect);
-      const performedAny = steps.some((s) => s.performed);
+      for (const it of distinct) {
+        if (record.interactionsUsed >= budget.maxTotalInteractions) break;
+        let page = null;
+        const steps = [];
+        try {
+          page = await freshPage(probeErrors);                  // RESET before this sequence
+          const initial = await page.evaluate(`(${SNAPSHOT})()`);
+          let prev = initial;
+          for (let rep = 1; rep <= budget.repeatsPerInteraction; rep++) {
+            if (record.interactionsUsed >= budget.maxTotalInteractions) break;
+            record.interactionsUsed++;
+            try {
+              await performAction(page, it, { settleMs: 40 });
+            } catch (e) {
+              steps.push({ repetition: rep, performed: false, error: String(e.message || e).slice(0, 140) });
+              break;
+            }
+            const now = await page.evaluate(`(${SNAPSHOT})()`);
+            steps.push({
+              repetition: rep, performed: true,
+              changedFromPrevious: changedBetween(prev, now),
+              changedFromInitial: changedBetween(initial, now),
+              seam: now.seam, domDigest: digest(now.domDigest), canvasDigest: digest(now.canvasDigest),
+            });
+            prev = now;
+          }
+        } catch (e) { probeError = String(e.message || e).slice(0, 180); }
+        finally { try { if (page) await page.close(); } catch { /* best effort */ } }
+
+        const performed = steps.filter((x) => x.performed);
+        const firstChange = performed.find((x) => x.changedFromInitial.any);
+        const effect = !performed.length ? null
+          : (firstChange ? (firstChange.repetition === 1 ? EFFECT.IMMEDIATE : EFFECT.SEQUENCE_DEPENDENT) : EFFECT.NONE);
+        sequences.push({
+          interaction: it, repetitions: steps.length, effect,
+          firstChangeAtRepetition: firstChange ? firstChange.repetition : null,
+          selfEffectOnly: !firstChange && performed.some((x) => x.changedFromInitial.selfEffect),
+          steps,
+        });
+      }
+
+      const performedAny = sequences.some((q) => q.steps.some((x) => x.performed));
+      const effective = sequences.filter((q) => q.effect === EFFECT.IMMEDIATE || q.effect === EFFECT.SEQUENCE_DEPENDENT);
+      const delayed = sequences.filter((q) => q.effect === EFFECT.SEQUENCE_DEPENDENT);
       const probe = {
         planId: plan.id, adapterId: plan.adapterId,
         probeError, pageErrors: probeErrors,
-        interactionsTried: steps.length, interactionsPerformed: steps.filter((s) => s.performed).length,
-        effective: effective.map((s) => ({ interaction: s.interaction, changed: s.changed })),
-        selfEffectOnly: selfOnly.map((s) => ({ interaction: s.interaction })),
-        steps,
+        repeatsPerInteraction: budget.repeatsPerInteraction,
+        interactionsTried: sequences.length,
+        interactionsPerformed: sequences.filter((q) => q.steps.some((x) => x.performed)).length,
+        sequences,
+        effective: effective.map((q) => ({ interaction: q.interaction, changed: q.steps.find((x) => x.changedFromInitial.any).changedFromInitial, atRepetition: q.firstChangeAtRepetition })),
+        selfEffectOnly: sequences.filter((q) => q.selfEffectOnly).map((q) => ({ interaction: q.interaction })),
+        sequenceDependent: delayed.map((q) => ({ interaction: q.interaction, atRepetition: q.firstChangeAtRepetition })),
         outcome: probeError ? OUTCOME.PROBE_ERROR
           : (!performedAny ? OUTCOME.PROBE_ERROR
             : (effective.length ? OUTCOME.CONFIRMED_BEHAVIOUR : OUTCOME.NO_CHANGE_OBSERVED)),
       };
       record.probes.push(probe);
+      if (delayed.length) {
+        record.unresolved.push(`${delayed.length} interaction(s) produced NO effect on the first attempt and only became observable after repeating (at repetition ${delayed.map((q) => q.firstChangeAtRepetition).join(', ')}). THAT THE BEHAVIOUR BECAME OBSERVABLE IS NOT A FINDING THAT IT IS CORRECT: whether a control meets its requirement - "each press toggles" say - is judged against the requirement, and a first press that does nothing may itself be a defect.`);
+      }
       if (probe.outcome === OUTCOME.CONFIRMED_BEHAVIOUR) {
         record.selected.push({
           adapterId: plan.adapterId, planId: plan.id,
           why: `probing ${plan.what} produced an observable change`,
-          effects: probe.effective.map((e) => ({ interaction: e.interaction, channels: Object.entries(e.changed).filter(([k, v]) => v && k !== 'any').map(([k]) => k) })),
+          effects: probe.effective.map((e) => ({ interaction: e.interaction, atRepetition: e.atRepetition, channels: Object.entries(e.changed).filter(([k, v]) => v && k !== 'any').map(([k]) => k) })),
           evidence: plan.evidence, uncertainty: plan.uncertainty,
         });
       }
@@ -396,7 +422,7 @@ if (DIRECT) {
     console.log(`  plans proposed: ${r.plans.length}`);
     for (const p of r.plans) console.log(`    ${p.adapterId.padEnd(18)} ${p.what}`);
     console.log(`  probes:`);
-    for (const p of r.probes) console.log(`    ${p.adapterId.padEnd(18)} ${p.outcome.padEnd(22)} ${p.interactionsPerformed} performed, ${p.effective.length} produced a change`);
+    for (const p of r.probes) console.log(`    ${p.adapterId.padEnd(18)} ${p.outcome.padEnd(22)} ${p.interactionsPerformed} interaction(s) x${p.repeatsPerInteraction}, ${p.effective.length} produced a change${p.sequenceDependent.length ? `, ${p.sequenceDependent.length} only after repeating` : ''}`);
     console.log(`  SELECTED: ${r.selected.map((x) => x.adapterId).join(', ') || 'none'}`);
     console.log(`  OUTCOME:  ${r.outcome}`);
     for (const u of r.unresolved) console.log(`    unresolved: ${u}`);

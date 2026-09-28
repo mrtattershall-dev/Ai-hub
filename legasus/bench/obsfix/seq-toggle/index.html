@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note List</title>
+    <style>
+        #note-list {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Note List</h1>
+    <ul id="note-list">
+        <li>Note 1</li>
+        <li>Note 2</li>
+        <li>Note 3</li>
+        <li>Note 4</li>
+        <li>Note 5</li>
+    </ul>
+    <button id="toggle">Toggle List</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('toggle');
+            const noteList = document.getElementById('note-list');
+
+            toggleButton.addEventListener('click', function() {
+                if (noteList.style.display === 'none') {
+                    noteList.style.display = 'block';
+                } else {
+                    noteList.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

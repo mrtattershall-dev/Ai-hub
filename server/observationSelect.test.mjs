@@ -144,6 +144,41 @@ const ids = (r) => r.selected.map((s) => s.adapterId).sort();
   say(inline.outcome === OUTCOME.CONFIRMED_BEHAVIOUR, 'the click probe still confirms the behaviour by OBSERVING it, despite not seeing the registration');
 }
 
+// ══ 4d. one interaction is not always enough ══════════════════════════════
+{
+  console.log('\n4d. a bounded repeat sequence, and delayed effect kept apart from correctness');
+  const { EFFECT, BUDGET: B } = await import('./observationSelect.mjs');
+
+  // THE REGRESSION CASE, preserved: a stylesheet hides the list while the handler tests the INLINE
+  // style, so the first click hides an already-hidden list and only the second reveals it.
+  const seq = await runFixture('seq-toggle');
+  say(seq.outcome === OUTCOME.CONFIRMED_BEHAVIOUR, `behaviour is confirmed once the action is repeated (${seq.outcome})`);
+  const pr = seq.probes.find((x) => x.adapterId === 'browser.click');
+  say(!!pr && pr.sequenceDependent.length === 1, 'and it is recorded as SEQUENCE DEPENDENT, not as an immediate effect');
+  say(pr.sequenceDependent[0].atRepetition === 2, `naming the repetition at which it appeared (${pr && pr.sequenceDependent[0] && pr.sequenceDependent[0].atRepetition})`);
+  const s0 = pr.sequences[0];
+  say(s0.steps.length === B.repeatsPerInteraction, `every intermediate result is recorded (${s0.steps.length} of ${B.repeatsPerInteraction})`);
+  say(s0.steps[0].performed && !s0.steps[0].changedFromInitial.any, 'the first repetition is recorded as performed and producing no change');
+  say(s0.effect === EFFECT.SEQUENCE_DEPENDENT, `the interaction's effect class is ${s0.effect}`);
+  say(seq.unresolved.some((u) => /NOT A FINDING THAT IT IS CORRECT/.test(u)),
+    'and the record says becoming observable is NOT a finding that the control meets its requirement');
+  say(seq.unresolved.some((u) => /first press that does nothing may itself be a defect/.test(u)),
+    'naming that a first press doing nothing may itself be a defect');
+
+  // An ordinary immediate-effect control must still classify as IMMEDIATE, so the distinction is real.
+  const click = await runFixture('click-button');
+  const cp = click.probes.find((x) => x.adapterId === 'browser.click');
+  say(cp.sequences[0].effect === EFFECT.IMMEDIATE, `a normal control is IMMEDIATE_EFFECT (${cp.sequences[0].effect})`);
+  say(cp.sequenceDependent.length === 0, 'and is not reported as sequence dependent');
+
+  // RESET BETWEEN SEQUENCES: each distinct interaction starts from a fresh page, so one cannot set up
+  // or destroy the conditions another is judged under.
+  const mixed = await runFixture('mixed');
+  const mp = mixed.probes.find((x) => x.adapterId === 'browser.input');
+  say(mp.sequences.every((q) => q.steps.length > 0), 'every sequence ran');
+  say(mp.sequences.length >= 1 && mp.sequences[0].steps[0].repetition === 1, 'each sequence starts again at repetition 1 from its own fresh page');
+}
+
 // ══ 5. a DELIBERATELY WRONG method reports nothing, rather than something ═══════════════════════
 {
   console.log('\n5. a deliberately wrong observation method yields NO_CHANGE_OBSERVED, not a confident answer');
