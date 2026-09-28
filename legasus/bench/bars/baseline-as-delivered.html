@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Bars</title>
+</head>
+<body>
+    <canvas id="canvas" width="400" height="100"></canvas>
+    <script>
+        window.app = {
+            state: () => JSON.stringify({
+                bars: [
+                    { height: 1 },
+                    { height: 1 },
+                    { height: 1 }
+                ]
+            })
+        };
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawBars(state) {
+            const bars = state.bars;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            bars.forEach((bar, index) => {
+                const x = index * 50;
+                const y = canvas.height - bar.height;
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(x, y, 50, bar.height);
+            });
+        }
+
+        document.addEventListener('keydown', (event) => {
+            const state = JSON.parse(window.app.state());
+            const newBars = state.bars.map((bar, index) => {
+                if (event.key === 'a') {
+                    return { height: bar.height + 1 };
+                } else if (event.key === 'b') {
+                    return { height: bar.height + 2 };
+                } else if (event.key === 'c') {
+                    return { height: bar.height + 3 };
+                }
+                return bar;
+            });
+            window.app.state = () => JSON.stringify({ bars: newBars });
+            drawBars(state);
+        });
+
+        drawBars(window.app.state());
+    </script>
+</body>
+</html>

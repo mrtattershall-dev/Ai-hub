@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Light</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="traffic-light"></canvas>
+    <script>
+        const canvas = document.getElementById('traffic-light');
+        const ctx = canvas.getContext('2d');
+
+        let state = 'red';
+
+        function drawLight() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(50, 50, 30, 0, Math.PI * 2);
+            ctx.fillStyle = state === 'red' ? 'red' : 'green';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function switchLight(key) {
+            switch (key) {
+                case '1':
+                    state = 'red';
+                    break;
+                case '2':
+                    state = 'amber';
+                    break;
+                case '3':
+                    state = 'green';
+                    break;
+            }
+            drawLight();
+        }
+
+        canvas.addEventListener('keydown', (e) => {
+            switchLight(e.key);
+        });
+
+        drawLight();
+    </script>
+</body>
+</html>

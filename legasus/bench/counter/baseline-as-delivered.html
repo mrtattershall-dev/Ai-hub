@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Counter</title>
+</head>
+<body>
+    <canvas id="counterCanvas" width="200" height="100"></canvas>
+    <script>
+        window.app = {
+            state: () => JSON.stringify({
+                value: 0
+            })
+        };
+
+        const canvas = document.getElementById('counterCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '20px Arial';
+            ctx.fillText(window.app.state().value, 50, 50);
+        }
+
+        function update() {
+            const newState = JSON.parse(window.app.state());
+            newState.value += window.event.key === 'ArrowUp' ? 1 : -1;
+            window.app.state = JSON.stringify(newState);
+            draw();
+        }
+
+        canvas.addEventListener('keydown', update);
+    </script>
+</body>
+</html>
