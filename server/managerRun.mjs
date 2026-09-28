@@ -42,6 +42,12 @@ const MAX_TOKENS = parseInt(opt('max-tokens', '400'), 10);
 
 // Declared in TRANSFER-3 before the run: the context rendering that ASSISTED-1 used.
 const CONTEXT_BUDGET = parseInt(opt('context-budget', '240'), 10);
+// ABLATION SWITCH, for isolating WHICH part of the guidance causes a result. `full` is the frozen
+// policy and the default, so an ordinary run is byte-identical to one without this flag.
+//   full         everything the planner proposes
+//   no-renderer  drop the one line naming the function the page updates through
+//   none         drop the planner's guidance entirely, keeping the slot contract and the instruction
+const GUIDANCE = opt('guidance', 'full');
 const CONTEXT_STYLE = 'compact';
 const INCLUDE_STRATEGY = true;
 
@@ -78,7 +84,7 @@ const out = {
   at: new Date().toISOString(), experiment: 'TRANSFER-3', task: task.id, model: MODEL,
   page: join(DIR, NAME), baselineSha: sha(startFile),
   budget: { maxCalls: MAX_CALLS, maxRounds: MAX_ROUNDS, seedsPerRound: SEEDS_PER_ROUND },
-  contextConfig: { style: CONTEXT_STYLE, budget: CONTEXT_BUDGET, includeStrategy: INCLUDE_STRATEGY },
+  contextConfig: { style: CONTEXT_STYLE, budget: CONTEXT_BUDGET, includeStrategy: INCLUDE_STRATEGY, guidance: GUIDANCE },
   interventionsByAPerson: 0,
   rounds: [], attempts: [], accepted: false, calls: 0,
 };
@@ -141,7 +147,9 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
   const rendered = renderConstraints(facts, { budget: CONTEXT_BUDGET, style: CONTEXT_STYLE, includeStrategy: INCLUDE_STRATEGY });
   const indent = (scaffold.lines.find((l) => l.includes('// FILL IN')) || '            ').match(/^\s*/)[0];
   // The guidance shown to the model comes from the PROPOSAL, so what it sees is what the planner decided.
-  const planGuidance = planToGuidance(proposal).map((l) => indent + l).join(NL);
+  const planGuidance = (GUIDANCE === 'none' ? [] : planToGuidance(proposal)
+    .filter((l) => !(GUIDANCE === 'no-renderer' && /the page updates through/.test(l))))
+    .map((l) => indent + l).join(NL);
   // A NON-DELIVERY NOTICE IS NOT GUIDANCE. `renderConstraints` returns explanatory text when it could
   // extract nothing - "the constraints could not be extracted: NO_ENCLOSING_FUNCTION" - which is right
   // for a RECORD and wrong to hand a model: it reaches the prompt as a line reporting that the system

@@ -15,6 +15,36 @@
 The unverified "$10 / 5-hour" figure from an earlier conversation remains unverified and is **not**
 the basis for this run. This authorization is separate, explicit, and from the authorizer.
 
+### What this authorization does NOT cover
+
+**The guidance ablation (`--guidance no-renderer | none`) is NOT authorized and has NOT been run.**
+
+The switch is built and the default (`full`) is byte-identical to the frozen policy, so nothing about
+an ordinary run changed. But the paid arm is held, for a process reason worth recording:
+
+I offered the ablation as an **opt-out** - "say if you'd rather I hold it" - rather than asking for an
+opt-in. That is consent-by-silence, and it is the precise pattern the standing rule exists to prevent:
+a cap suggested, assumed, or merely not objected to by any voice other than the authorizer is not
+authorization. The research and review voice in that exchange explicitly disclaimed spending authority,
+and was right to.
+
+Running it requires a new, explicit instruction from Micheal, recorded here before deployment, in the
+same form as the one above.
+
+### What each ablation switch removes, recorded before it is ever run
+
+So that no arm can later be described as something it was not:
+
+| switch | what is removed | what REMAINS supplied by Legasus |
+|---|---|---|
+| `full` | nothing | everything below |
+| `no-renderer` | the single line naming the function the page updates through | site selection, scope-aware facts, handler facts, slot contract, instruction, containment, emitted task, evaluator |
+| `none` | the planner's guidance block entirely | site selection, slot contract, instruction, containment, emitted task, evaluator |
+
+**`none` is not "the model without Legasus."** It still receives a planner-chosen edit site, a slot
+language contract, a machine-emitted requirement, containment, and an independent evaluator. A control
+without Legasus is CLAIM-1's Arm B, which is a different thing and is not built.
+
 ## Why a cloud model at all
 
 7B+ crashes this laptop — a firm standing constraint. The local arm is a 1.5B, and the question
