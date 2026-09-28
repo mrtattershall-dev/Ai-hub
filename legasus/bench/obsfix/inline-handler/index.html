@@ -1,0 +1,9 @@
+<!DOCTYPE html><html><body>
+<button id="b" onclick="document.getElementById(&apos;o&apos;).textContent=&apos;clicked&apos;">go</button>
+<p id="o">idle</p>
+<iframe src="about:blank"></iframe>
+<script>
+// Behaviour attached by an INLINE ATTRIBUTE, plus a frame. Neither is visible to addEventListener
+// capture. The layer must report both as detected-but-uncovered.
+const x = 1;
+</script></body></html>

@@ -30,6 +30,7 @@
  * no browser is downloaded. The candidate directory is served read-only from a temporary
  * local static server that exists only for the play.
  */
+import { perform as performAction, readDom, UnsupportedAction } from './actions.mjs';
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, extname, normalize, resolve } from 'node:path';
@@ -71,8 +72,13 @@ function serveDir(dirIn) {
 function evaluateExpectation(expr, env) {
   if (expr === 'noErrors') return env.errors.length === 0;
   // A small, explicit evaluation scope: no access to node globals beyond what is passed.
-  const fn = new Function('state', 'before', 'errors', 'storage', 'url', `return (${expr});`);
-  return !!fn(env.state, env.before, env.errors, env.storage, env.url);
+  //
+  // `dom` is the page as a user sees it: { visible, hidden, inputValues, visibleCount }. It exists so a
+  // check can state the DOWNSTREAM result - which rows are on screen - rather than reading a state seam
+  // a page may have no reason to expose. `inputValues` is kept apart from `visible` because typing
+  // changes an input's own value whether or not the application reacts.
+  const fn = new Function('state', 'before', 'errors', 'storage', 'url', 'dom', 'domBefore', `return (${expr});`);
+  return !!fn(env.state, env.before, env.errors, env.storage, env.url, env.dom, env.domBefore);
 }
 
 export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browserPath = null } = {}) {
@@ -149,18 +155,23 @@ export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browse
     for (const step of spec.steps || []) {
       if (Date.now() > deadline) { cases.push({ n: step.n, name: step.name, kind: 'ERROR', text: 'play timed out before this step' }); lines.push(`ERROR case ${step.n}  ${step.name}: play timed out`); continue; }
       const before = await readState();
+      const domBefore = await readDom(page);
       try {
+        // ONE VOCABULARY, SHARED WITH THE PROBER, and an unsupported action is an ERROR.
+        //
+        // This used to be a chain of `if (act.key) ... if (act.click) ...` that silently ignored
+        // anything it did not recognise. A step asking for an action the harness cannot perform would
+        // run zero interactions and could still be scored PASS - a required check quietly becoming a
+        // pass, which is the one thing acceptance must never do.
         for (const act of step.do || []) {
-          if (act.key) { for (let i = 0; i < (act.times || 1); i++) { await page.keyboard.press(act.key); await new Promise((r) => setTimeout(r, act.delayMs ?? 40)); } }
-          if (act.type) await page.keyboard.type(String(act.type), { delay: 20 });
-          if (act.click) await page.click(act.click);
-          if (act.eval) await page.evaluate(act.eval);
-          if (act.waitMs) await new Promise((r) => setTimeout(r, act.waitMs));
-          if (act.reload) { await page.reload({ waitUntil: 'load', timeout: 15_000 }); await new Promise((r) => setTimeout(r, spec.loadSettleMs ?? 400)); }
+          if (act.eval) { await page.evaluate(act.eval); continue; }
+          if (act.reload) { await page.reload({ waitUntil: 'load', timeout: 15_000 }); await new Promise((r) => setTimeout(r, spec.loadSettleMs ?? 400)); continue; }
+          await performAction(page, act, { settleMs: act.delayMs ?? 40 });
         }
         await new Promise((r) => setTimeout(r, settle));
         const state = await readState();
         const storage = await readStorage();
+        const domNow = await readDom(page);
         if (dom.idsAtFirstFailure === null) {
           dom = await page.evaluate(() => {
             const lookups = (window.__nullLookups || []).slice(0, 10);
@@ -172,11 +183,21 @@ export async function playCheck(candidateDir, spec, { timeoutMs = 60_000, browse
             };
           }).catch(() => dom);
         }
-        const ok = evaluateExpectation(step.expect, { state, before, errors: errors.slice(), storage, url });
-        cases.push({ n: step.n, name: step.name, kind: ok ? 'PASS' : 'FAIL', text: ok ? '' : `expected ${step.expect}; state ${JSON.stringify(state).slice(0, 200)}${errors.length ? '; errors: ' + errors.slice(-2).join(' | ') : ''}` });
+        const ok = evaluateExpectation(step.expect, { state, before, errors: errors.slice(), storage, url, dom: domNow, domBefore });
+        cases.push({
+          n: step.n, name: step.name, kind: ok ? 'PASS' : 'FAIL',
+          // The observed DOM goes in the record on failure, so "the filter is wrong" can be stated with
+          // the expected result AND what was actually on screen, rather than inferred.
+          observed: ok ? undefined : { visible: domNow.visible, inputValues: domNow.inputValues },
+          text: ok ? '' : `expected ${step.expect}; state ${JSON.stringify(state).slice(0, 200)}; visible ${JSON.stringify(domNow.visible).slice(0, 200)}${errors.length ? '; errors: ' + errors.slice(-2).join(' | ') : ''}`,
+        });
         lines.push(`${ok ? 'PASS' : 'FAIL'} case ${step.n}  ${step.name}${ok ? '' : ' -> ' + cases[cases.length - 1].text}`);
       } catch (e) {
-        cases.push({ n: step.n, name: step.name, kind: 'ERROR', text: String(e.message || e).slice(0, 200) });
+        const unsupported = e && e.name === 'UnsupportedAction';
+        cases.push({
+          n: step.n, name: step.name, kind: 'ERROR', unsupportedAction: unsupported || undefined,
+          text: (unsupported ? 'UNSUPPORTED ACTION - this check could not be performed and is NOT a pass: ' : '') + String(e.message || e).slice(0, 200),
+        });
         lines.push(`ERROR case ${step.n}  ${step.name}: ${String(e.message || e).slice(0, 160)}`);
       }
     }

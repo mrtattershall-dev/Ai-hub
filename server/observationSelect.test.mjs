@@ -115,6 +115,35 @@ const ids = (r) => r.selected.map((s) => s.adapterId).sort();
   say(/uncovered|does not support/.test(note), 'naming what was not covered');
 }
 
+// ══ 4b. the interaction's own effect is not the application's behaviour ═════════════
+{
+  console.log('\n4b. a field accepting text is the interaction, not the behaviour');
+  const inert = await runFixture('inert-input');
+  say(inert.outcome === OUTCOME.NO_CHANGE_OBSERVED, `an input with NO listener gives NO_CHANGE_OBSERVED (${inert.outcome})`);
+  const probe = inert.probes.find((p) => p.adapterId === 'browser.input');
+  say(probe && probe.effective.length === 0, 'nothing downstream changed');
+  say(probe && probe.selfEffectOnly.length > 0, `while the field DID receive the text (${probe.selfEffectOnly.length} self-effect interactions)`);
+  const note = inert.unresolved.join(' ');
+  say(/change their own control/.test(note), 'and the record separates the two explicitly');
+  say(/NOT a finding that its implementation is defective/.test(note),
+    'stating that "it did not react" is still not "its implementation is defective" - that needs an expected result');
+}
+
+// ══ 4c. handler mechanisms the capture cannot see are DETECTED and reported ══════════
+{
+  console.log('\n4c. uncovered handler mechanisms are detected, not silently missed');
+  const inline = await runFixture('inline-handler');
+  const cl = inline.coverageLimits;
+  say(!!cl, 'every selection carries its coverage limits');
+  say(cl.detectedButUncovered.inlineHandlers.length === 1, `an inline onclick attribute is DETECTED (${cl.detectedButUncovered.inlineHandlers.length})`);
+  say(cl.detectedButUncovered.frames.length === 1, `an iframe is DETECTED as a document this layer never enters (${cl.detectedButUncovered.frames.length})`);
+  say(cl.doesNotCapture.some((x) => /propert/.test(x)) && cl.doesNotCapture.some((x) => /iframe/.test(x)),
+    'and the record names what addEventListener capture does not see');
+  say(inline.unresolved.some((u) => /UNCOVERED/.test(u)), 'with an unresolved note saying behaviour reached only that way is uncovered');
+  say(inline.registrations.every((r) => r.target !== 'button#b'), 'the inline handler is indeed absent from the registrations');
+  say(inline.outcome === OUTCOME.CONFIRMED_BEHAVIOUR, 'the click probe still confirms the behaviour by OBSERVING it, despite not seeing the registration');
+}
+
 // ══ 5. a DELIBERATELY WRONG method reports nothing, rather than something ═══════════════════════
 {
   console.log('\n5. a deliberately wrong observation method yields NO_CHANGE_OBSERVED, not a confident answer');

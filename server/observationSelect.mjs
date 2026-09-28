@@ -103,6 +103,16 @@ const SNAPSHOT = `() => {
     const cs = Array.from(document.querySelectorAll('canvas'));
     if (cs.length) out.canvasDigest = cs.map((c) => c.toDataURL()).join('|');
   } catch {}
+  // THE INTERACTION'S OWN EFFECT, kept apart from the downstream result. Typing changes an input's value
+  // whether or not the application reacts, so folding the two together would call every keystroke
+  // 'behaviour'. domDigest above reads only leaf TEXT, which an input value is not part of.
+  try {
+    const iv = {};
+    for (const el of document.querySelectorAll('input, textarea, select')) {
+      iv[el.id ? '#' + el.id : (el.name || el.tagName.toLowerCase())] = el.value;
+    }
+    out.inputValues = iv;
+  } catch {}
   return out;
 }`;
 
@@ -118,7 +128,26 @@ const SURFACES = `() => {
   const forms = Array.from(document.querySelectorAll('form')).map((e) => ({ selector: sel(e) }));
   const canvases = Array.from(document.querySelectorAll('canvas')).map((e) => ({ selector: sel(e), width: e.width, height: e.height }));
   const selects = Array.from(document.querySelectorAll('select')).map((e) => ({ selector: sel(e) }));
-  return { inputs, clickables, forms, canvases, selects, hasSeam: !!(window.app && typeof window.app.state === 'function') };
+  // MECHANISMS THIS LAYER DOES NOT CAPTURE. Patching addEventListener sees registrations made through
+  // THAT API. These are the other ways a page can attach behaviour, detected so they can be REPORTED as
+  // uncovered rather than silently missed.
+  const EVENT_ATTRS = ['onclick', 'oninput', 'onchange', 'onsubmit', 'onkeydown', 'onkeyup', 'onmousedown'];
+  const inlineHandlers = [];
+  for (const el of document.querySelectorAll('*')) {
+    for (const a of EVENT_ATTRS) if (el.hasAttribute && el.hasAttribute(a)) inlineHandlers.push({ selector: sel(el), attr: a });
+  }
+  const propertyHandlers = [];
+  for (const el of document.querySelectorAll('*')) {
+    for (const a of EVENT_ATTRS) {
+      try { if (!el.hasAttribute(a) && typeof el[a] === 'function') propertyHandlers.push({ selector: sel(el), prop: a }); } catch {}
+    }
+  }
+  const frames = Array.from(document.querySelectorAll('iframe, frame')).map((e) => ({ selector: sel(e), src: e.getAttribute('src') || null }));
+  return {
+    inputs, clickables, forms, canvases, selects,
+    inlineHandlers, propertyHandlers, frames,
+    hasSeam: !!(window.app && typeof window.app.state === 'function'),
+  };
 }`;
 
 const digest = (s) => (s === null || s === undefined ? null : sha(JSON.stringify(s)).slice(0, 16));
@@ -130,7 +159,11 @@ function changedBetween(before, after) {
     dom: before.domDigest !== after.domDigest,
     canvas: before.canvasDigest !== after.canvasDigest,
   };
-  return { ...ch, any: ch.seam || ch.dom || ch.canvas };
+  // `selfEffect` is the interaction changing its OWN control - an input now holding the typed text. It
+  // is reported and is deliberately NOT part of `any`: an inert field would otherwise look responsive.
+  ch.selfEffect = JSON.stringify(before.inputValues || {}) !== JSON.stringify(after.inputValues || {});
+  ch.any = ch.seam || ch.dom || ch.canvas;
+  return ch;
 }
 
 export async function selectObservation(dir, { entry = 'index.html', budget = BUDGET, browserPath = null } = {}) {
@@ -177,6 +210,30 @@ export async function selectObservation(dir, { entry = 'index.html', budget = BU
     record.registrations = await scanPage.evaluate('window.__regs || []');
     record.surfaces = await scanPage.evaluate(`(${SURFACES})()`);
     const atLoad = await scanPage.evaluate(`(${SNAPSHOT})()`);
+    // WHAT THE REGISTRATION CAPTURE DOES AND DOES NOT SEE, recorded for every application.
+    const sf = record.surfaces;
+    record.coverageLimits = {
+      captures: 'listeners registered through addEventListener, at any time, including delegated ones on document or body',
+      doesNotCapture: [
+        'inline handler attributes such as onclick="..." in the markup',
+        'handlers assigned to element properties, e.g. el.onclick = fn',
+        'anything inside an iframe or frame - a separate document this layer never enters',
+        'handlers registered after observation finished',
+      ],
+      detectedButUncovered: {
+        inlineHandlers: sf.inlineHandlers || [],
+        propertyHandlers: sf.propertyHandlers || [],
+        frames: sf.frames || [],
+      },
+      anyDetected: !!((sf.inlineHandlers || []).length || (sf.propertyHandlers || []).length || (sf.frames || []).length),
+    };
+    if (record.coverageLimits.anyDetected) {
+      const bits = [];
+      if ((sf.inlineHandlers || []).length) bits.push(`${sf.inlineHandlers.length} inline handler attribute(s)`);
+      if ((sf.propertyHandlers || []).length) bits.push(`${sf.propertyHandlers.length} property-assigned handler(s)`);
+      if ((sf.frames || []).length) bits.push(`${sf.frames.length} frame(s)`);
+      record.unresolved.push(`this application uses handler mechanisms the registration capture does not see: ${bits.join(', ')}. Behaviour reached only through them is UNCOVERED, and any "no change observed" here is correspondingly weaker.`);
+    }
     record.atLoad = { seam: atLoad.seam, seamThrew: atLoad.seamThrew, elementCount: atLoad.elementCount, domDigest: digest(atLoad.domDigest), canvasDigest: digest(atLoad.canvasDigest) };
     await scanPage.close();
 
@@ -256,12 +313,16 @@ export async function selectObservation(dir, { entry = 'index.html', budget = BU
       finally { try { if (page) await page.close(); } catch { /* best effort */ } }
 
       const effective = steps.filter((s) => s.performed && s.changed && s.changed.any);
+      // Interactions that moved only their own control - a field that accepted text while the page did
+      // nothing with it. Reported so "the interaction happened" is never mistaken for "it did something".
+      const selfOnly = steps.filter((s) => s.performed && s.changed && !s.changed.any && s.changed.selfEffect);
       const performedAny = steps.some((s) => s.performed);
       const probe = {
         planId: plan.id, adapterId: plan.adapterId,
         probeError, pageErrors: probeErrors,
         interactionsTried: steps.length, interactionsPerformed: steps.filter((s) => s.performed).length,
         effective: effective.map((s) => ({ interaction: s.interaction, changed: s.changed })),
+        selfEffectOnly: selfOnly.map((s) => ({ interaction: s.interaction })),
         steps,
         outcome: probeError ? OUTCOME.PROBE_ERROR
           : (!performedAny ? OUTCOME.PROBE_ERROR
@@ -286,7 +347,9 @@ export async function selectObservation(dir, { entry = 'index.html', budget = BU
       record.unresolved.push('every probe failed to execute, so nothing is known about the application');
     } else {
       record.outcome = OUTCOME.NO_CHANGE_OBSERVED;
+      const selfTotal = record.probes.reduce((n, p) => n + (p.selfEffectOnly || []).length, 0);
       record.unresolved.push(`no probed interaction changed the seam, the DOM or the canvas. THIS IS NOT A FINDING THAT THE APPLICATION HAS NO BEHAVIOUR: ${record.plans.length} plan(s) were tried within a budget of ${budget.maxTotalInteractions} interactions, and any interaction outside them is uncovered.`);
+      if (selfTotal) record.unresolved.push(`${selfTotal} interaction(s) DID change their own control - a field accepted the text - without any downstream result. The interaction reached the application; the application did not visibly react. That is still NOT a finding that its implementation is defective: establishing THAT needs an expected result to compare against.`);
       const untried = ['drag', 'hover', 'scroll', 'select-option', 'file-upload', 'timer-driven updates'];
       record.unresolved.push(`interaction kinds this layer does not support at all: ${untried.join(', ')}`);
     }
