@@ -1,0 +1,546 @@
+{
+  "at": "2026-09-28T02:56:35.227Z",
+  "experiment": "TRANSFER-3",
+  "task": "set3-s3-05-stack",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\set3\\s3-05-stack\\baseline-as-delivered.html",
+  "baselineSha": "010d1522d9dc634bb737c7bd33567f17b295e51c6c6a5138776dbc8f46171ae7",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "R1",
+      "why": "a keydown listener already dispatches on key values and does not exclude this key, so a branch goes inside it",
+      "insertAfterLine": 35,
+      "scaffold": "            if (e.key === '0') {\n                // FILL IN\n            }",
+      "instruction": "// on this key: every piece of state is back to its starting value.",
+      "contextDelivered": "// FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n// FACT line 16: drawStack() takes no arguments, and the code here calls it after changing state.",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "stack: the whole constraint",
+        "ctx: the whole constraint",
+        "popBlock(): the whole redraw"
+      ],
+      "feedbackDelivered": null,
+      "promptHeadSha": "94dfdfa3872785563edb66ab1814ce2fa8fb22d64386376410750e5bbc8cf479",
+      "suffixSha": "11105b8bbf260e276b221dfe70b2fdf031514fa4ce01fa2f53eb61e30c9f8237",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REJECTED",
+          "passing": [
+            1,
+            2,
+            3,
+            6,
+            7
+          ],
+          "failing": [
+            4,
+            5
+          ]
+        },
+        {
+          "seed": 2,
+          "outcome": "REJECTED",
+          "passing": [
+            1,
+            2,
+            3,
+            6,
+            7
+          ],
+          "failing": [
+            4,
+            5
+          ]
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "rule": "R1",
+      "why": "a keydown listener already dispatches on key values and does not exclude this key, so a branch goes inside it",
+      "insertAfterLine": 35,
+      "scaffold": "            if (e.key === '0') {\n                // FILL IN\n            }",
+      "instruction": "// on this key: every piece of state is back to its starting value.",
+      "contextDelivered": "// FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n// FACT line 16: drawStack() takes no arguments, and the code here calls it after changing state.",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "stack: the whole constraint",
+        "ctx: the whole constraint",
+        "popBlock(): the whole redraw"
+      ],
+      "feedbackDelivered": "                // CHECK 4 FAILED: pressing 0 returns every piece of state to its starting value\n                // CHECK 5 FAILED: pressing 0 again leaves it at the starting value",
+      "promptHeadSha": "2ff6862e1a374fc3aa31d05cc7711b2d1cf47d00118a00f04dce1156ff43858e",
+      "suffixSha": "11105b8bbf260e276b221dfe70b2fdf031514fa4ce01fa2f53eb61e30c9f8237",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "rule": "R2",
+      "why": "no existing keydown listener dispatches on key values, so a new listener goes after the last one",
+      "insertAfterLine": 41,
+      "scaffold": "        document.addEventListener('keydown', (e) => {\n            if (e.key !== '0') return;\n            // FILL IN\n        });",
+      "instruction": "// on this key: every piece of state is back to its starting value.",
+      "contextDelivered": "// FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n// FACT line 16: drawStack() takes no arguments, and the code here calls it after changing state.",
+      "factsDelivered": 0,
+      "contextDropped": [
+        "stack: the whole constraint",
+        "ctx: the whole constraint",
+        "popBlock(): the whole redraw"
+      ],
+      "feedbackDelivered": null,
+      "promptHeadSha": "5a934aed473c349a068e268b7d1f8603890f169541f6f3e47edf0662b9113171",
+      "suffixSha": "e6a33d53c21e2b29ec1babe31083802a8ae386ff2f2035dcf4a27600702ff01b",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 2,
+          "outcome": "REFUSED_EMPTY"
+        },
+        {
+          "seed": 3,
+          "outcome": "REFUSED_EMPTY"
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 58631,
+      "outputTokens": 400,
+      "promptTokens": 391,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "                // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n                pushBlock();\n                drawStack();\n            } else if (e.key === '1') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === '2') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === '3') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === '4') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === '5') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === '6') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === '7') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === '8') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === '9') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === 'q') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === 'w') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === 'e') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === 'r') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === 't') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === 'y') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === 'u') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === 'i') {\n                pushBlock();\n                drawStack();\n            } else if (e.key === 'o') {\n                pushBlock();\n                drawStack();\n            } else if (e.key",
+        "chars": 1964,
+        "lines": 58
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 66349,
+        "acceptanceMs": 82629
+      },
+      "containment": {
+        "ok": true,
+        "text": "                // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n                pushBlock();\n                drawStack();",
+        "codeLines": 2,
+        "truncatedAtLine": 4,
+        "droppedLines": 55,
+        "how": "truncated at the point where it would have closed a block it did not open (line 4), dropping 55 line(s)"
+      },
+      "transformedCandidate": {
+        "text": "                // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n                pushBlock();\n                drawStack();",
+        "chars": 171,
+        "lines": 3
+      },
+      "extraction": {
+        "truncatedAtLine": 4,
+        "droppedLines": 55,
+        "how": "truncated at the point where it would have closed a block it did not open (line 4), dropping 55 line(s)"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          6,
+          7
+        ],
+        "failing": [
+          4,
+          5
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, in its starting state\nPASS case 2  pressing a changes the state as it already did\nPASS case 3  pressing a again changes it again\nFAIL case 4  pressing 0 returns every piece of state to its starting value -> expected JSON.stringify(state) === \"{\\\"stack\\\":[]}\"; state {\"stack\":[{\"x\":0,\"y\":350},{\"x\":50,\"y\":350},{\"x\":100,\"y\":350}]}\nFAIL case 5  pressing 0 again leaves it at the starting value -> expected JSON.stringify(state) === \"{\\\"stack\\\":[]}\"; state {\"stack\":[{\"x\":0,\"y\":350},{\"x\":50,\"y\":350},{\"x\":100,\"y\":350},{\"x\":150,\"y\":350}]}\nPASS case 6  after 0, pressing a still changes the state\nPASS case 7  no page or console error was raised at any point\nSUMMARY 5/7 cases pass, 2 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "gameCanvas"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "gameCanvas"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          4,
+          5
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "863c0777d0dfa1ed9c6f1ae8781178af21d9b0d0"
+        },
+        "survivingBytes": null
+      },
+      "candidateSha": "e641a0993eb0b520c6272189a0966671cbc4062f6d0c1709bec5892ab4d66c8a",
+      "outcome": "REJECTED"
+    },
+    {
+      "round": 1,
+      "seed": 2,
+      "generationMs": 39091,
+      "outputTokens": 400,
+      "promptTokens": 391,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "                // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 18: drawStack() takes no arguments, and the code here calls it after changing state.\n                pushBlock();\n                drawStack();\n                popBlock();\n                drawStack();\n            } else if (e.key === '1') {\n                // FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n                // FACT line 16: drawStack() takes no arguments, and the code here calls it after changing state.\n// on this key: every piece of state is back to its starting value.\n                // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 18: drawStack() takes no arguments, and the code here calls it after changing state.\n                pushBlock();\n                drawStack();\n                popBlock();\n                drawStack();\n            } else if (e.key === '2') {\n                // FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n                // FACT line 16: drawStack() takes no arguments, and the code here calls it after changing state.\n// on this key: every piece of state is back to its starting value.\n                // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 18: drawStack() takes no arguments, and the code here calls it after changing state.\n                pushBlock();\n                drawStack();\n                popBlock();\n                drawStack();\n            } else if (e.key === '3') {\n                // FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n                // FACT line 16: draw",
+        "chars": 1892,
+        "lines": 29
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": false,
+        "passedProtected": true,
+        "accepted": false
+      },
+      "timing": {
+        "playMs": 127699,
+        "acceptanceMs": 139416
+      },
+      "containment": {
+        "ok": true,
+        "text": "                // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 18: drawStack() takes no arguments, and the code here calls it after changing state.\n                pushBlock();\n                drawStack();\n                popBlock();\n                drawStack();",
+        "codeLines": 4,
+        "truncatedAtLine": 7,
+        "droppedLines": 23,
+        "how": "truncated at the point where it would have closed a block it did not open (line 7), dropping 23 line(s)"
+      },
+      "transformedCandidate": {
+        "text": "                // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 18: drawStack() takes no arguments, and the code here calls it after changing state.\n                pushBlock();\n                drawStack();\n                popBlock();\n                drawStack();",
+        "chars": 342,
+        "lines": 6
+      },
+      "extraction": {
+        "truncatedAtLine": 7,
+        "droppedLines": 23,
+        "how": "truncated at the point where it would have closed a block it did not open (line 7), dropping 23 line(s)"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          6,
+          7
+        ],
+        "failing": [
+          4,
+          5
+        ],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, in its starting state\nPASS case 2  pressing a changes the state as it already did\nPASS case 3  pressing a again changes it again\nFAIL case 4  pressing 0 returns every piece of state to its starting value -> expected JSON.stringify(state) === \"{\\\"stack\\\":[]}\"; state {\"stack\":[{\"x\":0,\"y\":350},{\"x\":50,\"y\":350}]}\nFAIL case 5  pressing 0 again leaves it at the starting value -> expected JSON.stringify(state) === \"{\\\"stack\\\":[]}\"; state {\"stack\":[{\"x\":0,\"y\":350},{\"x\":50,\"y\":350}]}\nPASS case 6  after 0, pressing a still changes the state\nPASS case 7  no page or console error was raised at any point\nSUMMARY 5/7 cases pass, 2 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "gameCanvas"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "gameCanvas"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "FAIL",
+        "requested": "FAIL",
+        "protected": "PASS",
+        "requestedFailing": [
+          4,
+          5
+        ]
+      },
+      "acceptance": {
+        "disposition": "PRESERVE_INCOMPLETE",
+        "countsAsCompletion": false,
+        "promotable": false,
+        "survivingWorkspaceVerdict": {
+          "overall": "FAIL",
+          "requested": "FAIL",
+          "protected": "PASS",
+          "candidateTree": "b07f80b770c2660f2db6667c76e998f2ef1d6961"
+        },
+        "survivingBytes": null
+      },
+      "candidateSha": "94b5e0c79736fbdd056b47315e3ebc26306c674122dbb0c3eededec5774fb9de",
+      "outcome": "REJECTED"
+    },
+    {
+      "round": 1,
+      "seed": 3,
+      "generationMs": 37449,
+      "outputTokens": 400,
+      "promptTokens": 391,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "                // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 18: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 19: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 20: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 21: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 22: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 23: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n                // FACT line 16: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 18: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 19: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 20: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 21: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 22: drawStack() takes no arguments, and the code here calls it after changing state.\n                // FACT line 23: drawStack() takes no arguments, and the code here calls it after changing state.\n",
+        "chars": 1824,
+        "lines": 17
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 2,
+      "seed": 1,
+      "generationMs": 34966,
+      "outputTokens": 349,
+      "promptTokens": 429,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "            } else if (e.key === '1') {\n                // FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n                // FACT line 16: drawStack() takes no arguments, and the code here calls it after changing state.\n                // CHECK 4 FAILED: pressing 1 returns every piece of state to its starting value\n                // CHECK 5 FAILED: pressing 1 again leaves it at the starting value\n// on this key: every piece of state is back to its starting value.\n            } else if (e.key === '2') {\n                // FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n                // FACT line 16: drawStack() takes no arguments, and the code here calls it after changing state.\n                // CHECK 4 FAILED: pressing 2 returns every piece of state to its starting value\n                // CHECK 5 FAILED: pressing 2 again leaves it at the starting value\n// on this key: every piece of state is back to its starting value.\n            } else if (e.key === '3') {\n                // FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n                // FACT line 16: drawStack() takes no arguments, and the code here calls it after changing state.\n                // CHECK 4 FAILED: pressing 3 returns every piece of state to its starting value\n                // CHECK 5 FAILED: pressing 3 again leaves it at the starting value\n// on this key: every piece of state is back to its starting value.",
+        "chars": 1550,
+        "lines": 18
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": 1,
+        "droppedLines": 18
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 2,
+      "seed": 2,
+      "generationMs": 40338,
+      "outputTokens": 400,
+      "promptTokens": 429,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "                // CHECK 6 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 7 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 8 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 9 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 10 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 11 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 12 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 13 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 14 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 15 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 16 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 17 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 18 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 19 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 20 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 21 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 22 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 23 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 24 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 25 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 26 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 2",
+        "chars": 1807,
+        "lines": 22
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 2,
+      "seed": 3,
+      "generationMs": 36516,
+      "outputTokens": 400,
+      "promptTokens": 429,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "                // CHECK 6 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 7 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 8 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 9 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 10 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 11 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 12 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 13 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 14 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 15 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 16 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 17 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 18 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 19 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 20 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 21 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 22 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 23 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 24 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 25 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 26 FAILED: pressing 0 again leaves it at the starting value\n                // CHECK 2",
+        "chars": 1807,
+        "lines": 22
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 3,
+      "seed": 1,
+      "generationMs": 39903,
+      "outputTokens": 400,
+      "promptTokens": 403,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "// This is because the code here is calling the functions after changing state, which is not allowed.\n            // FACT line 20: popBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 18: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 22: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 26: popBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 28: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 30: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 34: popBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 36: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 38: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 42: popBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 44: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 46: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 50: popBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 52: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 54: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line ",
+        "chars": 1772,
+        "lines": 17
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 3,
+      "seed": 2,
+      "generationMs": 37667,
+      "outputTokens": 400,
+      "promptTokens": 403,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "            // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 18: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 19: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 20: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 21: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 22: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 23: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 25: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 26: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 27: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 28: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 29: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 30: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 31: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 32: pushBlock() takes no arguments, and the code here calls it after changing state.\n",
+        "chars": 1760,
+        "lines": 17
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    },
+    {
+      "round": 3,
+      "seed": 3,
+      "generationMs": 46475,
+      "outputTokens": 400,
+      "promptTokens": 403,
+      "doneReason": "length",
+      "rawCompletion": {
+        "text": "            // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 18: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 19: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 20: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 21: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 22: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 23: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 24: pushBlock() takes no arguments, and the code here calls it after changing state.\n            // FACT line 16: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 17: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 18: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 19: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 20: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 21: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 22: drawStack() takes no arguments, and the code here calls it after changing state.\n            // FACT line 23: drawStack() takes no arguments, and the code here calls it after changing state.\n",
+        "chars": 1760,
+        "lines": 17
+      },
+      "boundaries": {},
+      "timing": {},
+      "containment": {
+        "ok": false,
+        "reason": "EMPTY",
+        "detail": "no code in the completion",
+        "truncatedAtLine": null,
+        "droppedLines": 0
+      },
+      "outcome": "REFUSED_EMPTY"
+    }
+  ],
+  "accepted": false,
+  "calls": 9,
+  "escalation": {
+    "afterRound": 2,
+    "reason": "every attempt at this site yielded no code",
+    "switchingTo": "R2"
+  },
+  "stoppedBecause": "no code at either scaffold shape",
+  "totals": {
+    "additionAttemptCalls": 9,
+    "accepted": 0,
+    "refused": 7,
+    "judged": 2,
+    "protectedFailures": 0,
+    "restored": 0,
+    "generationSeconds": 371,
+    "wallClockSeconds": 412.9,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

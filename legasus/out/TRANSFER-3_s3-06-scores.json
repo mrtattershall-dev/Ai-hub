@@ -1,0 +1,185 @@
+{
+  "at": "2026-09-28T03:03:33.150Z",
+  "experiment": "TRANSFER-3",
+  "task": "set3-s3-06-scores",
+  "model": "qwen2.5-coder:1.5b",
+  "page": "legasus\\bench\\set3\\s3-06-scores\\baseline-as-delivered.html",
+  "baselineSha": "54f8667e384ef85f261b312c9f61f31b2d829ef441ae1a9f98d346bbe9dddeb9",
+  "budget": {
+    "maxCalls": 12,
+    "maxRounds": 4,
+    "seedsPerRound": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contextConfig": {
+    "style": "compact",
+    "budget": 240,
+    "includeStrategy": true
+  },
+  "interventionsByAPerson": 0,
+  "rounds": [
+    {
+      "round": 1,
+      "rule": "R1",
+      "why": "a keydown listener already dispatches on key values and does not exclude this key, so a branch goes inside it",
+      "insertAfterLine": 27,
+      "scaffold": "            if (e.key === '0') {\n                // FILL IN\n            }",
+      "instruction": "// on this key: every piece of state is back to its starting value.",
+      "contextDelivered": "// FACT line 14: playerA is declared `let`.\n// FACT line 30: existing code writes it as playerA++;\n// FACT line 15: playerB is declared `let`.\n// FACT line 33: existing code writes it as playerB++;",
+      "factsDelivered": 2,
+      "contextDropped": [
+        "ctx: the whole constraint",
+        "updateScoreboard(): the whole redraw",
+        "drawScoreboard(): the whole redraw"
+      ],
+      "feedbackDelivered": null,
+      "promptHeadSha": "0c8ae4a34902d4be0c319bbf260b9210e9ddffa044879b37e74b67e379192109",
+      "suffixSha": "565e059acc467579a169e24ccc59fadabda6555904297c689952fb2a82a64390",
+      "seeds": [
+        {
+          "seed": 1,
+          "outcome": "ACCEPTED",
+          "passing": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "failing": []
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "round": 1,
+      "seed": 1,
+      "generationMs": 35102,
+      "outputTokens": 33,
+      "promptTokens": 382,
+      "doneReason": "stop",
+      "rawCompletion": {
+        "text": "// This is the same as the initial state of the game.\n                playerA = 0;\n                playerB = 0;\n                updateScoreboard();",
+        "chars": 147,
+        "lines": 4
+      },
+      "boundaries": {
+        "reachedExecution": true,
+        "passedDiagnostic": true,
+        "passedProtected": true,
+        "accepted": true
+      },
+      "timing": {
+        "playMs": 49542,
+        "acceptanceMs": 80837
+      },
+      "containment": {
+        "ok": true,
+        "text": "// This is the same as the initial state of the game.\n                playerA = 0;\n                playerB = 0;\n                updateScoreboard();",
+        "codeLines": 3,
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "transformedCandidate": {
+        "text": "// This is the same as the initial state of the game.\n                playerA = 0;\n                playerB = 0;\n                updateScoreboard();",
+        "chars": 147,
+        "lines": 4
+      },
+      "extraction": {
+        "truncatedAtLine": null,
+        "droppedLines": 0,
+        "how": "the completion stayed inside its slot"
+      },
+      "play": {
+        "status": "OK",
+        "reason": null,
+        "passing": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "failing": [],
+        "total": 7,
+        "log": "PASS case 1  loads with no page or console error, in its starting state\nPASS case 2  pressing a changes the state as it already did\nPASS case 3  pressing a again changes it again\nPASS case 4  pressing 0 returns every piece of state to its starting value\nPASS case 5  pressing 0 again leaves it at the starting value\nPASS case 6  after 0, pressing a still changes the state\nPASS case 7  no page or console error was raised at any point\nSUMMARY 7/7 cases pass, 0 fail",
+        "errors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "scoreboard"
+          ],
+          "readyState": "complete"
+        }
+      },
+      "diagnosis": {
+        "failureClass": "NONE",
+        "loadErrors": [],
+        "stacks": [],
+        "dom": {
+          "nullLookups": [],
+          "idsAtFirstFailure": null,
+          "idsAfterReady": [
+            "scoreboard"
+          ],
+          "readyState": "complete"
+        },
+        "threwDuringLoad": false,
+        "stateObserved": true,
+        "noFailureObservedDuringInit": true,
+        "initializationCompletedIsEstablished": false,
+        "behaviouralVerdictsMeaningful": true,
+        "note": null
+      },
+      "verdict": {
+        "overall": "PASS",
+        "requested": "PASS",
+        "protected": "PASS",
+        "requestedFailing": []
+      },
+      "acceptance": {
+        "disposition": "RETAIN",
+        "countsAsCompletion": true,
+        "promotable": true,
+        "survivingWorkspaceVerdict": {
+          "overall": "PASS",
+          "requested": "PASS",
+          "protected": "PASS",
+          "candidateTree": "db7d138cf1437310ebf42a0fa79e7894148478cb"
+        },
+        "survivingBytes": null
+      },
+      "acceptedFile": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Scoreboard</title>\n</head>\n<body>\n    <canvas id=\"scoreboard\" width=\"200\" height=\"100\"></canvas>\n    <script>\n        const canvas = document.getElementById('scoreboard');\n        const ctx = canvas.getContext('2d');\n\n        let playerA = 0;\n        let playerB = 0;\n\n        function drawScoreboard() {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            ctx.font = '20px Arial';\n            ctx.fillText(`Player A: ${playerA}`, 10, 20);\n            ctx.fillText(`Player B: ${playerB}`, canvas.width - 110, 20);\n        }\n\n        function updateScoreboard() {\n            drawScoreboard();\n        }\n\n        document.addEventListener('keydown', (e) => {\n            if (e.key === '0') {\n                // FACT line 14: playerA is declared `let`.\n                // FACT line 30: existing code writes it as playerA++;\n                // FACT line 15: playerB is declared `let`.\n                // FACT line 33: existing code writes it as playerB++;\n// on this key: every piece of state is back to its starting value.\n// This is the same as the initial state of the game.\n                playerA = 0;\n                playerB = 0;\n                updateScoreboard();\n            }\n            if (e.key === 'a') {\n                playerA++;\n                updateScoreboard();\n            } else if (e.key === 'b') {\n                playerB++;\n                updateScoreboard();\n            }\n        });\n\n        window.app = { state: () => ({ playerA, playerB }) };\n    </script>\n</body>\n</html>\n",
+      "candidateSha": "c0aabf44f93107c740721c32210d0dcfb1a16baab0b573702d8aa83b4c53bb4d",
+      "outcome": "ACCEPTED"
+    }
+  ],
+  "accepted": true,
+  "calls": 1,
+  "acceptedSeed": 1,
+  "acceptedRound": 1,
+  "acceptedCandidate": "// This is the same as the initial state of the game.\n                playerA = 0;\n                playerB = 0;\n                updateScoreboard();",
+  "totals": {
+    "additionAttemptCalls": 1,
+    "accepted": 1,
+    "refused": 0,
+    "judged": 1,
+    "protectedFailures": 0,
+    "restored": 0,
+    "generationSeconds": 35.1,
+    "wallClockSeconds": 81.1,
+    "interventionsByAPerson": 0,
+    "dollars": 0
+  }
+}

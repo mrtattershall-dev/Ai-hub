@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoreboard</title>
+</head>
+<body>
+    <canvas id="scoreboard" width="200" height="100"></canvas>
+    <script>
+        const canvas = document.getElementById('scoreboard');
+        const ctx = canvas.getContext('2d');
+
+        let playerA = 0;
+        let playerB = 0;
+
+        function drawScoreboard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '20px Arial';
+            ctx.fillText(`Player A: ${playerA}`, 10, 20);
+            ctx.fillText(`Player B: ${playerB}`, canvas.width - 110, 20);
+        }
+
+        function updateScoreboard() {
+            drawScoreboard();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '0') {
+                // FACT line 14: playerA is declared `let`.
+                // FACT line 30: existing code writes it as playerA++;
+                // FACT line 15: playerB is declared `let`.
+                // FACT line 33: existing code writes it as playerB++;
+// on this key: every piece of state is back to its starting value.
+// This is the same as the initial state of the game.
+                playerA = 0;
+                playerB = 0;
+                updateScoreboard();
+            }
+            if (e.key === 'a') {
+                playerA++;
+                updateScoreboard();
+            } else if (e.key === 'b') {
+                playerB++;
+                updateScoreboard();
+            }
+        });
+
+        window.app = { state: () => ({ playerA, playerB }) };
+    </script>
+</body>
+</html>
