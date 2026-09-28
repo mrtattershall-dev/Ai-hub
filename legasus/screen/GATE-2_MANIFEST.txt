@@ -1,0 +1,24 @@
+GATE-2 MANIFEST - hashes at freeze time, before the next set is generated
+recorded 2026-09-28T06:58:34Z
+
+THE FUNCTIONAL GATE - byte-identical to TRANSFER-2:
+  df56ddc0180262307dec4eb0dd7d171b9a416e25238023e189047586f215e5b4     7484  server/judgeCandidate.mjs
+  99e50264209ad4002df979fbd6edde9a45e7a9f09fe3d2085f9f8f201fffd623    12253  server/evaluator.js
+  64aa3b7bcb1ad51b5eaba23f996095ab692abbf9f715f3dd29e4685a3caa2bf3     9908  server/acceptance.js
+  f62fa26c96e5b5896517c0a6b97a2b463692224e96efeb0a2f7fa04869216fd1    12541  server/playCheck.js
+
+THE POLICY - unchanged from SEQ-1:
+  cbf4983a7ba89e219a4cbb29cfe8977f51efa440bcc0d8763b44960bc314d732    19101  server/autoGuide.mjs
+  c735f92f19bf17d4f0bdddffe578bd14e422c2b04606fa58a5af404084af3a04    43239  server/codeFacts.mjs
+  978bc299e5660034605d2f0049b952b9e2e8e7e9adc63163d0e8c4d8d53f9ee2    37806  server/localEdit.mjs
+
+THE NEW ARMS AND THE DECISION RULE:
+  aba14bebabfa99b328dcb439b594e490b7903661c8004c3408d0094efa48383b    12825  server/visualCheck.mjs
+  a0b00188d07a35a8e920436a7badaa82003eac893365fcb0f1e3c37981aea6e4    14837  server/renderEvidence.mjs
+  cb609905bbb1cd73901ce18e8a3e73eaced8e36790d4c50499fe6dbca6b21136     5702  server/acceptanceDecision.mjs
+  6a3a4b0b22fd0c71db8bb5a25aa3025b706e4baf3a474e4d3b9162a05ddb8698    10036  server/sealedPage.mjs
+  ce23081a29375641e1384ab77c4283beafefb9e0ac1d58bcfd8bdeac1b4719ec     7904  server/observeState.mjs
+
+THE VISUAL CONTRACT - written by hand from the requirement:
+  a7bc24b05a21a86941f31bfd02905ba00f754db5b336b9c750ed274f4bb4eaf2      904  legasus/bench/visual/scoreboard-layout.json
+  ce24b9cbcd482172cbf2201363466e3a67cffd3e5cc75277c7c14ccbae112b0d      741  legasus/bench/visual/trace.json
