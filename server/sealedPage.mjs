@@ -70,72 +70,61 @@ export function generationFacts(dir) {
 }
 
 /**
- * Probe the page: what is its state at load, and which declared keys change it? This is the page's
- * observed behaviour, discovered rather than interpreted.
- */
-/**
- * The state a failing case reports, pulled back out of playCheck's message.
+ * Probe the page by OBSERVING it: `observeState.observe` loads it, reads the state expression, presses
+ * each declared key and reads again, returning structured values.
  *
- * Everything after `state ` is taken verbatim. The first version tried to recognise the VALUE with a
- * regex of alternatives, and returned null for `state "{\"value\":0}"` - a page whose state() hands back
- * a JSON *string* rather than an object. That is unusual but perfectly readable, and the regex would
- * have disqualified the page while reporting NO_READABLE_STATE, which is the wrong reason. Never let a
- * parser decide eligibility.
+ * The previous version asserted `false` on every step so that playCheck would print the state inside a
+ * failure message, then parsed it back out with a regex. That regex returned null for a state which was a
+ * JSON *string*, and would have disqualified a readable page while reporting NO_READABLE_STATE - a true
+ * verdict reached for a false reason. Reading the value directly removes the whole class.
  */
-const stateFromText = (text) => {
-  const t = String(text || '').trim();
-  const i = t.indexOf('; state ');
-  if (i < 0) return null;
-  const raw = t.slice(i + '; state '.length).trim();
-  return raw.length ? raw : null;
-};
+export async function probe(html) {
+  const { observe, respondingKeys } = await import('./observeState.mjs');
+  const ws = mkdtempSync(join(tmpdir(), 'sealed-'));
+  try {
+    writeFileSync(join(ws, 'index.html'), html, 'utf8');
+    const keys = [...PROBE_KEYS, ...RESET_KEY_CANDIDATES];
+    const r = await observe(ws, { keys });
+    if (!r.ok) return { ok: false, reason: r.reason };
+    const responds = respondingKeys(r.observations);
+    return {
+      ok: true,
+      loadState: r.atLoad.threw ? null : r.atLoad.value,
+      loadReadThrew: r.atLoad.threw ? r.atLoad.message : null,
+      loadErrorCount: r.loadErrors.length,
+      loadErrors: r.loadErrors,
+      observations: r.observations,
+      responds,
+      respondsExisting: responds.filter((k) => PROBE_KEYS.includes(k)),
+      errorsTotal: r.errors.length,
+      readyState: r.readyState,
+      keysProbed: keys,
+    };
+  } finally { if (existsSync(ws)) { try { rmSync(ws, { recursive: true, force: true }); } catch { /* best effort */ } } }
+}
 
 /**
- * Probe the page. TWO runs, because they answer different questions and the first version conflated
- * them: a LOAD-ONLY run to see whether the page loads clean (eligibility rule 3 is about loading, not
- * about surviving a dozen key presses), then a KEY run to see which keys change the state.
- *
- * Every probe step asserts `false` ON PURPOSE. playCheck reports the state it saw only in a FAILING
- * case's message, so a probe whose steps pass tells you nothing - the first version printed seventeen
- * blank lines and would have let me "read" a page by inventing what it must have done.
+ * The six eligibility rules, applied mechanically. Returned as a list of failures so a page is rejected
+ * with EVERY reason it failed, not just the first one found.
  */
-export async function probe(html, { playCheck }) {
-  const run = async (steps) => {
-    const ws = mkdtempSync(join(tmpdir(), 'sealed-'));
-    try {
-      writeFileSync(join(ws, 'index.html'), html, 'utf8');
-      const spec = { entry: 'index.html', stateExpr: 'window.app.state()', contract: 'probe', steps };
-      const r = await playCheck(ws, spec);
-      return r;
-    } finally { if (existsSync(ws)) { try { rmSync(ws, { recursive: true, force: true }); } catch { /* best effort */ } } }
-  };
-
-  const loadRun = await run([{ n: 1, name: 'load', do: [], expect: 'false' }]);
-  if (loadRun.status !== 'OK') return { ok: false, reason: `the browser could not run the probe: ${loadRun.reason || ''}` };
-  const loadState = stateFromText((loadRun.cases || [])[0]?.text);
-  const loadErrors = loadRun.errors || [];
-
-  const keys = [...PROBE_KEYS, ...RESET_KEY_CANDIDATES];
-  const steps = [{ n: 1, name: 'load', do: [], expect: 'false' }];
-  let n = 2;
-  for (const k of keys) steps.push({ n: n++, name: `press ${k}`, do: [{ key: k }], expect: 'false' });
-  const keyRun = await run(steps);
-  if (keyRun.status !== 'OK') return { ok: false, reason: `the browser could not run the key probe: ${keyRun.reason || ''}` };
-
-  const seen = (keyRun.cases || []).map((c) => ({ n: c.n, name: c.name, state: stateFromText(c.text) }));
-  // A key RESPONDS if the state after pressing it differs from the state before. The presses are
-  // cumulative, which is what a real user does, so "responds" means "changed something at that point".
-  const responds = [];
-  for (let i = 1; i < seen.length; i++) {
-    const k = keys[i - 1];
-    if (seen[i].state !== null && seen[i - 1].state !== null && seen[i].state !== seen[i - 1].state) responds.push(k);
-  }
-  return {
-    ok: true, loadState, loadErrors, loadErrorCount: loadErrors.length,
-    cases: seen, responds, keysProbed: keys,
-    errorsDuringKeyRun: (keyRun.errors || []).length,
-    dom: loadRun.dom, raw: { loadRun, keyRun },
-  };
+export function eligibility({ gen, parses, pr }) {
+  const fails = [];
+  if (!gen.found) fails.push('NO_GENERATION_LOG: how this page was produced is not recorded');
+  else if (gen.doneReason !== 'stop') fails.push(`TRUNCATED_GENERATION: doneReason was ${gen.doneReason}, so the page may be incomplete`);
+  if (!parses.length) fails.push('NO_INLINE_SCRIPT');
+  for (const q of parses) if (!q.ok) fails.push(`SCRIPT_DOES_NOT_PARSE: ${q.message}`);
+  if (!pr) return { eligible: false, fails, trigger: null };
+  if (!pr.ok) { fails.push(`CANNOT_OBSERVE: ${pr.reason}`); return { eligible: false, fails, trigger: null }; }
+  if (pr.loadErrorCount > 0) fails.push(`ERRORS_AT_LOAD: ${pr.loadErrorCount} - ${(pr.loadErrors[0] || '').slice(0, 120)}`);
+  if (pr.loadReadThrew) fails.push(`STATE_READ_THREW_AT_LOAD: ${pr.loadReadThrew}`);
+  else if (pr.loadState === null) fails.push('NO_READABLE_STATE: the state expression yielded nothing');
+  if (!pr.respondsExisting.length) fails.push('NO_EXISTING_BEHAVIOUR: no probed key changed the state');
+  const trigger = RESET_KEY_CANDIDATES.find((k) => !pr.responds.includes(k)) || null;
+  if (!trigger) fails.push('NO_FREE_TRIGGER_KEY: the page already responds to every candidate trigger');
+  // A state that becomes unreadable partway through is not a usable subject either: the checks would
+  // fail for a reason that has nothing to do with the candidate.
+  if (pr.observations.some((o) => o.threw)) fails.push('STATE_BECAME_UNREADABLE: reading the state threw after some key press');
+  return { eligible: fails.length === 0, fails, trigger };
 }
 
 const DIRECT = process.argv[1] && (await import('node:url')).pathToFileURL(process.argv[1]).href === import.meta.url;
@@ -143,52 +132,38 @@ if (DIRECT) {
   const argv = process.argv.slice(2);
   const opt = (n, d) => { const i = argv.indexOf('--' + n); return i > -1 && argv[i + 1] !== undefined ? argv[i + 1] : d; };
   const DIR = opt('dir', null);
-  if (!DIR) { console.error('usage: node server/sealedPage.mjs --dir <dir> [--emit]'); process.exit(2); }
-  const file = join(DIR, 'baseline-as-delivered.html');
+  const NAME = opt('name', 'baseline-as-delivered.html');
+  if (!DIR) { console.error('usage: node server/sealedPage.mjs --dir <dir> [--name <file>]'); process.exit(2); }
+  const file = join(DIR, NAME);
   const html = readFileSync(file, 'utf8');
   const gen = generationFacts(DIR);
   const parses = parseCheck(html);
+  const cheapFails = eligibility({ gen, parses, pr: null }).fails;
 
-  const fails = [];
-  if (!gen.found) fails.push('NO_GENERATION_LOG: how this page was produced is not recorded');
-  else if (gen.doneReason !== 'stop') fails.push(`TRUNCATED_GENERATION: doneReason was ${gen.doneReason}, so the page may be incomplete`);
-  if (!parses.length) fails.push('NO_INLINE_SCRIPT');
-  for (const p of parses) if (!p.ok) fails.push(`SCRIPT_DOES_NOT_PARSE: ${p.message}`);
-
-  console.log(`dir            ${DIR}`);
+  console.log(`dir            ${DIR}/${NAME}`);
   console.log(`sha256         ${sha(html).slice(0, 16)}   chars ${html.length}`);
-  console.log(`generation     doneReason=${gen.doneReason}  attempts=${gen.attempts}`);
-  console.log(`scripts        ${parses.length} inline, ${parses.filter((p) => p.ok).length} parse`);
+  console.log(`generation     doneReason=${gen.doneReason}`);
+  console.log(`scripts        ${parses.length} inline, ${parses.filter((q) => q.ok).length} parse`);
 
-  if (fails.length) {
-    console.log(`\nINELIGIBLE:`);
-    for (const f of fails) console.log(`  ${f}`);
-    console.log('\nThis is an eligibility FAILURE and is recorded as one. The declared page order continues.');
-    process.exit(0);
+  // Only observe if the cheap rules pass - there is nothing to learn from driving a truncated file.
+  const pr = cheapFails.length ? null : await probe(html);
+  const v = eligibility({ gen, parses, pr });
+
+  if (pr && pr.ok) {
+    console.log(`errors AT LOAD ${pr.loadErrorCount}   readyState ${pr.readyState}`);
+    console.log(`state at load  ${pr.loadReadThrew ? 'READ THREW: ' + pr.loadReadThrew : JSON.stringify(pr.loadState)}`);
+    for (const o of pr.observations.slice(1)) {
+      console.log(`  after ${String(o.after).padEnd(12)} ${o.threw ? 'READ THREW' : JSON.stringify(o.value)}`);
+    }
+    console.log(`responds to    ${pr.respondsExisting.join(', ') || 'NOTHING'}`);
   }
 
-  const { playCheck } = await import('./playCheck.js');
-  const pr = await probe(html, { playCheck });
-  if (!pr.ok) { console.log(`\nINELIGIBLE:\n  ${pr.reason}`); process.exit(0); }
-
-  console.log(`errors AT LOAD  ${pr.loadErrorCount}`);
-  console.log(`state at load   ${pr.loadState}`);
-  console.log(`errors during the key run  ${pr.errorsDuringKeyRun}  (not an eligibility rule - rule 3 is about loading)`);
-  console.log('\nprobe (cumulative presses, state after each):');
-  for (const c of pr.cases) console.log(`  ${String(c.n).padStart(2)}. ${c.name.padEnd(16)} ${String(c.state).slice(0, 110)}`);
-  console.log(`\nresponds to     ${pr.responds.length ? pr.responds.join(', ') : 'NOTHING'}`);
-
-  const trigger = RESET_KEY_CANDIDATES.find((k) => !pr.responds.includes(k)) || null;
-  if (pr.loadErrorCount > 0) fails.push(`ERRORS_AT_LOAD: ${pr.loadErrorCount}`);
-  if (pr.loadState === null) fails.push('NO_READABLE_STATE: window.app.state() did not yield a readable value');
-  if (!pr.responds.filter((k) => PROBE_KEYS.includes(k)).length) fails.push('NO_EXISTING_BEHAVIOUR: no probed key changed the state');
-  if (!trigger) fails.push('NO_FREE_TRIGGER_KEY: the page already responds to every candidate trigger');
-
-  if (fails.length) {
+  if (!v.eligible) {
     console.log(`\nINELIGIBLE:`);
-    for (const f of fails) console.log(`  ${f}`);
-    console.log('\nThis is an eligibility FAILURE and is recorded as one. The declared page order continues.');
-    process.exit(0);
+    for (const f of v.fails) console.log(`  ${f}`);
+    console.log('\nRecorded as an eligibility FAILURE. The declared page order continues.');
+    process.exit(1);
   }
-  console.log(`\nELIGIBLE. trigger key '${trigger}', existing behaviour on ${pr.responds.filter((k) => PROBE_KEYS.includes(k)).join(', ')}`);
+  console.log(`\nELIGIBLE. trigger key '${v.trigger}', existing behaviour on ${pr.respondsExisting.join(', ')}`);
+  process.exit(0);
 }
