@@ -18,8 +18,13 @@ produce by itself.
     errors              0
     evaluator           PASS on named tree 100f3dacc57a5beaae5c15cb297a6da89140491d
     disposition         RETAIN
-    re-verified         yes: rebuilt from the ledger, sha 13d0b08c86628a99 MATCHES the judged
-                        candidate, then re-run in a fresh process and browser - 9 of 9 again
+    re-verified         REPRODUCIBLE EXECUTION, demonstrated: rebuilt from the ledger, sha
+                        13d0b08c86628a99 MATCHES the judged candidate, then re-run in a fresh process
+                        and a fresh browser - 9 of 9 again. This shows the SAVED ARTEFACT behaves the
+                        same way when run again.
+                        REPRODUCIBLE GENERATION, untested: nothing here shows that running the same
+                        prompt again would produce that candidate again. One seed, one draw. The two
+                        are different claims and only the first is demonstrated.
 
 The system's own contribution is visible and was large: the raw completion was **26 lines**, inventing
 further listeners and repeating the context comments back; containment kept **2 lines** and dropped 24.
@@ -88,10 +93,20 @@ than take my word.
 - **Established:** this model **can** complete this addition on a page nobody tuned against, with the
   recorded assistance, and the result survives independent re-verification and its own carried-forward
   checks.
-- **Established:** the single most decisive intervention was **the shape of the slot**, not information.
-  Interventions 1-4 delivered the same requirement four different ways and produced no code; changing
-  the scaffold from `if (key === x) { }` to a new listener with an early return produced code on the
-  first try. The state facts and the feedback then moved a working-but-wrong statement to a correct one.
+- **Observed, and stated as a sequence rather than a cause:** interventions 1-4 delivered the same
+  requirement four different ways and produced no code; **the change of slot shape PRECEDED the first
+  code production**, and the state facts and then the feedback preceded the first correct statement.
+
+  **That ordering does not establish that slot shape was the sole binding constraint**, and it does not
+  retrospectively explain CONSTRAINTS-1 or CONSTRAINTS-2. Other things differed between attempt 2 and
+  attempt 3 - the anchor moved, the surrounding code changed, the prefix grew - and a single ordered
+  sequence cannot separate them. What the sequence supports is **testing that mechanism**: hold
+  everything else and vary only the slot shape, across seeds. Untested.
+
+  The same limit applies to the last step. **The feedback preceded the success**; with one seed and one
+  attempt, its effect across repeated trials is not established. It is equally consistent with the
+  feedback being decisive, with the facts from attempt 4 having been enough given another draw, and with
+  seed-level variation.
 - **Established:** containment is doing heavy lifting on unfamiliar code - 24 and 53 lines of invented
   material dropped, in the two attempts that produced code.
 
@@ -99,8 +114,12 @@ than take my word.
 
 - **Not a capability ceiling, and not a limit.** One success shows attainability. It says nothing about
   what this model could or could not do with other assistance, other budgets, or other interfaces.
-- **Not reproducibility.** ONE seed, ONE attempt succeeded. No claim that seed 1 or any other seed would
-  succeed again, and the earlier attempts in this very sequence show how sensitive the outcome is.
+- **Not reproducible GENERATION.** ONE seed, ONE attempt succeeded. Re-running the saved page is
+  reproducible and was shown; re-producing the candidate from the prompt was never attempted. No claim
+  that seed 1 or any other seed would succeed again, and the earlier attempts in this very sequence show
+  how sensitive the outcome is.
+- **Not a mechanism.** "The slot shape is what mattered" is the ordering of events, not a demonstrated
+  cause; see the qualification above.
 - **Not automation.** Every one of the eight interventions was mine. **A success here is a TARGET for
   automated guidance, not an instance of it.** ASSIST-1 established attainability on the farm page with
   7 interventions and turning those into an automatic policy took four further experiments.
@@ -114,8 +133,9 @@ than take my word.
 
 ## The honest next question
 
-The decisive intervention was the slot's shape, and that is something a policy already knows how to
-choose: `autoGuide`'s R2 rule produces exactly the new-listener-with-early-return form that worked here.
-So the target is concrete and partly already built. **Whether the policy can select it, plus the state
+The intervention that preceded code production was the slot's shape, and that is something a policy
+already knows how to choose: `autoGuide`'s R2 rule produces exactly the new-listener-with-early-return
+form that worked here. So the target is concrete and partly already built - on the strength of one
+ordered sequence, which is a reason to test the mechanism, not a reason to believe it. **Whether the policy can select it, plus the state
 facts, plus the failure feedback, WITHOUT me - on a page it has not seen - is the next experiment, and
 it belongs on a sealed page.**
