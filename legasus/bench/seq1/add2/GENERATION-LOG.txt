@@ -1,0 +1,9 @@
+at            2026-09-28T02:04:32.030Z
+out           baseline-as-delivered.html
+sha256        54f8667e384ef85f261b312c9f61f31b2d829ef441ae1a9f98d346bbe9dddeb9
+chars         1151
+model         qwen2.5-coder:1.5b  seed 7  num_predict 2600  temperature 0.3
+outputTokens  293   doneReason stop   ms 34054
+seamWording   firm + document-listener (TRANSFER-3 frozen template)
+ask           Two players' scores drawn on a canvas. Key a scores a point for the first player and key b for the second.
+fullPrompt    "Write one complete HTML file, nothing else, no explanation, no markdown fence.\nTwo players' scores drawn on a canvas. Key a scores a point for the first player and key b for the second.\nREQUIRED, the page will be rejected without it: attach key handling with\ndocument.addEventListener('keydown', ...) and NOT to the canvas element.\nREQUIRED, the page will be rejected without it: the last line of the script must be exactly\nwindow.app = { state: () => ({ ...<every piece of state the page keeps> }) }; so that automated\ntests can read the state.\nUse a single <canvas> and one inline <script>. Plain JavaScript, no libraries."
