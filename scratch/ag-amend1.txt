@@ -1,0 +1,48 @@
+ACTION-GOVERNANCE-1 amendment 1: the delegation must bind, and DELEGATE is the only constructor with no context discipline
+
+Frozen BEFORE any build and before any result exists. Nothing in ACTION-GOVERNANCE-1 has been implemented
+or run, so this is an amendment to a preregistration rather than a revision after an outcome.
+
+MEASURED BASELINE rather than assumed. Of the eight bindings a delegation should carry, TWO ARE ALREADY
+ENFORCED and six are absent:
+
+    principal / root          ENFORCED   from must be OWNER or an existing authority token
+    action type               ENFORCED   grant non-empty; tracesToIndependentRoot refuses uncovered need
+    target scope              ABSENT     context || {} - optional, unvalidated, never checked
+    evidence preconditions    ABSENT     no link from an admitted certificate to a grant
+    time / run binding        ABSENT     zero expiry/issuedAt/ttl in the calculus
+    budget / blast radius     ABSENT     zero budget
+    validation requirement    ABSENT     commit() checks authority, not test outcomes
+    revocation                ABSENT     zero revoke
+
+AND THE ACTUAL FINDING IS AN ASYMMETRY, narrower than "delegation needs constraints". The calculus applies
+a STRICT context discipline to its epistemic constructors and NONE to the one that creates permission:
+
+    OBSERVE    REFUSES without a context
+    DERIVE     INTERSECTS premise contexts - output can only SHRINK
+    DELEGATE   context || {} - optional, never compared to the action
+
+The constructor that mints normative authority is the only one allowed an empty or arbitrary context. A
+grant is scoped by WHAT may be done and not by WHERE, TO WHAT, FOR HOW LONG, or ON WHAT EVIDENCE.
+
+THE CENTRAL CAUTION IS ALREADY STRUCTURALLY HELD, recorded so it is not re-solved: a controller cannot
+mint a root-traceable token. delegate() refuses unless from is literally OWNER or an existing authority,
+and refuses a non-NORMATIVE grantor with "Evidence establishes what may be BELIEVED; it does not originate
+permission." An epistemic certificate cannot be laundered into permission by re-delegation. Any change
+that lets a controller-held token satisfy from is a REGRESSION, and A5 exists to catch it.
+
+SEVEN NEW PREDICTIONS, A8-A14, every one a refusal condition and every one a first-class success: scope
+mismatch, replay, budget, revocation, wrong root, validation failure, and A14 CONTEXT MONOTONICITY - a
+delegated context may only NARROW, mirroring DERIVE's intersection. A14 is the one I expect to need real
+design rather than a check, and without it the other six are defeatable by re-delegating with a wider
+context.
+
+Plus the outcome taxonomy: thirteen named outcomes, so a run retaining ZERO repairs is still interpretable,
+and a run whose only outcome is ACTION_PERMITTED is explicitly NOT a success - the positive control must be
+accompanied by a denial of each declared class. Every denial must fire FOR ITS OWN REASON under an injected
+fault; a refusal caused by a missing import, an absent fixture, or a wrong working directory is not a
+governance result, and this project has produced all three and mistaken them for findings.
+
+Message-File: scratch/ag-amend1.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
