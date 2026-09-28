@@ -60,6 +60,7 @@ const { evaluate } = await import('./evaluator.js');
 const { applyAcceptance } = await import('./acceptance.js');
 const { playCheck } = await import('./playCheck.js');
 const { judgeCandidate } = await import('./judgeCandidate.mjs');
+const { judgeAndDecide, shouldRetain } = await import('./retainPath.mjs');
 
 const task = JSON.parse(readFileSync(join(DIR, 'task.json'), 'utf8'));
 const spec = task.diagnostic.spec;
@@ -174,13 +175,25 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
       await git(ws, ['-c', 'user.email=m@m', '-c', 'user.name=m', 'commit', '-q', '-m', 'candidate']).catch((e) => {
         if (!/nothing to commit/i.test(String(e.stdout || '') + String(e.stderr || ''))) throw e;
       });
-      await judgeCandidate(ws, task, spec, startRef, rec, T0, { playCheck, evaluate, applyAcceptance, join, readFileSync });
+      // THE RETAIN PATH, and the only one. `judgeAndDecide` runs the functional gate, gathers the visual
+      // and render evidence the task calls for, and returns the GATE-2 decision; `shouldRetain` is the
+      // only question asked before a candidate is kept. Reading `rec.boundaries.accepted` here - which is
+      // what this runner used to do - would restore the defect where the decision rule existed but
+      // governed nothing.
+      const decision = await judgeAndDecide({
+        ws, task, spec, startRef, rec, T0,
+        deps: { judgeCandidate, playCheck, evaluate, applyAcceptance },
+      });
       rec.candidateSha = sha(candidate);
-      rec.outcome = rec.boundaries.accepted ? 'ACCEPTED' : 'REJECTED';
-      console.log(`  seed ${seed}: play [${(rec.play?.passing || []).join(',')}] protected ${rec.acceptance?.survivingWorkspaceVerdict?.protected ?? '?'} ${rec.acceptance?.disposition ?? ''}${rec.boundaries.accepted ? '  <- ACCEPTED' : ''}`);
-      console.log(`           wrote: ${contained.text.trim().split(NL).join(' | ').slice(0, 130)}`);
-      out.attempts.push(rec); roundRec.seeds.push({ seed, outcome: rec.outcome, passing: rec.play?.passing, failing: rec.play?.failing });
-      if (rec.boundaries.accepted) { out.accepted = true; out.acceptedSeed = seed; out.acceptedRound = round; out.acceptedCandidate = contained.text; break; }
+      const vis = rec.visual ? `${rec.visual.verdict}${rec.visual.evaluated ? '' : ' (not evaluated)'}` : 'none';
+      console.log(`  seed ${seed}: play [${(rec.play?.passing || []).join(',')}] protected ${rec.acceptance?.survivingWorkspaceVerdict?.protected ?? '?'} ${rec.acceptance?.disposition ?? ''}`);
+      console.log(`           functional ${decision.summary.functional}  visual ${decision.summary.visual}  render ${decision.summary.render}`);
+      if (!decision.accepted && decision.functionallyAccepted) console.log(`           BLOCKED: ${decision.reasons.join('; ')}`);
+      for (const a of decision.advisories) console.log(`           advisory: ${a}`);
+      console.log(`           wrote: ${contained.text.trim().split(NL).join(' | ').slice(0, 130)}${decision.accepted ? '   <- ACCEPTED' : ''}`);
+      out.attempts.push(rec);
+      roundRec.seeds.push({ seed, outcome: rec.outcome, passing: rec.play?.passing, failing: rec.play?.failing, visual: rec.visual?.verdict ?? null, decision: decision.summary });
+      if (shouldRetain(decision)) { out.accepted = true; out.acceptedSeed = seed; out.acceptedRound = round; out.acceptedCandidate = contained.text; break; }
       // The attempt that got furthest is the one the next round gets feedback from.
       if (!worst || (rec.play?.passing || []).length > (worst.play?.passing || []).length) worst = rec;
     } finally { if (existsSync(ws)) { try { rmSync(ws, { recursive: true, force: true }); } catch { /* best effort */ } } }
@@ -203,6 +216,10 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
 out.totals = {
   additionAttemptCalls: out.calls,
   accepted: out.attempts.filter((a) => a.outcome === 'ACCEPTED').length,
+  // A candidate that passed the functional gate and was stopped by a required visual contract is its own
+  // outcome. Folding it into "rejected" would hide the thing GATE-2 exists to do.
+  blockedByVisualContract: out.attempts.filter((a) => a.outcome === 'BLOCKED_BY_VISUAL_CONTRACT').length,
+  visualNotEvaluated: out.attempts.filter((a) => a.decision && a.decision.visualStatus === 'NOT_EVALUATED').length,
   refused: out.attempts.filter((a) => String(a.outcome).startsWith('REFUSED')).length,
   judged: out.attempts.filter((a) => a.outcome === 'ACCEPTED' || a.outcome === 'REJECTED').length,
   protectedFailures: out.attempts.filter((a) => a.acceptance && a.acceptance.survivingWorkspaceVerdict && a.acceptance.survivingWorkspaceVerdict.protected !== 'PASS').length,
@@ -213,4 +230,4 @@ out.totals = {
   dollars: 0,
 };
 if (OUT) writeFileSync(OUT, JSON.stringify(out, null, 2), 'utf8');
-console.log(`\n${out.accepted ? 'ACCEPTED' : 'NO SUCCESS WITHIN THE DECLARED BUDGET'} - ${out.calls} of ${MAX_CALLS} calls, ${out.totals.judged} judged, ${out.totals.refused} refused, ${out.totals.protectedFailures} protected failures, 0 interventions`);
+console.log(`\n${out.accepted ? 'ACCEPTED' : 'NO SUCCESS WITHIN THE DECLARED BUDGET'} - ${out.calls} of ${MAX_CALLS} calls, ${out.totals.judged} judged, ${out.totals.refused} refused, ${out.totals.blockedByVisualContract} blocked by a visual contract, ${out.totals.visualNotEvaluated} with visual NOT EVALUATED, ${out.totals.protectedFailures} protected failures, 0 interventions`);
