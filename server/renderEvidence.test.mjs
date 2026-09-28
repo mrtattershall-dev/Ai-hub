@@ -109,17 +109,40 @@ const run = async (html, keys) => {
   say(r.consideredFrom >= 1, `the rules are applied from the first observation that drew anything (${r.consideredFrom})`);
 }
 
-// ── 4. VACUOUS rather than a pass that cannot fail ──────────────────────────────────────────────
+// ── 4. COVERAGE, counted PER RULE, because different things exercise them ────────────────────────
 {
-  console.log('\n4. when neither rule is exercised it says so');
+  console.log('\n4. each rule reports its own coverage, and a pass needs at least one to have run');
   const inert = pageOf(`
     const n = 0;
     ctx.fillText('n=' + n, 10, 20);
     window.app = { state: () => ({ n }) };`);
-  const r = await run(inert, ['a', '0']);
-  say(r.verdict === 'RENDER_EVIDENCE_VACUOUS', `verdict RENDER_EVIDENCE_VACUOUS (${r.verdict})`);
-  say(r.distinctStates < 2, `because fewer than two distinct states were seen (${r.distinctStates})`);
-  say(r.disagreements.length === 0, 'and it reports no contradiction rather than inventing one');
+
+  // With no presses there is ONE observation: neither rule can have run.
+  const none = await run(inert, []);
+  say(none.verdict === 'RENDER_EVIDENCE_VACUOUS', `with a single observation the verdict is VACUOUS (${none.verdict})`);
+  say(!none.coverage.functionalRuleExercised && !none.coverage.injectiveRuleExercised, 'and neither rule is marked exercised');
+
+  // With presses that change nothing, the state is REVISITED - so the FUNCTIONAL rule genuinely runs and
+  // is satisfied, while the INJECTIVE rule never does. The two must be reported apart: an earlier version
+  // counted "two distinct states" as coverage for both, which credited a rule that had never run.
+  const revisited = await run(inert, ['a', '0']);
+  say(revisited.coverage.functionalRuleExercised === true, `a revisited state exercises FUNCTIONAL (${revisited.coverage.revisitedStates} revisited)`);
+  say(revisited.coverage.injectiveRuleExercised === false, `and one distinct state does NOT exercise INJECTIVE (${revisited.coverage.distinctStates} distinct)`);
+  say(revisited.verdict === 'RENDER_AGREES', 'so the verdict is AGREES on the strength of the rule that actually ran');
+
+  // And the converse: two distinct states each seen once exercise INJECTIVE and not FUNCTIONAL.
+  const monotonic = pageOf(`
+    let n = 0;
+    function draw() { ctx.clearRect(0,0,200,60); ctx.fillText('n=' + n, 10, 20); }
+    document.addEventListener('keydown', (e) => { if (e.key === 'a') { n++; draw(); } });
+    draw();
+    window.app = { state: () => ({ n }) };`);
+  const m = await run(monotonic, ['a']);
+  say(m.coverage.injectiveRuleExercised === true, `two distinct states exercise INJECTIVE (${m.coverage.distinctStates})`);
+  say(m.coverage.revisitedStates === 0, 'while no state was revisited, so FUNCTIONAL did not run');
+
+  say(typeof none.meaning === 'string' && /not a finding that the software is correct/.test(none.meaning),
+    'every result carries what a pass does and does not mean');
 }
 
 // ── 5. a page whose accessor throws is not silently passed ──────────────────────────────────────

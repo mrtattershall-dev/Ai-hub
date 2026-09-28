@@ -18,6 +18,17 @@
 //   INJECTIVE   two DIFFERENT reported states must not render identically. This is the rule that catches
 //               a lying accessor: the deceptive page reports {0,0} while still showing the "2" picture.
 //
+// NEITHER RULE IS UNIVERSALLY VALID, and this module is a HEURISTIC, not a definition of visual
+// correctness. All three of these are legitimate and would be flagged or missed:
+//   different states CAN look identical - an inventory count, a hidden flag, an off-screen object
+//   the same state CAN look different - an animation frame, a cursor, any unreported visual state
+//   consistent pixels can still depict the WRONG RESULT - a program that always draws the wrong score
+//     while reporting the expected one satisfies both rules perfectly
+// So a pass means "no contradiction detected by these two rules on the traces exercised". It adds
+// evidence. It does not establish that the software is correct, and for a scoreboard the stronger and
+// task-specific requirement is that the DISPLAYED TOTALS match the expected totals once rendering has
+// settled - which pixel relationships can help test and cannot replace.
+//
 // An earlier version compared against the picture AT LOAD instead, and flagged the GENUINE accepted page
 // as a contradiction - a false positive that would have condemned working software, caught only because
 // the genuine page was run as a control. That page simply never draws at load.
@@ -76,17 +87,28 @@ export async function renderEvidence(dir, { keys = [], expr = 'window.app.state(
       const cs = Array.from(document.querySelectorAll('canvas'));
       let pixels = null;
       try { pixels = cs.map((c) => c.toDataURL()).join('|'); } catch (err) { pixels = 'UNREADABLE:' + String(err && err.message || err); }
-      return { state, threw, pixels, canvasCount: cs.length, text: document.body ? document.body.innerText.slice(0, 200) : '' };
+      // BLANK IS MEASURED, NOT GUESSED. Whether the page has drawn anything yet decides which
+      // observations the rules may use, and inferring it from "the hash changed later" threw away the
+      // load observation on pages that DO draw at load - losing coverage for no reason.
+      let blank = true;
+      try {
+        for (const c of cs) {
+          const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+          for (let i = 3; i < d.length; i += 4) { if (d[i] !== 0) { blank = false; break; } }
+          if (!blank) break;
+        }
+      } catch { blank = null; }
+      return { state, threw, pixels, blank, canvasCount: cs.length, text: document.body ? document.body.innerText.slice(0, 200) : '' };
     }, expr);
 
     const obs = [];
     const first = await look();
-    obs.push({ after: null, state: first.state, threw: first.threw, renderHash: sha(first.pixels), text: first.text, canvasCount: first.canvasCount });
+    obs.push({ after: null, state: first.state, threw: first.threw, renderHash: sha(first.pixels), blank: first.blank, text: first.text, canvasCount: first.canvasCount });
     for (const k of keys) {
       await page.keyboard.press(k).catch(() => {});
       await new Promise((r) => setTimeout(r, 40));
       const o = await look();
-      obs.push({ after: k, state: o.state, threw: o.threw, renderHash: sha(o.pixels), text: o.text, canvasCount: o.canvasCount });
+      obs.push({ after: k, state: o.state, threw: o.threw, renderHash: sha(o.pixels), blank: o.blank, text: o.text, canvasCount: o.canvasCount });
     }
 
     // ── THE RULES, and the false positive that forced them ──────────────────────────────────────
@@ -108,8 +130,10 @@ export async function renderEvidence(dir, { keys = [], expr = 'window.app.state(
     //               "2" picture, so {2,0} and {0,0} share a rendering.
     // Both are evaluated only from the first observation at which the page has drawn anything, because
     // before that the rendering cannot be a function of anything.
-    const firstDrawn = obs.findIndex((o, i) => i > 0 && o.renderHash !== obs[0].renderHash);
-    const from = firstDrawn === -1 ? 1 : firstDrawn;
+    // The rules apply from the first observation at which the page has actually DRAWN something. A blank
+    // canvas cannot be a function of anything.
+    const firstDrawn = obs.findIndex((o) => o.blank === false);
+    const from = firstDrawn === -1 ? obs.length : firstDrawn;
     const considered = obs.slice(from).filter((o) => !o.threw);
 
     const byState = new Map();
@@ -130,17 +154,34 @@ export async function renderEvidence(dir, { keys = [], expr = 'window.app.state(
     const disagreements = [...notFunctional.map((x) => ({ kind: 'SAME_STATE_TWO_PICTURES', ...x })),
                            ...notInjective.map((x) => ({ kind: 'TWO_STATES_ONE_PICTURE', ...x }))];
 
-    // A VACUOUS PASS IS NOT EVIDENCE. With fewer than two distinct states observed, neither rule was
-    // exercised: nothing could have disagreed. Reporting AGREES there would be a branch that cannot
-    // fail - which is how a page with no feature at all would earn a clean bill of health.
+    // COVERAGE, PER RULE, BECAUSE THE TWO ARE EXERCISED BY DIFFERENT THINGS.
+    //   the FUNCTIONAL rule needs a state to be REVISITED - seen at least twice. Two distinct states do
+    //   not exercise it at all, and an earlier version of this file reported AGREES on that basis, which
+    //   credited a rule that had never run.
+    //   the INJECTIVE rule needs at least two DISTINCT states.
+    const revisitedStates = [...byState.entries()].filter(([, h]) => h.size >= 1)
+      .filter(([k]) => considered.filter((o) => JSON.stringify(o.state) === k).length > 1).length;
+    const coverage = {
+      functionalRuleExercised: revisitedStates > 0,
+      revisitedStates,
+      injectiveRuleExercised: distinctStates >= 2,
+      distinctStates,
+      observationsConsidered: considered.length,
+    };
+
+    // A PASS THAT CANNOT FAIL IS NOT EVIDENCE. The verdict is only AGREES when at least one rule was
+    // actually exercised, and the coverage above says WHICH.
+    const anyExercised = coverage.functionalRuleExercised || coverage.injectiveRuleExercised;
     const verdict = disagreements.length ? 'RENDER_CONTRADICTS_STATE'
-      : (distinctStates >= 2 ? 'RENDER_AGREES' : 'RENDER_EVIDENCE_VACUOUS');
+      : (anyExercised ? 'RENDER_AGREES' : 'RENDER_EVIDENCE_VACUOUS');
 
     return {
       ok: true, observations: obs, loadHash: obs[0].renderHash, verdict, disagreements,
-      notFunctional, notInjective, distinctStates,
-      consideredFrom: from, drewAtLoad: firstDrawn === -1 ? null : false,
+      notFunctional, notInjective, distinctStates, coverage,
+      consideredFrom: from, drewAtLoad: obs[0].blank === null ? null : obs[0].blank === false,
       errors, canvasCount: first.canvasCount,
+      // WHAT A PASS MEANS, carried in the result so a reader cannot take more from it than it holds.
+      meaning: 'no contradiction detected by these two rules on the traces exercised; not a finding that the software is correct',
     };
   } catch (e) {
     return { ok: false, reason: `the browser could not gather render evidence: ${String(e.message || e).slice(0, 200)}` };
@@ -168,12 +209,14 @@ if (DIRECT) {
     for (const o of r.observations) {
       console.log(`  after ${String(o.after ?? 'load').padEnd(6)} state ${JSON.stringify(o.state).padEnd(30)} render ${o.renderHash.slice(0, 12)}`);
     }
-    console.log(`\n  distinct reported states observed: ${r.distinctStates}   (rules applied from observation ${r.consideredFrom})`);
+    console.log(`\n  coverage, per rule:`);
+    console.log(`    INJECTIVE  (distinct states must not share a picture) exercised: ${r.coverage.injectiveRuleExercised}  - ${r.coverage.distinctStates} distinct states`);
+    console.log(`    FUNCTIONAL (a revisited state must look the same)     exercised: ${r.coverage.functionalRuleExercised}  - ${r.coverage.revisitedStates} states revisited`);
     for (const d of r.disagreements) {
       if (d.kind === 'SAME_STATE_TWO_PICTURES') console.log(`    CONTRADICTS: state ${d.state} rendered ${d.renderings.length} different ways (${d.renderings.join(', ')})`);
       else console.log(`    CONTRADICTS: one picture ${d.renderHash} for ${d.states.length} different states (${d.states.join(' and ')})`);
     }
-    if (!r.disagreements.length) console.log('    no contradiction: the picture is a function of the reported state and distinguishes distinct states');
+    if (!r.disagreements.length) console.log(`    ${r.meaning}`);
     console.log(`\n  VERDICT ${r.verdict}`);
     process.exit(r.verdict === 'RENDER_AGREES' ? 0 : (r.verdict === 'RENDER_EVIDENCE_VACUOUS' ? 2 : 1));
   } finally { try { rmSync(ws, { recursive: true, force: true }); } catch { /* best effort */ } }
