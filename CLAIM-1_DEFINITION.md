@@ -14,8 +14,11 @@ button. None of them is a comparison. This is the comparison.
 
 ## What CLAIM-1 can and cannot establish
 
-It measures **one manager configuration, on one task family, with one model**. Specifically it
-varies **automatic planning and extracted guidance** — and nothing else.
+It measures **one manager configuration, on one task family, with one model**. It varies a *bundle*:
+automatic planning, extracted guidance, the scaffolded slot, and containment to that slot. An earlier
+version of this line said "automatic planning and extracted guidance — and nothing else," which was
+false: Arm B is deliberately not slot-constrained, so generation shape differs too. A win is a win
+for the bundle, and CLAIM-1 cannot attribute it to any one member.
 
 It does **not** establish:
 
@@ -56,6 +59,27 @@ can satisfy: Arm B is never refused for the *shape* of its answer, only for what
 > handed its own page returned it unchanged 5/5). If that happens it is **Arm B's result**, not an
 > apparatus defect to be fixed mid-experiment — but it must be reported as the mechanism, because
 > "the manager won" and "the control could not use its interface" are different findings.
+
+## Pilot — before the freeze, and it may cancel this design
+
+Every clear-filter result on record was produced by a **scripted** completion written by hand to
+exercise the wiring. The real model has never attempted this family. Freezing a 20-page comparison
+on a family whose base rate is unknown — against a record of 0 of 20 on a comparable one-handler
+task across four interfaces — would most likely buy an uninformative run.
+
+So: run Arm A only, with the real local model, on a small number of filter pages. This measures
+**tractability, not transfer** — the pages are written for the pilot and are not unfamiliar in the
+sense the evaluation set requires.
+
+Decision rule, fixed now:
+
+- **Arm A completes 0 of the pilot pages** → the family is not tractable for this model and CLAIM-1
+  as designed is cancelled. The next question becomes which family or which model, not which arm.
+- **Arm A completes some** → the base rate is non-zero, the design is worth executing, and the
+  pilot pages become development pages (they are never evaluation pages).
+
+The pilot runs *before* the freeze. Doing it afterwards, or adjusting the arms in response to it
+after freezing, invalidates the experiment.
 
 ## Calibration, then freeze
 
@@ -118,10 +142,28 @@ task and is counted as one in line 1.
 
 ## Power, declared in advance
 
-20 paired pages is a small experiment, and this project's observed completion rates are low (2 of 13
-accepted on one sweep; 0 of 20 on another). **CLAIM-1 can detect a large difference and cannot detect
-a small one.** With 20 paired tasks, a difference of roughly 5 or more completions is distinguishable
-from chance; a difference of 1-3 is not.
+A first version of this section said "a difference of roughly 5 or more completions is
+distinguishable from chance." That was asserted, not computed, and it is **wrong**. The exact
+McNemar test on paired binary outcomes turns on the number of **discordant pairs** — pages where the
+two arms disagree — not on the difference in totals. Computed:
+
+| discordant pairs, all favouring the manager | exact two-sided p |
+|---|---|
+| 4 | 0.1250 |
+| 5 | **0.0625 — does not clear 0.05** |
+| 6 | 0.0313 |
+| 7 | 0.0156 |
+
+And if any go the other way, the requirement climbs steeply: 1 against needs 9 discordant pairs,
+2 against needs 12, 3 against needs 15 — out of 20 pages total.
+
+So the real statement is: **CLAIM-1 needs at least 6 pages where the manager completes and the
+control does not, with none the other way.** Given this project's observed completion rates (2 of 13
+accepted on one sweep; 0 of 20 on another), that is a demanding requirement, and the most likely
+outcome of this design is the uninformative one.
+
+**Therefore a pilot precedes the freeze** (see *Pilot* below). Running it afterwards would be
+tampering; running it now is what decides whether this design is worth executing.
 
 So the outcomes are declared now:
 

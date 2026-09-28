@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>Shipping log</title></head>
+<body>
+<h1>Shipping log</h1>
+<form id="tools" onsubmit="return false;">
+  <input name="needle" id="needle" type="text">
+</form>
+<ol id="log">
+  <li data-row="1">Portland dispatched</li>
+  <li data-row="2">Portsmouth delayed</li>
+  <li data-row="3">Halifax dispatched</li>
+  <li data-row="4">Galveston held</li>
+  <li data-row="5">Hamburg dispatched</li>
+</ol>
+<script>
+var log = document.getElementById('log');
+var entries = [].slice.call(log.getElementsByTagName('li'));
+var needle = document.getElementById('needle');
+
+function visibleFor(text, term) {
+  return term.length === 0 || text.toLowerCase().indexOf(term) >= 0;
+}
+
+function update() {
+  var term = needle.value.toLowerCase();
+  entries.forEach(function (li) {
+    li.style.display = visibleFor(li.textContent, term) ? 'list-item' : 'none';
+  });
+}
+
+document.addEventListener('input', function (e) {
+  if (e.target === needle) update();
+});
+</script>
+</body>
+</html>

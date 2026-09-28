@@ -187,7 +187,7 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
       rec.outcome = `REFUSED_${contained.reason}`;
       console.log(`  seed ${seed}: REFUSED - ${contained.reason}`);
       rec.classification = classifyAttempt(task, rec);
-      if (CORPUS) rec.preserved = preserveAttempt(CORPUS, rec, { candidate: null, prompt: head, suffix: cut.suffix, proposal: roundRec.proposal, classification: rec.classification });
+      if (CORPUS) rec.preserved = preserveAttempt(CORPUS, rec, { candidate: null, rawFull: middle, prompt: head, suffix: cut.suffix, proposal: roundRec.proposal, classification: rec.classification });
       out.attempts.push(rec); roundRec.seeds.push({ seed, outcome: rec.outcome });
       worst = worst || rec;
       continue;
@@ -228,7 +228,7 @@ for (let round = 1; round <= MAX_ROUNDS && !out.accepted && out.calls < MAX_CALL
       // failed to clear the field, is a question worth keeping; deleting it answers the question by
       // destroying it. Nothing preserved here feeds back into this run or any later one.
       rec.classification = classifyAttempt(task, rec);
-      if (CORPUS) rec.preserved = preserveAttempt(CORPUS, rec, { candidate, prompt: head, suffix: cut.suffix, proposal: roundRec.proposal, classification: rec.classification });
+      if (CORPUS) rec.preserved = preserveAttempt(CORPUS, rec, { candidate, rawFull: middle, prompt: head, suffix: cut.suffix, proposal: roundRec.proposal, classification: rec.classification });
       if (rec.classification.mismatch === 'PARTIAL_EFFECT') console.log(`           PARTIAL: ${rec.classification.why}`);
       out.attempts.push(rec);
       roundRec.seeds.push({ seed, outcome: rec.outcome, mismatch: rec.classification.mismatch, passing: rec.play?.passing, failing: rec.play?.failing, visual: rec.visual?.verdict ?? null, decision: decision.summary });

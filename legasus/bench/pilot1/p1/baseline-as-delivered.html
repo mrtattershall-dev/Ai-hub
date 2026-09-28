@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><title>Parts</title></head>
+<body>
+<h1>Parts</h1>
+<input type="text" id="search" placeholder="search parts">
+<ul id="parts">
+  <li class="part">bracket</li>
+  <li class="part">brace</li>
+  <li class="part">washer</li>
+  <li class="part">spindle</li>
+  <li class="part">grommet</li>
+</ul>
+<script>
+const field = document.getElementById('search');
+const rows = Array.from(document.querySelectorAll('#parts .part'));
+function refresh() {
+  const q = field.value.toLowerCase();
+  rows.forEach(function (li) {
+    li.style.display = li.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';
+  });
+}
+field.addEventListener('input', refresh);
+</script>
+</body>
+</html>

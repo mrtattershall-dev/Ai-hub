@@ -89,7 +89,7 @@ export function classifyAttempt(task, rec) {
  * Returns the relative path recorded in the run, or null if nothing could be written. A corpus that
  * cannot be written is reported, never silently skipped.
  */
-export function preserveAttempt(dir, rec, { candidate, prompt, suffix, proposal, classification }) {
+export function preserveAttempt(dir, rec, { candidate, rawFull, prompt, suffix, proposal, classification }) {
   try {
     mkdirSync(dir, { recursive: true });
     const stem = `r${rec.round}-s${rec.seed}-${String(rec.outcome || 'UNKNOWN').toLowerCase()}`;
@@ -100,7 +100,10 @@ export function preserveAttempt(dir, rec, { candidate, prompt, suffix, proposal,
       classification,
       proposal,
       request: { prompt, suffix },
-      completion: rec.rawCompletion,
+      // THE COMPLETE completion, not the 6000-character slice the run record keeps. A corpus that
+      // truncates the artifact it exists to preserve has the defect it was built to prevent: a runaway
+      // completion is exactly the case worth studying, and exactly the one a slice destroys.
+      completion: { ...rec.rawCompletion, text: rawFull !== undefined ? rawFull : rec.rawCompletion.text, truncatedInRunRecord: rec.rawCompletion.chars > 6000 },
       contained: rec.transformedCandidate || null,
       containment: rec.containment || null,
       play: rec.play ? { passing: rec.play.passing, failing: rec.play.failing, errors: (rec.play.errors || []).slice(0, 5) } : null,

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head><title>Recipe box</title></head>
+<body>
+<header><h3>Recipe box</h3></header>
+<div class="controls">
+  <input id="recipe-filter" type="text" placeholder="type to narrow">
+  <span id="count"></span>
+</div>
+<div id="cards">
+  <div class="card"><span class="title">Flatbread</span></div>
+  <div class="card"><span class="title">Flapjacks</span></div>
+  <div class="card"><span class="title">Chowder</span></div>
+  <div class="card"><span class="title">Risotto</span></div>
+  <div class="card"><span class="title">Custard</span></div>
+  <div class="card"><span class="title">Chutney</span></div>
+</div>
+<script>
+const state = { query: '' };
+const cards = document.getElementById('cards');
+const counter = document.getElementById('count');
+
+function matches(card) {
+  if (!state.query) return true;
+  return card.querySelector('.title').textContent.toLowerCase().startsWith(state.query);
+}
+
+function paint() {
+  let shown = 0;
+  for (const card of cards.children) {
+    const on = matches(card);
+    card.hidden = !on;
+    if (on) shown++;
+  }
+  counter.textContent = shown + ' shown';
+}
+
+document.getElementById('recipe-filter').addEventListener('input', (e) => {
+  state.query = e.target.value.trim().toLowerCase();
+  paint();
+});
+
+paint();
+</script>
+</body>
+</html>
