@@ -1,0 +1,52 @@
+Amendment 3 plus the B-prime regression suite: four corrections, and the six held bindings pinned before anything is built
+
+AMENDMENT 3 corrects the INTERPRETATION of amendment 2's baseline. The measurements stand; three readings
+did not.
+
+1 THE EVIDENTIAL BOUNDARY OF G3. I reported "context pins fixture.js - commit edit OTHER.js - COMMITTED".
+  What was observed is an IN-PROCESS call to commit() returning committed:true for a mismatched action
+  DESCRIPTION. commit() is a pure authorization function and writes nothing. ESTABLISHED: a calculus-level
+  authorization failure. NOT ESTABLISHED: that a real write to OTHER.js occurred or could. The execution
+  test must connect the two, and until it does G3 is a governance hole rather than a demonstrated
+  unauthorized write.
+
+2 G3 IS AN UNCHECKED TARGET BINDING, NOT TIME-OF-CHECK-TO-TIME-OF-USE. I called it TOCTOU; wrong
+  mechanism. Unchecked binding: the target is NEVER compared, at any time. TOCTOU: the target IS checked
+  and then CHANGES before execution. Fixing the first does not address the second, and conflating them
+  would let a correct G3 fix be reported as covering a case never tested. The race is now E9, separate.
+
+3 G1 AND G2 ARE GAPS ONLY AGAINST A DECLARED POLICY. G1 shows DUPLICATED GRANTS, not doubled spending
+  authority - sharing a permission without consuming it is ordinary, and it becomes a budget violation
+  only where a parent holds a FINITE ALLOWANCE that descendants collectively exceed. G2 is a defect only
+  under a DECLARED single-use policy; most permissions are not tickets. Amendment 2 treated both as
+  defects on their face. E4 and E5 are therefore conditional on this experiment declaring those policies.
+
+4 THE ENFORCEMENT POINT MUST OWN A STRUCTURED ACTION AND THE ACTUAL EFFECT, and the baseline probe shows
+  the trap: it passed action: 'edit OTHER.js' AS A STRING. An enforcement point that validates a string
+  while another argument determines the file RECREATES THE HOLE WITH A CHECK IN FRONT OF IT. Immediately
+  before invoking the bounded operation it must own the resolved target, the revision, the evidence
+  obligations THE OPERATION CONTRACT DECLARES, grant status and remaining allowance - and that same
+  structure must be what the operation consumes. G4 is likewise scoped to the contract rather than made a
+  universal precondition.
+
+E0 IS NOW THE STRONGEST TEST: an owner-issued grant permits a REAL change to the intended fixture;
+changing ONLY the target causes refusal; and BOTH FILES REMAIN BYTE-IDENTICAL to their pre-attempt state.
+Byte-identity is what makes it a real-effect test rather than a verdict test. Then one dimension varied at
+a time, every negative case retaining an otherwise-valid setup.
+
+THE B-PRIME REGRESSION SUITE IS BUILT AND PASSING, 12/12, before any enforcement exists. It pins the six
+bindings the calculus already holds - grant non-widening, context non-dropping, context non-changing, no
+belief laundering, no bare epistemic commit, no uncovered grant - plus B7'. The four measured gaps are
+pinned as CURRENT BEHAVIOUR so the E-series inverting them is visible as a change, each labelled with what
+it would take to be a defect rather than asserted to be one.
+
+B6' IS THE ONE MOST AT RISK AND IT IS NOT A REFUSAL: a controller HOLDING owner-issued authority must stay
+exercisable. My amendment 1 called that a regression, which would have prohibited the legitimate case.
+controller-HELD is not controller-CREATED, and B6' exists so a future tightening cannot quietly forbid
+exercising a legitimate delegation.
+
+No validation borrowed from the 7B fuzzer, which remains untouched at 12 node processes.
+
+Message-File: scratch/ag-amend3.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
