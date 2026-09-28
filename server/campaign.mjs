@@ -71,6 +71,11 @@ const STOP_APP = opt('stop-app', null);
 // Deploying here rather than in a prior command is what puts deployment and the first cold start
 // INSIDE the measured budget. Deployed beforehand, that exposure is real and simply unmeasured.
 const DEPLOY = opt('deploy', null);
+// WHICH ARM. Both run through this same launcher, so campaign accounting - interruption detection,
+// corpus reconciliation, the wall-clock watchdog - is identical for the manager and the control. A
+// comparison where only one arm is supervised is not a comparison.
+const ARM = opt('arm', 'manager');
+const RUNNER = ARM === 'direct' ? 'server/directRun.mjs' : 'server/managerRun.mjs';
 const T_START = Date.now();
 const elapsed = () => (Date.now() - T_START) / 1000;
 let shutdown = null;
@@ -135,10 +140,10 @@ WATCHDOG: ${elapsed().toFixed(0)}s of a ${MAX_GPU_SECONDS}s budget - stopping be
     break;
   }
   const outFile = join(OUTDIR, `${p}.json`);
-  const args = ['server/managerRun.mjs', '--dir', join(PAGES, p), '--out', outFile];
+  const args = [RUNNER, '--dir', join(PAGES, p), '--out', outFile];
   if (MODEL) args.push('--model', MODEL);
   if (MODEL_URL) args.push('--model-url', MODEL_URL);
-  if (GUIDANCE) args.push('--guidance', GUIDANCE);
+  if (GUIDANCE && ARM !== 'direct') args.push('--guidance', GUIDANCE);
   console.log(`\n######## ${p} ########`);
   let exitCode = 0; let err = null; let timedOut = false;
   // THE REMAINING BUDGET IS THE CHILD'S TIMEOUT, so the deadline lands mid-page. Without this the bound
@@ -190,7 +195,7 @@ WATCHDOG: ${elapsed().toFixed(0)}s of a ${MAX_GPU_SECONDS}s budget - stopping be
 
 if (MAX_GPU_SECONDS && !watchdog) await stopHostedApp('campaign finished');
 const summary = {
-  at: new Date().toISOString(), pages: pages.length,
+  at: new Date().toISOString(), arm: ARM, runner: RUNNER, pages: pages.length,
   wallClockSeconds: +elapsed().toFixed(1), maxGpuSeconds: MAX_GPU_SECONDS || null, watchdog, deployment,
   terminatedInFlight: results.some((r) => r.killedByWatchdog), backstop: shutdown,
   pagesNotRun: watchdog ? pages.length - results.length : 0,
