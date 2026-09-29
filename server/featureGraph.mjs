@@ -6,6 +6,11 @@
 // shape as pre-supplying an empty function body. Stages 2 (feedback after a failed attempt) and 3
 // (planning) are separate treatments and are NOT implemented here.
 //
+// THE PRECISE CLAIM, because a loose one is easy to make here: Legasus DERIVES THE EXPECTED GRAPH
+// WITHOUT READING THE CANDIDATE, and then READS AND RUNS THE CANDIDATE to determine which nodes are
+// missing. It is not "explaining missing parts without reading the candidate" - the second half
+// necessarily inspects it. What matters is that the expectation was fixed beforehand.
+//
 // SAFEGUARD 1 - DERIVE BEFORE SEEING ANY CANDIDATE. `derive(page, task)` takes no candidate and cannot
 // see one. A graph built by inspecting output and deciding afterwards which nodes mattered would be a
 // post-hoc story, not a map.

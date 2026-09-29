@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html><body><h2>g2</h2>
+<p id="pos">position 0</p>
+<div id="track"><span class="cell">.</span><span class="cell">.</span><span class="cell">.</span></div>
+<script>
+let at = 0;
+const cells = document.querySelectorAll("#track .cell");
+const label = document.getElementById("pos");
+function paint() { for (let i = 0; i < cells.length; i++) cells[i].textContent = i === at ? "X" : "."; label.textContent = "position " + at; }
+document.addEventListener("keydown", function (e) { if (e.key === "ArrowRight" && at < cells.length - 1) { at++; paint(); } });
+paint();
+</script></body></html>
