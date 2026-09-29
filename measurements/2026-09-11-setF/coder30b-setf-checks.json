@@ -1,0 +1,907 @@
+{
+  "ws": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\measurements\\2026-09-11-setF\\data\\coder30b-setf\\workspace",
+  "asIs": 36,
+  "impl": 36,
+  "results": [
+    {
+      "goal": 1,
+      "chain": 1,
+      "step": 1,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.titles is not a function"
+    },
+    {
+      "goal": 2,
+      "chain": 2,
+      "step": 1,
+      "file": "s2_logs.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 3,
+      "chain": 3,
+      "step": 1,
+      "file": "s3_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 4,
+      "chain": 4,
+      "step": 1,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "no result:         ^^^^^^^^^\r | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'"
+    },
+    {
+      "goal": 5,
+      "chain": 5,
+      "step": 1,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "\"2 3\" did not throw"
+    },
+    {
+      "goal": 6,
+      "chain": 6,
+      "step": 1,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "a repeated edge did not replace the weight"
+    },
+    {
+      "goal": 7,
+      "chain": 7,
+      "step": 1,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 8,
+      "chain": 8,
+      "step": 1,
+      "file": "s8_grades.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 9,
+      "chain": 9,
+      "step": 1,
+      "file": "s9_board.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 10,
+      "chain": 10,
+      "step": 1,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: library.titles is not a function"
+    },
+    {
+      "goal": 11,
+      "chain": 1,
+      "step": 2,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "the same member twice did not throw"
+    },
+    {
+      "goal": 12,
+      "chain": 2,
+      "step": 2,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "bad_lines ['not a log line', '2.2.2.2 broken']"
+    },
+    {
+      "goal": 13,
+      "chain": 3,
+      "step": 2,
+      "file": "s3_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 14,
+      "chain": 4,
+      "step": 2,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "no result:         ^^^^^^^^^\r | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'"
+    },
+    {
+      "goal": 15,
+      "chain": 5,
+      "step": 2,
+      "file": "s5_expr.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 16,
+      "chain": 6,
+      "step": 2,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 17,
+      "chain": 7,
+      "step": 2,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 18,
+      "chain": 8,
+      "step": 2,
+      "file": "s8_grades.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 19,
+      "chain": 9,
+      "step": 2,
+      "file": "s9_board.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 20,
+      "chain": 10,
+      "step": 2,
+      "file": "s10_desk.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 21,
+      "chain": 1,
+      "step": 3,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.loans is not a function"
+    },
+    {
+      "goal": 22,
+      "chain": 2,
+      "step": 3,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "error_rate 0.75"
+    },
+    {
+      "goal": 23,
+      "chain": 3,
+      "step": 3,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: a.mul is not a function"
+    },
+    {
+      "goal": 24,
+      "chain": 4,
+      "step": 3,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "no result:         ^^^^^^^^^\r | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'"
+    },
+    {
+      "goal": 25,
+      "chain": 5,
+      "step": 3,
+      "file": "s5_expr.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 26,
+      "chain": 6,
+      "step": 3,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 27,
+      "chain": 7,
+      "step": 3,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "keys [\"b\",\"c\",\"a\"]"
+    },
+    {
+      "goal": 28,
+      "chain": 8,
+      "step": 3,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'"
+    },
+    {
+      "goal": 29,
+      "chain": 9,
+      "step": 3,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "start [\"To Do: 0\",\"Doing: 0\",\"Done: 0\"]"
+    },
+    {
+      "goal": 30,
+      "chain": 10,
+      "step": 3,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: library.getLoans is not a function"
+    },
+    {
+      "goal": 31,
+      "chain": 1,
+      "step": 4,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.holds is not a function"
+    },
+    {
+      "goal": 32,
+      "chain": 2,
+      "step": 4,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "top_paths [('/a', 1), ('/b?x=1', 1), ('/a?y=2', 1)]"
+    },
+    {
+      "goal": 33,
+      "chain": 3,
+      "step": 4,
+      "file": "s3_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 34,
+      "chain": 4,
+      "step": 4,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "no result:         ^^^^^^^^^\r | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'"
+    },
+    {
+      "goal": 35,
+      "chain": 5,
+      "step": 4,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Function x must be followed by parentheses at 1"
+    },
+    {
+      "goal": 36,
+      "chain": 6,
+      "step": 4,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 37,
+      "chain": 7,
+      "step": 4,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 38,
+      "chain": 8,
+      "step": 4,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "equal weights 55.0"
+    },
+    {
+      "goal": 39,
+      "chain": 9,
+      "step": 4,
+      "file": "s9_board.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 40,
+      "chain": 10,
+      "step": 4,
+      "file": "s10_desk.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 41,
+      "chain": 1,
+      "step": 5,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.overdue is not a function"
+    },
+    {
+      "goal": 42,
+      "chain": 2,
+      "step": 5,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: IndexError: list index out of range"
+    },
+    {
+      "goal": 43,
+      "chain": 3,
+      "step": 5,
+      "file": "s3_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 44,
+      "chain": 4,
+      "step": 5,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "no result:         ^^^^^^^^^\r | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'"
+    },
+    {
+      "goal": 45,
+      "chain": 5,
+      "step": 5,
+      "file": "s5_expr.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 46,
+      "chain": 6,
+      "step": 5,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 47,
+      "chain": 7,
+      "step": 5,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "keys still lists an expired entry: [\"b\",\"c\"]"
+    },
+    {
+      "goal": 48,
+      "chain": 8,
+      "step": 5,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.drop_lowest() missing 1 required positional argument: 'n'"
+    },
+    {
+      "goal": 49,
+      "chain": 9,
+      "step": 5,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "after reload [[\"Aâ†â†’Ã—\",\"Câ†â†’Ã—\"],[\"Bâ†â†’Ã—\"]]"
+    },
+    {
+      "goal": 50,
+      "chain": 10,
+      "step": 5,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: library.overdue is not a function"
+    },
+    {
+      "goal": 51,
+      "chain": 1,
+      "step": 6,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.returnBook is not a function"
+    },
+    {
+      "goal": 52,
+      "chain": 2,
+      "step": 6,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 's2_logs_mod' has no attribute 'by_hour'"
+    },
+    {
+      "goal": 53,
+      "chain": 3,
+      "step": 6,
+      "file": "s3_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 54,
+      "chain": 4,
+      "step": 6,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "no result:         ^^^^^^^^^\r | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'"
+    },
+    {
+      "goal": 55,
+      "chain": 5,
+      "step": 6,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "\"2 + * 3\": 2"
+    },
+    {
+      "goal": 56,
+      "chain": 6,
+      "step": 6,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'Graph' object has no attribute 'remove_node'"
+    },
+    {
+      "goal": 57,
+      "chain": 7,
+      "step": 6,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "stats {\"hits\":1,\"misses\":2,\"evictions\":0,\"expirations\":1}"
+    },
+    {
+      "goal": 58,
+      "chain": 8,
+      "step": 6,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "missing as zero (80.0, None)"
+    },
+    {
+      "goal": 59,
+      "chain": 9,
+      "step": 6,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "the message was not emptied: \"Doing is full\""
+    },
+    {
+      "goal": 60,
+      "chain": 10,
+      "step": 6,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.returnBook is not a function"
+    },
+    {
+      "goal": 61,
+      "chain": 1,
+      "step": 7,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: k.returnBook is not a function"
+    },
+    {
+      "goal": 62,
+      "chain": 2,
+      "step": 7,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 's2_logs_mod' has no attribute 'between'"
+    },
+    {
+      "goal": 63,
+      "chain": 3,
+      "step": 7,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: b.mul is not a function"
+    },
+    {
+      "goal": 64,
+      "chain": 4,
+      "step": 7,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "no result:         ^^^^^^^^^\r | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'"
+    },
+    {
+      "goal": 65,
+      "chain": 5,
+      "step": 7,
+      "file": "s5_expr.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 66,
+      "chain": 6,
+      "step": 7,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "reachable(a) ['a', 'b', 'c']"
+    },
+    {
+      "goal": 67,
+      "chain": 7,
+      "step": 7,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 68,
+      "chain": 8,
+      "step": 7,
+      "file": "s8_grades.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 69,
+      "chain": 9,
+      "step": 7,
+      "file": "s9_board.html",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 70,
+      "chain": 10,
+      "step": 7,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: library.getLoans is not a function"
+    },
+    {
+      "goal": 71,
+      "chain": 1,
+      "step": 8,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.returnBook is not a function"
+    },
+    {
+      "goal": 72,
+      "chain": 2,
+      "step": 8,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 's2_logs_mod' has no attribute 'sessions'"
+    },
+    {
+      "goal": 73,
+      "chain": 3,
+      "step": 8,
+      "file": "s3_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 74,
+      "chain": 4,
+      "step": 8,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "no result:         ^^^^^^^^^\r | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'"
+    },
+    {
+      "goal": 75,
+      "chain": 5,
+      "step": 8,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "\"1 + 2 * x\" -> [\"1\",\"2\",\"x\"]"
+    },
+    {
+      "goal": 76,
+      "chain": 6,
+      "step": 8,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "components [['a'], ['a', 'b'], ['c', 'd'], ['d', 'e'], ['f'], ['z']]"
+    },
+    {
+      "goal": 77,
+      "chain": 7,
+      "step": 8,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "resize kept [\"d\",\"a\"]"
+    },
+    {
+      "goal": 78,
+      "chain": 8,
+      "step": 8,
+      "file": "s8_grades.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 79,
+      "chain": 9,
+      "step": 8,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: No element found for selector: #s9-filter"
+    },
+    {
+      "goal": 80,
+      "chain": 10,
+      "step": 8,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: snapshot is not exported"
+    },
+    {
+      "goal": 81,
+      "chain": 1,
+      "step": 9,
+      "file": "s1_library.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 82,
+      "chain": 2,
+      "step": 9,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI --top 2 printed ['All tests passed!']"
+    },
+    {
+      "goal": 83,
+      "chain": 3,
+      "step": 9,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "toString \"1 0.5\\n-2 3.3333333\\n0.0001 10\""
+    },
+    {
+      "goal": 84,
+      "chain": 4,
+      "step": 9,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "no result:         ^^^^^^^^^\r | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'"
+    },
+    {
+      "goal": 85,
+      "chain": 5,
+      "step": 9,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: compile is not exported"
+    },
+    {
+      "goal": 86,
+      "chain": 6,
+      "step": 9,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 87,
+      "chain": 7,
+      "step": 9,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "fromJSON order [\"c\",\"b\"]"
+    },
+    {
+      "goal": 88,
+      "chain": 8,
+      "step": 9,
+      "file": "s8_grades.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 89,
+      "chain": 9,
+      "step": 9,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "a duplicate was added: [\"deploy\"]"
+    },
+    {
+      "goal": 90,
+      "chain": 10,
+      "step": 9,
+      "file": "s10_desk.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 91,
+      "chain": 1,
+      "step": 10,
+      "file": "S1_NOTES.md",
+      "asIs": false,
+      "impl": false,
+      "why": "notes miss titles, returnBook, loans, overdue, pay, toJSON, fromJSON"
+    },
+    {
+      "goal": 92,
+      "chain": 2,
+      "step": 10,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: IndexError: list index out of range"
+    },
+    {
+      "goal": 93,
+      "chain": 3,
+      "step": 10,
+      "file": "s3_matrix.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 94,
+      "chain": 4,
+      "step": 10,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "no result:         ^^^^^^^^^\r | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'"
+    },
+    {
+      "goal": 95,
+      "chain": 5,
+      "step": 10,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Invalid characters in expression at 3"
+    },
+    {
+      "goal": 96,
+      "chain": 6,
+      "step": 10,
+      "file": "s6_graph.py",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 97,
+      "chain": 7,
+      "step": 10,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 98,
+      "chain": 8,
+      "step": 10,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI header []"
+    },
+    {
+      "goal": 99,
+      "chain": 9,
+      "step": 10,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: No element found for selector: #s9-clear-done"
+    },
+    {
+      "goal": 100,
+      "chain": 10,
+      "step": 10,
+      "file": "S_INDEX.md",
+      "asIs": false,
+      "impl": false,
+      "why": "index misses files: s10_desk.js, s4_markdown.py, s6_graph.py, s7_cache.js, s8_grades.py, s9_board.html, s9_board.js"
+    }
+  ]
+}

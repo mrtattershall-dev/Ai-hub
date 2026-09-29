@@ -1,0 +1,103 @@
+  1 s1_library.js   done     then F  end F   [ee0f14a] trial35: done FN-MISSING(book,owns)  copies 1.5 did not throw
+  2 s2_logs.py      stopped  then F  end F   [63e3500] trial35: stopped FN-MISSING(time,status,bytes,seconds)  threw: AttributeError: 'NoneType' object has no attribute 'get'
+  3 s3_matrix.js    stopped  then F  end F   [1d29dc4] trial35: stopped FN-MISSING(Matrix,shape,get,toArray)  threw: m.shape is not a function
+  4 s4_markdown.py  done     then F  end F   [a79b2eb] trial35: done FN-MISSING(paragraphs)  one paragraph 'Hello world'
+  5 s5_expr.js      interrupted then F  end F   [c746e61] trial35: interrupted FN-MISSING(numbers)  threw: Unknown variable: 1
+  6 s6_graph.py     stopped  then F  end F   [12f647e] trial35: stopped FN-MISSING(number,of)  threw: TypeError: argument of type 'method' is not iterable
+  7 s7_cache.js     stopped  then CT end F   <- REGRESSED  [5d63a96] trial35: stopped FN-MISSING(Cache)  evicted the wrong key (b was the least recently used)
+  8 s8_grades.py    stopped  then F  end F   [c2d9ae7] trial35: stopped s8_grades.py:THROWS  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 
+  9 s9_board.html   done     then P  end F   <- REGRESSED  [d7d7474] trial35: done s9_board.js:parses  the input was not cleared
+ 10 s10_desk.js     done     then F  end P   [8b6a311] trial35: done FN-MISSING(js)  
+ 11 s1_library.js   stopped  then F  end F   [8483cba] trial35: stopped FN-MISSING(checkout,available)  threw: l.checkout is not a function
+ 12 s2_logs.py      stopped  then F  end F   [0d377be] trial35: stopped s2_logs.py:runs  threw: TypeError: 'NoneType' object is not iterable
+ 13 s3_matrix.js    stopped  then F  end F   [7a121e7] trial35: stopped FN-MISSING(add,sub)  threw: a.add is not a function
+ 14 s4_markdown.py  stopped  then F  end F   [80c9ed0] trial35: stopped s4_markdown.py:runs  headings '# Title\ntext under it\n## Sub\n\n### Small'
+ 15 s5_expr.js      stopped  then F  end F   [1d8d0b2] trial35: stopped s5_expr.js:runs  threw: Unknown variable: 2
+ 16 s6_graph.py     stopped  then F  end F   [59540e4] trial35: stopped s6_graph.py:THROWS  threw: TypeError: argument of type 'method' is not iterable
+ 17 s7_cache.js     stopped  then F  end F   [20d2d6d] trial35: stopped FN-MISSING(delete,clear)  threw: c.delete is not a function
+ 18 s8_grades.py    stopped  then F  end F   [cedbe4a] trial35: stopped s8_grades.py:THROWS  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 
+ 19 s9_board.html   done     then F  end F   [6ea708a] trial35: done FN-MISSING(board,column)  threw: no card "A" in todo
+ 20 s10_desk.js     done     then F  end F   [8ec7449] trial35: done s10_desk.js:runs  threw: l.checkout is not a function
+ 21 s1_library.js   stopped  then F  end F   [0b6ea3c] trial35: stopped FN-MISSING(returnBook,loans)  threw: l.checkout is not a function
+ 22 s2_logs.py      stopped  then F  end F   [7bb3049] trial35: stopped FN-MISSING(decimals)  threw: TypeError: 'NoneType' object is not iterable
+ 23 s3_matrix.js    stopped  then F  end F   [eddab87] trial35: stopped s3_matrix.js:runs  threw: m.toArray is not a function
+ 24 s4_markdown.py  stopped  then F  end F   [7daaf2a] trial35: stopped s4_markdown.py:runs  emphasis '**bold** and *it*'
+ 25 s5_expr.js      stopped  then F  end F   [c5a29be] trial35: stopped FN-MISSING(operator,associative,it)  threw: Unknown variable: 2
+ 26 s6_graph.py     stopped  then F  end F   [2b7adf8] trial35: stopped FN-MISSING(returning,is)  threw: TypeError: argument of type 'method' is not iterable
+ 27 s7_cache.js     stopped  then F  end F   [5d5c34f] trial35: stopped FN-MISSING(keys)  threw: c.keys is not a function
+ 28 s8_grades.py    stopped  then F  end F   [6dff04e] trial35: stopped FN-MISSING(letter,py,of)  threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'
+ 29 s9_board.html   stopped  then F  end F   [5fac62f] trial35: stopped FN-MISSING(board)  threw: no card "A" in todo
+ 30 s10_desk.js     done     then F  end F   [3f66713] trial35: done FN-MISSING(loans)  threw: l.checkout is not a function
+ 31 s1_library.js   stopped  then F  end F   [7c72fa6] trial35: stopped FN-MISSING(placeHold,holds)  threw: l.checkout is not a function
+ 32 s2_logs.py      stopped  then F  end F   [fde55b4] trial35: stopped FN-MISSING(of,path)  threw: TypeError: 'NoneType' object is not iterable
+ 33 s3_matrix.js    stopped  then F  end F   [259f0a1] trial35: stopped FN-MISSING(transpose,identity)  threw: a.transpose is not a function
+ 34 s4_markdown.py  stopped  then F  end F   [9015a5f] trial35: stopped s4_markdown.py:runs  inline code 'use `a**b** < c` here'
+ 35 s5_expr.js      stopped  then F  end F   [391bd81] trial35: stopped FN-MISSING(name)  threw: Unknown variable: 2
+ 36 s6_graph.py     stopped  then F  end F   [bd14d29] trial35: stopped FN-MISSING(cycle)  threw: TypeError: argument of type 'method' is not iterable
+ 37 s7_cache.js     done     then P  end P   [3011d44] trial35: done s7_cache.js:runs  
+ 38 s8_grades.py    stopped  then F  end F   [b54c698] trial35: stopped FN-MISSING(in)  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 4 
+ 39 s9_board.html   stopped  then F  end F   [1986d85] trial35: stopped FN-MISSING(board)  threw: no card "A" in todo
+ 40 s10_desk.js     done     then F  end F   [5686c7e] trial35: done FN-MISSING(function,Cache)  threw: library.getBook is not a function
+ 41 s1_library.js   stopped  then F  end F   [cfaf2ee] trial35: stopped FN-MISSING(checkout,returnBook,number,dueDay,overdue,daysLate)  threw: l.checkout is not a function
+ 42 s2_logs.py      done     then F  end F   [29aa264] trial35: done FN-MISSING(rank)  percentile [None, None, None, None, None]
+ 43 s3_matrix.js    stopped  then F  end F   [e4c3ad1] trial35: stopped FN-MISSING(equals)  threw: a.equals is not a function
+ 44 s4_markdown.py  stopped  then F  end F   [27fe6ca] trial35: stopped s4_markdown.py:THROWS  link 'see <a href="http://x.org/a?b=1">the docs</a> now'
+ 45 s5_expr.js      stopped  then F  end F   [c0169f3] trial35: stopped FN-MISSING(min,max,abs,sqrt)  threw: Unknown variable: m
+ 46 s6_graph.py     stopped  then F  end F   [8d69bf2] trial35: stopped s6_graph.py:THROWS  threw: TypeError: argument of type 'method' is not iterable
+ 47 s7_cache.js     stopped  then F  end F   [c75af1b] trial35: stopped FN-MISSING(Cache,now,clock,everywhere)  size counts expired entries: 3
+ 48 s8_grades.py    stopped  then F  end F   [664876f] trial35: stopped FN-MISSING(scores)  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 4 
+ 49 s9_board.html   stopped  then F  end F   [750367b] trial35: stopped FN-MISSING(board)  threw: no card "B" in todo
+ 50 s10_desk.js     done     then F  end F   [eff04b7] trial35: done FN-MISSING(overdue,isbn)  threw: l.checkout is not a function
+ 51 s1_library.js   stopped  then F  end F   [a2958af] trial35: stopped FN-MISSING(late,fines,pay)  threw: l.checkout is not a function
+ 52 s2_logs.py      stopped  then F  end F   [382bb50] trial35: stopped FN-MISSING(field)  by_hour None
+ 53 s3_matrix.js    stopped  then F  end F   [526a5d3] trial35: stopped FN-MISSING(determinant)  threw: (intermediate value).determinant is not a function
+ 54 s4_markdown.py  stopped  then F  end F   [ca641b5] trial35: stopped s4_markdown.py:THROWS  list '- one\n- **two**\n\nafter'
+ 55 s5_expr.js      stopped  then F  end F   [149484a] trial35: stopped FN-MISSING(early)  "2 + * 3": "Unknown variable: 2"
+ 56 s6_graph.py     stopped  then F  end F   [2fcde7e] trial35: stopped s6_graph.py:THROWS  threw: TypeError: argument of type 'method' is not iterable
+ 57 s7_cache.js     stopped  then F  end F   [47a115f] trial35: stopped FN-MISSING(stats)  threw: c.stats is not a function
+ 58 s8_grades.py    stopped  then F  end F   [2d583a6] trial35: stopped FN-MISSING(default)  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 
+ 59 s9_board.html   stopped  then F  end F   [2d583a6] trial35: stopped FN-MISSING(board)  threw: no card "A" in todo
+ 60 s10_desk.js     done     then F  end F   [efa0cd3] trial35: done FN-MISSING(amount)  threw: l.checkout is not a function
+ 61 s1_library.js   stopped  then F  end F   [d46e1e3] trial35: stopped FN-MISSING(hold,fines)  threw: l.checkout is not a function
+ 62 s2_logs.py      stopped  then F  end F   [1a33750] trial35: stopped s2_logs.py:THROWS  threw: TypeError: 'NoneType' object is not iterable
+ 63 s3_matrix.js    stopped  then F  end F   [60e8e97] trial35: stopped FN-MISSING(inverse,singular)  threw: a.inverse is not a function
+ 64 s4_markdown.py  stopped  then F  end F   [60e8e97] trial35: stopped FN-MISSING(space)  ordered list '1. first\n2. second\n10. tenth'
+ 65 s5_expr.js      stopped  then F  end F   [a7e82a5] trial35: stopped s5_expr.js:runs  threw: tokenize is not exported
+ 66 s6_graph.py     stopped  then F  end F   [79c4fc5] trial35: stopped FN-MISSING(edges)  threw: TypeError: argument of type 'method' is not iterable
+ 67 s7_cache.js     stopped  then F  end F   [0f3c8eb] trial35: stopped FN-MISSING(Cache,onEvict,delete,clear)  threw: c.delete is not a function
+ 68 s8_grades.py    done     then P  end F   <- REGRESSED  [7a4c74e] trial35: done s8_grades.py:runs  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 
+ 69 s9_board.html   stopped  then F  end F   [7a4c74e] trial35: stopped FN-MISSING(board)  Enter did not add: null
+ 70 s10_desk.js     done     then F  end F   [39cc4fe] trial35: done s10_desk.js:runs  threw: l.checkout is not a function
+ 71 s1_library.js   done     then F  end F   [39cc4fe] trial35: done FN-MISSING(toJSON,fromJSON)  threw: l.checkout is not a function
+ 72 s2_logs.py      stopped  then F  end F   [0b8392c] trial35: stopped s2_logs.py:THROWS  sessions None
+ 73 s3_matrix.js    stopped  then F  end F   [146396c] trial35: stopped FN-MISSING(solve)  threw: (intermediate value).solve is not a function
+ 74 s4_markdown.py  stopped  then F  end F   [915bf2f] trial35: stopped FN-MISSING(breaks)  code block 'before\n\n```\nx = 1 < 2\n  *not em*\n```\n\nafter'
+ 75 s5_expr.js      stopped  then F  end F   [f0d80e3] trial35: stopped FN-MISSING(String)  threw: toRPN is not exported
+ 76 s6_graph.py     stopped  then F  end F   [2eba131] trial35: stopped s6_graph.py:THROWS  threw: TypeError: argument of type 'method' is not iterable
+ 77 s7_cache.js     stopped  then F  end F   [2bce290] trial35: stopped FN-MISSING(resize,entries)  threw: c.resize is not a function
+ 78 s8_grades.py    stopped  then F  end F   [a5f2162] trial35: stopped FN-MISSING(decimals,letter)  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 
+ 79 s9_board.html   done     then F  end F   [f449902] trial35: done FN-MISSING(board,text)  threw: no card "Fix bug" in todo
+ 80 s10_desk.js     done     then F  end F   [d219d8d] trial35: done FN-MISSING(stringify,toJSON)  threw: l.checkout is not a function
+ 81 s1_library.js   stopped  then F  end F   [9c7143c] trial35: stopped FN-MISSING(search,removeBook)  threw: l.search is not a function
+ 82 s2_logs.py      stopped  then F  end F   [f4101a6] trial35: stopped FN-MISSING(paths)  CLI --top 2 printed [] |    valid_lines = len(entries)
+TypeError: object of typ
+ 83 s3_matrix.js    stopped  then F  end F   [88be088] trial35: stopped FN-MISSING(toString,zeros)  toString "[object Object]"
+ 84 s4_markdown.py  stopped  then F  end F   [9987ac8] trial35: stopped FN-MISSING(inside)  blockquote '> quoted **text**\n> # Head\n\nplain'
+ 85 s5_expr.js      stopped  then F  end F   [6e5e952] trial35: stopped FN-MISSING(function)  threw: infixToPostfix is not defined
+ 86 s6_graph.py     stopped  then F  end F   [d55c666] trial35: stopped s6_graph.py:THROWS  threw: TypeError: argument of type 'method' is not iterable
+ 87 s7_cache.js     stopped  then F  end F   [ae6e10e] trial35: stopped FN-MISSING(toJSON,fromJSON)  threw: c.toJSON is not a function
+ 88 s8_grades.py    done     then F  end F   [00914e1] trial35: done FN-MISSING(points)  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 
+ 89 s9_board.html   stopped  then F  end F   [687bb97] trial35: stopped FN-MISSING(board,column)  threw: no card "Deploy" in todo
+ 90 s10_desk.js     done     then F  end F   [b326c10] trial35: done FN-MISSING(search)  threw: Cannot read properties of undefined (reading 'includes')
+ 91 S1_NOTES.md     done     then F  end F   [c51cf72] trial35: done s1_library.js:runs  notes miss checkout, returnBook, loans, placeHold, holds, dueDay, overdue, fines
+ 92 s2_logs.py      stopped  then F  end F   [946a0ee] trial35: stopped FN-MISSING(field)  threw: AttributeError: 'NoneType' object has no attribute 'get'
+ 93 s3_matrix.js    stopped  then F  end F   [8c4a51c] trial35: stopped FN-MISSING(fromString,toString)  threw: X.fromString is not a function
+ 94 s4_markdown.py  stopped  then F  end F   [8a605d5] trial35: stopped FN-MISSING(of)  toc [(1, 'Intro', 'intro'), (2, 'Set up, fast!', 'set-up-fast'), (2, 'Intro', 'i
+ 95 s5_expr.js      stopped  then F  end F   [9cfc694] trial35: stopped s5_expr.js:runs  threw: Unknown variable: 1
+ 96 s6_graph.py     stopped  then F  end F   [56778a2] trial35: stopped s6_graph.py:THROWS  threw: TypeError: argument of type 'method' is not iterable
+ 97 s7_cache.js     stopped  then F  end F   [4ad9098] trial35: stopped FN-MISSING(getOrSet,one,factory,it)  threw: c.getOrSet is not a function
+ 98 s8_grades.py    stopped  then F  end F   [a6aef67] trial35: stopped s8_grades.py:THROWS  CLI header [['bob', 'hw1', '5', '10']]
+ 99 s9_board.html   done     then F  end F   [6add201] trial35: done FN-MISSING(board)  threw: no card "A" in todo
+100 S_INDEX.md      done     then F  end F   [final] trial35: done S_INDEX.md:ok  index misses files: s10_desk.js
+
+coder14b-setf: 100 goals run | worked when written 4 | works at the end 2 (as asked 2) | REGRESSED 3
