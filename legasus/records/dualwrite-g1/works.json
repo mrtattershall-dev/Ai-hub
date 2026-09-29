@@ -1,0 +1,429 @@
+{
+  "schema": "1.0.0",
+  "runId": "dualwrite-g1",
+  "changeId": "g1-works",
+  "opened": "2026-09-29T08:48:03.523Z",
+  "tool": "changeRecordDualWrite",
+  "events": [
+    {
+      "id": "g1-works:0:b997ef0a515d",
+      "seq": 0,
+      "section": "TASK",
+      "class": "FACT",
+      "by": "emitter",
+      "cites": [],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "what": "Continue the page already in index.html. Add a control #reset-filter that clears the filter: clicking it empties #q and ",
+        "taskSha": "9325ce3c2b7847cbc6594c971dc475bc19d9ec0827763ec3d14f3324afc5c79a",
+        "requirement": {
+          "trigger": {
+            "kind": "click",
+            "selector": "#reset-filter"
+          },
+          "effects": [
+            "#q is empty",
+            "every item in the list is visible again"
+          ],
+          "invariants": [
+            "typing in the filter still narrows the list"
+          ]
+        },
+        "steps": [
+          {
+            "n": 1,
+            "name": "loads with no page or console error, showing every item"
+          },
+          {
+            "n": 2,
+            "name": "typing \"alph\" narrows the list as it already does"
+          },
+          {
+            "n": 3,
+            "name": "clicking #reset-filter brings every item back"
+          },
+          {
+            "n": 4,
+            "name": "and leaves #q empty"
+          },
+          {
+            "n": 5,
+            "name": "filtering still narrows the list afterwards"
+          },
+          {
+            "n": 6,
+            "name": "clicking #reset-filter a second time brings every item back again"
+          },
+          {
+            "n": 7,
+            "name": "no page or console error was raised at any point"
+          }
+        ],
+        "additionSteps": [
+          3,
+          4,
+          6
+        ],
+        "carriedSteps": [
+          1,
+          2,
+          5,
+          7
+        ]
+      },
+      "prev": null
+    },
+    {
+      "id": "g1-works:1:d682afc30ab4",
+      "seq": 1,
+      "section": "BASELINE",
+      "class": "FACT",
+      "by": "observer",
+      "cites": [
+        "g1-works:0:b997ef0a515d"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "what": "delivered page observed",
+        "baselineSha": "ddab29794713efadf886b0c1bcee7c9b61b726f551d97e3c504344e116f02118",
+        "loadState": {
+          "visible": [
+            "g1",
+            "Clear",
+            "alpha",
+            "alto",
+            "bravo",
+            "cedar",
+            "delta"
+          ],
+          "hidden": [],
+          "inputValues": {
+            "#q": ""
+          }
+        },
+        "perturbation": {
+          "kind": "type",
+          "selector": "#q",
+          "text": "alph"
+        },
+        "claim": "[\"g1\",\"Clear\",\"alpha\",\"alto\",\"bravo\",\"cedar\",\"delta\"].every((t) => dom.visible.includes(t)) && Object.keys({\"#q\":\"\"}).every((k) => dom.inputValues[k] === {\"#q\":\"\"}[k])",
+        "triedActions": [
+          {
+            "action": {
+              "kind": "type",
+              "selector": "#q",
+              "text": "alph"
+            },
+            "movesState": true,
+            "leavesClaim": true
+          }
+        ]
+      },
+      "prev": "g1-works:0:b997ef0a515d"
+    },
+    {
+      "id": "g1-works:2:927f0521f54b",
+      "seq": 2,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g1-works:0:b997ef0a515d",
+        "g1-works:1:d682afc30ab4"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "C",
+        "kind": "surface",
+        "need": "a control matching #reset-filter",
+        "needFrom": "requirement.trigger.selector",
+        "evidence": null,
+        "preconditions": [],
+        "action": {
+          "kind": "click",
+          "selector": "#reset-filter"
+        },
+        "reExerciseOf": null,
+        "distinguishing": null,
+        "derivedSequence": [
+          "#reset-filter exists and can be clicked"
+        ]
+      },
+      "prev": "g1-works:1:d682afc30ab4"
+    },
+    {
+      "id": "g1-works:3:fbcf3958746b",
+      "seq": 3,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g1-works:0:b997ef0a515d",
+        "g1-works:1:d682afc30ab4",
+        "g1-works:2:927f0521f54b"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "W",
+        "kind": "wiring",
+        "need": "a click handler on #reset-filter that responds from a perturbed state",
+        "needFrom": "requirement.trigger.kind",
+        "evidence": null,
+        "preconditions": [
+          {
+            "kind": "type",
+            "selector": "#q",
+            "text": "alph"
+          }
+        ],
+        "action": {
+          "kind": "click",
+          "selector": "#reset-filter"
+        },
+        "reExerciseOf": null,
+        "distinguishing": null,
+        "derivedSequence": [
+          "establish a state where the control is meaningful",
+          "clicking changes observable state"
+        ]
+      },
+      "prev": "g1-works:2:927f0521f54b"
+    },
+    {
+      "id": "g1-works:4:6da5f45062f1",
+      "seq": 4,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g1-works:0:b997ef0a515d",
+        "g1-works:1:d682afc30ab4",
+        "g1-works:3:fbcf3958746b"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "E1",
+        "kind": "effect",
+        "need": "clicking #reset-filter brings every item back",
+        "needFrom": "evidence-step",
+        "evidence": 3,
+        "preconditions": null,
+        "action": null,
+        "reExerciseOf": null,
+        "distinguishing": null,
+        "derivedSequence": null
+      },
+      "prev": "g1-works:3:fbcf3958746b"
+    },
+    {
+      "id": "g1-works:5:6a5ddf9042d1",
+      "seq": 5,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g1-works:0:b997ef0a515d",
+        "g1-works:1:d682afc30ab4",
+        "g1-works:3:fbcf3958746b"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "E2",
+        "kind": "effect",
+        "need": "and leaves #q empty",
+        "needFrom": "evidence-step",
+        "evidence": 4,
+        "preconditions": null,
+        "action": null,
+        "reExerciseOf": null,
+        "distinguishing": null,
+        "derivedSequence": null
+      },
+      "prev": "g1-works:4:6da5f45062f1"
+    },
+    {
+      "id": "g1-works:6:ea64b8658871",
+      "seq": 6,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g1-works:0:b997ef0a515d",
+        "g1-works:1:d682afc30ab4",
+        "g1-works:3:fbcf3958746b",
+        "g1-works:4:6da5f45062f1"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "E3",
+        "kind": "effect",
+        "need": "clicking #reset-filter a second time brings every item back again",
+        "needFrom": "evidence-step",
+        "evidence": 6,
+        "preconditions": null,
+        "action": null,
+        "reExerciseOf": "E1",
+        "distinguishing": "OBSERVED",
+        "derivedSequence": null
+      },
+      "prev": "g1-works:5:6a5ddf9042d1"
+    },
+    {
+      "id": "g1-works:7:42694d9c3d5f",
+      "seq": 7,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g1-works:0:b997ef0a515d",
+        "g1-works:1:d682afc30ab4"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "U",
+        "kind": "existing-route",
+        "need": "the page's update path refresh(), as it already works",
+        "needFrom": "page analysis",
+        "evidence": 2,
+        "preconditions": null,
+        "action": null,
+        "reExerciseOf": null,
+        "distinguishing": null,
+        "derivedSequence": null
+      },
+      "prev": "g1-works:6:ea64b8658871"
+    },
+    {
+      "id": "g1-works:8:8b32b7b45ed8",
+      "seq": 8,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g1-works:0:b997ef0a515d",
+        "g1-works:1:d682afc30ab4",
+        "g1-works:7:42694d9c3d5f",
+        "g1-works:4:6da5f45062f1"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "P1",
+        "kind": "preserved",
+        "need": "typing in the filter still narrows the list",
+        "needFrom": "requirement.invariants",
+        "evidence": 5,
+        "preconditions": null,
+        "action": null,
+        "reExerciseOf": "U",
+        "distinguishing": "CONDITIONAL",
+        "derivedSequence": null
+      },
+      "prev": "g1-works:7:42694d9c3d5f"
+    },
+    {
+      "id": "g1-works:9:09b0d0d672c7",
+      "seq": 9,
+      "section": "PROPOSAL",
+      "class": "FACT",
+      "by": "model",
+      "cites": [
+        "g1-works:0:b997ef0a515d"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "what": "candidate (works)",
+        "candidateSha": "8280d355e5ad742da48e64dfdc57b540513931c1ff1b6d201dae83cc3ea622a8",
+        "insertedBytes": 196,
+        "source": "hand-written control"
+      },
+      "prev": "g1-works:8:8b32b7b45ed8"
+    },
+    {
+      "id": "g1-works:10:5530a4a1a311",
+      "seq": 10,
+      "section": "VERIFICATION",
+      "class": "FACT",
+      "by": "checker",
+      "cites": [
+        "g1-works:9:09b0d0d672c7",
+        "g1-works:1:d682afc30ab4"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "what": "ran each node against its own evidence",
+        "satisfied": {
+          "C": true,
+          "W": true,
+          "E1": true,
+          "E2": true,
+          "E3": true,
+          "U": true,
+          "P1": true
+        },
+        "errors": []
+      },
+      "prev": "g1-works:9:09b0d0d672c7"
+    },
+    {
+      "id": "g1-works:11:5bc5ac1a69c7",
+      "seq": 11,
+      "section": "DIAGNOSIS",
+      "class": "CLAIM",
+      "by": "checker",
+      "cites": [
+        "g1-works:10:5530a4a1a311",
+        "g1-works:2:927f0521f54b",
+        "g1-works:3:fbcf3958746b",
+        "g1-works:4:6da5f45062f1",
+        "g1-works:5:6a5ddf9042d1",
+        "g1-works:6:ea64b8658871",
+        "g1-works:7:42694d9c3d5f",
+        "g1-works:8:8b32b7b45ed8"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "what": "every node covered",
+        "covered": [
+          "C",
+          "W",
+          "E1",
+          "E2",
+          "E3",
+          "U",
+          "P1"
+        ],
+        "missing": []
+      },
+      "prev": "g1-works:10:5530a4a1a311"
+    },
+    {
+      "id": "g1-works:12:c44f78715fee",
+      "seq": 12,
+      "section": "DECISION",
+      "class": "CLAIM",
+      "by": "policy",
+      "cites": [
+        "g1-works:11:5bc5ac1a69c7"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "outcome": "ACCEPT",
+        "why": "every derived node was satisfied by observation"
+      },
+      "prev": "g1-works:11:5bc5ac1a69c7"
+    }
+  ]
+}

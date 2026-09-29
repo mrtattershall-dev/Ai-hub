@@ -1,0 +1,417 @@
+{
+  "schema": "1.0.0",
+  "runId": "dualwrite-g3",
+  "changeId": "g3-inert",
+  "opened": "2026-09-29T08:48:48.566Z",
+  "tool": "changeRecordDualWrite",
+  "events": [
+    {
+      "id": "g3-inert:0:b20314362843",
+      "seq": 0,
+      "section": "TASK",
+      "class": "FACT",
+      "by": "emitter",
+      "cites": [],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "what": "Continue the page already in index.html. Add a control #clear-filter that clears the filter: clicking it empties #needle",
+        "taskSha": "3f50a41e607fe1e0095c2b29960e8eb2f5b2b5a4621497dc38f72c7981748b94",
+        "requirement": {
+          "trigger": {
+            "kind": "click",
+            "selector": "#clear-filter"
+          },
+          "effects": [
+            "#needle is empty",
+            "every item in the list is visible again"
+          ],
+          "invariants": [
+            "typing in the filter still narrows the list"
+          ]
+        },
+        "steps": [
+          {
+            "n": 1,
+            "name": "loads with no page or console error, showing every item"
+          },
+          {
+            "n": 2,
+            "name": "typing \"iron\" narrows the list as it already does"
+          },
+          {
+            "n": 3,
+            "name": "clicking #clear-filter brings every item back"
+          },
+          {
+            "n": 4,
+            "name": "and leaves #needle empty"
+          },
+          {
+            "n": 5,
+            "name": "filtering still narrows the list afterwards"
+          },
+          {
+            "n": 6,
+            "name": "clicking #clear-filter a second time brings every item back again"
+          },
+          {
+            "n": 7,
+            "name": "no page or console error was raised at any point"
+          }
+        ],
+        "additionSteps": [
+          3,
+          4,
+          6
+        ],
+        "carriedSteps": [
+          1,
+          2,
+          5,
+          7
+        ]
+      },
+      "prev": null
+    },
+    {
+      "id": "g3-inert:1:b59155565456",
+      "seq": 1,
+      "section": "BASELINE",
+      "class": "FACT",
+      "by": "observer",
+      "cites": [
+        "g3-inert:0:b20314362843"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "what": "delivered page observed",
+        "baselineSha": "bd9fda9a01d57abfbd049a376d934ac78b7f70338bae0753788940eed680bfda",
+        "loadState": {
+          "visible": [
+            "g3",
+            "iron",
+            "ivory",
+            "jade",
+            "kelp",
+            "lime"
+          ],
+          "hidden": [],
+          "inputValues": {
+            "#needle": ""
+          }
+        },
+        "perturbation": {
+          "kind": "type",
+          "selector": "#needle",
+          "text": "iron"
+        },
+        "claim": "[\"g3\",\"iron\",\"ivory\",\"jade\",\"kelp\",\"lime\"].every((t) => dom.visible.includes(t)) && Object.keys({\"#needle\":\"\"}).every((k) => dom.inputValues[k] === {\"#needle\":\"\"}[k])",
+        "triedActions": [
+          {
+            "action": {
+              "kind": "type",
+              "selector": "#needle",
+              "text": "iron"
+            },
+            "movesState": true,
+            "leavesClaim": true
+          }
+        ]
+      },
+      "prev": "g3-inert:0:b20314362843"
+    },
+    {
+      "id": "g3-inert:2:681e1243af42",
+      "seq": 2,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g3-inert:0:b20314362843",
+        "g3-inert:1:b59155565456"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "C",
+        "kind": "surface",
+        "need": "a control matching #clear-filter",
+        "needFrom": "requirement.trigger.selector",
+        "evidence": null,
+        "preconditions": [],
+        "action": {
+          "kind": "click",
+          "selector": "#clear-filter"
+        },
+        "reExerciseOf": null,
+        "distinguishing": null,
+        "derivedSequence": [
+          "#clear-filter exists and can be clicked"
+        ]
+      },
+      "prev": "g3-inert:1:b59155565456"
+    },
+    {
+      "id": "g3-inert:3:25de49a5f196",
+      "seq": 3,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g3-inert:0:b20314362843",
+        "g3-inert:1:b59155565456",
+        "g3-inert:2:681e1243af42"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "W",
+        "kind": "wiring",
+        "need": "a click handler on #clear-filter that responds from a perturbed state",
+        "needFrom": "requirement.trigger.kind",
+        "evidence": null,
+        "preconditions": [
+          {
+            "kind": "type",
+            "selector": "#needle",
+            "text": "iron"
+          }
+        ],
+        "action": {
+          "kind": "click",
+          "selector": "#clear-filter"
+        },
+        "reExerciseOf": null,
+        "distinguishing": null,
+        "derivedSequence": [
+          "establish a state where the control is meaningful",
+          "clicking changes observable state"
+        ]
+      },
+      "prev": "g3-inert:2:681e1243af42"
+    },
+    {
+      "id": "g3-inert:4:77b1a781492e",
+      "seq": 4,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g3-inert:0:b20314362843",
+        "g3-inert:1:b59155565456",
+        "g3-inert:3:25de49a5f196"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "E1",
+        "kind": "effect",
+        "need": "clicking #clear-filter brings every item back",
+        "needFrom": "evidence-step",
+        "evidence": 3,
+        "preconditions": null,
+        "action": null,
+        "reExerciseOf": null,
+        "distinguishing": null,
+        "derivedSequence": null
+      },
+      "prev": "g3-inert:3:25de49a5f196"
+    },
+    {
+      "id": "g3-inert:5:4f2f24f6e176",
+      "seq": 5,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g3-inert:0:b20314362843",
+        "g3-inert:1:b59155565456",
+        "g3-inert:3:25de49a5f196"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "E2",
+        "kind": "effect",
+        "need": "and leaves #needle empty",
+        "needFrom": "evidence-step",
+        "evidence": 4,
+        "preconditions": null,
+        "action": null,
+        "reExerciseOf": null,
+        "distinguishing": null,
+        "derivedSequence": null
+      },
+      "prev": "g3-inert:4:77b1a781492e"
+    },
+    {
+      "id": "g3-inert:6:c7d0b57356e0",
+      "seq": 6,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g3-inert:0:b20314362843",
+        "g3-inert:1:b59155565456",
+        "g3-inert:3:25de49a5f196",
+        "g3-inert:4:77b1a781492e"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "E3",
+        "kind": "effect",
+        "need": "clicking #clear-filter a second time brings every item back again",
+        "needFrom": "evidence-step",
+        "evidence": 6,
+        "preconditions": null,
+        "action": null,
+        "reExerciseOf": "E1",
+        "distinguishing": "OBSERVED",
+        "derivedSequence": null
+      },
+      "prev": "g3-inert:5:4f2f24f6e176"
+    },
+    {
+      "id": "g3-inert:7:771b8178a889",
+      "seq": 7,
+      "section": "GRAPH",
+      "class": "CLAIM",
+      "by": "derivation",
+      "cites": [
+        "g3-inert:0:b20314362843",
+        "g3-inert:1:b59155565456",
+        "g3-inert:4:77b1a781492e"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "node": "P1",
+        "kind": "preserved",
+        "need": "typing in the filter still narrows the list",
+        "needFrom": "requirement.invariants",
+        "evidence": 5,
+        "preconditions": null,
+        "action": null,
+        "reExerciseOf": "step 2",
+        "distinguishing": "CONDITIONAL",
+        "derivedSequence": null
+      },
+      "prev": "g3-inert:6:c7d0b57356e0"
+    },
+    {
+      "id": "g3-inert:8:97e816a33dee",
+      "seq": 8,
+      "section": "UNKNOWN",
+      "class": "UNCERTAINTY",
+      "by": "any",
+      "cites": [
+        "g3-inert:0:b20314362843",
+        "g3-inert:1:b59155565456"
+      ],
+      "authority": null,
+      "uncertainty": "NO_UPDATE_ROUTE",
+      "body": {
+        "what": "no named zero-parameter update route is referenced elsewhere in the page",
+        "about": "U"
+      },
+      "prev": "g3-inert:7:771b8178a889"
+    },
+    {
+      "id": "g3-inert:9:10746b7da01c",
+      "seq": 9,
+      "section": "PROPOSAL",
+      "class": "FACT",
+      "by": "model",
+      "cites": [
+        "g3-inert:0:b20314362843"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "what": "candidate (inert)",
+        "candidateSha": "42316f7e2f19c05255b3fceffd68a17f63a932984757610171c00dddd80a64e3",
+        "insertedBytes": 188,
+        "source": "hand-written control"
+      },
+      "prev": "g3-inert:8:97e816a33dee"
+    },
+    {
+      "id": "g3-inert:10:750a1fab012a",
+      "seq": 10,
+      "section": "VERIFICATION",
+      "class": "FACT",
+      "by": "checker",
+      "cites": [
+        "g3-inert:9:10746b7da01c",
+        "g3-inert:1:b59155565456"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "what": "ran each node against its own evidence",
+        "satisfied": {
+          "C": true,
+          "W": false,
+          "E1": false,
+          "E2": false,
+          "E3": false,
+          "P1": true
+        },
+        "errors": []
+      },
+      "prev": "g3-inert:9:10746b7da01c"
+    },
+    {
+      "id": "g3-inert:11:133f10860bd0",
+      "seq": 11,
+      "section": "DIAGNOSIS",
+      "class": "CLAIM",
+      "by": "checker",
+      "cites": [
+        "g3-inert:10:750a1fab012a",
+        "g3-inert:2:681e1243af42",
+        "g3-inert:3:25de49a5f196",
+        "g3-inert:4:77b1a781492e",
+        "g3-inert:5:4f2f24f6e176",
+        "g3-inert:6:c7d0b57356e0",
+        "g3-inert:7:771b8178a889"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "what": "missing W,E1,E2,E3",
+        "covered": [
+          "C",
+          "P1"
+        ],
+        "missing": [
+          "W",
+          "E1",
+          "E2",
+          "E3"
+        ]
+      },
+      "prev": "g3-inert:10:750a1fab012a"
+    },
+    {
+      "id": "g3-inert:12:4377ba7af4c5",
+      "seq": 12,
+      "section": "DECISION",
+      "class": "CLAIM",
+      "by": "policy",
+      "cites": [
+        "g3-inert:11:133f10860bd0"
+      ],
+      "authority": null,
+      "uncertainty": null,
+      "body": {
+        "outcome": "REJECT",
+        "why": "W,E1,E2,E3 not satisfied; the control exists but does not do what the requirement names"
+      },
+      "prev": "g3-inert:11:133f10860bd0"
+    }
+  ]
+}
