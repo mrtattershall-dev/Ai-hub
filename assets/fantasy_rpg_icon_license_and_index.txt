@@ -1,0 +1,1173 @@
+FANTASY RPG ICON PACK (by Franuka) v2.3
+-------------------------
+Thank you for purchasing this asset pack!
+It was created from scratch, and licensed under the Creative commons BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+Feel free to use it on any commercial or non-commercial project, just remember to add a link to my itch.io page and/or X, it helps a lot :)
+---
+Included are all the files for each icon, in .png format, transparent background.
+The icons are 16x16px, and upscaled to 32x32 and 48x48
+---
+All art was made from scratch by me. 
+
+Contact: franukai@gmail.com
+Instagram: https://www.instagram.com/franuka.art/
+X: https://x.com/franuka_art
+Other projects and games: https://franuka.itch.io/
+
+If you like what I do, consider supporting me by buying my other packs, sharing, or sending your feedback.
+Have a good time making your games :)
+
+CHANGELOG
+----------
+v1.1: First expansion, added colour variations (95 new icons)
+v1.2: Second expansion, fishing set (rods, bait, junk, and a lot of new fishes)
+v1.3: Added 10 more defense items (blue robe, shirt, copper armour, shields, etc.)
+v1.4: Added exclamation/question marks and math symbols
+v1.5: Added mail/letter icon
+v1.6: Added 20 extra icons (scrolls, letters, writing material, etc.)
+v1.7: Added 20 extra icons (awards, coins, lock, clock, compass, paw, sound, and more)
+v1.8: Added 20 extra icons (tickets, lute, flute, drum, concertina, violin, vynil, music sheet)
+v1.9: Added 3 ingots (copper, silver, gold)
+v1.9.5: Added 10 crops and fruits
+v2.0: Spells Expansion. Added 100 new spell icons (10 schools of magic, 10 icons each), plus no frame variations.
+v2.1: 20 new Gathering/Outdoors icons, plus a Planks icon (318), and Exit icon (319). Also rearranged the main sheet with these additions.
+v2.2: 15 new icons. 4 Elemental swords (ice, earth, fire, lightning), 6 Watering cans (copper, steel, gold), and 5 resource icons (seeds, cotton, yarn, bread, chicken).
+v2.3: Fourth expansion, Minecraft icon set! 385 icons, covers all items up to Java Edition 1.11 (Resource pack format 3). If enough people show interest I might keep adding all items from the newest versions, but it's just too much for now :)
+
+INDEX
+----------
+1: Copper dagger
+2: Copper sword
+3: Shortbow
+4: Copper spear
+5: Copper axe
+6: Copper mace
+7: Copper shovel
+8: Copper pickaxe
+9: Copper hammer
+10: Copper scythe
+
+11: Steel dagger
+12: Steel sword
+13: Longbow
+14: Steel spear
+15: Steel axe
+16: Steel mace
+17: Steel shovel
+18: Steel pickaxe
+19: Steel hammer
+20: Steel scythe
+
+21: Golden dagger
+22: Golden sword
+23: Golden longbow
+24: Golden spear
+25: Golden axe
+26: Golden mace
+27: Golden shovel
+28: Golden pickaxe
+29: Golden hammer
+30: Golden scythe
+
+31: Copper arrow
+32: Steel arrow
+33: Golden arrow
+34: Poison arrow
+35: Fire arrow
+36: Ice arrow
+37: Electric arrow
+38: Charm arrow
+39: Leather quiver
+40: Elven quiver
+
+41: Apprentice robes
+42: Common shirt
+43: Copper armor
+44: Turtle buckler
+45: Wooden shield
+46: Plank shield
+47: Shoes
+48: Apprentice hat
+49: Cloth cap
+50: Copper helmet
+
+51: Mage robes
+52: Leather armor
+53: Steel armor
+54: Wooden buckler
+55: Reinforced wooden shield
+56: Steel shield
+57: Leather boots
+58: Mage hat
+59: Leather helmet
+60: Steel helmet
+
+61: Archmage robes
+62: Elven armor
+63: Golden armor
+64: Steel buckler
+65: Steel round shield
+66: Golden shield
+67: Elven boots
+68: Archmage hat
+69: Elven helmet
+70: Golden helmet
+
+71: Wooden staff
+72: Fire staff
+73: Lightning staff
+74: Ice staff
+75: Fire ring
+76: Lightning ring
+77: Ice ring
+78: Fire necklace
+79: Lightning necklace
+80: Ice necklace
+
+81: Minor healing potion
+82: Healing potion
+83: Greater healing potion
+84: Minor mana potion
+85: Mana potion
+86: Greater mana potion
+87: Yellow potion
+88: Green potion
+89: Purple potion
+90: Flying potion
+
+91: Gold coins (small)
+92: Gold coins (medium)
+93: Gold coins (big)
+94: Gold pouch
+95: Gold chest
+96: Ruby
+97: Topaz
+98: Emerald
+99: Sapphire
+100: Diamond
+
+101: Map
+102: Journal
+103: Satchel
+104: Backpack
+105: Pouch
+106: Chest (small)
+107: Chest (big)
+108: Bronze key
+109: Silver key
+110: Golden key
+
+111: Wood log
+112: Stone
+113: Meat
+114: Cheese
+115: Apple
+116: Poisoned apple
+117: Milk glass
+118: Egg (white)
+119: Egg (brown)
+120: Egg (golden)
+
+121: Carrot
+122: Berries
+123: Sunflower
+124: Flower (yellow)
+125: Flower (blue)
+126: Flower (red)
+127: Fishing rod
+128: Worm
+129: Fish_1
+130: Fish_2
+
+131: Disk (save)
+132: Gear (options)
+133: Check mark
+134: X mark
+135: Cursor
+136: Speech bubble
+137: Skull (big)
+138: Skull (small)
+139: Heart (big)
+140: Heart (small)
+
+141: Fire
+142: Water
+143: Earth
+144: Air
+145: Fire bolt
+146: Ice bolt
+147: Lightning bolt
+148: Buff
+149: Debuff
+150: Targeted
+
+151: Sword slash
+152: Sword slash (red)
+153: Sword slash (yellow)
+154: Sword slash (blue)
+155: Thrust
+156: Sword buff
+157: Crush
+158: Impale
+159: Defense buff
+160: Triple shot
+
+161: Poison nova
+162: Rage
+163: Icy death
+164: Haste
+165: Far sight (purple)
+166: Far sight (green)
+167: Heal
+168: Heal_2
+169: Bleeding
+170: Poisoned
+
+171: Bleeding damage
+172: Poison damage
+173: Fire damage
+174: Cold damage
+175: Electric damage
+176: Bleeding resistance
+177: Poison resistance
+178: Fire resistance
+179: Cold resistance
+180: Electric resistance
+
+181: Bat wing
+182: Bat wing (red)
+183: Bat wing (black)
+184: Mushroom (purple)
+185: Mushroom (red)
+186: Mushroom (yellow)
+187: Mushroom (blue)
+188: Ogre eye (red)
+189: Ogre eye (yellow)
+190: Ogre eye (purple)
+
+191: Skeleton bone
+192: Skeleton bone (dark)
+193: Skeleton bone (red)
+194: Slime goo (green)
+195: Slime goo (yellow)
+196: Slime goo (red)
+197: Slime goo (blue)
+198: Wolf fang
+199: Wolf fang_2 
+200: Wolf fang_3
+
+201: Number_0
+202: Number_1
+203: Number_2
+204: Number_3
+205: Number_4
+206: Number_5
+207: Number_6
+208: Number_7
+209: Number_8
+210: Number_9
+
+211: Number_0 (red)
+212: Number_1 (red)
+213: Number_2 (red)
+214: Number_3 (red)
+215: Number_4 (red)
+216: Number_5 (red)
+217: Number_6 (red)
+218: Number_7 (red)
+219: Number_8 (red)
+220: Number_9 (red)
+
+221: Frame (copper)
+222: Frame (silver)
+223: Frame (gold)
+224: Frame (bright gold)
+225: Frame (green)
+226: Frame (blue)
+227: Frame (purple)
+228: Frame (red)
+229: Background
+230: Catface =^･ω･^=
+
+231: Exclamation mark
+232: Question mark
+233: Minus
+234: Plus
+235: Equal
+236: Multiply
+237: Divide
+238: Exclamation mark (red)
+239: Question mark (red)
+240: Minus (red)
+
+241: Plus (red)
+242: Equal (red)
+243: Multiply (red)
+244: Divide (red)
+245: Mail
+246: Scroll_closed
+247: Letter_open
+248: Scroll_open
+249: ScrollVertical_closed
+250: ScrollVertical_open
+
+251: ScrollDiag
+252: ScrollDiag (red)
+253: ScrollDiag (purple)
+254: ScrollDiag (green)
+255: Scroll_open (blue)
+256: Scroll_open (red)
+257: Scroll_open (green)
+258: Crystal ball
+259: Pencil
+260: Pen
+
+261: Brush
+262: Quill
+263: Ink
+264: Magnifying glass
+265: Star
+266: Trophy
+267: Ribbon (red)
+268: Ribbon (blue)
+269: Ribbon (green)
+270: Crown
+
+271: Coin (gold)
+272: Coin (silver)
+273: Coin (bronze)
+274: Lock
+275: Clock
+276: Home
+277: Compass
+278: Paw
+279: Sound (high)
+280: Sound (low)
+
+281: Sound (muted)
+282: Music ON
+283: Music OFF
+284: Leaf
+285: Ticket 1
+286: Ticket 2
+287: Lute 1
+288: Lute 2
+289: Lute 3
+290: Flute 1
+
+291: Flute 2
+292: Flute 3
+293: Drum 1
+294: Drum 2
+295: Concertina 1
+296: Concertina 2
+297: Concertina 3
+298: Violin 1
+299: Violin 2
+300: Violin 3
+
+301: Vynil 1
+302: Vynil 2
+303: Vynil 3
+304: Music sheet
+305: Copper ingot
+306: Silver ingot
+307: Gold ingot
+308: Orange
+309: Tomato
+310: Banana
+
+311: Peach
+312: Potato
+313: Cabbage
+314: Corn
+315: Onion
+316: Broccoli
+317: Wheat
+318: Planks
+319: Exit
+320: Gardening scissors
+
+321: Scythe
+322: Sickle
+323: Skinning knife
+324: Leather 1
+325: Leather 2
+326: Leather 3
+327: Blacksmith hammer
+328: Hatchet
+329: Bear trap
+330: Harpoon
+
+331: Lobster cage
+332: Bucket (empty)
+333: Bucket (water)
+334: Bucket (milk)
+335: Basket
+336: Barrel
+337: Gardening gloves
+338: Hemp rope
+339: Bedroll
+
+340: Ice sword
+341: Earth sword
+342: Fire sword
+343: Lightning sword
+344: Copper watering can (empty)
+345: Copper watering can (full)
+346: Steel watering can (empty)
+347: Steel watering can (full)
+348: Gold watering can (empty)
+349: Gold watering can (full)
+
+350: Seeds
+351: Cotton
+352: Yarn
+353: Bread
+354: Chicken leg
+
+EXPANSION 1 (Colour variations)
+----------
+1: Fire dagger
+2: Fire sword
+3: Fire longbow
+4: Fire spear
+5: Fire axe
+6: Fire mace
+7: Fire shovel
+8: Fire pickaxe
+9: Fire hammer
+10: Fire scythe
+
+11: Ice dagger
+12: Ice sword
+13: Ice longbow
+14: Ice spear
+15: Ice axe
+16: Ice mace
+17: Ice shovel
+18: Ice pickaxe
+19: Ice hammer
+20: Ice scythe
+
+21: Lightning dagger
+22: Lightning sword
+23: Lightning longbow
+24: Lightning spear
+25: Lightning axe
+26: Lightning mace
+27: Lightning shovel
+28: Lightning pickaxe
+29: Lightning hammer
+30: Lightning scythe
+
+31: Minor white potion
+32: White potion
+33: Greater white potion
+34: Purple staff
+35: Purple ring
+36: Purple necklace
+37: Copper coins (small)
+38: Copper coins (medium)
+39: Copper coins (big)
+40: Copper pouch
+
+41: Copper chest
+42: Pink diamond
+43: Black diamond
+44: Silver coins (small)
+45: Silver coins (medium)
+46: Silver coins (big)
+47: Silver pouch
+48: Silver chest
+49: Golden apple
+50: Green apple
+
+51: Monster meat
+52: Burnt meat
+53: Glass of water
+54: Cup of wine
+55: Book (red)
+56: Book (blue)
+57: Book (green)
+58: Archmage book
+59: Ash log
+60: Birch log
+
+61: Coal ore
+62: Copper ore
+63: Silver ore
+64: Gold ore
+65: Half heart_1
+66: Half heart_2
+67: Empty heart
+68: Sword slash (brown)
+69: Sword slash (green)
+70: Sword slash (purple)
+
+71: Sword slash (black)
+72: Healing spell (green)
+73: Healing spell_2 (green)
+74: Thrust (blue)
+75: Sword buff (blue)
+76: Crush (blue)
+77: Impale (blue)
+78: Defense buff (red)
+79: Triple shot (blue)
+80: Thrust (yellow)
+
+81: Sword buff (yellow)
+82: Crush (yellow)
+83: Impale (yellow)
+84: Defense buff (yellow)
+85: Triple shot (red)
+86: Number_0 (black)
+87: Number_1 (black)
+88: Number_2 (black)
+89: Number_3 (black)
+90: Number_4 (black)
+
+91: Number_5 (black)
+92: Number_6 (black)
+93: Number_7 (black)
+94: Number_8 (black)
+95: Number_9 (black)
+
+96: Exclamation mark (black)
+97: Question mark (black)
+98: Minus (black)
+99: Plus (black)
+100: Equal (black)
+101: Multiply (black)
+102: Divide (black)
+
+EXPANSION 2 (Fishing set)
+----------
+1: Wooden rod
+2: Steel rod
+3: Golden rod
+4: Bait_1
+5: Bait_2
+6: Bait_3
+7: Bait_4
+8: Net
+9: Leech_1
+10: Leech_2
+
+11: Leech_3
+12: Worm_1
+13: Worm_2
+14: Worm_3
+15: Seaweed
+16: Driftwood
+17: Old boot
+18: Fish skeleton
+19: Cursed fish
+20: Sardine_1
+
+21: Sardine_2
+22: Sardine_3
+23: Sardine_4
+24: Sardine_5
+25: Sardine_6
+26: Sardine_7
+27: Sardine_8
+28: Sardine_golden
+29: Bass_1
+30: Bass_2
+
+31: Bass_3
+32: Bass_4
+33: Bass_5
+34: Bass_6
+35: Bass_7
+36: Bass_8
+37: Bass_9
+38: Bass_golden
+39: Carp_1
+40: Carp_2
+
+41: Carp_3
+42: Carp_4
+43: Carp_5
+44: Carp_6
+45: Carp_7
+46: Carp_8
+47: Carp_golden
+48: Shrimp_1
+49: Shrimp_2
+50: Shrimp_3
+
+51: Shrimp_4
+52: Shrimp_5
+53: Shrimp_6
+54: Shrimp_golden
+55: Swordfish_1
+56: Swordfish_2
+57: Swordfish_3
+58: Swordfish_4
+59: Swordfish_5
+60: Swordfish_6
+
+61: Swordfish_7
+62: Swordfish_8
+63: Swordfish_9
+64: Swordfish_golden
+65: Eel_1
+66: Eel_2
+67: Eel_3
+68: Eel_4
+69: Eel_5
+70: Eel_6
+
+71: Eel_7
+72: Eel_8
+73: Eel_9
+74: Eel_golden
+
+EXPANSION 3 (Spells)
+----------
+1: Fireball
+2: Flamethrower
+3: Fire wall
+4: Enchant: Fire
+5: Fire whip
+6: Fire shield
+7: Infernal chains
+8: Blaze step
+9: Phoenix rebirth
+10: Armageddon
+11: Background (fire)
+12-22: Fire spells variations (no background)
+
+23: Ice spike
+24: Water jet
+25: Ice wall
+26: Blizzard
+27: Frost armor
+28: Healing waters
+29: Tidal wave
+30: Frost nova
+31: Aqua prison
+32: Glacial blade
+33: Background (water/ice)
+34-44: Water/ice spells variations (no background)
+
+45: Lightning bolt
+46: Thunderstorm
+47: Tornado
+48: Fly
+49: Wind slash
+50: Thunderclap
+51: Chain lightning
+52: Electric cage
+53: Thunder smash
+54: Sonic wave
+55: Background (wind/lightning)
+56-66: Wind/lightning spells variations (no background)
+
+67: Rock throw
+68: Earthquake
+69: Stone armor
+70: Thorn whip
+71: Quicksand
+72: Spiked barricade
+73: Poison spray
+74: Root grasp
+75: Cure wounds
+76: Poison arrow
+77: Background (earth/nature)
+78-88: Earth/nature spells variations (no background)
+
+89: Magic missile
+90: Teleport
+91: Arcane shield
+92: Mana explosion
+93: Charm person
+94: Invisibility
+95: Hypnotic pattern
+96: Mage hand
+97: Major illusion
+98: Disintegrate
+99: Background (arcane)
+100-110: Arcane spells variations (no background)
+
+111: Healing light
+112: Holy shield
+113: Divine smite
+114: Circle of protection
+115: Sacred flames
+116: Purge evil
+117: Angelic wings
+118: Light's blessing
+119: Guardian's aura
+120: Resurrection
+121: Background (holy)
+122-132: Holy spells variations (no background)
+
+133: Spirit wolf
+134: Totemic protection
+135: Ancestral guidance
+136: Ghostly chains
+137: Astral projection
+138: Summon elemental
+139: Summon specter
+140: Purge
+141: Spirit bond
+142: Mind blast
+143: Background (spiritual)
+144-154: Spiritual spells variations (no background)
+
+155: Time stop
+156: Slow
+157: Polymorph
+158: Gravity well
+159: Reverse fate
+160: Haste
+161: Paralyze
+162: Enlarge
+163: Blink
+164: Banishment
+165: Background (transmutation/time)
+166-176: Transmutation/time spells variations (no background)
+
+177: Raise undead
+178: Blood pact
+179: Dark ritual
+180: Curse
+181: Life drain
+182: Bone spear
+183: Plague swarm
+184: Bone trap
+185: Summon demon
+186: Final judgement
+187: Background (unholy)
+188-198: Unholy spells variations (no background)
+
+199: Power strike
+200: Whirlwind
+201: Hardened fist
+202: Counterattack
+203: Shocking wave
+204: Battlecry
+205: Magic weapon
+206: Parry
+207: Berserker's rage
+208: Finishing blow
+209: Background (martial)
+210-220: Martial spells variations (no background)
+
+EXPANSION 4 (Minecraft set)
+----------
+1: cloth_helmet
+2: chainmail_helmet
+3: iron_helmet
+4: diamond_helmet
+5: golden_helmet
+6: flint_and_steel
+7: flint
+8: coal
+9: string
+10: wheat_seeds
+11: apple
+12: golden_apple
+13: egg
+14: sugar
+15: snowball
+16: empty_helmet
+
+17: cloth_chestplate
+18: chainmail_chestplate
+19: iron_chestplate
+20: diamond_chestplate
+21: golden_chestplate
+22: bow
+23: brick
+24: iron_ingot
+25: feather
+26: wheat
+27: painting
+28: reeds
+29: bone
+30: cake
+31: slime_ball
+32: empty_chestplate
+
+33: cloth_leggings
+34: chainmail_leggings
+35: iron_leggings
+36: diamond_leggings
+37: golden_leggings
+38: arrow
+39: quiver
+40: gold_ingot
+41: gunpowder
+42: bread
+43: sign
+44: wooden_door
+45: iron_door
+46: bed
+47: fire_charge
+48: empty_leggings
+
+49: cloth_boots
+50: chainmail_boots
+51: iron_boots
+52: diamond_boots
+53: golden_boots
+54: stick
+55: compass
+56: diamond
+57: redstone
+58: clay_ball
+59: paper
+60: book
+61: filled_map
+62: pumpkin_seeds
+63: melon_seeds
+64: empty_boots
+
+65: wooden_sword
+66: stone_sword
+67: iron_sword
+68: diamond_sword
+69: golden_sword
+70: fishing_rod
+71: clock
+72: bowl
+73: mushroom_stew
+74: glowstone_dust
+75: bucket
+76: water_bucket
+77: lava_bucket
+78: milk_bucket
+79: ink_sac
+80: gray_dye
+
+81: wooden_shovel
+82: stone_shovel
+83: iron_shovel
+84: diamond_shovel
+85: golden_shovel
+86: cast_fishing_rod
+87: repeater
+88: porkchop
+89: cooked_porkchop
+90: fish
+91: cooked_fish
+92: rotten_flesh
+93: cookie
+94: shears
+95: red_dye
+96: pink_dye
+
+97: wooden_pickaxe
+98: stone_pickaxe
+99: iron_pickaxe
+100: diamond_pickaxe
+101: golden_pickaxe
+102: bow_pull_0
+103: carrot_on_a_stick
+104: leather
+105: saddle
+106: beef
+107: cooked_beef
+108: ender_pearl
+109: blaze_rod
+110: melon
+111: green_dye
+112: lime_dye
+
+113: wooden_axe
+114: stone_axe
+115: iron_axe
+116: diamond_axe
+117: golden_axe
+118: bow_pull_1
+119: baked_potato
+120: potato
+121: carrot
+122: chicken
+123: cooked_chicken
+124: ghast_tear
+125: gold_nugget
+126: nether_wart
+127: cocoa_beans
+128: yellow_dye
+
+129: wooden_hoe
+130: stone_hoe
+131: iron_hoe
+132: diamond_hoe
+133: golden_hoe
+134: bow_pull_2
+135: poisonous_potato
+136: minecart
+137: boat
+138: speckled_melon
+139: fermented_spider_eye
+140: spider_eye
+141: glass_bottle
+142: potion
+143: lapislazuli
+144: cyan_dye
+
+145: lead
+146: horse_saddle
+147: iron_horse_armor
+148: diamond_horse_armor
+149: golden_horse_armor
+150: comparator
+151: golden_carrot
+152: chest_minecart
+153: pumpkin_pie
+154: poison
+155: splash_potion
+156: ender_eye
+157: cauldron
+158: blaze_powder
+159: purple_dye
+160: magenta_dye
+
+161: name_tag
+162: charcoal
+163: leather_horse_armor
+164: beetroot_seeds
+165: beetroot
+166: nether_brick
+167: beetroot_soup
+168: furnace_minecart
+169: salmon
+170: dragon_breath
+171: ruby
+172: experience_bottle
+173: brewing_stand
+174: magma_cream
+175: light_blue_dye
+176: orange_dye
+
+177: potion_fire_resistance
+178: potion_harming
+179: potion_healing
+180: potion_invisibility
+181: potion_night_vision
+182: potion_poison
+183: potion_regeneration
+184: tnt_minecart
+185: cooked_salmon
+186: nether_star
+187: emerald
+188: writable_book
+189: book_2
+190: flower_pot
+191: light_gray_dye
+192: bone_meal
+
+193: potion_slowness
+194: potion_strength
+195: potion_swiftness
+196: potion_water_breathing
+197: potion_weakness
+198: prismarine_shard
+199: prismarine_crystals
+200: hopper_minecart
+201: clownfish
+202: fireworks
+203: firework_charge
+204: tipped_arrow_poison
+205: quartz
+206: map
+207: item_frame
+208: enchanted_book
+
+
+209: armor_stand
+210: acacia_door
+211: birch_door
+212: dark_oak_door
+213: jungle_door
+214: spruce_door
+215: spectral_arrow
+216: command_block_minecart
+217: pufferfish
+218: rabbit
+219: chorus_fruit
+220: chorus_fruit_popped
+221: shield
+222: tipped_arrow_fire_resistance
+223: tipped_arrow_harming
+224: tipped_arrow_healing
+
+225: leather_helmet
+226: leather_chestplate
+227: leather_leggings
+228: leather_boots
+229: rabbit_hide
+230: cooked_mutton
+231: cooked_rabbit
+232: rabbit_foot
+233: rabbit_stew
+234: mutton
+235: spawn_egg
+236: door
+237: splash_bottle
+238: compass_2
+239: clock_2
+240: tipped_arrow_invisibility
+
+241: record_13
+242: record_cat
+243: record_blocks
+244: record_chirp
+245: record_far
+246: record_mall
+247: record_mellohi
+248: record_stal
+249: record_strad
+250: record_ward
+251: record_11
+252: record_wait
+253: tipped_arrow_leaping
+254: studded_chestplate
+255: record_double
+256: tipped_arrow_luck
+
+257: oak_boat
+258: spruce_boat
+259: birch_boat
+260: jungle_boat
+261: acacia_boat
+262: dark_oak_boat
+263: elytra
+264: tipped_arrow_night_vision
+265: tipped_arrow_regeneration
+266: tipped_arrow_slowness
+267: tipped_arrow_strength
+268: tipped_arrow_swiftness
+269: tipped_arrow_water_breathing
+270: tipped_arrow_weakness
+271: end_crystal
+272: empty_shield
+
+273: hopper
+274: tipped_arrow_decay
+275: tipped_arrow_uncraftable
+276: potion_decay
+277: potion_uncraftable
+278: potion_leaping
+279: potion_luck
+280: shulker_shell
+281: totem_of_undying
+282: ocean_explorer_map
+283: woodland_explorer_map
+284: portfolio
+285: chalkboard_slate
+286: chalkboard_poster
+287: chalkboard_board
+288: iron_nugget
+
+289: knowledge_book
+290: bat_spawn_egg
+291: blaze_spawn_egg
+292: cave_spider_spawn_egg
+293: chicken_spawn_egg
+294: cow_spawn_egg
+295: creeper_spawn_egg
+296: donkey_spawn_egg
+297: elder_guardian_spawn_egg
+298: enderman_spawn_egg
+299: endermite_spawn_egg
+300: evoker_spawn_egg
+301: polar_bear_spawn_egg
+302: guardian_spawn_egg
+303: horse_spawn_egg
+304: husk_spawn_egg
+
+305: llama_spawn_egg
+306: magma_cube_spawn_egg
+307: mooshroom_spawn_egg
+308: mule_spawn_egg
+309: ocelot_spawn_egg
+310: pig_spawn_egg
+311: ghast_spawn_egg
+312: rabbit_spawn_egg
+313: parrot_spawn_egg
+314: sheep_spawn_egg
+315: shulker_spawn_egg
+316: silverfish_spawn_egg
+317: skeleton_spawn_egg
+318: skeleton_horse_spawn_egg
+319: slime_spawn_egg
+320: spider_spawn_egg
+
+321: squid_spawn_egg
+322: stray_spawn_egg
+323: vex_spawn_egg
+324: villager_spawn_egg
+325: vindicator_spawn_egg
+326: witch_spawn_egg
+327: wither_skeleton_spawn_egg
+328: wolf_spawn_egg
+329: zombie_spawn_egg
+330: zombie_horse_spawn_egg
+331: zombie_pigman_spawn_egg
+332: zombie_villager_spawn_egg
+333: ankle_monitor
+334: reality_vision
+335: smarter_watch
+336: raw_cod
+
+337: trident
+338: kelp
+339: dried_kelp
+340: turtle_scute
+341: turtle_helmet
+342: potion_turtle_master
+343: tipped_arrow_turtle_master
+344: turtle_spawn_egg
+345: phantom_spawn_egg
+346: cooked_cod
+347: cooked_salmon_2
+348: pufferfish_2
+349: raw_salmon_2
+350: cod_spawn_egg
+351: pufferfish_spawn_egg
+352: salmon_spawn_egg
+
+353: tropical_fish_bucket
+354: cod_bucket
+355: pufferfish_bucket
+356: salmon_bucket
+357: tropical_fish_spawn_egg
+358: tropical_fish
+359: tipped_arrow_slow_falling
+360: potion_slow_falling
+361: phantom_membrane
+362: drowned_spawn_egg
+363: heart_of_the_sea
+364: nautilus_shell
+365: heart_of_the_sea_2
+366: nautilus_shell_2
+367: dolphin_spawn_egg
+368: enchanted_golden_apple
+
+369: bamboo
+370: panda_spawn_egg
+371: crossbow
+372: suspicious_stew
+373: black_dye
+374: blue_dye
+375: brown_dye
+376: white_dye
+377: arrow_loaded_crossbow
+378: crossbow_pull_0
+379: crossbow_pull_1
+380: crossbow_pull_2
+381: firework_loaded_crossbow
+382: bell
+383: banner_pattern
+384: question_mark
+
+385: lantern
+
+
