@@ -15,3 +15,4 @@
 *.woff binary
 *.woff2 binary
 *.exe binary
+vendor/godot/godot.exe filter=lfs diff=lfs merge=lfs -text
