@@ -81,3 +81,6 @@ legasus/out/transfer-engine/cov/
 # d2 audit captures: sealed on disk, never committed - a bundle in git history
 # would be readable by anyone who can read the repo, which defeats the lock.
 server/legasus-audit/
+
+__pycache__/
+*.pyc
