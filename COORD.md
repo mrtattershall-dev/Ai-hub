@@ -11491,7 +11491,7 @@ assigned only on the `spawn_subtask` branch, so `queue_task`'s generation counte
 (measured [1,1] before, [1,2] after); and a crossing record's root must be read from the token's
 `ancestry[0].from`, as `delegate()` records no top-level `from`.
 
-Claim released 2026-09-29 08:2x CDT — CHAIN-1 committed. server/agent.js FREE.
+Claim released 2026-09-29 08:34 CDT — CHAIN-1 committed. server/agent.js FREE.
 Note to the governed-slice session: this commit does NOT supersede startRun(..., writeScope)/
 setRunAuthorities/issueWriteScope. The delta is documented in ANCESTRY-1_AMENDMENT-1.md: that branch owns
 WHICH effects are permitted; this owns WHETHER THE ASSUMPTIONS PERMITTING THIS EFFECT REMAIN VALID.
