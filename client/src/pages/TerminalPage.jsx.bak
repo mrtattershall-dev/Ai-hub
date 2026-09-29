@@ -1,0 +1,89 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Terminal as XTerm } from '@xterm/xterm';
+import { FitAddon } from '@xterm/addon-fit';
+import { TerminalSquare, RotateCcw } from 'lucide-react';
+import '@xterm/xterm/css/xterm.css';
+
+// A real shell, not an exec wrapper: the server runs a PTY and we pipe bytes both
+// ways over a WebSocket. Colours, Ctrl+C, prompts and long-running processes all work.
+// The socket lives for the life of this component; closing it kills the shell server-side.
+export default function TerminalPage() {
+  const hostRef = useRef(null);
+  const termRef = useRef(null);
+  const wsRef = useRef(null);
+  const fitRef = useRef(null);
+  const [status, setStatus] = useState('connecting');
+  const [nonce, setNonce] = useState(0);      // bump to restart the shell
+
+  useEffect(() => {
+    if (!hostRef.current) return;
+
+    const term = new XTerm({
+      fontSize: 13,
+      fontFamily: 'Consolas, "Cascadia Mono", "DejaVu Sans Mono", monospace',
+      cursorBlink: true,
+      scrollback: 5000,
+      theme: { background: '#0c0d11', foreground: '#d5d8de', cursor: '#7aa2f7' },
+    });
+    const fit = new FitAddon();
+    term.loadAddon(fit);
+    term.open(hostRef.current);
+    try { fit.fit(); } catch {}
+    termRef.current = term;
+    fitRef.current = fit;
+
+    // Vite proxies /api to the server, but a WebSocket needs an absolute ws:// URL.
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = location.port === '5173' ? `${location.hostname}:3001` : location.host;
+    const url = `${proto}//${host}/api/terminal?cols=${term.cols}&rows=${term.rows}`;
+    const ws = new WebSocket(url);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      setStatus('connected');
+      try { fit.fit(); ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows })); } catch {}
+    };
+    ws.onmessage = (ev) => {
+      let m; try { m = JSON.parse(ev.data); } catch { return; }
+      if (m.type === 'output') term.write(m.data);
+      else if (m.type === 'exit') { term.write(`\r\n\x1b[90m[process exited with code ${m.code}]\x1b[0m\r\n`); setStatus('exited'); }
+      else if (m.type === 'error') { term.write(`\r\n\x1b[31m${m.msg}\x1b[0m\r\n`); setStatus('error'); }
+    };
+    ws.onclose = () => setStatus(s => (s === 'exited' || s === 'error' ? s : 'disconnected'));
+    ws.onerror = () => setStatus('error');
+
+    const onData = term.onData((d) => {
+      if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'input', data: d }));
+    });
+
+    // Keep the PTY's idea of the window matching the DOM, or wrapping breaks.
+    const ro = new ResizeObserver(() => {
+      try {
+        fit.fit();
+        if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+      } catch {}
+    });
+    ro.observe(hostRef.current);
+
+    return () => {
+      ro.disconnect();
+      onData.dispose();
+      try { ws.close(); } catch {}
+      term.dispose();
+    };
+  }, [nonce]);
+
+  return (
+    <div className="term-layout">
+      <div className="game-toolbar">
+        <span className="game-toolbar-title"><TerminalSquare size={14} /> Terminal</span>
+        <span className={`term-status ${status}`}>{status}</span>
+        <span style={{ flex: 1 }} />
+        <button className="btn btn-sm" onClick={() => setNonce(n => n + 1)} title="Kill this shell and start a fresh one">
+          <RotateCcw size={13} /> New shell
+        </button>
+      </div>
+      <div className="term-host" ref={hostRef} />
+    </div>
+  );
+}

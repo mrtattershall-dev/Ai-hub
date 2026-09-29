@@ -1,0 +1,89 @@
+import React from 'react';
+import { Code2, Compass, History, Settings, Sun, Moon, Sparkles, BookOpen, Bot, Gamepad2 } from 'lucide-react';
+import { useStore } from '../store/useStore.js';
+import { PROVIDERS } from '../lib/constants.js';
+
+const NAV_ITEMS = [
+  { id: 'code',     label: 'Code',         icon: Code2 },
+  { id: 'agent',    label: 'Agent',        icon: Bot },
+  { id: 'game',     label: 'Game',         icon: Gamepad2 },
+  { id: 'strategy', label: 'Strategy',     icon: Compass },
+  { id: 'training', label: 'Training Log', icon: BookOpen },
+  { id: 'history',  label: 'History',      icon: History },
+  { id: 'settings', label: 'Settings',     icon: Settings },
+];
+
+export default function Sidebar() {
+  const activeTab = useStore(s => s.activeTab);
+  const setActiveTab = useStore(s => s.setActiveTab);
+  const activeProvider = useStore(s => s.activeProvider);
+  const setActiveProvider = useStore(s => s.setActiveProvider);
+  const connectedProviders = useStore(s => s.connectedProviders);
+  const theme = useStore(s => s.theme);
+  const toggleTheme = useStore(s => s.toggleTheme);
+  const trainingLog = useStore(s => s.trainingLog);
+
+  const showProviders = activeTab === 'code' || activeTab === 'strategy';
+
+  return (
+    <div className="sidebar">
+      <div className="app-brand">
+        <span className="app-brand-icon"><Sparkles /></span>
+        <span>AI Coding Hub</span>
+      </div>
+
+      <div className="sidebar-section">
+        {NAV_ITEMS.map(item => {
+          const Icon = item.icon;
+          const badge = item.id === 'training' ? trainingLog.length : null;
+          return (
+            <div
+              key={item.id}
+              className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(item.id)}
+            >
+              <Icon className="nav-icon" />
+              <span>{item.label}</span>
+              {badge != null && <span className="nav-badge">{badge}</span>}
+            </div>
+          );
+        })}
+      </div>
+
+      {showProviders && (
+        <>
+          <div className="divider" style={{ margin: '4px 12px' }} />
+          <div className="sidebar-section" style={{ flex: 1 }}>
+            <div className="sidebar-label">Providers</div>
+            {PROVIDERS.map(p => {
+              const isConnected = p.id === 'ollama' || !!connectedProviders[p.id];
+              return (
+                <div
+                  key={p.id}
+                  className={`provider-item ${activeProvider === p.id ? 'active' : ''}`}
+                  onClick={() => setActiveProvider(p.id)}
+                  title={p.name}
+                >
+                  <span className="provider-dot" style={{ background: p.color }} />
+                  <span className="provider-name">{p.name}</span>
+                  <span className={`p-status ${isConnected ? 'connected' : ''}`}>
+                    {p.id === 'ollama' ? 'Local' : isConnected ? 'Connected' : 'Not set'}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {!showProviders && <div style={{ flex: 1 }} />}
+
+      <div className="sidebar-section">
+        <div className="nav-item" onClick={toggleTheme}>
+          {theme === 'light' ? <Moon className="nav-icon" /> : <Sun className="nav-icon" />}
+          <span>{theme === 'light' ? 'Dark mode' : 'Light mode'}</span>
+        </div>
+      </div>
+    </div>
+  );
+}

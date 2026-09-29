@@ -1,0 +1,52 @@
+import React, { useEffect } from 'react';
+import Sidebar from './components/Sidebar.jsx';
+import Topbar from './components/Topbar.jsx';
+import Toasts from './components/Toasts.jsx';
+import CodePage from './pages/CodePage.jsx';
+import AgentPage from './pages/AgentPage.jsx';
+import GamePage from './pages/GamePage.jsx';
+import StrategyPage from './pages/StrategyPage.jsx';
+import HistoryPage from './pages/HistoryPage.jsx';
+import SettingsPage from './pages/SettingsPage.jsx';
+import TrainingPage from './pages/TrainingPage.jsx';
+import { useStore } from './store/useStore.js';
+import { getKeys } from './lib/api.js';
+
+export default function App() {
+  const activeTab = useStore(s => s.activeTab);
+  const theme = useStore(s => s.theme);
+  const setConnectedProviders = useStore(s => s.setConnectedProviders);
+  const addToast = useStore(s => s.addToast);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const keys = await getKeys();
+        setConnectedProviders(keys);
+      } catch (err) {
+        addToast(`Could not reach server: ${err.message}`, 'error');
+      }
+    })();
+  }, []);
+
+  return (
+    <div className="app">
+      <Sidebar />
+      <div className="main">
+        <Topbar />
+        {activeTab === 'code'     && <CodePage />}
+        {activeTab === 'agent'    && <AgentPage />}
+        {activeTab === 'game'     && <GamePage />}
+        {activeTab === 'strategy' && <StrategyPage />}
+        {activeTab === 'training' && <TrainingPage />}
+        {activeTab === 'history'  && <HistoryPage />}
+        {activeTab === 'settings' && <SettingsPage />}
+      </div>
+      <Toasts />
+    </div>
+  );
+}

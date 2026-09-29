@@ -1,0 +1,188 @@
+﻿
+> ai-coding-hub@1.0.0 dev
+> concurrently -n SERVER,CLIENT -c blue,green "npm run dev --prefix server" "npm run dev --prefix client"
+
+node.exe : (node:18956) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() 
+instead.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:18956) [D...sign() instead.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[SERVER] 
+[SERVER] > ai-hub-server@1.0.0 dev
+[SERVER] > node --watch index.js
+[SERVER] 
+[CLIENT] 
+[CLIENT] > ai-hub-client@1.0.0 dev
+[CLIENT] > vite
+[CLIENT] 
+[SERVER] AI Hub server running on http://localhost:3001
+[CLIENT] 
+[CLIENT]   [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m714[22m[2m[0m ms[22m
+[CLIENT] 
+[CLIENT]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[CLIENT] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] file:///C:/Users/tatte/Projects/ai-coding-hub/server/agent.js:212
+[SERVER] the exact old code to replace
+[SERVER]     ^^^^^
+[SERVER] 
+[SERVER] SyntaxError: Unexpected identifier 'exact'
+[SERVER]     at compileSourceTextModule (node:internal/modules/esm/utils:318:16)
+[SERVER]     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:90:18)
+[SERVER]     at #translate (node:internal/modules/esm/loader:451:20)
+[SERVER]     at afterLoad (node:internal/modules/esm/loader:507:29)
+[SERVER]     at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:512:12)
+[SERVER]     at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:555:36)
+[SERVER]     at afterResolve (node:internal/modules/esm/loader:603:52)
+[SERVER]     at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:609:12)
+[SERVER]     at ModuleJob.syncLink (node:internal/modules/esm/module_job:162:33)
+[SERVER]     at ModuleJob.link (node:internal/modules/esm/module_job:252:17)
+[SERVER] 
+[SERVER] Node.js v24.15.0
+[SERVER] Failed running 'index.js'. Waiting for file changes before restarting...
+[SERVER] Restarting 'index.js'
+[SERVER] file:///C:/Users/tatte/Projects/ai-coding-hub/server/agent.js:212
+[SERVER] the exact old code to replace
+[SERVER]     ^^^^^
+[SERVER] 
+[SERVER] SyntaxError: Unexpected identifier 'exact'
+[SERVER]     at compileSourceTextModule (node:internal/modules/esm/utils:318:16)
+[SERVER]     at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:90:18)
+[SERVER]     at #translate (node:internal/modules/esm/loader:451:20)
+[SERVER]     at afterLoad (node:internal/modules/esm/loader:507:29)
+[SERVER]     at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:512:12)
+[SERVER]     at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:555:36)
+[SERVER]     at afterResolve (node:internal/modules/esm/loader:603:52)
+[SERVER]     at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:609:12)
+[SERVER]     at ModuleJob.syncLink (node:internal/modules/esm/module_job:162:33)
+[SERVER]     at ModuleJob.link (node:internal/modules/esm/module_job:252:17)
+[SERVER] 
+[SERVER] Node.js v24.15.0
+[SERVER] Failed running 'index.js'. Waiting for file changes before restarting...
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[CLIENT] [2m7:06:07 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx, /src/components/Sidebar.jsx, /src/components/Toasts.jsx, /src/pages/StrategyPage.jsx, /src/components/Topbar.jsx, /src/pages/HistoryPage.jsx, /src/pages/TrainingPage.jsx, /src/pages/AgentPage.jsx, /src/pages/SettingsPage.jsx, /src/pages/CodePage.jsx, /src/components/OutputBlock.jsx[22m
+[CLIENT] [2m7:06:38 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[CLIENT] [2m7:06:47 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[CLIENT] [2m7:06:56 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[CLIENT] [2m7:07:04 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[CLIENT] [2m7:07:14 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[CLIENT] [2m7:07:24 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[CLIENT] [2m7:07:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[CLIENT] [2m7:07:40 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[CLIENT] [2m7:08:07 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[CLIENT] [2m7:13:36 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:13:54 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:14:28 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:14:36 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:14:52 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:15:02 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[CLIENT] [2m7:18:17 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx, /src/pages/StrategyPage.jsx, /src/pages/HistoryPage.jsx, /src/pages/AgentPage.jsx, /src/pages/SettingsPage.jsx, /src/pages/CodePage.jsx[22m
+[CLIENT] [2m7:18:42 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:18:55 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:19:13 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:19:28 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:19:50 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+[SERVER]     at JSON.parse (<anonymous>)
+[SERVER]     at parse (C:\Users\tatte\Projects\ai-coding-hub\server\node_modules\body-parser\lib\types\json.js:92:19)
+[SERVER]     at C:\Users\tatte\Projects\ai-coding-hub\server\node_modules\body-parser\lib\read.js:128:18
+[SERVER]     at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
+[SERVER]     at invokeCallback (C:\Users\tatte\Projects\ai-coding-hub\server\node_modules\raw-body\index.js:238:16)
+[SERVER]     at done (C:\Users\tatte\Projects\ai-coding-hub\server\node_modules\raw-body\index.js:227:7)
+[SERVER]     at IncomingMessage.onEnd (C:\Users\tatte\Projects\ai-coding-hub\server\node_modules\raw-body\index.js:287:7)
+[SERVER]     at IncomingMessage.emit (node:events:509:28)
+[SERVER]     at endReadableNT (node:internal/streams/readable:1729:12)
+[SERVER]     at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[CLIENT] [2m7:25:53 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx, /src/pages/StrategyPage.jsx, /src/pages/HistoryPage.jsx, /src/pages/AgentPage.jsx, /src/pages/SettingsPage.jsx, /src/pages/CodePage.jsx[22m
+[CLIENT] [2m7:26:04 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:26:14 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[CLIENT] [2m7:36:39 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[CLIENT] [2m7:36:51 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AgentPage.jsx[22m
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[CLIENT] [2m8:36:42 PM[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/agent/d464f58f-1b41-46b2-af26-4aa0b1cc43b3[39m
+[CLIENT] AggregateError [ECONNREFUSED]: 
+[CLIENT]     at internalConnectMultiple (node:net:1193:18)
+[CLIENT]     at afterConnectMultiple (node:net:1783:7)
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
+[SERVER] Restarting 'index.js'
+[SERVER] AI Hub server running on http://localhost:3001
