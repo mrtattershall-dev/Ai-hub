@@ -1,0 +1,46 @@
+{
+  "contract": "TIMING-1",
+  "version": "1.1.0",
+  "arm": "governed",
+  "runId": "timing-governed-1790679208501",
+  "at": "2026-09-29T10:54:44.083Z",
+  "task": "auto-s02",
+  "page": "s02",
+  "baselineSha": "e486c7f15bfc1776bdc0db33406ce8fba3d42d51e0e4acdee699d9cd492d5a33",
+  "model": "qwen2.5-coder:1.5b",
+  "decodingProfile": "whole-file-v1",
+  "decoding": {
+    "temperature": 0.2,
+    "num_predict": 3000,
+    "seed": 1
+  },
+  "decodingOverridesRefused": [],
+  "authority": {
+    "root": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+    "commit": "ede6e089ed096f9eb2afbcf7dd954262e86b8f07",
+    "dirty": true,
+    "manifestDigest": "355d1946d51e93ba6ac863ad7f87896b4c4913b6c5a31c1f540a93b96de4d6a2",
+    "moduleCount": 4
+  },
+  "clocks": {
+    "generationMs": 63092,
+    "verificationMs": 16353,
+    "endToEndMs": 91704,
+    "derivationMs": 12227,
+    "containmentMs": 4,
+    "effectMs": 14,
+    "restorationMs": null
+  },
+  "counts": {
+    "calls": 1,
+    "promptTokens": 295,
+    "outputTokens": 507,
+    "acceptedChanges": 1,
+    "nodesCovered": 7,
+    "nodesMissing": 0
+  },
+  "terminal": "RETAINED",
+  "outcome": "ACCEPTED",
+  "candidateSha": "685c61b4a826d66f8e0bd8cc80efe4297a9edd45c3c593223ea565e65ec8f0c3",
+  "notes": []
+}

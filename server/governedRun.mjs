@@ -60,8 +60,30 @@ void _ge;
  * Promote a verified candidate. `deps` is forwarded to the workspace so the gate can inject a
  * transforming filesystem; nothing else ever passes it.
  */
-export async function promote({ canonical, entry, candidate, verdict, deps }) {
-  const ws = createWorkspace({ root: canonical, deps });
+export async function promote({ canonical, entry, candidate, verdict, deps, hooks = {} }) {
+  // THE EVENT LOG LIVES WITH THE WORKSPACE, NOT IN THIS FUNCTION'S MEMORY.
+  //
+  // The first version created a fresh workspace per call, so the log started empty every time. The
+  // quarantine is DERIVED from that log - which meant an unverified effect quarantined a scope for
+  // exactly as long as one call, and the very next promotion wrote straight over the damaged bytes
+  // and was ACTION_PERMITTED. The workspace layer had already been fixed to survive a reload via
+  // priorEvents; this caller simply never passed them, and the unit suite could not see it because
+  // the defect was in the WIRING. The gate driving the real path is what found it.
+  //
+  // Persisting beside the canonical files makes the quarantine a property of the workspace on disk
+  // rather than of an object in memory: any later promotion against this root picks it up, including
+  // one from a different process.
+  const logPath = join(canonical, '.legasus-events.json');
+  let priorEvents = [];
+  if (existsSync(logPath)) {
+    try { priorEvents = JSON.parse(readFileSync(logPath, 'utf8')); }
+    catch (e) {
+      // An unreadable log is not an empty one. Continuing would silently drop a quarantine.
+      throw new Error(`governedRun: ${logPath} exists but could not be read (${e.message}). `
+        + 'Refusing to promote against a workspace whose history cannot be established.');
+    }
+  }
+  const ws = createWorkspace({ root: canonical, deps, priorEvents });
   const scope = fileScope(entry);
   const baseRevision = ws.revisionOfScope(scope);
 
@@ -88,7 +110,14 @@ export async function promote({ canonical, entry, candidate, verdict, deps }) {
     contract: EDIT_FIXTURE_EVIDENCED, contents: candidate, by: 'governedRun',
     validation: { kind: 'feature-graph', covered: verdict.covered, missing: verdict.missing },
   });
+  // A SEAM, AND THE ONLY ONE. The window between preparing a packet and committing it is where
+  // staleness happens in the real world, and it is not otherwise reachable from a test because
+  // promote() reads the revision itself moments before. Like deps.readBack, it grants nothing: the
+  // authority, the evidence and the commit are unchanged, and only the gate ever passes it.
+  if (hooks.afterPrepare) await hooks.afterPrepare({ ws, scope, baseRevision, packetId: packet.id });
+
   const r = ws.commit(packet.id);
+  writeFileSync(logPath, JSON.stringify(ws.events(), null, 2), 'utf8');
   return { promoted: r.committed === true, result: r, ws, baseRevision, packetId: packet.id, evidenceMinted: true };
 }
 
