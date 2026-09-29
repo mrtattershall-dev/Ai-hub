@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html><body><h2>g3</h2>
+<input id="needle" type="text">
+<ol id="list"><li class="item">iron</li><li class="item">ivory</li><li class="item">jade</li><li class="item">kelp</li><li class="item">lime</li></ol>
+<script>
+const box = document.getElementById("needle");
+const items = Array.from(document.querySelectorAll("#list .item"));
+box.addEventListener("input", function () { const t = box.value.toLowerCase(); items.forEach(function (el) { el.hidden = el.textContent.toLowerCase().indexOf(t) === -1; }); });
+
+const b = document.createElement('button');
+b.id = 'clear-filter'; b.textContent = 'Reset';
+document.body.appendChild(b);
+b.addEventListener('click', function () { box.value = ''; items.forEach(function (el) { el.hidden = false; }); });
+</script></body></html>

@@ -2,11 +2,11 @@
   "schema": "1.0.0",
   "runId": "dualwrite-g3",
   "changeId": "g3-inert",
-  "opened": "2026-09-29T08:48:48.566Z",
+  "opened": "2026-09-29T08:55:29.786Z",
   "tool": "changeRecordDualWrite",
   "events": [
     {
-      "id": "g3-inert:0:b20314362843",
+      "id": "g3-inert:0:044f9521311d",
       "seq": 0,
       "section": "TASK",
       "class": "FACT",
@@ -16,7 +16,7 @@
       "uncertainty": null,
       "body": {
         "what": "Continue the page already in index.html. Add a control #clear-filter that clears the filter: clicking it empties #needle",
-        "taskSha": "3f50a41e607fe1e0095c2b29960e8eb2f5b2b5a4621497dc38f72c7981748b94",
+        "taskSha": "a55143caae0a62927449073e0491095db0bf86666816862c1319c870d95ef2f2",
         "requirement": {
           "trigger": {
             "kind": "click",
@@ -75,13 +75,13 @@
       "prev": null
     },
     {
-      "id": "g3-inert:1:b59155565456",
+      "id": "g3-inert:1:7099be82ba27",
       "seq": 1,
       "section": "BASELINE",
       "class": "FACT",
       "by": "observer",
       "cites": [
-        "g3-inert:0:b20314362843"
+        "g3-inert:0:044f9521311d"
       ],
       "authority": null,
       "uncertainty": null,
@@ -120,17 +120,17 @@
           }
         ]
       },
-      "prev": "g3-inert:0:b20314362843"
+      "prev": "g3-inert:0:044f9521311d"
     },
     {
-      "id": "g3-inert:2:681e1243af42",
+      "id": "g3-inert:2:0953fa24745b",
       "seq": 2,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-inert:0:b20314362843",
-        "g3-inert:1:b59155565456"
+        "g3-inert:0:044f9521311d",
+        "g3-inert:1:7099be82ba27"
       ],
       "authority": null,
       "uncertainty": null,
@@ -151,18 +151,18 @@
           "#clear-filter exists and can be clicked"
         ]
       },
-      "prev": "g3-inert:1:b59155565456"
+      "prev": "g3-inert:1:7099be82ba27"
     },
     {
-      "id": "g3-inert:3:25de49a5f196",
+      "id": "g3-inert:3:63c26c4bc455",
       "seq": 3,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-inert:0:b20314362843",
-        "g3-inert:1:b59155565456",
-        "g3-inert:2:681e1243af42"
+        "g3-inert:0:044f9521311d",
+        "g3-inert:1:7099be82ba27",
+        "g3-inert:2:0953fa24745b"
       ],
       "authority": null,
       "uncertainty": null,
@@ -190,18 +190,18 @@
           "clicking changes observable state"
         ]
       },
-      "prev": "g3-inert:2:681e1243af42"
+      "prev": "g3-inert:2:0953fa24745b"
     },
     {
-      "id": "g3-inert:4:77b1a781492e",
+      "id": "g3-inert:4:08ada1389a5c",
       "seq": 4,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-inert:0:b20314362843",
-        "g3-inert:1:b59155565456",
-        "g3-inert:3:25de49a5f196"
+        "g3-inert:0:044f9521311d",
+        "g3-inert:1:7099be82ba27",
+        "g3-inert:3:63c26c4bc455"
       ],
       "authority": null,
       "uncertainty": null,
@@ -217,18 +217,18 @@
         "distinguishing": null,
         "derivedSequence": null
       },
-      "prev": "g3-inert:3:25de49a5f196"
+      "prev": "g3-inert:3:63c26c4bc455"
     },
     {
-      "id": "g3-inert:5:4f2f24f6e176",
+      "id": "g3-inert:5:a87a1be5a876",
       "seq": 5,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-inert:0:b20314362843",
-        "g3-inert:1:b59155565456",
-        "g3-inert:3:25de49a5f196"
+        "g3-inert:0:044f9521311d",
+        "g3-inert:1:7099be82ba27",
+        "g3-inert:3:63c26c4bc455"
       ],
       "authority": null,
       "uncertainty": null,
@@ -244,19 +244,19 @@
         "distinguishing": null,
         "derivedSequence": null
       },
-      "prev": "g3-inert:4:77b1a781492e"
+      "prev": "g3-inert:4:08ada1389a5c"
     },
     {
-      "id": "g3-inert:6:c7d0b57356e0",
+      "id": "g3-inert:6:1e0f906357ab",
       "seq": 6,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-inert:0:b20314362843",
-        "g3-inert:1:b59155565456",
-        "g3-inert:3:25de49a5f196",
-        "g3-inert:4:77b1a781492e"
+        "g3-inert:0:044f9521311d",
+        "g3-inert:1:7099be82ba27",
+        "g3-inert:3:63c26c4bc455",
+        "g3-inert:4:08ada1389a5c"
       ],
       "authority": null,
       "uncertainty": null,
@@ -272,18 +272,18 @@
         "distinguishing": "OBSERVED",
         "derivedSequence": null
       },
-      "prev": "g3-inert:5:4f2f24f6e176"
+      "prev": "g3-inert:5:a87a1be5a876"
     },
     {
-      "id": "g3-inert:7:771b8178a889",
+      "id": "g3-inert:7:2934626421ce",
       "seq": 7,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-inert:0:b20314362843",
-        "g3-inert:1:b59155565456",
-        "g3-inert:4:77b1a781492e"
+        "g3-inert:0:044f9521311d",
+        "g3-inert:1:7099be82ba27",
+        "g3-inert:4:08ada1389a5c"
       ],
       "authority": null,
       "uncertainty": null,
@@ -299,17 +299,17 @@
         "distinguishing": "CONDITIONAL",
         "derivedSequence": null
       },
-      "prev": "g3-inert:6:c7d0b57356e0"
+      "prev": "g3-inert:6:1e0f906357ab"
     },
     {
-      "id": "g3-inert:8:97e816a33dee",
+      "id": "g3-inert:8:b6507caa35a3",
       "seq": 8,
       "section": "UNKNOWN",
       "class": "UNCERTAINTY",
       "by": "any",
       "cites": [
-        "g3-inert:0:b20314362843",
-        "g3-inert:1:b59155565456"
+        "g3-inert:0:044f9521311d",
+        "g3-inert:1:7099be82ba27"
       ],
       "authority": null,
       "uncertainty": "NO_UPDATE_ROUTE",
@@ -317,16 +317,16 @@
         "what": "no named zero-parameter update route is referenced elsewhere in the page",
         "about": "U"
       },
-      "prev": "g3-inert:7:771b8178a889"
+      "prev": "g3-inert:7:2934626421ce"
     },
     {
-      "id": "g3-inert:9:10746b7da01c",
+      "id": "g3-inert:9:2010a7274652",
       "seq": 9,
       "section": "PROPOSAL",
       "class": "FACT",
       "by": "model",
       "cites": [
-        "g3-inert:0:b20314362843"
+        "g3-inert:0:044f9521311d"
       ],
       "authority": null,
       "uncertainty": null,
@@ -336,17 +336,17 @@
         "insertedBytes": 188,
         "source": "hand-written control"
       },
-      "prev": "g3-inert:8:97e816a33dee"
+      "prev": "g3-inert:8:b6507caa35a3"
     },
     {
-      "id": "g3-inert:10:750a1fab012a",
+      "id": "g3-inert:10:f582b2701694",
       "seq": 10,
       "section": "VERIFICATION",
       "class": "FACT",
       "by": "checker",
       "cites": [
-        "g3-inert:9:10746b7da01c",
-        "g3-inert:1:b59155565456"
+        "g3-inert:9:2010a7274652",
+        "g3-inert:1:7099be82ba27"
       ],
       "authority": null,
       "uncertainty": null,
@@ -362,22 +362,22 @@
         },
         "errors": []
       },
-      "prev": "g3-inert:9:10746b7da01c"
+      "prev": "g3-inert:9:2010a7274652"
     },
     {
-      "id": "g3-inert:11:133f10860bd0",
+      "id": "g3-inert:11:ba7d238a9ccb",
       "seq": 11,
       "section": "DIAGNOSIS",
       "class": "CLAIM",
       "by": "checker",
       "cites": [
-        "g3-inert:10:750a1fab012a",
-        "g3-inert:2:681e1243af42",
-        "g3-inert:3:25de49a5f196",
-        "g3-inert:4:77b1a781492e",
-        "g3-inert:5:4f2f24f6e176",
-        "g3-inert:6:c7d0b57356e0",
-        "g3-inert:7:771b8178a889"
+        "g3-inert:10:f582b2701694",
+        "g3-inert:2:0953fa24745b",
+        "g3-inert:3:63c26c4bc455",
+        "g3-inert:4:08ada1389a5c",
+        "g3-inert:5:a87a1be5a876",
+        "g3-inert:6:1e0f906357ab",
+        "g3-inert:7:2934626421ce"
       ],
       "authority": null,
       "uncertainty": null,
@@ -394,16 +394,16 @@
           "E3"
         ]
       },
-      "prev": "g3-inert:10:750a1fab012a"
+      "prev": "g3-inert:10:f582b2701694"
     },
     {
-      "id": "g3-inert:12:4377ba7af4c5",
+      "id": "g3-inert:12:15f082ff7c67",
       "seq": 12,
       "section": "DECISION",
       "class": "CLAIM",
       "by": "policy",
       "cites": [
-        "g3-inert:11:133f10860bd0"
+        "g3-inert:11:ba7d238a9ccb"
       ],
       "authority": null,
       "uncertainty": null,
@@ -411,7 +411,7 @@
         "outcome": "REJECT",
         "why": "W,E1,E2,E3 not satisfied; the control exists but does not do what the requirement names"
       },
-      "prev": "g3-inert:11:133f10860bd0"
+      "prev": "g3-inert:11:ba7d238a9ccb"
     }
   ]
 }

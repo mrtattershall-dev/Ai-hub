@@ -2,11 +2,11 @@
   "schema": "1.0.0",
   "runId": "dualwrite-g3",
   "changeId": "g3-works",
-  "opened": "2026-09-29T08:48:42.467Z",
+  "opened": "2026-09-29T08:55:22.743Z",
   "tool": "changeRecordDualWrite",
   "events": [
     {
-      "id": "g3-works:0:b20314362843",
+      "id": "g3-works:0:044f9521311d",
       "seq": 0,
       "section": "TASK",
       "class": "FACT",
@@ -16,7 +16,7 @@
       "uncertainty": null,
       "body": {
         "what": "Continue the page already in index.html. Add a control #clear-filter that clears the filter: clicking it empties #needle",
-        "taskSha": "3f50a41e607fe1e0095c2b29960e8eb2f5b2b5a4621497dc38f72c7981748b94",
+        "taskSha": "a55143caae0a62927449073e0491095db0bf86666816862c1319c870d95ef2f2",
         "requirement": {
           "trigger": {
             "kind": "click",
@@ -75,13 +75,13 @@
       "prev": null
     },
     {
-      "id": "g3-works:1:af70476a672a",
+      "id": "g3-works:1:89c22370274c",
       "seq": 1,
       "section": "BASELINE",
       "class": "FACT",
       "by": "observer",
       "cites": [
-        "g3-works:0:b20314362843"
+        "g3-works:0:044f9521311d"
       ],
       "authority": null,
       "uncertainty": null,
@@ -120,17 +120,17 @@
           }
         ]
       },
-      "prev": "g3-works:0:b20314362843"
+      "prev": "g3-works:0:044f9521311d"
     },
     {
-      "id": "g3-works:2:75b4d300c530",
+      "id": "g3-works:2:a65913025021",
       "seq": 2,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-works:0:b20314362843",
-        "g3-works:1:af70476a672a"
+        "g3-works:0:044f9521311d",
+        "g3-works:1:89c22370274c"
       ],
       "authority": null,
       "uncertainty": null,
@@ -151,18 +151,18 @@
           "#clear-filter exists and can be clicked"
         ]
       },
-      "prev": "g3-works:1:af70476a672a"
+      "prev": "g3-works:1:89c22370274c"
     },
     {
-      "id": "g3-works:3:4c79620f4054",
+      "id": "g3-works:3:bc711682445f",
       "seq": 3,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-works:0:b20314362843",
-        "g3-works:1:af70476a672a",
-        "g3-works:2:75b4d300c530"
+        "g3-works:0:044f9521311d",
+        "g3-works:1:89c22370274c",
+        "g3-works:2:a65913025021"
       ],
       "authority": null,
       "uncertainty": null,
@@ -190,18 +190,18 @@
           "clicking changes observable state"
         ]
       },
-      "prev": "g3-works:2:75b4d300c530"
+      "prev": "g3-works:2:a65913025021"
     },
     {
-      "id": "g3-works:4:678ff0762e95",
+      "id": "g3-works:4:b6464638cdd8",
       "seq": 4,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-works:0:b20314362843",
-        "g3-works:1:af70476a672a",
-        "g3-works:3:4c79620f4054"
+        "g3-works:0:044f9521311d",
+        "g3-works:1:89c22370274c",
+        "g3-works:3:bc711682445f"
       ],
       "authority": null,
       "uncertainty": null,
@@ -217,18 +217,18 @@
         "distinguishing": null,
         "derivedSequence": null
       },
-      "prev": "g3-works:3:4c79620f4054"
+      "prev": "g3-works:3:bc711682445f"
     },
     {
-      "id": "g3-works:5:7e8bd25529f9",
+      "id": "g3-works:5:db8895de7ada",
       "seq": 5,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-works:0:b20314362843",
-        "g3-works:1:af70476a672a",
-        "g3-works:3:4c79620f4054"
+        "g3-works:0:044f9521311d",
+        "g3-works:1:89c22370274c",
+        "g3-works:3:bc711682445f"
       ],
       "authority": null,
       "uncertainty": null,
@@ -244,19 +244,19 @@
         "distinguishing": null,
         "derivedSequence": null
       },
-      "prev": "g3-works:4:678ff0762e95"
+      "prev": "g3-works:4:b6464638cdd8"
     },
     {
-      "id": "g3-works:6:e6575b52da0c",
+      "id": "g3-works:6:13d2a9546a68",
       "seq": 6,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-works:0:b20314362843",
-        "g3-works:1:af70476a672a",
-        "g3-works:3:4c79620f4054",
-        "g3-works:4:678ff0762e95"
+        "g3-works:0:044f9521311d",
+        "g3-works:1:89c22370274c",
+        "g3-works:3:bc711682445f",
+        "g3-works:4:b6464638cdd8"
       ],
       "authority": null,
       "uncertainty": null,
@@ -272,18 +272,18 @@
         "distinguishing": "OBSERVED",
         "derivedSequence": null
       },
-      "prev": "g3-works:5:7e8bd25529f9"
+      "prev": "g3-works:5:db8895de7ada"
     },
     {
-      "id": "g3-works:7:ba147eae1d74",
+      "id": "g3-works:7:ef8ad5828a69",
       "seq": 7,
       "section": "GRAPH",
       "class": "CLAIM",
       "by": "derivation",
       "cites": [
-        "g3-works:0:b20314362843",
-        "g3-works:1:af70476a672a",
-        "g3-works:4:678ff0762e95"
+        "g3-works:0:044f9521311d",
+        "g3-works:1:89c22370274c",
+        "g3-works:4:b6464638cdd8"
       ],
       "authority": null,
       "uncertainty": null,
@@ -299,17 +299,17 @@
         "distinguishing": "CONDITIONAL",
         "derivedSequence": null
       },
-      "prev": "g3-works:6:e6575b52da0c"
+      "prev": "g3-works:6:13d2a9546a68"
     },
     {
-      "id": "g3-works:8:df9965374e3f",
+      "id": "g3-works:8:7444c065dfb0",
       "seq": 8,
       "section": "UNKNOWN",
       "class": "UNCERTAINTY",
       "by": "any",
       "cites": [
-        "g3-works:0:b20314362843",
-        "g3-works:1:af70476a672a"
+        "g3-works:0:044f9521311d",
+        "g3-works:1:89c22370274c"
       ],
       "authority": null,
       "uncertainty": "NO_UPDATE_ROUTE",
@@ -317,16 +317,16 @@
         "what": "no named zero-parameter update route is referenced elsewhere in the page",
         "about": "U"
       },
-      "prev": "g3-works:7:ba147eae1d74"
+      "prev": "g3-works:7:ef8ad5828a69"
     },
     {
-      "id": "g3-works:9:7c75bc50a9d7",
+      "id": "g3-works:9:a1b9166d6dca",
       "seq": 9,
       "section": "PROPOSAL",
       "class": "FACT",
       "by": "model",
       "cites": [
-        "g3-works:0:b20314362843"
+        "g3-works:0:044f9521311d"
       ],
       "authority": null,
       "uncertainty": null,
@@ -336,17 +336,17 @@
         "insertedBytes": 236,
         "source": "hand-written control"
       },
-      "prev": "g3-works:8:df9965374e3f"
+      "prev": "g3-works:8:7444c065dfb0"
     },
     {
-      "id": "g3-works:10:3b8ee2231375",
+      "id": "g3-works:10:7940e13d209c",
       "seq": 10,
       "section": "VERIFICATION",
       "class": "FACT",
       "by": "checker",
       "cites": [
-        "g3-works:9:7c75bc50a9d7",
-        "g3-works:1:af70476a672a"
+        "g3-works:9:a1b9166d6dca",
+        "g3-works:1:89c22370274c"
       ],
       "authority": null,
       "uncertainty": null,
@@ -362,22 +362,22 @@
         },
         "errors": []
       },
-      "prev": "g3-works:9:7c75bc50a9d7"
+      "prev": "g3-works:9:a1b9166d6dca"
     },
     {
-      "id": "g3-works:11:6a59834e6913",
+      "id": "g3-works:11:35d1a4a43f51",
       "seq": 11,
       "section": "DIAGNOSIS",
       "class": "CLAIM",
       "by": "checker",
       "cites": [
-        "g3-works:10:3b8ee2231375",
-        "g3-works:2:75b4d300c530",
-        "g3-works:3:4c79620f4054",
-        "g3-works:4:678ff0762e95",
-        "g3-works:5:7e8bd25529f9",
-        "g3-works:6:e6575b52da0c",
-        "g3-works:7:ba147eae1d74"
+        "g3-works:10:7940e13d209c",
+        "g3-works:2:a65913025021",
+        "g3-works:3:bc711682445f",
+        "g3-works:4:b6464638cdd8",
+        "g3-works:5:db8895de7ada",
+        "g3-works:6:13d2a9546a68",
+        "g3-works:7:ef8ad5828a69"
       ],
       "authority": null,
       "uncertainty": null,
@@ -393,16 +393,16 @@
         ],
         "missing": []
       },
-      "prev": "g3-works:10:3b8ee2231375"
+      "prev": "g3-works:10:7940e13d209c"
     },
     {
-      "id": "g3-works:12:01448ef88137",
+      "id": "g3-works:12:f313e7ba16a6",
       "seq": 12,
       "section": "DECISION",
       "class": "CLAIM",
       "by": "policy",
       "cites": [
-        "g3-works:11:6a59834e6913"
+        "g3-works:11:35d1a4a43f51"
       ],
       "authority": null,
       "uncertainty": null,
@@ -410,7 +410,7 @@
         "outcome": "ACCEPT",
         "why": "every derived node was satisfied by observation"
       },
-      "prev": "g3-works:11:6a59834e6913"
+      "prev": "g3-works:11:35d1a4a43f51"
     }
   ]
 }
