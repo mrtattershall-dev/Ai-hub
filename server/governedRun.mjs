@@ -108,7 +108,18 @@ export async function promote({ canonical, entry, candidate, verdict, deps, hook
   const packet = ws.prepare({
     scope, baseRevision, evidence: [evidence], authority: grant,
     contract: EDIT_FIXTURE_EVIDENCED, contents: candidate, by: 'governedRun',
-    validation: { kind: 'feature-graph', covered: verdict.covered, missing: verdict.missing },
+    // `expect-bytes`, NOT a kind of my own invention. I previously declared
+    // `{ kind: 'feature-graph' }`, which the workspace had no implementation for - and at the time
+    // `validation` was recorded at prepare() and EXECUTED NOWHERE, so the declaration cost nothing
+    // and meant nothing. A later change to the authority stack made validation actually run, and an
+    // unrecognised kind correctly FAILS rather than falling through. That broke this runner, which is
+    // the right outcome: I had been declaring a check nobody implemented.
+    //
+    // The feature-graph verdict is already carried where it belongs - it is the EPISTEMIC token minted
+    // above, which is what licenses the grant. What `validation` is for is an INDEPENDENT post-write
+    // observation, and runValidation is given nothing from the packet, so it cannot grade the
+    // declaration against itself.
+    validation: { kind: 'expect-bytes', bytes: candidate },
   });
   // A SEAM, AND THE ONLY ONE. The window between preparing a packet and committing it is where
   // staleness happens in the real world, and it is not otherwise reachable from a test because

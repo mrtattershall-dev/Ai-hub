@@ -1,0 +1,109 @@
+{
+  "contract": "GOVERNED-RECEIPT-1",
+  "version": "1.0.0",
+  "runId": "timing-governed-1790680882852",
+  "page": "s03",
+  "task": "auto-s03",
+  "at": "2026-09-29T11:22:36.115Z",
+  "authority": {
+    "root": "C:\\Users\\tatte\\Projects\\ai-coding-hub-consolidation",
+    "commit": "2a7b220729c434c888fc9d64bbe43493c37477af",
+    "dirty": true,
+    "manifestDigest": "0ae793d2964c604f8c69abb78eb9a99705d24eaa1d1acd0ad803e0d7c99a5ff3",
+    "moduleCount": 4,
+    "external": [
+      "node:crypto",
+      "node:fs",
+      "node:path"
+    ],
+    "contract": {
+      "legasus/runtime/epistemic-admission/governed-edit.mjs": [
+        "governedEdit",
+        "editAction",
+        "revisionOf",
+        "OUTCOME",
+        "DISPOSITION",
+        "EDIT_FIXTURE",
+        "EDIT_FIXTURE_EVIDENCED"
+      ],
+      "legasus/runtime/governedWorkspace/workspace.mjs": [
+        "createWorkspace",
+        "fileScope",
+        "EVENT",
+        "PACKET",
+        "EFFECT_OUTCOME"
+      ],
+      "legasus/legaknow/calculus.mjs": [
+        "delegate",
+        "observe",
+        "isAuthority"
+      ],
+      "legasus/legaknow/observation.mjs": [
+        "observation",
+        "OBSERVABILITY"
+      ]
+    },
+    "manifest": [
+      {
+        "url": "file:///C:/Users/tatte/Projects/ai-coding-hub-consolidation/legasus/legaknow/calculus.mjs",
+        "sha": "8988942c5701be7bb2f4c317114acee41bb7a0ef31a90b02a1e995ab70a3c46c"
+      },
+      {
+        "url": "file:///C:/Users/tatte/Projects/ai-coding-hub-consolidation/legasus/legaknow/observation.mjs",
+        "sha": "8d229c39a7380dd00ec9b62b8b01916907e73091a77bf755dd2efee2d42acfda"
+      },
+      {
+        "url": "file:///C:/Users/tatte/Projects/ai-coding-hub-consolidation/legasus/runtime/epistemic-admission/governed-edit.mjs",
+        "sha": "a2fbf86475fe09b56551027a2a97914513a63a04794e1d74e59ad58b49cac579"
+      },
+      {
+        "url": "file:///C:/Users/tatte/Projects/ai-coding-hub-consolidation/legasus/runtime/governedWorkspace/workspace.mjs",
+        "sha": "9f89c25d8a7c0090386246226bd34bbe185c622a622f86db107a0349b30481dc"
+      }
+    ]
+  },
+  "decoding": {
+    "profile": "whole-file-v1",
+    "temperature": 0.2,
+    "num_predict": 3000,
+    "seed": 1,
+    "overridesRefused": []
+  },
+  "base": {
+    "baselineSha": "28c5786d28ae0d55bd1b7f658fb8b02f22f80dbc1a5229c8cc2d22b51ba1f614",
+    "observedRevision": "28c5786d28ae0d55bd1b7f658fb8b02f22f80dbc1a5229c8cc2d22b51ba1f614"
+  },
+  "model": {
+    "name": "qwen2.5-coder:1.5b",
+    "endpoint": "http://127.0.0.1:11434/api/generate",
+    "requestSha": "bf433ea8bc2126583b83fd62400a8016753799d9bc544d54114b1ecd9b8f5a18",
+    "responseSha": "010f94c2cb12d059d519904701d92688eaaf0f25f0befa2ff9ecbc095ef6571b",
+    "doneReason": "stop"
+  },
+  "verification": {
+    "complete": true,
+    "covered": [
+      "C",
+      "W",
+      "E1",
+      "E2",
+      "E3",
+      "U",
+      "P1"
+    ],
+    "missing": [],
+    "candidateSha": "8954e27e87b9815161241540d99474164b17c7bbfdf066c70f251d57ac6afcc4"
+  },
+  "effect": {
+    "promoted": true,
+    "packetId": "action_prepared-1",
+    "reason": "ACTION_PERMITTED",
+    "retryable": null,
+    "disposition": null,
+    "intendedRevision": "8954e27e87b9815161241540d99474164b17c7bbfdf066c70f251d57ac6afcc4",
+    "revisionAfter": "8954e27e87b9815161241540d99474164b17c7bbfdf066c70f251d57ac6afcc4",
+    "effectVerified": true,
+    "bytesAfter": 932
+  },
+  "terminal": "RETAINED"
+}
