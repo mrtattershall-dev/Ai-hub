@@ -1,0 +1,102 @@
+  1 s1_library.js   done     then P  end F   <- REGRESSED  [319c4be] trial35: done FN-MISSING(book,owns)  threw: l.titles is not a function
+  2 s2_logs.py      done     then P  end P   [13cf249] trial35: done FN-MISSING(time,status,bytes,seconds)  
+  3 s3_matrix.js    done     then F  end P   [2c96690] trial35: done FN-MISSING(Matrix)  
+  4 s4_markdown.py  done     then P  end F   <- REGRESSED  [5ea3355] trial35: done FN-MISSING(paragraphs)  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no 
+  5 s5_expr.js      done     then F  end F   [43669aa] trial35: done FN-MISSING(numbers)  "2 3" did not throw
+  6 s6_graph.py     done     then P  end F   <- REGRESSED  [1704cdb] trial35: done FN-MISSING(number,of)  a repeated edge did not replace the weight
+  7 s7_cache.js     done     then P  end P   [475a520] trial35: done FN-MISSING(Cache)  
+  8 s8_grades.py    done     then P  end P   [99ce918] trial35: done s8_grades.py:runs  
+  9 s9_board.html   done     then P  end P   [df45bc7] trial35: done s9_board.js:parses  
+ 10 s10_desk.js     done     then P  end F   <- REGRESSED  [7900ff0] trial35: done FN-MISSING(js)  threw: library.titles is not a function
+ 11 s1_library.js   done     then P  end F   <- REGRESSED  [f02e893] trial35: done s1_library.js:runs  the same member twice did not throw
+ 12 s2_logs.py      done     then P  end F   <- REGRESSED  [953688c] trial35: done s2_logs.py:runs  bad_lines ['not a log line', '2.2.2.2 broken']
+ 13 s3_matrix.js    done     then F  end P   [0acd349] trial35: done s3_matrix.js:runs  
+ 14 s4_markdown.py  done     then F  end F   [f40900b] trial35: done s4_markdown.py:runs  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no 
+ 15 s5_expr.js      done     then P  end P   [30ade50] trial35: done s5_expr.js:runs  
+ 16 s6_graph.py     done     then P  end P   [850faa5] trial35: done s6_graph.py:runs  
+ 17 s7_cache.js     done     then P  end P   [5a72d19] trial35: done s7_cache.js:runs  
+ 18 s8_grades.py    done     then P  end P   [1fc15f0] trial35: done s8_grades.py:runs  
+ 19 s9_board.html   done     then P  end P   [421ef31] trial35: done FN-MISSING(board,column)  
+ 20 s10_desk.js     done     then P  end P   [3d517d6] trial35: done s10_desk.js:runs  
+ 21 s1_library.js   stopped  then F  end F   [97d79b8] trial35: stopped FN-MISSING(loans)  threw: l.loans is not a function
+ 22 s2_logs.py      done     then P  end F   <- REGRESSED  [db65cc2] trial35: done FN-MISSING(decimals)  error_rate 0.75
+ 23 s3_matrix.js    done     then F  end F   [db65cc2] trial35: done FN-MISSING(mul)  threw: a.mul is not a function
+ 24 s4_markdown.py  done     then P  end F   <- REGRESSED  [5c71cfb] trial35: done s4_markdown.py:THROWS  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no 
+ 25 s5_expr.js      done     then F  end P   [14bdec7] trial35: done FN-MISSING(operator,associative,it)  
+ 26 s6_graph.py     stopped  then P  end P   [308894e] trial35: stopped FN-MISSING(returning,is)  
+ 27 s7_cache.js     done     then F  end F   [6dd5621] trial35: done s7_cache.js:runs  keys ["b","c","a"]
+ 28 s8_grades.py    done     then F  end F   [f9b96d4] trial35: done FN-MISSING(letter,py,of)  threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'
+ 29 s9_board.html   done     then F  end F   [119d0f4] trial35: done FN-MISSING(board)  start ["To Do: 0","Doing: 0","Done: 0"]
+ 30 s10_desk.js     done     then P  end F   <- REGRESSED  [fbebf8b] trial35: done FN-MISSING(loans)  threw: library.getLoans is not a function
+ 31 s1_library.js   stopped  then F  end F   [9a4b589] trial35: stopped s1_library.js:runs  threw: l.holds is not a function
+ 32 s2_logs.py      done     then P  end F   <- REGRESSED  [8f1a26c] trial35: done FN-MISSING(of,path)  top_paths [('/a', 1), ('/b?x=1', 1), ('/a?y=2', 1)]
+ 33 s3_matrix.js    stopped  then F  end P   [abe72f7] trial35: stopped s3_matrix.js:runs  
+ 34 s4_markdown.py  stopped  then F  end F   [d5ddeb6] trial35: stopped s4_markdown.py:THROWS  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no 
+ 35 s5_expr.js      done     then P  end F   <- REGRESSED  [8519016] trial35: done FN-MISSING(name)  threw: Function x must be followed by parentheses at 1
+ 36 s6_graph.py     done     then P  end P   [29992e3] trial35: done FN-MISSING(cycle)  
+ 37 s7_cache.js     done     then P  end P   [4b1a1f9] trial35: done s7_cache.js:runs  
+ 38 s8_grades.py    interrupted then F  end F   [1e8c1c4] trial35: interrupted FN-MISSING(set_weight,in)  equal weights 55.0
+ 39 s9_board.html   done     then P  end P   [4b2cfcc] trial35: done FN-MISSING(board)  
+ 40 s10_desk.js     done     then P  end P   [d15c831] trial35: done FN-MISSING(function,Cache)  
+ 41 s1_library.js   stopped  then P  end F   <- REGRESSED  [bfb78e2] trial35: stopped FN-MISSING(number,daysLate)  threw: l.overdue is not a function
+ 42 s2_logs.py      done     then P  end F   <- REGRESSED  [dab46ae] trial35: done FN-MISSING(rank)  threw: IndexError: list index out of range
+ 43 s3_matrix.js    stopped  then P  end P   [eacd81f] trial35: stopped s3_matrix.js:runs  
+ 44 s4_markdown.py  interrupted then P  end F   <- REGRESSED  [a9e6373] trial35: interrupted s4_markdown.py:THROWS  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no 
+ 45 s5_expr.js      stopped  then P  end P   [a59a5ac] trial35: stopped FN-MISSING(min,max,abs,sqrt)  
+ 46 s6_graph.py     done     then P  end P   [0546c42] trial35: done s6_graph.py:THROWS  
+ 47 s7_cache.js     done     then F  end F   [25eb115] trial35: done FN-MISSING(Cache,now,clock,everywhere)  keys still lists an expired entry: ["b","c"]
+ 48 s8_grades.py    stopped  then F  end F   [613a5c8] trial35: stopped FN-MISSING(scores)  threw: TypeError: Gradebook.drop_lowest() missing 1 required positional argument
+ 49 s9_board.html   done     then F  end F   [715e452] trial35: done FN-MISSING(board)  after reload [["Aâ†â†’Ã—","Câ†â†’Ã—"],["Bâ†â†’Ã—"]]
+ 50 s10_desk.js     done     then P  end F   <- REGRESSED  [9036a84] trial35: done FN-MISSING(overdue,isbn)  threw: library.overdue is not a function
+ 51 s1_library.js   stopped  then F  end F   [0f24506] trial35: stopped FN-MISSING(late)  threw: l.returnBook is not a function
+ 52 s2_logs.py      done     then F  end F   [0f24506] trial35: done FN-MISSING(by_hour,field)  threw: AttributeError: module 's2_logs_mod' has no attribute 'by_hour'
+ 53 s3_matrix.js    done     then P  end P   [cba1d74] trial35: done s3_matrix.js:runs  
+ 54 s4_markdown.py  interrupted then F  end F   [cba1d74] trial35: interrupted s4_markdown.py:THROWS  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no 
+ 55 s5_expr.js      stopped  then F  end F   [c27a66b] trial35: stopped FN-MISSING(early)  "2 + * 3": 2
+ 56 s6_graph.py     stopped  then F  end F   [0ef7501] trial35: stopped s6_graph.py:THROWS  threw: AttributeError: 'Graph' object has no attribute 'remove_node'
+ 57 s7_cache.js     done     then F  end F   [beb310f] trial35: done s7_cache.js:runs  stats {"hits":1,"misses":2,"evictions":0,"expirations":1}
+ 58 s8_grades.py    stopped  then F  end F   [0b89d5d] trial35: stopped FN-MISSING(default)  missing as zero (80.0, None)
+ 59 s9_board.html   done     then F  end F   [1863d2e] trial35: done FN-MISSING(board)  the message was not emptied: "Doing is full"
+ 60 s10_desk.js     done     then F  end F   [e4f1145] trial35: done FN-MISSING(amount)  threw: l.returnBook is not a function
+ 61 s1_library.js   stopped  then F  end F   [c829e47] trial35: stopped FN-MISSING(hold)  threw: k.returnBook is not a function
+ 62 s2_logs.py      done     then P  end F   <- REGRESSED  [3316c49] trial35: done s2_logs.py:runs  threw: AttributeError: module 's2_logs_mod' has no attribute 'between'
+ 63 s3_matrix.js    stopped  then F  end F   [598552a] trial35: stopped FN-MISSING(singular)  threw: b.mul is not a function
+ 64 s4_markdown.py  stopped  then F  end F   [8ba41fa] trial35: stopped FN-MISSING(space)  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no 
+ 65 s5_expr.js      done     then P  end P   [7697210] trial35: done s5_expr.js:THROWS  
+ 66 s6_graph.py     done     then F  end F   [f263c51] trial35: done FN-MISSING(edges)  reachable(a) ['a', 'b', 'c']
+ 67 s7_cache.js     done     then P  end P   [78654d2] trial35: done FN-MISSING(Cache,onEvict)  
+ 68 s8_grades.py    done     then P  end P   [d8ee97f] trial35: done s8_grades.py:runs  
+ 69 s9_board.html   done     then P  end P   [d8ee97f] trial35: done FN-MISSING(board)  
+ 70 s10_desk.js     done     then F  end F   [497d417] trial35: done s10_desk.js:runs  threw: library.getLoans is not a function
+ 71 s1_library.js   stopped  then F  end F   [f286276] trial35: stopped s1_library.js:runs  threw: l.returnBook is not a function
+ 72 s2_logs.py      interrupted then F  end F   [f286276] trial35: interrupted FN-MISSING(sessions)  threw: AttributeError: module 's2_logs_mod' has no attribute 'sessions'
+ 73 s3_matrix.js    done     then P  end P   [1cf6733] trial35: done s3_matrix.js:runs  
+ 74 s4_markdown.py  stopped  then F  end F   [ec8f464] trial35: stopped FN-MISSING(breaks)  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no 
+ 75 s5_expr.js      stopped  then F  end F   [a92be7c] trial35: stopped FN-MISSING(String)  "1 + 2 * x" -> ["1","2","x"]
+ 76 s6_graph.py     done     then F  end F   [f2f8c5e] trial35: done s6_graph.py:runs  components [['a'], ['a', 'b'], ['c', 'd'], ['d', 'e'], ['f'], ['z']]
+ 77 s7_cache.js     done     then F  end F   [67a0c05] trial35: done FN-MISSING(entries)  resize kept ["d","a"]
+ 78 s8_grades.py    done     then P  end P   [d09617a] trial35: done FN-MISSING(decimals,letter)  
+ 79 s9_board.html   stopped  then F  end F   [d09617a] trial35: stopped FN-MISSING(board,text)  threw: No element found for selector: #s9-filter
+ 80 s10_desk.js     done     then F  end F   [56ee00f] trial35: done FN-MISSING(stringify,toJSON)  threw: snapshot is not exported
+ 81 s1_library.js   stopped  then P  end P   [c38da89] trial35: stopped s1_library.js:runs  
+ 82 s2_logs.py      done     then F  end F   [90ad6c2] trial35: done FN-MISSING(paths)  CLI --top 2 printed ['All tests passed!']
+ 83 s3_matrix.js    done     then F  end F   [90ad6c2] trial35: done FN-MISSING(toString,zeros)  toString "1 0.5\n-2 3.3333333\n0.0001 10"
+ 84 s4_markdown.py  done     then F  end F   [215cd8b] trial35: done FN-MISSING(inside)  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no 
+ 85 s5_expr.js      stopped  then F  end F   [8f830ab] trial35: stopped FN-MISSING(function)  threw: compile is not exported
+ 86 s6_graph.py     done     then P  end P   [ce9356b] trial35: done s6_graph.py:runs  
+ 87 s7_cache.js     done     then F  end F   [4126bd4] trial35: done s7_cache.js:runs  fromJSON order ["c","b"]
+ 88 s8_grades.py    done     then P  end P   [9f644e1] trial35: done FN-MISSING(points)  
+ 89 s9_board.html   done     then F  end F   [9d61f86] trial35: done FN-MISSING(board,column)  a duplicate was added: ["deploy"]
+ 90 s10_desk.js     done     then P  end P   [bf16574] trial35: done FN-MISSING(search)  
+ 91 S1_NOTES.md     done     then F  end F   [54c43ce] trial35: done s1_library.js:runs  notes miss titles, returnBook, loans, overdue, pay, toJSON, fromJSON
+ 92 s2_logs.py      done     then F  end F   [6d41e70] trial35: done FN-MISSING(field)  threw: IndexError: list index out of range
+ 93 s3_matrix.js    done     then P  end P   [f96323b] trial35: done s3_matrix.js:runs  
+ 94 s4_markdown.py  error    then F  end F   [fb00492] trial35: error FN-MISSING(of)  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no 
+ 95 s5_expr.js      stopped  then F  end F   [cc4592b] trial35: stopped s5_expr.js:THROWS  threw: Invalid characters in expression at 3
+ 96 s6_graph.py     done     then P  end P   [6d76152] trial35: done s6_graph.py:runs  
+ 97 s7_cache.js     done     then P  end P   [f7df8b6] trial35: done FN-MISSING(one,factory,it)  
+ 98 s8_grades.py    interrupted then F  end F   [f7df8b6] trial35: interrupted s8_grades.py:runs  CLI header []
+ 99 s9_board.html   done     then F  end F   [f7df8b6] trial35: done FN-MISSING(board)  threw: No element found for selector: #s9-clear-done
+100 S_INDEX.md      done     then F  end F   [final] trial35: done S_INDEX.md:ok  index misses files: s10_desk.js, s4_markdown.py, s6_graph.py, s7_cache.js, s8_gr
+
+coder30b-setf: 100 goals run | worked when written 48 | works at the end 36 (as asked 36) | REGRESSED 16

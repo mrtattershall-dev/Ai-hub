@@ -8642,3 +8642,46 @@ into the result record, ceiling by rule). Accepted; one implementation, not thre
 
 ## [03:27] Captain (84a10d37) — BIND-CJS step 6 done. Machine free.
 - M1 falsified: the engine has no multiprocess witness (0 of 33 by pid; the 266 were coverage snapshots from one process). Correction appended to step-1 record. Interface still closed.
+
+## [01:01] Captain (84a10d37) — claiming training-data/factory/score_run.mjs: comparability precondition
+- Making asset-version agreement an ENFORCED precondition for the Phaser column (currently warns, then prints COMPARABLE anyway). Factory script only; the running hub is not touched or restarted. Will post done.
+
+## [01:25] Captain (84a10d37) — score_run.mjs done (eaf3714). Machine free.
+- Comparability is an enforced precondition for the phaser/godot columns; raw verdicts with asset versions now written to eval/scores-*.json. Historical Phaser/Godot comparisons marked UNESTABLISHED in COMPARABILITY-AUDIT.md; nothing rescored. Running hub untouched.
+
+## [01:33] Captain (84a10d37) — comparability audit closed (3f5a8ff).
+- Original generations survive (all four eval_*.jsonl with text; 18 shared ids = code 9 / godot 3 / phaser 6), so reverification needs verifier time only, no GPU. DEFERRED unless the asset-axis rankings would change the next model decision. Nothing rescored; affected claims stay qualified.
+
+## [04:58] 784f5dee — claiming Set G coder30b recovery: ONE clean uncontended rerun
+- measurements/replay/regress.mjs over the reconstructed trial (workspace.bundle + runs/), driven from my scratchpad; ~25 min; CPU only; READ-ONLY on measurements/ and the rig. Attempts 1-3 overlapped 1083fe36's setG replay (now exited) and are diagnostic-only under the frozen promotion rule (legasus/screen/ROUTE-COMPLETENESS_STEP2.md). fuzzForever/fuzzLoop are live but their temp sweep is scoped to fuzz*-; recorded, not treated as contention. Will post done with the real NODE_EXIT.
+
+## [05:38] 784f5dee — Set G coder30b recovery DONE. Machine free.
+- Clean uncontended run, real NODE_EXIT=0 (the shell reported 0 on a failed run twice today; only the child status counts). Reproduced the 2026-09-12 summary byte-identically: 78 run | 33 when written | 29 at end | REGRESSED 6. All 78 per-goal rows identical to the earlier diagnostic run; six identities identical: goals 1, 10, 13, 15, 33, 43.
+- RESULT: all six are load-time throws — 3 files whose module-level self-tests throw inside require(). Route completeness was NOT the missing thing: every breaking write went through agent.js:3396 and the guard demonstrably ran (goal 73 step 36 refused a destructive write_file). The 7 git_undo calls on the unguarded approval path caused NONE of it. The end-of-run rollback restored versions that PARSE (quickCheck = node --check, agent.js:1722) and still throw at load.
+- Rig note: regress.mjs locates its trial dir from a `workspace <path>` log line pointing into %TEMP%, which is long deleted; I rebuilt it read-only from runs/coder30b-setg/workspace.bundle + runs/. The rig and measurements/ were not modified. Artifacts: legasus/screen/ROUTE-COMPLETENESS_setG-clean-rows.{txt,json}.
+- Unresolved: one earlier attempt lost its mkdtemp tree mid-run (checker died on its final write, ENOENT). Four hypotheses cleared — checker, scenario code, fuzzForever sweep (scoped to fuzz*-), peer replay cleanup. DELETION_OWNER UNKNOWN. fuzzLoop/fuzzForever are still live under PIDs 5604/7536.
+
+## [06:04] 784f5dee — CLAIMING a new worktree for Legasus Phase 1 (NOT the main tree)
+- Worktree `../ai-coding-hub-phase1`, branch `phase1-host-event`, from 3f5a8ff. Main tree is NOT touched: fuzzForever (PID 7536, running since 09-12) reruns fuzzLoop against whatever is on disk NOW, so editing server/agent.js in place would silently fuzz an uncommitted change and contaminate both that 10-day campaign and my C4 baseline.
+- Scope, deliberately tiny (legasus/screen/PHASE1-OBSERVATION_PREREG.md): ONE canonical host execution event emitted at agent.js:3396, one consumer. NO behaviour change; nothing prevented or permitted differently. Phase 1 may only establish the information contract - "events reached LegaCore" is explicitly NOT evidence that Legasus improves coding.
+- Will baseline the test suite BEFORE the change (C4 requires identical pass counts with the consumer on and off) and post it here.
+- DISK: reclaimed 15.92 GB by removing Docker (tatte authorised; docker-desktop WSL distro unregistered, data vhdx deleted). C: was at 0.32 GB free and a worktree could not be created; now 16.2 GB. Anyone who hit unexplained ENOSPC/IO failures in the last few hours should re-check their results.
+
+## [07:16] 784f5dee — Legasus PHASE 1 DONE. Worktree released; main tree never touched.
+- `ai-coding-hub-phase1` @ branch `phase1-host-event`, commit a879d05 from 3f5a8ff. NOT merged - it is yours to review. server/agent.js +43/-5.
+- FIRST TIME LEGASUS IS INSIDE THE AGENT rather than beside it. Before today, server/ had zero references to legasus in either direction; Legasus had only been run AGAINST the hub (97 test files under coverage).
+- OBSERVATION ONLY. The sink returns nothing and has no channel to; "events reached the consumer" is NOT evidence Legasus improves coding. Phase 2 is the load-bearing one.
+- C1-C5 all established; hostEvent.test.mjs 20 passed, real NODE_EXIT=0. C1 checked on the REAL path: a spawned index.js + fakemodel with HOST_EVENT_LOG, comparing the hub own JSONL against that run type==tool steps - equal count, same tools, same order. It SKIPS loudly rather than passing if the harness is missing.
+- C4 against a CHARACTERISED baseline: 85 deterministic unchanged; realChain/realGame/realModel exit 2 at 0s before and after (they need MODEL_BASE - environmental, not defects); batchActions and verifierInfra are LOAD-SENSITIVE (each 3/3 PASS in isolation on pristine AND after). Both had FAILED in the pristine sweep and PASSED after - without characterising them first the available inference was "Phase 1 fixed two tests", which is false. A sweep result for those two is uninformative in both directions.
+- COVERAGE WITH ITS DENOMINATOR: 1 of 3 execution sites, 1 of 6 mutation mechanisms. agent.js:2690 (subtask) and :4590 (approved-pending) still execute tools with NO event and NO before-image; the PTY mutates out-of-process.
+- Anyone touching agent.js: the emit sits deliberately BEFORE the duplicate-call guard, because that guard rewrites `result` eleven lines later. Do not move it after.
+- Records: legasus/screen/PHASE1-OBSERVATION_{PREREG,RESULT}.md. Baseline artifacts: server/suite-{baseline-BEFORE,AFTER}.json on the branch.
+
+## [10:12] 784f5dee — Legasus PHASE 2 WIRED (307a54a). Not merged; not yet qualified.
+- Branch `phase2-d2-intervention` off a879d05. d2 can now REFUSE to promote a run. Chain: 3f5a8ff -> a879d05 (observation) -> e0ca8ef (d2 rule) -> 307a54a (finish gate).
+- ARMS DIFFER IN AUTHORITY, NOT INFORMATION. Both run the full machinery (start observations, candidate capture, evaluation, verdict); only AGENT_D2_ENFORCE=1 acts on it. ARM A records `wouldRefuse` - that counterfactual is how incremental prevention gets measured at all.
+- TWO TREATMENT LEAKS FOUND AND CLOSED, both mine: (1) run_command/run_python inherited the hub process.env, so the model could read the arm marker - and HUB_TOKEN, the hub API credential, from any shell command. modelEnv() strips both in BOTH arms. (2) capture originally created ARM-B-only git objects; `git show-ref`/`for-each-ref`/`fsck` would have revealed the arm. Now symmetric - refs/legasus/* exists in both.
+- If you touch run_command/run_python: keep `env: modelEnv()`. If you touch d2 capture: it must stay non-invasive (commit-tree + private ref, never commitAll) or ARM B gains visible history ARM A lacks.
+- 53 new tests: d2.test.mjs 10, d2Recovery.test.mjs 27, d2ArmIsolation.test.mjs 16. C4 vs the characterised pristine baseline with d2 off: 85 deterministic unchanged, 3 environmental unchanged, 2 load-sensitive decided by isolation. 91/94.
+- STANDING: d2 discriminates and can act. NOT established: incremental prevention, economic benefit. The paid campaign may still show the hub already refuses everything d2 would.
+- Next: Phase 2 qualification (1m/10m/30m gates) then the paired 60m campaign. Records: legasus/screen/PHASE2-INTERVENTION_PREREG.md Amendments 5-8.

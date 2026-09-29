@@ -1,0 +1,907 @@
+{
+  "ws": "C:\\Users\\tatte\\Projects\\ai-coding-hub\\measurements\\2026-09-11-setF\\data\\coder14b-setf\\workspace",
+  "asIs": 2,
+  "impl": 2,
+  "results": [
+    {
+      "goal": 1,
+      "chain": 1,
+      "step": 1,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "copies 1.5 did not throw"
+    },
+    {
+      "goal": 2,
+      "chain": 2,
+      "step": 1,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'NoneType' object has no attribute 'get'"
+    },
+    {
+      "goal": 3,
+      "chain": 3,
+      "step": 1,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: m.shape is not a function"
+    },
+    {
+      "goal": 4,
+      "chain": 4,
+      "step": 1,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "one paragraph 'Hello world'"
+    },
+    {
+      "goal": 5,
+      "chain": 5,
+      "step": 1,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown variable: 1"
+    },
+    {
+      "goal": 6,
+      "chain": 6,
+      "step": 1,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 7,
+      "chain": 7,
+      "step": 1,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "evicted the wrong key (b was the least recently used)"
+    },
+    {
+      "goal": 8,
+      "chain": 8,
+      "step": 1,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given"
+    },
+    {
+      "goal": 9,
+      "chain": 9,
+      "step": 1,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "the input was not cleared"
+    },
+    {
+      "goal": 10,
+      "chain": 10,
+      "step": 1,
+      "file": "s10_desk.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 11,
+      "chain": 1,
+      "step": 2,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 12,
+      "chain": 2,
+      "step": 2,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: 'NoneType' object is not iterable"
+    },
+    {
+      "goal": 13,
+      "chain": 3,
+      "step": 2,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: a.add is not a function"
+    },
+    {
+      "goal": 14,
+      "chain": 4,
+      "step": 2,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "headings '# Title\\ntext under it\\n## Sub\\n\\n### Small'"
+    },
+    {
+      "goal": 15,
+      "chain": 5,
+      "step": 2,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown variable: 2"
+    },
+    {
+      "goal": 16,
+      "chain": 6,
+      "step": 2,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 17,
+      "chain": 7,
+      "step": 2,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.delete is not a function"
+    },
+    {
+      "goal": 18,
+      "chain": 8,
+      "step": 2,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given"
+    },
+    {
+      "goal": 19,
+      "chain": 9,
+      "step": 2,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: no card \"A\" in todo"
+    },
+    {
+      "goal": 20,
+      "chain": 10,
+      "step": 2,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 21,
+      "chain": 1,
+      "step": 3,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 22,
+      "chain": 2,
+      "step": 3,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: 'NoneType' object is not iterable"
+    },
+    {
+      "goal": 23,
+      "chain": 3,
+      "step": 3,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: m.toArray is not a function"
+    },
+    {
+      "goal": 24,
+      "chain": 4,
+      "step": 3,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "emphasis '**bold** and *it*'"
+    },
+    {
+      "goal": 25,
+      "chain": 5,
+      "step": 3,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown variable: 2"
+    },
+    {
+      "goal": 26,
+      "chain": 6,
+      "step": 3,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 27,
+      "chain": 7,
+      "step": 3,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.keys is not a function"
+    },
+    {
+      "goal": 28,
+      "chain": 8,
+      "step": 3,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'"
+    },
+    {
+      "goal": 29,
+      "chain": 9,
+      "step": 3,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: no card \"A\" in todo"
+    },
+    {
+      "goal": 30,
+      "chain": 10,
+      "step": 3,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 31,
+      "chain": 1,
+      "step": 4,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 32,
+      "chain": 2,
+      "step": 4,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: 'NoneType' object is not iterable"
+    },
+    {
+      "goal": 33,
+      "chain": 3,
+      "step": 4,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: a.transpose is not a function"
+    },
+    {
+      "goal": 34,
+      "chain": 4,
+      "step": 4,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "inline code 'use `a**b** < c` here'"
+    },
+    {
+      "goal": 35,
+      "chain": 5,
+      "step": 4,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown variable: 2"
+    },
+    {
+      "goal": 36,
+      "chain": 6,
+      "step": 4,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 37,
+      "chain": 7,
+      "step": 4,
+      "file": "s7_cache.js",
+      "asIs": true,
+      "impl": true,
+      "why": ""
+    },
+    {
+      "goal": 38,
+      "chain": 8,
+      "step": 4,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 4 were given"
+    },
+    {
+      "goal": 39,
+      "chain": 9,
+      "step": 4,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: no card \"A\" in todo"
+    },
+    {
+      "goal": 40,
+      "chain": 10,
+      "step": 4,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: library.getBook is not a function"
+    },
+    {
+      "goal": 41,
+      "chain": 1,
+      "step": 5,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 42,
+      "chain": 2,
+      "step": 5,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "percentile [None, None, None, None, None]"
+    },
+    {
+      "goal": 43,
+      "chain": 3,
+      "step": 5,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: a.equals is not a function"
+    },
+    {
+      "goal": 44,
+      "chain": 4,
+      "step": 5,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "link 'see <a href=\"http://x.org/a?b=1\">the docs</a> now'"
+    },
+    {
+      "goal": 45,
+      "chain": 5,
+      "step": 5,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown variable: m"
+    },
+    {
+      "goal": 46,
+      "chain": 6,
+      "step": 5,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 47,
+      "chain": 7,
+      "step": 5,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "size counts expired entries: 3"
+    },
+    {
+      "goal": 48,
+      "chain": 8,
+      "step": 5,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 4 were given"
+    },
+    {
+      "goal": 49,
+      "chain": 9,
+      "step": 5,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: no card \"B\" in todo"
+    },
+    {
+      "goal": 50,
+      "chain": 10,
+      "step": 5,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 51,
+      "chain": 1,
+      "step": 6,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 52,
+      "chain": 2,
+      "step": 6,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "by_hour None"
+    },
+    {
+      "goal": 53,
+      "chain": 3,
+      "step": 6,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: (intermediate value).determinant is not a function"
+    },
+    {
+      "goal": 54,
+      "chain": 4,
+      "step": 6,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "list '- one\\n- **two**\\n\\nafter'"
+    },
+    {
+      "goal": 55,
+      "chain": 5,
+      "step": 6,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "\"2 + * 3\": \"Unknown variable: 2\""
+    },
+    {
+      "goal": 56,
+      "chain": 6,
+      "step": 6,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 57,
+      "chain": 7,
+      "step": 6,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.stats is not a function"
+    },
+    {
+      "goal": 58,
+      "chain": 8,
+      "step": 6,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given"
+    },
+    {
+      "goal": 59,
+      "chain": 9,
+      "step": 6,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: no card \"A\" in todo"
+    },
+    {
+      "goal": 60,
+      "chain": 10,
+      "step": 6,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 61,
+      "chain": 1,
+      "step": 7,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 62,
+      "chain": 2,
+      "step": 7,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: 'NoneType' object is not iterable"
+    },
+    {
+      "goal": 63,
+      "chain": 3,
+      "step": 7,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: a.inverse is not a function"
+    },
+    {
+      "goal": 64,
+      "chain": 4,
+      "step": 7,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "ordered list '1. first\\n2. second\\n10. tenth'"
+    },
+    {
+      "goal": 65,
+      "chain": 5,
+      "step": 7,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: tokenize is not exported"
+    },
+    {
+      "goal": 66,
+      "chain": 6,
+      "step": 7,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 67,
+      "chain": 7,
+      "step": 7,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.delete is not a function"
+    },
+    {
+      "goal": 68,
+      "chain": 8,
+      "step": 7,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given"
+    },
+    {
+      "goal": 69,
+      "chain": 9,
+      "step": 7,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "Enter did not add: null"
+    },
+    {
+      "goal": 70,
+      "chain": 10,
+      "step": 7,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 71,
+      "chain": 1,
+      "step": 8,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 72,
+      "chain": 2,
+      "step": 8,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "sessions None"
+    },
+    {
+      "goal": 73,
+      "chain": 3,
+      "step": 8,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: (intermediate value).solve is not a function"
+    },
+    {
+      "goal": 74,
+      "chain": 4,
+      "step": 8,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "code block 'before\\n\\n```\\nx = 1 < 2\\n  *not em*\\n```\\n\\nafter'"
+    },
+    {
+      "goal": 75,
+      "chain": 5,
+      "step": 8,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: toRPN is not exported"
+    },
+    {
+      "goal": 76,
+      "chain": 6,
+      "step": 8,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 77,
+      "chain": 7,
+      "step": 8,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.resize is not a function"
+    },
+    {
+      "goal": 78,
+      "chain": 8,
+      "step": 8,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given"
+    },
+    {
+      "goal": 79,
+      "chain": 9,
+      "step": 8,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: no card \"Fix bug\" in todo"
+    },
+    {
+      "goal": 80,
+      "chain": 10,
+      "step": 8,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.checkout is not a function"
+    },
+    {
+      "goal": 81,
+      "chain": 1,
+      "step": 9,
+      "file": "s1_library.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: l.search is not a function"
+    },
+    {
+      "goal": 82,
+      "chain": 2,
+      "step": 9,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI --top 2 printed [] |    valid_lines = len(entries)\r\nTypeError: object of type 'NoneType' has no len()"
+    },
+    {
+      "goal": 83,
+      "chain": 3,
+      "step": 9,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "toString \"[object Object]\""
+    },
+    {
+      "goal": 84,
+      "chain": 4,
+      "step": 9,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "blockquote '> quoted **text**\\n> # Head\\n\\nplain'"
+    },
+    {
+      "goal": 85,
+      "chain": 5,
+      "step": 9,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: infixToPostfix is not defined"
+    },
+    {
+      "goal": 86,
+      "chain": 6,
+      "step": 9,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 87,
+      "chain": 7,
+      "step": 9,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.toJSON is not a function"
+    },
+    {
+      "goal": 88,
+      "chain": 8,
+      "step": 9,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given"
+    },
+    {
+      "goal": 89,
+      "chain": 9,
+      "step": 9,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: no card \"Deploy\" in todo"
+    },
+    {
+      "goal": 90,
+      "chain": 10,
+      "step": 9,
+      "file": "s10_desk.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Cannot read properties of undefined (reading 'includes')"
+    },
+    {
+      "goal": 91,
+      "chain": 1,
+      "step": 10,
+      "file": "S1_NOTES.md",
+      "asIs": false,
+      "impl": false,
+      "why": "notes miss checkout, returnBook, loans, placeHold, holds, dueDay, overdue, fines, pay, toJSON, fromJSON, search, removeBook"
+    },
+    {
+      "goal": 92,
+      "chain": 2,
+      "step": 10,
+      "file": "s2_logs.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: AttributeError: 'NoneType' object has no attribute 'get'"
+    },
+    {
+      "goal": 93,
+      "chain": 3,
+      "step": 10,
+      "file": "s3_matrix.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: X.fromString is not a function"
+    },
+    {
+      "goal": 94,
+      "chain": 4,
+      "step": 10,
+      "file": "s4_markdown.py",
+      "asIs": false,
+      "impl": false,
+      "why": "toc [(1, 'Intro', 'intro'), (2, 'Set up, fast!', 'set-up-fast'), (2, 'Intro', 'intro-2'), (3, 'Intro', 'intro-2')]"
+    },
+    {
+      "goal": 95,
+      "chain": 5,
+      "step": 10,
+      "file": "s5_expr.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: Unknown variable: 1"
+    },
+    {
+      "goal": 96,
+      "chain": 6,
+      "step": 10,
+      "file": "s6_graph.py",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: TypeError: argument of type 'method' is not iterable"
+    },
+    {
+      "goal": 97,
+      "chain": 7,
+      "step": 10,
+      "file": "s7_cache.js",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: c.getOrSet is not a function"
+    },
+    {
+      "goal": 98,
+      "chain": 8,
+      "step": 10,
+      "file": "s8_grades.py",
+      "asIs": false,
+      "impl": false,
+      "why": "CLI header [['bob', 'hw1', '5', '10']]"
+    },
+    {
+      "goal": 99,
+      "chain": 9,
+      "step": 10,
+      "file": "s9_board.html",
+      "asIs": false,
+      "impl": false,
+      "why": "threw: no card \"A\" in todo"
+    },
+    {
+      "goal": 100,
+      "chain": 10,
+      "step": 10,
+      "file": "S_INDEX.md",
+      "asIs": false,
+      "impl": false,
+      "why": "index misses files: s10_desk.js"
+    }
+  ]
+}

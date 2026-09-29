@@ -314,7 +314,10 @@ export default function AgentPage() {
     try {
       const r = await agentGet(id);
       setRun(r);
-      if (r.status !== 'running') { stopPolling(); refreshFiles(); }
+      // Stop only when the run is IDLE. A terminal status with busy still set is teardown:
+      // the syntax rollback is still rewriting files, the server refuses new work, and the
+      // file list is not final yet - so keep watching until busy clears, then refresh.
+      if (r.status !== 'running' && !r.busy) { stopPolling(); refreshFiles(); }
     } catch (e) {
       stopPolling();
       addToast(`Lost the run: ${e.message}`, 'error');
@@ -385,7 +388,7 @@ export default function AgentPage() {
   // One entry point for the input: continue a finished run, else start a new one.
   // A paused (interrupted) run must be Resumed first — don't silently start over.
   const handleSend = () => {
-    if (!goal.trim() || busy || isRunning || awaiting) return;
+    if (!goal.trim() || busy || isRunning || awaiting || tearingDown) return;
     if (interrupted) { addToast('This run is paused — Resume it first, then continue.', 'error'); return; }
     (finished && runId ? handleFollowup : handleStart)();
   };
@@ -406,7 +409,7 @@ export default function AgentPage() {
 
   const handleStop = async () => {
     if (!runId) return;
-    try { await agentStop(runId); stopPolling(); poll(runId); } catch (e) { addToast(e.message, 'error'); }
+    try { await agentStop(runId); startPolling(runId); poll(runId); } catch (e) { addToast(e.message, 'error'); }
   };
 
   // Continue a paused run. drive() replays from history server-side, so it picks up
@@ -430,7 +433,7 @@ export default function AgentPage() {
   };
 
   const handleNewProject = async () => {
-    if (isRunning || awaiting) return;
+    if (isRunning || awaiting || tearingDown) return;
     if (!window.confirm('Start a new project? This clears the workspace — every file in it is deleted.')) return;
     try {
       await agentReset();
@@ -444,7 +447,12 @@ export default function AgentPage() {
   const isRunning = run?.status === 'running';
   const awaiting = run?.status === 'awaiting_approval';
   const interrupted = run?.status === 'interrupted';
-  const finished = run && ['done', 'error', 'stopped'].includes(run.status);
+  const terminal = !!run && ['done', 'error', 'stopped'].includes(run.status);
+  // A terminal status with busy still set is TEARDOWN: the syntax rollback is still
+  // rewriting files. The server refuses any new start, follow-up or reset until it ends
+  // (a correct 409), so the page must not offer them, nor call the run finished, yet.
+  const tearingDown = terminal && !!run.busy;
+  const finished = terminal && !run.busy;
   // Recovered runs the user isn't already looking at (the current run shows its own inline Resume).
   const otherResumable = resumable.filter(r => r.id !== runId);
   // Only show files the user dropped in — hide the locked base scaffold (index.html, etc.).
@@ -457,7 +465,7 @@ export default function AgentPage() {
         <Bot size={17} style={{ color: 'var(--accent)' }} /> <strong>Autonomous Agent</strong>
         <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>— writes &amp; tests code in <code>workspace/</code></span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-          <button className="btn btn-sm" onClick={handleNewProject} disabled={isRunning || awaiting} title="Clear the workspace and start a fresh project">
+          <button className="btn btn-sm" onClick={handleNewProject} disabled={isRunning || awaiting || tearingDown} title="Clear the workspace and start a fresh project">
             <FilePlus2 size={13} /> New project
           </button>
           <a className="btn btn-sm" href="/workspace/index.html" target="_blank" rel="noopener noreferrer">
@@ -636,6 +644,11 @@ export default function AgentPage() {
           </div>
         )}
         {run?.steps?.map((s, i) => <StepRow key={i} step={s} n={s.n || i + 1} />)}
+        {tearingDown && (
+          <div style={{ padding: 16, color: 'var(--text-tertiary)', fontSize: 13 }}>
+            Finishing up — checking the workspace for files that no longer parse before it is handed back.
+          </div>
+        )}
         {finished && run.status === 'done' && (
           <div style={{ padding: 16, color: 'var(--success)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
             <CheckCircle2 size={16} /> Build complete — click <strong>Open app</strong> to view it, or <strong>Export</strong> to download.
@@ -678,11 +691,11 @@ export default function AgentPage() {
           value={goal}
           onChange={e => setGoal(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); handleSend(); } }}
-          disabled={isRunning || awaiting}
+          disabled={isRunning || awaiting || tearingDown}
         />
         <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-          <button className="btn btn-primary" onClick={handleSend} disabled={busy || isRunning || awaiting || !goal.trim()}>
-            <Play size={14} /> {isRunning || awaiting ? 'Running…' : finished ? 'Continue building' : 'Build it'}
+          <button className="btn btn-primary" onClick={handleSend} disabled={busy || isRunning || awaiting || tearingDown || !goal.trim()}>
+            <Play size={14} /> {isRunning || awaiting ? 'Running…' : tearingDown ? 'Finishing up…' : finished ? 'Continue building' : 'Build it'}
           </button>
           {(isRunning || awaiting) && (
             <button className="btn btn-sm" onClick={handleStop}><Square size={13} /> Stop</button>

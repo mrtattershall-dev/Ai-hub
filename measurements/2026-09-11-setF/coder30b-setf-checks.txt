@@ -1,0 +1,103 @@
+  1 fail s1_library.js  s1  threw: l.titles is not a function
+  2 PASS s2_logs.py     s1  
+  3 PASS s3_matrix.js   s1  
+  4 fail s4_markdown.py s1  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'
+  5 fail s5_expr.js     s1  "2 3" did not throw
+  6 fail s6_graph.py    s1  a repeated edge did not replace the weight
+  7 PASS s7_cache.js    s1  
+  8 PASS s8_grades.py   s1  
+  9 PASS s9_board.html  s1  
+ 10 fail s10_desk.js    s1  threw: library.titles is not a function
+ 11 fail s1_library.js  s2  the same member twice did not throw
+ 12 fail s2_logs.py     s2  bad_lines ['not a log line', '2.2.2.2 broken']
+ 13 PASS s3_matrix.js   s2  
+ 14 fail s4_markdown.py s2  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'
+ 15 PASS s5_expr.js     s2  
+ 16 PASS s6_graph.py    s2  
+ 17 PASS s7_cache.js    s2  
+ 18 PASS s8_grades.py   s2  
+ 19 PASS s9_board.html  s2  
+ 20 PASS s10_desk.js    s2  
+ 21 fail s1_library.js  s3  threw: l.loans is not a function
+ 22 fail s2_logs.py     s3  error_rate 0.75
+ 23 fail s3_matrix.js   s3  threw: a.mul is not a function
+ 24 fail s4_markdown.py s3  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'
+ 25 PASS s5_expr.js     s3  
+ 26 PASS s6_graph.py    s3  
+ 27 fail s7_cache.js    s3  keys ["b","c","a"]
+ 28 fail s8_grades.py   s3  threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'
+ 29 fail s9_board.html  s3  start ["To Do: 0","Doing: 0","Done: 0"]
+ 30 fail s10_desk.js    s3  threw: library.getLoans is not a function
+ 31 fail s1_library.js  s4  threw: l.holds is not a function
+ 32 fail s2_logs.py     s4  top_paths [('/a', 1), ('/b?x=1', 1), ('/a?y=2', 1)]
+ 33 PASS s3_matrix.js   s4  
+ 34 fail s4_markdown.py s4  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'
+ 35 fail s5_expr.js     s4  threw: Function x must be followed by parentheses at 1
+ 36 PASS s6_graph.py    s4  
+ 37 PASS s7_cache.js    s4  
+ 38 fail s8_grades.py   s4  equal weights 55.0
+ 39 PASS s9_board.html  s4  
+ 40 PASS s10_desk.js    s4  
+ 41 fail s1_library.js  s5  threw: l.overdue is not a function
+ 42 fail s2_logs.py     s5  threw: IndexError: list index out of range
+ 43 PASS s3_matrix.js   s5  
+ 44 fail s4_markdown.py s5  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'
+ 45 PASS s5_expr.js     s5  
+ 46 PASS s6_graph.py    s5  
+ 47 fail s7_cache.js    s5  keys still lists an expired entry: ["b","c"]
+ 48 fail s8_grades.py   s5  threw: TypeError: Gradebook.drop_lowest() missing 1 required positional argument: 'n'
+ 49 fail s9_board.html  s5  after reload [["Aâ†â†’Ã—","Câ†â†’Ã—"],["Bâ†â†’Ã—"]]
+ 50 fail s10_desk.js    s5  threw: library.overdue is not a function
+ 51 fail s1_library.js  s6  threw: l.returnBook is not a function
+ 52 fail s2_logs.py     s6  threw: AttributeError: module 's2_logs_mod' has no attribute 'by_hour'
+ 53 PASS s3_matrix.js   s6  
+ 54 fail s4_markdown.py s6  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'
+ 55 fail s5_expr.js     s6  "2 + * 3": 2
+ 56 fail s6_graph.py    s6  threw: AttributeError: 'Graph' object has no attribute 'remove_node'
+ 57 fail s7_cache.js    s6  stats {"hits":1,"misses":2,"evictions":0,"expirations":1}
+ 58 fail s8_grades.py   s6  missing as zero (80.0, None)
+ 59 fail s9_board.html  s6  the message was not emptied: "Doing is full"
+ 60 fail s10_desk.js    s6  threw: l.returnBook is not a function
+ 61 fail s1_library.js  s7  threw: k.returnBook is not a function
+ 62 fail s2_logs.py     s7  threw: AttributeError: module 's2_logs_mod' has no attribute 'between'
+ 63 fail s3_matrix.js   s7  threw: b.mul is not a function
+ 64 fail s4_markdown.py s7  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'
+ 65 PASS s5_expr.js     s7  
+ 66 fail s6_graph.py    s7  reachable(a) ['a', 'b', 'c']
+ 67 PASS s7_cache.js    s7  
+ 68 PASS s8_grades.py   s7  
+ 69 PASS s9_board.html  s7  
+ 70 fail s10_desk.js    s7  threw: library.getLoans is not a function
+ 71 fail s1_library.js  s8  threw: l.returnBook is not a function
+ 72 fail s2_logs.py     s8  threw: AttributeError: module 's2_logs_mod' has no attribute 'sessions'
+ 73 PASS s3_matrix.js   s8  
+ 74 fail s4_markdown.py s8  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'
+ 75 fail s5_expr.js     s8  "1 + 2 * x" -> ["1","2","x"]
+ 76 fail s6_graph.py    s8  components [['a'], ['a', 'b'], ['c', 'd'], ['d', 'e'], ['f'], ['z']]
+ 77 fail s7_cache.js    s8  resize kept ["d","a"]
+ 78 PASS s8_grades.py   s8  
+ 79 fail s9_board.html  s8  threw: No element found for selector: #s9-filter
+ 80 fail s10_desk.js    s8  threw: snapshot is not exported
+ 81 PASS s1_library.js  s9  
+ 82 fail s2_logs.py     s9  CLI --top 2 printed ['All tests passed!']
+ 83 fail s3_matrix.js   s9  toString "1 0.5\n-2 3.3333333\n0.0001 10"
+ 84 fail s4_markdown.py s9  no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'
+ 85 fail s5_expr.js     s9  threw: compile is not exported
+ 86 PASS s6_graph.py    s9  
+ 87 fail s7_cache.js    s9  fromJSON order ["c","b"]
+ 88 PASS s8_grades.py   s9  
+ 89 fail s9_board.html  s9  a duplicate was added: ["deploy"]
+ 90 PASS s10_desk.js    s9  
+ 91 fail S1_NOTES.md    s10 notes miss titles, returnBook, loans, overdue, pay, toJSON, fromJSON
+ 92 fail s2_logs.py     s10 threw: IndexError: list index out of range
+ 93 PASS s3_matrix.js   s10 
+ 94 fail s4_markdown.py s10 no result:         ^^^^^^^^^ | AttributeError: module 's4_markdown_mod' has no attribute 'to_html'
+ 95 fail s5_expr.js     s10 threw: Invalid characters in expression at 3
+ 96 PASS s6_graph.py    s10 
+ 97 PASS s7_cache.js    s10 
+ 98 fail s8_grades.py   s10 CLI header []
+ 99 fail s9_board.html  s10 threw: No element found for selector: #s9-clear-done
+100 fail S_INDEX.md     s10 index misses files: s10_desk.js, s4_markdown.py, s6_graph.py, s7_cache.js, s8_grades.py, s9_board.ht
+
+per project (implementation correct): s1 1/10  s2 1/10  s3 7/10  s4 0/10  s5 4/10  s6 6/10  s7 5/10  s8 5/10  s9 4/10  s10 3/10
+done as asked 36/100 | implementation correct 36/100 (CT = correct code, own test broke it)

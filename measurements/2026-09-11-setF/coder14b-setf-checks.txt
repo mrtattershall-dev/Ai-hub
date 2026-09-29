@@ -1,0 +1,104 @@
+  1 fail s1_library.js  s1  copies 1.5 did not throw
+  2 fail s2_logs.py     s1  threw: AttributeError: 'NoneType' object has no attribute 'get'
+  3 fail s3_matrix.js   s1  threw: m.shape is not a function
+  4 fail s4_markdown.py s1  one paragraph 'Hello world'
+  5 fail s5_expr.js     s1  threw: Unknown variable: 1
+  6 fail s6_graph.py    s1  threw: TypeError: argument of type 'method' is not iterable
+  7 fail s7_cache.js    s1  evicted the wrong key (b was the least recently used)
+  8 fail s8_grades.py   s1  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given
+  9 fail s9_board.html  s1  the input was not cleared
+ 10 PASS s10_desk.js    s1  
+ 11 fail s1_library.js  s2  threw: l.checkout is not a function
+ 12 fail s2_logs.py     s2  threw: TypeError: 'NoneType' object is not iterable
+ 13 fail s3_matrix.js   s2  threw: a.add is not a function
+ 14 fail s4_markdown.py s2  headings '# Title\ntext under it\n## Sub\n\n### Small'
+ 15 fail s5_expr.js     s2  threw: Unknown variable: 2
+ 16 fail s6_graph.py    s2  threw: TypeError: argument of type 'method' is not iterable
+ 17 fail s7_cache.js    s2  threw: c.delete is not a function
+ 18 fail s8_grades.py   s2  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given
+ 19 fail s9_board.html  s2  threw: no card "A" in todo
+ 20 fail s10_desk.js    s2  threw: l.checkout is not a function
+ 21 fail s1_library.js  s3  threw: l.checkout is not a function
+ 22 fail s2_logs.py     s3  threw: TypeError: 'NoneType' object is not iterable
+ 23 fail s3_matrix.js   s3  threw: m.toArray is not a function
+ 24 fail s4_markdown.py s3  emphasis '**bold** and *it*'
+ 25 fail s5_expr.js     s3  threw: Unknown variable: 2
+ 26 fail s6_graph.py    s3  threw: TypeError: argument of type 'method' is not iterable
+ 27 fail s7_cache.js    s3  threw: c.keys is not a function
+ 28 fail s8_grades.py   s3  threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'
+ 29 fail s9_board.html  s3  threw: no card "A" in todo
+ 30 fail s10_desk.js    s3  threw: l.checkout is not a function
+ 31 fail s1_library.js  s4  threw: l.checkout is not a function
+ 32 fail s2_logs.py     s4  threw: TypeError: 'NoneType' object is not iterable
+ 33 fail s3_matrix.js   s4  threw: a.transpose is not a function
+ 34 fail s4_markdown.py s4  inline code 'use `a**b** < c` here'
+ 35 fail s5_expr.js     s4  threw: Unknown variable: 2
+ 36 fail s6_graph.py    s4  threw: TypeError: argument of type 'method' is not iterable
+ 37 PASS s7_cache.js    s4  
+ 38 fail s8_grades.py   s4  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 4 were given
+ 39 fail s9_board.html  s4  threw: no card "A" in todo
+ 40 fail s10_desk.js    s4  threw: library.getBook is not a function
+ 41 fail s1_library.js  s5  threw: l.checkout is not a function
+ 42 fail s2_logs.py     s5  percentile [None, None, None, None, None]
+ 43 fail s3_matrix.js   s5  threw: a.equals is not a function
+ 44 fail s4_markdown.py s5  link 'see <a href="http://x.org/a?b=1">the docs</a> now'
+ 45 fail s5_expr.js     s5  threw: Unknown variable: m
+ 46 fail s6_graph.py    s5  threw: TypeError: argument of type 'method' is not iterable
+ 47 fail s7_cache.js    s5  size counts expired entries: 3
+ 48 fail s8_grades.py   s5  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 4 were given
+ 49 fail s9_board.html  s5  threw: no card "B" in todo
+ 50 fail s10_desk.js    s5  threw: l.checkout is not a function
+ 51 fail s1_library.js  s6  threw: l.checkout is not a function
+ 52 fail s2_logs.py     s6  by_hour None
+ 53 fail s3_matrix.js   s6  threw: (intermediate value).determinant is not a function
+ 54 fail s4_markdown.py s6  list '- one\n- **two**\n\nafter'
+ 55 fail s5_expr.js     s6  "2 + * 3": "Unknown variable: 2"
+ 56 fail s6_graph.py    s6  threw: TypeError: argument of type 'method' is not iterable
+ 57 fail s7_cache.js    s6  threw: c.stats is not a function
+ 58 fail s8_grades.py   s6  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given
+ 59 fail s9_board.html  s6  threw: no card "A" in todo
+ 60 fail s10_desk.js    s6  threw: l.checkout is not a function
+ 61 fail s1_library.js  s7  threw: l.checkout is not a function
+ 62 fail s2_logs.py     s7  threw: TypeError: 'NoneType' object is not iterable
+ 63 fail s3_matrix.js   s7  threw: a.inverse is not a function
+ 64 fail s4_markdown.py s7  ordered list '1. first\n2. second\n10. tenth'
+ 65 fail s5_expr.js     s7  threw: tokenize is not exported
+ 66 fail s6_graph.py    s7  threw: TypeError: argument of type 'method' is not iterable
+ 67 fail s7_cache.js    s7  threw: c.delete is not a function
+ 68 fail s8_grades.py   s7  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given
+ 69 fail s9_board.html  s7  Enter did not add: null
+ 70 fail s10_desk.js    s7  threw: l.checkout is not a function
+ 71 fail s1_library.js  s8  threw: l.checkout is not a function
+ 72 fail s2_logs.py     s8  sessions None
+ 73 fail s3_matrix.js   s8  threw: (intermediate value).solve is not a function
+ 74 fail s4_markdown.py s8  code block 'before\n\n```\nx = 1 < 2\n  *not em*\n```\n\nafter'
+ 75 fail s5_expr.js     s8  threw: toRPN is not exported
+ 76 fail s6_graph.py    s8  threw: TypeError: argument of type 'method' is not iterable
+ 77 fail s7_cache.js    s8  threw: c.resize is not a function
+ 78 fail s8_grades.py   s8  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given
+ 79 fail s9_board.html  s8  threw: no card "Fix bug" in todo
+ 80 fail s10_desk.js    s8  threw: l.checkout is not a function
+ 81 fail s1_library.js  s9  threw: l.search is not a function
+ 82 fail s2_logs.py     s9  CLI --top 2 printed [] |    valid_lines = len(entries)
+TypeError: object of type 'NoneType' has no 
+ 83 fail s3_matrix.js   s9  toString "[object Object]"
+ 84 fail s4_markdown.py s9  blockquote '> quoted **text**\n> # Head\n\nplain'
+ 85 fail s5_expr.js     s9  threw: infixToPostfix is not defined
+ 86 fail s6_graph.py    s9  threw: TypeError: argument of type 'method' is not iterable
+ 87 fail s7_cache.js    s9  threw: c.toJSON is not a function
+ 88 fail s8_grades.py   s9  threw: TypeError: Gradebook.add_assignment() takes 2 positional arguments but 3 were given
+ 89 fail s9_board.html  s9  threw: no card "Deploy" in todo
+ 90 fail s10_desk.js    s9  threw: Cannot read properties of undefined (reading 'includes')
+ 91 fail S1_NOTES.md    s10 notes miss checkout, returnBook, loans, placeHold, holds, dueDay, overdue, fines, pay, toJSON, fromJ
+ 92 fail s2_logs.py     s10 threw: AttributeError: 'NoneType' object has no attribute 'get'
+ 93 fail s3_matrix.js   s10 threw: X.fromString is not a function
+ 94 fail s4_markdown.py s10 toc [(1, 'Intro', 'intro'), (2, 'Set up, fast!', 'set-up-fast'), (2, 'Intro', 'intro-2'), (3, 'Intro
+ 95 fail s5_expr.js     s10 threw: Unknown variable: 1
+ 96 fail s6_graph.py    s10 threw: TypeError: argument of type 'method' is not iterable
+ 97 fail s7_cache.js    s10 threw: c.getOrSet is not a function
+ 98 fail s8_grades.py   s10 CLI header [['bob', 'hw1', '5', '10']]
+ 99 fail s9_board.html  s10 threw: no card "A" in todo
+100 fail S_INDEX.md     s10 index misses files: s10_desk.js
+
+per project (implementation correct): s1 0/10  s2 0/10  s3 0/10  s4 0/10  s5 0/10  s6 0/10  s7 1/10  s8 0/10  s9 0/10  s10 1/10
+done as asked 2/100 | implementation correct 2/100 (CT = correct code, own test broke it)
