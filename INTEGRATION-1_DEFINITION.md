@@ -120,9 +120,43 @@ faithfully.
 - Gating an effect path on the record blocks work without preventing any real defect.
 - Bar 3 comes back null — the record predicts nothing about when a configuration is worth using.
 
+## The effect path, audited — step 5 has a prerequisite I did not know about
+
+Before gating anything on the record, I audited the path it would gate: `governedEdit` in
+`ai-coding-hub-consolidation`. Four load-bearing claims, each verified by grep rather than taken on
+report:
+
+| | finding |
+|---|---|
+| **The workspace layer has no consumer at all** | `createWorkspace` appears in exactly two files: its own definition and its own test. Zero non-test importers. |
+| **`governedEdit` is wired into the real agent, and doubly dead** | eight call sites in `server/agent.js` behind `AGENT_GOVERNED_WRITES`, which is **set nowhere in the repository** — it appears only where it is read and in a scratch note. Turning it on would not produce governance either: every write tool refuses unless `setRunAuthority` was called, and the only caller of that is a test-harness child process. |
+| **Freshness is opt-in by the requester** | the revision check fires only when the *authority token* carries a pinned revision, and the grant-minting function never requires one. A caller that mints its own unpinned grant writes over moved bytes and is `ACTION_PERMITTED`. This is asserted as intended in a test. |
+| **The proposal's own `baseRevision` is decorative** | the packet records it and `commit()` never compares it. So "the state the proposal was prepared against" and the state actually enforced are two different values that nothing reconciles. |
+
+Two more, both of the class this project keeps hitting:
+
+- **`evidenceTokens` is read and never assigned** — it appears exactly once in the repo, as a read. The
+  evidence obligation's *success* path is therefore unreachable from the coordination layer, and the test
+  asserting `ACTION_DENIED_UNADMITTED_EVIDENCE` **would pass identically against an implementation that
+  always refused.** An assertion that cannot fail.
+- **No stale/denied/invalid axis.** The stale case is named `ACTION_DENIED_REVISION_MISMATCH` — lexically a
+  denial, with no retryability signal in the return shape. `PACKET.STALE_DEPENDENCY` is declared and never
+  emitted. So "the world moved, re-prepare" and "you may not touch this file" are indistinguishable to a
+  caller, which is exactly the distinction optimistic concurrency depends on.
+
+**What this changes.** Step 5 was "let one narrow effect path require the record." That path does not
+currently govern anything, so gating the record on it would produce a record of a governance that never
+runs — the most convincing possible version of the failure the protocol exists to prevent. The
+prerequisite is now explicit: **before any record gates an effect, the effect path must first be shown to
+be live**, with a positive control proving its success path is reachable.
+
 ## Named next work, in order
 
-1. Dual-write a **model-calling** run, not just hand-written candidates. The model call is the FACT the
+1. Give the evidence obligation a **positive control** — a test that fails if the implementation always
+   refuses. Until that exists, nothing about that obligation is established.
+2. Dual-write a **model-calling** run, not just hand-written candidates. The model call is the FACT the
    protocol most needs to carry, and it has not been exercised.
-2. Make bar 2 real: a preserved failure that measurably changes a later run.
-3. Only then consider step 5, on one path.
+3. Make bar 2 real: a preserved failure that measurably changes a later run.
+4. Separate **stale** from **denied** in the executor's refusal vocabulary — without it, "propose freely,
+   commit only when fresh" cannot be built on this path.
+5. Only then consider gating, and only on a path proven live.
