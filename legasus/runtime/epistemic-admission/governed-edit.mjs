@@ -42,6 +42,31 @@ export const OUTCOME = {
   ACTION_DENIED_UNADMITTED_EVIDENCE: 'ACTION_DENIED_UNADMITTED_EVIDENCE',
 };
 
+// ══ WHY A REFUSAL HAPPENED IS NOT THE SAME QUESTION AS WHETHER RETRYING COULD HELP. ══════════════
+// Every outcome above is lexically a DENIAL, so a caller wanting to tell 'the world moved,
+// re-observe and reissue' from 'you may not touch this file' had to string-match an outcome name.
+// The names stay - they are load-bearing and pre-registered - and the retryability becomes its own
+// first-class field instead of being inferred from wording.
+//
+//   STALE    the permission or evidence was about bytes that no longer exist. NOTHING was written.
+//            Re-observing the target and reissuing the packet can legitimately proceed.
+//   DENIED   the authority does not cover this action at all. Retrying changes nothing; only a
+//            DIFFERENT authority would, and that is a new decision rather than a refresh.
+//   INVALID  the action is malformed for this contract. Neither re-observation nor a new grant helps.
+export const DISPOSITION = Object.freeze({ STALE: 'STALE', DENIED: 'DENIED', INVALID: 'INVALID' });
+
+const DISPOSITION_OF = Object.freeze({
+  [OUTCOME.ACTION_DENIED_OPERATION_UNSUPPORTED]: DISPOSITION.INVALID,
+  [OUTCOME.ACTION_DENIED_TARGET_ESCAPES_ROOT]: DISPOSITION.DENIED,
+  [OUTCOME.ACTION_DENIED_SCOPE_MISMATCH]: DISPOSITION.DENIED,
+  [OUTCOME.ACTION_DENIED_NO_NORMATIVE_AUTHORITY]: DISPOSITION.DENIED,
+  // The grant was issued FOR a revision that has since moved. Re-observe, reissue, proceed.
+  [OUTCOME.ACTION_DENIED_REVISION_MISMATCH]: DISPOSITION.STALE,
+  // Evidence splits: evidence ABOUT STALE BYTES is refreshable; missing or wrong-target evidence
+  // is not a freshness problem and re-observing the same thing will not produce it.
+  [OUTCOME.ACTION_DENIED_UNADMITTED_EVIDENCE]: DISPOSITION.DENIED,
+});
+
 // THE REVISION OF A TARGET IS THE DIGEST OF ITS CURRENT BYTES. Not an mtime, not a version label - both
 // of those can agree while the content differs, which is the whole failure being guarded against.
 const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
@@ -73,8 +98,18 @@ export function editAction({ target, contents, evidence = [] }) {
 // make fail is decoration. The default is the real filesystem; only a test passes anything else.
 export function governedEdit({ authority, action, root, contract = EDIT_FIXTURE,
   deps = { readBack: (p) => readFileSync(p) } }) {
-  const deny = (outcome, why, extra = {}) =>
-    ({ outcome, permitted: false, effected: false, why, ...extra });
+  const deny = (outcome, why, extra = {}) => {
+    // An evidence refusal is STALE only when what was supplied was about THIS target at OTHER bytes.
+    // None supplied, or supplied about another file, is a denial: re-observing cannot conjure it.
+    const disposition = (outcome === OUTCOME.ACTION_DENIED_UNADMITTED_EVIDENCE && extra.staleRevisionCount)
+      ? DISPOSITION.STALE
+      : DISPOSITION_OF[outcome] || DISPOSITION.DENIED;
+    return {
+      outcome, permitted: false, effected: false, why, disposition,
+      retryable: disposition === DISPOSITION.STALE,
+      ...extra,
+    };
+  };
 
   if (!action || action.operation !== contract.operation) {
     return deny(OUTCOME.ACTION_DENIED_OPERATION_UNSUPPORTED,

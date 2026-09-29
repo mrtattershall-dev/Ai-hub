@@ -75,10 +75,31 @@ export const sameScope = (a, b) => a && b && a.kind === b.kind && a.path === b.p
 
 // `deps` is forwarded verbatim to the executor. It exists ONLY so the read-back check can be
 // exercised from this layer - a quarantine nobody can trigger is a quarantine nobody has tested.
-export function createWorkspace({ root, clock = () => Date.now(), deps = undefined }) {
-  // Scopes whose current bytes are known NOT to be the bytes any authorised write intended.
-  const unverified = new Set();
-  const events = [];
+// `priorEvents` is how a workspace comes back after a restart. The quarantine is DERIVED from the
+// log, so replaying the log restores it - there is no separate quarantine state that a reload could
+// lose, which is the point of deriving it rather than holding it.
+export function createWorkspace({ root, clock = () => Date.now(), deps = undefined, priorEvents = [] }) {
+  /**
+   * QUARANTINE IS DERIVED FROM THE LOG, NOT HELD IN A SET. The first version kept an in-memory Set
+   * keyed by path, which had two defects tatte named: it died on reload, erasing the evidence that
+   * a scope was damaged; and keyed by PATH alone it could never be cleared, so restoring the file
+   * left the target frozen forever.
+   *
+   * Derived and revision-scoped fixes both. A scope is quarantined when the log holds an unverified
+   * effect on it whose landed bytes are STILL the bytes on disk. Restore or reconcile the file and
+   * the quarantine lifts by itself, because the condition stops being true - no clearing call, and
+   * nothing to forget to call. It survives any reload that replays the log.
+   */
+  const quarantineOn = (scope) => {
+    const now = revisionOfScope(scope);
+    // Compared against `revisionOnDisk`, which THIS layer read with its own eyes at the moment of the
+    // damage - not against the executor's `revisionAfter`. The two are the same file in production;
+    // they differ only under a test seam that simulates a transforming filesystem, and a quarantine
+    // that judged through one lens while being set by another would silently never fire.
+    return events.find((e) => e.type === EVENT.ACTION_EFFECTED_UNVERIFIED
+      && sameScope(e.scope, scope) && e.revisionOnDisk === now) || null;
+  };
+  const events = [...priorEvents];
   const packets = new Map();
   let seq = 0;
 
@@ -164,13 +185,16 @@ export function createWorkspace({ root, clock = () => Date.now(), deps = undefin
 
     // QUARANTINE. Enforced at the effect boundary rather than at prepare(), because proposing
     // against a damaged scope is harmless - only causing a further effect on it is not.
-    if (unverified.has(p.scope.path)) {
+    const damaged = quarantineOn(p.scope);
+    if (damaged) {
       const ev = append(EVENT.ACTION_REFUSED, {
-        packetId, scope: p.scope, reason: PACKET.SCOPE_UNVERIFIED,
-        why: `an earlier effect on ${p.scope.path} landed unverified; its current bytes may not be used as`
-          + ' a base revision for further work until that is reconciled or restored',
+        packetId, scope: p.scope, reason: PACKET.SCOPE_UNVERIFIED, damagedBy: damaged.id,
+        damagedRevision: damaged.revisionOnDisk, retryable: false,
+        why: `an earlier effect on ${p.scope.path} landed unverified and those bytes are still on disk;`
+          + ' they may not be used as a base revision for further work. Restore or reconcile the file'
+          + ' and this lifts on its own - retrying the same packet will not.',
       });
-      return { committed: false, reason: PACKET.SCOPE_UNVERIFIED, event: ev, effected: false };
+      return { committed: false, reason: PACKET.SCOPE_UNVERIFIED, retryable: false, event: ev, effected: false };
     }
 
     if (p.expiresAt !== null && clock() > p.expiresAt) {
@@ -190,6 +214,28 @@ export function createWorkspace({ root, clock = () => Date.now(), deps = undefin
       return { committed: false, reason: PACKET.DEPENDENCY_INVALIDATED, event: ev, effected: false };
     }
 
+    // ── FRESHNESS, AND ONLY WHERE THE EXECUTOR CANNOT DECIDE IT. The comment below is deliberate:
+    // this layer does not pre-empt a conflict the effect boundary can settle, because that would make
+    // the conflict outcome a property of this file. But E1 is CONDITIONAL - it fires only when the
+    // AUTHORITY pins a revision, and the grant-minting call never requires one. A caller minting its
+    // own unpinned grant therefore wrote over moved bytes and was ACTION_PERMITTED, which made the
+    // packet's own baseRevision decorative. So: when the authority pins nothing, the packet's declared
+    // base revision is enforced HERE, and nowhere else does behaviour change.
+    const authorityPinsRevision = !!(p.authority && p.authority.context && p.authority.context.revision);
+    if (!authorityPinsRevision && p.baseRevision) {
+      const now = revisionOfScope(p.scope);
+      if (now !== p.baseRevision) {
+        const ev = append(EVENT.ACTION_REFUSED, {
+          packetId, scope: p.scope, reason: PACKET.STALE_DEPENDENCY, retryable: true,
+          baseRevision: p.baseRevision, currentRevision: now,
+          why: `the packet was prepared against ${String(p.baseRevision).slice(0, 12)} and ${p.scope.path}`
+            + ` is now at ${String(now).slice(0, 12)}. The authority pins no revision, so nothing below`
+            + ' would have caught this. Re-observe and reissue: this is STALE, not denied.',
+        });
+        return { committed: false, reason: PACKET.STALE_DEPENDENCY, retryable: true, event: ev, effected: false };
+      }
+    }
+
     // ── THE EFFECT BOUNDARY. One call, the existing executor, unchanged. The authority is the one the
     // packet was prepared with; nothing here rebuilds, re-scopes or refreshes it.
     const r = governedEdit({
@@ -203,9 +249,11 @@ export function createWorkspace({ root, clock = () => Date.now(), deps = undefin
     if (!r.permitted) {
       const ev = append(EVENT.ACTION_REFUSED, {
         packetId, scope: p.scope, reason: r.outcome, why: r.why,
-        refusedBy: 'governedEdit', pinnedRevision: r.pinnedRevision, currentRevision: r.currentRevision,
+        refusedBy: 'governedEdit', disposition: r.disposition, retryable: r.retryable,
+        pinnedRevision: r.pinnedRevision, currentRevision: r.currentRevision,
       });
-      return { committed: false, reason: r.outcome, why: r.why, event: ev, effected: false, effect: r };
+      return { committed: false, reason: r.outcome, why: r.why, disposition: r.disposition,
+        retryable: r.retryable, event: ev, effected: false, effect: r };
     }
 
     // ── THE EFFECT LANDED. Did it land as intended? `governedEdit` now reads the file back, so this
@@ -214,10 +262,10 @@ export function createWorkspace({ root, clock = () => Date.now(), deps = undefin
     // already there. What it must never do is COUNT: it may not be published as progress and may not
     // become the base revision for later work, so the scope is quarantined.
     if (r.effectVerified === false) {
-      unverified.add(p.scope.path);
       const ev = append(EVENT.ACTION_EFFECTED_UNVERIFIED, {
         packetId, scope: p.scope, baseRevision: p.baseRevision, resolvedTarget: r.resolvedTarget,
-        intendedRevision: r.intendedRevision, revisionAfter: r.revisionAfter, why: r.effectMismatch,
+        intendedRevision: r.intendedRevision, revisionAfter: r.revisionAfter,
+        revisionOnDisk: revisionOfScope(p.scope), why: r.effectMismatch,
         note: 'the write was authorised and it occurred; the bytes on disk are not the bytes intended,'
           + ' so this is not verified progress and this scope is quarantined until reconciled or restored',
       });
