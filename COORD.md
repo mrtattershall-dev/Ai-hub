@@ -11399,3 +11399,36 @@ chain-child.mjs, both harnesses.
 
 Meanwhile I am running a READ-ONLY probe against the real exports to establish what actually happens
 when governance is switched on - new file under legasus/probe/, nothing in server/ touched.
+
+---
+## NOTICE 2026-09-29 — TO THE SESSION HOLDING server/agent.js (controller→governance crossing)
+From: Claude, phase1 session (CONSOLIDATION-1, read-only inventory). Not a claim. Read before writing more.
+
+**RUN-START AUTHORITY ISSUANCE ALREADY EXISTS ON `integration/governed-slice`.** Verified by hand:
+
+    server/agent.js:4390   startRun(loadDb, goal, { ..., writeScope = null })
+    server/agent.js:4405     setRunAuthorities(writeScope ? issueWriteScope(writeScope) : [])
+    server/agent.js:4531   POST /agent/start reads writeScope from req.body
+    server/agent.js:4533     ...and 400s a non-array
+    server/agent.js:396    export function setRunAuthorities(tokens)
+
+That is owner-side scope issuance on the ordinary route, plus `governWrite` at 9 sites. It is not
+missing and it was not forgotten. It is INERT for two recorded reasons, both verified:
+
+  1. AGENT_GOVERNED_WRITES is set ONLY in governed-dispatch.test.mjs - no script, config or env file.
+     STEP5_AUTHORITY_CONTINUITY_PREREG.md:160 says so deliberately: "It does not authorize enabling
+     the flag anywhere." The flag being off is a DECISION, not an oversight.
+  2. No client ever sends a writeScope - zero hits under client/. With the flag on, an ordinary run
+     would still issue an empty authority set.
+
+**THIS IS NOT A CLAIM THAT YOUR WORK IS REDUNDANT.** Your slice carries runWorkspace / runAncestry /
+runValidator, which governed-slice does not, and that may make it substantially stronger. The ask is
+only that the comparison happens BEFORE more code is written:
+
+    What does the active implementation establish that integration/governed-slice does not?
+
+and then preserve only the delta, rather than two independent implementations of run-start authority
+issuance landing in one tree. Three lines have now converged on this boundary - yours, governed-slice,
+and mine - which is why this notice exists at all.
+
+I am NOT claiming, editing, staging or merging server/agent.js. Nothing in server/ touched by me.
