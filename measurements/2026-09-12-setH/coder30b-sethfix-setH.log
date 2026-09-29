@@ -1,0 +1,142 @@
+coder30b-sethfix set H start 02:07:29
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+
+100 goals, sequential: coder30b-sethfix-setH
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-7oGAbq\workspace
+runs C:\Users\tatte\AppData\Local\Temp\trial35-7oGAbq\runs
+hub cb1f8ce3cb2b174f20e4ee1fee7c7ca232c80824 | AGENT_UNATTENDED=0 | AGENT_BATCH_ACTIONS=default
+
+   #  status      steps calls err grd  secs  ON DISK
+      run 852e1890-4082-4ddb-a058-1af5ce67553d
+   1  done          17     8   0   0    27  s1_library.js:runs FN-MISSING(book,owns)
+      run 7f41f3b7-cbde-4b50-b0ac-82c99a6811be
+   2  done          14     8   0   0    21  s2_logs.py:runs FN-MISSING(time,status,bytes,seconds)
+      run 5d0ad148-a91e-44ab-a103-96e97b19b238
+   3  done          16    11   0   0    21  s3_matrix.js:runs FN-MISSING(Matrix)
+      run b46c8b6a-ee8a-43a5-bb1d-e18875ec45f7
+   4  done          12     8   0   0    18  s4_markdown.py:runs FN-MISSING(paragraphs)
+      approval denied: run_command {"cmd":"rm s5_expr.js"}
+      run eb3b07e1-7719-4ae2-a9ab-b18e4ded4fd6
+   5  done          37    19   3   0    95  s5_expr.js:runs FN-MISSING(numbers)
+      run 439d6800-87d0-4ad0-8c03-2b90c00b3bcb
+   6  done          10     6   0   0    21  s6_graph.py:runs FN-MISSING(number,of)
+      run b386a69b-e1a4-480b-aae6-62a9e8543487
+   7  done          10     5   0   0    21  s7_cache.js:runs FN-MISSING(Cache)
+      run 26e0fb78-2e52-4cc5-956c-c853ef65c123
+   8  done          11     6   0   0    27  s8_grades.py:runs
+      run 832e290c-39c4-4ae1-9bd9-ff0e8b3632be
+   9  done           7     4   0   0    66  s9_board.html:ok s9_board.js:parses
+      run 6451c189-e406-48d2-961c-756a1285f179
+  10  done          19    12   0   0    30  s10_desk.js:runs s1_library.js:runs s7_cache.js:runs FN-MISSING(js)
+      run d60f2665-f299-4e90-ac54-cf0a95bec85d
+  11  done          28    17   0   0    63  s1_library.js:runs
+      run 67a12de4-6f01-4d87-83f3-0ac8270a011e
+  12  done          41    24   0   0   136  s2_logs.py:runs
+      run 433ef78c-cd24-432a-82be-bc649b310afc
+  13  done          15    11   0   0    78  s3_matrix.js:runs
+      run ce63f4ad-1253-48ed-99bd-36600e7f91b7
+  14  done          18    10   1   0   111  s4_markdown.py:runs
+      approval approved: git_undo {"sha":"HEAD","hard":false}
+      run 599ca286-1630-47c9-8bb7-da0fcd185955
+  15  done          39    25   2   0   109  s5_expr.js:runs
+      run 352a3493-bc90-446c-93b7-68de3d6a571a
+  16  done          17     9   0   0    57  s6_graph.py:runs
+      run dfa095ca-d02c-4fbc-930c-4352708764c7
+  17  done          22    14   1   0    48  s7_cache.js:runs
+      run ef89163f-d17e-4f1f-aaf8-5f0fd4be4eb0
+  18  done          29    16   2   0    78  s8_grades.py:runs
+      run 23fc1bf9-94eb-4561-88bb-fbac621d8644
+  19  stopped       12    11   0   0   238  s9_board.html:ok s9_board.js:parses FN-MISSING(board,column)
+      run 44755461-a2d1-45d9-9515-d07f7af78763
+  20  done          35    23   0   0   121  s10_desk.js:runs
+      run 064124ea-6bb0-4c11-a4a9-077b93183336
+  21  stopped       45    30   5   0   114  s1_library.js:runs
+      run 3a3ce157-6912-474c-85a0-c21791321605
+  22  done          22    11   0   0    91  s2_logs.py:runs FN-MISSING(decimals)
+      run 0df7ebc4-0f17-4a5a-b42f-75f4509079e8
+  23  done          25    17   1   0    78  s3_matrix.js:runs
+      run 1ba6e1db-2483-43e2-abce-b798d0742d1b
+  24  stopped       57    30   3   0   424  s4_markdown.py:runs
+      approval denied: run_command {"cmd":"rm _snippet.py"}
+      run fcde48b3-2b12-41c9-8abf-acc0299f4919
+  25  stopped       52    30   1   0   164  s5_expr.js:runs FN-MISSING(operator,associative,it)
+      run 2a89895b-d4c8-4eff-a518-be0de04f4b33
+  26  done          22    12   0   0    63  s6_graph.py:runs FN-MISSING(returning,is)
+      run 6469047b-3894-4da0-b3c1-58a4c365ef4b
+  27  done          20    13   0   0    48  s7_cache.js:runs
+      approval approved: git_undo {"sha":"HEAD","hard":false}
+      run 5ec8046d-d9f4-4ef8-bb7d-1e306f5b2269
+  28  interrupted   19    12   1   0   265  s8_grades.py:THROWS FN-MISSING(letter,py,of)
+      run 5b10353d-5cfc-4382-8760-6e839d71c1e9
+  29  done          19    14   0   0    72  s9_board.html:ok s9_board.js:parses FN-MISSING(board)
+      run afc5678c-6030-4dac-81ea-39b98f569ebd
+  30  done          24    15   2   0    57  s10_desk.js:runs FN-MISSING(loans)
+      approval denied: run_command {"cmd":"node test_library.js 2>&1 | grep -A 5 -B 5 \"PlaceHo
+      run 65e42fec-2c26-4279-865b-b79ea912728d
+  31  stopped       44    30   0   0    92  s1_library.js:runs
+      run 103bbf2f-aa53-4b71-8656-99ecffdf456f
+  32  stopped       54    30   0   0   102  s2_logs.py:runs FN-MISSING(of,path)
+      run 4fdfd9dd-bb49-488b-9424-da83ca60247d
+  33  done          19    12   0   0    54  s3_matrix.js:runs
+      run cbca693a-5191-4fd6-9900-249b106e29b2
+  34  stopped       49    30   1   0   105  s4_markdown.py:runs
+      run 5bfddda6-032e-4b49-9dbf-b7bc4cb437f6
+  35  stopped       45    30   1   0   154  s5_expr.js:runs FN-MISSING(name)
+      run 8ab14e33-c58e-4606-90f8-449e2b3884ff
+  36  stopped       47    30   0   0   112  s6_graph.py:runs FN-MISSING(cycle)
+      approval denied: run_command {"cmd":"node s7_cache.js 2>&1 | head -20"}
+      run b472e3d1-e4fd-45e2-a972-ec3ab7cf83e5
+  37  stopped       52    30   0   0   128  s7_cache.js:runs
+      run 89e8add0-595a-4568-b004-8698ac9d7bc0
+  38  stopped       52    30   2   0   118  s8_grades.py:runs FN-MISSING(in)
+      run ddce9a1c-1b20-42b3-83a5-7daa50ba650b
+  39  done          31    23   1   0   151  s9_board.html:ok s9_board.js:parses FN-MISSING(board)
+      run edbd1a1c-985c-4231-83c8-1728aca91594
+  40  done          27    18   0   0    71  s10_desk.js:runs s7_cache.js:runs FN-MISSING(function,Cache)
+      run 0df05800-c53a-42ad-84e0-1a5ce7be258b
+  41  done          30    18   0   0    87  s1_library.js:runs FN-MISSING(number,daysLate)
+      approval approved: git_undo {"sha":"HEAD","hard":false}
+      run 5c855c29-c437-4372-8186-64cf9f28bb21
+  42  stopped       55    30   4   0   198  s2_logs.py:runs FN-MISSING(rank)
+      run 93296505-8234-4a02-8dfc-b1d9e1e85a86
+  43  stopped       35    30   5   0    72  s3_matrix.js:THROWS
+      run 460c3a73-2db5-4751-ba93-beaf84b2281d
+  44  stopped       52    30   2   0   142  s4_markdown.py:THROWS
+      run 11bdb6be-7b95-4d6b-8851-a61f2d95bd7d
+  45  stopped       46    30   0   0    90  s5_expr.js:runs FN-MISSING(min,max,abs,sqrt)
+      run fc8e64f9-f6cb-43c9-939b-8962b604f010
+  46  stopped       48    30   3   0    81  s6_graph.py:runs
+      run 74a0b4d0-527d-4eae-ae33-a9331adf9f59
+  47  stopped       48    30   2   0    93  s7_cache.js:runs FN-MISSING(Cache,now,clock,everywhere)
+      approval approved: git_undo {"sha":"HEAD","hard":false}
+      run 5c1908cc-908e-40b0-9a72-bc9aff0b3f48
+  48  stopped       46    30   1   0   108  s8_grades.py:runs FN-MISSING(scores)
+      approval denied: run_command {"cmd":"python -m pytest test_s9_board.py -v 2>/dev/null || 
+      run 7d584a9a-2aec-4124-9b24-360df598c57b
+  49  done          35    21   0   0    71  s9_board.html:ok s9_board.js:parses FN-MISSING(board)
+      run 2b984077-e2a7-46a6-8d5f-a3f275b446ad
+  50  stopped       44    30   2   0    73  s10_desk.js:runs FN-MISSING(overdue,isbn)
+      run a815c21d-3062-48a1-94d8-18e71a76efaf
+  51  stopped       45    30   0   0    84  s1_library.js:runs FN-MISSING(late)
+      run 4cf74595-e133-4d5f-a7f0-3d46b7143dbd
+  52  stopped       48    30   2   0   130  s2_logs.py:runs FN-MISSING(field)
+      approval approved: git_undo {"sha":"HEAD","hard":false}
+      approval approved: git_undo {"sha":"HEAD","hard":false}
+      run a258480e-5597-44e3-aeb4-e069986c9313
+  53  stopped       45    30   2   0   132  s3_matrix.js:runs
+  -- window closed: 47 goal(s) not started --
+
+--- summary ---
+goals run           : 53
+status 'done'       : 30/53
+WORK ACTUALLY DONE  : 21/53   <- the number that matters
+tool errors         : 50
+guard refusals      : 0   (the system working)
+total model calls   : 1063
+wall clock          : 86.9 min
+files: .pytest_cache, .screenshots, debug_links.py, debug_test.js, detailed_test.js, ESCALATIONS.md, package.json, s10_desk.js, s1_library.js, s2_logs.py, s3_matrix.js, s4_markdown.py, s5_expr.js, s6_graph.py, s7_cache.js, s8_grades.py, s9_board.html, s9_board.js, TASKS.md, test_determinant.js, test_inline_code.py, test_library.js, test_makeLookup.js, test_overdue.js, test_overdue_simple.js, test_percent_function.py, test_s2_logs.py, test_s3_matrix.js, test_s4_markdown.py, test_s5_expr.js, test_s6_graph.py, test_s7_cache.js, test_s8_grades.py, test_s9_board.js, test_specific.js, _snippet.py, __pycache__
+tok/s: min 0.5 max 186.3
+approvals           : 5:run_command:denied, 15:git_undo:approved, 25:run_command:denied, 28:git_undo:approved, 31:run_command:denied, 37:run_command:denied, 42:git_undo:approved, 48:git_undo:approved, 49:run_command:denied, 53:git_undo:approved, 53:git_undo:approved
+harness exit 0 at 03:34:39
+done as asked 39/100 | implementation correct 39/100 (CT = correct code, own test broke it)
+records: 53 run files, 53 transcripts

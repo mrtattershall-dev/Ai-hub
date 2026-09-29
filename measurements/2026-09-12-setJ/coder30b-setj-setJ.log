@@ -1,0 +1,63 @@
+coder30b-setj set J start 06:11:04
+serving C:/Users/tatte/Projects/ai-coding-hub-indent @ 3d7a080 | agent.js md5 d53b1f230cb0
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+
+20 goals, sequential: coder30b-setj-setJ
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-cWxzHB\workspace
+runs C:\Users\tatte\AppData\Local\Temp\trial35-cWxzHB\runs
+hub C:/Users/tatte/Projects/ai-coding-hub-indent @ 3d7a0800fe27a052f571d21737f08bf76f33b881 | agent.js md5 d53b1f230cb0 | AGENT_UNATTENDED=0 | AGENT_BATCH_ACTIONS=default
+
+   #  status      steps calls err grd  secs  ON DISK
+      run 58a633f5-9428-4d58-904a-fea8375be036
+   1  done          21    10   0   0    42  s1_library.js:runs FN-MISSING(book,owns)
+      run 6a657aa6-f323-417a-98fc-6df39f16c2ee
+   2  done          20    11   0   0    42  s2_logs.py:runs FN-MISSING(time,status,bytes,seconds)
+      run 964a5ec2-fc3a-4df0-97e4-8cd2e0b1d50b
+   3  done          15    10   0   0    45  s3_matrix.js:runs FN-MISSING(Matrix)
+      run e7e990f0-481e-4e8f-a1eb-0ca621cc9462
+   4  done          13     8   0   0    36  s4_markdown.py:runs FN-MISSING(paragraphs)
+      run c75eab5e-76c5-41f7-ae7c-0d621a11c76f
+   5  stopped       51    30   5   0   163  s5_expr.js:runs FN-MISSING(numbers)
+      run 2a41c06d-f562-4ebc-a964-a514d1605421
+   6  done          15     8   0   0    42  s6_graph.py:runs FN-MISSING(number,of)
+      run 4111b948-649c-48ce-b91b-d04143298b29
+   7  done          13     7   0   0    39  s7_cache.js:runs FN-MISSING(Cache)
+      run e68e300b-ac25-42ed-876b-2647070eb3a0
+   8  done          13     8   0   0    45  s8_grades.py:runs
+      run b0b5fd74-a17c-42be-a841-a5aa37fd2d37
+   9  done          13     8   1   0   579  s9_board.html:ok s9_board.js:parses
+      run 3c02b5b7-7b1a-4c40-8c93-cb0ddcce3e6f
+  10  done          16    10   0   0   280  s10_desk.js:runs s1_library.js:runs s7_cache.js:runs FN-MISSING(js)
+      run f7956465-6dc4-4eb0-997c-b7938515feff
+  11  done          19    11   0   0   136  s1_library.js:runs
+      run c0813010-eabe-4641-817d-af3c64550e55
+  12  done          18    12   0   0   100  s2_logs.py:runs
+      run 32644545-b425-4bad-bad7-1288657ff8f1
+  13  done          26    16   0   0   127  s3_matrix.js:runs
+      run 480ec4e6-8372-4ec1-a061-db5327ef423b
+  14  done          15     8   0   0   157  s4_markdown.py:runs
+      run 66fb8638-d9c3-4ee6-ad9e-7dd057eba7af
+  15  stopped       51    30   0   0   383  s5_expr.js:runs
+      approval denied: run_command {"cmd":"rm _snippet.py"}
+      run 4ae15551-de13-4b5e-97f1-7bb1f706e7f6
+  16  done          25    13   0   0   333  s6_graph.py:runs
+      run 1611f3f0-6206-4b4f-88a7-a61f5944afd6
+  17  done          13     7   0   0   160  s7_cache.js:runs
+      run 9299229d-32f6-45c8-8d2f-c87b110646cb
+  18  done          18     9   0   0   338  s8_grades.py:runs
+  -- window closed: 2 goal(s) not started --
+
+--- summary ---
+goals run           : 18
+status 'done'       : 16/18
+WORK ACTUALLY DONE  : 10/18   <- the number that matters
+tool errors         : 6
+guard refusals      : 0   (the system working)
+total model calls   : 216
+wall clock          : 50.8 min
+files: .screenshots, debug_evaluate.js, debug_expr.js, debug_unary.js, demo_library.js, ESCALATIONS.md, package.json, s10_desk.js, s1_library.js, s2_logs.py, s3_matrix.js, s4_markdown.py, s5_expr.js, s6_graph.py, s7_cache.js, s8_grades.py, s9_board.html, s9_board.js, TASKS.md, test_evaluate.js, test_library.js, test_simple.js, _snippet.py, __pycache__
+tok/s: min 0.6 max 157.1
+approvals           : 16:run_command:denied
+harness exit 0 at 07:02:01
+done as asked 14/100 | implementation correct 14/100 (CT = correct code, own test broke it)
+records: 18 run files, 18 transcripts

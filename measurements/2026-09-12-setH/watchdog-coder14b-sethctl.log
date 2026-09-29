@@ -1,0 +1,4 @@
+armed 00:55:54: stop coder14b-sethctl on ALL DONE or at 110 min
+02:31:00 ALL DONE -> node training-data/factory/stopApp.mjs coder14b-sethctl
+{"ok":true,"stopExit":0,"stopAttempts":1,"appIds":["ap-OGBEYhlOgNFMxS3kGVXOgZ"],"stoppedAt":"2026-09-12 02:31:09-05:00","detail":"stopped, and confirmed by the app list"}
+02:31:10 stopApp exit 0

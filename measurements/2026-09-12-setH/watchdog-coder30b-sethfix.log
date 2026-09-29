@@ -1,0 +1,4 @@
+armed 02:02:45: stop coder30b-sethfix on ALL DONE or at 110 min
+03:35:41 ALL DONE -> node training-data/factory/stopApp.mjs coder30b-sethfix
+{"ok":true,"stopExit":0,"stopAttempts":1,"appIds":["ap-WzCVllvZ6oyl9sYOtOpLrP"],"stoppedAt":"2026-09-12 03:36:02-05:00","detail":"stopped, and confirmed by the app list"}
+03:36:05 stopApp exit 0

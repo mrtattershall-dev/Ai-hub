@@ -1,0 +1,44 @@
+deploy start 04:12:13
+Building image im-G05c1HGJ1jN53ILIu8QvHY
+
+=> Step 0: FROM base
+
+=> Step 1: ENV HF_HUB_ENABLE_HF_TRANSFER=1
+
+=> Step 2: ENV VLLM_WORKER_MULTIPROC_METHOD=spawn
+
+=> Step 3: ENV MYCODER_BASE=Qwen/Qwen2.5-Coder-32B-Instruct
+
+=> Step 4: ENV MYCODER_GPU=H100
+
+=> Step 5: ENV MYCODER_NAME=coder32b
+
+=> Step 6: ENV MYCODER_MAXLEN=16384
+
+=> Step 7: ENV MYCODER_GPU_FRAC=0.9
+
+=> Step 8: ENV MYCODER_LORA=''
+
+=> Step 9: ENV MYCODER_LORA_NAME=tuned
+
+=> Step 10: ENV MYCODER_LORA_RANK=16
+Saving image...
+Image saved, took 868.50ms
+
+Built image im-G05c1HGJ1jN53ILIu8QvHY in 1.61s
+
+
+✓ Created objects.
+├── 🔨 Created mount 
+│   C:\Users\tatte\Projects\ai-coding-hub\training-data\factory\modal_serve_vll
+│   m.py
+├── 🔨 Created function Server.*.
+└── 🔨 Created Web Function URL for Server.web => 
+    https://mr-tattershall--coder32b-seti-server-web.modal.run
+✓ App deployed in 4.199s! 🎉
+
+View Deployment: 
+https://modal.com/apps/mr-tattershall/main/deployed/coder32b-seti
+health try 1 04:14:50: 
+health try 2 04:17:36: 
+health try 3 04:17:57: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-32B-Instruct","gpu":"H100","max_len":16384,"lora":null}

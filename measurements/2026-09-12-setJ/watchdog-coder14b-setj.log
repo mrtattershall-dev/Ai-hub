@@ -1,0 +1,5 @@
+armed 06:08:04: stop coder14b-setj on ALL DONE or at 65 min
+armed 06:08:52: stop coder14b-setj on ALL DONE or at 65 min
+07:00:08 ALL DONE -> node training-data/factory/stopApp.mjs coder14b-setj
+{"ok":true,"stopExit":0,"stopAttempts":1,"appIds":["ap-dnFH69kqq4hYve0YD4m{"ok":true,"stopExit":1,"stopAttempts":1,"appIds":["ap-dnFH69kqq4hYve0YD4m0N3"],"stoppedAt":"2026-09-12 07:00:26-05:00","detail":"the stop command failed, but the app list shows nothing deployed - it was already stopped"}
+07:00:27 stopApp exit 0

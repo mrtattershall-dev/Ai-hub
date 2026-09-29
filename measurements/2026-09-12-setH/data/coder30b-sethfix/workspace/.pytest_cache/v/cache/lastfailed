@@ -1,0 +1,9 @@
+{
+  "test_s2_logs.py::test_top_paths": true,
+  "test_s8_grades.py::test_basic_functionality": true,
+  "test_s8_grades.py::test_categories": true,
+  "test_s4_markdown.py::test_to_html_links": true,
+  "test_s4_markdown.py::test_to_html_links_with_existing_features": true,
+  "test_s8_grades.py::test_drop_lowest": true,
+  "test_inline_code.py": true
+}

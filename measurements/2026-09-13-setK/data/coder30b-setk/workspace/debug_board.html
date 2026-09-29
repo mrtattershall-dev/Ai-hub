@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Board</title>
+    <style>
+        .s9-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 5px;
+            background-color: #f9f9f9;
+        }
+        .s9-left, .s9-right {
+            margin: 5px;
+            padding: 2px 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="s9-todo">
+        <h2>To Do</h2>
+        <ul>
+            <li class="s9-card">Test Task 1</li>
+        </ul>
+    </div>
+    
+    <div id="s9-doing">
+        <h2>Doing</h2>
+        <ul></ul>
+    </div>
+    
+    <div id="s9-done">
+        <h2>Done</h2>
+        <ul></ul>
+    </div>
+    
+    <div>
+        <input type="text" id="s9-new" placeholder="Add new task">
+        <button id="s9-add">Add Task</button>
+    </div>
+
+    <script src="s9_board.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+coder14b-setj set J start 06:10:40
+serving C:/Users/tatte/Projects/ai-coding-hub-indent @ 3d7a080 | agent.js md5 d53b1f230cb0
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+
+20 goals, sequential: coder14b-setj-setJ
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-Cq4RcJ\workspace
+runs C:\Users\tatte\AppData\Local\Temp\trial35-Cq4RcJ\runs
+hub C:/Users/tatte/Projects/ai-coding-hub-indent @ 3d7a0800fe27a052f571d21737f08bf76f33b881 | agent.js md5 d53b1f230cb0 | AGENT_UNATTENDED=0 | AGENT_BATCH_ACTIONS=default
+
+   #  status      steps calls err grd  secs  ON DISK
+      run b708926d-c77e-4c89-9984-7820f5643da5
+   1  done          16     6   0   0    63  s1_library.js:runs FN-MISSING(book,owns)
+      run 14153c9e-1d41-4a46-b796-d9d126822176
+   2  stopped       10     5   0   0    45  s2_logs.py:runs FN-MISSING(time,status,bytes,seconds)
+      run 4972679a-d40b-4a24-af2d-2a8368742c84
+   3  done          13     5   0   0    51  s3_matrix.js:runs FN-MISSING(Matrix)
+      run 26bfb85d-77c4-4211-b169-9d2fbdabc615
+   4  done           9     4   0   0    42  s4_markdown.py:runs FN-MISSING(paragraphs)
+      run 382c6ce9-71f0-4699-ac5c-7cfa7e6d4e5f
+   5  interrupted   10     4   0   0   395  s5_expr.js:runs FN-MISSING(numbers)
+      run 0df68d49-18b0-4938-9489-1fef69044fb6
+   6  stopped       13     7   2   0    54  s6_graph.py:THROWS FN-MISSING(number,of)
+      run fcc232b9-59d1-49bc-8271-e6cda2e579a9
+   7  done          20     9   1   0    72  s7_cache.js:runs FN-MISSING(Cache)
+      run 17cc6854-da73-4d6a-8643-f41e695fdfa6
+   8  stopped       61    30   0   0   244  s8_grades.py:THROWS
+      run a92a2637-23c9-4cd3-9fa0-4017de035c3a
+   9  done          10     5   0   0   377  s9_board.html:ok s9_board.js:parses
+      run 4a0b80f3-517d-4eb9-bb66-b0228b6a0732
+  10  stopped       18    10   0   0   223  s10_desk.js:THROWS s1_library.js:runs s7_cache.js:runs FN-MISSING(js)
+      run 8e7cf9aa-2831-4bb4-9912-b38ad556b165
+  11  done          21    11   4   0   142  s1_library.js:runs FN-MISSING(checkout,available)
+      run 27a9ee1c-9cbd-452e-9e93-db43100a1e30
+  12  done          13     7   1   0   325  s2_logs.py:runs
+      run 47f510ad-f172-4a7f-9534-a29d8589d676
+  13  stopped       13     8   3   0   154  s3_matrix.js:runs
+      run 38429517-2103-42f0-ba0e-6937072c896b
+  14  stopped       17     8   0   0   151  s4_markdown.py:THROWS
+      run 7931f7a0-06f7-44d3-ab92-882a4225fd84
+  15  stopped       16     8   0   0   325  s5_expr.js:runs
+      run ce597440-5cb0-4b40-a2b0-4bf75fc996ed
+  16  stopped       23    11   4   0   190  s6_graph.py:THROWS
+  -- window closed: 4 goal(s) not started --
+
+--- summary ---
+goals run           : 16
+status 'done'       : 7/16
+WORK ACTUALLY DONE  : 4/16   <- the number that matters
+tool errors         : 15
+guard refusals      : 0   (the system working)
+total model calls   : 138
+wall clock          : 47.6 min
+files: ESCALATIONS.md, node_modules, package-lock.json, package.json, s10_desk.js, s1_library.js, s2_logs.py, s3_matrix.js, s4_markdown.py, s5_expr.js, s6_graph.py, s7_cache.js, s8_grades.py, s9_board.html, s9_board.js, TASKS.md, test_s1_library.js, test_s3_matrix.js, test_s7_cache.js, __pycache__
+tok/s: min 0.7 max 47.2
+approvals           : none
+harness exit 0 at 06:58:24
+done as asked 4/100 | implementation correct 4/100 (CT = correct code, own test broke it)
+records: 16 run files, 16 transcripts
