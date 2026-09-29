@@ -29,7 +29,7 @@
 //       whether the remaining nodes can still be told apart with no surface node in play
 //   g3  a filter button on a page whose update path is an ANONYMOUS handler - derivation refuses U
 // ══════════════════════════════════════════════════════════════════════════════════════════════════
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const NL = String.fromCharCode(10);
@@ -40,6 +40,7 @@ const { topLevelFunctions, referencedElsewhere } = await import('./editPlanner.m
 
 let passed = 0, failed = 0;
 const limits = [];
+const ledger = [];
 const say = (ok, m) => { console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${m}`); ok ? passed++ : failed++; };
 
 /** Everything transitively downstream of `owner`, from the graph's own edges. */
@@ -189,6 +190,7 @@ for (const shape of SHAPES) {
     + (base.complete ? '' : `  UNREACHABLE: ${base.missing.join(',')}`));
   if (!base.complete) { console.log('    no mutant result on this shape can be trusted; skipping its mutants'); continue; }
 
+  const aimed = new Map();
   // ── SPECIFICITY, one mutant per node. ────────────────────────────────────────────────────────
   for (const m of shape.mutants) {
     const owner = graph.nodes.find((n) => (typeof m.at === 'number' ? n.step === m.at : n.id === m.at));
@@ -204,12 +206,49 @@ for (const shape of SHAPES) {
       limits.push(`${shape.name} ${owner.id} (step ${owner.step}): ${m.why.replace(/^BLIND SPOT: /, '')}`);
       continue;
     }
+    aimed.set(owner.id, [...(aimed.get(owner.id) || []), { verdict, why: m.why, brokenSentinels }]);
     say(verdict === 'CAUGHT', `${owner.id.padEnd(3)} ${verdict.padEnd(10)} ${m.why}`);
     console.log(`         sentinels [${sentinels.join(',')}]`
       + (brokenSentinels.length ? `  BROKEN ${brokenSentinels.join(',')}` : ' all intact')
       + (collateral.length ? `  + expected collateral ${collateral.join(',')}` : ''));
   }
+
+  // ══ EDGE STATUS ═════════════════════════════════════════════════════════════════════════════
+  // THE GRAPH IS A FALSIFIABLE MODEL OF THE SYSTEM, NOT GROUND TRUTH. Drawing a dependency edge does
+  // not make it real, and a passing tally hides which nodes were actually probed. Every node carries
+  // one of four statuses, and only the first means "validated":
+  //
+  //   OBSERVED      a mutant aimed at it FAILED it while its declared sentinels survived
+  //   ASSUMED       NO MUTANT WAS EVER AIMED AT IT. Plausible, unprobed - and invisible in a tally
+  //   ESCAPED       a mutant aimed at it did NOT fail it: the node cannot see a fault it owns
+  //   EDGE_MISSING  a mutant failed a node the graph did NOT declare downstream of its owner, so the
+  //                 map of dependencies is incomplete exactly there
+  //
+  // An escaped mutant is not merely a failed test. It is evidence that the system's map of its own
+  // dependencies is wrong, which is why it is recorded AGAINST THE NODE and kept, not just counted.
+  for (const n of graph.nodes) {
+    const hits = aimed.get(n.id) || [];
+    const status = !hits.length ? 'ASSUMED'
+      : hits.some((h) => h.verdict === 'ESCAPED') ? 'ESCAPED'
+        : hits.some((h) => h.verdict === 'OVER-BROAD') ? 'EDGE_MISSING' : 'OBSERVED';
+    ledger.push({
+      shape: shape.name, node: n.id, kind: n.kind,
+      derivation: n.distinguishing || (n.sequence ? 'DERIVED_SEQUENCE' : 'DIRECT'),
+      dependsOn: n.dependsOn || [], status,
+      mutants: hits.map((h) => ({ verdict: h.verdict, why: h.why, brokeSentinels: h.brokenSentinels })),
+    });
+  }
+  for (const r of graph.refusals) ledger.push({ shape: shape.name, node: r.id, kind: 'refused', status: 'REFUSED', refusal: r.type, why: r.why });
+  const unprobed = ledger.filter((l) => l.shape === shape.name && l.status === 'ASSUMED');
+  say(unprobed.length === 0, unprobed.length
+    ? `EDGE STATUS: ${unprobed.map((u) => u.node).join(',')} are ASSUMED - no mutant was ever aimed at them, so the tally above overstates what is validated`
+    : 'EDGE STATUS: every node on this shape was probed by a mutant of its own');
 }
+
+mkdirSync('legasus/records', { recursive: true });
+writeFileSync('legasus/records/edgeStatus.json', JSON.stringify({ at: new Date().toISOString(), ledger }, null, 2), 'utf8');
+const tally = ledger.reduce((a, l) => ({ ...a, [l.status]: (a[l.status] || 0) + 1 }), {});
+console.log(`${NL}  edge status -> ${Object.entries(tally).map(([k, v]) => `${k} ${v}`).join('  ')}   (legasus/records/edgeStatus.json)`);
 
 for (const l of limits) console.log(`${NL}  DECLARED LIMIT  ${l}`);
 console.log(`${NL}  graph node discrimination: ${passed} passed, ${failed} failed -> ${failed

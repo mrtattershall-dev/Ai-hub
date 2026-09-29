@@ -1,0 +1,307 @@
+{
+  "at": "2026-09-29T09:01:57.220Z",
+  "ledger": [
+    {
+      "shape": "g1",
+      "node": "C",
+      "kind": "surface",
+      "derivation": "DERIVED_SEQUENCE",
+      "dependsOn": [],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "binds a handler to a control it never creates",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g1",
+      "node": "W",
+      "kind": "wiring",
+      "derivation": "DERIVED_SEQUENCE",
+      "dependsOn": [
+        "C"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "creates the control and leaves it inert",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g1",
+      "node": "E1",
+      "kind": "effect",
+      "derivation": "DIRECT",
+      "dependsOn": [
+        "W"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "empties the field but never re-renders, so the rows stay hidden",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g1",
+      "node": "E2",
+      "kind": "effect",
+      "derivation": "DIRECT",
+      "dependsOn": [
+        "W"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "restores the typed text after clearing: the list comes back, the field is not empty",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g1",
+      "node": "E3",
+      "kind": "effect",
+      "derivation": "OBSERVED",
+      "dependsOn": [
+        "W",
+        "E1"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "works exactly once - the repeat step is the only thing that can catch this",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g1",
+      "node": "U",
+      "kind": "existing-route",
+      "derivation": "DIRECT",
+      "dependsOn": [],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "the new control is correct, but the page’s own filtering is destroyed outright",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g1",
+      "node": "P1",
+      "kind": "preserved",
+      "derivation": "CONDITIONAL",
+      "dependsOn": [
+        "U",
+        "E1"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "filtering works until the new control is used, then the addition detaches it",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g2",
+      "node": "E1",
+      "kind": "effect",
+      "derivation": "DIRECT",
+      "dependsOn": [],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "listens for the key and does nothing observable",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g2",
+      "node": "U",
+      "kind": "existing-route",
+      "derivation": "DIRECT",
+      "dependsOn": [],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "the reset is correct, but the page’s own ArrowRight route is destroyed",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g2",
+      "node": "D",
+      "kind": "durability",
+      "derivation": "DERIVED_SEQUENCE",
+      "dependsOn": [
+        "E1"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "the second press moves the page instead of leaving it where it is",
+          "brokeSentinels": []
+        },
+        {
+          "verdict": "CAUGHT",
+          "why": "resets once then stops responding - this ESCAPED the task’s own step 4",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g2",
+      "node": "C/W",
+      "kind": "refused",
+      "status": "REFUSED",
+      "refusal": "NO_SURFACE_REQUIRED",
+      "why": "the trigger is key with no selector, so there is no surface to require"
+    },
+    {
+      "shape": "g2",
+      "node": "P1",
+      "kind": "refused",
+      "status": "REFUSED",
+      "refusal": "NO_POST_ADDITION_EXERCISE",
+      "why": "no carried step re-exercises \"everything that already works keeps working\" after the addition"
+    },
+    {
+      "shape": "g2",
+      "node": "E2",
+      "kind": "refused",
+      "status": "REFUSED",
+      "refusal": "UNOBSERVABLE_REPEAT",
+      "why": "step 4 repeats step 3 with no intervening action that could alter the property it asserts, so it cannot separate a preserved behaviour from one that was only true the first time"
+    },
+    {
+      "shape": "g3",
+      "node": "C",
+      "kind": "surface",
+      "derivation": "DERIVED_SEQUENCE",
+      "dependsOn": [],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "binds a handler to a control it never creates",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g3",
+      "node": "W",
+      "kind": "wiring",
+      "derivation": "DERIVED_SEQUENCE",
+      "dependsOn": [
+        "C"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "creates the control and leaves it inert",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g3",
+      "node": "E1",
+      "kind": "effect",
+      "derivation": "DIRECT",
+      "dependsOn": [
+        "W"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "empties the field but never unhides, so the items stay hidden",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g3",
+      "node": "E2",
+      "kind": "effect",
+      "derivation": "DIRECT",
+      "dependsOn": [
+        "W"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "restores the typed text after unhiding: the list comes back, the field is not empty",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g3",
+      "node": "E3",
+      "kind": "effect",
+      "derivation": "OBSERVED",
+      "dependsOn": [
+        "W",
+        "E1"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "works exactly once - the repeat step is the only thing that can catch this",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g3",
+      "node": "P1",
+      "kind": "preserved",
+      "derivation": "CONDITIONAL",
+      "dependsOn": [
+        "E1"
+      ],
+      "status": "OBSERVED",
+      "mutants": [
+        {
+          "verdict": "CAUGHT",
+          "why": "the new control is correct, but the page’s own filtering is destroyed",
+          "brokeSentinels": []
+        }
+      ]
+    },
+    {
+      "shape": "g3",
+      "node": "U",
+      "kind": "refused",
+      "status": "REFUSED",
+      "refusal": "NO_UPDATE_ROUTE",
+      "why": "no named zero-parameter update route is referenced elsewhere in the page"
+    }
+  ]
+}
