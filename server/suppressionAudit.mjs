@@ -27,6 +27,7 @@ const NL = String.fromCharCode(10);
 const sha = (t) => createHash('sha256').update(t).digest('hex').slice(0, 16);
 
 let problems = 0;
+let audited = 0;
 const note = (ok, m) => { console.log(`  ${ok ? 'ok  ' : 'BAD '} ${m}`); if (!ok) problems++; };
 
 const pages = readdirSync(PAGES).filter((d) => /^s\d+$/.test(d) && existsSync(join(PAGES, d, 'task.json'))).sort();
@@ -40,7 +41,10 @@ for (const p of pages) {
   const control = (task.requirement.trigger || {}).selector || '';
   const id = control.replace(/^#/, '');
 
-  for (const arm of ['chat', 'operator', 'contract']) {
+  // 'manager' WAS MISSING HERE while the acceptance loop below covers all four, so a manager run's
+  // prompt was never leak-checked at all. Coverage gaps do not announce themselves: this one read
+  // as a clean pass because the arm was simply never visited.
+  for (const arm of ['chat', 'operator', 'contract', 'manager']) {
     const f = join(RUNS, `${p}-${arm}.json`);
     if (!existsSync(f)) continue;
     const run = JSON.parse(readFileSync(f, 'utf8'));
@@ -88,6 +92,7 @@ for (const p of pages) {
     const f = join(RUNS, `${p}-${arm}.json`);
     if (!existsSync(f)) continue;
     const run = JSON.parse(readFileSync(f, 'utf8'));
+    audited++;
     if (!run.accepted) continue;
     accepted++;
     const a = run.attempts.find((x) => x.outcome === 'ACCEPTED');
@@ -113,5 +118,14 @@ for (const p of pages) {
   note(Array.isArray(task.provenance.additionSteps) && task.provenance.additionSteps.length > 0, `${p}: addition steps declared (${(task.provenance.additionSteps || []).join(',')})`);
 }
 
-console.log(`${NL}${accepted} accepted candidate(s) audited. ${problems === 0 ? 'NO PROBLEMS FOUND - the result survives this check' : `${problems} PROBLEM(S) FOUND - do not interpret until resolved`}`);
+// READING NOTHING IS NOT PASSING. Every increment to `problems` sits inside an existsSync-guarded
+// loop, so a wrong --runs path or a moved corpus produced zero iterations and printed
+// 'NO PROBLEMS FOUND - the result survives this check' with exit 0, over no data at all. The count
+// was printed beside it, but the VERDICT did not depend on it and neither did the exit code.
+if (audited === 0) {
+  console.log(`${NL}NOTHING WAS AUDITED - no run records were found under ${RUNS}. This is NOT a pass;`);
+  console.log('the checks below never ran. Check the --runs path before reading anything into this.');
+  process.exit(2);
+}
+console.log(`${NL}${audited} run record(s) read, ${accepted} accepted candidate(s) audited. ${problems === 0 ? 'NO PROBLEMS FOUND - the result survives this check' : `${problems} PROBLEM(S) FOUND - do not interpret until resolved`}`);
 process.exit(problems ? 1 : 0);
