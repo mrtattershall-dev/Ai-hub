@@ -108,6 +108,29 @@ console.log(`${NL}what each comparison licenses`);
 console.log('  N vs H   the wrapper / role / token-regime effect, instruction placement held');
 console.log('  H vs S   the INSTRUCTION-LOCATION effect, wrapper held   <- the diagnostic comparison');
 console.log('  N vs S   the whole presentation package. NOT one cause. The feasibility probe ran only this.');
+// ── A PRE-REGISTERED PREDICTION, recorded because the evidence points BOTH WAYS ────────────────
+// Published work reports that Qwen2.5-Coder, given an alternate instruction-aware format it had
+// NO instruction-formatted training for, collapsed on a real-repository benchmark - roughly 0.4%
+// against 18.4% in its ordinary FIM mode, recovering only after training. That predicts S < N.
+//
+// A single local probe pointed the other way: S emitted relevant handler code where N closed the
+// document. One page, one seed - not a result.
+//
+// A possible reconciliation, and it is a HYPOTHESIS: the failing case used a NOVEL delimiter with
+// zero training. Condition S introduces no new token. Both `<|im_start|>system` and the FIM markers
+// are NATIVE to this package's own template - verified by reading it. So S composes two TRAINED
+// formats in an UNTRAINED ARRANGEMENT, which is a different thing from an untrained delimiter. It
+// may still be out of distribution; composition is not the same as familiarity.
+//
+// Declared now so neither outcome can be narrated after the fact:
+//   S < N   consistent with the published warning; the arrangement is out of distribution too
+//   S > N   composing native formats survives where a novel delimiter did not, and the probe holds
+//   S = N   instruction location is not the binding variable for this package on this task
+console.log(`${NL}PRE-REGISTERED: published work predicts S < N for an untrained instruction format;`);
+console.log('a single local probe pointed the other way. S introduces no novel token - both the ChatML');
+console.log('and FIM markers are native here - so it tests an untrained ARRANGEMENT of trained formats.');
+console.log('All three outcomes are written down in this file before the run.');
+
 console.log(`${NL}NOT claimed: that S is IFIM. That paper's result comes from TRAINING on (prefix, instruction,`);
 console.log('suffix) examples. S is an inference-time surrogate on an off-the-shelf package; if S fails it');
 console.log('does not refute that work - the model may never have seen this delimiter or layout.');
