@@ -1,0 +1,54 @@
+STEP 5 preregistration: authority continuity across a controller boundary, before any mechanism
+
+This commit contains the preregistration and nothing else.
+
+The owner's method instruction shapes the whole document: do not assume inheritance is the correct
+mechanism, first specify the authority proposition that must remain true across the boundary, then see
+what representation is actually required to preserve it. So the proposition comes first, the
+requirements are derived from it, five candidate representations are enumerated and NONE is chosen, and
+the worlds are frozen so reality eliminates them rather than argument.
+
+THE PROPOSITION, decomposed into six refutable properties: independent root, where every authority
+traces to an owner-issued grant and no link is derived from model-authored text; non-amplification,
+where the parent's authority is a ceiling at any depth; least authority, where the child's set is a
+SUBSET and not a copy; non-loss, where a child can do work the parent was authorized for and the parent
+survives the child's return; accountability, where an outside reader can recompute from the record
+alone which grant authorized each effect and where it was attenuated; and revocation response, with no
+stale retention across the boundary.
+
+AND THE TENSION THAT DECIDES THE REPRESENTATION. Least authority requires something to name what the
+child needs. The owner cannot know work the controller has not yet discovered, and the model's output
+is forbidden as a source of authority - so if neither can name it, least authority is unreachable and
+inheritance wins by default, which is where the baseline already is. The candidate escape is stated as
+a HYPOTHESIS: attenuation is not amplification, because a requester that can only SHRINK what it passes
+on cannot gain anything by lying, so a model-chosen narrowing would violate neither property. Whether
+that holds is the experiment, and the most likely reason it would not is composition.
+
+EIGHT FROZEN WORLDS - the owner's five plus three the measured baseline makes necessary. W6 is a
+grandchild re-requesting what the child narrowed away, and it is the one I expect to be hardest: if
+attenuation is implemented by overwriting shared state a grandchild may re-widen back to the ceiling and
+narrowing becomes a suggestion, while if it replaces the set then W7 breaks instead and the parent
+permanently loses what the child narrowed away. A representation passing W3 while failing W6 or W7 has
+moved the defect rather than fixed it. W8 is accountability, which is not bookkeeping: the baseline
+already contains a refusal that happened and left no trace, and an unrecorded correct decision is
+indistinguishable from an unrecorded wrong one.
+
+THE REFUSE-EVERYTHING CANDIDATE IS LISTED ON PURPOSE. Representation (e), children refuse all writes,
+satisfies every property except non-loss and passes every refusal-shaped test, so any result that does
+not distinguish its candidate from (e) has measured nothing. Four must-fire controls follow from that: a
+positive control, a specificity control with governance off, an independence control requiring the
+frozen widening result to survive step 5 unchanged, and a DEPTH control, because SUBTASK_MAX_DEPTH is 2
+and if depth cannot reach a grandchild write then W6 is vacuous. That last is a live risk rather than a
+hypothetical - this repo already has a recorded case of a reproduction blocked by a different guard
+reporting green forever - so it is checked FIRST and the choice recorded before any result.
+
+NOT DONE HERE. No representation is chosen, no numerical result is predicted, the flag stays off, and
+authority lineage is deliberately NOT combined with assumption lineage: those are two different reasons
+an action can lose its right to proceed, and combining them now would be doing it because the diagram is
+elegant rather than because a measurement forced it. If step 5 produces a case that authority alone
+cannot decide, that is the evidence for combining them. Queue and supervisor runs stay out of scope;
+spawn_subtask is chosen as the smallest boundary already present and isolable.
+
+Message-File: scratch-step5-msg.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
