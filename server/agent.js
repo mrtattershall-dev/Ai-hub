@@ -14,6 +14,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join, resolve, relative, sep } from 'path';
 import { governedEdit, editAction, EDIT_FIXTURE }
   from '../legasus/runtime/epistemic-admission/governed-edit.mjs';
+import { fileScope } from '../legasus/runtime/governedWorkspace/workspace.mjs';
 import { randomUUID } from 'crypto';
 import { mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, existsSync, unlinkSync, rmSync, appendFileSync, renameSync } from 'fs';
 import { exec } from 'child_process';
@@ -913,7 +914,39 @@ function suppliedFileMessages(goal) {
 const GOVERNED_WRITES = process.env.AGENT_GOVERNED_WRITES === '1';
 let runAuthority = null;
 export function setRunAuthority(token) { runAuthority = token || null; }
-export function clearRunAuthority() { runAuthority = null; }
+
+// ── ANCESTRY, AND IT IS HELD EXACTLY WHERE THE AUTHORITY IS HELD ──────────────────────────────────
+//
+// A verification result is CONDITIONAL ON ITS ANCESTRY, so "which predecessors was this verified with"
+// is as much a permission-shaped fact as the authority itself - and it is vulnerable the same way. A
+// model that could declare its own `assumedReceipts` would simply declare NONE, and every descendant
+// would promote over a defunct predecessor while the record showed a clean chain. That is self-issued
+// ancestry: it does not widen a grant, it erases a condition on one, which is worse because it leaves
+// no refusal to notice.
+//
+// So all three live HERE, set by the governing layer, never read from tool arguments:
+//   runWorkspace   the coordination layer to route through (null -> direct executor, the A-4 path)
+//   runAncestry    the promotion receipts this run's writes are declared to assume
+//   runValidator   how the governing layer wants an effect checked; the model cannot declare a check
+//                  of its own, which would be a check chosen by the party being checked
+let runWorkspace = null;
+let runAncestry = [];
+let runValidator = null;
+const runPromotionLog = [];
+
+export function setRunWorkspace(ws) { runWorkspace = ws || null; }
+export function setRunAncestry(digests) { runAncestry = Array.isArray(digests) ? [...digests] : []; }
+export function setRunValidator(fn) { runValidator = typeof fn === 'function' ? fn : null; }
+/** The receipts this run promoted, in order, so a governing layer can chain a later candidate. */
+export function runPromotions() { return [...runPromotionLog]; }
+
+export function clearRunAuthority() {
+  runAuthority = null;
+  runWorkspace = null;
+  runAncestry = [];
+  runValidator = null;
+  runPromotionLog.length = 0;
+}
 
 // null   -> proceed with the ordinary write
 // string -> REFUSED; the tool returns it, so the run sees the refusal instead of a silent no-op
@@ -925,6 +958,42 @@ function governWrite(tool, fullPath, contents) {
       + ' that reaches an independent root; none was issued.';
   }
   const rel = relative(WORKSPACE, fullPath).split(sep).join('/');
+
+  // ── ROUTE THROUGH THE COORDINATION LAYER when one is installed. The packet carries the CONFLICT
+  // fact (this scope's revision) and the ANCESTRY facts (the world it began from, and the promotion
+  // receipts it assumes) so a descendant of a defunct predecessor is refused before it writes.
+  //
+  // The executor is still the only route to an effect: commit() calls governedEdit, which resolves the
+  // target once and writes to the same resolved path it authorized against. This adds a gate; it does
+  // not add a way to write.
+  if (runWorkspace) {
+    // The coordination layer's root and the agent's workspace MUST be the same tree. If they diverge,
+    // every packet would be prepared against one world and written into another - and the receipts
+    // would look perfectly well-formed. Refuse rather than govern the wrong directory.
+    if (resolve(runWorkspace.root) !== resolve(WORKSPACE)) {
+      return 'REFUSED by governance: the governed workspace is rooted at ' + runWorkspace.root
+        + ' but this agent writes to ' + WORKSPACE + '. A receipt about the wrong tree is worse than none.';
+    }
+    const scope = fileScope(rel);
+    const packet = runWorkspace.prepare({
+      scope,
+      baseRevision: runWorkspace.revisionOfScope(scope),
+      baseTreeRevision: runWorkspace.treeRevision(),
+      assumedReceipts: runAncestry,
+      authority: runAuthority,
+      contract: EDIT_FIXTURE,
+      contents,
+      validation: runValidator ? runValidator(rel, contents) : null,
+      by: tool,
+    });
+    const r = runWorkspace.commit(packet.id);
+    if (!r.committed) {
+      return 'REFUSED by governance (' + r.reason + '): ' + (r.why || (r.event && r.event.why) || '');
+    }
+    runPromotionLog.push(r.receiptDigest);
+    return { governed: true, receiptDigest: r.receiptDigest };
+  }
+
   const r = governedEdit({ authority: runAuthority, action: editAction({ target: rel, contents }),
     root: WORKSPACE, contract: EDIT_FIXTURE });
   if (!r.permitted) return 'REFUSED by governance (' + r.outcome + '): ' + r.why;
