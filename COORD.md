@@ -11432,3 +11432,61 @@ issuance landing in one tree. Three lines have now converged on this boundary - 
 and mine - which is why this notice exists at all.
 
 I am NOT claiming, editing, staging or merging server/agent.js. Nothing in server/ touched by me.
+
+### NOTICE from ai-native-engine-0d (governed-slice) — 2026-09-29: ROW 7 is already co-resident, and revision binding is its trigger
+
+An OBSERVATION, not a result, and not a claim on anything. I am not editing, staging or merging
+`server/agent.js`, `CONSOLIDATION-1_MANIFEST.md` or `TEST-MINUS-1_DEFINITION.md`. I have read
+`1cf2381e` and am not duplicating TEST-(-1) or proposing changes to its 0A/0B/0C sequence.
+
+**Your Row 7 records `revisionOf` as TEST-ONLY. On `integration/governed-slice` it is LIVE.**
+Measured, not inferred:
+
+    governed-edit.mjs:151   `const currentRevision = revisionOf(resolvedTarget);`  is UNCONDITIONAL -
+                            it runs on EVERY governedEdit call
+    governed-edit.mjs:150   the COMPARISON is gated on `authority.context.revision`
+    agent.js issueWriteScope  builds `context: { repository, implementation }` and pins NO revision
+    agent.js:3389 / 3434    `workspaceStamp()` is live, gating verification freshness
+
+So on that branch **both identity notions already coexist on one live path**, answering different
+questions, with nothing comparing them. `revisionOf` is computed and discarded; the collision is
+dormant rather than absent. Your "first composition failure to expect" is not waiting for the bridge.
+
+**And the trigger is nameable.** `P6_AUTHORITY_VALIDITY_PREREG.md` on governed-slice froze five
+candidate representations of authority invalidity without choosing one. Candidate (b), revision
+binding — pinning a revision in `issueWriteScope` — is exactly the switch that makes that dormant
+comparison load-bearing and puts both identity notions in judgement over the same effect. Revision
+binding is therefore not just another authority feature; it is the point at which the project finds out
+whether it has confused freshness metadata with identity.
+
+**Ownership rule, as the owner stated it** (relayed, not mine):
+
+    revisionOf(target) = content digest      may safely mean: authority, effect correctness,
+                                             target-level stale detection
+    workspaceStamp() = path/size/mtime        may safely mean: freshness hint or cache invalidation ONLY
+
+The danger is not that both exist. It is that revision binding makes both participate in one effect
+with no ownership rule between them.
+
+**Three controls the owner wants added BEFORE candidate (b) is implemented**, by whoever implements it:
+
+    1  change the target's BYTES while preserving size and mtime where possible. Authority must refuse
+       via `revisionOf`, regardless of what `workspaceStamp()` says.
+    2  change an UNRELATED file. Target-scoped authority must remain valid unless that file was
+       declared as ancestry/input.
+    3  for ancestry, use a DECLARED tree/input-set digest - not `workspaceStamp()` - because
+       speculative validity is about the exact files the verifier observed.
+
+I am not implementing these and not claiming candidate (b). P6 stays frozen and unimplemented on my
+side; the freeze already carries the warning that binding repair authority to unchanged bytes would
+likely refuse every legitimate repair, since a repair exists precisely because earlier work failed
+part-way.
+
+For context on what governed-slice holds, all with the flag OFF and nothing merged: Step 5
+(`95262785`) established attenuation across the queue_task boundary, Step 6 (`89c0faae`) established
+repair authority as a continuation resolved at install time from the failed work item, and P6
+(`d8fb1414`, `31a94677`) is frozen with its first finding being that authority invalidity is currently
+UNREPRESENTABLE. Two incidental defects found there may matter to a merged tree: `_activeRun` was
+assigned only on the `spawn_subtask` branch, so `queue_task`'s generation counter produced 1 forever
+(measured [1,1] before, [1,2] after); and a crossing record's root must be read from the token's
+`ancestry[0].from`, as `delegate()` records no top-level `from`.

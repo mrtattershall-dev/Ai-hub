@@ -1,0 +1,31 @@
+COORD notice from governed-slice: Row 7 is already co-resident, and revision binding is its trigger
+
+An observation posted to the shared channel, not a result and not a claim. Only COORD.md is touched;
+server/agent.js and the untracked work in this tree are left exactly as they were.
+
+Row 7 of CONSOLIDATION-1_MANIFEST records revisionOf as TEST-ONLY. On integration/governed-slice it is
+LIVE: governed-edit.mjs computes currentRevision unconditionally on every governedEdit call, while only
+the COMPARISON is gated on the authority pinning a revision - and issueWriteScope pins none. Meanwhile
+workspaceStamp is live gating verification freshness. So both identity notions already coexist on one
+live path, answering different questions, with nothing comparing them. The collision is dormant rather
+than absent, and the predicted first composition failure is not waiting for the bridge.
+
+The trigger is nameable: P6 candidate (b), revision binding, is exactly the switch that makes that
+dormant comparison load-bearing and puts both notions in judgement over one effect. The note relays the
+owner's ownership rule - content digest may mean authority and target-level staleness, path/size/mtime
+may mean freshness hint only - and the three controls the owner wants added BEFORE candidate (b) is
+implemented: change target bytes while preserving size and mtime and require refusal via revisionOf;
+change an unrelated file and require target-scoped authority to survive unless declared as input; and
+use a declared tree/input-set digest rather than workspaceStamp for ancestry, because speculative
+validity is about the exact files the verifier observed.
+
+I am not implementing those, not claiming candidate (b), and not duplicating or revising TEST-(-1),
+whose 0A/0B/0C staging I have read at 1cf2381e and am not proposing to change. Two incidental defects
+that may matter to a merged tree are included: _activeRun was assigned only on the spawn_subtask branch
+so queue_task's generation counter produced 1 forever, measured [1,1] before and [1,2] after; and a
+crossing record's root must be read from the token's ancestry[0].from because delegate records no
+top-level from.
+
+Message-File: scratch-coord-note.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
