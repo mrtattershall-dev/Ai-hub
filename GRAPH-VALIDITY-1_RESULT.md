@@ -2,113 +2,143 @@
 
 **Date:** 2026-09-29 · **Cost:** $0, local, no model calls · **Stage:** 1 (graph-as-checker) only
 
-The question this answers, and the one it does not:
+`node server/graphNodeMutants.mjs` → **20 passed, 0 failed.**
+`node server/reExerciseRule.test.mjs` → **15 passed, 0 failed.**
+`node server/featureGraph.test.mjs` → **11 passed, 0 failed.**
 
-| | status |
-|---|---|
-| **Derivation validity** — does the graph adapt to a page it was not written against, and refuse where the page does not support a node? | established (a330e1c7, extended here) |
-| **Node discrimination** — can each node fail for its OWN reason, on shapes other than `s01`? | **established here, with one declared limit** |
-| Graph-as-feedback (Stage 2) | still closed; this was its precondition, not its evidence |
+## Read this before the results: what 20/20 does NOT establish
 
-Run it with `node server/graphNodeMutants.mjs`. Result: **20 passed, 0 failed, 1 declared limit.**
+| level | question | status |
+|---|---|---|
+| **Internal validity** | do the graph's nodes map correctly to the emitted steps, and do mutants discriminate between them? | **this is what was established** |
+| **Construct validity** | do the nodes capture what an independent person means by "this feature is done"? | **not established** |
+| **External validity** | do the results transfer to unfamiliar projects and requirements? | **not established** |
 
-## The shapes, and why these three
+The loop here is closed-world: **the emitter defines the task, and the same ontology defines what counts
+as solving it.** `emitTaskAuto` writes the trigger/effects/invariants; `featureGraph` derives nodes from
+those fields; the checker verifies those nodes; the mutants validate that checker. A green result
+establishes *"the graph reasons correctly over an emitter-shaped task"* — not *"the graph captures a
+software feature."* Better mutation testing makes the closed loop **more convincing without making it
+less closed**: it proves the checker detects faults expressed in its own language, not that its language
+contains the right faults.
 
-Not all filter buttons. Each was chosen so that derivation has to do something different:
+Concretely, for "add a clear-filter control" this graph says nothing about keyboard activation, a visible
+and discoverable label, a disabled state when already clear, placement, duplicate controls, behaviour
+across reloads or async data, or whether a clear control was the right design at all. The graph is not
+wrong about those. It is **silent**, and silence must not be read as coverage.
+
+**The named next requirement** is a semantic-independence boundary: requirements authored outside the
+emitter's ontology, with acceptance evidence that does not come from the checker being graded. Until
+then, no result here may be cited as evidence of feature understanding.
+
+## The shapes
+
+Not all filter buttons. Each forces derivation to do something different:
 
 | | shape | what it forces |
 |---|---|---|
-| `g1` | filter button, with a **distractor** `#clear-filter` already on the page, wired to nothing, while the required control is `#reset-filter` | a name-matching checker would score the distractor as the control |
-| `g2` | **keyboard** trigger, no selector at all | there is no surface node to require; C and W must be REFUSED, and the remaining nodes must still be separable |
-| `g3` | filter button on a page whose update path is an **anonymous** handler | there is no named route; U must be REFUSED |
+| `g1` | filter button, with a **distractor** `#clear-filter` already on the page wired to nothing, while the required control is `#reset-filter` | a name-matching checker scores the distractor as the control |
+| `g2` | **keyboard** trigger, no selector at all | no surface node exists; C and W must be refused and the rest still separable |
+| `g3` | filter button on a page whose update path is an **anonymous** handler | no named route; U must be refused |
 
-## What the mutants found before they could measure anything
+## Four defects the mutants found, all fixed in the checker
 
-Two defects in the derivation, both of which made a node not its own measurement. Both were found by
-mutants written **before** the run, and both were fixed in the checker — the mutants were not adjusted
-to match what the checker happened to do.
+The mutants were written before each run and were **not** adjusted to match what the checker happened to
+do. Every fix went into the thing being validated.
 
 **(1) Effects were paired to steps by position, and the order is inverted.** `requirement.effects` is
-`["#q is empty", "every item in the list is visible again"]`; `provenance.additionSteps` is `[3, 4, 6]`
-where step 3 asserts *every item back* and step 4 asserts *the field is empty*. The emitter records **no**
-correspondence between the two lists — I assumed one. So `E1` was labelled "the field is empty" while
-being settled by the all-items-back assertion, and **step 6 was silently dropped from the graph
-entirely**. Every effect mutant landed on the other effect: the harness reported `E1 ESCAPED / E2 BROKEN`
-and its mirror image, which is the signature of a swap.
+`["#q is empty", "every item visible"]`; `additionSteps` is `[3, 4, 6]` where step 3 asserts *every item
+back* and step 4 asserts *the field is empty*. The emitter records **no** correspondence — I inferred one
+from array order. `E1` was labelled "the field is empty" while settled by the all-items-back assertion,
+and **step 6 was dropped from the graph entirely**. A trace link must be explicit, never inferred from
+array order. Effect nodes now come one per addition step, named by the assertion that settles them.
+`s01` went from 6 nodes to 7.
 
-Effect nodes now come **one per addition step, named by the assertion that settles them**, with
-`requirement.effects` recorded as the provenance of the addition set as a whole — which is all the
-emitter actually supports. `s01` went from 6 nodes to 7; the recovered node is the repeat click.
+**(2) `U` and `P1` were one measurement under two names** — both read `carriedSteps[1]`. No mutant could
+fail one and spare the other, so every route-breaking mutant was scored OVER-BROAD for breaking a
+"sentinel" that was not a separate thing. `U` is now the route *as it already works*; `P` is the
+invariant *re-exercised after* the addition, never the no-error step. `derive` now **throws** if two
+nodes rest on the same step.
 
-**(2) `U` and `P1` were one measurement under two names.** Both read `carriedSteps[1]`. No mutant could
-ever fail one and spare the other, so every route-breaking mutant was scored OVER-BROAD for breaking a
-"sentinel" that was not a separate thing. They are now separated the way the emitter's own steps
-separate them: **U is the route as it already works** (a carried step before the first addition),
-**P is the invariant re-exercised after** the addition (a carried step after it, never the no-error
-step). Where no such step exists the node is **refused, not faked** — which is why `g2` now reports
-`REFUSED P1: no carried step re-exercises "everything that already works keeps working" after the
-addition`.
+**(3) The repeat criterion was syntactic, and it was wrong in both directions.**
 
-A hard check now enforces it: **no two nodes may rest on the same spec step**, and `derive` throws if
-they do. That is a derivation bug, not something to discover downstream.
+- *v1* — byte-identical `expect` alone. A repeat with nothing in between was kept, and a mutant that
+  stopped responding after the first use **escaped**. This was recorded as a declared limit.
+- *v2* — "was the observed perturbation applied in between". Right for a repeated **trigger**, wrong for
+  a repeated **route** assertion: it **falsely refused** `P1` ("typing still narrows") and invented a
+  durability node in its place. What makes `P1` worth asserting twice is that the *trigger* fired in
+  between and undid the narrowing, not that more text was typed.
+- *v3, current* — a repeat is meaningful only when some **intervening action could have altered the
+  property being asserted**, in two unequal tiers:
 
-## Re-exercise edges
+  | tier | meaning |
+  |---|---|
+  | `OBSERVED` | the intervening action was measured **on the delivered baseline** to leave the claim's target state |
+  | `CONDITIONAL` | the intervening action is the **trigger**, which cannot be observed on the baseline because it does not exist there — so the repeat is recorded as **depending on** the node that owns the trigger's first application |
+  | *neither* | `UNOBSERVABLE_REPEAT`: refused, and a derived distinguishing sequence built in its place |
 
-The emitter asserts some things twice — step 6 repeats step 3's assertion after a second click, step 5
-repeats step 2's after the addition has been used. Those later nodes are not independent claims; they
-ask whether the **same** assertion still holds under a further exercise. The criterion for declaring the
-edge needs no interpretation: **the two steps' `expect` strings are byte-identical.**
+**(4) The prior-exercise lookup ran over nodes instead of over steps.** A repeat of a step the graph did
+not turn into a node looked like a *fresh* claim and was never asked whether it distinguishes anything.
+`g3`'s `P1` was in exactly that state — it passed its mutant by luck, not by rule. The lookup now spans
+all spec steps, and `g3` `P1` is now correctly classified `CONDITIONAL, re-exercise of step 2`.
 
-This is what makes the collateral honest in both directions. A mutant that destroys a behaviour outright
-counts the repeat as expected collateral — *and* the repeat still has to earn its place by a mutant that
-fails **only** it: a control that works the first time and not the second.
+## The behavioural layer, and the criterion that drives it
+
+`server/behaviorModel.mjs` observes the **delivered baseline** (never a candidate) and answers one
+question:
+
+> An action is a **valid perturbation** for a claim `K` if, on the baseline, applying it produces a state
+> in which **`K` is false**.
+
+That is checkable with no candidate in hand. If `K` is false after the perturbation and true after the
+trigger, the trigger is the only thing that could have made it true. The model is deliberately small —
+the load state, the actions the task already uses, and which of them leave the claim's target state. It
+is not a learned automaton.
+
+## The declared limit dissolved
+
+The `g2` blind spot from the first run was recorded as *"this file fails the day it stops escaping."* It
+now stops escaping, deliberately: the task's own step 4 is refused as `UNOBSERVABLE_REPEAT`, and a
+derived node `D` runs **perturb → trigger → perturb → trigger** and requires the restore. Both g2
+durability mutants — *second press moves the page* and *resets once then stops responding* — are now
+**CAUGHT** with sentinels intact. The flip from ESCAPED to CAUGHT is the evidence the derived sequence
+does real work; the goalpost was moved on purpose and recorded, not quietly.
 
 ## Results
 
-Every node, on every shape, failed for its own reason with its declared sentinels intact.
-
 | shape | nodes | refused | mutants |
 |---|---|---|---|
-| `g1` | C, W, E1(3), E2(4), E3(6 · re-exercise of E1), U(2), P1(5 · re-exercise of U) | — | 7, all CAUGHT |
-| `g2` | E1(3), E2(4 · re-exercise of E1), U(2) | C/W (no selector), P1 (no post-addition step) | 3 CAUGHT + 1 declared limit |
-| `g3` | C, W, E1(3), E2(4), E3(6 · re-exercise of E1), P1(5) | U (no named route) | 6, all CAUGHT |
+| `g1` | C, W, E1(3), E2(4), E3(6 · OBSERVED re-exercise), U(2), P1(5 · CONDITIONAL re-exercise) | — | 7, all CAUGHT |
+| `g2` | E1(3), U(2), D(derived) | C/W `NO_SURFACE_REQUIRED`, P1 `NO_POST_ADDITION_EXERCISE`, E2 `UNOBSERVABLE_REPEAT` | 4, all CAUGHT |
+| `g3` | C, W, E1(3), E2(4), E3(6 · OBSERVED), P1(5 · CONDITIONAL) | U `NO_UPDATE_ROUTE` | 6, all CAUGHT |
 
-The two mutants that matter most, because nothing else separates their nodes:
+The mutants that matter most, because nothing else separates their nodes: a candidate that **detaches the
+page's input listener when clicked** (U intact, P1 fails); a control that **works exactly once**; and on
+g2 a handler that **goes quiet after the first use**, which no step the emitter wrote could see.
 
-- **`g1` P1 vs U** — a candidate whose new control is correct but which **detaches the page's input
-  listener when clicked**. Filtering works before the addition is used (U intact) and not after (P1
-  fails). Before the fix these were the same step and this distinction did not exist.
-- **`g1`/`g3` E3** — a control that **works exactly once**. E1 and E2 pass; only the repeat step catches it.
+## Typed uncertainties
 
-## The declared limit — `g2` E2
+Refusals are first-class outcomes with a type, not prose comments: `NO_SURFACE_REQUIRED`,
+`NO_UPDATE_ROUTE`, `NO_ROUTE_EVIDENCE`, `NO_POST_ADDITION_EXERCISE`, `UNOBSERVABLE_REPEAT`,
+`NO_PERTURBATION`, `NO_ACTION_VOCABULARY`, `UNOBSERVABLE_BASELINE`.
 
-On the KEY shape the emitter presses the trigger **twice with nothing in between**, so at step 4 the page
-is already in the starting state. A handler that resets once and then stops responding is
-**observationally identical** to a correct one at that step, and escapes.
+## The fault operators, and what they do not include
 
-This is recorded as a pre-declared limit, not a passing test: the mutant is marked `expectEscape` and
-**this file fails the day it stops escaping**, which would mean the step changed shape. E2 is still
-independently falsifiable — a second press that *moves* the page is caught — but it cannot detect a
-handler that has gone quiet. The filter shapes do not have this gap, because they type text between the
-two clicks.
+A passing mutant suite is only as broad as its fault operators. These are the classes exercised:
+*control never created, control created but inert, effect omitted, state restored after the effect,
+works-exactly-once, existing route destroyed outright, existing route detached on first use.*
 
-**Named future work:** the KEY branch of `emitTaskAuto` should perturb state between the two presses.
-Not changed here — `g2` is already emitted and under validation, and editing the emitter mid-validation
-would make this run incomparable with the derivation results it extends.
-
-## What this does and does not license
-
-**Does:** the graph's nodes are separate measurements on three shapes it was not written against, with
-their evidence assigned at derivation time and never chosen after seeing a candidate.
-
-**Does not:** say anything about whether showing a generator the missing nodes helps it. That is Stage 2,
-it is a different treatment, and it needs its own arms and its own null. Nor does it extend past these
-two trigger kinds (click-on-created-control, keydown) and these page shapes.
+**Not exercised:** wrong-element targeting, async and timing faults, faults that appear only after many
+repetitions, state leaking between interactions, spurious added output (the restore claim is
+subset-inclusion on visible text and cannot see it), and anything outside the emitter's ontology — see
+the construct-validity section.
 
 ## Still not done
 
-- The **"named required control already exists"** case. `g1` has a *distractor* with a different id; it
-  does not have the required control already present, and the emitter will not produce that by
-  construction.
+- The **"named required control already exists"** case. `g1` has a distractor with a different id; the
+  emitter will not produce the required control already present.
 - More than one preserved invariant on a shape (every task here has exactly one).
-- A shape where the update route takes parameters, which `derive` currently will not recognise.
+- A shape whose update route takes parameters, which `derive` will not recognise.
+- Requirements authored **outside** the emitter's ontology, with independent acceptance evidence.
+
+Stage 2 (graph-as-feedback) stays closed. This was its precondition, not its evidence.

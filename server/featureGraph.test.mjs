@@ -16,6 +16,7 @@ const say = (ok, m) => { console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${m}`); ok ? pa
 
 const { playCheck } = await import('./playCheck.js');
 const { topLevelFunctions, referencedElsewhere } = await import('./editPlanner.mjs');
+const { observeBaseline } = await import('./behaviorModel.mjs');
 
 const DIR = 'legasus/bench/suppression1/s01';
 const page = readFileSync(join(DIR, 'baseline-as-delivered.html'), 'utf8');
@@ -26,8 +27,10 @@ const splice = (code) => page.slice(0, at) + NL + code + NL + page.slice(at);
 
 // ══ SAFEGUARD 1: the graph is derived from the baseline alone ═══════════════════════════════════
 console.log('\nsafeguard 1 - derived before any candidate exists');
-const graph = derive(page, task, { topLevelFunctions, referencedElsewhere });
+const observation = await observeBaseline(page, task, { playCheck });
+const graph = derive(page, task, { topLevelFunctions, referencedElsewhere, observation });
 say(derive.length === 3, 'derive() takes (page, task, deps) - there is no candidate parameter to pass');
+say(!!observation.perturbation, `the baseline was observed: ${JSON.stringify(observation.perturbation && observation.perturbation.action)} leaves the claim's target state`);
 console.log('  nodes: ' + graph.nodes.map((n) => `${n.id}(${n.kind})`).join(' '));
 say(graph.missingAtBaseline.join(',') === 'C,W', `missing at baseline: ${graph.missingAtBaseline.join(',')}`);
 say(graph.nodes.some((n) => n.id === 'U' && n.need.includes('filterRows')), 'the existing update route was found by analysis');

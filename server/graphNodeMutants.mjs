@@ -34,6 +34,7 @@ import { join } from 'node:path';
 
 const NL = String.fromCharCode(10);
 const { derive, verify } = await import('./featureGraph.mjs');
+const { observeBaseline } = await import('./behaviorModel.mjs');
 const { playCheck } = await import('./playCheck.js');
 const { topLevelFunctions, referencedElsewhere } = await import('./editPlanner.mjs');
 
@@ -106,19 +107,17 @@ b.addEventListener('click', function () { field.value = ''; refresh(); field.rem
     mutants: [
       { at: 3, why: 'listens for the key and does nothing observable', code:
 `document.addEventListener('keydown', function (e) { if (e.key === '0') { const intended = 0; } });` },
-      { at: 4, why: 'the second press moves the page instead of leaving it where it is', code:
+      // THESE TWO ARE THE REASON behaviorModel.mjs EXISTS. Both aim at the DERIVED durability node,
+      // because the task's own step 4 is now refused as non-distinguishing: it presses the trigger
+      // twice with nothing in between, so the page is already in the target state and a dead handler
+      // looks exactly like a live one. The second mutant was previously declared a LIMIT this file
+      // EXPECTED TO ESCAPE. It is now expected to be CAUGHT. That is not a moved goalpost: the limit
+      // was recorded as "this file fails the day it stops escaping", the checker was strengthened
+      // deliberately, and the flip from ESCAPED to CAUGHT is the evidence the derived sequence works.
+      { at: 'D', why: 'the second press moves the page instead of leaving it where it is', code:
 `let seen = 0;
 document.addEventListener('keydown', function (e) { if (e.key === '0') { seen++; at = seen > 1 ? 1 : 0; paint(); } });` },
-      // A PRE-DECLARED LIMIT, not a moved goalpost. On the KEY shape the emitter presses the trigger
-      // twice with NOTHING IN BETWEEN, so at step 4 the page is already in the starting state and a
-      // handler that has stopped responding is observationally identical to a correct one. This mutant
-      // is declared to ESCAPE; it fails this file the day it stops escaping, which would mean the step
-      // changed shape. The filter shapes do not have this gap - g1/g3 type text between the two clicks,
-      // which is why their `works exactly once` mutants are CAUGHT. NAMED FUTURE WORK: the KEY branch
-      // of emitTaskAuto should perturb state between the two presses. Not changed here - g2 is already
-      // emitted and under validation, and editing the emitter mid-validation would make this run
-      // incomparable with the derivation results it is meant to extend.
-      { at: 4, expectEscape: true, why: 'BLIND SPOT: resets once and then stops responding - indistinguishable at this step', code:
+      { at: 'D', why: 'resets once then stops responding - this ESCAPED the task’s own step 4', code:
 `let used = false;
 document.addEventListener('keydown', function (e) { if (e.key === '0' && !used) { used = true; at = 0; paint(); } });` },
       { at: 2, why: 'the reset is correct, but the page’s own ArrowRight route is destroyed', code:
@@ -169,14 +168,17 @@ for (const shape of SHAPES) {
   const page = readFileSync(join(shape.dir, 'baseline-as-delivered.html'), 'utf8');
   const task = JSON.parse(readFileSync(join(shape.dir, 'task.json'), 'utf8'));
   const spec = task.diagnostic.spec;
-  const graph = derive(page, task, { topLevelFunctions, referencedElsewhere });
+  const observation = await observeBaseline(page, task, { playCheck });
+  const graph = derive(page, task, { topLevelFunctions, referencedElsewhere, observation });
   const at = page.lastIndexOf('</script>');
   const splice = (code) => page.slice(0, at) + NL + code + NL + page.slice(at);
 
-  console.log(`${NL}${shape.name}`);
+  console.log(`${NL}${shape.name}` + (observation.perturbation
+    ? `  perturbation ${JSON.stringify(observation.perturbation.action)} - observed to leave the claim's target state on the DELIVERED page`
+    : '  NO PERTURBATION AVAILABLE'));
   for (const n of graph.nodes) {
-    console.log(`    ${n.id.padEnd(3)} ${n.step !== undefined ? `step ${n.step}` : 'direct '}  ${n.need}`
-      + (n.reExerciseOf ? `   [re-exercise of ${n.reExerciseOf}]` : '')
+    console.log(`    ${n.id.padEnd(3)} ${n.step !== undefined ? `step ${n.step} ` : `derived seq`}  ${n.need}`
+      + (n.reExerciseOf ? `   [re-exercise of ${n.reExerciseOf}, ${n.distinguishing} distinguishing via ${JSON.stringify(n.distinguishedBy)}]` : '')
       + ((n.dependsOn || []).length && !n.reExerciseOf ? `   [rests on ${n.dependsOn.join(',')}]` : ''));
   }
   for (const r of graph.refusals) console.log(`    -   REFUSED ${r.id}: ${r.why}`);
