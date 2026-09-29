@@ -112,3 +112,73 @@ An active session is closing exactly that edge and **must not be disturbed**.
 
 CONSOLIDATION-1 exits only when one candidate commit/tree can be named and the complete live path drawn
 from an ordinary user request to a surviving filesystem effect **without jumping between branches**.
+
+---
+
+# Pass 2a — classification of the small heads
+
+Read-only. Every row below was classified against the rule that decides everything: **a mechanism with
+tests but no production consumer is not LIVE PRODUCT.** The two claims that carry weight were
+re-verified by hand rather than taken on report.
+
+## Finding 6 — THE X ALREADY EXISTS ON AN UNMERGED BRANCH
+
+`integration/governed-slice` built the run-start authority issuance **weeks ago, into the real route**:
+
+```
+server/agent.js:4390   function startRun(..., { writeScope = null })
+server/agent.js:4405     setRunAuthorities(writeScope ? issueWriteScope(writeScope) : [])
+server/agent.js:4531   POST /agent/start reads writeScope from req.body
+server/agent.js:4533     ...and rejects a non-array with 400
+```
+
+That is exactly *"owner-side code issues the permitted scope"* — the edge I was asked to close, and the
+edge an active session is closing right now on `connect-components`. **Three independent lines have now
+converged on the same boundary.**
+
+Why it is inert, precisely — and it is NOT "unwired":
+
+1. `AGENT_GOVERNED_WRITES` is set **only** in `governed-dispatch.test.mjs`. No shell script, no config,
+   no env file. `STEP5_AUTHORITY_CONTINUITY_PREREG.md:160` states the intent explicitly: *"It does not
+   authorize enabling the flag anywhere."* The flag being off is a deliberate, recorded decision.
+2. **No client ever sends a `writeScope`** — zero hits under `client/`. So even with the flag on, every
+   ordinary run would issue an empty authority set.
+
+So the remaining product edge is smaller and more specific than "make the controller route through
+governance": that routing exists on two branches. What is missing is **a requester that declares a
+scope**, and a decision to turn the flag on.
+
+## Finding 7 — two real product fixes are live-buggy on the baseline
+
+| commit | head | status | evidence |
+|---|---|---|---|
+| `5c16708c` | `fix-interrupted-eviction` | **LIVE PRODUCT** | the bug is live on the baseline: `connect-components:server/agent.js:2892` still filters only `running`/`awaiting_approval`, so an `interrupted` run is still evictable, and `RESUMABLE_STATUS` has **0 hits** on the baseline. Consumer is the ordinary `POST /:id/resume` route plus four siblings, mounted un-gated at `index.js:472`, with a real client caller (`client/src/lib/api.js:129`). No flag. |
+| `b3cee6c7` | `fix-ledger-taskdone` | **LIVE PRODUCT** | baseline `mark()` still has prefix-greedy `parseInt(which, 10)` and bare `includes(q)`; no carried-task refusal, no already-done guard. Consumer is the `task_done` tool on the ordinary loop. Distinct and unlanded. |
+
+## Finding 8 — one duplicate, and one branch that does not contain its own namesake
+
+- `d0011558` is **SUPERSEDED** — `620a069a` on the baseline makes the byte-equivalent change to `mark()`
+  and ships equivalent coverage.
+- `c96f21a0` (append-route duplicate refusal) is **SUPERSEDED** — its one functional line landed via
+  `141b6342`. The benchmark half stands alone as evidence.
+- `fix-tolerant-indent` contains **no fix**. Both unique commits are documents. The tolerant-indent
+  mechanism the branch is named for is already on the baseline. Its own `AUDIT_2026-09-29.md` claim that
+  "appendFix greps to zero on connect-components" is **now stale** — `141b6342` landed it.
+
+## Finding 9 — a genuine semantic conflict, not a merge conflict
+
+`f5ba97b8`, `5fdcd450`, `c952cbc9` carry `legasus/screen/PROTOCOL-1_PREREG.md` asserting
+**"PROSPECTIVE — no PROTOCOL-1 evaluation has run."** The baseline already carries
+`PROTOCOL-1_RESULT.md`: *ran 2026-09-23, ten runs, control 3/5, treatment 3/5* — plus `PROTOCOL-1_ORDER`,
+`PROTOCOL-1_REPORT.json` and a whole `PROTOCOL-2_*` successor series.
+
+Landing these puts a "not yet run" freeze into a tree containing that run's result. `PROTOCOL-1_PREREG.md`
+is **absent** on the baseline, so there is no text to diff against, and the two trees' `legasus/screen`
+corpora are near-disjoint (baseline ~103 records the branch lacks; branch 11 the baseline lacks).
+**UNKNOWN/CONFLICT — must not be merged until a human says which document governed the 09-23 run.**
+
+## Finding 10 — everything on `main` is measurement
+
+All nine `main`-only commits are under `measurements/` — sets H, I, J, K, their preregistrations and
+scoring tools. **RESEARCH/EVIDENCE.** One (`7fc4222a`) says in its own message that nothing automated
+reads the copy it syncs. None of it is runtime.
