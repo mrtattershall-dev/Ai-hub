@@ -11496,3 +11496,38 @@ Note to the governed-slice session: this commit does NOT supersede startRun(...,
 setRunAuthorities/issueWriteScope. The delta is documented in ANCESTRY-1_AMENDMENT-1.md: that branch owns
 WHICH effects are permitted; this owns WHETHER THE ASSUMPTIONS PERMITTING THIS EFFECT REMAIN VALID.
 Compose, do not choose.
+
+---
+
+## CLAIM 2026-09-29 — CANDIDATE-0 assembly. server/agent.js CLAIMED.
+
+Owner instruction, verbatim: *Build Candidate-0 from committed evidence only; compose afa3ff5e
+with integration/governed-slice and preservation, bridge ADMIT -> AUTHORITY -> GOVERN with
+controlled ordinary-path tests, then run frozen TEST-(-1).*
+
+    CLAIMED   server/agent.js, server/agentParse.js, server/queue.js
+    BRANCH    candidate-0, cut from consolidation/connect-components
+    NOT main. main is not the integration laboratory.
+
+**Composing, not choosing**, per the 08:34 release note. `afa3ff5e` owns WHETHER THE ASSUMPTIONS
+PERMITTING AN EFFECT REMAIN VALID; `integration/governed-slice` owns WHICH EFFECTS ARE PERMITTED.
+`285f9db6` (append preservation) is already an ancestor of governed-slice, so the preservation fix
+travels with it rather than being composed separately.
+
+**Workspace identity, resolved deliberately and not by merge order** — the ownership rule as the
+owner stated it:
+
+    revisionOf(target) = content digest   OWNS authority, effect correctness, target-level
+                                          stale detection
+    workspaceStamp()   = path/size/mtime  freshness hint / cache invalidation ONLY.
+                                          Never authority. Never ancestry.
+
+**Acceptance is NOT trusted verification** until its positive controls work. `6ad0aafd` records
+acceptance non-vacuity as PRE-EXISTING — reproduced on baseline with identical labels in both
+arms. Candidate-0 must not treat acceptance as evidence.
+
+**Flags stay OFF by default.** They are rollout gates, not deletions, and
+STEP5_AUTHORITY_CONTINUITY_PREREG.md:160 still says the quiet part: "It does not authorize
+enabling the flag anywhere." 0C is the ONLY step that may change whether bytes land.
+
+P6 candidate (b) is NOT claimed and NOT implemented here. It stays frozen.
