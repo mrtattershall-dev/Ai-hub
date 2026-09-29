@@ -134,7 +134,7 @@ function norm(goal) {
  * Pass `force` for the human case: re-running something deliberately is legitimate, and a
  * person typing it again is an explicit instruction, not a runaway loop.
  */
-function enqueueLocked(goal, { priority = 0, source = 'human', after = null, force = false, generation = 0, repairOf = null } = {}) {
+function enqueueLocked(goal, { priority = 0, source = 'human', after = null, force = false, generation = 0, repairOf = null, authority = null } = {}) {
   const g = String(goal || '').trim();
   if (!g) return { ok: false, error: 'goal is required' };
   const s = load();
@@ -164,6 +164,13 @@ function enqueueLocked(goal, { priority = 0, source = 'human', after = null, for
     // run no matter what it fails with. Dedup cannot do that job here - the second
     // failure usually carries a different error string, so the goals differ.
     repairOf,
+    // THE AUTHORITY CROSSING, decided when this item was created and carried with it. The paths in
+    // `authority.delegated` are the intersection of what the queueing run actually held with what the
+    // queued work nominated, so this field can never name something the parent did not hold. It is
+    // stored rather than recomputed because the decision belongs to the moment of crossing, while the
+    // parent's authority was live. null means no crossing was recorded, which is NOT permission - a
+    // run started from such an item installs nothing.
+    authority,
     createdAt: Date.now(),
     status: 'queued',
   };

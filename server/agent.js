@@ -39,6 +39,7 @@ import { lostDefs, lostExports, defCounts } from './defNames.js';
 // calculus, observation - which is what makes bringing it in a small slice rather than a merge.
 import { governedEdit, editAction, EDIT_FIXTURE } from '../legasus/runtime/epistemic-admission/governed-edit.mjs';
 import { delegate } from '../legasus/legaknow/calculus.mjs';
+import { attenuate, crossingRecord } from './authorityScope.mjs';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 
 /**
@@ -401,6 +402,8 @@ export function clearRunAuthority() { runAuthorities = []; }
 export function runAuthorityTargets() {
   return runAuthorities.map((a) => a && a.context && a.context.implementation).filter(Boolean);
 }
+/** The grants themselves, so a crossing can read their ROOT rather than be told one. */
+export function runAuthorityGrants() { return runAuthorities.slice(); }
 
 /**
  * Mint owner-issued grants for an explicit list of workspace-relative paths.
@@ -1517,12 +1520,39 @@ const tools = {
   // ---- queue work for later --------------------------------------------------
   // Lets the agent write down work it has NOTICED but should not do now, instead of
   // either derailing the current goal or forgetting it entirely.
-  async queue_task({ goal }) {
+  async queue_task({ goal, scope }) {
     if (!goal || !String(goal).trim()) return 'ERROR: provide a GOAL to queue.';
     // Machine-queued work inherits its parent's generation + 1, so the supervisor can
     // tell a human's goal from the fourth hop of a self-extending chain.
     const generation = ((_activeRun && _activeRun.generation) || 0) + 1;
-    const r = workQueue.enqueue(String(goal).trim(), { source: 'agent', generation });
+    // ── THE AUTHORITY CROSSING. This is the only place a descendant can acquire anything. ────────
+    //
+    // `scope` is what the queued work NOMINATES and it is a REQUEST, not a grant. It is intersected
+    // with what THIS run actually holds, so a request naming more than the parent has yields less -
+    // the model cannot manufacture a path by asking for it. Requesting nothing passes the parent's
+    // set unchanged, and the record says `leastAuthority: false` when that happens rather than
+    // pretending the crossing was minimal.
+    //
+    // The crossing is computed HERE, while the parent's authority is live, and carried on the item.
+    // It is not recomputed at pickup, because by then the parent is gone.
+    const crossing = attenuate(runAuthorityTargets(), scope == null ? null : scope);
+    const authority = crossingRecord({
+      crossing, grants: runAuthorityGrants(),
+      parentRunId: (_activeRun && _activeRun.id) || null, boundary: 'queue_task',
+    });
+    const r = workQueue.enqueue(String(goal).trim(), { source: 'agent', generation, authority });
+    // The crossing is EVIDENCE, so it goes in the parent's record whether or not anything was
+    // delegated. A refusal that leaves no trace is the defect this experiment started from.
+    if (_activeRun) {
+      pushStep(_activeRun, {
+        type: 'authority_delegated',
+        text: `queue_task -> ${r.item ? r.item.id : '(not queued)'}: available [${authority.availableBefore.join(', ') || '-'}]`
+          + `; requested [${authority.requested ? authority.requested.join(', ') : '(none)'}]`
+          + `; delegated [${authority.delegated.join(', ') || '-'}]`
+          + (authority.refusedFromRequest.length ? `; refused [${authority.refusedFromRequest.join(', ')}]` : ''),
+        authority,
+      });
+    }
     // A duplicate is not a failure - the work IS tracked, which is what the agent
     // wanted. Reporting it as an error invites a retry with reworded text, which is
     // exactly how a dedup-by-text guard gets defeated.
@@ -3488,7 +3518,19 @@ async function drive(loadDb, run) {
       // Depth is supplied here rather than trusted from the model. The parent is passed
       // through module scope - see spawn_subtask for why it must not go on args.
       _toolGoal = run.goal || null;
-      if (tool === 'spawn_subtask') { args.depth = (run.depth || 0) + 1; _activeRun = run; }
+      // `_activeRun` means "the run whose turn is executing", and it was assigned ONLY on the
+      // spawn_subtask branch, so every other tool saw null. Two consequences, both found by the
+      // authority crossing record printing `parentRunId: null` while the delegation itself was well
+      // formed:
+      //   - queue_task could not name the run it was delegating FROM, so the chain was unrecordable;
+      //   - queue_task computes `generation = (_activeRun && _activeRun.generation) + 1`, so with
+      //     _activeRun null it produced 1 EVERY TIME. A queued run that queues more work did not
+      //     increment, which means MAX_GENERATIONS could not bind along this route.
+      // Assigning it for every dispatch makes the name true. It is a correction to an existing
+      // defect, not a scheduler change: nothing here alters what the supervisor does with the
+      // number, only whether the number counts.
+      _activeRun = run;
+      if (tool === 'spawn_subtask') { args.depth = (run.depth || 0) + 1; }
       // The file as it was BEFORE this write/edit, so a write that silently drops definitions can say so (defNames.js).
       //
       // append_file IS IN THIS LIST because both preservation refusals are gated on beforeSrc, so leaving it
@@ -4378,7 +4420,7 @@ function autoStart(loadDb, item) {
     // actually START; charging it for an attempt that was declined would let a busy
     // workspace silently eat the budget and throttle work nobody ever ran.
     autoStarts.push(Date.now());
-    try { startRun(loadDb, item.goal, { queueItemId: item.id, source: 'queue', generation: item.generation || 0 }); }
+    try { startRun(loadDb, item.goal, { queueItemId: item.id, source: 'queue', generation: item.generation || 0, inheritedAuthority: item.authority || null }); }
     catch { workQueue.release(item.id); }
   }, 250);
 }
@@ -4387,7 +4429,7 @@ function autoStart(loadDb, item) {
  * Create and start a run. Shared by the HTTP route and the supervisor, so a
  * self-started run is identical to a human-started one in every respect.
  */
-function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, writeScope = null } = {}) {
+function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, writeScope = null, inheritedAuthority = null } = {}) {
   ensureWorkspace();
   // ── THE AUTHORITY INSTALLER. This is the owner side of the boundary. ──────────────────────────
   //
@@ -4402,7 +4444,17 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
   // No scope supplied means NO AUTHORITY, not implicit permission. With AGENT_GOVERNED_WRITES=1 every
   // write then refuses, which is the correct failure for a run nobody authorized - and is exactly why
   // the flag must not be turned on in a hub whose callers do not pass a scope yet.
-  setRunAuthorities(writeScope ? issueWriteScope(writeScope) : []);
+  //
+  // AN AUTONOMOUS DESCENDANT arrives with `inheritedAuthority`: the crossing record its queue item
+  // carried, decided at queue_task time by intersecting the parent's live authority with what the
+  // queued work nominated. Nothing is minted here from the descendant's own goal text, and the paths
+  // installed are exactly `delegated` - a field that cannot name anything the parent did not hold,
+  // because an intersection has no branch that adds a member. A missing or empty record installs
+  // NOTHING, which is a refusal and not a default.
+  const grantedPaths = inheritedAuthority && Array.isArray(inheritedAuthority.delegated)
+    ? inheritedAuthority.delegated
+    : (writeScope || null);
+  setRunAuthorities(grantedPaths && grantedPaths.length ? issueWriteScope(grantedPaths) : []);
   const id = randomUUID();
   const now = Date.now();
   const run = {
@@ -4420,6 +4472,29 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
       { role: 'user', content: `Files currently in the workspace (these are the ONLY files — use these EXACT names, never invent one):\n${tools.list_dir({ path: '.' })}\n\nGOAL: ${goal}\n\nBegin step by step. For any large file, outline_file it FIRST, then read_file the slice you need — never try to read a whole big file at once.` },
     ],
   };
+  // THE RECEIVING HALF OF THE CROSSING, recorded on the descendant. Together with the parent's
+  // `authority_delegated` step this makes the chain recomputable from the record alone: root, what
+  // was available before, what was requested, what was actually delegated, and who received it.
+  // Recorded even when NOTHING was delegated, because "this run received no authority" is the fact
+  // that explains every refusal that follows.
+  if (inheritedAuthority) {
+    pushStep(run, {
+      type: 'authority_received',
+      text: `from run ${inheritedAuthority.parentRunId || '(unknown)'} via ${inheritedAuthority.boundary}`
+        + `; root ${JSON.stringify(inheritedAuthority.root)}`
+        + `; delegated [${(inheritedAuthority.delegated || []).join(', ') || '-'}]`
+        + `; installed [${runAuthorityTargets().join(', ') || '-'}]`,
+      authority: inheritedAuthority,
+      installed: runAuthorityTargets(),
+    });
+  } else if (source === 'queue') {
+    pushStep(run, {
+      type: 'authority_received',
+      text: 'no crossing record accompanied this queued item, so NO authority was installed'
+        + ' - every governed write in this run will refuse',
+      authority: null, installed: [],
+    });
+  }
   // Anything still open in TASKS.md belongs to an earlier run. Mark it inherited so it
   // stays visible without gating THIS run's finish. Only here, never on a follow-up: a
   // follow-up is the same commitment continuing.
@@ -4659,7 +4734,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     if (!next) return res.status(404).json({ error: 'the queue is empty' });
     // Carry the hop count, or starting an item by hand would silently reset the chain
     // depth the supervisor's brake relies on.
-    const run = startRun(loadDb, next.goal, { queueItemId: next.id, source: 'queue', generation: next.generation || 0 });
+    const run = startRun(loadDb, next.goal, { queueItemId: next.id, source: 'queue', generation: next.generation || 0, inheritedAuthority: next.authority || null });
     res.json({ runId: run.id, item: next });
   });
 
