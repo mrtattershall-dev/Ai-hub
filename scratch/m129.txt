@@ -1,0 +1,25 @@
+Record the repeat/budget preregistration draft, unauthorized and unrun
+
+Left untracked at the end of the last session, which is exactly how a record gets lost. It states
+that the replay rig CANNOT test a budget increase - the mock cannot react, so extra turns surface as
+EXHAUSTED, an artefact of the instrument rather than a measurement of the hub - and splits the
+question accordingly: offline measures whether a repeat policy RECLAIMS CALLS, live measures whether
+reclaimed calls PRODUCE WORK and at what cost. The offline arm is a precondition, not a result.
+
+Denominator measured before proposing anything: across 1213 scenarios and 17466 recorded replies,
+10.3 percent of replies are byte-identical repeats of an earlier reply in the same run, rising to 51.3
+percent in the setH 14B control arm and 46.4 percent in setG's. The weaker signal, same tool and path
+with an identical body at 34.8 percent, is deliberately not leaned on because re-reading a file that
+has since changed is legitimate.
+
+Endpoints are fixed in the document, including cost per goal COMPLETED rather than completion alone,
+and reach kept separate from completion because conversion has held near 73 percent while reach moved.
+The null is preregistered: reclaiming calls does not by itself raise completion. EXHAUSTED and the
+status distribution are the guards against a policy that reclaims calls by truncating runs, which
+would look like efficiency and be a loss.
+
+Nothing in the document authorizes a run. The live arm is a spend decision.
+
+Message-File: scratch/m129.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
