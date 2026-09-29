@@ -1,0 +1,54 @@
+{
+  "name": "farm-v1",
+  "entry": "index.html",
+  "stateExpr": "window.game && window.game.state()",
+  "contract": "farm extension: plant, on a verified movement baseline",
+  "settleMs": 120,
+  "loadSettleMs": 400,
+  "steps": [
+    {
+      "n": 1,
+      "name": "loads with no page or console errors and exposes state",
+      "do": [],
+      "expect": "errors.length === 0 && state && state.player && typeof state.player.x === 'number'"
+    },
+    {
+      "n": 2,
+      "name": "ArrowRight moves the player right",
+      "do": [
+        {
+          "key": "ArrowRight",
+          "times": 3
+        }
+      ],
+      "expect": "state.player.x > before.player.x"
+    },
+    {
+      "n": 3,
+      "name": "ArrowDown moves the player down",
+      "do": [
+        {
+          "key": "ArrowDown",
+          "times": 2
+        }
+      ],
+      "expect": "state.player.y > before.player.y"
+    },
+    {
+      "n": 4,
+      "name": "p plants a seed on the player's tile and spends a seed",
+      "do": [
+        {
+          "key": "p"
+        }
+      ],
+      "expect": "(function(){ const k = state.player.x + ',' + state.player.y; return !!state.tiles[k] && !(before.tiles || {})[k] && state.inventory.seeds === before.inventory.seeds - 1; })()"
+    },
+    {
+      "n": 8,
+      "name": "still no errors after the whole play",
+      "do": [],
+      "expect": "noErrors"
+    }
+  ]
+}

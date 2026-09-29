@@ -1,0 +1,233 @@
+{
+  "id": "farmext-plant",
+  "group": "FARMEXT",
+  "source": "internal",
+  "language": "javascript",
+  "kind": "build",
+  "goal": "Continue the game already in index.html. Pressing p plants a seed on the player tile and spends one seed from the inventory. Everything the page already does must keep working. index.html is a single self-contained page: plain HTML and JavaScript, no frameworks, no external files.",
+  "requirement": {
+    "trigger": {
+      "kind": "key",
+      "key": "p"
+    },
+    "effects": [
+      "a seed is planted on the player tile",
+      "one seed is spent from the inventory"
+    ],
+    "invariants": [
+      "movement still works",
+      "no page or console error is raised"
+    ]
+  },
+  "seed": {},
+  "requested": {
+    "play": {
+      "spec": {
+        "name": "s12348",
+        "entry": "index.html",
+        "stateExpr": "window.game && window.game.state()",
+        "contract": "farm extension: plant, on a verified movement baseline",
+        "settleMs": 120,
+        "loadSettleMs": 400,
+        "steps": [
+          {
+            "n": 1,
+            "name": "loads with no page or console errors and exposes state",
+            "do": [],
+            "expect": "errors.length === 0 && state && state.player && typeof state.player.x === 'number'"
+          },
+          {
+            "n": 2,
+            "name": "ArrowRight moves the player right",
+            "do": [
+              {
+                "key": "ArrowRight",
+                "times": 3
+              }
+            ],
+            "expect": "state.player.x > before.player.x"
+          },
+          {
+            "n": 3,
+            "name": "ArrowDown moves the player down",
+            "do": [
+              {
+                "key": "ArrowDown",
+                "times": 2
+              }
+            ],
+            "expect": "state.player.y > before.player.y"
+          },
+          {
+            "n": 4,
+            "name": "p plants a seed on the player's tile and spends a seed",
+            "do": [
+              {
+                "key": "p"
+              }
+            ],
+            "expect": "(function(){ const k = state.player.x + ',' + state.player.y; return !!state.tiles[k] && !(before.tiles || {})[k] && state.inventory.seeds === before.inventory.seeds - 1; })()"
+          },
+          {
+            "n": 8,
+            "name": "still no errors after the whole play",
+            "do": [],
+            "expect": "noErrors"
+          }
+        ]
+      },
+      "steps": [
+        1,
+        2,
+        3,
+        4,
+        8
+      ]
+    }
+  },
+  "accumulates": [
+    "the verified movement baseline"
+  ],
+  "supersedes": [],
+  "protected": {
+    "plays": [
+      {
+        "from": "baseline-verified.html",
+        "spec": {
+          "name": "s1238",
+          "entry": "index.html",
+          "stateExpr": "window.game && window.game.state()",
+          "contract": "farm extension: plant, on a verified movement baseline",
+          "settleMs": 120,
+          "loadSettleMs": 400,
+          "steps": [
+            {
+              "n": 1,
+              "name": "loads with no page or console errors and exposes state",
+              "do": [],
+              "expect": "errors.length === 0 && state && state.player && typeof state.player.x === 'number'"
+            },
+            {
+              "n": 2,
+              "name": "ArrowRight moves the player right",
+              "do": [
+                {
+                  "key": "ArrowRight",
+                  "times": 3
+                }
+              ],
+              "expect": "state.player.x > before.player.x"
+            },
+            {
+              "n": 3,
+              "name": "ArrowDown moves the player down",
+              "do": [
+                {
+                  "key": "ArrowDown",
+                  "times": 2
+                }
+              ],
+              "expect": "state.player.y > before.player.y"
+            },
+            {
+              "n": 8,
+              "name": "still no errors after the whole play",
+              "do": [],
+              "expect": "noErrors"
+            }
+          ]
+        },
+        "steps": [
+          1,
+          2,
+          3,
+          8
+        ]
+      }
+    ]
+  },
+  "diagnostic": {
+    "kind": "play",
+    "spec": {
+      "name": "s12348",
+      "entry": "index.html",
+      "stateExpr": "window.game && window.game.state()",
+      "contract": "farm extension: plant, on a verified movement baseline",
+      "settleMs": 120,
+      "loadSettleMs": 400,
+      "steps": [
+        {
+          "n": 1,
+          "name": "loads with no page or console errors and exposes state",
+          "do": [],
+          "expect": "errors.length === 0 && state && state.player && typeof state.player.x === 'number'"
+        },
+        {
+          "n": 2,
+          "name": "ArrowRight moves the player right",
+          "do": [
+            {
+              "key": "ArrowRight",
+              "times": 3
+            }
+          ],
+          "expect": "state.player.x > before.player.x"
+        },
+        {
+          "n": 3,
+          "name": "ArrowDown moves the player down",
+          "do": [
+            {
+              "key": "ArrowDown",
+              "times": 2
+            }
+          ],
+          "expect": "state.player.y > before.player.y"
+        },
+        {
+          "n": 4,
+          "name": "p plants a seed on the player's tile and spends a seed",
+          "do": [
+            {
+              "key": "p"
+            }
+          ],
+          "expect": "(function(){ const k = state.player.x + ',' + state.player.y; return !!state.tiles[k] && !(before.tiles || {})[k] && state.inventory.seeds === before.inventory.seeds - 1; })()"
+        },
+        {
+          "n": 8,
+          "name": "still no errors after the whole play",
+          "do": [],
+          "expect": "noErrors"
+        }
+      ]
+    },
+    "timeoutSec": 120
+  },
+  "upstreamCases": 5,
+  "protectedCases": 4,
+  "validation": {
+    "checked": [
+      "the carried steps pass on the verified baseline",
+      "the addition step fails on it"
+    ],
+    "notEstablished": [
+      "that step 4 is the only way to express planting",
+      "that the carried set covers every behaviour the baseline has"
+    ]
+  },
+  "provenance": {
+    "carriedSteps": [
+      1,
+      2,
+      3,
+      8
+    ],
+    "additionSteps": [
+      4
+    ],
+    "noErrorStep": 8,
+    "correctedGate": "includes the trailing noErrors check that the NARROW-2 subset dropped",
+    "emittedAt": "2026-09-29T06:13:11.529Z"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "round": 1,
+  "seed": 1,
+  "outcome": "REFUSED_EMPTY",
+  "classification": {
+    "mismatch": "NOT_JUDGED",
+    "why": "the completion never reached the gate",
+    "addition": null,
+    "carriedForward": null
+  },
+  "proposal": null,
+  "request": {
+    "prompt": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Farming Game</title>\n    <style>\n        canvas {\n            border: 1px solid black;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n    <div id=\"day\"></div>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n        const gridSize = 32;\n        const player = { x: 0, y: 0 };\n        const tiles = {};\n        const inventory = { seeds: 5, crops: 0 };\n        let day = 0;\n\n        function drawPlayer() {\n            ctx.fillStyle = 'green';\n            ctx.fillRect(player.x * gridSize, player.y * gridSize, gridSize, gridSize);\n        }\n\n        function drawTile(x, y, crop, stage) {\n            ctx.fillStyle = crop === 'seed' ? 'yellow' : 'green';\n            ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Stage: ${stage}`, x * gridSize + 10, y * gridSize + 20);\n        }\n\n        function drawInventory() {\n            ctx.fillStyle = 'blue';\n            ctx.fillRect(0, 0, 100, 100);\n            ctx.fillStyle = 'black';\n            ctx.font = '12px Arial';\n            ctx.fillText(`Seeds: ${inventory.seeds}`, 10, 20);\n            ctx.fillText(`Crops: ${inventory.crops}`, 10, 40);\n        }\n\n        function draw() {\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\n            drawPlayer();\n            for (const [key, value] of Object.entries(tiles)) {\n                drawTile(key.split(',')[0], key.split(',')[1], value.crop, value.stage);\n            }\n            drawInventory();\n            document.getElementById('day').textContent = `Day: ${day}`;\n        }\n\n        function movePlayer(event) {\n            const dx = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;\n            const dy = event.key === 'ArrowUp' ? -1 : event.key === 'ArrowDown' ? 1 : 0;\n            const newX = player.x + dx;\n            const newY = player.y + dy;\n            if (newX >= 0 && newX < 20 && newY >= 0 && newY < 15) {\n                player.x = newX;\n                player.y = newY;\n                draw();\n            }\n        }\n\n        function plantSeed() {\n            const tileKey = `${player.x},${player.y}`;\n            if (!tiles[tileKey]) {\n                tiles[tileKey] = { crop: 'seed', stage: 1 };\n                draw();\n            }\n        }\n\n        function advanceTime() {\n            day++;\n            draw();\n        }\n\n        function harvestCrop() {\n            const tileKey = `${player.x},${player.y}`;\n            if (tiles[tileKey] && tiles[tileKey].crop === 'seed') {\n                tiles[tileKey] = { crop: 'empty', stage: 0 };\n                inventory.seeds++;\n                inventory.crops--;\n                draw();\n            }\n        }\n\n        function saveGame() {\n            localStorage.setItem('game', JSON.stringify({ player, tiles, inventory, day }));\n        }\n\n        function loadGame() {\n            const savedGame = JSON.parse(localStorage.getItem('game'));\n            player = savedGame.player;\n            tiles = savedGame.tiles;\n            inventory = savedGame.inventory;\n            day = savedGame.day;\n            draw();\n        }\n\n        document.addEventListener('keydown', movePlayer);\n        document.addEventListener('p', plantSeed);\n        document.addEventListener('t', advanceTime);\n        document.addEventListener('h', harvestCrop);\n        document.addEventListener('s', saveGame);\n        document.addEventListener('load', loadGame);\n\n        window.game = { state: () => JSON.parse(JSON.stringify({ player, tiles, inventory, day })) };\n        // JAVASCRIPT STATEMENTS ONLY. This point is inside the page's existing <script> block.\n        // when the p key is pressed: a seed is planted on the player tile; one seed is spent from the inventory. Ensure movement still works, and no page or console error is raised.\n        // This succeeds when that holds and everything the page already did still works.\n        // Continue here:\n",
+    "suffix": "\n    </script>\n</body>\n</html>\n"
+  },
+  "completion": {
+    "text": "",
+    "chars": 0,
+    "lines": 1,
+    "truncatedInRunRecord": false
+  },
+  "contained": null,
+  "containment": {
+    "ok": false,
+    "reason": "EMPTY",
+    "detail": "no code in the completion",
+    "truncatedAtLine": null,
+    "droppedLines": 0
+  },
+  "play": null,
+  "acceptance": null,
+  "decision": null,
+  "candidateFile": null
+}
