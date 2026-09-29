@@ -44,9 +44,8 @@ export const OUTCOME = {
 
 // THE REVISION OF A TARGET IS THE DIGEST OF ITS CURRENT BYTES. Not an mtime, not a version label - both
 // of those can agree while the content differs, which is the whole failure being guarded against.
-export const revisionOf = (absPath) => (existsSync(absPath)
-  ? createHash('sha256').update(readFileSync(absPath)).digest('hex')
-  : null);
+const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
+export const revisionOf = (absPath) => (existsSync(absPath) ? sha256(readFileSync(absPath)) : null);
 
 // The declared contract for the one operation E0 governs. Evidence obligations are a property of the
 // CONTRACT, not a universal precondition — an operation declaring none is unaffected by E3.
@@ -69,7 +68,11 @@ export function editAction({ target, contents, evidence = [] }) {
   return Object.freeze({ operation: 'edit', target, contents, evidence: Object.freeze([...evidence]) });
 }
 
-export function governedEdit({ authority, action, root, contract = EDIT_FIXTURE }) {
+// `deps.readBack` is a seam, and it exists so the read-back check is FALSIFIABLE. Without it there
+// is no way to exercise a filesystem that transforms bytes on write, and a verification nobody can
+// make fail is decoration. The default is the real filesystem; only a test passes anything else.
+export function governedEdit({ authority, action, root, contract = EDIT_FIXTURE,
+  deps = { readBack: (p) => readFileSync(p) } }) {
   const deny = (outcome, why, extra = {}) =>
     ({ outcome, permitted: false, effected: false, why, ...extra });
 
@@ -162,6 +165,24 @@ export function governedEdit({ authority, action, root, contract = EDIT_FIXTURE 
   const before = existedBefore ? readFileSync(resolvedTarget) : null;
   writeFileSync(resolvedTarget, action.contents);
 
+  // ---- THE READ-BACK. `bytesAfter` used to be Buffer.byteLength(action.contents) - the length of what
+  // was HANDED IN, never what landed. That is a receipt describing an INTENTION, and an intention is
+  // exactly what a receipt must not describe: in-toto's own documentation warns that its links record
+  // the artifacts a caller declares, so a caller can omit what actually changed. The same shape, one
+  // layer down: nothing here had ever opened the file it just wrote.
+  //
+  // It is not theoretical for this project. `core.autocrlf` once made a RESTORED file git-normalised
+  // rather than byte-exact, and a write that lands transformed - by encoding, by a normalising
+  // filesystem, by a partial write - would previously have produced a receipt claiming the right byte
+  // count over different bytes on disk.
+  //
+  // So the effect is now OBSERVED, not declared. `effectVerified` is false when the bytes on disk are
+  // not the bytes intended. The outcome stays ACTION_PERMITTED because the write DID happen and
+  // pretending otherwise would be a second lie; what the caller gets is the truth about what landed.
+  const after = deps.readBack(resolvedTarget);
+  const intendedRevision = sha256(Buffer.from(action.contents));
+  const revisionAfter = sha256(after);
+
   return {
     outcome: OUTCOME.ACTION_PERMITTED,
     permitted: true,
@@ -170,6 +191,14 @@ export function governedEdit({ authority, action, root, contract = EDIT_FIXTURE 
     authorizedTarget,
     consumed: c.consumed,
     bytesBefore: before ? before.length : 0,
-    bytesAfter: Buffer.byteLength(action.contents),
+    bytesAfter: after.length,
+    revisionBefore: before ? sha256(before) : null,
+    revisionAfter,
+    intendedRevision,
+    effectVerified: revisionAfter === intendedRevision,
+    ...(revisionAfter === intendedRevision ? {} : {
+      effectMismatch: `wrote ${Buffer.byteLength(action.contents)} bytes and read back ${after.length}; `
+        + `intended ${intendedRevision.slice(0, 12)}, on disk ${revisionAfter.slice(0, 12)}`,
+    }),
   };
 }
