@@ -15,7 +15,8 @@ import assert from 'node:assert';
 import { mkdtempSync, writeFileSync, readFileSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { delegate } from '../../legaknow/calculus.mjs';
+import { delegate, observe, isAuthority } from '../../legaknow/calculus.mjs';
+import { observation, OBSERVABILITY } from '../../legaknow/observation.mjs';
 import {
   createWorkspace, replay, fileScope, EVENT, PACKET, EFFECT_OUTCOME, revisionOf, EDIT_FIXTURE,
 } from './workspace.mjs';
@@ -185,6 +186,65 @@ test('7b — a contract requiring evidence, with none supplied: refused, and not
     });
     const r = f.ws.commit(packet.id);
     assert.equal(r.committed, false);
+    assert.equal(r.reason, EFFECT_OUTCOME.ACTION_DENIED_UNADMITTED_EVIDENCE);
+    assert.equal(readFileSync(f.a, 'utf8'), A_ORIGINAL);
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+// ── 7c IS WHAT MAKES 7b MEAN ANYTHING, AND IT DID NOT EXIST. `prepare()` accepted no evidence at all
+//    and `commit()` read `p.evidenceTokens`, a name assigned NOWHERE in the repository - so an
+//    evidence-gated contract could never be satisfied THROUGH THIS LAYER, and 7b would have passed
+//    identically against an executor that refused everything. The executor's own E3 suite has a real
+//    positive control and was never in doubt; this layer had only the refusal half.
+test('7c (positive control) — the SAME contract, with admitted evidence supplied: it commits', () => {
+  const f = setup();
+  try {
+    const scope = fileScope('src/a.js');
+    const evidence = observe({
+      observation: observation({
+        status: OBSERVABILITY.OBSERVED, value: 'parsed', subject: 'src/a.js',
+        producer: 'gw1-harness', procedure: 'read+parse', attribution: 'file', context: 'GW1',
+      }),
+      procedure: 'read+parse',
+      context: { repository: 'GW1', implementation: 'src/a.js', revision: revisionOf(f.a) },
+    });
+    // If observe() refused, no token would exist and this would fail for the wrong reason - so the
+    // minting is asserted before it is relied on, the way E3-FIXTURE does.
+    assert.equal(isAuthority(evidence), true, 'observe() refused: ' + (evidence && evidence.why));
+    assert.equal(evidence.kind, 'EPISTEMIC');
+
+    const packet = f.ws.prepare({
+      scope, baseRevision: f.ws.revisionOfScope(scope), evidence: [evidence],
+      authority: grantFor(f.root, 'src/a.js', EDIT_FIXTURE_EVIDENCED),
+      contract: EDIT_FIXTURE_EVIDENCED, contents: A_PROPOSED, by: 'planner',
+    });
+    const r = f.ws.commit(packet.id);
+    assert.equal(r.committed, true, r.why || r.reason);
+    assert.equal(r.effected, true);
+    assert.equal(readFileSync(f.a, 'utf8'), A_PROPOSED, 'the write actually happened');
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test('7d — evidence about ANOTHER file does not satisfy the obligation through this layer either', () => {
+  const f = setup();
+  try {
+    const scope = fileScope('src/a.js');
+    const wrong = observe({
+      observation: observation({
+        status: OBSERVABILITY.OBSERVED, value: 'parsed', subject: 'src/b.js',
+        producer: 'gw1-harness', procedure: 'read+parse', attribution: 'file', context: 'GW1',
+      }),
+      procedure: 'read+parse',
+      context: { repository: 'GW1', implementation: 'src/b.js', revision: revisionOf(f.b) },
+    });
+    assert.equal(isAuthority(wrong), true, 'observe() refused: ' + (wrong && wrong.why));
+    const packet = f.ws.prepare({
+      scope, baseRevision: f.ws.revisionOfScope(scope), evidence: [wrong],
+      authority: grantFor(f.root, 'src/a.js', EDIT_FIXTURE_EVIDENCED),
+      contract: EDIT_FIXTURE_EVIDENCED, contents: A_PROPOSED, by: 'planner',
+    });
+    const r = f.ws.commit(packet.id);
+    assert.equal(r.committed, false, 'evidence about another file must not pass');
     assert.equal(r.reason, EFFECT_OUTCOME.ACTION_DENIED_UNADMITTED_EVIDENCE);
     assert.equal(readFileSync(f.a, 'utf8'), A_ORIGINAL);
   } finally { rmSync(f.root, { recursive: true, force: true }); }

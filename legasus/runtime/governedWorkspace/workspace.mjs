@@ -113,16 +113,26 @@ export function createWorkspace({ root, clock = () => Date.now() }) {
    * target, the revision it was built against, the exact evidence it depends on, the authority it will
    * present, the contract, the effect, how it will be validated and how it would be rolled back.
    */
-  function prepare({ scope, baseRevision, dependsOn = [], authority, contract = EDIT_FIXTURE, contents, validation, rollback, expiresAt = null, by }) {
+  function prepare({ scope, baseRevision, dependsOn = [], evidence = [], authority, contract = EDIT_FIXTURE, contents, validation, rollback, expiresAt = null, by }) {
     const ev = append(EVENT.ACTION_PREPARED, {
       scope, baseRevision, dependsOn, contract: contract.operation, requires: contract.requires,
+      // TWO DIFFERENT THINGS ARE BOTH CALLED EVIDENCE HERE, and conflating them is what broke this.
+      // `dependsOn` holds EVENT IDS from this log, used below to refuse a packet resting on a withdrawn
+      // finding. `evidence` holds ADMITTED EPISTEMIC TOKENS, which the EXECUTOR checks against the
+      // contract's own obligations. This layer had the first and not the second: `p.evidenceTokens` was
+      // read at the effect boundary and assigned nowhere, so any contract declaring an evidence
+      // obligation could NEVER be satisfied through this layer. Its test asserted the refusal and would
+      // have passed identically against an executor that always refused - an assertion that could not
+      // fail. The executor's own E3 suite was never affected; it has a real positive control. This
+      // layer did not, which is why 7c now exists.
+      evidence: evidence.map((e) => ({ kind: e && e.kind, about: e && e.context && e.context.implementation })),
       effectHash: hash(contents), validation: validation || null,
       rollback: rollback || { kind: 'restore-bytes', note: 'the bytes present at baseRevision' },
       expiresAt, by,
       // Stated in the record itself, so nobody reading it can mistake preparation for permission.
       note: 'a prepared action is a PROPOSAL. It is not permission and cannot become an effect by itself.',
     });
-    packets.set(ev.id, { ev, authority, contract, contents, scope, baseRevision, dependsOn, expiresAt });
+    packets.set(ev.id, { ev, authority, contract, contents, scope, baseRevision, dependsOn, evidence, expiresAt });
     return ev;
   }
 
@@ -161,7 +171,7 @@ export function createWorkspace({ root, clock = () => Date.now() }) {
     // packet was prepared with; nothing here rebuilds, re-scopes or refreshes it.
     const r = governedEdit({
       authority: p.authority,
-      action: editAction({ target: p.scope.path, contents: p.contents, evidence: p.evidenceTokens || [] }),
+      action: editAction({ target: p.scope.path, contents: p.contents, evidence: p.evidence || [] }),
       root,
       contract: p.contract,
     });
