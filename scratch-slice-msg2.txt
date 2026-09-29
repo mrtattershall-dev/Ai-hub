@@ -1,0 +1,13 @@
+editTruth was the 90s cap, not the change: flag-off is 12 of 12
+
+It exited 124 under the sweep's 90 second cap with ok as its last line. Given 240 seconds it passes
+18 of 18. So the flag-off path is all 12 write and preservation suites, 86 assertions, 0 failed -
+appendFile 5, appendFragment 7, appendSyntax 4, defLoss 6, destructiveWrite 8, duplicateDecls 9,
+exportLoss 7, noopEdit 4, emptyReplace 8, editAddress 9, markerGuard 7, editTruth 18.
+
+Recorded as resolved rather than left standing as a caveat, since the same suite showed the same
+signature on the unmodified tree three days ago and was reported then as unattributed.
+
+Message-File: scratch-slice-msg2.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

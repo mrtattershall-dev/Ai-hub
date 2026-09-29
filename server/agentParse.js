@@ -408,7 +408,13 @@ function parseAction(text, lastPath) {
   }
   if (tool === 'queue_task') {
     const g = (text.match(/GOAL:\s*([\s\S]+)/i)?.[1] || '').split(/\n[A-Z]{3,}:/)[0].trim();
-    return { tool, thought, args: { goal: g } };
+    // SCOPE: a, b - the paths the queued work NOMINATES. A REQUEST, never a grant: the boundary
+    // intersects it with what the queueing run actually holds, so naming more than the parent has
+    // yields less rather than more (authorityScope.mjs). Parsed here only so the request has a
+    // channel; parsing it confers nothing.
+    const sc = (text.match(/^[ \t]*SCOPE:[ \t]*([^\n]+)/im) || [])[1];
+    const scope = sc == null ? null : sc.split(',').map((x) => x.trim().replace(/[`"']/g, '')).filter(Boolean);
+    return { tool, thought, args: { goal: g, ...(scope ? { scope } : {}) } };
   }
   if (tool === 'list_assets') {
     const filter = (text.match(/FILTER:\s*(.+)/i)?.[1] || '').trim().replace(/[`"']/g, '');

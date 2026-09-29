@@ -1,0 +1,80 @@
+  1 s1_library.js   done     then P  end F   <- REGRESSED  [d09036f] trial35: done FN-MISSING(book,owns)  load: Member Alice already has book 978-0134685991
+  2 s2_logs.py      done     then P  end P   [66a3828] trial35: done FN-MISSING(time,status,bytes,seconds)  
+  3 s3_matrix.js    done     then F  end F   [8b8d8d6] trial35: done FN-MISSING(Matrix)  load: [x].transpose is not a function
+  4 s4_markdown.py  done     then F  end F   [304e7df] trial35: done FN-MISSING(paragraphs)  two paragraphs '<p>line one</p>\n<p>line two</p>\n<p></p>\n<p>next</p>'
+  5 s5_expr.js      stopped  then F  end F   [eb3c2c7] trial35: stopped FN-MISSING(numbers)  load: Assertion failed: Invalid expression
+  6 s6_graph.py     done     then P  end P   [46937a1] trial35: done FN-MISSING(number,of)  
+  7 s7_cache.js     stopped  then P  end P   [39ac653] trial35: stopped FN-MISSING(Cache)  
+  8 s8_grades.py    done     then P  end P   [e9aa01d] trial35: done s8_grades.py:runs  
+  9 s9_board.html   done     then P  end P   [d1f2cd4] trial35: done s9_board.js:parses  
+ 10 s10_desk.js     done     then P  end F   <- REGRESSED  [b52438e] trial35: done FN-MISSING(js)  load: Member Alice already has book 978-0134685991
+ 11 s1_library.js   done     then F  end F   [61e1413] trial35: done s1_library.js:runs  load: Member Alice already has book 978-0134685991
+ 12 s2_logs.py      done     then P  end P   [5a790bb] trial35: done s2_logs.py:runs  
+ 13 s3_matrix.js    done     then P  end F   <- REGRESSED  [80e1d06] trial35: done s3_matrix.js:runs  load: [x].transpose is not a function
+ 14 s4_markdown.py  done     then F  end F   [cf6da4d] trial35: done s4_markdown.py:runs  headings '<p># Title</p>\n<p>text under it</p>\n<p>## Sub</p>\n<p></p>\n<p>### S
+ 15 s5_expr.js      done     then P  end F   <- REGRESSED  [d31a7f2] trial35: done s5_expr.js:runs  load: Assertion failed: Invalid expression
+ 16 s6_graph.py     done     then P  end P   [0cf2ca1] trial35: done s6_graph.py:runs  
+ 17 s7_cache.js     done     then P  end P   [ea15652] trial35: done s7_cache.js:runs  
+ 18 s8_grades.py    done     then P  end P   [48bc8c8] trial35: done s8_grades.py:runs  
+ 19 s9_board.html   done     then P  end P   [93ed913] trial35: done FN-MISSING(board,column)  
+ 20 s10_desk.js     done     then F  end F   [77ba092] trial35: done s10_desk.js:runs  load: Member Alice already has book 978-0134685991
+ 21 s1_library.js   stopped  then F  end F   [069acdd] trial35: stopped s1_library.js:THROWS  load: Member Alice already has book 978-0134685991
+ 22 s2_logs.py      done     then P  end P   [660dd3e] trial35: done FN-MISSING(decimals)  
+ 23 s3_matrix.js    stopped  then F  end F   [87b0024] trial35: stopped FN-MISSING(mul)  load: [x].transpose is not a function
+ 24 s4_markdown.py  stopped  then F  end F   [8d8a59b] trial35: stopped s4_markdown.py:THROWS  in a heading '<p># A <strong>big</strong> deal</p>'
+ 25 s5_expr.js      stopped  then F  end F   [2dd5591] trial35: stopped FN-MISSING(operator,associative,it)  load: Assertion failed: Invalid expression
+ 26 s6_graph.py     done     then P  end P   [5b95197] trial35: done FN-MISSING(returning,is)  
+ 27 s7_cache.js     done     then P  end P   [603c9a1] trial35: done s7_cache.js:runs  
+ 28 s8_grades.py    stopped  then F  end F   [2a2710c] trial35: stopped FN-MISSING(letter,py,of)  threw: AttributeError: module 's8_grades_mod' has no attribute 'letter'
+ 29 s9_board.html   done     then F  end P   [080ca08] trial35: done FN-MISSING(board)  
+ 30 s10_desk.js     stopped  then F  end F   [65cdd49] trial35: stopped FN-MISSING(loans)  load: Member Alice already has book 978-0134685991
+ 31 s1_library.js   stopped  then F  end F   [c1315e0] trial35: stopped s1_library.js:THROWS  load: Member Alice already has book 978-0134685991
+ 32 s2_logs.py      stopped  then P  end P   [69069d4] trial35: stopped FN-MISSING(of,path)  
+ 33 s3_matrix.js    stopped  then P  end F   <- REGRESSED  [d6b997a] trial35: stopped s3_matrix.js:runs  load: [x].transpose is not a function
+ 34 s4_markdown.py  stopped  then F  end F   [902acc3] trial35: stopped s4_markdown.py:THROWS  inline code '<p>use <code>a<strong>b</strong> &lt; c</code> here</p>'
+ 35 s5_expr.js      stopped  then F  end F   [743b4d2] trial35: stopped FN-MISSING(name)  load: Assertion failed: Invalid expression
+ 36 s6_graph.py     done     then P  end P   [0229d24] trial35: done FN-MISSING(cycle)  
+ 37 s7_cache.js     done     then P  end P   [8c5be9a] trial35: done s7_cache.js:runs  
+ 38 s8_grades.py    done     then P  end P   [d52053f] trial35: done FN-MISSING(in)  
+ 39 s9_board.html   done     then P  end P   [e260ace] trial35: done FN-MISSING(board)  
+ 40 s10_desk.js     stopped  then F  end F   [bbff299] trial35: stopped FN-MISSING(function,Cache)  load: Member Alice already has book 978-0134685991
+ 41 s1_library.js   stopped  then F  end F   [befcc15] trial35: stopped FN-MISSING(number,dueDay,overdue,daysLate)  load: Member Alice already has book 978-0134685991
+ 42 s2_logs.py      done     then P  end P   [d311faa] trial35: done FN-MISSING(rank)  
+ 43 s3_matrix.js    done     then P  end F   <- REGRESSED  [3aed370] trial35: done s3_matrix.js:runs  load: [x].transpose is not a function
+ 44 s4_markdown.py  stopped  then F  end P   [b5ff853] trial35: stopped s4_markdown.py:THROWS  
+ 45 s5_expr.js      stopped  then F  end F   [a6f0d00] trial35: stopped FN-MISSING(min,max,abs,sqrt)  load: Assertion failed: Invalid expression
+ 46 s6_graph.py     done     then P  end P   [7b72544] trial35: done s6_graph.py:runs  
+ 47 s7_cache.js     stopped  then P  end P   [01dc79a] trial35: stopped FN-MISSING(Cache,now,clock,everywhere)  
+ 48 s8_grades.py    stopped  then F  end F   [69b4418] trial35: stopped FN-MISSING(scores)  threw: TypeError: '>' not supported between instances of 'list' and 'int'
+ 49 s9_board.html   done     then F  end F   [649c570] trial35: done FN-MISSING(board)  after reload [["Aâ†â†’Ã—","Câ†â†’Ã—"],["Bâ†â†’Ã—"]]
+ 50 s10_desk.js     stopped  then F  end F   [f3b2c44] trial35: stopped FN-MISSING(overdue,isbn)  load: Member Alice already has book 978-0134685991
+ 51 s1_library.js   stopped  then F  end F   [fe85875] trial35: stopped FN-MISSING(late)  load: Member Alice already has book 978-0134685991
+ 52 s2_logs.py      stopped  then P  end P   [73cb151] trial35: stopped FN-MISSING(field)  
+ 53 s3_matrix.js    stopped  then F  end F   [d62ba0d] trial35: stopped FN-MISSING(determinant)  load: [x].transpose is not a function
+ 54 s4_markdown.py  done     then F  end F   [0a020e4] trial35: done s4_markdown.py:runs  list '<ul><li>one</li><li><strong>two</strong></li></ul>\n<p></p>\n<p>after</p>'
+ 55 s5_expr.js      stopped  then F  end F   [010ee30] trial35: stopped FN-MISSING(early)  load: Assertion failed: Invalid expression
+ 56 s6_graph.py     stopped  then F  end F   [3299858] trial35: stopped s6_graph.py:THROWS  threw: AttributeError: 'Graph' object has no attribute 'remove_node'
+ 57 s7_cache.js     done     then F  end F   [f3e150d] trial35: done s7_cache.js:runs  stats {"hits":1,"misses":2,"evictions":1,"expirations":1}
+ 58 s8_grades.py    stopped  then P  end P   [11b071b] trial35: stopped FN-MISSING(default)  
+ 59 s9_board.html   stopped  then F  end F   [11b071b] trial35: stopped FN-MISSING(board)  a 4th card got into Doing: ["A","B","C","D"]
+ 60 s10_desk.js     stopped  then F  end F   [56f57ee] trial35: stopped FN-MISSING(amount)  load: Member Alice already has book 978-0134685991
+ 61 s1_library.js   stopped  then F  end F   [717c1e1] trial35: stopped FN-MISSING(hold)  load: Member Alice already has book 978-0134685991
+ 62 s2_logs.py      done     then P  end P   [9eb2728] trial35: done s2_logs.py:runs  
+ 63 s3_matrix.js    stopped  then F  end F   [a1aedb9] trial35: stopped FN-MISSING(singular)  load: [x].transpose is not a function
+ 64 s4_markdown.py  stopped  then F  end F   [ce66e33] trial35: stopped FN-MISSING(space)  both kinds '<ul><li>a</li></ul>\n<p></p>\n<ol><li>b</li></ol>'
+ 65 s5_expr.js      stopped  then F  end F   [653fda3] trial35: stopped s5_expr.js:THROWS  load: Assertion failed: Invalid expression
+ 66 s6_graph.py     stopped  then F  end F   [4e03a77] trial35: stopped FN-MISSING(edges)  threw: AttributeError: 'Graph' object has no attribute 'reachable'
+ 67 s7_cache.js     stopped  then F  end F   [45a4c9d] trial35: stopped FN-MISSING(Cache,onEvict)  clear []
+ 68 s8_grades.py    stopped  then P  end P   [7b3c7d6] trial35: stopped s8_grades.py:runs  
+ 69 s9_board.html   done     then P  end P   [5d16d6c] trial35: done FN-MISSING(board)  
+ 70 s10_desk.js     stopped  then F  end F   [77f5ac2] trial35: stopped s10_desk.js:THROWS  load: Member Alice already has book 978-0134685991
+ 71 s1_library.js   stopped  then F  end F   [b7849b7] trial35: stopped s1_library.js:THROWS  load: Member Alice already has book 978-0134685991
+ 72 s2_logs.py      stopped  then F  end F   [e2d748a] trial35: stopped s2_logs.py:runs  sessions {'1.1.1.1': 4, '2.2.2.2': 1}
+ 73 s3_matrix.js    stopped  then F  end F   [5cbc049] trial35: stopped s3_matrix.js:THROWS  load: [x].transpose is not a function
+ 74 s4_markdown.py  stopped  then F  end F   [cd6d868] trial35: stopped FN-MISSING(breaks)  code block '<p>before</p>\n<p></p>\n<p>```</p>\n<p>x = 1 < 2</p>\n<p>  <em>not e
+ 75 s5_expr.js      stopped  then F  end F   [f04de0f] trial35: stopped FN-MISSING(String)  load: Assertion failed: Invalid expression
+ 76 s6_graph.py     stopped  then F  end F   [8713ca9] trial35: stopped s6_graph.py:THROWS  threw: AttributeError: 'Graph' object has no attribute 'components'
+ 77 s7_cache.js     stopped  then P  end P   [e5b8bfe] trial35: stopped FN-MISSING(entries)  
+ 78 s8_grades.py    stopped  then F  end F   [final] trial35: stopped FN-MISSING(decimals,letter)  to_csv 'student,hw1,hw2,percent,letter\nann,10,9,63.33,D\nbob,,5,50.00,F\ncy,,,,
+
+coder30b-setg: 78 goals run | worked when written 33 | works at the end 29 (as asked 29) | REGRESSED 6

@@ -1,0 +1,60 @@
+STEP 5: attenuation composes where tested, and a THIRD boundary loses authority entirely
+
+Component evidence and composition evidence are kept separate in STEP5_RESULT.md, because component
+evidence is not inherited as evidence of composition.
+
+COMPONENT. W6a, the attenuation relation: 17 passed, including composition and non-amplification over
+4000 random inputs with zero counterexamples, and a must-fire control where a UNION implementation is
+caught amplifying on 3007 of 4000. That is evidence about the FUNCTION and the file says so.
+
+COMPOSITION. W9, 29 passed across seven worlds through a real POST /agent/queue/run dequeue. The
+descendant installed exactly what was delegated and its OWN RECORD shows write_file a.py OK alongside
+write_file b.py REFUSED. Requesting {a,b} from a parent holding {a} yielded {a}: the lie bought
+nothing. An unauthorized parent delegated nothing. A forged AUTHORITY line is not even representable,
+because the parser builds queue_task args itself. The specificity control has a descendant write b.py
+when the owner authorized it directly, so the refusals are authority rather than a broken write path,
+and the flag-off control lands the same unauthorized write.
+
+W6b composed across TWO real crossings in separate processes: the child held {a}, REQUESTED {a,b}, and
+was delegated {a}, with b recorded as refused from the request. Narrowing was not undone by depth.
+
+AND THE THIRD HOP NEVER RAN, which is the better finding. The child ended stopped, which triggered the
+hub's own REPAIR path; that path enqueues retry work from the run-failure handler and passes no
+authority, so the item carries authority null. Dequeue took the repair item before HOP3, and the run I
+measured as a grandchild was an auto-generated retry that correctly refused everything because it held
+nothing. So there is a third boundary, absent from the preregistration: spawn_subtask crosses
+ambiently and unrecorded, queue_task crosses by attenuation and is recorded, and repair/retry does not
+cross at all. A retry of authorized work arrives unauthorized. That is a non-loss failure on a route
+nobody enumerated, and it is the shape the owner named in advance as persistence losing authority
+lineage. It is PRESERVED and not repaired here: attenuation did not fail, a different boundary did.
+
+Observability is what made it diagnosable. The repair run's authority_received step fired with
+installed [] and the sentence saying no crossing record accompanied the item, so every governed write
+would refuse. Without that step it would have looked like a grandchild governance refused, which is
+the opposite conclusion.
+
+PROPERTIES: P1 independent root HELD, P2 non-amplification HELD across two live crossings and 4000
+random inputs, P3 least authority HELD when the descendant asks and reported as leastAuthority false
+when it does not, P4 non-loss HELD on queue_task and FAILED on repair/retry, P5 accountability HELD,
+P6 revocation NOT TESTED and stated as a gap rather than a pass - the crossing is decided at queue
+time and stored, so a grant revoked afterwards would not be noticed.
+
+THREE APPARATUS FAULTS are recorded because each looked like a result. Routing the mock on a goal
+marker let the marker leak through the parent's own queue reply, so the PARENT was served the CHILD's
+script and wrote both files itself. Routing on the first GOAL line matched the SYSTEM PROMPT's worked
+example at messages[0], so the CHILD was served the parent's script and never wrote - and that run's
+FLAG-OFF control also failed, which is the tell, since a control failing with the mechanism switched
+off can only be apparatus. Both are fixed by one mock per run on its own port with the hub repointed
+between them, no text matching anywhere, plus controls requiring that the child's mock was CALLED,
+that the parent attempted ZERO writes, and that attribution comes from the run record rather than
+final file state. The third fault, assuming dequeue order, is NOT fixed, so W6b hop 3 remains
+unobserved and the composition claim stops at two crossings.
+
+Also measured rather than asserted: generations [1,2] after the _activeRun correction and [1,1]
+before, which is the must-fire control for that claim.
+
+Flag still off. Nothing merged.
+
+Message-File: scratch-step5-result.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

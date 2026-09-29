@@ -1,0 +1,63 @@
+STEP 6 RESULT: repair derives a non-amplifying continuation from the failed work item
+
+16 passed, 0 failed across all seven frozen worlds. The candidate was not touched while the matrix ran.
+
+THE BOUNDED RESULT. Repair/retry no longer drops authority entirely. A repair derives a non-amplifying
+continuation from the SPECIFIC FAILED WORK ITEM, at execution time; removing that source prevents
+continuation; recursive repair is structurally unavailable. That is the whole claim.
+
+Observed: same-scope repair ALLOWED with the continued item id in the record; outside-scope REFUSED;
+writing both paths gives a allowed and b refused, so the ceiling is the failed work's; continuing work
+that held nothing yields nothing; a forged OWNER grant in the repair's own reply leaves the ceiling
+exactly as it was; a verified-absent source REFUSES and the record says SOURCE_ITEM_GONE; and the
+specificity control has the SAME machinery write b when the owner authorized b, which is why the six
+refusals mean anything.
+
+IT IS EXISTENCE CHECKED, NOT FRESHNESS CHECKED, and that sentence appears nowhere in the record. Three
+propositions are separated explicitly: source exists, attacked here and established; source id
+resolves to the INTENDED item, newly exposed and NOT attacked; source's stored authority is currently
+valid, which is P6 and untouched. Root authority can still be revoked while the failed item persists
+carrying its historical scope, and the mechanism would today say that scope. If P6 later kills this
+design, step 6 was not wrong - it established a weaker property correctly and exposed the next missing
+distinction.
+
+R7 PHRASED PRECISELY: recursive repair-authority amplification is unreachable through the CURRENTLY
+IMPLEMENTED repair mechanism, because repair items cannot themselves generate repairs. Not "repair
+authority can never amplify" - queue_task called from inside a repair run is such a path and is
+untested. The guard was not relaxed to manufacture the world; this is the second frozen world vacuous
+by construction after W6 at spawn_subtask.
+
+AND A NEW DEPENDENCY, recorded rather than hidden. Deriving at install time makes continuationOf
+resolution part of the authority chain: a queue id that was scheduler bookkeeping now locates the
+authority source. Anything that lets two items collide, be renumbered or be reconstructed becomes an
+authority concern; the id is randomUUID sliced to 8 characters and its collision properties have not
+been examined in that light. A cost of the design, not a reason to abandon it and not an expedition
+launched here. The general pattern is worth naming because another session independently hit it with
+competing workspace-identity representations: identifiers that begin as bookkeeping become security
+primitives the moment other mechanisms trust them.
+
+APPARATUS. R6 first reported as a FAILURE and had not run: the agent router is mounted at /api/agent
+and the delete went to /api/queue/:id, so the 404 was swallowed and the item was never removed. The
+record is what distinguished them - unresolved null means resolveContinuation FOUND the source, which
+cannot happen if it was deleted - and without that field the tempting conclusion was available and
+wrong. The ledger entry is R6 first run: UNTESTED, the deletion intervention did not occur. The repair
+is a control rather than a path correction alone: sourceGone converts DELETE was attempted into source
+absence was OBSERVED, as a precondition. That is the third apparatus control in two steps, alongside
+the run's mock must have been called and attribution comes from the run record never from final file
+state.
+
+One recurring shape recorded and NOT pursued: an attempted operation was represented downstream as
+though its intended effect had occurred. Under the charter a deeper account of that family earns
+nothing until it predicts something the shallow statement does not, and the shallow statement suffices:
+DELETE requested did not establish source absent.
+
+Not claimed: P6, assumption ancestry, the safety of queue_task from inside a repair run, composition
+beyond owner to queue_task to attenuation to failure to repair to governed write, any merge, and
+anything from the CONSOLIDATION-1 session. The flag stays off.
+
+Step 6 is closed. The next hostile question is P6: the source still exists AND its authority has become
+invalid.
+
+Message-File: scratch-step6-result.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

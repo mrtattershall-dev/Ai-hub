@@ -1,0 +1,59 @@
+Prior art read rather than recalled: five reference repos against the Legasus mapping
+
+Five uploaded repositories extracted and inspected, every claim citing a file and line. One frozen
+document is touched, by appending P6 Amendment 2.
+
+WHAT EACH SUPPLIES AND WHAT IT DOES NOT. in-toto's Link binds materials used, products produced,
+byproducts, command and environment, and layout verification does signature thresholds, command
+alignment, expiry, and MATCH rules chaining one step's products to the next step's materials BY HASH.
+Marquez computes JobVersion identity from namespace plus job name plus SORTED DECLARED INPUT dataset ids
+plus output ids plus location - and has NO staleness concept and NO GATING AT ALL; greps for
+stale/invalidate and deny/reject/forbid across its api sources return nothing. SWE-bench's verdict is
+f2p == 1 and p2p == 1 gives FULL, with the halves NAMED Resolution and Maintenance. mini-swe-agent is a
+190-line loop whose only hard limits are step, cost and wall-time; its sole matches for
+authority/preserve/govern/revoke are two incidental uses of "preserving" about partial output and scroll
+position. SWE-ReX is the sandboxed execution substrate.
+
+The structural observation: two supply the untrusted generator and its substrate, three supply
+assurance, and NONE OF THE THREE ASSURANCE SYSTEMS GATES A RUNNING PRODUCT. in-toto verifies after the
+fact, marquez only records, SWE-bench grades offline. That is consistent with the stated hypothesis
+rather than a discovery, and it is where the mapping understates the difference.
+
+IN-TOTO DELIBERATELY HAS NO REVOCATION and its verification docstring says why: it does not consult
+creation time, revocation status or usage flags, because that "ensures that verification can be
+performed in isolation", and to revoke "the supply chain owner must sign a new layout". So its validity
+model is expiry plus SUPERSESSION, rejecting revocation lookup for an architectural reason that
+transfers directly - a continuation resolved at install time that had to consult external revocation
+state would no longer be decidable from the item and its source alone. That is an eighth meaning of
+invalid, appended to the P6 freeze as Amendment 2, attributed and NOT adopted, with the caution that
+supersession answers which authorization is current and says nothing about why the earlier one stopped
+being justified.
+
+MARQUEZ CORROBORATES THE DECLARED-INPUT-SET RULE independently. The owner's third control for candidate
+(b) said ancestry should use a declared tree or input-set digest rather than workspaceStamp, because
+speculative validity is about the exact files the verifier observed. Marquez does exactly that in
+production. Recorded with the limit that its digest is over declared IDENTIFIERS, so it changes when the
+declared set changes and not when an input's bytes change - it is an identity, not a freshness check,
+and must not be read as evidence that a declared-set digest can do a content check's job.
+
+SWE-BENCH ALREADY SPLIT THE VACUITY QUESTION, ASYMMETRICALLY AND ON PURPOSE. test_maintained carries the
+docstring "P2P semantics: a skipped test is not a regression, unlike for F2P", while test_failed counts
+SKIPPED as failure with the comment "a skipped F2P test is not a resolution; without this, a patch that
+makes every F2P test skip lands in neither list and scores RESOLVED_FULL". Skip is strict for resolution
+and lenient for maintenance, and the residue is asymmetric by choice: you cannot fake resolution by
+skipping, you can fake maintenance by skipping. Two consequences for Legasus. First, its preservation
+predicate makes no such distinction at all - lostDefs and defCounts are structural, so a symbol that
+disappears is a loss whether or not anything depended on it, and there is no representation of "this
+check no longer applies" as against "this behaviour regressed", which is exactly the axis step 1
+identified as unreachable in the 7 of 16 behaviour-changed cases. Second, build forward without breaking
+what came before ALREADY EXISTS as an operational verdict; Legasus's version differs in being a runtime
+gate on whether bytes survive rather than an offline grade.
+
+NOT ESTABLISHED: not that the combination is novel; not that any of this would work in Legasus, since no
+integration was attempted or proposed; nothing about NASA runtime assurance, Kubernetes, Zuul or SLSA,
+for which no artifact was supplied and none was read; nothing about the fuzzing line; and no readiness
+judgement, since TEST-(-1) belongs to another session at 1cf2381e.
+
+Message-File: scratch-priorart.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

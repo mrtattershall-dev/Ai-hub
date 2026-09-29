@@ -1,0 +1,40 @@
+Freeze the widening result, and characterize what authority does across spawn_subtask
+
+Two records. No mechanism is added and the flag stays off.
+
+FROZEN: WIDENING PERMISSION DID NOT WIDEN ACCEPTABILITY. Authorized(a) does not imply Acceptable(a),
+and an action does not become permissible merely because it would succeed. Both halves observed in one
+live path on the same three tools. The file records the design that makes it a measurement rather than
+an anecdote, which is three controls: the scope control, where t.py lands once it is in scope, so the
+earlier refusal was SCOPE and not a broken write; the specificity control, where flag-off writes all
+succeed with no authority, so the refusals are governance and not a hub that lost the ability to write;
+and the independence control, where widening permission to include t.py did NOT make the beta-dropping
+write to s.py acceptable. The third is the whole point - without it, two refusals are consistent with
+one mechanism wearing two names, and widening one while the other does not move is what separates the
+propositions. The forged control covers the authority direction: a well-formed grant for the exact
+target supplied in TOOL ARGUMENTS is ignored, so the thing requesting an action does not define the
+boundary within which its request is authorized. CAN was exercised only as the flag-off control and no
+claim is made about it beyond that.
+
+CHARACTERIZED, AND HALF OF IT IS A DEFECT. subtaskAuthority.test.mjs measures what authority currently
+does across spawn_subtask rather than reading it off the code. Four facts. The sub-task wrote b.py
+using authority nothing granted to IT, because runAuthorities is module-scoped and the subtask loop
+touches authority nowhere - parent was trusted, therefore child is trusted, which is the sudo -E
+hazard. No step TYPE records that authority crossed: the types are plan, note, tool, checkpoint,
+subtask_start, subtask_step, subtask_done, finish. The inheritance IS bounded, since the child could
+not write d.py outside the parent's grant set, so it is not unlimited escalation. And a governance
+refusal inside a sub-task is INVISIBLE in the parent's run record - d.py was absent yet no refusal text
+appears, because a sub-task's tool result is not carried up; the parent gets only an arrow line naming
+tool and path.
+
+TWO OF MY OWN DETECTORS WERE WRONG FIRST, and are recorded rather than quietly fixed. The lineage
+assertion grepped /delegat/i across all step text and matched the word "delegate" in this file's own
+fixture goal - my prompt reported back to me as evidence - and now asserts over step TYPES, which
+cannot do that. The refusal assertion assumed the refusal would appear in the parent record; it does
+not, and that failure is the fourth fact above rather than a test to be loosened.
+
+This is a baseline, not an endorsement, and it is what step 5 has to attack.
+
+Message-File: scratch-freeze-msg.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

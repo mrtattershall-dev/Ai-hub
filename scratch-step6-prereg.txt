@@ -1,0 +1,60 @@
+STEP 6 preregistration: repair work derives authority from the work it repairs
+
+Frozen before implementation; this commit contains nothing else. Step 5 is closed at 95262785 and
+nothing here revises it.
+
+THE CANDIDATE RULE. Automatically generated repair work may receive a derived continuation of the
+FAILED WORK ITEM's still-valid authority, and never greater authority. The source is the failed work
+item - not the model, the retry prompt, tool arguments, the scheduler, the ambient run that happens to
+enqueue it, nor the root grant directly. A_repair is a subset of A_failed, and for the first
+implementation equality is acceptable, subject to the same governing validity conditions. This is
+CONTINUATION rather than a fresh root grant, and the distinction changes what the record can answer:
+not "retries inherit" but "R1 may touch a.py because R1 continues W2, whose still-valid authority
+permitted a.py, and R1 received no more than W2 held". Failure may create new work; creating new work
+does not create authority.
+
+WHAT THE CODE ALREADY PROVIDES, measured so the design is not guesswork. The repair path already holds
+the failed item in scope and already records repairOf: item.id, so the authority source is addressable
+by an identifier that already exists. Step 5's own diagnostic showed the failed item SURVIVES in the
+queue with status stopped and its authority intact. The path fires only for machine failures - budget,
+loop, parse, same_error - or status error.
+
+DERIVE AT INSTALL, NOT AT ENQUEUE. queue_task decides its crossing while the parent is live and stores
+the result; a repair cannot do that without resurrecting authority that may have died in between, which
+the rule forbids. So the repair item carries a REFERENCE, continuationOf the failed item id, and the
+derivation happens when the repair run starts, re-reading the source item's stored authority. That
+makes staleness representable with NO new mechanism: if the source item is gone or carries no
+authority, the continuation yields nothing and every governed write refuses. It uses only the existing
+queue as the source of truth, and it is deliberately narrower than P6.
+
+NOMINATION IS NOT AUTHORIZATION. A repair that discovers it needs helper.py may nominate the need; it
+may not grant it. For this step the behaviour is refuse and name the missing scope. No automatic
+expansion and no escalation machinery.
+
+SEVEN FROZEN CASES plus a mandatory specificity control: same-scope repair allowed; outside-scope
+refused; nominating a wider scope capped at the ceiling; empty authority stays empty; a forged OWNER
+grant leaves the ceiling unchanged; a stale source refuses rather than resurrecting; repeated repair
+never amplifies; and independently owner-authorized b MUST be writable by the same machinery, because
+without that every row is satisfied by a refuse-everything mechanism. Two apparatus controls are
+frozen with them, both earned in step 5: the repair run's mock must have been CALLED, since never-ran
+and was-refused leave the same footprint on disk, and attribution comes from the run record rather
+than final file state.
+
+PREDICTIONS, stated as expectations. The easy half is the refusals, which are the intersection property
+already established at the queue boundary reached through a different carrier. The hard one is
+staleness, because it is the first place anything in this system asks whether an authority is STILL
+valid rather than whether it was ever granted. If that fails, the candidate is wounded exactly where it
+claims to be strong, and the failure is preserved rather than rescued.
+
+THEN W6b IS RERUN ON THE NATURAL PATH, without bypassing the repair that preempted it in step 5. The
+payoff is that the interposed repair executes lawfully under the failed work's ceiling AND the original
+HOP3 item remains independently queued afterwards with its own attenuated {a} intact - closing the new
+boundary without special-casing the experiment to manufacture the grandchild I wanted.
+
+Non-goals: not P6, not assumption ancestry, no generalized retry ontology, no scheduler policy, no
+automatic escalation. No evidence is inherited from the CONSOLIDATION-1 session, which is a different
+session's artifact. The flag stays off.
+
+Message-File: scratch-step6-prereg.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

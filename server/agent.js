@@ -38,6 +38,14 @@ import { SYSTEM_PROMPT, systemPromptFor } from './agentPrompt.js';
 import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
 import { lostDefs, lostExports, defCounts, exportNames } from './defNames.js';
+// STATIC on purpose: write_file and edit_file are not async, so an awaited dynamic import inside them
+// is a SyntaxError. The whole static closure of governed-edit.mjs is three files - governed-edit,
+// calculus, observation - which is what makes bringing it in a small slice rather than a merge.
+// governedEdit/editAction/EDIT_FIXTURE already imported above (afa3ff5e). The slice's copy of
+// this import is dropped as a DUPLICATE ONLY - delegate and authorityScope below are kept,
+// because those are the slice's own contribution and nothing else imports them.
+import { delegate } from '../legasus/legaknow/calculus.mjs';
+import { attenuate, crossingRecord, continuationRef, resolveContinuation } from './authorityScope.mjs';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 // LEGASUS PHASE 1 - OBSERVATION ONLY. See legasus/screen/PHASE1-OBSERVATION_PREREG.md.
 // Emits a canonical host execution event from the one place where the whole truth of a tool
@@ -800,6 +808,126 @@ function markerRefusal(path, tool) {
     + `Nothing about your goal requires editing ${MARKER}. Carry on with the actual work.`;
 }
 
+// ══ THE GOVERNED WRITE BOUNDARY, AND THE AUTHORITY INSTALLER THAT WAS MISSING ═══════════════════
+//
+// THE MODEL MUST NOT BE ABLE TO SUPPLY OR WIDEN ITS OWN AUTHORITY. Grants live HERE, in module scope,
+// installed by the OWNER SIDE at run start. Nothing below reads tool arguments for an authority: one
+// arriving in args is self-issued permission wearing a parameter name, so widening through a tool
+// argument is unrepresentable rather than merely forbidden.
+//
+// A SET, NOT A TOKEN, and this is forced rather than chosen. `governedEdit` compares the requested
+// relative path against `authority.context.implementation` for EXACT equality, and its own header
+// records E5 (allowance) as NOT implemented. So ONE GRANT AUTHORIZES EXACTLY ONE FILE: a run permitted
+// to write three files needs three grants. Selecting the grant whose pinned target matches the resolved
+// path is not widening - each grant still authorizes only its own path, and governedEdit re-checks the
+// one selected against the path it is about to write.
+//
+// OFF BY DEFAULT. With AGENT_GOVERNED_WRITES unset these tools behave exactly as before, so this cannot
+// alter a live hub. That also means governance is demonstrated UNDER A FLAG while the default path stays
+// ungoverned - a limitation, not a claim.
+//
+// WHAT THIS BOUNDARY DOES NOT DECIDE. It answers "may this run write this path", which is permission.
+// It does not answer "is this particular content acceptable", which is preservation, and which still
+// happens in the tool loop after the tool returns. The two compose deliberately: a governed write can
+// be permitted here and still be refused and restored by the preservation check, and that is the
+// distinction between authority and action-acceptability made operational in ONE live path.
+const GOVERNED_WRITES = process.env.AGENT_GOVERNED_WRITES === '1';
+let runAuthorities = [];
+
+/** Install a single grant. Kept for the class-A harness, which installs exactly one. */
+export function setRunAuthority(token) { runAuthorities = token ? [token] : []; }
+/** Install a run's whole write scope. The owner side calls this; no tool can reach it. */
+export function setRunAuthorities(tokens) {
+  runAuthorities = Array.isArray(tokens) ? tokens.filter(Boolean) : (tokens ? [tokens] : []);
+}
+// clearRunAuthority is defined ONCE, below, where the coordination state also lives - an
+// incomplete reset leaks ancestry and receipts from one run into the next.
+/** What this run may write, for a refusal message and for tests. Never used to decide. */
+export function runAuthorityTargets() {
+  return runAuthorities.map((a) => a && a.context && a.context.implementation).filter(Boolean);
+}
+/** The grants themselves, so a crossing can read their ROOT rather than be told one. */
+export function runAuthorityGrants() { return runAuthorities.slice(); }
+
+/**
+ * Mint owner-issued grants for an explicit list of workspace-relative paths.
+ *
+ * The scope comes from the REQUESTER at run start, never from the model and never from the plan - a
+ * plan's FILES: line is model-authored, so deriving scope from it would be the agent authorizing
+ * itself. `from: 'OWNER'` is the root the delegation chain terminates at.
+ */
+export function issueWriteScope(paths, repository = 'workspace') {
+  const rels = [...new Set((paths || [])
+    .map((p) => String(p || '').split(sep).join('/').replace(/^\.\//, '').trim())
+    .filter(Boolean))];
+  return rels.map((target) => delegate({
+    from: 'OWNER', grant: EDIT_FIXTURE.requires, to: 'controller',
+    context: { repository, implementation: target },
+  }));
+}
+
+// null            -> not governed; proceed with the ordinary write
+// string          -> REFUSED; the tool returns it, so the run sees a refusal and not a silent no-op
+// {governed:true} -> governedEdit HAS ALREADY WRITTEN; the caller must not write again
+//
+// EVERY REFUSAL COMES FROM THE BOUNDARY, not from this wrapper. When no grant matches the path this
+// still calls governedEdit - with the first grant if the run has any, so the boundary reports
+// SCOPE_MISMATCH against a real pinned target, and with null if it has none - rather than short-
+// circuiting here. A wrapper that decided refusals itself would be a second implementation of the
+// rule, and two implementations that happen to agree are not one rule.
+function governWrite(tool, fullPath, contents) {
+  if (!GOVERNED_WRITES) return null;
+  const rel = relative(WORKSPACE, fullPath).split(sep).join('/');
+  const matched = runAuthorities.find((a) => a && a.context && a.context.implementation === rel);
+  const authority = matched || runAuthorities[0] || null;
+
+  // COMPOSED FROM afa3ff5e. `authorityScope` decides WHICH effects are permitted; the coordination
+  // layer decides WHETHER THE ASSUMPTIONS PERMITTING THIS EFFECT REMAIN VALID. Both must hold, so the
+  // scope match above selects the grant and this route then judges its ancestry and conflict facts.
+  //
+  // IDENTITY OWNERSHIP, stated so a merge can never decide it: the packet's baseRevision comes from
+  // revisionOfScope - a CONTENT DIGEST. workspaceStamp (path/size/mtime) is freshness metadata and
+  // appears nowhere on this path; it is confined to run.verifiedAt.
+  if (runWorkspace) {
+    // The coordination layer's root and the agent's workspace MUST be the same tree. If they diverge,
+    // every packet would be prepared against one world and written into another - and the receipts
+    // would look perfectly well-formed. Refuse rather than govern the wrong directory.
+    if (resolve(runWorkspace.root) !== resolve(WORKSPACE)) {
+      return 'REFUSED by governance: the governed workspace is rooted at ' + runWorkspace.root
+        + ' but this agent writes to ' + WORKSPACE + '. A receipt about the wrong tree is worse than none.';
+    }
+    const scope = fileScope(rel);
+    const packet = runWorkspace.prepare({
+      scope,
+      baseRevision: runWorkspace.revisionOfScope(scope),
+      baseTreeRevision: runWorkspace.treeRevision(),
+      assumedReceipts: runAncestry,
+      authority,
+      contract: EDIT_FIXTURE,
+      contents,
+      validation: runValidator ? runValidator(rel, contents) : null,
+      by: tool,
+    });
+    const r = runWorkspace.commit(packet.id);
+    if (!r.committed) {
+      return 'REFUSED by governance (' + r.reason + '): ' + (r.why || (r.event && r.event.why) || '');
+    }
+    runPromotionLog.push(r.receiptDigest);
+    return { governed: true, receiptDigest: r.receiptDigest };
+  }
+
+  const r = governedEdit({
+    authority, action: editAction({ target: rel, contents }), root: WORKSPACE, contract: EDIT_FIXTURE,
+  });
+  if (!r.permitted) {
+    const scope = runAuthorityTargets();
+    return `REFUSED by governance (${r.outcome}): ${r.why}.`
+      + ` ${tool} wanted ${rel}; this run's write scope is `
+      + (scope.length ? scope.join(', ') : '(empty - no authority was issued for this run)')
+      + `. Disposition ${r.disposition}${r.retryable ? ' (retryable)' : ''}.`;
+  }
+  return { governed: true };
+}
 
 /**
  * Execute a model-chosen command, in the ISOLATED WORKER when the campaign says so.
@@ -911,9 +1039,13 @@ function suppliedFileMessages(goal) {
 //
 // SYNCHRONOUS on purpose: write_file and edit_file are not async functions, so an awaited dynamic import
 // inside them is a SyntaxError. node --check found that; it was not reasoned about. The import is static.
-const GOVERNED_WRITES = process.env.AGENT_GOVERNED_WRITES === '1';
-let runAuthority = null;
-export function setRunAuthority(token) { runAuthority = token || null; }
+// CANDIDATE-0: this block's GOVERNED_WRITES / runAuthority / setRunAuthority declarations and its
+// governWrite were DUPLICATES of the authority block above. Two independent implementations of one
+// rule are not one rule, so the scope model above is canonical and this one's contribution - the
+// coordination-layer route - was grafted into it rather than kept beside it.
+
+
+
 
 // ── ANCESTRY, AND IT IS HELD EXACTLY WHERE THE AUTHORITY IS HELD ──────────────────────────────────
 //
@@ -940,8 +1072,13 @@ export function setRunValidator(fn) { runValidator = typeof fn === 'function' ? 
 /** The receipts this run promoted, in order, so a governing layer can chain a later candidate. */
 export function runPromotions() { return [...runPromotionLog]; }
 
+/**
+ * COMPOSED RESET. Clearing must cover BOTH halves or state crosses a run boundary: the write scope
+ * (which effects are permitted) and the coordination state (whether the assumptions still hold).
+ * A reset that dropped only one would leave a later run reasoning from a previous run's ancestry.
+ */
 export function clearRunAuthority() {
-  runAuthority = null;
+  runAuthorities = [];
   runWorkspace = null;
   runAncestry = [];
   runValidator = null;
@@ -951,54 +1088,6 @@ export function clearRunAuthority() {
 // null   -> proceed with the ordinary write
 // string -> REFUSED; the tool returns it, so the run sees the refusal instead of a silent no-op
 // {governed:true} -> governedEdit HAS ALREADY WRITTEN; the caller must not write again
-function governWrite(tool, fullPath, contents) {
-  if (!GOVERNED_WRITES) return null;
-  if (!runAuthority) {
-    return 'REFUSED by governance: ' + tool + ' has no authority for this run. Acting needs permission'
-      + ' that reaches an independent root; none was issued.';
-  }
-  const rel = relative(WORKSPACE, fullPath).split(sep).join('/');
-
-  // ── ROUTE THROUGH THE COORDINATION LAYER when one is installed. The packet carries the CONFLICT
-  // fact (this scope's revision) and the ANCESTRY facts (the world it began from, and the promotion
-  // receipts it assumes) so a descendant of a defunct predecessor is refused before it writes.
-  //
-  // The executor is still the only route to an effect: commit() calls governedEdit, which resolves the
-  // target once and writes to the same resolved path it authorized against. This adds a gate; it does
-  // not add a way to write.
-  if (runWorkspace) {
-    // The coordination layer's root and the agent's workspace MUST be the same tree. If they diverge,
-    // every packet would be prepared against one world and written into another - and the receipts
-    // would look perfectly well-formed. Refuse rather than govern the wrong directory.
-    if (resolve(runWorkspace.root) !== resolve(WORKSPACE)) {
-      return 'REFUSED by governance: the governed workspace is rooted at ' + runWorkspace.root
-        + ' but this agent writes to ' + WORKSPACE + '. A receipt about the wrong tree is worse than none.';
-    }
-    const scope = fileScope(rel);
-    const packet = runWorkspace.prepare({
-      scope,
-      baseRevision: runWorkspace.revisionOfScope(scope),
-      baseTreeRevision: runWorkspace.treeRevision(),
-      assumedReceipts: runAncestry,
-      authority: runAuthority,
-      contract: EDIT_FIXTURE,
-      contents,
-      validation: runValidator ? runValidator(rel, contents) : null,
-      by: tool,
-    });
-    const r = runWorkspace.commit(packet.id);
-    if (!r.committed) {
-      return 'REFUSED by governance (' + r.reason + '): ' + (r.why || (r.event && r.event.why) || '');
-    }
-    runPromotionLog.push(r.receiptDigest);
-    return { governed: true, receiptDigest: r.receiptDigest };
-  }
-
-  const r = governedEdit({ authority: runAuthority, action: editAction({ target: rel, contents }),
-    root: WORKSPACE, contract: EDIT_FIXTURE });
-  if (!r.permitted) return 'REFUSED by governance (' + r.outcome + '): ' + r.why;
-  return { governed: true };
-}
 
 const tools = {
   list_dir({ path = '.' }) {
@@ -2249,12 +2338,39 @@ const tools = {
   // ---- queue work for later --------------------------------------------------
   // Lets the agent write down work it has NOTICED but should not do now, instead of
   // either derailing the current goal or forgetting it entirely.
-  async queue_task({ goal }) {
+  async queue_task({ goal, scope }) {
     if (!goal || !String(goal).trim()) return 'ERROR: provide a GOAL to queue.';
     // Machine-queued work inherits its parent's generation + 1, so the supervisor can
     // tell a human's goal from the fourth hop of a self-extending chain.
     const generation = ((_activeRun && _activeRun.generation) || 0) + 1;
-    const r = workQueue.enqueue(String(goal).trim(), { source: 'agent', generation });
+    // ── THE AUTHORITY CROSSING. This is the only place a descendant can acquire anything. ────────
+    //
+    // `scope` is what the queued work NOMINATES and it is a REQUEST, not a grant. It is intersected
+    // with what THIS run actually holds, so a request naming more than the parent has yields less -
+    // the model cannot manufacture a path by asking for it. Requesting nothing passes the parent's
+    // set unchanged, and the record says `leastAuthority: false` when that happens rather than
+    // pretending the crossing was minimal.
+    //
+    // The crossing is computed HERE, while the parent's authority is live, and carried on the item.
+    // It is not recomputed at pickup, because by then the parent is gone.
+    const crossing = attenuate(runAuthorityTargets(), scope == null ? null : scope);
+    const authority = crossingRecord({
+      crossing, grants: runAuthorityGrants(),
+      parentRunId: (_activeRun && _activeRun.id) || null, boundary: 'queue_task',
+    });
+    const r = workQueue.enqueue(String(goal).trim(), { source: 'agent', generation, authority });
+    // The crossing is EVIDENCE, so it goes in the parent's record whether or not anything was
+    // delegated. A refusal that leaves no trace is the defect this experiment started from.
+    if (_activeRun) {
+      pushStep(_activeRun, {
+        type: 'authority_delegated',
+        text: `queue_task -> ${r.item ? r.item.id : '(not queued)'}: available [${authority.availableBefore.join(', ') || '-'}]`
+          + `; requested [${authority.requested ? authority.requested.join(', ') : '(none)'}]`
+          + `; delegated [${authority.delegated.join(', ') || '-'}]`
+          + (authority.refusedFromRequest.length ? `; refused [${authority.refusedFromRequest.join(', ')}]` : ''),
+        authority,
+      });
+    }
     // A duplicate is not a failure - the work IS tracked, which is what the agent
     // wanted. Reporting it as an error invites a retry with reworded text, which is
     // exactly how a dedup-by-text guard gets defeated.
@@ -4637,8 +4753,28 @@ async function drive(loadDb, run) {
       // Depth is supplied here rather than trusted from the model. The parent is passed
       // through module scope - see spawn_subtask for why it must not go on args.
       _toolGoal = run.goal || null;
-      if (tool === 'spawn_subtask') { args.depth = (run.depth || 0) + 1; _activeRun = run; }
+      // `_activeRun` means "the run whose turn is executing", and it was assigned ONLY on the
+      // spawn_subtask branch, so every other tool saw null. Two consequences, both found by the
+      // authority crossing record printing `parentRunId: null` while the delegation itself was well
+      // formed:
+      //   - queue_task could not name the run it was delegating FROM, so the chain was unrecordable;
+      //   - queue_task computes `generation = (_activeRun && _activeRun.generation) + 1`, so with
+      //     _activeRun null it produced 1 EVERY TIME. A queued run that queues more work did not
+      //     increment, which means MAX_GENERATIONS could not bind along this route.
+      // Assigning it for every dispatch makes the name true. It is a correction to an existing
+      // defect, not a scheduler change: nothing here alters what the supervisor does with the
+      // number, only whether the number counts.
+      _activeRun = run;
+      if (tool === 'spawn_subtask') { args.depth = (run.depth || 0) + 1; }
       // The file as it was BEFORE this write/edit, so a write that silently drops definitions can say so (defNames.js).
+      //
+      // append_file IS IN THIS LIST because both preservation refusals are gated on beforeSrc, so leaving it
+      // out did not merely skip a warning - it made the duplicate refusal UNREACHABLE on this route. Measured
+      // 2026-09-26: append_file executed 31 times in set G alone, and a control appending a definition the
+      // file already has landed `def foo` twice, while the identical change made by write_file was refused.
+      // Appending cannot REMOVE a definition, so the removal refusal below is expected to be vacuous here;
+      // it is the duplicate refusal (defCounts) that this line makes reachable. A file that does not exist
+      // yet still leaves beforeSrc null through the catch, so creating a file by append is unaffected.
       let beforeSrc = null;
       // append_file BELONGS HERE. Every write guard downstream gates on `beforeSrc !== null` - the destructive-write
       // refusal (:3531), the DUPLICATE refusal (:3561) and both loss warnings (:3582, :3595) - so leaving append out
@@ -5640,9 +5776,14 @@ function failQueueItem(loadDb, run, reason, detail) {
     return;
   }
 
+  // THE REPAIR'S AUTHORITY SOURCE IS THE FAILED WORK ITEM, and only a REFERENCE to it is stored.
+  // Copying the scope here would let a retry resurrect authority that died between the failure and
+  // the retry; the paths are derived at install time instead (see startRun / resolveContinuation).
+  // Nothing about this run, the model, the retry prompt or the scheduler contributes.
   const r = workQueue.enqueue(goal, {
     source: 'repair', generation: (item.generation || 0) + 1,
     priority: (item.priority || 0) + 1, repairOf: item.id,
+    authority: continuationRef({ sourceItemId: item.id, parentRunId: (run && run.id) || null }),
   });
   if (!r.ok) {
     pushStep(run, { type: 'note', text: `Queue: ${item.id} failed (${reason}); no retry queued — ${r.error}` });
@@ -5797,9 +5938,10 @@ function autoStart(loadDb, item) {
     // workspace silently eat the budget and throttle work nobody ever ran.
     autoStarts.push(Date.now());
     // entrance 'supervisor': autoStart is the ONLY path by which the agent starts work on
-    // its own. That distinction is the whole point of the field - a run nobody asked for,
-    // reached while nobody is watching, is not the same chain as one a human pressed.
-    try { startRun(loadDb, item.goal, { queueItemId: item.id, source: 'queue', generation: item.generation || 0, entrance: 'supervisor' }); }
+    // its own. COMPOSED with the crossing record: `entrance` says which door the chain came
+    // through, `inheritedAuthority` says what it was permitted to do. Neither substitutes for
+    // the other, and collapsing them would destroy one.
+    try { startRun(loadDb, item.goal, { queueItemId: item.id, source: 'queue', generation: item.generation || 0, entrance: 'supervisor', inheritedAuthority: item.authority || null }); }
     catch { workQueue.release(item.id); }
   }, 250);
 }
@@ -5819,8 +5961,44 @@ function autoStart(loadDb, item) {
 //
 // Default 'unknown' rather than guessing: an unstamped caller is a gap to be seen, not a
 // value to be invented.
-function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown', budgetSec = null, callDeadlineSec = null, governed = null, diagnostic = null, recovery = null } = {}) {
+// COMPOSED: `writeScope` (owner-issued permitted effects, bridge step 0B) and
+// `inheritedAuthority` (the crossing record) join the lineage and d2 parameters. One
+// signature carries all three concerns; none of them is inferred from another.
+function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, entrance = 'unknown', budgetSec = null, callDeadlineSec = null, governed = null, diagnostic = null, recovery = null, writeScope = null, inheritedAuthority = null } = {}) {
   ensureWorkspace();
+  // ── THE AUTHORITY INSTALLER. This is the owner side of the boundary. ──────────────────────────
+  //
+  // Grants are minted HERE, from a scope the REQUESTER supplied, before the model has produced a
+  // single token. They are never derived from the goal text or from the plan's FILES: line: both are
+  // model-authored, and scope taken from either would be the agent authorizing itself.
+  //
+  // Module-scoped authority is sound here only because of the invariant enforced in the /start
+  // handler below - ONE TOP-LEVEL RUN AT A TIME, with a concurrent start answered 409. If that were
+  // ever relaxed this would have to move onto the run object, and this comment is the reminder.
+  //
+  // No scope supplied means NO AUTHORITY, not implicit permission. With AGENT_GOVERNED_WRITES=1 every
+  // write then refuses, which is the correct failure for a run nobody authorized - and is exactly why
+  // the flag must not be turned on in a hub whose callers do not pass a scope yet.
+  //
+  // AN AUTONOMOUS DESCENDANT arrives with `inheritedAuthority`: the crossing record its queue item
+  // carried, decided at queue_task time by intersecting the parent's live authority with what the
+  // queued work nominated. Nothing is minted here from the descendant's own goal text, and the paths
+  // installed are exactly `delegated` - a field that cannot name anything the parent did not hold,
+  // because an intersection has no branch that adds a member. A missing or empty record installs
+  // NOTHING, which is a refusal and not a default.
+  // A CONTINUATION REFERENCE is resolved HERE, against the work item it names, so a repair whose
+  // source has gone gets nothing rather than a revival of a dead scope.
+  let effectiveAuthority = inheritedAuthority;
+  if (inheritedAuthority && inheritedAuthority.continuationOf) {
+    let src = null;
+    try { src = workQueue.list().find((i) => i.id === inheritedAuthority.continuationOf) || null; }
+    catch { src = null; }
+    effectiveAuthority = resolveContinuation(inheritedAuthority, src);
+  }
+  const grantedPaths = effectiveAuthority && Array.isArray(effectiveAuthority.delegated)
+    ? effectiveAuthority.delegated
+    : (writeScope || null);
+  setRunAuthorities(grantedPaths && grantedPaths.length ? issueWriteScope(grantedPaths) : []);
   const id = randomUUID();
   const now = Date.now();
   // Computed BEFORE the run literal: referencing `run` from inside its own initialiser is a
@@ -5901,6 +6079,32 @@ function startRun(loadDb, goal, { queueItemId = null, source = 'human', generati
         run.d2StartError = `start observation failed: ${e.message}`;
       }
     })();
+  }
+  // THE RECEIVING HALF OF THE CROSSING, recorded on the descendant. Together with the parent's
+  // `authority_delegated` step this makes the chain recomputable from the record alone: root, what
+  // was available before, what was requested, what was actually delegated, and who received it.
+  // Recorded even when NOTHING was delegated, because "this run received no authority" is the fact
+  // that explains every refusal that follows.
+  if (inheritedAuthority) {
+    const eff = effectiveAuthority || inheritedAuthority;
+    pushStep(run, {
+      type: 'authority_received',
+      text: `from run ${eff.parentRunId || '(unknown)'} via ${eff.boundary}`
+        + (eff.continuationOf ? `; continuing work item ${eff.continuationOf}` : '')
+        + `; root ${JSON.stringify(eff.root)}`
+        + `; delegated [${(eff.delegated || []).join(', ') || '-'}]`
+        + `; installed [${runAuthorityTargets().join(', ') || '-'}]`
+        + (eff.unresolved ? `; UNRESOLVED ${eff.unresolved}: ${eff.why}` : ''),
+      authority: eff,
+      installed: runAuthorityTargets(),
+    });
+  } else if (source === 'queue') {
+    pushStep(run, {
+      type: 'authority_received',
+      text: 'no crossing record accompanied this queued item, so NO authority was installed'
+        + ' - every governed write in this run will refuse',
+      authority: null, installed: [],
+    });
   }
   // Anything still open in TASKS.md belongs to an earlier run. Mark it inherited so it
   // stays visible without gating THIS run's finish. Only here, never on a follow-up: a
@@ -6007,8 +6211,14 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
 
   // Start a new run; returns immediately, loop runs in the background.
   router.post('/start', async (req, res) => {
-    const { goal, queueIfBusy, budgetSec, callDeadlineSec, governed, diagnostic } = req.body || {};
+    // writeScope is the REQUESTER's declaration of which workspace-relative paths this run may
+    // write. It arrives on the HTTP request, from whoever started the run, and is handed to
+    // startRun before any model call. It is deliberately NOT inferred from the goal.
+    const { goal, queueIfBusy, budgetSec, callDeadlineSec, governed, diagnostic, writeScope } = req.body || {};
     if (!goal || !goal.trim()) return res.status(400).json({ error: 'goal required' });
+    if (writeScope !== undefined && writeScope !== null && !Array.isArray(writeScope)) {
+      return res.status(400).json({ error: 'writeScope must be an array of workspace-relative paths' });
+    }
 
     // ONE TOP-LEVEL RUN AT A TIME. There is a single shared WORKSPACE, and sharing it is
     // deliberate - NOTES.md carries memory between runs and the git history accumulates -
@@ -6051,7 +6261,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       if (!prep.ok) return res.status(409).json({ error: `governed run BLOCKED: ${prep.reason}`, blocked: true, protection: PROTECTION.NONE, startVerdict: prep.startVerdict || null });
       gov = { checks: governed.checks, startRef: prep.startRef, startTree: prep.startTree, startVerdict: prep.startVerdict, requestedAlreadyPasses: prep.requestedAlreadyPasses, declaredAt: new Date().toISOString() };
     }
-    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null, governed: gov, diagnostic: diagnostic || null, recovery: req.body.recovery || null });
+    const run = startRun(loadDb, goal.trim(), { entrance: 'http:start', writeScope: writeScope || null, budgetSec: Number(budgetSec) || null, callDeadlineSec: Number(callDeadlineSec) || null, governed: gov, diagnostic: diagnostic || null, recovery: req.body.recovery || null });
     res.json({ runId: run.id });
   });
 
@@ -6144,7 +6354,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
     if (!next) return res.status(404).json({ error: 'the queue is empty' });
     // Carry the hop count, or starting an item by hand would silently reset the chain
     // depth the supervisor's brake relies on.
-    const run = startRun(loadDb, next.goal, { queueItemId: next.id, source: 'queue', generation: next.generation || 0, entrance: 'http:queue-run' });
+    const run = startRun(loadDb, next.goal, { queueItemId: next.id, source: 'queue', generation: next.generation || 0, entrance: 'http:queue-run', inheritedAuthority: next.authority || null });
     res.json({ runId: run.id, item: next });
   });
 

@@ -1,0 +1,68 @@
+P6 preregistration: does previously granted authority remain valid over time?
+
+Frozen before implementation; this commit contains nothing else. Step 6 is closed at 89c0faae and
+nothing here revises it.
+
+WHY THIS IS A DIFFERENT QUESTION. Steps 5 and 6 both established continuity and neither touched
+validity: queue_task takes parent authority to attenuated descendant authority, repair takes
+failed-work authority to derived continuation authority, and in both the continuation mechanism creates
+no new authority. R6 destroyed the source and the system refused with SOURCE_ITEM_GONE, which
+established that source EXISTENCE is required - not that an existing source is still ENTITLED to
+authorize anything. The hostile world: owner grants {a}, F receives it, F fails, a repair references F,
+the original authority becomes invalid, F REMAINS PRESENT carrying its historical {a}, and the repair
+begins. Step 6 answers that with source exists therefore derive {a}. P6 asks whether that is
+legitimate.
+
+THE PROPOSITION. Authority that was validly granted must not remain usable after what entitled it has
+ceased to be valid, and a continuation must not silently detach from what justified it.
+
+AND THE FIRST CONTROL IS REACHABILITY, preregistered as step one because the last two frozen worlds
+were both vacuous by construction - W6 at spawn_subtask and R7 at repair depth - and both were found by
+asking reachability first. Measured here before writing anything: E1 revision binding IS implemented
+but fires only when an authority pins a revision, and issueWriteScope pins none, so E1 can never fire
+for any authority this slice issues. E4 single use, E5 allowance, E6 expiry, E7 ancestor revocation and
+E8 re-delegation are all unimplemented by governed-edit's own header. And there is no explicit
+revocation mechanism anywhere - nothing marks a grant, a crossing record or a work item revoked.
+
+So the honest starting position is that there is currently NO WAY for an authority in this system to
+become invalid. The proposition is not merely unproven, it is presently UNREPRESENTABLE, and that
+statement is P6's first result rather than a pass or a fail. The consequence is frozen now because it
+will be tempting to skip: P6 cannot be tested without introducing a representation of invalidity, and
+CHOOSING that representation is the substance of the experiment rather than a preliminary. Whatever is
+introduced must be forced by the hostile world rather than selected because it resembles machinery that
+exists elsewhere.
+
+FIVE CANDIDATE REPRESENTATIONS are enumerated and none is chosen: explicit revocation, revision binding
+via the already-implemented E1, expiry, ancestor revocation, and evidential staleness. Revision binding
+gets the sharpest warning because it is cheapest to reach and would be the easiest mistake: a repair
+exists precisely BECAUSE earlier work failed part-way, so the bytes probably HAVE moved, and binding
+repair authority to unchanged bytes would likely refuse every legitimate repair. Evidential staleness is
+where the other session's ancestry work would meet this one, and it is deliberately NOT preferred - it
+is listed because a world may force it, not because the diagram suggests it.
+
+SIX FROZEN WORLDS: invalidated authority refused; NOT-invalidated authority allowed, which is mandatory
+because marking everything invalid would satisfy every other row; invalidation landing after install but
+before the write, where governed-edit already says it resolves once and writes immediately so the window
+is narrowed and not closed - a negative result there is acceptable and must be stated as an open window
+rather than quietly repaired; an ANCESTOR grant invalidated rather than the leaf; a queue_task descendant
+rather than a repair, so the property is not repair-specific; and a forged un-revocation. Four must-fire
+controls, including one requiring the invalidation mechanism to be SHOWN to fire, or the refusals are
+indistinguishable from a no-op, plus controls that Step 5's frozen widening result and Step 6's R1 and
+SPEC all survive.
+
+NOT DONE HERE: no re-opening of steps 5 or 6, no adoption of the evidential route for elegance, no fix
+to the identifier debt - randomUUID sliced to 8 hex characters is 32 bits and its role changed in step 6
+from locating a job to resolving an authority-bearing source, status new authority-bearing dependency
+with collision properties UNESTABLISHED, not investigated and not replaced because there is no observed
+failure - no flag enabled anywhere, and nothing inherited from the CONSOLIDATION-1 session.
+
+The document also records the distinction ladder these steps produced, because a single field called
+authorized true would have collapsed every rung: once granted, crossed this boundary, source still
+exists, identifier resolves to the INTENDED source, source authority remains valid. Each rung was forced
+by a hostile world rather than designed in advance.
+
+Nothing in this document authorizes an implementation or a run.
+
+Message-File: scratch-p6-prereg.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
