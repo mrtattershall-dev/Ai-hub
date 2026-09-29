@@ -15,9 +15,14 @@
 // suffix only, so a hand-built section is an INFERENCE-TIME SURROGATE whose behaviour must be measured,
 // never assumed equivalent.
 //
-//   N  native-FIM / comment intent      the template's own FIM branch; intent in a comment at the hole
-//   H  hybrid-wrapper / comment intent  a hand-built ChatML-like wrapper; intent still in that comment
-//   S  hybrid-wrapper / separated intent  the same wrapper; intent moved to its own section
+//   N  native-FIM / inline-comment intent
+//   H  FRONT-LOADED hybrid system-wrapper / inline-comment intent
+//   S  FRONT-LOADED hybrid system-wrapper / separated intent
+//
+// THE WORD FRONT-LOADED IS LOad-BEARING. The strongest published instruction-aware FIM format places
+// the instruction IMMEDIATELY BEFORE the middle, and reports that position matters. A system wrapper
+// sits at the FRONT, far from the middle. So S is a valid inference-time surrogate and is NOT a test
+// of the strongest form of that work - and no result here speaks to its TRAINING efficacy either way.
 //
 // AND WHAT EACH COMPARISON MEANS:
 //   N vs H   the wrapper / role / token-regime effect, instruction placement held
@@ -104,6 +109,32 @@ note(conditions.H.wire.slice(0, conditions.H.wire.indexOf(FIM_PRE)) === conditio
   'H and S differ in their system section ONLY by the text placed in it');
 
 console.log(`${NL}decoding, identical by construction: ${JSON.stringify(DECODING)}`);
+
+// ── HOW FAR THE INSTRUCTION SITS FROM THE MIDDLE, in tokens ───────────────────────────────────
+// Published work reports that instruction POSITION matters, with instruction-immediately-before-
+// middle performing best. Without this number a future reader cannot tell a 'separate section'
+// effect from a pure PROXIMITY effect. Measured, not estimated: the model's own tokenizer counts it.
+const countTokens = async (text) => {
+  try {
+    const r = await fetch('http://127.0.0.1:11434/api/generate', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ model: 'qwen2.5-coder:1.5b', prompt: text, raw: true, stream: false, options: { num_predict: 1 } }),
+    });
+    const j = await r.json();
+    return j.prompt_eval_count ?? null;
+  } catch { return null; }
+};
+
+console.log(`${NL}distance from the END of the instruction text to the FIM middle, in tokens`);
+for (const [k, c] of Object.entries(conditions)) {
+  const last = c.wire.lastIndexOf(INTENT);
+  const after = last === -1 ? null : c.wire.slice(last + INTENT.length);
+  const total = await countTokens(c.wire);
+  const tail = after === null ? null : await countTokens(after);
+  console.log(`  ${k} ${c.name.padEnd(48)} instruction->middle ${tail === null ? '  (ollama unavailable)' : String(tail).padStart(5) + ' tokens'}   whole prompt ${total === null ? '?' : total}`);
+}
+console.log('  A LARGE distance means S tests a SEPARATE SECTION, not instruction proximity. The');
+console.log('  strongest published format has this number near zero; a front-loaded wrapper does not.');
 console.log(`${NL}what each comparison licenses`);
 console.log('  N vs H   the wrapper / role / token-regime effect, instruction placement held');
 console.log('  H vs S   the INSTRUCTION-LOCATION effect, wrapper held   <- the diagnostic comparison');
