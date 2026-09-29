@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <title>Interval Merging</title>
+</head>
+<body>
+  <h1>Interval Merging</h1>
+  <p id="output"></p>
+  <script>
+    // t4_intervals.js
+    function mergeIntervals(intervals) {
+      if (intervals.length <= 1) {
+        return intervals;
+      }
+
+      // Sort intervals by start time
+      intervals.sort((a, b) => a.start - b.start);
+
+      const merged = [intervals[0]];
+
+      for (let i = 1; i < intervals.length; i++) {
+        const current = intervals[i];
+        const lastMerged = merged[merged.length - 1];
+
+        if (current.start <= lastMerged.end) {
+          lastMerged.end = Math.max(lastMerged.end, current.end);
+        } else {
+          merged.push(current);
+        }
+      }
+
+      return merged;
+    }
+
+    // t4_intervals.js
+    function testMergeIntervals() {
+      const intervals = [
+        { start: 1, end: 3 },
+        { start: 2, end: 4 },
+        { start: 5, end: 9 },
+        { start: 8, end: 10 }
+      ];
+
+      const expected = [
+        { start: 1, end: 4 },
+        { start: 5, end: 10 }
+      ];
+
+      const result = mergeIntervals(intervals);
+      const output = document.getElementById('output');
+      if (JSON.stringify(result) === JSON.stringify(expected)) {
+        output.textContent = 'Test passed: mergeIntervals works correctly.';
+      } else {
+        output.textContent = 'Test failed: mergeIntervals does not work correctly.';
+      }
+    }
+
+    // Run the test
+    testMergeIntervals();
+  </script>
+</body>
+</html>

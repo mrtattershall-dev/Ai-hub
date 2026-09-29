@@ -1,0 +1,61 @@
+fuzzing: 40 iterations x 4 goals, seeds 1..40, corpus 1425 acting responses
+
+  ok   seed   1    7s  replayed  40  [done,done,stopped,done]
+  ok   seed   2    9s  replayed  37  [stopped,done,done,stopped]
+  ok   seed   3    4s  replayed  16  [done,done,done,done]
+  FAIL seed   4   11s  replayed  60  [stopped,stopped,stopped,stopped]
+         ESM: test_q3_list.js uses import/export in a commonjs workspace
+  ok   seed   5   13s  replayed  60  [stopped,stopped,done,done]
+  ok   seed   6    9s  replayed  27  [done,done,done,done]
+  ok   seed   7   12s  replayed  37  [stopped,done,done,done]
+  ok   seed   8    6s  replayed  22  [done,done,done,done]
+  ok   seed   9   11s  replayed  33  [stopped,done,done,done]
+  ok   seed  10   10s  replayed  49  [stopped,stopped,done,done]
+  ok   seed  11    9s  replayed  48  [stopped,stopped,done,done]
+  ok   seed  12    5s  replayed  36  [stopped,done,done,done]
+  ok   seed  13   17s  replayed  56  [stopped,stopped,done,stopped]
+  FAIL seed  14   19s  replayed  59  [done,stopped,stopped,stopped]
+         BROKEN: p1_calc.js does not parse
+         ESM: q6_index.js uses import/export in a commonjs workspace
+  ok   seed  15    8s  replayed  43  [stopped,done,stopped,done]
+  FAIL seed  16   24s  replayed  60  [stopped,stopped,stopped,stopped]
+         ESM: test_chunk_error.js uses import/export in a commonjs workspace
+         ESM: test_q3_list.js uses import/export in a commonjs workspace
+  ok   seed  17   12s  replayed  42  [done,done,stopped,stopped]
+  ok   seed  18   10s  replayed  32  [done,done,done,done]
+  ok   seed  19   16s  replayed  51  [stopped,stopped,done,stopped]
+  ok   seed  20   11s  replayed  46  [stopped,done,stopped,done]
+  ok   seed  21   12s  replayed  29  [stopped,done,done,done]
+  ok   seed  22    6s  replayed  31  [done,done,done,done]
+  ok   seed  23   18s  replayed  58  [stopped,stopped,done,stopped]
+  ok   seed  24   13s  replayed  53  [stopped,done,stopped,done]
+  ok   seed  25   10s  replayed  38  [done,done,stopped,stopped]
+  FAIL seed  26   16s  replayed  60  [stopped,stopped,stopped,stopped]
+         ESM: test_q1_math.js uses import/export in a commonjs workspace
+  ok   seed  27   10s  replayed  36  [done,done,stopped,done]
+  FAIL seed  28   20s  replayed  60  [stopped,stopped,stopped,stopped]
+         ESM: test_q3_list.js uses import/export in a commonjs workspace
+  ok   seed  29   16s  replayed  51  [stopped,stopped,done,done]
+  ok   seed  30   16s  replayed  60  [stopped,stopped,stopped,stopped]
+  FAIL seed  31   23s  replayed  59  [done,stopped,stopped,stopped]
+         ESM: test_chunk_error.js uses import/export in a commonjs workspace
+         ESM: test_q3_list.js uses import/export in a commonjs workspace
+  ok   seed  32   20s  replayed  47  [stopped,stopped,stopped,done]
+  ok   seed  33   14s  replayed  35  [done,done,done,done]
+  FAIL seed  34   17s  replayed  60  [stopped,done,stopped,stopped]
+         ESM: test_p1_calc.js uses import/export in a commonjs workspace
+  FAIL seed  35   23s  replayed  60  [stopped,stopped,stopped,stopped]
+         BROKEN: q3_list.js does not parse
+  ok   seed  36   29s  replayed  58  [stopped,stopped,done,stopped]
+  ok   seed  37   12s  replayed  54  [stopped,done,stopped,done]
+  ok   seed  38   15s  replayed  60  [stopped,done,stopped,stopped]
+  FAIL seed  39   16s  replayed  45  [stopped,stopped,done]
+         START threw: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+  FAIL seed  40   21s  replayed  60  [stopped,stopped,stopped,stopped]
+         BROKEN: q3_list.js does not parse
+         ESM: test_q3_list.js uses import/export in a commonjs workspace
+
+30/40 iterations clean
+violations by kind: {"ESM":10,"BROKEN":3,"START threw":1}
+reproduce one:     node server/fuzzLoop.mjs 1 4 4
+NODE_EXIT=1

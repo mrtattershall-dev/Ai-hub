@@ -1,0 +1,31 @@
+### MECHANICAL loop break (3 passes)
+create       stopped        6     4    0     18   16.3    | runs
+append       stopped        6     3    0      9   44.7    | runs
+surgical     stopped        8     5    0     15   42.3    | runs
+multi-site   stopped        4     3    0      6   33.7    | runs
+python       stopped        4     3    0      6   24.6   MISSING
+docs         stopped        6     5    0     12   43.9   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
+--- pass 1
+create       stopped       13     6    0     18   28.4    | runs
+append       stopped        5     3    0      6   38.3    | runs
+surgical     stopped        5     3    0      6   36.2    | runs
+multi-site   stopped        5     3    0      6   40.2    | runs
+python       stopped        4     3    0      6     38   MISSING
+docs         stopped        5     4    0      9   35.9   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
+--- pass 2
+create       stopped       11     6    0     21   25.2    | runs
+append       stopped        6     3    0      9   43.6    | runs
+surgical     stopped        8     5    0     12   31.3    | runs
+multi-site   stopped        4     3    0      6   38.4    | runs
+python       stopped        4     3    0      6     38   MISSING
+docs         stopped        5     3    0      6     39   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
+--- pass 3

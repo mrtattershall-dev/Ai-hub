@@ -1,0 +1,45 @@
+fuzzing: 40 iterations x 6 goals, seeds 1001..1040, corpus 1425 acting responses
+
+  FAIL seed 1001   25s  replayed  75  [stopped,stopped,done,done,stopped,stopped]
+         BROKEN: q3_list.js does not parse
+  ok   seed 1002   17s  replayed  71  [done,stopped,stopped,done,done,stopped]
+  ok   seed 1003   11s  replayed  51  [done,done,done,stopped,done,stopped]
+  ok   seed 1004   20s  replayed  62  [stopped,done,done,done,stopped,done]
+  FAIL seed 1005   27s  replayed  90  [stopped,stopped,stopped,stopped,stopped,stopped]
+         BROKEN: q3_list.js does not parse
+  FAIL seed 1006    2s  replayed   9  [awaiting_approval]
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"In the EXISTING p1_calc.j
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"In the EXISTING p1_calc.j
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"In the EXISTING p1_calc.j
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"In the EXISTING p1_calc.j
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"In the EXISTING p1_calc.j
+  FAIL seed 1007   12s  replayed  40  [stopped,done,stopped,awaiting_approval]
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Write P1.md documenting e
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Write P1.md documenting e
+  FAIL seed 1008   13s  replayed  50  [stopped,stopped,done,done,awaiting_approval]
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Build index.html: a plain
+  FAIL seed 1009   24s  replayed  90  [stopped,stopped,stopped,stopped,stopped,stopped]
+         BROKEN: test_q1_math.js does not parse
+  ok   seed 1010   21s  replayed  80  [stopped,stopped,stopped,stopped,stopped,done]
+  FAIL seed 1011   29s  replayed  90  [stopped,stopped,stopped,stopped,stopped,stopped]
+         BROKEN: test_chunk_error.js does not parse
+  FAIL seed 1012   32s  replayed  90  [stopped,stopped,stopped,stopped,stopped,stopped]
+         BROKEN: test_p1_calc.js does not parse
+  ok   seed 1013   16s  replayed  55  [done,done,done,done,done,stopped]
+  ok   seed 1014   17s  replayed  66  [done,stopped,stopped,done,done,done]
+  FAIL seed 1015   24s  replayed  90  [stopped,stopped,stopped,stopped,stopped,stopped]
+         BROKEN: test_q1_math.js does not parse
+  ok   seed 1016   21s  replayed  81  [stopped,stopped,stopped,stopped,done,stopped]
+  FAIL seed 1017   13s  replayed  51  [done,done,done,stopped,awaiting_approval]
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Rename the function add t
+  FAIL seed 1018    3s  replayed  10  [awaiting_approval]
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Write P1.md documenting e
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Write P1.md documenting e
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Write P1.md documenting e
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Write P1.md documenting e
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Write P1.md documenting e
+  FAIL seed 1019   16s  replayed  59  [done,done,done,stopped,stopped,stopped]
+         BROKEN: test_q1_math.js does not parse
+  FAIL seed 1020   22s  replayed  90  [stopped,stopped,stopped,stopped,stopped,stopped]
+         BROKEN: test_q3_list.js does not parse
+  ok   seed 1021   13s  replayed  72  [stopped,stopped,stopped,done,stopped,done]

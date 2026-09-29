@@ -1,0 +1,1 @@
+Ledger.fromCSV("account,balance\naccount1,100");

@@ -1,0 +1,4 @@
+{
+  "test_s8_grades.py::TestGradebook::test_drop_lowest": true,
+  "test_s8_grades.py::TestGradebook::test_percent": true
+}

@@ -1,0 +1,34 @@
+### WITH the dropped-action nudge (3 passes)
+shape        status      steps calls err   secs  tok/s   ON DISK
+create       stopped       10     5    0     18   21.2    | runs
+append       stopped        5     3    0      9   39.1    | runs
+surgical     stopped        4     3    0      6   35.6    | runs
+multi-site   stopped        4     3    0      6   35.8    | runs
+python       stopped        6     3    0     15   60.3   p2_str.py
+docs         stopped        4     3    0      6   40.2   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 5/6   <- the number that matters
+tool errors        : 0
+--- pass 1
+shape        status      steps calls err   secs  tok/s   ON DISK
+create       stopped       10     4    0     12     36    | runs
+append       stopped        5     3    0      6   35.9    | runs
+surgical     stopped        4     3    0      6   34.8    | runs
+multi-site   stopped        4     3    0      6   35.6    | runs
+python       stopped        4     3    0      6   38.3   MISSING
+docs         stopped        4     3    0      6   38.7   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
+--- pass 2
+shape        status      steps calls err   secs  tok/s   ON DISK
+create       done           9     3    0      9   22.9    | runs
+append       stopped        5     3    0      6     36    | runs
+surgical     stopped        4     3    0      6   37.5    | runs
+multi-site   stopped        4     3    0      6   36.8    | runs
+python       stopped        4     3    0      6   35.8   MISSING
+docs         stopped        5     4    0      9   28.5   MISSING
+status 'done'      : 1/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
+--- pass 3

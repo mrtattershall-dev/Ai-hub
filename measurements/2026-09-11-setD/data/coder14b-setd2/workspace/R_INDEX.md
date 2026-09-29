@@ -1,0 +1,81 @@
+# R-Files Index
+
+## JavaScript Files
+- r10_report.js
+  - Functions:
+    - `generateReport`
+- r1_ledger.js
+  - Functions:
+    - `updateLedger`
+- r2_text.py
+  - Functions:
+    - `getText`
+- r3_tasks.js
+  - Functions:
+    - `addTask`
+    - `removeTask`
+    - `isTaskReady`
+- r4_geom.js
+  - Functions:
+    - `calculateArea`
+    - `calculatePerimeter`
+- r5_store.py
+  - Functions:
+    - `addItem`
+    - `removeItem`
+    - `getInventory`
+- r6_days.py
+  - Functions:
+    - `nextDay`
+    - `getDay`
+- r7_grid.py
+  - Functions:
+    - `initializeGrid`
+    - `updateGrid`
+- r8_money.js
+  - Functions:
+    - `addMoney`
+    - `subtractMoney`
+    - `getBalance`
+- r9_app.html
+  - Content:
+    - HTML structure
+- r9_app.js
+  - Functions:
+    - `initApp`
+    - `handleClick`
+- test_r10_report.js
+  - Functions:
+    - `testGenerateReport`
+- test_r1_ledger.js
+  - Functions:
+    - `testUpdateLedger`
+- test_r2_text.py
+  - Functions:
+    - `testGetText`
+- test_r3_tasks.js
+  - Functions:
+    - `testAddTask`
+    - `testRemoveTask`
+    - `testIsTaskReady`
+- test_r5_store.py
+  - Functions:
+    - `testAddItem`
+    - `testRemoveItem`
+    - `testGetInventory`
+- test_r6_days.py
+  - Functions:
+    - `testNextDay`
+    - `testGetDay`
+- test_r7_grid.py
+  - Functions:
+    - `testInitializeGrid`
+    - `testUpdateGrid`
+- test_r7_grid_life_step.py
+  - Functions:
+    - `testLifeStep`
+- test_r8_money.js
+  - Functions:
+    - `testAddMoney`
+    - `testSubtractMoney`
+    - `testGetBalance`

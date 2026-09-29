@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .product {
+            margin: 10px;
+        }
+        #q9-cart {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="product">
+        <span>Apple - 50 cents</span>
+        <button class="q9-add" data-name="Apple" data-price="50">Add to Cart</button>
+    </div>
+    <div class="product">
+        <span>Bread - 225 cents</span>
+        <button class="q9-add" data-name="Bread" data-price="225">Add to Cart</button>
+    </div>
+    <div class="product">
+        <span>Milk - 199 cents</span>
+        <button class="q9-add" data-name="Milk" data-price="199">Add to Cart</button>
+    </div>
+    <ul id="q9-cart">
+        <li>Apple - 50 cents <button class="q9-inc">+</button> <button class="q9-dec">-</button></li>
+        <li>Bread - 225 cents <button class="q9-inc">+</button> <button class="q9-dec">-</button></li>
+        <li>Milk - 199 cents <button class="q9-inc">+</button> <button class="q9-dec">-</button></li>
+    </ul>
+
+    <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Load the script after the DOM is fully loaded
+    const script = document.createElement('script');
+    script.src = 'q9_shop.js';
+    document.body.appendChild(script);
+  });
+</script>
+<div id="q9-total">$0.00</div>
+<div id="q9-total">$0.00</div>
+</body>
+</html>
+<div id="q9-total">$0.00</div>
+<div id="q9-count">0 items</div>
+<div>
+  <input type="text" id="q9-code" placeholder="Enter discount code">
+  <button id="q9-apply">Apply</button>
+  <p id="q9-msg"></p>
+</div>
+<div id="q9-total">$0.00</div>
+<p id="q9-msg"></p>
+<div id="q9-total">$0.00</div>
+<p id="q9-msg"></p>
+<button id="q9-clear">Clear Cart</button>
+<div id="q9-empty" style="display:none;">Cart is empty</div>
+<div id="q9-delivery"></div>

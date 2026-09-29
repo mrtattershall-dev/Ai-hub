@@ -1,0 +1,10 @@
+def is_palindrome(s):
+    # Remove non-alphanumeric characters and convert to lowercase
+    cleaned = ''.join(char.lower() for char in s if char.isalnum())
+    # Check if the cleaned string is equal to its reverse
+    return cleaned == cleaned[::-1]
+
+# Test cases
+assert is_palindrome("A man, a plan, a canal, Panama") == True
+assert is_palindrome("No 'x' in Nixon") == True
+assert is_palindrome("Hello, World!") == False

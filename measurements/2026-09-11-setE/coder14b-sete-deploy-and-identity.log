@@ -1,0 +1,42 @@
+deploy start 11:10:31
+Building image im-dabyaSheL7d23pWUs3q1zm
+
+=> Step 0: FROM base
+
+=> Step 1: ENV HF_HUB_ENABLE_HF_TRANSFER=1
+
+=> Step 2: ENV VLLM_WORKER_MULTIPROC_METHOD=spawn
+
+=> Step 3: ENV MYCODER_BASE=Qwen/Qwen2.5-Coder-14B-Instruct-AWQ
+
+=> Step 4: ENV MYCODER_GPU=A10G
+
+=> Step 5: ENV MYCODER_NAME=coder14b-base
+
+=> Step 6: ENV MYCODER_MAXLEN=16384
+
+=> Step 7: ENV MYCODER_GPU_FRAC=0.9
+
+=> Step 8: ENV MYCODER_LORA=''
+
+=> Step 9: ENV MYCODER_LORA_NAME=tuned
+
+=> Step 10: ENV MYCODER_LORA_RANK=16
+Saving image...
+Image saved, took 808.42ms
+
+Built image im-dabyaSheL7d23pWUs3q1zm in 1.73s
+
+
+✓ Created objects.
+├── 🔨 Created mount 
+│   C:\Users\tatte\Projects\ai-coding-hub\training-data\factory\modal_serve_vll
+│   m.py
+├── 🔨 Created function Server.*.
+└── 🔨 Created Web Function URL for Server.web => 
+    https://mr-tattershall--coder14b-sete-server-web.modal.run
+✓ App deployed in 4.475s! 🎉
+
+View Deployment: 
+https://modal.com/apps/mr-tattershall/main/deployed/coder14b-sete
+health try 1 11:12:50: {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}

@@ -1,0 +1,28 @@
+### WITH the no-repeat rule (3 passes)
+create       stopped       11     5    0     18   34.2    | runs
+append       stopped        5     3    0      6   36.3    | runs
+surgical     stopped        4     3    0      9   40.5    | runs
+multi-site   stopped        4     3    0      6   31.3    | runs
+python       stopped       11     6    0     18   36.8   p2_str.py
+docs         stopped        5     4    0      9   31.9   MISSING
+WORK ACTUALLY DONE : 5/6   <- the number that matters
+tool errors        : 0
+--- pass 1 done
+create       stopped        5     3    0      9   38.5   NO FILE
+append       stopped        8     5    3     18   43.9    | runs
+surgical     stopped        4     3    0      6   38.1    | runs
+multi-site   stopped        4     3    0      6   36.8    | runs
+python       stopped        7     3    0      9     51   MISSING
+docs         stopped        4     3    0      6   35.9   MISSING
+WORK ACTUALLY DONE : 3/6   <- the number that matters
+tool errors        : 3
+--- pass 2 done
+create       done          11     4    0     12   28.4    | runs
+append       stopped        5     3    0      6   32.9    | runs
+surgical     stopped        4     3    0      9   50.3    | runs
+multi-site   stopped        4     3    0      6     27    | runs
+python       stopped        4     3    0      6   23.9   MISSING
+docs         stopped        4     3    0      6   35.3   MISSING
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 0
+--- pass 3 done

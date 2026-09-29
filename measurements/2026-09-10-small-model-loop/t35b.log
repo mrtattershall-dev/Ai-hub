@@ -1,0 +1,53 @@
+waiting for the endpoint to come up (cold start)...
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen3-Coder-30B-A3B-Instruct","gpu":"H100","max_len":16384,"lora":null}
+
+35 goals, sequential: Qwen3-Coder-30B / H100 — 35 NEW goals, post-fixes
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-J33lCc\workspace
+
+   #  status      steps calls err grd  secs  ON DISK
+   1  done           9     3   0   0    18  r1_csv.js:runs
+   2  done          14     6   0   0    15  r2_money.js:runs
+   3  stopped       62    30   0   0   102  r3_path.py:THROWS
+   4  done          19     9   0   0    24  r4_retry.js:runs
+   5  done          11     7   0   0    18  r5_form.html:ok r5_form.js:THROWS
+   6  done          22    12   0   0    18  r1_csv.js:runs
+   7  stopped       47    30   0   0    63  r2_money.js:runs
+   8  done          29    17   0   0    36  r4_retry.js:runs
+   9  done          17    11   0   0    18  r2_money.js:runs
+  10  done          21    11   0   0    24  r1_csv.js:runs
+  11  done          26    18   2   0    33  r2_money.js:runs
+  12  done          20    11   0   0    24  r1_csv.js:runs
+  13  done          18    11   0   0    21  r4_retry.js:runs
+  14  done          11     7   0   0    15  r2_money.js:runs
+  15  done          24    13   0   0    33  r1_csv.js:runs
+  16  stopped       48    30   0   0    66  r4_retry.js:runs
+  17  stopped       48    30   1   0    72  r3_path.py:THROWS
+  18  done          18    10   0   0    18  r6_index.js:runs r1_csv.js:runs r2_money.js:runs r4_retry.js:runs
+  19  stopped       46    30   0   0    51  r7_check.js:runs r6_index.js:runs
+  20  done          26    19   0   0    27  r6_index.js:runs r7_check.js:runs
+  21  stopped        7     5   0   0    30  r8_broken.js:runs
+  22  done          29    17   0   0    30  r8_broken.js:runs
+  23  done          16     9   1   0    21  r9_deep.js:runs
+  24  done          11     7   0   0    15  r9_deep.js:runs
+  25  done          19    12   1   0    45  r10_dedupe.js:runs
+  26  done           9     7   0   0    12  R_CSV.md:ok r1_csv.js:runs
+  27  done           9     6   0   0    12  R_MONEY.md:ok r2_money.js:runs
+  28  done           8     5   0   0    18  R_CSV.md:ok
+  29  done          24    18   0   0    21  R_INDEX.md:ok
+  30  done          31    24   0   0    33  r8_broken.js:runs R_FIX.md:ok
+  31  done           8     5   1   0    66  r11_game.html:LINKS-MISSING(r11_game.js) r11_game.js:MISSING
+  32  done          14    10   1   0   271  r11_game.html:ok
+  33  stopped        6     5   0   0    60  r11_game.html:ok
+  34  done          11     8   0   0    12  R_GAME.md:ok r11_game.html:ok r11_game.js:THROWS
+  35  stopped       21    14   0   0   316  R_AUDIT.md:MISSING
+
+--- summary ---
+goals run           : 35
+status 'done'       : 27/35
+WORK ACTUALLY DONE  : 29/35   <- the number that matters
+tool errors         : 7
+guard refusals      : 0   (the system working)
+total model calls   : 467
+wall clock          : 27.7 min
+files: .screenshots, debug.py, debug_round.js, ESCALATIONS.md, index.html, package.json, r10_dedupe.js, r11_game.html, r11_game.js, r1_csv.js, r2_money.js, r3_path.py, r4_retry.js, r5_form.html, r5_form.js, r6_index.js, r7_check.js, r8_broken.js, r9_deep.js, R_CSV.md, R_FIX.md, R_GAME.md, R_INDEX.md, R_MONEY.md, simple_test.js, TASKS.md, test_clamp01.js, test_exports.js, test_r10_dedupe.js, test_r1_csv.js, test_r2_money.js, test_r8_broken.js, test_r9_deep.js, test_retry.js, test_retry_zero.js, test_trailing_blank.js, test_trim.js, _snippet.py, __pycache__
+tok/s: min 36.4 max 154.2

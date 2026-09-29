@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+    <title>Test localStorage</title>
+</head>
+<body>
+    <h2>Test localStorage functionality</h2>
+    <button onclick="testSave()">Save Test Data</button>
+    <button onclick="testLoad()">Load Test Data</button>
+    <button onclick="testClear()">Clear Test Data</button>
+    <p id="output"></p>
+    
+    <script>
+        function testSave() {
+            const testData = {todo: ["Task 1", "Task 2"], doing: ["Task 3"], done: ["Task 4"]};
+            localStorage.setItem('s9-board', JSON.stringify(testData));
+            document.getElementById('output').textContent = 'Saved test data';
+        }
+        
+        function testLoad() {
+            const saved = localStorage.getItem('s9-board');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('output').textContent = 'Loaded: ' + JSON.stringify(data);
+            } else {
+                document.getElementById('output').textContent = 'No saved data found';
+            }
+        }
+        
+        function testClear() {
+            localStorage.removeItem('s9-board');
+            document.getElementById('output').textContent = 'Cleared localStorage';
+        }
+    </script>
+</body>
+</html>

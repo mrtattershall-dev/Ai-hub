@@ -1,0 +1,4 @@
+armed 16:55:32: stop coder30b-setf on ALL DONE or at 125 min
+18:41:49 ALL DONE -> node training-data/factory/stopApp.mjs coder30b-setf
+{"ok":true,"stopExit":0,"stopAttempts":1,"appIds":["ap-tXUtaKYP4OAtj9Js8uvTf5"],"stoppedAt":"2026-09-11 18:42:00-05:00","detail":"stopped, and confirmed by the app list"}
+18:42:00 stopApp exit 0

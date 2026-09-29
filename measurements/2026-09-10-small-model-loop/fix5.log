@@ -1,0 +1,31 @@
+### v3: observed loopers only + pardon (3 passes)
+create       stopped       11     5    0     15   31.5    | runs
+append       stopped       13     7    0     12   39.2    | runs
+surgical     stopped       12     7    0     12   22.1    | runs
+multi-site   stopped        4     3    0      6   47.7    | runs
+python       stopped       15     8    6     15     33   MISSING
+docs         stopped       11     9    0     21   35.1   P1.md
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 5/6   <- the number that matters
+tool errors        : 6
+--- pass 1
+create       stopped        9     4    0     15   27.3    | runs
+append       stopped       13     7    0     12   32.7    | runs
+surgical     stopped       13     8    0     12     27    | runs
+multi-site   stopped       12     7    0     12   37.9    | runs
+python       stopped       13     8    6     15   36.3   MISSING
+docs         stopped       12     7    0     12     32   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 4/6   <- the number that matters
+tool errors        : 6
+--- pass 2
+create       stopped        9     4    0     12   26.7    | runs
+append       stopped       13     7    0     15   40.2    | runs
+surgical     stopped       12     7    0     12   17.2    | runs
+multi-site   stopped       12     7    0     12     47    | runs
+python       stopped        7     4    0     18   42.2   p2_str.py
+docs         stopped       10     6    0     15   48.7   MISSING
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 5/6   <- the number that matters
+tool errors        : 0
+--- pass 3

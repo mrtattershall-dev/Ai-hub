@@ -1,0 +1,224 @@
+coder14b-sete set E start 11:12:51
+ENDPOINT {"ok":true,"engine":"vllm","model":"Qwen/Qwen2.5-Coder-14B-Instruct-AWQ","gpu":"A10G","max_len":16384,"lora":null}
+
+100 goals, sequential: coder14b-sete-setE
+workspace C:\Users\tatte\AppData\Local\Temp\trial35-KmCiML\workspace
+runs C:\Users\tatte\AppData\Local\Temp\trial35-KmCiML\runs
+hub 664e8ad098fe4c299bc7412501a5c5b2e596bc0c | AGENT_UNATTENDED=0 | AGENT_BATCH_ACTIONS=0
+
+   #  status      steps calls err grd  secs  ON DISK
+      run a386ec39-3823-4059-ab37-250c593ae254
+   1  done          17     7   0   0    36  q1_stock.js:runs FN-MISSING(quantity)
+      run 4b87b4e5-1408-49e0-8974-2f5f36077990
+   2  done          22     9   0   0    51  q2_table.py:runs FN-MISSING(commas,quotes)
+      run f3c71549-5ebd-452a-aaa1-8b4070cdc9f6
+   3  done          16     7   0   0    39  q3_calendar.js:runs FN-MISSING(midnight)
+      run 78ab7ea3-753f-4c47-914b-116fd25441a7
+   4  interrupted    3     2   0   0   307  q4_template.js:MISSING
+      run 96cebb1d-7e50-4f6a-86f8-cdf6bd54c03b
+   5  stopped       18     9   0   0    69  q5_limits.py:THROWS FN-MISSING(TokenBucket)
+      run 5714dddb-e134-428e-a98d-8959e1fc4b69
+   6  done          18     8   1   0    42  q6_jpath.py:runs FN-MISSING(dicts,lists)
+      run 2cfc66b7-4d6a-4a3f-89a0-ec6b180a8886
+   7  stopped       15     9   0   0    42  q7_buffer.js:THROWS FN-MISSING(TextBuffer)
+      run a117fa57-6f5f-407f-a5ce-27d1b4319d9a
+   8  stopped        7     5   0   0    27  q8_units.py:runs FN-MISSING(lb)
+      run 53bf006f-5b13-467f-9361-e2e64f532d0a
+   9  done           9     4   0   0    39  q9_shop.html:ok q9_shop.js:parses FN-MISSING(price)
+      run 3e703232-a2ad-424b-bf9e-751dfd972d57
+  10  done          15     7   1   0    42  q10_report.js:runs q1_stock.js:runs q4_template.js:MISSING FN-MISSING(js,render)
+      run ee3ea8f7-76ed-464c-bd4a-59d3d56cb932
+  11  stopped       11     7   4   0    45  q1_stock.js:runs FN-MISSING(remove)
+      run f3d37ecb-315c-478f-82ba-c4178d3bb705
+  12  stopped       13     6   1   0    33  q2_table.py:runs
+      run dec903ac-f386-4921-8caa-73dea0326692
+  13  stopped       12     7   0   0    42  q3_calendar.js:runs FN-MISSING(conflicts,touch)
+      run 0ab57fdb-3818-47ea-a0e0-bbace620a040
+  14  stopped       17    11   2   0    39  q4_template.js:MISSING
+      run 3959e717-c82a-4553-8977-666c222e259c
+  15  stopped       12     8   0   0    36  q5_limits.py:THROWS
+      run ebb68b51-ca17-4d7f-b636-ee8f3c098952
+  16  stopped       15     8   1   0    39  q6_jpath.py:runs
+      run cbcdf6f4-ffff-4504-852e-330c5ff5617e
+  17  stopped       16     8   1   0    48  q7_buffer.js:THROWS FN-MISSING(undo,redo)
+      run 56a067ae-7e81-4bf8-bda2-5c1776ecf1f5
+  18  stopped       11     6   0   0    54  q8_units.py:runs FN-MISSING(tsp,tbsp,cup)
+      run 68fff2f2-9a5b-4216-937a-dfbe589596eb
+  19  stopped       18    10   0   0    51  q9_shop.html:ok q9_shop.js:parses FN-MISSING(shop)
+      run a86703e9-dd08-408e-9f5c-f80b9b9004d6
+  20  done          10     4   0   0    24  q10_report.js:runs FN-MISSING(render)
+      run 859d52bb-6e2f-4f66-8f47-d955913e9e1c
+  21  stopped       10     6   0   0    30  q1_stock.js:runs FN-MISSING(reserve,available)
+      run 75ab813b-73bd-4bef-a2e7-c50c7e50c9d6
+  22  done          12     5   0   0    27  q2_table.py:runs
+      run 09efbbed-7a62-47df-b029-069d6bbacb96
+  23  done          10     5   0   0    27  q3_calendar.js:runs
+      run bb271ac4-3dab-42b6-8d1e-1790b8e5b266
+  24  stopped        5     4   1   0    18  q4_template.js:MISSING
+      run 5138c2f0-293e-44ca-bb62-63a377bd0226
+  25  stopped       14     8   0   0    48  q5_limits.py:THROWS FN-MISSING(SlidingWindow,seconds)
+      run f9038c53-5784-4537-a02a-adbc5ece36a6
+  26  stopped       11     6   0   0    30  q6_jpath.py:runs
+      run 8a67ee3e-7e6a-463d-a15d-30c228b54243
+  27  stopped       11     6   0   0    36  q7_buffer.js:THROWS FN-MISSING(lines,lineCol,posOf)
+      run 05805db6-0fe8-4ca8-bdf6-d44c6f89dec1
+  28  stopped       17     9   0   0    99  q8_units.py:THROWS FN-MISSING(py)
+      run 14a12acc-2830-4e68-a920-e02e31580d3c
+  29  stopped       13     8   1   0    69  q9_shop.html:ok q9_shop.js:parses FN-MISSING(shop)
+      run 2946bb6a-0fc7-44ac-bce3-29b2e20a1350
+  30  stopped       13     7   0   0    33  q10_report.js:runs FN-MISSING(render,available,stock)
+      run d15b3f7c-2109-4f0d-a310-2f134d201822
+  31  stopped       11     6   0   0    48  q1_stock.js:runs FN-MISSING(release,freed)
+      run fc26a427-2b84-4614-b978-bbaae06d29be
+  32  done          12     6   0   0    39  q2_table.py:runs
+      run 9f279ebf-3adc-475e-b0ec-046339403839
+  33  stopped       10     7   3   0    42  q3_calendar.js:runs FN-MISSING(remove)
+      run 7e01a791-2bae-4162-ac1f-ab1b5186de33
+  34  stopped       14     8   1   0    33  q4_template.js:MISSING
+      run 6b2e6b2f-752a-4c50-a0fe-9076a1b8810e
+  35  stopped       11     7   3   0    57  q5_limits.py:THROWS FN-MISSING(succeed)
+      run f4835beb-e2e8-46ba-961c-3cc43f975a1c
+  36  stopped       15     9   0   0    45  q6_jpath.py:THROWS
+      run 9e04a24d-6b6d-4957-af71-8ebd71c8854a
+  37  stopped       14     8   1   0    57  q7_buffer.js:THROWS FN-MISSING(find,findAll)
+      run 900e97d6-4b2c-457f-89ff-020add382357
+  38  stopped       13     6   0   0    42  q8_units.py:THROWS FN-MISSING(into,names)
+      run 5c7dfabf-0e90-4e52-adc6-7d2cc3f58cf8
+  39  stopped        7     5   0   0    24  q9_shop.html:ok q9_shop.js:parses FN-MISSING(shop)
+      run a6b65e4d-e349-4b48-b61d-41aba0f64488
+  40  done          13     6   0   0    39  q10_report.js:runs FN-MISSING(render)
+      run 5dc99d20-a7c0-44d6-b179-b8dd6cd5a495
+  41  stopped       10     6   0   0    39  q1_stock.js:runs FN-MISSING(fulfil)
+      run c4ee61d6-4fc6-41d1-bca6-08e2a36edfc9
+  42  stopped       13     7   0   0    36  q2_table.py:runs
+      run 45ab7421-4c69-428f-a7bf-f9a06d63c2a4
+  43  stopped       13     8   0   0    84  q3_calendar.js:THROWS
+      run d7b1aeda-e285-421d-a514-1acd47ee6ac3
+  44  stopped       16     9   1   0    84  q4_template.js:runs FN-MISSING(array)
+      run bc69ba5e-24b1-4f99-bfc7-d984e63dc334
+  45  stopped       13     8   0   0    45  q5_limits.py:THROWS FN-MISSING(KeyedLimiter,factory)
+      run b36fb787-23a0-4e30-9ec1-c0677e6d899a
+  46  stopped       15     8   0   0    63  q6_jpath.py:THROWS FN-MISSING(segment)
+      run f64c6891-0945-4f7e-a26b-741d23842371
+  47  stopped       13     7   0   0    54  q7_buffer.js:THROWS FN-MISSING(replaceAll,undo)
+      run db923df1-0999-4649-8756-ad9966ad23fe
+  48  stopped       12     7   2   0    72  q8_units.py:THROWS FN-MISSING(of)
+      run 2b158c19-c462-4c4c-980e-0443aa788c46
+  49  stopped       14     9   0   0    66  q9_shop.html:ok q9_shop.js:parses FN-MISSING(shop,total)
+      run 5074f88b-f79a-475b-8fb3-03023d205a02
+  50  done          10     4   0   0    30  q10_report.js:runs FN-MISSING(render,skus)
+      run e1b62453-9d29-493f-848a-e5b35264b609
+  51  stopped       11     7   1   0    45  q1_stock.js:runs FN-MISSING(remove)
+      run b278ba23-fb80-47df-8977-9800e719ca76
+  52  done          12     5   0   0    39  q2_table.py:runs
+      run 7d95a7f1-97f7-49d7-aa2e-f58890a9aaa2
+  53  stopped       10     6   0   0    57  q3_calendar.js:THROWS FN-MISSING(freeSlots)
+      run 28a0d775-68e9-48e0-b49f-d711da0d1c86
+  54  stopped       15     9   0   0   105  q4_template.js:runs
+      run d1d2a998-307a-4676-b269-9afd50c08e9c
+  55  stopped       13     9   0   0    45  q5_limits.py:THROWS
+      run ade43376-0f78-4b64-a15c-fe31ed72e23c
+  56  stopped       11     7   3   0    42  q6_jpath.py:THROWS FN-MISSING(value,predicate)
+      run 0f66480a-f386-414d-aa2d-48f6e802f7dc
+  57  stopped       10     5   0   0    45  q7_buffer.js:THROWS FN-MISSING(beginGroup,endGroup,undone)
+      run 8dfc3135-d905-4517-9b45-4a3726e427f2
+  58  stopped       18     9   0   0    69  q8_units.py:THROWS FN-MISSING(fraction,zeros)
+      run 568a4c8f-ed8c-43fe-a595-bdad3462ea9f
+  59  stopped       12     8   0   0    30  q9_shop.html:ok q9_shop.js:parses FN-MISSING(shop,cart)
+      run b5f91c7d-96a8-4e9c-ab30-cca446036020
+  60  done          10     4   0   0    30  q10_report.js:runs FN-MISSING(render)
+      run 315a7e8c-0bc6-4bfc-89b3-73819e4e6091
+  61  stopped        8     5   2   0    33  q1_stock.js:runs FN-MISSING(lowStock)
+      run 9de1e332-28ab-45d8-88f0-3120bed7e283
+  62  done          11     4   0   0    33  q2_table.py:runs FN-MISSING(value_col)
+      run 414421a4-b001-4b05-bed9-6f5875e62707
+  63  stopped       10     7   3   0    54  q3_calendar.js:THROWS FN-MISSING(firstFree,midnight)
+      run 3ae20f62-6a86-4a68-acce-83c333b0d493
+  64  stopped       14     7   0   0    54  q4_template.js:runs FN-MISSING(render)
+      run df5974a3-11d6-458b-a654-66a4051dcabe
+  65  stopped       15     8   0   0    42  q5_limits.py:THROWS
+      run b11338f3-b4b8-4073-85bc-641568da226d
+  66  stopped       15     8   0   0    54  q6_jpath.py:THROWS
+      run bacebd48-ba92-4957-88a9-5e23a3a9b86d
+  67  stopped       11     7   3   0    48  q7_buffer.js:THROWS FN-MISSING(wordAt,word)
+      run 98ce803a-b498-4baa-ba97-f9b13ad27842
+  68  stopped       15     8   0   0   105  q8_units.py:THROWS FN-MISSING(units)
+      run 9f0920a8-1212-449f-a68a-f0a6c5dd47a1
+  69  done          12     6   0   0    51  q9_shop.html:ok q9_shop.js:parses FN-MISSING(shop)
+      run 3c365cc8-195b-46ec-8a7f-b7d7d7a7e7ff
+  70  done          11     5   0   0    33  q10_report.js:runs FN-MISSING(render,lowStock)
+      run 0a3d2058-a588-4f77-86ff-240b85d0c281
+  71  stopped       12     7   0   0    45  q1_stock.js:runs FN-MISSING(toJSON,fromJSON)
+      run 9b580db9-a5ea-42dc-847f-5f7f4cf170c7
+  72  done          12     5   0   0    33  q2_table.py:runs
+      run 412790d8-9f31-46d4-851d-d04334062fbc
+  73  stopped       13     8   0   0    96  q3_calendar.js:THROWS FN-MISSING(formatTime,parseTime)
+      run e270dfb6-9056-4e46-8332-09f7198c8ac4
+  74  stopped        9     6   0   0    27  q4_template.js:runs
+      run 59111a8d-1efa-45bd-b57e-27526b623061
+  75  stopped       21    13   2   0    96  q5_limits.py:THROWS
+      run f85db774-1197-4b3b-91c9-5056c06742bc
+  76  stopped       14     9   4   0    60  q6_jpath.py:THROWS FN-MISSING(of,changed,added,removed)
+      run 568083de-2b75-436e-839b-cb75f6f2a763
+  77  stopped       19    11   0   0    75  q7_buffer.js:THROWS FN-MISSING(TextBuffer)
+      run 252e49d3-e91b-4d6f-9187-54a02caca969
+  78  stopped       15     7   0   0    48  q8_units.py:THROWS FN-MISSING(occurrence,returns)
+      run 0db06ae3-f70a-4a0f-9818-b32c58857e10
+  79  stopped       13     8   0   0    60  q9_shop.html:ok q9_shop.js:parses FN-MISSING(shop,total)
+      run 3049eb9e-690c-499d-a57a-2d5f98ffb013
+  80  stopped       13     7   0   0    36  q10_report.js:runs FN-MISSING(render,stringify,toJSON)
+      run eab53d04-e36b-4ecb-8c6c-54f8df93b82b
+  81  stopped        9     5   0   0    33  q1_stock.js:runs FN-MISSING(history,objects)
+      run 2b387f47-6f2d-429e-bbf4-fb2952d3c309
+  82  stopped        7     4   1   0    30  q2_table.py:runs FN-MISSING(CSV)
+      run 66441896-a020-4186-8f1a-64d7e41749c0
+  83  stopped       13     7   0   0    36  q3_calendar.js:THROWS
+      run d5979abb-1cea-440b-8c4a-4677f4c9a28a
+  84  stopped       15     9   0   0    45  q4_template.js:THROWS FN-MISSING(render)
+      run f8fbd6a8-69be-4c1c-b294-1424b54a8e1f
+  85  stopped       15     7   0   0    42  q5_limits.py:THROWS
+      run 8fc594fd-008e-4bb8-b2be-7e5326ccfc1c
+  86  done          21    11   0   0    66  q6_jpath.py:runs FN-MISSING(segments)
+      run ddd59dff-45e9-48f1-9a58-e41d19af4486
+  87  stopped       10     6   0   0    39  q7_buffer.js:THROWS FN-MISSING(toJSON,fromJSON,undo)
+      run 88e155a8-fade-4a67-8cc6-3f937f475a82
+  88  stopped       18     9   0   0    72  q8_units.py:THROWS FN-MISSING(density)
+      run 31e0ebcd-e3c6-47ec-9020-eba2ca9928b7
+  89  stopped       10     6   3   0    45  q9_shop.html:ok q9_shop.js:parses FN-MISSING(shop)
+      run ecaff45a-610c-4789-879c-aff1d9cae5a2
+  90  done          12     5   0   0    36  q10_report.js:runs FN-MISSING(history)
+      run f9ab46ea-dd2c-4e58-88d5-94e5dd4031d9
+  91  done           7     4   0   0    33  Q1_NOTES.md:ok q1_stock.js:runs
+      run 8666acc1-db9a-47bd-b127-490c9a4fffe2
+  92  done          11     5   0   0    54  q2_table.py:runs FN-MISSING(field,repeated)
+      run 696efbca-e32a-477e-ae32-e7ab00d1752e
+  93  stopped        9     6   2   0    60  q3_calendar.js:THROWS FN-MISSING(fromText)
+      run a53da6ed-b1f3-4c69-9079-50ca46673a5c
+  94  stopped       16     8   0   0    48  q4_template.js:runs FN-MISSING(function,render)
+      run 2f23db7f-1075-45ad-8c95-541d8b80acb1
+  95  stopped        8     6   1   0    30  q5_limits.py:THROWS FN-MISSING(cost)
+      run 99616340-d2a1-4d5e-9e14-93fcdabcbc69
+  96  done          13     5   0   0    60  q6_jpath.py:runs FN-MISSING(wins)
+      run d55763e5-d8e9-4fad-beb1-ba7ca9557cf5
+  97  stopped       15    10   3   0    54  q7_buffer.js:THROWS
+      run 7953ab52-e008-4521-acb0-f851a3c7cd45
+  98  stopped       15     9   1   0    42  q8_units.py:THROWS FN-MISSING(unit)
+      run 68e98953-c7af-4d68-b52d-ad07eb78ed59
+  99  stopped       16    11   0   0    78  q9_shop.html:ok q9_shop.js:parses FN-MISSING(shop)
+      run 7f4ee842-f205-40f8-aa56-a58123639913
+  100  running        1     1   0   0  6612  Q_INDEX.md:MISSING
+
+--- summary ---
+goals run           : 100
+status 'done'       : 23/100
+WORK ACTUALLY DONE  : 12/100   <- the number that matters
+tool errors         : 53
+guard refusals      : 0   (the system working)
+total model calls   : 696
+wall clock          : 194.1 min
+files: .screenshots, ESCALATIONS.md, package.json, q10_report.js, Q1_NOTES.md, q1_stock.js, q2_table.py, q3_calendar.js, q4_template.js, q5_limits.py, q6_jpath.py, q7_buffer.js, q8_units.py, q9_shop.html, q9_shop.js, TASKS.md, test_sliding_window.py, __pycache__
+tok/s: min 9.7 max 45.9
+approvals           : none
+harness exit 0 at 14:27:20
+done as asked 12/100 | implementation correct 15/100 (CT = correct code, own test broke it)
+records: 100 run files, 100 transcripts

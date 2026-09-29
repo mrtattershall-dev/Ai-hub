@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Board</title>
+    <style>
+        #s9-todo, #s9-doing, #s9-done {
+            width: 30%;
+            float: left;
+            margin: 10px;
+        }
+        .s9-card {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div id="s9-todo">
+        <h2>To Do</h2>
+        <ul id="s9-todo-list"></ul>
+    </div>
+    <div id="s9-doing">
+        <h2>Doing</h2>
+        <ul id="s9-doing-list"></ul>
+    </div>
+    <div id="s9-done">
+        <h2>Done</h2>
+        <ul id="s9-done-list"></ul>
+    </div>
+    <input type="text" id="s9-new" placeholder="Add a new task">
+    <button id="s9-add">Add</button>
+
+    <script src="s9_board.js"></script>
+</body>
+</html>
+<div id="s9-todo">
+    <h2>To Do</h2>
+    <ul id="s9-todo-list">
+        <div class="card" id="card-1">
+            <p>Card 1 Title</p>
+            <p>Card 1 Description</p>
+            <button class="s9-left">Left</button>
+            <button class="s9-right">Right</button>
+        </div>
+    </ul>
+</div>
+<div id="s9-doing">
+    <h2>Doing</h2>
+    <ul id="s9-doing-list">
+        <div class="card" id="card-2">
+            <p>Card 2 Title</p>
+            <p>Card 2 Description</p>
+            <button class="s9-left">Left</button>
+            <button class="s9-right">Right</button>
+        </div>
+    </ul>
+</div>
+<div id="s9-done">
+    <h2>Done</h2>
+    <ul id="s9-done-list">
+        <div class="card" id="card-3">
+            <p>Card 3 Title</p>
+            <p>Card 3 Description</p>
+            <button class="s9-left">Left</button>
+            <button class="s9-right">Right</button>
+        </div>
+    </ul>
+</div>
+    <div id="s9-count-todo">0</div>
+    <div id="s9-count-doing">0</div>
+    <div id="s9-count-done">0</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      const deleteButton = document.createElement('button');
+      deleteButton.className = 's9-del';
+      deleteButton.textContent = 'Delete';
+      card.appendChild(deleteButton);
+
+      deleteButton.addEventListener('click', function() {
+        card.remove();
+      });
+    });
+  });
+</script>

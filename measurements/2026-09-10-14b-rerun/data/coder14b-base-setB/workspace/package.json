@@ -1,0 +1,10 @@
+{
+  "name": "agent-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Boundary marker. Stops npm/node/tsc walking up into the hub's own project. Do not delete.",
+  "devDependencies": {
+    "mocha": "^12.0.0"
+  }
+}

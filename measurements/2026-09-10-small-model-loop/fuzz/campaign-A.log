@@ -1,0 +1,16 @@
+fuzzing: 40 iterations x 4 goals, seeds 1..40, corpus 1425 acting responses
+
+  ok   seed   1    7s  replayed  40  [done,done,stopped,done]
+  ok   seed   2   10s  replayed  37  [stopped,done,done,stopped]
+  ok   seed   3    4s  replayed  16  [done,done,done,done]
+  FAIL seed   4   12s  replayed  60  [stopped,stopped,stopped,stopped]
+         BROKEN: test_q3_list.js does not parse
+  FAIL seed   5    2s  replayed  10  [awaiting_approval]
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Build index.html: a plain
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Build index.html: a plain
+         START refused: {"error":"a run is already working in this workspace (awaiting_approval: \"Build index.html: a plain
+  ok   seed   6    9s  replayed  27  [done,done,done,done]
+  ok   seed   7   11s  replayed  37  [stopped,done,done,done]
+  ok   seed   8    6s  replayed  22  [done,done,done,done]
+  ok   seed   9   11s  replayed  33  [stopped,done,done,done]
+  ok   seed  10   11s  replayed  49  [stopped,stopped,done,done]

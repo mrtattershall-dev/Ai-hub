@@ -1,0 +1,18 @@
+
+six shapes, sequential: int4/A10G + no-repeat rule
+workspace C:\Users\tatte\AppData\Local\Temp\shapes7b-5kdbRK\workspace
+
+shape        status      steps calls err   secs  tok/s   ON DISK
+create       stopped        5     3    2      9   20.7   NO FILE
+append       stopped        9     6    1     15   38.4    | runs
+surgical     stopped        4     3    0      6   25.9    | runs
+multi-site   stopped        4     3    0      6   32.4    | runs
+python       stopped        4     3    0      6   30.6   MISSING
+docs         stopped        4     3    0      6   43.9   MISSING
+
+--- summary ---
+status 'done'      : 0/6
+WORK ACTUALLY DONE : 3/6   <- the number that matters
+tool errors        : 3
+files: ESCALATIONS.md, p1_calc.js, package.json, TASKS.md
+tok/s: min 20.7 max 67.1 n=27

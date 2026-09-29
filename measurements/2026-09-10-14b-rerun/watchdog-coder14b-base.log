@@ -1,0 +1,5 @@
+armed 22:55:02: stop coder14b-base on ALL DONE or at 70 min
+ALL DONE seen at 23:18:44
+STOPPING 23:18:44
+{"ok":true,"stopExit":0,"stopAttempts":1,"appIds":["ap-6NHGN30t1BHV3iJELQt5Id"],"stoppedAt":"2026-09-10 23:18:53-05:00","detail":"stopped, and confirmed by the app list"}
+stopApp exit 0 (VERIFIED STOPPED)

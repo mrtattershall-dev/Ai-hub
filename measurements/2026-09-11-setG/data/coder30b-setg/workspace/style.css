@@ -1,0 +1,33 @@
+.s9-card {
+    position: relative;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.s9-left, .s9-right {
+    position: absolute;
+    top: 5px;
+    width: 25px;
+    height: 25px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    background-color: #e0e0e0;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+}
+
+.s9-left {
+    left: 5px;
+}
+
+.s9-right {
+    right: 5px;
+}
+
+.s9-left:hover, .s9-right:hover {
+    background-color: #d0d0d0;
+}
