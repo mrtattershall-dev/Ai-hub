@@ -1,0 +1,63 @@
+The integration slice: one revision where governance and preservation both protect a live path
+
+Not a merge. main is untouched and so is every other branch. The audit found two real mechanisms and
+no revision where both were live; this is the narrow bridge between them, based on
+fix/append-preservation so the verified append fix is already present.
+
+BROUGHT IN, MEASURED RATHER THAN ESTIMATED. The static import closure of governed-edit.mjs is three
+files - governed-edit 239 lines, calculus 292, observation 155 - which is what made this a slice
+instead of a merge, plus its four own tests and write-interceptor. All four boundary tests passed in
+this worktree BEFORE any wiring, so the boundary is sound in isolation. Deliberately NOT brought in:
+legasus/runtime/governedWorkspace and its 551 lines of tests, because that is the coordination layer
+whose createWorkspace has zero non-test importers - a different layer from governWrite, with no
+consumer, whose inclusion would have enlarged the slice without making anything live. agent.js diff is
+133 insertions, 11 deletions.
+
+THE SCOPE MODEL FORCED THE INSTALLER'S SHAPE. governedEdit compares the requested relative path against
+authority.context.implementation for EXACT equality and its own header records E5 allowance as not
+implemented, so one grant authorizes exactly one file and a run-level installer must mint a SET, not
+hand over one workspace token. POST /agent/start now accepts writeScope, startRun installs one
+owner-issued grant per path before any model call, and nothing derives scope from the goal text or the
+plan's FILES line because both are model-authored and either would be the agent authorizing itself. No
+scope means NO authority rather than implicit permission. When no grant matches a path the wrapper
+still calls governedEdit rather than deciding the refusal itself, so every refusal comes from the
+boundary and there is not a second implementation of the rule.
+
+THREE OUTCOMES PROVEN THROUGH REAL DISPATCH. governed-dispatch.test.mjs, 30 passed 0 failed, one
+process per mode because the flag and the authority are read at import time: authorized scope makes
+write_file, append_file and edit_file all succeed with the exact bytes; no authority refuses all three
+with no effect on disk; an out-of-scope grant refuses with SCOPE_MISMATCH; and a well-formed grant for
+the exact target supplied IN TOOL ARGUMENTS is ignored, so self-issued permission buys nothing. The
+fifth mode is the one that makes the others mean anything - flag off, no scope, identical calls, all
+three SUCCEED - because without it an agent.js that had simply lost the ability to write would pass
+every refusal assertion. classA-governed-child.mjs already existed and nothing spawned it, so the only
+place setRunAuthority was ever called was itself unreachable; A-4 was listed as a requirement with no
+claimed result, which was honest, and it runs now.
+
+AND THE PART callTool CANNOT REACH. governedLoop.test.mjs, 12 passed 0 failed, drives a real hub with a
+scripted mock and the flag on so the preservation check in the tool loop is live too. One script, twice,
+with different scope: the authorized write lands; the write that drops beta is refused and beta is
+RESTORED; the append that duplicates alpha is refused; the out-of-scope t.py is refused. s.py ends with
+alpha once and beta present, t.py absent, destructiveRefused 1 and duplicateRefused 1 on the run with
+notes naming both. The control puts t.py in scope and it IS created, so scenario one refused on scope
+and not on breakage, while beta stays protected - widening permission does not widen acceptability. A
+write can be fully authorized and still refused, by a different mechanism, in the same path, on the
+same call.
+
+FLAG OFF IS UNCHANGED: 11 of 12 write and preservation suites pass, 68 assertions, 0 failed. editTruth
+exits 124 from a 90 second cap with ok as its last line, the same slow-test signature seen on the
+unmodified tree three days ago.
+
+NOT ESTABLISHED, and the flag stays OFF. Turning it on in a hub whose callers do not pass writeScope
+would refuse every write, which is an outage and not governance. Queue and supervisor runs call startRun
+without a scope and would be unauthorized; issuing or inheriting scope for non-human-initiated runs is
+unsolved and untouched. spawn_subtask re-enters the tools at a second call site and the human-approval
+resume at a third, and whether governance covers those is not tested and not claimed. Module-scoped
+authority rests on the one-run-at-a-time invariant. No score, cost or completion was measured.
+
+This unblocks step 5, which was unrunnable because an inert mechanism has no benefit to remove. Step 5
+can now be specified against this branch. It is still not run.
+
+Message-File: scratch-slice-msg.txt
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

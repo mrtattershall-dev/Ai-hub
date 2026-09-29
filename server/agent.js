@@ -34,6 +34,11 @@ import { SYSTEM_PROMPT } from './agentPrompt.js';
 import { parseAction, parseActions, replyWasTruncated } from './agentParse.js';
 import { duplicateNote } from './duplicateDecls.js';
 import { lostDefs, lostExports, defCounts } from './defNames.js';
+// STATIC on purpose: write_file and edit_file are not async, so an awaited dynamic import inside them
+// is a SyntaxError. The whole static closure of governed-edit.mjs is three files - governed-edit,
+// calculus, observation - which is what makes bringing it in a small slice rather than a merge.
+import { governedEdit, editAction, EDIT_FIXTURE } from '../legasus/runtime/epistemic-admission/governed-edit.mjs';
+import { delegate } from '../legasus/legaknow/calculus.mjs';
 import { googleTools, parseGoogleArgs, GOOGLE_TOOLS, GOOGLE_READ_TOOLS, GOOGLE_WRITE_TOOLS, GOOGLE_TOOL_DOCS } from './googleTools.js';
 
 /**
@@ -359,6 +364,87 @@ function markerRefusal(path, tool) {
     + `Nothing about your goal requires editing ${MARKER}. Carry on with the actual work.`;
 }
 
+// ══ THE GOVERNED WRITE BOUNDARY, AND THE AUTHORITY INSTALLER THAT WAS MISSING ═══════════════════
+//
+// THE MODEL MUST NOT BE ABLE TO SUPPLY OR WIDEN ITS OWN AUTHORITY. Grants live HERE, in module scope,
+// installed by the OWNER SIDE at run start. Nothing below reads tool arguments for an authority: one
+// arriving in args is self-issued permission wearing a parameter name, so widening through a tool
+// argument is unrepresentable rather than merely forbidden.
+//
+// A SET, NOT A TOKEN, and this is forced rather than chosen. `governedEdit` compares the requested
+// relative path against `authority.context.implementation` for EXACT equality, and its own header
+// records E5 (allowance) as NOT implemented. So ONE GRANT AUTHORIZES EXACTLY ONE FILE: a run permitted
+// to write three files needs three grants. Selecting the grant whose pinned target matches the resolved
+// path is not widening - each grant still authorizes only its own path, and governedEdit re-checks the
+// one selected against the path it is about to write.
+//
+// OFF BY DEFAULT. With AGENT_GOVERNED_WRITES unset these tools behave exactly as before, so this cannot
+// alter a live hub. That also means governance is demonstrated UNDER A FLAG while the default path stays
+// ungoverned - a limitation, not a claim.
+//
+// WHAT THIS BOUNDARY DOES NOT DECIDE. It answers "may this run write this path", which is permission.
+// It does not answer "is this particular content acceptable", which is preservation, and which still
+// happens in the tool loop after the tool returns. The two compose deliberately: a governed write can
+// be permitted here and still be refused and restored by the preservation check, and that is the
+// distinction between authority and action-acceptability made operational in ONE live path.
+const GOVERNED_WRITES = process.env.AGENT_GOVERNED_WRITES === '1';
+let runAuthorities = [];
+
+/** Install a single grant. Kept for the class-A harness, which installs exactly one. */
+export function setRunAuthority(token) { runAuthorities = token ? [token] : []; }
+/** Install a run's whole write scope. The owner side calls this; no tool can reach it. */
+export function setRunAuthorities(tokens) {
+  runAuthorities = Array.isArray(tokens) ? tokens.filter(Boolean) : (tokens ? [tokens] : []);
+}
+export function clearRunAuthority() { runAuthorities = []; }
+/** What this run may write, for a refusal message and for tests. Never used to decide. */
+export function runAuthorityTargets() {
+  return runAuthorities.map((a) => a && a.context && a.context.implementation).filter(Boolean);
+}
+
+/**
+ * Mint owner-issued grants for an explicit list of workspace-relative paths.
+ *
+ * The scope comes from the REQUESTER at run start, never from the model and never from the plan - a
+ * plan's FILES: line is model-authored, so deriving scope from it would be the agent authorizing
+ * itself. `from: 'OWNER'` is the root the delegation chain terminates at.
+ */
+export function issueWriteScope(paths, repository = 'workspace') {
+  const rels = [...new Set((paths || [])
+    .map((p) => String(p || '').split(sep).join('/').replace(/^\.\//, '').trim())
+    .filter(Boolean))];
+  return rels.map((target) => delegate({
+    from: 'OWNER', grant: EDIT_FIXTURE.requires, to: 'controller',
+    context: { repository, implementation: target },
+  }));
+}
+
+// null            -> not governed; proceed with the ordinary write
+// string          -> REFUSED; the tool returns it, so the run sees a refusal and not a silent no-op
+// {governed:true} -> governedEdit HAS ALREADY WRITTEN; the caller must not write again
+//
+// EVERY REFUSAL COMES FROM THE BOUNDARY, not from this wrapper. When no grant matches the path this
+// still calls governedEdit - with the first grant if the run has any, so the boundary reports
+// SCOPE_MISMATCH against a real pinned target, and with null if it has none - rather than short-
+// circuiting here. A wrapper that decided refusals itself would be a second implementation of the
+// rule, and two implementations that happen to agree are not one rule.
+function governWrite(tool, fullPath, contents) {
+  if (!GOVERNED_WRITES) return null;
+  const rel = relative(WORKSPACE, fullPath).split(sep).join('/');
+  const matched = runAuthorities.find((a) => a && a.context && a.context.implementation === rel);
+  const authority = matched || runAuthorities[0] || null;
+  const r = governedEdit({
+    authority, action: editAction({ target: rel, contents }), root: WORKSPACE, contract: EDIT_FIXTURE,
+  });
+  if (!r.permitted) {
+    const scope = runAuthorityTargets();
+    return `REFUSED by governance (${r.outcome}): ${r.why}.`
+      + ` ${tool} wanted ${rel}; this run's write scope is `
+      + (scope.length ? scope.join(', ') : '(empty - no authority was issued for this run)')
+      + `. Disposition ${r.disposition}${r.retryable ? ' (retryable)' : ''}.`;
+  }
+  return { governed: true };
+}
 
 const tools = {
   list_dir({ path = '.' }) {
@@ -548,7 +634,9 @@ const tools = {
           + `the whole file, send the COMPLETE new ${ext || 'source'} - not a description of it.`;
       }
     }
-    writeFileSync(full, content, 'utf8');
+    { const g = governWrite("write_file", full, content);
+      if (typeof g === 'string') return g;
+      if (!g) writeFileSync(full, content, 'utf8'); }
     return `OK: wrote ${Buffer.byteLength(content)} bytes to ${path}`;
   },
 
@@ -579,7 +667,9 @@ const tools = {
     const full = safePath(path);
     if (!content) return `ERROR: append_file needs CONTENT — put the lines to add in a fenced code block.`;
     if (!existsSync(full)) {
-      writeFileSync(full, content.endsWith('\n') ? content : content + '\n', 'utf8');
+      { const g = governWrite("append_file", full, content.endsWith('\n') ? content : content + '\n');
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, content.endsWith('\n') ? content : content + '\n', 'utf8'); }
       // ── A FRAGMENT IS NOT A FILE ────────────────────────────────────────────────
       //
       // "Add five helpers to the EXISTING q3_list.js" - but an earlier goal never created
@@ -608,7 +698,9 @@ const tools = {
     const before = readFileSync(full, 'utf8');
     const joiner = before.endsWith('\n') ? '' : '\n';
     const body = content.endsWith('\n') ? content : content + '\n';
-    writeFileSync(full, before + joiner + body, 'utf8');
+    { const g = governWrite("append_file", full, before + joiner + body);
+      if (typeof g === 'string') return g;
+      if (!g) writeFileSync(full, before + joiner + body, 'utf8'); }
     return `OK: appended ${Buffer.byteLength(body)} bytes to ${path} (now ${Buffer.byteLength(before + joiner + body)} bytes). The existing content was not touched.`;
   },
 
@@ -661,7 +753,9 @@ const tools = {
       const repl = String(replace) === '' ? [] : String(replace).split('\n');
       const out = [...srcLines.slice(0, a - 1), ...repl, ...srcLines.slice(b)].join('\n');
       if (out === src) return `NO CHANGE: lines ${a}-${b} of ${path} already read exactly like your REPLACE, so nothing was edited and whatever you were fixing is still there.`;
-      writeFileSync(full, out, 'utf8');
+      { const g = governWrite("edit_file", full, out);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, out, 'utf8'); }
       // The TEXT that went, not only how many lines: this is what makes two identical LINES requests answer
       // differently, because the second one is addressing different text (run 071d5478 deleted nine different pairs).
       const went = srcLines.slice(a - 1, b).filter((l) => l.trim()).slice(0, 2).map((l) => `"${l.trim().slice(0, 50)}"`).join(' / ');
@@ -705,7 +799,9 @@ const tools = {
       for (let k = 0; k < occurrence; k++) at = content.indexOf(find, at + 1);
       const out = content.slice(0, at) + replace + content.slice(at + find.length);
       if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
-      writeFileSync(full, out, 'utf8');
+      { const g = governWrite("edit_file", full, out);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, out, 'utf8'); }
       return `OK: edited ${path} (occurrence ${occurrence} of ${exact})${changed(content, out, find, out.split(find).length - 1)}`;
     }
     // NO CHANGE IS NOT AN EDIT. Set E (2026-09-11), 14B goal 5: the model sent the SAME 13-line edit three times with
@@ -718,7 +814,9 @@ const tools = {
     // A function replacement is handed the text verbatim. The other three write paths use slice/splice already.
     if (exact === 1) {
       const out = content.replace(find, () => replace);
-      writeFileSync(full, out, 'utf8');
+      { const g = governWrite("edit_file", full, out);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, out, 'utf8'); }
       return `OK: edited ${path}${changed(content, out, find, out.split(find).length - 1)}`;
     }
     // An ambiguous EXACT match falls through to the line-based path below, which computes
@@ -763,14 +861,18 @@ const tools = {
       const m = where[occurrence - 1];
       const out = [...fileLines.slice(0, m.start), replace, ...fileLines.slice(m.end + 1)].join('\n');
       if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
-      writeFileSync(full, out, 'utf8');
+      { const g = governWrite("edit_file", full, out);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, out, 'utf8'); }
       return `OK: edited ${path} (occurrence ${occurrence} of ${hits}, matched ignoring indentation)`
         + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
     }
     if (hits === 1) {
       const out = [...fileLines.slice(0, start), replace, ...fileLines.slice(end + 1)].join('\n');
       if (out === content) return `NO CHANGE: your REPLACE is identical to what it would replace, so ${path} is exactly as it was - nothing was edited, and whatever you were fixing is still there. An edit has to CHANGE the lines that are wrong.`;
-      writeFileSync(full, out, 'utf8');
+      { const g = governWrite("edit_file", full, out);
+        if (typeof g === 'string') return g;
+        if (!g) writeFileSync(full, out, 'utf8'); }
       return `OK: edited ${path} (matched ignoring indentation)`
         + changed(content, out, find, scanTolerant(out.split('\n'), findLines).length);
     }
@@ -4285,8 +4387,22 @@ function autoStart(loadDb, item) {
  * Create and start a run. Shared by the HTTP route and the supervisor, so a
  * self-started run is identical to a human-started one in every respect.
  */
-function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0 } = {}) {
+function startRun(loadDb, goal, { queueItemId = null, source = 'human', generation = 0, writeScope = null } = {}) {
   ensureWorkspace();
+  // ── THE AUTHORITY INSTALLER. This is the owner side of the boundary. ──────────────────────────
+  //
+  // Grants are minted HERE, from a scope the REQUESTER supplied, before the model has produced a
+  // single token. They are never derived from the goal text or from the plan's FILES: line: both are
+  // model-authored, and scope taken from either would be the agent authorizing itself.
+  //
+  // Module-scoped authority is sound here only because of the invariant enforced in the /start
+  // handler below - ONE TOP-LEVEL RUN AT A TIME, with a concurrent start answered 409. If that were
+  // ever relaxed this would have to move onto the run object, and this comment is the reminder.
+  //
+  // No scope supplied means NO AUTHORITY, not implicit permission. With AGENT_GOVERNED_WRITES=1 every
+  // write then refuses, which is the correct failure for a run nobody authorized - and is exactly why
+  // the flag must not be turned on in a hub whose callers do not pass a scope yet.
+  setRunAuthorities(writeScope ? issueWriteScope(writeScope) : []);
   const id = randomUUID();
   const now = Date.now();
   const run = {
@@ -4409,8 +4525,14 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
 
   // Start a new run; returns immediately, loop runs in the background.
   router.post('/start', (req, res) => {
-    const { goal, queueIfBusy } = req.body || {};
+    // writeScope is the REQUESTER's declaration of which workspace-relative paths this run may write.
+    // It arrives on the HTTP request, from whoever started the run, and is handed to startRun before
+    // any model call. It is deliberately NOT inferred from the goal.
+    const { goal, queueIfBusy, writeScope } = req.body || {};
     if (!goal || !goal.trim()) return res.status(400).json({ error: 'goal required' });
+    if (writeScope !== undefined && writeScope !== null && !Array.isArray(writeScope)) {
+      return res.status(400).json({ error: 'writeScope must be an array of workspace-relative paths' });
+    }
 
     // ONE TOP-LEVEL RUN AT A TIME. There is a single shared WORKSPACE, and sharing it is
     // deliberate - NOTES.md carries memory between runs and the git history accumulates -
@@ -4444,7 +4566,7 @@ export default function agentRouter({ loadDb, saveDb, withDb }) {
       });
     }
 
-    const run = startRun(loadDb, goal.trim());
+    const run = startRun(loadDb, goal.trim(), { writeScope: writeScope || null });
     res.json({ runId: run.id });
   });
 
