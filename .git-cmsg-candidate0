@@ -1,0 +1,73 @@
+CANDIDATE-0: compose permitted-effects with assumption-validity, one rule each
+
+Merge integration/governed-slice into the consolidation lineage that already carries afa3ff5e.
+285f9db6 (append preservation) is an ancestor of the slice, verified rather than assumed, so the
+preservation fix travels with it instead of being composed separately.
+
+SIXTEEN CONFLICTS IN agent.js, RESOLVED BY KIND, NOT BY SIDE.
+
+  9 cosmetic (brace and quote style, identical semantics) -> HEAD, which also carries the
+    tolerant-indent reindentTo/noChangeAt work and the append_file guard rationale.
+  7 compositional -> BOTH sides kept:
+      imports           exportNames plus delegate/authorityScope; the slice's duplicate
+                        governed-edit import dropped as a DUPLICATE ONLY
+      queue startRun    entrance (LINEAGE) and inheritedAuthority (AUTHORITY) are orthogonal
+                        facts; collapsing them would destroy one
+      startRun()        one signature carrying lineage, d2, writeScope and inheritedAuthority.
+                        None is inferred from another.
+      run creation      d2 start-capture AND the authority_received crossing record
+      /start route      every existing field plus writeScope, still async
+      governed prep     the whole prepareGoverned block, plus writeScope on the call
+      queue-run         entrance and inheritedAuthority again
+
+TWO INDEPENDENT IMPLEMENTATIONS OF ONE RULE, FOUND BY THE MERGE AND REDUCED TO ONE.
+
+Both branches had declared GOVERNED_WRITES, governWrite and clearRunAuthority. git merged them
+as non-conflicting because they sit at different offsets - two implementations that happen to
+agree are not one rule, and this is exactly the convergence the 06:53 COORD notice warned about.
+
+  canonical   the slice's multi-grant scope model: runAuthorities, setRunAuthorities,
+              issueWriteScope, runAuthorityTargets, runAuthorityGrants
+  grafted in  afa3ff5e's coordination-layer route, which judges whether the assumptions
+              permitting the effect still hold: baseRevision, baseTreeRevision, assumedReceipts,
+              validator, promotion receipts
+  composed    clearRunAuthority now resets BOTH halves. A reset covering only one would leak a
+              previous run's ancestry into the next.
+
+So the scope match selects the grant and the coordination layer then judges its ancestry. The
+executor remains the only route to an effect; this adds a gate, not a way to write.
+
+IDENTITY OWNERSHIP, RESOLVED DELIBERATELY AND NOT BY MERGE ORDER.
+
+  revisionOf / revisionOfScope = CONTENT DIGEST   owns authority, effect correctness,
+                                                  target-level stale detection
+  workspaceStamp = path/size/mtime                freshness metadata ONLY
+
+Verified structurally rather than asserted: workspaceStamp appears only at run.verifiedAt
+(agent.js:4601, :4662) and nowhere on the authority path. This is the distinction
+P6_AUTHORITY_VALIDITY_PREREG froze without choosing. P6 candidate (b) is NOT implemented here.
+
+THE COMPOSITION FINDING, which is the only kind of evidence the assembly question accepts.
+
+subtaskAuthority went 9/9 -> 8/9 on merge. Baselined before touching it: governed-slice is 9/9,
+so the change was MINE, not inherited. The failing assertion was a characterization test
+asserting that a governance refusal inside a sub-task is INVISIBLE in the parent run record.
+
+It is no longer invisible. The slice supplied the refusal text; consolidation already carried a
+subtask_step that keeps `result`. NEITHER BRANCH ALONE MADE A SUB-TASK GOVERNANCE REFUSAL
+LEGIBLE. Assembled, it reaches the parent record.
+
+The assertion is amended to assert visibility, with the original text preserved above it as the
+record of what changed, and with a negative control: the amended assertion scores 8/9 on
+governed-slice in isolation and 9/9 composed. It is an improvement surfaced by composition, not
+a test adjusted to go green.
+
+SUITES: authorityScope 17/17, governedLoop 12/12, subtaskAuthority 9/9, repairAuthority 16/16,
+queuedAuthority 29/29, attenuationComposes 12/12, generationChain 2/2.
+
+Flags remain OFF by default. Nothing here changes whether bytes land on an ordinary launch;
+that is bridge step 0C and it has not been taken. Not main.
+
+Message-File: .git-cmsg-candidate0
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>

@@ -1,0 +1,41 @@
+CANDIDATE-0 scope correction: retained, not emergent
+
+c16c59a6 claimed the visible sub-task governance refusal is a property that NEITHER BRANCH
+ALONE established. That is not shown, and the commit's own attribution paragraph contradicts it:
+it records that consolidation/connect-components ALREADY carried the richer subtask_step keeping
+`result`.
+
+WHAT IS ACTUALLY MEASURED
+
+    governed-slice alone, amended assertion     8/9    the slice lacks the recorder
+    composed candidate                          9/9    the merge preserved it
+
+One arm. The converse was never run, and cannot be run as written: consolidation alone has no
+issueWriteScope / multi-grant route, so subtaskAuthority has nothing to generate a governance
+refusal with there. A single-arm control cannot distinguish "emerges from the combination" from
+"was already present on one side and survived the merge".
+
+THE CORRECTED CLAIM, and the one the result should be read as:
+
+> The composed candidate RETAINS visible governance refusal across subtask reporting and passes
+> the available integration suite.
+
+Regression-free composition. Not emergence.
+
+WHAT WOULD ESTABLISH THE STRONGER CLAIM, recorded so it is not quietly skipped later:
+
+    1  generate the refusal through the governed-slice multi-grant authority route
+    2  assert consolidation's subtask recorder exposes THAT SPECIFIC refusal in the composed
+       candidate
+    3  show that neither the old slice recorder NOR an unguided route satisfies the same
+       end-to-end predicate
+
+Not done here and not claimed. The test comment is corrected in place, with the measurement and
+the missing arm both stated, rather than the overstatement being deleted.
+
+c16c59a6 is left standing rather than amended: its conflict-resolution record is accurate, and
+this project corrects beneath the sentence it corrects instead of rewriting the sentence.
+
+Message-File: .git-cmsg-scope
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
