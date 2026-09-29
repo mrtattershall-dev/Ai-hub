@@ -115,11 +115,14 @@ same call.
 
 ## THE FLAG-OFF PATH IS UNCHANGED
 
-With `AGENT_GOVERNED_WRITES` unset, 11 of 12 write/preservation suites pass (68 assertions, 0 failed):
-appendFile 5, appendFragment 7, appendSyntax 4, defLoss 6, destructiveWrite 8, duplicateDecls 9,
-exportLoss 7, noopEdit 4, emptyReplace 8, editAddress 9, markerGuard 7. `editTruth` exits 124 from a
-90s cap with `ok` as its last line — the same slow-test signature seen on the unmodified tree three
-days ago.
+With `AGENT_GOVERNED_WRITES` unset, **all 12 write/preservation suites pass — 86 assertions, 0
+failed**: appendFile 5, appendFragment 7, appendSyntax 4, defLoss 6, destructiveWrite 8,
+duplicateDecls 9, exportLoss 7, noopEdit 4, emptyReplace 8, editAddress 9, markerGuard 7,
+editTruth 18.
+
+`editTruth` first exited 124 under a 90s cap with `ok` as its last line. Given 240s it passes 18/18,
+so that was the cap and not the change — the same slow-test signature seen on the unmodified tree
+three days ago, and resolved here rather than left as a caveat.
 
 ## NOT ESTABLISHED
 
