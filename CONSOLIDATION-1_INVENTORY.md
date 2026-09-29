@@ -182,3 +182,56 @@ corpora are near-disjoint (baseline ~103 records the branch lacks; branch 11 the
 All nine `main`-only commits are under `measurements/` — sets H, I, J, K, their preregistrations and
 scoring tools. **RESEARCH/EVIDENCE.** One (`7fc4222a`) says in its own message that nothing automated
 reads the copy it syncs. None of it is runtime.
+
+## Finding 11 — PROTOCOL-1: prospectivity IS established. Treat as history, preserve the prereg.
+
+Resolved by chronology, not by preferring the newer document. The question asked was the only one that
+matters: **was the preregistration frozen before the run recorded in `PROTOCOL-1_RESULT.md`?**
+
+The run: **2026-09-23 10:04:27Z → 10:11:06Z**. Commit dates are −0500, so the run is 05:04:27 CDT.
+
+| artifact | authored (machine) | relative to the run |
+|---|---|---|
+| `f5ba97b8` archive the screen records | 2026-09-22 23:43:46 | **before** |
+| `5fdcd450` Amendment 1 | 2026-09-22 23:44:29 | **before** |
+| `c952cbc9` Amendment 2 | 2026-09-23 04:44:35 | **before, by 19m 52s** |
+| `PROTOCOL-1_RESULT.md` (`15877496`) | 2026-09-23 05:35:29 | **after** the run ended |
+
+**All three preregistrations predate the run.** The prospectivity claim holds.
+
+**The corroboration matters more than usual here.** This project has a recorded incident of frozen
+amendments being stamped with *invented* times, dated 2026-09-22 — the same window. So the git dates
+(machine-generated) were checked against the documents' own self-stamps, and the self-stamps are
+**date-only** — "Preregistered 2026-09-22", "Date: 2026-09-23. Status: PROSPECTIVE" — with no clock
+times to invent. Self-report and machine record agree, and neither rests on the other.
+
+**Disposition: PRESERVE as the governing historical artifact**, per the rule that a prereg established
+as prospective survives even though the baseline currently lacks it. It is a *history* question and was
+answered as one; nothing was cleaned up aesthetically, and the near-disjoint `legasus/screen` corpora
+(baseline ~103 records the branch lacks, branch 11 the baseline lacks) are a union to be preserved, not
+a conflict to be resolved.
+
+**Not a TEST-0 blocker.** No runtime file is involved.
+
+## Finding 12 — the notice to the active session
+
+Posted to `COORD.md` on `consolidation/connect-components` (`5d3b2a2a`), because the active session
+demonstrably reads that file and has no reason to read this one. It states the governed-slice discovery,
+that the flag being off is a *recorded decision* rather than an oversight, and the one question that
+should be answered before more code is written:
+
+> **What does the active implementation establish that `integration/governed-slice` does not?**
+
+…so that only the delta lands, rather than two independent implementations of run-start authority
+issuance in one tree. Explicitly **not** a claim that the active work is redundant: it carries
+`runWorkspace` / `runAncestry` / `runValidator`, which governed-slice does not.
+
+## Standing constraint for pass 3 — recorded before the temptation arrives
+
+`writeScope` has no requester. The obvious move is to have the client send the project's files, and
+that must **not** be done here: it would smuggle a new authority policy into consolidation under cover
+of a merge. The frozen authority-continuity work is already asking the harder question about autonomous
+descendants and attenuation.
+
+For TEST-0, find the **smallest owner-originated scope representation already justified by existing
+work**. No generalized scope-discovery architecture unless TEST-0 actually requires one.
